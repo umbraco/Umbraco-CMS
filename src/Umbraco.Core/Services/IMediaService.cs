@@ -179,6 +179,13 @@ namespace Umbraco.Core.Services
         void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = 0);
 
         /// <summary>
+        /// Gets an <see cref="IMedia"/> object from the path stored in the 'umbracoFile' property.
+        /// </summary>
+        /// <param name="mediaPath">Path of the media item to retreive (for example: /media/1024/koala_403x328.jpg)</param>
+        /// <returns><see cref="IMedia"/></returns>
+        IMedia GetMediaByPath(string mediaPath);        
+        
+        /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects, which are ancestors of the current media.
         /// </summary>
         /// <param name="id">Id of the <see cref="IMedia"/> to retrieve ancestors for</param>

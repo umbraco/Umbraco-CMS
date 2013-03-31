@@ -14,20 +14,29 @@ namespace Umbraco.Core.Services
     {
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly RepositoryFactory _repositoryFactory;
-        private readonly Dictionary<string, UmbracoObjectTypes> _supportedObjectTypes = new Dictionary<string, UmbracoObjectTypes>
-                                                                              {
-                                                                                  {typeof(IDataTypeDefinition).FullName, UmbracoObjectTypes.DataType},
-                                                                                  {typeof(IContent).FullName, UmbracoObjectTypes.Document},
-                                                                                  {typeof(IContentType).FullName, UmbracoObjectTypes.DocumentType},
-                                                                                  {typeof(IMedia).FullName, UmbracoObjectTypes.Media},
-                                                                                  {typeof(IMediaType).FullName, UmbracoObjectTypes.MediaType},
-                                                                                  {typeof(ITemplate).FullName, UmbracoObjectTypes.Template}
-                                                                              };
+        private readonly IContentService _contentService;
+        private readonly IContentTypeService _contentTypeService;
+        private readonly IMediaService _mediaService;
+        private readonly IDataTypeService _dataTypeService;
+        private readonly Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>> _supportedObjectTypes;
 
-        public EntityService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
+        public EntityService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IContentService contentService, IContentTypeService contentTypeService, IMediaService mediaService, IDataTypeService dataTypeService)
         {
             _uowProvider = provider;
             _repositoryFactory = repositoryFactory;
+            _contentService = contentService;
+            _contentTypeService = contentTypeService;
+            _mediaService = mediaService;
+            _dataTypeService = dataTypeService;
+
+            _supportedObjectTypes = new Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>>
+                                                                              {
+                                                                                  {typeof(IDataTypeDefinition).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.DataType, _dataTypeService.GetDataTypeDefinitionById)},
+                                                                                  {typeof(IContent).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.Document, _contentService.GetById)},
+                                                                                  {typeof(IContentType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.DocumentType, _contentTypeService.GetContentType)},
+                                                                                  {typeof(IMedia).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.Media, _mediaService.GetById)},
+                                                                                  {typeof(IMediaType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.MediaType, _contentTypeService.GetMediaType)}
+                                                                              };
         }
 
         /// <summary>
@@ -50,9 +59,11 @@ namespace Umbraco.Core.Services
             }
 
             var objectType = GetObjectType(id);
+            var entityType = GetEntityType(objectType);
+            var typeFullName = entityType.FullName;
+            var entity = _supportedObjectTypes[typeFullName].Item2(id);
 
-            //TODO Implementing loading from the various services
-            throw new NotImplementedException();
+            return entity;
         }
 
         /// <summary>
@@ -76,9 +87,11 @@ namespace Umbraco.Core.Services
                 }
             }
 
-            
-            //TODO Implementing loading from the various services
-            throw new NotImplementedException();
+            var entityType = GetEntityType(umbracoObjectType);
+            var typeFullName = entityType.FullName;
+            var entity = _supportedObjectTypes[typeFullName].Item2(id);
+
+            return entity;
         }
 
         /// <summary>
@@ -101,16 +114,15 @@ namespace Umbraco.Core.Services
                 }
             }
 
-            Mandate.That<NotSupportedException>(_supportedObjectTypes.ContainsKey(typeof (T).FullName), () =>
-                                                                                                            {
-                                                                                                                throw
-                                                                                                                    new NotSupportedException
-                                                                                                                        ("The passed in type is not supported");
-                                                                                                            });
-            var objectType = _supportedObjectTypes[typeof(T).FullName];
+            var typeFullName = typeof(T).FullName;
+            Mandate.That<NotSupportedException>(_supportedObjectTypes.ContainsKey(typeFullName), () =>
+            {
+                throw new NotSupportedException
+                    ("The passed in type is not supported");
+            });
+            var entity = _supportedObjectTypes[typeFullName].Item2(id);
 
-            //TODO Implementing loading from the various services
-            throw new NotImplementedException();
+            return entity;
         }
 
         /// <summary>
@@ -243,12 +255,13 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
         public virtual IEnumerable<IUmbracoEntity> GetAll<T>() where T : IUmbracoEntity
         {
-            Mandate.That<NotSupportedException>(_supportedObjectTypes.ContainsKey(typeof(T).FullName), () =>
+            var typeFullName = typeof (T).FullName;
+            Mandate.That<NotSupportedException>(_supportedObjectTypes.ContainsKey(typeFullName), () =>
                                                                                                            {
                                                                                                                throw new NotSupportedException
                                                                                                                    ("The passed in type is not supported");
                                                                                                            });
-            var objectType = _supportedObjectTypes[typeof (T).FullName];
+            var objectType = _supportedObjectTypes[typeFullName].Item1;
 
             return GetAll(objectType);
         }
@@ -260,6 +273,14 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
         public virtual IEnumerable<IUmbracoEntity> GetAll(UmbracoObjectTypes umbracoObjectType)
         {
+            var entityType = GetEntityType(umbracoObjectType);
+            var typeFullName = entityType.FullName;
+            Mandate.That<NotSupportedException>(_supportedObjectTypes.ContainsKey(typeFullName), () =>
+            {
+                throw new NotSupportedException
+                    ("The passed in type is not supported");
+            });
+
             var objectTypeId = umbracoObjectType.GetGuid();
             using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
             {
@@ -274,6 +295,15 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
         public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId)
         {
+            var umbracoObjectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
+            var entityType = GetEntityType(umbracoObjectType);
+            var typeFullName = entityType.FullName;
+            Mandate.That<NotSupportedException>(_supportedObjectTypes.ContainsKey(typeFullName), () =>
+            {
+                throw new NotSupportedException
+                    ("The passed in type is not supported");
+            });
+
             using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
             {
                 return repository.GetAll(objectTypeId);
@@ -328,7 +358,12 @@ namespace Umbraco.Core.Services
         /// <returns>Type of the entity</returns>
         public virtual Type GetEntityType(UmbracoObjectTypes umbracoObjectType)
         {
-            var attribute = umbracoObjectType.GetType().FirstAttribute<UmbracoObjectTypeAttribute>();
+            var type = typeof(UmbracoObjectTypes);
+            var memInfo = type.GetMember(umbracoObjectType.ToString());
+            var attributes = memInfo[0].GetCustomAttributes(typeof(UmbracoObjectTypeAttribute),
+                false);
+
+            var attribute = ((UmbracoObjectTypeAttribute)attributes[0]);
             if (attribute == null)
                 throw new NullReferenceException("The passed in UmbracoObjectType does not contain an UmbracoObjectTypeAttribute, which is used to retrieve the Type.");
 

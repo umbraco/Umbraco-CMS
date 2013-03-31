@@ -131,7 +131,7 @@ namespace Umbraco.Core
             //add vertices
             for (int i = 0; i < fields.Count(); i++)
             {
-                indexes[fields[i].Alias.ToLower()] = g.AddVertex(i);
+                indexes[fields[i].Alias.ToLowerInvariant()] = g.AddVertex(i);
             }
 
             //add edges
@@ -139,10 +139,9 @@ namespace Umbraco.Core
             {
                 if (fields[i].DependsOn != null)
                 {
-                    for (int j = 0; j < fields[i].DependsOn.Length; j++)
+                    foreach (string t in fields[i].DependsOn.Where(t => indexes.ContainsKey(t.ToLowerInvariant())))
                     {
-                        g.AddEdge(i,
-                            indexes[fields[i].DependsOn[j].ToLower()]);
+                        g.AddEdge(i,indexes[t.ToLowerInvariant()]);
                     }
                 }
             }

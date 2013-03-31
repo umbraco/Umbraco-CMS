@@ -267,7 +267,7 @@ namespace Umbraco.Tests
         public void Resolves_Assigned_Mappers()
         {
             var foundTypes1 = PluginManager.Current.ResolveAssignedMapperTypes();
-            Assert.AreEqual(16, foundTypes1.Count());
+            Assert.AreEqual(17, foundTypes1.Count());
         }
 
         [Test]

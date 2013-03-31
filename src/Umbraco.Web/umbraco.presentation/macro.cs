@@ -366,7 +366,7 @@ namespace umbraco
                             break;
                         }
                     case (int)MacroTypes.XSLT:
-                        macroControl = loadMacroXSLT(this, Model, pageElements);
+                        macroControl = LoadMacroXslt(this, Model, pageElements, true);
                         break;
                     case (int)MacroTypes.Script:
 
@@ -767,21 +767,20 @@ namespace umbraco
                 HttpRuntime.Cache.Remove("macroXslt_" + XsltFile);
         }
 
-        public Control loadMacroXSLT(macro macro, MacroModel model, Hashtable pageElements)
+        internal Control LoadMacroXslt(macro macro, MacroModel model, Hashtable pageElements, bool throwError)
         {
             if (XsltFile.Trim() != string.Empty)
             {
                 // Get main XML
-                XmlDocument umbracoXML = umbraco.content.Instance.XmlContent;
+                var umbracoXml = umbraco.content.Instance.XmlContent;
 
                 // Create XML document for Macro
-                var macroXML = new XmlDocument();
-                macroXML.LoadXml("<macro/>");
+                var macroXml = new XmlDocument();
+                macroXml.LoadXml("<macro/>");
 
-                foreach (MacroPropertyModel prop in macro.Model.Properties)
+                foreach (var prop in macro.Model.Properties)
                 {
-                    AddMacroXmlNode(umbracoXML, macroXML, prop.Key, prop.Type,
-                                    prop.Value);
+                    AddMacroXmlNode(umbracoXml, macroXml, prop.Key, prop.Type, prop.Value);
                 }
 
                 if (HttpContext.Current.Request.QueryString["umbDebug"] != null && GlobalSettings.DebugMode)
@@ -789,7 +788,7 @@ namespace umbraco
                     return
                         new LiteralControl("<div style=\"border: 2px solid green; padding: 5px;\"><b>Debug from " +
                                            macro.Name +
-										   "</b><br/><p>" + HttpContext.Current.Server.HtmlEncode(macroXML.OuterXml) +
+                                           "</b><br/><p>" + HttpContext.Current.Server.HtmlEncode(macroXml.OuterXml) +
                                            "</p></div>");
                 }
 
@@ -799,7 +798,7 @@ namespace umbraco
 
                     try
                     {
-                        Control result = CreateControlsFromText(GetXsltTransformResult(macroXML, xsltFile));
+                        var result = CreateControlsFromText(GetXsltTransformResult(macroXml, xsltFile));
 
                         TraceInfo("umbracoMacro", "After performing transformation");
 
@@ -817,23 +816,42 @@ namespace umbraco
                             ie = ie.InnerException;
                         }
 
-                        var macroErrorEventArgs = new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, ItemKey = Model.Xslt, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour};
-                        return GetControlForErrorBehavior("Error parsing XSLT file: \\xslt\\" + XsltFile, macroErrorEventArgs);
+                        var macroErrorEventArgs = new MacroErrorEventArgs { Name = Model.Name, Alias = Model.Alias, ItemKey = Model.Xslt, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour };
+                        var macroControl = GetControlForErrorBehavior("Error parsing XSLT file: \\xslt\\" + XsltFile, macroErrorEventArgs);
+                        //if it is null, then we are supposed to throw the (original) exception
+                        // see: http://issues.umbraco.org/issue/U4-497 at the end
+                        if (macroControl == null && throwError)
+                        {
+                            throw;
+                        }
+                        return macroControl;
                     }
                 }
                 catch (Exception e)
                 {
                     Exceptions.Add(e);
                     LogHelper.WarnWithException<macro>("Error loading XSLT " + Model.Xslt, true, e);
-                        
+
                     // Invoke any error handlers for this macro
-                    var macroErrorEventArgs = new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, ItemKey = Model.Xslt, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour};
-                    return GetControlForErrorBehavior("Error reading XSLT file: \\xslt\\" + XsltFile, macroErrorEventArgs);                        
+                    var macroErrorEventArgs = new MacroErrorEventArgs { Name = Model.Name, Alias = Model.Alias, ItemKey = Model.Xslt, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour };
+                    var macroControl = GetControlForErrorBehavior("Error reading XSLT file: \\xslt\\" + XsltFile, macroErrorEventArgs);
+                    //if it is null, then we are supposed to throw the (original) exception
+                    // see: http://issues.umbraco.org/issue/U4-497 at the end
+                    if (macroControl == null && throwError)
+                    {
+                        throw;
+                    }
+                    return macroControl;
                 }
             }
 
             TraceWarn("macro", "Xslt is empty");
             return new LiteralControl(string.Empty);
+        }
+
+        public Control loadMacroXSLT(macro macro, MacroModel model, Hashtable pageElements)
+        {
+            return LoadMacroXslt(macro, model, pageElements, false);
         }
 
         /// <summary>
