@@ -36,25 +36,28 @@ namespace Umbraco.Web.PublishedCache
         /// <summary>
         /// Gets a content identified by its unique identifier.
         /// </summary>
+        /// <param name="preview">A value indicating whether to consider unpublished content.</param>
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The content, or null.</returns>
-        public override IPublishedContent GetById(int contentId)
+        public override IPublishedContent GetById(bool preview, int contentId)
         {
-            return _cache.GetById(UmbracoContext, contentId);
+            return _cache.GetById(UmbracoContext, preview, contentId);
         }
 
         /// <summary>
-        /// Gets contents at root.
+        /// Gets content at root.
         /// </summary>
+        /// <param name="preview">A value indicating whether to consider unpublished content.</param>
         /// <returns>The contents.</returns>
-        public override IEnumerable<IPublishedContent> GetAtRoot()
+        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
         {
-            return _cache.GetAtRoot(UmbracoContext);
+            return _cache.GetAtRoot(UmbracoContext, preview);
         }
 
         /// <summary>
         /// Gets a content resulting from an XPath query.
         /// </summary>
+        /// <param name="preview">A value indicating whether to consider unpublished content.</param>
         /// <param name="xpath">The XPath query.</param>
         /// <param name="vars">Optional XPath variables.</param>
         /// <returns>The content, or null.</returns>
@@ -63,14 +66,15 @@ namespace Umbraco.Web.PublishedCache
         /// value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
-        public override IPublishedContent GetSingleByXPath(string xpath, params XPathVariable[] vars)
+        public override IPublishedContent GetSingleByXPath(bool preview, string xpath, params XPathVariable[] vars)
         {
-            return _cache.GetSingleByXPath(UmbracoContext, xpath, vars);
+            return _cache.GetSingleByXPath(UmbracoContext, preview, xpath, vars);
         }
 
         /// <summary>
-        /// Gets contents resulting from an XPath query.
+        /// Gets content resulting from an XPath query.
         /// </summary>
+        /// <param name="preview">A value indicating whether to consider unpublished content.</param>
         /// <param name="xpath">The XPath query.</param>
         /// <param name="vars">Optional XPath variables.</param>
         /// <returns>The contents.</returns>
@@ -79,27 +83,29 @@ namespace Umbraco.Web.PublishedCache
         /// value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
-        public override IEnumerable<IPublishedContent> GetByXPath(string xpath, params XPathVariable[] vars)
+        public override IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, params XPathVariable[] vars)
         {
-            return _cache.GetByXPath(UmbracoContext, xpath, vars);
+            return _cache.GetByXPath(UmbracoContext, preview, xpath, vars);
         }
 
         /// <summary>
-        /// Gets an XPath navigator that can be used to navigate contents.
+        /// Gets an XPath navigator that can be used to navigate content.
         /// </summary>
+        /// <param name="preview">A value indicating whether to consider unpublished content.</param>
         /// <returns>The XPath navigator.</returns>
-        public override XPathNavigator GetXPathNavigator()
+        public override XPathNavigator GetXPathNavigator(bool preview)
         {
-            return _cache.GetXPathNavigator(UmbracoContext);
+            return _cache.GetXPathNavigator(UmbracoContext, preview);
         }
 
         /// <summary>
-        /// Gets a value indicating whether the underlying non-contextual cache contains published content.
+        /// Gets a value indicating whether the underlying non-contextual cache contains content.
         /// </summary>
-        /// <returns>A value indicating whether the underlying non-contextual cache contains published content.</returns>
-        public override bool HasContent()
+        /// <param name="preview">A value indicating whether to consider unpublished content.</param>
+        /// <returns>A value indicating whether the underlying non-contextual cache contains content.</returns>
+        public override bool HasContent(bool preview)
         {
-            return _cache.HasContent(UmbracoContext);
+            return _cache.HasContent(UmbracoContext, preview);
         }
     }
 }
