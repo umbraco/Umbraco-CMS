@@ -209,12 +209,15 @@ namespace Umbraco.Web.Cache
                 if (payloads.Any(x => x.Type ==  typeof(IContentType).Name) 
                     && !payloads.All(x => x.IsNew)) //if they are all new then don't proceed
                 {
-                    //we need to clear the routes cache here!                    
-                    var contentCache = PublishedContentCacheResolver.Current.ContentCache as PublishedContentCache;
+                    // SD: we need to clear the routes cache here!             
+                    //
+                    // zpqrtbnk: no, not here, in fact the caches should subsribe to refresh events else we
+                    // are creating a nasty dependency - but keep it like that for the time being while
+                    // SD is cleaning cache refreshers up.
+
+                    var contentCache = PublishedCachesResolver.Current.Caches.ContentCache as PublishedContentCache;
                     if (contentCache != null)
-                    {
                         contentCache.RoutesCache.Clear();
-                    }
                 }                
             }
         }
