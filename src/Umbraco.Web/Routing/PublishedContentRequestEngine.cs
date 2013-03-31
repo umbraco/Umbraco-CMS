@@ -87,14 +87,16 @@ namespace Umbraco.Web.Routing
 			if (_pcr.IsRedirect)
 				return;
 
-			// safety
 			if (!_pcr.HasPublishedContent)
-				_pcr.Is404 = true;
+			{
+                // safety
+                _pcr.Is404 = true;
 
-			// handle 404 : return
-			// whoever called us is in charge of doing what's appropriate
-			if (_pcr.Is404)
-				return;
+                // whoever called us is in charge of doing what's appropriate
+			    return;
+			}
+
+            // we may be 404 _and_ have a content
 
 			// can't go beyond that point without a PublishedContent to render
 			// it's ok not to have a template, in order to give MVC a chance to hijack routes
