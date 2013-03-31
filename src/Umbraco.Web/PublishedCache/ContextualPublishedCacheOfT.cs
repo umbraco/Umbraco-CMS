@@ -11,31 +11,46 @@ namespace Umbraco.Web.PublishedCache
     /// <summary>
     /// Provides access to cached contents in a specified context.
     /// </summary>
-    internal abstract class ContextualPublishedCache
+    /// <typeparam name="T">The type of the underlying published cache.</typeparam>
+    internal abstract class ContextualPublishedCache<T> : ContextualPublishedCache
+        where T : IPublishedCache
     {
-        protected readonly UmbracoContext UmbracoContext;
+        private readonly T _cache;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ContextualPublishedCache"/> with a context.
+        /// Initializes a new instance of the <see cref="ContextualPublishedCache{T}"/> with a context and a published cache.
         /// </summary>
         /// <param name="umbracoContext">The context.</param>
-        protected ContextualPublishedCache(UmbracoContext umbracoContext)
+        /// <param name="cache">The cache.</param>
+        protected ContextualPublishedCache(UmbracoContext umbracoContext, T cache)
+            : base(umbracoContext)
         {
-            UmbracoContext = umbracoContext;
+            _cache = cache;
         }
+
+        /// <summary>
+        /// Gets the underlying published cache.
+        /// </summary>
+        public T InnerCache { get { return _cache; } }
 
         /// <summary>
         /// Gets a content identified by its unique identifier.
         /// </summary>
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The content, or null.</returns>
-        public abstract IPublishedContent GetById(int contentId);
+        public override IPublishedContent GetById(int contentId)
+        {
+            return _cache.GetById(UmbracoContext, contentId);
+        }
 
         /// <summary>
         /// Gets contents at root.
         /// </summary>
         /// <returns>The contents.</returns>
-        public abstract IEnumerable<IPublishedContent> GetAtRoot();
+        public override IEnumerable<IPublishedContent> GetAtRoot()
+        {
+            return _cache.GetAtRoot(UmbracoContext);
+        }
 
         /// <summary>
         /// Gets a content resulting from an XPath query.
@@ -48,7 +63,10 @@ namespace Umbraco.Web.PublishedCache
         /// value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
-        public abstract IPublishedContent GetSingleByXPath(string xpath, params XPathVariable[] vars);
+        public override IPublishedContent GetSingleByXPath(string xpath, params XPathVariable[] vars)
+        {
+            return _cache.GetSingleByXPath(UmbracoContext, xpath, vars);
+        }
 
         /// <summary>
         /// Gets contents resulting from an XPath query.
@@ -61,18 +79,27 @@ namespace Umbraco.Web.PublishedCache
         /// value which itself is <c>null</c>, then variables are ignored.</para>
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
-        public abstract IEnumerable<IPublishedContent> GetByXPath(string xpath, params XPathVariable[] vars);
+        public override IEnumerable<IPublishedContent> GetByXPath(string xpath, params XPathVariable[] vars)
+        {
+            return _cache.GetByXPath(UmbracoContext, xpath, vars);
+        }
 
         /// <summary>
         /// Gets an XPath navigator that can be used to navigate contents.
         /// </summary>
         /// <returns>The XPath navigator.</returns>
-        public abstract XPathNavigator GetXPathNavigator();
+        public override XPathNavigator GetXPathNavigator()
+        {
+            return _cache.GetXPathNavigator(UmbracoContext);
+        }
 
         /// <summary>
         /// Gets a value indicating whether the underlying non-contextual cache contains published content.
         /// </summary>
         /// <returns>A value indicating whether the underlying non-contextual cache contains published content.</returns>
-        public abstract bool HasContent();
+        public override bool HasContent()
+        {
+            return _cache.HasContent(UmbracoContext);
+        }
     }
 }

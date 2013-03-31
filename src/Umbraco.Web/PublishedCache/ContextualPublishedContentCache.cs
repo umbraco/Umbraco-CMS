@@ -9,10 +9,8 @@ namespace Umbraco.Web.PublishedCache
     /// <summary>
     /// Provides access to cached documents in a specified context.
     /// </summary>
-    internal class ContextualPublishedContentCache : ContextualPublishedCache
+    internal class ContextualPublishedContentCache : ContextualPublishedCache<IPublishedContentCache>
     {
-        private readonly IPublishedContentCache _cache;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ContextualPublishedContentCache"/> class with a published content cache and a context.
         /// </summary>
@@ -20,15 +18,7 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="umbracoContext">A context.</param>
         public ContextualPublishedContentCache(IPublishedContentCache cache, UmbracoContext umbracoContext)
             : base(umbracoContext, cache)
-        {
-            _cache = cache;
-        }
-
-        /// <summary>
-        /// Gets the inner IPublishedContentCache.
-        /// </summary>
-        /// <remarks>For unit tests.</remarks>
-        internal IPublishedContentCache InnerCache { get { return _cache; } }
+        { }
 
         /// <summary>
         /// Gets content identified by a route.
@@ -39,7 +29,7 @@ namespace Umbraco.Web.PublishedCache
         /// <remarks>A valid route is either a simple path eg <c>/foo/bar/nil</c> or a root node id and a path, eg <c>123/foo/bar/nil</c>.</remarks>
         public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null)
         {
-            return _cache.GetByRoute(UmbracoContext, route, hideTopLevelNode);
+            return InnerCache.GetByRoute(UmbracoContext, route, hideTopLevelNode);
         }
 
         /// <summary>
@@ -49,7 +39,7 @@ namespace Umbraco.Web.PublishedCache
         /// <returns>The route.</returns>
         public string GetRouteById(int contentId)
         {
-            return _cache.GetRouteById(UmbracoContext, contentId);
+            return InnerCache.GetRouteById(UmbracoContext, contentId);
         }
     }
 }
