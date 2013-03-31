@@ -136,5 +136,32 @@ namespace Umbraco.Tests.Services.Importing {
                 return ResourceManager.GetString("uBlogsy_Package", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+        ///&lt;umbPackage&gt;
+        ///  &lt;files&gt;
+        ///    &lt;file&gt;
+        ///      &lt;guid&gt;XSLTsearch.xslt&lt;/guid&gt;
+        ///      &lt;orgPath&gt;/xslt&lt;/orgPath&gt;
+        ///      &lt;orgName&gt;XSLTsearch.xslt&lt;/orgName&gt;
+        ///    &lt;/file&gt;
+        ///    &lt;file&gt;
+        ///      &lt;guid&gt;XSLTsearch.cs&lt;/guid&gt;
+        ///      &lt;orgPath&gt;/App_Code&lt;/orgPath&gt;
+        ///      &lt;orgName&gt;XSLTsearch.cs&lt;/orgName&gt;
+        ///    &lt;/file&gt;
+        ///  &lt;/files&gt;
+        ///  &lt;info&gt;
+        ///    &lt;package&gt;
+        ///      &lt;name&gt;XSLTsearch&lt;/name&gt;
+        ///      &lt;version&gt;3.0.4&lt;/version&gt;
+        ///      &lt;license url=&quot;http://www.opensource.org/licenses/mit-li [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string XsltSearch_Package {
+            get {
+                return ResourceManager.GetString("XsltSearch_Package", resourceCulture);
+            }
+        }
     }
 }
