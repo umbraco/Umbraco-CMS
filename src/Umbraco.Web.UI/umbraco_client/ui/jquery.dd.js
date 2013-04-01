@@ -97,9 +97,8 @@
             var t = "";
             var clsName = "";
             var pH = ""; //addition html
-            if (options.useSprite != false) {
+
                 clsName = ' ' + options.useSprite + ' ' + currentOptOption.className;
-            } else {
                 arrow = $(currentOptOption).prop("title");
                 var reg = new RegExp(/^\{.*\}$/);
                 var isJson = reg.test(arrow);
@@ -114,7 +113,7 @@
                 } else {
                     arrow = (arrow.length == 0) ? "" : '<img src="' + arrow + '" align="absmiddle" /> ';
                 };
-            };
+
             var sText = $(currentOptOption).text();
             var sValue = $(currentOptOption).val();
             var sEnabledClass = ($(currentOptOption).prop("disabled") == true) ? "disabled" : "enabled";
