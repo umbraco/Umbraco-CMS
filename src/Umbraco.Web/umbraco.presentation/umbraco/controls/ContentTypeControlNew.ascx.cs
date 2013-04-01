@@ -14,7 +14,7 @@ using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
 using umbraco.controls.GenericProperties;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.presentation;
 using umbraco.BasePages;
 using ContentType = umbraco.cms.businesslogic.ContentType;
@@ -41,7 +41,7 @@ namespace umbraco.controls
 
         // "Tab" tab
         protected uicontrols.Pane Pane8;
-        
+
         // "Structure" tab
         protected DualSelectbox DualAllowedContentTypes = new DualSelectbox();
 
@@ -50,7 +50,7 @@ namespace umbraco.controls
 
         // "Generic properties" tab
         public uicontrols.TabPage GenericPropertiesTabPage;
-        
+
         public GenericPropertyWrapper gp;
         private DataTable _dataTypeTable;
         private ArrayList _genericProperties = new ArrayList();
@@ -113,7 +113,7 @@ namespace umbraco.controls
 
             var ea = new SaveClickEventArgs("Saved");
             ea.IconType = BasePage.speechBubbleIcon.success;
-            
+
             //NOTE The saving of the 5 properties (Name, Alias, Icon, Description and Thumbnail) are divided
             //to avoid the multiple cache flushing when each property is set using the legacy ContentType class,
             //which has been reduced to the else-clause.
@@ -129,7 +129,7 @@ namespace umbraco.controls
 
                 int i = 0;
                 var ids = SaveAllowedChildTypes();
-                _contentType.ContentTypeItem.AllowedContentTypes = ids.Select(x => new ContentTypeSort{ Id = new Lazy<int>(() => x), SortOrder = i++ });
+                _contentType.ContentTypeItem.AllowedContentTypes = ids.Select(x => new ContentTypeSort { Id = new Lazy<int>(() => x), SortOrder = i++ });
 
                 var tabs = SaveTabs();
                 foreach (var tab in tabs)
@@ -140,7 +140,7 @@ namespace umbraco.controls
                     }
                     else
                     {
-                        _contentType.ContentTypeItem.PropertyGroups.Add(new PropertyGroup{ Id = tab.Item1, Name = tab.Item2, SortOrder = tab.Item3 });
+                        _contentType.ContentTypeItem.PropertyGroups.Add(new PropertyGroup { Id = tab.Item1, Name = tab.Item2, SortOrder = tab.Item3 });
                     }
                 }
 
@@ -252,7 +252,7 @@ namespace umbraco.controls
         }
 
         #region "Info" Pane
-        
+
         private void SetupInfoPane()
         {
             InfoTabPage = TabView1.NewTabPage("Info");
@@ -261,38 +261,62 @@ namespace umbraco.controls
             InfoTabPage.Style.Add("text-align", "center");
 
             ImageButton Save = InfoTabPage.Menu.NewImageButton();
-            Save.Click += new System.Web.UI.ImageClickEventHandler(save_click);
+            Save.Click += save_click;
 
             Save.ImageUrl = UmbracoPath + "/images/editor/save.gif";
             Save.AlternateText = ui.Text("save");
             Save.ID = "save";
-            var listOfIcons = new List<ListItem>();
-            // Get icons
-            // nh css file update, add support for css sprites
-            foreach (string iconClass in cms.businesslogic.CMSNode.DefaultIconClasses)
-            {
-                ListItem li = new ListItem(helper.SpaceCamelCasing((iconClass.Substring(1, iconClass.Length - 1))).Replace("Spr Tree", "").Trim(), iconClass);
-                li.Attributes.Add("class", "spriteBackground sprTree " + iconClass.Trim('.'));
-                li.Attributes.Add("style", "padding-left:20px !important; background-repeat:no-repeat;");
+            
+            var dirInfo = new DirectoryInfo(UmbracoContext.Current.Server.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
+            var fileInfo = dirInfo.GetFiles();
 
-                if (!this.Page.IsPostBack && li.Value == _contentType.IconUrl) li.Selected = true;
-                listOfIcons.Add(li);
+            var spriteFileNames = new List<string>();
+            foreach (var iconClass in cms.businesslogic.CMSNode.DefaultIconClasses)
+                spriteFileNames.Add(IconClassToIconFileName(iconClass));
+
+            var diskFileNames = new List<string>();
+            foreach (var file in fileInfo)
+                diskFileNames.Add(FileNameToIconFileName(file));
+            
+            var listOfIcons = new List<ListItem>();
+
+            foreach (var iconClass in cms.businesslogic.CMSNode.DefaultIconClasses)
+            {
+                // .sprNew was never intended to be in the document type editor
+                if (iconClass.ToLowerInvariant() == ".sprNew".ToLowerInvariant())
+                    continue;
+
+                if (_contentType.IconUrl == iconClass)
+                {
+                    AddSpriteListItem(iconClass, listOfIcons);
+                    continue;
+                }
+
+                if (UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideSpriteDuplicates
+                    && diskFileNames.Contains(IconClassToIconFileName(iconClass)))
+                    continue;
+                
+                AddSpriteListItem(iconClass, listOfIcons);
             }
 
-            DirectoryInfo dirInfo = new DirectoryInfo(UmbracoContext.Current.Server.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
-            FileInfo[] fileInfo = dirInfo.GetFiles();
-            for (int i = 0; i < fileInfo.Length; i++)
+            foreach (var file in fileInfo)
             {
                 // NH: don't show the sprite file
-                if (fileInfo[i].Name != "sprites.png" && fileInfo[i].Name != "sprites_ie6.gif")
-                {
-                    ListItem li = new ListItem(fileInfo[i].Name, fileInfo[i].Name);
-                    li.Attributes.Add("title", this.ResolveClientUrl(SystemDirectories.Umbraco + "/images/umbraco/" + fileInfo[i].Name));
+                if (file.Name.ToLowerInvariant() == "sprites.png".ToLowerInvariant() || file.Name.ToLowerInvariant() == "sprites_ie6.gif".ToLowerInvariant())
+                    continue;
 
-                    if (li.Value == _contentType.IconUrl)
-                        li.Selected = true;
-                    listOfIcons.Add(li);
+                var listItemValue = this.ResolveClientUrl(SystemDirectories.Umbraco + "/images/umbraco/" + file.Name);
+                if (_contentType.IconUrl == listItemValue)
+                {
+                    AddFileListItem(file.Name, listItemValue, listOfIcons);
+                    continue;
                 }
+
+                if (UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates
+                    && spriteFileNames.Contains(FileNameToIconFileName(file)))
+                    continue;
+
+                AddFileListItem(file.Name, listItemValue, listOfIcons);
             }
 
             ddlIcons.Items.AddRange(listOfIcons.OrderBy(o => o.Text).ToArray());
@@ -300,11 +324,15 @@ namespace umbraco.controls
             // Get thumbnails
             dirInfo = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Umbraco + "/images/thumbnails"));
             fileInfo = dirInfo.GetFiles();
-            for (int i = 0; i < fileInfo.Length; i++)
+
+            foreach (var file in fileInfo)
             {
-                ListItem li = new ListItem(fileInfo[i].Name);
-                li.Attributes.Add("title", this.ResolveClientUrl(SystemDirectories.Umbraco + "/images/thumbnails/" + fileInfo[i].Name));
-                if (!this.Page.IsPostBack && li.Value == _contentType.Thumbnail) li.Selected = true;
+                var li = new ListItem(file.Name);
+                li.Attributes.Add("title", this.ResolveClientUrl(SystemDirectories.Umbraco + "/images/thumbnails/" + file.Name));
+                
+                if (this.Page.IsPostBack == false && li.Value == _contentType.Thumbnail) 
+                    li.Selected = true;
+
                 ddlThumbnails.Items.Add(li);
             }
 
@@ -320,9 +348,49 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             description.Text = _contentType.GetRawDescription();
 
         }
-        
+
+        private void AddSpriteListItem(string iconClass, ICollection<ListItem> listOfIcons)
+        {
+            var li = new ListItem(
+                      helper.SpaceCamelCasing((iconClass.Substring(1, iconClass.Length - 1)))
+                      .Replace("Spr Tree", "")
+                      .Trim(), iconClass);
+
+            li.Attributes.Add("class", "spriteBackground sprTree " + iconClass.Trim('.'));
+            li.Attributes.Add("style", "padding-left:24px !important; background-repeat:no-repeat; width:auto; height:auto;");
+
+            AddListItem(listOfIcons, li);
+        }
+
+        private void AddFileListItem(string fileName, string listItemValue, ICollection<ListItem> listOfIcons)
+        {
+            var li = new ListItem(fileName, fileName);
+
+            li.Attributes.Add("title", listItemValue);
+
+            AddListItem(listOfIcons, li);
+        }
+
+        private void AddListItem(ICollection<ListItem> listOfIcons, ListItem li)
+        {
+            if (this.Page.IsPostBack == false && li.Value == _contentType.IconUrl)
+                li.Selected = true;
+
+            listOfIcons.Add(li);
+        }
+
+        private static string IconClassToIconFileName(string iconClass)
+        {
+            return iconClass.Substring(1, iconClass.Length - 1).ToLowerInvariant().Replace("sprTree".ToLowerInvariant(), "");
+        }
+
+        private static string FileNameToIconFileName(FileInfo file)
+        {
+            return file.Name.Substring(0, file.Name.LastIndexOf(".", StringComparison.Ordinal)).ToLowerInvariant();
+        }
+
         #endregion
-        
+
         #region "Structure" Pane
 
         private void SetupStructurePane()
@@ -358,7 +426,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 }
                 DualAllowedContentTypes.Value = chosenContentTypeIDs;
             }
-            
+
             allowAtRoot.Checked = _contentType.AllowAtRoot;
         }
 
@@ -452,7 +520,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                     foreach (cms.businesslogic.propertytype.PropertyType pt in propertyTypes)
                     {
                         //If the PropertyType doesn't belong on this ContentType skip it and continue to the next one
-                        if(pt.ContentTypeId != _contentType.Id) continue;
+                        if (pt.ContentTypeId != _contentType.Id) continue;
 
                         var gpw = new GenericPropertyWrapper();
                         gpw.ID = "gpw_" + pt.Id;
@@ -635,9 +703,9 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             //Loop through the _genericProperties ArrayList and update all existing PropertyTypes
             foreach (GenericPropertyWrapper gpw in _genericProperties)
             {
-                if(gpw.PropertyType == null) continue;
+                if (gpw.PropertyType == null) continue;
 
-                if(contentTypeItem.PropertyTypes == null || contentTypeItem.PropertyTypes.Any(x => x.Alias == gpw.PropertyType.Alias) == false) continue;
+                if (contentTypeItem.PropertyTypes == null || contentTypeItem.PropertyTypes.Any(x => x.Alias == gpw.PropertyType.Alias) == false) continue;
                 var propertyType = contentTypeItem.PropertyTypes.First(x => x.Alias == gpw.PropertyType.Alias);
                 if (propertyType == null) continue;
 
@@ -786,7 +854,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         {
             PropertyTypes.Controls.Add(new LiteralControl("<div style=\"margin: 10px; padding: 4px; border: 1px solid #ccc;\">No properties defined on this tab. Click on the \"add a new property\" link at the top to create a new property.</div>"));
         }
-        
+
         private bool DoesPropertyTypeAliasExist(GenericProperty gpData)
         {
             bool hasAlias = _contentType.getPropertyType(Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim())) != null;
@@ -855,7 +923,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             LoadContentType(_contentType.Id);
             BindDataGenericProperties(true);
         }
-       
+
         #endregion
 
         #region "Tab" Pane
@@ -863,7 +931,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         private void SetupTabPane()
         {
             uicontrols.TabPage tp = TabView1.NewTabPage("Tabs");
-            
+
             pnlTab.Style.Add("text-align", "center");
             tp.Controls.Add(pnlTab);
 
