@@ -580,8 +580,19 @@ namespace Umbraco.Core.Services
             foreach (XElement tempElement in templateElements)
             {
                 var dependencies = new List<string>();
-                if(tempElement.Element("Master") != null && string.IsNullOrEmpty(tempElement.Element("Master").Value) == false)
+                if (tempElement.Element("Master") != null &&
+                    string.IsNullOrEmpty(tempElement.Element("Master").Value) == false &&
+                    templateElements.Any(x => x.Element("Alias").Value == tempElement.Element("Master").Value))
+                {
                     dependencies.Add(tempElement.Element("Master").Value);
+                }
+                else if (tempElement.Element("Master") != null &&
+                         string.IsNullOrEmpty(tempElement.Element("Master").Value) == false &&
+                         templateElements.Any(x => x.Element("Alias").Value == tempElement.Element("Master").Value) ==
+                         false)
+                {
+                    LogHelper.Info<PackagingService>(string.Format("Template '{0}' has an invalid Master '{1}', so the reference has been ignored.", tempElement.Element("Alias").Value, tempElement.Element("Master").Value));
+                }
 
                 var field = new TopologicalSorter.DependencyField<XElement>
                                 {

@@ -188,5 +188,23 @@ namespace Umbraco.Tests.Services.Importing
             Assert.That(contents.Any(), Is.True);
             Assert.That(contents.Count(), Is.EqualTo(numberOfDocs));
         }
+
+        [Test]
+        public void PackagingService_Can_Import_Templates_Package_Xml_With_Invalid_Master()
+        {
+            // Arrange
+            string strXml = ImportResources.XsltSearch_Package;
+            var xml = XElement.Parse(strXml);
+            var templateElement = xml.Descendants("Templates").First();
+            var packagingService = ServiceContext.PackagingService;
+
+            // Act
+            var templates = packagingService.ImportTemplates(templateElement);
+            var numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
+
+            // Assert
+            Assert.That(templates.Any(), Is.True);
+            Assert.That(templates.Count(), Is.EqualTo(numberOfTemplates));
+        }
     }
 }
