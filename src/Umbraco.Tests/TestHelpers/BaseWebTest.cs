@@ -33,6 +33,8 @@ namespace Umbraco.Tests.TestHelpers
 				TestHelper.InitializeDatabase();
 			Resolution.Freeze();
 			ApplicationContext = new ApplicationContext() { IsReady = true };
+            //init the singleton too!
+            ApplicationContext.Current = ApplicationContext;
 			//we need to clear out all currently created template files
 			var masterPages = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Masterpages));
 			masterPages.GetFiles().ForEach(x => x.Delete());

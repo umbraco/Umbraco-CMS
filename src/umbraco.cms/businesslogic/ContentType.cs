@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Runtime.CompilerServices;
 using System.Linq;
-using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.datatype;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.propertytype;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
-using umbraco.BusinessLogic;
+using DataTypeDefinition = umbraco.cms.businesslogic.datatype.DataTypeDefinition;
+using Language = umbraco.cms.businesslogic.language.Language;
+using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 
 namespace umbraco.cms.businesslogic
 {
@@ -44,24 +44,6 @@ namespace umbraco.cms.businesslogic
 
         public ContentType(Guid id, bool noSetup) : base(id, noSetup) { }
 
-        ///// <summary>
-        ///// Initializes a new instance of the <see cref="ContentType"/> class.
-        ///// </summary>
-        ///// <param name="id">The id.</param>
-        ///// <param name="UseOptimizedMode">if set to <c>true</c> [use optimized mode] which loads in the data from the 
-        ///// database in an optimized manner (less queries)
-        ///// </param>
-        //public ContentType(bool optimizedMode, int id)
-        //    : base(id, optimizedMode)
-        //{
-        //    this._optimizedMode = optimizedMode;
-
-        //    if (optimizedMode)
-        //    {
-
-        //    }
-        //}
-
         /// <summary>
         /// Creates a new content type object manually.
         /// </summary>
@@ -82,7 +64,7 @@ namespace umbraco.cms.businesslogic
             _iconurl = icon;
             _thumbnail = thumbnail;
             if (masterContentType.HasValue)
-                m_masterContentType = masterContentType.Value;
+                _masterContentType = masterContentType.Value;
         }
 
         #endregion
@@ -95,8 +77,6 @@ namespace umbraco.cms.businesslogic
             FROM umbracoNode INNER JOIN cmsContentType ON umbracoNode.id = cmsContentType.nodeId
             WHERE nodeObjectType = @nodeObjectType";
 
-        private static readonly object m_Locker = new object();
-
         #endregion
 
         #region Static Methods
@@ -105,8 +85,7 @@ namespace umbraco.cms.businesslogic
 		/// Used for cache so we don't have to lookup column names all the time, this is actually only used for the ChildrenAsTable methods
 		/// </summary>
 		private static readonly ConcurrentDictionary<string, IDictionary<string, string>> AliasToNames = new ConcurrentDictionary<string, IDictionary<string, string>>();
-
-        private static Dictionary<Tuple<string, string>, Guid> _propertyTypeCache = new Dictionary<Tuple<string, string>, Guid>();
+        private static readonly ConcurrentDictionary<System.Tuple<string, string>, Guid> PropertyTypeCache = new ConcurrentDictionary<System.Tuple<string, string>, Guid>();
         
 		/// <summary>
 		/// Returns a content type's columns alias -> name mapping
@@ -118,121 +97,108 @@ namespace umbraco.cms.businesslogic
 		/// </remarks>
 		internal static IDictionary<string, string> GetAliasesAndNames(string contentTypeAlias)
 		{
-			IDictionary<string, string> cached;
-			if (AliasToNames.TryGetValue(contentTypeAlias, out cached))
-			{
-				return cached;
-			}
-
-			var ct = ContentType.GetByAlias(contentTypeAlias);
-			var userFields = ct.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
-			AliasToNames.TryAdd(contentTypeAlias, userFields);
-			return userFields;
+		    return AliasToNames.GetOrAdd(contentTypeAlias, s =>
+		        {
+		            var ct = GetByAlias(contentTypeAlias);
+		            var userFields = ct.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
+		            return userFields;
+		        });
 		}
-		
-		public static void RemoveFromDataTypeCache(string contentTypeAlias)
+
+        /// <summary>
+        /// Removes the static object cache
+        /// </summary>
+        /// <param name="contentTypeAlias"></param>
+        public static void RemoveFromDataTypeCache(string contentTypeAlias)
         {
-            lock (_propertyTypeCache)
+            var toDelete = PropertyTypeCache.Keys.Where(key => string.Equals(key.Item1, contentTypeAlias)).ToList();
+            foreach (var key in toDelete)
             {
-                List<Tuple<string, string>> toDelete = new List<Tuple<string, string>>();
-                foreach (Tuple<string, string> key in _propertyTypeCache.Keys)
-                {
-                    if (string.Equals(key.first, contentTypeAlias))
-                    {
-                        toDelete.Add(key);
-                    }
-                }
-                foreach (Tuple<string, string> key in toDelete)
-                {
-                    if(_propertyTypeCache != null)
-                        _propertyTypeCache.Remove(key);
-                }				
+                Guid id;
+                PropertyTypeCache.TryRemove(key, out id);
             }
-			//don't put lock around this as it is ConcurrentDictionary.
-			AliasToNames.Clear();
+            AliasToNames.Clear();
         }
+
+        /// <summary>
+        /// Removes the static object cache
+        /// </summary>
+        internal static void RemoveAllDataTypeCache()
+        {
+            AliasToNames.Clear();
+            PropertyTypeCache.Clear();
+        }
+
         public static Guid GetDataType(string contentTypeAlias, string propertyTypeAlias)
         {
-            Tuple<string, string> key = new Tuple<string, string>()
-            {
-                first = contentTypeAlias,
-                second = propertyTypeAlias
-            };
-            //The property type is not on IProperty (it's not stored in NodeFactory)
-            //first check the cache
-            if (_propertyTypeCache != null && _propertyTypeCache.ContainsKey(key))
-            {
-                return _propertyTypeCache[key];
-            }
+            var key = new System.Tuple<string, string>(contentTypeAlias, propertyTypeAlias);
 
-            //Instead of going via API, run this query to find the control type
-            //by-passes a lot of queries just to determine if this is a true/false data type
-
-            //This SQL returns a larger recordset than intended 
-            //causing controlId to sometimes be null instead of correct
-            //because all properties for the type are returned
-            //side effect of changing inner join to left join when adding masterContentType
-            //string sql = "select " +
-            //    "cmsDataType.controlId, masterContentType.alias as masterAlias " +
-            //    "from " +
-            //    "cmsContentType " +
-            //    "inner join cmsPropertyType on (cmsContentType.nodeId = cmsPropertyType.contentTypeId) " +
-            //    "left join cmsDataType on (cmsPropertyType.dataTypeId = cmsDataType.nodeId) and cmsPropertyType.Alias = @propertyAlias " +
-            //    "left join cmsContentType masterContentType on masterContentType.nodeid = cmsContentType.masterContentType " +
-            //    "where cmsContentType.alias = @contentTypeAlias";
-
-            //this SQL correctly returns a single row when the property exists, but still returns masterAlias if it doesn't
-            string sql = "select  cmsDataType.controlId, masterContentType.alias as masterAlias  " +
-                "from  " +
-                "cmsContentType  " +
-                "left join cmsPropertyType on (cmsContentType.nodeId = cmsPropertyType.contentTypeId and cmsPropertyType.Alias = @propertyAlias)  " +
-                "left join cmsDataType on (cmsPropertyType.dataTypeId = cmsDataType.nodeId) " +
-                "left join cmsContentType masterContentType on masterContentType.nodeid = cmsContentType.masterContentType  " +
-                "where  " +
-                "cmsContentType.alias = @contentTypeAlias";
-
-            //Ensure that getdatatype doesn't throw an exception
-            //http://our.umbraco.org/forum/developers/razor/18085-Access-custom-node-properties-with-Razor
-
-            //grab the controlid or test for parent
-            Guid controlId = Guid.Empty;
-            IRecordsReader reader = null;
+            //NOTE: We only have a try/catch here for legacy reasons, I don't see any reason to have it 
+            // but it was here before so we'll need to keep it for this legacy version.
+            // If an error occurs, we return an empty GUID but do not cache this.
             try
             {
-                reader = Application.SqlHelper.ExecuteReader(sql,
-                    Application.SqlHelper.CreateParameter("@contentTypeAlias", contentTypeAlias),
-                    Application.SqlHelper.CreateParameter("@propertyAlias", propertyTypeAlias)
-                    );
-                if (reader.Read())
-                {
-                    if (!reader.IsNull("controlId"))
-                        controlId = reader.GetGuid("controlId");
-                    else if (!reader.IsNull("masterAlias") && !String.IsNullOrEmpty(reader.GetString("masterAlias")))
-                    {
-                        controlId = GetDataType(reader.GetString("masterAlias"), propertyTypeAlias);
-                    }
+                return PropertyTypeCache.GetOrAdd(
+                    key,
+                    tuple =>
+                        {
+                            //Instead of going via API, run this query to find the control type
+                            //by-passes a lot of queries just to determine if this is a true/false data type
 
-                }
-            }
-            catch (UmbracoException)
-            {
-                _propertyTypeCache.Add(key, controlId);
-            }
-            finally
-            {
-                if (reader != null)
-                {
-                    reader.Close();
-                }
-            }
+                            //This SQL returns a larger recordset than intended 
+                            //causing controlId to sometimes be null instead of correct
+                            //because all properties for the type are returned
+                            //side effect of changing inner join to left join when adding masterContentType
+                            //string sql = "select " +
+                            //    "cmsDataType.controlId, masterContentType.alias as masterAlias " +
+                            //    "from " +
+                            //    "cmsContentType " +
+                            //    "inner join cmsPropertyType on (cmsContentType.nodeId = cmsPropertyType.contentTypeId) " +
+                            //    "left join cmsDataType on (cmsPropertyType.dataTypeId = cmsDataType.nodeId) and cmsPropertyType.Alias = @propertyAlias " +
+                            //    "left join cmsContentType masterContentType on masterContentType.nodeid = cmsContentType.masterContentType " +
+                            //    "where cmsContentType.alias = @contentTypeAlias";
 
-            //add to cache
-            if (!_propertyTypeCache.ContainsKey(key))
-            {
-                _propertyTypeCache.Add(key, controlId);
-            }
-            return controlId;
+                            //this SQL correctly returns a single row when the property exists, but still returns masterAlias if it doesn't
+                            var sql = "select  cmsDataType.controlId, masterContentType.alias as masterAlias  " +
+                                      "from  " +
+                                      "cmsContentType  " +
+                                      "left join cmsPropertyType on (cmsContentType.nodeId = cmsPropertyType.contentTypeId and cmsPropertyType.Alias = @propertyAlias)  " +
+                                      "left join cmsDataType on (cmsPropertyType.dataTypeId = cmsDataType.nodeId) " +
+                                      "left join cmsContentType masterContentType on masterContentType.nodeid = cmsContentType.masterContentType  " +
+                                      "where  " +
+                                      "cmsContentType.alias = @contentTypeAlias";
 
+                            //Ensure that getdatatype doesn't throw an exception
+                            //http://our.umbraco.org/forum/developers/razor/18085-Access-custom-node-properties-with-Razor
+
+                            //grab the controlid or test for parent
+                            var controlId = Guid.Empty;
+                            using (var reader = SqlHelper.ExecuteReader(
+                                sql,
+                                SqlHelper.CreateParameter("@contentTypeAlias", contentTypeAlias),
+                                SqlHelper.CreateParameter("@propertyAlias", propertyTypeAlias)
+                                ))
+                            {
+                                if (reader.Read())
+                                {
+                                    if (!reader.IsNull("controlId"))
+                                    {
+                                        controlId = reader.GetGuid("controlId");
+                                    }
+                                    else if (!reader.IsNull("masterAlias") && !String.IsNullOrEmpty(reader.GetString("masterAlias")))
+                                    {
+                                        controlId = GetDataType(reader.GetString("masterAlias"), propertyTypeAlias);
+                                    }
+                                }
+                            }
+                            return controlId;
+                        });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<ContentType>("An error occurred in GetDataType", ex);
+                return Guid.Empty;
+            }
         }
 
 
@@ -243,32 +209,10 @@ namespace umbraco.cms.businesslogic
         /// <returns></returns>
         public static ContentType GetContentType(int id)
         {
-            return Cache.GetCacheItem<ContentType>(string.Format("UmbracoContentType{0}", id.ToString()),
-                m_Locker,
-                TimeSpan.FromMinutes(30),
-                delegate
-                {
-                    return new ContentType(id);
-                });
-        }
-
-        /// <summary>
-        /// If true, this instance uses default umbraco data only.
-        /// </summary>
-        /// <param name="ct">The ct.</param>
-        /// <returns></returns>
-        private static bool usesUmbracoDataOnly(ContentType ct)
-        {
-            bool retVal = true;
-            foreach (PropertyType pt in ct.PropertyTypes)
-            {
-                if (!DataTypeDefinition.IsDefaultData(pt.DataTypeDefinition.DataType.Data))
-                {
-                    retVal = false;
-                    break;
-                }
-            }
-            return retVal;
+            return ApplicationContext.Current.ApplicationCache.GetCacheItem
+                (string.Format("UmbracoContentType{0}", id),
+                 TimeSpan.FromMinutes(30),
+                 () => new ContentType(id));
         }
 
         // This is needed, because the Tab class is protected and as such it's not possible for 
@@ -315,29 +259,25 @@ namespace umbraco.cms.businesslogic
         /// <returns>The Id of the Tab on which the PropertyType is placed</returns>
         public static int getTabIdFromPropertyType(PropertyType pt)
         {
-            object tmp = SqlHelper.ExecuteScalar<object>("Select tabId from cmsPropertyType where id = " + pt.Id.ToString());
+            var tmp = SqlHelper.ExecuteScalar<object>("Select tabId from cmsPropertyType where id = " + pt.Id.ToString());
             if (tmp == DBNull.Value)
                 return 0;
-            else return int.Parse(tmp.ToString());
+            return int.Parse(tmp.ToString());
         }
 
         #endregion
 
         #region Private Members
 
-        //private bool _optimizedMode = false;
         private string _alias;
         private string _iconurl;
         private string _description;
         private string _thumbnail;
-        private int m_masterContentType = 0;
-        private bool _isContainerContentType = false;
-
-        private List<int> m_AllowedChildContentTypeIDs = null;
-        private List<TabI> m_VirtualTabs = null;
-
-        private static readonly object propertyTypesCacheSyncLock = new object();
-
+        private int _masterContentType;
+        private bool _isContainerContentType;
+        private List<int> _allowedChildContentTypeIDs;
+        private List<TabI> _virtualTabs;
+        
         #endregion
 
         #region Public Properties
@@ -371,17 +311,14 @@ namespace umbraco.cms.businesslogic
                 {
                     if (!_description.StartsWith("#"))
                         return _description;
-                    else
+                    var lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
+                    if (lang != null)
                     {
-                        Language lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
-                        if (lang != null)
+                        if (Dictionary.DictionaryItem.hasKey(_description.Substring(1, _description.Length - 1)))
                         {
-                            if (Dictionary.DictionaryItem.hasKey(_description.Substring(1, _description.Length - 1)))
-                            {
-                                var di =
-                                    new Dictionary.DictionaryItem(_description.Substring(1, _description.Length - 1));
-                                return di.Value(lang.id);
-                            }
+                            var di =
+                                new Dictionary.DictionaryItem(_description.Substring(1, _description.Length - 1));
+                            return di.Value(lang.id);
                         }
                     }
 
@@ -421,15 +358,7 @@ namespace umbraco.cms.businesslogic
             }
         }
 
-        ///// <summary>
-        ///// Gets or sets a value indicating whether [optimized mode].
-        ///// </summary>
-        ///// <value><c>true</c> if [optimized mode]; otherwise, <c>false</c>.</value>
-        //public bool OptimizedMode
-        //{
-        //    get { return _optimizedMode; }
-        //    set { _optimizedMode = value; }
-        //}
+
 
         /// <summary>
         /// Human readable name/label
@@ -439,25 +368,20 @@ namespace umbraco.cms.businesslogic
         {
             get
             {
-                string tempText = base.Text;
+                var tempText = base.Text;
                 if (!tempText.StartsWith("#"))
                     return tempText;
-                else
+                var lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
+                if (lang != null)
                 {
-                    Language lang =
-                        Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
-                    if (lang != null)
+                    if (Dictionary.DictionaryItem.hasKey(tempText.Substring(1, tempText.Length - 1)))
                     {
-                        if (Dictionary.DictionaryItem.hasKey(tempText.Substring(1, tempText.Length - 1)))
-                        {
-                            Dictionary.DictionaryItem di =
-                                new Dictionary.DictionaryItem(tempText.Substring(1, tempText.Length - 1));
-                            return di.Value(lang.id);
-                        }
+                        var di = new Dictionary.DictionaryItem(tempText.Substring(1, tempText.Length - 1));
+                        return di.Value(lang.id);
                     }
-
-                    return "[" + tempText + "]";
                 }
+
+                return "[" + tempText + "]";
             }
             set
             {
@@ -481,22 +405,23 @@ namespace umbraco.cms.businesslogic
         {
             get
             {
-                string cacheKey = GetPropertiesCacheKey();
+                var cacheKey = GetPropertiesCacheKey();
 
-                return Cache.GetCacheItem<List<PropertyType>>(cacheKey, propertyTypesCacheSyncLock,
+                return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                    cacheKey,
                     TimeSpan.FromMinutes(15),
-                    delegate
+                    () =>
                     {
-                        List<PropertyType> result = new List<PropertyType>();
-                        using (IRecordsReader dr =
+                        var result = new List<PropertyType>();
+                        using (var dr =
                             SqlHelper.ExecuteReader(
                                 "select id from cmsPropertyType where contentTypeId = @ctId order by sortOrder",
                                 SqlHelper.CreateParameter("@ctId", Id)))
                         {
                             while (dr.Read())
                             {
-                                int id = dr.GetInt("id");
-                                PropertyType pt = PropertyType.GetPropertyType(id);
+                                var id = dr.GetInt("id");
+                                var pt = PropertyType.GetPropertyType(id);
                                 if (pt != null)
                                     result.Add(pt);
                             }
@@ -505,10 +430,7 @@ namespace umbraco.cms.businesslogic
                         // Get Property Types from the master content type
                         if (MasterContentType != 0)
                         {
-                            foreach (PropertyType pt in ContentType.GetContentType(MasterContentType).PropertyTypes)
-                            {
-                                result.Add(pt);
-                            }
+                            result.AddRange(GetContentType(MasterContentType).PropertyTypes);
                         }
                         return result;
                     });
@@ -552,8 +474,7 @@ namespace umbraco.cms.businesslogic
             set
             {
                 _iconurl = value;
-                SqlHelper.ExecuteNonQuery(
-                                          "update cmsContentType set icon='" + value + "' where nodeid = " + Id);
+                SqlHelper.ExecuteNonQuery("update cmsContentType set icon='" + value + "' where nodeid = " + Id);
                 // Remove from cache
                 FlushFromCache(Id);
             }
@@ -567,11 +488,11 @@ namespace umbraco.cms.businesslogic
         {
             get
             {
-                return m_masterContentType;
+                return _masterContentType;
             }
             set
             {
-                m_masterContentType = value;
+                _masterContentType = value;
 
                 SqlHelper.ExecuteNonQuery("update cmsContentType set masterContentType = @masterContentType where nodeId = @nodeId",
                     SqlHelper.CreateParameter("@masterContentType", value),
@@ -590,7 +511,7 @@ namespace umbraco.cms.businesslogic
             get
             {
                 EnsureVirtualTabs();
-                return m_VirtualTabs.ToArray();
+                return _virtualTabs.ToArray();
             }
         }
 
@@ -601,10 +522,11 @@ namespace umbraco.cms.businesslogic
         public void ClearVirtualTabs()
         {
             // zb-00040 #29889 : clear the right cache! t.contentType is the ctype which _defines_ the tab, not the current one.
-            foreach (TabI t in getVirtualTabs)
+            //NOTE: SD: There is no cache to clear so this doesn't actually do anything
+            foreach (var t in getVirtualTabs)
                 Tab.FlushCache(t.Id, Id);
 
-            m_VirtualTabs = null;
+            _virtualTabs = null;
         }
 
         /// <summary>
@@ -616,29 +538,26 @@ namespace umbraco.cms.businesslogic
             get
             {
                 //optimize this property so it lazy loads the data only one time.
-                if (m_AllowedChildContentTypeIDs == null)
+                if (_allowedChildContentTypeIDs == null)
                 {
-                    m_AllowedChildContentTypeIDs = new List<int>();
-                    using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                                                                      "Select AllowedId from cmsContentTypeAllowedContentType where id=" +
-                                                                      Id))
+                    _allowedChildContentTypeIDs = new List<int>();
+                    using (var dr = SqlHelper.ExecuteReader("Select AllowedId from cmsContentTypeAllowedContentType where id=" + Id))
                     {
                         while (dr.Read())
                         {
-                            m_AllowedChildContentTypeIDs.Add(dr.GetInt("AllowedId"));
+                            _allowedChildContentTypeIDs.Add(dr.GetInt("AllowedId"));
                         }
                     }
                 }
 
-                return m_AllowedChildContentTypeIDs.ToArray();
+                return _allowedChildContentTypeIDs.ToArray();
             }
             set
             {
-                m_AllowedChildContentTypeIDs = value.ToList();
+                _allowedChildContentTypeIDs = value.ToList();
 
-                SqlHelper.ExecuteNonQuery(
-                                          "delete from cmsContentTypeAllowedContentType where id=" + Id);
-                foreach (int i in value)
+                SqlHelper.ExecuteNonQuery("delete from cmsContentTypeAllowedContentType where id=" + Id);
+                foreach (var i in value)
                 {
                     SqlHelper.ExecuteNonQuery(
                                               "insert into cmsContentTypeAllowedContentType (id,AllowedId) values (" +
@@ -681,13 +600,13 @@ namespace umbraco.cms.businesslogic
         {
             var contentTypes = new List<ContentType>();
 
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(m_SQLOptimizedGetAll.Trim(), SqlHelper.CreateParameter("@nodeObjectType", base.nodeObjectType)))
+            using (var dr =
+                SqlHelper.ExecuteReader(m_SQLOptimizedGetAll.Trim(), SqlHelper.CreateParameter("@nodeObjectType", nodeObjectType)))
             {
                 while (dr.Read())
                 {
                     //create the ContentType object without setting up
-                    ContentType ct = new ContentType(dr.Get<int>("id"), true);
+                    var ct = new ContentType(dr.Get<int>("id"), true);
                     //populate it's CMSNode properties
                     ct.PopulateCMSNodeFromReader(dr);
                     //populate it's ContentType properties
@@ -712,10 +631,10 @@ namespace umbraco.cms.businesslogic
             PropertyType pt = PropertyType.MakeNew(dt, this, Name, Alias);
 
             // Optimized call
-            populatePropertyData(pt, this.Id);
+            PopulatePropertyData(pt, Id);
 
             // Inherited content types (document types only)
-            populateMasterContentTypes(pt, this.Id);
+            PopulateMasterContentTypes(pt, Id);
 
             //			foreach (Content c in Content.getContentOfContentType(this)) 
             //				c.addProperty(pt,c.Version);
@@ -747,6 +666,7 @@ namespace umbraco.cms.businesslogic
         public void removePropertyTypeFromTab(PropertyType pt)
         {
             pt.TabId = 0; //this will set to null in the database.
+            
             // Remove from cache
             FlushFromCache(Id);
         }
@@ -784,9 +704,7 @@ namespace umbraco.cms.businesslogic
         {
             //set each property on the tab to have a tab id of zero
             // zb-00036 #29889 : fix property types getter
-            this.getVirtualTabs.ToList()
-                .Where(x => x.Id == id)
-                .Single()
+            getVirtualTabs.ToList().Single(x => x.Id == id)
                 .GetAllPropertyTypes()
                 .ForEach(x =>
                 {
@@ -819,7 +737,7 @@ namespace umbraco.cms.businesslogic
         /// Updates the sort order of the Tab
         /// </summary>
         /// <param name="tabId">The Id of the Tab to be updated</param>
-        /// <param name="Caption">The new order number</param>
+        /// <param name="sortOrder">The new order number</param>
         public void SetTabSortOrder(int tabId, int sortOrder)
         {
             SqlHelper.ExecuteNonQuery(
@@ -837,27 +755,13 @@ namespace umbraco.cms.businesslogic
         public PropertyType getPropertyType(string alias)
         {
             // NH 22-08-08, Get from the property type stack to ensure support of master document types
-            object o = this.PropertyTypes.Find(pt => pt.Alias == alias);
-
-            //object o = SqlHelper.ExecuteScalar<object>(
-            //    "Select id from cmsPropertyType where contentTypeId=@contentTypeId And Alias=@alias",
-            //    SqlHelper.CreateParameter("@contentTypeId", this.Id),
-            //    SqlHelper.CreateParameter("@alias", alias));
+            object o = PropertyTypes.Find(pt => pt.Alias == alias);
 
             if (o == null)
             {
                 return null;
             }
-            else
-            {
-                return (PropertyType)o;
-            }
-
-            //int propertyTypeId;
-            //if (!int.TryParse(o.ToString(), out propertyTypeId))
-            //    return null;
-
-            //return PropertyType.GetPropertyType(propertyTypeId);
+            return (PropertyType)o;
         }
 
         /// <summary>
@@ -869,9 +773,9 @@ namespace umbraco.cms.businesslogic
             FlushFromCache(Id);
 
             // Delete all propertyTypes
-            foreach (PropertyType pt in PropertyTypes)
+            foreach (var pt in PropertyTypes)
             {
-                if (pt.ContentTypeId == this.Id)
+                if (pt.ContentTypeId == Id)
                 {
                     pt.delete();
                 }
@@ -880,7 +784,7 @@ namespace umbraco.cms.businesslogic
             // delete all tabs
             foreach (Tab t in getVirtualTabs.ToList())
             {
-                if (t.ContentType == this.Id)
+                if (t.ContentType == Id)
                 {
                     t.Delete();
                 }
@@ -907,7 +811,7 @@ namespace umbraco.cms.businesslogic
             _alias = dr.GetString("Alias");
             _iconurl = dr.GetString("icon");
             if (!dr.IsNull("masterContentType"))
-                m_masterContentType = dr.GetInt("masterContentType");
+                _masterContentType = dr.GetInt("masterContentType");
 
             if (!dr.IsNull("thumbnail"))
                 _thumbnail = dr.GetString("thumbnail");
@@ -922,9 +826,7 @@ namespace umbraco.cms.businesslogic
         {
             base.setupNode();
 
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader("Select masterContentType,Alias,icon,thumbnail,description from cmsContentType where nodeid=" + Id)
-                )
+            using (var dr = SqlHelper.ExecuteReader("Select masterContentType,Alias,icon,thumbnail,description from cmsContentType where nodeid=" + Id))
             {
                 if (dr.Read())
                 {
@@ -949,12 +851,12 @@ namespace umbraco.cms.businesslogic
         /// <summary>
         /// Flushes the cache.
         /// </summary>
-        /// <param name="Id">The id.</param>
+        /// <param name="id">The id.</param>
         public static void FlushFromCache(int id)
-        {
-            ContentType ct = new ContentType(id);
-            Cache.ClearCacheItem(string.Format("UmbracoContentType{0}", id));
-            Cache.ClearCacheItem(ct.GetPropertiesCacheKey());
+        {   
+            var ct = new ContentType(id);
+            ApplicationContext.Current.ApplicationCache.ClearCacheItem(string.Format("UmbracoContentType{0}", id));
+            ApplicationContext.Current.ApplicationCache.ClearCacheItem(ct.GetPropertiesCacheKey());
             ct.ClearVirtualTabs();
 
             //clear the content type from the property datatype cache used by razor
@@ -972,12 +874,10 @@ namespace umbraco.cms.businesslogic
 
         protected internal void FlushAllFromCache()
         {
-            Cache.ClearCacheByKeySearch("UmbracoContentType");
-            Cache.ClearCacheByKeySearch("ContentType_PropertyTypes_Content");
+            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch("UmbracoContentType");
+            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch("ContentType_PropertyTypes_Content");
 
-            //clear the property datatype cache used by razor
-            _propertyTypeCache = new Dictionary<Tuple<string, string>, Guid>();
-
+            RemoveAllDataTypeCache();
             ClearVirtualTabs();
         }
 
@@ -991,7 +891,7 @@ namespace umbraco.cms.businesslogic
         /// <returns></returns>
         private string GetPropertiesCacheKey()
         {
-            return "ContentType_PropertyTypes_Content:" + this.Id;
+            return "ContentType_PropertyTypes_Content:" + Id;
         }
 
 
@@ -1006,12 +906,12 @@ namespace umbraco.cms.businesslogic
             // If that happens, the m_VirtualTabs will contain duplicates.
             // We must prevent two threads from running InitializeVirtualTabs at the same time.
             // We must also prevent m_VirtualTabs from being modified while it is being populated.
-            if (m_VirtualTabs == null || m_VirtualTabs.Count == 0)
+            if (_virtualTabs == null || _virtualTabs.Count == 0)
             {
                 lock (_virtualTabLoadLock)
                 {
                     //optimize, lazy load the data only one time
-                    if (m_VirtualTabs == null || m_VirtualTabs.Count == 0)
+                    if (_virtualTabs == null || _virtualTabs.Count == 0)
                     {
                         InitializeVirtualTabs();
                     }
@@ -1027,8 +927,7 @@ namespace umbraco.cms.businesslogic
         {
             // While we are initialising, we should not use the class-scoped list, as it may be used by other threads
             var temporaryList = new List<TabI>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                                                              string.Format(
+            using (var dr = SqlHelper.ExecuteReader(string.Format(
                                                                   "Select Id,text,sortOrder from cmsTab where contenttypeNodeId = {0} order by sortOrder",
                                                                   Id)))
             {
@@ -1048,22 +947,22 @@ namespace umbraco.cms.businesslogic
             temporaryList.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
 
             // now that we aren't going to modify the list, we can set it to the class-scoped variable.
-            m_VirtualTabs = temporaryList;
+            _virtualTabs = temporaryList;
         }
 
-        private void populateMasterContentTypes(PropertyType pt, int docTypeId)
+        private static void PopulateMasterContentTypes(PropertyType pt, int docTypeId)
         {
-            foreach (web.DocumentType docType in web.DocumentType.GetAllAsList())
+            foreach (var docType in DocumentType.GetAllAsList())
             {
                 if (docType.MasterContentType == docTypeId)
                 {
-                    populatePropertyData(pt, docType.Id);
-                    populateMasterContentTypes(pt, docType.Id);
+                    PopulatePropertyData(pt, docType.Id);
+                    PopulateMasterContentTypes(pt, docType.Id);
                 }
             }
         }
 
-        private void populatePropertyData(PropertyType pt, int contentTypeId)
+        private static void PopulatePropertyData(PropertyType pt, int contentTypeId)
         {
             // NH: PropertyTypeId inserted directly into SQL instead of as a parameter for SQL CE 4 compatibility
             SqlHelper.ExecuteNonQuery(
@@ -1151,8 +1050,7 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         public class Tab : TabI
         {
-            private ContentType _contenttype;
-            private static object propertyTypesCacheSyncLock = new object();
+            private readonly ContentType _contenttype;
             public static readonly string CacheKey = "Tab_PropertyTypes_Content:";
 
             /// <summary>
@@ -1173,8 +1071,7 @@ namespace umbraco.cms.businesslogic
             public static Tab GetTab(int id)
             {
                 Tab tab = null;
-                using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                                                  string.Format(
+                using (var dr = SqlHelper.ExecuteReader(string.Format(
                                                       "Select Id, text, contenttypeNodeId, sortOrder from cmsTab where Id = {0} order by sortOrder",
                                                       id)))
                 {
@@ -1211,11 +1108,11 @@ namespace umbraco.cms.businesslogic
                 if (includeInheritedProperties)
                 {
                     // start from contentTypeId and list all ctypes, going up
-                    int c = contentTypeId;
+                    var c = contentTypeId;
                     while (c != 0)
                     {
                         ctypes.Add(c);
-                        c = umbraco.cms.businesslogic.ContentType.GetContentType(c).MasterContentType;
+                        c = businesslogic.ContentType.GetContentType(c).MasterContentType;
                     }
                     ctypes.Reverse(); // order from the top
                 }
@@ -1227,21 +1124,23 @@ namespace umbraco.cms.businesslogic
 
                 foreach (var ctype in ctypes)
                 {
-                    var ptypes = Cache.GetCacheItem<List<PropertyType>>(
-                        generateCacheKey(Id, ctype), propertyTypesCacheSyncLock, TimeSpan.FromMinutes(10),
-                        delegate
-                        {
-                            var tmp1 = new List<PropertyType>();
-
-                            using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(
-                                @"select id from cmsPropertyType where tabId = {0} and contentTypeId = {1}
-									order by sortOrder", _id, ctype)))
+                    //copy local for use in delegate
+                    var ctype1 = ctype;
+                    var ptypes = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                        GenerateCacheKey(Id, ctype), TimeSpan.FromMinutes(10),
+                        () =>
                             {
-                                while (dr.Read())
-                                    tmp1.Add(PropertyType.GetPropertyType(dr.GetInt("id")));
-                            }
-                            return tmp1;
-                        });
+                                var tmp1 = new List<PropertyType>();
+
+                                using (var dr = SqlHelper.ExecuteReader(string.Format(
+                                    @"select id from cmsPropertyType where tabId = {0} and contentTypeId = {1}
+									order by sortOrder", _id, ctype1)))
+                                {
+                                    while (dr.Read())
+                                        tmp1.Add(PropertyType.GetPropertyType(dr.GetInt("id")));
+                                }
+                                return tmp1;
+                            });
 
                     tmp.AddRange(ptypes);
                 }
@@ -1254,7 +1153,7 @@ namespace umbraco.cms.businesslogic
             {
                 var tmp = new List<PropertyType>();
 
-                using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(
+                using (var dr = SqlHelper.ExecuteReader(string.Format(
                     @"select id from cmsPropertyType where tabId = {0}", _id)))
                 {
                     while (dr.Read())
@@ -1270,7 +1169,7 @@ namespace umbraco.cms.businesslogic
             [Obsolete("Please use GetPropertyTypes() instead", false)]
             public PropertyType[] PropertyTypes
             {
-                get { return GetPropertyTypes(this.ContentType, true); }
+                get { return GetPropertyTypes(ContentType, true); }
             }
 
 
@@ -1282,10 +1181,10 @@ namespace umbraco.cms.businesslogic
             /// <param name="contentTypeId"></param>
             public static void FlushCache(int id, int contentTypeId)
             {
-                Cache.ClearCacheItem(generateCacheKey(id, contentTypeId));
+                ApplicationContext.Current.ApplicationCache.ClearCacheItem(GenerateCacheKey(id, contentTypeId));
             }
 
-            private static string generateCacheKey(int tabId, int contentTypeId)
+            private static string GenerateCacheKey(int tabId, int contentTypeId)
             {
                 return String.Format("{0}_{1}_{2}", CacheKey, tabId, contentTypeId);
             }
@@ -1310,20 +1209,15 @@ namespace umbraco.cms.businesslogic
             {
                 try
                 {
-                    string tempCaption = SqlHelper.ExecuteScalar<string>("Select text from cmsTab where id = " + id.ToString());
+                    var tempCaption = SqlHelper.ExecuteScalar<string>("Select text from cmsTab where id = " + id.ToString());
                     if (!tempCaption.StartsWith("#"))
                         return tempCaption;
-                    else
+                    var lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
+                    if (lang != null)
                     {
-                        Language lang =
-                            Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
-                        if (lang != null)
-                            return
-                                new Dictionary.DictionaryItem(tempCaption.Substring(1, tempCaption.Length - 1)).Value(
-                                    lang.id);
-                        else
-                            return "[" + tempCaption + "]";
+                        return new Dictionary.DictionaryItem(tempCaption.Substring(1, tempCaption.Length - 1)).Value(lang.id);
                     }
+                    return "[" + tempCaption + "]";
                 }
                 catch
                 {
@@ -1331,9 +1225,9 @@ namespace umbraco.cms.businesslogic
                 }
             }
 
-            private int _id;
+            private readonly int _id;
 
-            private int? _sortOrder = null;
+            private int? _sortOrder;
 
             /// <summary>
             /// The sortorder of the tab
@@ -1365,10 +1259,10 @@ namespace umbraco.cms.businesslogic
                 // hence moving it up.
                 if (SortOrder > 0)
                 {
-                    int newsortorder = SortOrder - 1;
+                    var newsortorder = SortOrder - 1;
                     // Find the tab to switch with
-                    TabI[] Tabs = _contenttype.getVirtualTabs;
-                    foreach (Tab t in Tabs)
+                    var tabs = _contenttype.getVirtualTabs;
+                    foreach (Tab t in tabs)
                     {
                         if (t.SortOrder == newsortorder)
                             t.SortOrder = SortOrder;
@@ -1385,12 +1279,12 @@ namespace umbraco.cms.businesslogic
                 FixTabOrder();
                 // If this tab is not the last tab we can switch places with the next tab 
                 // hence moving it down.
-                TabI[] Tabs = _contenttype.getVirtualTabs;
-                if (SortOrder < Tabs.Length - 1)
+                var tabs = _contenttype.getVirtualTabs;
+                if (SortOrder < tabs.Length - 1)
                 {
-                    int newsortorder = SortOrder + 1;
+                    var newsortorder = SortOrder + 1;
                     // Find the tab to switch with
-                    foreach (Tab t in Tabs)
+                    foreach (Tab t in tabs)
                     {
                         if (t.SortOrder == newsortorder)
                             t.SortOrder = SortOrder;
@@ -1416,10 +1310,10 @@ namespace umbraco.cms.businesslogic
             /// </summary>
             private void FixTabOrder()
             {
-                TabI[] Tabs = _contenttype.getVirtualTabs;
-                for (int i = 0; i < Tabs.Length; i++)
+                var tabs = _contenttype.getVirtualTabs;
+                for (int i = 0; i < tabs.Length; i++)
                 {
-                    Tab t = (Tab)Tabs[i];
+                    var t = (Tab)tabs[i];
                     t.SortOrder = i;
                 }
             }
@@ -1442,7 +1336,7 @@ namespace umbraco.cms.businesslogic
                 get { return _contenttype.Id; }
             }
 
-            private string _caption;
+            private readonly string _caption;
 
             /// <summary>
             /// The text on the tab
@@ -1454,65 +1348,22 @@ namespace umbraco.cms.businesslogic
                 {
                     if (!_caption.StartsWith("#"))
                         return _caption;
-                    else
+                    
+                    var lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
+                    if (lang != null)
                     {
-                        Language lang =
-                            Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
-                        if (lang != null)
+                        if (Dictionary.DictionaryItem.hasKey(_caption.Substring(1, _caption.Length - 1)))
                         {
-                            if (Dictionary.DictionaryItem.hasKey(_caption.Substring(1, _caption.Length - 1)))
-                            {
-                                Dictionary.DictionaryItem di =
-                                    new Dictionary.DictionaryItem(_caption.Substring(1, _caption.Length - 1));
-                                if (di != null)
-                                    return di.Value(lang.id);
-                            }
+                            var di = new Dictionary.DictionaryItem(_caption.Substring(1, _caption.Length - 1));
+                            return di.Value(lang.id);
                         }
-
-                        return "[" + _caption + "]";
                     }
+
+                    return "[" + _caption + "]";
                 }
             }
         }
         #endregion
-
-
-        ///// <summary>
-        ///// Analyzes the content types.
-        ///// </summary>
-        ///// <param name="ObjectType">Type of the object.</param>
-        ///// <param name="ForceUpdate">if set to <c>true</c> [force update].</param>
-        //protected void AnalyzeContentTypes(Guid ObjectType, bool ForceUpdate)
-        //{
-        //    if (!_analyzedContentTypes.ContainsKey(ObjectType) || ForceUpdate)
-        //    {
-        //        using (IRecordsReader dr = SqlHelper.ExecuteReader(
-        //                                                          "select id from umbracoNode where nodeObjectType = @objectType",
-        //                                                          SqlHelper.CreateParameter("@objectType", ObjectType)))
-        //        {
-        //            while (dr.Read())
-        //            {
-        //                ContentType ct = new ContentType(dr.GetInt("id"));
-        //                if (!_optimizedContentTypes.ContainsKey(ct.UniqueId))
-        //                    _optimizedContentTypes.Add(ct.UniqueId, false);
-
-        //                _optimizedContentTypes[ct.UniqueId] = usesUmbracoDataOnly(ct);
-        //            }
-        //        }
-        //    }
-        //}
-
-        ///// <summary>
-        ///// Determines whether this instance is optimized.
-        ///// </summary>
-        ///// <returns>
-        ///// 	<c>true</c> if this instance is optimized; otherwise, <c>false</c>.
-        ///// </returns>
-        //protected bool IsOptimized()
-        //{
-        //    return (bool) _optimizedContentTypes[UniqueId];
-        //}
-
 
     }
 }
