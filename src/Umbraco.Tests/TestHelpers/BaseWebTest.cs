@@ -34,6 +34,8 @@ namespace Umbraco.Tests.TestHelpers
         {
             if (RequiresDbSetup)
                 base.InitializeDatabase();
+            //init the singleton too!
+            ApplicationContext.Current = ApplicationContext;
         }
 
         [TearDown]

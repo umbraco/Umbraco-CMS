@@ -389,6 +389,46 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             return file.Name.Substring(0, file.Name.LastIndexOf(".", StringComparison.Ordinal)).ToLowerInvariant();
         }
 
+        private void AddSpriteListItem(string iconClass, ICollection<ListItem> listOfIcons)
+        {
+            var li = new ListItem(
+                      helper.SpaceCamelCasing((iconClass.Substring(1, iconClass.Length - 1)))
+                      .Replace("Spr Tree", "")
+                      .Trim(), iconClass);
+
+            li.Attributes.Add("class", "spriteBackground sprTree " + iconClass.Trim('.'));
+            li.Attributes.Add("style", "padding-left:24px !important; background-repeat:no-repeat; width:auto; height:auto;");
+
+            AddListItem(listOfIcons, li);
+        }
+
+        private void AddFileListItem(string fileName, string listItemValue, ICollection<ListItem> listOfIcons)
+        {
+            var li = new ListItem(fileName, fileName);
+
+            li.Attributes.Add("title", listItemValue);
+
+            AddListItem(listOfIcons, li);
+        }
+
+        private void AddListItem(ICollection<ListItem> listOfIcons, ListItem li)
+        {
+            if (this.Page.IsPostBack == false && li.Value == _contentType.IconUrl)
+                li.Selected = true;
+
+            listOfIcons.Add(li);
+        }
+
+        private static string IconClassToIconFileName(string iconClass)
+        {
+            return iconClass.Substring(1, iconClass.Length - 1).ToLowerInvariant().Replace("sprTree".ToLowerInvariant(), "");
+        }
+
+        private static string FileNameToIconFileName(FileInfo file)
+        {
+            return file.Name.Substring(0, file.Name.LastIndexOf(".", StringComparison.Ordinal)).ToLowerInvariant();
+        }
+
         #endregion
 
         #region "Structure" Pane

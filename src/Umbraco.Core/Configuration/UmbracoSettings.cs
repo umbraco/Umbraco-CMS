@@ -1286,6 +1286,41 @@ namespace Umbraco.Core.Configuration
 			}
 		}
 
+		private static IconPickerBehaviour? _iconPickerBehaviour;
+
+        /// <summary>
+        /// This configuration setting defines how to show icons in the document type editor. 
+        /// - ShowDuplicates       - Show duplicates in files and sprites. (default and current Umbraco 'normal' behaviour)
+        /// - HideSpriteDuplicates - Show files on disk and hide duplicates from the sprite
+        /// - HideFileDuplicates   - Show files in the sprite and hide duplicates on disk
+        /// </summary>
+        /// <value>MacroErrorBehaviour enum defining how to show icons in the document type editor.</value>
+        public static IconPickerBehaviour IconPickerBehaviour
+		{
+			get
+			{
+				if (_iconPickerBehaviour == null)
+				{
+					try
+					{
+						var behaviour = IconPickerBehaviour.ShowDuplicates;
+                        var value = GetKey("/settings/content/DocumentTypeIconList");
+						if (value != null)
+						{
+                            Enum<IconPickerBehaviour>.TryParse(value, true, out behaviour);
+						}
+                        _iconPickerBehaviour = behaviour;
+					}
+					catch (Exception ex)
+					{
+                        LogHelper.Error<UmbracoSettings>("Could not load /settings/content/DocumentTypeIconList from umbracosettings.config", ex);
+                        _iconPickerBehaviour = IconPickerBehaviour.ShowDuplicates;
+					}
+				}
+                return _iconPickerBehaviour.Value;
+			}
+		}
+
 		/// <summary>
 		/// Configuration regarding webservices
 		/// </summary>
