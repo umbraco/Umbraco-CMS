@@ -8,6 +8,8 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
+using umbraco.cms.businesslogic.cache;
+using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using DataTypeDefinition = umbraco.cms.businesslogic.datatype.DataTypeDefinition;
@@ -144,37 +146,22 @@ namespace umbraco.cms.businesslogic
         {
             var key = new System.Tuple<string, string>(contentTypeAlias, propertyTypeAlias);
 
-            //NOTE: We only have a try/catch here for legacy reasons, I don't see any reason to have it 
-            // but it was here before so we'll need to keep it for this legacy version.
-            // If an error occurs, we return an empty GUID but do not cache this.
-            try
-            {
-                return PropertyTypeCache.GetOrAdd(
-                    key,
-                    tuple =>
+            
+            return PropertyTypeCache.GetOrAdd(
+                key,
+                tuple =>
+                    {                       
+                        // With 4.10 we can't do this via direct SQL as we have content type mixins
+                        var controlId = Guid.Empty;
+                        var ct = GetByAlias(contentTypeAlias);
+                        PropertyType pt = ct.getPropertyType(propertyTypeAlias);
+                        if (pt != null)
                         {
-            // With 4.10 we can't do this via direct SQL as we have content type mixins
-                            var controlId = Guid.Empty;
-            ContentType ct = GetByAlias(contentTypeAlias);
-            PropertyType pt = ct.getPropertyType(propertyTypeAlias);
-            if (pt != null)
-                                SqlHelper.CreateParameter("@propertyAlias", propertyTypeAlias)
-                                ))
-                                    {
-                                    }
-            {
-                controlId = pt.DataTypeDefinition.DataType.Id;
-            }
-                            return controlId;
-                        });
-            catch (Exception ex)
-            //add to cache (even if empty!)
-            {
-                LogHelper.Error<ContentType>("An error occurred in GetDataType", ex);
-                return Guid.Empty;
-            }
+                            controlId = pt.DataTypeDefinition.DataType.Id;
+                        }
+                        return controlId;     
+                    });                          
         }
-
 
         /// <summary>
         /// Gets the type of the content.
@@ -510,39 +497,41 @@ namespace umbraco.cms.businesslogic
                     cacheKey,
                     TimeSpan.FromMinutes(15),
                     () =>
-                    {
-                        //MCH NOTE: For the timing being I have changed this to a dictionary to ensure that property types
-                        //aren't added multiple times through the MasterContentType structure, because each level loads
-                        //its own + inherited property types, which is wrong. Once we are able to fully switch to the new api
-                        //this should no longer be a problem as the composition always contains a correct list of property types.
-                        var result = new Dictionary<int, PropertyType>();
-                            SqlHelper.ExecuteReader(
-                                "select id from cmsPropertyType where contentTypeId = @ctId order by sortOrder",
-                                SqlHelper.CreateParameter("@ctId", Id)))
                         {
-                            while (dr.Read())
+                            //MCH NOTE: For the timing being I have changed this to a dictionary to ensure that property types
+                            //aren't added multiple times through the MasterContentType structure, because each level loads
+                            //its own + inherited property types, which is wrong. Once we are able to fully switch to the new api
+                            //this should no longer be a problem as the composition always contains a correct list of property types.
+                            var result = new Dictionary<int, PropertyType>();
+                            using (IRecordsReader dr =
+                                SqlHelper.ExecuteReader(
+                                    "select id from cmsPropertyType where contentTypeId = @ctId order by sortOrder",
+                                    SqlHelper.CreateParameter("@ctId", Id)))
                             {
-                                var id = dr.GetInt("id");
-                                var pt = PropertyType.GetPropertyType(id);
-                                if (pt != null)
-                                    result.Add(pt.Id, pt);
-                            }
-                        }
-
-                        // Get Property Types from the master content type
-                        if (MasterContentTypes.Count > 0)
-                        {
-                            foreach (var mct in MasterContentTypes)
-                                var pts = ContentType.GetContentType(mct).PropertyTypes;
-                                foreach (PropertyType pt in pts)
+                                while (dr.Read())
                                 {
-                                    if(result.ContainsKey(pt.Id) == false)
+                                    int id = dr.GetInt("id");
+                                    PropertyType pt = PropertyType.GetPropertyType(id);
+                                    if (pt != null)
                                         result.Add(pt.Id, pt);
                                 }
                             }
-                        }
-                        return result.Select(x => x.Value).ToList();
-                    });
+
+                            // Get Property Types from the master content type
+                            if (MasterContentTypes.Count > 0)
+                            {
+                                foreach (var mct in MasterContentTypes)
+                                {
+                                    var pts = GetContentType(mct).PropertyTypes;
+                                    foreach (var pt in pts)
+                                    {
+                                        if (result.ContainsKey(pt.Id) == false)
+                                            result.Add(pt.Id, pt);
+                                    }
+                                }
+                            }
+                            return result.Select(x => x.Value).ToList();
+                        });
             }
         }
 
@@ -1075,7 +1064,8 @@ namespace umbraco.cms.businesslogic
             }
 
             // TODO: Load master content types
-                SqlHelper.ExecuteReader("Select allowAtRoot, isContainer, Alias,icon,thumbnail,description from cmsContentType where nodeid=" + Id)
+            using (var dr = SqlHelper.ExecuteReader("Select allowAtRoot, isContainer, Alias,icon,thumbnail,description from cmsContentType where nodeid=" + Id)
+                )
             {
                 if (dr.Read())
                 {
@@ -1191,7 +1181,7 @@ namespace umbraco.cms.businesslogic
             temporaryList.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
 
             // now that we aren't going to modify the list, we can set it to the class-scoped variable.
-            m_VirtualTabs = temporaryList.DistinctBy(x => x.Id).ToList();
+            _virtualTabs = temporaryList.DistinctBy(x => x.Id).ToList();
         }
 
         private static void PopulateMasterContentTypes(PropertyType pt, int docTypeId)
@@ -1347,8 +1337,6 @@ namespace umbraco.cms.businesslogic
                     // we need to 
                     var contentType = businesslogic.ContentType.GetContentType(contentTypeId);
                     return pts.Where(x => contentType.MasterContentTypes.Contains(x.ContentTypeId) || x.ContentTypeId == contentTypeId).ToArray();
-                        GenerateCacheKey(Id, ctype), TimeSpan.FromMinutes(10),
-                        () =>
                 }
 
                 return pts.Where(x => x.ContentTypeId == contentTypeId).ToArray();

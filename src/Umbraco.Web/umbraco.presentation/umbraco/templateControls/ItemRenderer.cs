@@ -100,13 +100,7 @@ namespace umbraco.presentation.templateControls
 				{
                     //moved the following from the catch block up as this will allow fallback options alt text etc to work
                     var itemPage = new page(Umbraco.Web.UmbracoContext.Current.GetXml().GetElementById(tempNodeId.ToString()));
-					//get the publishedcontent item
-					var publishedContent = PublishedContentStoreResolver.Current.PublishedContentStore.GetDocumentById(
-						Umbraco.Web.UmbracoContext.Current,
-						tempNodeId.Value);
-
-					var itemPage = new page(publishedContent);                    
-					tempElementContent = new item(publishedContent, itemPage.Elements, item.LegacyAttributes).FieldContent;
+                    tempElementContent = new item(itemPage.Elements, item.LegacyAttributes).FieldContent;
 				}
 			}
 			else
