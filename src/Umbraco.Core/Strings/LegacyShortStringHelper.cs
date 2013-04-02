@@ -468,7 +468,7 @@ function isValidAlias(alias) {{
         /// </remarks>
         public string LegacyFormatUrl(string url)
         {
-            var newUrl = url;
+            var newUrl = url.ToLowerInvariant();
             var replaceChars = UmbracoSettings.UrlReplaceCharacters;
             foreach (XmlNode n in replaceChars.SelectNodes("char"))
             {
