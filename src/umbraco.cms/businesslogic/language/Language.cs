@@ -6,11 +6,9 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
-using umbraco.cms.businesslogic.cache;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace umbraco.cms.businesslogic.language
 {
@@ -56,9 +54,7 @@ namespace umbraco.cms.businesslogic.language
         /// <param name="id">The id.</param>
         public Language(int id)
         {
-            var lang = GetAllAsList()
-                .Where(x => x.id == id)
-                .SingleOrDefault();
+            var lang = GetAllAsList().SingleOrDefault(x => x.id == id);
             if (lang == null)
             {
                 throw new ArgumentException("No language found with the specified id");
@@ -110,6 +106,15 @@ namespace umbraco.cms.businesslogic.language
                     }
                 }
             }
+                        {
+
+                            var ct = new Language();
+                            ct.PopulateFromReader(dr);
+                            ct.OnNew(new NewEventArgs());
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -122,6 +127,11 @@ namespace umbraco.cms.businesslogic.language
             {
                 return GetAllAsList().ToArray();
             }
+        }
+
+        private static void InvalidateCache()
+        {
+            ApplicationContext.Current.ApplicationCache.ClearCacheItem(UmbracoLanguageCacheKey);
         }
 
         /// <summary>
@@ -184,16 +194,13 @@ namespace umbraco.cms.businesslogic.language
         /// <returns></returns>
         public static Language Import(XmlNode xmlData)
         {
-            string cA = xmlData.Attributes["CultureAlias"].Value;
+            var cA = xmlData.Attributes["CultureAlias"].Value;
             if (GetByCultureCode(cA) == null)
             {
                 MakeNew(cA);
                 return GetByCultureCode(cA);
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
         #endregion
@@ -282,10 +289,6 @@ namespace umbraco.cms.businesslogic.language
         /// </remarks>
         public void Delete()
         {            
-            //if (this.id == DefaultLanguageId)
-            //{
-            //    throw new InvalidOperationException("You cannot delete the default language: en-US");
-            //}
             lock (Locker)
             {
                 if (SqlHelper.ExecuteScalar<int>("SELECT count(id) FROM umbracoDomains where domainDefaultLanguage = @id",
@@ -322,10 +325,10 @@ namespace umbraco.cms.businesslogic.language
         /// <returns></returns>
         public XmlNode ToXml(XmlDocument xd)
         {
-            XmlNode language = xd.CreateElement("Language");
-            language.Attributes.Append(xmlHelper.addAttribute(xd, "Id", this.id.ToString()));
-            language.Attributes.Append(xmlHelper.addAttribute(xd, "CultureAlias", this.CultureAlias));
-            language.Attributes.Append(xmlHelper.addAttribute(xd, "FriendlyName", this.FriendlyName));
+            var language = xd.CreateElement("Language");
+            language.Attributes.Append(XmlHelper.AddAttribute(xd, "Id", id.ToString()));
+            language.Attributes.Append(XmlHelper.AddAttribute(xd, "CultureAlias", CultureAlias));
+            language.Attributes.Append(XmlHelper.AddAttribute(xd, "FriendlyName", FriendlyName));
 
             return language;
         } 

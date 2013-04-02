@@ -139,9 +139,15 @@ namespace Umbraco.Core
             {
                 if (fields[i].DependsOn != null)
                 {
-                    foreach (string t in fields[i].DependsOn.Where(t => indexes.ContainsKey(t.ToLowerInvariant())))
+                    for (int j = 0; j < fields[i].DependsOn.Length; j++)
                     {
-                        g.AddEdge(i,indexes[t.ToLowerInvariant()]);
+                        if (indexes.ContainsKey(fields[i].DependsOn[j].ToLowerInvariant()) == false)
+                            throw new IndexOutOfRangeException(
+                                string.Format(
+                                    "The alias '{0}' has an invalid dependency. The dependency '{1}' does not exist in the list of aliases",
+                                    fields[i], fields[i].DependsOn[j]));
+
+                        g.AddEdge(i, indexes[fields[i].DependsOn[j].ToLowerInvariant()]);
                     }
                 }
             }

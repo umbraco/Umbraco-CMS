@@ -466,6 +466,9 @@
     <Compile Include="umbraco.presentation\ScriptingMacroResult.cs" />
     <Compile Include="umbraco.presentation\umbraco\cacheBrowser.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
+    </Compile>    
+    <Compile Include="umbraco.presentation\umbraco\create.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\canvas.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -1878,7 +1881,9 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\AssignDomain.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\create.aspx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\create.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\cruds.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\emptyTrashcan.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\exportDocumenttype.aspx" />

@@ -13,7 +13,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
         function getHashFragment(frag) {
             //tests for xss and ensures only the first alphanumeric chars are matched
             var result = hashFragmentRegex.exec(frag);
-            if (result.length > 0) {
+            if (result != null && result.length > 0) {
                 return result[0];
             }
             return "";
