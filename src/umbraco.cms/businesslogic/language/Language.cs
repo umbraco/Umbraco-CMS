@@ -106,15 +106,6 @@ namespace umbraco.cms.businesslogic.language
                     }
                 }
             }
-                        {
-
-                            var ct = new Language();
-                            ct.PopulateFromReader(dr);
-                            ct.OnNew(new NewEventArgs());
-                        }
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -127,11 +118,6 @@ namespace umbraco.cms.businesslogic.language
             {
                 return GetAllAsList().ToArray();
             }
-        }
-
-        private static void InvalidateCache()
-        {
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(UmbracoLanguageCacheKey);
         }
 
         /// <summary>

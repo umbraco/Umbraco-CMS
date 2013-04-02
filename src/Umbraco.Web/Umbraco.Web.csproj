@@ -467,9 +467,6 @@
     <Compile Include="umbraco.presentation\umbraco\cacheBrowser.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>    
-    <Compile Include="umbraco.presentation\umbraco\create.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\canvas.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

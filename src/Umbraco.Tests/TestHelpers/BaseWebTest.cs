@@ -29,9 +29,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.Initialize();            
         }
-
-            //init the singleton too!
-            ApplicationContext.Current = ApplicationContext;
+        
         [TearDown]
         public override void TearDown()
         {

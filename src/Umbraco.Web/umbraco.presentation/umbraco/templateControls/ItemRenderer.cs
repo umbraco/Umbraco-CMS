@@ -10,6 +10,7 @@ using System.Xml;
 using Umbraco.Core.Macros;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 using umbraco.cms.businesslogic;
@@ -100,7 +101,9 @@ namespace umbraco.presentation.templateControls
 				if (tempNodeId != null && tempNodeId.Value != 0)
 				{
                     //moved the following from the catch block up as this will allow fallback options alt text etc to work
-                    var itemPage = new page(Umbraco.Web.UmbracoContext.Current.GetXml().GetElementById(tempNodeId.ToString()));
+				    var xml = ((PublishedContentCache) PublishedContentCacheResolver.Current.ContentCache)
+                        .GetXml(Umbraco.Web.UmbracoContext.Current);
+                    var itemPage = new page(xml.GetElementById(tempNodeId.ToString()));
                     tempElementContent = new item(itemPage.Elements, item.LegacyAttributes).FieldContent;
 				}
 			}
