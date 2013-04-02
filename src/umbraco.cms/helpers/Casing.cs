@@ -15,7 +15,7 @@ namespace umbraco.cms.helpers
         public const string VALID_ALIAS_CHARACTERS = "_-abcdefghijklmnopqrstuvwxyz1234567890";
 
         [Obsolete("Use Umbraco.Core.StringExtensions.UmbracoInvalidFirstCharacters instead")]
-        public const string INVALID_FIRST_CHARACTERS = "01234567890";
+        public const string INVALID_FIRST_CHARACTERS = "0123456789";
 
         /// <summary>
         /// A helper method to ensure that an Alias string doesn't contains any illegal characters
