@@ -47,7 +47,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	    private readonly BaseSearchProvider _searchProvider;
         private readonly BaseIndexProvider _indexProvider;
 
-		public virtual IPublishedContent GetById(UmbracoContext umbracoContext, int nodeId)
+        public virtual IPublishedContent GetById(UmbracoContext umbracoContext, int nodeId)
 		{
 			return GetUmbracoMedia(nodeId);
 		}
@@ -69,14 +69,19 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, string xpath, XPathVariable[] vars)
         {
-            throw new NotImplementedException("PublishedMediaCache does not support XPath queries.");
+            throw new NotImplementedException("PublishedMediaCache does not support XPath.");
         }
 
         public IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, string xpath, XPathVariable[] vars)
         {
-            throw new NotImplementedException("PublishedMediaCache does not support XPath queries.");
+            throw new NotImplementedException("PublishedMediaCache does not support XPath.");
         }
-        
+
+        public virtual XPathNavigator GetXPathNavigator(UmbracoContext umbracoContext)
+        {
+            throw new NotImplementedException("PublishedMediaCache does not support XPath.");
+        }
+
         public bool HasContent() { throw new NotImplementedException(); }
 
         private ExamineManager GetExamineManagerSafe()

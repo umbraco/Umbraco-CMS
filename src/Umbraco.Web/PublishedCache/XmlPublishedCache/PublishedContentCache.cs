@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Xml;
+using System.Xml.XPath;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
@@ -37,14 +38,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// <para>A valid route is either a simple path eg <c>/foo/bar/nil</c> or a root node id and a path, eg <c>123/foo/bar/nil</c>.</para>
         /// <para>If <param name="hideTopLevelNode" /> is <c>null</c> then the settings value is used.</para>
         /// </remarks>
-        public IPublishedContent GetByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null)
+        public virtual IPublishedContent GetByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null)
         {
             if (route == null) throw new ArgumentNullException("route");
 
             // try to get from cache if not previewing
-            var contentId = umbracoContext.InPreviewMode
-                ? 0
-                : _routesCache.GetNodeId(route);
+            var contentId = umbracoContext.InPreviewMode ? 0 : _routesCache.GetNodeId(route);
 
             // if found id in cache then get corresponding content
             // and clear cache if not found - for whatever reason
@@ -79,12 +78,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// <param name="umbracoContext">The context.</param>
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The route.</returns>
-        public string GetRouteById(UmbracoContext umbracoContext, int contentId)
+        public virtual string GetRouteById(UmbracoContext umbracoContext, int contentId)
         {
             // try to get from cache if not previewing
-            var route = umbracoContext.InPreviewMode
-                ? null
-                : _routesCache.GetRoute(contentId);
+            var route = umbracoContext.InPreviewMode ? null : _routesCache.GetRoute(contentId);
 
             // if found in cache then return
             if (route != null)
@@ -176,6 +173,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             if (node.Parent == null)
             {
                 var rootNode = umbracoContext.ContentCache.GetByRoute("/", true);
+                if (rootNode == null)
+                    throw new Exception("Failed to get node at /.");
                 if (rootNode.Id == node.Id) // remove only if we're the default node
                     pathParts.RemoveAt(pathParts.Count - 1);
             }
@@ -270,12 +269,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     		return ConvertToDocument(GetXml(umbracoContext).GetElementById(nodeId.ToString()));
     	}
 
-		public IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext)
+        public virtual IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext)
 		{
 			return (from XmlNode x in GetXml(umbracoContext).SelectNodes(XPathStrings.RootDocuments) select ConvertToDocument(x)).ToList();
 		}
 
-        public IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, string xpath, params XPathVariable[] vars)
+        public virtual IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, string xpath, params XPathVariable[] vars)
         {
             if (xpath == null) throw new ArgumentNullException("xpath");
             if (string.IsNullOrWhiteSpace(xpath)) return null;
@@ -287,7 +286,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return ConvertToDocument(node);
         }
 
-        public IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, string xpath, params XPathVariable[] vars)
+        public virtual IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, string xpath, params XPathVariable[] vars)
         {
             if (xpath == null) throw new ArgumentNullException("xpath");
             if (string.IsNullOrWhiteSpace(xpath)) return Enumerable.Empty<IPublishedContent>();
@@ -299,13 +298,19 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return ConvertToDocuments(nodes);
         }
 
-        public bool HasContent()
+        public virtual bool HasContent()
         {
 	        var xml = GetXml();
 			if (xml == null)
 				return false;
 			var node = xml.SelectSingleNode(XPathStrings.RootDocuments);
 			return node != null;
+        }
+
+        public virtual XPathNavigator GetXPathNavigator(UmbracoContext umbracoContext)
+        {
+            var xml = GetXml(umbracoContext);
+            return xml.CreateNavigator();
         }
 
         #endregion
