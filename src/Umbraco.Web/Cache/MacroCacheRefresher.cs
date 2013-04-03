@@ -27,7 +27,8 @@ namespace Umbraco.Web.Cache
                     CacheKeys.MacroControlCacheKey,
                     CacheKeys.MacroHtmlCacheKey,
                     CacheKeys.MacroHtmlDateAddedCacheKey,
-                    CacheKeys.MacroControlDateAddedCacheKey
+                    CacheKeys.MacroControlDateAddedCacheKey,
+                    CacheKeys.MacroXsltCacheKey,
                 };
         }
 

@@ -46,22 +46,22 @@ namespace Umbraco.Core.Cache
             return getCacheItem();
         }
 
-        public override T GetCacheItem<T>(string cacheKey, TimeSpan timeout, Func<T> getCacheItem)
+        public override T GetCacheItem<T>(string cacheKey, TimeSpan? timeout, Func<T> getCacheItem)
         {
             return getCacheItem();
         }
 
-        public override T GetCacheItem<T>(string cacheKey, CacheItemRemovedCallback refreshAction, TimeSpan timeout, Func<T> getCacheItem)
+        public override T GetCacheItem<T>(string cacheKey, CacheItemRemovedCallback refreshAction, TimeSpan? timeout, Func<T> getCacheItem)
         {
             return getCacheItem();
         }
 
-        public override T GetCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheItemRemovedCallback refreshAction, TimeSpan timeout, Func<T> getCacheItem)
+        public override T GetCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheItemRemovedCallback refreshAction, TimeSpan? timeout, Func<T> getCacheItem)
         {
             return getCacheItem();
         }
 
-        public override T GetCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheItemRemovedCallback refreshAction, CacheDependency cacheDependency, TimeSpan timeout, Func<T> getCacheItem)
+        public override T GetCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheItemRemovedCallback refreshAction, CacheDependency cacheDependency, TimeSpan? timeout, Func<T> getCacheItem)
         {
             return getCacheItem();
         }
@@ -70,11 +70,11 @@ namespace Umbraco.Core.Cache
         {
         }
 
-        public override void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, TimeSpan timeout, Func<T> getCacheItem)
+        public override void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, TimeSpan? timeout, Func<T> getCacheItem)
         {
         }
 
-        public override void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheDependency cacheDependency, TimeSpan timeout, Func<T> getCacheItem)
+        public override void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheDependency cacheDependency, TimeSpan? timeout, Func<T> getCacheItem)
         {
         }
 

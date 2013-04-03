@@ -10,6 +10,7 @@ namespace Umbraco.Core.Cache
 
         public const string MediaCacheKey = "UL_GetMedia";
 
+        public const string MacroXsltCacheKey = "macroXslt_";
         public const string MacroCacheKey = "UmbracoMacroCache";
         public const string MacroHtmlCacheKey = "macroHtml_";
         public const string MacroControlCacheKey = "macroControl_";
