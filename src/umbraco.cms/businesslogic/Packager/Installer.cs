@@ -421,7 +421,12 @@ namespace umbraco.cms.businesslogic.packager
                 #endregion
 
                 #region DocumentTypes
-                var docTypeElement = rootElement.Descendants("DocumentTypes").FirstOrDefault();
+                //Check whether the root element is a doc type rather then a complete package
+                var docTypeElement = rootElement.Name.LocalName.Equals("DocumentType") ||
+                                     rootElement.Name.LocalName.Equals("DocumentTypes")
+                                         ? rootElement
+                                         : rootElement.Descendants("DocumentTypes").FirstOrDefault();
+
                 if (docTypeElement != null)
                 {
                     var contentTypes = packagingService.ImportContentTypes(docTypeElement, currentUser.Id);
@@ -692,7 +697,11 @@ namespace umbraco.cms.businesslogic.packager
             #endregion
 
             #region Install DocumentTypes
-            var docTypeElement = rootElement.Descendants("DocumentTypes").FirstOrDefault();
+            //Check whether the root element is a doc type rather then a complete package
+            var docTypeElement = rootElement.Name.LocalName.Equals("DocumentType") ||
+                                 rootElement.Name.LocalName.Equals("DocumentTypes")
+                                     ? rootElement
+                                     : rootElement.Descendants("DocumentTypes").FirstOrDefault();
             if (docTypeElement != null)
             {
                 var contentTypes = packagingService.ImportContentTypes(docTypeElement, currentUser.Id);
