@@ -5,8 +5,8 @@ using System.Linq;
 using System.Web;
 using System.Xml.Linq;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using umbraco.DataLayer;
-using umbraco.IO;
 
 namespace umbraco.BusinessLogic
 {
@@ -49,16 +49,53 @@ namespace umbraco.BusinessLogic
         {
             get
             {
-                //ensure cache exists
-                EnsureCache();
-                return HttpRuntime.Cache[CacheKey] as List<ApplicationTree>;
-            }
-            set
-            {
-                HttpRuntime.Cache.Insert(CacheKey, value);
-            }
-        }
+                return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                    CacheKey,
+                    () =>
+                        {
+                            var list = new List<ApplicationTree>();
 
+                            LoadXml(doc =>
+                            {
+                                foreach (var addElement in doc.Root.Elements("add").OrderBy(x =>
+                                {
+                                    var sortOrderAttr = x.Attribute("sortOrder");
+                                    return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
+                                }))
+                                {
+
+                                    var applicationAlias = (string)addElement.Attribute("application");
+                                    var type = (string)addElement.Attribute("type");
+                                    var assembly = (string)addElement.Attribute("assembly");
+
+                                    //check if the tree definition (applicationAlias + type + assembly) is already in the list
+
+                                    if (!list.Any(tree => tree.ApplicationAlias.InvariantEquals(applicationAlias)
+                                        && tree.Type.InvariantEquals(type)
+                                        && tree.AssemblyName.InvariantEquals(assembly)))
+                                    {
+                                        list.Add(new ApplicationTree(
+                                                     addElement.Attribute("silent") != null ? Convert.ToBoolean(addElement.Attribute("silent").Value) : false,
+                                                     addElement.Attribute("initialize") != null ? Convert.ToBoolean(addElement.Attribute("initialize").Value) : true,
+                                                     addElement.Attribute("sortOrder") != null ? Convert.ToByte(addElement.Attribute("sortOrder").Value) : (byte)0,
+                                                     addElement.Attribute("application").Value,
+                                                     addElement.Attribute("alias").Value,
+                                                     addElement.Attribute("title").Value,
+                                                     addElement.Attribute("iconClosed").Value,
+                                                     addElement.Attribute("iconOpen").Value,
+                                                     (string)addElement.Attribute("assembly"), //this could be empty: http://issues.umbraco.org/issue/U4-1360
+                                                     addElement.Attribute("type").Value,
+                                                     addElement.Attribute("action") != null ? addElement.Attribute("action").Value : ""));
+                                    }
+
+
+                                }
+                            }, false);
+
+                            return list;
+                        });
+            }            
+        }
 
         /// <summary>
         /// Gets the SQL helper.
@@ -69,124 +106,71 @@ namespace umbraco.BusinessLogic
             get { return Application.SqlHelper; }
         }
 
-        private bool _silent;
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="ApplicationTree"/> is silent.
         /// </summary>
         /// <value><c>true</c> if silent; otherwise, <c>false</c>.</value>
-        public bool Silent
-        {
-            get { return _silent; }
-            set { _silent = value; }
-        }
+        public bool Silent { get; set; }
 
-        private bool _initialize;
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="ApplicationTree"/> should initialize.
         /// </summary>
         /// <value><c>true</c> if initialize; otherwise, <c>false</c>.</value>
-        public bool Initialize
-        {
-            get { return _initialize; }
-            set { _initialize = value; }
-        }
+        public bool Initialize { get; set; }
 
-        private byte _sortOrder;
         /// <summary>
         /// Gets or sets the sort order.
         /// </summary>
         /// <value>The sort order.</value>
-        public byte SortOrder
-        {
-            get { return _sortOrder; }
-            set { _sortOrder = value; }
-        }
+        public byte SortOrder { get; set; }
 
-        private string _applicationAlias;
         /// <summary>
         /// Gets the application alias.
         /// </summary>
         /// <value>The application alias.</value>
-        public string ApplicationAlias
-        {
-            get { return _applicationAlias; }
-        }
+        public string ApplicationAlias { get; private set; }
 
-        private string _alias;
         /// <summary>
         /// Gets the tree alias.
         /// </summary>
         /// <value>The alias.</value>
-        public string Alias
-        {
-            get { return _alias; }
-        }
+        public string Alias { get; private set; }
 
-        private string _title;
         /// <summary>
         /// Gets or sets the tree title.
         /// </summary>
         /// <value>The title.</value>
-        public string Title
-        {
-            get { return _title; }
-            set { _title = value; }
-        }
+        public string Title { get; set; }
 
-        private string _iconClosed;
         /// <summary>
         /// Gets or sets the icon closed.
         /// </summary>
         /// <value>The icon closed.</value>
-        public string IconClosed
-        {
-            get { return _iconClosed; }
-            set { _iconClosed = value; }
-        }
+        public string IconClosed { get; set; }
 
-        private string _iconOpened;
         /// <summary>
         /// Gets or sets the icon opened.
         /// </summary>
         /// <value>The icon opened.</value>
-        public string IconOpened
-        {
-            get { return _iconOpened; }
-            set { _iconOpened = value; }
-        }
+        public string IconOpened { get; set; }
 
-        private string _assemblyName;
         /// <summary>
         /// Gets or sets the name of the assembly.
         /// </summary>
         /// <value>The name of the assembly.</value>
-        public string AssemblyName
-        {
-            get { return _assemblyName; }
-            set { _assemblyName = value; }
-        }
+        public string AssemblyName { get; set; }
 
-        private string _type;
         /// <summary>
         /// Gets or sets the tree type.
         /// </summary>
         /// <value>The type.</value>
-        public string Type
-        {
-            get { return _type; }
-            set { _type = value; }
-        }
+        public string Type { get; set; }
 
-        private string _action;
         /// <summary>
         /// Gets or sets the default tree action.
         /// </summary>
         /// <value>The action.</value>
-        public string Action
-        {
-            get { return _action; }
-            set { _action = value; }
-        }        
+        public string Action { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationTree"/> class.
@@ -210,17 +194,17 @@ namespace umbraco.BusinessLogic
         /// <param name="action">The default tree action.</param>
         public ApplicationTree(bool silent, bool initialize, byte sortOrder, string applicationAlias, string alias, string title, string iconClosed, string iconOpened, string assemblyName, string type, string action)
         {
-            this._silent = silent;
-            this._initialize = initialize;
-            this._sortOrder = sortOrder;
-            this._applicationAlias = applicationAlias;
-            this._alias = alias;
-            this._title = title;
-            this._iconClosed = iconClosed;
-            this._iconOpened = iconOpened;
-            this._assemblyName = assemblyName;
-            this._type = type;
-            this._action = action;
+            this.Silent = silent;
+            this.Initialize = initialize;
+            this.SortOrder = sortOrder;
+            this.ApplicationAlias = applicationAlias;
+            this.Alias = alias;
+            this.Title = title;
+            this.IconClosed = iconClosed;
+            this.IconOpened = iconOpened;
+            this.AssemblyName = assemblyName;
+            this.Type = type;
+            this.Action = action;
         }
 
 
@@ -315,12 +299,7 @@ namespace umbraco.BusinessLogic
         /// <returns>An ApplicationTree instance</returns>
         public static ApplicationTree getByAlias(string treeAlias)
         {
-            return AppTrees.Find(
-                delegate(ApplicationTree t)
-                {
-                    return (t.Alias == treeAlias);
-                }
-            );
+            return AppTrees.Find(t => (t.Alias == treeAlias));
 
         }
 
@@ -351,83 +330,16 @@ namespace umbraco.BusinessLogic
         /// <returns>Returns a ApplicationTree Array</returns>
         public static ApplicationTree[] getApplicationTree(string applicationAlias, bool onlyInitializedApplications)
         {
-            List<ApplicationTree> list = AppTrees.FindAll(
-                delegate(ApplicationTree t)
-                {
-                    if (onlyInitializedApplications)
-                        return (t.ApplicationAlias == applicationAlias && t.Initialize);
-                    else
+            var list = AppTrees.FindAll(
+                t =>
+                    {
+                        if (onlyInitializedApplications)
+                            return (t.ApplicationAlias == applicationAlias && t.Initialize);
                         return (t.ApplicationAlias == applicationAlias);
-                }
-            );
+                    }
+                );
 
             return list.OrderBy(x => x.SortOrder).ToArray();
-        }
-
-        /// <summary>
-        /// Removes the ApplicationTree cache and re-reads the data from the db.
-        /// </summary>
-        private static void ReCache()
-        {
-            HttpRuntime.Cache.Remove(CacheKey);
-            EnsureCache();
-        }
-
-        /// <summary>
-        /// Read all ApplicationTree data and store it in cache.
-        /// </summary>
-        private static void EnsureCache()
-        {
-            //don't query the database if the cache is not null
-            if (HttpRuntime.Cache[CacheKey] != null) 
-                return;
-            
-            lock (Locker)
-            {
-                if (HttpRuntime.Cache[CacheKey] == null)
-                {
-                    var list = new List<ApplicationTree>();
-
-                    LoadXml(doc =>
-                    {
-                        foreach (var addElement in doc.Root.Elements("add").OrderBy(x =>
-                                {
-                                    var sortOrderAttr = x.Attribute("sortOrder");
-                                    return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
-                                }))
-                        {
-
-                            var applicationAlias = (string)addElement.Attribute("application");
-                            var type = (string)addElement.Attribute("type");
-                            var assembly = (string)addElement.Attribute("assembly");
-
-                            //check if the tree definition (applicationAlias + type + assembly) is already in the list
-
-                            if (!list.Any(tree => tree.ApplicationAlias.InvariantEquals(applicationAlias)
-                                && tree.Type.InvariantEquals(type)
-                                && tree.AssemblyName.InvariantEquals(assembly)))
-                            {
-                                list.Add(new ApplicationTree(
-                                             addElement.Attribute("silent") != null ? Convert.ToBoolean(addElement.Attribute("silent").Value) : false,
-                                             addElement.Attribute("initialize") != null ? Convert.ToBoolean(addElement.Attribute("initialize").Value) : true,
-                                             addElement.Attribute("sortOrder") != null ? Convert.ToByte(addElement.Attribute("sortOrder").Value) : (byte)0,
-                                             addElement.Attribute("application").Value,
-                                             addElement.Attribute("alias").Value,
-                                             addElement.Attribute("title").Value,
-                                             addElement.Attribute("iconClosed").Value,
-                                             addElement.Attribute("iconOpen").Value,
-                                             (string)addElement.Attribute("assembly"), //this could be empty: http://issues.umbraco.org/issue/U4-1360
-                                             addElement.Attribute("type").Value,
-                                             addElement.Attribute("action") != null ? addElement.Attribute("action").Value : ""));
-                            }
-
-                            
-                        }
-                    }, false);
-
-                    AppTrees = list;
-                }
-            }
         }
 
         internal static void LoadXml(Action<XDocument> callback, bool saveAfterCallback)
@@ -447,7 +359,8 @@ namespace umbraco.BusinessLogic
 
                         doc.Save(TreeConfigFilePath);
 
-                        ReCache();
+                        //remove the cache now that it has changed
+                        ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKey);
                     }
                 }
             }
