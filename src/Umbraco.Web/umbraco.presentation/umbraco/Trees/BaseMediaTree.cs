@@ -60,7 +60,7 @@ function openMedia(id) {
         //with the OnBeforeTreeRender/OnAfterTreeRender events, which sends an array for legacy Media items.
         /*public override void Render(ref XmlTree tree)
         {
-            _timer = DisposableTimer.Start(x => LogHelper.Info<BaseMediaTree>("Media tree loaded" + " (took " + x + "ms)"));
+            _timer = DisposableTimer.Start(x => LogHelper.Debug<BaseMediaTree>("Media tree loaded" + " (took " + x + "ms)"));
 
             var service = base.Services.EntityService;
             var entities = service.GetChildren(m_id, UmbracoObjectTypes.Media);
@@ -77,8 +77,8 @@ function openMedia(id) {
                 xNode.HasChildren = entity.HasChildren;
                 xNode.Source = this.IsDialog ? GetTreeDialogUrl(entity.Id) : GetTreeServiceUrl(entity.Id);
 
-                xNode.Icon = entity.ContentTypeIconUrl;
-                xNode.OpenIcon = entity.ContentTypeIconUrl;
+                xNode.Icon = entity.ContentTypeIcon;
+                xNode.OpenIcon = entity.ContentTypeIcon;
 
                 xNode.Menu = this.ShowContextMenu ? new List<IAction>(new IAction[] { ActionRefresh.Instance }) : null;
 
@@ -129,9 +129,7 @@ function openMedia(id) {
 
         public override void Render(ref XmlTree tree)
         {
-#if Debug
-            _timer = DisposableTimer.Start(x => LogHelper.Info<BaseMediaTree>("Media tree loaded" + " (took " + x + "ms)"));
-#endif
+            //_timer = DisposableTimer.Start(x => LogHelper.Debug<BaseMediaTree>("Media tree loaded" + " (took " + x + "ms)"));
           
 			Media[] docs = new Media(m_id).Children;
 
@@ -202,9 +200,7 @@ function openMedia(id) {
                     OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
                 }
             }
-#if Debug
-            _timer.Dispose();
-#endif
+            //_timer.Dispose();
             OnAfterTreeRender(docs, args);
         }
 

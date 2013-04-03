@@ -152,6 +152,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 columns.Add("latest.versionId as newestVersion");
                 columns.Add("contenttype.alias");
                 columns.Add("contenttype.icon");
+                columns.Add("contenttype.thumbnail");
                 columns.Add("property.dataNvarchar as umbracoFile");
             }
 
@@ -226,6 +227,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 columns.Add("latest.versionId");
                 columns.Add("contenttype.alias");
                 columns.Add("contenttype.icon");
+                columns.Add("contenttype.thumbnail");
                 columns.Add("property.dataNvarchar");
             }
 
@@ -267,7 +269,10 @@ namespace Umbraco.Core.Persistence.Repositories
             public string Alias { get; set; }
 
             [Column("icon")]
-            public string IconUrl { get; set; }
+            public string Icon { get; set; }
+
+            [Column("thumbnail")]
+            public string Thumbnail { get; set; }
 
             [Column("umbracoFile")]
             public string UmbracoFile { get; set; }

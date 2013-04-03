@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Web;
 using System.Web.Script.Serialization;
 using Umbraco.Core;
+using Umbraco.Core.IO;
+using Umbraco.Core.Models;
 using Umbraco.Web.Media.ThumbnailProviders;
-using umbraco.BasePages;
 using umbraco.BusinessLogic;
-using umbraco.IO;
 using umbraco.cms.businesslogic.Tags;
-using umbraco.cms.businesslogic.media;
 using Umbraco.Web.BaseRest;
 
 namespace Umbraco.Web.WebServices
@@ -23,7 +21,10 @@ namespace Umbraco.Web.WebServices
         [RestExtensionMethod(ReturnXml = false)]
         public static string GetChildren(int parentId)
         {
-            var parentMedia = new global::umbraco.cms.businesslogic.media.Media(parentId);
+            var service = ApplicationContext.Current.Services.EntityService;
+            var parentMedia = service.Get(parentId, UmbracoObjectTypes.Media);
+            var mediaPath = parentMedia == null ? parentId.ToString(CultureInfo.InvariantCulture) : parentMedia.Path;
+
             var currentUser = User.GetCurrent();
             var data = new List<object>();
 
@@ -32,32 +33,27 @@ namespace Umbraco.Web.WebServices
                 throw new UnauthorizedAccessException("You must be logged in to use this service");
 
             // Check user is allowed to access selected media item
-            if(!("," + parentMedia.Path + ",").Contains("," + currentUser.StartMediaId + ","))
+            if (!("," + mediaPath + ",").Contains("," + currentUser.StartMediaId + ","))
                 throw new UnauthorizedAccessException("You do not have access to this Media node");
 
             // Get children and filter
+            var entities = service.GetChildren(parentId, UmbracoObjectTypes.Media);
             //TODO: Only fetch files, not containers
-            //TODO: Cache responses to speed up susequent searches
-            foreach (var child in parentMedia.Children)
+            foreach (UmbracoEntity entity in entities)
             {
-                var fileProp = child.getProperty(Constants.Conventions.Media.File) ?? 
-                    child.GenericProperties.FirstOrDefault(x =>
-                        x.PropertyType.DataTypeDefinition.DataType.Id == new Guid(Constants.PropertyEditors.UploadField));
-
-                var fileUrl = fileProp != null ? fileProp.Value.ToString() : "";
-                var thumbUrl = ThumbnailProvidersResolver.Current.GetThumbnailUrl(fileUrl);
+                var thumbUrl = ThumbnailProvidersResolver.Current.GetThumbnailUrl(entity.UmbracoFile);
                 var item = new
                 {
-                    Id = child.Id,
-                    Path = child.Path,
-                    Name = child.Text,
-                    Tags = string.Join(",", Tag.GetTags(child.Id).Select(x => x.TagCaption)),
-                    MediaTypeAlias = child.ContentType.Alias,
-                    EditUrl = string.Format("editMedia.aspx?id={0}", child.Id),
-                    FileUrl = fileUrl,
+                    Id = entity.Id,
+                    Path = entity.Path,
+                    Name = entity.Name,
+                    Tags = string.Join(",", Tag.GetTags(entity.Id).Select(x => x.TagCaption)),
+                    MediaTypeAlias = entity.ContentTypeAlias,
+                    EditUrl = string.Format("editMedia.aspx?id={0}", entity.Id),
+                    FileUrl = entity.UmbracoFile,
                     ThumbnailUrl = !string.IsNullOrEmpty(thumbUrl)
                         ? thumbUrl
-                        : IOHelper.ResolveUrl(SystemDirectories.Umbraco + "/images/thumbnails/" + child.ContentType.Thumbnail)
+                        : IOHelper.ResolveUrl(SystemDirectories.Umbraco + "/images/thumbnails/" + entity.ContentTypeThumbnail)
                 };
 
                 data.Add(item);

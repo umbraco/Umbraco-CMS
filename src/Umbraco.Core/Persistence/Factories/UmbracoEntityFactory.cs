@@ -23,7 +23,8 @@ namespace Umbraco.Core.Persistence.Factories
                                  SortOrder = dto.SortOrder,
                                  HasChildren = dto.Children > 0,
                                  ContentTypeAlias = dto.Alias ?? string.Empty,
-                                 ContentTypeIcon = dto.IconUrl ?? string.Empty,
+                                 ContentTypeIcon = dto.Icon ?? string.Empty,
+                                 ContentTypeThumbnail = dto.Thumbnail ?? string.Empty,
                                  UmbracoFile = dto.UmbracoFile ?? string.Empty
                              };
 

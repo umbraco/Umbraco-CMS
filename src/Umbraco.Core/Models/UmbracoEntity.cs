@@ -36,10 +36,12 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo IsDraftSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.IsDraft);
         private static readonly PropertyInfo HasPendingChangesSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.HasPendingChanges);
         private static readonly PropertyInfo ContentTypeAliasSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeAlias);
-        private static readonly PropertyInfo ContentTypeIconUrlSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeIcon);
+        private static readonly PropertyInfo ContentTypeIconSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeIcon);
+        private static readonly PropertyInfo ContentTypeThumbnailSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeThumbnail);
         private static readonly PropertyInfo UmbracoFileSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.UmbracoFile);
         private static readonly PropertyInfo NodeObjectTypeIdSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, Guid>(x => x.NodeObjectTypeId);
         private string _contentTypeIcon;
+        private string _contentTypeThumbnail;
 
         public UmbracoEntity()
         {
@@ -215,7 +217,20 @@ namespace Umbraco.Core.Models
                 {
                     _contentTypeIcon = value;
                     return _contentTypeIcon;
-                }, _contentTypeIcon, ContentTypeIconUrlSelector);
+                }, _contentTypeIcon, ContentTypeIconSelector);
+            }
+        }
+
+        public string ContentTypeThumbnail
+        {
+            get { return _contentTypeThumbnail; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _contentTypeThumbnail = value;
+                    return _contentTypeThumbnail;
+                }, _contentTypeThumbnail, ContentTypeThumbnailSelector);
             }
         }
 
