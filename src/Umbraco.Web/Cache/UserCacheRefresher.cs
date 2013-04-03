@@ -28,6 +28,7 @@ namespace Umbraco.Web.Cache
         public override void RefreshAll()
         {
             ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.UserCacheKey);
+            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.UserContextCacheKey);
         }
 
         public override void Refresh(int id)
@@ -37,7 +38,11 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.UserCacheKey, id)); 
+            ApplicationContext.Current.ApplicationCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.UserCacheKey, id));
+
+            //we need to clear all UserContextCacheKey since we cannot invalidate based on ID since the cache is done so based
+            //on the current contextId stored in the database
+            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.UserContextCacheKey);
         }
 
     }

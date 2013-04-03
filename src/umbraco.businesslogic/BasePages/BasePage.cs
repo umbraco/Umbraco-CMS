@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
@@ -167,29 +168,22 @@ namespace umbraco.BasePages
         [Obsolete("Use Umbraco.Web.Security.WebSecurity.GetUserId instead")]
         public static int GetUserId(string umbracoUserContextID)
         {
-            try
-            {
-                if (System.Web.HttpRuntime.Cache["UmbracoUserContext" + umbracoUserContextID] == null)
-                {
-                    System.Web.HttpRuntime.Cache.Insert(
-                        "UmbracoUserContext" + umbracoUserContextID,
-                        SqlHelper.ExecuteScalar<int>("select userID from umbracoUserLogins where contextID = @contextId",
-                                                     SqlHelper.CreateParameter("@contextId", new Guid(umbracoUserContextID))
-                            ),
-                        null,
-                        System.Web.Caching.Cache.NoAbsoluteExpiration,
-                        new TimeSpan(0, (int) (UmbracoTimeOutInMinutes/10), 0));
-
-
-                }
-
-                return (int)System.Web.HttpRuntime.Cache["UmbracoUserContext" + umbracoUserContextID];
-
-            }
-            catch
+            //need to parse to guid
+            Guid gid;
+            if (!Guid.TryParse(umbracoUserContextID, out gid))
             {
                 return -1;
             }
+
+            var id = ApplicationContext.Current.ApplicationCache.GetCacheItem<int?>(
+                CacheKeys.UserContextCacheKey + umbracoUserContextID,
+                new TimeSpan(0, UmbracoTimeOutInMinutes / 10, 0),
+                () => SqlHelper.ExecuteScalar<int?>(
+                    "select userID from umbracoUserLogins where contextID = @contextId",
+                    SqlHelper.CreateParameter("@contextId", gid)));
+            if (id == null)
+                return -1;
+            return id.Value;    
         }
 
 
@@ -219,23 +213,10 @@ namespace umbraco.BasePages
 
         private static long GetTimeout(string umbracoUserContextID)
         {
-            if (System.Web.HttpRuntime.Cache["UmbracoUserContextTimeout" + umbracoUserContextID] == null)
-            {
-                System.Web.HttpRuntime.Cache.Insert(
-                    "UmbracoUserContextTimeout" + umbracoUserContextID,
-                        GetTimeout(true),
-                    null,
-                    DateTime.Now.AddMinutes(UmbracoTimeOutInMinutes / 10), System.Web.Caching.Cache.NoSlidingExpiration);
-
-
-            }
-
-            object timeout = HttpRuntime.Cache["UmbracoUserContextTimeout" + umbracoUserContextID];
-            if (timeout != null)
-                return (long)timeout;
-
-            return 0;
-
+            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                CacheKeys.UserContextTimeoutCacheKey + umbracoUserContextID,
+                new TimeSpan(0, UmbracoTimeOutInMinutes / 10, 0),
+                () => GetTimeout(true));
         }
 
         [Obsolete("Use Umbraco.Web.Security.WebSecurity.GetTimeout instead")]

@@ -5,8 +5,8 @@ using System.Text;
 using System.Web;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
-using Umbraco.Web.UI.Pages;
 using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -164,26 +164,10 @@ namespace Umbraco.Web.Security
 
         internal static long GetTimeout(string umbracoUserContextId)
         {
-            //TODO: Clean this up! We should be using the CacheHelper (ApplicationContext.Current.ApplicationCache) 
-            //  for all things cache related
-
-            if (HttpRuntime.Cache["UmbracoUserContextTimeout" + umbracoUserContextId] == null)
-            {
-                HttpRuntime.Cache.Insert(
-                    "UmbracoUserContextTimeout" + umbracoUserContextId,
-                        GetTimeout(true),
-                    null,
-                    DateTime.Now.AddMinutes(UmbracoTimeOutInMinutes / 10), System.Web.Caching.Cache.NoSlidingExpiration);
-
-
-            }
-
-            var timeout = HttpRuntime.Cache["UmbracoUserContextTimeout" + umbracoUserContextId];
-            if (timeout != null)
-                return (long)timeout;
-
-            return 0;
-
+            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                CacheKeys.UserContextTimeoutCacheKey + umbracoUserContextId,
+                new TimeSpan(0, UmbracoTimeOutInMinutes / 10, 0),
+                () => GetTimeout(true));
         }
 
         internal static long GetTimeout(bool byPassCache)
@@ -208,28 +192,22 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public static int GetUserId(string umbracoUserContextId)
         {
-            try
-            {
-                //TODO: Clean this up! We should be using the CacheHelper (ApplicationContext.Current.ApplicationCache) 
-                //  for all things cache related
-
-                if (HttpRuntime.Cache["UmbracoUserContext" + umbracoUserContextId] == null)
-                {
-                    HttpRuntime.Cache.Insert(
-                        "UmbracoUserContext" + umbracoUserContextId,
-                        SqlHelper.ExecuteScalar<int>("select userID from umbracoUserLogins where contextID = @contextId",
-                                                     SqlHelper.CreateParameter("@contextId", new Guid(umbracoUserContextId))
-                            ),
-                        null,
-                        System.Web.Caching.Cache.NoAbsoluteExpiration,
-                        new TimeSpan(0, (int)(UmbracoTimeOutInMinutes / 10), 0));
-                }
-                return (int)HttpRuntime.Cache["UmbracoUserContext" + umbracoUserContextId];
-            }
-            catch
+            //need to parse to guid
+            Guid gid;
+            if (!Guid.TryParse(umbracoUserContextId, out gid))
             {
                 return -1;
             }
+
+            var id = ApplicationContext.Current.ApplicationCache.GetCacheItem<int?>(
+                CacheKeys.UserContextCacheKey + umbracoUserContextId,
+                new TimeSpan(0, UmbracoTimeOutInMinutes/10, 0),
+                () => SqlHelper.ExecuteScalar<int?>(
+                    "select userID from umbracoUserLogins where contextID = @contextId",
+                    SqlHelper.CreateParameter("@contextId", gid)));
+            if (id == null)
+                return -1;
+            return id.Value;            
         }
 
         /// <summary>
@@ -248,7 +226,7 @@ namespace Umbraco.Web.Security
                 {
                     return true;
                 }
-                var user = global::umbraco.BusinessLogic.User.GetUser(uid);
+                var user = User.GetUser(uid);
                 LogHelper.Info(typeof(WebSecurity), "User {0} (Id:{1}) logged out", () => user.Name, () => user.Id);
             }
             return false;

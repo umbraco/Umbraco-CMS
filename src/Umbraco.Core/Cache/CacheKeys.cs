@@ -23,6 +23,8 @@ namespace Umbraco.Core.Cache
         public const string TemplateFrontEndCacheKey = "template";
         public const string TemplateBusinessLogicCacheKey = "UmbracoTemplateCache";
 
+        public const string UserContextCacheKey = "UmbracoUserContext";
+        public const string UserContextTimeoutCacheKey = "UmbracoUserContextTimeout";
         public const string UserCacheKey = "UmbracoUser";
 
         public const string ContentTypeCacheKey = "UmbracoContentType";
