@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
@@ -62,6 +63,18 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType()
+        {
+            var service = ServiceContext.EntityService;
+
+            var entities = service.GetChildren(-1, UmbracoObjectTypes.Document);
+
+            Assert.That(entities.Any(), Is.True);
+            Assert.That(entities.Count(), Is.EqualTo(1));
+            Assert.That(entities.Any(x => x.Trashed), Is.False);
+        }
+
+        [Test]
         public void EntityService_Throws_When_Getting_All_With_Invalid_Type()
         {
             var service = ServiceContext.EntityService;
@@ -104,6 +117,38 @@ namespace Umbraco.Tests.Services
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void EntityService_Can_Find_All_Media_By_UmbracoObjectTypes()
+        {
+            var service = ServiceContext.EntityService;
+
+            var entities = service.GetAll(UmbracoObjectTypes.Media);
+
+            Assert.That(entities.Any(), Is.True);
+            Assert.That(entities.Count(), Is.EqualTo(3));
+            Assert.That(entities.Any(x => ((UmbracoEntity)x).UmbracoFile != string.Empty), Is.True);
+        }
+
+        public override void CreateTestData()
+        {
+            base.CreateTestData();
+
+            //Create and Save folder-Media -> 1050
+            var folderMediaType = ServiceContext.ContentTypeService.GetMediaType(1031);
+            var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
+            ServiceContext.MediaService.Save(folder, 0);
+
+            //Create and Save image-Media -> 1051
+            var imageMediaType = ServiceContext.ContentTypeService.GetMediaType(1032);
+            var image = MockedMedia.CreateMediaImage(imageMediaType, folder.Id);
+            ServiceContext.MediaService.Save(image, 0);
+
+            //Create and Save file-Media -> 1052
+            var fileMediaType = ServiceContext.ContentTypeService.GetMediaType(1033);
+            var file = MockedMedia.CreateMediaFile(fileMediaType, folder.Id);
+            ServiceContext.MediaService.Save(file, 0);
         }
     }
 }

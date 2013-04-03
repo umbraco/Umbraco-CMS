@@ -29,7 +29,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.Initialize();            
         }
-
+        
         [TearDown]
         public override void TearDown()
         {

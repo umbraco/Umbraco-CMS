@@ -21,7 +21,11 @@ namespace Umbraco.Core.Persistence.Factories
                                  ParentId = dto.ParentId,
                                  Path = dto.Path,
                                  SortOrder = dto.SortOrder,
-                                 HasChildren = dto.Children > 0
+                                 HasChildren = dto.Children > 0,
+                                 ContentTypeAlias = dto.Alias ?? string.Empty,
+                                 ContentTypeIcon = dto.Icon ?? string.Empty,
+                                 ContentTypeThumbnail = dto.Thumbnail ?? string.Empty,
+                                 UmbracoFile = dto.UmbracoFile ?? string.Empty
                              };
 
             entity.IsPublished = dto.PublishedVersion != default(Guid) ||

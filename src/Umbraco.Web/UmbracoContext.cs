@@ -5,6 +5,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.CodeAnnotations;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 using umbraco;
 using umbraco.IO;
 using umbraco.presentation;
@@ -314,7 +315,7 @@ namespace Umbraco.Web
         {
             get
             {
-                return UmbracoEnsuredPage.CurrentUser;
+                return WebSecurity.CurrentUser;
             }
 
         }
@@ -335,7 +336,7 @@ namespace Umbraco.Web
             return
                 StateHelper.Cookies.Preview.HasValue // has preview cookie
                 && UmbracoUser != null // has user
-                && !currentUrl.StartsWith(Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco)); // is not in admin UI
+                && !currentUrl.StartsWith(Core.IO.IOHelper.ResolveUrl(Core.IO.SystemDirectories.Umbraco)); // is not in admin UI
         }
         
         private HttpRequestBase GetRequestFromContext()

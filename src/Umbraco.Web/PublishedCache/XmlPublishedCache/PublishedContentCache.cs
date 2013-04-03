@@ -334,7 +334,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     {
                         if (_previewContent == null)
                         {
-                            _previewContent = new PreviewContent(user, new Guid(global::umbraco.BusinessLogic.StateHelper.Cookies.Preview.GetValue()), true);
+                            _previewContent = new PreviewContent(user, new Guid(StateHelper.Cookies.Preview.GetValue()), true);
                             if (_previewContent.ValidPreviewSet)
                                 _previewContent.LoadPreviewset();
                         }

@@ -81,10 +81,10 @@ namespace Umbraco.Tests.CoreStrings
         }
 
         #region Cases
-        [TestCase("Home Page", "Home-Page")]
-        [TestCase("Shannon's Home Page!", "Shannons-Home-Page!")]
-        [TestCase("#Someones's Twitter $h1z%n", "Someoness-Twitter-$h1zn")]
-        [TestCase("Räksmörgås", "Raeksmoergaas")]
+        [TestCase("Home Page", "home-page")]
+        [TestCase("Shannon's Home Page!", "shannons-home-page!")]
+        [TestCase("#Someones's Twitter $h1z%n", "someoness-twitter-$h1zn")]
+        [TestCase("Räksmörgås", "raeksmoergaas")]
         [TestCase("'em guys-over there, are#goin' a \"little\"bit crazy eh!! :)", "em-guys-over-there,-aregoin-a-littlebit-crazy-eh!!-)")]
         [TestCase("汉#字*/漢?字", "汉字star漢字")]
         [TestCase("Réalösk fix bran#lo'sk", "realosk-fix-bran-lo-sk", IgnoreReason = "cannot handle it")]

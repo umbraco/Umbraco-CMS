@@ -20,6 +20,8 @@ namespace Umbraco.Core.Models
         private bool _isPublished;
         private bool _isDraft;
         private bool _hasPendingChanges;
+        private string _contentTypeAlias;
+        private string _umbracoFile;
         private Guid _nodeObjectTypeId;
 
         private static readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.CreatorId);
@@ -33,7 +35,13 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo IsPublishedSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.IsPublished);
         private static readonly PropertyInfo IsDraftSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.IsDraft);
         private static readonly PropertyInfo HasPendingChangesSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.HasPendingChanges);
+        private static readonly PropertyInfo ContentTypeAliasSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeAlias);
+        private static readonly PropertyInfo ContentTypeIconSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeIcon);
+        private static readonly PropertyInfo ContentTypeThumbnailSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeThumbnail);
+        private static readonly PropertyInfo UmbracoFileSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.UmbracoFile);
         private static readonly PropertyInfo NodeObjectTypeIdSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, Guid>(x => x.NodeObjectTypeId);
+        private string _contentTypeIcon;
+        private string _contentTypeThumbnail;
 
         public UmbracoEntity()
         {
@@ -184,6 +192,58 @@ namespace Umbraco.Core.Models
                     _hasPendingChanges = value;
                     return _hasPendingChanges;
                 }, _hasPendingChanges, HasPendingChangesSelector);
+            }
+        }
+
+        public string ContentTypeAlias
+        {
+            get { return _contentTypeAlias; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _contentTypeAlias = value;
+                    return _contentTypeAlias;
+                }, _contentTypeAlias, ContentTypeAliasSelector);
+            }
+        }
+
+        public string ContentTypeIcon
+        {
+            get { return _contentTypeIcon; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _contentTypeIcon = value;
+                    return _contentTypeIcon;
+                }, _contentTypeIcon, ContentTypeIconSelector);
+            }
+        }
+
+        public string ContentTypeThumbnail
+        {
+            get { return _contentTypeThumbnail; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _contentTypeThumbnail = value;
+                    return _contentTypeThumbnail;
+                }, _contentTypeThumbnail, ContentTypeThumbnailSelector);
+            }
+        }
+
+        public string UmbracoFile
+        {
+            get { return _umbracoFile; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _umbracoFile = value;
+                    return _umbracoFile;
+                }, _umbracoFile, UmbracoFileSelector);
             }
         }
 

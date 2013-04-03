@@ -99,7 +99,7 @@ namespace umbraco.cms.businesslogic
         /// Used for cache so we don't have to lookup column names all the time, this is actually only used for the ChildrenAsTable methods
         /// </summary>
         private static readonly ConcurrentDictionary<string, IDictionary<string, string>> AliasToNames = new ConcurrentDictionary<string, IDictionary<string, string>>();
-        private static readonly ConcurrentDictionary<Tuple<string, string>, Guid> PropertyTypeCache = new ConcurrentDictionary<Tuple<string, string>, Guid>();
+        private static readonly ConcurrentDictionary<System.Tuple<string, string>, Guid> PropertyTypeCache = new ConcurrentDictionary<System.Tuple<string, string>, Guid>();
 
         /// <summary>
         /// Returns a content type's columns alias -> name mapping
@@ -111,12 +111,12 @@ namespace umbraco.cms.businesslogic
         /// </remarks>
         internal static IDictionary<string, string> GetAliasesAndNames(string contentTypeAlias)
         {
-            return AliasToNames.GetOrAdd(contentTypeAlias, s =>
-                {
-                    var ct = ContentType.GetByAlias(contentTypeAlias);
-                    var userFields = ct.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
-                    return userFields;
-                });
+		    return AliasToNames.GetOrAdd(contentTypeAlias, s =>
+		        {
+		            var ct = GetByAlias(contentTypeAlias);
+		            var userFields = ct.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
+		            return userFields;
+		        });
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace umbraco.cms.businesslogic
         /// <param name="contentTypeAlias"></param>
         public static void RemoveFromDataTypeCache(string contentTypeAlias)
         {
-            var toDelete = PropertyTypeCache.Keys.Where(key => string.Equals(key.first, contentTypeAlias)).ToList();
+            var toDelete = PropertyTypeCache.Keys.Where(key => string.Equals(key.Item1, contentTypeAlias)).ToList();
             foreach (var key in toDelete)
             {
                 Guid id;
@@ -139,33 +139,30 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         internal static void RemoveAllDataTypeCache()
         {
-
             AliasToNames.Clear();
             PropertyTypeCache.Clear();
         }
 
         public static Guid GetDataType(string contentTypeAlias, string propertyTypeAlias)
         {
-            var key = new Tuple<string, string>()
-            {
-                first = contentTypeAlias,
-                second = propertyTypeAlias
-            };
+            var key = new System.Tuple<string, string>(contentTypeAlias, propertyTypeAlias);
 
-            return PropertyTypeCache.GetOrAdd(key, tuple =>
-                {
-                    // With 4.10 we can't do this via direct SQL as we have content type mixins
-                    var controlId = Guid.Empty;
-                    var ct = GetByAlias(contentTypeAlias);
+            
+            return PropertyTypeCache.GetOrAdd(
+                key,
+                tuple =>
+                    {                       
+                        // With 4.10 we can't do this via direct SQL as we have content type mixins
+                        var controlId = Guid.Empty;
+                        var ct = GetByAlias(contentTypeAlias);
                     var pt = ct.getPropertyType(propertyTypeAlias);
                     if (pt != null)
                     {
                         controlId = pt.DataTypeDefinition.DataType.Id;
                     }
-                    return controlId;
+                        return controlId;     
                 });  
         }
-
 
         /// <summary>
         /// Gets the type of the content.
@@ -175,7 +172,7 @@ namespace umbraco.cms.businesslogic
         public static ContentType GetContentType(int id)
         {
             return ApplicationContext.Current.ApplicationCache.GetCacheItem
-                (string.Format("UmbracoContentType{0}", id.ToString()),
+                (string.Format("UmbracoContentType{0}", id),
                  TimeSpan.FromMinutes(30),
                  () => new ContentType(id));
         }
@@ -228,24 +225,22 @@ namespace umbraco.cms.businesslogic
             object tmp = SqlHelper.ExecuteScalar<object>("Select propertyTypeGroupId from cmsPropertyType where id = " + pt.Id.ToString());
             if (tmp == DBNull.Value)
                 return 0;
-            else return int.Parse(tmp.ToString());
+            return int.Parse(tmp.ToString());
         }
 
         #endregion
 
         #region Private Members
 
-        //private bool _optimizedMode = false;
         private bool _allowAtRoot;
         private string _alias;
         private string _iconurl;
         private string _description;
         private string _thumbnail;
         List<int> m_masterContentTypes;
-        private bool _isContainerContentType = false;
-
-        private List<int> m_AllowedChildContentTypeIDs = null;
-        private List<TabI> m_VirtualTabs = null;
+        private bool _isContainerContentType;
+        private List<int> _allowedChildContentTypeIDs;
+        private List<TabI> _virtualTabs;
         
         protected internal IContentTypeComposition ContentTypeItem;
 
@@ -380,17 +375,14 @@ namespace umbraco.cms.businesslogic
                 {
                     if (!_description.StartsWith("#"))
                         return _description;
-                    else
+                    var lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
+                    if (lang != null)
                     {
-                        Language lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
-                        if (lang != null)
+                        if (Dictionary.DictionaryItem.hasKey(_description.Substring(1, _description.Length - 1)))
                         {
-                            if (Dictionary.DictionaryItem.hasKey(_description.Substring(1, _description.Length - 1)))
-                            {
-                                var di =
-                                    new Dictionary.DictionaryItem(_description.Substring(1, _description.Length - 1));
-                                return di.Value(lang.id);
-                            }
+                            var di =
+                                new Dictionary.DictionaryItem(_description.Substring(1, _description.Length - 1));
+                            return di.Value(lang.id);
                         }
                     }
 
@@ -450,6 +442,7 @@ namespace umbraco.cms.businesslogic
             }
         }
 
+
         /// <summary>
         /// Human readable name/label
         /// </summary>
@@ -458,25 +451,20 @@ namespace umbraco.cms.businesslogic
         {
             get
             {
-                string tempText = base.Text;
+                var tempText = base.Text;
                 if (!tempText.StartsWith("#"))
                     return tempText;
-                else
+                var lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
+                if (lang != null)
                 {
-                    Language lang =
-                        Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
-                    if (lang != null)
+                    if (Dictionary.DictionaryItem.hasKey(tempText.Substring(1, tempText.Length - 1)))
                     {
-                        if (Dictionary.DictionaryItem.hasKey(tempText.Substring(1, tempText.Length - 1)))
-                        {
-                            Dictionary.DictionaryItem di =
-                                new Dictionary.DictionaryItem(tempText.Substring(1, tempText.Length - 1));
-                            return di.Value(lang.id);
-                        }
+                        var di = new Dictionary.DictionaryItem(tempText.Substring(1, tempText.Length - 1));
+                        return di.Value(lang.id);
                     }
-
-                    return "[" + tempText + "]";
                 }
+
+                return "[" + tempText + "]";
             }
             set
             {
@@ -536,8 +524,8 @@ namespace umbraco.cms.businesslogic
                             {
                                 foreach (var mct in MasterContentTypes)
                                 {
-                                    var pts = ContentType.GetContentType(mct).PropertyTypes;
-                                    foreach (PropertyType pt in pts)
+                                    var pts = GetContentType(mct).PropertyTypes;
+                                    foreach (var pt in pts)
                                     {
                                         if (result.ContainsKey(pt.Id) == false)
                                             result.Add(pt.Id, pt);
@@ -715,7 +703,7 @@ namespace umbraco.cms.businesslogic
             get
             {
                 EnsureVirtualTabs();
-                return m_VirtualTabs.ToArray();
+                return _virtualTabs.ToArray();
             }
         }
 
@@ -727,10 +715,11 @@ namespace umbraco.cms.businesslogic
         public void ClearVirtualTabs()
         {
             //NOTE: SD: There is no cache to clear so this doesn't actually do anything
-            foreach (TabI t in getVirtualTabs)
+            //NOTE: SD: There is no cache to clear so this doesn't actually do anything
+            foreach (var t in getVirtualTabs)
                 Tab.FlushCache(t.Id, Id);
 
-            m_VirtualTabs = null;
+            _virtualTabs = null;
         }
 
         /// <summary>
@@ -742,25 +731,23 @@ namespace umbraco.cms.businesslogic
             get
             {
                 //optimize this property so it lazy loads the data only one time.
-                if (m_AllowedChildContentTypeIDs == null)
+                if (_allowedChildContentTypeIDs == null)
                 {
-                    m_AllowedChildContentTypeIDs = new List<int>();
-                    using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                                                                      "Select AllowedId from cmsContentTypeAllowedContentType where id=" +
-                                                                      Id))
+                    _allowedChildContentTypeIDs = new List<int>();
+                    using (var dr = SqlHelper.ExecuteReader("Select AllowedId from cmsContentTypeAllowedContentType where id=" + Id))
                     {
                         while (dr.Read())
                         {
-                            m_AllowedChildContentTypeIDs.Add(dr.GetInt("AllowedId"));
+                            _allowedChildContentTypeIDs.Add(dr.GetInt("AllowedId"));
                         }
                     }
                 }
 
-                return m_AllowedChildContentTypeIDs.ToArray();
+                return _allowedChildContentTypeIDs.ToArray();
             }
             set
             {
-                m_AllowedChildContentTypeIDs = value.ToList();
+                _allowedChildContentTypeIDs = value.ToList();
 
                 //This switches between using new vs. legacy api.
                 //Note that this is currently only done to support both DocumentType and MediaType, which use the new api and MemberType that doesn't.
@@ -822,13 +809,13 @@ namespace umbraco.cms.businesslogic
         {
             var contentTypes = new List<ContentType>();
 
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(m_SQLOptimizedGetAll.Trim(), SqlHelper.CreateParameter("@nodeObjectType", base.nodeObjectType)))
+            using (var dr =
+                SqlHelper.ExecuteReader(m_SQLOptimizedGetAll.Trim(), SqlHelper.CreateParameter("@nodeObjectType", nodeObjectType)))
             {
                 while (dr.Read())
                 {
                     //create the ContentType object without setting up
-                    ContentType ct = new ContentType(dr.Get<int>("id"), true);
+                    var ct = new ContentType(dr.Get<int>("id"), true);
                     //populate it's CMSNode properties
                     ct.PopulateCMSNodeFromReader(dr);
                     //populate it's ContentType properties
@@ -853,10 +840,10 @@ namespace umbraco.cms.businesslogic
             PropertyType pt = PropertyType.MakeNew(dt, this, Name, Alias);
 
             // Optimized call
-            populatePropertyData(pt, this.Id);
+            PopulatePropertyData(pt, Id);
 
             // Inherited content types (document types only)
-            populateMasterContentTypes(pt, this.Id);
+            PopulateMasterContentTypes(pt, Id);
 
             //			foreach (Content c in Content.getContentOfContentType(this)) 
             //				c.addProperty(pt,c.Version);
@@ -952,7 +939,7 @@ namespace umbraco.cms.businesslogic
         /// Updates the sort order of the Tab
         /// </summary>
         /// <param name="tabId">The Id of the Tab to be updated</param>
-        /// <param name="Caption">The new order number</param>
+        /// <param name="sortOrder">The new order number</param>
         [Obsolete("Use PropertyTypeGroup methods instead", false)]
         public void SetTabSortOrder(int tabId, int sortOrder)
         {
@@ -972,18 +959,14 @@ namespace umbraco.cms.businesslogic
         public PropertyType getPropertyType(string alias)
         {
             // NH 22-08-08, Get from the property type stack to ensure support of master document types
-            object o = this.PropertyTypes.Find(pt => pt.Alias == alias);
+            object o = PropertyTypes.Find(pt => pt.Alias == alias);
 
             if (o == null)
             {
                 return null;
             }
-            else
-            {
-                return (PropertyType)o;
-            }
+            return (PropertyType)o;
         }
-
         /// <summary>
         /// Deletes the current ContentType
         /// </summary>
@@ -993,9 +976,9 @@ namespace umbraco.cms.businesslogic
             FlushFromCache(Id);
 
             // Delete all propertyTypes
-            foreach (PropertyType pt in PropertyTypes)
+            foreach (var pt in PropertyTypes)
             {
-                if (pt.ContentTypeId == this.Id)
+                if (pt.ContentTypeId == Id)
                 {
                     pt.delete();
                 }
@@ -1080,8 +1063,7 @@ namespace umbraco.cms.businesslogic
             }
 
             // TODO: Load master content types
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader("Select allowAtRoot, isContainer, Alias,icon,thumbnail,description from cmsContentType where nodeid=" + Id)
+            using (var dr = SqlHelper.ExecuteReader("Select allowAtRoot, isContainer, Alias,icon,thumbnail,description from cmsContentType where nodeid=" + Id)
                 )
             {
                 if (dr.Read())
@@ -1100,7 +1082,7 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         /// <param name="id">The id.</param>
         public static void FlushFromCache(int id)
-        {
+        {   
             //Ensure that MediaTypes are reloaded from db by clearing cache
             InMemoryCacheProvider.Current.Clear();
 
@@ -1134,7 +1116,6 @@ namespace umbraco.cms.businesslogic
             ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.ContentTypePropertiesCacheKey);
 
             RemoveAllDataTypeCache();
-
             ClearVirtualTabs();
         }
 
@@ -1163,12 +1144,12 @@ namespace umbraco.cms.businesslogic
             // If that happens, the m_VirtualTabs will contain duplicates.
             // We must prevent two threads from running InitializeVirtualTabs at the same time.
             // We must also prevent m_VirtualTabs from being modified while it is being populated.
-            if (m_VirtualTabs == null || m_VirtualTabs.Count == 0)
+            if (_virtualTabs == null || _virtualTabs.Count == 0)
             {
                 lock (_virtualTabLoadLock)
                 {
                     //optimize, lazy load the data only one time
-                    if (m_VirtualTabs == null || m_VirtualTabs.Count == 0)
+                    if (_virtualTabs == null || _virtualTabs.Count == 0)
                     {
                         InitializeVirtualTabs();
                     }
@@ -1200,23 +1181,23 @@ namespace umbraco.cms.businesslogic
             temporaryList.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
 
             // now that we aren't going to modify the list, we can set it to the class-scoped variable.
-            m_VirtualTabs = temporaryList.DistinctBy(x => x.Id).ToList();
+            _virtualTabs = temporaryList.DistinctBy(x => x.Id).ToList();
         }
 
-        private void populateMasterContentTypes(PropertyType pt, int docTypeId)
+        private static void PopulateMasterContentTypes(PropertyType pt, int docTypeId)
         {
-            foreach (web.DocumentType docType in web.DocumentType.GetAllAsList())
+            foreach (var docType in DocumentType.GetAllAsList())
             {
                 //TODO: Check for multiple references (mixins) not causing endless loops!
                 if (docType.MasterContentTypes.Contains(docTypeId))
                 {
-                    populatePropertyData(pt, docType.Id);
-                    populateMasterContentTypes(pt, docType.Id);
+                    PopulatePropertyData(pt, docType.Id);
+                    PopulateMasterContentTypes(pt, docType.Id);
                 }
             }
         }
 
-        private void populatePropertyData(PropertyType pt, int contentTypeId)
+        private static void PopulatePropertyData(PropertyType pt, int contentTypeId)
         {
             // NH: PropertyTypeId inserted directly into SQL instead of as a parameter for SQL CE 4 compatibility
             SqlHelper.ExecuteNonQuery(
@@ -1389,7 +1370,7 @@ namespace umbraco.cms.businesslogic
             [Obsolete("Please use GetPropertyTypes() instead", false)]
             public PropertyType[] PropertyTypes
             {
-                get { return GetPropertyTypes(this.ContentType, true); }
+                get { return GetPropertyTypes(ContentType, true); }
             }
 
 
@@ -1429,17 +1410,12 @@ namespace umbraco.cms.businesslogic
                     var tempCaption = SqlHelper.ExecuteScalar<string>("Select text from cmsPropertyTypeGroup where id = " + id.ToString());
                     if (!tempCaption.StartsWith("#"))
                         return tempCaption;
-                    else
+                    var lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
+                    if (lang != null)
                     {
-                        Language lang =
-                            Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
-                        if (lang != null)
-                            return
-                                new Dictionary.DictionaryItem(tempCaption.Substring(1, tempCaption.Length - 1)).Value(
-                                    lang.id);
-                        else
-                            return "[" + tempCaption + "]";
+                        return new Dictionary.DictionaryItem(tempCaption.Substring(1, tempCaption.Length - 1)).Value(lang.id);
                     }
+                    return "[" + tempCaption + "]";
                 }
                 catch
                 {
@@ -1447,9 +1423,9 @@ namespace umbraco.cms.businesslogic
                 }
             }
 
-            private int _id;
+            private readonly int _id;
 
-            private int? _sortOrder = null;
+            private int? _sortOrder;
 
             /// <summary>
             /// The sortorder of the tab
@@ -1482,10 +1458,10 @@ namespace umbraco.cms.businesslogic
                 // hence moving it up.
                 if (SortOrder > 0)
                 {
-                    int newsortorder = SortOrder - 1;
+                    var newsortorder = SortOrder - 1;
                     // Find the tab to switch with
-                    TabI[] Tabs = _contenttype.getVirtualTabs;
-                    foreach (Tab t in Tabs)
+                    var tabs = _contenttype.getVirtualTabs;
+                    foreach (Tab t in tabs)
                     {
                         if (t.SortOrder == newsortorder)
                             t.SortOrder = SortOrder;
@@ -1503,12 +1479,12 @@ namespace umbraco.cms.businesslogic
                 FixTabOrder();
                 // If this tab is not the last tab we can switch places with the next tab 
                 // hence moving it down.
-                TabI[] Tabs = _contenttype.getVirtualTabs;
-                if (SortOrder < Tabs.Length - 1)
+                var tabs = _contenttype.getVirtualTabs;
+                if (SortOrder < tabs.Length - 1)
                 {
-                    int newsortorder = SortOrder + 1;
+                    var newsortorder = SortOrder + 1;
                     // Find the tab to switch with
-                    foreach (Tab t in Tabs)
+                    foreach (Tab t in tabs)
                     {
                         if (t.SortOrder == newsortorder)
                             t.SortOrder = SortOrder;
@@ -1534,10 +1510,10 @@ namespace umbraco.cms.businesslogic
             /// </summary>
             private void FixTabOrder()
             {
-                TabI[] Tabs = _contenttype.getVirtualTabs;
-                for (int i = 0; i < Tabs.Length; i++)
+                var tabs = _contenttype.getVirtualTabs;
+                for (int i = 0; i < tabs.Length; i++)
                 {
-                    Tab t = (Tab)Tabs[i];
+                    var t = (Tab)tabs[i];
                     t.SortOrder = i;
                 }
             }
@@ -1572,23 +1548,18 @@ namespace umbraco.cms.businesslogic
                 {
                     if (!_caption.StartsWith("#"))
                         return _caption;
-                    else
+                    
+                    var lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
+                    if (lang != null)
                     {
-                        Language lang =
-                            Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
-                        if (lang != null)
+                        if (Dictionary.DictionaryItem.hasKey(_caption.Substring(1, _caption.Length - 1)))
                         {
-                            if (Dictionary.DictionaryItem.hasKey(_caption.Substring(1, _caption.Length - 1)))
-                            {
-                                var di =
-                                    new Dictionary.DictionaryItem(_caption.Substring(1, _caption.Length - 1));
-                                if (di != null)
-                                    return di.Value(lang.id);
-                            }
+                            var di = new Dictionary.DictionaryItem(_caption.Substring(1, _caption.Length - 1));
+                            return di.Value(lang.id);
                         }
-
-                        return "[" + _caption + "]";
                     }
+
+                    return "[" + _caption + "]";
                 }
             }
         }

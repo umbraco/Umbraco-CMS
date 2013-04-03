@@ -62,7 +62,7 @@ namespace umbraco.presentation.webservices
 
 
                         //deletes the old css file if the name was changed... 
-                        if (fileName != oldName)
+                        if (fileName.ToLowerInvariant() != oldName.ToLowerInvariant())
                         {
                             string p = IOHelper.MapPath(SystemDirectories.Css + "/" + oldName + ".css");
                             if (System.IO.File.Exists(p))

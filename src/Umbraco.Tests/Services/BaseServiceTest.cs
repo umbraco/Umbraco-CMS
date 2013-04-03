@@ -1,11 +1,8 @@
 using System;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using umbraco.editorControls.tinyMCE3;
-using umbraco.interfaces;
 
 namespace Umbraco.Tests.Services
 {
@@ -26,7 +23,7 @@ namespace Umbraco.Tests.Services
 			base.TearDown();
 		}
 
-		public void CreateTestData()
+		public virtual void CreateTestData()
 		{
 			//NOTE Maybe not the best way to create/save test data as we are using the services, which are being tested.
 
