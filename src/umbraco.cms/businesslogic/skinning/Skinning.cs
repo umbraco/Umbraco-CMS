@@ -3,30 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml;
-using umbraco.IO;
 using System.IO;
 using System.Collections;
 using System.Web;
 using System.Web.Caching;
+using Umbraco.Core;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.template;
 
 namespace umbraco.cms.businesslogic.skinning
 {
+
+    //TODO: Convert the caching to use ApplicationContext.Current.ApplicationCache
+
     public class Skinning
     {
-        static private Hashtable _checkedPages = new Hashtable();
+        static private readonly Hashtable CheckedPages = new Hashtable();
         static private XmlDocument _skinningXmlContent;
         static private string _skinningXmlSource = IOHelper.MapPath(SystemFiles.SkinningXml, false);
 
-        private const string CACHEKEY = "SkinnableTemplates";
+        private const string Cachekey = "SkinnableTemplates";
 
-        private static void clearCheckPages()
+        private static void ClearCheckPages()
         {
-            _checkedPages.Clear();
+            CheckedPages.Clear();
         }
-
 
         public static void RollbackSkin(int template)
         {
@@ -45,7 +48,7 @@ namespace umbraco.cms.businesslogic.skinning
             }
 
             RemoveSkin(template);
-            save();
+            Save();
         }
 
         public static void ActivateAsCurrentSkin(Skin skin)
@@ -78,71 +81,68 @@ namespace umbraco.cms.businesslogic.skinning
 
                 newSkin.ExecuteInstallTasks();
 
-                save();
+                Save();
             }
         }
-
-
-
-        private static void save()
+        
+        private static void Save()
         {
-            System.IO.FileStream f = System.IO.File.Open(_skinningXmlSource, FileMode.Create);
+            var f = File.Open(_skinningXmlSource, FileMode.Create);
             SkinXml.Save(f);
             f.Close();
         }
 
         public static string GetCurrentSkinAlias(int templateID)
         {
-            XmlElement x = (XmlElement)getTemplate(templateID);
+            var x = (XmlElement)GetTemplate(templateID);
             if (x != null && x.HasAttribute("alias") && !string.IsNullOrEmpty(x.Attributes["alias"].Value))
                 return x.Attributes["alias"].Value;
 
             return string.Empty;
         }
 
-        private static void SetSkin(int templateID, string skinAlias)
+        private static void SetSkin(int templateId, string skinAlias)
         {
-            XmlElement x = (XmlElement)getTemplate(templateID);
+            var x = (XmlElement)GetTemplate(templateId);
             if (x == null)
             {
                 x = (XmlElement)_skinningXmlContent.CreateNode(XmlNodeType.Element, "skin", "");
                 SkinXml.DocumentElement.AppendChild(x);
             }
 
-            x.SetAttribute("template", templateID.ToString());
+            x.SetAttribute("template", templateId.ToString());
             x.SetAttribute("alias", skinAlias);
-            save();
+            Save();
 
-            clearCheckPages();
+            ClearCheckPages();
         }
 
-        private static void RemoveSkin(int templateID)
+        private static void RemoveSkin(int templateId)
         {
-            XmlElement x = (XmlElement)getTemplate(templateID);
+            var x = (XmlElement)GetTemplate(templateId);
             if (x != null)
             {
                 x.ParentNode.RemoveChild(x);
-                save();
-                clearCheckPages();
+                Save();
+                ClearCheckPages();
             }
         }
-
-
-        private static XmlNode getTemplate(int templateId)
+        
+        private static XmlNode GetTemplate(int templateId)
         {
-            XmlNode x = SkinXml.SelectSingleNode("/skinning/skin [@template=" + templateId.ToString() + "]");
+            var x = SkinXml.SelectSingleNode("/skinning/skin [@template=" + templateId.ToString() + "]");
             return x;
         }
 
         public static List<Skin> GetAllSkins()
         {
-            List<Skin> skins = new List<Skin>();
+            var skins = new List<Skin>();
 
-            foreach (string dir in Directory.GetDirectories(IO.IOHelper.MapPath(SystemDirectories.Masterpages)))
+            foreach (var dir in Directory.GetDirectories(IOHelper.MapPath(SystemDirectories.Masterpages)))
             {
                 if (File.Exists(Path.Combine(dir, "skin.xml")))
                 {
-                    Skin s = Skin.CreateFromFile((Path.Combine(dir, "skin.xml")));
+                    var s = Skin.CreateFromFile((Path.Combine(dir, "skin.xml")));
                     s.Alias = new DirectoryInfo(dir).Name;
                     skins.Add(s);
                 }
@@ -165,10 +165,10 @@ namespace umbraco.cms.businesslogic.skinning
 
                     _skinningXmlContent = new XmlDocument();
 
-                    if (!System.IO.File.Exists(_skinningXmlSource))
+                    if (!File.Exists(_skinningXmlSource))
                     {
-                        System.IO.FileStream f = System.IO.File.Open(_skinningXmlSource, FileMode.Create);
-                        System.IO.StreamWriter sw = new StreamWriter(f);
+                        var f = File.Open(_skinningXmlSource, FileMode.Create);
+                        var sw = new StreamWriter(f);
                         sw.WriteLine("<skinning/>");
                         sw.Close();
                         f.Close();
@@ -181,44 +181,45 @@ namespace umbraco.cms.businesslogic.skinning
 
         public static Dictionary<string, Dictionary<string, string>> SkinnableTemplates()
         {
-            Dictionary<string, Dictionary<string, string>> dts = (Dictionary<string, Dictionary<string, string>>)HttpRuntime.Cache[CACHEKEY];
+            var dts = (Dictionary<string, Dictionary<string, string>>)HttpRuntime.Cache[Cachekey];
             if (dts == null)
-                dts = registerSkinnableTemplates();
+                dts = RegisterSkinnableTemplates();
 
             return dts;
         }
 
         //this is an pretty expensive operation, so we will cache the result...
-        private static Dictionary<string, Dictionary<string, string>> registerSkinnableTemplates()
+        private static Dictionary<string, Dictionary<string, string>> RegisterSkinnableTemplates()
         {
-            HttpRuntime.Cache.Remove(CACHEKEY);
-            Dictionary<string, Dictionary<string, string>> _allowedTemplates = new Dictionary<string, Dictionary<string, string>>();
+            HttpRuntime.Cache.Remove(Cachekey);
 
-            foreach (string dir in Directory.GetDirectories(IO.IOHelper.MapPath(SystemDirectories.Masterpages)))
+            var allowedTemplates = new Dictionary<string, Dictionary<string, string>>();
+
+            foreach (string dir in Directory.GetDirectories(IOHelper.MapPath(SystemDirectories.Masterpages)))
             {
                 if (File.Exists(Path.Combine(dir, "skin.xml")))
                 {
-                    XmlDocument manifest = new XmlDocument();
+                    var manifest = new XmlDocument();
                     manifest.Load(Path.Combine(dir, "skin.xml"));
 
-                    string name = umbraco.xmlHelper.GetNodeValue(manifest.SelectSingleNode("/Skin/Name"));
-                    string[] types = umbraco.xmlHelper.GetNodeValue(manifest.SelectSingleNode("/Skin/AllowedRootTemplate")).Split(',');
-                    string alias = new DirectoryInfo(dir).Name;
+                    var name = XmlHelper.GetNodeValue(manifest.SelectSingleNode("/Skin/Name"));
+                    var types = XmlHelper.GetNodeValue(manifest.SelectSingleNode("/Skin/AllowedRootTemplate")).Split(',');
+                    var alias = new DirectoryInfo(dir).Name;
 
                     //foreach allowed type, test if it is already there...
-                    foreach (string t in types)
+                    foreach (var t in types)
                     {
-                        if (!_allowedTemplates.ContainsKey(t))
-                            _allowedTemplates.Add(t, new Dictionary<string, string>());
+                        if (!allowedTemplates.ContainsKey(t))
+                            allowedTemplates.Add(t, new Dictionary<string, string>());
 
-                        if (!_allowedTemplates[t].ContainsKey(alias))
-                            _allowedTemplates[t].Add(alias, name);
+                        if (!allowedTemplates[t].ContainsKey(alias))
+                            allowedTemplates[t].Add(alias, name);
                     }
                 }
             }
-            HttpRuntime.Cache.Insert(CACHEKEY, _allowedTemplates, new CacheDependency(IO.IOHelper.MapPath(SystemDirectories.Masterpages)));
+            HttpRuntime.Cache.Insert(Cachekey, allowedTemplates, new CacheDependency(IOHelper.MapPath(SystemDirectories.Masterpages)));
 
-            return _allowedTemplates;
+            return allowedTemplates;
         }
 
         //Helpers for detecting what skins work with what document types
@@ -235,7 +236,7 @@ namespace umbraco.cms.businesslogic.skinning
 
         public static Dictionary<string, string> AllowedSkins(int templateID)
         {
-            Template template = new Template(templateID);
+            var template = new Template(templateID);
             return AllowedSkins(template.Alias);
         }
 
@@ -256,7 +257,7 @@ namespace umbraco.cms.businesslogic.skinning
 
         public static bool IsStarterKitInstalled()
         {
-            foreach (packager.InstalledPackage p in packager.InstalledPackage.GetAllInstalledPackages())
+            foreach (var p in packager.InstalledPackage.GetAllInstalledPackages())
             {
                 if (p.Data.EnableSkins)
                     return true;
@@ -267,7 +268,7 @@ namespace umbraco.cms.businesslogic.skinning
 
         public static Guid? StarterKitGuid()
         {
-            foreach (packager.InstalledPackage p in packager.InstalledPackage.GetAllInstalledPackages())
+            foreach (var p in packager.InstalledPackage.GetAllInstalledPackages())
             {
                 if (p.Data.EnableSkins)
                     return new Guid(p.Data.PackageGuid);
@@ -278,13 +279,13 @@ namespace umbraco.cms.businesslogic.skinning
 
         public static Guid? StarterKitGuid(int template)
         {
-            string packageFile = IO.IOHelper.MapPath(SystemDirectories.Packages) + "/installed/installedPackages.config";
-            XmlDocument installed = new XmlDocument();
+            string packageFile = IOHelper.MapPath(SystemDirectories.Packages) + "/installed/installedPackages.config";
+            var installed = new XmlDocument();
             if (File.Exists(packageFile))
             {
                 installed.Load(packageFile);
 
-                XmlNode starterKit = installed.SelectSingleNode(
+                var starterKit = installed.SelectSingleNode(
                     string.Format("//package [@enableSkins = 'True' and @packageGuid != '' and contains(./templates, '{0}')]", template));
 
                 if (starterKit != null)
@@ -296,24 +297,24 @@ namespace umbraco.cms.businesslogic.skinning
 
         public static bool HasAvailableSkins(int template)
         {
-            bool r = false;
+            var r = false;
 
-            Guid? g = StarterKitGuid(template);
+            var g = StarterKitGuid(template);
 
             if (g != null)
             {
                 try
                 {
-                    string skinRepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
+                    var skinRepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
-                    if (umbraco.cms.businesslogic.packager.InstalledPackage.GetByGuid(g.ToString()).Data.SkinRepoGuid != null &&
-                        umbraco.cms.businesslogic.packager.InstalledPackage.GetByGuid(g.ToString()).Data.SkinRepoGuid != Guid.Empty)
+                    if (packager.InstalledPackage.GetByGuid(g.ToString()).Data.SkinRepoGuid != null &&
+                        packager.InstalledPackage.GetByGuid(g.ToString()).Data.SkinRepoGuid != Guid.Empty)
                     {
-                        skinRepoGuid = umbraco.cms.businesslogic.packager.InstalledPackage.GetByGuid(g.ToString()).Data.SkinRepoGuid.ToString();
+                        skinRepoGuid = packager.InstalledPackage.GetByGuid(g.ToString()).Data.SkinRepoGuid.ToString();
                     }
 
 
-                    umbraco.cms.businesslogic.packager.repositories.Repository repo = cms.businesslogic.packager.repositories.Repository.getByGuid(skinRepoGuid);
+                    packager.repositories.Repository repo = packager.repositories.Repository.getByGuid(skinRepoGuid);
 
                     r = repo.Webservice.Skins(g.ToString()).Length > 0;
                 }
@@ -330,10 +331,10 @@ namespace umbraco.cms.businesslogic.skinning
 
         public static bool IsPackageInstalled(Guid PackageGuid)
         {
-            XmlDocument installed = new XmlDocument();
-            installed.Load(IO.IOHelper.MapPath(SystemDirectories.Packages) + "/installed/installedPackages.config");
+            var installed = new XmlDocument();
+            installed.Load(IOHelper.MapPath(SystemDirectories.Packages) + "/installed/installedPackages.config");
 
-            XmlNode packageNode = installed.SelectSingleNode(
+            var packageNode = installed.SelectSingleNode(
                 string.Format("//package [@packageGuid = '{0}']", PackageGuid.ToString()));
 
             return packageNode != null;
@@ -341,10 +342,10 @@ namespace umbraco.cms.businesslogic.skinning
 
         public static bool IsPackageInstalled(string Name)
         {
-            XmlDocument installed = new XmlDocument();
-            installed.Load(IO.IOHelper.MapPath(SystemDirectories.Packages) + "/installed/installedPackages.config");
+            var installed = new XmlDocument();
+            installed.Load(IOHelper.MapPath(SystemDirectories.Packages) + "/installed/installedPackages.config");
 
-            XmlNode packageNode = installed.SelectSingleNode(
+            var packageNode = installed.SelectSingleNode(
                 string.Format("//package [@name = '{0}']", Name));
 
             return packageNode != null;
@@ -352,171 +353,18 @@ namespace umbraco.cms.businesslogic.skinning
 
         public static string GetModuleAlias(string Name)
         {
-            XmlDocument installed = new XmlDocument();
-            installed.Load(IO.IOHelper.MapPath(SystemDirectories.Packages) + "/installed/installedPackages.config");
+            var installed = new XmlDocument();
+            installed.Load(IOHelper.MapPath(SystemDirectories.Packages) + "/installed/installedPackages.config");
 
-            XmlNode packageNode = installed.SelectSingleNode(
+            var packageNode = installed.SelectSingleNode(
                 string.Format("//package [@name = '{0}']", Name));
 
-            XmlNode macroNode = packageNode.SelectSingleNode(".//macros");
+            var macroNode = packageNode.SelectSingleNode(".//macros");
 
-            cms.businesslogic.macro.Macro m = new cms.businesslogic.macro.Macro(Convert.ToInt32(macroNode.InnerText.Split(',')[0]));
+            var m = new macro.Macro(Convert.ToInt32(macroNode.InnerText.Split(',')[0]));
 
             return m.Alias;
         }
-        #region old code
-
-
-
-        /*
-        
-        public static string FindAppliedSkin(int DocumentId, string Path)
-        {
-            string skinAlias = string.Empty;
-
-            if (!_checkedPages.ContainsKey(DocumentId))
-            {
-                foreach (string id in Path.Split(','))
-                {
-                    XmlNode n = getPage(int.Parse(id));
-                    if (n != null && n.Attributes["skin"] != null && !string.IsNullOrEmpty(n.Attributes["skin"].Value))
-                    {
-                        skinAlias = n.Attributes["skin"].Value;
-                        break;
-                    }
-                }
-
-                // Add thread safe updating to the hashtable
-                System.Web.HttpContext.Current.Application.Lock();
-                if (!_checkedPages.ContainsKey(DocumentId))
-                    _checkedPages.Add(DocumentId, skinAlias);
-
-                System.Web.HttpContext.Current.Application.UnLock();
-            }
-            else
-                skinAlias = (string)_checkedPages[DocumentId];
-
-            return skinAlias;
-        }
-         * 
-         * 
-        public static Skin AppliedSkin(int DocumentId, string Path)
-        {
-            string active = FindAppliedSkin(DocumentId, Path);
-            if (!string.IsNullOrEmpty(active))
-            {
-               
-                return Skin.CreateFromFile(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + active + "/skin.xml");
-            }
-
-            return null;
-        }
-
-        
-        public static Dictionary<string, Dictionary<string, string>> SkinnableDocumentTypes()
-        {            
-            Dictionary<string, Dictionary<string, string>> dts = (Dictionary<string, Dictionary<string, string>>)HttpRuntime.Cache[CACHEKEY];
-            if (dts == null)
-                dts = registerAllowedDocumentTypes();
-            
-            return dts;
-        }
-                      
-        //this is an pretty expensive operation, so we will cache the result...
-        private static Dictionary<string, Dictionary<string, string>> registerAllowedDocumentTypes()
-        {
-            HttpRuntime.Cache.Remove(CACHEKEY);
-            Dictionary<string, Dictionary<string, string>> _allowedDocumentTypes = new Dictionary<string, Dictionary<string, string>>();
-
-            foreach (string dir in Directory.GetDirectories(IO.IOHelper.MapPath(SystemDirectories.Masterpages)))
-            {
-                if( File.Exists( Path.Combine( dir , "skin.xml" ) )) {
-                    XmlDocument manifest = new XmlDocument();
-                    manifest.Load(Path.Combine(dir, "skin.xml"));
-
-                    string name = umbraco.xmlHelper.GetNodeValue( manifest.SelectSingleNode("/Skin/Name"));
-                    string[] types = umbraco.xmlHelper.GetNodeValue( manifest.SelectSingleNode("/Skin/AllowedDocumentTypes")).Split(',');
-                    string alias = new DirectoryInfo(dir).Name;
-                    
-                    //foreach allowed type, test if it is already there...
-                    foreach(string t in types){
-                        if (!_allowedDocumentTypes.ContainsKey(t))
-                            _allowedDocumentTypes.Add(t, new Dictionary<string,string>());
-
-                        if (!_allowedDocumentTypes[t].ContainsKey(alias))
-                            _allowedDocumentTypes[t].Add(alias, name);
-                    }
-                }
-            }
-            HttpRuntime.Cache.Insert(CACHEKEY, _allowedDocumentTypes, new CacheDependency( IO.IOHelper.MapPath(SystemDirectories.Masterpages) ));
-
-            return _allowedDocumentTypes;
-        }
-        
-        public static void SetSkin(int DocumentId, string skinAlias)
-        {
-
-                XmlElement x = (XmlElement)getPage(DocumentId);
-                if (x == null)
-                {
-                    x = (XmlElement)_skinningXmlContent.CreateNode(XmlNodeType.Element, "page", "");
-                    SkinXml.DocumentElement.AppendChild(x);
-                }
-               
-                x.SetAttribute("id", DocumentId.ToString());
-                x.SetAttribute("skin", skinAlias);
-                save();
-                    
-                clearCheckPages();
-        }
-               
-        public static void RemoveSkin(int DocumentId)
-        {
-            XmlElement x = (XmlElement)getPage(DocumentId);
-            if (x != null)
-            {   
-                x.ParentNode.RemoveChild(x);
-                save();
-                clearCheckPages();
-            }
-        }
-        
-        private static XmlNode getPage(int documentId)
-        {
-            XmlNode x = SkinXml.SelectSingleNode("/skinning/page [@id=" + documentId.ToString() + "]");
-            return x;
-        }           
-        
-        //Helpers for detecting what skins work with what document types
-        public static bool IsSkinnable(string documentTypeAlias)
-        {
-            return SkinnableDocumentTypes().ContainsKey(documentTypeAlias);
-        }
-
-        public static bool IsSkinnable(DocumentType documentType)
-        {
-            return IsSkinnable(documentType.Alias);
-        }
-        
-
-        public static Dictionary<string, string> AllowedSkins(DocumentType documentType)
-        {
-            return AllowedSkins(documentType.Alias);
-        }
-        
-        public static Dictionary<string, string> AllowedSkins(string documentTypeAlias)
-        {
-            if (IsSkinnable(documentTypeAlias))
-            {
-                return SkinnableDocumentTypes()[documentTypeAlias];
-            }
-            else
-                return new Dictionary<string, string>();
-        }
-         * 
-         * 
-        */
-        #endregion
 
     }
 }

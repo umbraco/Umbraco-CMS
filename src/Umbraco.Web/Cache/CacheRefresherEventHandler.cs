@@ -22,6 +22,10 @@ namespace Umbraco.Web.Cache
     {
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {          
+            //bind to user type events
+            UserType.Deleted += UserTypeDeleted;
+            UserType.New += UserTypeNew;
+            UserType.Updated += UserTypeUpdated;
 
             //Bind to dictionary events
             //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
@@ -111,6 +115,23 @@ namespace Umbraco.Web.Cache
             MediaService.Moving += MediaServiceMoving;
             MediaService.Trashing += MediaServiceTrashing;
         }
+
+        #region UserType event handlers
+        static void UserTypeUpdated(UserType sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RefreshUserTypeCache(sender.Id);
+        }
+
+        static void UserTypeNew(UserType sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RefreshAllUserTypeCache();
+        }
+
+        static void UserTypeDeleted(UserType sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RemoveUserTypeCache(sender.Id);
+        } 
+        #endregion
         
         #region Dictionary event handlers
 

@@ -22,6 +22,8 @@ namespace Umbraco.Core.Configuration
 
 	//TODO: Re-enable logging !!!!
 
+    //TODO: We need to convert this to a real section, it's currently using HttpRuntime.Cache to detect cahnges, this is real poor, especially in a console app
+
 	/// <summary>
 	/// The UmbracoSettings Class contains general settings information for the entire Umbraco instance based on information from the /config/umbracoSettings.config file
 	/// </summary>
