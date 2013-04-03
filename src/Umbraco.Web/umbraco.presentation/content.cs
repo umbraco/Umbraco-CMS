@@ -558,12 +558,12 @@ namespace umbraco
                 Action.RunActionHandlers(d, ActionPublish.Instance);
             }
         }
-
-        [Obsolete("Method obsolete in version 4.1 and later, please use UpdateDocumentCache", true)]
+        
         /// <summary>
         /// Updates the document cache async.
         /// </summary>
         /// <param name="documentId">The document id.</param>
+        [Obsolete("Method obsolete in version 4.1 and later, please use UpdateDocumentCache", true)]
         public virtual void UpdateDocumentCacheAsync(int documentId)
         {
             ThreadPool.QueueUserWorkItem(delegate { UpdateDocumentCache(documentId); });
@@ -975,19 +975,6 @@ namespace umbraco
             // If running in a context very important to reset context cache orelse new nodes are missing
             if (HttpContext.Current != null && HttpContext.Current.Items.Contains(XmlContextContentItemKey))
                 HttpContext.Current.Items.Remove(XmlContextContentItemKey);
-        }
-
-        /// <summary>
-        /// Invalidates the disk content cache file. Effectively just deletes it.
-        /// </summary>
-        [Obsolete("This method is obsolete in version 4.1 and above, please use DeleteXmlCache", true)]
-        private void ClearDiskCacheAsync()
-        {
-            // Queue file deletion
-            // We queue this function, because there can be a write process running at the same time
-            // and we don't want this method to block web request
-            ThreadPool.QueueUserWorkItem(
-                delegate { DeleteXmlCache(); });
         }
 
         /// <summary>
