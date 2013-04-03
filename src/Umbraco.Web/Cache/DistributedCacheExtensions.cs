@@ -22,6 +22,11 @@ namespace Umbraco.Web.Cache
         public static void RefreshUserCache(this DistributedCache dc, int userId)
         {
             dc.Refresh(new Guid(DistributedCache.UserCacheRefresherId), userId);
+        }
+
+        public static void RefreshAllUserCache(this DistributedCache dc)
+        {
+            dc.RefreshAll(new Guid(DistributedCache.UserCacheRefresherId));
         } 
         #endregion
 
