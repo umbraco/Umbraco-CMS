@@ -66,6 +66,10 @@ namespace Umbraco.Core.Cache
             return getCacheItem();
         }
 
+        public override void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, Func<T> getCacheItem)
+        {
+        }
+
         public override void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, TimeSpan timeout, Func<T> getCacheItem)
         {
         }

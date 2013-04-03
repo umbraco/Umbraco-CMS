@@ -283,6 +283,20 @@ namespace Umbraco.Core.Cache
         /// <typeparam name="T"></typeparam>
         /// <param name="cacheKey"></param>
         /// <param name="priority"></param>
+        /// <param name="getCacheItem"></param>
+        public override void InsertCacheItem<T>(string cacheKey,
+                                                CacheItemPriority priority,
+                                                Func<T> getCacheItem)
+        {
+            InsertCacheItem(cacheKey, priority, null, null, null, getCacheItem);
+        }
+
+        /// <summary>
+        /// Inserts an item into the cache, if it already exists in the cache it will be replaced
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cacheKey"></param>
+        /// <param name="priority"></param>
         /// <param name="timeout">This will set an absolute expiration from now until the timeout</param>
         /// <param name="getCacheItem"></param>
         public override void InsertCacheItem<T>(string cacheKey,

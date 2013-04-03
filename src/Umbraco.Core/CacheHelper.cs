@@ -272,6 +272,27 @@ namespace Umbraco.Core
                 return _httpCache.GetCacheItem<TT>(cacheKey, priority, refreshAction, cacheDependency, timeout, getCacheItem);
             }
         }
+
+        /// <summary>
+        /// Inserts an item into the cache, if it already exists in the cache it will be replaced
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cacheKey"></param>
+        /// <param name="priority"></param>
+        /// <param name="getCacheItem"></param>
+        public void InsertCacheItem<T>(string cacheKey,
+                                       CacheItemPriority priority,
+                                       Func<T> getCacheItem)
+        {
+            if (!_enableCache)
+            {
+                _nullCache.InsertCacheItem<T>(cacheKey, priority, getCacheItem);
+            }
+            else
+            {
+                _httpCache.InsertCacheItem<T>(cacheKey, priority, getCacheItem);
+            }
+        }
 		
         /// <summary>
         /// Inserts an item into the cache, if it already exists in the cache it will be replaced

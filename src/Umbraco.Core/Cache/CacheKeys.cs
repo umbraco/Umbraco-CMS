@@ -6,6 +6,8 @@ namespace Umbraco.Core.Cache
     /// </summary>
     public static class CacheKeys
     {
+        public const string ContentItemCacheKey = "contentItem";
+
         public const string MediaCacheKey = "UL_GetMedia";
 
         public const string MacroCacheKey = "UmbracoMacroCache";
