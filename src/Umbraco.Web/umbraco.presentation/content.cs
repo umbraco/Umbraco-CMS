@@ -965,19 +965,6 @@ namespace umbraco
         }
 
         /// <summary>
-        /// Invalidates the disk content cache file. Effectively just deletes it.
-        /// </summary>
-        [Obsolete("This method is obsolete in version 4.1 and above, please use DeleteXmlCache", true)]
-        private void ClearDiskCacheAsync()
-        {
-            // Queue file deletion
-            // We queue this function, because there can be a write process running at the same time
-            // and we don't want this method to block web request
-            ThreadPool.QueueUserWorkItem(
-                delegate { DeleteXmlCache(); });
-        }
-
-        /// <summary>
         /// Load content from either disk or database
         /// </summary>
         /// <returns></returns>

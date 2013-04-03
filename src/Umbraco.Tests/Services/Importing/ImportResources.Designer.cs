@@ -86,6 +86,34 @@ namespace Umbraco.Tests.Services.Importing {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+        ///&lt;DocumentType&gt;
+        ///  &lt;Info&gt;
+        ///    &lt;Name&gt;test&lt;/Name&gt;
+        ///    &lt;Alias&gt;test&lt;/Alias&gt;
+        ///    &lt;Icon&gt;folder.gif&lt;/Icon&gt;
+        ///    &lt;Thumbnail&gt;folder.png&lt;/Thumbnail&gt;
+        ///    &lt;Description&gt;
+        ///    &lt;/Description&gt;
+        ///    &lt;AllowAtRoot&gt;False&lt;/AllowAtRoot&gt;
+        ///    &lt;AllowedTemplates&gt;
+        ///      &lt;Template&gt;test&lt;/Template&gt;
+        ///    &lt;/AllowedTemplates&gt;
+        ///    &lt;DefaultTemplate&gt;test&lt;/DefaultTemplate&gt;
+        ///  &lt;/Info&gt;
+        ///  &lt;Structure&gt;
+        ///    &lt;DocumentType&gt;test&lt;/DocumentType&gt;
+        ///  &lt;/Structure&gt;
+        ///  &lt;GenericProperties&gt;
+        ///    &lt;GenericProperty&gt; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string SingleDocType {
+            get {
+                return ResourceManager.GetString("SingleDocType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
         ///&lt;umbPackage&gt;
         ///  &lt;files&gt;

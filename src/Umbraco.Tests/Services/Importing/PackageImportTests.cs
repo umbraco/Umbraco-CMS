@@ -206,5 +206,22 @@ namespace Umbraco.Tests.Services.Importing
             Assert.That(templates.Any(), Is.True);
             Assert.That(templates.Count(), Is.EqualTo(numberOfTemplates));
         }
+
+        [Test]
+        public void PackagingService_Can_Import_Single_DocTypr()
+        {
+            // Arrange
+            string strXml = ImportResources.SingleDocType;
+            var docTypeElement = XElement.Parse(strXml);
+            var packagingService = ServiceContext.PackagingService;
+
+            // Act
+            var contentTypes = packagingService.ImportContentTypes(docTypeElement);
+
+            // Assert
+            Assert.That(contentTypes.Any(), Is.True);
+            Assert.That(contentTypes.Any(x => x.HasIdentity == false), Is.False);
+            Assert.That(contentTypes.Count(), Is.EqualTo(1));
+        }
     }
 }
