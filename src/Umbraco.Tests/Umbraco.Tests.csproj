@@ -426,6 +426,7 @@
     <Content Include="Migrations\SqlScripts\SqlCeTotal-480.sql" />
     <Content Include="Migrations\SqlScripts\SqlServerTotal-480.sql" />
     <Content Include="Services\Importing\InheritedDocTypes-Package.xml" />
+    <Content Include="Services\Importing\SingleDocType.xml" />
     <Content Include="Services\Importing\StandardMvc-Package.xml">
       <SubType>Designer</SubType>
     </Content>
