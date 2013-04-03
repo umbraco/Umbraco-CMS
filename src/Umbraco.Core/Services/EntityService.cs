@@ -164,13 +164,13 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets a collection of children by the parents Id
         /// </summary>
-        /// <param name="id">Id of the parent to retrieve children for</param>
+        /// <param name="parentId">Id of the parent to retrieve children for</param>
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
-        public virtual IEnumerable<IUmbracoEntity> GetChildren(int id)
+        public virtual IEnumerable<IUmbracoEntity> GetChildren(int parentId)
         {
             using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == id);
+                var query = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == parentId);
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -180,15 +180,15 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets a collection of children by the parents Id and UmbracoObjectType
         /// </summary>
-        /// <param name="id">Id of the parent to retrieve children for</param>
+        /// <param name="parentId">Id of the parent to retrieve children for</param>
         /// <param name="umbracoObjectType">UmbracoObjectType of the children to retrieve</param>
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
-        public virtual IEnumerable<IUmbracoEntity> GetChildren(int id, UmbracoObjectTypes umbracoObjectType)
+        public virtual IEnumerable<IUmbracoEntity> GetChildren(int parentId, UmbracoObjectTypes umbracoObjectType)
         {
             var objectTypeId = umbracoObjectType.GetGuid();
             using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == id);
+                var query = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == parentId);
                 var contents = repository.GetByQuery(query, objectTypeId);
 
                 return contents;

@@ -58,8 +58,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IUmbracoEntity Get(int id, Guid objectTypeId)
         {
-            bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
-            var sql = GetBaseWhere(GetBase, isContent, objectTypeId, id).Append(GetGroupBy(isContent));
+            bool isContentOrMedia = objectTypeId == new Guid(Constants.ObjectTypes.Document) || objectTypeId == new Guid(Constants.ObjectTypes.Media);
+            var sql = GetBaseWhere(GetBase, isContentOrMedia, objectTypeId, id).Append(GetGroupBy(isContentOrMedia));
             var nodeDto = _work.Database.FirstOrDefault<UmbracoEntityDto>(sql);
             if (nodeDto == null)
                 return null;
@@ -81,8 +81,8 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
-                var sql = GetBaseWhere(GetBase, isContent, objectTypeId).Append(GetGroupBy(isContent));
+                bool isContentOrMedia = objectTypeId == new Guid(Constants.ObjectTypes.Document) || objectTypeId == new Guid(Constants.ObjectTypes.Media);
+                var sql = GetBaseWhere(GetBase, isContentOrMedia, objectTypeId).Append(GetGroupBy(isContentOrMedia));
                 var dtos = _work.Database.Fetch<UmbracoEntityDto>(sql);
 
                 var factory = new UmbracoEntityFactory();
@@ -111,10 +111,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId)
         {
-            bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
-            var sqlClause = GetBaseWhere(GetBase, isContent, objectTypeId);
+            bool isContentOrMedia = objectTypeId == new Guid(Constants.ObjectTypes.Document) || objectTypeId == new Guid(Constants.ObjectTypes.Media);
+            var sqlClause = GetBaseWhere(GetBase, isContentOrMedia, objectTypeId);
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
-            var sql = translator.Translate().Append(GetGroupBy(isContent));
+            var sql = translator.Translate().Append(GetGroupBy(isContentOrMedia));
 
             var dtos = _work.Database.Fetch<UmbracoEntityDto>(sql);
 
@@ -128,94 +128,110 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Sql Statements
 
-        protected virtual Sql GetBase(bool isContent)
+        protected virtual Sql GetBase(bool isContentOrMedia)
         {
             var columns = new List<object>
                               {
-                                  "main.id",
-                                  "main.trashed",
-                                  "main.parentID",
-                                  "main.nodeUser",
-                                  "main.level",
-                                  "main.path",
-                                  "main.sortOrder",
-                                  "main.uniqueID",
-                                  "main.text",
-                                  "main.nodeObjectType",
-                                  "main.createDate",
+                                  "umbracoNode.id",
+                                  "umbracoNode.trashed",
+                                  "umbracoNode.parentID",
+                                  "umbracoNode.nodeUser",
+                                  "umbracoNode.level",
+                                  "umbracoNode.path",
+                                  "umbracoNode.sortOrder",
+                                  "umbracoNode.uniqueID",
+                                  "umbracoNode.text",
+                                  "umbracoNode.nodeObjectType",
+                                  "umbracoNode.createDate",
                                   "COUNT(parent.parentID) as children"
                               };
 
-            if (isContent)
+            if (isContentOrMedia)
             {
                 columns.Add("published.versionId as publishedVerison");
                 columns.Add("latest.versionId as newestVersion");
+                columns.Add("contenttype.alias");
+                columns.Add("contenttype.icon");
+                columns.Add("property.dataNvarchar as umbracoFile");
             }
 
             var sql = new Sql()
                 .Select(columns.ToArray())
-                .From("umbracoNode main")
-                .LeftJoin("umbracoNode parent").On("parent.parentID = main.id");
+                .From("umbracoNode umbracoNode")
+                .LeftJoin("umbracoNode parent").On("parent.parentID = umbracoNode.id");
 
 
-            if (isContent)
+            if (isContentOrMedia)
             {
-                sql.LeftJoin("(SELECT nodeId, versionId FROM cmsDocument WHERE published = 1 GROUP BY nodeId, versionId) as published").On("main.id = published.nodeId");
-                sql.LeftJoin("(SELECT nodeId, versionId FROM cmsDocument WHERE newest = 1 GROUP BY nodeId, versionId) as latest").On("main.id = latest.nodeId");
+                sql.InnerJoin("cmsContent content").On("content.nodeId = umbracoNode.id")
+                   .LeftJoin("cmsContentType contenttype").On("contenttype.nodeId = content.contentType")
+                   .LeftJoin(
+                       "(SELECT nodeId, versionId FROM cmsDocument WHERE published = 1 GROUP BY nodeId, versionId) as published")
+                   .On("umbracoNode.id = published.nodeId")
+                   .LeftJoin(
+                       "(SELECT nodeId, versionId FROM cmsDocument WHERE newest = 1 GROUP BY nodeId, versionId) as latest")
+                   .On("umbracoNode.id = latest.nodeId")
+                   .LeftJoin(
+                       "(SELECT contentNodeId, dataNvarchar FROM cmsPropertyData INNER JOIN cmsPropertyType ON cmsPropertyType.id = cmsPropertyData.propertytypeid"+
+                       " INNER JOIN cmsDataType ON cmsPropertyType.dataTypeId = cmsDataType.nodeId WHERE cmsDataType.controlId = '"+ Constants.PropertyEditors.UploadField +"') as property")
+                   .On("umbracoNode.id = property.contentNodeId");
             }
 
             return sql;
         }
 
-        protected virtual Sql GetBaseWhere(Func<bool, Sql> baseQuery, bool isContent, Guid id)
+        protected virtual Sql GetBaseWhere(Func<bool, Sql> baseQuery, bool isContentOrMedia, Guid id)
         {
-            var sql = baseQuery(isContent)
-                .Where("main.nodeObjectType = @NodeObjectType", new {NodeObjectType = id});
+            var sql = baseQuery(isContentOrMedia)
+                .Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = id });
             return sql;
         }
 
-        protected virtual Sql GetBaseWhere(Func<bool, Sql> baseQuery, bool isContent, int id)
+        protected virtual Sql GetBaseWhere(Func<bool, Sql> baseQuery, bool isContentOrMedia, int id)
         {
-            var sql = baseQuery(isContent)
-                .Where("main.id = @Id", new {Id = id})
-                .Append(GetGroupBy(isContent));
+            var sql = baseQuery(isContentOrMedia)
+                .Where("umbracoNode.id = @Id", new { Id = id })
+                .Append(GetGroupBy(isContentOrMedia));
             return sql;
         }
 
-        protected virtual Sql GetBaseWhere(Func<bool, Sql> baseQuery, bool isContent, Guid objectId, int id)
+        protected virtual Sql GetBaseWhere(Func<bool, Sql> baseQuery, bool isContentOrMedia, Guid objectId, int id)
         {
-            var sql = baseQuery(isContent)
-                .Where("main.id = @Id AND main.nodeObjectType = @NodeObjectType",
+            var sql = baseQuery(isContentOrMedia)
+                .Where("umbracoNode.id = @Id AND umbracoNode.nodeObjectType = @NodeObjectType",
                        new {Id = id, NodeObjectType = objectId});
             return sql;
         }
 
-        protected virtual Sql GetGroupBy(bool isContent)
+        protected virtual Sql GetGroupBy(bool isContentOrMedia)
         {
             var columns = new List<object>
                               {
-                                  "main.id",
-                                  "main.trashed",
-                                  "main.parentID",
-                                  "main.nodeUser",
-                                  "main.level",
-                                  "main.path",
-                                  "main.sortOrder",
-                                  "main.uniqueID",
-                                  "main.text",
-                                  "main.nodeObjectType",
-                                  "main.createDate"
+                                  "umbracoNode.id",
+                                  "umbracoNode.trashed",
+                                  "umbracoNode.parentID",
+                                  "umbracoNode.nodeUser",
+                                  "umbracoNode.level",
+                                  "umbracoNode.path",
+                                  "umbracoNode.sortOrder",
+                                  "umbracoNode.uniqueID",
+                                  "umbracoNode.text",
+                                  "umbracoNode.nodeObjectType",
+                                  "umbracoNode.createDate"
                               };
 
-            if (isContent)
+            if (isContentOrMedia)
             {
                 columns.Add("published.versionId");
                 columns.Add("latest.versionId");
+                columns.Add("contenttype.alias");
+                columns.Add("contenttype.icon");
+                columns.Add("property.dataNvarchar");
             }
 
             var sql = new Sql()
                 .GroupBy(columns.ToArray())
-                .OrderBy("main.sortOrder");
+                .OrderBy("umbracoNode.sortOrder");
             return sql;
         }
 
@@ -246,6 +262,15 @@ namespace Umbraco.Core.Persistence.Repositories
 
             [Column("newestVerison")]
             public Guid NewestVersion { get; set; }
+
+            [Column("alias")]
+            public string Alias { get; set; }
+
+            [Column("icon")]
+            public string IconUrl { get; set; }
+
+            [Column("umbracoFile")]
+            public string UmbracoFile { get; set; }
         }
         #endregion
     }
