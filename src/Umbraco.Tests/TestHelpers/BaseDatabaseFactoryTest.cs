@@ -298,8 +298,7 @@ namespace Umbraco.Tests.TestHelpers
             var ctx = new UmbracoContext(
                 GetHttpContextFactory(url, routeData).HttpContext,
                 ApplicationContext,
-                cache, 
-                new PublishedMediaCache());
+                new PublishedCaches(cache, new PublishedMediaCache()));
 
             return ctx;
         }
