@@ -97,24 +97,23 @@
             var t = "";
             var clsName = "";
             var pH = ""; //addition html
-            if (options.useSprite != false) {
-                clsName = ' ' + options.useSprite + ' ' + currentOptOption.className;
-            } else {
-                arrow = $(currentOptOption).prop("title");
-                var reg = new RegExp(/^\{.*\}$/);
-                var isJson = reg.test(arrow);
-                if (options.jsonTitle == true && isJson == true) {
-                    if (arrow.length != 0) {
-                        var obj = eval("[" + arrow + "]");
-                        img = (typeof obj[0].image == "undefined") ? "" : obj[0].image;
-                        t = (typeof obj[0].title == "undefined") ? "" : obj[0].title;
-                        pH = (typeof obj[0].postHTML == "undefined") ? "" : obj[0].postHTML;
-                        arrow = (img.length == 0) ? "" : '<img src="' + img + '" align="absmiddle" /> ';
-                    };
-                } else {
-                    arrow = (arrow.length == 0) ? "" : '<img src="' + arrow + '" align="absmiddle" /> ';
+
+            clsName = ' ' + options.useSprite + ' ' + currentOptOption.className;
+            arrow = $(currentOptOption).prop("title");
+            var reg = new RegExp(/^\{.*\}$/);
+            var isJson = reg.test(arrow);
+            if (options.jsonTitle == true && isJson == true) {
+                if (arrow.length != 0) {
+                    var obj = eval("[" + arrow + "]");
+                    img = (typeof obj[0].image == "undefined") ? "" : obj[0].image;
+                    t = (typeof obj[0].title == "undefined") ? "" : obj[0].title;
+                    pH = (typeof obj[0].postHTML == "undefined") ? "" : obj[0].postHTML;
+                    arrow = (img.length == 0) ? "" : '<img src="' + img + '" align="absmiddle" /> ';
                 };
+            } else {
+                arrow = (arrow.length == 0) ? "" : '<img src="' + arrow + '" align="absmiddle" /> ';
             };
+
             var sText = $(currentOptOption).text();
             var sValue = $(currentOptOption).val();
             var sEnabledClass = ($(currentOptOption).prop("disabled") == true) ? "disabled" : "enabled";
@@ -325,7 +324,7 @@
                             };
                         });
 
-                    } 
+                    }
                 });
             };
             $("#" + childid).bind("mouseout", function (event) { setInsideWindow(false); $(document).unbind("keydown", d_onkeydown); actionSettings.keyboardAction = false; actionSettings.currentKey = null; });
@@ -385,7 +384,7 @@
                         //shift
                         var currentSelected = $(obj).prop("id");
                         var currentIndex = a_array[currentSelected].index;
-                        for (var i = Math.min(oldIndex, currentIndex); i <= Math.max(oldIndex, currentIndex); i++) {
+                        for (var i = Math.min(oldIndex, currentIndex) ; i <= Math.max(oldIndex, currentIndex) ; i++) {
                             $("#" + getByIndex(i).id).addClass(styles.selected);
                         };
                     } else {
@@ -621,7 +620,7 @@
             if (has_handler('change') == true) {
                 //alert(1);
                 var currentSelected = a_array[$("#" + childid + " a.selected").prop("id")];
-                if(currentSelected != undefined) {
+                if (currentSelected != undefined) {
                     var currentSelectedValue = currentSelected.text;
                     if ($.trim(oldSelectedValue) !== $.trim(currentSelectedValue) && oldSelectedValue !== "") {
                         $("#" + elementid).trigger("change");
@@ -786,9 +785,9 @@
             };
             if ($("#" + childid).css("display") == "none") {
                 var oldSelected = a_array[$("#" + childid + " a.selected").prop("id")];
-                if(oldSelected != undefined)
+                if (oldSelected != undefined)
                     oldSelectedValue = oldSelected.text;
-                
+
                 //keyboard action
                 inputText = "";
                 oldHeight = $("#" + childid).height();

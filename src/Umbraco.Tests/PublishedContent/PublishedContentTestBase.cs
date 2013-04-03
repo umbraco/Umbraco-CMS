@@ -18,7 +18,7 @@ namespace Umbraco.Tests.PublishedContent
         public override void Initialize()
         {
             base.Initialize();
-
+            
             UmbracoSettings.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
 
             //need to specify a custom callback for unit tests

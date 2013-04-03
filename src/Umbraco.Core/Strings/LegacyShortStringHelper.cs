@@ -32,14 +32,14 @@ namespace Umbraco.Core.Strings
         }
 
         const string UmbracoValidAliasCharacters = "_-abcdefghijklmnopqrstuvwxyz1234567890";
-        const string UmbracoInvalidFirstCharacters = "01234567890";
+        const string UmbracoInvalidFirstCharacters = "0123456789";
 
         #endregion
 
         #region Short string services JavaScript
 
         const string SssjsValidCharacters = "_-abcdefghijklmnopqrstuvwxyz1234567890";
-        const string SssjsInvalidFirstCharacters = "01234567890";
+        const string SssjsInvalidFirstCharacters = "0123456789";
 
         private const string SssjsFormat = @"
 var UMBRACO_FORCE_SAFE_ALIAS = {0};
@@ -468,7 +468,7 @@ function isValidAlias(alias) {{
         /// </remarks>
         public string LegacyFormatUrl(string url)
         {
-            var newUrl = url;
+            var newUrl = url.ToLowerInvariant();
             var replaceChars = UmbracoSettings.UrlReplaceCharacters;
             foreach (XmlNode n in replaceChars.SelectNodes("char"))
             {

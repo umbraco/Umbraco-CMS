@@ -494,6 +494,7 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Services\Importing\uBlogsy-Package.xml" />
+    <Content Include="Services\Importing\XsltSearch-Package.xml" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

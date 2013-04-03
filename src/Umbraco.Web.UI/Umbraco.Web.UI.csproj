@@ -378,6 +378,13 @@
       <DependentUpon>Title.ascx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Umbraco\Create.aspx.cs">
+      <DependentUpon>create.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Create.aspx.designer.cs">
+      <DependentUpon>create.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Create\PartialViewMacro.ascx.cs">
       <DependentUpon>PartialViewMacro.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -552,6 +559,7 @@
     <Content Include="Umbraco\Config\Lang\ru.xml" />
     <Content Include="Umbraco\Config\Lang\zh.xml" />
     <Content Include="Umbraco\Controls\Tree\CustomTreeService.asmx" />
+    <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Create\PartialViewMacro.ascx" />
     <Content Include="Umbraco\Dashboard\ExamineManagement.ascx" />
     <Content Include="Umbraco\Dashboard\Images\access-denied.png" />
@@ -2041,7 +2049,6 @@
     <Content Include="Umbraco\Translation\default.aspx" />
     <Content Include="Umbraco\Translation\preview.aspx" />
     <Content Include="Umbraco\Translation\xml.aspx" />
-    <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Create\content.ascx" />
     <Content Include="Umbraco\Create\language.ascx">
       <SubType>UserControl</SubType>
