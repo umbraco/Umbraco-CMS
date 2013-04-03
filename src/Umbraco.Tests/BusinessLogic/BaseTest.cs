@@ -71,10 +71,11 @@ namespace Umbraco.Tests.BusinessLogic
 
         private void InitializeApps()
         {
-            Application.Apps = new List<Application>()
-                {
-                    new Application(Constants.Applications.Content, "content", "content", 0)
-                };
+            Application.MakeNew("content", "content", "file", 0);
+            //Application.SetTestApps(new List<Application>()
+            //    {
+            //        new Application(Constants.Applications.Content, "content", "content", 0)
+            //    });
         }
 
         private void InitializeAppConfigFile()

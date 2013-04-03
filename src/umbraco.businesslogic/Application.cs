@@ -6,9 +6,9 @@ using System.Linq;
 using System.Web;
 using System.Xml.Linq;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.DataLayer;
-using umbraco.IO;
 using System.Runtime.CompilerServices;
 using umbraco.businesslogic;
 
@@ -45,6 +45,8 @@ namespace umbraco.BusinessLogic
             set { _appConfig = value; }
         }
 
+        //private static List<Application> _testApps; 
+
         /// <summary>
         /// The cache storage for all applications
         /// </summary>
@@ -56,6 +58,10 @@ namespace umbraco.BusinessLogic
                     CacheKey,
                     () =>
                         {
+                            ////used for unit tests
+                            //if (_testApps != null)
+                            //    return _testApps;
+
                             var tmp = new List<Application>();
 
                             try
@@ -89,8 +95,17 @@ namespace umbraco.BusinessLogic
                                 return null;
                             }
                         });
-            }            
+            }                   
         }
+
+        ///// <summary>
+        ///// THIS IS USED ONLY FOR UNIT TESTS!
+        ///// </summary>
+        ///// <param name="testApps"></param>
+        //internal static void SetTestApps(List<Application> testApps)
+        //{
+        //    _testApps = testApps;
+        //}
 
         /// <summary>
         /// Gets the SQL helper.
@@ -210,12 +225,8 @@ namespace umbraco.BusinessLogic
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static void MakeNew(string name, string alias, string icon, int sortOrder)
         {
-            var exist = false;
-            foreach (Application app in getAll().Where(app => app.alias == alias))
-            {
-                exist = true;
-            }
-
+            var exist = getAll().Any(x => x.alias == alias);
+            
             if (!exist)
             {
                 LoadXml(doc =>
