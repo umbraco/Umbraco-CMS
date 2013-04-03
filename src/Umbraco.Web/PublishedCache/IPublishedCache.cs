@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using System.Xml.XPath;
 using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
@@ -16,12 +16,12 @@ namespace Umbraco.Web.PublishedCache
         "We need to create something like the IPublishListener interface to have proper published content storage.")]
     internal interface IPublishedCache
     {
-	    /// <summary>
-	    /// Gets a content identified by its unique identifier.
-	    /// </summary>
-	    /// <param name="umbracoContext">The context.</param>
-	    /// <param name="contentId">The content unique identifier.</param>
-	    /// <returns>The content, or null.</returns>
+        /// <summary>
+        /// Gets a content identified by its unique identifier.
+        /// </summary>
+        /// <param name="umbracoContext">The context.</param>
+        /// <param name="contentId">The content unique identifier.</param>
+        /// <returns>The content, or null.</returns>
 	    IPublishedContent GetById(UmbracoContext umbracoContext, int contentId);
 
         /// <summary>
@@ -48,6 +48,13 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="vars">Optional XPath variables.</param>
         /// <returns>The contents.</returns>
         IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, string xpath, XPathVariable[] vars);
+
+        /// <summary>
+        /// Gets an XPath navigator that can be used to navigate contents.
+        /// </summary>
+        /// <param name="umbracoContext">The context.</param>
+        /// <returns>The XPath navigator.</returns>
+        XPathNavigator GetXPathNavigator(UmbracoContext umbracoContext);
 
         /// <summary>
         /// Gets a value indicating whether the cache contains published content.

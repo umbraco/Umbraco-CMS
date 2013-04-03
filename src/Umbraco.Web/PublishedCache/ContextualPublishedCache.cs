@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.XPath;
 using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
 
@@ -70,6 +71,15 @@ namespace Umbraco.Web.PublishedCache
         public virtual IEnumerable<IPublishedContent> GetByXPath(string xpath, params XPathVariable[] vars)
         {
             return _cache.GetByXPath(UmbracoContext, xpath, vars);
+        }
+
+        /// <summary>
+        /// Gets an XPath navigator that can be used to navigate contents.
+        /// </summary>
+        /// <returns>The XPath navigator.</returns>
+        public virtual XPathNavigator GetXPathNavigator()
+        {
+            return _cache.GetXPathNavigator(UmbracoContext);
         }
 
         /// <summary>

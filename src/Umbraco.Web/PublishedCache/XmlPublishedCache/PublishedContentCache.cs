@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Xml;
+using System.Xml.XPath;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
@@ -42,9 +43,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             if (route == null) throw new ArgumentNullException("route");
 
             // try to get from cache if not previewing
-            var contentId = umbracoContext.InPreviewMode
-                ? 0
-                : _routesCache.GetNodeId(route);
+            var contentId = umbracoContext.InPreviewMode ? 0 : _routesCache.GetNodeId(route);
 
             // if found id in cache then get corresponding content
             // and clear cache if not found - for whatever reason
@@ -82,9 +81,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         public virtual string GetRouteById(UmbracoContext umbracoContext, int contentId)
         {
             // try to get from cache if not previewing
-            var route = umbracoContext.InPreviewMode
-                ? null
-                : _routesCache.GetRoute(contentId);
+            var route = umbracoContext.InPreviewMode ? null : _routesCache.GetRoute(contentId);
 
             // if found in cache then return
             if (route != null)
@@ -272,7 +269,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     		return ConvertToDocument(GetXml(umbracoContext).GetElementById(nodeId.ToString()));
     	}
 
-		public virtual IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext)
+        public virtual IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext)
 		{
 			return (from XmlNode x in GetXml(umbracoContext).SelectNodes(XPathStrings.RootDocuments) select ConvertToDocument(x)).ToList();
 		}
@@ -308,6 +305,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				return false;
 			var node = xml.SelectSingleNode(XPathStrings.RootDocuments);
 			return node != null;
+        }
+
+        public virtual XPathNavigator GetXPathNavigator(UmbracoContext umbracoContext)
+        {
+            var xml = GetXml(umbracoContext);
+            return xml.CreateNavigator();
         }
 
         #endregion
