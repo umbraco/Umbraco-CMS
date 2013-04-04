@@ -1337,9 +1337,9 @@ namespace umbraco
         {
             try
             {
-                XPathNavigator xp = UmbracoContext.Current.GetXml().CreateNavigator();
-                xp.MoveToId(HttpContext.Current.Items["pageID"].ToString());
-                return xp.Select(".");
+                var nav = Umbraco.Web.UmbracoContext.Current.ContentCache.GetXPathNavigator();
+                nav.MoveToId(HttpContext.Current.Items["pageID"].ToString());
+                return nav.Select(".");
             }
             catch
             {
