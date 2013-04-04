@@ -799,12 +799,19 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
         public bool PublishWithResult(User u)
         {
+            return PublishWithResult(u, true);
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
+        internal bool PublishWithResult(User u, bool omitCacheRefresh)
+        {
             var e = new PublishEventArgs();
             FireBeforePublish(e);
 
             if (!e.Cancel)
             {
-                var result = ((ContentService)ApplicationContext.Current.Services.ContentService).Publish(Content, true, u.Id);
+                var result = ((ContentService)ApplicationContext.Current.Services.ContentService).Publish(Content, omitCacheRefresh, u.Id);
                 _published = result;
 
                 FireAfterPublish(e);

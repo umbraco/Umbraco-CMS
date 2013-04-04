@@ -1480,6 +1480,47 @@ namespace Umbraco.Core.Services
 
         #endregion
 
+        #region Proxy Event Handlers
+        /// <summary>
+        /// Occurs before publish.
+        /// </summary>
+        /// <remarks>Proxy to the real event on the <see cref="PublishingStrategy"/></remarks>
+        public static event TypedEventHandler<IPublishingStrategy, PublishEventArgs<IContent>> Publishing
+        {
+            add { PublishingStrategy.Publishing += value; }
+            remove { PublishingStrategy.Publishing -= value; }
+        }
+
+        /// <summary>
+        /// Occurs after publish.
+        /// </summary>
+        /// <remarks>Proxy to the real event on the <see cref="PublishingStrategy"/></remarks>
+        public static event TypedEventHandler<IPublishingStrategy, PublishEventArgs<IContent>> Published
+        {
+            add { PublishingStrategy.Published += value; }
+            remove { PublishingStrategy.Published -= value; }
+        }
+        /// <summary>
+        /// Occurs before unpublish.
+        /// </summary>
+        /// <remarks>Proxy to the real event on the <see cref="PublishingStrategy"/></remarks>
+        public static event TypedEventHandler<IPublishingStrategy, PublishEventArgs<IContent>> UnPublishing
+        {
+            add { PublishingStrategy.UnPublishing += value; }
+            remove { PublishingStrategy.UnPublishing -= value; }
+        }
+
+        /// <summary>
+        /// Occurs after unpublish.
+        /// </summary>
+        /// <remarks>Proxy to the real event on the <see cref="PublishingStrategy"/></remarks>
+        public static event TypedEventHandler<IPublishingStrategy, PublishEventArgs<IContent>> UnPublished
+        {
+            add { PublishingStrategy.UnPublished += value; }
+            remove { PublishingStrategy.UnPublished -= value; }
+        }
+        #endregion
+
         #region Event Handlers
         /// <summary>
 		/// Occurs before Delete

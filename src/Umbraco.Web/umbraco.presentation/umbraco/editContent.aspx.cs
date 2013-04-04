@@ -318,9 +318,8 @@ namespace umbraco.cms.presentation
 
                     Trace.Warn("before d.publish");
 
-                    if (_document.PublishWithResult(base.getUser()))
+                    if (_document.PublishWithResult(base.getUser(), false))
                     {
-                        library.UpdateDocumentCache(_document.Id);
                         ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));
 
                         littPublishStatus.Text = string.Format("{0}: {1}<br/>", ui.Text("content", "lastPublished", base.getUser()), _document.VersionDate.ToString());
