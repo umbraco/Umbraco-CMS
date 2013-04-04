@@ -86,7 +86,7 @@ namespace Umbraco.Tests.PublishedContent
             var ctx = GetUmbracoContext("/test", 1234);
 
             var cache = ctx.ContentCache.InnerCache as PublishedContentCache;
-            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the legacy one is supported.");
+            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
             var node = new DynamicNode(
                 new DynamicBackingItem(

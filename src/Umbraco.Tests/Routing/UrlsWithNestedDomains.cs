@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Routing
 
 			// check that the proper route has been cached
 		    var cache = routingContext.UmbracoContext.ContentCache.InnerCache as PublishedContentCache;
-            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the legacy one is supported.");
+            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 		    var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
 			Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]);
 
