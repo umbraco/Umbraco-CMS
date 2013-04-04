@@ -22,12 +22,13 @@ namespace Umbraco.Core.Cache
         public abstract IEnumerable<T> GetCacheItemsByKeySearch<T>(string keyStartsWith);
         public abstract T GetCacheItem<T>(string cacheKey);
         public abstract T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem);
-        public abstract T GetCacheItem<T>(string cacheKey, TimeSpan timeout, Func<T> getCacheItem);
-        public abstract T GetCacheItem<T>(string cacheKey, CacheItemRemovedCallback refreshAction, TimeSpan timeout, Func<T> getCacheItem);
-        public abstract T GetCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheItemRemovedCallback refreshAction, TimeSpan timeout, Func<T> getCacheItem);
-        public abstract T GetCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheItemRemovedCallback refreshAction, CacheDependency cacheDependency, TimeSpan timeout, Func<T> getCacheItem);
-        public abstract void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, TimeSpan timeout, Func<T> getCacheItem);
-        public abstract void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheDependency cacheDependency, TimeSpan timeout, Func<T> getCacheItem);
+        public abstract T GetCacheItem<T>(string cacheKey, TimeSpan? timeout, Func<T> getCacheItem);
+        public abstract T GetCacheItem<T>(string cacheKey, CacheItemRemovedCallback refreshAction, TimeSpan? timeout, Func<T> getCacheItem);
+        public abstract T GetCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheItemRemovedCallback refreshAction, TimeSpan? timeout, Func<T> getCacheItem);
+        public abstract T GetCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheItemRemovedCallback refreshAction, CacheDependency cacheDependency, TimeSpan? timeout, Func<T> getCacheItem);
+        public abstract void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, Func<T> getCacheItem);
+        public abstract void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, TimeSpan? timeout, Func<T> getCacheItem);
+        public abstract void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheDependency cacheDependency, TimeSpan? timeout, Func<T> getCacheItem);
         public abstract void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheItemRemovedCallback refreshAction, CacheDependency cacheDependency, TimeSpan? timeout, Func<T> getCacheItem);
     }
 }

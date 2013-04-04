@@ -647,6 +647,9 @@ namespace umbraco.BusinessLogic
             OnDisabling(EventArgs.Empty);
             //change disabled and userLogin (prefix with yyyyMMdd_ )
             this.Disabled = true;
+            //MUST clear out the umbraco logins otherwise if they are still logged in they can still do stuff:
+            //http://issues.umbraco.org/issue/U4-2042
+            SqlHelper.ExecuteNonQuery("delete from umbracoUserLogins where userID = @id", SqlHelper.CreateParameter("@id", Id));
             //can't rename if it's going to take up too many chars
             if (this.LoginName.Length + 9 <= 125)
             {

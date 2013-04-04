@@ -42,8 +42,8 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="ServiceStack.Text">
-      <HintPath>..\packages\ServiceStack.Text.3.9.21\lib\net35\ServiceStack.Text.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -688,10 +688,9 @@
     <Compile Include="Serialization\IFormatter.cs" />
     <Compile Include="Serialization\ISerializer.cs" />
     <Compile Include="Serialization\IStreamedResult.cs" />
+    <Compile Include="Serialization\JsonNetSerializer.cs" />
     <Compile Include="Serialization\SerializationExtensions.cs" />
     <Compile Include="Serialization\SerializationService.cs" />
-    <Compile Include="Serialization\ServiceStackJsonSerializer.cs" />
-    <Compile Include="Serialization\ServiceStackXmlSerializer.cs" />
     <Compile Include="Serialization\StreamedResult.cs" />
     <Compile Include="Services\ContentService.cs" />
     <Compile Include="Services\ContentTypeService.cs" />

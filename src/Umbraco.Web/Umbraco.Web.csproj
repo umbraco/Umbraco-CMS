@@ -340,6 +340,7 @@
     <Compile Include="Routing\UrlProviderMode.cs" />
     <Compile Include="Search\ExamineIndexerModel.cs" />
     <Compile Include="Search\LuceneIndexerExtensions.cs" />
+    <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="umbraco.presentation\LegacyClasses.cs" />
     <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.cs">
       <DependentUpon>AssignDomain2.aspx</DependentUpon>
@@ -424,7 +425,6 @@
     <Compile Include="Routing\WebServicesRouteConstraint.cs" />
     <Compile Include="Search\ExamineSearcherModel.cs" />
     <Compile Include="Search\ExamineEvents.cs" />
-    <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="Strategies\DataTypes\LegacyUploadFieldWorkaround.cs" />
     <Compile Include="Strategies\Migrations\PublishAfterUpgradeToVersionSixth.cs" />
     <Compile Include="Strategies\Publishing\UpdateCacheAfterPublish.cs" />
@@ -466,7 +466,7 @@
     <Compile Include="umbraco.presentation\ScriptingMacroResult.cs" />
     <Compile Include="umbraco.presentation\umbraco\cacheBrowser.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
-    </Compile>    
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\canvas.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

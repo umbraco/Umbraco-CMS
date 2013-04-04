@@ -497,23 +497,9 @@ namespace umbraco
                     ClearContextCache();
                 }
 
-                // clear cached field values
-                if (HttpContext.Current != null)
-                {
-                    System.Web.Caching.Cache httpCache = HttpContext.Current.Cache;
-                    string cachedFieldKeyStart = String.Format("contentItem{0}_", d.Id);
-                    var foundKeys = new List<string>();
-                    foreach (DictionaryEntry cacheItem in httpCache)
-                    {
-                        string key = cacheItem.Key.ToString();
-                        if (key.StartsWith(cachedFieldKeyStart))
-                            foundKeys.Add(key);
-                    }
-                    foreach (string foundKey in foundKeys)
-                    {
-                        httpCache.Remove(foundKey);
-                    }
-                }
+                var cachedFieldKeyStart = string.Format("{0}{1}_", CacheKeys.ContentItemCacheKey, d.Id);
+                ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(cachedFieldKeyStart);                    
+
                 Action.RunActionHandlers(d, ActionPublish.Instance);
 
                 FireAfterUpdateDocumentCache(d, e);
@@ -976,19 +962,6 @@ namespace umbraco
             // If running in a context very important to reset context cache orelse new nodes are missing
             if (HttpContext.Current != null && HttpContext.Current.Items.Contains(XmlContextContentItemKey))
                 HttpContext.Current.Items.Remove(XmlContextContentItemKey);
-        }
-
-        /// <summary>
-        /// Invalidates the disk content cache file. Effectively just deletes it.
-        /// </summary>
-        [Obsolete("This method is obsolete in version 4.1 and above, please use DeleteXmlCache", true)]
-        private void ClearDiskCacheAsync()
-        {
-            // Queue file deletion
-            // We queue this function, because there can be a write process running at the same time
-            // and we don't want this method to block web request
-            ThreadPool.QueueUserWorkItem(
-                delegate { DeleteXmlCache(); });
         }
 
         /// <summary>

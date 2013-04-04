@@ -6,8 +6,13 @@ namespace Umbraco.Core.Cache
     /// </summary>
     public static class CacheKeys
     {
+        public const string UserTypeCacheKey = "UserTypeCache";
+
+        public const string ContentItemCacheKey = "contentItem";
+
         public const string MediaCacheKey = "UL_GetMedia";
 
+        public const string MacroXsltCacheKey = "macroXslt_";
         public const string MacroCacheKey = "UmbracoMacroCache";
         public const string MacroHtmlCacheKey = "macroHtml_";
         public const string MacroControlCacheKey = "macroControl_";
@@ -20,6 +25,8 @@ namespace Umbraco.Core.Cache
         public const string TemplateFrontEndCacheKey = "template";
         public const string TemplateBusinessLogicCacheKey = "UmbracoTemplateCache";
 
+        public const string UserContextCacheKey = "UmbracoUserContext";
+        public const string UserContextTimeoutCacheKey = "UmbracoUserContextTimeout";
         public const string UserCacheKey = "UmbracoUser";
 
         public const string ContentTypeCacheKey = "UmbracoContentType";

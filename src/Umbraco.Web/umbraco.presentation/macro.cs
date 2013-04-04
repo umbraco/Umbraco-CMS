@@ -162,15 +162,13 @@ namespace umbraco
 
         #endregion
 
-        private const string _xsltExtensionsCacheKey = "UmbracoXsltExtensions";
+        private const string XsltExtensionsCacheKey = "UmbracoXsltExtensions";
 
-        private static readonly string _xsltExtensionsConfig =
+        private static readonly string XsltExtensionsConfig =
             IOHelper.MapPath(SystemDirectories.Config + "/xsltExtensions.config");
 
-        private static readonly object _xsltExtensionsSyncLock = new object();
-
         private static readonly Func<CacheDependency> _xsltExtensionsDependency =
-            () => new CacheDependency(_xsltExtensionsConfig);
+            () => new CacheDependency(XsltExtensionsConfig);
 
         /// <summary>
         /// Creates an empty macro object.
@@ -693,22 +691,18 @@ namespace umbraco
 
         public static XslCompiledTransform getXslt(string XsltFile)
         {
-            if (HttpRuntime.Cache["macroXslt_" + XsltFile] != null)
-            {
-                return (XslCompiledTransform)HttpRuntime.Cache["macroXslt_" + XsltFile];
-            }
-            else
-            {
-                var xslReader =
-                    new XmlTextReader(IOHelper.MapPath(SystemDirectories.Xslt + "/" + XsltFile));
-
-                XslCompiledTransform macroXSLT = CreateXsltTransform(xslReader, GlobalSettings.DebugMode);
-                HttpRuntime.Cache.Insert(
-                    "macroXslt_" + XsltFile,
-                    macroXSLT,
-                    new CacheDependency(IOHelper.MapPath(SystemDirectories.Xslt + "/" + XsltFile)));
-                return macroXSLT;
-            }
+            //TODO: SD: Do we really need to cache this??
+            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                CacheKeys.MacroXsltCacheKey + XsltFile,
+                CacheItemPriority.Default,
+                new CacheDependency(IOHelper.MapPath(SystemDirectories.Xslt + "/" + XsltFile)),
+                () =>
+                    {
+                        using (var xslReader = new XmlTextReader(IOHelper.MapPath(SystemDirectories.Xslt.EnsureEndsWith('/') + XsltFile)))
+                        {
+                            return CreateXsltTransform(xslReader, GlobalSettings.DebugMode);
+                        }
+                    });
         }
 
         public void UpdateMacroModel(Hashtable attributes)
@@ -737,9 +731,11 @@ namespace umbraco
 
         public static XslCompiledTransform CreateXsltTransform(XmlTextReader xslReader, bool debugMode)
         {
-            var macroXSLT = new XslCompiledTransform(debugMode);
-            var xslResolver = new XmlUrlResolver();
-            xslResolver.Credentials = CredentialCache.DefaultCredentials;
+            var macroXslt = new XslCompiledTransform(debugMode);
+            var xslResolver = new XmlUrlResolver
+                {
+                    Credentials = CredentialCache.DefaultCredentials
+                };
 
             xslReader.EntityHandling = EntityHandling.ExpandEntities;
 
@@ -747,11 +743,11 @@ namespace umbraco
             {
                 if (GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium)
                 {
-                    macroXSLT.Load(xslReader, XsltSettings.TrustedXslt, xslResolver);
+                    macroXslt.Load(xslReader, XsltSettings.TrustedXslt, xslResolver);
                 }
                 else
                 {
-                    macroXSLT.Load(xslReader, XsltSettings.Default, xslResolver);
+                    macroXslt.Load(xslReader, XsltSettings.Default, xslResolver);
                 }
             }
             finally
@@ -759,13 +755,13 @@ namespace umbraco
                 xslReader.Close();
             }
 
-            return macroXSLT;
+            return macroXslt;
         }
 
+        [Obsolete("This is no longer used in the codebase and will be removed in future versions")]
         public static void unloadXslt(string XsltFile)
         {
-            if (HttpRuntime.Cache["macroXslt_" + XsltFile] != null)
-                HttpRuntime.Cache.Remove("macroXslt_" + XsltFile);
+            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.MacroXsltCacheKey + XsltFile);
         }
 
         #region LoadMacroXslt
@@ -1016,7 +1012,7 @@ namespace umbraco
 			//  Having this stuff in cache just adds to the gigantic amount of cache data and will cause more cache turnover to happen.
 
             return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                _xsltExtensionsCacheKey, 
+                XsltExtensionsCacheKey, 
                 CacheItemPriority.NotRemovable, // NH 4.7.1, Changing to NotRemovable
                 null, // no refresh action
                 _xsltExtensionsDependency(), // depends on the .config file
@@ -1031,7 +1027,7 @@ namespace umbraco
 
             // Load the XSLT extensions configuration
             var xsltExt = new XmlDocument();
-            xsltExt.Load(_xsltExtensionsConfig);
+            xsltExt.Load(XsltExtensionsConfig);
 
             // add all descendants of the XsltExtensions element
             foreach (XmlNode xsltEx in xsltExt.SelectSingleNode("/XsltExtensions"))

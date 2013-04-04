@@ -17,9 +17,9 @@ namespace umbraco.cms.presentation
         {
             // Cache removal checks
             if (Request.QueryString["clearByType"] != null)
-                cms.businesslogic.cache.Cache.ClearCacheObjectTypes(Request.QueryString["clearByType"]);
+                ApplicationContext.ApplicationCache.ClearCacheObjectTypes(Request.QueryString["clearByType"]);
             else if (Request.QueryString["clearByKey"] != null)
-                cms.businesslogic.cache.Cache.ClearCacheItem(Request.QueryString["clearByKey"]);
+                ApplicationContext.ApplicationCache.ClearCacheItem(Request.QueryString["clearByKey"]);
 
             // Put user code to initialize the page here
             Hashtable ht = cms.businesslogic.cache.Cache.ReturnCacheItemsOrdred();
@@ -33,7 +33,7 @@ namespace umbraco.cms.presentation
         }
         protected void Button1_Click(object sender, System.EventArgs e)
         {
-            cms.businesslogic.cache.Cache.ClearAllCache();
+            ApplicationContext.ApplicationCache.ClearAllCache();
         }
 
         protected System.Web.UI.HtmlControls.HtmlForm Form1;

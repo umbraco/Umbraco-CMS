@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,7 +11,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.UI.Umbraco
 {
-    public partial class UmbracoMainPage : Pages.UmbracoEnsuredPage
+    public partial class Umbraco : Pages.UmbracoEnsuredPage
 	{        
         public string DefaultApp { get; private set; }
 

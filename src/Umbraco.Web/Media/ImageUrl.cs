@@ -4,6 +4,8 @@ using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Web;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Media;
 using umbraco;
 
@@ -72,12 +74,8 @@ namespace Umbraco.Web.Media
 
         private static object GetContentFromCache(int nodeIdInt, string field)
         {
-            var context = HttpContext.Current;
-            
-            if (context == null)
-                return string.Empty;
-            
-            var content = context.Cache[String.Format("contentItem{0}_{1}", nodeIdInt.ToString(CultureInfo.InvariantCulture), field)];
+            var content = ApplicationContext.Current.ApplicationCache.GetCacheItem<object>(
+                string.Format("{0}{1}_{2}", CacheKeys.ContentItemCacheKey, nodeIdInt.ToString(CultureInfo.InvariantCulture), field));            
             return content;
         }
     }

@@ -14,7 +14,9 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
     /// </summary>
     public class LiveEditingItemRenderer : ItemRenderer
     {
-        //public const string RICHTEXTEDITOR_DATATYPE_ID = "{5E9B75AE-FACE-41c8-B47E-5F4B0FD82F83}";
+        [Obsolete("Use Umbraco.Core.Constants.PropertyEditors.TinyMCEv3 instead")]
+        public const string RichtexteditorDatatypeId = Constants.PropertyEditors.TinyMCEv3;
+        
         /// <summary>Returns the instance of <see cref="LiveEditingItemRenderer"/>.</summary>
         public new readonly static LiveEditingItemRenderer Instance = new LiveEditingItemRenderer();
 

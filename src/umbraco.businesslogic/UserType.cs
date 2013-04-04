@@ -69,7 +69,7 @@ namespace umbraco.BusinessLogic
         }
 
         private const string CACHE_KEY = "UserTypeCache";
-        
+
         private int m_id;
         private string m_name;
         private string m_defaultPermissions;
@@ -178,7 +178,7 @@ namespace umbraco.BusinessLogic
             SqlHelper.ExecuteNonQuery(@"
 				delete from umbracoUserType where id=@id",
                 SqlHelper.CreateParameter("@id", m_id));
-            
+
             ReCache();
         }
 

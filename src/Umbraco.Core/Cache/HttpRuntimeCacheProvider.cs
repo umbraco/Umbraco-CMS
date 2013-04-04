@@ -180,7 +180,7 @@ namespace Umbraco.Core.Cache
         /// <param name="getCacheItem"></param>
         /// <returns></returns>
         public override TT GetCacheItem<TT>(string cacheKey,
-                                            TimeSpan timeout, Func<TT> getCacheItem)
+                                            TimeSpan? timeout, Func<TT> getCacheItem)
         {
             return GetCacheItem(cacheKey, null, timeout, getCacheItem);
         }
@@ -195,7 +195,7 @@ namespace Umbraco.Core.Cache
         /// <param name="getCacheItem"></param>
         /// <returns></returns>
         public override TT GetCacheItem<TT>(string cacheKey,
-                                            CacheItemRemovedCallback refreshAction, TimeSpan timeout,
+                                            CacheItemRemovedCallback refreshAction, TimeSpan? timeout,
                                             Func<TT> getCacheItem)
         {
             return GetCacheItem(cacheKey, CacheItemPriority.Normal, refreshAction, timeout, getCacheItem);
@@ -212,7 +212,7 @@ namespace Umbraco.Core.Cache
         /// <param name="getCacheItem"></param>
         /// <returns></returns>
         public override TT GetCacheItem<TT>(string cacheKey,
-                                            CacheItemPriority priority, CacheItemRemovedCallback refreshAction, TimeSpan timeout,
+                                            CacheItemPriority priority, CacheItemRemovedCallback refreshAction, TimeSpan? timeout,
                                             Func<TT> getCacheItem)
         {
             return GetCacheItem(cacheKey, priority, refreshAction, null, timeout, getCacheItem);
@@ -233,7 +233,7 @@ namespace Umbraco.Core.Cache
                                             CacheItemPriority priority,
                                             CacheItemRemovedCallback refreshAction,
                                             CacheDependency cacheDependency,
-                                            TimeSpan timeout,
+                                            TimeSpan? timeout,
                                             Func<TT> getCacheItem)
         {
             return GetCacheItem(cacheKey, priority, refreshAction, cacheDependency, timeout, getCacheItem, Locker);
@@ -283,11 +283,25 @@ namespace Umbraco.Core.Cache
         /// <typeparam name="T"></typeparam>
         /// <param name="cacheKey"></param>
         /// <param name="priority"></param>
+        /// <param name="getCacheItem"></param>
+        public override void InsertCacheItem<T>(string cacheKey,
+                                                CacheItemPriority priority,
+                                                Func<T> getCacheItem)
+        {
+            InsertCacheItem(cacheKey, priority, null, null, null, getCacheItem);
+        }
+
+        /// <summary>
+        /// Inserts an item into the cache, if it already exists in the cache it will be replaced
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cacheKey"></param>
+        /// <param name="priority"></param>
         /// <param name="timeout">This will set an absolute expiration from now until the timeout</param>
         /// <param name="getCacheItem"></param>
         public override void InsertCacheItem<T>(string cacheKey,
                                                 CacheItemPriority priority,
-                                                TimeSpan timeout,
+                                                TimeSpan? timeout,
                                                 Func<T> getCacheItem)
         {
             InsertCacheItem(cacheKey, priority, null, null, timeout, getCacheItem);
@@ -305,7 +319,7 @@ namespace Umbraco.Core.Cache
         public override void InsertCacheItem<T>(string cacheKey,
                                                 CacheItemPriority priority,
                                                 CacheDependency cacheDependency,
-                                                TimeSpan timeout,
+                                                TimeSpan? timeout,
                                                 Func<T> getCacheItem)
         {
             InsertCacheItem(cacheKey, priority, null, cacheDependency, timeout, getCacheItem);

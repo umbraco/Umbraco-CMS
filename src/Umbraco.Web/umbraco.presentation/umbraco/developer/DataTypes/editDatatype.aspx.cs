@@ -102,9 +102,7 @@ namespace umbraco.cms.presentation.developer
             dt.DataType = f.DataType(new Guid(ddlRenderControl.SelectedValue));
             dt.Save();
 
-            System.Web.HttpRuntime.Cache.Remove(string.Format("UmbracoDataTypeDefinition{0}", dt.UniqueId));
-
-            ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.save, ui.Text("speechBubbles", "dataTypeSaved", null), "");
+            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "dataTypeSaved", null), "");
 
             ClientTools.SyncTree(dt.Path, true);
         }

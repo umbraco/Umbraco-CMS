@@ -5,8 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
+using System.Web.Caching;
 using System.Web.UI;
 using System.Xml;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Macros;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
@@ -229,29 +232,31 @@ namespace umbraco.presentation.templateControls
 			return item.TextIfEmpty;
 		}
 
-		/// <summary>
-		/// Gets the field content from database instead of the published XML via the APIs.
-		/// </summary>
-		/// <param name="nodeIdInt">The node id.</param>
-		/// <param name="currentField">The field that should be fetched.</param>
-		/// <returns>The contents of the <paramref name="currentField"/> from the <paramref name="nodeIdInt"/> content object</returns>
+	    /// <summary>
+	    /// Gets the field content from database instead of the published XML via the APIs.
+	    /// </summary>
+	    /// <param name="itemAttributes"></param>
+	    /// <param name="nodeIdInt">The node id.</param>
+	    /// <param name="currentField">The field that should be fetched.</param>
+	    /// <returns>The contents of the <paramref name="currentField"/> from the <paramref name="nodeIdInt"/> content object</returns>
+	    [Obsolete("This is no longer used in the codebase and will be removed in future versions")]
         protected virtual string GetContentFromDatabase(AttributeCollectionAdapter itemAttributes, int nodeIdInt, string currentField)
 		{
-			Content c = new Content(nodeIdInt);
+			var c = new Content(nodeIdInt);
 
-			Property property = c.getProperty(currentField);
+			var property = c.getProperty(currentField);
 			if (property == null)
 				throw new ArgumentException(String.Format("Could not find property {0} of node {1}.", currentField, nodeIdInt));
 
-			item umbItem = new item(property.Value.ToString(), itemAttributes);
-			string tempElementContent = umbItem.FieldContent;
+			var umbItem = new item(property.Value.ToString(), itemAttributes);
+			var tempElementContent = umbItem.FieldContent;
 
 			// If the current content object is a document object, we'll only output it if it's published
-			if (c.nodeObjectType == cms.businesslogic.web.Document._objectType)
+			if (c.nodeObjectType == Document._objectType)
 			{
 				try
 				{
-					Document d = (Document)c;
+					var d = (Document)c;
 					if (!d.Published)
 						tempElementContent = "";
 				}
@@ -259,9 +264,13 @@ namespace umbraco.presentation.templateControls
 			}
 
 			// Add the content to the cache
-			if (!String.IsNullOrEmpty(tempElementContent))
-				HttpContext.Current.Cache.Insert(String.Format("contentItem{0}_{1}", nodeIdInt.ToString(), currentField), tempElementContent);
-			return tempElementContent;
+	        if (!string.IsNullOrEmpty(tempElementContent))
+	        {
+	            ApplicationContext.Current.ApplicationCache.InsertCacheItem(
+	                string.Format("{0}{1}_{2}", CacheKeys.ContentItemCacheKey, nodeIdInt, currentField),
+	                CacheItemPriority.Default, () => tempElementContent);
+	        }
+	        return tempElementContent;
 		}
 
 		/// <summary>
@@ -269,10 +278,12 @@ namespace umbraco.presentation.templateControls
 		/// </summary>
 		/// <param name="nodeIdInt">The node id.</param>
 		/// <param name="field">The field.</param>
-		/// <returns>The cached contents of the <paramref name="currentField"/> from the <paramref name="nodeIdInt"/> content object</returns>
+        /// <returns>The cached contents of the <paramref name="field"/> from the <paramref name="nodeIdInt"/> content object</returns>
+        [Obsolete("This is no longer used in the codebase and will be removed in future versions")]
 		protected virtual object GetContentFromCache(int nodeIdInt, string field)
 		{
-			object content = HttpContext.Current.Cache[String.Format("contentItem{0}_{1}", nodeIdInt.ToString(), field.ToString())];
+		    var content = ApplicationContext.Current.ApplicationCache.GetCacheItem<object>(
+                string.Format("{0}{1}_{2}", CacheKeys.ContentItemCacheKey, nodeIdInt, field));
 			return content;
 		}
 	}

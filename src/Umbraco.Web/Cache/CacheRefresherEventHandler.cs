@@ -22,6 +22,10 @@ namespace Umbraco.Web.Cache
     {
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {          
+            //bind to user type events
+            //UserType.Deleted += UserTypeDeleted;
+            //UserType.New += UserTypeNew;
+            //UserType.Updated += UserTypeUpdated;
 
             //Bind to dictionary events
             //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
@@ -77,6 +81,12 @@ namespace Umbraco.Web.Cache
             User.Saving += UserSaving;
             User.Deleting += UserDeleting;
 
+            //Bind to permission events
+
+            Permission.New += PermissionNew;
+            Permission.Updated += PermissionUpdated;
+            Permission.Deleted += PermissionDeleted;
+
             //Bind to template events
             //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
 
@@ -106,6 +116,23 @@ namespace Umbraco.Web.Cache
             MediaService.Trashing += MediaServiceTrashing;
         }
 
+        #region UserType event handlers
+        static void UserTypeUpdated(UserType sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RefreshUserTypeCache(sender.Id);
+        }
+
+        static void UserTypeNew(UserType sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RefreshAllUserTypeCache();
+        }
+
+        static void UserTypeDeleted(UserType sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RemoveUserTypeCache(sender.Id);
+        } 
+        #endregion
+        
         #region Dictionary event handlers
 
         static void LocalizationServiceSavedDictionaryItem(ILocalizationService sender, Core.Events.SaveEventArgs<IDictionaryItem> e)
@@ -301,6 +328,22 @@ namespace Umbraco.Web.Cache
         #endregion
         
         #region User event handlers
+
+        static void PermissionDeleted(UserPermission sender, DeleteEventArgs e)
+        {
+            InvalidateCacheForPermissionsChange(sender);
+        }
+
+        static void PermissionUpdated(UserPermission sender, SaveEventArgs e)
+        {
+            InvalidateCacheForPermissionsChange(sender);
+        }
+
+        static void PermissionNew(UserPermission sender, NewEventArgs e)
+        {
+            InvalidateCacheForPermissionsChange(sender);
+        }
+        
         static void UserDeleting(User sender, System.EventArgs e)
         {
             DistributedCache.Instance.RemoveUserCache(sender.Id);
@@ -309,7 +352,24 @@ namespace Umbraco.Web.Cache
         static void UserSaving(User sender, System.EventArgs e)
         {
             DistributedCache.Instance.RefreshUserCache(sender.Id);
-        } 
+        }
+
+        private static void InvalidateCacheForPermissionsChange(UserPermission sender)
+        {
+            if (sender.User != null)
+            {
+                DistributedCache.Instance.RefreshUserCache(sender.User.Id);
+            }
+            if (sender.UserId > -1)
+            {
+                DistributedCache.Instance.RefreshUserCache(sender.UserId);
+            }
+            if (sender.Nodes.Any())
+            {
+                DistributedCache.Instance.RefreshAllUserCache();
+            }
+        }
+
         #endregion
 
         #region Template event handlers
