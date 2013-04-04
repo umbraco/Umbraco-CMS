@@ -13,6 +13,20 @@ namespace Umbraco.Web.Cache
     /// </summary>
     internal static class DistributedCacheExtensions
     {
+        #region Application tree cache
+        public static void RefreshAllApplicationTreeCache(this DistributedCache dc)
+        {
+            dc.RefreshAll(new Guid(DistributedCache.ApplicationTreeCacheRefresherId));
+        }
+        #endregion
+
+        #region Application cache
+        public static void RefreshAllApplicationCache(this DistributedCache dc)
+        {
+            dc.RefreshAll(new Guid(DistributedCache.ApplicationCacheRefresherId));
+        }
+        #endregion
+
         #region User type cache
         public static void RemoveUserTypeCache(this DistributedCache dc, int userTypeId)
         {

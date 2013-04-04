@@ -263,6 +263,8 @@
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
+    <Compile Include="Cache\ApplicationCacheRefresher.cs" />
+    <Compile Include="Cache\ApplicationTreeCacheRefresher.cs" />
     <Compile Include="Cache\ContentTypeCacheRefresher.cs" />
     <Compile Include="Cache\DataTypeCacheRefresher.cs" />
     <Compile Include="Cache\DictionaryCacheRefresher.cs" />

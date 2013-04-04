@@ -238,9 +238,7 @@ namespace umbraco.cms.businesslogic.web
 
             return retval;
         }
-
-
-
+        
         public StylesheetProperty AddProperty(string Alias, BusinessLogic.User u)
         {
             return StylesheetProperty.MakeNew(Alias, this, u);
@@ -254,8 +252,10 @@ namespace umbraco.cms.businesslogic.web
             if (!e.Cancel)
             {
                 File.Delete(IOHelper.MapPath(String.Format("{0}/{1}.css", SystemDirectories.Css, this.Text)));
-                foreach (StylesheetProperty p in this.Properties)
+                foreach (var p in Properties.Where(p => p != null))
+                {
                     p.delete();
+                }
                 SqlHelper.ExecuteNonQuery("delete from cmsStylesheet where nodeId = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
                 base.delete();
 

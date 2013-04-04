@@ -35,6 +35,8 @@ namespace Umbraco.Web.Cache
 
         #region Public constants/Ids
 
+        public const string ApplicationTreeCacheRefresherId = "0AC6C028-9860-4EA4-958D-14D39F45886E";
+        public const string ApplicationCacheRefresherId = "B15F34A1-BC1D-4F8B-8369-3222728AB4C8";
         public const string TemplateRefresherId = "DD12B6A0-14B9-46e8-8800-C154F74047C8";
         public const string PageCacheRefresherId = "27AB3022-3DFA-47b6-9119-5945BC88FD66";
         public const string MemberCacheRefresherId = "E285DF34-ACDC-4226-AE32-C0CB5CF388DA";

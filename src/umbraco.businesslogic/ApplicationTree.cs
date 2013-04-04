@@ -5,6 +5,8 @@ using System.Linq;
 using System.Web;
 using System.Xml.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using umbraco.DataLayer;
 
@@ -18,7 +20,6 @@ namespace umbraco.BusinessLogic
     public class ApplicationTree
     {
 
-        private const string CacheKey = "ApplicationTreeCache";
         internal const string TreeConfigFileName = "trees.config";
         private static string _treeConfig;
         private static readonly object Locker = new object();
@@ -50,7 +51,7 @@ namespace umbraco.BusinessLogic
             get
             {
                 return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                    CacheKey,
+                    CacheKeys.ApplicationTreeCacheKey,
                     () =>
                         {
                             var list = new List<ApplicationTree>();
@@ -244,6 +245,8 @@ namespace umbraco.BusinessLogic
                     new XAttribute("action", string.IsNullOrEmpty(action) ? "" : action)));
                 }
             }, true);
+
+            OnNew(new ApplicationTree(silent, initialize, sortOrder, applicationAlias, alias, title, iconClosed, iconOpened, assemblyName, type, action), new EventArgs());
         }
 
         /// <summary>
@@ -274,6 +277,7 @@ namespace umbraco.BusinessLogic
 
             }, true);
 
+            OnUpdated(this, new EventArgs());
         }
 
         /// <summary>
@@ -289,6 +293,8 @@ namespace umbraco.BusinessLogic
                 doc.Root.Elements("add").Where(x => x.Attribute("application") != null && x.Attribute("application").Value == this.ApplicationAlias &&
                 x.Attribute("alias") != null && x.Attribute("alias").Value == this.Alias).Remove();
             }, true);
+
+            OnDeleted(this, new EventArgs());
         }
 
 
@@ -359,10 +365,38 @@ namespace umbraco.BusinessLogic
 
                         doc.Save(TreeConfigFilePath);
 
-                        //remove the cache now that it has changed
-                        ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKey);
+                        //remove the cache now that it has changed  SD: I'm leaving this here even though it
+                        // is taken care of by events as well, I think unit tests may rely on it being cleared here.
+                        ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.ApplicationTreeCacheKey);
                     }
                 }
+            }
+        }
+
+        internal static event TypedEventHandler<ApplicationTree, EventArgs> Deleted;
+        private static void OnDeleted(ApplicationTree app, EventArgs args)
+        {
+            if (Deleted != null)
+            {
+                Deleted(app, args);
+            }
+        }
+
+        internal static event TypedEventHandler<ApplicationTree, EventArgs> New;
+        private static void OnNew(ApplicationTree app, EventArgs args)
+        {
+            if (New != null)
+            {
+                New(app, args);
+            }
+        }
+
+        internal static event TypedEventHandler<ApplicationTree, EventArgs> Updated;
+        private static void OnUpdated(ApplicationTree app, EventArgs args)
+        {
+            if (Updated != null)
+            {
+                Updated(app, args);
             }
         }
     }

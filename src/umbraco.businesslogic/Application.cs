@@ -6,6 +6,8 @@ using System.Linq;
 using System.Web;
 using System.Xml.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.DataLayer;
@@ -21,7 +23,6 @@ namespace umbraco.BusinessLogic
     {
         private static ISqlHelper _sqlHelper;
 
-        private const string CacheKey = "ApplicationCache";
         internal const string AppConfigFileName = "applications.config";
         private static string _appConfig;
         private static readonly object Locker = new object();
@@ -45,8 +46,6 @@ namespace umbraco.BusinessLogic
             set { _appConfig = value; }
         }
 
-        //private static List<Application> _testApps; 
-
         /// <summary>
         /// The cache storage for all applications
         /// </summary>
@@ -55,7 +54,7 @@ namespace umbraco.BusinessLogic
             get
             {
                 return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                    CacheKey,
+                    CacheKeys.ApplicationsCacheKey,
                     () =>
                         {
                             ////used for unit tests
@@ -98,15 +97,6 @@ namespace umbraco.BusinessLogic
             }                   
         }
 
-        ///// <summary>
-        ///// THIS IS USED ONLY FOR UNIT TESTS!
-        ///// </summary>
-        ///// <param name="testApps"></param>
-        //internal static void SetTestApps(List<Application> testApps)
-        //{
-        //    _testApps = testApps;
-        //}
-
         /// <summary>
         /// Gets the SQL helper.
         /// </summary>
@@ -143,8 +133,6 @@ namespace umbraco.BusinessLogic
                 return _sqlHelper;
             }
         }
-
-        
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Application"/> class.
@@ -237,6 +225,9 @@ namespace umbraco.BusinessLogic
                         new XAttribute("icon", icon),
                         new XAttribute("sortOrder", sortOrder)));
                 }, true);
+
+                //raise event
+                OnNew(new Application(name, alias, icon, sortOrder), new EventArgs());
             }
         }
 
@@ -269,6 +260,9 @@ namespace umbraco.BusinessLogic
             {
                 doc.Root.Elements("add").Where(x => x.Attribute("alias") != null && x.Attribute("alias").Value == this.alias).Remove();
             }, true);
+
+            //raise event
+            OnDeleted(this, new EventArgs());
         }
 
         /// <summary>
@@ -308,10 +302,29 @@ namespace umbraco.BusinessLogic
 
                         doc.Save(AppConfigFilePath);
 
-                        //remove the cache so it gets re-read
-                        ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKey);
+                        //remove the cache so it gets re-read ... SD: I'm leaving this here even though it
+                        // is taken care of by events as well, I think unit tests may rely on it being cleared here.
+                        ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.ApplicationsCacheKey);
                     }
                 }
+            }
+        }
+
+        internal static event TypedEventHandler<Application, EventArgs> Deleted;
+        private static void OnDeleted(Application app, EventArgs args)
+        {
+            if (Deleted != null)
+            {
+                Deleted(app, args);
+            }
+        }
+
+        internal static event TypedEventHandler<Application, EventArgs> New;
+        private static void OnNew(Application app, EventArgs args)
+        {
+            if (New != null)
+            {
+                New(app, args);
             }
         }
     }

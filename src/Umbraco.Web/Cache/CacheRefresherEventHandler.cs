@@ -21,7 +21,16 @@ namespace Umbraco.Web.Cache
     public class CacheRefresherEventHandler : ApplicationEventHandler
     {
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {          
+        {   
+            //bind to application tree events
+            ApplicationTree.Deleted += ApplicationTreeDeleted;
+            ApplicationTree.Updated += ApplicationTreeUpdated;
+            ApplicationTree.New += ApplicationTreeNew;
+
+            //bind to application events
+            Application.Deleted += ApplicationDeleted;
+            Application.New += ApplicationNew;
+
             //bind to user type events
             UserType.Deleted += UserTypeDeleted;
             UserType.New += UserTypeNew;
@@ -115,6 +124,35 @@ namespace Umbraco.Web.Cache
             MediaService.Moving += MediaServiceMoving;
             MediaService.Trashing += MediaServiceTrashing;
         }
+
+        #region ApplicationTree event handlers
+        static void ApplicationTreeNew(ApplicationTree sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RefreshAllApplicationTreeCache();
+        }
+
+        static void ApplicationTreeUpdated(ApplicationTree sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RefreshAllApplicationTreeCache();
+        }
+
+        static void ApplicationTreeDeleted(ApplicationTree sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RefreshAllApplicationTreeCache();
+        } 
+        #endregion
+
+        #region Application event handlers
+        static void ApplicationNew(Application sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RefreshAllApplicationCache();
+        }
+
+        static void ApplicationDeleted(Application sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RefreshAllApplicationCache();
+        } 
+        #endregion
 
         #region UserType event handlers
         static void UserTypeUpdated(UserType sender, System.EventArgs e)

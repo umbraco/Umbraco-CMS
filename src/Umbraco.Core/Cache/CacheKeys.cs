@@ -6,6 +6,9 @@ namespace Umbraco.Core.Cache
     /// </summary>
     public static class CacheKeys
     {
+        public const string ApplicationTreeCacheKey = "ApplicationTreeCache";
+        public const string ApplicationsCacheKey = "ApplicationCache";
+
         public const string UserTypeCacheKey = "UserTypeCache";
 
         public const string ContentItemCacheKey = "contentItem";
