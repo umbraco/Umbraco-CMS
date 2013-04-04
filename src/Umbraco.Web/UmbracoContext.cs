@@ -135,8 +135,8 @@ namespace Umbraco.Web
             Application = applicationContext;
             Security = new WebSecurity();
 
-            ContentCache = new ContextualPublishedContentCache(publishedCaches.ContentCache, this);
-            MediaCache = new ContextualPublishedMediaCache(publishedCaches.MediaCache, this);
+            ContentCache = publishedCaches.CreateContextualContentCache(this);
+            MediaCache = publishedCaches.CreateContextualMediaCache(this);
             InPreviewMode = preview ?? DetectInPreviewModeFromRequest();
 
 			// set the urls...
