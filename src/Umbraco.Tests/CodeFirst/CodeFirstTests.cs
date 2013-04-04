@@ -28,8 +28,8 @@ namespace Umbraco.Tests.CodeFirst
            
             base.Initialize();
 
-            var serviceStackSerializer = new ServiceStackJsonSerializer();
-            SerializationService = new SerializationService(serviceStackSerializer);
+            var jsonNetSerializer = new JsonNetSerializer();
+            SerializationService = new SerializationService(jsonNetSerializer);
         }
 
         [Test]
@@ -59,8 +59,8 @@ namespace Umbraco.Tests.CodeFirst
             Assert.That(contentType.Value.PropertyTypes.Count(), Is.EqualTo(2));
 
             var result = SerializationService.ToStream(contentType.Value);
-            var xml = result.ResultStream.ToJsonString();
-            Console.WriteLine(xml);
+            var json = result.ResultStream.ToJsonString();
+            Console.WriteLine(json);
         }
 
         [Test]
@@ -90,8 +90,8 @@ namespace Umbraco.Tests.CodeFirst
             Assert.That(contentType.Value.PropertyTypes.Count(), Is.EqualTo(5));
 
             var result = SerializationService.ToStream(contentType.Value);
-            var xml = result.ResultStream.ToJsonString();
-            Console.WriteLine(xml);
+            var json = result.ResultStream.ToJsonString();
+            Console.WriteLine(json);
         }
 
         [Test]
