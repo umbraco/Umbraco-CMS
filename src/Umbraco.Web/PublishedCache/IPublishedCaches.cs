@@ -12,16 +12,6 @@ namespace Umbraco.Web.PublishedCache
     interface IPublishedCaches
     {
         /// <summary>
-        /// Gets the content cache.
-        /// </summary>
-        IPublishedContentCache ContentCache { get; }
-
-        /// <summary>
-        /// Gets the media cache.
-        /// </summary>
-        IPublishedMediaCache MediaCache { get; }
-
-        /// <summary>
         /// Creates a contextual content cache for a specified context.
         /// </summary>
         /// <param name="context">The context.</param>

@@ -6,25 +6,18 @@
     /// <remarks>Default implementation for unrelated caches.</remarks>
     class PublishedCaches : IPublishedCaches
     {
+        private readonly IPublishedContentCache _contentCache;
+        private readonly IPublishedMediaCache _mediaCache;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedCaches"/> class with a content cache
         /// and a media cache.
         /// </summary>
         public PublishedCaches(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache)
         {
-            ContentCache = contentCache;
-            MediaCache = mediaCache;
+            _contentCache = contentCache;
+            _mediaCache = mediaCache;
         }
-
-        /// <summary>
-        /// Gets the content cache.
-        /// </summary>
-        public IPublishedContentCache ContentCache { get; private set; }
-
-        /// <summary>
-        /// Gets the media cache.
-        /// </summary>
-        public IPublishedMediaCache MediaCache { get; private set; }
 
         /// <summary>
         /// Creates a contextual content cache for a specified context.
@@ -33,7 +26,7 @@
         /// <returns>A new contextual content cache for the specified context.</returns>
         public ContextualPublishedContentCache CreateContextualContentCache(UmbracoContext context)
         {
-            return new ContextualPublishedContentCache(ContentCache, context);
+            return new ContextualPublishedContentCache(_contentCache, context);
         }
 
         /// <summary>
@@ -43,7 +36,7 @@
         /// <returns>A new contextual media cache for the specified context.</returns>
         public ContextualPublishedMediaCache CreateContextualMediaCache(UmbracoContext context)
         {
-            return new ContextualPublishedMediaCache(MediaCache, context);            
+            return new ContextualPublishedMediaCache(_mediaCache, context);            
         }
     }
 }
