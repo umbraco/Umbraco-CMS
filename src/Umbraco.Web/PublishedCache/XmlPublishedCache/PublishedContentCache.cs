@@ -360,7 +360,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return GetXmlDelegate(umbracoContext.UmbracoUser, umbracoContext.InPreviewMode);
         }
 
-        internal XmlDocument GetXml()
+        private XmlDocument GetXml()
         {
             return GetXmlDelegate(null, false);
         }
