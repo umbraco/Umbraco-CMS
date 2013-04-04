@@ -41,8 +41,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Examine.0.1.50.2941\lib\Examine.dll</HintPath>
     </Reference>
-    <Reference Include="Examine.Azure">
-      <HintPath>..\packages\Examine.Azure.0.1.43.2941\lib\Examine.Azure.dll</HintPath>
+    <Reference Include="Examine.Azure, Version=0.1.50.2941, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Examine.Azure.0.1.50.2941\lib\Examine.Azure.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
