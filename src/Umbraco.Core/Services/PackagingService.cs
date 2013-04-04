@@ -423,6 +423,8 @@ namespace Umbraco.Core.Services
                 if (_importedContentTypes.ContainsKey(alias))
                 {
                     var allowedChild = _importedContentTypes[alias];
+                    if(allowedChild == null || allowedChildren.Any(x => x.Alias == alias)) continue;
+
                     allowedChildren.Add(new ContentTypeSort(new Lazy<int>(() => allowedChild.Id), sortOrder, allowedChild.Alias));
                     sortOrder++;
                 }

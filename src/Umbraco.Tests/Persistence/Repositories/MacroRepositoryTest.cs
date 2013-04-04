@@ -10,7 +10,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [TestFixture]
+    [TestFixture, Ignore]
     public class MacroRepositoryTest
     {
         [Test]

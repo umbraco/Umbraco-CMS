@@ -10,7 +10,7 @@
 namespace Umbraco.Web.UI.Umbraco {
 
 
-    public partial class UmbracoMainPage
+    public partial class Umbraco
     {
         
         /// <summary>

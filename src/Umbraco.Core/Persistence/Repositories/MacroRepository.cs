@@ -35,8 +35,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private void EnsureDependencies()
         {            
 			_fileSystem = new PhysicalFileSystem("~/App_Data/Macros");
-            var serviceStackSerializer = new ServiceStackJsonSerializer();
-            _serializationService = new SerializationService(serviceStackSerializer);
+            var jsonSerializer = new JsonNetSerializer();
+            _serializationService = new SerializationService(jsonSerializer);
         }
 
         #region Overrides of RepositoryBase<string,IMacro>

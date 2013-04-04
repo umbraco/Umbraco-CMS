@@ -223,5 +223,29 @@ namespace Umbraco.Tests.Services.Importing
             Assert.That(contentTypes.Any(x => x.HasIdentity == false), Is.False);
             Assert.That(contentTypes.Count(), Is.EqualTo(1));
         }
+
+        [Test]
+        public void PackagingService_Can_ReImport_Single_DocTypr()
+        {
+            // Arrange
+            string strXml = ImportResources.SingleDocType;
+            var docTypeElement = XElement.Parse(strXml);
+            var packagingService = ServiceContext.PackagingService;
+
+            // Act
+            var contentTypes = packagingService.ImportContentTypes(docTypeElement);
+            var contentTypesUpdated = packagingService.ImportContentTypes(docTypeElement);
+
+            // Assert
+            Assert.That(contentTypes.Any(), Is.True);
+            Assert.That(contentTypes.Any(x => x.HasIdentity == false), Is.False);
+            Assert.That(contentTypes.Count(), Is.EqualTo(1));
+            Assert.That(contentTypes.First().AllowedContentTypes.Count(), Is.EqualTo(1));
+
+            Assert.That(contentTypesUpdated.Any(), Is.True);
+            Assert.That(contentTypesUpdated.Any(x => x.HasIdentity == false), Is.False);
+            Assert.That(contentTypesUpdated.Count(), Is.EqualTo(1));
+            Assert.That(contentTypesUpdated.First().AllowedContentTypes.Count(), Is.EqualTo(1));
+        }
     }
 }

@@ -1,5 +1,5 @@
 <%@ Page Trace="false" Language="c#" CodeBehind="umbraco.aspx.cs" AutoEventWireup="True"
-    Inherits="Umbraco.Web.UI.Umbraco.UmbracoMainPage" %>
+    Inherits="Umbraco.Web.UI.Umbraco.Umbraco" %>
 
 <%@ Import Namespace="System.Web.Script.Serialization" %>
 
