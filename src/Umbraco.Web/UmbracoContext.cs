@@ -131,6 +131,7 @@ namespace Umbraco.Web
 
             HttpContext = httpContext;            
             Application = applicationContext;
+            Security = new WebSecurity();
 
             ContentCache = new ContextualPublishedContentCache(contentCache, this);
             MediaCache = new ContextualPublishedMediaCache(mediaCache, this);
@@ -211,7 +212,12 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the current ApplicationContext
         /// </summary>
-        public ApplicationContext Application { get; private set; }       
+        public ApplicationContext Application { get; private set; }
+
+        /// <summary>
+        /// Gets the WebSecurity class
+        /// </summary>
+        public WebSecurity Security { get; private set; }
 
 	    /// <summary>
 	    /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.
@@ -318,7 +324,7 @@ namespace Umbraco.Web
         {
             get
             {
-                return WebSecurity.CurrentUser;
+                return Security.CurrentUser;
             }
 
         }

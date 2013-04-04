@@ -25,28 +25,22 @@ namespace Umbraco.Web.UI.Pages
     /// </summary>
     public class BasePage : Page
     {
-        private User _user;
-        private bool _userisValidated = false;
+        
         private ClientTools _clientTools;
         
-        /// <summary>
-        /// The current user ID
-        /// </summary>
-        private int _uid = 0;
+        
 
-        /// <summary>
-        /// The page timeout in seconds.
-        /// </summary>
-        private long _timeout = 0;
 
-        /// <summary>
-        /// Gets the SQL helper.
-        /// </summary>
-        /// <value>The SQL helper.</value>
-        protected static ISqlHelper SqlHelper
-        {
-            get { return global::umbraco.BusinessLogic.Application.SqlHelper; }
-        }
+        //We won't expose this... people should be using the DatabaseContext for custom queries if they need them.
+
+        ///// <summary>
+        ///// Gets the SQL helper.
+        ///// </summary>
+        ///// <value>The SQL helper.</value>
+        //protected ISqlHelper SqlHelper
+        //{
+        //    get { return global::umbraco.BusinessLogic.Application.SqlHelper; }
+        //}
 
 	    private UrlHelper _url;
 		/// <summary>
@@ -66,6 +60,22 @@ namespace Umbraco.Web.UI.Pages
         public ApplicationContext ApplicationContext
         {
             get { return ApplicationContext.Current; }
+        }
+
+        /// <summary>
+        /// Returns the current UmbracoContext
+        /// </summary>
+        public UmbracoContext UmbracoContext
+        {
+            get { return UmbracoContext.Current; }
+        }
+
+        /// <summary>
+        /// Returns the current WebSecurity instance
+        /// </summary>
+        public WebSecurity Security
+        {
+            get { return UmbracoContext.Security; }
         }
 
         /// <summary>
@@ -92,57 +102,7 @@ namespace Umbraco.Web.UI.Pages
             get { return _clientTools ?? (_clientTools = new ClientTools(this)); }
         }
         
-        private void ValidateUser()
-        {
-            if ((WebSecurity.UmbracoUserContextId != ""))
-            {
-                _uid = WebSecurity.GetUserId(WebSecurity.UmbracoUserContextId);
-                _timeout = WebSecurity.GetTimeout(WebSecurity.UmbracoUserContextId);
-
-                if (_timeout > DateTime.Now.Ticks)
-                {
-                    _user = global::umbraco.BusinessLogic.User.GetUser(_uid);
-
-                    // Check for console access
-                    if (_user.Disabled || (_user.NoConsole && GlobalSettings.RequestIsInUmbracoApplication(Context) && !GlobalSettings.RequestIsLiveEditRedirector(Context)))
-                    {
-                        throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
-                    }
-                    _userisValidated = true;
-                    WebSecurity.UpdateLogin(_timeout);
-                }
-                else
-                {
-                    throw new ArgumentException("User has timed out!!");
-                }
-            }
-            else
-            {
-                throw new InvalidOperationException("The user has no umbraco contextid - try logging in");
-            }
-
-        }
-
-        /// <summary>
-        /// Gets the user.
-        /// </summary>
-        /// <value></value>
-        public User UmbracoUser
-        {
-            get
-            {
-                if (!_userisValidated) ValidateUser();
-                return _user;
-            }
-        }
-
-        /// <summary>
-        /// Ensures the page context.
-        /// </summary>
-        public void EnsureContext()
-        {
-            ValidateUser();
-        }
+        
 
         /// <summary>
         /// Raises the <see cref="E:System.Web.UI.Control.Load"></see> event.

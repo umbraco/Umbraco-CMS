@@ -11,15 +11,17 @@ namespace Umbraco.Web.WebApi
     public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
     {
         private readonly ApplicationContext _applicationContext;
+        private readonly UmbracoContext _umbracoContext;
 
-        public UmbracoAuthorizeAttribute(ApplicationContext appContext)
+        public UmbracoAuthorizeAttribute(UmbracoContext umbracoContext)
         {
-            if (appContext == null) throw new ArgumentNullException("appContext");
-            _applicationContext = appContext;
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            _umbracoContext = umbracoContext;
+            _applicationContext = _umbracoContext.Application;
         }
 
         public UmbracoAuthorizeAttribute()
-            : this(ApplicationContext.Current)
+            : this(UmbracoContext.Current)
         {
 
         }
@@ -31,7 +33,7 @@ namespace Umbraco.Web.WebApi
                 //we need to that the app is configured and that a user is logged in
                 if (!_applicationContext.IsConfigured)
                     return false;
-                var isLoggedIn = WebSecurity.ValidateUserContextId(WebSecurity.UmbracoUserContextId);
+                var isLoggedIn = _umbracoContext.Security.ValidateUserContextId(_umbracoContext.Security.UmbracoUserContextId);
                 return isLoggedIn;
             }
             catch (Exception)

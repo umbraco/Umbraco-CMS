@@ -165,7 +165,7 @@ namespace umbraco.BasePages
         /// </summary>
         /// <param name="umbracoUserContextID">The umbraco user context ID.</param>
         /// <returns></returns>
-        [Obsolete("Use Umbraco.Web.Security.WebSecurity.GetUserId instead")]
+        //[Obsolete("Use Umbraco.Web.Security.WebSecurity.GetUserId instead")]
         public static int GetUserId(string umbracoUserContextID)
         {
             //need to parse to guid
@@ -193,7 +193,7 @@ namespace umbraco.BasePages
         /// </summary>
         /// <param name="currentUmbracoUserContextID">The umbraco user context ID.</param>
         /// <returns></returns>
-        [Obsolete("Use Umbraco.Web.Security.WebSecurity.ValidateUserContextId instead")]
+        //[Obsolete("Use Umbraco.Web.Security.WebSecurity.ValidateUserContextId instead")]
         public static bool ValidateUserContextID(string currentUmbracoUserContextID)
         {
             if ((currentUmbracoUserContextID != ""))
@@ -219,7 +219,7 @@ namespace umbraco.BasePages
                 () => GetTimeout(true));
         }
 
-        [Obsolete("Use Umbraco.Web.Security.WebSecurity.GetTimeout instead")]
+        //[Obsolete("Use Umbraco.Web.Security.WebSecurity.GetTimeout instead")]
         public static long GetTimeout(bool bypassCache)
         {
             if (UmbracoSettings.KeepUserLoggedIn)
@@ -240,7 +240,7 @@ namespace umbraco.BasePages
         /// Gets or sets the umbraco user context ID.
         /// </summary>
         /// <value>The umbraco user context ID.</value>
-        [Obsolete("Use Umbraco.Web.Security.WebSecurity.UmbracoUserContextId instead")]
+        //[Obsolete("Use Umbraco.Web.Security.WebSecurity.UmbracoUserContextId instead")]
         public static string umbracoUserContextID
         {
             get
@@ -341,7 +341,7 @@ namespace umbraco.BasePages
                     SqlHelper.CreateParameter("@contextId", umbracoUserContextID));
         }
 
-        [Obsolete("Use Umbraco.Web.Security.WebSecurity.RenewLoginTimeout instead")]
+        //[Obsolete("Use Umbraco.Web.Security.WebSecurity.RenewLoginTimeout instead")]
         public static void RenewLoginTimeout()
         {
             // only call update if more than 1/10 of the timeout has passed
@@ -355,7 +355,7 @@ namespace umbraco.BasePages
         /// Logs a user in.
         /// </summary>
         /// <param name="u">The user</param>
-        [Obsolete("Use Umbraco.Web.Security.WebSecurity.PerformLogin instead")]
+        //[Obsolete("Use Umbraco.Web.Security.WebSecurity.PerformLogin instead")]
         public static void doLogin(User u)
         {
             Guid retVal = Guid.NewGuid();

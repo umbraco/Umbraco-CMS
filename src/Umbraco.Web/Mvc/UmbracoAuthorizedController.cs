@@ -48,10 +48,10 @@ namespace Umbraco.Web.Mvc
 
         private void ValidateUser()
         {
-            if ((WebSecurity.UmbracoUserContextId != ""))
+            if ((UmbracoContext.Security.UmbracoUserContextId != ""))
             {
-                _uid = WebSecurity.GetUserId(WebSecurity.UmbracoUserContextId);
-                _timeout = WebSecurity.GetTimeout(WebSecurity.UmbracoUserContextId);
+                _uid = UmbracoContext.Security.GetUserId(UmbracoContext.Security.UmbracoUserContextId);
+                _timeout = UmbracoContext.Security.GetTimeout(UmbracoContext.Security.UmbracoUserContextId);
 
                 if (_timeout > DateTime.Now.Ticks)
                 {
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Mvc
                         throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
                     }
                     _userisValidated = true;
-                    WebSecurity.UpdateLogin(_timeout);
+                    UmbracoContext.Security.UpdateLogin(_timeout);
                 }
                 else
                 {

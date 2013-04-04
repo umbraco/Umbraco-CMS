@@ -8,6 +8,7 @@ using System.Collections;
 using System.Web.UI.WebControls;
 using System.Data.SqlClient;
 using System.Data;
+using Umbraco.Web;
 using Umbraco.Web.Security;
 using umbraco;
 using umbraco.BusinessLogic;
@@ -54,7 +55,7 @@ namespace umbraco.cms.presentation.user
             var lstNoPermissions = new List<int>();
             foreach (var nodeId in nodeIDs)
             {
-                var nodeActions = WebSecurity.CurrentUser.GetPermissions(GetNodePath(nodeId));
+                var nodeActions = UmbracoContext.Current.UmbracoUser.GetPermissions(GetNodePath(nodeId));
                 var lstActions = BusinessLogic.Actions.Action.FromString(nodeActions);
                 if (lstActions == null || !lstActions.Contains(ActionRights.Instance))
                     lstNoPermissions.Add(nodeId);
