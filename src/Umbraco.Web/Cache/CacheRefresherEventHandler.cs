@@ -32,9 +32,9 @@ namespace Umbraco.Web.Cache
             Application.New += ApplicationNew;
 
             //bind to user type events
-            //UserType.Deleted += UserTypeDeleted;
-            //UserType.New += UserTypeNew;
-            //UserType.Updated += UserTypeUpdated;
+            UserType.Deleted += UserTypeDeleted;
+            UserType.New += UserTypeNew;
+            UserType.Updated += UserTypeUpdated;
 
             //Bind to dictionary events
             //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
