@@ -298,7 +298,14 @@
     <Compile Include="Umbraco\Developer\Macros\EditMacro.aspx.designer.cs">
       <DependentUpon>editMacro.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Developer\Packages\StarterKits.aspx.cs">
+    <Compile Include="Umbraco\developer\Packages\DirectoryBrowser.aspx.cs">
+      <DependentUpon>directoryBrowser.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\developer\Packages\DirectoryBrowser.aspx.designer.cs">
+      <DependentUpon>directoryBrowser.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Umbraco\developer\Packages\StarterKits.aspx.cs">
       <DependentUpon>StarterKits.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -437,6 +444,7 @@
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Create\PartialViewMacro.ascx" />
     <Content Include="Umbraco\Dashboard\Images\access-denied.png" />
+    <Content Include="Umbraco\developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Dashboard\Scripts\swfobject.js" />
     <Content Include="Umbraco\Dashboard\MediaDashboardFolderBrowser.ascx" />
     <Content Include="Umbraco\Developer\RelationTypes\EditRelationType.aspx" />
@@ -649,6 +657,7 @@
     <Content Include="Umbraco_Client\ContextMenu\Js\jquery.contextMenu.js" />
     <Content Include="Umbraco_Client\Dialogs\CreateDialog.css" />
     <Content Include="Umbraco_Client\Dialogs\EditMacro.css" />
+    <Content Include="umbraco_client\Editors\DirectoryBrowser.css" />
     <Content Include="Umbraco_Client\Dialogs\EditMacro.js" />
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
     <Content Include="Umbraco_Client\Editors\EditMacro.css" />
@@ -1708,7 +1717,6 @@
     <Content Include="Umbraco\Images\Umbraco\uploadpackage.gif" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.autocomplete.js" />
     <Content Include="Umbraco\Developer\Packages\BrowseRepository.aspx" />
-    <Content Include="Umbraco\Developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Developer\Packages\editPackage.aspx" />
     <Content Include="Umbraco\Developer\Packages\installedPackage.aspx" />
     <Content Include="Umbraco\Developer\Packages\LoadNitros.ascx" />
