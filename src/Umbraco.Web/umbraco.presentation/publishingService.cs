@@ -18,6 +18,7 @@ namespace umbraco.presentation
 		private static readonly Hashtable ScheduledTaskTimes = new Hashtable();
 		private static bool _isPublishingRunning = false;
 		
+        //NOTE: sender will be the umbraco ApplicationContext
 		public static void CheckPublishing(object sender)
 		{
 			if(_isPublishingRunning)
@@ -112,7 +113,7 @@ namespace umbraco.presentation
 
 		private static bool getTaskByHttp(string url)
 		{
-			HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+			var myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
 			HttpWebResponse myHttpWebResponse = null;
 			try
 			{
