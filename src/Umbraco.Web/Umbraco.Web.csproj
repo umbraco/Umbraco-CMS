@@ -385,6 +385,9 @@
     <Compile Include="umbraco.presentation\umbraco\settings\editTemplate.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\settings\modals\ShowUmbracoTags.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\templateControls\Image.cs" />
     <Compile Include="umbraco.presentation\umbraco\uQuery\IGetProperty.cs" />
     <Compile Include="umbraco.presentation\XsltExtensionAttribute.cs" />
@@ -1496,13 +1499,6 @@
     <Compile Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx.designer.cs">
       <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\modals\ShowUmbracoTags.aspx.cs">
-      <DependentUpon>ShowUmbracoTags.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\modals\ShowUmbracoTags.aspx.designer.cs">
-      <DependentUpon>ShowUmbracoTags.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\scripts\editScript.aspx.cs">
       <DependentUpon>editScript.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2037,9 +2033,6 @@
     <Content Include="umbraco.presentation\umbraco\settings\editLanguage.aspx" />
     <Content Include="umbraco.presentation\umbraco\settings\EditMediaType.aspx" />
     <Content Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\settings\modals\ShowUmbracoTags.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx">
