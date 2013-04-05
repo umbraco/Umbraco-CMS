@@ -1,23 +1,17 @@
 using System;
-using System.Data;
 using System.Web;
-using System.Collections;
 using System.Web.Services;
-using System.Web.Services.Protocols;
 using System.ComponentModel;
-
 using System.Web.Script.Services;
 using System.Xml;
-using System.Xml.XPath;
 using System.Xml.Xsl;
 using System.IO;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
 using System.Net;
 using System.Web.UI;
+using Umbraco.Core.IO;
+using Umbraco.Web.UI;
 using umbraco.businesslogic.Exceptions;
-using umbraco.IO;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.media;
 using umbraco.BasePages;
@@ -32,26 +26,21 @@ namespace umbraco.presentation.webservices
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [ToolboxItem(false)]
     [ScriptService]
-    public class legacyAjaxCalls : System.Web.Services.WebService
+    public class legacyAjaxCalls : WebService
     {
         [WebMethod]
         public bool ValidateUser(string username, string password)
         {
-
             if (System.Web.Security.Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].ValidateUser(
                  username, password))
             {
-                BusinessLogic.User u = new BusinessLogic.User(username);
+                var u = new BusinessLogic.User(username);
                 BasePage.doLogin(u);
-
                 return true;
             }
-            else
-            {
-                return false;
-            }
-
+            return false;
         }
+
         /// <summary>
         /// method to accept a string value for the node id. Used for tree's such as python
         /// and xslt since the file names are the node IDs
@@ -63,43 +52,48 @@ namespace umbraco.presentation.webservices
         [ScriptMethod]
         public void Delete(string nodeId, string alias, string nodeType)
         {
-
             Authorize();
 
             //check which parameters to pass depending on the types passed in
-            int intNodeID;
-            if (int.TryParse(nodeId, out intNodeID) && nodeType != "member") // Fix for #26965 - numeric member login gets parsed as nodeId
-                presentation.create.dialogHandler_temp.Delete(nodeType, intNodeID, alias);
+            int intNodeId;
+            // Fix for #26965 - numeric member login gets parsed as nodeId
+            if (int.TryParse(nodeId, out intNodeId) && nodeType != "member")
+            {
+                LegacyDialogHandler.Delete(nodeType, intNodeId, alias);
+            }
             else
-                presentation.create.dialogHandler_temp.Delete(nodeType, 0, nodeId);
+            {
+                LegacyDialogHandler.Delete(nodeType, 0, nodeId);
+            }
         }
-        
+
         /// <summary>
         /// Permanently deletes a document/media object.
         /// Used to remove an item from the recycle bin.
         /// </summary>
         /// <param name="nodeId"></param>
+        /// <param name="nodeType"></param>
         [WebMethod]
         [ScriptMethod]
         public void DeleteContentPermanently(string nodeId, string nodeType)
         {
             Authorize();
 
-            int intNodeID;
-            if (int.TryParse(nodeId, out intNodeID))
+            int intNodeId;
+            if (int.TryParse(nodeId, out intNodeId))
             {
                 switch (nodeType)
                 {
                     case "media":
                     case "mediaRecycleBin":
-                        new Media(intNodeID).delete(true);
+                        new Media(intNodeId).delete(true);
                         break;
                     case "content":
                     case "contentRecycleBin":
-                        new Document(intNodeID).delete(true);
+                        new Document(intNodeId).delete(true);
                         break;
                     default:
-                        new Document(intNodeID).delete(true);
+                        new Document(intNodeId).delete(true);
                         break;
                 }                
             }
@@ -179,9 +173,9 @@ namespace umbraco.presentation.webservices
         public int GetSecondsBeforeUserLogout()
         {
             Authorize();
-            long timeout = BasePage.GetTimeout(true);
-            DateTime timeoutDate = new DateTime(timeout);
-            DateTime currentDate = DateTime.Now;
+            var timeout = BasePage.GetTimeout(true);
+            var timeoutDate = new DateTime(timeout);
+            var currentDate = DateTime.Now;
             
             return (int) timeoutDate.Subtract(currentDate).TotalSeconds;
 
@@ -199,21 +193,20 @@ namespace umbraco.presentation.webservices
         [ScriptMethod]
         public string SaveFile(string fileName, string fileAlias, string fileContents, string fileType, int fileID, int masterID, bool ignoreDebug)
         {
-
             Authorize();
 
             switch (fileType)
             {
                 case "xslt":
-                    return saveXslt(fileName, fileContents, ignoreDebug);
+                    return SaveXslt(fileName, fileContents, ignoreDebug);
                 case "python":
                     return "true";
                 case "css":
-                    return saveCss(fileName, fileContents, fileID);
+                    return SaveCss(fileName, fileContents, fileID);
                 case "script":
-                    return saveScript(fileName, fileContents);
+                    return SaveScript(fileName, fileContents);
                 case "template":
-                    return saveTemplate(fileName, fileAlias, fileContents, fileID, masterID);
+                    return SaveTemplate(fileName, fileAlias, fileContents, fileID, masterID);
                 default:
                     throw new ArgumentException(String.Format("Invalid fileType passed: '{0}'", fileType));
             }
@@ -222,46 +215,43 @@ namespace umbraco.presentation.webservices
 
         public string Tidy(string textToTidy)
         {
-
             Authorize();
             return library.Tidy(helper.Request("StringToTidy"), true);
-
         }
 
-        private string saveCss(string fileName, string fileContents, int fileID)
+        private static string SaveCss(string fileName, string fileContents, int fileId)
         {
-            string returnValue = "false";
-            cms.businesslogic.web.StyleSheet stylesheet = new cms.businesslogic.web.StyleSheet(fileID);
+            string returnValue;
+            var stylesheet = new StyleSheet(fileId)
+                {
+                    Content = fileContents,
+                    Text = fileName
+                };
 
-            if (stylesheet != null)
+            try
             {
-                stylesheet.Content = fileContents;
-                stylesheet.Text = fileName;
-                try
-                {
-                    stylesheet.saveCssToFile();
-                    returnValue = "true";
-                }
-                catch (Exception ee)
-                {
-                    throw new Exception("Couldn't save file", ee);
-                }
-
-                //this.speechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editStylesheetSaved", base.getUser()), "");
+                stylesheet.saveCssToFile();
+                returnValue = "true";
             }
+            catch (Exception ee)
+            {
+                throw new Exception("Couldn't save file", ee);
+            }
+
             return returnValue;
         }
 
-        private string saveXslt(string fileName, string fileContents, bool ignoreDebugging)
+        private string SaveXslt(string fileName, string fileContents, bool ignoreDebugging)
         {
-            StreamWriter SW;
-            string tempFileName = IOHelper.MapPath(SystemDirectories.Xslt + "/" + System.DateTime.Now.Ticks + "_temp.xslt");
-            SW = File.CreateText(tempFileName);
-            SW.Write(fileContents);
-            SW.Close();
+            var tempFileName = IOHelper.MapPath(SystemDirectories.Xslt + "/" + DateTime.Now.Ticks + "_temp.xslt");
+            using (var sw = File.CreateText(tempFileName))
+            {
+                sw.Write(fileContents);
+                sw.Close();
+            }
 
             // Test the xslt
-            string errorMessage = "";
+            var errorMessage = "";
             if (!ignoreDebugging)
             {
                 try
@@ -270,15 +260,14 @@ namespace umbraco.presentation.webservices
                     // Check if there's any documents yet
                     if (content.Instance.XmlContent.SelectNodes("/root/node").Count > 0)
                     {
-                        XmlDocument macroXML = new XmlDocument();
-                        macroXML.LoadXml("<macro/>");
+                        var macroXml = new XmlDocument();
+                        macroXml.LoadXml("<macro/>");
 
-                        XslCompiledTransform macroXSLT = new XslCompiledTransform();
-                        page umbPage = new page(content.Instance.XmlContent.SelectSingleNode("//node [@parentID = -1]"));
+                        var macroXslt = new XslCompiledTransform();
+                        var umbPage = new page(content.Instance.XmlContent.SelectSingleNode("//node [@parentID = -1]"));
 
-                        XsltArgumentList xslArgs;
-                        xslArgs = macro.AddMacroXsltExtensions();
-                        library lib = new library(umbPage);
+                        var xslArgs = macro.AddMacroXsltExtensions();
+                        var lib = new library(umbPage);
                         xslArgs.AddExtensionObject("urn:umbraco.library", lib);
                         HttpContext.Current.Trace.Write("umbracoMacro", "After adding extensions");
 
@@ -288,58 +277,51 @@ namespace umbraco.presentation.webservices
 
                         // Create reader and load XSL file
                         // We need to allow custom DTD's, useful for defining an ENTITY
-                        XmlReaderSettings readerSettings = new XmlReaderSettings();
+                        var readerSettings = new XmlReaderSettings();
                         readerSettings.ProhibitDtd = false;
-                        using (XmlReader xmlReader = XmlReader.Create(tempFileName, readerSettings))
+                        using (var xmlReader = XmlReader.Create(tempFileName, readerSettings))
                         {
-                            XmlUrlResolver xslResolver = new XmlUrlResolver();
-                            xslResolver.Credentials = CredentialCache.DefaultCredentials;
-                            macroXSLT.Load(xmlReader, XsltSettings.TrustedXslt, xslResolver);
+                            var xslResolver = new XmlUrlResolver
+                                {
+                                    Credentials = CredentialCache.DefaultCredentials
+                                };
+                            macroXslt.Load(xmlReader, XsltSettings.TrustedXslt, xslResolver);
                             xmlReader.Close();
                             // Try to execute the transformation
-                            HtmlTextWriter macroResult = new HtmlTextWriter(new StringWriter());
-                            macroXSLT.Transform(macroXML, xslArgs, macroResult);
+                            var macroResult = new HtmlTextWriter(new StringWriter());
+                            macroXslt.Transform(macroXml, xslArgs, macroResult);
                             macroResult.Close();
                         }
                     }
                     else
                     {
                         errorMessage = "stub";
-                        //base.speechBubble(speechBubbleIcon.info, ui.Text("errors", "xsltErrorHeader", base.getUser()), "Unable to validate xslt as no published content nodes exist.");
                     }
 
                 }
                 catch (Exception errorXslt)
                 {
-                    //base.speechBubble(speechBubbleIcon.error, ui.Text("errors", "xsltErrorHeader", base.getUser()), ui.Text("errors", "xsltErrorText", base.getUser()));
-
-                    //errorHolder.Visible = true;
-                    //closeErrorMessage.Visible = true;
-                    //errorHolder.Attributes.Add("style", "height: 250px; overflow: auto; border: 1px solid CCC; padding: 5px;");
-
                     errorMessage = (errorXslt.InnerException ?? errorXslt).ToString();
 
                     // Full error message
                     errorMessage = errorMessage.Replace("\n", "<br/>\n");
-                    //closeErrorMessage.Visible = true;
 
-                    string[] errorLine;
                     // Find error
-                    MatchCollection m = Regex.Matches(errorMessage, @"\d*[^,],\d[^\)]", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+                    var m = Regex.Matches(errorMessage, @"\d*[^,],\d[^\)]", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
                     foreach (Match mm in m)
                     {
-                        errorLine = mm.Value.Split(',');
+                        var errorLine = mm.Value.Split(',');
 
                         if (errorLine.Length > 0)
                         {
-                            int theErrorLine = int.Parse(errorLine[0]);
-                            int theErrorChar = int.Parse(errorLine[1]);
+                            var theErrorLine = int.Parse(errorLine[0]);
+                            var theErrorChar = int.Parse(errorLine[1]);
 
                             errorMessage = "Error in XSLT at line " + errorLine[0] + ", char " + errorLine[1] + "<br/>";
                             errorMessage += "<span style=\"font-family: courier; font-size: 11px;\">";
 
-                            string[] xsltText = fileContents.Split("\n".ToCharArray());
-                            for (int i = 0; i < xsltText.Length; i++)
+                            var xsltText = fileContents.Split("\n".ToCharArray());
+                            for (var i = 0; i < xsltText.Length; i++)
                             {
                                 if (i >= theErrorLine - 3 && i <= theErrorLine + 1)
                                     if (i + 1 == theErrorLine)
@@ -363,13 +345,15 @@ namespace umbraco.presentation.webservices
             if (errorMessage == "" && fileName.ToLower().EndsWith(".xslt"))
             {
                 //Hardcoded security-check... only allow saving files in xslt directory... 
-                string savePath = IOHelper.MapPath(SystemDirectories.Xslt + "/" + fileName);
+                var savePath = IOHelper.MapPath(SystemDirectories.Xslt + "/" + fileName);
 
                 if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Xslt)))
                 {
-                    SW = File.CreateText(savePath);
-                    SW.Write(fileContents);
-                    SW.Close();
+                    using (var sw = File.CreateText(savePath))
+                    {
+                        sw.Write(fileContents);
+                        sw.Close();                        
+                    }
                     errorMessage = "true";
                 }
                 else
@@ -378,23 +362,15 @@ namespace umbraco.presentation.webservices
                 }
             }
 
-            System.IO.File.Delete(tempFileName);
-
+            File.Delete(tempFileName);
 
             return errorMessage;
         }
 
-        private string savePython(string filename, string contents)
-        {
-
-
-            return "true";
-        }
-
-        private string saveScript(string filename, string contents)
+        private static string SaveScript(string filename, string contents)
         {
             string val = contents;
-            string returnValue = "false";
+            string returnValue;
             try
             {
                 string savePath = IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename);
@@ -402,11 +378,13 @@ namespace umbraco.presentation.webservices
                 //Directory check.. only allow files in script dir and below to be edited
                 if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Scripts + "/")))
                 {
-                    StreamWriter SW;
-                    SW = File.CreateText(IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename));
-                    SW.Write(val);
-                    SW.Close();
-                    returnValue = "true";
+                    using (var sw = File.CreateText(IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename)))
+                    {
+                        sw.Write(val);
+                        sw.Close();
+                        returnValue = "true";
+                    }
+                    
                 }
                 else
                 {
@@ -422,34 +400,25 @@ namespace umbraco.presentation.webservices
             return returnValue;
         }
 
-        private string saveTemplate(string templateName, string templateAlias, string templateContents, int templateID, int masterTemplateID)
+        private static string SaveTemplate(string templateName, string templateAlias, string templateContents, int templateId, int masterTemplateId)
         {
+            var templt = new cms.businesslogic.template.Template(templateId)
+                {
+                    Text = templateName,
+                    Alias = templateAlias,
+                    MasterTemplate = masterTemplateId,
+                    Design = templateContents
+                };
 
-            cms.businesslogic.template.Template _template = new global::umbraco.cms.businesslogic.template.Template(templateID);
-            string retVal = "false";
-
-            if (_template != null)
-            {
-                _template.Text = templateName;
-                _template.Alias = templateAlias;
-                _template.MasterTemplate = masterTemplateID;
-                _template.Design = templateContents;
-
-                retVal = "true";
-
-                // Clear cache in rutime
-                if (UmbracoSettings.UseDistributedCalls)
-                    cache.dispatcher.Refresh(
-                        new Guid("dd12b6a0-14b9-46e8-8800-c154f74047c8"),
-                        _template.Id);
-                else
-                    template.ClearCachedTemplate(_template.Id);
-            }
+            // Clear cache in rutime
+            if (UmbracoSettings.UseDistributedCalls)
+                cache.dispatcher.Refresh(
+                    new Guid("dd12b6a0-14b9-46e8-8800-c154f74047c8"),
+                    templt.Id);
             else
-                return "false";
+                template.ClearCachedTemplate(templt.Id);
 
-
-            return retVal;
+            return "true";
         }
 
 
@@ -460,7 +429,7 @@ namespace umbraco.presentation.webservices
             if (GlobalSettings.UseSSL && !HttpContext.Current.Request.IsSecureConnection)
                 throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
 
-            if (!BasePages.BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
+            if (!BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
                 throw new Exception("Client authorization failed. User is not logged in");
 
         }

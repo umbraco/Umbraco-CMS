@@ -3,6 +3,7 @@ using System;
 using System.Xml;
 using System.Xml.XPath;
 using System.Reflection;
+using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.BasePages;
 using umbraco.IO;
@@ -12,35 +13,16 @@ namespace umbraco.presentation.create
     /// <summary>
     /// Summary description for dialogHandler_temp.
     /// </summary>
+    [Obsolete("This class is no longer used, it has been replaced by Umbraco.Web.UI.LegacyDialogHandler which will also eventually be deprecated")]
     public class dialogHandler_temp
     {
-        public dialogHandler_temp()
-        {
-        }
-
         public static void Delete(string NodeType, int NodeId)
         {
             Delete(NodeType, NodeId, "");
         }
         public static void Delete(string NodeType, int NodeId, string Text)
         {
-            // Load task settings
-            XmlDocument createDef = GetXmlDoc();
-
-            // Create an instance of the type by loading it from the assembly
-            XmlNode def = createDef.SelectSingleNode("//nodeType [@alias = '" + NodeType + "']");
-            string taskAssembly = def.SelectSingleNode("./tasks/delete").Attributes.GetNamedItem("assembly").Value;
-            string taskType = def.SelectSingleNode("./tasks/delete").Attributes.GetNamedItem("type").Value;
-
-            Assembly assembly = Assembly.LoadFrom( IOHelper.MapPath(SystemDirectories.Bin + "/" + taskAssembly + ".dll"));
-            Type type = assembly.GetType(taskAssembly + "." + taskType);
-            interfaces.ITask typeInstance = Activator.CreateInstance(type) as interfaces.ITask;
-            if (typeInstance != null)
-            {
-                typeInstance.ParentID = NodeId;
-                typeInstance.Alias = Text;
-                typeInstance.Delete();
-            }
+            LegacyDialogHandler.Delete(NodeType, NodeId, Text);
         }
 
         public static string Create(string NodeType, int NodeId, string Text)
@@ -50,60 +32,7 @@ namespace umbraco.presentation.create
 
         public static string Create(string NodeType, int TypeId, int NodeId, string Text)
         {
-
-            // Load task settings
-            XmlDocument createDef = GetXmlDoc();
-
-            // Create an instance of the type by loading it from the assembly
-            XmlNode def = createDef.SelectSingleNode("//nodeType [@alias = '" + NodeType + "']");
-            string taskAssembly = def.SelectSingleNode("./tasks/create").Attributes.GetNamedItem("assembly").Value;
-            string taskType = def.SelectSingleNode("./tasks/create").Attributes.GetNamedItem("type").Value;
-
-            Assembly assembly = Assembly.LoadFrom( IOHelper.MapPath(SystemDirectories.Bin + "/" + taskAssembly + ".dll"));
-            Type type = assembly.GetType(taskAssembly + "." + taskType);
-            interfaces.ITask typeInstance = Activator.CreateInstance(type) as interfaces.ITask;
-            if (typeInstance != null)
-            {
-                typeInstance.TypeID = TypeId;
-                typeInstance.ParentID = NodeId;
-                typeInstance.Alias = Text;
-                typeInstance.UserId = BasePages.UmbracoEnsuredPage.GetUserId(BasePages.UmbracoEnsuredPage.umbracoUserContextID);
-                typeInstance.Save();
-
-                // check for returning url
-                try
-                {
-                    return ((interfaces.ITaskReturnUrl)typeInstance).ReturnUrl;
-                }
-                catch
-                {
-                    return "";
-                }
-            }
-
-
-            //try
-            //{
-
-            //}
-            //catch (Exception ex)
-            //{
-            //    Log.Add(LogTypes.Error, UmbracoEnsuredPage.CurrentUser, -1, string.Format("Could not create node ({0},{1},{2},{3} ERROR: {4}", NodeType, TypeId, NodeId, Text, ex.Message));
-            //    return "";
-            //}
-
-            return "";
+            return LegacyDialogHandler.Create(NodeType, NodeId, Text, TypeId);
         }
-
-        private static XmlDocument GetXmlDoc()
-        {
-            // Load task settings
-            XmlDocument createDef = new XmlDocument();
-            XmlTextReader defReader = new XmlTextReader(IOHelper.MapPath(SystemFiles.CreateUiXml));
-            createDef.Load(defReader);
-            defReader.Close();
-            return createDef;
-        }
-
     }
 }

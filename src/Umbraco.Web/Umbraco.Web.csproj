@@ -325,6 +325,7 @@
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
+    <Compile Include="UI\LegacyDialogHandler.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
