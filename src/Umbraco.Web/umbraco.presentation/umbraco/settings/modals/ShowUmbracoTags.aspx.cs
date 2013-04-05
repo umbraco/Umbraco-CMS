@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Data;
@@ -11,37 +11,26 @@ using System.Web.UI.HtmlControls;
 
 namespace umbraco.cms.presentation.settings.modal
 {
-	/// <summary>
-	/// Summary description for ShowUmbracoTags.
-	/// </summary>
-	public partial class ShowUmbracoTags : umbraco.BasePages.UmbracoEnsuredPage
-	{
+    /// <summary>
+    /// Summary description for ShowUmbracoTags.
+    /// </summary>
+    public partial class ShowUmbracoTags : umbraco.BasePages.UmbracoEnsuredPage
+    {
 
         public static string alias = "";
-		protected void Page_Load(object sender, System.EventArgs e)
-		{
+        protected void Page_Load(object sender, System.EventArgs e)
+        {
             alias = Request.QueryString["alias"].Replace(" ", "").Trim();
-			// Put user code to initialize the page here
-		}
+            // Put user code to initialize the page here
+        }
 
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
-
-		}
-		#endregion
-	}
+        /// <summary>
+        /// Pane7 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane7;
+    }
 }
