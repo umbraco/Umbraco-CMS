@@ -269,6 +269,13 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="config\splashes\NoNodes.aspx.cs">
+      <DependentUpon>noNodes.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="config\splashes\NoNodes.aspx.designer.cs">
+      <DependentUpon>noNodes.aspx</DependentUpon>
+    </Compile>
     <Compile Include="install\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
