@@ -14,13 +14,6 @@ namespace umbraco.presentation.install.utills
         protected void Page_Load(object sender, EventArgs e)
         {
             LogHelper.Info<p>(string.Format("Hitting Page_Load on p.aspx for the requested '{0}' feed", Request.QueryString["feed"]));
-
-            //if its not configured then we can continue
-            if (ApplicationContext.Current == null || ApplicationContext.Current.IsConfigured)
-            {
-                throw new AuthenticationException("The application is already configured");
-            }
-
             // Stop Caching in IE
             Response.Cache.SetCacheability(System.Web.HttpCacheability.NoCache);
 
