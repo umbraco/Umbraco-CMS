@@ -478,7 +478,7 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\channels\rsd.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
-    </Compile
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\canvas.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
