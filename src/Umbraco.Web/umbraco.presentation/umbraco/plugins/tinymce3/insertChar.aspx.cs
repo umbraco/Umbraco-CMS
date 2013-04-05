@@ -6,7 +6,7 @@ using System.Web.UI.WebControls;
 
 namespace umbraco.presentation.umbraco.plugins.tinymce3
 {
-	public partial class insertChar : System.Web.UI.Page
+    public partial class insertChar : BasePages.UmbracoEnsuredPage
 	{
 		protected override void OnLoad(EventArgs e)
 		{
