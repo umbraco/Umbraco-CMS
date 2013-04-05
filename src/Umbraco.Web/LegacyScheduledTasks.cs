@@ -35,10 +35,10 @@ namespace Umbraco.Web
 			// of course we should have a proper scheduler, see #U4-809
 
 			// ping/keepalive
-			pingTimer = new Timer(new TimerCallback(global::umbraco.presentation.keepAliveService.PingUmbraco), httpApplication.Context, 60000, 300000);
+            pingTimer = new Timer(new TimerCallback(global::umbraco.presentation.keepAliveService.PingUmbraco), applicationContext, 60000, 300000);
 
 			// (un)publishing _and_ also run scheduled tasks (!)
-			publishingTimer = new Timer(new TimerCallback(global::umbraco.presentation.publishingService.CheckPublishing), httpApplication.Context, 30000, 60000);
+            publishingTimer = new Timer(new TimerCallback(global::umbraco.presentation.publishingService.CheckPublishing), applicationContext, 30000, 60000);
 
 			// log scrubbing
 			AddTask(LOG_SCRUBBER_TASK_NAME, GetLogScrubbingInterval());
