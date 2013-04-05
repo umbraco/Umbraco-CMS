@@ -62,7 +62,7 @@ namespace Umbraco.Web.UI.Install.Steps
 
 
                 if (String.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus))
-                    WebSecurity.PerformLogin(u);
+                    UmbracoContext.Current.Security.PerformLogin(u.Id);
 
                 InstallHelper.RedirectToNextStep(Page, GetCurrentStep());
             }

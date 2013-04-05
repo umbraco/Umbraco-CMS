@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Web;
 using System.Web.UI.WebControls;
 using Umbraco.Core.IO;
 using Umbraco.Web.Install;
+using Umbraco.Web.Security;
 using Umbraco.Web.UI.Pages;
 using umbraco;
 
@@ -59,17 +61,11 @@ namespace Umbraco.Web.UI.Install
 
             //if this is not an upgrade we will log in with the default user.
             // It's not considered an upgrade if the ConfigurationStatus is missing or empty.
-            if (String.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus) == false)
+            if (string.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus) == false)
             {
-                try
-                {
-                    EnsureContext();
-                }
-                catch (InvalidOperationException ex)
-                {
-
-                }
-                catch (Exception)
+                var result = Security.ValidateCurrentUser(new HttpContextWrapper(Context));
+                
+                if (result == ValidateUserAttempt.FailedTimedOut || result == ValidateUserAttempt.FailedNoPrivileges)
                 {
                     Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl));
                 }

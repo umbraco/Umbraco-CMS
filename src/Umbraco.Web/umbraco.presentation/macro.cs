@@ -133,19 +133,13 @@ namespace umbraco
         public macro(int id)
         {
             Macro m = Macro.GetById(id);
-            if (m != null)
-            {
-                Model = new MacroModel(m);    
-            }
+            Model = new MacroModel(m);
         }
 
         public macro(string alias)
         {
             Macro m = Macro.GetByAlias(alias);
-            if (m != null)
-            {
-                Model = new MacroModel(m);
-            }            
+            Model = new MacroModel(m);  
         }
 
         public MacroModel Model { get; set; }

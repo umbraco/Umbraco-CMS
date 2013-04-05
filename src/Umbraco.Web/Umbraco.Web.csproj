@@ -100,9 +100,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\xmlrpcnet.2.5.0\lib\net20\CookComputing.XmlRpcV2.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.50.2941, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Examine, Version=0.1.51.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.50.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.51.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.5.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -263,6 +263,8 @@
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
+    <Compile Include="Cache\ApplicationCacheRefresher.cs" />
+    <Compile Include="Cache\ApplicationTreeCacheRefresher.cs" />
     <Compile Include="Cache\ContentTypeCacheRefresher.cs" />
     <Compile Include="Cache\DataTypeCacheRefresher.cs" />
     <Compile Include="Cache\DictionaryCacheRefresher.cs" />
@@ -340,8 +342,12 @@
     <Compile Include="Routing\UrlProviderMode.cs" />
     <Compile Include="Search\ExamineIndexerModel.cs" />
     <Compile Include="Search\LuceneIndexerExtensions.cs" />
+    <Compile Include="Security\ValidateUserAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="umbraco.presentation\LegacyClasses.cs" />
+    <Compile Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.cs">
       <DependentUpon>AssignDomain2.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1137,13 +1143,6 @@
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\BrowseRepository.aspx.designer.cs">
       <DependentUpon>BrowseRepository.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx.cs">
-      <DependentUpon>directoryBrowser.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx.designer.cs">
-      <DependentUpon>directoryBrowser.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx.cs">
       <DependentUpon>editPackage.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1865,9 +1864,6 @@
     <Content Include="umbraco.presentation\umbraco\members\search.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\details.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\BrowseRepository.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\installedPackage.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\LoadNitros.ascx" />

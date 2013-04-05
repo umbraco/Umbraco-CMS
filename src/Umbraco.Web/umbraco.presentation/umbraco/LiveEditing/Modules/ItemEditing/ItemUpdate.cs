@@ -97,7 +97,7 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
             if(!publishedDocuments.Contains(NodeId.Value))
             {
                 Document document = new Document(NodeId.Value);
-                document.SaveAndPublish(WebSecurity.CurrentUser);
+                document.SaveAndPublish(Umbraco.Web.UmbracoContext.Current.UmbracoUser);
                 
                 publishedDocuments.Add(NodeId.Value);
             }

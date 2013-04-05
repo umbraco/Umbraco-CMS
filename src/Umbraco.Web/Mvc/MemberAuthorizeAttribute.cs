@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -16,6 +17,23 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public sealed class MemberAuthorizeAttribute : AuthorizeAttribute
     {
+
+        private readonly ApplicationContext _applicationContext;
+        private readonly UmbracoContext _umbracoContext;
+
+        public MemberAuthorizeAttribute(UmbracoContext umbracoContext)
+        {
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            _umbracoContext = umbracoContext;
+            _applicationContext = _umbracoContext.Application;
+        }
+
+        public MemberAuthorizeAttribute()
+            : this(UmbracoContext.Current)
+        {
+
+        }
+
         /// <summary>
         /// Flag for whether to allow all site visitors or just authenticated members
         /// </summary>
@@ -58,7 +76,7 @@ namespace Umbraco.Web.Mvc
                 }
             }
 
-            return WebSecurity.IsMemberAuthorized(AllowAll,
+            return _umbracoContext.Security.IsMemberAuthorized(AllowAll,
                                                   AllowType.Split(','),
                                                   AllowGroup.Split(','),
                                                   members);

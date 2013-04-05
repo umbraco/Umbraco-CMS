@@ -6,19 +6,18 @@ using System.Web;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic.member;
 
 namespace Umbraco.Web.Security
 {
-
     /// <summary>
     /// A utility class used for dealing with security in Umbraco
     /// </summary>
-    public static class WebSecurity
+    public class WebSecurity
     {
         /// <summary>
         /// Returns true or false if the currently logged in member is authorized based on the parameters provided
@@ -28,7 +27,7 @@ namespace Umbraco.Web.Security
         /// <param name="allowGroups"></param>
         /// <param name="allowMembers"></param>
         /// <returns></returns>
-        public static bool IsMemberAuthorized(
+        public bool IsMemberAuthorized(
             bool allowAll = false,
             IEnumerable<string> allowTypes = null,
             IEnumerable<string> allowGroups = null,
@@ -86,7 +85,7 @@ namespace Umbraco.Web.Security
         /// Gets the SQL helper.
         /// </summary>
         /// <value>The SQL helper.</value>
-        private static ISqlHelper SqlHelper
+        private ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
         }
@@ -94,40 +93,47 @@ namespace Umbraco.Web.Security
         private const long TicksPrMinute = 600000000;
         private static readonly int UmbracoTimeOutInMinutes = Core.Configuration.GlobalSettings.TimeOutInMinutes;
 
+        private User _currentUser;
+
         /// <summary>
         /// Gets the current user.
         /// </summary>
         /// <value>The current user.</value>
-        public static User CurrentUser
+        /// <remarks>
+        /// This is internal because we don't want to expose the legacy User object on this class, instead we'll wait until IUser
+        /// is public. If people want to reference the current user, they can reference it from the UmbracoContext.
+        /// </remarks>
+        internal User CurrentUser
         {
             get
             {
-                return User.GetCurrent();
+                //only load it once per instance!
+                return _currentUser ?? (_currentUser = User.GetCurrent());
             }
         }
 
         /// <summary>
         /// Logs a user in.
         /// </summary>
-        /// <param name="u">The user</param>
-        public static void PerformLogin(User u)
+        /// <param name="userId">The user Id</param>
+        public void PerformLogin(int userId)
         {
             var retVal = Guid.NewGuid();
             SqlHelper.ExecuteNonQuery(
-                                      "insert into umbracoUserLogins (contextID, userID, timeout) values (@contextId,'" + u.Id + "','" +
+                                      "insert into umbracoUserLogins (contextID, userID, timeout) values (@contextId,'" + userId + "','" +
                                       (DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)).ToString() +
                                       "') ",
                                       SqlHelper.CreateParameter("@contextId", retVal));
             UmbracoUserContextId = retVal.ToString();
 
-            LogHelper.Info(typeof(WebSecurity), "User {0} (Id: {1}) logged in", () => u.Name, () => u.Id);
+            LogHelper.Info(typeof(WebSecurity), "User Id: {0} logged in", () => userId);
 
         }
 
         /// <summary>
         /// Clears the current login for the currently logged in user
         /// </summary>
-        public static void ClearCurrentLogin()
+        public void ClearCurrentLogin()
         {
             // Added try-catch in case login doesn't exist in the database
             // Either due to old cookie or running multiple sessions on localhost with different port number
@@ -143,7 +149,7 @@ namespace Umbraco.Web.Security
             }
         }
 
-        public static void RenewLoginTimeout()
+        public void RenewLoginTimeout()
         {
             // only call update if more than 1/10 of the timeout has passed
             SqlHelper.ExecuteNonQuery(
@@ -152,7 +158,25 @@ namespace Umbraco.Web.Security
                 SqlHelper.CreateParameter("@contextId", UmbracoUserContextId));
         }
 
-        internal static void UpdateLogin(long timeout)
+        /// <summary>
+        /// Validates the user node tree permissions.
+        /// </summary>
+        /// <param name="umbracoUser"></param>
+        /// <param name="path">The path.</param>
+        /// <param name="action">The action.</param>
+        /// <returns></returns>
+        internal bool ValidateUserNodeTreePermissions(User umbracoUser, string path, string action)
+        {
+            var permissions = umbracoUser.GetPermissions(path);
+            if (permissions.IndexOf(action) > -1 && (path.Contains("-20") || ("," + path + ",").Contains("," + umbracoUser.StartNodeId.ToString() + ",")))
+                return true;
+
+            var user = umbracoUser;
+            LogHelper.Info<WebSecurity>("User {0} has insufficient permissions in UmbracoEnsuredPage: '{1}', '{2}', '{3}'", () => user.Name, () => path, () => permissions, () => action);
+            return false;
+        }
+
+        internal void UpdateLogin(long timeout)
         {
             // only call update if more than 1/10 of the timeout has passed
             if (timeout - (((TicksPrMinute * UmbracoTimeOutInMinutes) * 0.8)) < DateTime.Now.Ticks)
@@ -162,7 +186,7 @@ namespace Umbraco.Web.Security
                     SqlHelper.CreateParameter("@contextId", UmbracoUserContextId));
         }
 
-        internal static long GetTimeout(string umbracoUserContextId)
+        internal long GetTimeout(string umbracoUserContextId)
         {
             return ApplicationContext.Current.ApplicationCache.GetCacheItem(
                 CacheKeys.UserContextTimeoutCacheKey + umbracoUserContextId,
@@ -170,7 +194,7 @@ namespace Umbraco.Web.Security
                 () => GetTimeout(true));
         }
 
-        internal static long GetTimeout(bool byPassCache)
+        internal long GetTimeout(bool byPassCache)
         {
             if (UmbracoSettings.KeepUserLoggedIn)
                 RenewLoginTimeout();
@@ -190,7 +214,7 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="umbracoUserContextId">The umbraco user context ID.</param>
         /// <returns></returns>
-        public static int GetUserId(string umbracoUserContextId)
+        public int GetUserId(string umbracoUserContextId)
         {
             //need to parse to guid
             Guid gid;
@@ -215,7 +239,7 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="currentUmbracoUserContextId">The umbraco user context ID.</param>
         /// <returns></returns>
-        public static bool ValidateUserContextId(string currentUmbracoUserContextId)
+        public bool ValidateUserContextId(string currentUmbracoUserContextId)
         {
             if ((currentUmbracoUserContextId != ""))
             {
@@ -232,14 +256,46 @@ namespace Umbraco.Web.Security
             return false;
         }
 
+        /// <summary>
+        /// Validates the current user
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <returns></returns>
+        internal ValidateUserAttempt ValidateCurrentUser(HttpContextBase httpContext)
+        {
+            if (UmbracoUserContextId != "")
+            {
+                var uid = GetUserId(UmbracoUserContextId);
+                var timeout = GetTimeout(UmbracoUserContextId);
+
+                if (timeout > DateTime.Now.Ticks)
+                {
+                    var user = User.GetUser(uid);
+
+                    // Check for console access
+                    if (user.Disabled || (user.NoConsole && GlobalSettings.RequestIsInUmbracoApplication(httpContext) && !GlobalSettings.RequestIsLiveEditRedirector(httpContext)))
+                    {
+                        return ValidateUserAttempt.FailedNoPrivileges;
+                        //throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
+                    }
+                    UpdateLogin(timeout);
+                    return ValidateUserAttempt.Success;
+                }
+                return ValidateUserAttempt.FailedTimedOut;
+                //throw new ArgumentException("User has timed out!!");
+            }
+            return ValidateUserAttempt.FailedNoContextId;
+            //throw new InvalidOperationException("The user has no umbraco contextid - try logging in");
+        }
+
         //TODO: Clean this up!! We also have extension methods in StringExtensions for decrypting/encrypting in med trust
         // ... though an existing cookie may fail decryption, in that case they'd just get logged out. no problems.
-
+        
         /// <summary>
         /// Gets or sets the umbraco user context ID.
         /// </summary>
         /// <value>The umbraco user context ID.</value>
-        public static string UmbracoUserContextId
+        public string UmbracoUserContextId
         {
             get
             {
