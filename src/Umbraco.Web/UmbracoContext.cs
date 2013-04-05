@@ -28,6 +28,7 @@ namespace Umbraco.Web
         private const string HttpContextItemName = "Umbraco.Web.UmbracoContext";
         private static readonly object Locker = new object();
 
+        private bool _replacing;
         private PreviewContent _previewContent;
 
         /// <summary>
@@ -78,8 +79,12 @@ namespace Umbraco.Web
         /// </remarks>
         internal static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext, bool replaceContext)
         {
-            if (UmbracoContext.Current != null && !replaceContext)
-                return UmbracoContext.Current;
+            if (UmbracoContext.Current != null)
+            {
+                if (!replaceContext)
+                    return UmbracoContext.Current;
+                UmbracoContext.Current._replacing = true;
+            }
 
             var umbracoContext = new UmbracoContext(httpContext, applicationContext, RoutesCacheResolver.Current.RoutesCache);
 
@@ -165,9 +170,9 @@ namespace Umbraco.Web
                 lock (Locker)
                 {
                     //if running in a real HttpContext, this can only be set once
-                    if (System.Web.HttpContext.Current != null && Current != null)
+                    if (System.Web.HttpContext.Current != null && Current != null && !Current._replacing)
                     {
-                        throw new ApplicationException("The current httpContext can only be set once during a request.");
+                        throw new ApplicationException("The current UmbracoContext can only be set once during a request.");
                     }
 
                     //if there is an HttpContext, return the item
