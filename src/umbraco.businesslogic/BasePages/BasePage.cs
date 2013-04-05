@@ -5,10 +5,10 @@ using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
-using umbraco.IO;
 using System.Web.UI;
 
 namespace umbraco.BasePages
