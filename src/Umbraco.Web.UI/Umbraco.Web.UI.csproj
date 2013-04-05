@@ -265,8 +265,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="config\splashes\NoNodes.aspx.designer.cs">
-      <DependentUpon>noNodes.aspx</DependentUpon>
-    </Compile>
+      <DependentUpon>noNodes.aspx</DependentUpon>   
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Install\Default.aspx.designer.cs">
