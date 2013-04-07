@@ -4,7 +4,12 @@ using System.Linq;
 
 namespace Umbraco.Core
 {
-    internal class TopologicalSorter
+    /// <summary>
+    /// Topological Sort algorithm for sorting items based on dependencies.
+    /// Use the static method TopologicalSorter.GetSortedItems for a convenient 
+    /// way of sorting a list of items with dependencies between them.
+    /// </summary>
+    public class TopologicalSorter
     {
         private readonly int[] _vertices; // list of vertices
         private readonly int[,] _matrix; // adjacency matrix
@@ -109,8 +114,9 @@ namespace Umbraco.Core
 
         #endregion
 
-        #region Internal Staic methods
-        internal static IEnumerable<T> GetSortedItems<T>(List<DependencyField<T>> fields) where T : class 
+        #region Static methods
+
+        public static IEnumerable<T> GetSortedItems<T>(List<DependencyField<T>> fields) where T : class 
         {
             int[] sortOrder = GetTopologicalSortOrder(fields);
             var list = new List<T>();
@@ -155,9 +161,10 @@ namespace Umbraco.Core
             int[] result = g.Sort();
             return result;
         }
+
         #endregion
 
-        internal class DependencyField<T> where T : class 
+        public class DependencyField<T> where T : class 
         {
             public DependencyField()
             {
