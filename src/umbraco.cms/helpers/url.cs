@@ -1,8 +1,8 @@
 using System;
 using System.Xml;
 using System.Text.RegularExpressions;
-using umbraco.IO;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.CodeAnnotations;
 
 namespace umbraco.cms.helpers
@@ -33,12 +33,17 @@ namespace umbraco.cms.helpers
         /// <returns>True if it's an allowed url</returns>
         public static bool ValidateProxyUrl(string url, string callerUrl)
         {
+            if (!Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute))
+            {
+                return false;
+            }
+
             Uri requestUri;
-            Uri localUri;
             if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out requestUri))
             {
-                if (!String.IsNullOrEmpty(callerUrl))
+                if (!string.IsNullOrEmpty(callerUrl))
                 {
+                    Uri localUri;
                     if (Uri.TryCreate(callerUrl, UriKind.RelativeOrAbsolute, out localUri))
                     {
                         // check for local urls
@@ -49,18 +54,21 @@ namespace umbraco.cms.helpers
                     }
                     else
                     {
+                        //TODO: SD: why throw an exception?? shouldn't we just return false ?
                         throw new ArgumentException("CallerUrl is in a wrong format that couldn't be parsed as a valid URI. If you don't want to evaluate for local urls, but just proxy urls then leave callerUrl empty", "callerUrl");
                     }
                 }
                 // check for valid proxy urls
-                var feedProxyXml = xmlHelper.OpenAsXmlDocument(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
+                var feedProxyXml = XmlHelper.OpenAsXmlDocument(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
                 if (feedProxyXml != null &&
                     feedProxyXml.SelectSingleNode(string.Concat("//allow[@host = '", requestUri.Host, "']")) != null)
                 {
                     return true;
                 }
-            } else
+            } 
+            else
             {
+                //TODO: SD: why throw an exception?? shouldn't we just return false ?
                 throw new ArgumentException("url is in a wrong format that couldn't be parsed as a valid URI", "url");
                 
             }

@@ -11,16 +11,10 @@ using System.Web.UI.HtmlControls;
 
 namespace umbraco.presentation
 {
-    /// <summary>
-    /// Summary description for ping.
-    /// </summary>
+
     [Obsolete("This class is no longer used and will be removed in future versions.")]
     public partial class ping : System.Web.UI.Page
     {
-        protected void Page_Load(object sender, System.EventArgs e)
-        {
-        }
-
         #region Web Form Designer generated code
         override protected void OnInit(EventArgs e)
         {

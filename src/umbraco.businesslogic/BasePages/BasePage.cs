@@ -6,12 +6,12 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
-using umbraco.IO;
 using System.Web.UI;
 
 namespace umbraco.BasePages
