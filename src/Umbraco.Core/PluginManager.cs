@@ -488,15 +488,6 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Returns all available IMacroPropertyTypes in application
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveMacroPropertyTypes()
-        {
-            return ResolveTypes<IMacroPropertyType>();
-        }
-
-        /// <summary>
         /// Returns all mapper types that have a MapperFor attribute defined
         /// </summary>
         /// <returns></returns>
