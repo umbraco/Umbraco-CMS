@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -9,64 +10,37 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
-    public class StylesheetTasks : interfaces.ITaskReturnUrl
+    public class StylesheetTasks : LegacyDialogTask
     {
-
-        private string _alias;
-        private int _parentID;
-        private int _typeID;
-        private int _userID;
-
-        public int UserId
-        {
-            set { _userID = value; }
-        }
-        public int TypeID
-        {
-            set { _typeID = value; }
-            get { return _typeID; }
-        }
-
-
-        public string Alias
-        {
-            set { _alias = value; }
-            get { return _alias; }
-        }
-
-        public int ParentID
-        {
-            set { _parentID = value; }
-            get { return _parentID; }
-        }
-
-        public bool Save()
+        public override bool PerformSave()
         {
 
             int id = -1;
-            umbraco.cms.businesslogic.web.StyleSheet checkingSheet =umbraco.cms.businesslogic.web.StyleSheet.GetByName(Alias);
-            if (checkingSheet != null)
-                id = checkingSheet.Id;
-            else
-                id =cms.businesslogic.web.StyleSheet.MakeNew(BusinessLogic.User.GetUser(_userID), Alias, "", "").Id;            
-            m_returnUrl = string.Format("settings/stylesheet/editStylesheet.aspx?id={0}", id);
+            var checkingSheet = cms.businesslogic.web.StyleSheet.GetByName(Alias);
+            id = checkingSheet != null 
+                ? checkingSheet.Id 
+                : cms.businesslogic.web.StyleSheet.MakeNew(User, Alias, "", "").Id;            
+            _returnUrl = string.Format("settings/stylesheet/editStylesheet.aspx?id={0}", id);
             return true;
         }
 
-        public bool Delete()
+        public override bool PerformDelete()
         {
-            cms.businesslogic.web.StyleSheet s = new cms.businesslogic.web.StyleSheet(ParentID);
+            var s = new cms.businesslogic.web.StyleSheet(ParentID);
             s.delete();
             return true;
         }
 
-        #region ITaskReturnUrl Members
-        private string m_returnUrl = "";
-        public string ReturnUrl
+        private string _returnUrl = "";
+        
+        public override string ReturnUrl
         {
-            get { return m_returnUrl; }
+            get { return _returnUrl; }
         }
 
-        #endregion
+        public override string AssignedApp
+        {
+            get { return DefaultApps.settings.ToString(); }
+        }
     }
 }

@@ -1,5 +1,5 @@
 using System;
-
+using System.Web;
 using System.Xml;
 using System.Xml.XPath;
 using System.Reflection;
@@ -22,7 +22,10 @@ namespace umbraco.presentation.create
         }
         public static void Delete(string NodeType, int NodeId, string Text)
         {
-            LegacyDialogHandler.Delete(NodeType, NodeId, Text);
+            LegacyDialogHandler.Delete(
+                new HttpContextWrapper(HttpContext.Current),
+                BasePage.Current.getUser(),
+                NodeType, NodeId, Text);
         }
 
         public static string Create(string NodeType, int NodeId, string Text)
@@ -32,7 +35,10 @@ namespace umbraco.presentation.create
 
         public static string Create(string NodeType, int TypeId, int NodeId, string Text)
         {
-            return LegacyDialogHandler.Create(NodeType, NodeId, Text, TypeId);
+            return LegacyDialogHandler.Create(
+                new HttpContextWrapper(HttpContext.Current),
+                BasePage.Current.getUser(),
+                NodeType, NodeId, Text, TypeId);
         }
     }
 }

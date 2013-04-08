@@ -8,6 +8,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using Umbraco.Web.UI;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
 using umbraco.IO;
@@ -37,7 +38,9 @@ namespace umbraco.presentation.umbraco.create
 				if (scriptType.SelectedValue == "")
 					createFolder = 1;
 
-				string returnUrl = presentation.create.dialogHandler_temp.Create(
+                string returnUrl = LegacyDialogHandler.Create(
+                    new HttpContextWrapper(Context),
+                    BasePage.Current.getUser(),
 					helper.Request("nodeType"),
 					createFolder,
                     relativepath + "¤" + rename.Text + "¤" + scriptType.SelectedValue);

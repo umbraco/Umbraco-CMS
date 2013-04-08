@@ -13,7 +13,7 @@ namespace Umbraco.Core
     /// </summary>
     public class XmlHelper
     {
-
+        
 		/// <summary>
         /// Imports a XML node from text.
         /// </summary>

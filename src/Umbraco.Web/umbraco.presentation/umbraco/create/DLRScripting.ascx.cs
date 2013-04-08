@@ -10,6 +10,7 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Xml.Linq;
+using Umbraco.Web.UI;
 using umbraco.cms.businesslogic.macro;
 using umbraco.scripting;
 using umbraco.BasePages;
@@ -36,11 +37,14 @@ namespace umbraco.presentation.create
         {
             if (Page.IsValid)
             {
-                int createMacroVal = 0;
+                var createMacroVal = 0;
                 if (createMacro.Checked)
                     createMacroVal = 1;
 
-                string returnUrl = dialogHandler_temp.Create(UmbracoContext.Current.Request["nodeType"],
+                var returnUrl = LegacyDialogHandler.Create(
+                    new HttpContextWrapper(Context),
+                    BasePage.Current.getUser(),
+                    helper.Request("nodeType"),
                     createMacroVal, template.SelectedValue + "|||" + rename.Text + "." + filetype.SelectedValue);
 
                 BasePage.Current.ClientTools

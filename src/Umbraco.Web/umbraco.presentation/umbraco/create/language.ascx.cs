@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Globalization;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Web.UI;
 using umbraco.presentation.create;
 using umbraco.cms.businesslogic.language;
 using umbraco.cms.helpers;
@@ -72,7 +74,9 @@ namespace umbraco.cms.presentation.create.controls
 
         protected void sbmt_Click(object sender, EventArgs e)
         {
-            dialogHandler_temp.Create(
+            LegacyDialogHandler.Create(
+                new HttpContextWrapper(Context),
+                BasePage.Current.getUser(),
                 helper.Request("nodeType"),
                 -1,
                 Cultures.SelectedValue);

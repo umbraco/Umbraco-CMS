@@ -11,6 +11,7 @@ using System.Net;
 using System.Web.UI;
 using Umbraco.Core.IO;
 using Umbraco.Web.UI;
+using umbraco.BusinessLogic;
 using umbraco.businesslogic.Exceptions;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.media;
@@ -28,6 +29,8 @@ namespace umbraco.presentation.webservices
     [ScriptService]
     public class legacyAjaxCalls : WebService
     {
+        private User _currentUser;
+
         [WebMethod]
         public bool ValidateUser(string username, string password)
         {
@@ -52,18 +55,25 @@ namespace umbraco.presentation.webservices
         [ScriptMethod]
         public void Delete(string nodeId, string alias, string nodeType)
         {
-            Authorize();
-
+            if (!AuthorizeUser())
+                return;
+            
             //check which parameters to pass depending on the types passed in
             int intNodeId;
             // Fix for #26965 - numeric member login gets parsed as nodeId
             if (int.TryParse(nodeId, out intNodeId) && nodeType != "member")
             {
-                LegacyDialogHandler.Delete(nodeType, intNodeId, alias);
+                LegacyDialogHandler.Delete(
+                    new HttpContextWrapper(HttpContext.Current),
+                    CurrentUser,
+                    nodeType, intNodeId, alias);
             }
             else
             {
-                LegacyDialogHandler.Delete(nodeType, 0, nodeId);
+                LegacyDialogHandler.Delete(
+                    new HttpContextWrapper(HttpContext.Current),
+                    CurrentUser,
+                    nodeType, 0, nodeId);
             }
         }
 
@@ -421,7 +431,41 @@ namespace umbraco.presentation.webservices
             return "true";
         }
 
+        private User CurrentUser
+        {
+            get
+            {
+                if (_currentUser == null)
+                {
+                    throw new InvalidOperationException("The CurrentUser property has not been set, ensure a successful call is made to AuthorizeUser()");
+                }
+                return _currentUser;
+            }
+            set { _currentUser = value; }
+        }
 
+        /// <summary>
+        /// Authorizes the current user and ensures we don't have to re-lookup the business logic for the current
+        /// web service instance.
+        /// </summary>
+        private bool AuthorizeUser()
+        {
+            // check for secure connection
+            if (GlobalSettings.UseSSL && !HttpContext.Current.Request.IsSecureConnection)
+                throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
+
+            if (!BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
+                return false;
+
+            _currentUser = global::umbraco.BusinessLogic.User.GetUser(
+                BasePage.GetUserId(BasePage.umbracoUserContextID));
+            
+            return true;
+        }
+
+        /// <summary>
+        /// Authorizes the current user based on the cookie value
+        /// </summary>
         public static void Authorize()
         {
 

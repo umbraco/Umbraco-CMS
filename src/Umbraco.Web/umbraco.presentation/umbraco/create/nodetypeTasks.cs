@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -9,46 +10,18 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
-    public class nodetypeTasks : interfaces.ITaskReturnUrl
+    public class nodetypeTasks : LegacyDialogTask
     {
-
-        private string _alias;
-        private int _parentID;
-        private int _typeID;
-        private int _userID;
-
-        public int UserId
+       
+        public override bool PerformSave()
         {
-            set { _userID = value; }
-        }
-        public int TypeID
-        {
-            set { _typeID = value; }
-            get { return _typeID; }
-        }
-
-
-        public string Alias
-        {
-            set { _alias = value; }
-            get { return _alias; }
-        }
-
-        public int ParentID
-        {
-            set { _parentID = value; }
-            get { return _parentID; }
-        }
-
-        public bool Save()
-        {
-            cms.businesslogic.web.DocumentType dt = cms.businesslogic.web.DocumentType.MakeNew(BusinessLogic.User.GetUser(_userID), Alias.Replace("'", "''"));
+            var dt = cms.businesslogic.web.DocumentType.MakeNew(User, Alias.Replace("'", "''"));
             dt.IconUrl = "folder.gif";
 
             // Create template?
             if (ParentID == 1)
             {
-                cms.businesslogic.template.Template[] t = { cms.businesslogic.template.Template.MakeNew(_alias, BusinessLogic.User.GetUser(_userID)) };
+                cms.businesslogic.template.Template[] t = { cms.businesslogic.template.Template.MakeNew(Alias, User) };
                 dt.allowedTemplates = t;
                 dt.DefaultTemplate = t[0].Id;
             }
@@ -59,12 +32,12 @@ namespace umbraco
                 dt.MasterContentType = TypeID;
             }
 
-            m_returnUrl = "settings/editNodeTypeNew.aspx?id=" + dt.Id.ToString();
+            _returnUrl = "settings/editNodeTypeNew.aspx?id=" + dt.Id.ToString();
 
             return true;
         }
 
-        public bool Delete()
+        public override bool PerformDelete()
         {
             new cms.businesslogic.web.DocumentType(ParentID).delete();
 
@@ -73,21 +46,16 @@ namespace umbraco
 
             return false;
         }
-
-        public nodetypeTasks()
+        
+        private string _returnUrl = "";
+        public override string ReturnUrl
         {
-            //
-            // TODO: Add constructor logic here
-            //
+            get { return _returnUrl; }
         }
 
-        #region ITaskReturnUrl Members
-        private string m_returnUrl = "";
-        public string ReturnUrl
+        public override string AssignedApp
         {
-            get { return m_returnUrl; }
+            get { return DefaultApps.settings.ToString(); }
         }
-
-        #endregion
     }
 }

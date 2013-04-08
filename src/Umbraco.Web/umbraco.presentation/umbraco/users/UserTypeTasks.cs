@@ -7,63 +7,20 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using Umbraco.Web.UI;
 using umbraco.interfaces;
 using umbraco.BusinessLogic;
 
 namespace umbraco.cms.presentation.user
 {
-    public class UserTypeTasks : ITaskReturnUrl
+    public class UserTypeTasks : LegacyDialogTask
     {
-        private int m_parentID;
-        private int m_typeID;
-        private string m_alias;
-        private int m_userID;
-
-        #region ITaskReturnUrl Members
-
-        public int ParentID
-        {
-            get
-            {
-                return m_parentID;
-            }
-            set
-            {
-                m_parentID = value;
-            }
-        }
-
-        public int TypeID
-        {
-            get
-            {
-                return m_typeID;
-            }
-            set
-            {
-                m_typeID = value;
-            }
-        }
-
-        public string Alias
-        {
-            get
-            {
-                return m_alias;
-            }
-            set
-            {
-                m_alias = value;
-            }
-        }
-
-        public bool Save()
+        public override bool PerformSave()
         {
             try
             {
-                UserType u = UserType.MakeNew(this.m_alias, "", this.m_alias);
-
-                m_returnUrl = string.Format("users/EditUserType.aspx?id={0}", u.Id);
+                var u = UserType.MakeNew(Alias, "", Alias);
+                _returnUrl = string.Format("users/EditUserType.aspx?id={0}", u.Id);
                 return true;
             }
             catch 
@@ -72,27 +29,24 @@ namespace umbraco.cms.presentation.user
             }            
         }
 
-        public bool Delete()
+        public override bool PerformDelete()
         {
-            UserType userType = UserType.GetUserType(this.m_parentID);
+            var userType = UserType.GetUserType(ParentID);
             if (userType == null)
                 return false;
             userType.Delete();
             return true;
         }
 
-        public int UserId
+        private string _returnUrl = "";
+        public override string ReturnUrl
         {
-            set { m_userID = value; }
+            get { return _returnUrl; }
         }
 
-      
-        private string m_returnUrl = "";
-        public string ReturnUrl
+        public override string AssignedApp
         {
-            get { return m_returnUrl; }
+            get { return DefaultApps.users.ToString(); }
         }
-
-        #endregion
     }
 }

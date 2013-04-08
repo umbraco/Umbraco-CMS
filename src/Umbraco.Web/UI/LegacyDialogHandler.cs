@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Web;
 using System.Xml;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using umbraco.BasePages;
+using umbraco.BusinessLogic;
 using umbraco.interfaces;
+using System.Linq;
 
 namespace Umbraco.Web.UI
 {
@@ -20,53 +24,161 @@ namespace Umbraco.Web.UI
     /// </remarks>
     public static class LegacyDialogHandler
     {
-        public static void Delete(string nodeType, int nodeId, string text)
+        private enum Operation
         {
-            // Load task settings
-            var createDef = GetXmlDoc();
+            Create,
+            Delete
+        }
 
-            // Create an instance of the type by loading it from the assembly
+        private const string ContextKeyCreate = "LegacyDialogHandler-Create-";
+        private const string ContextKeyDelete = "LegacyDialogHandler-Delete-";
+
+        /// <summary>
+        /// Gets the ITask for the operation for the node Type
+        /// </summary>
+        /// <param name="umbracoUser"></param>
+        /// <param name="op"></param>
+        /// <param name="nodeType"></param>
+        /// <param name="httpContext"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This will first check if we've already created the ITask in the current Http request
+        /// </remarks>
+        private static ITask GetTaskForOperation(HttpContextBase httpContext, User umbracoUser, Operation op, string nodeType)
+        {
+            if (httpContext == null) throw new ArgumentNullException("httpContext");
+            if (umbracoUser == null) throw new ArgumentNullException("umbracoUser");
+            if (nodeType == null) throw new ArgumentNullException("nodeType");
+
+            var ctxKey = op == Operation.Create ? ContextKeyCreate : ContextKeyDelete;
+
+            //check contextual cache
+            if (httpContext.Items[ctxKey] != null)
+            {
+                return (ITask) httpContext.Items[ctxKey];
+            }
+
+            var operationNode = op == Operation.Create ? "create" : "delete";
+            var createDef = GetXmlDoc();
             var def = createDef.SelectSingleNode("//nodeType [@alias = '" + nodeType + "']");
-            var taskAssembly = def.SelectSingleNode("./tasks/delete").Attributes.GetNamedItem("assembly").Value;
-            var taskType = def.SelectSingleNode("./tasks/delete").Attributes.GetNamedItem("type").Value;
+            if (def == null)
+            {
+                throw new InvalidOperationException("Cannot find an item that matches node type " + nodeType);
+            }
+            var del = def.SelectSingleNode("./tasks/" + operationNode);
+            if (del == null)
+            {
+                throw new InvalidOperationException("No delete task found for node type " + nodeType);
+            }
+            if (!del.Attributes.HasAttribute("assembly"))
+            {
+                throw new InvalidOperationException("No assembly attribute found for delete task for node type " + nodeType);
+            }
+            var taskAssembly = del.AttributeValue<string>("assembly");
+            if (!del.Attributes.HasAttribute("type"))
+            {
+                throw new InvalidOperationException("No type attribute found for delete task for node type " + nodeType);
+            }
+            var taskType = del.AttributeValue<string>("type");
+
             var assembly = Assembly.LoadFrom(IOHelper.MapPath(SystemDirectories.Bin + "/" + taskAssembly + ".dll"));
             var type = assembly.GetType(taskAssembly + "." + taskType);
             var typeInstance = Activator.CreateInstance(type) as ITask;
-            if (typeInstance == null) return;
+            if (typeInstance == null)
+            {
+                throw new InvalidOperationException("The type returned (" + type + ") is not an " + typeof(ITask));
+            }
+
+            //set the user/user id for the instance
+            var dialogTask = typeInstance as LegacyDialogTask;
+            if (dialogTask != null)
+            {
+                dialogTask.User = umbracoUser;
+            }
+            else
+            {
+                typeInstance.UserId = umbracoUser.Id;
+            }
+
+            //put in contextual cache 
+            httpContext.Items[ctxKey] = typeInstance;
+
+            return typeInstance;
+        }
+
+        /// <summary>
+        /// Checks if the user has access to launch the ITask that matches the node type based on the app assigned
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <param name="umbracoUser"></param>
+        /// <param name="nodeType"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// If the ITask doesn't implement LegacyDialogTask then we will return 'true' since we cannot validate
+        /// the application assigned.
+        /// 
+        /// TODO: Create an API to assign a nodeType to an app so developers can manually secure it
+        /// </remarks>
+        internal static bool UserHasCreateAccess(HttpContextBase httpContext, User umbracoUser, string nodeType)
+        {
+            var task = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
+            var dialogTask = task as LegacyDialogTask;
+            if (dialogTask != null)
+            {
+                return dialogTask.ValidateUserForApplication();
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Checks if the user has access to launch the ITask that matches the node type based on the app assigned
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <param name="umbracoUser"></param>
+        /// <param name="nodeType"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// If the ITask doesn't implement LegacyDialogTask then we will return 'true' since we cannot validate
+        /// the application assigned.
+        /// 
+        /// TODO: Create an API to assign a nodeType to an app so developers can manually secure it
+        /// </remarks>
+        internal static bool UserHasDeleteAccess(HttpContextBase httpContext, User umbracoUser, string nodeType)
+        {
+            var task = GetTaskForOperation(httpContext, umbracoUser, Operation.Delete, nodeType);
+            var dialogTask = task as LegacyDialogTask;
+            if (dialogTask != null)
+            {
+                return dialogTask.ValidateUserForApplication();
+            }
+            return true;
+        }
+
+        public static void Delete(HttpContextBase httpContext, User umbracoUser, string nodeType, int nodeId, string text)
+        {
+            var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Delete, nodeType);
+            
             typeInstance.ParentID = nodeId;
             typeInstance.Alias = text;
+
             typeInstance.Delete();
         }
 
-        public static string Create(string nodeType, int nodeId, string text, int typeId = 0)
+        public static string Create(HttpContextBase httpContext, User umbracoUser, string nodeType, int nodeId, string text, int typeId = 0)
         {
-            // Load task settings
-            var createDef = GetXmlDoc();
+            var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
+            
+            typeInstance.TypeID = typeId;
+            typeInstance.ParentID = nodeId;
+            typeInstance.Alias = text;
 
-            // Create an instance of the type by loading it from the assembly
-            var def = createDef.SelectSingleNode("//nodeType [@alias = '" + nodeType + "']");
-            var taskAssembly = def.SelectSingleNode("./tasks/create").Attributes.GetNamedItem("assembly").Value;
-            var taskType = def.SelectSingleNode("./tasks/create").Attributes.GetNamedItem("type").Value;
+            typeInstance.Save();
 
-            var assembly = Assembly.LoadFrom(IOHelper.MapPath(SystemDirectories.Bin + "/" + taskAssembly + ".dll"));
-            var type = assembly.GetType(taskAssembly + "." + taskType);
-            var typeInstance = Activator.CreateInstance(type) as ITask;
-            if (typeInstance != null)
-            {
-                typeInstance.TypeID = typeId;
-                typeInstance.ParentID = nodeId;
-                typeInstance.Alias = text;
-                typeInstance.UserId = BasePage.GetUserId(BasePage.umbracoUserContextID);
-                typeInstance.Save();
-
-                // check for returning url
-                var returnUrlTask = typeInstance as ITaskReturnUrl;
-                return returnUrlTask != null 
-                    ? returnUrlTask.ReturnUrl 
-                    : "";
-            }
-
-            return "";
+            // check for returning url
+            var returnUrlTask = typeInstance as ITaskReturnUrl;
+            return returnUrlTask != null
+                ? returnUrlTask.ReturnUrl
+                : "";
         }
 
         private static XmlDocument GetXmlDoc()

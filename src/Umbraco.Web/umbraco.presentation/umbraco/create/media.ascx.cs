@@ -1,3 +1,5 @@
+using Umbraco.Web.UI;
+
 namespace umbraco.cms.presentation.create.controls
 {
 	using System;
@@ -65,13 +67,15 @@ namespace umbraco.cms.presentation.create.controls
 
 		protected void sbmt_Click(object sender, System.EventArgs e)
 		{
-			if (Page.IsValid) 
+			if (Page.IsValid)
 			{
-				string returnUrl = umbraco.presentation.create.dialogHandler_temp.Create(
-					umbraco.helper.Request("nodeType"),
-					int.Parse(nodeType.SelectedValue),
-					int.Parse(Request["nodeID"]),
-					rename.Text);
+			    var returnUrl = LegacyDialogHandler.Create(
+			        new HttpContextWrapper(Context),
+			        BasePage.Current.getUser(),
+			        helper.Request("nodeType"),
+			        int.Parse(nodeType.SelectedValue),
+			        rename.Text,
+			        int.Parse(Request["nodeID"]));
 
 				BasePage.Current.ClientTools
 					.ChangeContentFrameUrl(returnUrl)

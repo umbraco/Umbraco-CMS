@@ -25,6 +25,7 @@ using umbraco.cms.presentation.Trees;
 
 namespace umbraco
 {
+    [Obsolete("This class is no longer used and will be removed from the codebase in future versions")]
 	public class loadcontentItemType : BaseTree
 	{
         public loadcontentItemType(string application) : base(application) { }

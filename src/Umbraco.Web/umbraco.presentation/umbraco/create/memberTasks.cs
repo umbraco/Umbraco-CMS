@@ -1,6 +1,8 @@
 using System;
 using System.Data;
+using System.Web;
 using System.Web.Security;
+using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -9,7 +11,7 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
-    public class memberTasks : interfaces.ITaskReturnUrl
+    public class memberTasks : LegacyDialogTask
     {
         /// <summary>
         /// The new event handler
@@ -17,111 +19,80 @@ namespace umbraco
         public delegate void NewUIMemberEventHandler(Member sender, string unencryptedPassword, NewMemberUIEventArgs e);
 
         public static event NewUIMemberEventHandler NewMember;
-        new protected virtual void OnNewMember(NewMemberUIEventArgs e, string unencryptedPassword, Member m)
+
+        protected virtual void OnNewMember(NewMemberUIEventArgs e, string unencryptedPassword, Member m)
         {
             if (NewMember != null)
             {
                 NewMember(m, unencryptedPassword, e);
             }
         }
-
-
-        private string _alias;
-        private int _parentID;
-        private int _typeID;
-        private int _userID;
+        
+        private int _parentId;        
         private string _returnUrl = "";
 
-        public int UserId
-        {
-            set { _userID = value; }
-        }
-
-        public int TypeID
-        {
-            set { _typeID = value; }
-            get { return _typeID; }
-        }
-
-        public string ReturnUrl
+        public override string ReturnUrl
         {
             get { return _returnUrl; }
         }
 
-        public string Alias
+        public override string AssignedApp
         {
-            set { _alias = value; }
-            get { return _alias; }
+            get { return DefaultApps.member.ToString(); }
         }
 
-        public int ParentID
+        public override int ParentID
         {
             set
             {
-                _parentID = value;
-                if (_parentID == 1) _parentID = -1;
+                _parentId = value;
+                if (_parentId == 1) _parentId = -1;
             }
             get
             {
-                return _parentID;
+                return _parentId;
             }
         }
 
-        public bool Save()
+        public override bool PerformSave()
         {
-            string[] nameAndMail = Alias.Split("|".ToCharArray());
-            string name = nameAndMail[0];
-            string email = nameAndMail.Length > 0 ? nameAndMail[1] : "";
-            string password = nameAndMail.Length > 1 ? nameAndMail[2] : "";
-            string loginName = nameAndMail.Length > 2 ? nameAndMail[3] : "";
-            if (cms.businesslogic.member.Member.InUmbracoMemberMode() && TypeID != -1)
+            var nameAndMail = Alias.Split("|".ToCharArray());
+            var name = nameAndMail[0];
+            var email = nameAndMail.Length > 0 ? nameAndMail[1] : "";
+            var password = nameAndMail.Length > 1 ? nameAndMail[2] : "";
+            var loginName = nameAndMail.Length > 2 ? nameAndMail[3] : "";
+            if (Member.InUmbracoMemberMode() && TypeID != -1)
             {
-                cms.businesslogic.member.MemberType dt = new cms.businesslogic.member.MemberType(TypeID);
-                cms.businesslogic.member.Member m = cms.businesslogic.member.Member.MakeNew(name, loginName, email, dt, BusinessLogic.User.GetUser(_userID));
+                var dt = new MemberType(TypeID);
+                var m = Member.MakeNew(name, loginName, email, dt, User);
                 m.Password = password;                
                 m.LoginName = loginName.Replace(" ", "").ToLower();
 
-                NewMemberUIEventArgs e = new NewMemberUIEventArgs();
-                this.OnNewMember(e, password, m);
+                var e = new NewMemberUIEventArgs();
+                OnNewMember(e, password, m);
 
                 _returnUrl = "members/editMember.aspx?id=" + m.Id.ToString();
             }
             else
             {
-                MembershipCreateStatus mc = new MembershipCreateStatus();
+                var mc = new MembershipCreateStatus();
                 Membership.CreateUser(name, password, email, "empty", "empty", true, out mc);
                 if (mc != MembershipCreateStatus.Success)
                 {
                     throw new Exception("Error creating Member: " + mc.ToString());
                 }
-                _returnUrl = "members/editMember.aspx?id=" + System.Web.HttpContext.Current.Server.UrlEncode(name);
+                _returnUrl = "members/editMember.aspx?id=" + HttpUtility.UrlEncode(name);
             }
 
             return true;
         }
 
-        public bool Delete()
-        {
-            //cms.businesslogic.member.Member d = new cms.businesslogic.member.Member(ParentID);
-            //d.delete();
-            //return true;
-            MembershipUser u = Membership.GetUser(Alias);
+        public override bool PerformDelete()
+        {            
+            var u = Membership.GetUser(Alias);
             Membership.DeleteUser(u.UserName, true);
             return true;
-
-
         }
 
-        public bool Sort()
-        {
-            return false;
-        }
-
-        public memberTasks()
-        {
-            //
-            // TODO: Add constructor logic here
-            //
-        }
     }
 }

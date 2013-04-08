@@ -323,9 +323,12 @@
     <Compile Include="Routing\LookupByPageIdQuery.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
+    <Compile Include="Security\LegacyDefaultAppMapping.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
+    <Compile Include="UI\IAssignedApp.cs" />
     <Compile Include="UI\LegacyDialogHandler.cs" />
+    <Compile Include="UI\LegacyDialogTask.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

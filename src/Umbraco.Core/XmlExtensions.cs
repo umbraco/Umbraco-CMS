@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Xml;
 
 namespace Umbraco.Core
@@ -9,6 +10,10 @@ namespace Umbraco.Core
 	/// </summary>
 	internal static class XmlExtensions
 	{
+        public static bool HasAttribute(this XmlAttributeCollection attributes, string attributeName)
+        {
+            return attributes.Cast<XmlAttribute>().Any(x => x.Name == attributeName);
+        }
 
 		public static T AttributeValue<T>(this XmlNode xml, string attributeName)
 		{

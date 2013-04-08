@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.IO;
+using Umbraco.Web.UI;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
 using umbraco.IO;
@@ -66,14 +67,16 @@ namespace umbraco.presentation.create
         {
             if (Page.IsValid)
             {
-                int createMacroVal = 0;
+                var createMacroVal = 0;
                 if (createMacro.Checked)
                     createMacroVal = 1;
 
-                string xsltName = UmbracoSettings.UseLegacyXmlSchema ? xsltTemplate.SelectedValue :
+                var xsltName = UmbracoSettings.UseLegacyXmlSchema ? xsltTemplate.SelectedValue :
                     Path.Combine("schema2", xsltTemplate.SelectedValue);
 
-                string returnUrl = dialogHandler_temp.Create(
+                var returnUrl = LegacyDialogHandler.Create(
+                    new HttpContextWrapper(Context),
+                    BasePage.Current.getUser(),
                     helper.Request("nodeType"),
                     createMacroVal,
                     xsltName + "|||" + rename.Text);
