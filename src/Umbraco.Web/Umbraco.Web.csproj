@@ -1816,6 +1816,12 @@
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
     <Compile Include="WebServices\FolderBrowserService.cs" />
+    <Compile Include="WebServices\UmbracoAuthorizedWebService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WebServices\UmbracoWebService.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Content Include="umbraco.presentation\umbracobase\readme.txt" />
     <Content Include="umbraco.presentation\umbraco\controls\Tree\CustomTreeService.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx" />

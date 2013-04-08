@@ -12,7 +12,9 @@ using System.Web.UI;
 using System.Xml;
 using System.Xml.Xsl;
 using Umbraco.Core.IO;
+using Umbraco.Web.WebServices;
 using umbraco.BasePages;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
@@ -30,19 +32,13 @@ namespace umbraco.presentation.webservices
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [ToolboxItem(false)]
     [ScriptService]
-    public class codeEditorSave : WebService
+    public class codeEditorSave : UmbracoAuthorizedWebService
     {
-        [WebMethod]
-        public string Save(string fileName, string fileAlias, string fileContents, string fileType, int fileID,
-                           int masterID, bool ignoreDebug)
-        {
-            return "Not implemented";
-        }
 
         [WebMethod]
         public string SaveCss(string fileName, string oldName, string fileContents, int fileID)
         {
-            if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
+            if (ValidateUserApp(DefaultApps.settings.ToString()))
             {
                 string returnValue;
                 var stylesheet = new StyleSheet(fileID)
@@ -79,7 +75,7 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public string SaveXslt(string fileName, string oldName, string fileContents, bool ignoreDebugging)
         {
-            if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
+            if (ValidateUserApp(DefaultApps.developer.ToString()))
             {
 
                 // validate file
@@ -238,8 +234,7 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public string SaveDLRScript(string fileName, string oldName, string fileContents, bool ignoreDebugging)
         {
-
-            if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
+            if (ValidateUserApp(DefaultApps.developer.ToString()))
             {
                 if (string.IsNullOrEmpty(fileName))
                     throw new ArgumentNullException("fileName");
@@ -335,7 +330,7 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public string SaveScript(string filename, string oldName, string contents)
         {
-            if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
+            if (ValidateUserApp(DefaultApps.settings.ToString()))
             {
 
                 // validate file
@@ -397,7 +392,7 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public string SaveTemplate(string templateName, string templateAlias, string templateContents, int templateID, int masterTemplateID)
         {
-            if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
+            if (ValidateUserApp(DefaultApps.settings.ToString()))
             {
                 var _template = new Template(templateID);
                 string retVal = "false";
