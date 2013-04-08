@@ -172,7 +172,7 @@ namespace umbraco.BasePages
         /// <summary>
         /// Validates the user context ID.
         /// </summary>
-        /// <param name="umbracoUserContextID">The umbraco user context ID.</param>
+        /// <param name="currentUmbracoUserContextID">The umbraco user context ID.</param>
         /// <returns></returns>
         public static bool ValidateUserContextID(string currentUmbracoUserContextID)
         {
