@@ -32,13 +32,7 @@ namespace umbraco.presentation.webservices
     [ScriptService]
     public class codeEditorSave : WebService
     {
-        [WebMethod]
-        public string Save(string fileName, string fileAlias, string fileContents, string fileType, int fileID,
-                           int masterID, bool ignoreDebug)
-        {
-            return "Not implemented";
-        }
-
+       
         [WebMethod]
         public string SaveCss(string fileName, string oldName, string fileContents, int fileID)
         {
