@@ -131,23 +131,34 @@ namespace umbraco.BasePages
         /// <returns></returns>
         public static int GetUserId(string umbracoUserContextID)
         {
+
+            Guid contextId;
+            if (!Guid.TryParse(umbracoUserContextID, out contextId))
+            {
+                return -1;
+            }
+
             try
             {
-                if (System.Web.HttpRuntime.Cache["UmbracoUserContext" + umbracoUserContextID] == null)
+                if (HttpRuntime.Cache["UmbracoUserContext" + umbracoUserContextID] == null)
                 {
-                    System.Web.HttpRuntime.Cache.Insert(
+                    var uId = SqlHelper.ExecuteScalar<int?>(
+                        "select userID from umbracoUserLogins where contextID = @contextId",
+                        SqlHelper.CreateParameter("@contextId", new Guid(umbracoUserContextID)));
+                    if (!uId.HasValue)
+                    {
+                        return -1;
+                    }
+
+                    HttpRuntime.Cache.Insert(
                         "UmbracoUserContext" + umbracoUserContextID,
-                        SqlHelper.ExecuteScalar<int>("select userID from umbracoUserLogins where contextID = @contextId",
-                                                     SqlHelper.CreateParameter("@contextId", new Guid(umbracoUserContextID))
-                            ),
+                        uId.Value,
                         null,
                         System.Web.Caching.Cache.NoAbsoluteExpiration,
                         new TimeSpan(0, (int) (UmbracoTimeOutInMinutes/10), 0));
-
-
                 }
 
-                return (int)System.Web.HttpRuntime.Cache["UmbracoUserContext" + umbracoUserContextID];
+                return (int)HttpRuntime.Cache["UmbracoUserContext" + umbracoUserContextID];
 
             }
             catch
