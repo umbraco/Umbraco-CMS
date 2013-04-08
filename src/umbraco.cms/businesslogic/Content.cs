@@ -699,7 +699,7 @@ namespace umbraco.cms.businesslogic
                     continue;
 
                 //get the propertyId
-                var property = propData.FirstOrDefault(x => x.PropertyTypeId == pt.Id);
+                var property = propData.LastOrDefault(x => x.PropertyTypeId == pt.Id);
                 if (property == null)
                 {
                     //continue;
