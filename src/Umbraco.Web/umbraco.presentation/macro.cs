@@ -31,6 +31,7 @@ using umbraco.NodeFactory;
 using umbraco.presentation.templateControls;
 using Content = umbraco.cms.businesslogic.Content;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
+using MacroErrorEventArgs = Umbraco.Core.Events.MacroErrorEventArgs;
 
 namespace umbraco
 {
