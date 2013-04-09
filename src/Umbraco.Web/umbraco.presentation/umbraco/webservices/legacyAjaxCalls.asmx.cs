@@ -57,7 +57,7 @@ namespace umbraco.presentation.webservices
         [ScriptMethod]
         public void Delete(string nodeId, string alias, string nodeType)
         {
-            if (!AuthorizeUser())
+            if (!AuthorizeRequest())
                 return;
             
             //check which parameters to pass depending on the types passed in
@@ -67,14 +67,14 @@ namespace umbraco.presentation.webservices
             {
                 LegacyDialogHandler.Delete(
                     new HttpContextWrapper(HttpContext.Current),
-                    CurrentUser,
+                    UmbracoUser,
                     nodeType, intNodeId, alias);
             }
             else
             {
                 LegacyDialogHandler.Delete(
                     new HttpContextWrapper(HttpContext.Current),
-                    CurrentUser,
+                    UmbracoUser,
                     nodeType, 0, nodeId);
             }
         }
@@ -436,39 +436,7 @@ namespace umbraco.presentation.webservices
 
             return "true";
         }
-
-        private User CurrentUser
-        {
-            get
-            {
-                if (_currentUser == null)
-                {
-                    throw new InvalidOperationException("The CurrentUser property has not been set, ensure a successful call is made to AuthorizeUser()");
-                }
-                return _currentUser;
-            }
-            set { _currentUser = value; }
-        }
-
-        /// <summary>       
-        /// Authorizes the current user and ensures we don't have to re-lookup the business logic for the current
-        /// web service instance.
-        /// </summary>
-        [Obsolete("You should use the AuthorizeRequest methods on the base class of UmbracoAuthorizedWebService and ensure you inherit from that class for umbraco asmx web services")]
-        private bool AuthorizeUser()
-        {
-            // check for secure connection
-            if (GlobalSettings.UseSSL && !HttpContext.Current.Request.IsSecureConnection)
-                throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
-
-            if (!BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
-                return false;
-            _currentUser = global::umbraco.BusinessLogic.User.GetUser(
-                BasePage.GetUserId(BasePage.umbracoUserContextID));
-            
-            return true;
-        }
-
+        
         /// <summary>
         /// Authorizes the current user based on the cookie value
         /// </summary>
