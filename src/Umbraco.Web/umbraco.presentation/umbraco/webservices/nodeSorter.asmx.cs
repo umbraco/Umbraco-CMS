@@ -103,7 +103,7 @@ namespace umbraco.presentation.webservices
                         // refresh the xml for the sorting to work
                         if (published)
                         {
-                                        document.SaveAndPublish(Umbraco.Web.UmbracoContext.Current.UmbracoUser);
+                            document.SaveAndPublish(global::Umbraco.Web.UmbracoContext.Current.UmbracoUser);
                             document.refreshXmlSortOrder();
                         }
                     }
