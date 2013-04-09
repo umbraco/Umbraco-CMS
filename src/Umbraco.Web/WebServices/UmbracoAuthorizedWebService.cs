@@ -5,6 +5,7 @@ using System.Text;
 using System.Web;
 using System.Web.Security;
 using Umbraco.Core.Configuration;
+using Umbraco.Web.Security;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
@@ -26,12 +27,8 @@ namespace Umbraco.Web.WebServices
             : base(umbracoContext)
         {
         }
-        
-        //IMPORTANT NOTE: !! All of these security bits and pieces have been moved in to one centralized class
-        // in 6.1 called WebSecurity. All this logic is all here temporarily!
 
-        private User _user;
-        private readonly InnerPage _page = new InnerPage();
+        private bool _hasValidated = false;
 
         /// <summary>
         /// Checks if the umbraco context id is valid
@@ -40,7 +37,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         protected bool ValidateUserContextId(string currentUmbracoUserContextId)
         {
-            return BasePage.ValidateUserContextID(currentUmbracoUserContextId);
+            return UmbracoContext.Security.ValidateUserContextId(currentUmbracoUserContextId);
         }
 
         /// <summary>
@@ -51,7 +48,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         protected bool ValidateCredentials(string username, string password)
         {
-            return Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].ValidateUser(username, password);
+            return UmbracoContext.Security.ValidateBackOfficeCredentials(username, password);            
         }
 
         /// <summary>
@@ -84,7 +81,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         protected bool UserHasAppAccess(string app, User user)
         {
-            return user.Applications.Any(uApp => uApp.alias == app);
+            return Security.UserHasAppAccess(app, user);
         }
 
         /// <summary>
@@ -95,11 +92,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         protected bool UserHasAppAccess(string app, string username)
         {
-            var uid = global::umbraco.BusinessLogic.User.getUserId(username);
-            if (uid < 0) return false;
-            var usr = global::umbraco.BusinessLogic.User.GetUser(uid);
-            if (usr == null) return false;
-            return UserHasAppAccess(app, usr);
+            return Security.UserHasAppAccess(app, username);
         }
 
         /// <summary>
@@ -109,30 +102,8 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         protected bool AuthorizeRequest(bool throwExceptions = false)
         {
-            // check for secure connection
-            if (GlobalSettings.UseSSL && !HttpContext.Current.Request.IsSecureConnection)
-            {
-                if (throwExceptions)
-                    throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
-                return false;
-            }                
-
-            try
-            {
-                return UmbracoUser != null;
-            }
-            catch (ArgumentException)
-            {
-                if (throwExceptions) throw;
-                //an exception will occur if the user is not valid inside of _page.getUser();
-                return false;
-            }
-            catch (InvalidOperationException)
-            {
-                if (throwExceptions) throw;
-                //an exception will occur if the user is not valid inside of _page.getUser();
-                return false;
-            }
+            var result = Security.AuthorizeRequest(new HttpContextWrapper(Context), throwExceptions);
+            return result == ValidateRequestAttempt.Success;
         }
 
         /// <summary>
@@ -142,17 +113,13 @@ namespace Umbraco.Web.WebServices
         {
             get
             {
-                return _user ?? (_user = _page.getUser());
+                if (!_hasValidated)
+                {
+                    Security.ValidateCurrentUser(new HttpContextWrapper(Context));
+                    _hasValidated = true;
+                }
+                return Security.CurrentUser;
             }
-        }
-
-        /// <summary>
-        /// Used to validate, thie is temporary, in 6.1 we have the WebSecurity class which does all 
-        /// authorization stuff for us.
-        /// </summary>
-        private class InnerPage : BasePage
-        {
-            
         }
 
     }

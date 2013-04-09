@@ -84,8 +84,9 @@ namespace umbraco.presentation.webservices
                 if (SortOrder.Trim().Length <= 0) return;
                 var tmp = SortOrder.Split(',');
 
-                        var isContent = Context.Request.GetItemAsString("app") == Constants.Applications.Content | helper.Request("app") == "";
-                        var isMedia = Context.Request.GetItemAsString("app") == Constants.Applications.Media;
+                var isContent = Context.Request.GetItemAsString("app") == Constants.Applications.Content | helper.Request("app") == "";
+                var isMedia = Context.Request.GetItemAsString("app") == Constants.Applications.Media;
+
                 //ensure user is authorized for the app requested
                 if (isContent && !AuthorizeRequest(DefaultApps.content.ToString())) return;
                 if (isMedia && !AuthorizeRequest(DefaultApps.media.ToString())) return;
@@ -103,7 +104,7 @@ namespace umbraco.presentation.webservices
                         // refresh the xml for the sorting to work
                         if (published)
                         {
-                            document.SaveAndPublish(global::Umbraco.Web.UmbracoContext.Current.UmbracoUser);
+                            document.SaveAndPublish(UmbracoUser);
                             document.refreshXmlSortOrder();
                         }
                     }
@@ -140,7 +141,7 @@ namespace umbraco.presentation.webservices
                 }
 
                 // fire actionhandler, check for content
-                        if ((helper.Request("app") == Constants.Applications.Content | helper.Request("app") == "") && ParentId > 0)
+                if ((helper.Request("app") == Constants.Applications.Content | helper.Request("app") == "") && ParentId > 0)
                     BusinessLogic.Actions.Action.RunActionHandlers(new Document(ParentId), ActionSort.Instance);
             }
             catch (Exception ex)

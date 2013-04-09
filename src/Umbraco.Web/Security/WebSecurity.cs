@@ -10,6 +10,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
+using umbraco.businesslogic.Exceptions;
 using umbraco.cms.businesslogic.member;
 
 namespace Umbraco.Web.Security
@@ -159,6 +160,17 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
+        /// Validates credentials for a back office user
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        internal bool ValidateBackOfficeCredentials(string username, string password)
+        {
+            return Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].ValidateUser(username, password);
+        }
+
+        /// <summary>
         /// Validates the user node tree permissions.
         /// </summary>
         /// <param name="umbracoUser"></param>
@@ -174,6 +186,21 @@ namespace Umbraco.Web.Security
             var user = umbracoUser;
             LogHelper.Info<WebSecurity>("User {0} has insufficient permissions in UmbracoEnsuredPage: '{1}', '{2}', '{3}'", () => user.Name, () => path, () => permissions, () => action);
             return false;
+        }
+
+        /// <summary>
+        /// Validates the current user to see if they have access to the specified app
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns></returns>
+        internal bool ValidateUserApp(string app)
+        {
+            //if it is empty, don't validate
+            if (app.IsNullOrWhiteSpace())
+            {
+                return true;
+            }
+            return CurrentUser.Applications.Any(uApp => uApp.alias == app);
         }
 
         internal void UpdateLogin(long timeout)
@@ -260,8 +287,9 @@ namespace Umbraco.Web.Security
         /// Validates the current user
         /// </summary>
         /// <param name="httpContext"></param>
+        /// <param name="throwExceptions">set to true if you want exceptions to be thrown if failed</param>
         /// <returns></returns>
-        internal ValidateUserAttempt ValidateCurrentUser(HttpContextBase httpContext)
+        internal ValidateRequestAttempt ValidateCurrentUser(HttpContextBase httpContext, bool throwExceptions = false)
         {
             if (UmbracoUserContextId != "")
             {
@@ -275,28 +303,72 @@ namespace Umbraco.Web.Security
                     // Check for console access
                     if (user.Disabled || (user.NoConsole && GlobalSettings.RequestIsInUmbracoApplication(httpContext) && !GlobalSettings.RequestIsLiveEditRedirector(httpContext)))
                     {
-                        return ValidateUserAttempt.FailedNoPrivileges;
-                        //throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
+                        if (throwExceptions) throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
+                        return ValidateRequestAttempt.FailedNoPrivileges;
                     }
                     UpdateLogin(timeout);
-                    return ValidateUserAttempt.Success;
+                    return ValidateRequestAttempt.Success;
                 }
-                return ValidateUserAttempt.FailedTimedOut;
-                //throw new ArgumentException("User has timed out!!");
+                if (throwExceptions) throw new ArgumentException("User has timed out!!");
+                return ValidateRequestAttempt.FailedTimedOut;
             }
-            return ValidateUserAttempt.FailedNoContextId;
-            //throw new InvalidOperationException("The user has no umbraco contextid - try logging in");
+            if (throwExceptions) throw new InvalidOperationException("The user has no umbraco contextid - try logging in");
+            return ValidateRequestAttempt.FailedNoContextId;
         }
 
-        //TODO: Clean this up!! We also have extension methods in StringExtensions for decrypting/encrypting in med trust
-        // ... though an existing cookie may fail decryption, in that case they'd just get logged out. no problems.
-        
+        /// <summary>
+        /// Authorizes the full request, checks for SSL and validates the current user
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <param name="throwExceptions">set to true if you want exceptions to be thrown if failed</param>
+        /// <returns></returns>
+        internal ValidateRequestAttempt AuthorizeRequest(HttpContextBase httpContext, bool throwExceptions = false)
+        {
+            // check for secure connection
+            if (GlobalSettings.UseSSL && !httpContext.Request.IsSecureConnection)
+            {
+                if (throwExceptions) throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");                
+                return ValidateRequestAttempt.FailedNoSsl;
+            }
+            return ValidateCurrentUser(httpContext, throwExceptions);
+        }
+
+        /// <summary>
+        /// Checks if the specified user as access to the app
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        internal bool UserHasAppAccess(string app, User user)
+        {
+            return user.Applications.Any(uApp => uApp.alias == app);
+        }
+
+        /// <summary>
+        /// Checks if the specified user by username as access to the app
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        internal bool UserHasAppAccess(string app, string username)
+        {
+            var uid = User.getUserId(username);
+            if (uid < 0) return false;
+            var usr = User.GetUser(uid);
+            if (usr == null) return false;
+            return UserHasAppAccess(app, usr);
+        }
+
         /// <summary>
         /// Gets or sets the umbraco user context ID.
         /// </summary>
         /// <value>The umbraco user context ID.</value>
         public string UmbracoUserContextId
         {
+
+            //TODO: Clean this up!! We also have extension methods in StringExtensions for decrypting/encrypting in med trust
+            // ... though an existing cookie may fail decryption, in that case they'd just get logged out. no problems.
+
             get
             {
                 // zb-00004 #29956 : refactor cookies names & handling

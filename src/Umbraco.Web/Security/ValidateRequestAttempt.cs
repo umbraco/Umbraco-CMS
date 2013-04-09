@@ -1,10 +1,11 @@
 ﻿namespace Umbraco.Web.Security
 {
-    internal enum ValidateUserAttempt
+    internal enum ValidateRequestAttempt
     {
         Success,
         FailedNoPrivileges,
         FailedTimedOut,
-        FailedNoContextId       
+        FailedNoContextId,
+        FailedNoSsl
     }
 }
