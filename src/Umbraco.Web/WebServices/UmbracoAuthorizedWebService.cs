@@ -69,10 +69,36 @@ namespace Umbraco.Web.WebServices
             {
                 return true;
             }
-            var hasAccess = UmbracoUser.Applications.Any(uApp => uApp.alias == app);
+            var hasAccess = UserHasAppAccess(app, UmbracoUser);
             if (!hasAccess && throwExceptions)
                 throw new UserAuthorizationException("The user does not have access to the required application");
             return hasAccess;
+        }
+
+        /// <summary>
+        /// Checks if the specified user as access to the app
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        protected bool UserHasAppAccess(string app, User user)
+        {
+            return user.Applications.Any(uApp => uApp.alias == app);
+        }
+
+        /// <summary>
+        /// Checks if the specified user by username as access to the app
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        protected bool UserHasAppAccess(string app, string username)
+        {
+            var uid = global::umbraco.BusinessLogic.User.getUserId(username);
+            if (uid < 0) return false;
+            var usr = global::umbraco.BusinessLogic.User.GetUser(uid);
+            if (usr == null) return false;
+            return UserHasAppAccess(app, usr);
         }
 
         /// <summary>

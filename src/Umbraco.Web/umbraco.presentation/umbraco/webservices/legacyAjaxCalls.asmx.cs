@@ -84,7 +84,7 @@ namespace umbraco.presentation.webservices
         [ScriptMethod]
         public void DeleteContentPermanently(string nodeId, string nodeType)
         {
-            AuthorizeRequest( true);
+            AuthorizeRequest(DefaultApps.content.ToString(), true);
 
             int intNodeID;
             if (int.TryParse(nodeId, out intNodeID))

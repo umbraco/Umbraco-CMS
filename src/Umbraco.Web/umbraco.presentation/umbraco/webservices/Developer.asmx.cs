@@ -2,6 +2,7 @@ using System.Web.Services;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Web.WebServices;
+using umbraco.BusinessLogic;
 using umbraco.presentation.webservices;
 
 namespace umbraco.webservices
@@ -26,7 +27,8 @@ namespace umbraco.webservices
 		[WebMethod]
 		public XmlNode GetMacros(string Login, string Password)
 		{
-		    if (ValidateCredentials(Login, Password))  
+		    if (ValidateCredentials(Login, Password) 
+                && UserHasAppAccess(DefaultApps.developer.ToString(), Login))  
 			{
 				var xmlDoc = new XmlDocument();
 				var macros = xmlDoc.CreateElement("macros");
@@ -46,7 +48,8 @@ namespace umbraco.webservices
 	    [WebMethod]
 		public XmlNode GetMacro(int Id, string Login, string Password)
 		{
-		    if (ValidateCredentials(Login, Password)) 
+		    if (ValidateCredentials(Login, Password)
+                && UserHasAppAccess(DefaultApps.developer.ToString(), Login)) 
 			{
 				var xmlDoc = new XmlDocument();
 				var macro = xmlDoc.CreateElement("macro");
