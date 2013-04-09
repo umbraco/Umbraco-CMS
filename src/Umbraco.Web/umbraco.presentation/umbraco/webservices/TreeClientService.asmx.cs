@@ -31,7 +31,7 @@ namespace umbraco.presentation.webservices
 		{
 			Authorize();
 
-			TreeControl treeCtl = new TreeControl()
+			var treeCtl = new TreeControl()
 			{
                 ShowContextMenu = showContextMenu,
                 IsDialog = isDialog,
@@ -43,7 +43,7 @@ namespace umbraco.presentation.webservices
                 FunctionToCall = string.IsNullOrEmpty(functionToCall) ? "" : functionToCall
 			};
 
-			Dictionary<string, string> returnVal = new Dictionary<string, string>();
+			var returnVal = new Dictionary<string, string>();
 
             if (string.IsNullOrEmpty(treeType))
             {
@@ -65,7 +65,7 @@ namespace umbraco.presentation.webservices
                 //tree.StartNodeID =
 
                 //now render it's start node
-                XmlTree xTree = new XmlTree();
+                var xTree = new XmlTree();
                 xTree.Add(tree.RootNode);
                 returnVal.Add("json", xTree.ToString());
             }

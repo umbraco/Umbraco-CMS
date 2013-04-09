@@ -7,13 +7,16 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
-namespace umbraco.presentation.webservices {
-    public class ajaxHelpers {
-        public static void EnsureLegacyCalls(System.Web.UI.Page page) {
-            ScriptManager sm = ScriptManager.GetCurrent(page);
-            ServiceReference legacyPath = new ServiceReference(SystemDirectories.Webservices + "/legacyAjaxCalls.asmx");
+namespace umbraco.presentation.webservices
+{
+    public class ajaxHelpers
+    {
+        public static void EnsureLegacyCalls(Page page)
+        {
+            var sm = ScriptManager.GetCurrent(page);
+            var legacyPath = new ServiceReference(SystemDirectories.WebServices + "/legacyAjaxCalls.asmx");
 
             if (!sm.Services.Contains(legacyPath))
                 sm.Services.Add(legacyPath);

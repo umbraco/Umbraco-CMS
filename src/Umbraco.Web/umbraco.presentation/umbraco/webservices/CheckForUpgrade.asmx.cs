@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.Services;
 using System.Web.Script.Services;
+using Umbraco.Web.WebServices;
 
 
 namespace umbraco.presentation.webservices
@@ -14,17 +15,16 @@ namespace umbraco.presentation.webservices
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
     [ScriptService]
-    public class CheckForUpgrade : System.Web.Services.WebService
+    public class CheckForUpgrade : UmbracoAuthorizedWebService
     {
 
         [WebMethod]
         [ScriptMethod]
         public UpgradeResult CallUpgradeService()
         {
-            legacyAjaxCalls.Authorize();
-
-            org.umbraco.update.CheckForUpgrade check = new global::umbraco.presentation.org.umbraco.update.CheckForUpgrade();
-            org.umbraco.update.UpgradeResult result = check.CheckUpgrade(GlobalSettings.VersionMajor, GlobalSettings.VersionMinor, GlobalSettings.VersionPatch, GlobalSettings.VersionComment);
+            if (!AuthorizeRequest()) return null;
+            var check = new org.umbraco.update.CheckForUpgrade();
+            var result = check.CheckUpgrade(GlobalSettings.VersionMajor, GlobalSettings.VersionMinor, GlobalSettings.VersionPatch, GlobalSettings.VersionComment);
             return new UpgradeResult(result.UpgradeType.ToString(), result.Comment, result.UpgradeUrl);
         }
 

@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
+using System.Web.Security;
 using Umbraco.Core.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
+using umbraco.businesslogic.Exceptions;
+using GlobalSettings = umbraco.GlobalSettings;
+using UmbracoSettings = umbraco.UmbracoSettings;
 
 namespace Umbraco.Web.WebServices
 {
@@ -25,45 +29,80 @@ namespace Umbraco.Web.WebServices
         {
         }
 
+        private User _user;
+        private readonly InnerPage _page = new InnerPage();
+
+        /// <summary>
+        /// Checks if the umbraco context id is valid
+        /// </summary>
+        /// <param name="currentUmbracoUserContextId"></param>
+        /// <returns></returns>
+        protected bool ValidateUserContextId(string currentUmbracoUserContextId)
+        {
+            return BasePage.ValidateUserContextID(currentUmbracoUserContextId);
+        }
+
+        /// <summary>
+        /// Checks if the username/password credentials are valid
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        protected bool ValidateCredentials(string username, string password)
+        {
+            return Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].ValidateUser(username, password);
+        }
+
         /// <summary>
         /// Validates the user for access to a certain application
         /// </summary>
         /// <param name="app">The application alias.</param>
+        /// <param name="throwExceptions">true if an exception should be thrown if authorization fails</param>
         /// <returns></returns>
-        protected bool ValidateUserApp(string app)
+        protected bool AuthorizeRequest(string app, bool throwExceptions = false)
         {
             //ensure we have a valid user first!
-            if (!ValidateUser()) return false;
+            if (!AuthorizeRequest(throwExceptions)) return false;
                 
             //if it is empty, don't validate
             if (app.IsNullOrWhiteSpace())
             {
                 return true;
             }
-            return UmbracoUser.Applications.Any(uApp => uApp.alias == app);
+            var hasAccess = UmbracoUser.Applications.Any(uApp => uApp.alias == app);
+            if (!hasAccess && throwExceptions)
+                throw new UserAuthorizationException("The user does not have access to the required application");
+            return hasAccess;
         }
 
-        
-        private User _user;
-        private readonly InnerPage _page = new InnerPage();
-
         /// <summary>
-        /// Returns true if there is a valid logged in user
+        /// Returns true if there is a valid logged in user and that ssl is enabled if required
         /// </summary>
+        /// <param name="throwExceptions">true if an exception should be thrown if authorization fails</param>
         /// <returns></returns>
-        protected bool ValidateUser()
+        protected bool AuthorizeRequest(bool throwExceptions = false)
         {
+            // check for secure connection
+            if (GlobalSettings.UseSSL && !HttpContext.Current.Request.IsSecureConnection)
+            {
+                if (throwExceptions)
+                    throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
+                return false;
+            }                
+
             try
             {
                 return UmbracoUser != null;
             }
             catch (ArgumentException)
             {
+                if (throwExceptions) throw;
                 //an exception will occur if the user is not valid inside of _page.getUser();
                 return false;
             }
             catch (InvalidOperationException)
             {
+                if (throwExceptions) throw;
                 //an exception will occur if the user is not valid inside of _page.getUser();
                 return false;
             }

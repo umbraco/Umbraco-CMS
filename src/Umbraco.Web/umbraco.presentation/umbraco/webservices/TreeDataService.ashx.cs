@@ -65,7 +65,7 @@ namespace umbraco.presentation.webservices
 		/// If the application supports multiple trees, then this function iterates over all of the trees assigned to it
 		/// and creates their top level nodes and context menus.
 		/// </summary>
-		/// <param name="appAlias"></param>
+        /// <param name="treeParams"></param>
 		private void LoadAppTrees(TreeRequestParams treeParams)
 		{
 			//find all tree definitions that have the current application alias
@@ -82,8 +82,7 @@ namespace umbraco.presentation.webservices
 		/// <summary>
 		/// This will load the particular ITree object and call it's render method to get the nodes that need to be rendered.
 		/// </summary>
-		/// <param name="appAlias"></param>
-		/// <param name="treeAlias"></param>
+        /// <param name="treeParams"></param>
 		private void LoadTree(TreeRequestParams treeParams)
 		{
 

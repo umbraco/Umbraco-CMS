@@ -6,7 +6,7 @@ using System.Web.Script.Services;
 using System.Web.Services;
 using System.Web.Services.Protocols;
 using System.ComponentModel;
-
+using Umbraco.Web.WebServices;
 using umbraco.cms.businesslogic;
 using umbraco.BusinessLogic;
 
@@ -17,22 +17,21 @@ namespace umbraco.presentation.webservices
     /// </summary>
     [WebService(Namespace = "http://umbraco.org/webservices/")]
     [ScriptService]
-    public class CMSNode : System.Web.Services.WebService
+    public class CMSNode : UmbracoAuthorizedWebService
     {
 
         [WebMethod]
         public string GetNodeName(string ContextID, int NodeId)
         {
-            if (BasePages.BasePage.ValidateUserContextID(ContextID))
-                return getNodeName(NodeId);
-
-            return "";
+            return ValidateUserContextId(ContextID) 
+                ? GetNodeName(NodeId) 
+                : string.Empty;
         }
 
-        private string getNodeName(int NodeId)
+        private string GetNodeName(int nodeId)
         {
-            legacyAjaxCalls.Authorize();
-            cms.businesslogic.CMSNode n = new cms.businesslogic.CMSNode(NodeId);
+            if (!AuthorizeRequest()) return string.Empty;
+            var n = new cms.businesslogic.CMSNode(nodeId);
             return n.Text;
         }
     }

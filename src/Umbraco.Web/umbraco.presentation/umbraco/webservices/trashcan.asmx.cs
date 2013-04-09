@@ -40,19 +40,18 @@ namespace umbraco.presentation.webservices
         {
             if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
             {
-                if (Application["trashcanEmptyLeft"] != null)
-                    return Application["trashcanEmptyLeft"].ToString();
-                else
-                    return "";
+                return Application["trashcanEmptyLeft"] != null 
+                    ? Application["trashcanEmptyLeft"].ToString() 
+                    : "";
             }
 
             return "-";
 
         }
 
-        private void emptyTrashCanDo(cms.businesslogic.RecycleBin.RecycleBinType type)
+        private void emptyTrashCanDo(RecycleBin.RecycleBinType type)
         {
-            RecycleBin trashCan = new RecycleBin(type);
+            var trashCan = new RecycleBin(type);
 
             var callback = new Action<int>(x =>
             {
