@@ -9,6 +9,8 @@ using System.Xml;
 using System.Web.Script.Services;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Web.WebServices;
+using umbraco.BusinessLogic;
 using umbraco.presentation.webservices;
 
 namespace umbraco.webservices
@@ -18,13 +20,13 @@ namespace umbraco.webservices
 	/// </summary>
 	[WebService(Namespace="http://umbraco.org/webservices/")]
     [ScriptService]
-	public class templates : WebService
+    public class templates : UmbracoAuthorizedWebService
 	{
 		
 		[WebMethod]
 		public XmlNode GetTemplates(string Login, string Password)
 		{
-		    if (BusinessLogic.User.validateCredentials(Login, Password)) 
+		    if (ValidateCredentials(Login, Password) && UserHasAppAccess(DefaultApps.settings.ToString(), Login)) 
 			{
 				var xmlDoc = new XmlDocument();
 				xmlDoc.LoadXml("<templates/>");
@@ -43,7 +45,7 @@ namespace umbraco.webservices
 	    [WebMethod]
 		public XmlNode GetTemplate(int Id, string Login, string Password)
 		{
-		    if (BusinessLogic.User.validateCredentials(Login, Password)) 
+            if (ValidateCredentials(Login, Password) && UserHasAppAccess(DefaultApps.settings.ToString(), Login)) 
 			{
 				var t = new cms.businesslogic.template.Template(Id);
 				var xmlDoc = new XmlDocument();
@@ -60,7 +62,7 @@ namespace umbraco.webservices
 	    [WebMethod]
 		public bool UpdateTemplate(int Id, int Master, string Design, string Login, string Password)
 		{
-		    if (BusinessLogic.User.validateCredentials(Login, Password)) 
+            if (ValidateCredentials(Login, Password) && UserHasAppAccess(DefaultApps.settings.ToString(), Login)) 
 			{
                 try
                 {
@@ -84,8 +86,9 @@ namespace umbraco.webservices
 	    [WebMethod]
         [ScriptMethod]
         public string GetCodeSnippet(object templateId)
-        {
-            legacyAjaxCalls.Authorize();
+	    {
+            //NOTE: The legacy code threw an exception so will continue to do that.
+	        AuthorizeRequest(DefaultApps.settings.ToString(), true);
             
 	        var templateFile = 
                 System.IO.File.OpenText(IOHelper.MapPath(SystemDirectories.Umbraco + "/scripting/templates/cshtml/" + templateId));

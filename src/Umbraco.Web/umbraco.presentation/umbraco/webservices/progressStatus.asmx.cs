@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Web;
 using System.Web.Services;
+using Umbraco.Web.WebServices;
 
 namespace presentation.umbraco.webservices
 {
@@ -12,12 +13,14 @@ namespace presentation.umbraco.webservices
 	/// Summary description for progressStatus.
 	/// </summary>
 	[WebService(Namespace="http://umbraco.org/webservices/")]
-	public class progressStatus : System.Web.Services.WebService
+    public class progressStatus : UmbracoAuthorizedWebService
 	{
 		
 		[WebMethod]
-		public int GetStatus(string key) 
+		public int GetStatus(string key)
 		{
+		    if (!AuthorizeRequest()) return 0;
+
 			try 
 			{
 				return int.Parse(Application[key].ToString());

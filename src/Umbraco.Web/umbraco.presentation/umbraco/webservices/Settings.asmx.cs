@@ -8,17 +8,19 @@ using System.Web.Services;
 using System.Linq;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Web.WebServices;
+using umbraco.BusinessLogic;
 
 namespace umbraco.webservices
 {
-	
-	public class Settings : WebService
+
+    public class Settings : UmbracoAuthorizedWebService
 	{
 		
 		[WebMethod]
 		public XmlNode GetTabs(string ContextID, int ContentTypeId)
 		{
-		    if (BasePages.BasePage.ValidateUserContextID(ContextID)) 
+            if (!AuthorizeRequest(DefaultApps.settings.ToString()))
 			{
 				var xmlDoc = new XmlDocument();
 				var tabs = xmlDoc.CreateElement("tabs");
