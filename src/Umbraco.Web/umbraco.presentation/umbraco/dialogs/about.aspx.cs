@@ -3,6 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -10,6 +11,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Reflection;
 using System.Diagnostics;
+using Umbraco.Core;
 using umbraco.IO;
 
 namespace umbraco.dialogs
@@ -24,12 +26,11 @@ namespace umbraco.dialogs
 		{
 			// Put user code to initialize the page here
 			version.Text = GlobalSettings.CurrentVersion;
-			thisYear.Text = DateTime.Now.Year.ToString();
-
-
+            thisYear.Text = DateTime.Now.Year.ToString(CultureInfo.InvariantCulture);
+            
 			// umbraco.dll version
-			FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(IOHelper.MapPath(SystemDirectories.Bin + "/umbraco.dll"));
-			version.Text += " (Assembly version: " + myFileVersionInfo.FileVersion + ")";
+            var assemblyVersion = new AssemblyName(typeof(ActionsResolver).Assembly.FullName).Version.ToString();
+            version.Text += string.Format(" (Assembly version: {0})", assemblyVersion);
 		}
 
 		#region Web Form Designer generated code
