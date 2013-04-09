@@ -3,7 +3,11 @@ using System.Collections;
 using System.ComponentModel;
 using System.Web.Script.Services;
 using System.Web.Services;
+using System.Xml;
+using Umbraco.Core.Logging;
+using Umbraco.Web.WebServices;
 using umbraco.BasePages;
+using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
 
@@ -16,7 +20,7 @@ namespace umbraco.presentation.webservices
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [ToolboxItem(false)]
     [ScriptService]
-    public class nodeSorter : WebService
+    public class nodeSorter : UmbracoAuthorizedWebService
     {
         [WebMethod]
         public SortNode GetNodes(int ParentId, string App)
@@ -76,81 +80,63 @@ namespace umbraco.presentation.webservices
 
             try
             {
-                if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
+                if (!AuthorizeRequest()) return;
+                if (SortOrder.Trim().Length <= 0) return;
+                
+                var tmp = SortOrder.Split(',');
+
+                var isContent = helper.Request("app") == "content" | helper.Request("app") == "";
+                var isMedia = helper.Request("app") == "media";
+
+                //ensure user is authorized for the app requested
+                if (isContent && !AuthorizeRequest(DefaultApps.content.ToString())) return;
+                if (isMedia && !AuthorizeRequest(DefaultApps.media.ToString())) return;
+
+                for (var i = 0; i < tmp.Length; i++)
                 {
+                    if (tmp[i] == "" || tmp[i].Trim() == "") continue;
+                    
+                    new cms.businesslogic.CMSNode(int.Parse(tmp[i])).sortOrder = i;
 
-                    if (SortOrder.Trim().Length > 0)
+                    if (isContent)
                     {
-                        string[] tmp = SortOrder.Split(',');
-
-                        bool isContent = false;
-                        if (helper.Request("app") == "content" | helper.Request("app") == "")
-                            isContent = true;
-
-                        //CHANGE:Allan Stegelmann Laustsen, we need to know if the node is in media.
-                        bool isMedia = false;
-                        if (helper.Request("app") == "media")
+                        var d = new Document(int.Parse(tmp[i]));
+                        // refresh the xml for the sorting to work
+                        if (d.Published)
                         {
-                            isMedia = true;
+                            d.refreshXmlSortOrder();
+                            library.UpdateDocumentCache(int.Parse(tmp[i]));
                         }
-                        //CHANGE:End
-
-                        for (int i = 0; i < tmp.Length; i++)
-                        {
-                            if (tmp[i] != "" && tmp[i].Trim() != "")
-                            {
-                                new cms.businesslogic.CMSNode(int.Parse(tmp[i])).sortOrder = i;
-
-                                if (isContent)
-                                {
-                                    Document d = new Document(int.Parse(tmp[i]));
-                                    // refresh the xml for the sorting to work
-                                    if (d.Published)
-                                    {
-                                        d.refreshXmlSortOrder();
-                                        library.UpdateDocumentCache(int.Parse(tmp[i]));
-                                    }
-                                }
-                                //CHANGE:Allan Laustsen, to update the sortorder of the media node in the XML, re-save the node....
-                                else if (isMedia)
-                                {
-                                    new cms.businesslogic.media.Media(int.Parse(tmp[i])).Save();
-                                }
-                                //CHANGE:End
-                            }
-                        }
-
-                        // Refresh sort order on cached xml
-                        if (isContent)
-                        {
-                            System.Xml.XmlNode parentNode;
-
-                            if (ParentId == -1)
-                                parentNode = content.Instance.XmlContent.DocumentElement;
-                            else
-                                parentNode = content.Instance.XmlContent.GetElementById(ParentId.ToString());
-
-                            //only try to do the content sort if the the parent node is available... 
-                            if (parentNode != null)
-                                content.SortNodes(ref parentNode);
-
-
-                            // Load balancing - then refresh entire cache
-                            if (UmbracoSettings.UseDistributedCalls)
-                                library.RefreshContent();
-                        }
-                       
-
-                        // fire actionhandler, check for content
-                        if ((helper.Request("app") == "content" | helper.Request("app") == "") && ParentId > 0)
-                            global::umbraco.BusinessLogic.Actions.Action.RunActionHandlers(new Document(ParentId), ActionSort.Instance);                        
+                    }
+                    else if (isMedia)
+                    {
+                        new cms.businesslogic.media.Media(int.Parse(tmp[i])).Save();
                     }
                 }
 
+                // Refresh sort order on cached xml
+                if (isContent)
+                {
+                    XmlNode parentNode = ParentId == -1
+                                             ? content.Instance.XmlContent.DocumentElement
+                                             : content.Instance.XmlContent.GetElementById(ParentId.ToString());
+
+                    //only try to do the content sort if the the parent node is available... 
+                    if (parentNode != null)
+                        content.SortNodes(ref parentNode);
+
+                    // Load balancing - then refresh entire cache
+                    if (UmbracoSettings.UseDistributedCalls)
+                        library.RefreshContent();
+                }
+
+                // fire actionhandler, check for content
+                if ((helper.Request("app") == "content" | helper.Request("app") == "") && ParentId > 0)
+                    BusinessLogic.Actions.Action.RunActionHandlers(new Document(ParentId), ActionSort.Instance);
             }
             catch (Exception ex)
             {
-                BusinessLogic.Log.Add(global::umbraco.BusinessLogic.LogTypes.Debug, ParentId, ex.ToString());
+                LogHelper.Error<nodeSorter>("Could not update sort order", ex);
             }
 
         }

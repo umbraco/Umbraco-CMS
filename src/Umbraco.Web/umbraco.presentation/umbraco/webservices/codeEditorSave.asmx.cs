@@ -38,7 +38,7 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public string SaveCss(string fileName, string oldName, string fileContents, int fileID)
         {
-            if (ValidateUserApp(DefaultApps.settings.ToString()))
+            if (AuthorizeRequest(DefaultApps.settings.ToString()))
             {
                 string returnValue;
                 var stylesheet = new StyleSheet(fileID)
@@ -75,7 +75,7 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public string SaveXslt(string fileName, string oldName, string fileContents, bool ignoreDebugging)
         {
-            if (ValidateUserApp(DefaultApps.developer.ToString()))
+            if (AuthorizeRequest(DefaultApps.developer.ToString()))
             {
 
                 // validate file
@@ -234,7 +234,7 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public string SaveDLRScript(string fileName, string oldName, string fileContents, bool ignoreDebugging)
         {
-            if (ValidateUserApp(DefaultApps.developer.ToString()))
+            if (AuthorizeRequest(DefaultApps.developer.ToString()))
             {
                 if (string.IsNullOrEmpty(fileName))
                     throw new ArgumentNullException("fileName");
@@ -330,7 +330,7 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public string SaveScript(string filename, string oldName, string contents)
         {
-            if (ValidateUserApp(DefaultApps.settings.ToString()))
+            if (AuthorizeRequest(DefaultApps.settings.ToString()))
             {
 
                 // validate file
@@ -392,7 +392,7 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public string SaveTemplate(string templateName, string templateAlias, string templateContents, int templateID, int masterTemplateID)
         {
-            if (ValidateUserApp(DefaultApps.settings.ToString()))
+            if (AuthorizeRequest(DefaultApps.settings.ToString()))
             {
                 var _template = new Template(templateID);
                 string retVal = "false";

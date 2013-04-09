@@ -7,7 +7,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
-using System.Web.UI;
+using Umbraco.Core;
 
 namespace umbraco.BasePages
 {
@@ -176,17 +176,18 @@ namespace umbraco.BasePages
         /// <returns></returns>
         public static bool ValidateUserContextID(string currentUmbracoUserContextID)
         {
-            if ((currentUmbracoUserContextID != ""))
+            if (!currentUmbracoUserContextID.IsNullOrWhiteSpace())
             {
-                int uid = GetUserId(currentUmbracoUserContextID);
-                long timeout = GetTimeout(currentUmbracoUserContextID);
+                var uid = GetUserId(currentUmbracoUserContextID);
+                var timeout = GetTimeout(currentUmbracoUserContextID);
 
                 if (timeout > DateTime.Now.Ticks)
                 {
                     return true;
                 }
 
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.Logout, BusinessLogic.User.GetUser(uid), -1, "");
+                //TODO: We don't actually log anyone out here, not sure why we're logging ??
+                Log.Add(LogTypes.Logout, BusinessLogic.User.GetUser(uid), -1, "");
             }
             return false;
         }

@@ -1820,9 +1820,11 @@
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
     <Compile Include="WebServices\FolderBrowserService.cs" />
+    <Compile Include="WebServices\UmbracoAuthorizedHttpHandler.cs" />
     <Compile Include="WebServices\UmbracoAuthorizedWebService.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="WebServices\UmbracoHttpHandler.cs" />
     <Compile Include="WebServices\UmbracoWebService.cs">
       <SubType>Component</SubType>
     </Compile>
