@@ -1,5 +1,6 @@
 using System;
 using Umbraco.Core.Logging;
+using System.Linq;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic.Exceptions;
 using umbraco.IO;
@@ -21,20 +22,16 @@ namespace umbraco.BasePages
 
         }
 
+        [Obsolete("This constructor is not used and will be removed from the codebase in the future")]
         public UmbracoEnsuredPage(string hest)
         {
             
         }
 
-        private bool _redirectToUmbraco;
         /// <summary>
         /// If true then umbraco will force any window/frame to reload umbraco in the main window
         /// </summary>
-        public bool RedirectToUmbraco
-        {
-            get { return _redirectToUmbraco; }
-            set { _redirectToUmbraco = value; }
-        }
+        public bool RedirectToUmbraco { get; set; }
 
         /// <summary>
         /// Validates the user for access to a certain application
@@ -43,11 +40,7 @@ namespace umbraco.BasePages
         /// <returns></returns>
         public bool ValidateUserApp(string app)
         {
-
-            foreach (Application uApp in getUser().Applications)
-                if (uApp.alias == app)
-                    return true;
-            return false;
+            return getUser().Applications.Any(uApp => uApp.alias == app);
         }
 
         /// <summary>
@@ -71,7 +64,7 @@ namespace umbraco.BasePages
         /// Gets the current user.
         /// </summary>
         /// <value>The current user.</value>
-        public static BusinessLogic.User CurrentUser
+        public static User CurrentUser
         {
             get
             {
