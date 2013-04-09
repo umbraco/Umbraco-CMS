@@ -99,15 +99,15 @@ namespace umbraco.presentation.webservices
                         //ensure user has access to media
                         AuthorizeRequest(DefaultApps.media.ToString(), true);
 
-                        new Media(intNodeID).delete(true);
+                        new Media(intNodeId).delete(true);
                         break;
                     case "content":
                     case "contentRecycleBin":
                     default:
                         //ensure user has access to content
                         AuthorizeRequest(DefaultApps.content.ToString(), true);
-                        
-                        new Document(intNodeID).delete(true);
+
+                        new Document(intNodeId).delete(true);
                         break;
                 }                
             }
