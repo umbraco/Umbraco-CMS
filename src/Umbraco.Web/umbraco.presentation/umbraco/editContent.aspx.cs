@@ -88,6 +88,7 @@ namespace umbraco.cms.presentation
                 }
             }
 
+            _cControl = new controls.ContentControl(_document, _canPublish, "TabView1");
 
             _cControl.ID = "TabView1";
 
