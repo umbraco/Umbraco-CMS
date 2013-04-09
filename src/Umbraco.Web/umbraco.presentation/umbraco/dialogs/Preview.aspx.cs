@@ -18,10 +18,15 @@ namespace umbraco.presentation.dialogs
 {
     public partial class Preview : BasePages.UmbracoEnsuredPage
     {
+        public Preview()
+        {
+            CurrentApp = DefaultApps.content.ToString();
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            Document d = new Document(int.Parse(helper.Request("id")));
-            PreviewContent pc = new PreviewContent(base.getUser(), Guid.NewGuid(), false);
+            var d = new Document(int.Parse(helper.Request("id")));
+            var pc = new PreviewContent(base.getUser(), Guid.NewGuid(), false);
             pc.PrepareDocument(base.getUser(), d, true);
             pc.SavePreviewSet();
             docLit.Text = d.Text;

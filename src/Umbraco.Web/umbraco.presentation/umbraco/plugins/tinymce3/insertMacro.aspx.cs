@@ -5,12 +5,13 @@ using System.Reflection;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-
+using Umbraco.Core.IO;
 using umbraco.BasePages;
+using umbraco.BusinessLogic;
+using umbraco.businesslogic.Exceptions;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
 using umbraco.DataLayer;
-using umbraco.IO;
 
 namespace umbraco.presentation.tinymce3
 {
@@ -20,15 +21,24 @@ namespace umbraco.presentation.tinymce3
     public partial class insertMacro : UmbracoEnsuredPage
     {
         protected Button Button1;
-        private ArrayList _dataFields = new ArrayList();
+        private readonly ArrayList _dataFields = new ArrayList();
         public Macro m;
         private string _scriptOnLoad = "";
+
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            //this could be used for media or content so we need to at least validate that the user has access to one or the other
+            if (!ValidateUserApp(DefaultApps.content.ToString()) && !ValidateUserApp(DefaultApps.media.ToString()))
+                throw new UserAuthorizationException("The current user doesn't have access to the section/app");
+        }
 
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
 
-            if (!String.IsNullOrEmpty(_scriptOnLoad))
+            if (!string.IsNullOrEmpty(_scriptOnLoad))
             {
                 jQueryReady.Text = _scriptOnLoad;
             }
@@ -40,14 +50,14 @@ namespace umbraco.presentation.tinymce3
 
             _scriptOnLoad = "";
 
-            string reqMacroID = UmbracoContext.Current.Request["umb_macroID"];
-            string reqMacroAlias = UmbracoContext.Current.Request["umb_macroAlias"];
-            bool ignoreForm = string.IsNullOrEmpty(UmbracoContext.Current.Request["class"]);
+            var reqMacroId = Request["umb_macroID"];
+            var reqMacroAlias = Request["umb_macroAlias"];
+            var ignoreForm = string.IsNullOrEmpty(Request["class"]);
 
             pane_insert.Text = ui.Text("insertMacro");
             Page.Title = ui.Text("insertMacro");
 
-            if (!String.IsNullOrEmpty(reqMacroID) || !String.IsNullOrEmpty(reqMacroAlias))
+            if (!string.IsNullOrEmpty(reqMacroId) || !string.IsNullOrEmpty(reqMacroAlias))
             {
 
                 pane_edit.Visible = true;
@@ -56,9 +66,9 @@ namespace umbraco.presentation.tinymce3
                 insert_buttons.Visible = false;
 
                 // Put user code to initialize the page here
-                if (!string.IsNullOrEmpty(reqMacroID))
+                if (!string.IsNullOrEmpty(reqMacroId))
                 {
-                    m = new Macro(int.Parse(reqMacroID));
+                    m = new Macro(int.Parse(reqMacroId));
                 }
                 else
                 {
@@ -67,9 +77,6 @@ namespace umbraco.presentation.tinymce3
 
                 pane_edit.Text = ui.Text("edit") + " " + m.Name;
                 Page.Title = ui.Text("edit") + " " + m.Name;
-
-                String macroAssembly = "";
-                String macroType = "";
 
                 if (m.Properties.Length == 0)
                 {
@@ -80,7 +87,7 @@ namespace umbraco.presentation.tinymce3
                     }
                     else
                     {
-                        Literal fb = new Literal();
+                        var fb = new Literal();
                         fb.Text = "<p>" + ui.Text("macroDoesNotHaveProperties") + "</p><p><a href='#' onClick='tinyMCEPopup.close();'>" + ui.Text("closeThisWindow") + "</a>";
                         macroProperties.Controls.Add(fb);
                         edit_buttons.Visible = false;
@@ -89,20 +96,20 @@ namespace umbraco.presentation.tinymce3
                 }
                 else
                 {
-                    foreach (MacroProperty mp in m.Properties)
+                    foreach (var mp in m.Properties)
                     {
 
-                        macroAssembly = mp.Type.Assembly;
-                        macroType = mp.Type.Type;
+                        var macroAssembly = mp.Type.Assembly;
+                        var macroType = mp.Type.Type;
                         try
                         {
-                            Assembly assembly = Assembly.LoadFrom(IOHelper.MapPath(SystemDirectories.Bin + "/" + macroAssembly + ".dll"));
+                            var assembly = Assembly.LoadFrom(IOHelper.MapPath(SystemDirectories.Bin + "/" + macroAssembly + ".dll"));
 
-                            Type type = assembly.GetType(macroAssembly + "." + macroType);
-                            IMacroGuiRendering typeInstance = Activator.CreateInstance(type) as IMacroGuiRendering;
+                            var type = assembly.GetType(macroAssembly + "." + macroType);
+                            var typeInstance = Activator.CreateInstance(type) as IMacroGuiRendering;
                             if (typeInstance != null)
                             {
-                                Control control = Activator.CreateInstance(type) as Control;
+                                var control = Activator.CreateInstance(type) as Control;
                                 control.ID = mp.Alias;
 
                                 if (!IsPostBack)
@@ -129,16 +136,15 @@ namespace umbraco.presentation.tinymce3
                                 }
 
 
-                                uicontrols.PropertyPanel pp = new global::umbraco.uicontrols.PropertyPanel();
+                                var pp = new uicontrols.PropertyPanel();
                                 pp.Text = mp.Name;
                                 pp.Controls.Add(control);
                                 _scriptOnLoad += "\t\tregisterAlias('" + control.ID + "');\n";
-                                //                                pp.Controls.Add(new LiteralControl("<script type=\"text/javascript\"></script>\n"));
                                 macroProperties.Controls.Add(pp);
 
                                 _dataFields.Add(control);
 
-                                //macroProperties.Controls.Add(new LiteralControl("</td></tr>"));
+                                
                             }
                             else
                             {
@@ -158,7 +164,7 @@ namespace umbraco.presentation.tinymce3
             else
             {
                 IRecordsReader macroRenderings;
-                if (UmbracoContext.Current.Request["editor"] != "")
+                if (Request["editor"] != "")
                     macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro where macroUseInEditor = 1 order by macroName");
                 else
                     macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro order by macroName");
@@ -174,19 +180,19 @@ namespace umbraco.presentation.tinymce3
 
         protected void renderMacro_Click(object sender, EventArgs e)
         {
-            int pageID = int.Parse(UmbracoContext.Current.Request["umbPageId"]);
+            var pageId = int.Parse(Request["umbPageId"]);
 
-            string macroAttributes = string.Format("macroAlias=\"{0}\"", m.Alias);
+            var macroAttributes = string.Format("macroAlias=\"{0}\"", m.Alias);
 
-            Guid pageVersion = new Guid(UmbracoContext.Current.Request["umbVersionId"]);
+            var pageVersion = new Guid(Request["umbVersionId"]);
 
-            Hashtable attributes = new Hashtable { { "macroAlias", m.Alias } };
+            var attributes = new Hashtable { { "macroAlias", m.Alias } };
 
             foreach (Control c in _dataFields)
             {
                 try
                 {
-                    IMacroGuiRendering ic = (IMacroGuiRendering)c;
+                    var ic = (IMacroGuiRendering)c;
                     attributes.Add(c.ID.ToLower(), ic.Value);
                     macroAttributes += string.Format(" {0}=\"{1}\"", c.ID, ic.Value.Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "\\r"));
                 }
@@ -196,11 +202,11 @@ namespace umbraco.presentation.tinymce3
             }
 
             HttpContext.Current.Items["macrosAdded"] = 0;
-            HttpContext.Current.Items["pageID"] = pageID.ToString();
+            HttpContext.Current.Items["pageID"] = pageId.ToString();
 
-            string div = macro.renderMacroStartTag(attributes, pageID, pageVersion).Replace("\\", "\\\\").Replace("'", "\\'");
+            var div = macro.renderMacroStartTag(attributes, pageId, pageVersion).Replace("\\", "\\\\").Replace("'", "\\'");
 
-            string macroContent = macro.MacroContentByHttp(pageID, pageVersion, attributes).Replace("\\", "\\\\").Replace("'", "\\'").Replace("/", "\\/").Replace("\n", "\\n");
+            var macroContent = macro.MacroContentByHttp(pageId, pageVersion, attributes).Replace("\\", "\\\\").Replace("'", "\\'").Replace("/", "\\/").Replace("\n", "\\n");
 
             if (macroContent.Length > 0 && macroContent.ToLower().IndexOf("<script") > -1)
                 macroContent = "<b>Macro rendering contains script code</b><br/>This macro won\\'t be rendered in the editor because it contains script code. It will render correct during runtime.";

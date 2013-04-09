@@ -3,6 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -10,10 +11,10 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Reflection;
 using System.Collections.Specialized;
-
+using Umbraco.Core.IO;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.macro;
 using System.Collections.Generic;
-using umbraco.IO;
 
 namespace umbraco.developer
 {
@@ -22,15 +23,16 @@ namespace umbraco.developer
     /// </summary>
     public partial class assemblyBrowser : BasePages.UmbracoEnsuredPage
     {
+        public assemblyBrowser()
+        {
+            CurrentApp = DefaultApps.developer.ToString();
+        }
 
-        private string _ConnString = GlobalSettings.DbDSN;
-        protected void Page_Load(object sender, System.EventArgs e)
+        protected void Page_Load(object sender, EventArgs e)
         {
 
-            //			if (!IsPostBack) 
-            //			{
-            bool isUserControl = false;
-            bool errorReadingControl = false;
+            var isUserControl = false;
+            var errorReadingControl = false;
 
             try
             {
@@ -39,7 +41,7 @@ namespace umbraco.developer
                 if (Request.QueryString["type"] == null)
                 {
                     isUserControl = true;
-                    string fileName = Request.QueryString["fileName"];
+                    var fileName = Request.QueryString["fileName"];
                     if (!fileName.StartsWith("~"))
                     {
                         if (fileName.StartsWith("/"))
@@ -51,12 +53,11 @@ namespace umbraco.developer
                             fileName = "~/" + fileName;
                         }
                     }
-                    IOHelper.ValidateEditPath(fileName, SystemDirectories.Usercontrols);
-
-
+                    IOHelper.ValidateEditPath(fileName, SystemDirectories.UserControls);
+                    
                     if (System.IO.File.Exists(IOHelper.MapPath(fileName)))
                     {
-                        UserControl oControl = (UserControl)LoadControl(fileName);
+                        var oControl = (UserControl)LoadControl(fileName);
 
                         type = oControl.GetType();
                     }
@@ -69,12 +70,10 @@ namespace umbraco.developer
                 }
                 else
                 {
-                    string currentAss = IOHelper.MapPath(SystemDirectories.Bin + "/" + Request.QueryString["fileName"] + ".dll");
-                    Assembly asm = System.Reflection.Assembly.LoadFrom(currentAss);
+                    var currentAss = IOHelper.MapPath(SystemDirectories.Bin + "/" + Request.QueryString["fileName"] + ".dll");
+                    var asm = Assembly.LoadFrom(currentAss);
                     type = asm.GetType(Request.QueryString["type"]);
                 }
-
-
 
                 if (!errorReadingControl)
                 {
@@ -94,23 +93,18 @@ namespace umbraco.developer
                     if (!IsPostBack && type != null)
                     {
                         MacroProperties.Items.Clear();
-                        foreach (PropertyInfo pi in type.GetProperties())
+                        foreach (var pi in type.GetProperties())
                         {
                             if (pi.CanWrite && fullControlAssemblyName == pi.DeclaringType.Namespace + "." + pi.DeclaringType.Name)
                             {
                                 MacroProperties.Items.Add(new ListItem(pi.Name + " <span style=\"color: #99CCCC\">(" + pi.PropertyType.Name + ")</span>", pi.PropertyType.Name));
-
-                                //						Response.Write("<li>" + pi.Name + ", " + pi.CanWrite.ToString() + ", " + pi.DeclaringType.Namespace+"."+pi.DeclaringType.Name + ", " + pi.PropertyType.Name + "</li>");
                             }
 
                             foreach (ListItem li in MacroProperties.Items)
                                 li.Selected = true;
                         }
                     }
-                    else if (type == null)
-                    {
-                        AssemblyName.Text = "Type '" + Request.QueryString["type"] + "' is null";
-                    }
+        
                 }
             }
             catch (Exception err)
@@ -119,130 +113,102 @@ namespace umbraco.developer
                 Button1.Visible = false;
                 ChooseProperties.Controls.Add(new LiteralControl("<p class=\"guiDialogNormal\" style=\"color: red;\">" + err.ToString() + "</p><p/><p class=\"guiDialogNormal\">"));
             }
-            //			}
-
 
         }
-
-        #region Web Form Designer generated code
-        override protected void OnInit(EventArgs e)
+        
+        protected void Button1_Click(object sender, EventArgs e)
         {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
-            base.OnInit(e);
-        }
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-
-        }
-        #endregion
-
-        protected void Button1_Click(object sender, System.EventArgs e)
-        {
-            string result = "";
+            var result = "";
 
             // Get the macro object
-            umbraco.cms.businesslogic.macro.Macro macroObject =
-                new umbraco.cms.businesslogic.macro.Macro(Convert.ToInt32(Request.QueryString["macroID"]));
+            var macroObject = new Macro(Convert.ToInt32(Request.QueryString["macroID"]));
 
             // Load all macroPropertyTypes
-            Hashtable macroPropertyTypes = new Hashtable();
-            Hashtable macroPropertyIds = new Hashtable();
+            var macroPropertyTypes = new Hashtable();
+            var macroPropertyIds = new Hashtable();
 
-            //            SqlDataReader dr = SqlHelper.ExecuteReader(_ConnString, CommandType.Text, "select id, macroPropertyTypeBaseType, macroPropertyTypeAlias from cmsMacroPropertyType");
-            List<MacroPropertyType> macroPropTypes = MacroPropertyType.GetAll;
-            foreach (MacroPropertyType mpt in macroPropTypes)
+            var macroPropTypes = MacroPropertyType.GetAll;
+            foreach (var mpt in macroPropTypes)
             {
                 macroPropertyIds.Add(mpt.Alias, mpt.Id.ToString());
 
                 macroPropertyTypes.Add(mpt.Alias, mpt.BaseType);
             }
-            //            dr.Close();
 
             foreach (ListItem li in MacroProperties.Items)
             {
-                if (li.Selected && !macrohasProperty(macroObject, li.Text.Substring(0, li.Text.IndexOf(" ")).ToLower()))
+                if (li.Selected && !MacroHasProperty(macroObject, li.Text.Substring(0, li.Text.IndexOf(" ")).ToLower()))
                 {
-                    result += "<li>Added: " + spaceCamelCasing(li.Text) + "</li>";
-                    string _macroPropertyTypeAlias = findMacroType(macroPropertyTypes, li.Value);
-                    if (_macroPropertyTypeAlias == "")
-                        _macroPropertyTypeAlias = "text";
-                    object propertyId = macroPropertyIds[_macroPropertyTypeAlias];
+                    result += "<li>Added: " + SpaceCamelCasing(li.Text) + "</li>";
+                    var macroPropertyTypeAlias = FindMacroType(macroPropertyTypes, li.Value);
+                    if (macroPropertyTypeAlias == "")
+                        macroPropertyTypeAlias = "text";
+                    var propertyId = macroPropertyIds[macroPropertyTypeAlias];
                     if (propertyId != null)
                     {
-                        int macroPropertyTypeId = 0;
+                        var macroPropertyTypeId = 0;
                         if(int.TryParse(string.Format("{0}", propertyId), out macroPropertyTypeId))
                         {
                             MacroProperty.MakeNew(macroObject,
                                 true,
                                 li.Text.Substring(0, li.Text.IndexOf(" ")),
-                                spaceCamelCasing(li.Text),
-                                macroPropTypes.Find(delegate(MacroPropertyType mpt) { return mpt.Id == macroPropertyTypeId; }));
+                                SpaceCamelCasing(li.Text),
+                                macroPropTypes.Find(mpt => mpt.Id == macroPropertyTypeId));
                         }
                     }
                 }
                 else if (li.Selected)
-                    result += "<li>Skipped: " + spaceCamelCasing(li.Text) + " (already exists as a parameter)</li>";
+                    result += "<li>Skipped: " + SpaceCamelCasing(li.Text) + " (already exists as a parameter)</li>";
             }
             ChooseProperties.Visible = false;
             ConfigProperties.Visible = true;
             resultLiteral.Text = result;
         }
 
-        private bool macrohasProperty(umbraco.cms.businesslogic.macro.Macro macroObject, string propertyAlias)
+        private static bool MacroHasProperty(Macro macroObject, string propertyAlias)
         {
-            foreach (cms.businesslogic.macro.MacroProperty mp in macroObject.Properties)
-                if (mp.Alias.ToLower() == propertyAlias)
-                    return true;
-
-            return false;
+            return macroObject.Properties.Any(mp => mp.Alias.ToLower() == propertyAlias);
         }
 
-        private string spaceCamelCasing(string text)
+        private static string SpaceCamelCasing(string text)
         {
-            string _tempString = text.Substring(0, 1).ToUpper();
-            for (int i = 1; i < text.Length; i++)
+            var tempString = text.Substring(0, 1).ToUpper();
+            for (var i = 1; i < text.Length; i++)
             {
                 if (text.Substring(i, 1) == " ")
                     break;
                 if (text.Substring(i, 1).ToUpper() == text.Substring(i, 1))
-                    _tempString += " ";
-                _tempString += text.Substring(i, 1);
+                    tempString += " ";
+                tempString += text.Substring(i, 1);
             }
-            return _tempString;
+            return tempString;
         }
 
-        private string findMacroType(Hashtable macroPropertyTypes, string baseTypeName)
+        private static string FindMacroType(Hashtable macroPropertyTypes, string baseTypeName)
         {
-            string _tempType = "";
+            var tempType = "";
             // Hard-code numeric values
             if (baseTypeName == "Int32")
-                _tempType = "number";
+                tempType = "number";
             else if (baseTypeName == "Decimal")
-                _tempType = "decimal";
+                tempType = "decimal";
             else if (baseTypeName == "String")
-                _tempType = "text";
+                tempType = "text";
             else if (baseTypeName == "Boolean")
-                _tempType = "bool";
+                tempType = "bool";
             else
             {
-
                 foreach (DictionaryEntry de in macroPropertyTypes)
+                {
                     if (de.Value.ToString() == baseTypeName)
                     {
-                        _tempType = de.Key.ToString();
+                        tempType = de.Key.ToString();
                         break;
                     }
+                }
             }
 
-            return _tempType;
+            return tempType;
         }
 
     }

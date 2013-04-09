@@ -1,8 +1,9 @@
 using System;
 using System.Linq;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic.Exceptions;
-using umbraco.IO;
 
 namespace umbraco.BasePages
 {
@@ -61,7 +62,7 @@ namespace umbraco.BasePages
             if (permissions.IndexOf(Action) > -1 && (Path.Contains("-20") || ("," + Path + ",").Contains("," + getUser().StartNodeId.ToString() + ",")))
                 return true;
 
-            Log.Add(LogTypes.LoginFailure, getUser(), -1, "Insufficient permissions in UmbracoEnsuredPage: '" + Path + "', '" + permissions + "', '" + Action + "'");
+            LogHelper.Info<UmbracoEnsuredPage>("Insufficient permissions in UmbracoEnsuredPage: '" + Path + "', '" + permissions + "', '" + Action + "'");
             return false;
         }
 
@@ -88,7 +89,7 @@ namespace umbraco.BasePages
             {
                 ensureContext();
 
-                if (!String.IsNullOrEmpty(CurrentApp))
+                if (!string.IsNullOrEmpty(CurrentApp))
                 {
                     if (!ValidateUserApp(CurrentApp))
                         throw new UserAuthorizationException(String.Format("The current user doesn't have access to the section/app '{0}'", CurrentApp));
@@ -96,7 +97,7 @@ namespace umbraco.BasePages
             }
             catch (UserAuthorizationException)
             {
-                Log.Add(LogTypes.Error, CurrentUser, -1, String.Format("Tried to access '{0}'", CurrentApp));
+                LogHelper.Warn<UmbracoEnsuredPage>(string.Format("{0} tried to access '{1}'", CurrentUser.Id, CurrentApp));
                 throw;
             }
             catch

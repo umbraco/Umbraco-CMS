@@ -3,17 +3,22 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using umbraco.BusinessLogic;
+using umbraco.businesslogic.Exceptions;
 
 namespace umbraco.presentation.plugins.tinymce3
 {
     public partial class insertLink : BasePages.UmbracoEnsuredPage
     {
-        //protected uicontrols.TabView tbv = new uicontrols.TabView();
-        public insertLink()
+        protected override void OnInit(EventArgs e)
         {
-            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+            base.OnInit(e);
 
+            //this could be used for media or content so we need to at least validate that the user has access to one or the other
+            if (!ValidateUserApp(DefaultApps.content.ToString()) && !ValidateUserApp(DefaultApps.media.ToString()))
+                throw new UserAuthorizationException("The current user doesn't have access to the section/app");
         }
+
         protected void Page_Load(object sender, System.EventArgs e)
         {
             ClientLoader.DataBind();
@@ -48,23 +53,11 @@ namespace umbraco.presentation.plugins.tinymce3
             base.Render(writer);
         }
 
-        public BusinessLogic.User GetUser()
+        public User GetUser()
         {
             return base.getUser();
         }
 
-        override protected void OnInit(EventArgs e)
-        {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            //tbv.ID = "tabview1";
-            //tbv.Width = 300;
-            //tbv.Height = 320;
-            //tbv.AutoResize = false;
-
-            base.OnInit(e);
-        }
 
     }
 }

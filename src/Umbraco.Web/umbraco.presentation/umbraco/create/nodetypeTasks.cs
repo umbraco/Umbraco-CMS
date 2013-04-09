@@ -1,6 +1,8 @@
 using System;
+using System.Configuration;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Core;
 using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -16,7 +18,7 @@ namespace umbraco
         public override bool PerformSave()
         {
             var dt = cms.businesslogic.web.DocumentType.MakeNew(User, Alias.Replace("'", "''"));
-            dt.IconUrl = "folder.gif";
+            dt.IconUrl = UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates ? ".sprTreeFolder" : "folder.gif";
 
             // Create template?
             if (ParentID == 1)
