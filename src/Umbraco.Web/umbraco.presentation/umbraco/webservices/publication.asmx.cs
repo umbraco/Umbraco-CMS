@@ -2,6 +2,8 @@ using System;
 using System.ComponentModel;
 using System.Web.Services;
 using System.Web.Script.Services;
+using Umbraco.Web.WebServices;
+using umbraco.BusinessLogic;
 using umbraco.presentation.webservices;
 
 namespace umbraco.webservices
@@ -11,14 +13,15 @@ namespace umbraco.webservices
 	/// </summary>
 	[WebService(Namespace="http://umbraco.org/webservices/")]
     [ScriptService]
-	public class publication : WebService
+    public class publication : UmbracoAuthorizedWebService
 	{
 		
 		[WebMethod]
         [ScriptMethod]
-		public int GetPublicationStatus(string key) 
+		public int GetPublicationStatus(string key)
 		{
-            legacyAjaxCalls.Authorize();
+		    if (!AuthorizeRequest(DefaultApps.content.ToString()))
+		        return 0;
 
 			try 
 			{
@@ -34,7 +37,8 @@ namespace umbraco.webservices
         [ScriptMethod]
         public int GetPublicationStatusMax(string key)
         {
-            legacyAjaxCalls.Authorize();
+            if (!AuthorizeRequest(DefaultApps.content.ToString()))
+                return 0;
 
             try
             {
@@ -50,6 +54,9 @@ namespace umbraco.webservices
         [ScriptMethod]
         public int GetPublicationStatusMaxAll(string key)
         {
+            if (!AuthorizeRequest(DefaultApps.content.ToString()))
+		        return 0;
+
             try
             {
                 return int.Parse(Application["publishTotalAll" + key].ToString());
@@ -60,6 +67,7 @@ namespace umbraco.webservices
             }
         }
 
+        [Obsolete("This doesn't do anything and will be removed in future versions")]
 		[WebMethod]
 		public void HandleReleaseAndExpireDates(Guid PublishingServiceKey) 
 		{
@@ -68,30 +76,12 @@ namespace umbraco.webservices
         [WebMethod]
         public void SaveXmlCacheToDisk()
         {
-            legacyAjaxCalls.Authorize();
+            if (!AuthorizeRequest(DefaultApps.content.ToString()))
+                return;
 
             content.Instance.PersistXmlToFile();
         }
 
-		#region Component Designer generated code
 		
-		//Required by the Web Services Designer 
-		private IContainer components = null;
-		
-
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		protected override void Dispose( bool disposing )
-		{
-			if(disposing && components != null)
-			{
-				components.Dispose();
-			}
-			base.Dispose(disposing);		
-		}
-		
-		#endregion
-
 	}
 }

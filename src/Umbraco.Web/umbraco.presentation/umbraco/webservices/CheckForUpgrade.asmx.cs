@@ -4,6 +4,7 @@ using System.Web;
 using System.Web.Services;
 using System.Web.Script.Services;
 using Umbraco.Core;
+using Umbraco.Web.WebServices;
 using Umbraco.Core.Configuration;
 
 
@@ -16,16 +17,16 @@ namespace umbraco.presentation.webservices
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
     [ScriptService]
-    public class CheckForUpgrade : System.Web.Services.WebService
+    public class CheckForUpgrade : UmbracoAuthorizedWebService
     {
 
         [WebMethod]
         [ScriptMethod]
         public UpgradeResult CallUpgradeService()
         {
-            legacyAjaxCalls.Authorize();
+            if (!AuthorizeRequest()) return null;
 
-            org.umbraco.update.CheckForUpgrade check = new global::umbraco.presentation.org.umbraco.update.CheckForUpgrade();
+            var check = new global::umbraco.presentation.org.umbraco.update.CheckForUpgrade();                        
             org.umbraco.update.UpgradeResult result = check.CheckUpgrade(UmbracoVersion.Current.Major,
                                                                          UmbracoVersion.Current.Minor,
                                                                          UmbracoVersion.Current.Build,
@@ -39,7 +40,7 @@ namespace umbraco.presentation.webservices
         {
             bool isUpgrade = false;
             // if it's an upgrade, you'll need to be logged in before we allow this call
-            if (!String.IsNullOrEmpty(Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus))
+            if (!String.IsNullOrEmpty(global::Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus))
             {
                 isUpgrade = true;
                 legacyAjaxCalls.Authorize();
@@ -62,7 +63,7 @@ namespace umbraco.presentation.webservices
             installCookie.SetValue(installId.ToString());
 
             string dbProvider = String.Empty;
-            if (!String.IsNullOrEmpty(Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus))
+            if (!String.IsNullOrEmpty(global::Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus))
             dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
 
             org.umbraco.update.CheckForUpgrade check = new global::umbraco.presentation.org.umbraco.update.CheckForUpgrade();

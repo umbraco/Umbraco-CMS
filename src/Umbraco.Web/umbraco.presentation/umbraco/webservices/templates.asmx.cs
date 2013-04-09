@@ -7,6 +7,10 @@ using System.Web;
 using System.Web.Services;
 using System.Xml;
 using System.Web.Script.Services;
+using Umbraco.Core;
+using Umbraco.Core.IO;
+using Umbraco.Web.WebServices;
+using umbraco.BusinessLogic;
 using umbraco.presentation.webservices;
 
 namespace umbraco.webservices
@@ -16,111 +20,83 @@ namespace umbraco.webservices
 	/// </summary>
 	[WebService(Namespace="http://umbraco.org/webservices/")]
     [ScriptService]
-	public class templates : System.Web.Services.WebService
+    public class templates : UmbracoAuthorizedWebService
 	{
-		public templates()
-		{
-			//CODEGEN: This call is required by the ASP.NET Web Services Designer
-			InitializeComponent();
-		}
-
+		
 		[WebMethod]
-		public XmlNode GetTemplates(string Login, string Password) 
+		public XmlNode GetTemplates(string Login, string Password)
 		{
-			if (BusinessLogic.User.validateCredentials(Login, Password)) 
+		    if (ValidateCredentials(Login, Password) && UserHasAppAccess(DefaultApps.settings.ToString(), Login)) 
 			{
-				XmlDocument xmlDoc = new XmlDocument();
+				var xmlDoc = new XmlDocument();
 				xmlDoc.LoadXml("<templates/>");
 				foreach (cms.businesslogic.template.Template t in cms.businesslogic.template.Template.GetAllAsList()) 
 				{
-					XmlElement tt = xmlDoc.CreateElement("template");
-					tt.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "id", t.Id.ToString()));
-					tt.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "name", t.Text));
+					var tt = xmlDoc.CreateElement("template");
+					tt.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "id", t.Id.ToString()));
+                    tt.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "name", t.Text));
 					xmlDoc.DocumentElement.AppendChild(tt);
 				}
 				return xmlDoc.DocumentElement;
-			} else
-				return null;
+			}
+		    return null;
 		}
 
-		[WebMethod]
-		public XmlNode GetTemplate(int Id, string Login, string Password) 
+	    [WebMethod]
+		public XmlNode GetTemplate(int Id, string Login, string Password)
 		{
-			if (BusinessLogic.User.validateCredentials(Login, Password)) 
+            if (ValidateCredentials(Login, Password) && UserHasAppAccess(DefaultApps.settings.ToString(), Login)) 
 			{
-				cms.businesslogic.template.Template t = new cms.businesslogic.template.Template(Id);
-				XmlDocument xmlDoc = new XmlDocument();
-				XmlElement tXml = xmlDoc.CreateElement("template");
-				tXml.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "id", t.Id.ToString()));
-				tXml.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "master", t.MasterTemplate.ToString()));
-				tXml.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "name", t.Text));
-				tXml.AppendChild(xmlHelper.addCDataNode(xmlDoc, "design", t.Design));
+				var t = new cms.businesslogic.template.Template(Id);
+				var xmlDoc = new XmlDocument();
+				var tXml = xmlDoc.CreateElement("template");
+                tXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "id", t.Id.ToString()));
+                tXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "master", t.MasterTemplate.ToString()));
+                tXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "name", t.Text));
+				tXml.AppendChild(XmlHelper.AddCDataNode(xmlDoc, "design", t.Design));
 				return tXml;
-			} else
-				return null;
-			
+			}
+		    return null;
 		}
 
-		[WebMethod]
-		public bool UpdateTemplate(int Id, int Master, string Design, string Login, string Password) 
+	    [WebMethod]
+		public bool UpdateTemplate(int Id, int Master, string Design, string Login, string Password)
 		{
-			if (BusinessLogic.User.validateCredentials(Login, Password)) 
+            if (ValidateCredentials(Login, Password) && UserHasAppAccess(DefaultApps.settings.ToString(), Login)) 
 			{
-				cms.businesslogic.template.Template t = new cms.businesslogic.template.Template(Id);
-				if (t != null) 
-				{
-					t.MasterTemplate = Master;
-					t.Design = Design;
-					return true;
-				} 
-				else
-					return false;
-			} else
-				return false;
+                try
+                {
+                    var t = new cms.businesslogic.template.Template(Id)
+                        {
+                            MasterTemplate = Master,
+                            Design = Design
+                        };
+                    //ensure events are raised
+                    t.Save();
+                    return true;
+                }
+                catch (ArgumentException)
+                {
+                    return false;
+                }			    
+			}
+		    return false;
 		}
 
-        [WebMethod]
+	    [WebMethod]
         [ScriptMethod]
         public string GetCodeSnippet(object templateId)
-        {
-            legacyAjaxCalls.Authorize();
-
-
-            string content = string.Empty;
-
-            System.IO.StreamReader templateFile = 
-                System.IO.File.OpenText(umbraco.IO.IOHelper.MapPath(IO.SystemDirectories.Umbraco + "/scripting/templates/cshtml/" + templateId.ToString()));
-            content = templateFile.ReadToEnd();
+	    {
+            //NOTE: The legacy code threw an exception so will continue to do that.
+	        AuthorizeRequest(DefaultApps.settings.ToString(), true);
+            
+	        var templateFile = 
+                System.IO.File.OpenText(IOHelper.MapPath(SystemDirectories.Umbraco + "/scripting/templates/cshtml/" + templateId));
+            var content = templateFile.ReadToEnd();
             templateFile.Close();
 
             return content;
         }
-		#region Component Designer generated code
 		
-		//Required by the Web Services Designer 
-		private IContainer components = null;
-				
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
-		}
-
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		protected override void Dispose( bool disposing )
-		{
-			if(disposing && components != null)
-			{
-				components.Dispose();
-			}
-			base.Dispose(disposing);		
-		}
-		
-		#endregion
-
 	}
 }

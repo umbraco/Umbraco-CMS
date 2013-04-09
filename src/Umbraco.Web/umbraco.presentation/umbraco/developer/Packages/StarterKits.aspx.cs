@@ -4,27 +4,33 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core.IO;
 using umbraco.BasePages;
-using umbraco.IO;
+using umbraco.BusinessLogic;
 
 namespace umbraco.presentation.umbraco.developer.Packages
 {
     [Obsolete("This class is no longer used and will be removed in future version. The page that supercedes this is Umbraco.Web.UI.Umbraco.Developer.Packages.StarterKits")]
 	public partial class StarterKits : UmbracoEnsuredPage
 	{
+	    public StarterKits()
+	    {
+	        CurrentApp = DefaultApps.developer.ToString();
+	    }
+
 		protected void Page_Load(object sender, EventArgs e)
 		{
 			if (!cms.businesslogic.skinning.Skinning.IsStarterKitInstalled())
-				showStarterKits();
+				ShowStarterKits();
 			else
 				showSkins((Guid)cms.businesslogic.skinning.Skinning.StarterKitGuid());
 		}
 
-		private void showStarterKits()
+		private void ShowStarterKits()
 		{
-			install.steps.Skinning.loadStarterKits starterkitsctrl =
-				(install.steps.Skinning.loadStarterKits)new UserControl().LoadControl(SystemDirectories.Install + "/steps/Skinning/loadStarterKits.ascx");
-			starterkitsctrl.StarterKitInstalled += new install.steps.Skinning.StarterKitInstalledEventHandler(starterkitsctrl_StarterKitInstalled);
+			var starterkitsctrl =
+				(install.steps.Skinning.loadStarterKits)LoadControl(SystemDirectories.Install + "/steps/Skinning/loadStarterKits.ascx");
+			starterkitsctrl.StarterKitInstalled += starterkitsctrl_StarterKitInstalled;
 
 			ph_starterkits.Controls.Add(starterkitsctrl);
 
@@ -40,11 +46,11 @@ namespace umbraco.presentation.umbraco.developer.Packages
 		public void showSkins(Guid starterKitGuid)
 		{
 
-			install.steps.Skinning.loadStarterKitDesigns ctrl = (install.steps.Skinning.loadStarterKitDesigns)new UserControl().LoadControl(SystemDirectories.Install + "/steps/Skinning/loadStarterKitDesigns.ascx");
+			var ctrl = (install.steps.Skinning.loadStarterKitDesigns)new UserControl().LoadControl(SystemDirectories.Install + "/steps/Skinning/loadStarterKitDesigns.ascx");
 			ctrl.ID = "StarterKitDesigns";
 
 			ctrl.StarterKitGuid = starterKitGuid;
-			ctrl.StarterKitDesignInstalled += new install.steps.Skinning.StarterKitDesignInstalledEventHandler(ctrl_StarterKitDesignInstalled);
+			ctrl.StarterKitDesignInstalled += ctrl_StarterKitDesignInstalled;
 			ph_skins.Controls.Add(ctrl);
 
 			StarterKitNotInstalled.Visible = false;
