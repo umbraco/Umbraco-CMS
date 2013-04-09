@@ -1,32 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Web;
 using System.Web.Security;
-using Umbraco.Core.Configuration;
+using Umbraco.Core;
+using umbraco;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
-using Umbraco.Core;
 using umbraco.businesslogic.Exceptions;
 
 namespace Umbraco.Web.WebServices
 {
-    /// <summary>
-    /// An abstract web service class that has the methods and properties to correct validate an Umbraco user
-    /// </summary>
-    public abstract class UmbracoAuthorizedWebService : UmbracoWebService
+    public abstract class UmbracoAuthorizedHttpHandler : UmbracoHttpHandler
     {
-        protected UmbracoAuthorizedWebService()
+        protected UmbracoAuthorizedHttpHandler()
             : base()
         {
         }
 
-        protected UmbracoAuthorizedWebService(UmbracoContext umbracoContext)
+        protected UmbracoAuthorizedHttpHandler(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
         }
-        
+
         //IMPORTANT NOTE: !! All of these security bits and pieces have been moved in to one centralized class
         // in 6.1 called WebSecurity. All this logic is all here temporarily!
 
@@ -64,7 +59,7 @@ namespace Umbraco.Web.WebServices
         {
             //ensure we have a valid user first!
             if (!AuthorizeRequest(throwExceptions)) return false;
-                
+
             //if it is empty, don't validate
             if (app.IsNullOrWhiteSpace())
             {
@@ -115,7 +110,7 @@ namespace Umbraco.Web.WebServices
                 if (throwExceptions)
                     throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
                 return false;
-            }                
+            }
 
             try
             {
@@ -152,8 +147,7 @@ namespace Umbraco.Web.WebServices
         /// </summary>
         private class InnerPage : BasePage
         {
-            
-        }
 
+        }
     }
 }
