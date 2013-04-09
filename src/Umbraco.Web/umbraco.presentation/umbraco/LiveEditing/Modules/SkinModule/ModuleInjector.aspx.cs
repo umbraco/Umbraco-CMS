@@ -5,14 +5,21 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Reflection;
-using umbraco.IO;
+using Umbraco.Core.IO;
+using umbraco.BusinessLogic;
 
 namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 {
     public partial class ModuleInjector : BasePages.UmbracoEnsuredPage
     {
-        private cms.businesslogic.macro.Macro m;
+        private cms.businesslogic.macro.Macro _m;
         public string _macroAlias = "";
+
+        public ModuleInjector()
+        {
+            //for skinning, you need to be a developer
+            CurrentApp = DefaultApps.developer.ToString();
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -25,38 +32,35 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             {
 
 
-                m = cms.businesslogic.macro.Macro.GetByAlias(Request["macroAlias"]);
+                _m = cms.businesslogic.macro.Macro.GetByAlias(Request["macroAlias"]);
 
-                String macroAssembly = "";
-                String macroType = "";
-
-                _macroAlias = m.Alias;
+                _macroAlias = _m.Alias;
 
 
                 //If no properties, we will exit now...
-                if (m.Properties.Length == 0)
+                if (_m.Properties.Length == 0)
                 {
-                    Literal noProps = new Literal();
+                    var noProps = new Literal();
                     noProps.Text = "<script type='text/javascript'>updateMacro()</script>";
                     macroProperties.Controls.Add(noProps);
                 }
                 else
                 {
                     //if we have properties, we'll render the controls for them...
-                    foreach (cms.businesslogic.macro.MacroProperty mp in m.Properties)
+                    foreach (cms.businesslogic.macro.MacroProperty mp in _m.Properties)
                     {
-                        macroAssembly = mp.Type.Assembly;
-                        macroType = mp.Type.Type;
+                        var macroAssembly = mp.Type.Assembly;
+                        var macroType = mp.Type.Type;
                         try
                         {
 
-                            Assembly assembly = Assembly.LoadFrom(IOHelper.MapPath(SystemDirectories.Bin + "/" + macroAssembly + ".dll"));
+                            var assembly = Assembly.LoadFrom(IOHelper.MapPath(SystemDirectories.Bin + "/" + macroAssembly + ".dll"));
 
-                            Type type = assembly.GetType(macroAssembly + "." + macroType);
-                            interfaces.IMacroGuiRendering typeInstance = Activator.CreateInstance(type) as interfaces.IMacroGuiRendering;
+                            var type = assembly.GetType(macroAssembly + "." + macroType);
+                            var typeInstance = Activator.CreateInstance(type) as interfaces.IMacroGuiRendering;
                             if (typeInstance != null)
                             {
-                                Control control = Activator.CreateInstance(type) as Control;
+                                var control = Activator.CreateInstance(type) as Control;
                                 control.ID = mp.Alias;
 
                                 if (!IsPostBack)
@@ -71,7 +75,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                                 }
 
                                 // register alias
-                                uicontrols.PropertyPanel pp = new uicontrols.PropertyPanel();
+                                var pp = new uicontrols.PropertyPanel();
                                 pp.Text = mp.Name;
                                 pp.Controls.Add(control);
                                 macroProperties.Controls.Add(pp);
@@ -93,10 +97,6 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                         }
                     }
                 }
-            }
-            else
-            {
-              
             }
         }
     }

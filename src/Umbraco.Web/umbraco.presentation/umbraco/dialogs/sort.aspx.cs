@@ -23,11 +23,17 @@ namespace umbraco.cms.presentation
     {
         private readonly List<SortableNode> _nodes = new List<SortableNode>();
 
+        protected override void OnInit(EventArgs e)
+        {
+            CurrentApp = helper.Request("app");
+
+            base.OnInit(e);
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             sortDone.Text = ui.Text("sort", "sortDone");
         }
-
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
@@ -131,27 +137,6 @@ namespace umbraco.cms.presentation
             public DateTime createDate;
         }
 
-
-        #region Web Form Designer generated code
-
-        protected override void OnInit(EventArgs e)
-        {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
-            base.OnInit(e);
-        }
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-        }
-
-        #endregion
     }
 
     public class nodeNameCompare : IComparer<sort.SortableNode>

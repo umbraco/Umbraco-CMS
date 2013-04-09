@@ -5,8 +5,8 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Services;
+using Umbraco.Core.IO;
 using umbraco.BusinessLogic.Actions;
-using umbraco.IO;
 using umbraco.uicontrols.DatePicker;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
@@ -101,7 +101,7 @@ namespace umbraco.cms.presentation
 
             foreach (uicontrols.TabPage tp in _cControl.GetPanels())
             {
-                addPreviewButton(tp.Menu, _document.Id);
+                AddPreviewButton(tp.Menu, _document.Id);
             }
 
             plc.Controls.Add(_cControl);
@@ -134,8 +134,8 @@ namespace umbraco.cms.presentation
 
             // Template
             var template = new PlaceHolder();
-            var documentType = new DocumentType(_document.ContentType.Id);
-            _cControl.PropertiesPane.addProperty(ui.Text("documentType"), new LiteralControl(documentType.Text));
+            var DocumentType = new DocumentType(_document.ContentType.Id);
+            _cControl.PropertiesPane.addProperty(ui.Text("documentType"), new LiteralControl(DocumentType.Text));
 
 
             //template picker
@@ -149,14 +149,14 @@ namespace umbraco.cms.presentation
             if (UmbracoUser.UserType.Name == "writer")
             {
                 if (defaultTemplate != 0)
-                    template.Controls.Add(new LiteralControl(cms.businesslogic.template.Template.GetTemplate(defaultTemplate).Text));
+                    template.Controls.Add(new LiteralControl(businesslogic.template.Template.GetTemplate(defaultTemplate).Text));
                 else
                     template.Controls.Add(new LiteralControl(ui.Text("content", "noDefaultTemplate")));
             }
             else
             {
                 _ddlDefaultTemplate.Items.Add(new ListItem(ui.Text("choose") + "...", ""));
-                foreach (var t in documentType.allowedTemplates)
+                foreach (var t in DocumentType.allowedTemplates)
                 {
 
                     var tTemp = new ListItem(t.Text, t.Id.ToString());
@@ -192,12 +192,12 @@ namespace umbraco.cms.presentation
             _cControl.tpProp.Controls.AddAt(2, _linkProps);
 
             // add preview to properties pane too
-            addPreviewButton(_cControl.tpProp.Menu, _document.Id);
+            AddPreviewButton(_cControl.tpProp.Menu, _document.Id);
 
 
         }
 
-        protected void Page_Load(object sender, System.EventArgs e)
+        protected void Page_Load(object sender, EventArgs e)
         {
             if (!_contentId.HasValue)
                 return;
@@ -349,7 +349,7 @@ namespace umbraco.cms.presentation
             }
         }
 
-        protected void UnPublishDo(object sender, System.EventArgs e)
+        protected void UnPublishDo(object sender, EventArgs e)
         {
             _document.UnPublish();
             _littPublishStatus.Text = ui.Text("content", "itemNotPublished", UmbracoUser);
@@ -366,11 +366,9 @@ namespace umbraco.cms.presentation
 
         void UpdateNiceUrlProperties(string niceUrlText, string altUrlsText)
         {
-            Literal lit;
-
             _linkProps.Controls.Clear();
 
-            lit = new Literal();
+            var lit = new Literal();
             lit.Text = niceUrlText;
             _linkProps.addProperty(ui.Text("content", "urls", UmbracoUser), lit);
 
@@ -507,14 +505,14 @@ namespace umbraco.cms.presentation
                 ShowUserValidationError("<h3>The current user doesn't have access to this application</h3><p>Please contact the system administrator if you think that you should have access.</p>");
                 return false;
             }
-            if (!base.ValidateUserNodeTreePermissions(_document.Path, ActionBrowse.Instance.Letter.ToString()))
+            if (!ValidateUserNodeTreePermissions(_document.Path, ActionBrowse.Instance.Letter.ToString()))
             {
                 ShowUserValidationError(
                     "<h3>The current user doesn't have permissions to browse this document</h3><p>Please contact the system administrator if you think that you should have access.</p>");
                 return false;
             }
             //TODO: Change this, when we add view capabilities, the user will be able to view but not edit!
-            if (!base.ValidateUserNodeTreePermissions(_document.Path, ActionUpdate.Instance.Letter.ToString()))
+            if (!ValidateUserNodeTreePermissions(_document.Path, ActionUpdate.Instance.Letter.ToString()))
             {
                 ShowUserValidationError("<h3>The current user doesn't have permissions to edit this document</h3><p>Please contact the system administrator if you think that you should have access.</p>");
                 return false;
@@ -522,7 +520,7 @@ namespace umbraco.cms.presentation
             return true;
         }
 
-        private void addPreviewButton(uicontrols.ScrollingMenu menu, int id)
+        private void AddPreviewButton(uicontrols.ScrollingMenu menu, int id)
         {
             uicontrols.MenuIconI menuItem;
 
