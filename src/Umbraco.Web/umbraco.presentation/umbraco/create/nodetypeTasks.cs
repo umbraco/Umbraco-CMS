@@ -1,4 +1,5 @@
 using System;
+using System.Configuration;
 using System.Data;
 using System.Web.Security;
 using Umbraco.Core;
@@ -50,9 +51,10 @@ namespace umbraco
                 {
                     CreatorId = _userID,
                     Alias = Alias.Replace("'", "''"),
-                    Icon = "folder.gif",
+                    Icon = UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates ? ".sprTreeFolder" : "folder.gif",
                     Name = Alias.Replace("'", "''")
                 };
+
             // Create template?
             if (ParentID == 1)
             {
