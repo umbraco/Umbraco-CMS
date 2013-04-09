@@ -84,8 +84,6 @@ namespace umbraco.presentation.webservices
         [ScriptMethod]
         public void DeleteContentPermanently(string nodeId, string nodeType)
         {
-            AuthorizeRequest(DefaultApps.content.ToString(), true);
-
             int intNodeID;
             if (int.TryParse(nodeId, out intNodeID))
             {
@@ -93,13 +91,17 @@ namespace umbraco.presentation.webservices
                 {
                     case "media":
                     case "mediaRecycleBin":
+                        //ensure user has access to media
+                        AuthorizeRequest(DefaultApps.media.ToString(), true);
+
                         new Media(intNodeID).delete(true);
                         break;
                     case "content":
                     case "contentRecycleBin":
-                        new Document(intNodeID).delete(true);
-                        break;
                     default:
+                        //ensure user has access to content
+                        AuthorizeRequest(DefaultApps.content.ToString(), true);
+                        
                         new Document(intNodeID).delete(true);
                         break;
                 }                
