@@ -56,7 +56,14 @@ namespace umbraco.webservices.templates
         {
             Authenticate(username, password);
 
-            return cms.businesslogic.template.Template.GetAllAsList().Select(createTemplateCarrier).ToList();
+            var templateCarriers = new List<templateCarrier>();
+
+            foreach (var template in cms.businesslogic.template.Template.GetAllAsList())
+            {
+                templateCarriers.Add(createTemplateCarrier(template));
+            }
+
+            return templateCarriers;
         }
 
 
