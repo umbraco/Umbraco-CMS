@@ -93,28 +93,28 @@ namespace umbraco.presentation.webservices
                     
                     if (isContent)
                     {
-                                    var document = new Document(int.Parse(tmp[i]));
-                                    var published = document.Published;
-                                    document.sortOrder = i;
-                                    document.Save();
+                        var document = new Document(int.Parse(tmp[i]));
+                        var published = document.Published;
+                        document.sortOrder = i;
+                        document.Save();
                         // refresh the xml for the sorting to work
-                        if (d.Published)
+                        if (published)
                         {
-                                        document.Publish(BusinessLogic.User.GetCurrent());
-                                        document.refreshXmlSortOrder();
+                            document.Publish(BusinessLogic.User.GetCurrent());
+                            document.refreshXmlSortOrder();
                             library.UpdateDocumentCache(int.Parse(tmp[i]));
                         }
                     }
-                                // to update the sortorder of the media node in the XML, re-save the node....
+                    // to update the sortorder of the media node in the XML, re-save the node....
                     else if (isMedia)
                     {
-                                    var media = new cms.businesslogic.media.Media(int.Parse(tmp[i]));
-                                    media.sortOrder = i;
-                                    media.Save();
-                                }
-                                else
-                                {
-                                    new cms.businesslogic.CMSNode(int.Parse(tmp[i])).sortOrder = i;
+                        var media = new cms.businesslogic.media.Media(int.Parse(tmp[i]));
+                        media.sortOrder = i;
+                        media.Save();
+                    }
+                    else
+                    {
+                        new cms.businesslogic.CMSNode(int.Parse(tmp[i])).sortOrder = i;
                     }
                 }
 
