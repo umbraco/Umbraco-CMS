@@ -134,8 +134,8 @@ namespace umbraco.cms.presentation
 
             // Template
             var template = new PlaceHolder();
-            var DocumentType = new DocumentType(_document.ContentType.Id);
-            _cControl.PropertiesPane.addProperty(ui.Text("documentType"), new LiteralControl(DocumentType.Text));
+            var documentType = new DocumentType(_document.ContentType.Id);
+            _cControl.PropertiesPane.addProperty(ui.Text("documentType"), new LiteralControl(documentType.Text));
 
 
             //template picker
@@ -156,7 +156,7 @@ namespace umbraco.cms.presentation
             else
             {
                 _ddlDefaultTemplate.Items.Add(new ListItem(ui.Text("choose") + "...", ""));
-                foreach (var t in DocumentType.allowedTemplates)
+                foreach (var t in documentType.allowedTemplates)
                 {
 
                     var tTemp = new ListItem(t.Text, t.Id.ToString());
