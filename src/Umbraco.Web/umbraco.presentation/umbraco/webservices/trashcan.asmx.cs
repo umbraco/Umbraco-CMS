@@ -7,7 +7,9 @@ using System.Web.Script.Services;
 using System.Web.Services;
 using System.Web.Services.Protocols;
 using System.ComponentModel;
+using Umbraco.Web.WebServices;
 using umbraco.BasePages;
+using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.console;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
@@ -22,23 +24,35 @@ namespace umbraco.presentation.webservices
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [ToolboxItem(false)]
     [ScriptService]
-    public class trashcan : System.Web.Services.WebService
+    public class trashcan : UmbracoAuthorizedWebService
     {
         [WebMethod]
-        public void EmptyTrashcan(cms.businesslogic.RecycleBin.RecycleBinType type)
+        public void EmptyTrashcan(RecycleBin.RecycleBinType type)
         {
-            if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
+            //validate against the app type!
+            switch (type)
             {
-                Application["trashcanEmptyLeft"] = RecycleBin.Count(type).ToString();
-                emptyTrashCanDo(type);
+                case RecycleBin.RecycleBinType.Content:
+                    if (!AuthorizeRequest(DefaultApps.content.ToString())) return;
+                    break;
+                case RecycleBin.RecycleBinType.Media:
+                    if (!AuthorizeRequest(DefaultApps.media.ToString())) return;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("type");
             }
 
+            //TODO: This will never work in LB scenarios
+            Application["trashcanEmptyLeft"] = RecycleBin.Count(type).ToString();
+            emptyTrashCanDo(type);
         }
 
         [WebMethod]
         public string GetTrashStatus()
         {
-            if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
+            //TODO: This will never work in LB scenarios
+
+            if (AuthorizeRequest())
             {
                 return Application["trashcanEmptyLeft"] != null 
                     ? Application["trashcanEmptyLeft"].ToString() 
