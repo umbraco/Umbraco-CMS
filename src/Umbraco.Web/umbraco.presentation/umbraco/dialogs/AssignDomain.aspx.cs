@@ -1,6 +1,7 @@
 using System;
 using System.Web.UI.WebControls;
 using umbraco.BasePages;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.web;
 
@@ -11,47 +12,51 @@ namespace umbraco.dialogs
     /// </summary>
     public partial class AssignDomain : UmbracoEnsuredPage
     {
-        private int currentID;
-        private int editDomain;
+        private int _currentId;
+        private int _editDomain;
+
+        public AssignDomain()
+        {
+            CurrentApp = DefaultApps.content.ToString();
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            currentID = int.Parse(helper.Request("id"));
-            prop_domain.Text = umbraco.ui.Text("assignDomain", "domain", this.getUser());
-            prop_lang.Text = umbraco.ui.Text("general", "language", this.getUser());
-            pane_addnew.Text = umbraco.ui.Text("assignDomain", "addNew", this.getUser());
-            pane_edit.Text = umbraco.ui.Text("assignDomain", "orEdit", this.getUser());
+            _currentId = int.Parse(helper.Request("id"));
+            prop_domain.Text = ui.Text("assignDomain", "domain", this.getUser());
+            prop_lang.Text = ui.Text("general", "language", this.getUser());
+            pane_addnew.Text = ui.Text("assignDomain", "addNew", this.getUser());
+            pane_edit.Text = ui.Text("assignDomain", "orEdit", this.getUser());
             
             // Put user code to initialize the page here
             if (helper.Request("editDomain").Trim() != "")
             {
-                editDomain = int.Parse(helper.Request("editDomain"));
+                _editDomain = int.Parse(helper.Request("editDomain"));
             }
 
             if (helper.Request("delDomain").Trim() != "")
             {
-                Domain d = new Domain(int.Parse(helper.Request("delDomain")));
-                FeedBackMessage.type = umbraco.uicontrols.Feedback.feedbacktype.success;
-                FeedBackMessage.Text = ui.Text("assignDomain", "domainDeleted", d.Name, base.getUser());
+                var d = new Domain(int.Parse(helper.Request("delDomain")));
+                FeedBackMessage.type = uicontrols.Feedback.feedbacktype.success;
+                FeedBackMessage.Text = ui.Text("assignDomain", "domainDeleted", d.Name, getUser());
                 d.Delete();
-                updateDomainList();
+                UpdateDomainList();
             }
 
             if (!IsPostBack)
             {
                 // Add caption to button
-                ok.Text = ui.Text("assignDomain", "addNew", base.getUser());
+                ok.Text = ui.Text("assignDomain", "addNew", getUser());
               
-
-                int selectedLanguage = -1;
+                var selectedLanguage = -1;
 
                 // Maybe add editing info - not the best way this is made ;-)
-                if (editDomain > 0)
+                if (_editDomain > 0)
                 {
-                    Domain d = new Domain(editDomain);
+                    var d = new Domain(_editDomain);
                     selectedLanguage = d.Language.id;
 					DomainName.Text = d.Name.StartsWith("*") ? "*" : d.Name;
-                    ok.Text = ui.Text("general", "update", base.getUser());
+                    ok.Text = ui.Text("general", "update", getUser());
                 }
 
                 // Add caption to language validator
@@ -63,9 +68,9 @@ namespace umbraco.dialogs
 				DomainValidator2.ValidationExpression = @"^(\*|((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/[-\w]*)?))$";
 
                 Languages.Items.Add(new ListItem(ui.Text("general", "choose", base.getUser()), ""));
-                foreach (Language l in Language.getAll)
+                foreach (var l in Language.getAll)
                 {
-                    ListItem li = new ListItem();
+                    var li = new ListItem();
                     li.Text = l.FriendlyName;
                     li.Value = l.id.ToString();
                     if (selectedLanguage == l.id)
@@ -74,102 +79,84 @@ namespace umbraco.dialogs
                 }
             }
 
-            updateDomainList();
+            UpdateDomainList();
         }
 
-        private void updateDomainList()
+        private void UpdateDomainList()
         {
             
-            Domain[] domainList = Domain.GetDomainsById(currentID);
+            var domainList = Domain.GetDomainsById(_currentId);
 
-            if (domainList.Length > 0) {
+            if (domainList.Length > 0)
+            {
                 allDomains.Text = "<table border=\"0\" cellspacing=\"10\">";
 
-                foreach (Domain d in domainList) {
-					var name = d.Name.StartsWith("*") ? "*" : d.Name;
-                    allDomains.Text += "<tr><td>" + name + "</td><td>(" + d.Language.CultureAlias + ")</td><td><a href=\"?id=" + currentID + "&editDomain=" +
-                                       d.Id.ToString() + "\">" + ui.Text("edit") + "</a></td><td><a href=\"?id=" + currentID +
+                foreach (var d in domainList)
+                {
+                    var name = d.Name.StartsWith("*") ? "*" : d.Name;
+                    allDomains.Text += "<tr><td>" + name + "</td><td>(" + d.Language.CultureAlias + ")</td><td><a href=\"?id=" + _currentId + "&editDomain=" +
+                                       d.Id.ToString() + "\">" + ui.Text("edit") + "</a></td><td><a href=\"?id=" + _currentId +
                                        "&delDomain=" + d.Id.ToString() + "\" onClick=\"return confirm('" +
                                        ui.Text("defaultdialogs", "confirmdelete", base.getUser()) +
                                        "');\" style=\"color: red\">" + ui.Text("delete") + "</a></td></tr>";
                 }
 
                 allDomains.Text += "</table>";
-                pane_edit.Visible = true;                 
-            } else {
-                pane_edit.Visible = false;
+                pane_edit.Visible = true;
             }
-
-
+            else
+            {
+                pane_edit.Visible = false;
+            }            
         }
 
         protected void SaveDomain(object sender, EventArgs e)
         {
             if (Page.IsValid)
             {
-                if (editDomain > 0)
+                if (_editDomain > 0)
                 {
-                    Domain d = new Domain(editDomain);
+                    var d = new Domain(_editDomain);
                     d.Language = new Language(int.Parse(Languages.SelectedValue));
                     d.Name = DomainName.Text.ToLower();
-                    FeedBackMessage.type = umbraco.uicontrols.Feedback.feedbacktype.success;
-                    FeedBackMessage.Text = ui.Text("assignDomain", "domainUpdated", DomainName.Text, base.getUser());
+                    FeedBackMessage.type = uicontrols.Feedback.feedbacktype.success;
+                    FeedBackMessage.Text = ui.Text("assignDomain", "domainUpdated", DomainName.Text, getUser());
                     d.Save();
 
                     DomainName.Text = "";
                     Languages.SelectedIndex = 0;
-                    updateDomainList();
+                    UpdateDomainList();
 
                     //this is probably the worst webform I've ever seen... 
-                    Response.Redirect("AssignDomain.aspx?id=" + currentID.ToString());
+                    Response.Redirect("AssignDomain.aspx?id=" + _currentId.ToString());
                 }
                 else
                 {
 					// have to handle wildcard
                     var domainName = DomainName.Text.Trim();
-					domainName = domainName == "*" ? ("*" + currentID.ToString()) : domainName;
+					domainName = domainName == "*" ? ("*" + _currentId.ToString()) : domainName;
 
-					if (!Domain.Exists(domainName.ToLower()))
-					{
-						Domain.MakeNew(domainName, currentID, int.Parse(Languages.SelectedValue));
-                        FeedBackMessage.Text = ui.Text("assignDomain", "domainCreated", domainName, base.getUser());
-                        FeedBackMessage.type = umbraco.uicontrols.Feedback.feedbacktype.success;
+                    if (!Domain.Exists(domainName.ToLower()))
+                    {
+                        Domain.MakeNew(domainName, _currentId, int.Parse(Languages.SelectedValue));
+                        FeedBackMessage.Text = ui.Text("assignDomain", "domainCreated", domainName, getUser());
+                        FeedBackMessage.type = uicontrols.Feedback.feedbacktype.success;
 
                         DomainName.Text = "";
                         Languages.SelectedIndex = 0;
-                        updateDomainList();
+                        UpdateDomainList();
 
                         //this is probably the worst webform I've ever seen... 
-                        Response.Redirect("AssignDomain.aspx?id=" + currentID.ToString());
-                    } else {
-						FeedBackMessage.Text = ui.Text("assignDomain", "domainExists", DomainName.Text.Trim(), base.getUser());
-                        FeedBackMessage.type = umbraco.uicontrols.Feedback.feedbacktype.error;
+                        Response.Redirect("AssignDomain.aspx?id=" + _currentId.ToString());
                     }
-                }
-
-                
+                    else
+                    {
+                        FeedBackMessage.Text = ui.Text("assignDomain", "domainExists", DomainName.Text.Trim(), getUser());
+                        FeedBackMessage.type = uicontrols.Feedback.feedbacktype.error;
+                    }
+                }   
             }
         }
 
-        #region Web Form Designer generated code
-
-        protected override void OnInit(EventArgs e)
-        {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
-            base.OnInit(e);
-        }
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-        }
-
-        #endregion
     }
 }
