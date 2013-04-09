@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core.Logging;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.skinning;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic;
@@ -13,39 +14,40 @@ namespace umbraco.presentation.umbraco.dialogs
 {
     public partial class TemplateSkinning : BasePages.UmbracoEnsuredPage
     {
-        private int templateID = 0;
+        private int _templateId = 0;
 
-        private cms.businesslogic.packager.repositories.Repository repo;
-        private string repoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
+        private readonly cms.businesslogic.packager.repositories.Repository _repo;
+        private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
         public TemplateSkinning()
         {
-            repo = cms.businesslogic.packager.repositories.Repository.getByGuid(repoGuid);
+            CurrentApp = DefaultApps.settings.ToString();
+            _repo = cms.businesslogic.packager.repositories.Repository.getByGuid(RepoGuid);
         }
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            templateID = int.Parse(Request["id"]);
-            Template t = new Template(templateID);
+            _templateId = int.Parse(Request["id"]);
+            var t = new Template(_templateId);
 
-            if (Skinning.StarterKitGuid(templateID).HasValue)
+            if (Skinning.StarterKitGuid(_templateId).HasValue)
             {
                 p_apply.Visible = true;
 
-                string currentSkin = Skinning.GetCurrentSkinAlias(templateID);
-                int templateRoot = FindTemplateRoot((CMSNode)t);
+                var currentSkin = Skinning.GetCurrentSkinAlias(_templateId);
+                var templateRoot = FindTemplateRoot(t);
 
                 dd_skins.Items.Add("Choose...");
-                foreach (KeyValuePair<string,string> kvp in Skinning.AllowedSkins(templateRoot))
+                foreach (var kvp in Skinning.AllowedSkins(templateRoot))
                 {
-                    ListItem li = new ListItem(kvp.Value, kvp.Key);
+                    var li = new ListItem(kvp.Value, kvp.Key);
                     if (kvp.Key == currentSkin)
                         li.Selected = true;
 
                     dd_skins.Items.Add(li);
                 }
 
-                if (!string.IsNullOrEmpty(Skinning.GetCurrentSkinAlias(templateID)))
+                if (!string.IsNullOrEmpty(Skinning.GetCurrentSkinAlias(_templateId)))
                 {
                     ph_rollback.Visible = true;
                 }
@@ -56,26 +58,25 @@ namespace umbraco.presentation.umbraco.dialogs
         {
             if (t.ParentId < 0)
                 return t.Id;
-            else
-                return FindTemplateRoot(t.Parent);
+            return FindTemplateRoot(t.Parent);
         }
 
         protected void openRepo(object sender, EventArgs e) {
 
-            Guid? g = Skinning.StarterKitGuid(templateID);
+            var g = Skinning.StarterKitGuid(_templateId);
 
 
-            if (g == null || !Skinning.HasAvailableSkins(templateID))
+            if (g == null || !Skinning.HasAvailableSkins(_templateId))
             {
                 bt_repo.Visible = false;
             }
             else
             {
-                if (repo.HasConnection())
+                if (_repo.HasConnection())
                 {
                     try
                     {
-                        rep_starterKitDesigns.DataSource = repo.Webservice.Skins(g.ToString());
+                        rep_starterKitDesigns.DataSource = _repo.Webservice.Skins(g.ToString());
                         rep_starterKitDesigns.DataBind();
                     }
                     catch (Exception ex)
@@ -84,10 +85,6 @@ namespace umbraco.presentation.umbraco.dialogs
 
                         //ShowConnectionError();
                     }
-                }
-                else
-                {
-                    //ShowConnectionError();
                 }
             }
 
@@ -100,16 +97,16 @@ namespace umbraco.presentation.umbraco.dialogs
         {
             if (((Button)sender).CommandName == "apply")
             {
-                Skin s = Skin.CreateFromName(((Button)sender).CommandArgument);
+                var s = Skin.CreateFromName(((Button)sender).CommandArgument);
                 Skinning.ActivateAsCurrentSkin(s);
 
                 Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())));
             }
             else if (((Button)sender).CommandName == "remove")
             {
-                NodeFactory.Node n = NodeFactory.Node.GetCurrent();
+                var n = NodeFactory.Node.GetCurrent();
 
-                Template t = new Template(n.template);
+                var t = new Template(n.template);
                 Skinning.RollbackSkin(t.Id);
 
                 Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())));
@@ -117,35 +114,29 @@ namespace umbraco.presentation.umbraco.dialogs
             else
             {
 
-                Guid kitGuid = new Guid(((Button)sender).CommandArgument);
+                var kitGuid = new Guid(((Button)sender).CommandArgument);
 
-                cms.businesslogic.packager.Installer installer = new cms.businesslogic.packager.Installer();
-
-                if (repo.HasConnection())
+                if (_repo.HasConnection())
                 {
-                    cms.businesslogic.packager.Installer p = new cms.businesslogic.packager.Installer();
+                    var p = new cms.businesslogic.packager.Installer();
 
-                    string tempFile = p.Import(repo.fetch(kitGuid.ToString()));
+                    var tempFile = p.Import(_repo.fetch(kitGuid.ToString()));
                     p.LoadConfig(tempFile);
-                    int pID = p.CreateManifest(tempFile, kitGuid.ToString(), repoGuid);
+                    var pId = p.CreateManifest(tempFile, kitGuid.ToString(), RepoGuid);
 
-                    p.InstallFiles(pID, tempFile);
-                    p.InstallBusinessLogic(pID, tempFile);
-                    p.InstallCleanUp(pID, tempFile);
+                    p.InstallFiles(pId, tempFile);
+                    p.InstallBusinessLogic(pId, tempFile);
+                    p.InstallCleanUp(pId, tempFile);
 
                     library.RefreshContent();
 
-                    if (cms.businesslogic.skinning.Skinning.GetAllSkins().Count > 0)
+                    if (Skinning.GetAllSkins().Count > 0)
                     {
-                        cms.businesslogic.skinning.Skinning.ActivateAsCurrentSkin(cms.businesslogic.skinning.Skinning.GetAllSkins()[0]);
+                        Skinning.ActivateAsCurrentSkin(Skinning.GetAllSkins()[0]);
                     }
 
 
                     Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())));
-                }
-                else
-                {
-                    //ShowConnectionError();
                 }
             }
         }
@@ -154,34 +145,34 @@ namespace umbraco.presentation.umbraco.dialogs
 
             if (dd_skins.SelectedIndex > 0)
             {
-                Skin s = Skin.CreateFromAlias(dd_skins.SelectedValue);
+                var s = Skin.CreateFromAlias(dd_skins.SelectedValue);
                 Skinning.ActivateAsCurrentSkin(s);
             }
 
         }
         protected void rollback(object sender, EventArgs e) {
 
-            Skinning.RollbackSkin(templateID);
+            Skinning.RollbackSkin(_templateId);
         }
 
         protected void rep_starterKitDesigns_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
             if (e.Item.DataItem != null)
             {
-                cms.businesslogic.packager.repositories.Skin s = (cms.businesslogic.packager.repositories.Skin)e.Item.DataItem;
+                var s = (cms.businesslogic.packager.repositories.Skin)e.Item.DataItem;
 
                 if (Skinning.IsSkinInstalled(s.RepoGuid))
                 {
-                    Button inst = (Button)e.Item.FindControl("Button1");
+                    var inst = (Button)e.Item.FindControl("Button1");
                     inst.Text = "Apply (already downloaded)";
                     inst.CommandName = "apply";
                     inst.CommandArgument = s.Text;
 
                 }
 
-                if (Skin.CreateFromAlias(Skinning.GetCurrentSkinAlias(templateID)).Name == s.Text)
+                if (Skin.CreateFromAlias(Skinning.GetCurrentSkinAlias(_templateId)).Name == s.Text)
                 {
-                    Button inst = (Button)e.Item.FindControl("Button1");
+                    var inst = (Button)e.Item.FindControl("Button1");
                     inst.Text = "Rollback (active skin)";
                     inst.CommandName = "remove";
                     inst.CommandArgument = s.Text;

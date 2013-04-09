@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 
 using System.IO;
+using umbraco.BusinessLogic;
 using umbraco.IO;
 
 namespace umbraco.dialogs
@@ -17,8 +18,13 @@ namespace umbraco.dialogs
 	[Obsolete("Use the ImageViewer user control instead")]
 	public partial class imageViewer : BasePages.UmbracoEnsuredPage
 	{
+
+	    public imageViewer()
+	    {
+	        CurrentApp = DefaultApps.media.ToString();
+	    }
 	
-		protected void Page_Load(object sender, System.EventArgs e)
+		protected void Page_Load(object sender, EventArgs e)
 		{
 			//Response.Write(umbraco.helper.Request("id"));
 			//Response.End();
@@ -28,53 +34,55 @@ namespace umbraco.dialogs
 				if (Request.QueryString["id"] != "")  
 				{
 					//TODO: fix Nasty FAST'N'CANELINE HACK. ..
-					int MediaId = int.Parse(Request.QueryString["id"]);
+					var mediaId = int.Parse(Request.QueryString["id"]);
 					
 					image.Controls.Clear();
-					int fileWidth = 0;
-					int fileHeight = 0;
-					string fileName = "/blank.gif";
-					string altText = "";
+					var fileWidth = 0;
+					var fileHeight = 0;
+					var fileName = "/blank.gif";
+					var altText = "";
 
-					try 
-					{
-						cms.businesslogic.media.Media m = new cms.businesslogic.media.Media(MediaId);
+				    try
+				    {
+				        var m = new cms.businesslogic.media.Media(mediaId);
 
-						// TODO: Remove "Magic strings" from code.
-						try 
-						{
-							fileName = m.getProperty("fileName").Value.ToString();
-						} 
-						catch 
-						{
-							try 
-							{
-								fileName = m.getProperty("umbracoFile").Value.ToString();
-							} 
-							catch 
-							{
-								fileName = m.getProperty("file").Value.ToString();
-							}
-						}
+				        // TODO: Remove "Magic strings" from code.
+				        try
+				        {
+				            fileName = m.getProperty("fileName").Value.ToString();
+				        }
+				        catch
+				        {
+				            try
+				            {
+				                fileName = m.getProperty("umbracoFile").Value.ToString();
+				            }
+				            catch
+				            {
+				                fileName = m.getProperty("file").Value.ToString();
+				            }
+				        }
 
-						altText = m.Text;
-						try 
-							{
-							fileWidth = int.Parse(m.getProperty("umbracoWidth").Value.ToString());
-							fileHeight = int.Parse(m.getProperty("umbracoHeight").Value.ToString());
-							}
-						catch {
-						
-						}
-						string fileNameOrg = fileName;
-						string ext = fileNameOrg.Substring(fileNameOrg.LastIndexOf(".")+1, fileNameOrg.Length-fileNameOrg.LastIndexOf(".")-1);
-						string fileNameThumb = SystemDirectories.Root + fileNameOrg.Replace("."+ext, "_thumb.jpg");
-						image.Controls.Add(new LiteralControl("<a href=\"" + SystemDirectories.Root + fileNameOrg + "\" title=\"Zoom\"><img src=\"" + fileNameThumb + "\" border=\"0\"/></a>"));
-					} 
-					catch {
-					}
+				        altText = m.Text;
+				        try
+				        {
+				            fileWidth = int.Parse(m.getProperty("umbracoWidth").Value.ToString());
+				            fileHeight = int.Parse(m.getProperty("umbracoHeight").Value.ToString());
+				        }
+				        catch
+				        {
 
-                    image.Controls.Add(new LiteralControl("<script>\nparent.updateImageSource('" + SystemDirectories.Root  + fileName.Replace("'", "\\'") + "','" + altText + "','" + fileWidth.ToString() + "','" + fileHeight.ToString() + "')\n</script>"));
+				        }
+				        var fileNameOrg = fileName;
+				        var ext = fileNameOrg.Substring(fileNameOrg.LastIndexOf(".") + 1, fileNameOrg.Length - fileNameOrg.LastIndexOf(".") - 1);
+				        var fileNameThumb = SystemDirectories.Root + fileNameOrg.Replace("." + ext, "_thumb.jpg");
+				        image.Controls.Add(new LiteralControl("<a href=\"" + SystemDirectories.Root + fileNameOrg + "\" title=\"Zoom\"><img src=\"" + fileNameThumb + "\" border=\"0\"/></a>"));
+				    }
+				    catch
+				    {
+				    }
+
+				    image.Controls.Add(new LiteralControl("<script>\nparent.updateImageSource('" + SystemDirectories.Root  + fileName.Replace("'", "\\'") + "','" + altText + "','" + fileWidth.ToString() + "','" + fileHeight.ToString() + "')\n</script>"));
 
 				}
 			}

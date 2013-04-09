@@ -14,6 +14,7 @@ using System.Xml.XPath;
 using Umbraco.Core.IO;
 using Umbraco.Web;
 using umbraco.BasePages;
+using umbraco.BusinessLogic;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using BizLogicAction = umbraco.BusinessLogic.Actions.Action;
@@ -23,14 +24,19 @@ namespace umbraco.presentation.developer.packages
     /// <summary>
     /// Summary description for packager.
     /// </summary>
-    public partial class Installer : BasePages.UmbracoEnsuredPage
+    public partial class Installer : UmbracoEnsuredPage
     {
+        public Installer()
+        {
+            CurrentApp = DefaultApps.developer.ToString();
+        }
+
         private Control _configControl;
         private cms.businesslogic.packager.repositories.Repository _repo;
         private readonly cms.businesslogic.packager.Installer _installer = new cms.businesslogic.packager.Installer();
         private string _tempFileName = "";
 
-        protected void Page_Load(object sender, System.EventArgs e)
+        protected void Page_Load(object sender, EventArgs e)
         {
             var ex = new Exception();
             if (!cms.businesslogic.packager.Settings.HasFileAccess(ref ex))
@@ -311,19 +317,6 @@ namespace umbraco.presentation.developer.packages
 
             Response.Redirect("installer.aspx?installing=businesslogic&dir=" + tempFile.Value + "&pId=" + pId.ToString());
         }
-
-
-        private void DrawConfig()
-        {
-            HideAllPanes();
-
-            _configControl = new System.Web.UI.UserControl().LoadControl(SystemDirectories.Root + helper.Request("config"));
-            _configControl.ID = "packagerConfigControl";
-
-            pane_optional.Controls.Add(_configControl);
-            pane_optional.Visible = true;
-        }
-
 
         private void HideAllPanes()
         {

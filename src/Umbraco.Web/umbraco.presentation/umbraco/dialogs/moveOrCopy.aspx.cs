@@ -3,11 +3,11 @@ using System.Collections;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml;
+using Umbraco.Core.IO;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation;
 using umbraco.cms.businesslogic.media;
-using Umbraco.Core.IO;
 using System.Linq;
 using umbraco.cms.businesslogic;
 using umbraco.cms.presentation.user;
@@ -21,7 +21,14 @@ namespace umbraco.dialogs
     public partial class moveOrCopy : UmbracoEnsuredPage
     {
 
-        protected void Page_Load(object sender, EventArgs e)
+        protected override void OnInit(EventArgs e)
+        {            
+            CurrentApp = Request["app"];
+
+            base.OnInit(e);
+        }
+
+		protected void Page_Load(object sender, EventArgs e)
         {
             JTree.DataBind();
 
@@ -30,10 +37,9 @@ namespace umbraco.dialogs
             {
                 pp_relate.Text = ui.Text("moveOrCopy", "relateToOriginal");
 
-                //Document Type copy Hack...
-                var app = helper.Request("app");
+                //Document Type copy Hack...                
 
-                if (app == "settings")
+                if (CurrentApp == "settings")
                 {
                     pane_form.Visible = false;
                     pane_form_notice.Visible = false;
@@ -48,13 +54,15 @@ namespace umbraco.dialogs
                     masterType.Attributes.Add("style", "width: 350px;");
                     masterType.Items.Add(new ListItem(ui.Text("none") + "...", "0"));
                     foreach (var docT in DocumentType.GetAllAsList())
+                    {
                         masterType.Items.Add(new ListItem(docT.Text, docT.Id.ToString()));
+                    }
 
                     masterType.SelectedValue = documentType.MasterContentType.ToString();
 
-                    //hack to close window if not a doctype...
-                    rename.Text = string.Format("{0} (copy)", documentType.Text);
-                    pane_settings.Text = "Make a copy of the document type '" + documentType.Text + "' and save it under a new name";
+                    rename.Text = dt.Text + " (copy)";
+                    pane_settings.Text = "Make a copy of the document type '" + dt.Text + "' and save it under a new name";
+
                 }
                 else
                 {
@@ -95,7 +103,7 @@ namespace umbraco.dialogs
 
         }
 
-        private bool ValidAction(char actionLetter)
+        private static bool ValidAction(char actionLetter)
         {
             var cmsNode = new CMSNode(int.Parse(helper.Request("id")));
             var currentAction = BusinessLogic.Actions.Action.GetPermissionAssignable().First(a => a.Letter == actionLetter);
@@ -103,7 +111,7 @@ namespace umbraco.dialogs
         }
 
         private bool CheckPermissions(CMSNode node, IAction currentAction)
-        {
+        {                       
             var currUserPermissions = new UserPermissions(CurrentUser);
             var lstCurrUserActions = currUserPermissions.GetExistingNodePermission(node.Id);
 
@@ -118,6 +126,7 @@ namespace umbraco.dialogs
             }
             return true;
         }
+
         //PPH moving multiple nodes and publishing them aswell.
         private void handleChildNodes(cms.businesslogic.web.Document document)
         {
@@ -190,19 +199,18 @@ namespace umbraco.dialogs
 
         public void HandleMoveOrCopy(object sender, EventArgs e)
         {
-            if (UmbracoContext.Current.Request["app"] == "settings")
-                HandleDocumentTypeCopy();
-            else
+	        if (Request["app"] == "settings")
+	            HandleDocumentTypeCopy();
+	        else
                 HandleDocumentMoveOrCopy();
-        }
+	    }
 
         protected override void OnPreRender(EventArgs e)
         {
-            base.OnPreRender(e);
-
-            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/cmsnode.asmx"));
-            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
-        }
+	        base.OnPreRender(e);        
+	        ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/cmsnode.asmx"));
+	        ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
+	    }
 
         private void HandleDocumentMoveOrCopy()
         {
@@ -213,7 +221,7 @@ namespace umbraco.dialogs
 
                 var currentNode = new cms.businesslogic.Content(int.Parse(helper.Request("id")));
 
-                cms.businesslogic.Content newNode = new cms.businesslogic.Content(int.Parse(helper.Request("copyTo")));
+				var newNode = new cms.businesslogic.Content(int.Parse(helper.Request("copyTo")));
 
                 // Check on contenttypes
                 if (int.Parse(helper.Request("copyTo")) == -1)
@@ -254,9 +262,9 @@ namespace umbraco.dialogs
 
                     string[] nodes = { currentNode.Text, newNodeCaption };
 
-                    if (UmbracoContext.Current.Request["mode"] == "cut")
+                    if (Request["mode"] == "cut")
                     {
-                        if (UmbracoContext.Current.Request["app"] == "content")
+                        if (Request["app"] == "content")
                         {
                             //PPH changed this to document instead of cmsNode to handle republishing.
                             var documentId = int.Parse(helper.Request("id"));
@@ -273,7 +281,7 @@ namespace umbraco.dialogs
                             library.ClearLibraryCacheForMedia(media.Id);
                         }
 
-                        feedback.Text = ui.Text("moveOrCopy", "moveDone", nodes, base.getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+                        feedback.Text = ui.Text("moveOrCopy", "moveDone", nodes, getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
                         feedback.type = uicontrols.Feedback.feedbacktype.success;
 
                         // refresh tree
@@ -291,23 +299,5 @@ namespace umbraco.dialogs
             }
         }
 
-        #region Web Form Designer generated code
-        override protected void OnInit(EventArgs e)
-        {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
-            base.OnInit(e);
-        }
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-        }
-        #endregion
     }
 }
