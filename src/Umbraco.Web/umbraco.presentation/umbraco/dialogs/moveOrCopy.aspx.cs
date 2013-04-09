@@ -60,8 +60,8 @@ namespace umbraco.dialogs
 
                     masterType.SelectedValue = documentType.MasterContentType.ToString();
 
-                    rename.Text = dt.Text + " (copy)";
-                    pane_settings.Text = "Make a copy of the document type '" + dt.Text + "' and save it under a new name";
+                    rename.Text = documentType.Text + " (copy)";
+                    pane_settings.Text = "Make a copy of the document type '" + documentType.Text + "' and save it under a new name";
 
                 }
                 else
@@ -79,7 +79,7 @@ namespace umbraco.dialogs
                     var cmsNode = new CMSNode(int.Parse(helper.Request("id")));
 
                     var validAction = true;
-                    if (app == "content" && cmsNode.HasChildren)
+                    if (CurrentApp == "content" && cmsNode.HasChildren)
                         validAction = ValidAction(helper.Request("mode") == "cut" ? 'M' : 'O');
 
 
@@ -103,7 +103,7 @@ namespace umbraco.dialogs
 
         }
 
-        private static bool ValidAction(char actionLetter)
+        private bool ValidAction(char actionLetter)
         {
             var cmsNode = new CMSNode(int.Parse(helper.Request("id")));
             var currentAction = BusinessLogic.Actions.Action.GetPermissionAssignable().First(a => a.Letter == actionLetter);

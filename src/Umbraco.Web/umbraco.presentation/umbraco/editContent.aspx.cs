@@ -280,7 +280,7 @@ namespace umbraco.cms.presentation
             //so we need to 'retrieve' that value and set it on the property of the new IContent object.
             //NOTE This is a workaround for the legacy approach to saving values through the DataType instead of the Property 
             //- (The DataType shouldn't be responsible for saving the value - especically directly to the db).
-            foreach (var item in cControl.DataTypes)
+            foreach (var item in _cControl.DataTypes)
             {
                 _document.getProperty(item.Key).Value = item.Value.Data.Value;
             }
@@ -321,7 +321,7 @@ namespace umbraco.cms.presentation
                     {
                         ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));
 
-                        littPublishStatus.Text = string.Format("{0}: {1}<br/>", ui.Text("content", "lastPublished", base.getUser()), _document.VersionDate.ToString());
+                        _littPublishStatus.Text = string.Format("{0}: {1}<br/>", ui.Text("content", "lastPublished", base.getUser()), _document.VersionDate.ToString());
 
                         if (getUser().GetPermissions(_document.Path).IndexOf("U") > -1)
                             _unPublish.Visible = true;

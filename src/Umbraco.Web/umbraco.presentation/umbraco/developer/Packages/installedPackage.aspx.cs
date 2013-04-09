@@ -15,6 +15,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 using runtimeMacro = umbraco.macro;
 using System.Xml;
@@ -436,7 +437,7 @@ namespace umbraco.presentation.developer.packages
                         if (contentType != null)
                         {
                             contentTypes.Add(contentType);
-                            pack.Data.Documenttypes.Remove(nId.ToString(CultureInfo.InvariantCulture));
+                            _pack.Data.Documenttypes.Remove(nId.ToString(CultureInfo.InvariantCulture));
                             // refresh content cache when document types are removed
                             refreshCache = true;
                         }
