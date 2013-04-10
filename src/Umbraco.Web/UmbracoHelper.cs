@@ -482,17 +482,17 @@ namespace Umbraco.Web
 
 		public dynamic Content(object id)
 		{
-			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
+			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore, new DynamicNull());
 		}
 
 		public dynamic Content(int id)
 		{
-			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
+			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore, new DynamicNull());
 		}
 
 		public dynamic Content(string id)
 		{
-			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
+			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore, new DynamicNull());
 		}
 
 		public dynamic Content(params object[] ids)
@@ -586,17 +586,17 @@ namespace Umbraco.Web
 
 		public dynamic Media(object id)
 		{
-			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
+			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore, new DynamicNull());
 		}
 
 		public dynamic Media(int id)
 		{
-			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
+			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore, new DynamicNull());
 		}
 
 		public dynamic Media(string id)
 		{
-			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
+			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore, new DynamicNull());
 		}
 
 		public dynamic Media(params object[] ids)
@@ -663,7 +663,7 @@ namespace Umbraco.Web
 		{
 			int docId;
 			return int.TryParse(id, out docId)
-				       ? DocumentById(docId, store)
+				       ? DocumentById(docId, store, null)
 				       : null;
 		}
 
@@ -698,35 +698,36 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="id"></param>
 		/// <param name="store"> </param>
+		/// <param name="ifNotFound"> </param>
 		/// <returns></returns>
 		/// <remarks>
 		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass 
 		/// this result in to this method.
 		/// This method will throw an exception if the value is not of type int or string.
 		/// </remarks>
-		private dynamic DocumentById(object id, IPublishedStore store)
+		private dynamic DocumentById(object id, IPublishedStore store, object ifNotFound)
 		{
 			if (id is string)
-				return DocumentById((string)id, store);
+				return DocumentById((string)id, store, ifNotFound);
 			if (id is int)
-				return DocumentById((int)id, store);
+				return DocumentById((int)id, store, ifNotFound);
 			throw new InvalidOperationException("The value of parameter 'id' must be either a string or an integer");
 		}
 
-		private dynamic DocumentById(int id, IPublishedStore store)
+		private dynamic DocumentById(int id, IPublishedStore store, object ifNotFound)
 		{
 			var doc = store.GetDocumentById(UmbracoContext.Current, id);
 			return doc == null
-					? new DynamicNull()
+					? ifNotFound
 					: new DynamicPublishedContent(doc).AsDynamic();
 		}
 
-		private dynamic DocumentById(string id, IPublishedStore store)
+		private dynamic DocumentById(string id, IPublishedStore store, object ifNotFound)
 		{
 			int docId;
 			return int.TryParse(id, out docId)
-				? DocumentById(docId, store)
-				: new DynamicNull();
+				? DocumentById(docId, store, ifNotFound)
+				: ifNotFound;
 		}
 
 		/// <summary>
@@ -742,7 +743,8 @@ namespace Umbraco.Web
 		/// </remarks>
 		private dynamic DocumentByIds(IPublishedStore store, params object[] ids)
 		{
-			var nodes = ids.Select(eachId => DocumentById(eachId, store))
+			var dNull = new DynamicNull();
+			var nodes = ids.Select(eachId => DocumentById(eachId, store, dNull))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
 				.Cast<DynamicPublishedContent>();
 			return new DynamicPublishedContentList(nodes);
@@ -750,7 +752,8 @@ namespace Umbraco.Web
 
 		private dynamic DocumentByIds(IPublishedStore store, params int[] ids)
 		{
-			var nodes = ids.Select(eachId => DocumentById(eachId, store))
+			var dNull = new DynamicNull();
+			var nodes = ids.Select(eachId => DocumentById(eachId, store, dNull))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
 				.Cast<DynamicPublishedContent>();
 			return new DynamicPublishedContentList(nodes);
@@ -758,7 +761,8 @@ namespace Umbraco.Web
 
 		private dynamic DocumentByIds(IPublishedStore store, params string[] ids)
 		{
-			var nodes = ids.Select(eachId => DocumentById(eachId, store))
+			var dNull = new DynamicNull();
+			var nodes = ids.Select(eachId => DocumentById(eachId, store, dNull))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
 				.Cast<DynamicPublishedContent>();
 			return new DynamicPublishedContentList(nodes);
