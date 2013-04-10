@@ -47,6 +47,17 @@ namespace Umbraco.Web.PublishedCache
         IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, bool preview, string xpath, XPathVariable[] vars);
 
         /// <summary>
+        /// Gets a content resulting from an XPath query.
+        /// </summary>
+        /// <param name="umbracoContext">The context.</param>
+        /// <param name="preview">A value indicating whether to consider unpublished content.</param>
+        /// <param name="xpath">The XPath query.</param>
+        /// <param name="vars">Optional XPath variables.</param>
+        /// <returns>The content, or null.</returns>
+        /// <remarks>The value of <paramref name="preview"/> overrides the context.</remarks>
+        IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, bool preview, XPathExpression xpath, XPathVariable[] vars);
+
+        /// <summary>
         /// Gets contents resulting from an XPath query.
         /// </summary>
         /// <param name="umbracoContext">The context.</param>
@@ -56,6 +67,17 @@ namespace Umbraco.Web.PublishedCache
         /// <returns>The contents.</returns>
         /// <remarks>The value of <paramref name="preview"/> overrides the context.</remarks>
         IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, bool preview, string xpath, XPathVariable[] vars);
+
+        /// <summary>
+        /// Gets contents resulting from an XPath query.
+        /// </summary>
+        /// <param name="umbracoContext">The context.</param>
+        /// <param name="preview">A value indicating whether to consider unpublished content.</param>
+        /// <param name="xpath">The XPath query.</param>
+        /// <param name="vars">Optional XPath variables.</param>
+        /// <returns>The contents.</returns>
+        /// <remarks>The value of <paramref name="preview"/> overrides the context.</remarks>
+        IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, bool preview, XPathExpression xpath, XPathVariable[] vars);
 
         /// <summary>
         /// Gets an XPath navigator that can be used to navigate contents.

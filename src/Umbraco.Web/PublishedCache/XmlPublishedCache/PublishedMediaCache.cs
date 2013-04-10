@@ -72,7 +72,17 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             throw new NotImplementedException("PublishedMediaCache does not support XPath.");
         }
 
-	    public virtual IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, bool preview, string xpath, XPathVariable[] vars)
+        public virtual IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, bool preview, XPathExpression xpath, XPathVariable[] vars)
+        {
+            throw new NotImplementedException("PublishedMediaCache does not support XPath.");
+        }
+        
+        public virtual IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, bool preview, string xpath, XPathVariable[] vars)
+        {
+            throw new NotImplementedException("PublishedMediaCache does not support XPath.");
+        }
+
+        public virtual IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, bool preview, XPathExpression xpath, XPathVariable[] vars)
         {
             throw new NotImplementedException("PublishedMediaCache does not support XPath.");
         }

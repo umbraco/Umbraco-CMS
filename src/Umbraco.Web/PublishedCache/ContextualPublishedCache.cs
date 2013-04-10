@@ -80,6 +80,23 @@ namespace Umbraco.Web.PublishedCache
         /// <summary>
         /// Gets a content resulting from an XPath query.
         /// </summary>
+        /// <param name="xpath">The XPath query.</param>
+        /// <param name="vars">Optional XPath variables.</param>
+        /// <returns>The content, or null.</returns>
+        /// <remarks>
+        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single
+        /// value which itself is <c>null</c>, then variables are ignored.</para>
+        /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
+        /// <para>Considers published or unpublished content depending on context.</para>
+        /// </remarks>
+        public IPublishedContent GetSingleByXPath(XPathExpression xpath, params XPathVariable[] vars)
+        {
+            return GetSingleByXPath(UmbracoContext.InPreviewMode, xpath, vars);
+        }
+
+        /// <summary>
+        /// Gets a content resulting from an XPath query.
+        /// </summary>
         /// <param name="preview">A value indicating whether to consider unpublished content.</param>
         /// <param name="xpath">The XPath query.</param>
         /// <param name="vars">Optional XPath variables.</param>
@@ -90,6 +107,20 @@ namespace Umbraco.Web.PublishedCache
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
         public abstract IPublishedContent GetSingleByXPath(bool preview, string xpath, params XPathVariable[] vars);
+
+        /// <summary>
+        /// Gets a content resulting from an XPath query.
+        /// </summary>
+        /// <param name="preview">A value indicating whether to consider unpublished content.</param>
+        /// <param name="xpath">The XPath query.</param>
+        /// <param name="vars">Optional XPath variables.</param>
+        /// <returns>The content, or null.</returns>
+        /// <remarks>
+        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single
+        /// value which itself is <c>null</c>, then variables are ignored.</para>
+        /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
+        /// </remarks>
+        public abstract IPublishedContent GetSingleByXPath(bool preview, XPathExpression xpath, params XPathVariable[] vars);
 
         /// <summary>
         /// Gets content resulting from an XPath query.
@@ -111,6 +142,23 @@ namespace Umbraco.Web.PublishedCache
         /// <summary>
         /// Gets content resulting from an XPath query.
         /// </summary>
+        /// <param name="xpath">The XPath query.</param>
+        /// <param name="vars">Optional XPath variables.</param>
+        /// <returns>The contents.</returns>
+        /// <remarks>
+        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single
+        /// value which itself is <c>null</c>, then variables are ignored.</para>
+        /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
+        /// <para>Considers published or unpublished content depending on context.</para>
+        /// </remarks>
+        public IEnumerable<IPublishedContent> GetByXPath(XPathExpression xpath, params XPathVariable[] vars)
+        {
+            return GetByXPath(UmbracoContext.InPreviewMode, xpath, vars);
+        }
+
+        /// <summary>
+        /// Gets content resulting from an XPath query.
+        /// </summary>
         /// <param name="preview">A value indicating whether to consider unpublished content.</param>
         /// <param name="xpath">The XPath query.</param>
         /// <param name="vars">Optional XPath variables.</param>
@@ -121,6 +169,20 @@ namespace Umbraco.Web.PublishedCache
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
         public abstract IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, params XPathVariable[] vars);
+
+        /// <summary>
+        /// Gets content resulting from an XPath query.
+        /// </summary>
+        /// <param name="preview">A value indicating whether to consider unpublished content.</param>
+        /// <param name="xpath">The XPath query.</param>
+        /// <param name="vars">Optional XPath variables.</param>
+        /// <returns>The contents.</returns>
+        /// <remarks>
+        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single
+        /// value which itself is <c>null</c>, then variables are ignored.</para>
+        /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
+        /// </remarks>
+        public abstract IEnumerable<IPublishedContent> GetByXPath(bool preview, XPathExpression xpath, params XPathVariable[] vars);
 
         /// <summary>
         /// Gets an XPath navigator that can be used to navigate content.

@@ -72,6 +72,23 @@ namespace Umbraco.Web.PublishedCache
         }
 
         /// <summary>
+        /// Gets a content resulting from an XPath query.
+        /// </summary>
+        /// <param name="preview">A value indicating whether to consider unpublished content.</param>
+        /// <param name="xpath">The XPath query.</param>
+        /// <param name="vars">Optional XPath variables.</param>
+        /// <returns>The content, or null.</returns>
+        /// <remarks>
+        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single
+        /// value which itself is <c>null</c>, then variables are ignored.</para>
+        /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
+        /// </remarks>
+        public override IPublishedContent GetSingleByXPath(bool preview, XPathExpression xpath, params XPathVariable[] vars)
+        {
+            return _cache.GetSingleByXPath(UmbracoContext, preview, xpath, vars);
+        }
+
+        /// <summary>
         /// Gets content resulting from an XPath query.
         /// </summary>
         /// <param name="preview">A value indicating whether to consider unpublished content.</param>
@@ -84,6 +101,23 @@ namespace Umbraco.Web.PublishedCache
         /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
         /// </remarks>
         public override IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, params XPathVariable[] vars)
+        {
+            return _cache.GetByXPath(UmbracoContext, preview, xpath, vars);
+        }
+
+        /// <summary>
+        /// Gets content resulting from an XPath query.
+        /// </summary>
+        /// <param name="preview">A value indicating whether to consider unpublished content.</param>
+        /// <param name="xpath">The XPath query.</param>
+        /// <param name="vars">Optional XPath variables.</param>
+        /// <returns>The contents.</returns>
+        /// <remarks>
+        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single
+        /// value which itself is <c>null</c>, then variables are ignored.</para>
+        /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
+        /// </remarks>
+        public override IEnumerable<IPublishedContent> GetByXPath(bool preview, XPathExpression xpath, params XPathVariable[] vars)
         {
             return _cache.GetByXPath(UmbracoContext, preview, xpath, vars);
         }

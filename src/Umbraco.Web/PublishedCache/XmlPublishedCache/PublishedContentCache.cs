@@ -269,10 +269,32 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return ConvertToDocument(node);
         }
 
+        public virtual IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, bool preview, XPathExpression xpath, params XPathVariable[] vars)
+        {
+            if (xpath == null) throw new ArgumentNullException("xpath");
+
+            var xml = GetXml(umbracoContext, preview);
+            var node = vars == null
+                ? xml.SelectSingleNode(xpath)
+                : xml.SelectSingleNode(xpath, vars);
+            return ConvertToDocument(node);
+        }
+
         public virtual IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, bool preview, string xpath, params XPathVariable[] vars)
         {
             if (xpath == null) throw new ArgumentNullException("xpath");
             if (string.IsNullOrWhiteSpace(xpath)) return Enumerable.Empty<IPublishedContent>();
+
+            var xml = GetXml(umbracoContext, preview);
+            var nodes = vars == null
+                ? xml.SelectNodes(xpath)
+                : xml.SelectNodes(xpath, vars);
+            return ConvertToDocuments(nodes);
+        }
+
+        public virtual IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, bool preview, XPathExpression xpath, params XPathVariable[] vars)
+        {
+            if (xpath == null) throw new ArgumentNullException("xpath");
 
             var xml = GetXml(umbracoContext, preview);
             var nodes = vars == null
