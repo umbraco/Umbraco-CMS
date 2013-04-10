@@ -1,24 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
-using System.Xml.XPath;
 
 // source: mvpxml.codeplex.com
 
 namespace Umbraco.Core.Xml
 {
+    /// <summary>
+    /// Provides extensions to XmlNode.
+    /// </summary>
 	internal static class XmlNodeExtensions
 	{
-        static XPathNodeIterator Select(string expression, XPathNavigator source, params XPathVariable[] variables)
-		{
-			var expr = source.Compile(expression);
-			var context = new DynamicContext();
-			foreach (var variable in variables)
-				context.AddVariable(variable.Name, variable.Value);
-			expr.SetContext(context);
-			return source.Select(expr);
-		}
-
         /// <summary>
         /// Selects a list of XmlNode matching an XPath expression.
         /// </summary>
@@ -54,7 +46,7 @@ namespace Umbraco.Core.Xml
             if (variables == null || variables.Length == 0 || variables[0] == null)
                 return source.SelectNodes(expression);
 
-			var iterator = Select(expression, source.CreateNavigator(), variables);
+			var iterator = source.CreateNavigator().Select(expression, variables);
 			return XmlNodeListFactory.CreateNodeList(iterator);
 		}
 
