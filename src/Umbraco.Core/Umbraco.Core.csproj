@@ -765,6 +765,7 @@
     <Compile Include="Xml\XmlNamespaces.cs" />
     <Compile Include="Xml\XmlNodeListFactory.cs" />
     <Compile Include="Xml\XmlNodeExtensions.cs" />
+    <Compile Include="Xml\XPathNavigatorExtensions.cs" />
     <Compile Include="Xml\XPathVariable.cs" />
   </ItemGroup>
   <ItemGroup>

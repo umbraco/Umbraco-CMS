@@ -104,8 +104,9 @@ namespace umbraco.presentation.templateControls
 				if (tempNodeId != null && tempNodeId.Value != 0)
 				{
                     //moved the following from the catch block up as this will allow fallback options alt text etc to work
-				    var xml = ((PublishedContentCache) PublishedContentCacheResolver.Current.ContentCache)
-                        .GetXml(Umbraco.Web.UmbracoContext.Current);
+				    var cache = Umbraco.Web.UmbracoContext.Current.ContentCache.InnerCache as PublishedContentCache;
+                    if (cache == null) throw new InvalidOperationException("Unsupported IPublishedContentCache, only the Xml one is supported.");
+				    var xml = cache.GetXml(Umbraco.Web.UmbracoContext.Current, Umbraco.Web.UmbracoContext.Current.InPreviewMode);
                     var itemPage = new page(xml.GetElementById(tempNodeId.ToString()));
                     tempElementContent = new item(itemPage.Elements, item.LegacyAttributes).FieldContent;
 				}

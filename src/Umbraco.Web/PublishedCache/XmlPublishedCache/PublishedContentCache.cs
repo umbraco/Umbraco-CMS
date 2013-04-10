@@ -27,40 +27,29 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         // for INTERNAL, UNIT TESTS use ONLY
         internal static bool UnitTesting = false;
 
-        /// <summary>
-        /// Gets content identified by a route.
-        /// </summary>
-        /// <param name="umbracoContext">The context.</param>
-        /// <param name="route">The route</param>
-        /// <param name="hideTopLevelNode">A value forcing the HideTopLevelNode setting.</param>
-        /// <returns>The content, or null.</returns>
-        /// <remarks>
-        /// <para>A valid route is either a simple path eg <c>/foo/bar/nil</c> or a root node id and a path, eg <c>123/foo/bar/nil</c>.</para>
-        /// <para>If <param name="hideTopLevelNode" /> is <c>null</c> then the settings value is used.</para>
-        /// </remarks>
-        public virtual IPublishedContent GetByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null)
+        public virtual IPublishedContent GetByRoute(UmbracoContext umbracoContext, bool preview, string route, bool? hideTopLevelNode = null)
         {
             if (route == null) throw new ArgumentNullException("route");
 
             // try to get from cache if not previewing
-            var contentId = umbracoContext.InPreviewMode ? 0 : _routesCache.GetNodeId(route);
+            var contentId = preview ? 0 : _routesCache.GetNodeId(route);
 
             // if found id in cache then get corresponding content
             // and clear cache if not found - for whatever reason
             IPublishedContent content = null;
             if (contentId > 0)
             {
-                content = GetById(umbracoContext, contentId);
+                content = GetById(umbracoContext, preview, contentId);
                 if (content == null)
                     _routesCache.ClearNode(contentId);
             }
 
             // still have nothing? actually determine the id
             hideTopLevelNode = hideTopLevelNode ?? GlobalSettings.HideTopLevelNodeFromPath; // default = settings
-            content = content ?? DetermineIdByRoute(umbracoContext, route, hideTopLevelNode.Value);
+            content = content ?? DetermineIdByRoute(umbracoContext, preview, route, hideTopLevelNode.Value);
 
             // cache if we have a content and not previewing
-            if (content != null && !umbracoContext.InPreviewMode)
+            if (content != null && !preview)
             {
                 var domainRootNodeId = route.StartsWith("/") ? -1 : int.Parse(route.Substring(0, route.IndexOf('/')));
                 var iscanon = !UnitTesting && !DomainHelper.ExistsDomainInPath(DomainHelper.GetAllDomains(false), content.Path, domainRootNodeId);
@@ -72,32 +61,26 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return content;
         }
 
-        /// <summary>
-        /// Gets the route for a content identified by its unique identifier.
-        /// </summary>
-        /// <param name="umbracoContext">The context.</param>
-        /// <param name="contentId">The content unique identifier.</param>
-        /// <returns>The route.</returns>
-        public virtual string GetRouteById(UmbracoContext umbracoContext, int contentId)
+        public virtual string GetRouteById(UmbracoContext umbracoContext, bool preview, int contentId)
         {
             // try to get from cache if not previewing
-            var route = umbracoContext.InPreviewMode ? null : _routesCache.GetRoute(contentId);
+            var route = preview ? null : _routesCache.GetRoute(contentId);
 
             // if found in cache then return
             if (route != null)
                 return route;
 
             // else actually determine the route
-            route = DetermineRouteById(umbracoContext, contentId);
+            route = DetermineRouteById(umbracoContext, preview, contentId);
 
             // cache if we have a route and not previewing
-            if (route != null && !umbracoContext.InPreviewMode)
+            if (route != null && !preview)
                 _routesCache.Store(contentId, route);
 
             return route;
         }
 
-        IPublishedContent DetermineIdByRoute(UmbracoContext umbracoContext, string route, bool hideTopLevelNode)
+        IPublishedContent DetermineIdByRoute(UmbracoContext umbracoContext, bool preview, string route, bool hideTopLevelNode)
         {
             if (route == null) throw new ArgumentNullException("route");
 
@@ -112,7 +95,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             var xpath = CreateXpathQuery(startNodeId, path, hideTopLevelNode, out vars);
 
             //check if we can find the node in our xml cache
-            var content = GetSingleByXPath(umbracoContext, xpath, vars == null ? null : vars.ToArray());
+            var content = GetSingleByXPath(umbracoContext, preview, xpath, vars == null ? null : vars.ToArray());
 
             // if hideTopLevelNodePath is true then for url /foo we looked for /*/foo
             // but maybe that was the url of a non-default top-level node, so we also
@@ -120,15 +103,15 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             if (content == null && hideTopLevelNode && path.Length > 1 && path.IndexOf('/', 1) < 0)
             {
                 xpath = CreateXpathQuery(startNodeId, path, false, out vars);
-                content = GetSingleByXPath(umbracoContext, xpath, vars == null ? null : vars.ToArray());
+                content = GetSingleByXPath(umbracoContext, preview, xpath, vars == null ? null : vars.ToArray());
             }
 
             return content;
         }
 
-        string DetermineRouteById(UmbracoContext umbracoContext, int contentId)
+        string DetermineRouteById(UmbracoContext umbracoContext, bool preview, int contentId)
         {
-            var node = GetById(umbracoContext, contentId);
+            var node = GetById(umbracoContext, preview, contentId);
             if (node == null)
                 return null;
 
@@ -264,52 +247,74 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         #region Getters
 
-        public virtual IPublishedContent GetById(UmbracoContext umbracoContext, int nodeId)
+        public virtual IPublishedContent GetById(UmbracoContext umbracoContext, bool preview, int nodeId)
     	{
-    		return ConvertToDocument(GetXml(umbracoContext).GetElementById(nodeId.ToString()));
+    		return ConvertToDocument(GetXml(umbracoContext, preview).GetElementById(nodeId.ToString(CultureInfo.InvariantCulture)));
     	}
 
-        public virtual IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext)
-		{
-			return (from XmlNode x in GetXml(umbracoContext).SelectNodes(XPathStrings.RootDocuments) select ConvertToDocument(x)).ToList();
+        public virtual IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext, bool preview)
+        {
+            return ConvertToDocuments(GetXml(umbracoContext, preview).SelectNodes(XPathStrings.RootDocuments));
 		}
 
-        public virtual IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, string xpath, params XPathVariable[] vars)
+        public virtual IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, bool preview, string xpath, params XPathVariable[] vars)
         {
             if (xpath == null) throw new ArgumentNullException("xpath");
             if (string.IsNullOrWhiteSpace(xpath)) return null;
 
-            var xml = GetXml(umbracoContext);
+            var xml = GetXml(umbracoContext, preview);
             var node = vars == null
                 ? xml.SelectSingleNode(xpath)
                 : xml.SelectSingleNode(xpath, vars);
             return ConvertToDocument(node);
         }
 
-        public virtual IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, string xpath, params XPathVariable[] vars)
+        public virtual IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, bool preview, XPathExpression xpath, params XPathVariable[] vars)
+        {
+            if (xpath == null) throw new ArgumentNullException("xpath");
+
+            var xml = GetXml(umbracoContext, preview);
+            var node = vars == null
+                ? xml.SelectSingleNode(xpath)
+                : xml.SelectSingleNode(xpath, vars);
+            return ConvertToDocument(node);
+        }
+
+        public virtual IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, bool preview, string xpath, params XPathVariable[] vars)
         {
             if (xpath == null) throw new ArgumentNullException("xpath");
             if (string.IsNullOrWhiteSpace(xpath)) return Enumerable.Empty<IPublishedContent>();
 
-            var xml = GetXml(umbracoContext);
+            var xml = GetXml(umbracoContext, preview);
             var nodes = vars == null
                 ? xml.SelectNodes(xpath)
                 : xml.SelectNodes(xpath, vars);
             return ConvertToDocuments(nodes);
         }
 
-        public virtual bool HasContent()
+        public virtual IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, bool preview, XPathExpression xpath, params XPathVariable[] vars)
         {
-	        var xml = GetXml();
+            if (xpath == null) throw new ArgumentNullException("xpath");
+
+            var xml = GetXml(umbracoContext, preview);
+            var nodes = vars == null
+                ? xml.SelectNodes(xpath)
+                : xml.SelectNodes(xpath, vars);
+            return ConvertToDocuments(nodes);
+        }
+
+        public virtual bool HasContent(UmbracoContext umbracoContext, bool preview)
+        {
+	        var xml = GetXml(umbracoContext, preview);
 			if (xml == null)
 				return false;
 			var node = xml.SelectSingleNode(XPathStrings.RootDocuments);
 			return node != null;
         }
 
-        public virtual XPathNavigator GetXPathNavigator(UmbracoContext umbracoContext)
+        public virtual XPathNavigator GetXPathNavigator(UmbracoContext umbracoContext, bool preview)
         {
-            var xml = GetXml(umbracoContext);
+            var xml = GetXml(umbracoContext, preview);
             return xml.CreateNavigator();
         }
 
@@ -355,14 +360,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
         }
 
-        internal XmlDocument GetXml(UmbracoContext umbracoContext)
+        internal XmlDocument GetXml(UmbracoContext umbracoContext, bool preview)
         {
-            return GetXmlDelegate(umbracoContext.UmbracoUser, umbracoContext.InPreviewMode);
-        }
-
-        internal XmlDocument GetXml()
-        {
-            return GetXmlDelegate(null, false);
+            return GetXmlDelegate(umbracoContext.UmbracoUser, preview);
         }
 
         #endregion

@@ -86,9 +86,9 @@ namespace umbraco.presentation
             var umbracoContext = Umbraco.Web.UmbracoContext.Current;
             var cache = umbracoContext.ContentCache.InnerCache as Umbraco.Web.PublishedCache.XmlPublishedCache.PublishedContentCache;
             if (cache == null)
-                throw new InvalidOperationException("ContentCache is not XmlPublishedCache.PublishedContentCache.");
+                throw new InvalidOperationException("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
-            return cache.GetXml(umbracoContext);
+            return cache.GetXml(umbracoContext, umbracoContext.InPreviewMode);
         }
 
         /// <summary>

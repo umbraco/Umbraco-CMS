@@ -213,5 +213,27 @@ namespace Umbraco.Tests.CoreXml
 
             Assert.AreEqual(5, count);
         }
+
+        [Test]
+        public void OldFrameworkXPathBugIsFixed()
+        {
+            // see http://bytes.com/topic/net/answers/177129-reusing-xpathexpression-multiple-iterations
+
+            var doc = new XmlDocument();
+            doc.LoadXml("<root><a><a1/><a2/></a><b/></root>");
+
+            var nav = doc.CreateNavigator();
+            var expr = nav.Compile("*");
+
+            nav.MoveToFirstChild(); //root
+            var iter1 = nav.Select(expr);
+            iter1.MoveNext(); //root/a
+            var iter2 = iter1.Current.Select(expr);
+            iter2.MoveNext(); // /root/a/a1
+            iter2.MoveNext(); // /root/a/a2
+
+            // used to fail because iter1 and iter2 would conflict
+            Assert.IsTrue(iter1.MoveNext()); //root/b
+        }
     }
 }

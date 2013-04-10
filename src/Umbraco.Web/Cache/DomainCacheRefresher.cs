@@ -48,7 +48,7 @@ namespace Umbraco.Web.Cache
             // are creating a nasty dependency - but keep it like that for the time being while
             // SD is cleaning cache refreshers up.
 
-            var contentCache = PublishedContentCacheResolver.Current.ContentCache as PublishedContentCache;
+            var contentCache = UmbracoContext.Current.ContentCache.InnerCache as PublishedContentCache;
             if (contentCache != null)
                 contentCache.RoutesCache.Clear();
         }

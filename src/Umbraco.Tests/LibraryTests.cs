@@ -94,8 +94,8 @@ namespace Umbraco.Tests
 		private string LegacyGetItem(int nodeId, string alias)
 		{
             var cache = UmbracoContext.Current.ContentCache.InnerCache as PublishedContentCache;
-            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the legacy one is supported.");
-            var umbracoXML = cache.GetXml(UmbracoContext.Current); // = UmbracoContext.Current.GetXml();
+            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
+            var umbracoXML = cache.GetXml(UmbracoContext.Current, UmbracoContext.Current.InPreviewMode);
 
             string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data [@alias='{0}']" : "./{0}";
 			if (umbracoXML.GetElementById(nodeId.ToString()) != null)

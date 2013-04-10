@@ -20,7 +20,6 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
@@ -277,8 +276,9 @@ namespace Umbraco.Web
             PropertyEditorValueConvertersResolver.Current.RemoveType<TinyMcePropertyEditorValueConverter>();
             PropertyEditorValueConvertersResolver.Current.AddType<RteMacroRenderingPropertyEditorValueConverter>();
 
-            PublishedContentCacheResolver.Current = new PublishedContentCacheResolver(new PublishedContentCache());
-            PublishedMediaCacheResolver.Current = new PublishedMediaCacheResolver(new PublishedMediaCache());
+            PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
+                new PublishedCache.XmlPublishedCache.PublishedContentCache(),
+                new PublishedCache.XmlPublishedCache.PublishedMediaCache()));
 
             FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
                 // add all known factories, devs can then modify this list on application
@@ -313,7 +313,8 @@ namespace Umbraco.Web
 
             SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
 
-            PublishedContentCache.UnitTesting = _isForTesting;
+            // ain't that a bit dirty?
+            PublishedCache.XmlPublishedCache.PublishedContentCache.UnitTesting = _isForTesting;
 
             ThumbnailProvidersResolver.Current = new ThumbnailProvidersResolver(
                 PluginManager.Current.ResolveThumbnailProviders());

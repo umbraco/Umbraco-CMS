@@ -11,8 +11,6 @@ namespace Umbraco.Web.PublishedCache
     /// </summary>
     public class ContextualPublishedMediaCache : ContextualPublishedCache
     {
-        private readonly IPublishedMediaCache _cache;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ContextualPublishedMediaCache"/> class with a published media cache and a context.
         /// </summary>
@@ -20,8 +18,6 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="umbracoContext">A context.</param>
         internal ContextualPublishedMediaCache(IPublishedMediaCache cache, UmbracoContext umbracoContext)
             : base(umbracoContext, cache)
-        {
-            _cache = cache;
-        }
+        { }
     }
 }

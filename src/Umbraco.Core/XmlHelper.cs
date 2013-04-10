@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.Xml.XPath;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core
@@ -14,6 +15,28 @@ namespace Umbraco.Core
     /// </summary>
     public class XmlHelper
     {
+        /// <summary>
+        /// Gets a value indicating whether a specified string contains only xml whitespace characters.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <returns><c>true</c> if the string contains only xml whitespace characters.</returns>
+        /// <remarks>As per XML 1.1 specs, space, \t, \r and \n.</remarks>
+        public static bool IsXmlWhitespace(string s)
+        {
+            // as per xml 1.1 specs - anything else is significant whitespace
+            s = s.Trim(' ', '\t', '\r', '\n');
+            return s.Length == 0;
+        }
+
+        /// <summary>
+        /// Creates a new <c>XPathDocument</c> from an xml string.
+        /// </summary>
+        /// <param name="xml">The xml string.</param>
+        /// <returns>An <c>XPathDocument</c> created from the xml string.</returns>
+        public static XPathDocument CreateXPathDocument(string xml)
+        {
+            return new XPathDocument(new XmlTextReader(new StringReader(xml)));
+        }
 
         public static string StripDashesInElementOrAttributeNames(string xml)
         {

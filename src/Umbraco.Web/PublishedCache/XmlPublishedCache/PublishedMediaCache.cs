@@ -47,12 +47,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	    private readonly BaseSearchProvider _searchProvider;
         private readonly BaseIndexProvider _indexProvider;
 
-        public virtual IPublishedContent GetById(UmbracoContext umbracoContext, int nodeId)
+        public virtual IPublishedContent GetById(UmbracoContext umbracoContext, bool preview, int nodeId)
 		{
 			return GetUmbracoMedia(nodeId);
 		}
 
-		public IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext)
+		public virtual IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext, bool preview)
 		{
 			var rootMedia = global::umbraco.cms.businesslogic.media.Media.GetRootMedias();
 			var result = new List<IPublishedContent>();
@@ -67,22 +67,32 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			return result;
 		}
 
-        public IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, string xpath, XPathVariable[] vars)
+        public virtual IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, bool preview, string xpath, XPathVariable[] vars)
         {
             throw new NotImplementedException("PublishedMediaCache does not support XPath.");
         }
 
-        public IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, string xpath, XPathVariable[] vars)
+        public virtual IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, bool preview, XPathExpression xpath, XPathVariable[] vars)
+        {
+            throw new NotImplementedException("PublishedMediaCache does not support XPath.");
+        }
+        
+        public virtual IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, bool preview, string xpath, XPathVariable[] vars)
         {
             throw new NotImplementedException("PublishedMediaCache does not support XPath.");
         }
 
-        public virtual XPathNavigator GetXPathNavigator(UmbracoContext umbracoContext)
+        public virtual IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, bool preview, XPathExpression xpath, XPathVariable[] vars)
         {
             throw new NotImplementedException("PublishedMediaCache does not support XPath.");
         }
 
-        public bool HasContent() { throw new NotImplementedException(); }
+        public virtual XPathNavigator GetXPathNavigator(UmbracoContext umbracoContext, bool preview)
+        {
+            throw new NotImplementedException("PublishedMediaCache does not support XPath.");
+        }
+
+        public virtual bool HasContent(UmbracoContext context, bool preview) { throw new NotImplementedException(); }
 
         private ExamineManager GetExamineManagerSafe()
 		{
