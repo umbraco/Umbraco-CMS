@@ -4,12 +4,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4
 	ProjectSection(SolutionItems) = preProject
 		..\build\Build.bat = ..\build\Build.bat
 		..\build\Build.proj = ..\build\Build.proj
+		..\build\RevertToCleanInstall.bat = ..\build\RevertToCleanInstall.bat
 		umbraco.presentation.targets = umbraco.presentation.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-184C-4005-A5F3-E705D92FC645}"
 	ProjectSection(SolutionItems) = preProject
-		..\docs\IronPython License.Rtf = ..\docs\IronPython License.Rtf
 		..\docs\License.txt = ..\docs\License.txt
 		..\docs\README.txt = ..\docs\README.txt
 	EndProjectSection
