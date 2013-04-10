@@ -19,10 +19,11 @@ namespace Umbraco.Core.Sync
     {
         private readonly Func<Tuple<string, string>> _getUserNamePasswordDelegate;
         private volatile bool _hasResolvedDelegate = false;
-        private readonly object _locker = new object();
-        private string _login;
-        private string _password;
+        private readonly object _locker = new object();        
         private bool _useDistributedCalls;
+
+        protected string Login { get; private set; }
+        protected string Password{ get; private set; }
 
         /// <summary>
         /// Without a username/password all distribuion will be disabled
@@ -43,8 +44,8 @@ namespace Umbraco.Core.Sync
             if (password == null) throw new ArgumentNullException("password");
 
             _useDistributedCalls = UmbracoSettings.UseDistributedCalls;
-            _login = login;
-            _password = password;
+            Login = login;
+            Password = password;
         }
 
         /// <summary>
@@ -202,22 +203,22 @@ namespace Umbraco.Core.Sync
                             var result = _getUserNamePasswordDelegate();
                             if (result == null)
                             {
-                                _login = null;
-                                _password = null;
+                                Login = null;
+                                Password = null;
                                 _useDistributedCalls = false;
                             }
                             else
                             {
-                                _login = result.Item1;
-                                _password = result.Item2;
+                                Login = result.Item1;
+                                Password = result.Item2;
                                 _useDistributedCalls = UmbracoSettings.UseDistributedCalls;    
                             }
                         }
                         catch (Exception ex)
                         {
                             LogHelper.Error<DefaultServerMessenger>("Could not resolve username/password delegate, server distribution will be disabled", ex);
-                            _login = null;
-                            _password = null;
+                            Login = null;
+                            Password = null;
                             _useDistributedCalls = false;
                         }
                     }
@@ -385,12 +386,12 @@ namespace Umbraco.Core.Sync
                             case MessageType.RefreshByJson:
                                 asyncResultsList.Add(
                                     cacheRefresher.BeginRefreshByJson(
-                                        refresher.UniqueIdentifier, jsonPayload, _login, _password, null, null));
+                                        refresher.UniqueIdentifier, jsonPayload, Login, Password, null, null));
                                 break;
                             case MessageType.RefreshAll:
                                 asyncResultsList.Add(
                                     cacheRefresher.BeginRefreshAll(
-                                        refresher.UniqueIdentifier, _login, _password, null, null));
+                                        refresher.UniqueIdentifier, Login, Password, null, null));
                                 break;
                             case MessageType.RefreshById:
                                 if (idArrayType == null)
@@ -403,7 +404,7 @@ namespace Umbraco.Core.Sync
                                     var serializer = new JavaScriptSerializer();
                                     var jsonIds = serializer.Serialize(ids.Cast<int>().ToArray());
                                     //we support bulk loading of Integers 
-                                    var result = cacheRefresher.BeginRefreshByIds(refresher.UniqueIdentifier, jsonIds, _login, _password, null, null);
+                                    var result = cacheRefresher.BeginRefreshByIds(refresher.UniqueIdentifier, jsonIds, Login, Password, null, null);
                                     asyncResultsList.Add(result);
                                 }
                                 else
@@ -412,7 +413,7 @@ namespace Umbraco.Core.Sync
                                     //so we'll just iterate
                                     asyncResultsList.AddRange(
                                         ids.Select(i => cacheRefresher.BeginRefreshByGuid(
-                                            refresher.UniqueIdentifier, (Guid)i, _login, _password, null, null)));
+                                            refresher.UniqueIdentifier, (Guid)i, Login, Password, null, null)));
                                 }
 
                                 break;
@@ -420,7 +421,7 @@ namespace Umbraco.Core.Sync
                                 //we don't currently support bulk removing so we'll iterate
                                 asyncResultsList.AddRange(
                                         ids.Select(i => cacheRefresher.BeginRemoveById(
-                                            refresher.UniqueIdentifier, (int)i, _login, _password, null, null)));
+                                            refresher.UniqueIdentifier, (int)i, Login, Password, null, null)));
                                 break;
                         }
                     }
