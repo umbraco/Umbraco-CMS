@@ -24,7 +24,7 @@ namespace umbraco.presentation.umbraco.webservices
 
         public bool IsReusable
         {
-            get { return true; }
+            get { return false; }
         }
 
         public void ProcessRequest(HttpContext context)
@@ -240,10 +240,14 @@ namespace umbraco.presentation.umbraco.webservices
                 if (isValid)
                     AuthenticatedUser = user;
             }
-            else if (User.GetCurrent() != null)
+            else
             {
-                isValid = true;
-                AuthenticatedUser = User.GetCurrent();
+                var usr = User.GetCurrent();
+                if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID) && usr != null)
+                {
+                    isValid = true;
+                    AuthenticatedUser = usr;    
+                }
             }
 
             return isValid;

@@ -6,13 +6,13 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
-using umbraco.IO;
-using System.Web.UI;
+using Umbraco.Core;
 
 namespace umbraco.BasePages
 {
@@ -196,16 +196,17 @@ namespace umbraco.BasePages
         //[Obsolete("Use Umbraco.Web.Security.WebSecurity.ValidateUserContextId instead")]
         public static bool ValidateUserContextID(string currentUmbracoUserContextID)
         {
-            if ((currentUmbracoUserContextID != ""))
+            if (!currentUmbracoUserContextID.IsNullOrWhiteSpace())
             {
-                int uid = GetUserId(currentUmbracoUserContextID);
-                long timeout = GetTimeout(currentUmbracoUserContextID);
+                var uid = GetUserId(currentUmbracoUserContextID);
+                var timeout = GetTimeout(currentUmbracoUserContextID);
 
                 if (timeout > DateTime.Now.Ticks)
                 {
                     return true;
                 }
 	            var user = BusinessLogic.User.GetUser(uid);
+                //TODO: We don't actually log anyone out here, not sure why we're logging ??
 				LogHelper.Info<BasePage>("User {0} (Id:{1}) logged out", () => user.Name, () => user.Id);
             }
             return false;

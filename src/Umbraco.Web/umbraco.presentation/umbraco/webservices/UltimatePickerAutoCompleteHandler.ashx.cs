@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Services;
+using Umbraco.Web.WebServices;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic;
 
@@ -13,19 +15,24 @@ namespace umbraco.presentation.umbraco.webservices
     /// </summary>
     [WebService(Namespace = "http://tempuri.org/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
-    public class UltimatePickerAutoCompleteHandler : IHttpHandler
+    public class UltimatePickerAutoCompleteHandler : UmbracoAuthorizedHttpHandler
     {
 
-        private int nodeCount;
-        private int Counter;
-        private string[] output;
-        private string prefix;
+        private int _nodeCount;
+        private int _counter;
+        private string[] _output;
+        private string _prefix;
 
-        public void ProcessRequest(HttpContext context)
+        public override void ProcessRequest(HttpContext context)
         {
+            //user must be allowed to see content or media
+            if (!AuthorizeRequest(DefaultApps.content.ToString()) && !AuthorizeRequest(DefaultApps.media.ToString()))
+                return;
+
+
             context.Response.ContentType = "text/plain";
 
-            prefix = context.Request.QueryString["q"];
+            _prefix = context.Request.QueryString["q"];
 
             int parentNodeId = Convert.ToInt32(context.Request.QueryString["id"]);
             bool showGrandChildren = Convert.ToBoolean(context.Request.QueryString["showchildren"]);
@@ -37,7 +44,7 @@ namespace umbraco.presentation.umbraco.webservices
             CMSNode parent = new CMSNode(parentNodeId);
             if (!showGrandChildren)
             {
-                nodeCount = 0;
+                _nodeCount = 0;
 
                 //store children array here because iterating over an Array property object is very inneficient.
                 var children = parent.Children;
@@ -45,42 +52,42 @@ namespace umbraco.presentation.umbraco.webservices
                 {
 
 
-                    nodeChildrenCount(child, false, documentAliasFilters);
+                    NodeChildrenCount(child, false, documentAliasFilters);
 
                 }
 
-                output = new string[nodeCount];
+                _output = new string[_nodeCount];
 
-                Counter = 0;
+                _counter = 0;
                 int level = 1;
 
                 //why is there a 2nd iteration of the same thing here?
                 foreach (CMSNode child in children)
                 {
 
-                    addNode(child, level, showGrandChildren, documentAliasFilters);
+                    AddNode(child, level, showGrandChildren, documentAliasFilters);
                 }
 
 
             }
             else
             {
-                nodeCount = 0;
+                _nodeCount = 0;
 
                 //store children array here because iterating over an Array property object is very inneficient.
                 var children = parent.Children;
                 foreach (CMSNode child in children)
                 {
-                    nodeChildrenCount(child, true, documentAliasFilters);
+                    NodeChildrenCount(child, true, documentAliasFilters);
                 }
 
-                output = new string[nodeCount];
-                Counter = 0;
+                _output = new string[_nodeCount];
+                _counter = 0;
                 int level = 1;
 
                 foreach (CMSNode child in children)
                 {
-                    addNode(child, level, showGrandChildren, documentAliasFilters);
+                    AddNode(child, level, showGrandChildren, documentAliasFilters);
                 }
 
 
@@ -88,21 +95,21 @@ namespace umbraco.presentation.umbraco.webservices
             }
 
 
-            foreach (string item in output)
+            foreach (string item in _output)
             {
                 context.Response.Write(item + Environment.NewLine);
             }
         }
 
-        private bool validNode(string nodeText)
+        private bool ValidNode(string nodeText)
         {
 
 
-            if (nodeText.Length >= prefix.Length)
+            if (nodeText.Length >= _prefix.Length)
             {
 
 
-                if (nodeText.Substring(0, prefix.Length).ToLower() == prefix.ToLower())
+                if (nodeText.Substring(0, _prefix.Length).ToLower() == _prefix.ToLower())
                 {
                     return true;
                 }
@@ -111,7 +118,7 @@ namespace umbraco.presentation.umbraco.webservices
             return false;
         }
 
-        private void nodeChildrenCount(CMSNode node, bool countChildren, string[] documentAliasFilters)
+        private void NodeChildrenCount(CMSNode node, bool countChildren, string[] documentAliasFilters)
         {
             if (documentAliasFilters.Length > 0)
             {
@@ -123,9 +130,9 @@ namespace umbraco.presentation.umbraco.webservices
 
                     if (new Document(node.Id).ContentType.Alias == trimmedFilter || trimmedFilter == string.Empty)
                     {
-                        if (validNode(node.Text))
+                        if (ValidNode(node.Text))
                         {
-                            nodeCount += 1;
+                            _nodeCount += 1;
                         }
 
                     }
@@ -133,9 +140,9 @@ namespace umbraco.presentation.umbraco.webservices
             }
             else
             {
-                if (validNode(node.Text))
+                if (ValidNode(node.Text))
                 {
-                    nodeCount += 1;
+                    _nodeCount += 1;
                 }
             }
 
@@ -145,13 +152,13 @@ namespace umbraco.presentation.umbraco.webservices
                 var children = node.Children;
                 foreach (CMSNode child in children)
                 {
-                    nodeChildrenCount(child, countChildren, documentAliasFilters);
+                    NodeChildrenCount(child, countChildren, documentAliasFilters);
                 }
             }
 
         }
 
-        private void addNode(CMSNode node, int level, bool showGrandChildren, string[] documentAliasFilters)
+        private void AddNode(CMSNode node, int level, bool showGrandChildren, string[] documentAliasFilters)
         {
 
             string preText = string.Empty;
@@ -170,10 +177,10 @@ namespace umbraco.presentation.umbraco.webservices
 
                     if (new Document(node.Id).ContentType.Alias == trimmedFilter || trimmedFilter == string.Empty)
                     {
-                        if (validNode(node.Text))
+                        if (ValidNode(node.Text))
                         {
-                            output[Counter] = preText + node.Text + " [" + node.Id + "]";
-                            Counter++;
+                            _output[_counter] = preText + node.Text + " [" + node.Id + "]";
+                            _counter++;
                         }
                     }
 
@@ -181,10 +188,10 @@ namespace umbraco.presentation.umbraco.webservices
             }
             else
             {
-                if (validNode(node.Text))
+                if (ValidNode(node.Text))
                 {
-                    output[Counter] = preText + node.Text + " [" + node.Id + "]";
-                    Counter++;
+                    _output[_counter] = preText + node.Text + " [" + node.Id + "]";
+                    _counter++;
                 }
             }
 
@@ -196,13 +203,13 @@ namespace umbraco.presentation.umbraco.webservices
                     var children = node.Children;
                     foreach (CMSNode child in children)
                     {
-                        addNode(child, level + 1, showGrandChildren, documentAliasFilters);
+                        AddNode(child, level + 1, showGrandChildren, documentAliasFilters);
                     }
                 }
             }
         }
 
-        public bool IsReusable
+        public override bool IsReusable
         {
             get
             {

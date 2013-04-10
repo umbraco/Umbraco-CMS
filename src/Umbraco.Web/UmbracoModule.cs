@@ -4,10 +4,10 @@ using System.Linq;
 using System.Web;
 using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
 using umbraco;
-using umbraco.IO;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Web.Configuration;
@@ -30,6 +30,16 @@ namespace Umbraco.Web
 		/// <param name="httpContext"></param>
 		void BeginRequest(HttpContextBase httpContext)
 		{
+            //we need to set the initial url in our ApplicationContext, this is so our keep alive service works and this must
+            //exist on a global context because the keep alive service doesn't run in a web context.
+            //we are NOT going to put a lock on this because locking will slow down the application and we don't really care
+            //if two threads write to this at the exact same time during first page hit.
+            //see: http://issues.umbraco.org/issue/U4-2059
+            if (ApplicationContext.Current.OriginalRequestUrl.IsNullOrWhiteSpace())
+            {
+                ApplicationContext.Current.OriginalRequestUrl = string.Format("{0}:{1}{2}", httpContext.Request.ServerVariables["SERVER_NAME"], httpContext.Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl(SystemDirectories.Umbraco));
+            }
+
 			// do not process if client-side request
 			if (IsClientSideRequest(httpContext.Request.Url))
 				return;

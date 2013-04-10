@@ -65,7 +65,7 @@ namespace Umbraco.Web.UI.Install
             {
                 var result = Security.ValidateCurrentUser(new HttpContextWrapper(Context));
                 
-                if (result == ValidateUserAttempt.FailedTimedOut || result == ValidateUserAttempt.FailedNoPrivileges)
+                if (result == ValidateRequestAttempt.FailedTimedOut || result == ValidateRequestAttempt.FailedNoPrivileges)
                 {
                     Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl));
                 }

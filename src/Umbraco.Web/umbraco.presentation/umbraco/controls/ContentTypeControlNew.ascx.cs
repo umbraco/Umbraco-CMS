@@ -13,6 +13,7 @@ using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
@@ -262,29 +263,18 @@ namespace umbraco.controls
             var dirInfo = new DirectoryInfo(UmbracoContext.Current.Server.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
             var fileInfo = dirInfo.GetFiles();
 
-            var spriteFileNames = new List<string>();
-            foreach (var iconClass in cms.businesslogic.CMSNode.DefaultIconClasses)
-                spriteFileNames.Add(IconClassToIconFileName(iconClass));
+            var spriteFileNames = CMSNode.DefaultIconClasses.Select(IconClassToIconFileName).ToList();
 
-            var diskFileNames = new List<string>();
-            foreach (var file in fileInfo)
-                diskFileNames.Add(FileNameToIconFileName(file));
+            var diskFileNames = fileInfo.Select(FileNameToIconFileName).ToList();
             
             var listOfIcons = new List<ListItem>();
 
-            foreach (var iconClass in cms.businesslogic.CMSNode.DefaultIconClasses)
+            // .sprNew was never intended to be in the document type editor
+            foreach (var iconClass in CMSNode.DefaultIconClasses.Where(iconClass => iconClass.Equals(".sprNew", StringComparison.InvariantCultureIgnoreCase) == false))
             {
-                // .sprNew was never intended to be in the document type editor
-                if (iconClass.ToLowerInvariant() == ".sprNew".ToLowerInvariant())
-                    continue;
-
-                if (_contentType.IconUrl == iconClass)
-                {
-                    AddSpriteListItem(iconClass, listOfIcons);
-                    continue;
-                }
-
-                if (UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideSpriteDuplicates
+                // Still shows the selected even if we tell it to hide sprite duplicates so as not to break an existing selection
+                if (_contentType.IconUrl.Equals(iconClass, StringComparison.InvariantCultureIgnoreCase) == false 
+                    && UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideSpriteDuplicates 
                     && diskFileNames.Contains(IconClassToIconFileName(iconClass)))
                     continue;
                 
@@ -297,16 +287,13 @@ namespace umbraco.controls
                 if (file.Name.ToLowerInvariant() == "sprites.png".ToLowerInvariant() || file.Name.ToLowerInvariant() == "sprites_ie6.gif".ToLowerInvariant())
                     continue;
 
-                var listItemValue = this.ResolveClientUrl(SystemDirectories.Umbraco + "/images/umbraco/" + file.Name);
-                if (_contentType.IconUrl == listItemValue)
-                {
-                    AddFileListItem(file.Name, listItemValue, listOfIcons);
-                    continue;
-                }
-
-                if (UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates
+                // Still shows the selected even if we tell it to hide file duplicates so as not to break an existing selection
+                if (_contentType.IconUrl.Equals(file.Name, StringComparison.InvariantCultureIgnoreCase) == false
+                    && UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates
                     && spriteFileNames.Contains(FileNameToIconFileName(file)))
                     continue;
+
+                var listItemValue = ResolveClientUrl(SystemDirectories.Umbraco + "/images/umbraco/" + file.Name);
 
                 AddFileListItem(file.Name, listItemValue, listOfIcons);
             }

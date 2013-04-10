@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Web;
 using System.Web.Services;
+using Umbraco.Web.WebServices;
 using umbraco.cms.presentation.Trees;
 using System.Threading;
 
@@ -13,19 +14,18 @@ namespace umbraco.presentation.webservices
 	[WebService(Namespace = "http://tempuri.org/")]
 	[WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 	[System.ComponentModel.ToolboxItem(false)]
-	public class TreeDataService : IHttpHandler
+	public class TreeDataService : UmbracoAuthorizedHttpHandler
 	{
 
-		public void ProcessRequest(HttpContext context)
+		public override void ProcessRequest(HttpContext context)
 		{
-			Authorize();
-            //Thread.Sleep(100000);
+			AuthorizeRequest(true);
 			context.Response.ContentType = "application/json";
 			context.Response.Write(GetXmlTree().ToString());
 
 		}
 
-		public bool IsReusable
+		public override bool IsReusable
 		{
 			get
 			{
@@ -33,6 +33,7 @@ namespace umbraco.presentation.webservices
 			}
 		}
 
+        [Obsolete("Use the base class AuthorizeRequest methods in UmbracoAuthorizedHttpHandler")]
 		public static void Authorize()
 		{
 			if (!BasePages.BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
@@ -46,7 +47,10 @@ namespace umbraco.presentation.webservices
 		/// <returns></returns>
 		public XmlTree GetXmlTree()
 		{
-			TreeRequestParams treeParams = TreeRequestParams.FromQueryStrings();
+			var treeParams = TreeRequestParams.FromQueryStrings();
+
+            //validate the current user for the request app!
+            AuthorizeRequest(treeParams.Application, true);
 
 			if (string.IsNullOrEmpty(treeParams.TreeType))
 				if (!string.IsNullOrEmpty(treeParams.Application))
@@ -56,16 +60,16 @@ namespace umbraco.presentation.webservices
 			else
 				LoadTree(treeParams);
 
-			return xTree;
+			return _xTree;
 		}
 
-		private XmlTree xTree = new XmlTree();
+		private XmlTree _xTree = new XmlTree();
 
 		/// <summary>
 		/// If the application supports multiple trees, then this function iterates over all of the trees assigned to it
 		/// and creates their top level nodes and context menus.
 		/// </summary>
-		/// <param name="appAlias"></param>
+        /// <param name="treeParams"></param>
 		private void LoadAppTrees(TreeRequestParams treeParams)
 		{
 			//find all tree definitions that have the current application alias
@@ -75,15 +79,14 @@ namespace umbraco.presentation.webservices
 			{
 				BaseTree bTree = treeDef.CreateInstance();
 				bTree.SetTreeParameters(treeParams);
-				xTree.Add(bTree.RootNode);
+				_xTree.Add(bTree.RootNode);
 			}
 		}
 
 		/// <summary>
 		/// This will load the particular ITree object and call it's render method to get the nodes that need to be rendered.
 		/// </summary>
-		/// <param name="appAlias"></param>
-		/// <param name="treeAlias"></param>
+        /// <param name="treeParams"></param>
 		private void LoadTree(TreeRequestParams treeParams)
 		{
 
@@ -93,7 +96,7 @@ namespace umbraco.presentation.webservices
 			{
 				BaseTree bTree = treeDef.CreateInstance();
 				bTree.SetTreeParameters(treeParams);
-				bTree.Render(ref xTree);
+				bTree.Render(ref _xTree);
 			}
 			else
 				LoadNullTree(treeParams);
@@ -106,7 +109,7 @@ namespace umbraco.presentation.webservices
 		{
 			BaseTree nullTree = new NullTree(treeParams.Application);
 			nullTree.SetTreeParameters(treeParams);
-			nullTree.Render(ref xTree);
+			nullTree.Render(ref _xTree);
 		}
 	}
 }

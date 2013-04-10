@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Web;
 using System.Web.Services;
+using Umbraco.Web.WebServices;
 using umbraco.presentation.umbraco.controls;
 using umbraco.cms.presentation.Trees;
 using System.Web.Script.Services;
@@ -18,7 +19,7 @@ namespace umbraco.presentation.webservices
 	/// </summary>
 	[ScriptService]
 	[WebService]
-	public class TreeClientService : WebService
+    public class TreeClientService : UmbracoAuthorizedWebService
 	{
 
 		/// <summary>
@@ -29,9 +30,9 @@ namespace umbraco.presentation.webservices
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
 		public Dictionary<string, string> GetInitAppTreeData(string app, string treeType, bool showContextMenu, bool isDialog, TreeDialogModes dialogMode, string functionToCall, string nodeKey)
 		{
-			Authorize();
+		    AuthorizeRequest(app, true);
 
-			TreeControl treeCtl = new TreeControl()
+			var treeCtl = new TreeControl()
 			{
                 ShowContextMenu = showContextMenu,
                 IsDialog = isDialog,
@@ -43,7 +44,7 @@ namespace umbraco.presentation.webservices
                 FunctionToCall = string.IsNullOrEmpty(functionToCall) ? "" : functionToCall
 			};
 
-			Dictionary<string, string> returnVal = new Dictionary<string, string>();
+			var returnVal = new Dictionary<string, string>();
 
             if (string.IsNullOrEmpty(treeType))
             {
@@ -65,7 +66,7 @@ namespace umbraco.presentation.webservices
                 //tree.StartNodeID =
 
                 //now render it's start node
-                XmlTree xTree = new XmlTree();
+                var xTree = new XmlTree();
                 xTree.Add(tree.RootNode);
                 returnVal.Add("json", xTree.ToString());
             }
@@ -74,13 +75,13 @@ namespace umbraco.presentation.webservices
 			returnVal.Add("js", treeCtl.JSCurrApp);
 
 			return returnVal;
-		}	
+		}
 
+        [Obsolete("Use the AuthorizeRequest methods on the base class UmbracoAuthorizedWebService instead")]
 		public static void Authorize()
 		{
 			if (!BasePages.BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
 				throw new Exception("Client authorization failed. User is not logged in");
-
 		}
 
 	}

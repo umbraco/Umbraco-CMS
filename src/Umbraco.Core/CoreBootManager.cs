@@ -223,9 +223,6 @@ namespace Umbraco.Core
 			ActionsResolver.Current = new ActionsResolver(
 				() => PluginManager.Current.ResolveActions());
 
-            MacroPropertyTypeResolver.Current = new MacroPropertyTypeResolver(
-                PluginManager.Current.ResolveMacroPropertyTypes());
-
             //the database migration objects
             MigrationResolver.Current = new MigrationResolver(
                 () => PluginManager.Current.ResolveMigrationTypes());

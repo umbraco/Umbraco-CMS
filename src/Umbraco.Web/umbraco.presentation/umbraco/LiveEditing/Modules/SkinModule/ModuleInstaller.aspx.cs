@@ -4,33 +4,36 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.packager;
 
 namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 {
     public partial class ModuleInstaller : BasePages.UmbracoEnsuredPage
     {
-        private cms.businesslogic.packager.repositories.Repository repo;
-        private string repoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
-
+        private readonly cms.businesslogic.packager.repositories.Repository _repo;
+        private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
         public ModuleInstaller()
         {
-            this.repo = cms.businesslogic.packager.repositories.Repository.getByGuid(this.repoGuid);
+            _repo = cms.businesslogic.packager.repositories.Repository.getByGuid(RepoGuid);
+            //for skinning, you need to be a developer
+            CurrentApp = DefaultApps.developer.ToString();
         }
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if(!string.IsNullOrEmpty(Request["guid"])){
+            if (!string.IsNullOrEmpty(Request["guid"]))
+            {
 
-                Guid guid = new Guid(Request["guid"]);
+                var guid = new Guid(Request["guid"]);
 
-                if (this.repo.HasConnection())
+                if (_repo.HasConnection())
                 {
-                    Installer installer = new Installer();
-                    string tempDir = installer.Import(this.repo.fetch(guid.ToString()));
+                    var installer = new Installer();
+                    var tempDir = installer.Import(_repo.fetch(guid.ToString()));
                     installer.LoadConfig(tempDir);
-                    int packageId = installer.CreateManifest(tempDir, guid.ToString(), this.repoGuid);
+                    var packageId = installer.CreateManifest(tempDir, guid.ToString(), RepoGuid);
                     installer.InstallFiles(packageId, tempDir);
                     installer.InstallBusinessLogic(packageId, tempDir);
                     installer.InstallCleanUp(packageId, tempDir);
@@ -39,9 +42,9 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                     library.RefreshContent();
 
                     if (cms.businesslogic.skinning.Skinning.IsPackageInstalled(new Guid(Request["guid"])) ||
-                    cms.businesslogic.skinning.Skinning.IsPackageInstalled(Request["name"]))
+                        cms.businesslogic.skinning.Skinning.IsPackageInstalled(Request["name"]))
                     {
-                       Response.Write(cms.businesslogic.skinning.Skinning.GetModuleAlias(Request["name"]));
+                        Response.Write(cms.businesslogic.skinning.Skinning.GetModuleAlias(Request["name"]));
                     }
                     else
                     {

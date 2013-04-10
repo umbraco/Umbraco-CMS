@@ -10,8 +10,10 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 
 using System.Reflection;
+using Umbraco.Core.IO;
+using umbraco.BusinessLogic;
 using umbraco.DataLayer;
-using umbraco.IO;
+using umbraco.businesslogic.Exceptions;
 
 namespace umbraco.dialogs
 {
@@ -20,8 +22,18 @@ namespace umbraco.dialogs
 	/// </summary>
 	public partial class insertMacro : BasePages.UmbracoEnsuredPage
 	{
-		protected System.Web.UI.WebControls.Button Button1;
-		protected void Page_Load(object sender, System.EventArgs e)
+		protected Button Button1;
+
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            //this could be used for media or content so we need to at least validate that the user has access to one or the other
+            if (!ValidateUserApp(DefaultApps.content.ToString()) && !ValidateUserApp(DefaultApps.media.ToString()))
+                throw new UserAuthorizationException("The current user doesn't have access to the section/app");
+        }
+
+		protected void Page_Load(object sender, EventArgs e)
 		{
             pane_edit.Text = ui.Text("general", "edit",this.getUser()) + " " + ui.Text("general", "macro",this.getUser());
             pane_insert.Text = ui.Text("general", "insert",this.getUser()) + " " + ui.Text("general", "macro",this.getUser());
@@ -31,27 +43,24 @@ namespace umbraco.dialogs
 				// Put user code to initialize the page here
 				cms.businesslogic.macro.Macro m;
 				if (helper.Request("macroID") != "")
-					m = new umbraco.cms.businesslogic.macro.Macro(int.Parse(helper.Request("macroID")));
+					m = new cms.businesslogic.macro.Macro(int.Parse(helper.Request("macroID")));
 				else
 					m = cms.businesslogic.macro.Macro.GetByAlias(helper.Request("macroAlias"));
 
-				String macroAssembly = "";
-				String macroType = "";
-
-				foreach (cms.businesslogic.macro.MacroProperty mp in m.Properties) {
+			    foreach (var mp in m.Properties) {
 		
-					macroAssembly = mp.Type.Assembly;
-					macroType = mp.Type.Type;
+					var macroAssembly = mp.Type.Assembly;
+					var macroType = mp.Type.Type;
 					try 
 					{
 
-                        Assembly assembly = Assembly.LoadFrom( IOHelper.MapPath(SystemDirectories.Bin + "/" + macroAssembly + ".dll"));
+                        var assembly = Assembly.LoadFrom( IOHelper.MapPath(SystemDirectories.Bin + "/" + macroAssembly + ".dll"));
 
 						Type type = assembly.GetType(macroAssembly+"."+macroType);
-						interfaces.IMacroGuiRendering typeInstance = Activator.CreateInstance(type) as interfaces.IMacroGuiRendering;
+						var typeInstance = Activator.CreateInstance(type) as interfaces.IMacroGuiRendering;
 						if (typeInstance != null) 
 						{
-							Control control = Activator.CreateInstance(type) as Control;	
+							var control = Activator.CreateInstance(type) as Control;	
 							control.ID = mp.Alias;
 							if (Request[mp.Alias] != null) 
 							{
@@ -62,7 +71,7 @@ namespace umbraco.dialogs
 							}
 
 							// register alias
-                            umbraco.uicontrols.PropertyPanel pp = new umbraco.uicontrols.PropertyPanel();
+                            var pp = new uicontrols.PropertyPanel();
                             pp.Text = mp.Name;
                             pp.Controls.Add(control);
 
@@ -103,29 +112,6 @@ namespace umbraco.dialogs
 
 			}
 
-
-
-
 		}
-
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
-
-		}
-		#endregion
 	}
 }

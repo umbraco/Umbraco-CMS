@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Services;
 using System.Web.Script.Services;
+using Umbraco.Web.WebServices;
 
 namespace umbraco.presentation.webservices
 {
@@ -14,15 +15,17 @@ namespace umbraco.presentation.webservices
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
     [ScriptService]
-    public class MacroContainerService : System.Web.Services.WebService
+    public class MacroContainerService : UmbracoAuthorizedWebService
     {
 
         [WebMethod(EnableSession = true)]
         [ScriptMethod]
         public void SetSortOrder(string id, string sortorder)
         {
-            HttpContext.Current.Session[id + "sortorder"] = sortorder;
-
+            if (AuthorizeRequest())
+            {
+                HttpContext.Current.Session[id + "sortorder"] = sortorder;    
+            }
         }
     }
 }

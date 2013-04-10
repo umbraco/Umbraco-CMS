@@ -1,6 +1,7 @@
 <%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master" Title="ShowUmbracoTags"
     Codebehind="ShowUmbracoTags.aspx.cs" AutoEventWireup="True"
   Inherits="umbraco.cms.presentation.settings.modal.ShowUmbracoTags" %>
+<%@ Import Namespace="Umbraco.Core.IO" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
@@ -44,9 +45,9 @@
               </td></tr>
               <tr><th width="120">MetaBlogApi / Content Channels</th><td>
               <code>
-              &lt;link rel="EditURI" type="application/rsd+xml" href="http://<%=Request.ServerVariables["SERVER_NAME"] %><%= umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)%>/channels/rsd.aspx" /&gt;
+              &lt;link rel="EditURI" type="application/rsd+xml" href="http://<%=Request.ServerVariables["SERVER_NAME"] %><%= IOHelper.ResolveUrl(SystemDirectories.Umbraco)%>/channels/rsd.aspx" /&gt;
               <br /><br />
-              &lt;link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://<%=Request.ServerVariables["SERVER_NAME"] %><%= umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)%>/channels/wlwmanifest.aspx" /&gt;
+              &lt;link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://<%=Request.ServerVariables["SERVER_NAME"] %><%= IOHelper.ResolveUrl(SystemDirectories.Umbraco)%>/channels/wlwmanifest.aspx" /&gt;
               </code>
               <small>
               Insert the above two elements to the head element to gain optimal support for

@@ -9,7 +9,6 @@ namespace umbraco.webservices.maintenance
     [ToolboxItem(false)]
     public class maintenanceService : BaseWebService
     {
-
         override public Services Service
         {
             get
@@ -24,7 +23,7 @@ namespace umbraco.webservices.maintenance
             // We check if services are enabled and user has access
             Authenticate(username, password);
 
-            Version thisVersion = new Version(0, 9);
+            var thisVersion = new Version(0, 10);
             return Convert.ToString(thisVersion);
         }
 
@@ -36,6 +35,5 @@ namespace umbraco.webservices.maintenance
 
             System.Web.HttpRuntime.UnloadAppDomain();
         }
-
     }
 }

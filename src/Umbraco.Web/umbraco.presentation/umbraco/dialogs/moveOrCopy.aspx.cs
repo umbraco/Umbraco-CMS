@@ -3,11 +3,11 @@ using System.Collections;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml;
+using Umbraco.Core.IO;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation;
 using umbraco.cms.businesslogic.media;
-using Umbraco.Core.IO;
 using System.Linq;
 using umbraco.cms.businesslogic;
 using umbraco.cms.presentation.user;
@@ -23,7 +23,14 @@ namespace umbraco.dialogs
     public partial class moveOrCopy : UmbracoEnsuredPage
     {
 
-        protected void Page_Load(object sender, EventArgs e)
+        protected override void OnInit(EventArgs e)
+        {            
+            CurrentApp = Request["app"];
+
+            base.OnInit(e);
+        }
+
+		protected void Page_Load(object sender, EventArgs e)
         {
             JTree.DataBind();
 
@@ -32,10 +39,9 @@ namespace umbraco.dialogs
             {
                 pp_relate.Text = ui.Text("moveOrCopy", "relateToOriginal");
 
-                //Document Type copy Hack...
-                var app = Request.GetItemAsString("app");
+                //Document Type copy Hack...                
 
-                if (app == Constants.Applications.Settings)
+                if (CurrentApp == Constants.Applications.Settings)
                 {
                     pane_form.Visible = false;
                     pane_form_notice.Visible = false;
@@ -50,13 +56,15 @@ namespace umbraco.dialogs
                     masterType.Attributes.Add("style", "width: 350px;");
                     masterType.Items.Add(new ListItem(ui.Text("none") + "...", "0"));
                     foreach (var docT in DocumentType.GetAllAsList())
+                    {
                         masterType.Items.Add(new ListItem(docT.Text, docT.Id.ToString()));
+                    }
 
                     masterType.SelectedValue = documentType.MasterContentType.ToString();
 
-                    //hack to close window if not a doctype...
-                    rename.Text = string.Format("{0} (copy)", documentType.Text);
+                    rename.Text = documentType.Text + " (copy)";
                     pane_settings.Text = "Make a copy of the document type '" + documentType.Text + "' and save it under a new name";
+
                 }
                 else
                 {
@@ -73,7 +81,7 @@ namespace umbraco.dialogs
                     var cmsNode = new CMSNode(int.Parse(Request.GetItemAsString("id")));
 
                     var validAction = true;
-                    if (app == Constants.Applications.Content && cmsNode.HasChildren)
+                    if (CurrentApp == Constants.Applications.Content && cmsNode.HasChildren)
                         validAction = ValidAction(Request.GetItemAsString("mode") == "cut" ? 'M' : 'O');
 
 
@@ -105,7 +113,7 @@ namespace umbraco.dialogs
         }
 
         private bool CheckPermissions(CMSNode node, IAction currentAction)
-        {
+        {                       
             var currUserPermissions = new UserPermissions(CurrentUser);
             var lstCurrUserActions = currUserPermissions.GetExistingNodePermission(node.Id);
 
@@ -120,6 +128,7 @@ namespace umbraco.dialogs
             }
             return true;
         }
+
         
 
         //PPH Handle doctype copies..
@@ -179,18 +188,17 @@ namespace umbraco.dialogs
         public void HandleMoveOrCopy(object sender, EventArgs e)
         {
             if (Request["app"] == Constants.Applications.Settings)
-                HandleDocumentTypeCopy();
-            else
+	            HandleDocumentTypeCopy();
+	        else
                 HandleDocumentMoveOrCopy();
-        }
+	    }
 
         protected override void OnPreRender(EventArgs e)
         {
-            base.OnPreRender(e);
-
-            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/cmsnode.asmx"));
-            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
-        }
+	        base.OnPreRender(e);        
+	        ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/cmsnode.asmx"));
+	        ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
+	    }
 
         private void HandleDocumentMoveOrCopy()
         {

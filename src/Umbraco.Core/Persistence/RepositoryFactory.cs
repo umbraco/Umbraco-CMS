@@ -76,13 +76,6 @@ namespace Umbraco.Core.Persistence
                 InMemoryCacheProvider.Current);
         }
 
-		internal virtual IMacroRepository CreateMacroRepository(IUnitOfWork uow)
-        {
-            return new MacroRepository(
-                uow,
-                InMemoryCacheProvider.Current);
-        }
-
         public virtual IMediaRepository CreateMediaRepository(IDatabaseUnitOfWork uow)
         {
             return new MediaRepository(

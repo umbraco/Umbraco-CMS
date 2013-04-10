@@ -9,11 +9,16 @@ using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web.UI.Pages;
+using umbraco.BusinessLogic;
 
 namespace Umbraco.Web.UI.Umbraco.Developer.Packages
 {
     public partial class DirectoryBrowser : UmbracoEnsuredPage
     {
+        public DirectoryBrowser()
+        {
+            CurrentApp = DefaultApps.developer.ToString();
+        }
 
         string _lsTitle;
         string _lsLink;

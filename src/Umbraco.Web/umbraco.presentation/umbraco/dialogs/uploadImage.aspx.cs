@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 
 using System.Xml;
+using umbraco.BusinessLogic;
 using umbraco.IO;
 
 namespace umbraco.dialogs
@@ -17,6 +18,9 @@ namespace umbraco.dialogs
 	[Obsolete("Use the UploadMediaImage control instead")]
 	public partial class uploadImage : BasePages.UmbracoEnsuredPage
 	{
-   
+	    public uploadImage()
+	    {
+	        CurrentApp = DefaultApps.media.ToString();
+	    }
 	}
 }

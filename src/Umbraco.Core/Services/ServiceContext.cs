@@ -15,7 +15,6 @@ namespace Umbraco.Core.Services
         private Lazy<ContentService> _contentService;
         private Lazy<UserService> _userService;
         private Lazy<MediaService> _mediaService;
-        private Lazy<MacroService> _macroService;
         private Lazy<ContentTypeService> _contentTypeService;
         private Lazy<DataTypeService> _dataTypeService;
         private Lazy<FileService> _fileService;
@@ -61,9 +60,6 @@ namespace Umbraco.Core.Services
 
             if(_mediaService == null)
                 _mediaService = new Lazy<MediaService>(() => new MediaService(provider, repositoryFactory.Value));
-
-            if(_macroService == null)
-				_macroService = new Lazy<MacroService>(() => new MacroService(fileProvider, repositoryFactory.Value));
 
             if(_contentTypeService == null)
 				_contentTypeService = new Lazy<ContentTypeService>(() => new ContentTypeService(provider, repositoryFactory.Value, _contentService.Value, _mediaService.Value));
@@ -154,14 +150,6 @@ namespace Umbraco.Core.Services
         public PackagingService PackagingService
         {
             get { return _packagingService.Value; }
-        }
-
-        /// <summary>
-        /// Gets the <see cref="IMacroService"/>
-        /// </summary>
-        internal IMacroService MacroService
-        {
-			get { return _macroService.Value; }
         }
 
         /// <summary>

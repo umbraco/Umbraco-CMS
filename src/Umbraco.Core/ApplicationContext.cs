@@ -123,6 +123,18 @@ namespace Umbraco.Core
             }
         }
 
+        /// <summary>
+        /// The original/first url that the web application executes
+        /// </summary>
+        /// <remarks>
+        /// we need to set the initial url in our ApplicationContext, this is so our keep alive service works and this must
+        /// exist on a global context because the keep alive service doesn't run in a web context.
+        /// we are NOT going to put a lock on this because locking will slow down the application and we don't really care
+        /// if two threads write to this at the exact same time during first page hit.
+        /// see: http://issues.umbraco.org/issue/U4-2059
+        /// </remarks>
+        internal string OriginalRequestUrl { get; set; }
+
 		private bool Configured
 		{
 			get
@@ -162,7 +174,6 @@ namespace Umbraco.Core
 				}
 			}			
 		}
-
 
         private void AssertIsReady()
         {

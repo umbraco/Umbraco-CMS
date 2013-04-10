@@ -28,9 +28,10 @@ namespace Umbraco.Web.UI.Pages
 
             try
             {
-                ValidateUser();
+                Security.ValidateCurrentUser(new HttpContextWrapper(Context), true);
+                _hasValidated = true;
 
-                if (!ValidateUserApp(CurrentApp))
+                if (!Security.ValidateUserApp(CurrentApp))
                 {
                     var ex = new UserAuthorizationException(String.Format("The current user doesn't have access to the section/app '{0}'", CurrentApp));
                     LogHelper.Error<UmbracoEnsuredPage>(String.Format("Tried to access '{0}'", CurrentApp), ex);
@@ -68,37 +69,6 @@ namespace Umbraco.Web.UI.Pages
         /// If true then umbraco will force any window/frame to reload umbraco in the main window
         /// </summary>
         protected bool RedirectToUmbraco { get; set; }
-
-        /// <summary>
-        /// Validates the user for access to a certain application
-        /// </summary>
-        /// <param name="app">The application alias.</param>
-        /// <returns></returns>
-        private bool ValidateUserApp(string app)
-        {
-            //if it is empty, don't validate
-            if (app.IsNullOrWhiteSpace())
-            {
-                return true;
-            }
-            return Security.CurrentUser.Applications.Any(uApp => uApp.alias == app);
-        }
-
-        private void ValidateUser()
-        {
-            //validate the current user, if failed then throw exceptions
-            var attempt = Security.ValidateCurrentUser(new HttpContextWrapper(Context));
-            _hasValidated = true;
-            switch (attempt)
-            {
-                case ValidateUserAttempt.FailedNoPrivileges:
-                    throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
-                case ValidateUserAttempt.FailedTimedOut:
-                    throw new ArgumentException("User has timed out!!");
-                case ValidateUserAttempt.FailedNoContextId:
-                    throw new InvalidOperationException("The user has no umbraco contextid - try logging in");
-            }            
-        }
         
         /// <summary>
         /// Returns the current user
@@ -107,7 +77,13 @@ namespace Umbraco.Web.UI.Pages
         {
             get
             {
-                if (!_hasValidated) ValidateUser();
+                //throw exceptions if not valid (true)
+                if (!_hasValidated)
+                {
+                    Security.ValidateCurrentUser(new HttpContextWrapper(Context), true);
+                    _hasValidated = true;
+                }
+                
                 return Security.CurrentUser;
             }
         }

@@ -53,18 +53,16 @@ namespace umbraco.cms.businesslogic.datatype
         {
             get
             {
-                if (_controlId != Guid.Empty)
-                {
-                    cms.businesslogic.datatype.controls.Factory f = new cms.businesslogic.datatype.controls.Factory();
-                    interfaces.IDataType dt = f.DataType(_controlId);
+                if (_controlId == Guid.Empty) 
+                    return null;
+                
+                controls.Factory factory = new controls.Factory();
+                var dt = factory.DataType(_controlId);
+
+                if (dt != null)
                     dt.DataTypeDefinitionId = Id;
 
-                    return dt;
-                }
-                else
-                {
-                    return null;
-                }
+                return dt;
             }
             set
             {
