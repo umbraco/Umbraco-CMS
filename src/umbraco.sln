@@ -1,7 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F0242771-6DE6-4E03-BD3A-7B79BA79105B}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}"
 	ProjectSection(SolutionItems) = preProject
 		..\build\Build.bat = ..\build\Build.bat
@@ -12,12 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-184C-4005-A5F3-E705D92FC645}"
 	ProjectSection(SolutionItems) = preProject
-		..\docs\4.5-changelog.docx = ..\docs\4.5-changelog.docx
-		..\docs\GettingStarted.txt = ..\docs\GettingStarted.txt
 		..\docs\IronPython License.Rtf = ..\docs\IronPython License.Rtf
 		..\docs\License.txt = ..\docs\License.txt
 		..\docs\README.txt = ..\docs\README.txt
-		..\docs\ReleaseNotes.txt = ..\docs\ReleaseNotes.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.UI", "Umbraco.Web.UI\Umbraco.Web.UI.csproj", "{4C4C194C-B5E4-4991-8F87-4373E24CC19F}"
