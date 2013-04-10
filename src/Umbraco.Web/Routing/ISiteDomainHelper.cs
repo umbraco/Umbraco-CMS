@@ -8,7 +8,7 @@ namespace Umbraco.Web.Routing
     /// <summary>
     /// Provides utilities to handle site domains.
     /// </summary>
-    internal interface ISiteDomainHelper
+    public interface ISiteDomainHelper
     {
         /// <summary>
         /// Filters a list of <c>DomainAndUri</c> to pick one that best matches the current request.

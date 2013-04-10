@@ -3,7 +3,7 @@
     /// <summary>
     /// Provides extension methods to StringAliasCaseType to facilitate migration to CleanStringType.
     /// </summary>
-    internal static class StringAliasCaseTypeExtensions
+    public static class StringAliasCaseTypeExtensions
     {
         /// <summary>
         /// Gets the CleanStringType value corresponding to the StringAliasCaseType value.

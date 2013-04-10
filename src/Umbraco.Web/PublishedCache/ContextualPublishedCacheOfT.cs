@@ -12,7 +12,7 @@ namespace Umbraco.Web.PublishedCache
     /// Provides access to cached contents in a specified context.
     /// </summary>
     /// <typeparam name="T">The type of the underlying published cache.</typeparam>
-    internal abstract class ContextualPublishedCache<T> : ContextualPublishedCache
+    public abstract class ContextualPublishedCache<T> : ContextualPublishedCache
         where T : IPublishedCache
     {
         private readonly T _cache;

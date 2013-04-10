@@ -16,7 +16,7 @@ namespace Umbraco.Core.Strings
     /// <para>Full-unicode support is probably not so good.</para>
     /// <para>NOTE: pre-filters run _before_ the string is re-encoded.</para>
     /// </remarks>
-    internal class DefaultShortStringHelper : IShortStringHelper
+    public class DefaultShortStringHelper : IShortStringHelper
     {
         #region Ctor and vars
 
@@ -237,7 +237,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <para>The string will be cleaned in the context of the default culture.</para>
         /// <para>Safe aliases are Ascii only.</para>
         /// </remarks>
-        public string CleanStringForSafeAlias(string text)
+        public virtual string CleanStringForSafeAlias(string text)
         {
             return CleanString(text, CleanStringType.Ascii | CleanStringType.CamelCase | CleanStringType.Alias);
         }
@@ -251,7 +251,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <remarks>
         /// <para>Safe aliases are Ascii only.</para>
         /// </remarks>
-        public string CleanStringForSafeAlias(string text, CultureInfo culture)
+        public virtual string CleanStringForSafeAlias(string text, CultureInfo culture)
         {
             return CleanString(text, CleanStringType.Ascii | CleanStringType.CamelCase | CleanStringType.Alias, culture);
         }
@@ -265,7 +265,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <para>The string will be cleaned in the context of the default culture.</para>
         /// <para>Url segments are Ascii only (no accents...).</para>
         /// </remarks>
-        public string CleanStringForUrlSegment(string text)
+        public virtual string CleanStringForUrlSegment(string text)
         {
             return CleanString(text, CleanStringType.Ascii | CleanStringType.LowerCase | CleanStringType.Url, '-');
         }
@@ -279,7 +279,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <remarks>
         /// <para>Url segments are Ascii only (no accents...).</para>
         /// </remarks>
-        public string CleanStringForUrlSegment(string text, CultureInfo culture)
+        public virtual string CleanStringForUrlSegment(string text, CultureInfo culture)
         {
             return CleanString(text, CleanStringType.Ascii | CleanStringType.LowerCase | CleanStringType.Url, '-', culture);
         }
@@ -402,7 +402,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <param name="separator">The separator.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
-        public string CleanString(string text, CleanStringType stringType, char separator, CultureInfo culture)
+        public virtual string CleanString(string text, CleanStringType stringType, char separator, CultureInfo culture)
         {
             var config = GetConfig(stringType & CleanStringType.RoleMask, culture);
             return CleanString(text, stringType, separator, culture, config);
@@ -838,7 +838,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <param name="separator">The separator, which defaults to a whitespace.</param>
         /// <returns>The splitted text.</returns>
         /// <remarks>Supports Utf8 and Ascii strings, not Unicode strings.</remarks>
-        public string SplitPascalCasing(string text, char separator)
+        public virtual string SplitPascalCasing(string text, char separator)
         {
             // be safe
             if (text == null)
@@ -892,7 +892,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <returns>The filtered string.</returns>
         /// <remarks>If <paramref name="stringType"/> is not <c>Unicode</c> then non-utf8 characters are
         /// removed. If it is <c>Ascii</c> we try to do some intelligent replacement of accents, etc.</remarks>
-        public string Recode(string text, CleanStringType stringType)
+        public virtual string Recode(string text, CleanStringType stringType)
         {
             // be safe
             if (text == null)
@@ -939,7 +939,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <param name="text">The string to filter.</param>
         /// <param name="replacements">The replacements definition.</param>
         /// <returns>The filtered string.</returns>
-        public string ReplaceMany(string text, IDictionary<string, string> replacements)
+        public virtual string ReplaceMany(string text, IDictionary<string, string> replacements)
         {
             // be safe
             if (text == null)

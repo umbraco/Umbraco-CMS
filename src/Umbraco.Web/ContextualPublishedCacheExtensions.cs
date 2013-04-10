@@ -10,7 +10,7 @@ namespace Umbraco.Web
     /// <summary>
     /// Provides extension methods to ContextualPublishedCache.
     /// </summary>
-    internal static class ContextualPublishedCacheExtensions
+    public static class ContextualPublishedCacheExtensions
     {
         /// <summary>
         /// Gets a dynamic content identified by its unique identifier.

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Umbraco.Web.PublishedCache
 {
-    internal interface IPublishedMediaCache : IPublishedCache
+    public interface IPublishedMediaCache : IPublishedCache
     {
     }
 }

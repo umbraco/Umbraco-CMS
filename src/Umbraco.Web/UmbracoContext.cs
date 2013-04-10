@@ -235,12 +235,12 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets or sets the published content cache.
         /// </summary>
-        internal ContextualPublishedContentCache ContentCache { get; private set; }
+        public ContextualPublishedContentCache ContentCache { get; private set; }
 
         /// <summary>
         /// Gets or sets the published media cache.
         /// </summary>
-        internal ContextualPublishedMediaCache MediaCache { get; private set; }
+        public ContextualPublishedMediaCache MediaCache { get; private set; }
 
         /// <summary>
 		/// Boolean value indicating whether the current request is a front-end umbraco request

@@ -10,7 +10,7 @@ namespace Umbraco.Core.Configuration
     /// A case-insensitive configuration converter for enumerations.
     /// </summary>
     /// <typeparam name="T">The type of the enumeration.</typeparam>
-    internal class CaseInsensitiveEnumConfigConverter<T> : ConfigurationConverterBase
+    public class CaseInsensitiveEnumConfigConverter<T> : ConfigurationConverterBase
         where T : struct
     {
         public override object ConvertFrom(ITypeDescriptorContext ctx, CultureInfo ci, object data)

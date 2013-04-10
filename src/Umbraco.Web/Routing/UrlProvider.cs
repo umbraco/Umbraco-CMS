@@ -9,7 +9,7 @@ namespace Umbraco.Web.Routing
     /// <summary>
     /// Provides urls.
     /// </summary>
-    internal class UrlProvider
+    public class UrlProvider
     {
         #region Ctor and configuration
 
@@ -18,7 +18,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="urlProviders">The list of url providers.</param>
-        public UrlProvider(UmbracoContext umbracoContext, IEnumerable<IUrlProvider> urlProviders)
+        internal UrlProvider(UmbracoContext umbracoContext, IEnumerable<IUrlProvider> urlProviders)
         {
             _umbracoContext = umbracoContext;
             _urlProviders = urlProviders;

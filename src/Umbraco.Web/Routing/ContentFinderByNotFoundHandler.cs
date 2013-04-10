@@ -8,7 +8,7 @@ namespace Umbraco.Web.Routing
 	/// Provides an implementation of <see cref="IContentFinder"/> that runs a legacy NotFoundHandler.
 	/// </summary>
 	/// <remarks>Provided for backward compatibility.</remarks>
-	internal class ContentFinderByNotFoundHandler<THandler> : IContentFinder
+	public class ContentFinderByNotFoundHandler<THandler> : IContentFinder
 	{
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.

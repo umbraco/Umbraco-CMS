@@ -7,7 +7,7 @@ namespace Umbraco.Web.Routing
 	/// <summary>
     /// Resolves IPublishedContentFinder objects.
 	/// </summary>
-	internal sealed class ContentFinderResolver : ManyObjectsResolverBase<ContentFinderResolver, IContentFinder>
+	public sealed class ContentFinderResolver : ManyObjectsResolverBase<ContentFinderResolver, IContentFinder>
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ContentFinderResolver"/> class with an initial list of finder types.
