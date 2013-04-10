@@ -284,6 +284,9 @@
     <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />
+    <Compile Include="Standalone\StandaloneApplication.cs" />
+    <Compile Include="Standalone\StandaloneBootManager.cs" />
+    <Compile Include="Standalone\StandaloneHttpContext.cs" />
     <Compile Include="Dynamics\DynamicExpression.cs" />
     <Compile Include="Dynamics\DynamicGrouping.cs" />
     <Compile Include="Dynamics\DynamicPublishedContentIdEqualityComparer.cs" />
