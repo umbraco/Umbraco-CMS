@@ -9,7 +9,7 @@ namespace Umbraco.Web.PublishedCache
     /// <summary>
     /// Provides access to cached medias in a specified context.
     /// </summary>
-    public class ContextualPublishedMediaCache : ContextualPublishedCache
+    public class ContextualPublishedMediaCache : ContextualPublishedCache<IPublishedMediaCache>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ContextualPublishedMediaCache"/> class with a published media cache and a context.

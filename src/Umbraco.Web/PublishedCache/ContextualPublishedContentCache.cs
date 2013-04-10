@@ -9,7 +9,7 @@ namespace Umbraco.Web.PublishedCache
     /// <summary>
     /// Provides access to cached documents in a specified context.
     /// </summary>
-    public class ContextualPublishedContentCache : ContextualPublishedCache
+    public class ContextualPublishedContentCache : ContextualPublishedCache<IPublishedContentCache>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ContextualPublishedContentCache"/> class with a published content cache and a context.

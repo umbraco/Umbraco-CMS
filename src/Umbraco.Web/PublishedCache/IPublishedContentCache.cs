@@ -7,7 +7,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Web.PublishedCache
 {
-    internal interface IPublishedContentCache : IPublishedCache
+    public interface IPublishedContentCache : IPublishedCache
     {
         /// <summary>
         /// Gets content identified by a route.
