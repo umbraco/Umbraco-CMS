@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Web;
@@ -43,43 +44,53 @@ namespace umbraco.cms.businesslogic.datatype
             {
                 if (value is HttpPostedFile || value is HttpPostedFileBase)
                 {
-                    var postedFileName = value is HttpPostedFile 
-                        ? ((HttpPostedFile)value).FileName 
+                    var postedFileName = value is HttpPostedFile
+                        ? ((HttpPostedFile)value).FileName
                         : ((HttpPostedFileBase)value).FileName;
 
                     var name = IOHelper.SafeFileName(postedFileName.Substring(postedFileName.LastIndexOf(IOHelper.DirSepChar) + 1, postedFileName.Length - postedFileName.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
 
-                    var fileStream = value is HttpPostedFile 
-                        ? ((HttpPostedFile)value).InputStream 
+                    var fileStream = value is HttpPostedFile
+                        ? ((HttpPostedFile)value).InputStream
                         : ((HttpPostedFileBase)value).InputStream;
 
                     // handle upload
+                    var currentValue = Value.ToString();
                     if (name != String.Empty)
                     {
-                        var numberedFolder = MediaSubfolderCounter.Current.Increment();
-                        string fileName = UmbracoSettings.UploadAllowDirectories
-                                              ? Path.Combine(numberedFolder.ToString(CultureInfo.InvariantCulture), name)
-                                              : numberedFolder + "-" + name;
+                        var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
-                        //fileName = Path.Combine(SystemDirectories.Media, fileName);
-                        UmbracoFile um = UmbracoFile.Save(fileStream, fileName);
+                        var subfolder = UmbracoSettings.UploadAllowDirectories
+                            ? currentValue.Replace(fs.GetUrl("/"), "").Split('/')[0]
+                            : currentValue.Substring(currentValue.LastIndexOf("/", StringComparison.Ordinal) + 1).Split('-')[0];
+                        
+                        int subfolderId;
+                        var numberedFolder = int.TryParse(subfolder, out subfolderId)
+                            ? subfolderId.ToString(CultureInfo.InvariantCulture)
+                            : MediaSubfolderCounter.Current.Increment().ToString(CultureInfo.InvariantCulture);
 
-                        if (um.SupportsResizing)
+                        var fileName = UmbracoSettings.UploadAllowDirectories 
+                            ? Path.Combine(numberedFolder, name) 
+                            : numberedFolder + "-" + name;
+                        
+                        var umbracoFile = UmbracoFile.Save(fileStream, fileName);
+
+                        if (umbracoFile.SupportsResizing)
                         {
                             // make default thumbnail
-                            um.Resize(100, "thumb");
+                            umbracoFile.Resize(100, "thumb");
 
                             // additional thumbnails configured as prevalues on the DataType
                             if (_thumbnailSizes != "")
                             {
-                                char sep = (!_thumbnailSizes.Contains("") && _thumbnailSizes.Contains(",")) ? ',' : ';';
+                                char sep = (_thumbnailSizes.Contains("") == false && _thumbnailSizes.Contains(",")) ? ',' : ';';
 
                                 foreach (string thumb in _thumbnailSizes.Split(sep))
                                 {
                                     int thumbSize;
                                     if (thumb != "" && int.TryParse(thumb, out thumbSize))
                                     {
-                                        um.Resize(thumbSize, string.Format("thumb_{0}", thumbSize));
+                                        umbracoFile.Resize(thumbSize, string.Format("thumb_{0}", thumbSize));
                                     }
                                 }
                             }
@@ -88,18 +99,18 @@ namespace umbraco.cms.businesslogic.datatype
                         // check for auto fill of other properties (width, height, extension and filesize)
                         if (UmbracoSettings.ImageAutoFillImageProperties != null)
                         {
-                            XmlNode uploadFieldConfigNode =
+                            var uploadFieldConfigNode =
                                 UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
                                     string.Format("uploadField [@alias = \"{0}\"]", PropertyTypeAlias));
 
                             if (uploadFieldConfigNode != null)
                             {
                                 EnsureLoadedContentItem(Version);
-                                FillProperties(uploadFieldConfigNode, LoadedContentItem, um);
+                                FillProperties(uploadFieldConfigNode, LoadedContentItem, umbracoFile);
                             }
                         }
 
-                        base.Value = um.Url;
+                        base.Value = umbracoFile.Url;
                     }
                     else
                     {
@@ -120,7 +131,7 @@ namespace umbraco.cms.businesslogic.datatype
 
         private void ClearRelatedValues()
         {
-            if(PropertyId == default(int))
+            if (PropertyId == default(int))
                 return;
 
             if (UmbracoSettings.ImageAutoFillImageProperties != null)
