@@ -274,7 +274,7 @@ namespace Umbraco.Web
 		/// <summary>
 		/// Gets/sets the PublishedContentRequest object
 		/// </summary>
-		internal PublishedContentRequest PublishedContentRequest { get; set; }	
+		public PublishedContentRequest PublishedContentRequest { get; set; }	
 
         /// <summary>
         /// Exposes the HttpContext for the current request

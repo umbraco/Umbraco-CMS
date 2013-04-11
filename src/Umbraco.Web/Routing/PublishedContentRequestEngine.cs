@@ -74,27 +74,21 @@ namespace Umbraco.Web.Routing
 
 			// trigger the Prepared event - at that point it is still possible to change about anything
             // even though the request might be flagged for redirection - we'll redirect _after_ the event
+            //
+            // also, OnPrepared() will make the PublishedContentRequest readonly, so nothing can change
+            //
 			_pcr.OnPrepared();
 
-            // we don't take care of anything xcept finding the rendering engine again
-            // so if the content has changed, it's up to the user to find out the template
+            // we don't take care of anything so if the content has changed, it's up to the user
+            // to find out the appropriate template
 
             // set the culture on the thread -- again, 'cos it might have changed in the event handler
 			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
 
-			// if request has been flagged to redirect then return
-			// whoever called us is in charge of actually redirecting
-			if (_pcr.IsRedirect)
+			// if request has been flagged to redirect, or has no content to display,
+            // then return - whoever called us is in charge of actually redirecting
+            if (_pcr.IsRedirect || !_pcr.HasPublishedContent)
 				return;
-
-			if (!_pcr.HasPublishedContent)
-			{
-                // safety
-                _pcr.Is404 = true;
-
-                // whoever called us is in charge of doing what's appropriate
-			    return;
-			}
 
             // we may be 404 _and_ have a content
 

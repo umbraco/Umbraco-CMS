@@ -14,7 +14,9 @@ namespace Umbraco.Web.Routing
 	/// by one specified template, using one specified Culture and RenderingEngine.
 	/// </summary>
 	public class PublishedContentRequest
-    {
+	{
+	    private bool _readonly;
+
 		/// <summary>
 		/// Triggers once the published content request has been prepared, but before it is processed.
 		/// </summary>
@@ -74,6 +76,11 @@ namespace Umbraco.Web.Routing
 		{
 			if (Prepared != null)
 				Prepared(this, EventArgs.Empty);
+
+		    if (!HasPublishedContent)
+                Is404 = true; // safety
+
+		    _readonly = true;
 		}
 
 		/// <summary>
@@ -81,6 +88,12 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		/// <remarks>The cleaned up Uri has no virtual directory, no trailing slash, no .aspx extension, etc.</remarks>
 		public Uri Uri { get; private set; }
+
+        private void EnsureWriteable()
+        {
+            if (_readonly)
+                throw new InvalidOperationException("Cannot modify a PublishedContentRequest once it is read-only.");
+        }
 
 		#region PublishedContent
 
@@ -105,6 +118,7 @@ namespace Umbraco.Web.Routing
 			get { return _publishedContent; }
 			set
 			{
+                EnsureWriteable();
 				_publishedContent = value;
                 IsInternalRedirectPublishedContent = false;
 				TemplateModel = null;
@@ -119,6 +133,8 @@ namespace Umbraco.Web.Routing
         /// preserve or reset the template, if any.</remarks>
         public void SetInternalRedirectPublishedContent(IPublishedContent content)
         {
+            EnsureWriteable();
+
             // unless a template has been set already by the finder,
             // template should be null at that point. 
             var initial = IsInitialPublishedContent;
@@ -152,6 +168,8 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public void SetIsInitialPublishedContent()
         {
+            EnsureWriteable();
+
             // note: it can very well be null if the initial content was not found
             _initialPublishedContent = _publishedContent;
             IsInternalRedirectPublishedContent = false;
@@ -222,6 +240,8 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public bool TrySetTemplate(string alias)
         {
+            EnsureWriteable();
+
             if (string.IsNullOrWhiteSpace(alias))
             {
                 TemplateModel = null;
@@ -270,10 +290,20 @@ namespace Umbraco.Web.Routing
 			get { return Domain != null; }
 		}
 
-		/// <summary>
-		/// Gets or sets the content request's culture.
-		/// </summary>
-		public CultureInfo Culture { get; set; }
+	    private CultureInfo _culture;
+
+	    /// <summary>
+	    /// Gets or sets the content request's culture.
+	    /// </summary>
+	    public CultureInfo Culture
+	    {
+            get { return _culture; }
+            set
+            {
+                EnsureWriteable();
+                _culture = value;
+            }
+	    }
 
 		// note: do we want to have an ordered list of alternate cultures,
         // to allow for fallbacks when doing dictionnary lookup and such?
@@ -332,6 +362,7 @@ namespace Umbraco.Web.Routing
         /// where we want to allow developers to indicate a request is 404 but not to cancel it.</remarks>
         public void SetIs404()
         {
+            EnsureWriteable();
             Is404 = true;
         }
 
@@ -358,6 +389,7 @@ namespace Umbraco.Web.Routing
         /// redirect. Redirect will or will not take place in due time.</remarks>
         public void SetRedirect(string url)
         {
+            EnsureWriteable();
             RedirectUrl = url;
             IsRedirectPermanent = false;
         }
@@ -370,6 +402,7 @@ namespace Umbraco.Web.Routing
         /// redirect. Redirect will or will not take place in due time.</remarks>
         public void SetRedirectPermanent(string url)
         {
+            EnsureWriteable();
             RedirectUrl = url;
             IsRedirectPermanent = true;
         }
@@ -383,6 +416,8 @@ namespace Umbraco.Web.Routing
         /// redirect. Redirect will or will not take place in due time.</remarks>
         public void SetRedirect(string url, int status)
         {
+            EnsureWriteable();
+
             if (status < 300 || status > 308)
                 throw new ArgumentOutOfRangeException("status", "Valid redirection status codes 300-308.");
 
@@ -416,6 +451,8 @@ namespace Umbraco.Web.Routing
         /// not be used, in due time.</remarks>
         public void SetResponseStatus(int code, string description = null)
         {
+            EnsureWriteable();
+
             // .Status is deprecated
             // .SubStatusCode is IIS 7+ internal, ignore
             ResponseStatusCode = code;
