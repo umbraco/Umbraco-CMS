@@ -10,7 +10,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    internal class EntityService : IService
+    public class EntityService : IService
     {
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly RepositoryFactory _repositoryFactory;

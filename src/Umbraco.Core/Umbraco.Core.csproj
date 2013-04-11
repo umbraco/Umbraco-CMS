@@ -681,6 +681,7 @@
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\LocalizationService.cs" />
     <Compile Include="Services\MediaService.cs" />
+    <Compile Include="Services\RelationService.cs" />
     <Compile Include="Services\ServerRegistrationService.cs" />
     <Compile Include="Services\PackagingService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
