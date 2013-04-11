@@ -235,7 +235,7 @@ namespace Umbraco.Web.Routing
         /// <param name="alias">The alias of the template.</param>
         /// <returns>A value indicating whether a valid template with the specified alias was found.</returns>
         /// <remarks>
-        /// <para>Successfully setting the template resets <c>RenderingEngine</c> to <c>Unknown</c>.</para>
+        /// <para>Successfully setting the template does refresh <c>RenderingEngine</c>.</para>
         /// <para>If setting the template fails, then the previous template (if any) remains in place.</para>
         /// </remarks>
         public bool TrySetTemplate(string alias)
@@ -257,6 +257,17 @@ namespace Umbraco.Web.Routing
 
             TemplateModel = model;                    
             return true;
+        }
+
+        /// <summary>
+        /// Sets the template to use to display the requested content.
+        /// </summary>
+        /// <param name="template">The template.</param>
+        /// <remarks>Setting the template does refresh <c>RenderingEngine</c>.</remarks>
+        public void SetTemplate(ITemplate template)
+        {
+            EnsureWriteable();
+            TemplateModel = template;
         }
 
         /// <summary>
