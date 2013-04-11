@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Web;
 using System.Linq;
@@ -90,7 +91,17 @@ namespace umbraco.BasePages
         {
             get
             {
-                return HttpContext.Current.CurrentHandler as BasePage;
+                var page = HttpContext.Current.CurrentHandler as BasePage;
+                if (page != null) return page;
+                //the current handler is not BasePage but people might be expecting this to be the case if they 
+                // are using this singleton accesor... which is legacy code now and shouldn't be used. When people
+                // start using Umbraco.Web.UI.Pages.BasePage then this will not be the case! So, we'll just return a 
+                // new instance of BasePage as a hack to make it work.
+                if (HttpContext.Current.Items["umbraco.BasePages.BasePage"] == null)
+                {
+                    HttpContext.Current.Items["umbraco.BasePages.BasePage"] = new BasePage();
+                }
+                return (BasePage)HttpContext.Current.Items["umbraco.BasePages.BasePage"];
             }
         }
 
