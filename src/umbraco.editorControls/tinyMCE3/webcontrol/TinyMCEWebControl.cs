@@ -338,15 +338,30 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                     var heightProperty = imageMedia.Properties.FirstOrDefault(x => x.Alias == "umbracoHeight");
                     var umbracoFileProperty = imageMedia.Properties.FirstOrDefault(x => x.Alias == "umbracoFile");
 
-                    // Format the tag
-                    if (widthProperty != null && heightProperty != null && umbracoFileProperty != null)
+                    var widthValue = string.Empty;
+                    try
                     {
-                        tempTag = string.Format("{0} rel=\"{1},{2}\" src=\"{3}\" />",
-                                                tempTag,
-                                                widthProperty.Value,
-                                                heightProperty.Value,
-                                                umbracoFileProperty.Value);
+                        widthValue = widthProperty.Value.ToString();
                     }
+                    catch (Exception wx)
+                    {
+                        // For some reason widthProperty == null returns false when the widthproperty is actually null...
+                    }
+
+                    var heightValue = string.Empty;
+                    try
+                    {
+                        heightValue = heightProperty.Value.ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                        // For some reason heightProperty == null returns false when the heightProperty is actually null...
+                    }
+                        
+
+                    // Format the tag
+                    if (umbracoFileProperty != null)
+                        tempTag = string.Format("{0} rel=\"{1},{2}\" src=\"{3}\" />", tempTag, widthValue, heightValue, umbracoFileProperty.Value);
                 }
 
                 html = html.Replace(tag.Value, tempTag);
