@@ -230,7 +230,7 @@ namespace Umbraco.Core.Sync
             }
         }
 
-        private void InvokeMethodOnRefresherInstance(ICacheRefresher refresher, MessageType dispatchType, IEnumerable<object> ids = null, string jsonPayload = null)
+        protected void InvokeMethodOnRefresherInstance(ICacheRefresher refresher, MessageType dispatchType, IEnumerable<object> ids = null, string jsonPayload = null)
         {
             if (refresher == null) throw new ArgumentNullException("refresher");
 
