@@ -94,5 +94,10 @@ namespace Umbraco.Core.Models
                 }, _isActive, IsActiveSelector);
             }
         }
+
+        public override string ToString()
+        {
+            return "(" + ServerAddress + ", " + ComputerName + ", IsActive = " + IsActive + ")";
+        }
     }
 }
