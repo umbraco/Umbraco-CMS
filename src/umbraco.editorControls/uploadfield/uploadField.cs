@@ -160,38 +160,38 @@ namespace umbraco.editorControls
             // we update additional properties post image upload
             if (_data.Value != DBNull.Value && string.IsNullOrEmpty(_data.Value.ToString()) == false)
             {
-					//check the FileHandlerData to see if it already loaded in the content item and set it's properties.
-					//if not, then the properties haven't changed so skip.
-	                if (_data.LoadedContentItem != null)
-	                {
-						var content = _data.LoadedContentItem;
+                //check the FileHandlerData to see if it already loaded in the content item and set it's properties.
+                //if not, then the properties haven't changed so skip.
+                if (_data.LoadedContentItem != null)
+                {
+                    var content = _data.LoadedContentItem;
 
-						// update extension in UI				
-						UpdateLabelValue("umbracoExtension", "prop_umbracoExtension", Page, content);
-						// update file size in UI
-						UpdateLabelValue("umbracoBytes", "prop_umbracoBytes", Page, content);
-						UpdateLabelValue("umbracoWidth", "prop_umbracoWidth", Page, content);
-						UpdateLabelValue("umbracoHeight", "prop_umbracoHeight", Page, content);                        
-	                }
-					
+                    // update extension in UI				
+                    UpdateLabelValue("umbracoExtension", "prop_umbracoExtension", Page, content);
+                    // update file size in UI
+                    UpdateLabelValue("umbracoBytes", "prop_umbracoBytes", Page, content);
+                    UpdateLabelValue("umbracoWidth", "prop_umbracoWidth", Page, content);
+                    UpdateLabelValue("umbracoHeight", "prop_umbracoHeight", Page, content);
                 }
-                Text = _data.Value.ToString();
+
             }
+            Text = _data.Value.ToString();
         }
+
 
         #endregion
 
-		private static void UpdateLabelValue(string propAlias, string controlId, Page controlPage, Content content)
-		{
-			var extensionControl = FindControlRecursive<noEdit>(controlPage, controlId);
-			if (extensionControl != null)
-			{
-				if (content.getProperty(propAlias) != null && content.getProperty(propAlias).Value != null)
-				{
-					extensionControl.RefreshLabel(content.getProperty(propAlias).Value.ToString());
-				}
-			}
-		}
+        private static void UpdateLabelValue(string propAlias, string controlId, Page controlPage, Content content)
+        {
+            var extensionControl = FindControlRecursive<noEdit>(controlPage, controlId);
+            if (extensionControl != null)
+            {
+                if (content.getProperty(propAlias) != null && content.getProperty(propAlias).Value != null)
+                {
+                    extensionControl.RefreshLabel(content.getProperty(propAlias).Value.ToString());
+                }
+            }
+        }
 
         [Obsolete("This method is now obsolete due to a change in the way that files are handled.  If you need to check if a URL for an uploaded file is safe you should implement your own as this method will be removed in a future version", false)]
         public string SafeUrl(string url)

@@ -258,14 +258,14 @@
     </Compile>
     <Compile Include="Install\Default.aspx.cs">
       <DependentUpon>default.aspx</DependentUpon>
-       <SubType>ASPXCodeBehind</SubType>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="config\splashes\NoNodes.aspx.cs">
       <DependentUpon>noNodes.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="config\splashes\NoNodes.aspx.designer.cs">
-      <DependentUpon>noNodes.aspx</DependentUpon>   
+      <DependentUpon>noNodes.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Install\Default.aspx.designer.cs">
@@ -405,6 +405,7 @@
     </None>
     <None Include="Config\umbracoSettings.Release.config">
       <DependentUpon>umbracoSettings.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Config\trees.Release.config">
       <DependentUpon>trees.config</DependentUpon>
