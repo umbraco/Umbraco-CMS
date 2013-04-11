@@ -45,12 +45,8 @@ namespace Umbraco.Core.Models
         {
             base.Path = path;
             ParentId = -1;
-            Key = name.EncodeAsGuid();
             _name = name.Replace("/", ".").Replace("\\", "");
             _alias = alias.ToSafeAlias();
-
-            CreateDate = DateTime.Now;
-            UpdateDate = DateTime.Now;
         }
 
         [DataMember]
@@ -198,6 +194,18 @@ namespace Umbraco.Core.Models
             var validExtension = IOHelper.VerifyFileExtension(Path, exts);
 
             return validFile && validExtension;
+        }
+
+        /// <summary>
+        /// Method to call when Entity is being saved
+        /// </summary>
+        /// <remarks>Created date is set and a Unique key is assigned</remarks>
+        internal override void AddingEntity()
+        {
+            base.AddingEntity();
+
+            if (Key == Guid.Empty)
+                Key = Guid.NewGuid();
         }
     }
 }
