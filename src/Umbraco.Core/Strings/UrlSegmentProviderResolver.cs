@@ -7,7 +7,7 @@ namespace Umbraco.Core.Strings
     /// <summary>
     /// Resolves IUrlSegmentProvider objects.
     /// </summary>
-    internal sealed class UrlSegmentProviderResolver : ManyObjectsResolverBase<UrlSegmentProviderResolver, IUrlSegmentProvider>
+    public sealed class UrlSegmentProviderResolver : ManyObjectsResolverBase<UrlSegmentProviderResolver, IUrlSegmentProvider>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="UrlSegmentProviderResolver"/> class with an initial list of provider types.

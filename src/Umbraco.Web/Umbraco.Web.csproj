@@ -330,8 +330,12 @@
     <Compile Include="BaseRest\RestExtensionMethodInfo.cs" />
     <Compile Include="ContextualPublishedCacheExtensions.cs" />
     <Compile Include="PublishedCache\ContextualPublishedContentCache.cs" />
+    <Compile Include="PublishedCache\ContextualPublishedCacheOfT.cs" />
     <Compile Include="PublishedCache\ContextualPublishedCache.cs" />
     <Compile Include="PublishedCache\ContextualPublishedMediaCache.cs" />
+    <Compile Include="PublishedCache\PublishedCachesResolver.cs" />
+    <Compile Include="PublishedCache\IPublishedCaches.cs" />
+    <Compile Include="PublishedCache\PublishedCaches.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedMediaCache.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
@@ -369,8 +373,6 @@
     <Compile Include="PublishedCache\IPublishedCache.cs" />
     <Compile Include="PublishedCache\IPublishedContentCache.cs" />
     <Compile Include="PublishedCache\IPublishedMediaCache.cs" />
-    <Compile Include="PublishedCache\PublishedContentCacheResolver.cs" />
-    <Compile Include="PublishedCache\PublishedMediaCacheResolver.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="ExamineExtensions.cs" />
     <Compile Include="FormlessPage.cs">

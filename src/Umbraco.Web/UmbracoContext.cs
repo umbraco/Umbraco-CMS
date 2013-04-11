@@ -89,8 +89,7 @@ namespace Umbraco.Web
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 applicationContext,
-                PublishedContentCacheResolver.Current.ContentCache,
-                PublishedMediaCacheResolver.Current.PublishedMediaCache);
+                PublishedCachesResolver.Current.Caches);
 
             // create the nice urls provider
             // there's one per request because there are some behavior parameters that can be changed
@@ -118,14 +117,12 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="httpContext"></param>
         /// <param name="applicationContext"> </param>
-        /// <param name="contentCache">The published content cache.</param>
-        /// <param name="mediaCache">The published media cache.</param>
+        /// <param name="publishedCaches">The published caches.</param>
         /// <param name="preview">An optional value overriding detection of preview mode.</param>
         internal UmbracoContext(
 			HttpContextBase httpContext, 
 			ApplicationContext applicationContext,
-            IPublishedContentCache contentCache,
-            IPublishedMediaCache mediaCache,
+            IPublishedCaches publishedCaches,
             bool? preview = null)
         {
             if (httpContext == null) throw new ArgumentNullException("httpContext");
@@ -138,8 +135,8 @@ namespace Umbraco.Web
             Application = applicationContext;
             Security = new WebSecurity();
 
-            ContentCache = new ContextualPublishedContentCache(contentCache, this);
-            MediaCache = new ContextualPublishedMediaCache(mediaCache, this);
+            ContentCache = publishedCaches.CreateContextualContentCache(this);
+            MediaCache = publishedCaches.CreateContextualMediaCache(this);
             InPreviewMode = preview ?? DetectInPreviewModeFromRequest();
 
 			// set the urls...
@@ -238,14 +235,14 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets or sets the published content cache.
         /// </summary>
-        internal ContextualPublishedContentCache ContentCache { get; private set; }
+        public ContextualPublishedContentCache ContentCache { get; private set; }
 
         /// <summary>
         /// Gets or sets the published media cache.
         /// </summary>
-        internal ContextualPublishedMediaCache MediaCache { get; private set; }
+        public ContextualPublishedMediaCache MediaCache { get; private set; }
 
-		/// <summary>
+        /// <summary>
 		/// Boolean value indicating whether the current request is a front-end umbraco request
 		/// </summary>
 		public bool IsFrontEndUmbracoRequest

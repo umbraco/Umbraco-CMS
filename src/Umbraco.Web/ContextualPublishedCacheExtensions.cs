@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Xml.XPath;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Models;
@@ -9,7 +10,7 @@ namespace Umbraco.Web
     /// <summary>
     /// Provides extension methods to ContextualPublishedCache.
     /// </summary>
-    internal static class ContextualPublishedCacheExtensions
+    public static class ContextualPublishedCacheExtensions
     {
         /// <summary>
         /// Gets a dynamic content identified by its unique identifier.
@@ -37,6 +38,19 @@ namespace Umbraco.Web
         }
 
         /// <summary>
+        /// Gets a dynamic content resulting from an XPath query.
+        /// </summary>
+        /// <param name="cache">The contextual cache.</param>
+        /// <param name="xpath">The XPath query.</param>
+        /// <param name="vars">Optional XPath variables</param>
+        /// <returns>The dynamic content, or null.</returns>
+        public static dynamic GetDynamicSingleByXPath(this ContextualPublishedContentCache cache, XPathExpression xpath, params XPathVariable[] vars)
+        {
+            var content = cache.GetSingleByXPath(xpath, vars);
+            return content == null ? new DynamicNull() : new DynamicPublishedContent(content).AsDynamic();
+        }
+
+        /// <summary>
         /// Gets dynamic contents resulting from an XPath query.
         /// </summary>
         /// <param name="cache">The contextual cache.</param>
@@ -44,6 +58,19 @@ namespace Umbraco.Web
         /// <param name="vars">Optional XPath variables</param>
         /// <returns>The dynamic contents.</returns>
         public static dynamic GetDynamicByXPath(this ContextualPublishedContentCache cache, string xpath, params XPathVariable[] vars)
+        {
+            var content = cache.GetByXPath(xpath, vars);
+            return new DynamicPublishedContentList(content.Select(c => new DynamicPublishedContent(c)));
+        }
+
+        /// <summary>
+        /// Gets dynamic contents resulting from an XPath query.
+        /// </summary>
+        /// <param name="cache">The contextual cache.</param>
+        /// <param name="xpath">The XPath query.</param>
+        /// <param name="vars">Optional XPath variables</param>
+        /// <returns>The dynamic contents.</returns>
+        public static dynamic GetDynamicByXPath(this ContextualPublishedContentCache cache, XPathExpression xpath, params XPathVariable[] vars)
         {
             var content = cache.GetByXPath(xpath, vars);
             return new DynamicPublishedContentList(content.Select(c => new DynamicPublishedContent(c)));

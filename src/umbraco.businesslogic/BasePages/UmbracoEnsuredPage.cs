@@ -1,6 +1,7 @@
 using System;
 using Umbraco.Core.Logging;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
@@ -42,7 +43,7 @@ namespace umbraco.BasePages
         /// <returns></returns>
         public bool ValidateUserApp(string app)
         {
-            return getUser().Applications.Any(uApp => uApp.alias == app);
+            return getUser().Applications.Any(uApp => uApp.alias.InvariantEquals(app));
         }
 
         /// <summary>

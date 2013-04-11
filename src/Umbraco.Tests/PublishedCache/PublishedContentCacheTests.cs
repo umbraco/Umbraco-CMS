@@ -90,8 +90,7 @@ namespace Umbraco.Tests.PublishedCache
 		    _umbracoContext = new UmbracoContext(
                 _httpContextFactory.HttpContext,
                 ApplicationContext.Current,
-                cache, 
-                new PublishedMediaCache());
+                new PublishedCaches(cache, new PublishedMediaCache()));
 
 		    _cache = _umbracoContext.ContentCache;
 		}
@@ -101,7 +100,7 @@ namespace Umbraco.Tests.PublishedCache
 			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = true;
 
             var cache = _umbracoContext.ContentCache.InnerCache as PublishedContentCache;
-            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the legacy one is supported.");
+            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
             cache.GetXmlDelegate = (user, preview) =>
             {

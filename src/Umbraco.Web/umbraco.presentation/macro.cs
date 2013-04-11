@@ -769,7 +769,9 @@ namespace umbraco
                 XmlDocument macroXml = null;
 
                 // get master xml document
-                XmlDocument umbracoXml = umbraco.content.Instance.XmlContent;   
+                var cache = UmbracoContext.Current.ContentCache.InnerCache as Umbraco.Web.PublishedCache.XmlPublishedCache.PublishedContentCache;
+                if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
+                XmlDocument umbracoXml = cache.GetXml(UmbracoContext.Current, UmbracoContext.Current.InPreviewMode);
                 macroXml = new XmlDocument();
                 macroXml.LoadXml("<macro/>");
                 foreach (var prop in macro.Model.Properties)

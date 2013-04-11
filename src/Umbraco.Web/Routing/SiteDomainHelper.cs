@@ -11,7 +11,7 @@ namespace Umbraco.Web.Routing
  	/// <summary>
 	/// Provides utilities to handle site domains.
  	/// </summary>
-	internal class SiteDomainHelper : ISiteDomainHelper
+	public class SiteDomainHelper : ISiteDomainHelper
  	{
         #region Configure
  

@@ -47,8 +47,8 @@ namespace Umbraco.Tests.PublishedContent
                         typeof(YesNoPropertyEditorValueConverter)
                     });    
 
-            PublishedContentCacheResolver.Current = new PublishedContentCacheResolver(new PublishedContentCache());
-            PublishedMediaCacheResolver.Current = new PublishedMediaCacheResolver(new PublishedMediaCache());
+            PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
+                new PublishedContentCache(), new PublishedMediaCache()));
 
             base.FreezeResolution();
         }

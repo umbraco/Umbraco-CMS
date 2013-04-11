@@ -187,7 +187,7 @@ namespace umbraco.dialogs
 
         public void HandleMoveOrCopy(object sender, EventArgs e)
         {
-            if (Request["app"] == Constants.Applications.Settings)
+            if (CurrentApp == Constants.Applications.Settings)
 	            HandleDocumentTypeCopy();
 	        else
                 HandleDocumentMoveOrCopy();
@@ -246,13 +246,13 @@ namespace umbraco.dialogs
                     pane_form_notice.Visible = false;
                     panel_buttons.Visible = false;
 
-                    var newNodeCaption = newNode.Id == -1 ? ui.Text(Request.GetItemAsString("app")) : newNode.Text;
+                    var newNodeCaption = newNode.Id == -1 ? ui.Text(CurrentApp) : newNode.Text;
 
                     string[] nodes = { currentNode.Text, newNodeCaption };
 
                     if (Request["mode"] == "cut")
                     {
-                        if (Request["app"] == Constants.Applications.Content)
+                        if (CurrentApp == Constants.Applications.Content)
                         {
                             //PPH changed this to document instead of cmsNode to handle republishing.
                             var documentId = int.Parse(Request.GetItemAsString("id"));

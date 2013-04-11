@@ -11,7 +11,7 @@ namespace Umbraco.Web.Routing
 	/// <remarks>
 	/// <para>Handles <c>/1234</c> where <c>1234</c> is the identified of a document.</para>
 	/// </remarks>
-	internal class ContentFinderByIdPath : IContentFinder
+	public class ContentFinderByIdPath : IContentFinder
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.

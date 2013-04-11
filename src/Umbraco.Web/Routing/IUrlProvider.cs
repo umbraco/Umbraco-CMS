@@ -7,7 +7,7 @@ namespace Umbraco.Web.Routing
     /// <summary>
     /// Provides urls.
     /// </summary>
-    internal interface IUrlProvider
+    public interface IUrlProvider
     {
         /// <summary>
         /// Gets the nice url of a published content.

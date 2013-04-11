@@ -6,7 +6,7 @@ namespace Umbraco.Web.Routing
 	/// <summary>
 	/// Resolves the <see cref="ISiteDomainHelper"/> implementation.
 	/// </summary>
-	internal sealed class SiteDomainHelperResolver : SingleObjectResolverBase<SiteDomainHelperResolver, ISiteDomainHelper>
+	public sealed class SiteDomainHelperResolver : SingleObjectResolverBase<SiteDomainHelperResolver, ISiteDomainHelper>
 	{
 		
 		/// <summary>
