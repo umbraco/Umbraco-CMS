@@ -138,6 +138,10 @@ namespace Umbraco.Core.Sync
         {
             if (refresher == null) throw new ArgumentNullException("refresher");
 
+            LogHelper.Debug<DefaultServerMessenger>("Invoking refresher {0} on single server instance, message type {1}",
+                                                    () => refresher.GetType(),
+                                                    () => dispatchType);
+
             var stronglyTypedRefresher = refresher as ICacheRefresher<T>;
             
             foreach (var instance in instances)
@@ -290,6 +294,8 @@ namespace Umbraco.Core.Sync
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
 
+            EnsureLazyUsernamePasswordDelegateResolved();
+
             //Now, check if we are using Distrubuted calls. If there are no servers in the list then we
             // can definitely not distribute.
             if (!_useDistributedCalls || !servers.Any())
@@ -318,7 +324,9 @@ namespace Umbraco.Core.Sync
             {
                 throw new ArgumentException("The id must be either an int or a Guid");
             }
-            
+
+            EnsureLazyUsernamePasswordDelegateResolved();
+
             //Now, check if we are using Distrubuted calls. If there are no servers in the list then we
             // can definitely not distribute.
             if (!_useDistributedCalls || !servers.Any())
@@ -328,7 +336,13 @@ namespace Umbraco.Core.Sync
                 return;
             }
             
-            EnsureLazyUsernamePasswordDelegateResolved();
+            LogHelper.Debug<DefaultServerMessenger>(
+                "Performing distributed call for refresher {0}, message type: {1}, servers: {2}, ids: {3}, json: {4}",
+                refresher.GetType,
+                () => dispatchType,
+                () => string.Join(";", servers.Select(x => x.ToString())),
+                () => ids == null ? "" : string.Join(";", ids.Select(x => x.ToString())),
+                () => jsonPayload ?? "");
 
             PerformDistributedCall(servers, refresher, dispatchType, ids, arrayType, jsonPayload);
         }

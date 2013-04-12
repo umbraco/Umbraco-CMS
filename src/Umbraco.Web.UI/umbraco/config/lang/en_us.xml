@@ -227,6 +227,7 @@
     <key alias="errorRegExpWithoutTab">%0% is not in a correct format</key>
   </area>
   <area alias="errors">
+    <key alias="dissallowedMediaType">The specified file type has been dissallowed by the administrator</key>
     <key alias="codemirroriewarning">NOTE! Even though CodeMirror is enabled by configuration, it is disabled in Internet Explorer because it's not stable enough.</key>
     <key alias="contentTypeAliasAndNameNotNull">Please fill both alias and name on the new propertytype!</key>
     <key alias="filePermissionsError">There is a problem with read/write access to a specific file or folder</key>

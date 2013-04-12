@@ -24,6 +24,11 @@ namespace Umbraco.Core.Sync
         }
 
         public string ServerAddress { get; private set; }
+
+        public override string ToString()
+        {
+            return ServerAddress;
+        }
         
     }
 }

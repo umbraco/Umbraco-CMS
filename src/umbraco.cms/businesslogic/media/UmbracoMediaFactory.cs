@@ -89,7 +89,12 @@ namespace umbraco.cms.businesslogic.media
                     if (prop != null && prop.Value != null)
                     {
                         int subfolderId;
-                        var subfolder = prop.Value.ToString().Replace(FileSystem.GetUrl("/"), "").Split('/')[0];
+                        var currentValue = prop.Value.ToString();
+
+                        var subfolder = UmbracoSettings.UploadAllowDirectories
+                            ? currentValue.Replace(FileSystem.GetUrl("/"), "").Split('/')[0]
+                            : currentValue.Substring(currentValue.LastIndexOf("/", StringComparison.Ordinal) + 1).Split('-')[0];
+                        
                         if (int.TryParse(subfolder, out subfolderId))
                         {
                             var destFilePath = FileSystem.GetRelativePath(subfolderId, fileName);
