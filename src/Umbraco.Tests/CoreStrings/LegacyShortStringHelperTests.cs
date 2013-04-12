@@ -46,6 +46,11 @@ namespace Umbraco.Tests.CoreStrings
         [TestCase("aa DB cd EFG X KLMN OP qrst", "aaDBCdEFGXKLMNOPQrst")]
         [TestCase("AA db cd EFG X KLMN OP qrst", "AADbCdEFGXKLMNOPQrst")]
         [TestCase("AAA db cd EFG X KLMN OP qrst", "AAADbCdEFGXKLMNOPQrst")]
+        [TestCase("4 ways selector", "WaysSelector")]
+        [TestCase("WhatIfWeDoItAgain", "WhatIfWeDoItAgain")]
+        [TestCase("whatIfWeDoItAgain", "whatIfWeDoItAgain")]
+        [TestCase("WhatIfWEDOITAgain", "WhatIfWEDOITAgain")]
+        [TestCase("WhatIfWe doItAgain", "WhatIfWeDoItAgain")]
         #endregion
         public void CleanStringForSafeAlias(string input, string expected)
         {
