@@ -733,7 +733,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
                     case StateAcronym:
                         if (!isTerm || isLower || isDigit)
                         {
-                            if (isLower || !config.GreedyAcronyms)
+                            if (isLower && !config.GreedyAcronyms)
                                 i -= 1;
                             CopyUtf8Term(input, ipos, output, ref opos, i - ipos, caseType, culture, /*termFilter,*/ true);
                             ipos = i;
