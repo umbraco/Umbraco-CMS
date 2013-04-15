@@ -282,6 +282,13 @@ namespace umbraco
 			get { return Umbraco.Core.Configuration.UmbracoSettings.ForceSafeAliases; }
         }
 
+        /// <summary>
+        /// File types that will not be allowed to be uploaded via the content/media upload control
+        /// </summary>
+        public static IEnumerable<string> DissallowedUploadFiles
+        {
+            get { return Umbraco.Core.Configuration.UmbracoSettings.DissallowedUploadFiles; }
+        }
 
         /// <summary>
         /// Gets the allowed image file types.
