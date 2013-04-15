@@ -1,29 +1,17 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F0242771-6DE6-4E03-BD3A-7B79BA79105B}"
-	ProjectSection(SolutionItems) = preProject
-		INDIGO64.testrunconfig = INDIGO64.testrunconfig
-		SHANDEMVAIO.testrunconfig = SHANDEMVAIO.testrunconfig
-		umbraco2.vsmdi = umbraco2.vsmdi
-		UMBRACOELISE.testrunconfig = UMBRACOELISE.testrunconfig
-		UMBRACOHUMMER.testrunconfig = UMBRACOHUMMER.testrunconfig
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}"
 	ProjectSection(SolutionItems) = preProject
 		..\build\Build.bat = ..\build\Build.bat
 		..\build\Build.proj = ..\build\Build.proj
+		..\build\RevertToCleanInstall.bat = ..\build\RevertToCleanInstall.bat
 		umbraco.presentation.targets = umbraco.presentation.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-184C-4005-A5F3-E705D92FC645}"
 	ProjectSection(SolutionItems) = preProject
-		..\docs\4.5-changelog.docx = ..\docs\4.5-changelog.docx
-		..\docs\GettingStarted.txt = ..\docs\GettingStarted.txt
-		..\docs\IronPython License.Rtf = ..\docs\IronPython License.Rtf
 		..\docs\License.txt = ..\docs\License.txt
 		..\docs\README.txt = ..\docs\README.txt
-		..\docs\ReleaseNotes.txt = ..\docs\ReleaseNotes.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.UI", "Umbraco.Web.UI\Umbraco.Web.UI.csproj", "{4C4C194C-B5E4-4991-8F87-4373E24CC19F}"
@@ -52,8 +40,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCE4Umbraco", "SQLCE4Umbr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.MacroEngines", "umbraco.MacroEngines\umbraco.MacroEngines.csproj", "{89C09045-1064-466B-B94A-DB3AFE2A5853}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.MacroEngines.Iron", "umbraco.MacroEngines.Iron\umbraco.MacroEngines.Iron.csproj", "{98CBA7E2-1B62-497C-8AA3-B868704068D7}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{B5BD12C1-A454-435E-8A46-FF4A364C0382}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Core", "Umbraco.Core\Umbraco.Core.csproj", "{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}"
@@ -68,9 +54,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{674CD2
 	EndProjectSection
 EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = umbraco2.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -128,10 +111,6 @@ Global
 		{89C09045-1064-466B-B94A-DB3AFE2A5853}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89C09045-1064-466B-B94A-DB3AFE2A5853}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89C09045-1064-466B-B94A-DB3AFE2A5853}.Release|Any CPU.Build.0 = Release|Any CPU
-		{98CBA7E2-1B62-497C-8AA3-B868704068D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{98CBA7E2-1B62-497C-8AA3-B868704068D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{98CBA7E2-1B62-497C-8AA3-B868704068D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{98CBA7E2-1B62-497C-8AA3-B868704068D7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}.Release|Any CPU.ActiveCfg = Release|Any CPU

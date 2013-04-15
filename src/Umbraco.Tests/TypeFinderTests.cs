@@ -12,7 +12,6 @@ using Umbraco.Tests.TestHelpers;
 using umbraco;
 using umbraco.DataLayer;
 using umbraco.MacroEngines;
-using umbraco.MacroEngines.Iron;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.uicontrols;
@@ -51,7 +50,6 @@ namespace Umbraco.Tests
 			        typeof(System.Web.Mvc.ActionResult).Assembly,
 			        typeof(TypeFinder).Assembly,
 			        typeof(ISqlHelper).Assembly,
-			        typeof(DLRScriptingEngine).Assembly,
 			        typeof(ICultureDictionary).Assembly
 			    };
 

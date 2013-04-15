@@ -191,10 +191,6 @@
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Name>umbraco.interfaces</Name>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.MacroEngines.Iron\umbraco.MacroEngines.Iron.csproj">
-      <Project>{98CBA7E2-1B62-497C-8AA3-B868704068D7}</Project>
-      <Name>umbraco.MacroEngines.Iron</Name>
-    </ProjectReference>
     <ProjectReference Include="..\umbraco.MacroEngines\umbraco.MacroEngines.csproj">
       <Project>{89C09045-1064-466B-B94A-DB3AFE2A5853}</Project>
       <Name>umbraco.MacroEngines</Name>
