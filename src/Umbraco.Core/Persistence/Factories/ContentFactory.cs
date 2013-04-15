@@ -51,7 +51,8 @@ namespace Umbraco.Core.Persistence.Factories
                 UpdateDate = dto.ContentVersionDto.VersionDate,
                 ExpireDate = dto.ExpiresDate.HasValue ? dto.ExpiresDate.Value : (DateTime?)null,
                 ReleaseDate = dto.ReleaseDate.HasValue ? dto.ReleaseDate.Value : (DateTime?)null,
-                Version = dto.ContentVersionDto.VersionId
+                Version = dto.ContentVersionDto.VersionId,
+                PublishedState = dto.Published ? PublishedState.Published : PublishedState.Unpublished
             };
         }
 

@@ -972,7 +972,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Instead of calling this just check if the latest version of the content is published", false)]
         public bool HasPendingChanges()
         {
-            return Content.Published == false;
+            return Content.Published == false && ((Umbraco.Core.Models.Content)Content).PublishedState != PublishedState.Unpublished;
         }
 
         /// <summary>

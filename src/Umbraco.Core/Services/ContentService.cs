@@ -1383,8 +1383,8 @@ namespace Umbraco.Core.Services
                 {
                     content.WriterId = userId;
 
-                    //Only change the publish state if the "previous" version was actually published
-                    if (changeState && content.Published)
+                    //Only change the publish state if the "previous" version was actually published or marked as unpublished
+                    if (changeState && (content.Published || ((Content)content).PublishedState == PublishedState.Unpublished))
                         content.ChangePublishedState(PublishedState.Saved);
 
                     repository.AddOrUpdate(content);
