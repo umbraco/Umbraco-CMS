@@ -234,6 +234,10 @@ namespace Umbraco.Core.Sync
         {
             if (refresher == null) throw new ArgumentNullException("refresher");
 
+            LogHelper.Debug<DefaultServerMessenger>("Invoking refresher {0} on single server instance, message type {1}",
+                                                    () => refresher.GetType(),
+                                                    () => dispatchType);
+
             //if it is a refresh all we'll do it here since ids will be null or empty
             if (dispatchType == MessageType.RefreshAll)
             {

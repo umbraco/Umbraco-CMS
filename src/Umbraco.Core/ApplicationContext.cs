@@ -256,7 +256,7 @@ namespace Umbraco.Core
                 this.ApplicationCache = null;
                 if (_databaseContext != null) //need to check the internal field here
                 {
-                    if (DatabaseContext.Database != null)
+                    if (DatabaseContext.IsDatabaseConfigured)
                     {
                         DatabaseContext.Database.Dispose();       
                     }                    

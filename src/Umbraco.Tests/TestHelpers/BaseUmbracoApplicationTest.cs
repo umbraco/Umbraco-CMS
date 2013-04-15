@@ -2,6 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             //reset settings
             SettingsForTests.Reset();
-
+            UmbracoContext.Current = null;
             TestHelper.CleanContentDirectories();
             //reset the app context, this should reset most things that require resetting like ALL resolvers
             ApplicationContext.Current.DisposeIfDisposable();
