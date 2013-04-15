@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Web;
 using System.Web.Security;
 using Umbraco.Core;
@@ -34,51 +33,53 @@ namespace Umbraco.Web.Security
             IEnumerable<string> allowGroups = null,
             IEnumerable<int> allowMembers = null)
         {
+            if (allowAll)
+                return true;
+
             if (allowTypes == null)
                 allowTypes = Enumerable.Empty<string>();
             if (allowGroups == null)
                 allowGroups = Enumerable.Empty<string>();
             if (allowMembers == null)
                 allowMembers = Enumerable.Empty<int>();
-
+            
             // Allow by default
             var allowAction = true;
-
-            // If not set to allow all, need to check current loggined in member
-            if (!allowAll)
+            
+            // Get member details
+            var member = Member.GetCurrentMember();
+            if (member == null)
             {
-                // Get member details
-                var member = Member.GetCurrentMember();
-                if (member == null)
+                // If not logged on, not allowed
+                allowAction = false;
+            }
+            else
+            {
+                // If types defined, check member is of one of those types
+                var allowTypesList = allowTypes as IList<string> ?? allowTypes.ToList();
+                if (allowTypesList.Any(allowType => allowType != string.Empty))
                 {
-                    // If not logged on, not allowed
-                    allowAction = false;
+                    // Allow only if member's type is in list
+                    allowAction = allowTypesList.Select(x => x.ToLowerInvariant()).Contains(member.ContentType.Alias.ToLowerInvariant());
                 }
-                else
+
+                // If groups defined, check member is of one of those groups
+                var allowGroupsList = allowGroups as IList<string> ?? allowGroups.ToList();
+                if (allowAction && allowGroupsList.Any(allowGroup => allowGroup != string.Empty))
                 {
-                    // If types defined, check member is of one of those types
-                    if (allowTypes.Any())
-                    {
-                        // Allow only if member's type is in list
-                        allowAction = allowTypes.Select(x => x.ToLowerInvariant()).Contains(member.ContentType.Alias.ToLowerInvariant());
-                    }
+                    // Allow only if member's type is in list
+                    var groups = Roles.GetRolesForUser(member.LoginName);
+                    allowAction = groups.Select(s => s.ToLowerInvariant()).Intersect(groups.Select(myGroup => myGroup.ToLowerInvariant())).Any();
+                }
 
-                    // If groups defined, check member is of one of those groups
-                    if (allowAction && allowGroups.Any())
-                    {
-                        // Allow only if member's type is in list
-                        var groups = System.Web.Security.Roles.GetRolesForUser(member.LoginName);
-                        allowAction = groups.Select(s => s.ToLower()).Intersect(allowGroups).Any();
-                    }
-
-                    // If specific members defined, check member is of one of those
-                    if (allowAction && allowMembers.Any())
-                    {
-                        // Allow only if member's type is in list
-                        allowAction = allowMembers.Contains(member.Id);
-                    }
+                // If specific members defined, check member is of one of those
+                if (allowAction && allowMembers.Any())
+                {
+                    // Allow only if member's type is in list
+                    allowAction = allowMembers.Contains(member.Id);
                 }
             }
+
             return allowAction;
         }
 
@@ -92,7 +93,7 @@ namespace Umbraco.Web.Security
         }
 
         private const long TicksPrMinute = 600000000;
-        private static readonly int UmbracoTimeOutInMinutes = Core.Configuration.GlobalSettings.TimeOutInMinutes;
+        private static readonly int UmbracoTimeOutInMinutes = GlobalSettings.TimeOutInMinutes;
 
         private User _currentUser;
 
@@ -122,7 +123,7 @@ namespace Umbraco.Web.Security
             var retVal = Guid.NewGuid();
             SqlHelper.ExecuteNonQuery(
                                       "insert into umbracoUserLogins (contextID, userID, timeout) values (@contextId,'" + userId + "','" +
-                                      (DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)).ToString() +
+                                      (DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)) +
                                       "') ",
                                       SqlHelper.CreateParameter("@contextId", retVal));
             UmbracoUserContextId = retVal.ToString();
@@ -167,7 +168,8 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         internal bool ValidateBackOfficeCredentials(string username, string password)
         {
-            return Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].ValidateUser(username, password);
+            var membershipProvider = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider];
+            return membershipProvider != null && membershipProvider.ValidateUser(username, password);
         }
 
         /// <summary>
@@ -180,7 +182,7 @@ namespace Umbraco.Web.Security
         internal bool ValidateUserNodeTreePermissions(User umbracoUser, string path, string action)
         {
             var permissions = umbracoUser.GetPermissions(path);
-            if (permissions.IndexOf(action) > -1 && (path.Contains("-20") || ("," + path + ",").Contains("," + umbracoUser.StartNodeId.ToString() + ",")))
+            if (permissions.IndexOf(action, StringComparison.Ordinal) > -1 && (path.Contains("-20") || ("," + path + ",").Contains("," + umbracoUser.StartNodeId + ",")))
                 return true;
 
             var user = umbracoUser;
@@ -232,7 +234,7 @@ namespace Umbraco.Web.Security
                                                           SqlHelper.CreateParameter("@contextId", new Guid(UmbracoUserContextId))
                                         );
             }
-            
+
             return GetTimeout(UmbracoUserContextId);
         }
 
@@ -244,21 +246,21 @@ namespace Umbraco.Web.Security
         public int GetUserId(string umbracoUserContextId)
         {
             //need to parse to guid
-            Guid gid;
-            if (!Guid.TryParse(umbracoUserContextId, out gid))
+            Guid guid;
+            if (Guid.TryParse(umbracoUserContextId, out guid) == false)
             {
                 return -1;
             }
 
-            var id = ApplicationContext.Current.ApplicationCache.GetCacheItem<int?>(
+            var id = ApplicationContext.Current.ApplicationCache.GetCacheItem(
                 CacheKeys.UserContextCacheKey + umbracoUserContextId,
-                new TimeSpan(0, UmbracoTimeOutInMinutes/10, 0),
+                new TimeSpan(0, UmbracoTimeOutInMinutes / 10, 0),
                 () => SqlHelper.ExecuteScalar<int?>(
                     "select userID from umbracoUserLogins where contextID = @contextId",
-                    SqlHelper.CreateParameter("@contextId", gid)));
+                    SqlHelper.CreateParameter("@contextId", guid)));
             if (id == null)
                 return -1;
-            return id.Value;            
+            return id.Value;
         }
 
         /// <summary>
@@ -301,7 +303,7 @@ namespace Umbraco.Web.Security
                     var user = User.GetUser(uid);
 
                     // Check for console access
-                    if (user.Disabled || (user.NoConsole && GlobalSettings.RequestIsInUmbracoApplication(httpContext) && !GlobalSettings.RequestIsLiveEditRedirector(httpContext)))
+                    if (user.Disabled || (user.NoConsole && GlobalSettings.RequestIsInUmbracoApplication(httpContext) && GlobalSettings.RequestIsLiveEditRedirector(httpContext) == false))
                     {
                         if (throwExceptions) throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
                         return ValidateRequestAttempt.FailedNoPrivileges;
@@ -325,9 +327,9 @@ namespace Umbraco.Web.Security
         internal ValidateRequestAttempt AuthorizeRequest(HttpContextBase httpContext, bool throwExceptions = false)
         {
             // check for secure connection
-            if (GlobalSettings.UseSSL && !httpContext.Request.IsSecureConnection)
+            if (GlobalSettings.UseSSL && httpContext.Request.IsSecureConnection == false)
             {
-                if (throwExceptions) throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");                
+                if (throwExceptions) throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
                 return ValidateRequestAttempt.FailedNoSsl;
             }
             return ValidateCurrentUser(httpContext, throwExceptions);
@@ -377,10 +379,14 @@ namespace Umbraco.Web.Security
                 try
                 {
                     var encTicket = StateHelper.Cookies.UserContext.GetValue();
-                    if (!string.IsNullOrEmpty(encTicket))
-                        return FormsAuthentication.Decrypt(encTicket).UserData;
+                    if (string.IsNullOrEmpty(encTicket) == false)
+                    {
+                        var formsAuthenticationTicket = FormsAuthentication.Decrypt(encTicket);
+                        if (formsAuthenticationTicket != null)
+                            return formsAuthenticationTicket.UserData;
+                    }
                 }
-                catch (HttpException ex)
+                catch (HttpException)
                 {
                     // we swallow this type of exception as it happens if a legacy (pre 4.8.1) cookie is set
                 }
@@ -400,7 +406,7 @@ namespace Umbraco.Web.Security
                     if (StateHelper.Cookies.UserContext.HasValue)
                         StateHelper.Cookies.ClearAll();
 
-                    if (!String.IsNullOrEmpty(value))
+                    if (string.IsNullOrEmpty(value) == false)
                     {
                         var ticket = new FormsAuthenticationTicket(1,
                         value,
@@ -411,13 +417,10 @@ namespace Umbraco.Web.Security
                         FormsAuthentication.FormsCookiePath);
 
                         // Encrypt the ticket.
-                        var encTicket = FormsAuthentication.Encrypt(ticket);
-
-
+                        FormsAuthentication.Encrypt(ticket);
+                        
                         // Create new cookie.
                         StateHelper.Cookies.UserContext.SetValue(value, 1);
-
-
                     }
                     else
                     {
