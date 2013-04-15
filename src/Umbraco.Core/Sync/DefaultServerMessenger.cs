@@ -39,11 +39,22 @@ namespace Umbraco.Core.Sync
         /// <param name="login"></param>
         /// <param name="password"></param>
         internal DefaultServerMessenger(string login, string password)
+            : this(login, password, UmbracoSettings.UseDistributedCalls)
+        {            
+        }
+
+        /// <summary>
+        /// Specifies the username/password and whether or not to use distributed calls
+        /// </summary>
+        /// <param name="login"></param>
+        /// <param name="password"></param>
+        /// <param name="useDistributedCalls"></param>
+        internal DefaultServerMessenger(string login, string password, bool useDistributedCalls)
         {
             if (login == null) throw new ArgumentNullException("login");
             if (password == null) throw new ArgumentNullException("password");
 
-            _useDistributedCalls = UmbracoSettings.UseDistributedCalls;
+            _useDistributedCalls = useDistributedCalls;
             Login = login;
             Password = password;
         }
