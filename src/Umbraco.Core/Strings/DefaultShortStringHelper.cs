@@ -144,9 +144,22 @@ namespace Umbraco.Core.Strings
             }
 
             public Func<string, string> PreFilter { get; private set; }
+
+            // indicate whether an uppercase within a term eg "fooBar" is to break
+            // into a new term, or to be considered as part of the current term
             public bool BreakTermsOnUpper { get; private set; }
+
+            // indicates whether it is legal to have leading digits, or whether they
+            // should be stripped as any other illegal character
             public bool AllowLeadingDigits { get; private set; }
+
+            // indicates whether underscore is a valid character in a term or is
+            // to be considered as a separator
             public bool AllowUnderscoreInTerm { get; private set; }
+
+            // indicates whether acronyms parsing is greedy ie whether "FOObar" is
+            // "FOO" + "bar" (greedy) or "FO" + "Obar" (non-greedy)
+            public bool GreedyAcronyms { get { return false; } }
 
             public static readonly HelperConfig Empty = new HelperConfig();
         }
@@ -239,7 +252,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// </remarks>
         public virtual string CleanStringForSafeAlias(string text)
         {
-            return CleanString(text, CleanStringType.Ascii | CleanStringType.CamelCase | CleanStringType.Alias);
+            return CleanString(text, CleanStringType.Ascii | CleanStringType.UmbracoCase | CleanStringType.Alias);
         }
 
         /// <summary>
@@ -253,7 +266,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// </remarks>
         public virtual string CleanStringForSafeAlias(string text, CultureInfo culture)
         {
-            return CleanString(text, CleanStringType.Ascii | CleanStringType.CamelCase | CleanStringType.Alias, culture);
+            return CleanString(text, CleanStringType.Ascii | CleanStringType.UmbracoCase | CleanStringType.Alias, culture);
         }
 
         /// <summary>
@@ -720,6 +733,8 @@ function validateSafeAlias(id, value, immediate, callback) {{
                     case StateAcronym:
                         if (!isTerm || isLower || isDigit)
                         {
+                            if (isLower && !config.GreedyAcronyms)
+                                i -= 1;
                             CopyUtf8Term(input, ipos, output, ref opos, i - ipos, caseType, culture, /*termFilter,*/ true);
                             ipos = i;
                             state = isTerm ? StateWord : StateBreak;
@@ -780,9 +795,9 @@ function validateSafeAlias(id, value, immediate, callback) {{
 
             if (isAcronym)
             {
-                if (caseType == CleanStringType.CamelCase && len <= 2 && opos > 0)
-                    caseType = CleanStringType.Unchanged;
-                else if (caseType == CleanStringType.PascalCase && len <= 2)
+                if ((caseType == CleanStringType.CamelCase && len <= 2 && opos > 0) ||
+                        (caseType == CleanStringType.PascalCase && len <= 2) ||
+                        (caseType == CleanStringType.UmbracoCase))
                     caseType = CleanStringType.Unchanged;
             }
 
@@ -819,6 +834,14 @@ function validateSafeAlias(id, value, immediate, callback) {{
                     output[opos++] = char.ToUpper(c, culture);
                     if (len > 1)
                         term.ToLower(culture).CopyTo(ipos, output, opos, len - 1);
+                    opos += len - 1;
+                    break;
+
+                case CleanStringType.UmbracoCase:
+                    c = term[ipos++];
+                    output[opos] = opos++ == 0 ? c : char.ToUpper(c, culture);
+                    if (len > 1)
+                        term.CopyTo(ipos, output, opos, len - 1);
                     opos += len - 1;
                     break;
 

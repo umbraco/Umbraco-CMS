@@ -22,6 +22,7 @@ namespace Umbraco.Core.Services
         private Lazy<PackagingService> _packagingService;
         private Lazy<ServerRegistrationService> _serverRegistrationService;
         private Lazy<EntityService> _entityService;
+        private Lazy<RelationService> _relationService;
 
 		/// <summary>
 		/// Constructor
@@ -78,6 +79,9 @@ namespace Umbraco.Core.Services
 
             if (_entityService == null)
                 _entityService = new Lazy<EntityService>(() => new EntityService(provider, repositoryFactory.Value, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value));
+
+            if(_relationService == null)
+                _relationService = new Lazy<RelationService>(() => new RelationService(provider, repositoryFactory.Value, _entityService.Value));
         }
 
         /// <summary>
@@ -91,9 +95,17 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="EntityService"/>
         /// </summary>
-        internal EntityService EntityService
+        public EntityService EntityService
         {
             get { return _entityService.Value; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="RelationService"/>
+        /// </summary>
+        public RelationService RelationService
+        {
+            get { return _relationService.Value; }
         }
 
         /// <summary>

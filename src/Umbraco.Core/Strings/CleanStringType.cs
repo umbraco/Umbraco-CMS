@@ -17,7 +17,7 @@ namespace Umbraco.Core.Strings
         /// <summary>
         /// Flag mask for casing.
         /// </summary>
-        CaseMask = 0x1f, // 0xff - 8 possible values
+        CaseMask = 0x3f, // 0xff - 8 possible values
 
         /// <summary>
         /// Flag mask for encoding.
@@ -58,6 +58,13 @@ namespace Umbraco.Core.Strings
         /// Upper casing eg "UPPERCASE".
         /// </summary>
         UpperCase = 0x10,
+
+        /// <summary>
+        /// Umbraco "safe alias" case.
+        /// </summary>
+        /// <remarks>This is for backward compatibility. Casing is unchanged within terms,
+        /// and is pascal otherwise.</remarks>
+        UmbracoCase = 0x20,
 
         /// <summary>
         /// Unicode encoding.
