@@ -779,9 +779,9 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                         _contentType.AddPropertyType(
                             cms.businesslogic.datatype.DataTypeDefinition.GetDataTypeDefinition(gpData.Type),
                             Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim()), gpData.Name);
-                    pt.Mandatory = gpData.Mandatory;
-                    pt.ValidationRegExp = gpData.Validation;
                     pt.Description = gpData.Description;
+                    pt.ValidationRegExp = gpData.Validation.Trim();
+                    pt.Mandatory = gpData.Mandatory;
 
                     if (gpData.Tab != 0)
                     {
@@ -804,7 +804,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 pt.Alias = gpw.GenricPropertyControl.Alias;
                 pt.Name = gpw.GenricPropertyControl.Name;
                 pt.Description = gpw.GenricPropertyControl.Description;
-                pt.ValidationRegExp = gpw.GenricPropertyControl.Validation;
+                pt.ValidationRegExp = gpw.GenricPropertyControl.Validation.Trim();
                 pt.Mandatory = gpw.GenricPropertyControl.Mandatory;
                 pt.DataTypeDefinition = cms.businesslogic.datatype.DataTypeDefinition.GetDataTypeDefinition(gpw.GenricPropertyControl.Type);
                 if (gpw.GenricPropertyControl.Tab == 0)
