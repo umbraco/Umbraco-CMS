@@ -802,7 +802,7 @@ namespace Umbraco.Web
             return content.AncestorsOrSelf(false, n => n.DocumentTypeAlias == nodeTypeAlias);
         }
 
-        public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, Func<IPublishedContent, bool> func)
+		internal static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, Func<IPublishedContent, bool> func)
         {
             return content.AncestorsOrSelf(false, func);
         }
