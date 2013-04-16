@@ -785,128 +785,100 @@ namespace Umbraco.Web
 
 		#endregion
 
-		#region Ancestors
+        #region Ancestors
 
-		public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, int level)
-		{
-			return content.Ancestors(n => n.Level <= level);
-		}
-		public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, string nodeTypeAlias)
-		{
-			return content.Ancestors(n => n.DocumentTypeAlias == nodeTypeAlias);
-		}
-		public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content)
-		{
-			return content.Ancestors(n => true);
-		}
-		internal static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, Func<IPublishedContent, bool> func)
-		{
-			var ancestorList = new List<IPublishedContent>();
-			var node = content;
-			while (node != null)
-			{
-				if (node.Level == 1) break;
-				var parent = node.Parent;
-				if (parent == null)
-				{
-					break;
-				}
-				if (content != parent)
-				{
-					node = parent;
-					if (func(node))
-					{
-						ancestorList.Add(node);
-					}
-				}
-				else
-				{
-					break;
-				}
-			}
-			ancestorList.Reverse();
-			return ancestorList;
-		}
+        public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content)
+        {
+            return content.AncestorsOrSelf(false, n => true);
+        }
 
-		public static IPublishedContent AncestorOrSelf(this IPublishedContent content)
-		{
-			//TODO: Why is this query like this??
-			return content.AncestorOrSelf(node => node.Level == 1);
-		}
-		public static IPublishedContent AncestorOrSelf(this IPublishedContent content, int level)
-		{
-			return content.AncestorOrSelf(node => node.Level == level);
-		}
-		public static IPublishedContent AncestorOrSelf(this IPublishedContent content, string nodeTypeAlias)
-		{
-			return content.AncestorOrSelf(node => node.DocumentTypeAlias == nodeTypeAlias);
-		}
-		internal static IPublishedContent AncestorOrSelf(this IPublishedContent content, Func<IPublishedContent, bool> func)
-		{
-			var node = content;
-			while (node != null)
-			{
-				if (func(node)) return node;
-				var parent = node.Parent;
-				if (parent == null)
-				{
-					return null;
-				}
-				if (content != parent)
-				{
-					node = parent;
-				}
-				else
-				{
-					return node;
-				}
-			}
-			return null;
-		}
+        public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, int level)
+        {
+            return content.AncestorsOrSelf(false, n => n.Level <= level);
+        }
 
-		internal static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, Func<IPublishedContent, bool> func)
-		{
-			var ancestorList = new List<IPublishedContent>();
-			var node = content;
-			ancestorList.Add(node);
-			while (node != null)
-			{
-				if (node.Level == 1) break;
-				var parent = node.Parent;
-				if (parent == null)
-				{
-					break;
-				}
-				if (content != parent)
-				{
-					node = parent;
-					if (func(node))
-					{
-						ancestorList.Add(node);
-					}
-				}
-				else
-				{
-					break;
-				}
-			}
-			ancestorList.Reverse();
-			return ancestorList;
-		}
-		public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content)
-		{
-			return content.AncestorsOrSelf(n => true);
-		}
-		public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, string nodeTypeAlias)
-		{
-			return content.AncestorsOrSelf(n => n.DocumentTypeAlias == nodeTypeAlias);
-		}
-		public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, int level)
-		{
-			return content.AncestorsOrSelf(n => n.Level <= level);
-		}
+        public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, string nodeTypeAlias)
+        {
+            return content.AncestorsOrSelf(false, n => n.DocumentTypeAlias == nodeTypeAlias);
+        }
 
-		#endregion
+        public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, Func<IPublishedContent, bool> func)
+        {
+            return content.AncestorsOrSelf(false, func);
+        }
+
+        public static IPublishedContent AncestorOrSelf(this IPublishedContent content)
+        {
+            //TODO: Why is this query like this??
+            return content.AncestorOrSelf(node => node.Level == 1);
+        }
+
+        public static IPublishedContent AncestorOrSelf(this IPublishedContent content, int level)
+        {
+            return content.AncestorOrSelf(node => node.Level == level);
+        }
+
+        public static IPublishedContent AncestorOrSelf(this IPublishedContent content, string nodeTypeAlias)
+        {
+            return content.AncestorOrSelf(node => node.DocumentTypeAlias == nodeTypeAlias);
+        }
+
+        internal static IPublishedContent AncestorOrSelf(this IPublishedContent content, Func<IPublishedContent, bool> func)
+        {
+            if (func(content))
+                return content;
+
+            while (content.Level > 1) // while we have a parent, consider the parent
+            {
+                content = content.Parent;
+
+                if (func(content))
+                    return content;
+            }
+
+            return null;
+        }
+
+        public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content)
+        {
+            return content.AncestorsOrSelf(true, n => true);
+        }
+
+        public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, int level)
+        {
+            return content.AncestorsOrSelf(true, n => n.Level <= level);
+        }
+
+        public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, string nodeTypeAlias)
+        {
+            return content.AncestorsOrSelf(true, n => n.DocumentTypeAlias == nodeTypeAlias);
+        }
+
+	    internal static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, Func<IPublishedContent, bool> func)
+	    {
+	        return content.AncestorsOrSelf(true, func);
+	    }
+
+	    internal static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool> func)
+        {
+            var ancestors = new List<IPublishedContent>();
+
+            if (orSelf && func(content))
+                ancestors.Add(content);
+
+            while (content.Level > 1) // while we have a parent, consider the parent
+            {
+                content = content.Parent;
+
+                if (func(content))
+                    ancestors.Add(content);
+            }
+
+            ancestors.Reverse();
+            return ancestors;
+        }
+
+        #endregion
 
 		#region Descendants
 		public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, string nodeTypeAlias)
