@@ -45,7 +45,7 @@ namespace Umbraco.Core.ObjectResolution
         /// <summary>
         /// Create instances of all of the legacy startup handlers
         /// </summary>
-	    public void InstantiateLegacyStartupHanlders()
+	    public void InstantiateLegacyStartupHandlers()
 	    {
             //this will instantiate them all
 	        var handlers = _legacyResolver.LegacyStartupHandlers;

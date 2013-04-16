@@ -119,7 +119,7 @@ namespace Umbraco.Web
             base.Complete(afterComplete);
 
             //Now, startup all of our legacy startup handler
-            ApplicationEventsResolver.Current.InstantiateLegacyStartupHanlders();
+            ApplicationEventsResolver.Current.InstantiateLegacyStartupHandlers();
 
             return this;
         }
