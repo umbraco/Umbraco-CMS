@@ -27,7 +27,7 @@ namespace Umbraco.Core.Configuration
 	/// <summary>
 	/// The UmbracoSettings Class contains general settings information for the entire Umbraco instance based on information from the /config/umbracoSettings.config file
 	/// </summary>
-	public class UmbracoSettings
+	internal class UmbracoSettings
 	{
         private static bool GetKeyValue(string key, bool defaultValue)
         {

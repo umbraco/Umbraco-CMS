@@ -209,7 +209,7 @@ namespace Umbraco.Web
             {                
                 route.DataTokens = new RouteValueDictionary();
             }
-            route.DataTokens.Add("Namespaces", meta.ControllerNamespace); //look in this namespace to create the controller
+            route.DataTokens.Add("Namespaces", new[] {meta.ControllerNamespace}); //look in this namespace to create the controller
             route.DataTokens.Add("umbraco", "api"); //ensure the umbraco token is set
         }
 

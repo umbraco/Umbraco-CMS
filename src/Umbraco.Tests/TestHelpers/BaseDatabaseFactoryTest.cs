@@ -282,7 +282,7 @@ namespace Umbraco.Tests.TestHelpers
 		    get { return ApplicationContext.DatabaseContext; }
 	    }
 
-        protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null)
+        protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null, bool setSingleton = false)
         {
             var cache = new PublishedContentCache();
 
@@ -299,6 +299,11 @@ namespace Umbraco.Tests.TestHelpers
                 GetHttpContextFactory(url, routeData).HttpContext,
                 ApplicationContext,
                 new PublishedCaches(cache, new PublishedMediaCache()));
+
+            if (setSingleton)
+            {
+                UmbracoContext.Current = ctx;
+            }
 
             return ctx;
         }

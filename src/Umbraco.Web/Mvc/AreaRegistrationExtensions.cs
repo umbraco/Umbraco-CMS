@@ -83,7 +83,7 @@ namespace Umbraco.Web.Mvc
                     controllerPluginRoute.DataTokens = new RouteValueDictionary();
                 }
                 //look in this namespace to create the controller
-                controllerPluginRoute.DataTokens.Add("Namespaces", controllerType.Namespace); 
+                controllerPluginRoute.DataTokens.Add("Namespaces", new[] {controllerType.Namespace});
             }
 
             //constraints: only match controllers ending with 'controllerSuffixName' and only match this controller's ID for this route            
