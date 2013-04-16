@@ -953,73 +953,61 @@ namespace umbraco.MacroEngines
         }
         public DynamicNode AncestorOrSelf(Func<DynamicNode, bool> func)
         {
-            var node = this;
-            while (node != null)
+            if (func(this)) return this;
+
+            var content = this;
+            while (content.Level > 1) // while we have a parent, consider the parent
             {
-                if (func(node)) return node;
-                DynamicNode parent = node.Parent;
-                if (parent != null)
-                {
-                    if (this != parent)
-                    {
-                        node = parent;
-                    }
-                    else
-                    {
-                        return node;
-                    }
-                }
-                else
-                {
-                    return null;
-                }
+                // see note in .Parent - strange things can happen
+                var parent = content.Parent;
+                if (parent == content) return null;
+                content = parent;
+
+                if (func(content))
+                    return content;
             }
-            return node;
+
+            return null;
         }
-        public DynamicNodeList AncestorsOrSelf(Func<DynamicNode, bool> func)
-        {
-            List<DynamicNode> ancestorList = new List<DynamicNode>();
-            var node = this;
-            ancestorList.Add(node);
-            while (node != null)
-            {
-                if (node.Level == 1) break;
-                DynamicNode parent = node.Parent;
-                if (parent != null)
-                {
-                    if (this != parent)
-                    {
-                        node = parent;
-                        if (func(node))
-                        {
-                            ancestorList.Add(node);
-                        }
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
-            ancestorList.Reverse();
-            return new DynamicNodeList(ancestorList);
-        }
+
         public DynamicNodeList AncestorsOrSelf()
         {
             return AncestorsOrSelf(n => true);
         }
-        public DynamicNodeList AncestorsOrSelf(string nodeTypeAlias)
-        {
-            return AncestorsOrSelf(n => n.NodeTypeAlias == nodeTypeAlias);
-        }
+
         public DynamicNodeList AncestorsOrSelf(int level)
         {
             return AncestorsOrSelf(n => n.Level <= level);
         }
+
+        public DynamicNodeList AncestorsOrSelf(string nodeTypeAlias)
+        {
+            return AncestorsOrSelf(n => n.NodeTypeAlias == nodeTypeAlias);
+        }
+
+        public DynamicNodeList AncestorsOrSelf(Func<DynamicNode, bool> func)
+        {
+		    var ancestors = new List<DynamicNode>();
+
+		    if (func(this))
+		        ancestors.Add(this);
+
+            var content = this;
+            while (content.Level > 1) // while we have a parent, consider the parent
+            {
+                // see note in .Parent - strange things can happen
+                var parent = content.Parent;
+                if (parent == content) break;
+                content = parent;
+
+                if (func(content))
+                    ancestors.Add(content);
+            }
+
+		    ancestors.Reverse();
+		    return new DynamicNodeList(ancestors);
+        }
+
         public DynamicNodeList Descendants(string nodeTypeAlias)
         {
             return Descendants(p => p.NodeTypeAlias == nodeTypeAlias);
@@ -1108,22 +1096,25 @@ namespace umbraco.MacroEngines
             ancestorList.Reverse();
             return new DynamicNodeList(ancestorList);
         }
+
         public DynamicNode Parent
         {
             get
             {
                 if (n == null)
-                {
                     return null;
-                }
+
                 if (n.Parent != null)
-                {
                     return new DynamicNode(n.Parent);
-                }
+
+                // DynamicBackingItem.Id will return zero if IsNull else it should return non-zero;
+                // it's IsNull when it's neither content nor media - which might happen when created
+                // an invalid identifier. And then it's a "non-existing" node which is its own parent.
+                // Does not make much sense, but, hey...
+
                 if (n != null && n.Id == 0)
-                {
-                    return this;
-                }
+                    return this; // ouch
+
                 return null;
             }
         }
