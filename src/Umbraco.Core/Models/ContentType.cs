@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
@@ -16,12 +15,22 @@ namespace Umbraco.Core.Models
     {
         private int _defaultTemplate;
         private IEnumerable<ITemplate> _allowedTemplates;
-
+        
+        /// <summary>
+        /// Constuctor for creating a ContentType with the parent's id.
+        /// </summary>
+        /// <remarks>You usually only want to use this for creating ContentTypes at the root.</remarks>
+        /// <param name="parentId"></param>
         public ContentType(int parentId) : base(parentId)
         {
             _allowedTemplates = new List<ITemplate>();
         }
 
+        /// <summary>
+        /// Constuctor for creating a ContentType with the parent as an inherited type.
+        /// </summary>
+        /// <remarks>Use this to ensure inheritance from parent.</remarks>
+        /// <param name="parent"></param>
 		public ContentType(IContentType parent) : base(parent)
 		{
 			_allowedTemplates = new List<ITemplate>();

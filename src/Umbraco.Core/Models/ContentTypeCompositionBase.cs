@@ -20,8 +20,10 @@ namespace Umbraco.Core.Models
         {
         }
 
-		protected ContentTypeCompositionBase(IContentTypeBase parent) : base(parent)
+        protected ContentTypeCompositionBase(IContentTypeComposition parent)
+            : base(parent)
 		{
+		    AddContentType(parent);
 		}
 
         private static readonly PropertyInfo ContentTypeCompositionSelector =

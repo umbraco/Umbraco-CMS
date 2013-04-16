@@ -47,13 +47,16 @@ namespace umbraco
         {
             //NOTE: TypeID is the parent id!
             //NOTE: ParentID is aparently a flag to determine if we are to create a template! Hack much ?! :P
-            var contentType = new ContentType(TypeID != 0 ? TypeID : -1)
-                {
-                    CreatorId = _userID,
-                    Alias = Alias.Replace("'", "''"),
-                    Icon = UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates ? ".sprTreeFolder" : "folder.gif",
-                    Name = Alias.Replace("'", "''")
-                };
+            var parentId = TypeID != 0 ? TypeID : -1;
+            var contentType = parentId == -1
+                                  ? new ContentType(-1)
+                                  : new ContentType(ApplicationContext.Current.Services.ContentTypeService.GetContentType(parentId));
+            contentType.CreatorId = _userID;
+            contentType.Alias = Alias.Replace("'", "''");
+            contentType.Name = Alias.Replace("'", "''");
+            contentType.Icon = UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates
+                                   ? ".sprTreeFolder"
+                                   : "folder.gif";
 
             // Create template?
             if (ParentID == 1)
