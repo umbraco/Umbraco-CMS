@@ -50,6 +50,20 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets a <see cref="RelationType"/> by its Alias
+        /// </summary>
+        /// <param name="alias">Alias of the <see cref="RelationType"/></param>
+        /// <returns>A <see cref="RelationType"/> object</returns>
+        public RelationType GetRelationTypeByAlias(string alias)
+        {
+            using (var repository = _repositoryFactory.CreateRelationTypeRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = new Query<RelationType>().Where(x => x.Alias == alias);
+                return repository.GetByQuery(query).FirstOrDefault();
+            }
+        }
+
+        /// <summary>
         /// Gets all <see cref="Relation"/> objects
         /// </summary>
         /// <param name="ids">Optional array of integer ids to return relations for</param>
@@ -283,6 +297,54 @@ namespace Umbraco.Core.Services
             }
         }
         
+        /// <summary>
+        /// Relates two objects that are based on the <see cref="IUmbracoEntity"/> interface.
+        /// </summary>
+        /// <param name="parent">Parent entity</param>
+        /// <param name="child">Child entity</param>
+        /// <param name="relationType">The type of relation to create</param>
+        /// <returns>The created <see cref="Relation"/></returns>
+        public Relation Relate(IUmbracoEntity parent, IUmbracoEntity child, RelationType relationType)
+        {
+            //Ensure that the RelationType has an indentity before using it to relate two entities
+            if(relationType.HasIdentity == false)
+                Save(relationType);
+
+            var relation = new Relation(parent.Id, child.Id, relationType);
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateRelationRepository(uow))
+            {
+                repository.AddOrUpdate(relation);
+                uow.Commit();
+
+                return relation;
+            }
+        }
+
+        /// <summary>
+        /// Relates two objects that are based on the <see cref="IUmbracoEntity"/> interface.
+        /// </summary>
+        /// <param name="parent">Parent entity</param>
+        /// <param name="child">Child entity</param>
+        /// <param name="relationTypeAlias">Alias of the type of relation to create</param>
+        /// <returns>The created <see cref="Relation"/></returns>
+        public Relation Relate(IUmbracoEntity parent, IUmbracoEntity child, string relationTypeAlias)
+        {
+            var relationType = GetRelationTypeByAlias(relationTypeAlias);
+            if(relationType == null || string.IsNullOrEmpty(relationType.Alias))
+                throw new ArgumentNullException(string.Format("No RelationType with Alias '{0}' exists.", relationTypeAlias));
+
+            var relation = new Relation(parent.Id, child.Id, relationType);
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateRelationRepository(uow))
+            {
+                repository.AddOrUpdate(relation);
+                uow.Commit();
+
+                return relation;
+            }
+        }
+
         /// <summary>
         /// Checks whether any relations exists for the passed in <see cref="RelationType"/>.
         /// </summary>
