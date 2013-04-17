@@ -582,24 +582,26 @@ namespace Umbraco.Core.Services
             foreach (XElement tempElement in templateElements)
             {
                 var dependencies = new List<string>();
-                if (tempElement.Element("Master") != null &&
-                    string.IsNullOrEmpty(tempElement.Element("Master").Value) == false &&
-                    templateElements.Any(x => x.Element("Alias").Value == tempElement.Element("Master").Value))
+                var elementCopy = tempElement;
+
+                if (elementCopy.Element("Master") != null &&
+                    string.IsNullOrEmpty(elementCopy.Element("Master").Value) == false &&
+                    templateElements.Any(x => x.Element("Alias").Value == elementCopy.Element("Master").Value))
                 {
-                    dependencies.Add(tempElement.Element("Master").Value);
+                    dependencies.Add(elementCopy.Element("Master").Value);
                 }
-                else if (tempElement.Element("Master") != null &&
-                         string.IsNullOrEmpty(tempElement.Element("Master").Value) == false &&
-                         templateElements.Any(x => x.Element("Alias").Value == tempElement.Element("Master").Value) ==
+                else if (elementCopy.Element("Master") != null &&
+                         string.IsNullOrEmpty(elementCopy.Element("Master").Value) == false &&
+                         templateElements.Any(x => x.Element("Alias").Value == elementCopy.Element("Master").Value) ==
                          false)
                 {
-                    LogHelper.Info<PackagingService>(string.Format("Template '{0}' has an invalid Master '{1}', so the reference has been ignored.", tempElement.Element("Alias").Value, tempElement.Element("Master").Value));
+                    LogHelper.Info<PackagingService>(string.Format("Template '{0}' has an invalid Master '{1}', so the reference has been ignored.", elementCopy.Element("Alias").Value, elementCopy.Element("Master").Value));
                 }
 
                 var field = new TopologicalSorter.DependencyField<XElement>
                                 {
-                                    Alias = tempElement.Element("Alias").Value,
-                                    Item = new Lazy<XElement>(() => tempElement),
+                                    Alias = elementCopy.Element("Alias").Value,
+                                    Item = new Lazy<XElement>(() => elementCopy),
                                     DependsOn = dependencies.ToArray()
                                 };
 

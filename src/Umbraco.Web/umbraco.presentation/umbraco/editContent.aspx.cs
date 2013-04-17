@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Caching;
-using Umbraco.Core.Services;
 using Umbraco.Core.IO;
+using Umbraco.Core.Services;
 using umbraco.BusinessLogic.Actions;
 using umbraco.uicontrols.DatePicker;
 using umbraco.BusinessLogic;
@@ -13,6 +12,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.presentation;
 using System.Linq;
 using Image = System.Web.UI.WebControls.Image;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation
 {
@@ -312,9 +312,7 @@ namespace umbraco.cms.presentation
                 _document.Save();
                 return;
             }
-
-            //var previouslyPublished = _document.HasPublishedVersion();
-
+                    
             if (_document.SaveAndPublish(UmbracoUser))
             {
                 //library.UpdateDocumentCache(_document.Id);

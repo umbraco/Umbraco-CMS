@@ -1,17 +1,9 @@
 using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.member;
 using System.Web.Security;
-using umbraco.IO;
 
 namespace umbraco.cms.presentation.members
 {
@@ -25,11 +17,11 @@ namespace umbraco.cms.presentation.members
             CurrentApp = BusinessLogic.DefaultApps.member.ToString();
         }
 		protected uicontrols.TabView TabView1;
-		protected System.Web.UI.WebControls.TextBox documentName;
-		private cms.businesslogic.member.Member _document;
-        private MembershipUser m_Member;
-		controls.ContentControl tmp;
-        protected umbraco.uicontrols.UmbracoPanel m_MemberShipPanel = new umbraco.uicontrols.UmbracoPanel(); 
+		protected TextBox documentName;
+		private Member _document;
+        private MembershipUser _member;
+		controls.ContentControl _contentControl;
+        protected uicontrols.UmbracoPanel m_MemberShipPanel = new uicontrols.UmbracoPanel(); 
 
 		protected TextBox MemberLoginNameTxt = new TextBox();
 	    protected RequiredFieldValidator MemberLoginNameVal = new RequiredFieldValidator();
@@ -39,7 +31,7 @@ namespace umbraco.cms.presentation.members
 		protected controls.DualSelectbox _memberGroups = new controls.DualSelectbox();
 
 
-		protected void Page_Load(object sender, System.EventArgs e)
+		protected void Page_Load(object sender, EventArgs e)
 		{
 
             // Add password changer
@@ -47,19 +39,23 @@ namespace umbraco.cms.presentation.members
 
             if (Member.InUmbracoMemberMode())
             {
-                _document = new cms.businesslogic.member.Member(int.Parse(Request.QueryString["id"]));
-                m_Member = Membership.GetUser(_document.Id);
-                tmp = new controls.ContentControl(_document, controls.ContentControl.publishModes.NoPublish, "TabView1");
-                tmp.Width = Unit.Pixel(666);
-                tmp.Height = Unit.Pixel(666);
-                plc.Controls.Add(tmp);
+                _document = new Member(int.Parse(Request.QueryString["id"]));
+                _member = Membership.GetUser(_document.Id);
+                _contentControl = new controls.ContentControl(_document, controls.ContentControl.publishModes.NoPublish, "TabView1");
+                _contentControl.Width = Unit.Pixel(666);
+                _contentControl.Height = Unit.Pixel(666);
+
+                //this must be set to false as we don't want to proceed to save anything if the page is invalid
+                _contentControl.SavePropertyDataWhenInvalid = false;
+
+                plc.Controls.Add(_contentControl);
 
                 if (!IsPostBack)
                 {
                     MemberLoginNameTxt.Text = _document.LoginName;
                     MemberEmail.Text = _document.Email;
                 }
-                PlaceHolder ph = new PlaceHolder();
+                var ph = new PlaceHolder();
                 MemberLoginNameTxt.ID = "loginname";
                 ph.Controls.Add(MemberLoginNameTxt);
                 ph.Controls.Add(MemberLoginNameVal);
@@ -69,26 +65,27 @@ namespace umbraco.cms.presentation.members
                 MemberLoginNameVal.EnableClientScript = false;
                 MemberLoginNameVal.Display = ValidatorDisplay.Dynamic;
 
-                tmp.PropertiesPane.addProperty(ui.Text("login"), ph);
-                tmp.PropertiesPane.addProperty(ui.Text("password"), MemberPasswordTxt);
-                tmp.PropertiesPane.addProperty("Email", MemberEmail);
+                _contentControl.PropertiesPane.addProperty(ui.Text("login"), ph);
+                _contentControl.PropertiesPane.addProperty(ui.Text("password"), MemberPasswordTxt);
+                _contentControl.PropertiesPane.addProperty("Email", MemberEmail);
             }
             else
             {
-                m_Member = Membership.GetUser(Request.QueryString["id"]);
-                MemberLoginNameTxt.Text = m_Member.UserName;
+                _member = Membership.GetUser(Request.QueryString["id"]);
+                MemberLoginNameTxt.Text = _member.UserName;
                 if (!IsPostBack)
                 {
-                    MemberEmail.Text = m_Member.Email;
+                    MemberEmail.Text = _member.Email;
                 }
 
                 m_MemberShipPanel.Width = 300;
-                m_MemberShipPanel.Text = ui.Text("edit") + " " + m_Member.UserName;
-                umbraco.uicontrols.Pane props = new umbraco.uicontrols.Pane();
+                m_MemberShipPanel.Text = ui.Text("edit") + " " + _member.UserName;
+                var props = new uicontrols.Pane();
                 MemberLoginNameTxt.Enabled = false;
 
                 // check for pw support
-                if (!Membership.Provider.EnablePasswordRetrieval) {
+                if (!Membership.Provider.EnablePasswordRetrieval)
+                {
                     MemberPasswordTxt.Controls.Clear();
                     MemberPasswordTxt.Controls.Add(
                         new LiteralControl("<em>" + ui.Text("errorHandling", "errorChangingProviderPassword") + "</em>"));
@@ -102,20 +99,20 @@ namespace umbraco.cms.presentation.members
             }
 
 			// Groups
-			umbraco.uicontrols.Pane p = new umbraco.uicontrols.Pane();
+			var p = new uicontrols.Pane();
 			_memberGroups.ID = "Membergroups";
 			_memberGroups.Width = 175;
-			string selectedMembers = "";
-			foreach(string role in Roles.GetAllRoles()) 
+			var selectedMembers = "";
+			foreach(var role in Roles.GetAllRoles()) 
 			{
                 // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
                 if (!role.StartsWith("__umbracoRole"))
                 {
-                    ListItem li = new ListItem(role);
+                    var li = new ListItem(role);
                     if (!IsPostBack)
                     {
 
-                        if (Roles.IsUserInRole(m_Member.UserName, role))
+                        if (Roles.IsUserInRole(_member.UserName, role))
                             selectedMembers += role + ",";
                     }
                     _memberGroups.Items.Add(li);
@@ -127,125 +124,131 @@ namespace umbraco.cms.presentation.members
 
             if (Member.InUmbracoMemberMode())
             {
-                tmp.tpProp.Controls.Add(p);
-                tmp.Save += new System.EventHandler(tmp_save);
+                _contentControl.tpProp.Controls.Add(p);
+                _contentControl.Save += new System.EventHandler(tmp_save);
             }
             else
                 m_MemberShipPanel.Controls.Add(p);
 
 		}
 
-        void menuSave_Click(object sender, ImageClickEventArgs e)
+        void MenuSaveClick(object sender, ImageClickEventArgs e)
         {
            
             tmp_save(sender, e);
             
         }
-		protected void tmp_save(object sender, System.EventArgs e) {
-            Page.Validate();
-            if (Page.IsValid)
-            {
-                if (Member.InUmbracoMemberMode())
+
+	    protected void tmp_save(object sender, EventArgs e)
+	    {
+	        Page.Validate();
+	        if (!Page.IsValid)
+	        {
+                foreach (uicontrols.TabPage tp in _contentControl.GetPanels())
                 {
-                    _document.LoginName = MemberLoginNameTxt.Text;
-                    _document.Email = MemberEmail.Text;
+                    tp.ErrorControl.Visible = true;
+                    tp.ErrorHeader = ui.Text("errorHandling", "errorHeader");
+                    tp.CloseCaption = ui.Text("close");
+                }
+	        }
+	        else
+	        {
 
-                    // Check if password should be changed
-                    string tempPassword = ((controls.passwordChanger) MemberPasswordTxt.Controls[0]).Password;
-                    if (tempPassword.Trim() != "")
-                        _document.Password = tempPassword;
-
-                    // Groups
-                    foreach (ListItem li in _memberGroups.Items)
+                if (Page.IsPostBack)
+                {
+                    // hide validation summaries
+                    foreach (uicontrols.TabPage tp in _contentControl.GetPanels())
                     {
-                        if (("," + _memberGroups.Value + ",").IndexOf("," + li.Value + ",") > -1)
-                        {
-                            if (!Roles.IsUserInRole(_document.LoginName, li.Value))
-                                Roles.AddUserToRole(_document.LoginName, li.Value);
-                        }
-                        else if (Roles.IsUserInRole(_document.LoginName, li.Value))
-                        {
-                            Roles.RemoveUserFromRole(_document.LoginName, li.Value);
-                        }
+                        tp.ErrorControl.Visible = false;
+                    }
+                }    
+
+	            if (Member.InUmbracoMemberMode())
+	            {
+	                _document.LoginName = MemberLoginNameTxt.Text;
+	                _document.Email = MemberEmail.Text;
+
+	                // Check if password should be changed
+	                string tempPassword = ((controls.passwordChanger) MemberPasswordTxt.Controls[0]).Password;
+	                if (tempPassword.Trim() != "")
+	                    _document.Password = tempPassword;
+
+	                // Groups
+	                foreach (ListItem li in _memberGroups.Items)
+                    {
+	                    if (("," + _memberGroups.Value + ",").IndexOf("," + li.Value + ",") > -1)
+	                    {
+	                        if (!Roles.IsUserInRole(_document.LoginName, li.Value))
+	                            Roles.AddUserToRole(_document.LoginName, li.Value);
+	                    }
+	                    else if (Roles.IsUserInRole(_document.LoginName, li.Value))
+	                    {
+	                        Roles.RemoveUserFromRole(_document.LoginName, li.Value);
+	                    }
                     }
 
                     //The value of the properties has been set on IData through IDataEditor in the ContentControl
                     //so we need to 'retrieve' that value and set it on the property of the new IContent object.
                     //NOTE This is a workaround for the legacy approach to saving values through the DataType instead of the Property 
                     //- (The DataType shouldn't be responsible for saving the value - especically directly to the db).
-                    foreach (var item in tmp.DataTypes)
+                    foreach (var item in _contentControl.DataTypes)
                     {
                         _document.getProperty(item.Key).Value = item.Value.Data.Value;
                     }
 
-                    // refresh cache
-                    _document.XmlGenerate(new System.Xml.XmlDocument());
-                    _document.Save();
-                }
-                else
-                {
-                    m_Member.Email = MemberEmail.Text;
-                    if (Membership.Provider.EnablePasswordRetrieval)
-                    {
-                        string tempPassword = ((controls.passwordChanger) MemberPasswordTxt.Controls[0]).Password;
-                        if (tempPassword.Trim() != "")
-                            m_Member.ChangePassword(m_Member.GetPassword(), tempPassword);
-                    }
-                    Membership.UpdateUser(m_Member);
-                    // Groups
-                    foreach (ListItem li in _memberGroups.Items)
-                        if (("," + _memberGroups.Value + ",").IndexOf("," + li.Value + ",") > -1)
-                        {
-                            if (!Roles.IsUserInRole(m_Member.UserName, li.Value))
-                                Roles.AddUserToRole(m_Member.UserName, li.Value);
-                        }
-                        else if (Roles.IsUserInRole(m_Member.UserName, li.Value))
-                        {
-                            Roles.RemoveUserFromRole(m_Member.UserName, li.Value);
-                        }
+	                // refresh cache
+	                _document.XmlGenerate(new System.Xml.XmlDocument());
+	                _document.Save();
+	            }
+	            else
+	            {
+	                _member.Email = MemberEmail.Text;
+	                if (Membership.Provider.EnablePasswordRetrieval)
+	                {
+	                    string tempPassword = ((controls.passwordChanger) MemberPasswordTxt.Controls[0]).Password;
+	                    if (tempPassword.Trim() != "")
+	                        _member.ChangePassword(_member.GetPassword(), tempPassword);
+	                }
+	                Membership.UpdateUser(_member);
+	                // Groups
+	                foreach (ListItem li in _memberGroups.Items)
+	                    if (("," + _memberGroups.Value + ",").IndexOf("," + li.Value + ",") > -1)
+	                    {
+	                        if (!Roles.IsUserInRole(_member.UserName, li.Value))
+	                            Roles.AddUserToRole(_member.UserName, li.Value);
+	                    }
+	                    else if (Roles.IsUserInRole(_member.UserName, li.Value))
+	                    {
+	                        Roles.RemoveUserFromRole(_member.UserName, li.Value);
+	                    }
 
-                }
+	            }
 
-                ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.save,
-                                  ui.Text("speechBubbles", "editMemberSaved", base.getUser()), "");
+                ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editMemberSaved", base.getUser()), "");
             }
 		}
 
-        private umbraco.uicontrols.PropertyPanel AddProperty(string Caption, Control C) {
-            umbraco.uicontrols.PropertyPanel pp = new umbraco.uicontrols.PropertyPanel();
-            pp.Controls.Add(C);
-            pp.Text = Caption;
-            return pp;
-        }
-		
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
+	    private uicontrols.PropertyPanel AddProperty(string caption, Control c)
+	    {
+	        var pp = new uicontrols.PropertyPanel();
+	        pp.Controls.Add(c);
+	        pp.Text = caption;
+	        return pp;
+	    }
+
+	    override protected void OnInit(EventArgs e)
 		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-
-            if (!Member.InUmbracoMemberMode()) {
-                m_MemberShipPanel.hasMenu = true;
-                umbraco.uicontrols.MenuImageButton menuSave = m_MemberShipPanel.Menu.NewImageButton();
-                menuSave.ID = m_MemberShipPanel.ID + "_save";
-                menuSave.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
-                menuSave.Click += new ImageClickEventHandler(menuSave_Click);
-                menuSave.AltText = ui.Text("buttons", "save", null);
-            
-            }
-            InitializeComponent();
-            base.OnInit(e);
+		    if (!Member.InUmbracoMemberMode())
+		    {
+		        m_MemberShipPanel.hasMenu = true;
+		        umbraco.uicontrols.MenuImageButton menuSave = m_MemberShipPanel.Menu.NewImageButton();
+		        menuSave.ID = m_MemberShipPanel.ID + "_save";
+		        menuSave.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
+		        menuSave.Click += new ImageClickEventHandler(MenuSaveClick);
+		        menuSave.AltText = ui.Text("buttons", "save", null);
+		    }
+		    base.OnInit(e);
         }
 		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
-
-		}
-		#endregion
 	}
 }
