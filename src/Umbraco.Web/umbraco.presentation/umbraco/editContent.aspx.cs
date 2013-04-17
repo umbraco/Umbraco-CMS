@@ -1,8 +1,6 @@
 using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Umbraco.Core;
-using Umbraco.Core.Services;
 using Umbraco.Core.IO;
 using umbraco.BusinessLogic.Actions;
 using umbraco.uicontrols.DatePicker;
@@ -11,6 +9,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.presentation;
 using System.Linq;
 using Image = System.Web.UI.WebControls.Image;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation
 {
@@ -74,7 +73,7 @@ namespace umbraco.cms.presentation
             _documentHasPublishedVersion = _document.HasPublishedVersion();
 
             // Check publishing permissions
-            if (!base.getUser().GetPermissions(_document.Path).Contains(ActionPublish.Instance.Letter.ToString()))
+            if (base.getUser().GetPermissions(_document.Path).Contains(ActionPublish.Instance.Letter.ToString()) == false)
             {
                 // Check to see if the user has send to publish permissions
                 if (!base.getUser().GetPermissions(_document.Path).Contains(ActionToPublish.Instance.Letter.ToString()))
@@ -228,7 +227,7 @@ namespace umbraco.cms.presentation
         protected void Save(object sender, EventArgs e)
         {
             // error handling test
-            if (!Page.IsValid)
+            if (Page.IsValid == false)
             {
                 foreach (uicontrols.TabPage tp in _cControl.GetPanels())
                 {
@@ -246,8 +245,8 @@ namespace umbraco.cms.presentation
                 }
             }
 
-            // Update name 
-            if (_document.Text != _cControl.NameTxt.Text)
+            // Update name if it has not changed and is not empty
+            if (_cControl.NameTxt != null && _document.Text != _cControl.NameTxt.Text && !_cControl.NameTxt.Text.IsNullOrWhiteSpace())
             {
                 //_refreshTree = true;
                 _document.Text = _cControl.NameTxt.Text;
@@ -285,7 +284,6 @@ namespace umbraco.cms.presentation
             {
                 _document.getProperty(item.Key).Value = item.Value.Data.Value;
             }
-
             // Run Handler				
             BusinessLogic.Actions.Action.RunActionHandlers(_document, ActionUpdate.Instance);
             _document.Save();
@@ -293,7 +291,7 @@ namespace umbraco.cms.presentation
             // Update the update date
             _dp.Text = _document.UpdateDate.ToShortDateString() + " " + _document.UpdateDate.ToShortTimeString();
 
-            if (!_cControl.DoesPublish)
+            if (_cControl.DoesPublish == false)
                 ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSavedHeader", null), ui.Text("speechBubbles", "editContentSavedText", null));
 
             ClientTools.SyncTree(_document.Path, true);
