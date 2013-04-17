@@ -30,12 +30,6 @@ namespace umbraco.controls
     public class ContentControl : TabView
     {
 
-        public ContentControl()
-        {
-            //by default set this to true for content
-            SavePropertyDataWhenInvalid = true;
-        }
-
         private readonly Content _content;
         private readonly ArrayList _dataFields = new ArrayList();
         private UmbracoEnsuredPage _prntpage;
@@ -51,7 +45,11 @@ namespace umbraco.controls
         private readonly CustomValidator _nameTxtCustomValidator = new CustomValidator();
         private static readonly string UmbracoPath = SystemDirectories.Umbraco;
         public Pane PropertiesPane = new Pane();
-
+        // zb-00036 #29889 : load it only once
+        List<ContentType.TabI> _virtualTabs;
+        //default to true!
+        private bool _savePropertyDataWhenInvalid = true;
+        
         public Content ContentObject
         {
             get { return _content; }
@@ -68,7 +66,11 @@ namespace umbraco.controls
         /// to the database when the page is invalid because there is no published state.
         /// Relates to: http://issues.umbraco.org/issue/U4-227
         /// </remarks>
-        public bool SavePropertyDataWhenInvalid { get; set; }
+        public bool SavePropertyDataWhenInvalid
+        {
+            get { return _savePropertyDataWhenInvalid; }
+            set { _savePropertyDataWhenInvalid = value; }
+        }
 
         [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
         private string _errorMessage = "";
@@ -83,9 +85,6 @@ namespace umbraco.controls
         protected void standardSaveAndPublishHandler(object sender, EventArgs e)
         {
         }
-
-        // zb-00036 #29889 : load it only once
-        List<ContentType.TabI> _virtualTabs;
 
         /// <summary>
         /// Constructor to set default properties.
