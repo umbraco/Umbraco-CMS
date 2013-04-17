@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.Xml.Linq;
+using System.Xml.XPath;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core
@@ -13,6 +16,61 @@ namespace Umbraco.Core
     /// </summary>
     public class XmlHelper
     {
+	    /// <summary>
+	    /// Sorts the children of the parentNode that match the xpath selector 
+	    /// </summary>
+	    /// <param name="parentNode"></param>
+	    /// <param name="childXPathSelector">An xpath expression used to select child nodes of the XmlElement</param>
+	    /// <param name="childSelector">An expression that returns true if the XElement passed in is a valid child node to be sorted</param>
+	    /// <param name="orderByValue">The value to order the results by</param>
+	    internal static void SortNodes(
+            XmlNode parentNode, 
+            string childXPathSelector, 
+            Func<XElement, bool> childSelector,
+            Func<XElement, object> orderByValue)
+	    {
+
+            var xElement = parentNode.ToXElement();
+            var children = xElement.Elements().Where(childSelector).ToArray();
+            
+            var data = children
+                .OrderByDescending(orderByValue)     //order by the sort order desc
+                .Select(children.IndexOf)           //store the current item's index               
+                .ToList();
+
+            //get the minimum index that a content node exists  in the parent
+            var minElementIndex = xElement.Elements()
+                .TakeWhile(x => childSelector(x) == false)
+                .Count();
+
+	        //if the minimum index is zero, then it is the very first node inside the parent,
+            // if it is not, we need to store the child property node that exists just before the 
+            // first content node found so we can insert elements after it when we're sorting.
+            var insertAfter = minElementIndex == 0 ? null : parentNode.ChildNodes[minElementIndex - 1];
+
+            var selectedChildren = parentNode.SelectNodes(childXPathSelector);
+            if (selectedChildren == null)
+            {
+                throw new InvalidOperationException(string.Format("The childXPathSelector value did not return any results {0}", childXPathSelector));
+            }
+
+            var childElements = selectedChildren.Cast<XmlElement>().ToArray();
+
+            //iterate over the ndoes starting with the node with the highest sort order.
+            //then we insert this node at the begginning of the parent so that by the end
+            //of the iteration the node with the least sort order will be at the top.
+            foreach (var node in data.Select(index => childElements[index]))
+            {
+                if (insertAfter == null)
+                {
+                    parentNode.PrependChild(node);
+                }
+                else
+                {
+                    parentNode.InsertAfter(node, insertAfter);
+                }
+            }
+        }
 
 		/// <summary>
         /// Imports a XML node from text.
