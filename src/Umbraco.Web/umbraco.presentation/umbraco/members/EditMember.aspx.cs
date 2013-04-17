@@ -191,7 +191,7 @@ namespace umbraco.cms.presentation.members
                     //so we need to 'retrieve' that value and set it on the property of the new IContent object.
                     //NOTE This is a workaround for the legacy approach to saving values through the DataType instead of the Property 
                     //- (The DataType shouldn't be responsible for saving the value - especically directly to the db).
-                    foreach (var item in tmp.DataTypes)
+                    foreach (var item in _contentControl.DataTypes)
                     {
                         _document.getProperty(item.Key).Value = item.Value.Data.Value;
                     }
@@ -224,8 +224,7 @@ namespace umbraco.cms.presentation.members
 
 	            }
 
-                ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.save,
-                                  ui.Text("speechBubbles", "editMemberSaved", base.getUser()), "");
+                ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editMemberSaved", base.getUser()), "");
             }
 		}
 

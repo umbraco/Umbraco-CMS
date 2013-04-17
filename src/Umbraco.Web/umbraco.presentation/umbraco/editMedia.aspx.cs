@@ -109,7 +109,7 @@ namespace umbraco.cms.presentation
             //so we need to 'retrieve' that value and set it on the property of the new IContent object.
             //NOTE This is a workaround for the legacy approach to saving values through the DataType instead of the Property 
             //- (The DataType shouldn't be responsible for saving the value - especically directly to the db).
-            foreach (var item in tmp.DataTypes)
+            foreach (var item in _contentControl.DataTypes)
             {
                 _media.getProperty(item.Key).Value = item.Value.Data.Value;
             }

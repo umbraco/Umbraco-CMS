@@ -18,6 +18,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using umbraco.uicontrols;
 using Content = umbraco.cms.businesslogic.Content;
+using ContentType = umbraco.cms.businesslogic.ContentType;
 using Media = umbraco.cms.businesslogic.media.Media;
 using Property = umbraco.cms.businesslogic.property.Property;
 using StylesheetProperty = umbraco.cms.businesslogic.web.StylesheetProperty;
@@ -31,18 +32,15 @@ namespace umbraco.controls
     /// </summary>
     public class ContentControl : TabView
     {
-        private readonly Content _content;
-        internal Dictionary<string, IDataType> DataTypes = new Dictionary<string, IDataType>();
-        private UmbracoEnsuredPage _prntpage;
 
         public ContentControl()
         {
             //by default set this to true for content
             SavePropertyDataWhenInvalid = true;
         }
-
+        
+        internal Dictionary<string, IDataType> DataTypes = new Dictionary<string, IDataType>();
         private readonly Content _content;
-        private readonly ArrayList _dataFields = new ArrayList();
         private UmbracoEnsuredPage _prntpage;
         public event EventHandler SaveAndPublish;
         public event EventHandler SaveToPublish;
@@ -360,16 +358,16 @@ namespace umbraco.controls
                     }
                 }
 
-            foreach (var property in DataTypes)
-            {
-                var defaultData = property.Value.Data as DefaultData;
-                if (defaultData != null)
+                foreach (var property in DataTypes)
                 {
-                    defaultData.PropertyTypeAlias = property.Key;
-                    defaultData.NodeId = _content.Id;
+                    var defaultData = property.Value.Data as DefaultData;
+                    if (defaultData != null)
+                    {
+                        defaultData.PropertyTypeAlias = property.Key;
+                        defaultData.NodeId = _content.Id;
+                    }
+                    property.Value.DataEditor.Save();
                 }
-                property.Value.DataEditor.Save();
-            }
 
                 //don't update if the name is empty
                 if (!NameTxt.Text.IsNullOrWhiteSpace())

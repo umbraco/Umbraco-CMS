@@ -2,6 +2,7 @@ using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core.IO;
+using Umbraco.Core.Services;
 using umbraco.BusinessLogic.Actions;
 using umbraco.uicontrols.DatePicker;
 using umbraco.BusinessLogic;
@@ -313,9 +314,7 @@ namespace umbraco.cms.presentation
                 if (_document.Level == 1 || _document.PathPublished)
                 {
                     var previouslyPublished = _document.HasPublishedVersion();
-
-                    Trace.Warn("before d.publish");
-
+                    
                     if (_document.PublishWithResult(base.getUser(), false))
                     {
                         ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));
