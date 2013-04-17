@@ -345,7 +345,7 @@ namespace umbraco
             if (d.Published)
             {
                 int parentId = d.Level == 1 ? -1 : d.Parent.Id;
-				xmlContentCopy = AppendDocumentXml(d.Id, d.Level, parentId, getPreviewOrPublishedNode(d, xmlContentCopy, false),
+				xmlContentCopy = AppendDocumentXml(d.Id, d.Level, parentId, GetPreviewOrPublishedNode(d, xmlContentCopy, false),
                                   xmlContentCopy);
 
                 // update sitemapprovider
@@ -424,7 +424,7 @@ namespace umbraco
 			return xmlContentCopy;
         }
 
-        private static XmlNode getPreviewOrPublishedNode(Document d, XmlDocument xmlContentCopy, bool isPreview)
+        private static XmlNode GetPreviewOrPublishedNode(Document d, XmlDocument xmlContentCopy, bool isPreview)
         {
             if (isPreview)
             {
