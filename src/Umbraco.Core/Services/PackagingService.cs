@@ -596,10 +596,11 @@ namespace Umbraco.Core.Services
                     LogHelper.Info<PackagingService>(string.Format("Template '{0}' has an invalid Master '{1}', so the reference has been ignored.", tempElement.Element("Alias").Value, tempElement.Element("Master").Value));
                 }
 
+                XElement elementCopy = tempElement;
                 var field = new TopologicalSorter.DependencyField<XElement>
                                 {
-                                    Alias = tempElement.Element("Alias").Value,
-                                    Item = new Lazy<XElement>(() => tempElement),
+                                    Alias = elementCopy.Element("Alias").Value,
+                                    Item = new Lazy<XElement>(() => elementCopy),
                                     DependsOn = dependencies.ToArray()
                                 };
 
