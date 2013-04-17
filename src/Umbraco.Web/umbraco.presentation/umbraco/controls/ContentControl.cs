@@ -344,18 +344,28 @@ namespace umbraco.controls
         /// </summary>
         private void SetNameAndDataTypeValues()
         {
-            if (!string.IsNullOrEmpty(NameTxt.Text))
-                _content.Text = NameTxt.Text;
-
-            foreach (var property in DataTypes)
+            //we only continue saving anything if: 
+            // SavePropertyDataWhenInvalid == true
+            // OR if the page is actually valid.
+            if (SavePropertyDataWhenInvalid || Page.IsValid)
             {
-                var defaultData = property.Value.Data as DefaultData;
-                if (defaultData != null)
+
+                foreach (var property in DataTypes)
                 {
-                    defaultData.PropertyTypeAlias = property.Key;
-                    defaultData.NodeId = _content.Id;
+                    var defaultData = property.Value.Data as DefaultData;
+                    if (defaultData != null)
+                    {
+                        defaultData.PropertyTypeAlias = property.Key;
+                        defaultData.NodeId = _content.Id;
+                    }
+                    property.Value.DataEditor.Save();
                 }
-                property.Value.DataEditor.Save();
+
+                //don't update if the name is empty
+                if (!NameTxt.Text.IsNullOrWhiteSpace())
+                {
+                    _content.Text = NameTxt.Text;
+                }
             }
         }
 
