@@ -29,6 +29,13 @@ namespace umbraco.controls
     /// </summary>
     public class ContentControl : TabView
     {
+
+        public ContentControl()
+        {
+            //by default set this to true for content
+            SavePropertyDataWhenInvalid = true;
+        }
+
         private readonly Content _content;
         private readonly ArrayList _dataFields = new ArrayList();
         private UmbracoEnsuredPage _prntpage;
@@ -49,6 +56,19 @@ namespace umbraco.controls
         {
             get { return _content; }
         }
+
+        /// <summary>
+        /// This property controls whether the content property values are persisted even if validation 
+        /// fails. If set to false, then the values will not be persisted.
+        /// </summary>
+        /// <remarks>
+        /// This is required because when we are editing content we should be persisting invalid values to the database
+        /// as this makes it easier for editors to come back and fix up their changes before they publish. Of course we
+        /// don't publish if the page is invalid. In the case of media and members, we don't want to persist the values
+        /// to the database when the page is invalid because there is no published state.
+        /// Relates to: http://issues.umbraco.org/issue/U4-227
+        /// </remarks>
+        public bool SavePropertyDataWhenInvalid { get; set; }
 
         [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
         private string _errorMessage = "";
@@ -261,34 +281,33 @@ namespace umbraco.controls
 
 
         private void SaveClick(object sender, ImageClickEventArgs e)
-        {            
-            ////TODO: If we are editing media/content we should not continue saving
-            //// if the page is invalid!
-            //// http://issues.umbraco.org/issue/U4-227
-            //if (Page.IsValid)
-            //{                
-            //}
-
-            var doc = this._content as Document;
-            if (doc != null)
+        {
+            //we only continue saving anything if: 
+            // SavePropertyDataWhenInvalid == true
+            // OR if the page is actually valid.
+            if (SavePropertyDataWhenInvalid || Page.IsValid)
             {
-                var docArgs = new SaveEventArgs();
-                doc.FireBeforeSave(docArgs);
-
-                if (docArgs.Cancel) //TODO: need to have some notification to the user here
+                var doc = this._content as Document;
+                if (doc != null)
                 {
-                    return;
-                }
-            }
-            foreach (IDataEditor df in _dataFields)
-            {
-                df.Save();
-            }
+                    var docArgs = new SaveEventArgs();
+                    doc.FireBeforeSave(docArgs);
 
-            //don't update if the name is empty
-            if (!NameTxt.Text.IsNullOrWhiteSpace())
-            {
-                _content.Text = NameTxt.Text;
+                    if (docArgs.Cancel) //TODO: need to have some notification to the user here
+                    {
+                        return;
+                    }
+                }
+                foreach (IDataEditor df in _dataFields)
+                {
+                    df.Save();
+                }
+
+                //don't update if the name is empty
+                if (!NameTxt.Text.IsNullOrWhiteSpace())
+                {
+                    _content.Text = NameTxt.Text;
+                }
             }
 
             if (Save != null)

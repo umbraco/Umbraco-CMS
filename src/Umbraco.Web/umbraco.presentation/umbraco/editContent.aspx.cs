@@ -265,9 +265,6 @@ namespace umbraco.cms.presentation
                 }
             }
 
-
-
-
             // Run Handler				
             BusinessLogic.Actions.Action.RunActionHandlers(_document, ActionUpdate.Instance);
             _document.Save();
