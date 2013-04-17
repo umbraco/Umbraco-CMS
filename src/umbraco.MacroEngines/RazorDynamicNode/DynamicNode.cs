@@ -1007,10 +1007,6 @@ namespace umbraco.MacroEngines
 
 		    ancestors.Reverse();
 		    return new DynamicNodeList(ancestors);
-            }
-
-		    ancestors.Reverse();
-		    return new DynamicNodeList(ancestors);
         }
 
         public DynamicNodeList Descendants(string nodeTypeAlias)
