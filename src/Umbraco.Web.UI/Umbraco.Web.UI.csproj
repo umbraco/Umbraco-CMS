@@ -2283,7 +2283,9 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="config\tinyMceConfig.config" />
-    <Content Include="config\umbracoSettings.config" />
+    <Content Include="config\umbracoSettings.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="config\xsltExtensions.config" />
     <Content Include="config\UrlRewriting.config" />
     <Content Include="config\log4net.config" />
