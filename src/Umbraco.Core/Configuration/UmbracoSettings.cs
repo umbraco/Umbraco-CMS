@@ -677,7 +677,7 @@ namespace Umbraco.Core.Configuration
 	    {
 	        get
 	        {
-                var val = GetKey("/settings/content/dissallowedUploadFiles");
+                var val = GetKey("/settings/content/disallowedUploadFiles");
 	            return val.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
 	        }
 	    }
