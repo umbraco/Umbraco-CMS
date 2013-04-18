@@ -75,6 +75,9 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public void UpdateSortOrder(int ParentId, string SortOrder)
         {
+            //TODO: The amount of processing this method takes is HUGE. We should look at 
+            // refactoring this to use purely the new APIs and see how much faster we can make it!
+
             try
             {
                 if (AuthorizeRequest() == false) return;
@@ -90,29 +93,23 @@ namespace umbraco.presentation.webservices
                 for (var i = 0; i < ids.Length; i++)
                 {
                     if (ids[i] == "" || ids[i].Trim() == "") continue;
-                   
+
                     if (isContent)
                     {
                         var document = new Document(int.Parse(ids[i]))
                             {
                                 sortOrder = i
                             };
-                        
-                        //TODO: Theoretically we should be calling this too but it will show up as an unpublished
-                        // revision which is not what we want, otherwise we should call Publish() on each node but this
-                        // will be even worse performance! We'll wait till version 6 to fix up.
-                        //document.Save();
-                        
+
                         if (document.Published)
                         {
-                            // update the sort order of the xml in the database
-                            document.refreshXmlSortOrder();
+                            document.Publish(BusinessLogic.User.GetCurrent());
 
                             //TODO: WE don't want to have to republish the entire document !!!!
                             library.UpdateDocumentCache(document);
                         }
                     }
-                    // to update the sortorder of the media node in the XML, re-save the node....
+                        // to update the sortorder of the media node in the XML, re-save the node....
                     else if (isMedia)
                     {
                         var media = new cms.businesslogic.media.Media(int.Parse(ids[i]))
@@ -120,35 +117,35 @@ namespace umbraco.presentation.webservices
                                 sortOrder = i
                             };
                         media.Save();
-                    {
-                        new cms.businesslogic.CMSNode(int.Parse(tmp[i])).sortOrder = i;
+                        {
+                            new cms.businesslogic.CMSNode(int.Parse(ids[i])).sortOrder = i;
+                        }
                     }
-                }
 
-                // Refresh sort order on cached xml
-                if (isContent)
-                {
-                    XmlNode parentNode = ParentId == -1
-                                             ? content.Instance.XmlContent.DocumentElement
-                                             : content.Instance.XmlContent.GetElementById(ParentId.ToString());
+                    // Refresh sort order on cached xml
+                    if (isContent)
+                    {
+                        XmlNode parentNode = ParentId == -1
+                                                 ? content.Instance.XmlContent.DocumentElement
+                                                 : content.Instance.XmlContent.GetElementById(ParentId.ToString());
 
-                    //only try to do the content sort if the the parent node is available... 
-                    if (parentNode != null)
-                        content.SortNodes(ref parentNode);
+                        //only try to do the content sort if the the parent node is available... 
+                        if (parentNode != null)
+                            content.SortNodes(ref parentNode);
 
-                    // Load balancing - then refresh entire cache
-                    if (UmbracoSettings.UseDistributedCalls)
-                        library.RefreshContent();
+                        // Load balancing - then refresh entire cache
+                        if (UmbracoSettings.UseDistributedCalls)
+                            library.RefreshContent();
 
-                    // fire actionhandler, check for content
-                    BusinessLogic.Actions.Action.RunActionHandlers(new Document(ParentId), ActionSort.Instance);
-                }
+                        // fire actionhandler, check for content
+                        BusinessLogic.Actions.Action.RunActionHandlers(new Document(ParentId), ActionSort.Instance);
+                    }
+                }                
             }
             catch (Exception ex)
             {
                 LogHelper.Error<nodeSorter>("Could not update sort order", ex);
             }
-
         }
     }
 
