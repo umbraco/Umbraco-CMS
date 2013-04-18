@@ -285,9 +285,9 @@ namespace umbraco
         /// <summary>
         /// File types that will not be allowed to be uploaded via the content/media upload control
         /// </summary>
-        public static IEnumerable<string> DissallowedUploadFiles
+        public static IEnumerable<string> DisallowedUploadFiles
         {
-            get { return Umbraco.Core.Configuration.UmbracoSettings.DissallowedUploadFiles; }
+            get { return Umbraco.Core.Configuration.UmbracoSettings.DisallowedUploadFiles; }
         }
 
         /// <summary>

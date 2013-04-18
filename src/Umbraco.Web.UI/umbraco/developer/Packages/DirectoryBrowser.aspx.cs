@@ -20,8 +20,6 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
             CurrentApp = DefaultApps.developer.ToString();
         }
 
-        string _lsTitle;
-        string _lsLink;
         string _lsScriptName;
         string _lsWebPath;
         protected string Target = "";
@@ -35,7 +33,6 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
 
             Response.Cache.SetExpires(DateTime.Now.AddSeconds(5));
             Response.Cache.SetCacheability(HttpCacheability.Public);
-            _lsTitle = Request.QueryString.Get("title");
             
             //we need to clean this string:
             //http://issues.umbraco.org/issue/U4-2027
@@ -47,21 +44,12 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
                 throw new InvalidOperationException("The target query string must be set to a valid html element id");
 
             Target = matched[0].Value;
-
-            if (string.IsNullOrEmpty(_lsTitle)) { _lsTitle = "Web Browse"; }
             
             try
             {
 
                 //Variables used in script
                 var sebChar = IOHelper.DirSepChar.ToString();
-
-                //Write header, get link param
-                _lsLink = Request.QueryString.Get("link");
-                if (!string.IsNullOrEmpty(_lsLink))
-                {
-                    _sb.Append("<A href=\"" + _lsLink + "\">[&nbsp;Return&nbsp;]</A><BR>");
-                }
 
                 //Work on path and ensure no back tracking
                 string sSubDir = Request.QueryString.Get("path");
@@ -105,7 +93,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
                 {
                     try
                     {
-                        _sb.Append("<tr><td class=\"tdDir\"><a href=\"" + _lsScriptName + "?path=" + _lsWebPath + oDir.Name + "&title=" + _lsTitle + "&link=" + _lsLink + "&target=" + Target + "\">" + oDir.Name + "</a>  <small><a href=\"javascript:postPath('/" + _lsWebPath + oDir.Name + "')\"> (Include entire folder)</small></td></tr>");
+                        _sb.Append("<tr><td class=\"tdDir\"><a href=\"" + _lsScriptName + "?path=" + _lsWebPath + oDir.Name + "&target=" + Target + "\">" + oDir.Name + "</a>  <small><a href=\"javascript:postPath('/" + _lsWebPath + oDir.Name + "')\"> (Include entire folder)</small></td></tr>");
                     }
                     catch (Exception ex)
                     {
@@ -147,7 +135,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
 
         private string GetNavLink(string psHref, string psText)
         {
-            return ("/<a class=\"tdheadA\" href=\"" + _lsScriptName + "?path=" + psHref + "&title=" + _lsTitle + "&link=" + _lsLink + "\">" + psText + "</a>");
+            return ("/<a class=\"tdheadA\" href=\"" + _lsScriptName + "?path=" + psHref + "\">" + psText + "</a>");
         }
 
     }
