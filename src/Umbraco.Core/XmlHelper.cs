@@ -31,11 +31,11 @@ namespace Umbraco.Core
 	    {
 
             var xElement = parentNode.ToXElement();
-            var children = xElement.Elements().Where(childSelector).ToArray();
+            var children = xElement.Elements().Where(x => childSelector(x)).ToArray(); //(DONT conver to method group, the build server doesn't like it)
             
             var data = children
                 .OrderByDescending(orderByValue)     //order by the sort order desc
-                .Select(children.IndexOf)           //store the current item's index               
+                .Select(x => children.IndexOf(x))   //store the current item's index (DONT conver to method group, the build server doesn't like it)
                 .ToList();
 
             //get the minimum index that a content node exists  in the parent
