@@ -66,10 +66,17 @@ namespace Umbraco.Web.WebServices
 				if (System.IO.File.Exists(saveOldPath))
 					System.IO.File.Delete(saveOldPath);
 			}
-			using (var sw = System.IO.File.CreateText(savePath))
-			{
-				sw.Write(val);
-			}
+
+            //NOTE: I've left the below here just for informational purposes. If we save a file this way, then the UTF8
+            // BOM mucks everything up, strangely, if we use WriteAllText everything is ok! 
+            // http://issues.umbraco.org/issue/U4-2118
+            //using (var sw = System.IO.File.CreateText(savePath))
+            //{
+            //    sw.Write(val);
+            //}
+
+            System.IO.File.WriteAllText(savePath, val, Encoding.UTF8);
+
 			return Success(ui.Text("speechBubbles", "partialViewSavedText"), ui.Text("speechBubbles", "partialViewSavedHeader"));
 		}
 
