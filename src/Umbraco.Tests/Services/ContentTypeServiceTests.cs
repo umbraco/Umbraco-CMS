@@ -170,7 +170,6 @@ namespace Umbraco.Tests.Services
             cts.Save(ctBase);
 
             var ctHomePage = new ContentType(ctBase) { Name = "Home Page", Alias = "HomePage", Icon = "settingDomain.gif", Thumbnail = "folder.png", AllowedAsRoot = true };
-            bool addedContentType = ctHomePage.AddContentType(ctBase);
             ctHomePage.AddPropertyType(new PropertyType(dtdYesNo) { Name = "Some property", Alias = "someProperty" }  /*,"Navigation"*/ );
             cts.Save(ctHomePage);
 
@@ -183,7 +182,6 @@ namespace Umbraco.Tests.Services
             Assert.That(ctHomePage.HasIdentity, Is.True);
             Assert.That(homeDoc.HasIdentity, Is.True);
             Assert.That(homeDoc.ContentTypeId, Is.EqualTo(ctHomePage.Id));
-            Assert.That(addedContentType, Is.True);
         }
 
 		private IEnumerable<IContentType> CreateContentTypeHierarchy()
