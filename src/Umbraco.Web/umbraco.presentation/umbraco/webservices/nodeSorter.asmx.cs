@@ -80,37 +80,50 @@ namespace umbraco.presentation.webservices
 
             try
             {
-                if (!AuthorizeRequest()) return;
+                if (AuthorizeRequest() == false) return;
                 if (SortOrder.Trim().Length <= 0) return;
                 
-                var tmp = SortOrder.Split(',');
+                var ids = SortOrder.Split(',');
 
                 var isContent = helper.Request("app") == "content" | helper.Request("app") == "";
                 var isMedia = helper.Request("app") == "media";
 
                 //ensure user is authorized for the app requested
-                if (isContent && !AuthorizeRequest(DefaultApps.content.ToString())) return;
-                if (isMedia && !AuthorizeRequest(DefaultApps.media.ToString())) return;
+                if (isContent && AuthorizeRequest(DefaultApps.content.ToString()) == false) return;
+                if (isMedia && AuthorizeRequest(DefaultApps.media.ToString()) == false) return;
 
-                for (var i = 0; i < tmp.Length; i++)
+                for (var i = 0; i < ids.Length; i++)
                 {
-                    if (tmp[i] == "" || tmp[i].Trim() == "") continue;
-                    
-                    new cms.businesslogic.CMSNode(int.Parse(tmp[i])).sortOrder = i;
-
+                    if (ids[i] == "" || ids[i].Trim() == "") continue;
+                   
                     if (isContent)
                     {
-                        var d = new Document(int.Parse(tmp[i]));
-                        // refresh the xml for the sorting to work
-                        if (d.Published)
+                        var document = new Document(int.Parse(ids[i]))
+                            {
+                                sortOrder = i
+                            };
+                        
+                        //TODO: Theoretically we should be calling this too but it will show up as an unpublished
+                        // revision which is not what we want, otherwise we should call Publish() on each node but this
+                        // will be even worse performance! We'll wait till version 6 to fix up.
+                        //document.Save();
+                        
+                        if (document.Published)
                         {
-                            d.refreshXmlSortOrder();
-                            library.UpdateDocumentCache(int.Parse(tmp[i]));
+                            // update the sort order of the xml in the database
+                            document.refreshXmlSortOrder();
+
+                            //TODO: WE don't want to have to republish the entire document !!!!
+                            library.UpdateDocumentCache(document);
                         }
                     }
                     else if (isMedia)
                     {
-                        new cms.businesslogic.media.Media(int.Parse(tmp[i])).Save();
+                        var media = new cms.businesslogic.media.Media(int.Parse(ids[i]))
+                            {
+                                sortOrder = i
+                            };
+                        media.Save();
                     }
                 }
 
@@ -128,11 +141,10 @@ namespace umbraco.presentation.webservices
                     // Load balancing - then refresh entire cache
                     if (UmbracoSettings.UseDistributedCalls)
                         library.RefreshContent();
-                }
 
-                // fire actionhandler, check for content
-                if ((helper.Request("app") == "content" | helper.Request("app") == "") && ParentId > 0)
+                    // fire actionhandler, check for content
                     BusinessLogic.Actions.Action.RunActionHandlers(new Document(ParentId), ActionSort.Instance);
+                }
             }
             catch (Exception ex)
             {

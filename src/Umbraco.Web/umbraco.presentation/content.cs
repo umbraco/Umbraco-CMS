@@ -350,14 +350,15 @@ namespace umbraco
         /// </summary>
         /// <param name="d"></param>
         /// <param name="xmlContentCopy"></param>
+        /// <param name="updateSitemapProvider"></param>
         public static XmlDocument PublishNodeDo(Document d, XmlDocument xmlContentCopy, bool updateSitemapProvider)
         {
             // check if document *is* published, it could be unpublished by an event
             if (d.Published)
             {
-                int parentId = d.Level == 1 ? -1 : d.Parent.Id;
-				xmlContentCopy = AppendDocumentXml(d.Id, d.Level, parentId, GetPreviewOrPublishedNode(d, xmlContentCopy, false),
-                                  xmlContentCopy);
+                var parentId = d.Level == 1 ? -1 : d.Parent.Id;
+                xmlContentCopy = AppendDocumentXml(d.Id, d.Level, parentId,
+                                                   GetPreviewOrPublishedNode(d, xmlContentCopy, false), xmlContentCopy);
 
                 // update sitemapprovider
                 if (updateSitemapProvider && SiteMap.Provider is UmbracoSiteMapProvider)
@@ -365,9 +366,11 @@ namespace umbraco
                     try
                     {
                         var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
-                        Node n = new Node(d.Id, true);
-                        if (!String.IsNullOrEmpty(n.Url) && n.Url != "/#")
+                        var n = new Node(d.Id, true);
+                        if (string.IsNullOrEmpty(n.Url) == false && n.Url != "/#")
+                        {
                             prov.UpdateNode(n);
+                        }
                         else
                         {
                             Log.Add(LogTypes.Error, d.Id, "Can't update Sitemap Provider due to empty Url in node");
@@ -1354,12 +1357,10 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         /// <returns></returns>
         private static XmlDocument CloneXmlDoc(XmlDocument xmlDoc)
         {
-            if (xmlDoc == null) return null;
-
-            Log.Add(LogTypes.Debug, -1, "Cloning...");
+            if (xmlDoc == null) return null;            
+            
             // Save copy of content
-            var xmlCopy = (XmlDocument)xmlDoc.CloneNode(true);
-            Log.Add(LogTypes.Debug, -1, "Cloning ended...");
+            var xmlCopy = (XmlDocument)xmlDoc.CloneNode(true);            
             return xmlCopy;
         }
 
