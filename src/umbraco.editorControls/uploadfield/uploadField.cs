@@ -88,7 +88,7 @@ namespace umbraco.editorControls
             //now check the file type
             var extension = Path.GetExtension(postedFile.FileName).TrimStart(".");
             
-            return UmbracoSettings.DissallowedUploadFiles.Any(x => x.InvariantEquals(extension)) == false;
+            return UmbracoSettings.DisallowedUploadFiles.Any(x => x.InvariantEquals(extension)) == false;
         }
 
         public string Text

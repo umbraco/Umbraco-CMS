@@ -674,11 +674,11 @@ namespace Umbraco.Core.Configuration
         /// <summary>
         /// File types that will not be allowed to be uploaded via the content/media upload control
         /// </summary>
-	    public static IEnumerable<string> DissallowedUploadFiles
+	    public static IEnumerable<string> DisallowedUploadFiles
 	    {
 	        get
 	        {
-                var val = GetKey("/settings/content/dissallowedUploadFiles");
+                var val = GetKey("/settings/content/disallowedUploadFiles");
 	            return val.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
 	        }
 	    }
