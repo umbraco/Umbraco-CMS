@@ -110,6 +110,11 @@ namespace umbraco.presentation.webservices
                             document.SaveAndPublish(UmbracoUser);
 
                         }
+                        else
+                        {
+                            //we need to save it if it is not published to persist the sort order value
+                            document.Save();
+                        }
                     }
                         // to update the sortorder of the media node in the XML, re-save the node....
                     else if (isMedia)
@@ -118,10 +123,7 @@ namespace umbraco.presentation.webservices
                             {
                                 sortOrder = i
                             };
-                        media.Save();
-                        {
-                            new cms.businesslogic.CMSNode(int.Parse(ids[i])).sortOrder = i;
-                        }
+                        media.Save();                        
                     }
 
                     // Refresh sort order on cached xml
