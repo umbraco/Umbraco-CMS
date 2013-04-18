@@ -345,6 +345,8 @@ namespace umbraco.cms.presentation
             {
                 ClientTools.ShowSpeechBubble(speechBubbleIcon.warning, ui.Text("publish"), ui.Text("speechBubbles", "contentPublishedFailedByEvent"));
             }
+
+            ClientTools.SyncTree(_document.Path, true);
         }
 
         protected void UnPublishDo(object sender, EventArgs e)

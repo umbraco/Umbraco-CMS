@@ -137,7 +137,7 @@ namespace Umbraco.Web.Search
 		private static void MemberAfterSave(Member sender, SaveEventArgs e)
 		{
 			//ensure that only the providers are flagged to listen execute
-			var xml = sender.ToXml(new System.Xml.XmlDocument(), false).ToXElement();
+			var xml = ExamineXmlExtensions.ToXElement(sender.ToXml(new System.Xml.XmlDocument(), false));
 			var providers = ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
 				.Where(x => x.EnableDefaultEventHandler);
 			ExamineManager.Instance.ReIndexNode(xml, IndexTypes.Member, providers);
@@ -274,7 +274,7 @@ namespace Umbraco.Web.Search
 				xNode.Attributes.Append(d);
 			}
 
-			return new XDocument(xNode.ToXElement());
+			return new XDocument(ExamineXmlExtensions.ToXElement(xNode));
 		}
 
 	}
