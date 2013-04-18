@@ -1,28 +1,15 @@
 using System;
-using System.Collections;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using System.Reflection;
 using Umbraco.Core.IO;
 using umbraco.BusinessLogic.Actions;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.helpers;
 using umbraco.uicontrols.DatePicker;
 using umbraco.BusinessLogic;
-using umbraco.presentation.preview;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation;
-using umbraco.cms.businesslogic.skinning;
-using System.Collections.Generic;
 using System.Linq;
 using Image = System.Web.UI.WebControls.Image;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation
 {
@@ -57,7 +44,7 @@ namespace umbraco.cms.presentation
 
             //validate!
             int id;
-            if (!int.TryParse(Request.QueryString["id"], out id))
+            if (int.TryParse(Request.QueryString["id"], out id) == false)
             {
                 //if this is invalid show an error
                 this.DisplayFatalError("Invalid query string");
@@ -85,7 +72,7 @@ namespace umbraco.cms.presentation
             _documentHasPublishedVersion = _document.HasPublishedVersion();
 
             // Check publishing permissions
-            if (!base.getUser().GetPermissions(_document.Path).Contains(ActionPublish.Instance.Letter.ToString()))
+            if (base.getUser().GetPermissions(_document.Path).Contains(ActionPublish.Instance.Letter.ToString()) == false)
                 _canPublish = controls.ContentControl.publishModes.SendToPublish;
             _cControl = new controls.ContentControl(_document, _canPublish, "TabView1");
 
@@ -227,7 +214,7 @@ namespace umbraco.cms.presentation
         protected void Save(object sender, EventArgs e)
         {
             // error handling test
-            if (!Page.IsValid)
+            if (Page.IsValid == false)
             {
                 foreach (uicontrols.TabPage tp in _cControl.GetPanels())
                 {
@@ -247,8 +234,8 @@ namespace umbraco.cms.presentation
             //Audit trail...
             Log.Add(LogTypes.Save, getUser(), _document.Id, "");
 
-            // Update name 
-            if (_document.Text != _cControl.NameTxt.Text)
+            // Update name if it has not changed and is not empty
+            if (_cControl.NameTxt != null && _document.Text != _cControl.NameTxt.Text && !_cControl.NameTxt.Text.IsNullOrWhiteSpace())
             {
                 //_refreshTree = true;
                 _document.Text = _cControl.NameTxt.Text;
@@ -278,9 +265,6 @@ namespace umbraco.cms.presentation
                 }
             }
 
-
-
-
             // Run Handler				
             BusinessLogic.Actions.Action.RunActionHandlers(_document, ActionUpdate.Instance);
             _document.Save();
@@ -288,7 +272,7 @@ namespace umbraco.cms.presentation
             // Update the update date
             _dp.Text = _document.UpdateDate.ToShortDateString() + " " + _document.UpdateDate.ToShortTimeString();
 
-            if (!_cControl.DoesPublish)
+            if (_cControl.DoesPublish == false)
                 ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSavedHeader", null), ui.Text("speechBubbles", "editContentSavedText", null));
 
             ClientTools.SyncTree(_document.Path, true);

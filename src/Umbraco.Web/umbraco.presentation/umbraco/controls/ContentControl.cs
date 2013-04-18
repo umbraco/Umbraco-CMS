@@ -7,6 +7,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.datatype.controls;
@@ -18,51 +19,72 @@ using umbraco.interfaces;
 using umbraco.uicontrols;
 using Umbraco.Core.IO;
 using Content = umbraco.cms.businesslogic.Content;
-using SystemDirectories = umbraco.IO.SystemDirectories;
 
 namespace umbraco.controls
 {
-    public class ContentControlLoadEventArgs : System.ComponentModel.CancelEventArgs { }
+    public class ContentControlLoadEventArgs : CancelEventArgs { }
 
     /// <summary>
     /// Summary description for ContentControl.
     /// </summary>
     public class ContentControl : TabView
     {
-        private Content _content;
-        private ArrayList _dataFields = new ArrayList();
-        private UmbracoEnsuredPage prntpage;
+
+        private readonly Content _content;
+        private readonly ArrayList _dataFields = new ArrayList();
+        private UmbracoEnsuredPage _prntpage;
         public event EventHandler SaveAndPublish;
         public event EventHandler SaveToPublish;
         public event EventHandler Save;
-        private publishModes CanPublish = publishModes.NoPublish;
+        private readonly publishModes _canPublish = publishModes.NoPublish;
         public TabPage tpProp;
         public bool DoesPublish = false;
         public TextBox NameTxt = new TextBox();
         public PlaceHolder NameTxtHolder = new PlaceHolder();
         public RequiredFieldValidator NameTxtValidator = new RequiredFieldValidator();
-        private static string _UmbracoPath = SystemDirectories.Umbraco;
+        private readonly CustomValidator _nameTxtCustomValidator = new CustomValidator();
+        private static readonly string UmbracoPath = SystemDirectories.Umbraco;
         public Pane PropertiesPane = new Pane();
-
+        // zb-00036 #29889 : load it only once
+        List<ContentType.TabI> _virtualTabs;
+        //default to true!
+        private bool _savePropertyDataWhenInvalid = true;
+        
         public Content ContentObject
         {
             get { return _content; }
         }
 
-        // Error messages
+        /// <summary>
+        /// This property controls whether the content property values are persisted even if validation 
+        /// fails. If set to false, then the values will not be persisted.
+        /// </summary>
+        /// <remarks>
+        /// This is required because when we are editing content we should be persisting invalid values to the database
+        /// as this makes it easier for editors to come back and fix up their changes before they publish. Of course we
+        /// don't publish if the page is invalid. In the case of media and members, we don't want to persist the values
+        /// to the database when the page is invalid because there is no published state.
+        /// Relates to: http://issues.umbraco.org/issue/U4-227
+        /// </remarks>
+        public bool SavePropertyDataWhenInvalid
+        {
+            get { return _savePropertyDataWhenInvalid; }
+            set { _savePropertyDataWhenInvalid = value; }
+        }
+
+        [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
         private string _errorMessage = "";
 
+        [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
         public string ErrorMessage
         {
             set { _errorMessage = value; }
         }
 
+        [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
         protected void standardSaveAndPublishHandler(object sender, EventArgs e)
         {
         }
-
-        // zb-00036 #29889 : load it only once
-        List<ContentType.TabI> virtualTabs;
 
         /// <summary>
         /// Constructor to set default properties.
@@ -79,24 +101,23 @@ namespace umbraco.controls
         public ContentControl(Content c, publishModes CanPublish, string Id)
         {
             ID = Id;
-            this.CanPublish = CanPublish;
+            this._canPublish = CanPublish;
             _content = c;
 
             Width = 350;
             Height = 350;
 
-            SaveAndPublish += new EventHandler(standardSaveAndPublishHandler);
-            Save += new EventHandler(standardSaveAndPublishHandler);
-            prntpage = (UmbracoEnsuredPage)Page;
+            
+            _prntpage = (UmbracoEnsuredPage)Page;
 
             // zb-00036 #29889 : load it only once
-            if (virtualTabs == null)
-                virtualTabs = _content.ContentType.getVirtualTabs.ToList();
+            if (_virtualTabs == null)
+                _virtualTabs = _content.ContentType.getVirtualTabs.ToList();
 
-            foreach (ContentType.TabI t in virtualTabs)
+            foreach (ContentType.TabI t in _virtualTabs)
             {
                 TabPage tp = NewTabPage(t.Caption);
-                addSaveAndPublishButtons(ref tp);
+                AddSaveAndPublishButtons(ref tp);
             }
         }
 
@@ -107,17 +128,16 @@ namespace umbraco.controls
         {
             base.CreateChildControls();
 
-            SaveAndPublish += new EventHandler(standardSaveAndPublishHandler);
-            Save += new EventHandler(standardSaveAndPublishHandler);
-            prntpage = (UmbracoEnsuredPage)Page;
+            
+            _prntpage = (UmbracoEnsuredPage)Page;
             int i = 0;
             var inTab = new Hashtable();
 
             // zb-00036 #29889 : load it only once
-            if (virtualTabs == null)
-                virtualTabs = _content.ContentType.getVirtualTabs.ToList();
+            if (_virtualTabs == null)
+                _virtualTabs = _content.ContentType.getVirtualTabs.ToList();
 
-            foreach (ContentType.TabI tab in virtualTabs)
+            foreach (ContentType.TabI tab in _virtualTabs)
             {
                 var tabPage = this.Panels[i] as TabPage;
                 if (tabPage == null)
@@ -133,13 +153,13 @@ namespace umbraco.controls
                 // Iterate through the property types and add them to the tab
                 // zb-00036 #29889 : fix property types getter to get the right set of properties
                 // ge : had a bit of a corrupt db and got weird NRE errors so rewrote this to catch the error and rethrow with detail
-                foreach (PropertyType propertyType in tab.GetPropertyTypes(_content.ContentType.Id).OrderBy(x=>x.SortOrder))
+                foreach (PropertyType propertyType in tab.GetPropertyTypes(_content.ContentType.Id))
                 {
                     // table.Rows.Add(addControl(_content.getProperty(editPropertyType.Alias), tp));
                     var property = _content.getProperty(propertyType);
                     if (property != null && tabPage != null)
                     {
-                        addControlNew(property, tabPage, tab.Caption);
+                        AddControlNew(property, tabPage, tab.Caption);
 
                         // adding this check, as we occasionally get an already in dictionary error, though not sure why
                         if (!inTab.ContainsKey(propertyType.Id.ToString()))
@@ -156,7 +176,7 @@ namespace umbraco.controls
 
             // Add property pane
             tpProp = NewTabPage(ui.Text("general", "properties", null));
-            addSaveAndPublishButtons(ref tpProp);
+            AddSaveAndPublishButtons(ref tpProp);
             tpProp.Controls.Add(
                 new LiteralControl("<div id=\"errorPane_" + tpProp.ClientID +
                                    "\" style=\"display: none; text-align: left; color: red;width: 100%; border: 1px solid red; background-color: #FCDEDE\"><div><b>There were errors - data has not been saved!</b><br/></div></div>"));
@@ -166,7 +186,7 @@ namespace umbraco.controls
             foreach (Property p in props)
             {
                 if (inTab[p.PropertyType.Id.ToString()] == null)
-                    addControlNew(p, tpProp, ui.Text("general", "properties", null));
+                    AddControlNew(p, tpProp, ui.Text("general", "properties", null));
             }
 
         }
@@ -196,12 +216,19 @@ namespace umbraco.controls
 
                 // Name validation
                 NameTxtValidator.ControlToValidate = NameTxt.ID;
+                _nameTxtCustomValidator.ControlToValidate = NameTxt.ID;
                 string[] errorVars = { ui.Text("name") };
                 NameTxtValidator.ErrorMessage = " " + ui.Text("errorHandling", "errorMandatoryWithoutTab", errorVars, null) + "<br/>";
                 NameTxtValidator.EnableClientScript = false;
-                NameTxtValidator.Display = ValidatorDisplay.Dynamic;
+                NameTxtValidator.Display = ValidatorDisplay.Dynamic;                
+                _nameTxtCustomValidator.EnableClientScript = false;
+                _nameTxtCustomValidator.Display = ValidatorDisplay.Dynamic;
+                _nameTxtCustomValidator.ServerValidate += NameTxtCustomValidatorServerValidate;
+                _nameTxtCustomValidator.ValidateEmptyText = false;
+
                 NameTxtHolder.Controls.Add(NameTxt);
                 NameTxtHolder.Controls.Add(NameTxtValidator);
+                NameTxtHolder.Controls.Add(_nameTxtCustomValidator);
                 PropertiesPane.addProperty(ui.Text("general", "name", null), NameTxtHolder);
 
                 Literal ltt = new Literal();
@@ -226,6 +253,23 @@ namespace umbraco.controls
             }
         }
 
+        /// <summary>
+        /// Custom validates the content name field
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="args"></param>
+        /// <remarks>
+        /// We need to ensure people are not entering XSS attacks on this field
+        /// http://issues.umbraco.org/issue/U4-485
+        /// 
+        /// This doesn't actually 'validate' but changes the text field value and strips html
+        /// </remarks>
+        void NameTxtCustomValidatorServerValidate(object source, ServerValidateEventArgs args)
+        {
+            NameTxt.Text = NameTxt.Text.StripHtml();
+            args.IsValid = true;
+        }
+
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
@@ -235,74 +279,92 @@ namespace umbraco.controls
         }
 
 
-        private void saveClick(object Sender, ImageClickEventArgs e)
+        private void SaveClick(object sender, ImageClickEventArgs e)
         {
-            var doc = this._content as Document;
-            if (doc != null)
+            //we only continue saving anything if: 
+            // SavePropertyDataWhenInvalid == true
+            // OR if the page is actually valid.
+            if (SavePropertyDataWhenInvalid || Page.IsValid)
             {
-                var docArgs = new SaveEventArgs();
-                doc.FireBeforeSave(docArgs);
-
-                if (docArgs.Cancel) //TODO: need to have some notification to the user here
+                var doc = this._content as Document;
+                if (doc != null)
                 {
-                    return;
+                    var docArgs = new SaveEventArgs();
+                    doc.FireBeforeSave(docArgs);
+
+                    if (docArgs.Cancel) //TODO: need to have some notification to the user here
+                    {
+                        return;
+                    }
+                }
+                foreach (IDataEditor df in _dataFields)
+                {
+                    df.Save();
+                }
+
+                //don't update if the name is empty
+                if (!NameTxt.Text.IsNullOrWhiteSpace())
+                {
+                    _content.Text = NameTxt.Text;
                 }
             }
-            foreach (IDataEditor df in _dataFields)
+
+            if (Save != null)
             {
-                df.Save();
+                Save(this, new EventArgs());
             }
-
-            if (!string.IsNullOrEmpty(NameTxt.Text))
-                _content.Text = NameTxt.Text;
-
-            Save(this, new EventArgs());
         }
 
-        private void savePublish(object Sender, ImageClickEventArgs e)
+        private void SavePublish(object sender, ImageClickEventArgs e)
         {
             DoesPublish = true;
-            saveClick(Sender, e);
+            SaveClick(sender, e);
 
-            SaveAndPublish(this, new EventArgs());
+            if (SaveAndPublish != null)
+            {
+                SaveAndPublish(this, new EventArgs());    
+            }
         }
 
-        private void saveToPublish(object Sender, ImageClickEventArgs e)
+        private void SendToPublishEventHandler(object sender, ImageClickEventArgs e)
         {
-            saveClick(Sender, e);
-            SaveToPublish(this, new EventArgs());
+            SaveClick(sender, e);
+            if (SaveToPublish != null)
+            {
+                SaveToPublish(this, new EventArgs());
+            }
         }
 
-        private void addSaveAndPublishButtons(ref TabPage tp)
+        private void AddSaveAndPublishButtons(ref TabPage tp)
         {
             MenuImageButton menuSave = tp.Menu.NewImageButton();
             menuSave.ID = tp.ID + "_save";
-            menuSave.ImageUrl = _UmbracoPath + "/images/editor/save.gif";
-            menuSave.Click += new ImageClickEventHandler(saveClick);
+            menuSave.ImageUrl = UmbracoPath + "/images/editor/save.gif";
+            menuSave.Click += new ImageClickEventHandler(SaveClick);
             menuSave.OnClickCommand = "invokeSaveHandlers();";
             menuSave.AltText = ui.Text("buttons", "save", null);
-            if (CanPublish == publishModes.Publish)
+            if (_canPublish == publishModes.Publish)
             {
                 MenuImageButton menuPublish = tp.Menu.NewImageButton();
                 menuPublish.ID = tp.ID + "_publish";
-                menuPublish.ImageUrl = _UmbracoPath + "/images/editor/saveAndPublish.gif";
+                menuPublish.ImageUrl = UmbracoPath + "/images/editor/saveAndPublish.gif";
                 menuPublish.OnClickCommand = "invokeSaveHandlers();";
-                menuPublish.Click += new ImageClickEventHandler(savePublish);
+                menuPublish.Click += new ImageClickEventHandler(SavePublish);
                 menuPublish.AltText = ui.Text("buttons", "saveAndPublish", null);
             }
-            else if (CanPublish == publishModes.SendToPublish)
+            else if (_canPublish == publishModes.SendToPublish)
             {
                 MenuImageButton menuToPublish = tp.Menu.NewImageButton();
                 menuToPublish.ID = tp.ID + "_topublish";
-                menuToPublish.ImageUrl = _UmbracoPath + "/images/editor/saveToPublish.gif";
+                menuToPublish.ImageUrl = UmbracoPath + "/images/editor/saveToPublish.gif";
                 menuToPublish.OnClickCommand = "invokeSaveHandlers();";
-                menuToPublish.Click += new ImageClickEventHandler(saveToPublish);
+                menuToPublish.Click += new ImageClickEventHandler(SendToPublishEventHandler);
                 menuToPublish.AltText = ui.Text("buttons", "saveToPublish", null);
             }
         }
 
 
-        private void addControlNew(Property p, TabPage tp, string Caption)
+        private void AddControlNew(Property p, TabPage tp, string cap)
         {
             IDataType dt = p.PropertyType.DataTypeDefinition.DataType;
             dt.DataEditor.Editor.ID = string.Format("prop_{0}", p.PropertyType.Alias);
@@ -438,7 +500,7 @@ namespace umbraco.controls
                     {
                         rq.EnableClientScript = false;
                         rq.Display = ValidatorDisplay.Dynamic;
-                        string[] errorVars = { p.PropertyType.Name, Caption };
+                        string[] errorVars = { p.PropertyType.Name, cap };
                         rq.ErrorMessage = ui.Text("errorHandling", "errorMandatory", errorVars, null) + "<br/>";
                         holder.Controls.AddAt(0, rq);
                     }
@@ -473,7 +535,7 @@ namespace umbraco.controls
                         rv.ValidationExpression = p.PropertyType.ValidationRegExp;
                         rv.EnableClientScript = false;
                         rv.Display = ValidatorDisplay.Dynamic;
-                        string[] errorVars = { p.PropertyType.Name, Caption };
+                        string[] errorVars = { p.PropertyType.Name, cap };
                         rv.ErrorMessage = ui.Text("errorHandling", "errorRegExp", errorVars, null) + "<br/>";
                         holder.Controls.AddAt(0, rv);
                     }
@@ -506,25 +568,6 @@ namespace umbraco.controls
             Publish,
             SendToPublish,
             NoPublish
-        }
-
-        private string dictinaryItem(string alias)
-        {
-            if (alias.Substring(1, 0) == "#")
-            {
-
-                if (Dictionary.DictionaryItem.hasKey(alias.Substring(1)))
-                {
-
-                    Dictionary.DictionaryItem di = new Dictionary.DictionaryItem(alias.Substring(1));
-
-                    if (di != null && !string.IsNullOrEmpty(di.Value()))
-                        return di.Value();
-                }
-
-            }
-
-            return alias + " " + alias.Substring(1);
         }
 
         // EVENTS

@@ -1910,7 +1910,9 @@
     <Content Include="umbraco.presentation\umbraco\members\search.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\details.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\BrowseRepository.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx" />
+    <Content Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Packages\installedPackage.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\LoadNitros.ascx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\SubmitPackage.aspx" />
