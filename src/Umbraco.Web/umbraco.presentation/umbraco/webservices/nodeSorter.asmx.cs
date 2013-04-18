@@ -77,42 +77,49 @@ namespace umbraco.presentation.webservices
         {
             try
             {
-                if (!AuthorizeRequest()) return;
+                if (AuthorizeRequest() == false) return;
                 if (SortOrder.Trim().Length <= 0) return;
-                var tmp = SortOrder.Split(',');
+                var ids = SortOrder.Split(',');
 
                 var isContent = helper.Request("app") == "content" | helper.Request("app") == "";
                 var isMedia = helper.Request("app") == "media";
                 //ensure user is authorized for the app requested
-                if (isContent && !AuthorizeRequest(DefaultApps.content.ToString())) return;
-                if (isMedia && !AuthorizeRequest(DefaultApps.media.ToString())) return;
+                if (isContent && AuthorizeRequest(DefaultApps.content.ToString()) == false) return;
+                if (isMedia && AuthorizeRequest(DefaultApps.media.ToString()) == false) return;
 
-                for (var i = 0; i < tmp.Length; i++)
+                for (var i = 0; i < ids.Length; i++)
                 {
-                    if (tmp[i] == "" || tmp[i].Trim() == "") continue;
-                    
+                    if (ids[i] == "" || ids[i].Trim() == "") continue;
+                   
                     if (isContent)
                     {
-                        var document = new Document(int.Parse(tmp[i]));
-                        var published = document.Published;
-                        document.sortOrder = i;
-                        document.Save();
-                        // refresh the xml for the sorting to work
-                        if (published)
+                        var document = new Document(int.Parse(ids[i]))
+                            {
+                                sortOrder = i
+                            };
+                        
+                        //TODO: Theoretically we should be calling this too but it will show up as an unpublished
+                        // revision which is not what we want, otherwise we should call Publish() on each node but this
+                        // will be even worse performance! We'll wait till version 6 to fix up.
+                        //document.Save();
+                        
+                        if (document.Published)
                         {
-                            document.Publish(BusinessLogic.User.GetCurrent());
+                            // update the sort order of the xml in the database
                             document.refreshXmlSortOrder();
-                            library.UpdateDocumentCache(int.Parse(tmp[i]));
+
+                            //TODO: WE don't want to have to republish the entire document !!!!
+                            library.UpdateDocumentCache(document);
                         }
                     }
                     // to update the sortorder of the media node in the XML, re-save the node....
                     else if (isMedia)
                     {
-                        var media = new cms.businesslogic.media.Media(int.Parse(tmp[i]));
-                        media.sortOrder = i;
+                        var media = new cms.businesslogic.media.Media(int.Parse(ids[i]))
+                            {
+                                sortOrder = i
+                            };
                         media.Save();
-                    }
-                    else
                     {
                         new cms.businesslogic.CMSNode(int.Parse(tmp[i])).sortOrder = i;
                     }
@@ -132,11 +139,10 @@ namespace umbraco.presentation.webservices
                     // Load balancing - then refresh entire cache
                     if (UmbracoSettings.UseDistributedCalls)
                         library.RefreshContent();
-                }
 
-                // fire actionhandler, check for content
-                if ((helper.Request("app") == "content" | helper.Request("app") == "") && ParentId > 0)
+                    // fire actionhandler, check for content
                     BusinessLogic.Actions.Action.RunActionHandlers(new Document(ParentId), ActionSort.Instance);
+                }
             }
             catch (Exception ex)
             {

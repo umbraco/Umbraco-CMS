@@ -1259,6 +1259,10 @@ namespace umbraco.cms.businesslogic.web
             }
         }
 
+        /// <summary>
+        /// This is a specialized method which literally just makes sure that the sortOrder attribute of the xml
+        /// that is stored in the database is up to date.
+        /// </summary>
         public void refreshXmlSortOrder()
         {
             if (Published)
@@ -1451,6 +1455,11 @@ namespace umbraco.cms.businesslogic.web
             return temp;
         }
 
+        /// <summary>
+        /// This needs to be synchronized since we're doing multiple sql operations in the single method
+        /// </summary>
+        /// <param name="x"></param>
+        [MethodImpl(MethodImplOptions.Synchronized)]
         private void saveXml(XmlNode x)
         {
             bool exists = (SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId=@nodeId",

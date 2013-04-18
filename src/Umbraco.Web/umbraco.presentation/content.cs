@@ -3,10 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Web;
 using System.Xml;
 using System.Xml.XPath;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
@@ -348,14 +350,15 @@ namespace umbraco
         /// </summary>
         /// <param name="d"></param>
         /// <param name="xmlContentCopy"></param>
+        /// <param name="updateSitemapProvider"></param>
         public static XmlDocument PublishNodeDo(Document d, XmlDocument xmlContentCopy, bool updateSitemapProvider)
         {
             // check if document *is* published, it could be unpublished by an event
             if (d.Published)
             {
-                int parentId = d.Level == 1 ? -1 : d.Parent.Id;
-				xmlContentCopy = AppendDocumentXml(d.Id, d.Level, parentId, getPreviewOrPublishedNode(d, xmlContentCopy, false),
-                                  xmlContentCopy);
+                var parentId = d.Level == 1 ? -1 : d.Parent.Id;
+                xmlContentCopy = AppendDocumentXml(d.Id, d.Level, parentId,
+                                                   GetPreviewOrPublishedNode(d, xmlContentCopy, false), xmlContentCopy);
 
                 // update sitemapprovider
                 if (updateSitemapProvider && SiteMap.Provider is UmbracoSiteMapProvider)
@@ -363,9 +366,11 @@ namespace umbraco
                     try
                     {
                         var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
-                        Node n = new Node(d.Id, true);
-                        if (!String.IsNullOrEmpty(n.Url) && n.Url != "/#")
+                        var n = new Node(d.Id, true);
+                        if (string.IsNullOrEmpty(n.Url) == false && n.Url != "/#")
+                        {
                             prov.UpdateNode(n);
+                        }
                         else
                         {
                             LogHelper.Debug<content>(string.Format("Can't update Sitemap Provider due to empty Url in node id: {0}", d.Id));
@@ -384,12 +389,12 @@ namespace umbraco
         public static XmlDocument AppendDocumentXml(int id, int level, int parentId, XmlNode docNode, XmlDocument xmlContentCopy)
         {
             // Find the document in the xml cache
-            XmlNode x = xmlContentCopy.GetElementById(id.ToString());
+            XmlNode currentNode = xmlContentCopy.GetElementById(id.ToString());
 
 			// if the document is not there already then it's a new document
 			// we must make sure that its document type exists in the schema
-			var xmlContentCopy2 = xmlContentCopy;
-			if (x == null && !UmbracoSettings.UseLegacyXmlSchema)
+            var xmlContentCopy2 = xmlContentCopy;
+			if (currentNode == null && UmbracoSettings.UseLegacyXmlSchema == false)
 			{
 				xmlContentCopy = ValidateSchema(docNode.Name, xmlContentCopy);
 				if (xmlContentCopy != xmlContentCopy2)
@@ -397,33 +402,39 @@ namespace umbraco
 			}
 
             // Find the parent (used for sortering and maybe creation of new node)
-            XmlNode parentNode;
-            if (level == 1)
-                parentNode = xmlContentCopy.DocumentElement;
-            else
-                parentNode = xmlContentCopy.GetElementById(parentId.ToString());
+            XmlNode parentNode = level == 1
+                                     ? xmlContentCopy.DocumentElement
+                                     : xmlContentCopy.GetElementById(parentId.ToString());
 
             if (parentNode != null)
             {
-                if (x == null)
+                if (currentNode == null)
                 {
-                    x = docNode;
-                    parentNode.AppendChild(x);
+                    currentNode = docNode;
+                    parentNode.AppendChild(currentNode);
                 }
                 else
-                    TransferValuesFromDocumentXmlToPublishedXml(docNode, x);
+                {
+                    TransferValuesFromDocumentXmlToPublishedXml(docNode, currentNode);
+                }
 
                 // TODO: Update with new schema!
-                string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./node" : "./* [@id]";
-                XmlNodeList childNodes = parentNode.SelectNodes(xpath);
+                var xpath = UmbracoSettings.UseLegacyXmlSchema
+                                ? "./node"
+                                : "./* [@id]";
 
-                // Maybe sort the nodes if the added node has a lower sortorder than the last
-                if (childNodes.Count > 0)
+                var childNodes = parentNode.SelectNodes(xpath);
+
+                // Sort the nodes if the added node has a lower sortorder than the last
+                if (childNodes != null && childNodes.Count > 0)
                 {
-                    int siblingSortOrder =
-                        int.Parse(childNodes[childNodes.Count - 1].Attributes.GetNamedItem("sortOrder").Value);
-                    int currentSortOrder = int.Parse(x.Attributes.GetNamedItem("sortOrder").Value);
-                    if (childNodes.Count > 1 && siblingSortOrder > currentSortOrder)
+                    //get the biggest sort order for all children including the one added
+                    var largestSortOrder = childNodes.Cast<XmlNode>().Max(x => x.AttributeValue<int>("sortOrder"));
+                    var currentSortOrder = currentNode.AttributeValue<int>("sortOrder");
+                    //if the current item's sort order is less than the largest sort order in the list then
+                    //we need to resort the xml structure since this item belongs somewhere in the middle.
+                    //http://issues.umbraco.org/issue/U4-509
+                    if (childNodes.Count > 1 && currentSortOrder < largestSortOrder)
                     {
                         SortNodes(ref parentNode);
                     }
@@ -433,7 +444,7 @@ namespace umbraco
 			return xmlContentCopy;
         }
 
-        private static XmlNode getPreviewOrPublishedNode(Document d, XmlDocument xmlContentCopy, bool isPreview)
+        private static XmlNode GetPreviewOrPublishedNode(Document d, XmlDocument xmlContentCopy, bool isPreview)
         {
             if (isPreview)
             {
@@ -451,21 +462,15 @@ namespace umbraco
         /// <param name="parentNode">The parent node.</param>
         public static void SortNodes(ref XmlNode parentNode)
         {
-            XmlNode n = parentNode.CloneNode(true);
+            var xpath = UmbracoSettings.UseLegacyXmlSchema
+                            ? "./node"
+                            : "./* [@id]";
 
-            // remove all children from original node
-            string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./node" : "./* [@id]";
-            foreach (XmlNode child in parentNode.SelectNodes(xpath))
-                parentNode.RemoveChild(child);
-
-
-            XPathNavigator nav = n.CreateNavigator();
-            XPathExpression expr = nav.Compile(xpath);
-            expr.AddSort("@sortOrder", XmlSortOrder.Ascending, XmlCaseOrder.None, "", XmlDataType.Number);
-            XPathNodeIterator iterator = nav.Select(expr);
-            while (iterator.MoveNext())
-                parentNode.AppendChild(
-                    ((IHasXmlNode)iterator.Current).GetNode());
+            XmlHelper.SortNodes(
+                parentNode,
+                xpath,
+                element => element.Attribute("id") != null,
+                element => element.AttributeValue<int>("sortOrder"));            
         }
 
 
@@ -1337,10 +1342,10 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         /// <returns></returns>
         private static XmlDocument CloneXmlDoc(XmlDocument xmlDoc)
         {
-            if (xmlDoc == null) return null;
-
+            if (xmlDoc == null) return null;            
+            
             // Save copy of content
-            var xmlCopy = (XmlDocument)xmlDoc.CloneNode(true);
+            var xmlCopy = (XmlDocument)xmlDoc.CloneNode(true);            
             return xmlCopy;
         }
 
