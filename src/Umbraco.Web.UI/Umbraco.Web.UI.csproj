@@ -818,6 +818,8 @@
     <Content Include="Umbraco_Client\Installer\Js\PackageInstaller.js" />
     <Content Include="Umbraco_Client\Splitbutton\InsertMacroSplitButton.js" />
     <Content Include="Umbraco_Client\Splitbutton\jquery.splitbutton.js" />
+    <Content Include="Umbraco_Client\Tablesorting\Img\asc.gif" />
+    <Content Include="Umbraco_Client\Tablesorting\Img\desc.gif" />
     <Content Include="Umbraco_Client\Tags\Css\jquery.tagsinput.css" />
     <Content Include="Umbraco_Client\Tags\Js\jquery.tagsinput.js" />
     <Content Include="Umbraco_Client\Tags\Js\jquery.tagsinput.min.js">
