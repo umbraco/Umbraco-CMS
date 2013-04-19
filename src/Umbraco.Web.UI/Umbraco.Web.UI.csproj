@@ -433,6 +433,14 @@
       <DependentUpon>EditMacro.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Umbraco\dialogs\Sort.aspx.cs">
+      <DependentUpon>sort.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\dialogs\Sort.aspx.designer.cs">
+      <DependentUpon>sort.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Umbraco\Dialogs\EditMacro.aspx.designer.cs">
       <DependentUpon>EditMacro.aspx</DependentUpon>
     </Compile>
@@ -793,6 +801,8 @@
     <Content Include="Umbraco_Client\ContextMenu\Js\jquery.contextMenu.js" />
     <Content Include="Umbraco_Client\Dashboards\ExamineManagement.css" />
     <Content Include="Umbraco_Client\Dashboards\ExamineManagement.js" />
+    <Content Include="umbraco_Client\Dialogs\SortDialog.css" />
+    <Content Include="umbraco_client\Dialogs\SortDialog.js" />
     <Content Include="Umbraco_Client\Dialogs\AssignDomain2.js" />
     <Content Include="Umbraco_Client\Dialogs\AssignDomain2.css" />
     <Content Include="Umbraco_Client\Dialogs\CreateDialog.css" />
@@ -817,6 +827,9 @@
     <Content Include="Umbraco_Client\Installer\Images\pbar.gif" />
     <Content Include="Umbraco_Client\Installer\Js\PackageInstaller.js" />
     <Content Include="Umbraco_Client\Splitbutton\InsertMacroSplitButton.js" />
+    <Content Include="umbraco_Client\tablesorting\img\asc.gif" />
+    <Content Include="umbraco_Client\tablesorting\img\desc.gif" />
+    <Content Include="umbraco_Client\tablesorting\jquery.tablesorter.min.js" />
     <Content Include="Umbraco_Client\Splitbutton\jquery.splitbutton.js" />
     <Content Include="Umbraco_Client\Tablesorting\Img\asc.gif" />
     <Content Include="Umbraco_Client\Tablesorting\Img\desc.gif" />
