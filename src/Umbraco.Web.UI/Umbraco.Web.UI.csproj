@@ -664,6 +664,7 @@
     <Content Include="umbraco_client\ContextMenu\Css\jquery.contextMenu.css" />
     <Content Include="umbraco_client\ContextMenu\Js\jquery.contextMenu.js" />
     <Content Include="umbraco_client\Dialogs\SortDialog.css" />
+    <Content Include="umbraco_client\Dialogs\SortDialog.js" />
     <Content Include="umbraco_client\Dialogs\UmbracoField.js" />
     <Content Include="umbraco_client\Editors\DirectoryBrowser.css" />
     <Content Include="umbraco_client\Editors\EditView.js" />
@@ -682,6 +683,7 @@
     <Content Include="umbraco_client\splitbutton\jquery.splitbutton.js" />
     <Content Include="umbraco_client\tablesorting\img\asc.gif" />
     <Content Include="umbraco_client\tablesorting\img\desc.gif" />
+    <Content Include="umbraco_client\tablesorting\jquery.tablesorter.min.js" />
     <Content Include="umbraco_client\tags\css\jquery.tagsinput.css" />
     <Content Include="umbraco_client\tags\js\jquery.tagsinput.js" />
     <Content Include="umbraco_client\tags\js\jquery.tagsinput.min.js">
