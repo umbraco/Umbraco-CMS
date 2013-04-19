@@ -324,6 +324,15 @@
       <DependentUpon>EditMacro.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Umbraco\dialogs\Sort.aspx.cs">
+      <DependentUpon>sort.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\dialogs\Sort.aspx.designer.cs">
+      <DependentUpon>sort.aspx</DependentUpon>
+    </Compile>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Umbraco\Dialogs\EditMacro.aspx.designer.cs">
       <DependentUpon>EditMacro.aspx</DependentUpon>
     </Compile>
@@ -664,9 +673,11 @@
     <Content Include="Umbraco_Client\CodeMirror\Js\Theme\xq-dark.css" />
     <Content Include="Umbraco_Client\ContextMenu\Css\jquery.contextMenu.css" />
     <Content Include="Umbraco_Client\ContextMenu\Js\jquery.contextMenu.js" />
+    <Content Include="umbraco_Client\Dialogs\SortDialog.css" />
+    <Content Include="umbraco_client\Dialogs\SortDialog.js" />
     <Content Include="Umbraco_Client\Dialogs\CreateDialog.css" />
     <Content Include="Umbraco_Client\Dialogs\EditMacro.css" />
-    <Content Include="umbraco_client\Editors\DirectoryBrowser.css" />
+    <Content Include="umbraco_Client\Editors\DirectoryBrowser.css" />
     <Content Include="Umbraco_Client\Dialogs\EditMacro.js" />
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
     <Content Include="Umbraco_Client\Editors\EditMacro.css" />
@@ -684,6 +695,9 @@
     <Content Include="Umbraco_Client\Installer\Images\pbar.gif" />
     <Content Include="Umbraco_Client\Installer\Js\PackageInstaller.js" />
     <Content Include="Umbraco_Client\Splitbutton\InsertMacroSplitButton.js" />
+    <Content Include="umbraco_Client\tablesorting\img\asc.gif" />
+    <Content Include="umbraco_Client\tablesorting\img\desc.gif" />
+    <Content Include="umbraco_Client\tablesorting\jquery.tablesorter.min.js" />
     <Content Include="Umbraco_Client\Splitbutton\jquery.splitbutton.js" />
     <Content Include="Umbraco_Client\Tags\Css\jquery.tagsinput.css" />
     <Content Include="Umbraco_Client\Tags\Js\jquery.tagsinput.js" />
