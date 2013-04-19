@@ -344,6 +344,24 @@ namespace umbraco.BusinessLogic
                 SqlHelper.CreateParameter("@user", user.Id),
                 SqlHelper.CreateParameter("@dateStamp", SinceDate));
         }
+
+        /// <summary>
+        /// Gets a reader of specific for the log for specific types and a specified user.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <param name="type">The type of log message.</param>
+        /// <param name="sinceDate">The since date.</param>
+        /// <param name="numberOfResults">Number of rows returned</param>
+        /// <returns>A reader for the log.</returns>
+        [Obsolete("Use the Instance.GetLogItems method which return a list of LogItems instead")]
+        internal static IRecordsReader GetLogReader(User user, LogTypes type, DateTime sinceDate, int numberOfResults)
+        {
+            return SqlHelper.ExecuteReader(
+                "select top " + numberOfResults + " userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
+                SqlHelper.CreateParameter("@logHeader", type.ToString()),
+                SqlHelper.CreateParameter("@user", user.Id),
+                SqlHelper.CreateParameter("@dateStamp", sinceDate));
+        }
         #endregion
 
         #endregion
