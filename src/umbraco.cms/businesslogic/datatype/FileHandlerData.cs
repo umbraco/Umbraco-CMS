@@ -54,8 +54,10 @@ namespace umbraco.cms.businesslogic.datatype
                         ? ((HttpPostedFile)value).InputStream
                         : ((HttpPostedFileBase)value).InputStream;
 
+                    // get the currently stored value, if it is null then change to an empty string.
+                    var currentValue = Value == null ? "" : Value.ToString();
+
                     // handle upload
-                    var currentValue = Value.ToString();
                     if (name != String.Empty)
                     {
                         var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
