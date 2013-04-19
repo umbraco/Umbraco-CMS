@@ -1,16 +1,13 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web.Mvc;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Cache;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Mvc;
 using umbraco;
-using umbraco.BasePages;
 using umbraco.cms.businesslogic.macro;
-using umbraco.presentation.cache;
 using Umbraco.Core;
 using Template = umbraco.cms.businesslogic.template.Template;
 
