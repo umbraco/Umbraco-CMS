@@ -683,7 +683,7 @@ namespace Umbraco.Core.Services
                 }
 
                 //Unpublish descendents of the content item that is being moved to trash
-                var descendants = GetDescendants(content).ToList();
+                var descendants = GetDescendants(content).OrderBy(x => x.Level).ToList();
                 foreach (var descendant in descendants)
                 {
                     UnPublish(descendant, userId);
@@ -819,8 +819,8 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
-				var query = Query<IContent>.Builder.Where(x => x.Path.Contains("-20"));
-				var contents = repository.GetByQuery(query).OrderByDescending(x => x.ParentId);
+				var query = Query<IContent>.Builder.Where(x => x.Trashed == true);
+				var contents = repository.GetByQuery(query).OrderByDescending(x => x.Level);
 
 				foreach (var content in contents)
 				{
