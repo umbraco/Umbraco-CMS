@@ -348,6 +348,9 @@
     <Compile Include="umbraco.presentation\umbraco\channels\rsd.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\dialogs\sort.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\ping.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1517,13 +1520,6 @@
     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx.designer.cs">
       <DependentUpon>EditStyleSheetProperty.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\sort.aspx.cs">
-      <DependentUpon>sort.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\sort.aspx.designer.cs">
-      <DependentUpon>sort.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\templateControls\Script.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\BaseMediaTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadDLRScripts.cs" />
@@ -2049,9 +2045,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\sort.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\test.aspx" />
     <Content Include="umbraco.presentation\umbraco\tree.aspx">
       <SubType>ASPXCodeBehind</SubType>

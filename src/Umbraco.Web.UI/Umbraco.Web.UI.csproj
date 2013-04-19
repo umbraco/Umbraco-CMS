@@ -324,6 +324,13 @@
     <Compile Include="Umbraco\developer\Packages\StarterKits.aspx.designer.cs">
       <DependentUpon>StarterKits.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\dialogs\Sort.aspx.cs">
+      <DependentUpon>sort.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\dialogs\Sort.aspx.designer.cs">
+      <DependentUpon>sort.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\masterpages\UmbracoDialog.master.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -656,6 +663,7 @@
     <Content Include="umbraco_client\CodeMirror\js\theme\xq-dark.css" />
     <Content Include="umbraco_client\ContextMenu\Css\jquery.contextMenu.css" />
     <Content Include="umbraco_client\ContextMenu\Js\jquery.contextMenu.js" />
+    <Content Include="umbraco_client\Dialogs\SortDialog.css" />
     <Content Include="umbraco_client\Dialogs\UmbracoField.js" />
     <Content Include="umbraco_client\Editors\DirectoryBrowser.css" />
     <Content Include="umbraco_client\Editors\EditView.js" />
@@ -672,6 +680,8 @@
     <Content Include="umbraco_client\Installer\images\pbar.gif" />
     <Content Include="umbraco_client\Installer\js\PackageInstaller.js" />
     <Content Include="umbraco_client\splitbutton\jquery.splitbutton.js" />
+    <Content Include="umbraco_client\tablesorting\img\asc.gif" />
+    <Content Include="umbraco_client\tablesorting\img\desc.gif" />
     <Content Include="umbraco_client\tags\css\jquery.tagsinput.css" />
     <Content Include="umbraco_client\tags\js\jquery.tagsinput.js" />
     <Content Include="umbraco_client\tags\js\jquery.tagsinput.min.js">
