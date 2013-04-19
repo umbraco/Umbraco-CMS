@@ -16,7 +16,7 @@ namespace Umbraco.Web.Cache
 
         public override Guid UniqueIdentifier
         {
-            get { return new Guid(DistributedCache.StylesheetCacheRefresherId); }
+            get { return new Guid(DistributedCache.StylesheetPropertyCacheRefresherId); }
         }
 
         public override string Name
