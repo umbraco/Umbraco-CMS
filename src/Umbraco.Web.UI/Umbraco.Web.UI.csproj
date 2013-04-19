@@ -330,7 +330,6 @@
     </Compile>
     <Compile Include="Umbraco\dialogs\Sort.aspx.designer.cs">
       <DependentUpon>sort.aspx</DependentUpon>
-    </Compile>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Umbraco\Dialogs\EditMacro.aspx.designer.cs">
