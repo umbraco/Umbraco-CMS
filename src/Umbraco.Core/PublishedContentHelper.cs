@@ -22,36 +22,13 @@ namespace Umbraco.Core
     /// </remarks>
     internal class PublishedContentHelper : ApplicationEventHandler
 	{
-
-        #region event handlers to ensure that the cache is cleared when content types change
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {
-            ContentTypeService.SavedContentType += ContentTypeServiceSavedContentType;
-            ContentTypeService.SavedMediaType += ContentTypeServiceSavedMediaType;
-            ContentTypeService.DeletedContentType += ContentTypeServiceDeletedContentType;
-            ContentTypeService.DeletedMediaType += ContentTypeServiceDeletedMediaType;
-        }
-
-        static void ContentTypeServiceDeletedMediaType(IContentTypeService sender, Events.DeleteEventArgs<Models.IMediaType> e)
+        /// <summary>
+        /// Used to invalidate the cache from the ICacherefresher
+        /// </summary>
+        internal static void ClearPropertyTypeCache()
         {
             PropertyTypeCache.Clear();
         }
-
-        static void ContentTypeServiceDeletedContentType(IContentTypeService sender, Events.DeleteEventArgs<Models.IContentType> e)
-        {
-            PropertyTypeCache.Clear();
-        }
-
-        static void ContentTypeServiceSavedMediaType(IContentTypeService sender, Events.SaveEventArgs<Models.IMediaType> e)
-        {
-            PropertyTypeCache.Clear();
-        }
-
-        static void ContentTypeServiceSavedContentType(IContentTypeService sender, Events.SaveEventArgs<Models.IContentType> e)
-        {
-            PropertyTypeCache.Clear();
-        } 
-        #endregion
 
         /// <summary>
         /// This callback is used only for unit tests which enables us to return any data we want and not rely on having the data in a database
@@ -77,11 +54,16 @@ namespace Umbraco.Core
                 {
                     var result = applicationContext.Services.ContentTypeService.GetContentType(docTypeAlias);
                     if (result == null) return Guid.Empty;
-                    if (!result.PropertyTypes.Any(x => x.Alias.InvariantEquals(propertyAlias)))
+                    
+                    //SD: we need to check for 'any' here because the collection is backed by KeyValuePair which is a struct
+                    // and can never be null so FirstOrDefault doesn't actually work. Have told Seb and Morten about thsi 
+                    // issue.
+                    if (!result.CompositionPropertyTypes.Any(x => x.Alias.InvariantEquals(propertyAlias)))
                     {
                         return Guid.Empty;
                     }
-                    var property = result.PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyAlias));
+                    var property = result.CompositionPropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyAlias));
+                    //as per above, this will never be null but we'll keep the check here anyways.
                     if (property == null) return Guid.Empty;
                     return property.DataTypeId;
                 });
