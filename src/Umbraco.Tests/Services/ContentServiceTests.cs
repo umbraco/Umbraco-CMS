@@ -582,6 +582,34 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Move_Content_Structure_To_RecycleBin_And_Empty_RecycleBin()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
+            Content subsubpage = MockedContent.CreateSimpleContent(contentType, "Text Page 3", 1047);
+            contentService.Save(subsubpage, 0);
+
+            var content = contentService.GetById(1046);
+
+            // Act
+            contentService.MoveToRecycleBin(content, 0);
+            var descendants = contentService.GetDescendants(content);
+
+            // Assert
+            Assert.That(content.ParentId, Is.EqualTo(-20));
+            Assert.That(content.Trashed, Is.True);
+            Assert.That(descendants.Count(), Is.EqualTo(3));
+            Assert.That(descendants.Any(x => x.Path.Contains("-20") == false), Is.False);
+
+            //Empty Recycle Bin
+            contentService.EmptyRecycleBin();
+            var trashed = contentService.GetContentInRecycleBin();
+
+            Assert.That(trashed.Any(), Is.False);
+        }
+
+        [Test]
         public void Can_Empty_RecycleBin()
         {
             // Arrange
