@@ -560,7 +560,7 @@ namespace Umbraco.Core.Services
 	    }
 
 	    /// <summary>
-        /// Permanently deletes an <see cref="IContent"/> object.
+        /// Permanently deletes an <see cref="IContent"/> object as well as all of its Children.
         /// </summary>
         /// <remarks>
         /// This method will also delete associated media files, child content and possibly associated domains.

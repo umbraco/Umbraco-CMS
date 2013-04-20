@@ -489,11 +489,11 @@ namespace Umbraco.Core.Services
         }
 
 	    /// <summary>
-	    /// Permanently deletes an <see cref="IMedia"/> object
+        /// Permanently deletes an <see cref="IMedia"/> object as well as all of its Children.
 	    /// </summary>
 	    /// <remarks>
 	    /// Please note that this method will completely remove the Media from the database,
-	    /// but current not from the file system.
+	    /// as well as associated media files from the file system.
 	    /// </remarks>
 	    /// <param name="media">The <see cref="IMedia"/> to delete</param>
 	    /// <param name="userId">Id of the User deleting the Media</param>
@@ -501,6 +501,13 @@ namespace Umbraco.Core.Services
 	    {
 			if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMedia>(media), this))
 				return;
+
+            //Delete children before deleting the 'possible parent'
+            var children = GetChildren(media.Id);
+            foreach (var child in children)
+            {
+                Delete(child, userId);
+            }
 
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
