@@ -3,10 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Web;
 using System.Xml;
 using System.Configuration;
+using Umbraco.Core;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic;
@@ -52,7 +54,10 @@ namespace umbraco
 
         protected override string FilePath
         {
-            get { return SystemDirectories.Scripts + "/"; }
+            get
+            {
+                return SystemDirectories.Scripts + "/";
+            }
         }
 
         protected override string FileSearchPattern
