@@ -759,6 +759,7 @@ order by level,sortOrder";
         public virtual int ParentId
         {
             get { return _parentid; }
+            internal set { _parentid = value; }
         }
 
         /// <summary>

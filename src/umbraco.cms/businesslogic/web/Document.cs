@@ -1033,6 +1033,10 @@ namespace umbraco.cms.businesslogic.web
                 var current = User.GetCurrent();
                 int userId = current == null ? 0 : current.Id;
                 ApplicationContext.Current.Services.ContentService.Move(Content, newParentId, userId);
+
+                //We need to manually update this property as the above change is not directly reflected in 
+                //the current object unless its reloaded.
+                base.ParentId = newParentId;
             }
 
             base.FireAfterMove(e);
