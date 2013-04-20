@@ -437,13 +437,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 content.Template = _templateRepository.Get(dto.TemplateId.Value);
             }
 
-            content.Properties = GetPropertyCollection(dto.NodeId, versionId, contentType);
+            content.Properties = GetPropertyCollection(dto.NodeId, versionId, contentType, content.CreateDate, content.UpdateDate);
 
             ((ICanBeDirty)content).ResetDirtyProperties();
             return content;
         }
 
-        private PropertyCollection GetPropertyCollection(int id, Guid versionId, IContentType contentType)
+        private PropertyCollection GetPropertyCollection(int id, Guid versionId, IContentType contentType, DateTime createDate, DateTime updateDate)
         {
             var sql = new Sql();
             sql.Select("*")
@@ -454,7 +454,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<PropertyDataDto>(x => x.VersionId == versionId);
 
             var propertyDataDtos = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql);
-            var propertyFactory = new PropertyFactory(contentType, versionId, id);
+            var propertyFactory = new PropertyFactory(contentType, versionId, id, createDate, updateDate);
             var properties = propertyFactory.BuildEntity(propertyDataDtos);
 
             var newProperties = properties.Where(x => x.HasIdentity == false);

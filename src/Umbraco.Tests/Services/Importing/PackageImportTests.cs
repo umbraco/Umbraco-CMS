@@ -230,11 +230,10 @@ namespace Umbraco.Tests.Services.Importing
             // Arrange
             string strXml = ImportResources.SingleDocType;
             var docTypeElement = XElement.Parse(strXml);
-            var packagingService = ServiceContext.PackagingService;
 
             // Act
-            var contentTypes = packagingService.ImportContentTypes(docTypeElement);
-            var contentTypesUpdated = packagingService.ImportContentTypes(docTypeElement);
+            var contentTypes = ServiceContext.PackagingService.ImportContentTypes(docTypeElement);
+            var contentTypesUpdated = ServiceContext.PackagingService.ImportContentTypes(docTypeElement);
 
             // Assert
             Assert.That(contentTypes.Any(), Is.True);

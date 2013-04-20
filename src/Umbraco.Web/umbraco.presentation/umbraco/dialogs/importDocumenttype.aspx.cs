@@ -72,8 +72,10 @@ namespace umbraco.presentation.umbraco.dialogs
             var xd = new XmlDocument();
             xd.Load(tempFile.Value);
 
+		    var userId = base.getUser().Id;
+
             var element = XElement.Parse(xd.InnerXml);
-		    var importContentTypes = ApplicationContext.Current.Services.PackagingService.ImportContentTypes(element);
+		    var importContentTypes = ApplicationContext.Current.Services.PackagingService.ImportContentTypes(element, userId);
 		    var contentType = importContentTypes.FirstOrDefault();
 		    if (contentType != null)
 		        dtNameConfirm.Text = contentType.Name;
