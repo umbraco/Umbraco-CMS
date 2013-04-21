@@ -936,7 +936,7 @@ namespace umbraco.cms.businesslogic.packager
         public static void ImportDocumentType(XmlNode n, User u, bool ImportStructure)
         {
             var element = n.GetXElement();
-            var contentTypes = ApplicationContext.Current.Services.PackagingService.ImportContentTypes(element, u.Id);
+            var contentTypes = ApplicationContext.Current.Services.PackagingService.ImportContentTypes(element, ImportStructure, u.Id);
         }
 
         #endregion
