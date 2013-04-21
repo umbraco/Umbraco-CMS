@@ -1070,8 +1070,8 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Id != content.Id && x.Path.StartsWith(content.Path) && x.Published == true && x.Trashed == false);
-                var contents = repository.GetByQuery(query);
+                var query = Query<IContent>.Builder.Where(x => x.Id != content.Id && x.Path.StartsWith(content.Path) && x.Trashed == false);
+                var contents = repository.GetByPublishedVersion(query);
 
                 return contents;
             }

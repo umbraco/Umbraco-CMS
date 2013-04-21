@@ -401,6 +401,24 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Implementation of IContentRepository
 
+        public IEnumerable<IContent> GetByPublishedVersion(IQuery<IContent> query)
+        {
+            var sqlClause = GetBaseQuery(false);
+            var translator = new SqlTranslator<IContent>(sqlClause, query);
+            var sql = translator.Translate()
+                                .Where<DocumentDto>(x => x.Published)
+                                .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
+                                .OrderBy<NodeDto>(x => x.SortOrder);
+
+            //NOTE: This doesn't allow properties to be part of the query
+            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+
+            foreach (var dto in dtos)
+            {
+                yield return CreateContentFromDto(dto, dto.VersionId);
+            }
+        }
+
         public IContent GetByLanguage(int id, string language)
         {
             var sql = GetBaseQuery(false);
