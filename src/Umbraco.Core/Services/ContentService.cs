@@ -19,25 +19,25 @@ using Umbraco.Core.Publishing;
 
 namespace Umbraco.Core.Services
 {
-	/// <summary>
-	/// Represents the Content Service, which is an easy access to operations involving <see cref="IContent"/>
-	/// </summary>
-	public class ContentService : IContentService
-	{
-		private readonly IDatabaseUnitOfWorkProvider _uowProvider;
-		private readonly IPublishingStrategy _publishingStrategy;
+    /// <summary>
+    /// Represents the Content Service, which is an easy access to operations involving <see cref="IContent"/>
+    /// </summary>
+    public class ContentService : IContentService
+    {
+        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
+        private readonly IPublishingStrategy _publishingStrategy;
         private readonly RepositoryFactory _repositoryFactory;
         //Support recursive locks because some of the methods that require locking call other methods that require locking. 
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
-        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion); 
+        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
         public ContentService()
             : this(new RepositoryFactory())
-        {}
+        { }
 
         public ContentService(RepositoryFactory repositoryFactory)
             : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory, new PublishingStrategy())
-        {}
+        { }
 
         public ContentService(IDatabaseUnitOfWorkProvider provider)
             : this(provider, new RepositoryFactory(), new PublishingStrategy())
@@ -47,42 +47,42 @@ namespace Umbraco.Core.Services
             : this(provider, repositoryFactory, new PublishingStrategy())
         { }
 
-	    public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy)
-		{
-			_uowProvider = provider;
-			_publishingStrategy = publishingStrategy;
+        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy)
+        {
+            _uowProvider = provider;
+            _publishingStrategy = publishingStrategy;
             _repositoryFactory = repositoryFactory;
-		}
+        }
 
-	    /// <summary>
-	    /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
-	    /// that this Content is based on.
-	    /// </summary>
+        /// <summary>
+        /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+        /// that this Content is based on.
+        /// </summary>
         /// <param name="name">Name of the Content object</param>
-	    /// <param name="parentId">Id of Parent for the new Content</param>
-	    /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
-	    /// <param name="userId">Optional id of the user creating the content</param>
-	    /// <returns><see cref="IContent"/></returns>
-	    public IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = 0)
-		{
-		    var contentType = FindContentTypeByAlias(contentTypeAlias);
+        /// <param name="parentId">Id of Parent for the new Content</param>
+        /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
+        /// <returns><see cref="IContent"/></returns>
+        public IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = 0)
+        {
+            var contentType = FindContentTypeByAlias(contentTypeAlias);
             var content = new Content(name, parentId, contentType); ;
 
-			if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
-			{
-			    content.WasCancelled = true;
-			    return content;
-			}
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
+            {
+                content.WasCancelled = true;
+                return content;
+            }
 
-	        content.CreatorId = userId;
-			content.WriterId = userId;
+            content.CreatorId = userId;
+            content.WriterId = userId;
 
-			Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this);
+            Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this);
 
-			Audit.Add(AuditTypes.New, "", content.CreatorId, content.Id);
+            Audit.Add(AuditTypes.New, "", content.CreatorId, content.Id);
 
-		    return content;	
-		}
+            return content;
+        }
 
         /// <summary>
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
@@ -114,65 +114,65 @@ namespace Umbraco.Core.Services
             return content;
         }
 
-		/// <summary>
-		/// Gets an <see cref="IContent"/> object by Id
-		/// </summary>
-		/// <param name="id">Id of the Content to retrieve</param>
-		/// <returns><see cref="IContent"/></returns>
-		public IContent GetById(int id)
-		{
-			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
-			{
-				return repository.Get(id);
-			}
-		}
+        /// <summary>
+        /// Gets an <see cref="IContent"/> object by Id
+        /// </summary>
+        /// <param name="id">Id of the Content to retrieve</param>
+        /// <returns><see cref="IContent"/></returns>
+        public IContent GetById(int id)
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(id);
+            }
+        }
 
-		/// <summary>
-		/// Gets an <see cref="IContent"/> object by its 'UniqueId'
-		/// </summary>
-		/// <param name="key">Guid key of the Content to retrieve</param>
-		/// <returns><see cref="IContent"/></returns>
-		public IContent GetById(Guid key)
-		{
-			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
-			{
-				var query = Query<IContent>.Builder.Where(x => x.Key == key);
-				var contents = repository.GetByQuery(query);
-				return contents.SingleOrDefault();
-			}
-		}
+        /// <summary>
+        /// Gets an <see cref="IContent"/> object by its 'UniqueId'
+        /// </summary>
+        /// <param name="key">Guid key of the Content to retrieve</param>
+        /// <returns><see cref="IContent"/></returns>
+        public IContent GetById(Guid key)
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IContent>.Builder.Where(x => x.Key == key);
+                var contents = repository.GetByQuery(query);
+                return contents.SingleOrDefault();
+            }
+        }
 
-		/// <summary>
-		/// Gets a collection of <see cref="IContent"/> objects by the Id of the <see cref="IContentType"/>
-		/// </summary>
-		/// <param name="id">Id of the <see cref="IContentType"/></param>
-		/// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-		public IEnumerable<IContent> GetContentOfContentType(int id)
-		{
-			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
-			{
-				var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == id);
-				var contents = repository.GetByQuery(query);
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by the Id of the <see cref="IContentType"/>
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContentType"/></param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetContentOfContentType(int id)
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == id);
+                var contents = repository.GetByQuery(query);
 
-				return contents;
-			}
-		}
+                return contents;
+            }
+        }
 
-		/// <summary>
-		/// Gets a collection of <see cref="IContent"/> objects by Level
-		/// </summary>
-		/// <param name="level">The level to retrieve Content from</param>
-		/// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-		public IEnumerable<IContent> GetByLevel(int level)
-		{
-			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
-			{
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by Level
+        /// </summary>
+        /// <param name="level">The level to retrieve Content from</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetByLevel(int level)
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
                 var query = Query<IContent>.Builder.Where(x => x.Level == level && !x.Path.StartsWith("-20"));
-				var contents = repository.GetByQuery(query);
+                var contents = repository.GetByQuery(query);
 
-				return contents;
-			}
-		}
+                return contents;
+            }
+        }
 
         /// <summary>
         /// Gets a specific version of an <see cref="IContent"/> item.
@@ -201,21 +201,21 @@ namespace Umbraco.Core.Services
             }
         }
 
-		/// <summary>
-		/// Gets a collection of <see cref="IContent"/> objects by Parent Id
-		/// </summary>
-		/// <param name="id">Id of the Parent to retrieve Children from</param>
-		/// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-		public IEnumerable<IContent> GetChildren(int id)
-		{
-			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
-			{
-				var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
-				var contents = repository.GetByQuery(query);
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Children from</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetChildren(int id)
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
+                var contents = repository.GetByQuery(query);
 
-				return contents;
-			}
-		}
+                return contents;
+            }
+        }
 
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by its name or partial name
@@ -272,65 +272,65 @@ namespace Umbraco.Core.Services
             return version.FirstOrDefault(x => x.Published == true);
         }
 
-		/// <summary>
-		/// Gets a collection of <see cref="IContent"/> objects, which reside at the first level / root
-		/// </summary>
-		/// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-		public IEnumerable<IContent> GetRootContent()
-		{
-			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
-			{
-				var query = Query<IContent>.Builder.Where(x => x.ParentId == -1);
-				var contents = repository.GetByQuery(query);
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects, which reside at the first level / root
+        /// </summary>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetRootContent()
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IContent>.Builder.Where(x => x.ParentId == -1);
+                var contents = repository.GetByQuery(query);
 
-				return contents;
-			}
-		}
+                return contents;
+            }
+        }
 
-		/// <summary>
-		/// Gets a collection of <see cref="IContent"/> objects, which has an expiration date less than or equal to today.
-		/// </summary>
-		/// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-		public IEnumerable<IContent> GetContentForExpiration()
-		{
-			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
-			{
-				var query = Query<IContent>.Builder.Where(x => x.Published == true && x.ExpireDate <= DateTime.Now);
-				var contents = repository.GetByQuery(query);
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects, which has an expiration date less than or equal to today.
+        /// </summary>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetContentForExpiration()
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IContent>.Builder.Where(x => x.Published == true && x.ExpireDate <= DateTime.Now);
+                var contents = repository.GetByQuery(query);
 
-				return contents;
-			}
-		}
+                return contents;
+            }
+        }
 
-		/// <summary>
-		/// Gets a collection of <see cref="IContent"/> objects, which has a release date less than or equal to today.
-		/// </summary>
-		/// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-		public IEnumerable<IContent> GetContentForRelease()
-		{
-			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
-			{
-				var query = Query<IContent>.Builder.Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
-				var contents = repository.GetByQuery(query);
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects, which has a release date less than or equal to today.
+        /// </summary>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetContentForRelease()
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IContent>.Builder.Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
+                var contents = repository.GetByQuery(query);
 
-				return contents;
-			}
-		}
+                return contents;
+            }
+        }
 
-		/// <summary>
-		/// Gets a collection of an <see cref="IContent"/> objects, which resides in the Recycle Bin
-		/// </summary>
-		/// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-		public IEnumerable<IContent> GetContentInRecycleBin()
-		{
-			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
-			{
-				var query = Query<IContent>.Builder.Where(x => x.Path.Contains("-20"));
-				var contents = repository.GetByQuery(query);
+        /// <summary>
+        /// Gets a collection of an <see cref="IContent"/> objects, which resides in the Recycle Bin
+        /// </summary>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetContentInRecycleBin()
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IContent>.Builder.Where(x => x.Path.Contains("-20"));
+                var contents = repository.GetByQuery(query);
 
-				return contents;
-			}
-		}
+                return contents;
+            }
+        }
 
         /// <summary>
         /// Checks whether an <see cref="IContent"/> item has any children
@@ -403,7 +403,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-	    /// <summary>
+        /// <summary>
         /// Publishes a single <see cref="IContent"/> object
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to publish</param>
@@ -414,152 +414,152 @@ namespace Umbraco.Core.Services
             return SaveAndPublishDo(content, false, userId);
         }
 
-	    /// <summary>
-	    /// Publishes a <see cref="IContent"/> object and all its children
-	    /// </summary>
-	    /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
-	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
-	    /// <returns>True if publishing succeeded, otherwise False</returns>
-	    public bool PublishWithChildren(IContent content, int userId = 0)
-	    {
-	        return PublishWithChildrenDo(content, false, userId);
-	    }
+        /// <summary>
+        /// Publishes a <see cref="IContent"/> object and all its children
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        public bool PublishWithChildren(IContent content, int userId = 0)
+        {
+            return PublishWithChildrenDo(content, false, userId);
+        }
 
-	    /// <summary>
-	    /// UnPublishes a single <see cref="IContent"/> object
-	    /// </summary>
-	    /// <param name="content">The <see cref="IContent"/> to publish</param>
-	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
-	    /// <returns>True if unpublishing succeeded, otherwise False</returns>
-	    public bool UnPublish(IContent content, int userId = 0)
-	    {
-	        return UnPublishDo(content, false, userId);
-	    }
+        /// <summary>
+        /// UnPublishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if unpublishing succeeded, otherwise False</returns>
+        public bool UnPublish(IContent content, int userId = 0)
+        {
+            return UnPublishDo(content, false, userId);
+        }
 
-	    /// <summary>
-	    /// Saves and Publishes a single <see cref="IContent"/> object
-	    /// </summary>
-	    /// <param name="content">The <see cref="IContent"/> to save and publish</param>
-	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <summary>
+        /// Saves and Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save and publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
-	    /// <returns>True if publishing succeeded, otherwise False</returns>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
         public bool SaveAndPublish(IContent content, int userId = 0, bool raiseEvents = true)
-	    {
-			return SaveAndPublishDo(content, false, userId, raiseEvents);
-	    }
+        {
+            return SaveAndPublishDo(content, false, userId, raiseEvents);
+        }
 
-	    /// <summary>
-	    /// Saves a single <see cref="IContent"/> object
-	    /// </summary>
-	    /// <param name="content">The <see cref="IContent"/> to save</param>
-	    /// <param name="userId">Optional Id of the User saving the Content</param>
+        /// <summary>
+        /// Saves a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save</param>
+        /// <param name="userId">Optional Id of the User saving the Content</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
         public void Save(IContent content, int userId = 0, bool raiseEvents = true)
-	    {
-			Save(content, true, userId, raiseEvents);
-	    }
+        {
+            Save(content, true, userId, raiseEvents);
+        }
 
-	    /// <summary>
-	    /// Saves a collection of <see cref="IContent"/> objects.
-	    /// </summary>
-	    /// <remarks>
-	    /// If the collection of content contains new objects that references eachother by Id or ParentId,
-	    /// then use the overload Save method with a collection of Lazy <see cref="IContent"/>.
-	    /// </remarks>
-	    /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
-	    /// <param name="userId">Optional Id of the User saving the Content</param>
+        /// <summary>
+        /// Saves a collection of <see cref="IContent"/> objects.
+        /// </summary>
+        /// <remarks>
+        /// If the collection of content contains new objects that references eachother by Id or ParentId,
+        /// then use the overload Save method with a collection of Lazy <see cref="IContent"/>.
+        /// </remarks>
+        /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
+        /// <param name="userId">Optional Id of the User saving the Content</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
         public void Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true)
-	    {
-            if(raiseEvents)
-			{
+        {
+            if (raiseEvents)
+            {
                 if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(contents), this))
-				return;
+                    return;
             }
-	        using (new WriteLock(Locker))
-	        {
-	            var containsNew = contents.Any(x => x.HasIdentity == false);
+            using (new WriteLock(Locker))
+            {
+                var containsNew = contents.Any(x => x.HasIdentity == false);
 
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
-	            {
-	                if (containsNew)
-	                {
-	                    foreach (var content in contents)
-	                    {
-	                        content.WriterId = userId;
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateContentRepository(uow))
+                {
+                    if (containsNew)
+                    {
+                        foreach (var content in contents)
+                        {
+                            content.WriterId = userId;
 
-	                        //Only change the publish state if the "previous" version was actually published
-	                        if (content.Published)
-	                            content.ChangePublishedState(PublishedState.Saved);
+                            //Only change the publish state if the "previous" version was actually published
+                            if (content.Published)
+                                content.ChangePublishedState(PublishedState.Saved);
 
-	                        repository.AddOrUpdate(content);
-	                        uow.Commit();
-	                    }
-	                }
-	                else
-	                {
-	                    foreach (var content in contents)
-	                    {
-	                        content.WriterId = userId;
-	                        repository.AddOrUpdate(content);
-	                    }
-	                    uow.Commit();
-	                }
-	            }
+                            repository.AddOrUpdate(content);
+                            uow.Commit();
+                        }
+                    }
+                    else
+                    {
+                        foreach (var content in contents)
+                        {
+                            content.WriterId = userId;
+                            repository.AddOrUpdate(content);
+                        }
+                        uow.Commit();
+                    }
+                }
 
-	            if (raiseEvents)
-	                Saved.RaiseEvent(new SaveEventArgs<IContent>(contents, false), this);
+                if (raiseEvents)
+                    Saved.RaiseEvent(new SaveEventArgs<IContent>(contents, false), this);
 
-	            Audit.Add(AuditTypes.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, -1);
-	        }
-	    }
-		
-	    /// <summary>
-	    /// Deletes all content of specified type. All children of deleted content is moved to Recycle Bin.
-	    /// </summary>
-	    /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
-	    /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
-	    /// <param name="userId">Optional Id of the user issueing the delete operation</param>
-	    public void DeleteContentOfType(int contentTypeId, int userId = 0)
-	    {
-	        using (new WriteLock(Locker))
-	        {
-	            using (var uow = _uowProvider.GetUnitOfWork())
-	            {
-	                var repository = _repositoryFactory.CreateContentRepository(uow);
-	                //NOTE What about content that has the contenttype as part of its composition?
-	                var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == contentTypeId);
-	                var contents = repository.GetByQuery(query);
+                Audit.Add(AuditTypes.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, -1);
+            }
+        }
 
-	                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(contents), this))
-	                    return;
+        /// <summary>
+        /// Deletes all content of specified type. All children of deleted content is moved to Recycle Bin.
+        /// </summary>
+        /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
+        /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional Id of the user issueing the delete operation</param>
+        public void DeleteContentOfType(int contentTypeId, int userId = 0)
+        {
+            using (new WriteLock(Locker))
+            {
+                using (var uow = _uowProvider.GetUnitOfWork())
+                {
+                    var repository = _repositoryFactory.CreateContentRepository(uow);
+                    //NOTE What about content that has the contenttype as part of its composition?
+                    var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == contentTypeId);
+                    var contents = repository.GetByQuery(query);
 
-	                foreach (var content in contents.OrderByDescending(x => x.ParentId))
-	                {
-	                    //Look for children of current content and move that to trash before the current content is deleted
-	                    var c = content;
-	                    var childQuery = Query<IContent>.Builder.Where(x => x.Path.StartsWith(c.Path));
-	                    var children = repository.GetByQuery(childQuery);
+                    if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(contents), this))
+                        return;
 
-	                    foreach (var child in children)
-	                    {
-	                        if (child.ContentType.Id != contentTypeId)
-	                            MoveToRecycleBin(child, userId);
-	                    }
+                    foreach (var content in contents.OrderByDescending(x => x.ParentId))
+                    {
+                        //Look for children of current content and move that to trash before the current content is deleted
+                        var c = content;
+                        var childQuery = Query<IContent>.Builder.Where(x => x.Path.StartsWith(c.Path));
+                        var children = repository.GetByQuery(childQuery);
 
-	                    //Permantly delete the content
-	                    Delete(content, userId);
-	                }
-	            }
+                        foreach (var child in children)
+                        {
+                            if (child.ContentType.Id != contentTypeId)
+                                MoveToRecycleBin(child, userId);
+                        }
 
-	            Audit.Add(AuditTypes.Delete,
-	                      string.Format("Delete Content of Type {0} performed by user", contentTypeId),
-	                      userId, -1);
-	        }
-	    }
+                        //Permantly delete the content
+                        Delete(content, userId);
+                    }
+                }
 
-	    /// <summary>
+                Audit.Add(AuditTypes.Delete,
+                          string.Format("Delete Content of Type {0} performed by user", contentTypeId),
+                          userId, -1);
+            }
+        }
+
+        /// <summary>
         /// Permanently deletes an <see cref="IContent"/> object as well as all of its Children.
         /// </summary>
         /// <remarks>
@@ -568,47 +568,47 @@ namespace Umbraco.Core.Services
         /// <remarks>Please note that this method will completely remove the Content from the database</remarks>
         /// <param name="content">The <see cref="IContent"/> to delete</param>
         /// <param name="userId">Optional Id of the User deleting the Content</param>
-		public void Delete(IContent content, int userId = 0)
-		{
-	        using (new WriteLock(Locker))
-	        {
-	            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(content), this))
-	                return;
+        public void Delete(IContent content, int userId = 0)
+        {
+            using (new WriteLock(Locker))
+            {
+                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(content), this))
+                    return;
 
-	            //Make sure that published content is unpublished before being deleted
-	            if (HasPublishedVersion(content.Id))
-	            {
-	                UnPublish(content, userId);
-	            }
+                //Make sure that published content is unpublished before being deleted
+                if (HasPublishedVersion(content.Id))
+                {
+                    UnPublish(content, userId);
+                }
 
-	            //Delete children before deleting the 'possible parent'
-	            var children = GetChildren(content.Id);
-	            foreach (var child in children)
-	            {
-	                Delete(child, userId);
-	            }
+                //Delete children before deleting the 'possible parent'
+                var children = GetChildren(content.Id);
+                foreach (var child in children)
+                {
+                    Delete(child, userId);
+                }
 
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
-	            {
-	                repository.Delete(content);
-	                uow.Commit();
-	            }
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateContentRepository(uow))
+                {
+                    repository.Delete(content);
+                    uow.Commit();
+                }
 
-	            Deleted.RaiseEvent(new DeleteEventArgs<IContent>(content, false), this);
+                Deleted.RaiseEvent(new DeleteEventArgs<IContent>(content, false), this);
 
-	            Audit.Add(AuditTypes.Delete, "Delete Content performed by user", userId, content.Id);
-	        }
-		}
+                Audit.Add(AuditTypes.Delete, "Delete Content performed by user", userId, content.Id);
+            }
+        }
 
-		/// <summary>
-		/// Permanently deletes versions from an <see cref="IContent"/> object prior to a specific date.
-		/// </summary>
-		/// <param name="id">Id of the <see cref="IContent"/> object to delete versions from</param>
-		/// <param name="versionDate">Latest version date</param>
-		/// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-		public void DeleteVersions(int id, DateTime versionDate, int userId = 0)
-		{
+        /// <summary>
+        /// Permanently deletes versions from an <see cref="IContent"/> object prior to a specific date.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/> object to delete versions from</param>
+        /// <param name="versionDate">Latest version date</param>
+        /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
+        public void DeleteVersions(int id, DateTime versionDate, int userId = 0)
+        {
             //TODO: We should check if we are going to delete the most recent version because if that happens it means the 
             // entity is completely deleted and we should raise the normal Deleting/Deleted event
 
@@ -625,19 +625,19 @@ namespace Umbraco.Core.Services
             DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate), this);
 
             Audit.Add(AuditTypes.Delete, "Delete Content by version date performed by user", userId, -1);
-		}
+        }
 
-		/// <summary>
-	    /// Permanently deletes specific version(s) from an <see cref="IContent"/> object.
-	    /// </summary>
-	    /// <param name="id">Id of the <see cref="IContent"/> object to delete a version from</param>
-	    /// <param name="versionId">Id of the version to delete</param>
-	    /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
-	    /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-	    public void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = 0)
-	    {
-		    using (new WriteLock(Locker))
-		    {
+        /// <summary>
+        /// Permanently deletes specific version(s) from an <see cref="IContent"/> object.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/> object to delete a version from</param>
+        /// <param name="versionId">Id of the version to delete</param>
+        /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
+        /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
+        public void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = 0)
+        {
+            using (new WriteLock(Locker))
+            {
                 //TODO: We should check if we are going to delete the most recent version because if that happens it means the 
                 // entity is completely deleted and we should raise the normal Deleting/Deleted event
 
@@ -660,19 +660,19 @@ namespace Umbraco.Core.Services
                 DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, specificVersion: versionId), this);
 
                 Audit.Add(AuditTypes.Delete, "Delete Content by version performed by user", userId, -1);
-		    }		    
-	    }
+            }
+        }
 
-	    /// <summary>
-	    /// Deletes an <see cref="IContent"/> object by moving it to the Recycle Bin
-	    /// </summary>
-	    /// <remarks>Move an item to the Recycle Bin will result in the item being unpublished</remarks>
-	    /// <param name="content">The <see cref="IContent"/> to delete</param>
-	    /// <param name="userId">Optional Id of the User deleting the Content</param>
-	    public void MoveToRecycleBin(IContent content, int userId = 0)
-	    {
-	        using (new WriteLock(Locker))
-	        {
+        /// <summary>
+        /// Deletes an <see cref="IContent"/> object by moving it to the Recycle Bin
+        /// </summary>
+        /// <remarks>Move an item to the Recycle Bin will result in the item being unpublished</remarks>
+        /// <param name="content">The <see cref="IContent"/> to delete</param>
+        /// <param name="userId">Optional Id of the User deleting the Content</param>
+        public void MoveToRecycleBin(IContent content, int userId = 0)
+        {
+            using (new WriteLock(Locker))
+            {
                 if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, -20), this))
                     return;
 
@@ -710,24 +710,24 @@ namespace Umbraco.Core.Services
                 Trashed.RaiseEvent(new MoveEventArgs<IContent>(content, false, -20), this);
 
                 Audit.Add(AuditTypes.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
-	        }	        
-	    }
+            }
+        }
 
-	    /// <summary>
-	    /// Moves an <see cref="IContent"/> object to a new location by changing its parent id.
-	    /// </summary>
-	    /// <remarks>
-	    /// If the <see cref="IContent"/> object is already published it will be
-	    /// published after being moved to its new location. Otherwise it'll just
-	    /// be saved with a new parent id.
-	    /// </remarks>
-	    /// <param name="content">The <see cref="IContent"/> to move</param>
-	    /// <param name="parentId">Id of the Content's new Parent</param>
-	    /// <param name="userId">Optional Id of the User moving the Content</param>
-	    public void Move(IContent content, int parentId, int userId = 0)
-	    {
-	        using (new WriteLock(Locker))
-	        {
+        /// <summary>
+        /// Moves an <see cref="IContent"/> object to a new location by changing its parent id.
+        /// </summary>
+        /// <remarks>
+        /// If the <see cref="IContent"/> object is already published it will be
+        /// published after being moved to its new location. Otherwise it'll just
+        /// be saved with a new parent id.
+        /// </remarks>
+        /// <param name="content">The <see cref="IContent"/> to move</param>
+        /// <param name="parentId">Id of the Content's new Parent</param>
+        /// <param name="userId">Optional Id of the User moving the Content</param>
+        public void Move(IContent content, int parentId, int userId = 0)
+        {
+            using (new WriteLock(Locker))
+            {
                 //This ensures that the correct method is called if this method is used to Move to recycle bin.
                 if (parentId == -20)
                 {
@@ -737,9 +737,9 @@ namespace Umbraco.Core.Services
 
                 if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, parentId), this))
                     return;
-	            
+
                 content.WriterId = userId;
-	            if (parentId == -1)
+                if (parentId == -1)
                 {
                     content.Path = string.Concat("-1,", content.Id);
                     content.Level = 1;
@@ -806,36 +806,36 @@ namespace Umbraco.Core.Services
                 Moved.RaiseEvent(new MoveEventArgs<IContent>(content, false, parentId), this);
 
                 Audit.Add(AuditTypes.Move, "Move Content performed by user", userId, content.Id);
-	        }	        
-		}
+            }
+        }
 
         /// <summary>
-		/// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
-		/// </summary>
-		public void EmptyRecycleBin()
-		{
-			//TODO: Why don't we have a base class to share between MediaService/ContentService as some of this is exacty the same?
+        /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
+        /// </summary>
+        public void EmptyRecycleBin()
+        {
+            //TODO: Why don't we have a base class to share between MediaService/ContentService as some of this is exacty the same?
 
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateContentRepository(uow))
-			{
-				var query = Query<IContent>.Builder.Where(x => x.Trashed == true);
-				var contents = repository.GetByQuery(query).OrderByDescending(x => x.Level);
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                var query = Query<IContent>.Builder.Where(x => x.Trashed == true);
+                var contents = repository.GetByQuery(query).OrderByDescending(x => x.Level);
 
-				foreach (var content in contents)
-				{
-					if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(content), this))
-						continue;
+                foreach (var content in contents)
+                {
+                    if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(content), this))
+                        continue;
 
-					repository.Delete(content);
+                    repository.Delete(content);
 
-					Deleted.RaiseEvent(new DeleteEventArgs<IContent>(content, false), this);
-				}
-				uow.Commit();
-			}
+                    Deleted.RaiseEvent(new DeleteEventArgs<IContent>(content, false), this);
+                }
+                uow.Commit();
+            }
 
             Audit.Add(AuditTypes.Delete, "Empty Recycle Bin performed by user", 0, -20);
-		}
+        }
 
         /// <summary>
         /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current 
@@ -850,7 +850,7 @@ namespace Umbraco.Core.Services
         {
             using (new WriteLock(Locker))
             {
-                var copy = ((Content) content).Clone();
+                var copy = ((Content)content).Clone();
                 copy.ParentId = parentId;
 
                 // A copy should never be set to published automatically even if the original was.
@@ -907,10 +907,10 @@ namespace Umbraco.Core.Services
                     var tagsDataTypeId = new Guid("4023e540-92f5-11dd-ad8b-0800200c9a66");
                     if (content.Properties.Any(x => x.PropertyType.DataTypeId == tagsDataTypeId))
                     {
-                        var tags = uow.Database.Fetch<TagRelationshipDto>("WHERE nodeId = @Id", new {Id = content.Id});
+                        var tags = uow.Database.Fetch<TagRelationshipDto>("WHERE nodeId = @Id", new { Id = content.Id });
                         foreach (var tag in tags)
                         {
-                            uow.Database.Insert(new TagRelationshipDto {NodeId = copy.Id, TagId = tag.TagId});
+                            uow.Database.Insert(new TagRelationshipDto { NodeId = copy.Id, TagId = tag.TagId });
                         }
                     }
                 }
@@ -935,9 +935,9 @@ namespace Umbraco.Core.Services
                               string.Format("Copied content with Id: '{0}' related to original content with Id: '{1}'",
                                             copy.Id, content.Id), copy.WriterId, copy.Id);
                 }
-                
+
                 //Look for children and copy those as well
-                var children = GetChildren(content.Id);
+                var children = GetChildren(content.Id).OrderBy(x => x.SortOrder);
                 foreach (var child in children)
                 {
                     Copy(child, copy.Id, relateToOriginal, userId);
@@ -946,48 +946,48 @@ namespace Umbraco.Core.Services
                 Copied.RaiseEvent(new CopyEventArgs<IContent>(content, copy, false, parentId), this);
 
                 Audit.Add(AuditTypes.Copy, "Copy Content performed by user", content.WriterId, content.Id);
-                
+
                 RuntimeCacheProvider.Current.Clear();
 
                 return copy;
             }
         }
 
-		/// <summary>
-		/// Sends an <see cref="IContent"/> to Publication, which executes handlers and events for the 'Send to Publication' action.
-		/// </summary>
-		/// <param name="content">The <see cref="IContent"/> to send to publication</param>
-		/// <param name="userId">Optional Id of the User issueing the send to publication</param>
-		/// <returns>True if sending publication was succesfull otherwise false</returns>
-		internal bool SendToPublication(IContent content, int userId = 0)
-		{
+        /// <summary>
+        /// Sends an <see cref="IContent"/> to Publication, which executes handlers and events for the 'Send to Publication' action.
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to send to publication</param>
+        /// <param name="userId">Optional Id of the User issueing the send to publication</param>
+        /// <returns>True if sending publication was succesfull otherwise false</returns>
+        internal bool SendToPublication(IContent content, int userId = 0)
+        {
 
-			if (SendingToPublish.IsRaisedEventCancelled(new SendToPublishEventArgs<IContent>(content), this))
-				return false;
+            if (SendingToPublish.IsRaisedEventCancelled(new SendToPublishEventArgs<IContent>(content), this))
+                return false;
 
-			//TODO: Do some stuff here.. RunActionHandlers
+            //TODO: Do some stuff here.. RunActionHandlers
 
-			SentToPublish.RaiseEvent(new SendToPublishEventArgs<IContent>(content, false), this);
+            SentToPublish.RaiseEvent(new SendToPublishEventArgs<IContent>(content, false), this);
 
-			Audit.Add(AuditTypes.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
+            Audit.Add(AuditTypes.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
 
-			return true;
-		}
+            return true;
+        }
 
-	    /// <summary>
-	    /// Rollback an <see cref="IContent"/> object to a previous version.
-	    /// This will create a new version, which is a copy of all the old data.
-	    /// </summary>
-	    /// <remarks>
-	    /// The way data is stored actually only allows us to rollback on properties
-	    /// and not data like Name and Alias of the Content.
-	    /// </remarks>
-	    /// <param name="id">Id of the <see cref="IContent"/>being rolled back</param>
-	    /// <param name="versionId">Id of the version to rollback to</param>
-	    /// <param name="userId">Optional Id of the User issueing the rollback of the Content</param>
-	    /// <returns>The newly created <see cref="IContent"/> object</returns>
-	    public IContent Rollback(int id, Guid versionId, int userId = 0)
-	    {
+        /// <summary>
+        /// Rollback an <see cref="IContent"/> object to a previous version.
+        /// This will create a new version, which is a copy of all the old data.
+        /// </summary>
+        /// <remarks>
+        /// The way data is stored actually only allows us to rollback on properties
+        /// and not data like Name and Alias of the Content.
+        /// </remarks>
+        /// <param name="id">Id of the <see cref="IContent"/>being rolled back</param>
+        /// <param name="versionId">Id of the version to rollback to</param>
+        /// <param name="userId">Optional Id of the User issueing the rollback of the Content</param>
+        /// <returns>The newly created <see cref="IContent"/> object</returns>
+        public IContent Rollback(int id, Guid versionId, int userId = 0)
+        {
             var content = GetByVersion(versionId);
 
             if (RollingBack.IsRaisedEventCancelled(new RollbackEventArgs<IContent>(content), this))
@@ -1008,10 +1008,10 @@ namespace Umbraco.Core.Services
             Audit.Add(AuditTypes.RollBack, "Content rollback performed by user", content.WriterId, content.Id);
 
             return content;
-	    }
+        }
 
         #region Internal Methods
-        
+
         /// <summary>
         /// Internal method that Publishes a single <see cref="IContent"/> object for legacy purposes.
         /// </summary>
@@ -1048,15 +1048,15 @@ namespace Umbraco.Core.Services
             return UnPublishDo(content, omitCacheRefresh, userId);
         }
 
-	    /// <summary>
-	    /// Saves and Publishes a single <see cref="IContent"/> object
-	    /// </summary>
-	    /// <param name="content">The <see cref="IContent"/> to save and publish</param>
-	    /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will not update the cache.</param>
-	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <summary>
+        /// Saves and Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save and publish</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will not update the cache.</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
-	    /// <returns>True if publishing succeeded, otherwise False</returns>
-	    internal bool SaveAndPublish(IContent content, bool omitCacheRefresh = true, int userId = 0, bool raiseEvents = true)
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        internal bool SaveAndPublish(IContent content, bool omitCacheRefresh = true, int userId = 0, bool raiseEvents = true)
         {
             return SaveAndPublishDo(content, omitCacheRefresh, userId, raiseEvents);
         }
@@ -1246,138 +1246,138 @@ namespace Umbraco.Core.Services
                 }
 
                 return unpublished;
-            }            
+            }
         }
 
-	    /// <summary>
-	    /// Saves and Publishes a single <see cref="IContent"/> object
-	    /// </summary>
-	    /// <param name="content">The <see cref="IContent"/> to save and publish</param>
-	    /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
-	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <summary>
+        /// Saves and Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save and publish</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
-	    /// <returns>True if publishing succeeded, otherwise False</returns>
-	    private bool SaveAndPublishDo(IContent content, bool omitCacheRefresh = false, int userId = 0, bool raiseEvents = true)
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        private bool SaveAndPublishDo(IContent content, bool omitCacheRefresh = false, int userId = 0, bool raiseEvents = true)
         {
-            if(raiseEvents)
+            if (raiseEvents)
             {
                 if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
-                return false;
+                    return false;
             }
 
-	        using (new WriteLock(Locker))
-	        {
-	            //Has this content item previously been published? If so, we don't need to refresh the children
-	            var previouslyPublished = HasPublishedVersion(content.Id);
-	            var validForPublishing = true;
+            using (new WriteLock(Locker))
+            {
+                //Has this content item previously been published? If so, we don't need to refresh the children
+                var previouslyPublished = HasPublishedVersion(content.Id);
+                var validForPublishing = true;
 
-	            //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
-	            if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
-	            {
-	                LogHelper.Info<ContentService>(
-	                    string.Format(
-	                        "Content '{0}' with Id '{1}' could not be published because its parent is not published.",
-	                        content.Name, content.Id));
-	                validForPublishing = false;
-	            }
+                //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
+                if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
+                {
+                    LogHelper.Info<ContentService>(
+                        string.Format(
+                            "Content '{0}' with Id '{1}' could not be published because its parent is not published.",
+                            content.Name, content.Id));
+                    validForPublishing = false;
+                }
 
-	            //Content contains invalid property values and can therefore not be published - fire event?
-	            if (!content.IsValid())
-	            {
-	                LogHelper.Info<ContentService>(
-	                    string.Format(
-	                        "Content '{0}' with Id '{1}' could not be published because of invalid properties.",
-	                        content.Name, content.Id));
-	                validForPublishing = false;
-	            }
+                //Content contains invalid property values and can therefore not be published - fire event?
+                if (!content.IsValid())
+                {
+                    LogHelper.Info<ContentService>(
+                        string.Format(
+                            "Content '{0}' with Id '{1}' could not be published because of invalid properties.",
+                            content.Name, content.Id));
+                    validForPublishing = false;
+                }
 
-	            //Publish and then update the database with new status
-	            bool published = validForPublishing && _publishingStrategy.Publish(content, userId);
+                //Publish and then update the database with new status
+                bool published = validForPublishing && _publishingStrategy.Publish(content, userId);
 
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
-	            {
-	                //Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
-	                content.WriterId = userId;
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateContentRepository(uow))
+                {
+                    //Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
+                    content.WriterId = userId;
 
-	                repository.AddOrUpdate(content);
+                    repository.AddOrUpdate(content);
 
-	                uow.Commit();
+                    uow.Commit();
 
-	                var xml = content.ToXml();
-	                //Preview Xml
-	                var previewPoco = new PreviewXmlDto
-	                    {
-	                        NodeId = content.Id,
-	                        Timestamp = DateTime.Now,
-	                        VersionId = content.Version,
-	                        Xml = xml.ToString(SaveOptions.None)
-	                    };
-	                var previewExists =
-	                    uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
-	                                                    new {Id = content.Id, Version = content.Version}) != 0;
-	                int previewResult = previewExists
-	                                        ? uow.Database.Update<PreviewXmlDto>(
-	                                            "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
-	                                            new
-	                                                {
-	                                                    Xml = previewPoco.Xml,
-	                                                    Timestamp = previewPoco.Timestamp,
-	                                                    Id = previewPoco.NodeId,
-	                                                    Version = previewPoco.VersionId
-	                                                })
-	                                        : Convert.ToInt32(uow.Database.Insert(previewPoco));
+                    var xml = content.ToXml();
+                    //Preview Xml
+                    var previewPoco = new PreviewXmlDto
+                        {
+                            NodeId = content.Id,
+                            Timestamp = DateTime.Now,
+                            VersionId = content.Version,
+                            Xml = xml.ToString(SaveOptions.None)
+                        };
+                    var previewExists =
+                        uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
+                                                        new { Id = content.Id, Version = content.Version }) != 0;
+                    int previewResult = previewExists
+                                            ? uow.Database.Update<PreviewXmlDto>(
+                                                "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
+                                                new
+                                                    {
+                                                        Xml = previewPoco.Xml,
+                                                        Timestamp = previewPoco.Timestamp,
+                                                        Id = previewPoco.NodeId,
+                                                        Version = previewPoco.VersionId
+                                                    })
+                                            : Convert.ToInt32(uow.Database.Insert(previewPoco));
 
-	                if (published)
-	                {
-	                    //Content Xml
-	                    var contentPoco = new ContentXmlDto {NodeId = content.Id, Xml = xml.ToString(SaveOptions.None)};
-	                    var contentExists = uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new {Id = content.Id}) != 0;
-	                    int contentResult = contentExists
-	                                            ? uow.Database.Update(contentPoco)
-	                                            : Convert.ToInt32(uow.Database.Insert(contentPoco));
+                    if (published)
+                    {
+                        //Content Xml
+                        var contentPoco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
+                        var contentExists = uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = content.Id }) != 0;
+                        int contentResult = contentExists
+                                                ? uow.Database.Update(contentPoco)
+                                                : Convert.ToInt32(uow.Database.Insert(contentPoco));
 
-	                }
-	            }
+                    }
+                }
 
-	            if (raiseEvents)
-	                Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
+                if (raiseEvents)
+                    Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
 
-	            //Save xml to db and call following method to fire event through PublishingStrategy to update cache
-	            if (published && omitCacheRefresh == false)
-	                _publishingStrategy.PublishingFinalized(content);
+                //Save xml to db and call following method to fire event through PublishingStrategy to update cache
+                if (published && omitCacheRefresh == false)
+                    _publishingStrategy.PublishingFinalized(content);
 
-	            //We need to check if children and their publish state to ensure that we 'republish' content that was previously published
-	            if (published && omitCacheRefresh == false && previouslyPublished == false && HasChildren(content.Id))
-	            {
-	                var descendants = GetPublishedDescendants(content);
+                //We need to check if children and their publish state to ensure that we 'republish' content that was previously published
+                if (published && omitCacheRefresh == false && previouslyPublished == false && HasChildren(content.Id))
+                {
+                    var descendants = GetPublishedDescendants(content);
 
-	                _publishingStrategy.PublishingFinalized(descendants, false);
-	            }
+                    _publishingStrategy.PublishingFinalized(descendants, false);
+                }
 
-	            Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId, content.Id);
+                Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId, content.Id);
 
-	            return published;
-	        }
+                return published;
+            }
         }
 
-	    /// <summary>
-	    /// Saves a single <see cref="IContent"/> object
-	    /// </summary>
-	    /// <param name="content">The <see cref="IContent"/> to save</param>
-	    /// <param name="changeState">Boolean indicating whether or not to change the Published state upon saving</param>
-	    /// <param name="userId">Optional Id of the User saving the Content</param>
+        /// <summary>
+        /// Saves a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save</param>
+        /// <param name="changeState">Boolean indicating whether or not to change the Published state upon saving</param>
+        /// <param name="userId">Optional Id of the User saving the Content</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-	    private void Save(IContent content, bool changeState, int userId = 0, bool raiseEvents = true)
+        private void Save(IContent content, bool changeState, int userId = 0, bool raiseEvents = true)
         {
-            if(raiseEvents)
+            if (raiseEvents)
             {
                 if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
-                return;
+                    return;
             }
 
-	        using (new WriteLock(Locker))
-	        {
+            using (new WriteLock(Locker))
+            {
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentRepository(uow))
                 {
@@ -1419,7 +1419,7 @@ namespace Umbraco.Core.Services
                     Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
 
                 Audit.Add(AuditTypes.Save, "Save Content performed by user", userId, content.Id);
-	        }	        
+            }
         }
 
         /// <summary>
@@ -1523,98 +1523,98 @@ namespace Umbraco.Core.Services
 
         #region Event Handlers
         /// <summary>
-		/// Occurs before Delete
-		/// </summary>		
-		public static event TypedEventHandler<IContentService, DeleteEventArgs<IContent>> Deleting;
+        /// Occurs before Delete
+        /// </summary>		
+        public static event TypedEventHandler<IContentService, DeleteEventArgs<IContent>> Deleting;
 
-		/// <summary>
-		/// Occurs after Delete
-		/// </summary>
-		public static event TypedEventHandler<IContentService, DeleteEventArgs<IContent>> Deleted;
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event TypedEventHandler<IContentService, DeleteEventArgs<IContent>> Deleted;
 
-		/// <summary>
-		/// Occurs before Delete Versions
-		/// </summary>		
-		public static event TypedEventHandler<IContentService, DeleteRevisionsEventArgs> DeletingVersions;
+        /// <summary>
+        /// Occurs before Delete Versions
+        /// </summary>		
+        public static event TypedEventHandler<IContentService, DeleteRevisionsEventArgs> DeletingVersions;
 
-		/// <summary>
-		/// Occurs after Delete Versions
-		/// </summary>
-		public static event TypedEventHandler<IContentService, DeleteRevisionsEventArgs> DeletedVersions;
+        /// <summary>
+        /// Occurs after Delete Versions
+        /// </summary>
+        public static event TypedEventHandler<IContentService, DeleteRevisionsEventArgs> DeletedVersions;
 
-		/// <summary>
-		/// Occurs before Save
-		/// </summary>
-		public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Saving;
-		
-		/// <summary>
-		/// Occurs after Save
-		/// </summary>
-		public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Saved;
-		
-		/// <summary>
-		/// Occurs before Create
-		/// </summary>
-		public static event TypedEventHandler<IContentService, NewEventArgs<IContent>> Creating;
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Saving;
 
-		/// <summary>
-		/// Occurs after Create
-		/// </summary>
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Saved;
+
+        /// <summary>
+        /// Occurs before Create
+        /// </summary>
+        public static event TypedEventHandler<IContentService, NewEventArgs<IContent>> Creating;
+
+        /// <summary>
+        /// Occurs after Create
+        /// </summary>
         /// <remarks>
         /// Please note that the Content object has been created, but not saved
         /// so it does not have an identity yet (meaning no Id has been set).
         /// </remarks>
-		public static event TypedEventHandler<IContentService, NewEventArgs<IContent>> Created;
+        public static event TypedEventHandler<IContentService, NewEventArgs<IContent>> Created;
 
-		/// <summary>
-		/// Occurs before Copy
-		/// </summary>
-		public static event TypedEventHandler<IContentService, CopyEventArgs<IContent>> Copying;
+        /// <summary>
+        /// Occurs before Copy
+        /// </summary>
+        public static event TypedEventHandler<IContentService, CopyEventArgs<IContent>> Copying;
 
-		/// <summary>
-		/// Occurs after Copy
-		/// </summary>
-		public static event TypedEventHandler<IContentService, CopyEventArgs<IContent>> Copied;
+        /// <summary>
+        /// Occurs after Copy
+        /// </summary>
+        public static event TypedEventHandler<IContentService, CopyEventArgs<IContent>> Copied;
 
-		/// <summary>
-		/// Occurs before Content is moved to Recycle Bin
-		/// </summary>
-		public static event TypedEventHandler<IContentService, MoveEventArgs<IContent>> Trashing;
+        /// <summary>
+        /// Occurs before Content is moved to Recycle Bin
+        /// </summary>
+        public static event TypedEventHandler<IContentService, MoveEventArgs<IContent>> Trashing;
 
-		/// <summary>
-		/// Occurs after Content is moved to Recycle Bin
-		/// </summary>
-		public static event TypedEventHandler<IContentService, MoveEventArgs<IContent>> Trashed;
+        /// <summary>
+        /// Occurs after Content is moved to Recycle Bin
+        /// </summary>
+        public static event TypedEventHandler<IContentService, MoveEventArgs<IContent>> Trashed;
 
-		/// <summary>
-		/// Occurs before Move
-		/// </summary>
-		public static event TypedEventHandler<IContentService, MoveEventArgs<IContent>> Moving;
+        /// <summary>
+        /// Occurs before Move
+        /// </summary>
+        public static event TypedEventHandler<IContentService, MoveEventArgs<IContent>> Moving;
 
-		/// <summary>
-		/// Occurs after Move
-		/// </summary>
-		public static event TypedEventHandler<IContentService, MoveEventArgs<IContent>> Moved;
+        /// <summary>
+        /// Occurs after Move
+        /// </summary>
+        public static event TypedEventHandler<IContentService, MoveEventArgs<IContent>> Moved;
 
-		/// <summary>
-		/// Occurs before Rollback
-		/// </summary>
-		public static event TypedEventHandler<IContentService, RollbackEventArgs<IContent>> RollingBack;
+        /// <summary>
+        /// Occurs before Rollback
+        /// </summary>
+        public static event TypedEventHandler<IContentService, RollbackEventArgs<IContent>> RollingBack;
 
-		/// <summary>
-		/// Occurs after Rollback
-		/// </summary>
-		public static event TypedEventHandler<IContentService, RollbackEventArgs<IContent>> RolledBack;
+        /// <summary>
+        /// Occurs after Rollback
+        /// </summary>
+        public static event TypedEventHandler<IContentService, RollbackEventArgs<IContent>> RolledBack;
 
-		/// <summary>
-		/// Occurs before Send to Publish
-		/// </summary>
-		public static event TypedEventHandler<IContentService, SendToPublishEventArgs<IContent>> SendingToPublish;
+        /// <summary>
+        /// Occurs before Send to Publish
+        /// </summary>
+        public static event TypedEventHandler<IContentService, SendToPublishEventArgs<IContent>> SendingToPublish;
 
-		/// <summary>
-		/// Occurs after Send to Publish
-		/// </summary>
-		public static event TypedEventHandler<IContentService, SendToPublishEventArgs<IContent>> SentToPublish;
-		#endregion
-	}
+        /// <summary>
+        /// Occurs after Send to Publish
+        /// </summary>
+        public static event TypedEventHandler<IContentService, SendToPublishEventArgs<IContent>> SentToPublish;
+        #endregion
+    }
 }
