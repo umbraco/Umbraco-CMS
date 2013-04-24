@@ -387,6 +387,13 @@
       <DependentUpon>Title.ascx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Umbraco\controls\ContentTypeControlNew.ascx.cs">
+      <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\controls\ContentTypeControlNew.ascx.designer.cs">
+      <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Create.aspx.cs">
       <DependentUpon>create.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -476,6 +483,13 @@
     </Compile>
     <Compile Include="Umbraco\Search\QuickSearch.ascx.designer.cs">
       <DependentUpon>QuickSearch.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Umbraco\settings\EditNodeTypeNew.aspx.cs">
+      <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\settings\EditNodeTypeNew.aspx.designer.cs">
+      <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Settings\EditTemplate.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -2039,6 +2053,7 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Views\Web.config.transform" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>

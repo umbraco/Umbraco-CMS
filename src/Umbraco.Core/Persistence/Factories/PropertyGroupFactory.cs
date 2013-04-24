@@ -9,10 +9,19 @@ namespace Umbraco.Core.Persistence.Factories
     internal class PropertyGroupFactory : IEntityFactory<IEnumerable<PropertyGroup>, IEnumerable<PropertyTypeGroupDto>>
     {
         private readonly int _id;
+        private readonly DateTime _createDate;
+        private readonly DateTime _updateDate;
 
         public PropertyGroupFactory(int id)
         {
             _id = id;
+        }
+
+        public PropertyGroupFactory(int id, DateTime createDate, DateTime updateDate)
+        {
+            _id = id;
+            _createDate = createDate;
+            _updateDate = updateDate;
         }
 
         #region Implementation of IEntityFactory<IEnumerable<PropertyGroup>,IEnumerable<TabDto>>
@@ -58,7 +67,9 @@ namespace Umbraco.Core.Persistence.Factories
                                                     Mandatory = typeDto.Mandatory,
                                                     SortOrder = typeDto.SortOrder,
                                                     ValidationRegExp = typeDto.ValidationRegExp,
-                                                    PropertyGroupId = new Lazy<int>(() => tempGroupDto.Id)
+                                                    PropertyGroupId = new Lazy<int>(() => tempGroupDto.Id),
+                                                    CreateDate = _createDate,
+                                                    UpdateDate = _updateDate
                                                 };
                     //on initial construction we don't want to have dirty properties tracked
                     // http://issues.umbraco.org/issue/U4-1946

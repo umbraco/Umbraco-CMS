@@ -51,7 +51,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MediaFactory(mediaType, NodeObjectTypeId, id);
             var media = factory.BuildEntity(dto);
 
-            media.Properties = GetPropertyCollection(id, dto.VersionId, mediaType);
+            media.Properties = GetPropertyCollection(id, dto.VersionId, mediaType, media.CreateDate, media.UpdateDate);
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
@@ -120,6 +120,8 @@ namespace Umbraco.Core.Persistence.Repositories
                            {
                                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
                                "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                               "DELETE FROM umbracoRelation WHERE parentId = @Id",
+                               "DELETE FROM umbracoRelation WHERE childId = @Id",
                                "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
                                "DELETE FROM cmsDocument WHERE NodeId = @Id",
                                "DELETE FROM cmsPropertyData WHERE contentNodeId = @Id",
@@ -157,7 +159,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MediaFactory(mediaType, NodeObjectTypeId, dto.NodeId);
             var media = factory.BuildEntity(dto);
 
-            media.Properties = GetPropertyCollection(dto.NodeId, dto.VersionId, mediaType);
+            media.Properties = GetPropertyCollection(dto.NodeId, dto.VersionId, mediaType, media.CreateDate, media.UpdateDate);
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
@@ -342,7 +344,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        private PropertyCollection GetPropertyCollection(int id, Guid versionId, IMediaType contentType)
+        private PropertyCollection GetPropertyCollection(int id, Guid versionId, IMediaType contentType, DateTime createDate, DateTime updateDate)
         {
             var sql = new Sql();
             sql.Select("*")
@@ -353,7 +355,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<PropertyDataDto>(x => x.VersionId == versionId);
 
             var propertyDataDtos = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql);
-            var propertyFactory = new PropertyFactory(contentType, versionId, id);
+            var propertyFactory = new PropertyFactory(contentType, versionId, id, createDate, updateDate);
             var properties = propertyFactory.BuildEntity(propertyDataDtos);
 
             var newProperties = properties.Where(x => x.HasIdentity == false);

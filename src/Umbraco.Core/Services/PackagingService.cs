@@ -196,9 +196,21 @@ namespace Umbraco.Core.Services
         /// Imports and saves package xml as <see cref="IContentType"/>
         /// </summary>
         /// <param name="element">Xml to import</param>
-        /// <param name="userId"></param>
+        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <returns>An enumrable list of generated ContentTypes</returns>
         public IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = 0)
+        {
+            return ImportContentTypes(element, true, userId);
+        }
+
+        /// <summary>
+        /// Imports and saves package xml as <see cref="IContentType"/>
+        /// </summary>
+        /// <param name="element">Xml to import</param>
+        /// <param name="importStructure">Boolean indicating whether or not to import the </param>
+        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
+        /// <returns>An enumrable list of generated ContentTypes</returns>
+        public IEnumerable<IContentType> ImportContentTypes(XElement element, bool importStructure, int userId = 0)
         {
             var name = element.Name.LocalName;
             if (name.Equals("DocumentTypes") == false && name.Equals("DocumentType") == false)
@@ -227,22 +239,25 @@ namespace Umbraco.Core.Services
             var list = _importedContentTypes.Select(x => x.Value).ToList();
             _contentTypeService.Save(list, userId);
 
-            var updatedContentTypes = new List<IContentType>();
-            //Update the structure here - we can't do it untill all DocTypes have been created
-            foreach (var documentType in documentTypes)
+            if (importStructure)
             {
-                var alias = documentType.Element("Info").Element("Alias").Value;
-                var structureElement = documentType.Element("Structure");
-                //Ensure that we only update ContentTypes which has actual structure-elements
-                if (structureElement == null || structureElement.Elements("DocumentType").Any() == false) continue;
+                var updatedContentTypes = new List<IContentType>();
+                //Update the structure here - we can't do it untill all DocTypes have been created
+                foreach (var documentType in documentTypes)
+                {
+                    var alias = documentType.Element("Info").Element("Alias").Value;
+                    var structureElement = documentType.Element("Structure");
+                    //Ensure that we only update ContentTypes which has actual structure-elements
+                    if (structureElement == null || structureElement.Elements("DocumentType").Any() == false) continue;
 
-                var updated = UpdateContentTypesStructure(_importedContentTypes[alias], structureElement);
-                updatedContentTypes.Add(updated);
+                    var updated = UpdateContentTypesStructure(_importedContentTypes[alias], structureElement);
+                    updatedContentTypes.Add(updated);
+                }
+                //Update ContentTypes with a newly added structure/list of allowed children
+                if (updatedContentTypes.Any())
+                    _contentTypeService.Save(updatedContentTypes, userId);
             }
-            //Update ContentTypes with a newly added structure/list of allowed children
-            if(updatedContentTypes.Any())
-                _contentTypeService.Save(updatedContentTypes, userId);
-            
+
             return list;
         }
 
@@ -423,7 +438,7 @@ namespace Umbraco.Core.Services
                 if (_importedContentTypes.ContainsKey(alias))
                 {
                     var allowedChild = _importedContentTypes[alias];
-                    if(allowedChild == null || allowedChildren.Any(x => x.Alias == alias)) continue;
+                    if (allowedChild == null || allowedChildren.Any(x => x.Id.IsValueCreated && x.Id.Value == allowedChild.Id)) continue;
 
                     allowedChildren.Add(new ContentTypeSort(new Lazy<int>(() => allowedChild.Id), sortOrder, allowedChild.Alias));
                     sortOrder++;

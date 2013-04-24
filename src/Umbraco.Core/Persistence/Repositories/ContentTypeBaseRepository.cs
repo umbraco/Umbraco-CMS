@@ -326,7 +326,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return allowedContentTypeDtos.Select(x => new ContentTypeSort { Id = new Lazy<int>(() => x.AllowedId), SortOrder = x.SortOrder }).ToList();
         }
 
-        protected PropertyGroupCollection GetPropertyGroupCollection(int id)
+        protected PropertyGroupCollection GetPropertyGroupCollection(int id, DateTime createDate, DateTime updateDate)
         {
             var sql = new Sql();
             sql.Select("*")
@@ -340,12 +340,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
 
-            var propertyGroupFactory = new PropertyGroupFactory(id);
+            var propertyGroupFactory = new PropertyGroupFactory(id, createDate, updateDate);
             var propertyGroups = propertyGroupFactory.BuildEntity(dtos);
             return new PropertyGroupCollection(propertyGroups);
         }
 
-        protected PropertyTypeCollection GetPropertyTypeCollection(int id)
+        protected PropertyTypeCollection GetPropertyTypeCollection(int id, DateTime createDate, DateTime updateDate)
         {
             var sql = new Sql();
             sql.Select("*")
@@ -371,7 +371,9 @@ namespace Umbraco.Core.Persistence.Repositories
                                     HelpText = dto.HelpText,
                                     Mandatory = dto.Mandatory,
                                     SortOrder = dto.SortOrder,
-                                    ValidationRegExp = dto.ValidationRegExp
+                                    ValidationRegExp = dto.ValidationRegExp,
+                                    CreateDate = createDate,
+                                    UpdateDate = updateDate
                                 }).ToList();
 
             //Reset dirty properties

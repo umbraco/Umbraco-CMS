@@ -1,5 +1,5 @@
 <%@ Page Language="c#" CodeBehind="EditNodeTypeNew.aspx.cs" AutoEventWireup="True"
-    Trace="false" Inherits="umbraco.settings.EditContentTypeNew" MasterPageFile="../masterpages/umbracoPage.Master" %>
+    Async="true" AsyncTimeOut="300" Trace="false" Inherits="Umbraco.Web.UI.Umbraco.Settings.EditNodeTypeNew" MasterPageFile="../masterpages/umbracoPage.Master" %>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="uc1" TagName="ContentTypeControlNew" Src="../controls/ContentTypeControlNew.ascx" %>
@@ -9,7 +9,7 @@
         jQuery(document).ready(function () {
 
             // Auto selection/de-selection of default template based on allow templates
-            jQuery("#<%= templateList.ClientID %> input[type='checkbox']").on("change", function () {
+            jQuery("#<%= templateList.ClientID %> input[type='checkbox']").on("change", function() {
                 var checkbox = jQuery(this);
                 var ddl = jQuery("#<%= ddlTemplates.ClientID %>");
                 // If default template is not set, and an allowed template is selected, auto-select the default template
@@ -17,7 +17,8 @@
                     if (ddl.val() == "0") {
                         ddl.val(checkbox.val());
                     }
-                } else {
+                }
+                else {
                     // If allowed template has been de-selected, and it's selected as the default, then de-select the default template
                     if (ddl.val() == checkbox.val()) {
                         ddl.val("0");

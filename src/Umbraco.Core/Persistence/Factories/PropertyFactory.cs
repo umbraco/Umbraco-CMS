@@ -11,12 +11,23 @@ namespace Umbraco.Core.Persistence.Factories
         private readonly IContentTypeComposition _contentType;
         private readonly Guid _version;
         private readonly int _id;
+        private readonly DateTime _createDate;
+        private readonly DateTime _updateDate;
 
         public PropertyFactory(IContentTypeComposition contentType, Guid version, int id)
         {
             _contentType = contentType;
             _version = version;
             _id = id;
+        }
+
+        public PropertyFactory(IContentTypeComposition contentType, Guid version, int id, DateTime createDate, DateTime updateDate)
+        {
+            _contentType = contentType;
+            _version = version;
+            _id = id;
+            _createDate = createDate;
+            _updateDate = updateDate;
         }
 
         #region Implementation of IEntityFactory<IContent,PropertyDataDto>
@@ -34,6 +45,8 @@ namespace Umbraco.Core.Persistence.Factories
                                                                              propertyDataDto.VersionId.Value,
                                                                              propertyDataDto.Id);
                 //on initial construction we don't want to have dirty properties tracked
+                property.CreateDate = _createDate;
+                property.UpdateDate = _updateDate;
                 // http://issues.umbraco.org/issue/U4-1946
                 property.ResetDirtyProperties(false);
                 properties.Add(property);

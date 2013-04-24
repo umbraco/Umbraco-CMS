@@ -401,6 +401,24 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Implementation of IContentRepository
 
+        public IEnumerable<IContent> GetByPublishedVersion(IQuery<IContent> query)
+        {
+            var sqlClause = GetBaseQuery(false);
+            var translator = new SqlTranslator<IContent>(sqlClause, query);
+            var sql = translator.Translate()
+                                .Where<DocumentDto>(x => x.Published)
+                                .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
+                                .OrderBy<NodeDto>(x => x.SortOrder);
+
+            //NOTE: This doesn't allow properties to be part of the query
+            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+
+            foreach (var dto in dtos)
+            {
+                yield return CreateContentFromDto(dto, dto.VersionId);
+            }
+        }
+
         public IContent GetByLanguage(int id, string language)
         {
             var sql = GetBaseQuery(false);
@@ -437,7 +455,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 content.Template = _templateRepository.Get(dto.TemplateId.Value);
             }
 
-            content.Properties = GetPropertyCollection(dto.NodeId, versionId, contentType);
+            content.Properties = GetPropertyCollection(dto.NodeId, versionId, contentType, content.CreateDate, content.UpdateDate);
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
@@ -445,7 +463,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return content;
         }
 
-        private PropertyCollection GetPropertyCollection(int id, Guid versionId, IContentType contentType)
+        private PropertyCollection GetPropertyCollection(int id, Guid versionId, IContentType contentType, DateTime createDate, DateTime updateDate)
         {
             var sql = new Sql();
             sql.Select("*")
@@ -456,7 +474,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<PropertyDataDto>(x => x.VersionId == versionId);
 
             var propertyDataDtos = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql);
-            var propertyFactory = new PropertyFactory(contentType, versionId, id);
+            var propertyFactory = new PropertyFactory(contentType, versionId, id, createDate, updateDate);
             var properties = propertyFactory.BuildEntity(propertyDataDtos);
 
             var newProperties = properties.Where(x => x.HasIdentity == false);

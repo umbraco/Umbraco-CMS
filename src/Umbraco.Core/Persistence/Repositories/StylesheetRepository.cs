@@ -47,12 +47,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var path = FileSystem.GetRelativePath(id);
             var created = FileSystem.GetCreated(path).UtcDateTime;
             var updated = FileSystem.GetLastModified(path).UtcDateTime;
-            var name = new FileInfo(path).Name;
 
             var stylesheet = new Stylesheet(path)
                                  {
                                      Content = content,
-                                     Key = name.EncodeAsGuid(),
+                                     Key = path.EncodeAsGuid(),
                                      CreateDate = created,
                                      UpdateDate = updated
                                  };
@@ -75,7 +74,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                var files = FileSystem.GetFiles("", "*");
+                var files = FindAllFiles("");
                 foreach (var file in files)
                 {
                     yield return Get(file);

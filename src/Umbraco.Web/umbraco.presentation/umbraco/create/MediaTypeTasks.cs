@@ -42,10 +42,10 @@ namespace umbraco
         }
 
         public bool Save()
-        {
-            var mediaType = cms.businesslogic.media.MediaType.MakeNew(User.GetUser(_userID), Alias.Replace("'", "''"),
-                                                                      ParentID);
-
+        { 
+            var mediaType = cms.businesslogic.media.MediaType.MakeNew(User.GetUser(_userID), Alias.Replace("'", "''"));
+            mediaType.IconUrl = UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates ? ".sprTreeFolder" : "folder.gif";
+           
             if (ParentID != -1)
             {
                 mediaType.MasterContentType = ParentID;

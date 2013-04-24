@@ -14,7 +14,6 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class PropertyType : Entity, IEquatable<PropertyType>
     {
-        //private SerializationService _service;
         private string _name;
         private string _alias;
         private string _description;
@@ -34,22 +33,12 @@ namespace Umbraco.Core.Models
 
             DataTypeId = dataTypeDefinition.ControlId;
             DataTypeDatabaseType = dataTypeDefinition.DatabaseType;
-
-            EnsureSerializationService();
         }
 
         internal PropertyType(Guid dataTypeControlId, DataTypeDatabaseType dataTypeDatabaseType)
         {
             DataTypeId = dataTypeControlId;
             DataTypeDatabaseType = dataTypeDatabaseType;
-
-            EnsureSerializationService();
-        }
-
-        private void EnsureSerializationService()
-        {
-            /*var serviceStackSerializer = new ServiceStackXmlSerializer();
-            _service = new SerializationService(serviceStackSerializer);*/
         }
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Name);
@@ -206,6 +195,7 @@ namespace Umbraco.Core.Models
         /// Gets of Sets the Help text for the current PropertyType
         /// </summary>
         [DataMember]
+        [Obsolete("Not used anywhere in the UI")]
         public string HelpText
         {
             get { return _helpText; }
@@ -240,7 +230,7 @@ namespace Umbraco.Core.Models
         /// Gets or Sets the RegEx for validation of legacy DataTypes
         /// </summary>
         [DataMember]
-        internal string ValidationRegExp
+        public string ValidationRegExp
         {
             get { return _validationRegExp; }
             set
@@ -252,7 +242,6 @@ namespace Umbraco.Core.Models
                 }, _validationRegExp, ValidationRegExpSelector);
             }
         }
-        //Note that Validation should eventually come from PropertyEditors like in v5
 
         /// <summary>
         /// Create a new Property object from a "raw" database value.
