@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Data;
@@ -24,11 +24,8 @@ namespace umbraco.settings
         }
 
         protected controls.ContentTypeControlNew ContentTypeControlNew1;
-        cms.businesslogic.web.DocumentType dt;
-
-
-        private DataTable dtTemplates = new DataTable();
-
+        DocumentType _dt;
+        
         override protected void OnInit(EventArgs e)
         {
             ContentTypeControlNew1.InfoTabPage.Controls.Add(tmpPane);
@@ -37,25 +34,24 @@ namespace umbraco.settings
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
-            dt = new DocumentType(int.Parse(Request.QueryString["id"]));
+            _dt = new DocumentType(int.Parse(Request.QueryString["id"]));
             if (!Page.IsPostBack)
             {
-                bindTemplates();
+                BindTemplates();
 
                 ClientTools
                     .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadNodeTypes>().Tree.Alias)
-                     .SyncTree("-1,init," + dt.Path.Replace("-1,", ""), false);
+                     .SyncTree("-1,init," + _dt.Path.Replace("-1,", ""), false);
 
             }
 
 
         }
 
-
-        private void bindTemplates()
+        private void BindTemplates()
         {
             var templates = (from t in cms.businesslogic.template.Template.GetAllAsList()
-                             join at in dt.allowedTemplates on t.Id equals at.Id into at_l
+                             join at in _dt.allowedTemplates on t.Id equals at.Id into at_l
                              from at in at_l.DefaultIfEmpty()
                              select new
                              {
@@ -77,7 +73,7 @@ namespace umbraco.settings
 
             ddlTemplates.Enabled = templates.Any();
             ddlTemplates.Items.Clear();
-            ddlTemplates.Items.Insert(0, new ListItem(ui.Text("choose") + "...", "0"));
+            ddlTemplates.Items.Insert(0, new ListItem(ui.Text("choose", getUser()) + "...", "0"));
             ddlTemplates.Items.AddRange(templates.ConvertAll(item =>
             {
                 ListItem li = new ListItem();
@@ -86,7 +82,7 @@ namespace umbraco.settings
                 return li;
             }).ToArray());
 
-            var ddlTemplatesSelect = ddlTemplates.Items.FindByValue(dt.DefaultTemplate.ToString());
+            var ddlTemplatesSelect = ddlTemplates.Items.FindByValue(_dt.DefaultTemplate.ToString());
             if (ddlTemplatesSelect != null) ddlTemplatesSelect.Selected = true;
 
         }
@@ -96,39 +92,39 @@ namespace umbraco.settings
             bool handled = false;
             if (args is controls.SaveClickEventArgs)
             {
-                controls.SaveClickEventArgs e = (controls.SaveClickEventArgs)args;
+                var e = (controls.SaveClickEventArgs)args;
                 if (e.Message == "Saved")
                 {
                     int dtid = 0;
                     if (int.TryParse(Request.QueryString["id"], out dtid))
                         new cms.businesslogic.web.DocumentType(dtid).Save();
 
-                    ClientTools.ShowSpeechBubble(e.IconType, ui.Text("contentTypeSavedHeader"), "");
+                    ClientTools.ShowSpeechBubble(e.IconType, ui.Text("contentTypeSavedHeader", getUser()), "");
 
-                    ArrayList tmp = new ArrayList();
+                    var tmp = new ArrayList();
 
                     foreach (ListItem li in templateList.Items)
                     {
                         if (li.Selected) tmp.Add(new cms.businesslogic.template.Template(int.Parse(li.Value)));
                     }
 
-                    cms.businesslogic.template.Template[] tt = new cms.businesslogic.template.Template[tmp.Count];
+                    var tt = new cms.businesslogic.template.Template[tmp.Count];
                     for (int i = 0; i < tt.Length; i++)
                     {
                         tt[i] = (cms.businesslogic.template.Template)tmp[i];
                     }
 
-                    dt.allowedTemplates = tt;
+                    _dt.allowedTemplates = tt;
 
 
-                    if (dt.allowedTemplates.Length > 0 && ddlTemplates.SelectedIndex >= 0)
+                    if (_dt.allowedTemplates.Length > 0 && ddlTemplates.SelectedIndex >= 0)
                     {
-                        dt.DefaultTemplate = int.Parse(ddlTemplates.SelectedValue);
+                        _dt.DefaultTemplate = int.Parse(ddlTemplates.SelectedValue);
                     }
                     else
-                        dt.RemoveDefaultTemplate();
+                        _dt.RemoveDefaultTemplate();
 
-                    bindTemplates();
+                    BindTemplates();
                 }
                 else
                 {
@@ -147,6 +143,31 @@ namespace umbraco.settings
             }
         }
 
+        /// <summary>
+        /// tmpPane control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane tmpPane;
 
+        /// <summary>
+        /// templateList control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBoxList templateList;
+
+        /// <summary>
+        /// ddlTemplates control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlTemplates;
     }
 }

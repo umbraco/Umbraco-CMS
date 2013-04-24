@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Web;
 using System.Xml;
 using Umbraco.Core.IO;
@@ -627,7 +628,7 @@ order by {1}
             return tmp;
         }
 
-
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public static void RePublishAll()
         {
             XmlDocument xd = new XmlDocument();

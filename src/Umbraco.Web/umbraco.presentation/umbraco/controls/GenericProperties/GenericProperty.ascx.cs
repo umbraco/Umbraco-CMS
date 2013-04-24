@@ -1,8 +1,9 @@
 using System;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
+using Umbraco.Core.IO;
 using umbraco.BasePages;
-using umbraco.IO;
+using umbraco.BusinessLogic;
 
 namespace umbraco.controls.GenericProperties
 {
@@ -134,6 +135,22 @@ namespace umbraco.controls.GenericProperties
 
 		}
 
+        //SD: this is temporary in v4, in v6 we have a proper user control hierarchy
+        //containing this property.
+        //this is required due to this issue: http://issues.umbraco.org/issue/u4-493
+        //because we need to execute some code in async but due to the localization 
+        //framework requiring an httpcontext.current, it will not work. 
+        //http://issues.umbraco.org/issue/u4-2143
+        //so, we are going to make a property here and ensure that the basepage has
+        //resolved the user before we execute the async task so that in this method
+        //our calls to ui.text will include the current user and not rely on the 
+        //httpcontext.current. This also makes it perform better:
+        // http://issues.umbraco.org/issue/U4-2142
+	    private User CurrentUser
+	    {
+	        get { return ((BasePage) Page).getUser(); }
+	    }
+
 		public void UpdateInterface() 
 		{
 			// Name and alias
@@ -148,11 +165,11 @@ namespace umbraco.controls.GenericProperties
 				DeleteButton.Visible = true;
 				DeleteButton.ImageUrl = SystemDirectories.Umbraco + "/images/delete_button.png";
 				DeleteButton.Attributes.Add("style", "float: right; cursor: hand;");
-				DeleteButton.Attributes.Add("onclick", "return confirm('" + ui.Text("areyousure") + "');");
+                DeleteButton.Attributes.Add("onclick", "return confirm('" + ui.Text("areyousure", CurrentUser) + "');");
 				DeleteButton2.Visible = true;
                 DeleteButton2.ImageUrl = SystemDirectories.Umbraco + "/images/delete_button.png";
 				DeleteButton2.Attributes.Add("style", "float: right; cursor: hand;");
-				DeleteButton2.Attributes.Add("onclick", "return confirm('" + ui.Text("areyousure") + "');");
+                DeleteButton2.Attributes.Add("onclick", "return confirm('" + ui.Text("areyousure", CurrentUser) + "');");
 			} 
 			else 
 			{

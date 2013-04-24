@@ -348,6 +348,9 @@
     <Compile Include="umbraco.presentation\umbraco\channels\rsd.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\sort.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -383,6 +386,9 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProviderAccessUpdate.cs" />
     <Compile Include="umbraco.presentation\umbraco\Search\QuickSearch.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\editTemplate.aspx.cs">
@@ -676,13 +682,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\Images\UploadMediaImage.ascx.designer.cs">
       <DependentUpon>UploadMediaImage.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx.cs">
-      <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx.designer.cs">
-      <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\dualSelectBox.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx.cs">
@@ -1495,13 +1494,6 @@
     <Compile Include="umbraco.presentation\umbraco\settings\EditMediaType.aspx.designer.cs">
       <DependentUpon>EditMediaType.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx.cs">
-      <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx.designer.cs">
-      <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\scripts\editScript.aspx.cs">
       <DependentUpon>editScript.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1864,9 +1856,6 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\Preview.aspx" />
     <Content Include="umbraco.presentation\umbraco\controls\passwordChanger.ascx" />
     <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx" />
-    <Content Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx" />
     <Content Include="umbraco.presentation\umbraco\create\DLRScripting.ascx">
       <SubType>ASPXCodeBehind</SubType>
@@ -2038,9 +2027,6 @@
     <Content Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx" />
     <Content Include="umbraco.presentation\umbraco\settings\editLanguage.aspx" />
     <Content Include="umbraco.presentation\umbraco\settings\EditMediaType.aspx" />
-    <Content Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
