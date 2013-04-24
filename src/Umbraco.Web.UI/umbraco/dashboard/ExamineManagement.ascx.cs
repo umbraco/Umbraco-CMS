@@ -7,7 +7,7 @@ using System.Web.UI.WebControls;
 
 namespace Umbraco.Web.UI.Umbraco.Dashboard
 {
-    public partial class ExamineManagement : Controls.UmbracoUserControl
+    public partial class ExamineManagement : UI.Controls.UmbracoUserControl
     {
         
     }

@@ -5,6 +5,7 @@ using System.Web.Routing;
 using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Web.Security;
 using umbraco.DataLayer;
 
 namespace Umbraco.Web.UI.Controls
@@ -43,6 +44,14 @@ namespace Umbraco.Web.UI.Controls
         /// Returns an UmbracoHelper object
         /// </summary>
         public UmbracoHelper Umbraco { get; private set; }
+
+        /// <summary>
+        /// Returns the current WebSecurity instance
+        /// </summary>
+        public WebSecurity Security
+        {
+            get { return UmbracoContext.Security; }
+        }
 
         /// <summary>
         /// Returns the current UmbracoContext

@@ -16,6 +16,7 @@ using ClientDependency.Core;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Web.UI.Controls;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.propertytype;
@@ -38,7 +39,7 @@ namespace umbraco.controls
     [ClientDependency(ClientDependencyType.Css, "Tree/Themes/umbraco/style.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Css, "GenericProperty/genericproperty.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "GenericProperty/genericproperty.js", "UmbracoClient")]
-    public partial class ContentTypeControlNew : UserControl
+    public partial class ContentTypeControlNew : UmbracoUserControl
     {
         // General Private members
         private ContentType _contentType;
@@ -110,34 +111,20 @@ namespace umbraco.controls
             checkTxtAliasJs.Text = string.Format("checkAlias('{0}');", txtAlias.ClientID);
         }
 
-        //SD: this is temporary in v4, in v6 we have a proper user control hierarchy
-        //containing this property.
-        //this is required due to this issue: http://issues.umbraco.org/issue/u4-493
-        //because we need to execute some code in async but due to the localization 
-        //framework requiring an httpcontext.current, it will not work. 
-        //http://issues.umbraco.org/issue/u4-2143
-        //so, we are going to make a property here and ensure that the basepage has
-        //resolved the user before we execute the async task so that in this method
-        //our calls to ui.text will include the current user and not rely on the 
-        //httpcontext.current. This also improves performance:
-        // http://issues.umbraco.org/issue/U4-2142
-        private User CurrentUser
-        {
-            get { return ((BasePage)Page).getUser(); }
-        }
-
         /// <summary>
         /// A class to track the async state for saving the doc type
         /// </summary>
         private class SaveAsyncState
         {
             public SaveAsyncState(
+                Umbraco.Web.UmbracoContext umbracoContext,
                 SaveClickEventArgs saveArgs, 
                 string originalAlias, 
                 string originalName,
                 string newAlias,
                 string newName)
             {
+                UmbracoContext = umbracoContext;
                 SaveArgs = saveArgs;
                 OriginalAlias = originalAlias;
                 OriginalName = originalName;
@@ -145,6 +132,7 @@ namespace umbraco.controls
                 NewName = newName;
             }
 
+            public Umbraco.Web.UmbracoContext UmbracoContext { get; private set; }
             public SaveClickEventArgs SaveArgs { get; private set; }
             public string OriginalAlias { get; private set; }
             public string OriginalName { get; private set; }
@@ -198,7 +186,7 @@ namespace umbraco.controls
             
             //get the args from the async state
             var state = (SaveAsyncState)ar.AsyncState;
-
+            
             // reload content type (due to caching)
             LoadContentType();
             BindTabs();
@@ -236,7 +224,9 @@ namespace umbraco.controls
         protected void save_click(object sender, ImageClickEventArgs e)
         {
 
-            var state = new SaveAsyncState(new SaveClickEventArgs("Saved")
+            var state = new SaveAsyncState(
+                UmbracoContext,
+                new SaveClickEventArgs("Saved")
                 {
                     IconType = BasePage.speechBubbleIcon.success
                 }, _contentType.Alias, _contentType.Text, txtAlias.Text, txtName.Text);
@@ -248,6 +238,9 @@ namespace umbraco.controls
             _asyncSaveTask = asyncState =>
                 {
                     Trace.Write("ContentTypeControlNew", "executing task");
+
+                    //we need to re-set the UmbracoContext since it will be nulled and our cache handlers need it
+                    global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
 
                     //NOTE The saving of the 5 properties (Name, Alias, Icon, Description and Thumbnail) are divided
                     //to avoid the multiple cache flushing when each property is set using the legacy ContentType class,
@@ -377,10 +370,10 @@ namespace umbraco.controls
             Save.Click += save_click;
 
             Save.ImageUrl = UmbracoPath + "/images/editor/save.gif";
-            Save.AlternateText = ui.Text("save", CurrentUser);
+            Save.AlternateText = ui.Text("save", Security.CurrentUser);
             Save.ID = "save";
             
-            var dirInfo = new DirectoryInfo(UmbracoContext.Current.Server.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
+            var dirInfo = new DirectoryInfo(Server.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
             var fileInfo = dirInfo.GetFiles();
 
             var spriteFileNames = CMSNode.DefaultIconClasses.Select(IconClassToIconFileName).ToList();
@@ -890,7 +883,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 }
                 else
                 {
-                    e.Message = ui.Text("contentTypeDublicatePropertyType", CurrentUser);
+                    e.Message = ui.Text("contentTypeDublicatePropertyType", Security.CurrentUser);
                     e.IconType = BasePage.speechBubbleIcon.warning;
                 }
             }
@@ -1572,12 +1565,12 @@ Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
         protected global::System.Web.UI.WebControls.PlaceHolder PropertyTypes;
 
         /// <summary>
-        /// theClientId control.
+        /// checkTxtAliasJs control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal theClientId;
+        protected global::System.Web.UI.WebControls.Literal checkTxtAliasJs;
     }
 }

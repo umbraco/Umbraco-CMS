@@ -24,7 +24,7 @@ namespace umbraco.cms.presentation.members
 		private cms.businesslogic.member.MemberType dt;
 
 		private System.Collections.ArrayList ExtraPropertyTypeInfos = new System.Collections.ArrayList();
-		protected controls.ContentTypeControlNew ContentTypeControlNew1;
+		protected global::umbraco.controls.ContentTypeControlNew ContentTypeControlNew1;
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
