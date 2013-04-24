@@ -11,7 +11,9 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
@@ -123,23 +125,33 @@ namespace umbraco.controls
         /// </summary>
         private class SaveAsyncState
         {
-            public SaveAsyncState(SaveClickEventArgs saveArgs, string originalAlias, string originalName)
+            public SaveAsyncState(
+                SaveClickEventArgs saveArgs, 
+                string originalAlias, 
+                string originalName,
+                string newAlias,
+                string newName)
             {
                 SaveArgs = saveArgs;
                 OriginalAlias = originalAlias;
                 OriginalName = originalName;
+                NewAlias = newAlias;
+                NewName = newName;
             }
 
             public SaveClickEventArgs SaveArgs { get; private set; }
             public string OriginalAlias { get; private set; }
             public string OriginalName { get; private set; }
-            public bool HasAliasChanged(ContentType contentType)
+            public string NewAlias { get; private set; }
+            public string NewName { get; private set; }
+
+            public bool HasAliasChanged()
             {
-                return (string.Compare(OriginalAlias, contentType.Alias, StringComparison.OrdinalIgnoreCase) != 0);
+                return (string.Compare(OriginalAlias, NewAlias, StringComparison.OrdinalIgnoreCase) != 0);
             }
-            public bool HasNameChanged(ContentType contentType)
+            public bool HasNameChanged()
             {
-                return (string.Compare(OriginalName, contentType.Text, StringComparison.OrdinalIgnoreCase) != 0);
+                return (string.Compare(OriginalName, NewName, StringComparison.OrdinalIgnoreCase) != 0);
             }
         }
 
@@ -181,6 +193,9 @@ namespace umbraco.controls
             //get the args from the async state
             var state = (SaveAsyncState)ar.AsyncState;
 
+            // reload content type (due to caching)
+            LoadContentType();
+            BindTabs();
             BindDataGenericProperties(true);
 
             // we need to re-bind the alias as the SafeAlias method can have changed it
@@ -188,7 +203,7 @@ namespace umbraco.controls
 
             RaiseBubbleEvent(new object(), state.SaveArgs);
 
-            if (state.HasNameChanged(_contentType))
+            if (state.HasNameChanged())
                 UpdateTreeNode();
 
             Trace.Write("ContentTypeControlNew", "async operation ended");
@@ -212,13 +227,13 @@ namespace umbraco.controls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        protected void save_click(object sender, System.Web.UI.ImageClickEventArgs e)
+        protected void save_click(object sender, ImageClickEventArgs e)
         {
 
             var state = new SaveAsyncState(new SaveClickEventArgs("Saved")
                 {
                     IconType = BasePage.speechBubbleIcon.success
-                }, _contentType.Alias, _contentType.Text);
+                }, _contentType.Alias, _contentType.Text, txtAlias.Text, txtName.Text);
 
             //Add the async operation to the page
             Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncSaveOperation, EndAsyncSaveOperation, HandleAsyncSaveTimeout, state));
@@ -228,88 +243,80 @@ namespace umbraco.controls
                 {
                     Trace.Write("ContentTypeControlNew", "executing task");
 
-            // Check if the doctype alias has changed as a result of either the user input or
-            // the alias checking performed upon saving
-            var docTypeAliasChanged = (string.Compare(originalDocTypeAlias, txtAlias.Text, true) != 0);
-            var docTypeNameChanged = (string.Compare(originalDocTypeName, txtName.Text, true) != 0);
-
-            var ea = new SaveClickEventArgs("Saved");
-            ea.IconType = BasePage.speechBubbleIcon.success;
-
-            //NOTE The saving of the 5 properties (Name, Alias, Icon, Description and Thumbnail) are divided
-            //to avoid the multiple cache flushing when each property is set using the legacy ContentType class,
-            //which has been reduced to the else-clause.
-            //For IContentType and IMediaType the cache will only be flushed upon saving.
-            if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
-            {
-                _contentType.ContentTypeItem.Name = txtName.Text;
-                _contentType.ContentTypeItem.Alias = txtAlias.Text;
-                _contentType.ContentTypeItem.Icon = ddlIcons.SelectedValue;
-                _contentType.ContentTypeItem.Description = description.Text;
-                _contentType.ContentTypeItem.Thumbnail = ddlThumbnails.SelectedValue;
-                _contentType.ContentTypeItem.AllowedAsRoot = allowAtRoot.Checked;
-
-                int i = 0;
-                var ids = SaveAllowedChildTypes();
-                _contentType.ContentTypeItem.AllowedContentTypes = ids.Select(x => new ContentTypeSort { Id = new Lazy<int>(() => x), SortOrder = i++ });
-
-                var tabs = SaveTabs();
-                foreach (var tab in tabs)
-                {
-                    if (_contentType.ContentTypeItem.PropertyGroups.Contains(tab.Item2))
+                    //NOTE The saving of the 5 properties (Name, Alias, Icon, Description and Thumbnail) are divided
+                    //to avoid the multiple cache flushing when each property is set using the legacy ContentType class,
+                    //which has been reduced to the else-clause.
+                    //For IContentType and IMediaType the cache will only be flushed upon saving.
+                    if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
                     {
-                        _contentType.ContentTypeItem.PropertyGroups[tab.Item2].SortOrder = tab.Item3;
+                        _contentType.ContentTypeItem.Name = txtName.Text;
+                        _contentType.ContentTypeItem.Alias = txtAlias.Text;
+                        _contentType.ContentTypeItem.Icon = ddlIcons.SelectedValue;
+                        _contentType.ContentTypeItem.Description = description.Text;
+                        _contentType.ContentTypeItem.Thumbnail = ddlThumbnails.SelectedValue;
+                        _contentType.ContentTypeItem.AllowedAsRoot = allowAtRoot.Checked;
+
+                        int i = 0;
+                        var ids = SaveAllowedChildTypes();
+                        _contentType.ContentTypeItem.AllowedContentTypes = ids.Select(x => new ContentTypeSort {Id = new Lazy<int>(() => x), SortOrder = i++});
+
+                        var tabs = SaveTabs();
+                        foreach (var tab in tabs)
+                        {
+                            if (_contentType.ContentTypeItem.PropertyGroups.Contains(tab.Item2))
+                            {
+                                _contentType.ContentTypeItem.PropertyGroups[tab.Item2].SortOrder = tab.Item3;
+                            }
+                            else
+                            {
+                                _contentType.ContentTypeItem.PropertyGroups.Add(new PropertyGroup {Id = tab.Item1, Name = tab.Item2, SortOrder = tab.Item3});
+                            }
+                        }
+
+                        SavePropertyType(asyncState.SaveArgs, _contentType.ContentTypeItem);
+                        UpdatePropertyTypes(_contentType.ContentTypeItem);
+
+                        if (DocumentTypeCallback != null)
+                        {
+                            var documentType = _contentType as DocumentType;
+                            if (documentType != null)
+                            {
+                                var result = DocumentTypeCallback(documentType);
+                            }
+                        }
+
+                        _contentType.Save();
                     }
-                    else
+                    else //Legacy approach for supporting MemberType
                     {
-                        _contentType.ContentTypeItem.PropertyGroups.Add(new PropertyGroup { Id = tab.Item1, Name = tab.Item2, SortOrder = tab.Item3 });
+                        if (asyncState.HasNameChanged())
+                            _contentType.Text = txtName.Text;
+
+                        if (asyncState.HasAliasChanged())
+                            _contentType.Alias = txtAlias.Text;
+
+                        _contentType.IconUrl = ddlIcons.SelectedValue;
+                        _contentType.Description = description.Text;
+                        _contentType.Thumbnail = ddlThumbnails.SelectedValue;
+
+                        SavePropertyTypesLegacy(asyncState.SaveArgs);
+
+                        var tabs = SaveTabs();
+                        foreach (var tab in tabs)
+                        {
+                            _contentType.SetTabName(tab.Item1, tab.Item2);
+                            _contentType.SetTabSortOrder(tab.Item1, tab.Item3);
+                        }
+
+                        _contentType.AllowedChildContentTypeIDs = SaveAllowedChildTypes();
+                        _contentType.AllowAtRoot = allowAtRoot.Checked;
+
+                        _contentType.Save();
                     }
-                }
 
-                SavePropertyType(ref ea, _contentType.ContentTypeItem);
-                UpdatePropertyTypes(_contentType.ContentTypeItem);
-
-                if (DocumentTypeCallback != null)
-                {
-                    var documentType = _contentType as DocumentType;
-                    if (documentType != null)
-                    {
-                        var result = DocumentTypeCallback(documentType);
-                    }
-                }
-
-                _contentType.Save();
-            }
-            else //Legacy approach for supporting MemberType
-            {
-                if (docTypeNameChanged)
-                    _contentType.Text = txtName.Text;
-
-                if (docTypeAliasChanged)
-                    _contentType.Alias = txtAlias.Text;
-
-                _contentType.IconUrl = ddlIcons.SelectedValue;
-                _contentType.Description = description.Text;
-                _contentType.Thumbnail = ddlThumbnails.SelectedValue;
-
-                SavePropertyTypesLegacy(ref ea);
-
-                var tabs = SaveTabs();
-                foreach (var tab in tabs)
-                {
-                    _contentType.SetTabName(tab.Item1, tab.Item2);
-                    _contentType.SetTabSortOrder(tab.Item1, tab.Item3);
-                }
-
-                _contentType.AllowedChildContentTypeIDs = SaveAllowedChildTypes();
-                _contentType.AllowAtRoot = allowAtRoot.Checked;
-
-                _contentType.Save();
-            }
-                    
                     // Only if the doctype alias changed, cause a regeneration of the xml cache file since
                     // the xml element names will need to be updated to reflect the new alias
-                    if (asyncState.HasAliasChanged(_contentType))
+                    if (asyncState.HasAliasChanged())
                         RegenerateXmlCaches();
 
                     Trace.Write("ContentTypeControlNew", "task completing");
@@ -741,7 +748,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
         }
 
-        private void SavePropertyType(ref SaveClickEventArgs e, IContentTypeComposition contentTypeItem)
+        private void SavePropertyType(SaveClickEventArgs e, IContentTypeComposition contentTypeItem)
         {
             this.CreateChildControls();
 
@@ -870,7 +877,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             }
         }
 
-        private void SavePropertyTypesLegacy(ref SaveClickEventArgs e)
+        private void SavePropertyTypesLegacy(SaveClickEventArgs e)
         {
             this.CreateChildControls();
 
@@ -1454,6 +1461,33 @@ Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel pnlStructure;
+
+        /// <summary>
+        /// Pane6 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane6;
+
+        /// <summary>
+        /// pp_Root control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_Root;
+
+        /// <summary>
+        /// allowAtRoot control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox allowAtRoot;
 
         /// <summary>
         /// Pane5 control.
