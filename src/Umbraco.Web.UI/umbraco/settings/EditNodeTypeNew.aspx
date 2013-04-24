@@ -1,5 +1,5 @@
 <%@ Page Language="c#" CodeBehind="EditNodeTypeNew.aspx.cs" AutoEventWireup="True"
-    Async="true" AsyncTimeOut="300" Trace="true" Inherits="Umbraco.Web.UI.Umbraco.Settings.EditNodeTypeNew" MasterPageFile="../masterpages/umbracoPage.Master" %>
+    Async="true" AsyncTimeOut="300" Trace="false" Inherits="Umbraco.Web.UI.Umbraco.Settings.EditNodeTypeNew" MasterPageFile="../masterpages/umbracoPage.Master" %>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="uc1" TagName="ContentTypeControlNew" Src="../controls/ContentTypeControlNew.ascx" %>
