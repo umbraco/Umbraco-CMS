@@ -208,7 +208,7 @@ namespace Umbraco.Tests.Services.Importing
         }
 
         [Test]
-        public void PackagingService_Can_Import_Single_DocTypr()
+        public void PackagingService_Can_Import_Single_DocType()
         {
             // Arrange
             string strXml = ImportResources.SingleDocType;
@@ -225,7 +225,7 @@ namespace Umbraco.Tests.Services.Importing
         }
 
         [Test]
-        public void PackagingService_Can_ReImport_Single_DocTypr()
+        public void PackagingService_Can_ReImport_Single_DocType()
         {
             // Arrange
             string strXml = ImportResources.SingleDocType;
@@ -245,6 +245,31 @@ namespace Umbraco.Tests.Services.Importing
             Assert.That(contentTypesUpdated.Any(x => x.HasIdentity == false), Is.False);
             Assert.That(contentTypesUpdated.Count(), Is.EqualTo(1));
             Assert.That(contentTypesUpdated.First().AllowedContentTypes.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void PackagingService_Can_ReImport_Templates_To_Update()
+        {
+            var newPackageXml = XElement.Parse(ImportResources.TemplateOnly_Package);
+            var updatedPackageXml = XElement.Parse(ImportResources.TemplateOnly_Updated_Package);
+
+            var templateElement = newPackageXml.Descendants("Templates").First();
+            var templateElementUpdated = updatedPackageXml.Descendants("Templates").First();
+            var packagingService = ServiceContext.PackagingService;
+            var fileService = ServiceContext.FileService;
+
+            // Act
+            var numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
+            var templates = packagingService.ImportTemplates(templateElement);
+            var templatesAfterUpdate = packagingService.ImportTemplates(templateElementUpdated);
+            var allTemplates = fileService.GetTemplates();
+            
+            // Assert
+            Assert.That(templates.Any(), Is.True);
+            Assert.That(templates.Count(), Is.EqualTo(numberOfTemplates));
+            Assert.That(templatesAfterUpdate.Count(), Is.EqualTo(numberOfTemplates));
+            Assert.That(allTemplates.Count(), Is.EqualTo(numberOfTemplates));
+            Assert.That(allTemplates.First(x => x.Alias == "umbHomepage").Content, Contains.Substring("THIS HAS BEEN UPDATED!"));
         }
     }
 }

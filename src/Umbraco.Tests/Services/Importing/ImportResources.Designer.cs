@@ -143,6 +143,58 @@ namespace Umbraco.Tests.Services.Importing {
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
         ///&lt;umbPackage&gt;
+        ///  &lt;files /&gt;
+        ///  &lt;info&gt;
+        ///    &lt;package&gt;
+        ///      &lt;name&gt;Template-Update&lt;/name&gt;
+        ///      &lt;version&gt;0.1&lt;/version&gt;
+        ///      &lt;license url=&quot;http://www.opensource.org/licenses/mit-license.php&quot;&gt;MIT license&lt;/license&gt;
+        ///      &lt;url&gt;http://our.umbraco.org/projects&lt;/url&gt;
+        ///      &lt;requirements&gt;
+        ///        &lt;major&gt;3&lt;/major&gt;
+        ///        &lt;minor&gt;0&lt;/minor&gt;
+        ///        &lt;patch&gt;0&lt;/patch&gt;
+        ///      &lt;/requirements&gt;
+        ///    &lt;/package&gt;
+        ///    &lt;author&gt;
+        ///      &lt;name&gt;Morten Christensen&lt;/name&gt;
+        ///  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string TemplateOnly_Package {
+            get {
+                return ResourceManager.GetString("TemplateOnly_Package", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+        ///&lt;umbPackage&gt;
+        ///  &lt;files /&gt;
+        ///  &lt;info&gt;
+        ///    &lt;package&gt;
+        ///      &lt;name&gt;Template-Update&lt;/name&gt;
+        ///      &lt;version&gt;0.1&lt;/version&gt;
+        ///      &lt;license url=&quot;http://www.opensource.org/licenses/mit-license.php&quot;&gt;MIT license&lt;/license&gt;
+        ///      &lt;url&gt;http://our.umbraco.org/projects&lt;/url&gt;
+        ///      &lt;requirements&gt;
+        ///        &lt;major&gt;3&lt;/major&gt;
+        ///        &lt;minor&gt;0&lt;/minor&gt;
+        ///        &lt;patch&gt;0&lt;/patch&gt;
+        ///      &lt;/requirements&gt;
+        ///    &lt;/package&gt;
+        ///    &lt;author&gt;
+        ///      &lt;name&gt;Morten Christensen&lt;/name&gt;
+        ///  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string TemplateOnly_Updated_Package {
+            get {
+                return ResourceManager.GetString("TemplateOnly_Updated_Package", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+        ///&lt;umbPackage&gt;
         ///  &lt;files&gt;
         ///    &lt;file&gt;
         ///      &lt;guid&gt;uBlogsy.BusinessLogic.dll&lt;/guid&gt;
