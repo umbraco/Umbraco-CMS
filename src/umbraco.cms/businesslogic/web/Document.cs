@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -402,6 +403,7 @@ namespace umbraco.cms.businesslogic.web
             return children.Select(x => new Document(x)).ToList();
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.RePublishAll()", false)]
         public static void RePublishAll()
         {
