@@ -59,7 +59,7 @@ namespace umbraco.controls
         protected System.Web.UI.WebControls.DataGrid dgGeneralTabProperties;
 
         //the async saving task
-        private Action<SaveClickEventArgs> _asyncSaveTask;
+        private Action<SaveAsyncState> _asyncSaveTask;
 
         override protected void OnInit(EventArgs e)
         {
@@ -124,6 +124,31 @@ namespace umbraco.controls
         }
 
         /// <summary>
+        /// A class to track the async state for saving the doc type
+        /// </summary>
+        private class SaveAsyncState
+        {
+            public SaveAsyncState(SaveClickEventArgs saveArgs, string originalAlias, string originalName)
+            {
+                SaveArgs = saveArgs;
+                OriginalAlias = originalAlias;
+                OriginalName = originalName;
+            }
+
+            public SaveClickEventArgs SaveArgs { get; private set; }
+            public string OriginalAlias { get; private set; }
+            public string OriginalName { get; private set; }
+            public bool HasAliasChanged(ContentType contentType)
+            {
+                return (string.Compare(OriginalAlias, contentType.Alias, StringComparison.OrdinalIgnoreCase) != 0);
+            }
+            public bool HasNameChanged(ContentType contentType)
+            {
+                return (string.Compare(OriginalName, contentType.Text, StringComparison.OrdinalIgnoreCase) != 0);
+            }
+        }
+
+        /// <summary>
         /// Called asynchronously in order to persist all of the data to the database
         /// </summary>
         /// <param name="sender"></param>
@@ -140,7 +165,7 @@ namespace umbraco.controls
             Trace.Write("ContentTypeControlNew", "Start async operation");
 
             //get the args from the async state
-            var args = (SaveClickEventArgs)state;
+            var args = (SaveAsyncState)state;
 
             //start the task
             var result = _asyncSaveTask.BeginInvoke(args, cb, args);
@@ -159,19 +184,16 @@ namespace umbraco.controls
             Trace.Write("ContentTypeControlNew", "ending async operation");
             
             //get the args from the async state
-            var args = (SaveClickEventArgs)ar.AsyncState;
-
-            var originalDocTypeName = _contentType.Text;
-            var docTypeNameChanged = (string.Compare(originalDocTypeName, _contentType.Text, StringComparison.OrdinalIgnoreCase) != 0);
+            var state = (SaveAsyncState)ar.AsyncState;
 
             BindDataGenericProperties(true);
 
             // we need to re-bind the alias as the SafeAlias method can have changed it
             txtAlias.Text = _contentType.Alias;
 
-            RaiseBubbleEvent(new object(), args);
+            RaiseBubbleEvent(new object(), state.SaveArgs);
 
-            if (docTypeNameChanged)
+            if (state.HasNameChanged(_contentType))
                 UpdateTreeNode();
 
             Trace.Write("ContentTypeControlNew", "async operation ended");
@@ -193,22 +215,18 @@ namespace umbraco.controls
         protected void save_click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
 
-            //event args to be passed in to the async method
-            var eventArgs = new SaveClickEventArgs("Saved")
-            {
-                IconType = BasePage.speechBubbleIcon.success
-            };
+            var state = new SaveAsyncState(new SaveClickEventArgs("Saved")
+                {
+                    IconType = BasePage.speechBubbleIcon.success
+                }, _contentType.Alias, _contentType.Text);
 
             //Add the async operation to the page
-            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncSaveOperation, EndAsyncSaveOperation, HandleAsyncSaveTimeout, eventArgs));
+            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncSaveOperation, EndAsyncSaveOperation, HandleAsyncSaveTimeout, state));
             
             //create the save task to be executed async
-            _asyncSaveTask = args =>
+            _asyncSaveTask = asyncState =>
                 {
                     Trace.Write("ContentTypeControlNew", "executing task");
-
-                    // Keep a reference of the original doctype alias and name
-                    var originalDocTypeAlias = _contentType.Alias;
 
                     _contentType.Text = txtName.Text;
                     _contentType.Alias = txtAlias.Text;
@@ -216,7 +234,7 @@ namespace umbraco.controls
                     _contentType.Description = description.Text;
                     _contentType.Thumbnail = ddlThumbnails.SelectedValue;
 
-                    SaveProperties(args);
+                    SaveProperties(asyncState.SaveArgs);
 
                     SaveTabs();
 
@@ -224,14 +242,10 @@ namespace umbraco.controls
 
                     // reload content type (due to caching)
                     _contentType = new ContentType(_contentType.Id);
-
-                    // Check if the doctype alias has changed as a result of either the user input or
-                    // the alias checking performed upon saving
-                    var docTypeAliasChanged = (string.Compare(originalDocTypeAlias, _contentType.Alias, StringComparison.OrdinalIgnoreCase) != 0);
-
+                    
                     // Only if the doctype alias changed, cause a regeneration of the xml cache file since
                     // the xml element names will need to be updated to reflect the new alias
-                    if (docTypeAliasChanged)
+                    if (asyncState.HasAliasChanged(_contentType))
                         RegenerateXmlCaches();
 
                     Trace.Write("ContentTypeControlNew", "task completing");
