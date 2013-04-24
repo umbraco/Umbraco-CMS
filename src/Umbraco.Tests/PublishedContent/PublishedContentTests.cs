@@ -70,6 +70,39 @@ namespace Umbraco.Tests.PublishedContent
 		}
 
         [Test]
+        [Ignore("IPublishedContent currently (6.1 as of april 25, 2013) has bugs")]
+        public void Fails()
+        {
+            var content = GetNode(1173);
+
+            var c1 = content.Children.First(x => x.Id == 1177);
+            Assert.IsFalse(c1.IsFirst());
+
+            var c2 = content.Children.Where(x => x.DocumentTypeAlias == "CustomDocument").First(x => x.Id == 1177);
+            Assert.IsTrue(c2.IsFirst());
+
+            // First is not implemented
+            var c2a = content.Children.First(x => x.DocumentTypeAlias == "CustomDocument" && x.Id == 1177);
+            Assert.IsTrue(c2a.IsFirst()); // so here it's luck
+
+            c1 = content.Children.First(x => x.Id == 1177);
+            Assert.IsFalse(c1.IsFirst()); // and here it fails
+
+            // but even using supported (where) method...
+            // do not replace by First(x => ...) here since it's not supported at the moment
+            c1 = content.Children.Where(x => x.Id == 1177).First();
+            c2 = content.Children.Where(x => x.DocumentTypeAlias == "CustomDocument" && x.Id == 1177).First();
+
+            Assert.IsFalse(c1.IsFirst()); // here it fails because c2 has corrupted it
+
+            // so there's only 1 IPublishedContent instance
+            // which keeps changing collection, ie being modified
+            // which is *bad* from a cache point of vue
+            // and from a consistency point of vue...
+            // => we want clones!
+        }
+
+        [Test]
         public void Is_Last_From_Where_Filter_Dynamic_Linq()
         {
             var doc = GetNode(1173);
