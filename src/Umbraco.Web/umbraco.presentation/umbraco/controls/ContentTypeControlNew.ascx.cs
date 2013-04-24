@@ -13,6 +13,7 @@ using ClientDependency.Core;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
+using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
 using umbraco.cms.presentation.Trees;
 using umbraco.controls.GenericProperties;
@@ -65,9 +66,8 @@ namespace umbraco.controls
         override protected void OnInit(EventArgs e)
         {
             base.OnInit(e);
-            
-            int docTypeId = GetDocTypeId();
-            _contentType = new cms.businesslogic.ContentType(docTypeId);
+
+            LoadContentType();
 
             SetupInfoPane();
             if (!HideStructure)
@@ -77,12 +77,7 @@ namespace umbraco.controls
             SetupGenericPropertiesPane();
             SetupTabPane();
 
-        }
-
-        private int GetDocTypeId()
-        {
-            return int.Parse(Request.QueryString["id"]);
-        }
+        }        
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
@@ -187,6 +182,8 @@ namespace umbraco.controls
             //get the args from the async state
             var state = (SaveAsyncState)ar.AsyncState;
 
+            // reload content type (due to caching)
+            LoadContentType();
             BindDataGenericProperties(true);
 
             // we need to re-bind the alias as the SafeAlias method can have changed it
@@ -245,9 +242,6 @@ namespace umbraco.controls
                     SaveTabs();
 
                     SaveAllowedChildTypes();
-
-                    // reload content type (due to caching)
-                    _contentType = new ContentType(_contentType.Id);
                     
                     // Only if the doctype alias changed, cause a regeneration of the xml cache file since
                     // the xml element names will need to be updated to reflect the new alias
@@ -262,12 +256,46 @@ namespace umbraco.controls
         }
 
         /// <summary>
+        /// Loads the current ContentType from the id found in the querystring.
+        /// The correct type is loaded based on editing location (DocumentType, MediaType or MemberType).
+        /// </summary>
+        private void LoadContentType()
+        {
+            int docTypeId = int.Parse(Request.QueryString["id"]);
+            LoadContentType(docTypeId);
+        }
+
+        private void LoadContentType(int docTypeId)
+        {
+            //Fairly hacky code to load the ContentType as the real type instead of its base type, so it can be properly saved.
+            if (Request.Path.ToLowerInvariant().Contains("editnodetypenew.aspx"))
+            {
+                _contentType = new DocumentType(docTypeId);
+            }
+            else if (Request.Path.ToLowerInvariant().Contains("editmediatype.aspx"))
+            {
+                _contentType = new cms.businesslogic.media.MediaType(docTypeId);
+            }
+            else
+            {
+                _contentType = new ContentType(docTypeId);
+            }
+        }
+
+        /// <summary>
         /// Regenerates the XML caches. Used after a document type alias has been changed.
         /// </summary>
+        /// <remarks>
+        /// We only regenerate any XML cache based on if this is a Document type, not a media type or 
+        /// a member type.
+        /// </remarks>
         private void RegenerateXmlCaches()
         {
-            umbraco.cms.businesslogic.web.Document.RePublishAll();
-            library.RefreshContent();
+            if (_contentType is DocumentType)
+            {
+                umbraco.cms.businesslogic.web.Document.RePublishAll();
+                library.RefreshContent();    
+            }
         }
 
         private void UpdateTreeNode()
