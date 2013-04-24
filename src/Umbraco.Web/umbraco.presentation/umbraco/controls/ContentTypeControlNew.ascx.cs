@@ -11,6 +11,7 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.cms.helpers;
 using umbraco.cms.presentation.Trees;
@@ -205,6 +206,11 @@ namespace umbraco.controls
         private void HandleAsyncSaveTimeout(IAsyncResult ar)
         {
             Trace.Write("ContentTypeControlNew", "async operation timed out!");
+
+            LogHelper.Error<ContentTypeControlNew>(
+                "The content type saving operation timed out",
+                new TimeoutException("The content type saving operation timed out. This could cause problems because the xml for the content node might not have been generated. "));
+
         }
 
         /// <summary>
