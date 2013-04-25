@@ -5,7 +5,7 @@ using System.Web.UI.HtmlControls;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
@@ -69,13 +69,13 @@ namespace umbraco.presentation.umbraco.dialogs
 
 		private void import_Click(object sender, EventArgs e)
 		{
-			/*XmlDocument xd = new XmlDocument();
-			xd.Load(tempFile.Value);
-			cms.businesslogic.packager.Installer.ImportDocumentType(xd.DocumentElement, base.getUser(), true);
-			dtNameConfirm.Text = xd.DocumentElement.SelectSingleNode("/DocumentType/Info/Name").FirstChild.Value;*/
+            var xd = new XmlDocument();
+            xd.Load(tempFile.Value);
 
-		    var element = XElement.Parse(tempFile.Value);
-		    var importContentTypes = ApplicationContext.Current.Services.PackagingService.ImportContentTypes(element);
+		    var userId = base.getUser().Id;
+
+            var element = XElement.Parse(xd.InnerXml);
+		    var importContentTypes = ApplicationContext.Current.Services.PackagingService.ImportContentTypes(element, userId);
 		    var contentType = importContentTypes.FirstOrDefault();
 		    if (contentType != null)
 		        dtNameConfirm.Text = contentType.Name;
@@ -85,25 +85,22 @@ namespace umbraco.presentation.umbraco.dialogs
 			done.Visible = true;
 		}
 
-		private void submit_Click(object sender, System.EventArgs e)
+		private void submit_Click(object sender, EventArgs e)
 		{
 			tempFileName = "justDelete_" + Guid.NewGuid().ToString() + ".udt";
-			string fileName = IOHelper.MapPath(SystemDirectories.Data + "/" + tempFileName);
+			var fileName = IOHelper.MapPath(SystemDirectories.Data + "/" + tempFileName);
 			tempFile.Value = fileName;
 
 			documentTypeFile.PostedFile.SaveAs(fileName);
 
-			XmlDocument xd = new XmlDocument();
+			var xd = new XmlDocument();
 			xd.Load(fileName);
-			dtName.Text = xd.DocumentElement.SelectSingleNode("/DocumentType/Info/Name").FirstChild.Value;
-			dtAlias.Text = xd.DocumentElement.SelectSingleNode("/DocumentType/Info/Alias").FirstChild.Value;
-
+			dtName.Text = xd.DocumentElement.SelectSingleNode("//DocumentType/Info/Name").FirstChild.Value;
+			dtAlias.Text = xd.DocumentElement.SelectSingleNode("//DocumentType/Info/Alias").FirstChild.Value;
 
 			Wizard.Visible = false;
 			done.Visible = false;
 			Confirm.Visible = true;
-
 		}
-
 	}
 }

@@ -11,8 +11,5 @@
 
 CREATE USER PlaceHolderForUser FOR LOGIN PlaceHolderForUser;
 GO
-EXEC sp_addrolemember 'db_ddladmin', PlaceHolderForUser;
-EXEC sp_addrolemember 'db_securityadmin', PlaceHolderForUser;
-EXEC sp_addrolemember 'db_datareader', PlaceHolderForUser;
-EXEC sp_addrolemember 'db_datawriter', PlaceHolderForUser;
+EXEC sp_addrolemember 'db_owner', PlaceHolderForUser;
 GO

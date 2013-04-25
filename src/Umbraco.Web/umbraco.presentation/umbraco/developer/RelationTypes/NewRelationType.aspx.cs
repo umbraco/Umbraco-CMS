@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web.UI.WebControls;
 using umbraco.BasePages;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.relation;
 
 namespace umbraco.cms.presentation.developer.RelationTypes
@@ -10,6 +11,11 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 	/// </summary>
 	public partial class NewRelationType : UmbracoEnsuredPage
 	{
+	    public NewRelationType()
+	    {
+	        CurrentApp = DefaultApps.developer.ToString();
+	    }
+
 		/// <summary>
 		/// On Load event
 		/// </summary>
@@ -44,9 +50,9 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// <param name="e">expects EventArgs for addButton</param>
 		protected void AddButton_Click(object sender, EventArgs e)
 		{
-			if (this.Page.IsValid)
+			if (Page.IsValid)
 			{
-                string newRelationTypeAlias = this.aliasTextBox.Text.Trim();
+                var newRelationTypeAlias = this.aliasTextBox.Text.Trim();
 
                 uQuery.SqlHelper.ExecuteNonQuery(
                     string.Format("INSERT INTO umbracoRelationType ([dual], parentObjectType, childObjectType, name, alias) VALUES ({0}, '{1}', '{2}', '{3}', '{4}')",
@@ -56,11 +62,11 @@ namespace umbraco.cms.presentation.developer.RelationTypes
                         this.descriptionTextBox.Text,
                         newRelationTypeAlias));
 
-                int newRelationTypeId = uQuery.SqlHelper.ExecuteScalar<int>("SELECT id FROM umbracoRelationType WHERE alias = '" + newRelationTypeAlias + "'");
+                var newRelationTypeId = uQuery.SqlHelper.ExecuteScalar<int>("SELECT id FROM umbracoRelationType WHERE alias = '" + newRelationTypeAlias + "'");
 
 				// base.speechBubble(BasePage.speechBubbleIcon.success, "New Relation Type", "relation type created");
 
-				BasePage.Current.ClientTools.ChangeContentFrameUrl("/umbraco/developer/RelationTypes/EditRelationType.aspx?id=" + newRelationTypeId.ToString()).CloseModalWindow().ChildNodeCreated();
+				ClientTools.ChangeContentFrameUrl("/umbraco/developer/RelationTypes/EditRelationType.aspx?id=" + newRelationTypeId.ToString()).CloseModalWindow().ChildNodeCreated();
 			}
 		}
 

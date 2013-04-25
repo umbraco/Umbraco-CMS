@@ -1,0 +1,254 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<umbPackage>
+  <files>
+    <file>
+      <guid>XSLTsearch.xslt</guid>
+      <orgPath>/xslt</orgPath>
+      <orgName>XSLTsearch.xslt</orgName>
+    </file>
+    <file>
+      <guid>XSLTsearch.cs</guid>
+      <orgPath>/App_Code</orgPath>
+      <orgName>XSLTsearch.cs</orgName>
+    </file>
+  </files>
+  <info>
+    <package>
+      <name>XSLTsearch</name>
+      <version>3.0.4</version>
+      <license url="http://www.opensource.org/licenses/mit-license.php">MIT license</license>
+      <url>http://www.percipientstudios.com</url>
+      <requirements>
+        <major>3</major>
+        <minor>0</minor>
+        <patch>0</patch>
+      </requirements>
+    </package>
+    <author>
+      <name>Percipient Studios</name>
+      <website>http://www.percipientstudios.com</website>
+    </author>
+    <readme>
+      <![CDATA[XSLTsearch is the easy search solution for Umbraco web sites with up to a few thousand pages. It is fast, completely self-contained, and extremely configurable.
+
+With XSLTsearch you can search for all words and phrases in all document properties and attributes, including your custom properties. Search results are automatically sorted by relevance with search terms highlighted in the results.
+
+XSLTsearch installs in all Umbraco sites.
+
+New in 3.0:
+- Multi-lingual support with dictionary items
+- Medium trust support (helper functions now in /app_code/xsltsearch.cs)
+- Many bug fixes
+
+Version 3.0.1 
+- For umbraco 4.5+ and new XML schema
+- Fixed xslt error when a previewed field had fewer than six characters
+- Changed default behavior to only search within current site if source node id is not specified (better for multiple sites in one installation)
+- Multi-site searching made easier. Now searches only within the current site if the source= parameter is not specified (better for multiple sites in one installation)
+                  
+Version 3.0.2 
+- Fixed issue of PreviewMode="CONTEXT" in which the search term would not be highlighted if it were the last word in the content being searched
+  
+Version 3.0.3 
+- Removed extraneous whitespace and empty quotes from search term
+  
+Version 3.0.4 
+- Additional fix for PreviewMode="CONTEXT" in which the search term would not be displayed if it were the last word in the content being search and the search term were more than $maxChars from the beginning of the search field
+- Removed errant 'xmp' debug statement that appeared in v3.0.3
+]]>
+    </readme>
+  </info>
+  <Documents>
+    <DocumentSet importMode="root">
+      <XSLTsearch id="1090" parentID="-1" level="1" writerID="0" creatorID="0" nodeType="1087" template="1086" sortOrder="39" createDate="2010-11-09T13:45:22" updateDate="2010-11-09T14:18:04" nodeName="Search" urlName="search" writerName="Administrator" creatorName="Administrator" path="-1,1090" isDoc="">
+        <umbracoNaviHide>0</umbracoNaviHide>
+      </XSLTsearch>
+    </DocumentSet>
+  </Documents>
+  <DocumentTypes>
+    <DocumentType>
+      <Info>
+        <Name>XSLTsearch</Name>
+        <Alias>XSLTsearch</Alias>
+        <Icon>.sprTreeDoc2</Icon>
+        <Thumbnail>doc.png</Thumbnail>
+        <Description>
+          XSLTsearch page.
+          (adjust settings via the macro in the XSLTsearch template)
+        </Description>
+        <AllowedTemplates>
+          <Template>XSLTsearch</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>XSLTsearch</DefaultTemplate>
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Hide in navigation</Name>
+          <Alias>umbracoNaviHide</Alias>
+          <Type>38b352c1-e9f8-4fd8-9324-9a2eab06d97a</Type>
+          <Definition>92897bc6-a5f3-4ffe-ae27-f2e7e33dda49</Definition>
+          <Tab>
+          </Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs />
+    </DocumentType>
+  </DocumentTypes>
+  <Templates>
+    <Template>
+      <Name>XSLTsearch</Name>
+      <Alias>XSLTsearch</Alias>
+      <Master>RunwayMaster</Master>
+      <Design>
+        <![CDATA[<%@ Master Language="C#" MasterPageFile="~/masterpages/RunwayMaster.master" AutoEventWireup="true" %>
+
+  
+<asp:Content ContentPlaceHolderId="RunwayMasterContentPlaceHolder" runat="server">
+  <div id="content">
+    <div id="contentHeader">  
+        <h2><umbraco:Item runat="server" field="pageName"/></h2>
+    </div>
+
+    <umbraco:Macro runat="server" Alias="XSLTsearch"
+      macroAlias="XSLTsearch"
+      source="-1"
+      searchFields="@nodeName,metaKeywords,metaDescription,bodyText"
+      previewFields="bodyText,metaDescription"
+      previewType="beginning"
+      searchBoxLocation="bottom"
+      resultsPerPage="5"
+      previewChars="255"
+      showPageRange="0"
+      showOrdinals="0"
+      showScores="0"
+      showStats="1">
+    </umbraco:Macro>
+
+  </div>
+</asp:Content>]]>
+      </Design>
+    </Template>
+  </Templates>
+  <Stylesheets>
+    <Stylesheet>
+      <Name>XSLTsearch</Name>
+      <FileName>
+      </FileName>
+      <Content>
+        <![CDATA[#xsltsearch {margin: 0; padding-bottom: 20px;}
+#xsltsearch_navigation {text-align: center;}
+#xsltsearch_navigation .disabled {color: #AAA;}
+#xsltsearch_stats {font-size: 75%; color: #999;}
+#xsltsearch_results {padding-bottom: 20px;}
+#xsltsearch h2 {font-size: 150%;}
+.xsltsearch_result p {margin: 0; padding: 0;}
+.xsltsearch_result:hover {background: #fafafa;}
+.xsltsearch_ordinal {font-weight: bold; font-size: 75%;}
+.xsltsearch_title {font-weight: bold;}
+.xsltsearch_score {font-size: 75%;}
+p.xsltsearch_result_description {padding-bottom: 10px;}
+.xsltsearch_description strong {background: #FFD;} /* highlighting */
+]]>
+      </Content>
+    </Stylesheet>
+  </Stylesheets>
+  <Macros>
+    <macro>
+      <name>XSLTsearch</name>
+      <alias>XSLTsearch</alias>
+      <scriptType>
+      </scriptType>
+      <scriptAssembly>
+      </scriptAssembly>
+      <xslt>XSLTsearch.xslt</xslt>
+      <useInEditor>False</useInEditor>
+      <refreshRate>0</refreshRate>
+      <scriptingFile>
+      </scriptingFile>
+      <properties>
+        <property name="Source" alias="source" show="True" propertyType="contentTree" />
+        <property name="Umbraco fields to search" alias="searchFields" show="True" propertyType="text" />
+        <property name="Umbraco fields shown in results preview" alias="previewFields" show="True" propertyType="text" />
+        <property name="Display search box at TOP, BOTTOM, BOTH, or NONE" alias="searchBoxLocation" show="True" propertyType="text" />
+        <property name="Display BEGINNING or CONTEXT of each result" alias="previewType" show="True" propertyType="text" />
+        <property name="Number of search results to display per page" alias="resultsPerPage" show="True" propertyType="number" />
+        <property name="Number of characters of preview text to display" alias="previewChars" show="True" propertyType="number" />
+        <property name="Display 'Showing result X to Y'?" alias="showPageRange" show="True" propertyType="bool" />
+        <property name="Display numbers before each result?" alias="showOrdinals" show="True" propertyType="bool" />
+        <property name="Display search score for each result?" alias="showScores" show="True" propertyType="bool" />
+        <property name="Display 'Searched X documents in Y seconds'?" alias="showStats" show="True" propertyType="bool" />
+      </properties>
+    </macro>
+  </Macros>
+  <DictionaryItems>
+    <DictionaryItem Key="XSLTsearch">
+      <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[]]></Value>
+      <DictionaryItem Key="[XSLTsearch]Button-Search">
+        <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Search]]></Value>
+      </DictionaryItem>
+      <DictionaryItem Key="[XSLTsearch]Description-Context">
+        <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Context]]></Value>
+      </DictionaryItem>
+      <DictionaryItem Key="[XSLTsearch]Description-ContextUnavailable">
+        <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[unavailable]]></Value>
+      </DictionaryItem>
+      <DictionaryItem Key="[XSLTsearch]Heading-SearchResults">
+        <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Search Results]]></Value>
+      </DictionaryItem>
+      <DictionaryItem Key="[XSLTsearch]Navigation-Next">
+        <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Next]]></Value>
+      </DictionaryItem>
+      <DictionaryItem Key="[XSLTsearch]Navigation-Previous">
+        <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Previous]]></Value>
+      </DictionaryItem>
+      <DictionaryItem Key="[XSLTsearch]PageRange-ShowingResults">
+        <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Showing results]]></Value>
+      </DictionaryItem>
+      <DictionaryItem Key="[XSLTsearch]PageRange-To">
+        <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[to]]></Value>
+      </DictionaryItem>
+      <DictionaryItem Key="[XSLTsearch]Score-Score">
+        <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[score]]></Value>
+      </DictionaryItem>
+      <DictionaryItem Key="[XSLTsearch]Stats-PagesIn">
+        <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[pages in]]></Value>
+      </DictionaryItem>
+      <DictionaryItem Key="[XSLTsearch]Stats-Searched">
+        <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Searched]]></Value>
+      </DictionaryItem>
+      <DictionaryItem Key="[XSLTsearch]Stats-Seconds">
+        <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[seconds]]></Value>
+      </DictionaryItem>
+      <DictionaryItem Key="[XSLTsearch]Summary-Matches">
+        <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[matches]]></Value>
+      </DictionaryItem>
+      <DictionaryItem Key="[XSLTsearch]Summary-NoMatchesWereFoundFor">
+        <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[No matches were found for]]></Value>
+      </DictionaryItem>
+      <DictionaryItem Key="[XSLTsearch]Summary-Page">
+        <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[page]]></Value>
+      </DictionaryItem>
+      <DictionaryItem Key="[XSLTsearch]Summary-Pages">
+        <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[pages]]></Value>
+      </DictionaryItem>
+      <DictionaryItem Key="[XSLTsearch]Summary-YourSearchFor">
+        <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Your search for]]></Value>
+      </DictionaryItem>
+    </DictionaryItem>
+  </DictionaryItems>
+  <Languages>
+    <Language Id="2" CultureAlias="en-US" FriendlyName="English (United States)" />
+  </Languages>
+  <DataTypes />
+  <Actions>
+    <Action runat="install" alias="addStringToHtmlElement" templateAlias="RunwayMaster" htmlElementId="head" position="end"><![CDATA[	<link rel="stylesheet" type="text/css" href="/css/XSLTsearch.css" />]]></Action>
+    <Action runat="install" alias="publishRootDocument" documentName="Search" />
+    <Action runat="install" alias="allowDocumenttype" documentTypeAlias="XSLTsearch" parentDocumentTypeAlias="RunwayHomepage" />
+    <Action runat="install" alias="moveRootDocument" documentName="Search" parentDocumentType="RunwayHomepage" />
+  </Actions>
+</umbPackage>

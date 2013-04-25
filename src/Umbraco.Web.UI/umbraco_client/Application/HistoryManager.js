@@ -1,6 +1,6 @@
 ﻿/// <reference path="/umbraco_client/Application/NamespaceManager.js" />
 /// <reference name="MicrosoftAjax.js"/>
-/// <reference path="/umbraco_client/Application/Query/jquery.ba-bbq.min.js" />
+/// <reference path="/umbraco_client/Application/JQuery/jquery.ba-bbq.min.js" />
 
 Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
@@ -8,18 +8,28 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
     Umbraco.Controls.HistoryManager = function() {
         /// <summary>This is a wrapper for the bbq plugin history manager, but we could do alot with history mgmt in the future!</summary>
+
+        var hashFragmentRegex = new RegExp(/^\w+/);
+        function getHashFragment(frag) {
+            //tests for xss and ensures only the first alphanumeric chars are matched
+            var result = hashFragmentRegex.exec(frag);
+            if (result != null && result.length > 0) {
+                return result[0];
+            }
+            return "";
+        }
         var obj = {
 
             onNavigate: function(e) {
-                
-                var l = $.param.fragment();
-                if (l != "") {
-                    jQuery(window.top).trigger("navigating", [$.param.fragment()]); //raise event!
+                var fragment = getHashFragment($.param.fragment());
+                if (fragment != "") {
+                    jQuery(window.top).trigger("navigating", [fragment]); //raise event!   
                 }
                 
             },
             addHistory: function(name, forceRefresh) {
-                if ($.param.fragment() == name && forceRefresh) {
+                var fragment = getHashFragment($.param.fragment());
+                if (fragment == name && forceRefresh) {
                     this.onNavigate();
                 }
                 else {
@@ -27,8 +37,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 }
 
             },
-            getCurrent: function() {
-                return ($.param.fragment().length > 0) ? $.param.fragment() : "";
+            getCurrent: function () {                
+                return getHashFragment($.param.fragment());
             },
 
             addEventHandler: function(fnName, fn) {

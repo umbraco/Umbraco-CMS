@@ -835,7 +835,7 @@ namespace Umbraco.Core
         public static string ToSafeAlias(this string alias)
         {
             const string validAliasCharacters = "_-abcdefghijklmnopqrstuvwxyz1234567890";
-            const string invalidFirstCharacters = "01234567890";
+            const string invalidFirstCharacters = "0123456789";
             var safeString = new StringBuilder();
             int aliasLength = alias.Length;
             for (int i = 0; i < aliasLength; i++)

@@ -5,11 +5,11 @@ using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
-using umbraco.IO;
-using System.Web.UI;
+using Umbraco.Core;
 
 namespace umbraco.BasePages
 {
@@ -145,23 +145,34 @@ namespace umbraco.BasePages
         /// <returns></returns>
         public static int GetUserId(string umbracoUserContextID)
         {
+
+            Guid contextId;
+            if (!Guid.TryParse(umbracoUserContextID, out contextId))
+            {
+                return -1;
+            }
+
             try
             {
-                if (System.Web.HttpRuntime.Cache["UmbracoUserContext" + umbracoUserContextID] == null)
+                if (HttpRuntime.Cache["UmbracoUserContext" + umbracoUserContextID] == null)
                 {
-                    System.Web.HttpRuntime.Cache.Insert(
+                    var uId = SqlHelper.ExecuteScalar<int?>(
+                        "select userID from umbracoUserLogins where contextID = @contextId",
+                        SqlHelper.CreateParameter("@contextId", new Guid(umbracoUserContextID)));
+                    if (!uId.HasValue)
+                    {
+                        return -1;
+                    }
+
+                    HttpRuntime.Cache.Insert(
                         "UmbracoUserContext" + umbracoUserContextID,
-                        SqlHelper.ExecuteScalar<int>("select userID from umbracoUserLogins where contextID = @contextId",
-                                                     SqlHelper.CreateParameter("@contextId", new Guid(umbracoUserContextID))
-                            ),
+                        uId.Value,
                         null,
                         System.Web.Caching.Cache.NoAbsoluteExpiration,
                         new TimeSpan(0, (int) (UmbracoTimeOutInMinutes/10), 0));
-
-
                 }
 
-                return (int)System.Web.HttpRuntime.Cache["UmbracoUserContext" + umbracoUserContextID];
+                return (int)HttpRuntime.Cache["UmbracoUserContext" + umbracoUserContextID];
 
             }
             catch
@@ -175,20 +186,21 @@ namespace umbraco.BasePages
         /// <summary>
         /// Validates the user context ID.
         /// </summary>
-        /// <param name="umbracoUserContextID">The umbraco user context ID.</param>
+        /// <param name="currentUmbracoUserContextID">The umbraco user context ID.</param>
         /// <returns></returns>
         public static bool ValidateUserContextID(string currentUmbracoUserContextID)
         {
-            if ((currentUmbracoUserContextID != ""))
+            if (!currentUmbracoUserContextID.IsNullOrWhiteSpace())
             {
-                int uid = GetUserId(currentUmbracoUserContextID);
-                long timeout = GetTimeout(currentUmbracoUserContextID);
+                var uid = GetUserId(currentUmbracoUserContextID);
+                var timeout = GetTimeout(currentUmbracoUserContextID);
 
                 if (timeout > DateTime.Now.Ticks)
                 {
                     return true;
                 }
 	            var user = BusinessLogic.User.GetUser(uid);
+                //TODO: We don't actually log anyone out here, not sure why we're logging ??
 				LogHelper.Info<BasePage>("User {0} (Id:{1}) logged out", () => user.Name, () => user.Id);
             }
             return false;

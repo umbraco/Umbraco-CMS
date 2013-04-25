@@ -20,9 +20,14 @@ namespace umbraco.presentation.dialogs
     {
         private CMSNode _currentPage;
 
+        public sendToTranslation()
+        {
+            CurrentApp = DefaultApps.content.ToString();
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            _currentPage = new cms.businesslogic.CMSNode(int.Parse(helper.Request("id")));
+            _currentPage = new CMSNode(int.Parse(helper.Request("id")));
 
             pp_translator.Text = ui.Text("translation","translator", this.getUser());
             pp_language.Text = ui.Text("translation", "translateTo", this.getUser());
@@ -34,9 +39,9 @@ namespace umbraco.presentation.dialogs
             if (!IsPostBack)
             {
                 // default language
-                int selectedLanguage = 0;
+                var selectedLanguage = 0;
 
-                Domain[] domains = library.GetCurrentDomains(_currentPage.Id);
+                var domains = library.GetCurrentDomains(_currentPage.Id);
                 if (domains != null)
                 {
                     selectedLanguage = domains[0].Language.id;
@@ -49,9 +54,9 @@ namespace umbraco.presentation.dialogs
                 
                 // languages
                 language.Items.Add(new ListItem(ui.Text("general", "choose", base.getUser()), ""));
-                foreach (cms.businesslogic.language.Language l in cms.businesslogic.language.Language.getAll)
+                foreach (var l in cms.businesslogic.language.Language.getAll)
                 {
-                    ListItem li = new ListItem();
+                    var li = new ListItem();
                     li.Text = l.FriendlyName;
                     li.Value = l.id.ToString();
                     if (selectedLanguage == l.id)
@@ -64,13 +69,13 @@ namespace umbraco.presentation.dialogs
                     includeSubpages.Enabled = false;
 
                 // Translators
-                foreach (User u in BusinessLogic.User.getAll())
+                foreach (var u in BusinessLogic.User.getAll())
                     if (u.UserType.Alias.ToLower() == "translator")
                         translator.Items.Add(new ListItem(u.Name, u.Id.ToString()));
 
                 if (translator.Items.Count == 0) {
                     feedback.Text = ui.Text("translation", "noTranslators");
-                    feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.error;
+                    feedback.type = uicontrols.Feedback.feedbacktype.error;
                     doTranslation.Enabled = false;
                 }
 
@@ -94,7 +99,7 @@ namespace umbraco.presentation.dialogs
             pl_buttons.Visible = false;
 
             feedback.Text = ui.Text("translation","pageHasBeenSendToTranslation", _currentPage.Text, base.getUser()) + "</p><p><a href=\"#\" onclick=\"" + ClientTools.Scripts.CloseModalWindow() + "\">" + ui.Text("defaultdialogs", "closeThisWindow") + "</a></p>";
-            feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
+            feedback.type = uicontrols.Feedback.feedbacktype.success;
         }
     }
 }

@@ -168,19 +168,6 @@ namespace Umbraco.Core.Models.EntityBase
             }
         }
 
-        public static bool operator ==(Entity left, Entity right)
-        {
-            if (ReferenceEquals(null, left))
-                return false;
-
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(Entity left, Entity right)
-        {
-            return !(left == right);
-        }
-
         public virtual bool SameIdentityAs(IEntity other)
         {
             if (ReferenceEquals(null, other))

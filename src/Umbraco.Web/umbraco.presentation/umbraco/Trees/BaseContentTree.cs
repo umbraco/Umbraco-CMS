@@ -113,7 +113,7 @@ function openContent(id) {
                 node.OpenIcon = dd.ContentTypeIcon;
             }
 
-            if (!dd.Published)
+            if (dd.HasPublishedVersion() == false)
                 node.Style.DimNode();
 
             if (dd.HasPendingChanges())

@@ -17,9 +17,9 @@ namespace umbraco.cms.presentation
 	/// </summary>
 	public partial class editMedia : BasePages.UmbracoEnsuredPage
 	{
-        private uicontrols.Pane mediaPropertiesPane = new uicontrols.Pane();
-        private LiteralControl updateDateLiteral = new LiteralControl();
-        private LiteralControl mediaFileLinksLiteral = new LiteralControl();
+        private readonly uicontrols.Pane _mediaPropertiesPane = new uicontrols.Pane();
+        private readonly LiteralControl _updateDateLiteral = new LiteralControl();
+        private readonly LiteralControl _mediaFileLinksLiteral = new LiteralControl();
 
 	    public editMedia()
 	    {
@@ -27,18 +27,12 @@ namespace umbraco.cms.presentation
 	    }
 
 		protected uicontrols.TabView TabView1;
-		protected System.Web.UI.WebControls.TextBox documentName;
-		private cms.businesslogic.media.Media _media;
-		controls.ContentControl tmp;
-
-		//protected System.Web.UI.WebControls.Literal SyncPath;
-
+		protected TextBox documentName;
+		private businesslogic.media.Media _media;
+		controls.ContentControl _contentControl;
+        
         override protected void OnInit(EventArgs e)
         {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
             base.OnInit(e);
 
             int id = int.Parse(Request.QueryString["id"]);
@@ -51,98 +45,92 @@ namespace umbraco.cms.presentation
             bool exists = SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @nodeId",
                                        SqlHelper.CreateParameter("@nodeId", _media.Id)) > 0;
             if (!exists)
+            {
                 _media.XmlGenerate(new XmlDocument());
+            }
 
+            _contentControl = new controls.ContentControl(_media, controls.ContentControl.publishModes.NoPublish, "TabView1");
+            _contentControl.Width = Unit.Pixel(666);
+            _contentControl.Height = Unit.Pixel(666);
 
-            tmp = new controls.ContentControl(_media, controls.ContentControl.publishModes.NoPublish, "TabView1");
-            tmp.Width = Unit.Pixel(666);
-            tmp.Height = Unit.Pixel(666);
-            plc.Controls.Add(tmp);
+            //this must be set to false as we don't want to proceed to save anything if the page is invalid
+            _contentControl.SavePropertyDataWhenInvalid = false;
 
-            tmp.Save += new System.EventHandler(Save);
+            plc.Controls.Add(_contentControl);
 
-            this.updateDateLiteral.ID = "updateDate";
-            this.updateDateLiteral.Text = _media.VersionDate.ToShortDateString() + " " + _media.VersionDate.ToShortTimeString();
+            _contentControl.Save += new System.EventHandler(Save);
 
-            this.mediaFileLinksLiteral.ID = "mediaFileLinks";
-            mediaPropertiesPane.addProperty(ui.Text("content", "updateDate", base.getUser()), this.updateDateLiteral);
+            this._updateDateLiteral.ID = "updateDate";
+            this._updateDateLiteral.Text = _media.VersionDate.ToShortDateString() + " " + _media.VersionDate.ToShortTimeString();
+
+            this._mediaFileLinksLiteral.ID = "mediaFileLinks";
+            _mediaPropertiesPane.addProperty(ui.Text("content", "updateDate", base.getUser()), this._updateDateLiteral);
 
             this.UpdateMediaFileLinksLiteral();
-            mediaPropertiesPane.addProperty(ui.Text("content", "mediaLinks"), this.mediaFileLinksLiteral);
+            _mediaPropertiesPane.addProperty(ui.Text("content", "mediaLinks"), this._mediaFileLinksLiteral);
 
             // add the property pane to the page rendering
-            tmp.tpProp.Controls.AddAt(1, mediaPropertiesPane);                       
+            _contentControl.tpProp.Controls.AddAt(1, _mediaPropertiesPane);                       
         }
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-
-        }
-
-		protected void Page_Load(object sender, System.EventArgs e)
+		protected void Page_Load(object sender, EventArgs e)
 		{
-			//if (!IsPostBack) 
-			//{
-			//    SyncPath.Text = _media.Path;
-			//    newName.Text = _media.Text.Replace("'", "\\'");
-			//}
 			if (!IsPostBack)
 			{
 				ClientTools.SyncTree(_media.Path, false);
 			}			
 		}
 
-		protected void Save(object sender, System.EventArgs e) 
+		protected void Save(object sender, EventArgs e) 
 		{
-            // error handling test
+            // do not continue saving anything if the page is invalid!
+            // http://issues.umbraco.org/issue/U4-227
             if (!Page.IsValid)
             {
-                foreach (uicontrols.TabPage tp in tmp.GetPanels())
+                foreach (uicontrols.TabPage tp in _contentControl.GetPanels())
                 {
                     tp.ErrorControl.Visible = true;
                     tp.ErrorHeader = ui.Text("errorHandling", "errorHeader");
                     tp.CloseCaption = ui.Text("close");
                 }
             }
-            else if (Page.IsPostBack)
+            else
             {
-                // hide validation summaries
-                foreach (uicontrols.TabPage tp in tmp.GetPanels())
+                if (Page.IsPostBack)
                 {
-                    tp.ErrorControl.Visible = false;
-                }
-            }
+                    // hide validation summaries
+                    foreach (uicontrols.TabPage tp in _contentControl.GetPanels())
+                    {
+                        tp.ErrorControl.Visible = false;
+                    }
+                }    
 
             //The value of the properties has been set on IData through IDataEditor in the ContentControl
             //so we need to 'retrieve' that value and set it on the property of the new IContent object.
             //NOTE This is a workaround for the legacy approach to saving values through the DataType instead of the Property 
             //- (The DataType shouldn't be responsible for saving the value - especically directly to the db).
-            foreach (var item in tmp.DataTypes)
+            foreach (var item in _contentControl.DataTypes)
             {
                 _media.getProperty(item.Key).Value = item.Value.Data.Value;
             }
 
-            _media.Save();
+                _media.Save();
 
-            this.updateDateLiteral.Text = _media.VersionDate.ToShortDateString() + " " + _media.VersionDate.ToShortTimeString();
-            this.UpdateMediaFileLinksLiteral();
+                this._updateDateLiteral.Text = _media.VersionDate.ToShortDateString() + " " + _media.VersionDate.ToShortTimeString();
+                this.UpdateMediaFileLinksLiteral();
 
-			_media.XmlGenerate(new XmlDocument());
-            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editMediaSaved"), ui.Text("editMediaSavedText"));
-			ClientTools.SyncTree(_media.Path, true);
+                _media.XmlGenerate(new XmlDocument());
+                ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editMediaSaved"), ui.Text("editMediaSavedText"));
+                ClientTools.SyncTree(_media.Path, true);
+            }                               
 		}
-
 
         private void UpdateMediaFileLinksLiteral()
         {
             var uploadField = new Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
 
             // always clear, incase the upload file was removed
-            this.mediaFileLinksLiteral.Text = string.Empty;
+            this._mediaFileLinksLiteral.Text = string.Empty;
 
             try
             {
@@ -155,14 +143,14 @@ namespace umbraco.cms.presentation
 
                 if (properties.Any())
                 {
-                    this.mediaFileLinksLiteral.Text += "<table>";
+                    this._mediaFileLinksLiteral.Text += "<table>";
 
                     foreach (var property in properties)
                     {
-                        this.mediaFileLinksLiteral.Text += string.Format("<tr><td>{0}&nbsp;</td><td><a href=\"{1}\" target=\"_blank\">{1}</a></td></tr>", property.PropertyType.Name, property.Value);
+                        this._mediaFileLinksLiteral.Text += string.Format("<tr><td>{0}&nbsp;</td><td><a href=\"{1}\" target=\"_blank\">{1}</a></td></tr>", property.PropertyType.Name, property.Value);
                     }
                     
-                    this.mediaFileLinksLiteral.Text += "</table>";
+                    this._mediaFileLinksLiteral.Text += "</table>";
                 }
             }
             catch

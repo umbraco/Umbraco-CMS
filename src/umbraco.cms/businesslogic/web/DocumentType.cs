@@ -342,11 +342,11 @@ namespace umbraco.cms.businesslogic.web
             // info section
             XmlElement info = xd.CreateElement("Info");
             doc.AppendChild(info);
-            info.AppendChild(XmlHelper.AddTextNode(xd, "Name", Text));
+            info.AppendChild(XmlHelper.AddTextNode(xd, "Name", GetRawText()));
             info.AppendChild(XmlHelper.AddTextNode(xd, "Alias", Alias));
             info.AppendChild(XmlHelper.AddTextNode(xd, "Icon", IconUrl));
             info.AppendChild(XmlHelper.AddTextNode(xd, "Thumbnail", Thumbnail));
-            info.AppendChild(XmlHelper.AddTextNode(xd, "Description", Description));
+            info.AppendChild(XmlHelper.AddTextNode(xd, "Description", GetRawDescription()));
             info.AppendChild(XmlHelper.AddTextNode(xd, "AllowAtRoot", AllowAtRoot.ToString()));
 
             //TODO: Add support for mixins!
@@ -385,7 +385,7 @@ namespace umbraco.cms.businesslogic.web
                 if (pt.ContentTypeId == this.Id)
                 {
                     XmlElement ptx = xd.CreateElement("GenericProperty");
-                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Name", pt.Name));
+                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Name", pt.GetRawName()));
                     ptx.AppendChild(XmlHelper.AddTextNode(xd, "Alias", pt.Alias));
                     ptx.AppendChild(XmlHelper.AddTextNode(xd, "Type", pt.DataTypeDefinition.DataType.Id.ToString()));
 
@@ -395,7 +395,7 @@ namespace umbraco.cms.businesslogic.web
                     ptx.AppendChild(XmlHelper.AddTextNode(xd, "Tab", Tab.GetCaptionById(pt.TabId)));
                     ptx.AppendChild(XmlHelper.AddTextNode(xd, "Mandatory", pt.Mandatory.ToString()));
                     ptx.AppendChild(XmlHelper.AddTextNode(xd, "Validation", pt.ValidationRegExp));
-                    ptx.AppendChild(XmlHelper.AddCDataNode(xd, "Description", pt.Description));
+                    ptx.AppendChild(XmlHelper.AddCDataNode(xd, "Description", pt.GetRawDescription()));
                     pts.AppendChild(ptx);
                 }
             }

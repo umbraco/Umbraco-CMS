@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -401,8 +402,9 @@ namespace umbraco.cms.businesslogic.web
             var children = ApplicationContext.Current.Services.ContentService.GetChildrenByName(NodeId, searchString);
             return children.Select(x => new Document(x)).ToList();
         }
-
+        
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.RePublishAll()", false)]
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public static void RePublishAll()
         {
             XmlDocument xd = new XmlDocument();
@@ -799,12 +801,19 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
         public bool PublishWithResult(User u)
         {
+            return PublishWithResult(u, true);
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
+        internal bool PublishWithResult(User u, bool omitCacheRefresh)
+        {
             var e = new PublishEventArgs();
             FireBeforePublish(e);
 
             if (!e.Cancel)
             {
-                var result = ((ContentService)ApplicationContext.Current.Services.ContentService).Publish(Content, true, u.Id);
+                var result = ((ContentService)ApplicationContext.Current.Services.ContentService).Publish(Content, omitCacheRefresh, u.Id);
                 _published = result;
 
                 FireAfterPublish(e);
@@ -916,9 +925,6 @@ namespace umbraco.cms.businesslogic.web
         {
             foreach (var property in GenericProperties)
             {
-                if(property.Value == null)
-                    continue;
-
                 Content.SetValue(property.PropertyType.Alias, property.Value);
             }
 
@@ -968,7 +974,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Instead of calling this just check if the latest version of the content is published", false)]
         public bool HasPendingChanges()
         {
-            return Content.Published == false;
+            return Content.Published == false && ((Umbraco.Core.Models.Content)Content).PublishedState != PublishedState.Unpublished;
         }
 
         /// <summary>
@@ -1029,6 +1035,10 @@ namespace umbraco.cms.businesslogic.web
                 var current = User.GetCurrent();
                 int userId = current == null ? 0 : current.Id;
                 ApplicationContext.Current.Services.ContentService.Move(Content, newParentId, userId);
+
+                //We need to manually update this property as the above change is not directly reflected in 
+                //the current object unless its reloaded.
+                base.ParentId = newParentId;
             }
 
             base.FireAfterMove(e);
@@ -1255,6 +1265,10 @@ namespace umbraco.cms.businesslogic.web
             }
         }
 
+        /// <summary>
+        /// This is a specialized method which literally just makes sure that the sortOrder attribute of the xml
+        /// that is stored in the database is up to date.
+        /// </summary>
         public void refreshXmlSortOrder()
         {
             if (Published)
@@ -1447,6 +1461,11 @@ namespace umbraco.cms.businesslogic.web
             return temp;
         }
 
+        /// <summary>
+        /// This needs to be synchronized since we're doing multiple sql operations in the single method
+        /// </summary>
+        /// <param name="x"></param>
+        [MethodImpl(MethodImplOptions.Synchronized)]
         private void saveXml(XmlNode x)
         {
             bool exists = (SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId=@nodeId",

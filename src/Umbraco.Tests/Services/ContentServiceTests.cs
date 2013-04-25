@@ -469,6 +469,50 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Get_Published_Descendant_Versions()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var root = contentService.GetById(1046);
+            var rootPublished = contentService.Publish(root);
+            var content = contentService.GetById(1048);
+            content.Properties["title"].Value = content.Properties["title"].Value + " Published";
+            bool published = contentService.SaveAndPublish(content);
+
+            var publishedVersion = content.Version;
+
+            content.Properties["title"].Value = content.Properties["title"].Value + " Saved";
+            contentService.Save(content);
+
+            var savedVersion = content.Version;
+
+            // Act
+            var publishedDescendants = ((ContentService) contentService).GetPublishedDescendants(root);
+
+            // Assert
+            Assert.That(rootPublished, Is.True);
+            Assert.That(published, Is.True);
+            Assert.That(publishedDescendants.Any(x => x.Version == publishedVersion), Is.True);
+            Assert.That(publishedDescendants.Any(x => x.Version == savedVersion), Is.False);
+
+            //Ensure that the published content version has the correct property value and is marked as published
+            var publishedContentVersion = publishedDescendants.First(x => x.Version == publishedVersion);
+            Assert.That(publishedContentVersion.Published, Is.True);
+            Assert.That(publishedContentVersion.Properties["title"].Value, Contains.Substring("Published"));
+
+            //Ensure that the saved content version has the correct property value and is not marked as published
+            var savedContentVersion = contentService.GetByVersion(savedVersion);
+            Assert.That(savedContentVersion.Published, Is.False);
+            Assert.That(savedContentVersion.Properties["title"].Value, Contains.Substring("Saved"));
+
+            //Ensure that the latest version of the content is the saved and not-yet-published one
+            var currentContent = contentService.GetById(1048);
+            Assert.That(currentContent.Published, Is.False);
+            Assert.That(currentContent.Properties["title"].Value, Contains.Substring("Saved"));
+            Assert.That(currentContent.Version, Is.EqualTo(savedVersion));
+        }
+
+        [Test]
         public void Can_Save_Content()
         {
             // Arrange
@@ -565,6 +609,34 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(content.ParentId, Is.EqualTo(-20));
             Assert.That(content.Trashed, Is.True);
+        }
+
+        [Test]
+        public void Can_Move_Content_Structure_To_RecycleBin_And_Empty_RecycleBin()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
+            Content subsubpage = MockedContent.CreateSimpleContent(contentType, "Text Page 3", 1047);
+            contentService.Save(subsubpage, 0);
+
+            var content = contentService.GetById(1046);
+
+            // Act
+            contentService.MoveToRecycleBin(content, 0);
+            var descendants = contentService.GetDescendants(content);
+
+            // Assert
+            Assert.That(content.ParentId, Is.EqualTo(-20));
+            Assert.That(content.Trashed, Is.True);
+            Assert.That(descendants.Count(), Is.EqualTo(3));
+            Assert.That(descendants.Any(x => x.Path.Contains("-20") == false), Is.False);
+
+            //Empty Recycle Bin
+            contentService.EmptyRecycleBin();
+            var trashed = contentService.GetContentInRecycleBin();
+
+            Assert.That(trashed.Any(), Is.False);
         }
 
         [Test]

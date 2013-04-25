@@ -260,6 +260,14 @@
       <DependentUpon>default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="config\splashes\NoNodes.aspx.cs">
+      <DependentUpon>noNodes.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="config\splashes\NoNodes.aspx.designer.cs">
+      <DependentUpon>noNodes.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Install\Default.aspx.designer.cs">
       <DependentUpon>default.aspx</DependentUpon>
     </Compile>
@@ -277,6 +285,20 @@
       <DependentUpon>loadStarterKits.ascx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Umbraco\controls\ContentTypeControlNew.ascx.cs">
+      <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\controls\ContentTypeControlNew.ascx.designer.cs">
+      <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Umbraco\Create.aspx.cs">
+      <DependentUpon>create.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Create.aspx.designer.cs">
+      <DependentUpon>create.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Create\PartialViewMacro.ascx.cs">
       <DependentUpon>PartialViewMacro.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -291,7 +313,14 @@
     <Compile Include="Umbraco\Developer\Macros\EditMacro.aspx.designer.cs">
       <DependentUpon>editMacro.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Developer\Packages\StarterKits.aspx.cs">
+    <Compile Include="Umbraco\developer\Packages\DirectoryBrowser.aspx.cs">
+      <DependentUpon>directoryBrowser.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\developer\Packages\DirectoryBrowser.aspx.designer.cs">
+      <DependentUpon>directoryBrowser.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Umbraco\developer\Packages\StarterKits.aspx.cs">
       <DependentUpon>StarterKits.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -300,6 +329,14 @@
     </Compile>
     <Compile Include="Umbraco\Dialogs\EditMacro.aspx.cs">
       <DependentUpon>EditMacro.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\dialogs\Sort.aspx.cs">
+      <DependentUpon>sort.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\dialogs\Sort.aspx.designer.cs">
+      <DependentUpon>sort.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Umbraco\Dialogs\EditMacro.aspx.designer.cs">
@@ -323,6 +360,13 @@
     </Compile>
     <Compile Include="Umbraco\Search\QuickSearch.ascx.designer.cs">
       <DependentUpon>QuickSearch.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Umbraco\settings\EditNodeTypeNew.aspx.cs">
+      <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\settings\EditNodeTypeNew.aspx.designer.cs">
+      <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Settings\EditTemplate.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -383,6 +427,7 @@
     </None>
     <None Include="Config\umbracoSettings.Release.config">
       <DependentUpon>umbracoSettings.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Config\trees.Release.config">
       <DependentUpon>trees.config</DependentUpon>
@@ -427,8 +472,10 @@
     <Content Include="Umbraco\Config\Lang\ru.xml" />
     <Content Include="Umbraco\Config\Lang\zh.xml" />
     <Content Include="Umbraco\Controls\Tree\CustomTreeService.asmx" />
+    <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Create\PartialViewMacro.ascx" />
     <Content Include="Umbraco\Dashboard\Images\access-denied.png" />
+    <Content Include="Umbraco\developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Dashboard\Scripts\swfobject.js" />
     <Content Include="Umbraco\Dashboard\MediaDashboardFolderBrowser.ascx" />
     <Content Include="Umbraco\Developer\RelationTypes\EditRelationType.aspx" />
@@ -639,8 +686,11 @@
     <Content Include="Umbraco_Client\CodeMirror\Js\Theme\xq-dark.css" />
     <Content Include="Umbraco_Client\ContextMenu\Css\jquery.contextMenu.css" />
     <Content Include="Umbraco_Client\ContextMenu\Js\jquery.contextMenu.js" />
+    <Content Include="umbraco_Client\Dialogs\SortDialog.css" />
+    <Content Include="umbraco_client\Dialogs\SortDialog.js" />
     <Content Include="Umbraco_Client\Dialogs\CreateDialog.css" />
     <Content Include="Umbraco_Client\Dialogs\EditMacro.css" />
+    <Content Include="umbraco_Client\Editors\DirectoryBrowser.css" />
     <Content Include="Umbraco_Client\Dialogs\EditMacro.js" />
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
     <Content Include="Umbraco_Client\Editors\EditMacro.css" />
@@ -658,6 +708,9 @@
     <Content Include="Umbraco_Client\Installer\Images\pbar.gif" />
     <Content Include="Umbraco_Client\Installer\Js\PackageInstaller.js" />
     <Content Include="Umbraco_Client\Splitbutton\InsertMacroSplitButton.js" />
+    <Content Include="umbraco_Client\tablesorting\img\asc.gif" />
+    <Content Include="umbraco_Client\tablesorting\img\desc.gif" />
+    <Content Include="umbraco_Client\tablesorting\jquery.tablesorter.min.js" />
     <Content Include="Umbraco_Client\Splitbutton\jquery.splitbutton.js" />
     <Content Include="Umbraco_Client\Tags\Css\jquery.tagsinput.css" />
     <Content Include="Umbraco_Client\Tags\Js\jquery.tagsinput.js" />
@@ -1700,7 +1753,6 @@
     <Content Include="Umbraco\Images\Umbraco\uploadpackage.gif" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.autocomplete.js" />
     <Content Include="Umbraco\Developer\Packages\BrowseRepository.aspx" />
-    <Content Include="Umbraco\Developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Developer\Packages\editPackage.aspx" />
     <Content Include="Umbraco\Developer\Packages\installedPackage.aspx" />
     <Content Include="Umbraco\Developer\Packages\LoadNitros.ascx" />
@@ -1864,6 +1916,7 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Views\Web.config.transform" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -1906,7 +1959,6 @@
     <Content Include="Umbraco\Translation\default.aspx" />
     <Content Include="Umbraco\Translation\preview.aspx" />
     <Content Include="Umbraco\Translation\xml.aspx" />
-    <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Create\content.ascx" />
     <Content Include="Umbraco\Create\language.ascx">
       <SubType>UserControl</SubType>

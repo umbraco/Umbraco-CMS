@@ -8,6 +8,7 @@ using System.IO;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using umbraco.BusinessLogic;
 
 namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 {
@@ -17,7 +18,12 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
         public int MaxWidth = 700;
         public int MaxHeight = 480;
         public string scaleWidth = "500px";
-
+        
+        public ImageUploader()
+        {
+            //for skinning, you need to be a developer
+            CurrentApp = DefaultApps.developer.ToString();
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {

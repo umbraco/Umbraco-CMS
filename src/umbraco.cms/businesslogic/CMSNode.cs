@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Xml;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -758,6 +759,7 @@ order by level,sortOrder";
         public virtual int ParentId
         {
             get { return _parentid; }
+            internal set { _parentid = value; }
         }
 
         /// <summary>
@@ -1067,6 +1069,12 @@ order by level,sortOrder";
 
         }
 
+        /// <summary>
+        /// This needs to be synchronized since we are doing multiple sql operations in one method
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="versionId"></param>
+        [MethodImpl(MethodImplOptions.Synchronized)]
         protected void SavePreviewXml(XmlNode x, Guid versionId)
         {
             string sql = PreviewExists(versionId) ? "UPDATE cmsPreviewXml SET xml = @xml, timestamp = @timestamp WHERE nodeId=@nodeId AND versionId = @versionId"

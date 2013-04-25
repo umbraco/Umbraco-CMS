@@ -7,6 +7,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core.IO;
 using Umbraco.Web.Trees;
+using Umbraco.Web.UI.Controls;
 using umbraco;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.template;
@@ -166,7 +167,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 					640, 550);
 			umbDictionary.AltText = "Insert umbraco dictionary item";
 
-			var macroSplitButton = new Controls.InsertMacroSplitButton
+			var macroSplitButton = new InsertMacroSplitButton
 				{
 					ClientCallbackInsertMacroMarkup = "function(alias) {editViewEditor.insertMacroMarkup(alias);}",
 					ClientCallbackOpenMacroModel = "function(alias) {editViewEditor.openMacroModal(alias);}"

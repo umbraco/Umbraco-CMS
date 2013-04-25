@@ -1,4 +1,4 @@
-<%@ Page Language="c#" MasterPageFile="masterpages/umbracoDialog.Master" Codebehind="create.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.Create" %>
+<%@ Page Language="c#" MasterPageFile="masterpages/umbracoDialog.Master" Codebehind="CreateDialog.aspx.cs" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Umbraco.CreateDialog" %>
 
 <%@ Register Namespace="umbraco" TagPrefix="umb" Assembly="umbraco" %>
 
@@ -18,6 +18,13 @@
 
 <asp:Content runat="server" ContentPlaceHolderID="body">
       <asp:PlaceHolder ID="UI" runat="server"></asp:PlaceHolder>
+    <asp:PlaceHolder runat="server" Visible="False" ID="AccessError">
+        <div class="error">
+            <p>
+                The current user does not have access to create this type of object
+            </p>
+        </div>
+    </asp:PlaceHolder>
 </asp:Content>
 
 <asp:Content runat="server" ContentPlaceHolderID="footer">

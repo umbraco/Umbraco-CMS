@@ -10,15 +10,19 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 
 namespace umbraco.uicontrols {
-    public class TabPage : System.Web.UI.WebControls.WebControl {
+
+    public class TabPage : WebControl
+    {
         // Ensure that a TabPage cannot be instatiated outside 
         // this assembly -> New instances of a tabpage can only be retrieved through the tabview
         private bool _hasMenu = true;
-        private ScrollingMenu _Menu = new ScrollingMenu();
+        private readonly ScrollingMenu _menu = new ScrollingMenu();
         protected LiteralControl ErrorHeaderControl = new LiteralControl();
-        private ValidationSummary _vs = new ValidationSummary();
-        private Control _tempErr = new Control();
-        internal TabPage() {
+        private readonly ValidationSummary _vs = new ValidationSummary();
+        private readonly Control _tempErr = new Control();
+
+        internal TabPage()
+        {
 
         }
 
@@ -29,13 +33,19 @@ namespace umbraco.uicontrols {
 
         public string ErrorHeader { get; set; }
         public string CloseCaption { get; set; }
-        public Control ErrorControl { get { return _tempErr; } }
 
-        protected override void OnLoad(EventArgs e) {
-            if (this.HasMenu) {
-                Menu.Width = System.Web.UI.WebControls.Unit.Pixel((int)this.Width.Value - 12);
-                _Menu.ID = this.ID + "_menu";
-                this.Controls.Add(_Menu);
+        public Control ErrorControl
+        {
+            get { return _tempErr; }
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            if (this.HasMenu)
+            {
+                Menu.Width = Unit.Pixel((int) this.Width.Value - 12);
+                _menu.ID = this.ID + "_menu";
+                this.Controls.Add(_menu);
             }
         }
 
@@ -61,42 +71,49 @@ namespace umbraco.uicontrols {
         }
 
 
-        public ScrollingMenu Menu {
-            get { return _Menu; }
+        public ScrollingMenu Menu
+        {
+            get { return _menu; }
         }
 
-        public bool HasMenu {
+        public bool HasMenu
+        {
             get { return _hasMenu; }
             set { _hasMenu = value; }
         }
 
-        protected override void Render(System.Web.UI.HtmlTextWriter writer) {
+        protected override void Render(HtmlTextWriter writer)
+        {
             ErrorHeaderControl.Text = ErrorHeader;
             CreateChildControls();
             writer.WriteLine("<div id='" + this.ClientID + "' class='tabpage'>");
-            if (HasMenu) {
+            if (HasMenu)
+            {
                 writer.WriteLine("<div class='menubar'>");
                 Menu.Width = this.Width;
                 Menu.RenderControl(writer);
                 writer.WriteLine("</div>");
             }
-            int ScrollingLayerHeight = (int)((System.Web.UI.WebControls.WebControl)this.Parent).Height.Value - 22;
-            int ScrollingLayerWidth = (int)((System.Web.UI.WebControls.WebControl)this.Parent).Width.Value;
+            var scrollingLayerHeight = (int) ((WebControl) this.Parent).Height.Value - 22;
+            var scrollingLayerWidth = (int) ((WebControl) this.Parent).Width.Value;
             if (HasMenu)
-                ScrollingLayerHeight = ScrollingLayerHeight - 28;
-            writer.WriteLine("<div class='tabpagescrollinglayer' id='" + this.ClientID + "_contentlayer' style='height:" + ScrollingLayerHeight + "px;width:" + ScrollingLayerWidth + "px'>");
+                scrollingLayerHeight = scrollingLayerHeight - 28;
+            writer.WriteLine("<div class='tabpagescrollinglayer' id='" + this.ClientID + "_contentlayer' style='height:" + scrollingLayerHeight + "px;width:" + scrollingLayerWidth + "px'>");
 
             string styleString = "";
-            foreach (string key in this.Style.Keys) {
+            foreach (string key in this.Style.Keys)
+            {
                 styleString += key + ":" + this.Style[key] + ";";
             }
 
             writer.WriteLine("<div class=\"tabpageContent\" style='" + styleString + "'>");
 
             _tempErr.RenderControl(writer);
-            
-            foreach (System.Web.UI.Control C in this.Controls) {
-                if (C.ClientID != _Menu.ClientID && C.ClientID != _tempErr.ClientID ) {
+
+            foreach (Control C in this.Controls)
+            {
+                if (C.ClientID != _menu.ClientID && C.ClientID != _tempErr.ClientID)
+                {
                     C.RenderControl(writer);
                 }
             }

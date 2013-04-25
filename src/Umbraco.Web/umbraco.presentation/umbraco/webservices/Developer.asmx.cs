@@ -1,12 +1,8 @@
-using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Web;
 using System.Web.Services;
-
 using System.Xml;
+using Umbraco.Core;
+using Umbraco.Web.WebServices;
+using umbraco.BusinessLogic;
 using umbraco.presentation.webservices;
 
 namespace umbraco.webservices
@@ -15,99 +11,70 @@ namespace umbraco.webservices
 	/// Summary description for Developer.
 	/// </summary>
 	[WebService(Namespace="http://umbraco.org/webservices/")]
-	public class Developer : System.Web.Services.WebService
+    public class Developer : UmbracoAuthorizedWebService
 	{
-		public Developer()
-		{
-			//CODEGEN: This call is required by the ASP.NET Web Services Designer
-			InitializeComponent();
-		}
-
+		
 		[WebMethod]
-		public string BootStrapTidy(string html, string ContextID) 
+		public string BootStrapTidy(string html, string ContextID)
 		{
-            legacyAjaxCalls.Authorize();
+            //pretty sure this is legacy and it used to throw an exception so we'll continue to do the same
+            //true = throw if invalid
+		    AuthorizeRequest(true);
 
 			return cms.helpers.xhtml.BootstrapTidy(html);
 		}
 
 		[WebMethod]
-		public XmlNode GetMacros(string Login, string Password) 
+		public XmlNode GetMacros(string Login, string Password)
 		{
-			if (BusinessLogic.User.validateCredentials(Login, Password))  
+		    if (ValidateCredentials(Login, Password) 
+                && UserHasAppAccess(DefaultApps.developer.ToString(), Login))  
 			{
-				XmlDocument xmlDoc = new XmlDocument();
-				XmlElement macros = xmlDoc.CreateElement("macros");
-				foreach (cms.businesslogic.macro.Macro m in cms.businesslogic.macro.Macro.GetAll()) 
+				var xmlDoc = new XmlDocument();
+				var macros = xmlDoc.CreateElement("macros");
+				foreach (var m in cms.businesslogic.macro.Macro.GetAll()) 
 				{
-					XmlElement mXml = xmlDoc.CreateElement("macro");
-					mXml.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "id", m.Id.ToString()));
-					mXml.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "alias", m.Alias));
-					mXml.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "name", m.Name));
+					var mXml = xmlDoc.CreateElement("macro");
+					mXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "id", m.Id.ToString()));
+                    mXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "alias", m.Alias));
+                    mXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "name", m.Name));
 					macros.AppendChild(mXml);
 				}
 				return macros;
-			} else
-				return null;
-		}
-
-		[WebMethod]
-		public XmlNode GetMacro(int Id, string Login, string Password) 
-		{
-			if (BusinessLogic.User.validateCredentials(Login, Password)) 
-			{
-				XmlDocument xmlDoc = new XmlDocument();
-				XmlElement macro = xmlDoc.CreateElement("macro");
-				cms.businesslogic.macro.Macro m = new cms.businesslogic.macro.Macro(Id);
-				macro.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "id", m.Id.ToString()));
-				macro.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "refreshRate", m.RefreshRate.ToString()));
-				macro.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "useInEditor", m.UseInEditor.ToString()));
-				macro.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "alias", m.Alias));
-				macro.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "name", m.Name));
-				macro.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "assembly", m.Assembly));
-				macro.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "type", m.Type));
-				macro.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "xslt", m.Xslt));
-				XmlElement Properties = xmlDoc.CreateElement("properties");
-				foreach (cms.businesslogic.macro.MacroProperty mp in m.Properties) 
-				{
-					XmlElement pXml = xmlDoc.CreateElement("property");
-					pXml.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "alias", mp.Alias));
-					pXml.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "name", mp.Name));
-					pXml.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "public", mp.Public.ToString()));
-					Properties.AppendChild(pXml);
-				}
-				macro.AppendChild(Properties);
-				return macro;
-			} else
-				return null;
-		}
-
-		#region Component Designer generated code
-		
-		//Required by the Web Services Designer 
-		private IContainer components = null;
-				
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
-		}
-
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		protected override void Dispose( bool disposing )
-		{
-			if(disposing && components != null)
-			{
-				components.Dispose();
 			}
-			base.Dispose(disposing);		
+		    return null;
 		}
-		
-		#endregion
 
+	    [WebMethod]
+		public XmlNode GetMacro(int Id, string Login, string Password)
+		{
+		    if (ValidateCredentials(Login, Password)
+                && UserHasAppAccess(DefaultApps.developer.ToString(), Login)) 
+			{
+				var xmlDoc = new XmlDocument();
+				var macro = xmlDoc.CreateElement("macro");
+				var m = new cms.businesslogic.macro.Macro(Id);
+                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "id", m.Id.ToString()));
+                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "refreshRate", m.RefreshRate.ToString()));
+                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "useInEditor", m.UseInEditor.ToString()));
+                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "alias", m.Alias));
+                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "name", m.Name));
+                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "assembly", m.Assembly));
+                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "type", m.Type));
+                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "xslt", m.Xslt));
+				var properties = xmlDoc.CreateElement("properties");
+				foreach (var mp in m.Properties) 
+				{
+					var pXml = xmlDoc.CreateElement("property");
+                    pXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "alias", mp.Alias));
+                    pXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "name", mp.Name));
+                    pXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "public", mp.Public.ToString()));
+					properties.AppendChild(pXml);
+				}
+				macro.AppendChild(properties);
+				return macro;
+			}
+		    return null;
+		}
 	}
 }

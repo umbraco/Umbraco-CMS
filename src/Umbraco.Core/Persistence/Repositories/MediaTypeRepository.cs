@@ -42,8 +42,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentType = factory.BuildEntity(dto);
             
             contentType.AllowedContentTypes = GetAllowedContentTypeIds(id);
-            contentType.PropertyGroups = GetPropertyGroupCollection(id);
-            ((MediaType)contentType).PropertyTypes = GetPropertyTypeCollection(id);
+            contentType.PropertyGroups = GetPropertyGroupCollection(id, contentType.CreateDate, contentType.UpdateDate);
+            ((MediaType)contentType).PropertyTypes = GetPropertyTypeCollection(id, contentType.CreateDate, contentType.UpdateDate);
 
             var list = Database.Fetch<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id", new{ Id = id});
             foreach (var contentTypeDto in list)

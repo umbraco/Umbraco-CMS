@@ -25,9 +25,6 @@ namespace Umbraco.Tests.Routing
 		{
 			base.Initialize();
 			
-			//the module requires that the singleton is setup
-			ApplicationContext.Current = ApplicationContext;
-
 			//create the module
 			_module = new UmbracoModule();
 

@@ -421,7 +421,12 @@ namespace umbraco.cms.businesslogic.packager
                 #endregion
 
                 #region DocumentTypes
-                var docTypeElement = rootElement.Descendants("DocumentTypes").FirstOrDefault();
+                //Check whether the root element is a doc type rather then a complete package
+                var docTypeElement = rootElement.Name.LocalName.Equals("DocumentType") ||
+                                     rootElement.Name.LocalName.Equals("DocumentTypes")
+                                         ? rootElement
+                                         : rootElement.Descendants("DocumentTypes").FirstOrDefault();
+
                 if (docTypeElement != null)
                 {
                     var contentTypes = packagingService.ImportContentTypes(docTypeElement, currentUser.Id);
@@ -692,7 +697,11 @@ namespace umbraco.cms.businesslogic.packager
             #endregion
 
             #region Install DocumentTypes
-            var docTypeElement = rootElement.Descendants("DocumentTypes").FirstOrDefault();
+            //Check whether the root element is a doc type rather then a complete package
+            var docTypeElement = rootElement.Name.LocalName.Equals("DocumentType") ||
+                                 rootElement.Name.LocalName.Equals("DocumentTypes")
+                                     ? rootElement
+                                     : rootElement.Descendants("DocumentTypes").FirstOrDefault();
             if (docTypeElement != null)
             {
                 var contentTypes = packagingService.ImportContentTypes(docTypeElement, currentUser.Id);
@@ -927,188 +936,7 @@ namespace umbraco.cms.businesslogic.packager
         public static void ImportDocumentType(XmlNode n, User u, bool ImportStructure)
         {
             var element = n.GetXElement();
-            var contentTypes = ApplicationContext.Current.Services.PackagingService.ImportContentTypes(element, u.Id);
-            /*DocumentType dt = DocumentType.GetByAlias(xmlHelper.GetNodeValue(n.SelectSingleNode("Info/Alias")));
-            if (dt == null)
-            {
-                dt = DocumentType.MakeNew(u, xmlHelper.GetNodeValue(n.SelectSingleNode("Info/Name")));
-                dt.Alias = xmlHelper.GetNodeValue(n.SelectSingleNode("Info/Alias"));
-
-
-                //Master content type
-                DocumentType mdt = DocumentType.GetByAlias(xmlHelper.GetNodeValue(n.SelectSingleNode("Info/Master")));
-                if (mdt != null)
-                    dt.MasterContentType = mdt.Id;
-            }
-            else
-            {
-                dt.Text = xmlHelper.GetNodeValue(n.SelectSingleNode("Info/Name"));
-            }
-
-
-            // Info
-            dt.IconUrl = xmlHelper.GetNodeValue(n.SelectSingleNode("Info/Icon"));
-            dt.Thumbnail = xmlHelper.GetNodeValue(n.SelectSingleNode("Info/Thumbnail"));
-            dt.Description = xmlHelper.GetNodeValue(n.SelectSingleNode("Info/Description"));
-
-            // Allow at root (check for node due to legacy)
-            bool allowAtRoot = false;
-            string allowAtRootNode = xmlHelper.GetNodeValue(n.SelectSingleNode("Info/AllowAtRoot"));
-            if (!String.IsNullOrEmpty(allowAtRootNode))
-            {
-                bool.TryParse(allowAtRootNode, out allowAtRoot);
-            }
-            dt.AllowAtRoot = allowAtRoot;
-
-            // Templates	
-            ArrayList templates = new ArrayList();
-            foreach (XmlNode tem in n.SelectNodes("Info/AllowedTemplates/Template"))
-            {
-                template.Template t = template.Template.GetByAlias(xmlHelper.GetNodeValue(tem));
-                if (t != null)
-                    templates.Add(t);
-            }
-
-            try
-            {
-                template.Template[] at = new template.Template[templates.Count];
-                for (int i = 0; i < templates.Count; i++)
-                    at[i] = (template.Template)templates[i];
-                dt.allowedTemplates = at;
-            }
-            catch (Exception ee)
-            {
-                LogHelper.Error<Installer>("Packager: Error handling allowed templates", ee);
-            }
-
-            // Default template
-            try
-            {
-                if (xmlHelper.GetNodeValue(n.SelectSingleNode("Info/DefaultTemplate")) != "")
-                    dt.DefaultTemplate = template.Template.GetByAlias(xmlHelper.GetNodeValue(n.SelectSingleNode("Info/DefaultTemplate"))).Id;
-            }
-            catch (Exception ee)
-            {
-                LogHelper.Error<Installer>("Packager: Error assigning default template", ee);
-            }
-
-            // Tabs
-            cms.businesslogic.ContentType.TabI[] tabs = dt.getVirtualTabs;
-            string tabNames = ";";
-            for (int t = 0; t < tabs.Length; t++)
-                tabNames += tabs[t].Caption + ";";
-
-
-            //So the Tab is added to the DocumentType and then to this Hashtable, but its never used anywhere - WHY?
-            Hashtable ht = new Hashtable();
-            foreach (XmlNode t in n.SelectNodes("Tabs/Tab"))
-            {
-                if (tabNames.IndexOf(";" + xmlHelper.GetNodeValue(t.SelectSingleNode("Caption")) + ";") == -1)
-                {
-                    ht.Add(int.Parse(xmlHelper.GetNodeValue(t.SelectSingleNode("Id"))),
-                        dt.AddVirtualTab(xmlHelper.GetNodeValue(t.SelectSingleNode("Caption"))));
-                }
-            }
-
-            dt.ClearVirtualTabs();
-            // Get all tabs in hashtable
-            Hashtable tabList = new Hashtable();
-            foreach (cms.businesslogic.ContentType.TabI t in dt.getVirtualTabs.ToList())
-            {
-                if (!tabList.ContainsKey(t.Caption))
-                    tabList.Add(t.Caption, t.Id);
-            }
-
-            // Generic Properties
-            datatype.controls.Factory f = new datatype.controls.Factory();
-            foreach (XmlNode gp in n.SelectNodes("GenericProperties/GenericProperty"))
-            {
-                int dfId = 0;
-                Guid dtId = new Guid(xmlHelper.GetNodeValue(gp.SelectSingleNode("Type")));
-
-                if (gp.SelectSingleNode("Definition") != null && !string.IsNullOrEmpty(xmlHelper.GetNodeValue(gp.SelectSingleNode("Definition"))))
-                {
-                    Guid dtdId = new Guid(xmlHelper.GetNodeValue(gp.SelectSingleNode("Definition")));
-                    if (CMSNode.IsNode(dtdId))
-                        dfId = new CMSNode(dtdId).Id;
-                }
-                if (dfId == 0)
-                {
-                    try
-                    {
-                        dfId = FindDataTypeDefinitionFromType(ref dtId);
-                    }
-                    catch
-                    {
-                        throw new Exception(String.Format("Could not find datatype with id {0}.", dtId));
-                    }
-                }
-
-                // Fix for rich text editor backwards compatibility 
-                if (dfId == 0 && dtId == new Guid("a3776494-0574-4d93-b7de-efdfdec6f2d1"))
-                {
-                    dtId = new Guid("83722133-f80c-4273-bdb6-1befaa04a612");
-                    dfId = FindDataTypeDefinitionFromType(ref dtId);
-                }
-
-                if (dfId != 0)
-                {
-                    PropertyType pt = dt.getPropertyType(xmlHelper.GetNodeValue(gp.SelectSingleNode("Alias")));
-                    if (pt == null)
-                    {
-                        dt.AddPropertyType(
-                            datatype.DataTypeDefinition.GetDataTypeDefinition(dfId),
-                            xmlHelper.GetNodeValue(gp.SelectSingleNode("Alias")),
-                            xmlHelper.GetNodeValue(gp.SelectSingleNode("Name"))
-                            );
-                        pt = dt.getPropertyType(xmlHelper.GetNodeValue(gp.SelectSingleNode("Alias")));
-                    }
-                    else
-                    {
-                        pt.DataTypeDefinition = datatype.DataTypeDefinition.GetDataTypeDefinition(dfId);
-                        pt.Name = xmlHelper.GetNodeValue(gp.SelectSingleNode("Name"));
-                    }
-
-                    pt.Mandatory = bool.Parse(xmlHelper.GetNodeValue(gp.SelectSingleNode("Mandatory")));
-                    pt.ValidationRegExp = xmlHelper.GetNodeValue(gp.SelectSingleNode("Validation"));
-                    pt.Description = xmlHelper.GetNodeValue(gp.SelectSingleNode("Description"));
-
-                    // tab
-                    try
-                    {
-                        if (tabList.ContainsKey(xmlHelper.GetNodeValue(gp.SelectSingleNode("Tab"))))
-                            pt.TabId = (int)tabList[xmlHelper.GetNodeValue(gp.SelectSingleNode("Tab"))];
-                    }
-                    catch (Exception ee)
-                    {
-                        LogHelper.Error<Installer>("Packager: Error assigning property to tab", ee);
-                    }
-                }
-            }
-
-            if (ImportStructure)
-            {
-                if (dt != null)
-                {
-                    ArrayList allowed = new ArrayList();
-                    foreach (XmlNode structure in n.SelectNodes("Structure/DocumentType"))
-                    {
-                        DocumentType dtt = DocumentType.GetByAlias(xmlHelper.GetNodeValue(structure));
-                        if (dtt != null)
-                            allowed.Add(dtt.Id);
-                    }
-                    int[] adt = new int[allowed.Count];
-                    for (int i = 0; i < allowed.Count; i++)
-                        adt[i] = (int)allowed[i];
-                    dt.AllowedChildContentTypeIDs = adt;
-                }
-            }
-
-            // clear caching
-            foreach (DocumentType.TabI t in dt.getVirtualTabs.ToList())
-                DocumentType.FlushTabCache(t.Id, dt.Id);
-
-            dt.Save();*/
+            var contentTypes = ApplicationContext.Current.Services.PackagingService.ImportContentTypes(element, ImportStructure, u.Id);
         }
 
         #endregion

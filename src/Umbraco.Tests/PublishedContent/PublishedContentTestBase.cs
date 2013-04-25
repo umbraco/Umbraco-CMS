@@ -16,7 +16,7 @@ namespace Umbraco.Tests.PublishedContent
         public override void Initialize()
         {
             base.Initialize();
-
+            
             UmbracoSettings.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
 
             PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
@@ -47,7 +47,7 @@ namespace Umbraco.Tests.PublishedContent
         public override void TearDown()
         {
             base.TearDown();
-
+            
             PropertyEditorValueConvertersResolver.Reset();
             PublishedContentStoreResolver.Reset();
             PublishedMediaStoreResolver.Reset();

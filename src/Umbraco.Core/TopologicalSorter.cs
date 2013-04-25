@@ -131,7 +131,7 @@ namespace Umbraco.Core
             //add vertices
             for (int i = 0; i < fields.Count(); i++)
             {
-                indexes[fields[i].Alias.ToLower()] = g.AddVertex(i);
+                indexes[fields[i].Alias.ToLowerInvariant()] = g.AddVertex(i);
             }
 
             //add edges
@@ -141,8 +141,13 @@ namespace Umbraco.Core
                 {
                     for (int j = 0; j < fields[i].DependsOn.Length; j++)
                     {
-                        g.AddEdge(i,
-                            indexes[fields[i].DependsOn[j].ToLower()]);
+                        if (indexes.ContainsKey(fields[i].DependsOn[j].ToLowerInvariant()) == false)
+                            throw new IndexOutOfRangeException(
+                                string.Format(
+                                    "The alias '{0}' has an invalid dependency. The dependency '{1}' does not exist in the list of aliases",
+                                    fields[i], fields[i].DependsOn[j]));
+
+                        g.AddEdge(i, indexes[fields[i].DependsOn[j].ToLowerInvariant()]);
                     }
                 }
             }

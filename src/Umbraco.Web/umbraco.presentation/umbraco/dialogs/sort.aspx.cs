@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Globalization;
 using System.Linq;
@@ -23,11 +23,17 @@ namespace umbraco.cms.presentation
     {
         private readonly List<SortableNode> _nodes = new List<SortableNode>();
 
+        protected override void OnInit(EventArgs e)
+        {
+            CurrentApp = helper.Request("app");
+
+            base.OnInit(e);
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             sortDone.Text = ui.Text("sort", "sortDone");
         }
-
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
@@ -36,6 +42,7 @@ namespace umbraco.cms.presentation
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
 
             var app = Request.GetItemAsString("app");
+
             var icon = "../images/umbraco/doc.gif";
 
             int parentId;
@@ -131,27 +138,60 @@ namespace umbraco.cms.presentation
             public DateTime createDate;
         }
 
-
-        #region Web Form Designer generated code
-
-        protected override void OnInit(EventArgs e)
-        {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
-            base.OnInit(e);
-        }
+        /// <summary>
+        /// JsInclude1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude1;
 
         /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
+        /// JsInclude2 control.
         /// </summary>
-        private void InitializeComponent()
-        {
-        }
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude2;
 
-        #endregion
+        /// <summary>
+        /// prog1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.ProgressBar prog1;
+
+        /// <summary>
+        /// sortDone control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal sortDone;
+
+        /// <summary>
+        /// sortPane control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane sortPane;
+
+        /// <summary>
+        /// lt_nodes control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal lt_nodes;
+
     }
 
     public class nodeNameCompare : IComparer<sort.SortableNode>

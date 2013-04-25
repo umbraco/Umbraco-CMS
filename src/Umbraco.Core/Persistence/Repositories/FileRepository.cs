@@ -111,6 +111,20 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
+        protected IEnumerable<string> FindAllFiles(string path)
+        {
+            var list = new List<string>();
+            list.AddRange(FileSystem.GetFiles(path, "*"));
+
+            var directories = FileSystem.GetDirectories(path);
+            foreach (var directory in directories)
+            {
+                list.AddRange(FindAllFiles(directory));
+            }
+
+            return list;
+        }
+
 		/// <summary>
 		/// Dispose any disposable properties
 		/// </summary>

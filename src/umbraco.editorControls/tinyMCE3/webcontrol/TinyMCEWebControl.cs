@@ -334,18 +334,23 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                 }
                 else
                 {
-                    var widthProperty = imageMedia.Properties.FirstOrDefault(x => x.Alias == "umbracoWidth");
-                    var heightProperty = imageMedia.Properties.FirstOrDefault(x => x.Alias == "umbracoHeight");
-                    var umbracoFileProperty = imageMedia.Properties.FirstOrDefault(x => x.Alias == "umbracoFile");
+                    // We're doing .Any checks here instead of FirstOrDefault because the default value of Properties
+                    // is not null but default(KeyedCollection<string, Property>). This is a bit easier to read.
+                    // To clarify: imageMedia.Properties.FirstOrDefault(x => x.Alias == "umbracoWidth") == null; will NOT work.
 
+                    var widthValue = string.Empty;
+                    if (imageMedia.Properties.Any(x => x.Alias == "umbracoWidth"))
+                        widthValue = imageMedia.Properties.First(x => x.Alias == "umbracoWidth").Value.ToString();
+
+                    var heightValue = string.Empty;
+                    if (imageMedia.Properties.Any(x => x.Alias == "umbracoHeight"))
+                        heightValue = imageMedia.Properties.First(x => x.Alias == "umbracoHeight").Value.ToString();
+                    
                     // Format the tag
-                    if (widthProperty != null && heightProperty != null && umbracoFileProperty != null)
+                    if (imageMedia.Properties.Any(x => x.Alias == "umbracoFile"))
                     {
-                        tempTag = string.Format("{0} rel=\"{1},{2}\" src=\"{3}\" />",
-                                                tempTag,
-                                                widthProperty.Value,
-                                                heightProperty.Value,
-                                                umbracoFileProperty.Value);
+                        var umbracoFileProperty = imageMedia.Properties.First(x => x.Alias == "umbracoFile");
+                        tempTag = string.Format("{0} rel=\"{1},{2}\" src=\"{3}\" />", tempTag, widthValue, heightValue, umbracoFileProperty.Value);
                     }
                 }
 

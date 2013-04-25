@@ -8,6 +8,7 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
 
@@ -19,18 +20,23 @@ namespace umbraco.dialogs
 	/// </summary>
 	public partial class SendPublish : BasePages.UmbracoEnsuredPage
 	{
-		protected void Page_Load(object sender, System.EventArgs e)
+	    public SendPublish()
+	    {
+	        CurrentApp = DefaultApps.content.ToString();
+	    }
+
+		protected void Page_Load(object sender, EventArgs e)
 		{
             if (!string.IsNullOrEmpty(Request.QueryString["id"]))
             {
-                int docID;
-                if (int.TryParse(Request.QueryString["id"], out docID))
+                int docId;
+                if (int.TryParse(Request.QueryString["id"], out docId))
                 {
-                    Document _document = new Document(docID);
-                    if (_document != null)
-                        BusinessLogic.Actions.Action.RunActionHandlers(_document, ActionToPublish.Instance);
+                    var document = new Document(docId);
+                    BusinessLogic.Actions.Action.RunActionHandlers(document, ActionToPublish.Instance);
+
                 }
-                
+
             }
             
 		}

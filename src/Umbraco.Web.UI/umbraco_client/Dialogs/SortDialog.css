@@ -1,0 +1,59 @@
+﻿#sortableFrame
+{
+    height: 270px;
+    overflow: auto;
+    border: 1px solid #ccc;
+}
+
+#sortableNodes
+{
+    padding: 4px;
+    display: block;
+    border-spacing:0;
+    border-collapse:collapse;
+}
+
+    #sortableNodes thead tr th
+    {
+        border-bottom: 1px solid #ccc;
+        padding: 4px;
+        padding-right: 25px;
+        background-image: url(../tableSorting/img/bg.gif);
+        cursor: pointer;
+        font-weight: bold;
+        background-repeat: no-repeat;
+        background-position: center right;
+    }
+
+        #sortableNodes thead tr th.headerSortDown
+        {
+            background-image: url(../tableSorting/img/desc.gif);
+        }
+
+        #sortableNodes thead tr th.headerSortUp
+        {
+            background-image: url(../tableSorting/img/asc.gif);
+        }
+
+    #sortableNodes tbody tr td
+    {
+        border-bottom: 1px solid #efefef;
+    }
+
+    #sortableNodes td
+    {
+        padding: 4px;
+        cursor: move;
+    }
+
+tr.tDnD_whileDrag, tr.tDnD_whileDrag td
+{
+    background: #dcecf3;
+    border-color: #a8d8eb !Important;
+    margin-top: 20px;
+}
+
+#sortableNodes .nowrap
+{
+    white-space: nowrap;
+}

@@ -145,6 +145,7 @@
     <Compile Include="Enum.cs" />
     <Compile Include="Events\MacroErrorEventArgs.cs" />
     <Compile Include="HashCodeCombiner.cs" />
+    <Compile Include="IconPickerBehaviour.cs" />
     <Compile Include="IO\FileSystemWrapper.cs" />
     <Compile Include="MacroErrorBehaviour.cs" />
     <Compile Include="Media\IImageUrlProvider.cs" />

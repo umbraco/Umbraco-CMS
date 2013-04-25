@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Web;
 using System.Collections;
+using System.Web.Security;
 using System.Web.Services;
 using System.Web.Services.Protocols;
 using System.ComponentModel;
@@ -17,6 +18,8 @@ using System.Diagnostics;
 using System.Net;
 using System.Web.UI;
 using Umbraco.Core.IO;
+using Umbraco.Web.WebServices;
+using umbraco.BusinessLogic;
 using umbraco.businesslogic.Exceptions;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.media;
@@ -32,18 +35,16 @@ namespace umbraco.presentation.webservices
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [ToolboxItem(false)]
     [ScriptService]
-    public class legacyAjaxCalls : System.Web.Services.WebService
+    public class legacyAjaxCalls : UmbracoAuthorizedWebService
     {
         [WebMethod]
         public bool ValidateUser(string username, string password)
         {
 
-            if (System.Web.Security.Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].ValidateUser(
-                 username, password))
+            if (ValidateCredentials(username, password))
             {
-                BusinessLogic.User u = new BusinessLogic.User(username);
+                var u = new BusinessLogic.User(username);
                 BasePage.doLogin(u);
-
                 return true;
             }
             else
@@ -64,7 +65,7 @@ namespace umbraco.presentation.webservices
         public void Delete(string nodeId, string alias, string nodeType)
         {
 
-            Authorize();
+            AuthorizeRequest(true);
 
             //check which parameters to pass depending on the types passed in
             int intNodeID;
@@ -83,8 +84,6 @@ namespace umbraco.presentation.webservices
         [ScriptMethod]
         public void DeleteContentPermanently(string nodeId, string nodeType)
         {
-            Authorize();
-
             int intNodeID;
             if (int.TryParse(nodeId, out intNodeID))
             {
@@ -92,13 +91,17 @@ namespace umbraco.presentation.webservices
                 {
                     case "media":
                     case "mediaRecycleBin":
+                        //ensure user has access to media
+                        AuthorizeRequest(DefaultApps.media.ToString(), true);
+
                         new Media(intNodeID).delete(true);
                         break;
                     case "content":
                     case "contentRecycleBin":
-                        new Document(intNodeID).delete(true);
-                        break;
                     default:
+                        //ensure user has access to content
+                        AuthorizeRequest(DefaultApps.content.ToString(), true);
+                        
                         new Document(intNodeID).delete(true);
                         break;
                 }                
@@ -113,8 +116,7 @@ namespace umbraco.presentation.webservices
         [ScriptMethod]
         public void DisableUser(int userId)
         {
-
-            Authorize();
+            AuthorizeRequest(DefaultApps.users.ToString(), true);
 
             BusinessLogic.User.GetUser(userId).disable();
         }
@@ -124,7 +126,7 @@ namespace umbraco.presentation.webservices
         public string GetNodeName(int nodeId)
         {
 
-            Authorize();
+            AuthorizeRequest(true);
 
             return new cms.businesslogic.CMSNode(nodeId).Text;
         }
@@ -134,7 +136,7 @@ namespace umbraco.presentation.webservices
         public string[] GetNodeBreadcrumbs(int nodeId)
         {
 
-            Authorize();
+            AuthorizeRequest(true);
 
             var node = new cms.businesslogic.CMSNode(nodeId);
             var crumbs = new System.Collections.Generic.List<string>() { node.Text };
@@ -152,7 +154,7 @@ namespace umbraco.presentation.webservices
         public string NiceUrl(int nodeId)
         {
 
-            Authorize();
+            AuthorizeRequest(true);
 
             return library.NiceUrl(nodeId);
         }
@@ -168,7 +170,7 @@ namespace umbraco.presentation.webservices
         [ScriptMethod]
         public void RenewUmbracoSession()
         {
-            Authorize();
+            AuthorizeRequest(true);
 
             BasePage.RenewLoginTimeout();
 
@@ -178,7 +180,9 @@ namespace umbraco.presentation.webservices
         [ScriptMethod]
         public int GetSecondsBeforeUserLogout()
         {
-            Authorize();
+            //TODO: Change this to not throw an exception otherwise we end up with JS errors all the time when recompiling!!
+
+            AuthorizeRequest(true);
             long timeout = BasePage.GetTimeout(true);
             DateTime timeoutDate = new DateTime(timeout);
             DateTime currentDate = DateTime.Now;
@@ -191,7 +195,7 @@ namespace umbraco.presentation.webservices
         [ScriptMethod]
         public string TemplateMasterPageContentContainer(int templateId, int masterTemplateId)
         {
-            Authorize();
+            AuthorizeRequest(DefaultApps.settings.ToString(), true);
             return new cms.businesslogic.template.Template(templateId).GetMasterContentElement(masterTemplateId);
         }
 
@@ -199,20 +203,22 @@ namespace umbraco.presentation.webservices
         [ScriptMethod]
         public string SaveFile(string fileName, string fileAlias, string fileContents, string fileType, int fileID, int masterID, bool ignoreDebug)
         {
-
-            Authorize();
-
             switch (fileType)
             {
                 case "xslt":
+                    AuthorizeRequest(DefaultApps.developer.ToString(), true);
                     return SaveXslt(fileName, fileContents, ignoreDebug);
                 case "python":
+                    AuthorizeRequest(DefaultApps.developer.ToString(), true);
                     return "true";
                 case "css":
+                    AuthorizeRequest(DefaultApps.settings.ToString(), true);
                     return SaveCss(fileName, fileContents, fileID);
                 case "script":
+                    AuthorizeRequest(DefaultApps.settings.ToString(), true);
                     return SaveScript(fileName, fileContents);
                 case "template":
+                    AuthorizeRequest(DefaultApps.settings.ToString(), true);
                     return SaveTemplate(fileName, fileAlias, fileContents, fileID, masterID);
                 default:
                     throw new ArgumentException(String.Format("Invalid fileType passed: '{0}'", fileType));
@@ -223,7 +229,7 @@ namespace umbraco.presentation.webservices
         public string Tidy(string textToTidy)
         {
 
-            Authorize();
+            AuthorizeRequest(true);
             return library.Tidy(helper.Request("StringToTidy"), true);
 
         }
@@ -437,10 +443,9 @@ namespace umbraco.presentation.webservices
 	        return retVal;
         }
 
-
+        [Obsolete("You should use the AuthorizeRequest methods on the base class of UmbracoAuthorizedWebService and ensure you inherit from that class for umbraco asmx web services")]
         public static void Authorize()
         {
-
             // check for secure connection
             if (GlobalSettings.UseSSL && !HttpContext.Current.Request.IsSecureConnection)
                 throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");

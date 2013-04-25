@@ -1,16 +1,10 @@
 using umbraco.BusinessLogic;
+using System;
+using umbraco.IO;
+using umbraco.cms.businesslogic.web;
 
 namespace dashboardUtilities
 {
-	using System;
-	using System.Data;
-	using System.Drawing;
-	using System.Web;
-	using System.Web.UI.WebControls;
-	using System.Web.UI.HtmlControls;
-    using umbraco.IO;
-    using umbraco.cms.businesslogic.web;
-
 	/// <summary>
 	///		Summary description for LatestEdits.
 	/// </summary>
@@ -22,11 +16,12 @@ namespace dashboardUtilities
 		private int count = 0;
         public int MaxRecords { get; set; }
 
-		protected void Page_Load(object sender, System.EventArgs e)
+		protected void Page_Load(object sender, EventArgs e)
 		{
+			if (MaxRecords == 0)
+		        MaxRecords = 30;
 
-			// Put user code to initialize the page here
-			Repeater1.DataSource = umbraco.BusinessLogic.Log.GetLogReader(User.GetCurrent(), umbraco.BusinessLogic.LogTypes.Save, DateTime.Now.Subtract(new System.TimeSpan(7,0,0,0,0)));
+			Repeater1.DataSource = Log.GetLogReader(User.GetCurrent(), LogTypes.Save, DateTime.Now.Subtract(new TimeSpan(7,0,0,0,0)), MaxRecords);
 			Repeater1.DataBind();
 		}
 

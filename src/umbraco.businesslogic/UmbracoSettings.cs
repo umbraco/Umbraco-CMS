@@ -282,6 +282,13 @@ namespace umbraco
 			get { return Umbraco.Core.Configuration.UmbracoSettings.ForceSafeAliases; }
         }
 
+        /// <summary>
+        /// File types that will not be allowed to be uploaded via the content/media upload control
+        /// </summary>
+        public static IEnumerable<string> DisallowedUploadFiles
+        {
+            get { return Umbraco.Core.Configuration.UmbracoSettings.DisallowedUploadFiles; }
+        }
 
         /// <summary>
         /// Gets the allowed image file types.
@@ -560,6 +567,18 @@ namespace umbraco
         public static MacroErrorBehaviour MacroErrorBehaviour
         {
             get { return Umbraco.Core.Configuration.UmbracoSettings.MacroErrorBehaviour; }
+        }
+
+        /// <summary>
+        /// This configuration setting defines how to show icons in the document type editor. 
+        /// - ShowDuplicates       - Show duplicates in files and sprites. (default and current Umbraco 'normal' behaviour)
+        /// - HideSpriteDuplicates - Show files on disk and hide duplicates from the sprite
+        /// - HideFileDuplicates   - Show files in the sprite and hide duplicates on disk
+        /// </summary>
+        /// <value>MacroErrorBehaviour enum defining how to show icons in the document type editor.</value>
+        public static IconPickerBehaviour IconPickerBehaviour
+        {
+            get { return Umbraco.Core.Configuration.UmbracoSettings.IconPickerBehaviour; }
         }
 
         /// <summary>

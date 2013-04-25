@@ -90,51 +90,18 @@ namespace umbraco.presentation.templateControls
 		/// <returns>A string of field contents (macros not parsed)</returns>
 		protected virtual string GetFieldContents(Item item)
 		{
-			string tempElementContent = String.Empty;
+			var tempElementContent = string.Empty;
 
 			// if a nodeId is specified we should get the data from another page than the current one
-			if (!String.IsNullOrEmpty(item.NodeId))
+			if (string.IsNullOrEmpty(item.NodeId) == false)
 			{
-				int? tempNodeId = item.GetParsedNodeId();
+				var tempNodeId = item.GetParsedNodeId();
 				if (tempNodeId != null && tempNodeId.Value != 0)
 				{
-
                     //moved the following from the catch block up as this will allow fallback options alt text etc to work
-
-					//get the publishedcontent item
-					var publishedContent = PublishedContentStoreResolver.Current.PublishedContentStore.GetDocumentById(
-						Umbraco.Web.UmbracoContext.Current,
-						tempNodeId.Value);
-
-					var itemPage = new page(publishedContent);                    
-					tempElementContent = new item(publishedContent, itemPage.Elements, item.LegacyAttributes).FieldContent;
-
-                    /*removed as would fail as there is a incorrect cast in the method called.  
-                      Also the following code does not respect any of Umbraco Items fallback and formatting options */
-
-					//string currentField = helper.FindAttribute(item.LegacyAttributes, "field");
-					// check for a cached instance of the content
-					//object contents = GetContentFromCache(tempNodeId.Value, currentField);
-                    //if (contents != null)
-                    //    tempElementContent = (string)contents;
-                    //else
-                    //{
-                    //    // as the field can be used for both documents, media and even members we'll use the 
-                    //    // content class to lookup field items
-                    //    try
-                    //    {
-                    //        tempElementContent = GetContentFromDatabase(item.LegacyAttributes, tempNodeId.Value, currentField);
-                    //    }
-                    //    catch
-                    //    {
-                    //        // content was not found in property fields,
-                    //        // so the last place to look for is page fields
-                    //        page itemPage = new page(content.Instance.XmlContent.GetElementById(tempNodeId.ToString()));
-                    //        tempElementContent = new item(itemPage.Elements, item.LegacyAttributes).FieldContent;
-                    //    }
-                    //}
+                    var itemPage = new page(Umbraco.Web.UmbracoContext.Current.GetXml().GetElementById(tempNodeId.ToString()));
+                    tempElementContent = new item(itemPage.Elements, item.LegacyAttributes).FieldContent;
 				}
-
 			}
 			else
 			{

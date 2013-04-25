@@ -186,6 +186,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Save to db
             var template = entity as Template;
+            template.AddingEntity();
+
             var factory = new TemplateFactory(NodeObjectTypeId);
             var dto = factory.BuildDto(template);
 
@@ -254,6 +256,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var templateDto = Database.SingleOrDefault<TemplateDto>("WHERE nodeId = @Id", new { Id = entity.Id });
             //Save updated entity to db
             var template = entity as Template;
+            template.UpdateDate = DateTime.Now;
             var factory = new TemplateFactory(templateDto.PrimaryKey, NodeObjectTypeId);
             var dto = factory.BuildDto(template);
 
