@@ -62,6 +62,8 @@ namespace umbraco.controls
 
         //the async saving task
         private Action<SaveAsyncState> _asyncSaveTask;
+        //the async delete property task
+        private Action<GenericPropertyWrapper> _asyncDeleteTask;
 
         override protected void OnInit(EventArgs e)
         {
@@ -737,12 +739,69 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             PropertyTypes.Controls.Add(new LiteralControl("<div style=\"margin: 10px; padding: 4px; border: 1px solid #ccc;\">No properties defined on this tab. Click on the \"add a new property\" link at the top to create a new property.</div>"));
         }
 
-        protected void gpw_Delete(object sender, System.EventArgs e)
+        /// <summary>
+        /// Called asynchronously in order to delete a content type property
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <param name="cb"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        private IAsyncResult BeginAsyncDeleteOperation(object sender, EventArgs e, AsyncCallback cb, object state)
         {
-            GenericProperties.GenericPropertyWrapper gpw = (GenericProperties.GenericPropertyWrapper)sender;
-            gpw.GenricPropertyControl.PropertyType.delete();
-            _contentType = ContentType.GetContentType(_contentType.Id);
+            Trace.Write("ContentTypeControlNew", "Start async operation");
+
+            //get the args from the async state
+            var args = (GenericPropertyWrapper)state;
+
+            //start the task
+            var result = _asyncDeleteTask.BeginInvoke(args, cb, args);
+            return result;
+        }
+
+        /// <summary>
+        /// Occurs once the async database save operation has completed
+        /// </summary>
+        /// <param name="ar"></param>
+        /// <remarks>
+        /// This updates the UI elements
+        /// </remarks>
+        private void EndAsyncDeleteOperation(IAsyncResult ar)
+        {
+            Trace.Write("ContentTypeControlNew", "ending async operation");
+
+            // reload content type (due to caching)
+            LoadContentType();
             this.BindDataGenericProperties(true);
+
+            Trace.Write("ContentTypeControlNew", "async operation ended");
+
+            //complete it
+            _asyncDeleteTask.EndInvoke(ar);
+        }
+
+        protected void gpw_Delete(object sender, EventArgs e)
+        {            
+            //Add the async operation to the page
+            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncDeleteOperation, EndAsyncDeleteOperation, HandleAsyncSaveTimeout, (GenericPropertyWrapper)sender));
+
+            //create the save task to be executed async
+            _asyncDeleteTask = genericPropertyWrapper =>
+            {
+                Trace.Write("ContentTypeControlNew", "executing task");
+
+                //delete the property
+                genericPropertyWrapper.GenricPropertyControl.PropertyType.delete();
+                
+                //we need to re-generate the xml structures because we're removing a content type property
+                RegenerateXmlCaches();
+
+                Trace.Write("ContentTypeControlNew", "task completing");
+            };
+
+            //execute the async tasks
+            Page.ExecuteRegisteredAsyncTasks();
+            
         }
         
         private void SaveProperties(SaveClickEventArgs e)
