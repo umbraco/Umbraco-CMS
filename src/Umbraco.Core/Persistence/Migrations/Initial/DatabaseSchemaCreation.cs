@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -54,15 +55,39 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {34, typeof (TaskTypeDto)},
                                                                               {35, typeof (TaskDto)},
                                                                               {36, typeof (ContentType2ContentTypeDto)},
-                                                                              {
-                                                                                  37,
-                                                                                  typeof (ContentTypeAllowedContentTypeDto)
-                                                                              },
+                                                                              {37, typeof (ContentTypeAllowedContentTypeDto)},
                                                                               {38, typeof (User2AppDto)},
                                                                               {39, typeof (User2NodeNotifyDto)},
                                                                               {40, typeof (User2NodePermissionDto)}
                                                                           };
         #endregion
+        /// <summary>
+        /// Drops all Umbraco tables in the db
+        /// </summary>
+        internal void UninstallDatabaseSchema()
+        {
+            LogHelper.Info<DatabaseSchemaCreation>("Start UninstallDatabaseSchema");
+
+            foreach (var item in OrderedTables.OrderByDescending(x => x.Key))
+            {
+                var tableNameAttribute = item.Value.FirstAttribute<TableNameAttribute>();
+
+                string tableName = tableNameAttribute == null ? item.Value.Name : tableNameAttribute.Value;
+
+                LogHelper.Info<DatabaseSchemaCreation>("Uninstall" + tableName);
+
+                try
+                {
+                    _database.DropTable(tableName);
+                }
+                catch (Exception ex)
+                {
+                    //swallow this for now, not sure how best to handle this with diff databases... though this is internal
+                    // and only used for unit tests. If this fails its because the table doesn't exist... generally!
+                    LogHelper.Error<DatabaseSchemaCreation>("Could not drop table " + tableName, ex);
+                }
+            }
+        }
 
         public DatabaseSchemaCreation(Database database)
         {
