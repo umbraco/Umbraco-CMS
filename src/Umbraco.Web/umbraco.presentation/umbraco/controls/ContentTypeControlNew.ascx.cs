@@ -276,6 +276,10 @@ namespace umbraco.controls
             {
                 _contentType = new cms.businesslogic.media.MediaType(docTypeId);
             }
+            else if (Request.Path.ToLowerInvariant().Contains("editmembertype.aspx"))
+            {
+                _contentType = new cms.businesslogic.member.MemberType(docTypeId);
+            }
             else
             {
                 _contentType = new ContentType(docTypeId);
@@ -291,9 +295,11 @@ namespace umbraco.controls
         /// </remarks>
         private void RegenerateXmlCaches()
         {
+            _contentType.RebuildXmlStructuresForContent();
+
+            //special case for DocumentType's
             if (_contentType is DocumentType)
             {
-                umbraco.cms.businesslogic.web.Document.RePublishAll();
                 library.RefreshContent();    
             }
         }

@@ -7,6 +7,7 @@ using System.Threading;
 using System.Web;
 using System.Xml;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.property;
@@ -655,8 +656,7 @@ order by {1}
                 }
                 catch (Exception ee)
                 {
-                    Log.Add(LogTypes.Error, User.GetUser(0), dr.GetInt("nodeId"),
-                            string.Format("Error generating xml: {0}", ee));
+                    LogHelper.Error<Document>("Error generating xml", ee);                    
                 }
             }
             dr.Close();
