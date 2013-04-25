@@ -93,9 +93,9 @@ namespace Umbraco.Tests.Integration
 
             const string packagesDir = @"C:\\Downloads\\Packages\\";
             var file = new DirectoryInfo(packagesDir).GetFiles().First(f => f.Name.ToLowerInvariant().StartsWith("UmbracoContour".ToLowerInvariant()));
-            
+
             Driver.FindElement(By.Id("cb")).Click();
-            Driver.FindElement(By.Id("body_file1")).SendKeys(file.Name);
+            Driver.FindElement(By.XPath("//input[@type='file']")).SendKeys(file.FullName);
             Driver.FindElement(By.Id("body_ButtonLoadPackage")).Click();
             Driver.FindElement(By.Id("body_acceptCheckbox")).Click();
             Driver.FindElement(By.Id("body_ButtonInstall")).Click();
