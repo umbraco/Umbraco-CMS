@@ -1,4 +1,5 @@
 using Umbraco.Web.UI;
+using Umbraco.Core;
 using umbraco.BusinessLogic;
 
 namespace umbraco
@@ -7,9 +8,12 @@ namespace umbraco
     {
        
         public override bool PerformSave()
-        {
-            var id = cms.businesslogic.media.MediaType.MakeNew(User, Alias.Replace("'", "''")).Id;
-            _returnUrl = string.Format("settings/editMediaType.aspx?id={0}", id);
+        { 
+
+            var mediaType = cms.businesslogic.media.MediaType.MakeNew(User, Alias.Replace("'", "''"));
+            mediaType.IconUrl = UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates ? ".sprTreeFolder" : "folder.gif";
+            
+            m_returnUrl = string.Format("settings/editMediaType.aspx?id={0}", mediaType.Id);
             return true;
         }
 

@@ -1,14 +1,19 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
+using umbraco.BusinessLogic;
+using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
 using umbraco.cms.presentation.Trees;
 using umbraco.controls.GenericProperties;
@@ -50,45 +55,41 @@ namespace umbraco.controls
         // "Generic properties" tab
         public uicontrols.TabPage GenericPropertiesTabPage;
 
-
         public GenericProperties.GenericPropertyWrapper gp;
         private ArrayList _genericProperties = new ArrayList();
         private ArrayList _sortLists = new ArrayList();
         protected System.Web.UI.WebControls.DataGrid dgGeneralTabProperties;
 
+        //the async saving task
+        private Action<SaveAsyncState> _asyncSaveTask;
+        //the async delete property task
+        private Action<GenericPropertyWrapper> _asyncDeleteTask;
+
         override protected void OnInit(EventArgs e)
         {
             base.OnInit(e);
 
-            int docTypeId = getDocTypeId();
-            _contentType = new cms.businesslogic.ContentType(docTypeId);
+            LoadContentType();
 
-            setupInfoPane();
+            SetupInfoPane();
             if (!HideStructure)
             {
-                setupStructurePane();
+                SetupStructurePane();
             }
-            setupGenericPropertiesPane();
-            setupTabPane();
+            SetupGenericPropertiesPane();
+            SetupTabPane();
 
-        }
-
-        private int getDocTypeId()
-        {
-            return int.Parse(Request.QueryString["id"]);
-        }
+        }        
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
-
-
-            pp_newTab.Text = ui.Text("newtab", umbraco.BasePages.UmbracoEnsuredPage.CurrentUser);
-            pp_alias.Text = umbraco.ui.Text("alias", umbraco.BasePages.UmbracoEnsuredPage.CurrentUser);
-            pp_name.Text = umbraco.ui.Text("name", umbraco.BasePages.UmbracoEnsuredPage.CurrentUser);
-            pp_allowedChildren.Text = umbraco.ui.Text("allowedchildnodetypes", umbraco.BasePages.UmbracoEnsuredPage.CurrentUser);
-            pp_description.Text = umbraco.ui.Text("editcontenttype", "description");
-            pp_icon.Text = umbraco.ui.Text("icon", umbraco.BasePages.UmbracoEnsuredPage.CurrentUser);
-            pp_thumbnail.Text = umbraco.ui.Text("editcontenttype", "thumbnail");
+            pp_newTab.Text = ui.Text("newtab", CurrentUser);
+            pp_alias.Text = umbraco.ui.Text("alias", CurrentUser);
+            pp_name.Text = umbraco.ui.Text("name", CurrentUser);
+            pp_allowedChildren.Text = umbraco.ui.Text("allowedchildnodetypes", CurrentUser);
+            pp_description.Text = umbraco.ui.Text("editcontenttype", "description", CurrentUser);
+            pp_icon.Text = umbraco.ui.Text("icon", CurrentUser);
+            pp_thumbnail.Text = umbraco.ui.Text("editcontenttype", "thumbnail", CurrentUser);
 
 
             // we'll disable this...
@@ -104,61 +105,229 @@ namespace umbraco.controls
             theClientId.Text = this.ClientID;
         }
 
-        protected void save_click(object sender, System.Web.UI.ImageClickEventArgs e)
+        //SD: this is temporary in v4, in v6 we have a proper user control hierarchy
+        //containing this property.
+        //this is required due to this issue: http://issues.umbraco.org/issue/u4-493
+        //because we need to execute some code in async but due to the localization 
+        //framework requiring an httpcontext.current, it will not work. 
+        //http://issues.umbraco.org/issue/u4-2143
+        //so, we are going to make a property here and ensure that the basepage has
+        //resolved the user before we execute the async task so that in this method
+        //our calls to ui.text will include the current user and not rely on the 
+        //httpcontext.current. This also improves performance:
+        // http://issues.umbraco.org/issue/U4-2142
+        private User CurrentUser
         {
-            // 2011 01 06 - APN - Modified method to update Xml caches if a doctype alias changed, 
-            // also added calls to update the tree if the name has changed
-            // ---
+            get { return ((BasePage)Page).getUser(); }
+        }
 
-            // Keep a reference of the original doctype alias and name
-            var originalDocTypeAlias = _contentType.Alias;
-            var originalDocTypeName = _contentType.Text;
+        /// <summary>
+        /// A class to track the async state for saving the doc type
+        /// </summary>
+        private class SaveAsyncState
+        {
+            public SaveAsyncState(
+                SaveClickEventArgs saveArgs, 
+                string originalAlias, 
+                string originalName,
+                string[] originalPropertyAliases)
+            {
+                SaveArgs = saveArgs;
+                _originalAlias = originalAlias;
+                _originalName = originalName;
+                _originalPropertyAliases = originalPropertyAliases;
+            }
 
-            _contentType.Text = txtName.Text;
-            _contentType.Alias = txtAlias.Text;
-            _contentType.IconUrl = ddlIcons.SelectedValue;
-            _contentType.Description = description.Text;
-            _contentType.Thumbnail = ddlThumbnails.SelectedValue;
-            SaveClickEventArgs ea = new SaveClickEventArgs("Saved");
-            ea.IconType = umbraco.BasePages.BasePage.speechBubbleIcon.success;
+            public SaveClickEventArgs SaveArgs { get; private set; }
+            private readonly string _originalAlias;
+            private readonly string _originalName;
+            private readonly string[] _originalPropertyAliases;
 
-            saveProperties(ref ea);
+            public bool HasAliasChanged(ContentType contentType)
+            {
+                return (string.Compare(_originalAlias, contentType.Alias, StringComparison.OrdinalIgnoreCase) != 0);
+            }
+            public bool HasNameChanged(ContentType contentType)
+            {
+                return (string.Compare(_originalName, contentType.Text, StringComparison.OrdinalIgnoreCase) != 0);
+            }
 
-            SaveTabs();
+            /// <summary>
+            /// Returns true if any property has been removed or if any alias has changed
+            /// </summary>
+            /// <param name="contentType"></param>
+            /// <returns></returns>
+            public bool HasAnyPropertyAliasChanged(ContentType contentType)
+            {                
+                var newAliases = contentType.PropertyTypes.Select(x => x.Alias).ToArray();
+                //if any have been removed, return true
+                if (newAliases.Length < _originalPropertyAliases.Count())
+                {
+                    return true;
+                }
+                //otherwise ensure that all of the original aliases are still existing
+                return newAliases.ContainsAll(_originalPropertyAliases) == false;
+            }
+        }
 
-            SaveAllowedChildTypes();
+        /// <summary>
+        /// Called asynchronously in order to persist all of the data to the database
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <param name="cb"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This can be a long running operation depending on how many content nodes exist and if the node type alias
+        /// has changed as this will need to regenerate XML for all of the nodes.
+        /// </remarks>
+        private IAsyncResult BeginAsyncSaveOperation(object sender, EventArgs e, AsyncCallback cb, object state)
+        {
+            Trace.Write("ContentTypeControlNew", "Start async operation");
+
+            //get the args from the async state
+            var args = (SaveAsyncState)state;
+
+            //start the task
+            var result = _asyncSaveTask.BeginInvoke(args, cb, args);
+            return result;
+        }
+
+        /// <summary>
+        /// Occurs once the async database save operation has completed
+        /// </summary>
+        /// <param name="ar"></param>
+        /// <remarks>
+        /// This updates the UI elements
+        /// </remarks>
+        private void EndAsyncSaveOperation(IAsyncResult ar)
+        {
+            Trace.Write("ContentTypeControlNew", "ending async operation");
+            
+            //get the args from the async state
+            var state = (SaveAsyncState)ar.AsyncState;
 
             // reload content type (due to caching)
-            _contentType = new ContentType(_contentType.Id);
-
-            // Check if the doctype alias has changed as a result of either the user input or
-            // the alias checking performed upon saving
-            var docTypeAliasChanged = (string.Compare(originalDocTypeAlias, _contentType.Alias, true) != 0);
-            var docTypeNameChanged = (string.Compare(originalDocTypeName, _contentType.Text, true) != 0);
-
-            // Only if the doctype alias changed, cause a regeneration of the xml cache file since
-            // the xml element names will need to be updated to reflect the new alias
-            if (docTypeAliasChanged)
-                RegenerateXmlCaches();
-
-            bindDataGenericProperties(true);
+            LoadContentType();
+            BindDataGenericProperties(true);
 
             // we need to re-bind the alias as the SafeAlias method can have changed it
             txtAlias.Text = _contentType.Alias;
 
-            RaiseBubbleEvent(new object(), ea);
+            RaiseBubbleEvent(new object(), state.SaveArgs);
 
-            if (docTypeNameChanged)
+            if (state.HasNameChanged(_contentType))
                 UpdateTreeNode();
+
+            Trace.Write("ContentTypeControlNew", "async operation ended");
+
+            //complete it
+            _asyncSaveTask.EndInvoke(ar);
+        }
+
+        private void HandleAsyncSaveTimeout(IAsyncResult ar)
+        {
+            Trace.Write("ContentTypeControlNew", "async operation timed out!");
+
+            LogHelper.Error<ContentTypeControlNew>(
+                "The content type saving operation timed out",
+                new TimeoutException("The content type saving operation timed out. This could cause problems because the xml for the content node might not have been generated. "));
+
+        }
+
+        /// <summary>
+        /// The save button click event handlers
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void save_click(object sender, System.Web.UI.ImageClickEventArgs e)
+        {
+
+            var state = new SaveAsyncState(new SaveClickEventArgs("Saved")
+                {
+                    IconType = BasePage.speechBubbleIcon.success
+                }, _contentType.Alias, _contentType.Text, _contentType.PropertyTypes.Select(x => x.Alias).ToArray());
+
+            //Add the async operation to the page
+            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncSaveOperation, EndAsyncSaveOperation, HandleAsyncSaveTimeout, state));
+            
+            //create the save task to be executed async
+            _asyncSaveTask = asyncState =>
+                {
+                    Trace.Write("ContentTypeControlNew", "executing task");
+
+                    _contentType.Text = txtName.Text;
+                    _contentType.Alias = txtAlias.Text;
+                    _contentType.IconUrl = ddlIcons.SelectedValue;
+                    _contentType.Description = description.Text;
+                    _contentType.Thumbnail = ddlThumbnails.SelectedValue;
+
+                    SaveProperties(asyncState.SaveArgs);
+
+                    SaveTabs();
+
+                    SaveAllowedChildTypes();
+                    
+                    // Only if the doctype alias changed, cause a regeneration of the xml cache file since
+                    // the xml element names will need to be updated to reflect the new alias
+                    if (asyncState.HasAliasChanged(_contentType) || asyncState.HasAnyPropertyAliasChanged(_contentType))
+                        RegenerateXmlCaches();
+
+                    Trace.Write("ContentTypeControlNew", "task completing");
+                };
+
+            //execute the async tasks
+            Page.ExecuteRegisteredAsyncTasks();
+        }
+
+        /// <summary>
+        /// Loads the current ContentType from the id found in the querystring.
+        /// The correct type is loaded based on editing location (DocumentType, MediaType or MemberType).
+        /// </summary>
+        private void LoadContentType()
+        {
+            int docTypeId = int.Parse(Request.QueryString["id"]);
+            LoadContentType(docTypeId);
+        }
+
+        private void LoadContentType(int docTypeId)
+        {
+            //Fairly hacky code to load the ContentType as the real type instead of its base type, so it can be properly saved.
+            if (Request.Path.ToLowerInvariant().Contains("editnodetypenew.aspx"))
+            {
+                _contentType = new DocumentType(docTypeId);
+            }
+            else if (Request.Path.ToLowerInvariant().Contains("editmediatype.aspx"))
+            {
+                _contentType = new cms.businesslogic.media.MediaType(docTypeId);
+            }
+            else if (Request.Path.ToLowerInvariant().Contains("editmembertype.aspx"))
+            {
+                _contentType = new cms.businesslogic.member.MemberType(docTypeId);
+            }
+            else
+            {
+                _contentType = new ContentType(docTypeId);
+            }
         }
 
         /// <summary>
         /// Regenerates the XML caches. Used after a document type alias has been changed.
         /// </summary>
+        /// <remarks>
+        /// We only regenerate any XML cache based on if this is a Document type, not a media type or 
+        /// a member type.
+        /// </remarks>
         private void RegenerateXmlCaches()
         {
-            umbraco.cms.businesslogic.web.Document.RePublishAll();
-            library.RefreshContent();
+            _contentType.RebuildXmlStructuresForContent();
+
+            //special case for DocumentType's
+            if (_contentType is DocumentType)
+            {
+                library.RefreshContent();    
+            }
         }
 
         private void UpdateTreeNode()
@@ -171,7 +340,7 @@ namespace umbraco.controls
         #region "Info" Pane
 
 
-        private void setupInfoPane()
+        private void SetupInfoPane()
         {
             InfoTabPage = TabView1.NewTabPage("Info");
             InfoTabPage.Controls.Add(pnlInfo);
@@ -182,7 +351,7 @@ namespace umbraco.controls
             Save.Click += save_click;
 
             Save.ImageUrl = UmbracoPath + "/images/editor/save.gif";
-            Save.AlternateText = ui.Text("save");
+            Save.AlternateText = ui.Text("save", CurrentUser);
             Save.ID = "save";
 
             var dirInfo = new DirectoryInfo(UmbracoContext.Current.Server.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
@@ -198,8 +367,8 @@ namespace umbraco.controls
             foreach (var iconClass in CMSNode.DefaultIconClasses.Where(iconClass => iconClass.Equals(".sprNew", StringComparison.InvariantCultureIgnoreCase) == false))
             {
                 // Still shows the selected even if we tell it to hide sprite duplicates so as not to break an existing selection
-                if (_contentType.IconUrl.Equals(iconClass, StringComparison.InvariantCultureIgnoreCase) == false 
-                    && UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideSpriteDuplicates 
+                if (_contentType.IconUrl.Equals(iconClass, StringComparison.InvariantCultureIgnoreCase) == false
+                    && UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideSpriteDuplicates
                     && diskFileNames.Contains(IconClassToIconFileName(iconClass)))
                     continue;
 
@@ -296,7 +465,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
 
         #region "Structure" Pane
-        private void setupStructurePane()
+        private void SetupStructurePane()
         {
             dualAllowedContentTypes.ID = "allowedContentTypes";
             dualAllowedContentTypes.Width = 175;
@@ -347,7 +516,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         #endregion
 
         #region "Generic properties" Pane
-        private void setupGenericPropertiesPane()
+        private void SetupGenericPropertiesPane()
         {
             GenericPropertiesTabPage = TabView1.NewTabPage("Generic properties");
             GenericPropertiesTabPage.Style.Add("text-align", "center");
@@ -358,7 +527,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             Save.ImageUrl = UmbracoPath + "/images/editor/save.gif";
 
             //dlTabs.ItemCommand += new DataListCommandEventHandler(dlTabs_ItemCommand);
-            bindDataGenericProperties(false);
+            BindDataGenericProperties(false);
         }
 
         protected void dgTabs_itemdatabound(object sender, DataGridItemEventArgs e)
@@ -372,7 +541,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             }
 
         }
-        private void bindDataGenericProperties(bool Refresh)
+        private void BindDataGenericProperties(bool Refresh)
         {
             cms.businesslogic.ContentType.TabI[] tabs = _contentType.getVirtualTabs;
             cms.businesslogic.datatype.DataTypeDefinition[] dtds = cms.businesslogic.datatype.DataTypeDefinition.GetAll();
@@ -480,14 +649,14 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                     if (!hasProperties)
                     {
-                        addNoPropertiesDefinedMessage();
+                        AddNoPropertiesDefinedMessage();
                     }
 
                     PropertyTypes.Controls.Add(new LiteralControl("</div>"));
                 }
                 else
                 {
-                    addNoPropertiesDefinedMessage();
+                    AddNoPropertiesDefinedMessage();
                     PropertyTypes.Controls.Add(new LiteralControl("</div>"));
                 }
             }
@@ -565,102 +734,84 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
         }
 
-        private void addNoPropertiesDefinedMessage()
+        private void AddNoPropertiesDefinedMessage()
         {
             PropertyTypes.Controls.Add(new LiteralControl("<div style=\"margin: 10px; padding: 4px; border: 1px solid #ccc;\">No properties defined on this tab. Click on the \"add a new property\" link at the top to create a new property.</div>"));
         }
 
-        protected void gpw_Delete(object sender, System.EventArgs e)
+        /// <summary>
+        /// Called asynchronously in order to delete a content type property
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <param name="cb"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        private IAsyncResult BeginAsyncDeleteOperation(object sender, EventArgs e, AsyncCallback cb, object state)
         {
-            GenericProperties.GenericPropertyWrapper gpw = (GenericProperties.GenericPropertyWrapper)sender;
-            gpw.GenricPropertyControl.PropertyType.delete();
-            _contentType = ContentType.GetContentType(_contentType.Id);
-            this.bindDataGenericProperties(true);
+            Trace.Write("ContentTypeControlNew", "Start async operation");
+
+            //get the args from the async state
+            var args = (GenericPropertyWrapper)state;
+
+            //start the task
+            var result = _asyncDeleteTask.BeginInvoke(args, cb, args);
+            return result;
         }
 
-
-        private void _old_bindDataGenericProperties()
+        /// <summary>
+        /// Occurs once the async database delete operation has completed
+        /// </summary>
+        /// <param name="ar"></param>
+        /// <remarks>
+        /// This updates the UI elements
+        /// </remarks>
+        private void EndAsyncDeleteOperation(IAsyncResult ar)
         {
+            Trace.Write("ContentTypeControlNew", "ending async operation");
 
-            // Data bind create new
-            gp.GenricPropertyControl.Tabs = _contentType.getVirtualTabs;
-            gp.GenricPropertyControl.DataTypeDefinitions = cms.businesslogic.datatype.DataTypeDefinition.GetAll();
+            // reload content type (due to caching)
+            LoadContentType();
+            this.BindDataGenericProperties(true);
 
-            DataSet ds = new DataSet();
+            Trace.Write("ContentTypeControlNew", "async operation ended");
 
-            DataTable dtP = new DataTable("Properties");
-            DataTable dtT = new DataTable("Tabs");
-
-            ds.Tables.Add(dtP);
-            ds.Tables.Add(dtT);
-
-            dtP.Columns.Add("id");
-            dtP.Columns.Add("tabid");
-            dtP.Columns.Add("alias");
-            dtP.Columns.Add("name");
-            dtP.Columns.Add("type");
-            dtP.Columns.Add("tab");
-
-            dtT.Columns.Add("tabid");
-            dtT.Columns.Add("TabName");
-            dtT.Columns.Add("genericProperties");
-
-            Hashtable inTab = new Hashtable();
-            foreach (cms.businesslogic.ContentType.TabI tb in _contentType.getVirtualTabs.ToList())
-            {
-                DataRow dr = dtT.NewRow();
-                dr["TabName"] = tb.GetRawCaption();
-                dr["tabid"] = tb.Id;
-                dtT.Rows.Add(dr);
-
-                // zb-00036 #29889 : fix property types getter
-                foreach (cms.businesslogic.propertytype.PropertyType pt in tb.GetPropertyTypes(_contentType.Id))
-                {
-                    DataRow dr1 = dtP.NewRow();
-                    dr1["alias"] = pt.Alias;
-                    dr1["tabid"] = tb.Id;
-                    dr1["name"] = pt.GetRawName();
-                    dr1["type"] = pt.DataTypeDefinition.Id;
-                    dr1["tab"] = tb.GetRawCaption();
-                    dr1["id"] = pt.Id.ToString();
-                    dtP.Rows.Add(dr1);
-                    inTab.Add(pt.Id.ToString(), true);
-                }
-            }
-
-            DataRow dr2 = dtT.NewRow();
-            dr2["TabName"] = "General properties";
-            dr2["tabid"] = 0;
-            dtT.Rows.Add(dr2);
-
-            foreach (cms.businesslogic.propertytype.PropertyType pt in _contentType.PropertyTypes)
-            {
-                if (!inTab.ContainsKey(pt.Id.ToString()))
-                {
-                    DataRow dr1 = dtP.NewRow();
-                    dr1["alias"] = pt.Alias;
-                    dr1["tabid"] = 0;
-                    dr1["name"] = pt.GetRawName();
-                    dr1["type"] = pt.DataTypeDefinition.Id;
-                    dr1["tab"] = "General properties";
-                    dr1["id"] = pt.Id.ToString();
-                    dtP.Rows.Add(dr1);
-                }
-            }
-
-
-            ds.Relations.Add(new DataRelation("tabidrelation", dtT.Columns["tabid"], dtP.Columns["tabid"], false));
+            //complete it
+            _asyncDeleteTask.EndInvoke(ar);
         }
 
+        protected void gpw_Delete(object sender, EventArgs e)
+        {            
+            //Add the async operation to the page
+            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncDeleteOperation, EndAsyncDeleteOperation, HandleAsyncSaveTimeout, (GenericPropertyWrapper)sender));
 
-        private void saveProperties(ref SaveClickEventArgs e)
+            //create the save task to be executed async
+            _asyncDeleteTask = genericPropertyWrapper =>
+            {
+                Trace.Write("ContentTypeControlNew", "executing task");
+
+                //delete the property
+                genericPropertyWrapper.GenricPropertyControl.PropertyType.delete();
+                
+                //we need to re-generate the xml structures because we're removing a content type property
+                RegenerateXmlCaches();
+
+                Trace.Write("ContentTypeControlNew", "task completing");
+            };
+
+            //execute the async tasks
+            Page.ExecuteRegisteredAsyncTasks();
+            
+        }
+        
+        private void SaveProperties(SaveClickEventArgs e)
         {
             this.CreateChildControls();
 
             GenericProperties.GenericProperty gpData = gp.GenricPropertyControl;
             if (gpData.Name.Trim() != "" && gpData.Alias.Trim() != "")
             {
-                if (doesPropertyTypeAliasExist(gpData))
+                if (DoesPropertyTypeAliasExist(gpData))
                 {
                     string[] info = { gpData.Name, gpData.Type.ToString() };
                     cms.businesslogic.propertytype.PropertyType pt = _contentType.AddPropertyType(cms.businesslogic.datatype.DataTypeDefinition.GetDataTypeDefinition(gpData.Type), Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim()), gpData.Name);
@@ -678,7 +829,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 }
                 else
                 {
-                    e.Message = ui.Text("contentTypeDublicatePropertyType");
+                    e.Message = ui.Text("contentTypeDublicatePropertyType", CurrentUser);
                     e.IconType = umbraco.BasePages.BasePage.speechBubbleIcon.warning;
                 }
             }
@@ -722,7 +873,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             }
         }
 
-        private bool doesPropertyTypeAliasExist(GenericProperty gpData)
+        private bool DoesPropertyTypeAliasExist(GenericProperty gpData)
         {
             bool hasAlias = _contentType.getPropertyType(Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim())) != null;
             ContentType ct = _contentType;
@@ -738,41 +889,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         {
             return (dv.Count == 0);
         }
-        private void dlTabs_ItemCommand(object source, DataListCommandEventArgs e)
-        {
-            if (e.CommandName == "Delete")
-            {
-                _contentType.DeleteVirtualTab(int.Parse(e.CommandArgument.ToString()));
-            }
-
-            if (e.CommandName == "MoveDown")
-            {
-                int TabId = int.Parse(e.CommandArgument.ToString());
-                foreach (cms.businesslogic.ContentType.TabI t in _contentType.getVirtualTabs.ToList())
-                {
-                    if (t.Id == TabId)
-                    {
-                        t.MoveDown();
-                    }
-                }
-            }
-
-            if (e.CommandName == "MoveUp")
-            {
-                int TabId = int.Parse(e.CommandArgument.ToString());
-                foreach (cms.businesslogic.ContentType.TabI t in _contentType.getVirtualTabs.ToList())
-                {
-                    if (t.Id == TabId)
-                    {
-                        t.MoveUp();
-                    }
-                }
-            }
-            bindTabs();
-            bindDataGenericProperties(false);
-        }
-
-
+       
         protected void dgGenericPropertiesOfTab_itemcommand(object sender, DataGridCommandEventArgs e)
         {
             // Delete propertytype from contenttype
@@ -780,9 +897,9 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             {
                 int propertyId = int.Parse(e.Item.Cells[0].Text);
                 cms.businesslogic.propertytype.PropertyType pt = cms.businesslogic.propertytype.PropertyType.GetPropertyType(propertyId);
-                RaiseBubbleEvent(new object(), new SaveClickEventArgs("Property ´" + pt.GetRawName() + "´ deleted"));
+                RaiseBubbleEvent(new object(), new SaveClickEventArgs("Property Â´" + pt.GetRawName() + "Â´ deleted"));
                 pt.delete();
-                bindDataGenericProperties(false);
+                BindDataGenericProperties(false);
             }
         }
 
@@ -800,7 +917,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         #endregion
 
         #region "Tab" Pane
-        private void setupTabPane()
+        private void SetupTabPane()
         {
             uicontrols.TabPage tp = TabView1.NewTabPage("Tabs");
 
@@ -811,10 +928,10 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             Save.Click += new System.Web.UI.ImageClickEventHandler(save_click);
             Save.ID = "SaveButton";
             Save.ImageUrl = UmbracoPath + "/images/editor/save.gif";
-            bindTabs();
+            BindTabs();
         }
 
-        private void bindTabs()
+        private void BindTabs()
         {
             DataTable dt = new DataTable();
             dt.Columns.Add("name");
@@ -851,7 +968,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             get
             {
                 if (dgTabs.DataSource == null)
-                    bindTabs();
+                    BindTabs();
 
                 DataTable dt = new DataTable();
                 dt.Columns.Add("name");
@@ -874,26 +991,26 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             }
         }
 
-        private DataTable _DataTypeTable;
+        private DataTable _dataTypeTable;
 
         public DataTable DataTypeTable
         {
             get
             {
-                if (_DataTypeTable == null)
+                if (_dataTypeTable == null)
                 {
-                    _DataTypeTable = new DataTable();
-                    _DataTypeTable.Columns.Add("name");
-                    _DataTypeTable.Columns.Add("id");
+                    _dataTypeTable = new DataTable();
+                    _dataTypeTable.Columns.Add("name");
+                    _dataTypeTable.Columns.Add("id");
                     foreach (cms.businesslogic.datatype.DataTypeDefinition DataType in cms.businesslogic.datatype.DataTypeDefinition.GetAll())
                     {
-                        DataRow dr = _DataTypeTable.NewRow();
+                        DataRow dr = _dataTypeTable.NewRow();
                         dr["name"] = DataType.Text;
                         dr["id"] = DataType.Id.ToString();
-                        _DataTypeTable.Rows.Add(dr);
+                        _dataTypeTable.Rows.Add(dr);
                     }
                 }
-                return _DataTypeTable;
+                return _dataTypeTable;
             }
         }
 
@@ -904,14 +1021,14 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             {
                 _contentType.AddVirtualTab(txtNewTab.Text);
                 _contentType = new ContentType(_contentType.Id);
-                SaveClickEventArgs ea = new SaveClickEventArgs(ui.Text("contentTypeTabCreated"));
+                SaveClickEventArgs ea = new SaveClickEventArgs(ui.Text("contentTypeTabCreated", CurrentUser));
                 ea.IconType = umbraco.BasePages.BasePage.speechBubbleIcon.success;
 
                 RaiseBubbleEvent(new object(), ea);
 
                 txtNewTab.Text = "";
-                bindTabs();
-                bindDataGenericProperties(true);
+                BindTabs();
+                BindDataGenericProperties(true);
             }
 
             Page.ClientScript.RegisterStartupScript(this.GetType(), "dropDowns", @"
@@ -927,7 +1044,7 @@ Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
             {
                 _contentType.DeleteVirtualTab(int.Parse(e.Item.Cells[0].Text));
 
-                SaveClickEventArgs ea = new SaveClickEventArgs(ui.Text("contentTypeTabDeleted"));
+                SaveClickEventArgs ea = new SaveClickEventArgs(ui.Text("contentTypeTabDeleted", CurrentUser));
                 ea.IconType = umbraco.BasePages.BasePage.speechBubbleIcon.success;
 
                 RaiseBubbleEvent(new object(), ea);
@@ -935,8 +1052,8 @@ Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
             }
 
 
-            bindTabs();
-            bindDataGenericProperties(true);
+            BindTabs();
+            BindDataGenericProperties(true);
         }
 
 
@@ -958,6 +1075,339 @@ Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
         }
 
         #endregion
+
+        /// <summary>
+        /// TabView1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.TabView TabView1;
+
+        /// <summary>
+        /// pnlGeneral control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlGeneral;
+
+        /// <summary>
+        /// pnlTab control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlTab;
+
+        /// <summary>
+        /// PaneTabsInherited control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane PaneTabsInherited;
+
+        /// <summary>
+        /// tabsMasterContentTypeName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal tabsMasterContentTypeName;
+
+        /// <summary>
+        /// Pane2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane2;
+
+        /// <summary>
+        /// pp_newTab control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_newTab;
+
+        /// <summary>
+        /// txtNewTab control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtNewTab;
+
+        /// <summary>
+        /// btnNewTab control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnNewTab;
+
+        /// <summary>
+        /// Pane1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane1;
+
+        /// <summary>
+        /// dgTabs control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DataGrid dgTabs;
+
+        /// <summary>
+        /// lttNoTabs control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal lttNoTabs;
+
+        /// <summary>
+        /// pnlInfo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlInfo;
+
+        /// <summary>
+        /// Pane3 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane3;
+
+        /// <summary>
+        /// pp_name control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_name;
+
+        /// <summary>
+        /// txtName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtName;
+
+        /// <summary>
+        /// RequiredFieldValidator1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
+
+        /// <summary>
+        /// pp_alias control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_alias;
+
+        /// <summary>
+        /// txtAlias control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtAlias;
+
+        /// <summary>
+        /// pp_icon control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_icon;
+
+        /// <summary>
+        /// ddlIcons control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlIcons;
+
+        /// <summary>
+        /// pp_thumbnail control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_thumbnail;
+
+        /// <summary>
+        /// ddlThumbnails control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlThumbnails;
+
+        /// <summary>
+        /// pp_description control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_description;
+
+        /// <summary>
+        /// description control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox description;
+
+        /// <summary>
+        /// pnlStructure control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlStructure;
+
+        /// <summary>
+        /// Pane5 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane5;
+
+        /// <summary>
+        /// pp_allowedChildren control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_allowedChildren;
+
+        /// <summary>
+        /// lstAllowedContentTypes control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBoxList lstAllowedContentTypes;
+
+        /// <summary>
+        /// PlaceHolderAllowedContentTypes control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder PlaceHolderAllowedContentTypes;
+
+        /// <summary>
+        /// pnlProperties control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlProperties;
+
+        /// <summary>
+        /// PanePropertiesInherited control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane PanePropertiesInherited;
+
+        /// <summary>
+        /// propertiesMasterContentTypeName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal propertiesMasterContentTypeName;
+
+        /// <summary>
+        /// Pane4 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane4;
+
+        /// <summary>
+        /// PropertyTypeNew control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder PropertyTypeNew;
+
+        /// <summary>
+        /// PropertyTypes control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder PropertyTypes;
+
+        /// <summary>
+        /// theClientId control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal theClientId;
 
     }
 }

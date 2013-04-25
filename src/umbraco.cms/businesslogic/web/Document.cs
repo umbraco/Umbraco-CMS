@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Web;
 using System.Xml;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.property;
@@ -627,20 +629,24 @@ order by {1}
             return tmp;
         }
 
-
+        /// <summary>
+        /// This will clear out the cmsContentXml table for all Documents (not media or members) and then
+        /// rebuild the xml for each Docuemtn item and store it in this table.
+        /// </summary>
+        /// <remarks>
+        /// This method is thread safe
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public static void RePublishAll()
         {
-            XmlDocument xd = new XmlDocument();
+            var xd = new XmlDocument();
 
-            if (!DataLayerHelper.IsEmbeddedDatabase(SqlHelper.ConnectionString))
-            {
-                SqlHelper.ExecuteNonQuery("truncate table cmsContentXml");
-            }
-            else
-            {
-                SqlHelper.ExecuteNonQuery("delete from cmsContentXml");
-            }
-            IRecordsReader dr = SqlHelper.ExecuteReader("select nodeId from cmsDocument where published = 1");
+            //Remove all Documents (not media or members), only Documents are stored in the cmsDocument table
+            SqlHelper.ExecuteNonQuery(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                        (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+                                            INNER JOIN cmsDocument ON cmsContentXml.nodeId = cmsDocument.nodeId)");
+            
+            var dr = SqlHelper.ExecuteReader("select nodeId from cmsDocument where published = 1");
 
             while (dr.Read())
             {
@@ -650,8 +656,7 @@ order by {1}
                 }
                 catch (Exception ee)
                 {
-                    Log.Add(LogTypes.Error, User.GetUser(0), dr.GetInt("nodeId"),
-                            string.Format("Error generating xml: {0}", ee));
+                    LogHelper.Error<Document>("Error generating xml", ee);                    
                 }
             }
             dr.Close();
