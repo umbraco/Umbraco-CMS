@@ -124,23 +124,47 @@ namespace umbraco.controls
         /// </summary>
         private class SaveAsyncState
         {
-            public SaveAsyncState(SaveClickEventArgs saveArgs, string originalAlias, string originalName)
+            public SaveAsyncState(
+                SaveClickEventArgs saveArgs, 
+                string originalAlias, 
+                string originalName,
+                string[] originalPropertyAliases)
             {
                 SaveArgs = saveArgs;
-                OriginalAlias = originalAlias;
-                OriginalName = originalName;
+                _originalAlias = originalAlias;
+                _originalName = originalName;
+                _originalPropertyAliases = originalPropertyAliases;
             }
 
             public SaveClickEventArgs SaveArgs { get; private set; }
-            public string OriginalAlias { get; private set; }
-            public string OriginalName { get; private set; }
+            private readonly string _originalAlias;
+            private readonly string _originalName;
+            private readonly string[] _originalPropertyAliases;
+
             public bool HasAliasChanged(ContentType contentType)
             {
-                return (string.Compare(OriginalAlias, contentType.Alias, StringComparison.OrdinalIgnoreCase) != 0);
+                return (string.Compare(_originalAlias, contentType.Alias, StringComparison.OrdinalIgnoreCase) != 0);
             }
             public bool HasNameChanged(ContentType contentType)
             {
-                return (string.Compare(OriginalName, contentType.Text, StringComparison.OrdinalIgnoreCase) != 0);
+                return (string.Compare(_originalName, contentType.Text, StringComparison.OrdinalIgnoreCase) != 0);
+            }
+
+            /// <summary>
+            /// Returns true if any property has been removed or if any alias has changed
+            /// </summary>
+            /// <param name="contentType"></param>
+            /// <returns></returns>
+            public bool HasAnyPropertyAliasChanged(ContentType contentType)
+            {                
+                var newAliases = contentType.PropertyTypes.Select(x => x.Alias).ToArray();
+                //if any have been removed, return true
+                if (newAliases.Length < _originalPropertyAliases.Count())
+                {
+                    return true;
+                }
+                //otherwise ensure that all of the original aliases are still existing
+                return newAliases.ContainsAll(_originalPropertyAliases) == false;
             }
         }
 
@@ -221,7 +245,7 @@ namespace umbraco.controls
             var state = new SaveAsyncState(new SaveClickEventArgs("Saved")
                 {
                     IconType = BasePage.speechBubbleIcon.success
-                }, _contentType.Alias, _contentType.Text);
+                }, _contentType.Alias, _contentType.Text, _contentType.PropertyTypes.Select(x => x.Alias).ToArray());
 
             //Add the async operation to the page
             Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncSaveOperation, EndAsyncSaveOperation, HandleAsyncSaveTimeout, state));
@@ -245,7 +269,7 @@ namespace umbraco.controls
                     
                     // Only if the doctype alias changed, cause a regeneration of the xml cache file since
                     // the xml element names will need to be updated to reflect the new alias
-                    if (asyncState.HasAliasChanged(_contentType))
+                    if (asyncState.HasAliasChanged(_contentType) || asyncState.HasAnyPropertyAliasChanged(_contentType))
                         RegenerateXmlCaches();
 
                     Trace.Write("ContentTypeControlNew", "task completing");
