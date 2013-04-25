@@ -760,7 +760,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         }
 
         /// <summary>
-        /// Occurs once the async database save operation has completed
+        /// Occurs once the async database delete operation has completed
         /// </summary>
         /// <param name="ar"></param>
         /// <remarks>
