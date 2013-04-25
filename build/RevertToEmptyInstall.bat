@@ -139,7 +139,7 @@ FOR %%A IN (..\src\Umbraco.Web.UI\css\*.*) DO DEL %%A
 echo Removing Courier files
 del ..\src\Umbraco.Web.UI\config\courier.config
 del ..\src\Umbraco.Web.UI\umbraco\images\tray\courier.jpg
-rmdir "..\src\Umbraco.Web.UI\umbraco\plugins\courier\*.*" /S /Q
+rmdir "..\src\Umbraco.Web.UI\umbraco\plugins\courier\" /S /Q
 
 echo Removing Contour files
 del ..\src\Umbraco.Web.UI\umbraco\images\tray\contour.png
