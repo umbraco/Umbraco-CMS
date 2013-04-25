@@ -82,14 +82,14 @@ echo Current folder: %CD%
 echo Regenerating SQL CE database
 SET buildfolder=%CD%
 CD ..\tools\RegenerateUmbracoSQLCEDatabase\
-REM RegenerateUmbracoSQLCEDatabase.exe %CD%\..\..\src\Umbraco.Web.UI
+RegenerateUmbracoSQLCEDatabase.exe %CD%\..\..\src\Umbraco.Web.UI
 CD %buildfolder%
 
 echo Removing bin files
-REM FOR %%A IN (..\src\Umbraco.Web.UI\bin\*.*) DO DEL %%A
+ FOR %%A IN (..\src\Umbraco.Web.UI\bin\*.*) DO DEL %%A
 
 echo Building solution
-REM %windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe ..\src\umbraco.sln /t:Clean,Build
+%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe ..\src\umbraco.sln /t:Clean,Build
 
 echo Resetting installedPackages.config
 echo ^<?xml version="1.0" encoding="utf-8"?^>^<packages^>^</packages^> >..\src\Umbraco.Web.UI\App_Data\packages\installed\installedPackages.config
@@ -147,6 +147,9 @@ FOR %%A IN (..\src\Umbraco.Web.UI\umbraco\images\umbraco\icon_*.*) DO DEL %%A
 rmdir "..\src\Umbraco.Web.UI\umbraco\plugins\umbracoContour\" /S /Q
 del ..\src\Umbraco.Web.UI\umbraco\xslt\templates\UmbracoContour*.* /S /Q
 rmdir "..\src\Umbraco.Web.UI\usercontrols\umbracoContour\" /S /Q
+
+echo Start with a clean web.config
+copy ..\src\Umbraco.Web.UI\web.Template.config ..\src\Umbraco.Web.UI\web.config /Y
 
 echo "Umbraco install reverted to clean install"
 pause 
