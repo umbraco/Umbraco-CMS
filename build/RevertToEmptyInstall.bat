@@ -82,14 +82,14 @@ echo Current folder: %CD%
 echo Regenerating SQL CE database
 SET buildfolder=%CD%
 CD ..\tools\RegenerateUmbracoSQLCEDatabase\
-RegenerateUmbracoSQLCEDatabase.exe %CD%\..\..\src\Umbraco.Web.UI
+REM RegenerateUmbracoSQLCEDatabase.exe %CD%\..\..\src\Umbraco.Web.UI
 CD %buildfolder%
 
 echo Removing bin files
-FOR %%A IN (..\src\Umbraco.Web.UI\bin\*.*) DO DEL %%A
+REM FOR %%A IN (..\src\Umbraco.Web.UI\bin\*.*) DO DEL %%A
 
 echo Building solution
-%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe ..\src\umbraco.sln /t:Clean,Build
+REM %windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe ..\src\umbraco.sln /t:Clean,Build
 
 echo Resetting installedPackages.config
 echo ^<?xml version="1.0" encoding="utf-8"?^>^<packages^>^</packages^> >..\src\Umbraco.Web.UI\App_Data\packages\installed\installedPackages.config
@@ -135,6 +135,18 @@ FOR %%A IN (..\src\Umbraco.Web.UI\scripts\*.*) DO DEL %%A
 
 echo Removing css files
 FOR %%A IN (..\src\Umbraco.Web.UI\css\*.*) DO DEL %%A
+
+echo Removing Courier files
+del ..\src\Umbraco.Web.UI\config\courier.config
+del ..\src\Umbraco.Web.UI\umbraco\images\tray\courier.jpg
+rmdir "..\src\Umbraco.Web.UI\umbraco\plugins\courier\*.*" /S /Q
+
+echo Removing Contour files
+del ..\src\Umbraco.Web.UI\umbraco\images\tray\contour.png
+FOR %%A IN (..\src\Umbraco.Web.UI\umbraco\images\umbraco\icon_*.*) DO DEL %%A
+rmdir "..\src\Umbraco.Web.UI\umbraco\plugins\umbracoContour\" /S /Q
+del ..\src\Umbraco.Web.UI\umbraco\xslt\templates\UmbracoContour*.* /S /Q
+rmdir "..\src\Umbraco.Web.UI\usercontrols\umbracoContour\" /S /Q
 
 echo "Umbraco install reverted to clean install"
 pause 
