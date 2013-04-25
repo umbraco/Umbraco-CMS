@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Hosting;
+using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
@@ -34,6 +35,9 @@ namespace Umbraco.Web
 		/// <param name="e"></param>
 		protected void Application_Start(object sender, EventArgs e)
 		{
+            //don't output the MVC version header (security)
+            MvcHandler.DisableMvcResponseHeader = true;
+
 			//boot up the application
 			_bootManager
 				.Initialize()
