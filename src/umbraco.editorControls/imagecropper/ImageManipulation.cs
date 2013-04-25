@@ -19,7 +19,7 @@ namespace umbraco.editorControls.imagecropper
 
             byte[] buffer = null;
 
-            using(FileStream fs = new FileStream(sourceFile, FileMode.Open, FileAccess.Read))
+            using (FileStream fs = new FileStream(sourceFile, FileMode.Open, FileAccess.Read))
             {
                 buffer = new byte[fs.Length];
                 fs.Read(buffer, 0, (int)fs.Length);
@@ -31,9 +31,9 @@ namespace umbraco.editorControls.imagecropper
             DirectoryInfo di = new DirectoryInfo(path);
             if (!di.Exists) di.Create();
 
-            using(Image croppedImage = CropImage(image, new Rectangle(cropX, cropY, cropWidth, cropHeight)))
+            using (Image croppedImage = CropImage(image, new Rectangle(cropX, cropY, cropWidth, cropHeight)))
             {
-                using(Image resizedImage = ResizeImage(croppedImage, new Size(sizeWidth, sizeHeight)))
+                using (Image resizedImage = ResizeImage(croppedImage, new Size(sizeWidth, sizeHeight)))
                 {
                     using (Bitmap b = new Bitmap(resizedImage))
                     {
@@ -76,11 +76,11 @@ namespace umbraco.editorControls.imagecropper
         {
             var bmpImage = new Bitmap(img);
 
-			if (cropArea.Right > img.Width)
-				cropArea.Width -= (cropArea.Right - img.Width);
+            if (cropArea.Right > img.Width)
+                cropArea.Width -= (cropArea.Right - img.Width);
 
-			if (cropArea.Bottom > img.Height)
-				cropArea.Height -= (cropArea.Bottom - img.Height);
+            if (cropArea.Bottom > img.Height)
+                cropArea.Height -= (cropArea.Bottom - img.Height);
 
             var bmpCrop = bmpImage.Clone(cropArea, bmpImage.PixelFormat);
             return bmpCrop;
@@ -104,7 +104,7 @@ namespace umbraco.editorControls.imagecropper
             g.SmoothingMode = SmoothingMode.HighQuality;
             g.DrawImage(imgToResize, new Rectangle(0, 0, destWidth, destHeight), 0, 0, imgToResize.Width,
                         imgToResize.Height, GraphicsUnit.Pixel, ia);
-            
+
             ia.Dispose();
             g.Dispose();
 

@@ -1,15 +1,19 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
@@ -57,10 +61,13 @@ namespace umbraco.controls
         private ArrayList _genericProperties = new ArrayList();
         private ArrayList _sortLists = new ArrayList();
 
-        protected override void OnInit(EventArgs e)
+        //the async saving task
+        private Action<SaveAsyncState> _asyncSaveTask;
+
+        override protected void OnInit(EventArgs e)
         {
             base.OnInit(e);
-
+            
             LoadContentType();
 
             SetupInfoPane();
@@ -97,113 +104,226 @@ namespace umbraco.controls
             theClientId.Text = this.ClientID;
         }
 
-        protected void save_click(object sender, ImageClickEventArgs e)
+        //SD: this is temporary in v4, in v6 we have a proper user control hierarchy
+        //containing this property.
+        //this is required due to this issue: http://issues.umbraco.org/issue/u4-493
+        //because we need to execute some code in async but due to the localization 
+        //framework requiring an httpcontext.current, it will not work. 
+        //http://issues.umbraco.org/issue/u4-2143
+        //so, we are going to make a property here and ensure that the basepage has
+        //resolved the user before we execute the async task so that in this method
+        //our calls to ui.text will include the current user and not rely on the 
+        //httpcontext.current. This also improves performance:
+        // http://issues.umbraco.org/issue/U4-2142
+        private User CurrentUser
         {
-            // 2011 01 06 - APN - Modified method to update Xml caches if a doctype alias changed, 
-            // also added calls to update the tree if the name has changed
-            // ---
+            get { return ((BasePage)Page).getUser(); }
+        }
 
-            // Keep a reference of the original doctype alias and name
-            var originalDocTypeAlias = _contentType.Alias;
-            var originalDocTypeName = _contentType.Text;
-
-            // Check if the doctype alias has changed as a result of either the user input or
-            // the alias checking performed upon saving
-            var docTypeAliasChanged = (string.Compare(originalDocTypeAlias, txtAlias.Text, true) != 0);
-            var docTypeNameChanged = (string.Compare(originalDocTypeName, txtName.Text, true) != 0);
-
-            var ea = new SaveClickEventArgs("Saved");
-            ea.IconType = BasePage.speechBubbleIcon.success;
-
-            //NOTE The saving of the 5 properties (Name, Alias, Icon, Description and Thumbnail) are divided
-            //to avoid the multiple cache flushing when each property is set using the legacy ContentType class,
-            //which has been reduced to the else-clause.
-            //For IContentType and IMediaType the cache will only be flushed upon saving.
-            if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
+        /// <summary>
+        /// A class to track the async state for saving the doc type
+        /// </summary>
+        private class SaveAsyncState
+        {
+            public SaveAsyncState(
+                SaveClickEventArgs saveArgs, 
+                string originalAlias, 
+                string originalName,
+                string newAlias,
+                string newName)
             {
-                _contentType.ContentTypeItem.Name = txtName.Text;
-                _contentType.ContentTypeItem.Alias = txtAlias.Text;
-                _contentType.ContentTypeItem.Icon = ddlIcons.SelectedValue;
-                _contentType.ContentTypeItem.Description = description.Text;
-                _contentType.ContentTypeItem.Thumbnail = ddlThumbnails.SelectedValue;
-                _contentType.ContentTypeItem.AllowedAsRoot = allowAtRoot.Checked;
-
-                int i = 0;
-                var ids = SaveAllowedChildTypes();
-                _contentType.ContentTypeItem.AllowedContentTypes = ids.Select(x => new ContentTypeSort { Id = new Lazy<int>(() => x), SortOrder = i++ });
-
-                var tabs = SaveTabs();
-                foreach (var tab in tabs)
-                {
-                    if (_contentType.ContentTypeItem.PropertyGroups.Contains(tab.Item2))
-                    {
-                        _contentType.ContentTypeItem.PropertyGroups[tab.Item2].SortOrder = tab.Item3;
-                    }
-                    else
-                    {
-                        _contentType.ContentTypeItem.PropertyGroups.Add(new PropertyGroup { Id = tab.Item1, Name = tab.Item2, SortOrder = tab.Item3 });
-                    }
-                }
-
-                SavePropertyType(ref ea, _contentType.ContentTypeItem);
-                UpdatePropertyTypes(_contentType.ContentTypeItem);
-
-                if (DocumentTypeCallback != null)
-                {
-                    var documentType = _contentType as DocumentType;
-                    if (documentType != null)
-                    {
-                        var result = DocumentTypeCallback(documentType);
-                    }
-                }
-
-                _contentType.Save();
+                SaveArgs = saveArgs;
+                OriginalAlias = originalAlias;
+                OriginalName = originalName;
+                NewAlias = newAlias;
+                NewName = newName;
             }
-            else //Legacy approach for supporting MemberType
+
+            public SaveClickEventArgs SaveArgs { get; private set; }
+            public string OriginalAlias { get; private set; }
+            public string OriginalName { get; private set; }
+            public string NewAlias { get; private set; }
+            public string NewName { get; private set; }
+
+            public bool HasAliasChanged()
             {
-                if (docTypeNameChanged)
-                    _contentType.Text = txtName.Text;
-
-                if (docTypeAliasChanged)
-                    _contentType.Alias = txtAlias.Text;
-
-                _contentType.IconUrl = ddlIcons.SelectedValue;
-                _contentType.Description = description.Text;
-                _contentType.Thumbnail = ddlThumbnails.SelectedValue;
-
-                SavePropertyTypesLegacy(ref ea);
-
-                var tabs = SaveTabs();
-                foreach (var tab in tabs)
-                {
-                    _contentType.SetTabName(tab.Item1, tab.Item2);
-                    _contentType.SetTabSortOrder(tab.Item1, tab.Item3);
-                }
-
-                _contentType.AllowedChildContentTypeIDs = SaveAllowedChildTypes();
-                _contentType.AllowAtRoot = allowAtRoot.Checked;
-
-                _contentType.Save();
+                return (string.Compare(OriginalAlias, NewAlias, StringComparison.OrdinalIgnoreCase) != 0);
             }
+            public bool HasNameChanged()
+            {
+                return (string.Compare(OriginalName, NewName, StringComparison.OrdinalIgnoreCase) != 0);
+            }
+        }
+
+        /// <summary>
+        /// Called asynchronously in order to persist all of the data to the database
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <param name="cb"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This can be a long running operation depending on how many content nodes exist and if the node type alias
+        /// has changed as this will need to regenerate XML for all of the nodes.
+        /// </remarks>
+        private IAsyncResult BeginAsyncSaveOperation(object sender, EventArgs e, AsyncCallback cb, object state)
+        {
+            Trace.Write("ContentTypeControlNew", "Start async operation");
+
+            //get the args from the async state
+            var args = (SaveAsyncState)state;
+
+            //start the task
+            var result = _asyncSaveTask.BeginInvoke(args, cb, args);
+            return result;
+        }
+
+        /// <summary>
+        /// Occurs once the async database save operation has completed
+        /// </summary>
+        /// <param name="ar"></param>
+        /// <remarks>
+        /// This updates the UI elements
+        /// </remarks>
+        private void EndAsyncSaveOperation(IAsyncResult ar)
+        {
+            Trace.Write("ContentTypeControlNew", "ending async operation");
+            
+            //get the args from the async state
+            var state = (SaveAsyncState)ar.AsyncState;
 
             // reload content type (due to caching)
             LoadContentType();
             BindTabs();
-
-            // Only if the doctype alias changed, cause a regeneration of the xml cache file since
-            // the xml element names will need to be updated to reflect the new alias
-            if (docTypeAliasChanged)
-                RegenerateXmlCaches();
-
             BindDataGenericProperties(true);
 
             // we need to re-bind the alias as the SafeAlias method can have changed it
             txtAlias.Text = _contentType.Alias;
 
-            RaiseBubbleEvent(new object(), ea);
+            RaiseBubbleEvent(new object(), state.SaveArgs);
 
-            if (docTypeNameChanged)
+            if (state.HasNameChanged())
                 UpdateTreeNode();
+
+            Trace.Write("ContentTypeControlNew", "async operation ended");
+
+            //complete it
+            _asyncSaveTask.EndInvoke(ar);
+        }
+
+        private void HandleAsyncSaveTimeout(IAsyncResult ar)
+        {
+            Trace.Write("ContentTypeControlNew", "async operation timed out!");
+
+            LogHelper.Error<ContentTypeControlNew>(
+                "The content type saving operation timed out",
+                new TimeoutException("The content type saving operation timed out. This could cause problems because the xml for the content node might not have been generated. "));
+
+        }
+
+        /// <summary>
+        /// The save button click event handlers
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void save_click(object sender, ImageClickEventArgs e)
+        {
+
+            var state = new SaveAsyncState(new SaveClickEventArgs("Saved")
+                {
+                    IconType = BasePage.speechBubbleIcon.success
+                }, _contentType.Alias, _contentType.Text, txtAlias.Text, txtName.Text);
+
+            //Add the async operation to the page
+            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncSaveOperation, EndAsyncSaveOperation, HandleAsyncSaveTimeout, state));
+            
+            //create the save task to be executed async
+            _asyncSaveTask = asyncState =>
+                {
+                    Trace.Write("ContentTypeControlNew", "executing task");
+
+                    //NOTE The saving of the 5 properties (Name, Alias, Icon, Description and Thumbnail) are divided
+                    //to avoid the multiple cache flushing when each property is set using the legacy ContentType class,
+                    //which has been reduced to the else-clause.
+                    //For IContentType and IMediaType the cache will only be flushed upon saving.
+                    if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
+                    {
+                        _contentType.ContentTypeItem.Name = txtName.Text;
+                        _contentType.ContentTypeItem.Alias = txtAlias.Text;
+                        _contentType.ContentTypeItem.Icon = ddlIcons.SelectedValue;
+                        _contentType.ContentTypeItem.Description = description.Text;
+                        _contentType.ContentTypeItem.Thumbnail = ddlThumbnails.SelectedValue;
+                        _contentType.ContentTypeItem.AllowedAsRoot = allowAtRoot.Checked;
+
+                        int i = 0;
+                        var ids = SaveAllowedChildTypes();
+                        _contentType.ContentTypeItem.AllowedContentTypes = ids.Select(x => new ContentTypeSort {Id = new Lazy<int>(() => x), SortOrder = i++});
+
+                        var tabs = SaveTabs();
+                        foreach (var tab in tabs)
+                        {
+                            if (_contentType.ContentTypeItem.PropertyGroups.Contains(tab.Item2))
+                            {
+                                _contentType.ContentTypeItem.PropertyGroups[tab.Item2].SortOrder = tab.Item3;
+                            }
+                            else
+                            {
+                                _contentType.ContentTypeItem.PropertyGroups.Add(new PropertyGroup {Id = tab.Item1, Name = tab.Item2, SortOrder = tab.Item3});
+                            }
+                        }
+
+                        SavePropertyType(asyncState.SaveArgs, _contentType.ContentTypeItem);
+                        UpdatePropertyTypes(_contentType.ContentTypeItem);
+
+                        if (DocumentTypeCallback != null)
+                        {
+                            var documentType = _contentType as DocumentType;
+                            if (documentType != null)
+                            {
+                                var result = DocumentTypeCallback(documentType);
+                            }
+                        }
+
+                        _contentType.Save();
+                    }
+                    else //Legacy approach for supporting MemberType
+                    {
+                        if (asyncState.HasNameChanged())
+                            _contentType.Text = txtName.Text;
+
+                        if (asyncState.HasAliasChanged())
+                            _contentType.Alias = txtAlias.Text;
+
+                        _contentType.IconUrl = ddlIcons.SelectedValue;
+                        _contentType.Description = description.Text;
+                        _contentType.Thumbnail = ddlThumbnails.SelectedValue;
+
+                        SavePropertyTypesLegacy(asyncState.SaveArgs);
+
+                        var tabs = SaveTabs();
+                        foreach (var tab in tabs)
+                        {
+                            _contentType.SetTabName(tab.Item1, tab.Item2);
+                            _contentType.SetTabSortOrder(tab.Item1, tab.Item3);
+                        }
+
+                        _contentType.AllowedChildContentTypeIDs = SaveAllowedChildTypes();
+                        _contentType.AllowAtRoot = allowAtRoot.Checked;
+
+                        _contentType.Save();
+                    }
+
+                    // Only if the doctype alias changed, cause a regeneration of the xml cache file since
+                    // the xml element names will need to be updated to reflect the new alias
+                    if (asyncState.HasAliasChanged())
+                        RegenerateXmlCaches();
+
+                    Trace.Write("ContentTypeControlNew", "task completing");
+                };
+
+            //execute the async tasks
+            Page.ExecuteRegisteredAsyncTasks();
         }
 
         /// <summary>
@@ -265,7 +385,7 @@ namespace umbraco.controls
             Save.Click += save_click;
 
             Save.ImageUrl = UmbracoPath + "/images/editor/save.gif";
-            Save.AlternateText = ui.Text("save");
+            Save.AlternateText = ui.Text("save", CurrentUser);
             Save.ID = "save";
             
             var dirInfo = new DirectoryInfo(UmbracoContext.Current.Server.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
@@ -281,8 +401,8 @@ namespace umbraco.controls
             foreach (var iconClass in CMSNode.DefaultIconClasses.Where(iconClass => iconClass.Equals(".sprNew", StringComparison.InvariantCultureIgnoreCase) == false))
             {
                 // Still shows the selected even if we tell it to hide sprite duplicates so as not to break an existing selection
-                if (_contentType.IconUrl.Equals(iconClass, StringComparison.InvariantCultureIgnoreCase) == false 
-                    && UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideSpriteDuplicates 
+                if (_contentType.IconUrl.Equals(iconClass, StringComparison.InvariantCultureIgnoreCase) == false
+                    && UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideSpriteDuplicates
                     && diskFileNames.Contains(IconClassToIconFileName(iconClass)))
                     continue;
                 
@@ -628,7 +748,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
         }
 
-        private void SavePropertyType(ref SaveClickEventArgs e, IContentTypeComposition contentTypeItem)
+        private void SavePropertyType(SaveClickEventArgs e, IContentTypeComposition contentTypeItem)
         {
             this.CreateChildControls();
 
@@ -649,7 +769,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                                                ValidationRegExp = gpData.Validation,
                                                Description = gpData.Description
                                            };
-
                     //gpData.Tab == 0 Generic Properties / No Group
                     if (gpData.Tab == 0)
                     {
@@ -674,7 +793,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                             }
                         }
                     }
-
                     gpData.Clear();
                 }
                 else
@@ -684,20 +802,16 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 }
             }
         }
-
         private void UpdatePropertyTypes(IContentTypeComposition contentTypeItem)
         {
             //Loop through the _genericProperties ArrayList and update all existing PropertyTypes
             foreach (GenericPropertyWrapper gpw in _genericProperties)
             {
                 if (gpw.PropertyType == null) continue;
-
                 if (contentTypeItem.PropertyTypes == null || contentTypeItem.PropertyTypes.Any(x => x.Alias == gpw.PropertyType.Alias) == false) continue;
                 var propertyType = contentTypeItem.PropertyTypes.First(x => x.Alias == gpw.PropertyType.Alias);
                 if (propertyType == null) continue;
-
                 var dataTypeDefinition = ApplicationContext.Current.Services.DataTypeService.GetDataTypeDefinitionById(gpw.GenricPropertyControl.Type);
-
                 propertyType.Alias = gpw.GenricPropertyControl.Alias;
                 propertyType.Name = gpw.GenricPropertyControl.Name;
                 propertyType.Description = gpw.GenricPropertyControl.Description;
@@ -706,7 +820,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 propertyType.DataTypeDatabaseType = dataTypeDefinition.DatabaseType;
                 propertyType.DataTypeDefinitionId = dataTypeDefinition.Id;
                 propertyType.DataTypeId = dataTypeDefinition.ControlId;
-
                 if (propertyType.PropertyGroupId == null || propertyType.PropertyGroupId.Value != gpw.GenricPropertyControl.Tab)
                 {
                     if (gpw.GenricPropertyControl.Tab == 0)
@@ -729,7 +842,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                         contentTypeItem.MovePropertyType(propertyType.Alias, propertyGroup.Name);
                     }
                 }
-
                 //Is only called to flush cache since gpw.PropertyType.Save() isn't called
                 // clear local cache
                 cms.businesslogic.cache.Cache.ClearCacheItem("UmbracoPropertyTypeCache" + gpw.PropertyType.Id);
@@ -737,7 +849,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 cms.businesslogic.cache.Cache.ClearCacheItem("ContentType_PropertyTypes_Content:" + contentTypeItem.Id);
                 _contentType.ClearVirtualTabs();
             }
-
+        
             //Update the SortOrder of the PropertyTypes
             foreach (HtmlInputHidden propSorter in _sortLists)
             {
@@ -753,7 +865,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                     for (int i = 0; i < tempSO.Length; i++)
                     {
                         string propSO = tempSO[i].Substring(propSOPosition);
-
                         int propertyTypeId = int.Parse(propSO);
                         if (contentTypeItem.PropertyTypes != null &&
                             contentTypeItem.PropertyTypes.Any(x => x.Id == propertyTypeId))
@@ -766,7 +877,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             }
         }
 
-        private void SavePropertyTypesLegacy(ref SaveClickEventArgs e)
+        private void SavePropertyTypesLegacy(SaveClickEventArgs e)
         {
             this.CreateChildControls();
 
@@ -793,7 +904,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 }
                 else
                 {
-                    e.Message = ui.Text("contentTypeDublicatePropertyType");
+                    e.Message = ui.Text("contentTypeDublicatePropertyType", CurrentUser);
                     e.IconType = BasePage.speechBubbleIcon.warning;
                 }
             }
@@ -884,8 +995,8 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                     pt.delete();
                 }
 
-                RaiseBubbleEvent(new object(), new SaveClickEventArgs("Property ´" + rawName + "´ deleted"));
-
+                RaiseBubbleEvent(new object(), new SaveClickEventArgs("Property Â´" + rawName + "Â´ deleted"));
+       
                 BindDataGenericProperties(false);
             }
         }
@@ -1116,5 +1227,365 @@ Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
         }
 
         #endregion
+
+        /// <summary>
+        /// TabView1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.TabView TabView1;
+
+        /// <summary>
+        /// pnlGeneral control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlGeneral;
+
+        /// <summary>
+        /// pnlTab control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlTab;
+
+        /// <summary>
+        /// PaneTabsInherited control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane PaneTabsInherited;
+
+        /// <summary>
+        /// tabsMasterContentTypeName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal tabsMasterContentTypeName;
+
+        /// <summary>
+        /// Pane2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane2;
+
+        /// <summary>
+        /// pp_newTab control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_newTab;
+
+        /// <summary>
+        /// txtNewTab control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtNewTab;
+
+        /// <summary>
+        /// btnNewTab control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnNewTab;
+
+        /// <summary>
+        /// Pane1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane1;
+
+        /// <summary>
+        /// dgTabs control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DataGrid dgTabs;
+
+        /// <summary>
+        /// lttNoTabs control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal lttNoTabs;
+
+        /// <summary>
+        /// pnlInfo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlInfo;
+
+        /// <summary>
+        /// Pane3 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane3;
+
+        /// <summary>
+        /// pp_name control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_name;
+
+        /// <summary>
+        /// txtName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtName;
+
+        /// <summary>
+        /// RequiredFieldValidator1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
+
+        /// <summary>
+        /// pp_alias control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_alias;
+
+        /// <summary>
+        /// txtAlias control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtAlias;
+
+        /// <summary>
+        /// pp_icon control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_icon;
+
+        /// <summary>
+        /// ddlIcons control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlIcons;
+
+        /// <summary>
+        /// pp_thumbnail control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_thumbnail;
+
+        /// <summary>
+        /// ddlThumbnails control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlThumbnails;
+
+        /// <summary>
+        /// pp_description control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_description;
+
+        /// <summary>
+        /// description control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox description;
+
+        /// <summary>
+        /// pnlStructure control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlStructure;
+
+        /// <summary>
+        /// Pane6 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane6;
+
+        /// <summary>
+        /// pp_Root control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_Root;
+
+        /// <summary>
+        /// allowAtRoot control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox allowAtRoot;
+
+        /// <summary>
+        /// Pane5 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane5;
+
+        /// <summary>
+        /// pp_allowedChildren control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_allowedChildren;
+
+        /// <summary>
+        /// lstAllowedContentTypes control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBoxList lstAllowedContentTypes;
+
+        /// <summary>
+        /// PlaceHolderAllowedContentTypes control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder PlaceHolderAllowedContentTypes;
+
+        /// <summary>
+        /// pnlProperties control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlProperties;
+
+        /// <summary>
+        /// PanePropertiesInherited control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane PanePropertiesInherited;
+
+        /// <summary>
+        /// propertiesMasterContentTypeName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal propertiesMasterContentTypeName;
+
+        /// <summary>
+        /// Pane4 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane4;
+
+        /// <summary>
+        /// PropertyTypeNew control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder PropertyTypeNew;
+
+        /// <summary>
+        /// PropertyTypes control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder PropertyTypes;
+
+        /// <summary>
+        /// theClientId control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal theClientId;
     }
 }
