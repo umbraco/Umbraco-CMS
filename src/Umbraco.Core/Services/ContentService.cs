@@ -449,7 +449,7 @@ namespace Umbraco.Core.Services
         {
             try
             {
-                RePublishAllDo();
+                RebuildXmlStructures();
                 return true;
             }
             catch (Exception ex)
@@ -470,7 +470,7 @@ namespace Umbraco.Core.Services
         {
             try
             {
-                RePublishAllDo(contentTypeIds);
+                RebuildXmlStructures(contentTypeIds);
             }
             catch (Exception ex)
             {
@@ -1152,11 +1152,18 @@ namespace Umbraco.Core.Services
 
         #region Private Methods
 
+        //TODO: WE should make a base class for ContentService and MediaService to share! 
+        // currently we have this logic duplicated (nearly the same) for media types and soon to be member types
+
         /// <summary>
-        /// Rebuilds all xml content in the cmsContentXml table for all published documents
+        /// Rebuilds all xml content in the cmsContentXml table for all documents
         /// </summary>
+        /// <param name="contentTypeIds">
+        /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
+        /// for all content
+        /// </param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        private void RePublishAllDo(params int[] contentTypeIds)
+        private void RebuildXmlStructures(params int[] contentTypeIds)
         {
             using (new WriteLock(Locker))
             {
@@ -1165,7 +1172,7 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentRepository(uow))
                 {
-                    if (!contentTypeIds.Any())
+                    if (contentTypeIds.Any() == false)
                     {
                         //Remove all Document records from the cmsContentXml table (DO NOT REMOVE Media/Members!)
                         uow.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
@@ -1207,7 +1214,7 @@ namespace Umbraco.Core.Services
                         uow.Database.Insert(poco);
                     }
                 }
-                Audit.Add(AuditTypes.Publish, "RePublish All completed, the xml has been regenerated in the database", 0, -1);
+                Audit.Add(AuditTypes.Publish, "RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
             }                        
         }
 

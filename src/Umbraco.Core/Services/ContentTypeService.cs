@@ -144,7 +144,7 @@ namespace Umbraco.Core.Services
         /// if they are required to be updated.
         /// </summary>
         /// <param name="contentTypes">A tuple of a content type and a boolean indicating if it is new (HasIdentity was false before committing)</param>
-        private void UpdateContentXmlStructure(params IContentType[] contentTypes)
+        private void UpdateContentXmlStructure(params IContentTypeBase[] contentTypes)
         {
 
             var toUpdate = new List<IContentTypeBase>();
@@ -190,17 +190,33 @@ namespace Umbraco.Core.Services
                 }
             }
 
-            var typedContentService = _contentService as ContentService;
-            if (typedContentService != null && toUpdate.Any())
+            if (toUpdate.Any())
             {
-                typedContentService.RePublishAll(toUpdate.Select(x => x.Id).ToArray());
+                var firstType = toUpdate.First();
+                //if it is a content type then call the rebuilding methods or content
+                if (firstType is IContentType)
+                {
+                    var typedContentService = _contentService as ContentService;
+                    if (typedContentService != null)
+                    {
+                        typedContentService.RePublishAll(toUpdate.Select(x => x.Id).ToArray());
+                    }
+                    else
+                    {
+                        //this should never occur, the content service should always be typed but we'll check anyways.
+                        _contentService.RePublishAll();
+                    }    
+                }
+                else if (firstType is IMediaType)
+                {
+                    //if it is a media type then call the rebuilding methods for media
+                    var typedContentService = _mediaService as MediaService;
+                    if (typedContentService != null)
+                    {
+                        typedContentService.RebuildXmlStructures(toUpdate.Select(x => x.Id).ToArray());
+                    }                     
+                }
             }
-            else if (toUpdate.Any())
-            {
-                //this should never occur, the content service should always be typed but we'll check anyways.
-                _contentService.RePublishAll();
-            }
-
             
         }
 
@@ -258,7 +274,7 @@ namespace Umbraco.Core.Services
                     uow.Commit();
                 }
 
-                UpdateContentXmlStructure(asArray);
+                UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
             }
             SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(asArray, false), this);
 	        Audit.Add(AuditTypes.Save, string.Format("Save ContentTypes performed by user"), userId, -1);
@@ -412,17 +428,22 @@ namespace Umbraco.Core.Services
         {
 	        if (SavingMediaType.IsRaisedEventCancelled(new SaveEventArgs<IMediaType>(mediaType), this)) 
 				return;
-	        
-			var uow = _uowProvider.GetUnitOfWork();
-	        using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
-	        {
-                mediaType.CreatorId = userId;
-		        repository.AddOrUpdate(mediaType);
-		        uow.Commit();
 
-				SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(mediaType, false), this);
-	        }
+            using (new WriteLock(Locker))
+            {
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
+                {
+                    mediaType.CreatorId = userId;
+                    repository.AddOrUpdate(mediaType);
+                    uow.Commit();
+                    
+                }
 
+                UpdateContentXmlStructure(mediaType);
+            }
+
+            SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(mediaType, false), this);
 	        Audit.Add(AuditTypes.Save, string.Format("Save MediaType performed by user"), userId, mediaType.Id);
         }
 
@@ -438,22 +459,26 @@ namespace Umbraco.Core.Services
             if (SavingMediaType.IsRaisedEventCancelled(new SaveEventArgs<IMediaType>(asArray), this))
 				return;
 
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
-			{
+            using (new WriteLock(Locker))
+            {
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
+                {
 
-                foreach (var mediaType in asArray)
-				{
-					mediaType.CreatorId = userId;
-					repository.AddOrUpdate(mediaType);					
-				}
+                    foreach (var mediaType in asArray)
+                    {
+                        mediaType.CreatorId = userId;
+                        repository.AddOrUpdate(mediaType);
+                    }
 
-				//save it all in one go
-				uow.Commit();
+                    //save it all in one go
+                    uow.Commit();                    
+                }
 
-                SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(asArray, false), this);
-			}
+                UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
+            }
 
+            SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(asArray, false), this);
 			Audit.Add(AuditTypes.Save, string.Format("Save MediaTypes performed by user"), userId, -1);
         }
 

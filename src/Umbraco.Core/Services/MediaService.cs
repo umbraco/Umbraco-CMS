@@ -699,6 +699,72 @@ namespace Umbraco.Core.Services
 	    }
 
         /// <summary>
+        /// Rebuilds all xml content in the cmsContentXml table for all media
+        /// </summary>
+        /// <param name="contentTypeIds">
+        /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
+        /// for all media
+        /// </param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        internal void RebuildXmlStructures(params int[] contentTypeIds)
+        {
+            using (new WriteLock(Locker))
+            {
+                var list = new List<IMedia>();
+
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateContentRepository(uow))
+                {
+                    if (contentTypeIds.Any() == false)
+                    {
+                        //Remove all media records from the cmsContentXml table (DO NOT REMOVE Content/Members!)
+                        uow.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+                                                    INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
+                                                    WHERE nodeObjectType = @nodeObjectType)",
+                                             new {nodeObjectType = Constants.ObjectTypes.Media});
+                        
+                        //  Consider creating a Path query instead of recursive method:
+                        //  var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith("-1"));
+                        var rootMedia = GetRootMedia();
+                        foreach (var media in rootMedia)
+                        {
+                            list.Add(media);
+                            list.AddRange(GetDescendants(media));
+                        }
+                    }
+                    else
+                    {
+                        foreach (var id in contentTypeIds)
+                        {
+                            //first we'll clear out the data from the cmsContentXml table for this type
+                            uow.Database.Execute(@"delete from cmsContentXml where nodeId in 
+                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+                                INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
+                                INNER JOIN cmsContent ON cmsContent.nodeId = umbracoNode.id
+                                WHERE nodeObjectType = @nodeObjectType AND cmsContent.contentType = @contentTypeId)",
+                                                 new {contentTypeId = id, nodeObjectType = Constants.ObjectTypes.Media});
+
+                            //now get all media objects of this type and add to the list
+                            list.AddRange(GetMediaOfMediaType(id));
+                        }
+                    }
+
+                    foreach (var c in list)
+                    {
+                        //generate the xml
+                        var xml = c.ToXml();
+                        //create the dto to insert
+                        var poco = new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) };
+                        //insert it into the database
+                        uow.Database.Insert(poco);
+                    }
+                }
+                Audit.Add(AuditTypes.Publish, "RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
+            }
+        }
+
+        /// <summary>
         /// Updates the Path and Level on a collection of <see cref="IMedia"/> objects
         /// based on the Parent's Path and Level.
         /// </summary>
