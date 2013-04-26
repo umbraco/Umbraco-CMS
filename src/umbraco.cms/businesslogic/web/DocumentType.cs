@@ -280,6 +280,121 @@ namespace umbraco.cms.businesslogic.web
 
         #region Public Methods
 
+        #region Regenerate Xml Structures
+
+        /// <summary>
+        /// This will return all PUBLISHED content Ids that are of this content type or any descendant types as well.
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// This will also work if we have multiple child content types (if one day we support that)
+        /// </remarks>
+        internal override IEnumerable<int> GetContentIdsForContentType()
+        {
+            var ids = new List<int>();
+
+            var currentContentTypeIds = new[] { this.Id };
+            while (currentContentTypeIds.Any())
+            {
+                var childContentTypeIds = new List<int>();
+
+                //loop through each content type id
+                foreach (var currentContentTypeId in currentContentTypeIds)
+                {
+                    //get all the content item ids of the current content type
+                    using (var dr = SqlHelper.ExecuteReader(@"SELECT DISTINCT cmsDocument.nodeId FROM cmsDocument
+                                                        INNER JOIN cmsContent ON cmsContent.nodeId = cmsDocument.nodeId
+                                                        INNER JOIN cmsContentType ON cmsContent.contentType = cmsContentType.nodeId
+                                                        WHERE cmsContentType.nodeId = @contentTypeId AND cmsDocument.published = 1",
+                                                            SqlHelper.CreateParameter("@contentTypeId", currentContentTypeId)))
+                    {
+                        while (dr.Read())
+                        {
+                            ids.Add(dr.GetInt("nodeId"));
+                        }
+                        dr.Close();
+                    }
+
+                    //lookup the child content types if there are any and add the ids to the content type ids array
+                    using (var reader = SqlHelper.ExecuteReader("SELECT childContentTypeId FROM cmsContentType2ContentType WHERE parentContentTypeId=@contentTypeId",
+                                                                SqlHelper.CreateParameter("@contentTypeId", currentContentTypeId)))
+                    {
+                        while (reader.Read())
+                        {
+                            childContentTypeIds.Add(reader.GetInt("childContentTypeId"));
+                        }
+                    }
+      
+                }
+
+                currentContentTypeIds = childContentTypeIds.ToArray();       
+                
+            }
+            return ids;
+        } 
+
+        /// <summary>
+        /// Rebuilds the xml structure for the content item by id
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <remarks>
+        /// This is not thread safe
+        /// </remarks>
+        internal override void RebuildXmlStructureForContentItem(int contentId)
+        {
+            var xd = new XmlDocument();
+            try
+            {
+                new Document(contentId).XmlGenerate(xd);
+            }
+            catch (Exception ee)
+            {
+                LogHelper.Error<DocumentType>("Error generating xml", ee);
+            }
+        }
+
+        /// <summary>
+        /// Clears all xml structures in the cmsContentXml table for the current content type and any of it's descendant types
+        /// </summary>
+        /// <remarks>
+        /// This is not thread safe.
+        /// This will also work if we have multiple child content types (if one day we support that)
+        /// </remarks>
+        internal override void ClearXmlStructuresForContent()
+        {
+            var currentContentTypeIds = new[] {this.Id};
+            while (currentContentTypeIds.Any())
+            {
+                var childContentTypeIds = new List<int>();
+
+                //loop through each content type id
+                foreach (var currentContentTypeId in currentContentTypeIds)
+                {
+                    //Remove all items from the cmsContentXml table that are of this current content type
+                    SqlHelper.ExecuteNonQuery(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                        (SELECT DISTINCT cmsContent.nodeId FROM cmsContent 
+                                            INNER JOIN cmsContentType ON cmsContent.contentType = cmsContentType.nodeId 
+                                            WHERE cmsContentType.nodeId = @contentTypeId)",
+                                              SqlHelper.CreateParameter("@contentTypeId", currentContentTypeId));
+
+                    //lookup the child content types if there are any and add the ids to the content type ids array
+                    using (var reader = SqlHelper.ExecuteReader("SELECT childContentTypeId FROM cmsContentType2ContentType WHERE parentContentTypeId=@contentTypeId",
+                                                                SqlHelper.CreateParameter("@contentTypeId", currentContentTypeId)))
+                    {                        
+                        while (reader.Read())
+                        {
+                            childContentTypeIds.Add(reader.GetInt("childContentTypeId"));
+                        }                        
+                    }      
+
+                }
+
+                currentContentTypeIds = childContentTypeIds.ToArray();                          
+            }
+        } 
+
+        #endregion
+
         [Obsolete("Obsolete, Use RemoveTemplate() on Umbraco.Core.Models.ContentType", false)]
         public void RemoveTemplate(int templateId)
         {

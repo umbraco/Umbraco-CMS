@@ -133,4 +133,10 @@
   <data name="SingleDocType" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>singledoctype.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="TemplateOnly_Package" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>templateonly-package.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="TemplateOnly_Updated_Package" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>templateonly-updated-package.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

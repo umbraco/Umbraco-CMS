@@ -90,6 +90,7 @@
       <Private>True</Private>
       <HintPath>..\packages\SqlServerCE.4.0.0.0\lib\System.Data.SqlServerCe.Entity.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.dll</HintPath>
     </Reference>
@@ -136,6 +137,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WebDriver">
+      <HintPath>..\packages\Selenium.WebDriver.2.32.0\lib\net40\WebDriver.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auditing\AuditTests.cs" />
@@ -176,6 +180,9 @@
     <Compile Include="CodeFirst\TypeInheritanceTest.cs" />
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
+    <Compile Include="Integration\CreateContent.cs" />
+    <Compile Include="TestHelpers\BaseSeleniumTest.cs" />
+    <Compile Include="Integration\InstallPackage.cs" />
     <Compile Include="PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="CoreStrings\CmsHelperCasingTests.cs" />
     <Compile Include="CoreStrings\ShortStringHelperResolverTest.cs" />
@@ -494,6 +501,8 @@
     <Content Include="Services\Importing\StandardMvc-Package.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Services\Importing\TemplateOnly-Package.xml" />
+    <Content Include="Services\Importing\TemplateOnly-Updated-Package.xml" />
     <Content Include="Services\Importing\uBlogsy-Package.xml" />
     <Content Include="Services\Importing\XsltSearch-Package.xml" />
   </ItemGroup>

@@ -639,16 +639,7 @@ namespace umbraco.cms.businesslogic.member
                 FireAfterSave(e);
             }
         }
-
-        /// <summary>
-        /// Generates the xmlrepresentation of a member
-        /// </summary>
-        /// <param name="xd"></param>
-        public override void XmlGenerate(XmlDocument xd)
-        {
-            SaveXmlDocument(generateXmlWithoutSaving(xd));
-        }
-
+        
         /// <summary>
         /// Xmlrepresentation of a member
         /// </summary>

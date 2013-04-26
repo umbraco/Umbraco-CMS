@@ -1167,9 +1167,11 @@ namespace Umbraco.Core.Services
                 {
                     if (!contentTypeIds.Any())
                     {
-                        //since we're updating all records, it will be much faster to just clear the table first
-                        uow.Database.TruncateTable("cmsContentXml");
-
+                        //Remove all Document records from the cmsContentXml table (DO NOT REMOVE Media/Members!)
+                        uow.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+                                                    INNER JOIN cmsDocument ON cmsContentXml.nodeId = cmsDocument.nodeId)");
+                        
                         //get all content items that are published
                         //  Consider creating a Path query instead of recursive method:
                         //  var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith("-1"));

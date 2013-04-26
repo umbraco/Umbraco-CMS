@@ -598,7 +598,7 @@ namespace Umbraco.Core.Services
             {
                 var dependencies = new List<string>();
                 var elementCopy = tempElement;
-
+                //Ensure that the Master of the current template is part of the import, otherwise we ignore this dependency as part of the dependency sorting.
                 if (elementCopy.Element("Master") != null &&
                     string.IsNullOrEmpty(elementCopy.Element("Master").Value) == false &&
                     templateElements.Any(x => x.Element("Alias").Value == elementCopy.Element("Master").Value))
@@ -634,7 +634,9 @@ namespace Umbraco.Core.Services
                 var isMasterPage = IsMasterPageSyntax(design);
                 var path = isMasterPage ? MasterpagePath(alias) : ViewPath(alias);
 
-                var template = new Template(path, templateName, alias) { Content = design };
+                var existingTemplate = _fileService.GetTemplate(alias) as Template;
+                var template = existingTemplate ?? new Template(path, templateName, alias);
+                template.Content = design;
                 if (masterElement != null && string.IsNullOrEmpty(masterElement.Value) == false)
                 {
                     template.MasterTemplateAlias = masterElement.Value;

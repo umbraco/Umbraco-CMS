@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Hosting;
+using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
@@ -17,7 +18,7 @@ namespace Umbraco.Web
 	/// </summary>
     public class UmbracoApplication : UmbracoApplicationBase
 	{
-		
+           
 	    protected override IBootManager GetBootManager()
 	    {
             return new WebBootManager(this);	        

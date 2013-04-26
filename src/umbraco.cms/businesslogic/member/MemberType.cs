@@ -1,5 +1,6 @@
 using System;
 using System.Xml;
+using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.propertytype;
 using System.Linq;
 using umbraco.BusinessLogic;
@@ -32,6 +33,30 @@ namespace umbraco.cms.businesslogic.member
 		/// </summary>
 		/// <param name="id">MemberType id</param>
         public MemberType(Guid id) : base(id) { }
+
+        #region Regenerate Xml Structures
+
+        /// <summary>
+        /// Rebuilds the xml structure for the member item by id
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <remarks>
+        /// This is not thread safe
+        /// </remarks>
+        internal override void RebuildXmlStructureForContentItem(int contentId)
+        {
+            var xd = new XmlDocument();
+            try
+            {
+                new Member(contentId).XmlGenerate(xd);
+            }
+            catch (Exception ee)
+            {
+                LogHelper.Error<MemberType>("Error generating xml", ee);
+            }
+        }
+
+        #endregion
 
         #endregion
 
