@@ -132,32 +132,32 @@ namespace umbraco.controls
                 string originalAlias, 
                 string originalName,
                 string newAlias,
-                string newName
+                string newName,
                 string[] originalPropertyAliases)
             {
                 SaveArgs = saveArgs;
                 _originalAlias = originalAlias;
                 _originalName = originalName;
-                NewAlias = newAlias;
+                _newAlias = newAlias;
                 _originalPropertyAliases = originalPropertyAliases;
-                NewName = newName;
+                _newName = newName;
             }
 
             public SaveClickEventArgs SaveArgs { get; private set; }
             private readonly string _originalAlias;
             private readonly string _originalName;
-            public string NewAlias { get; private set; }
-            public string NewName { get; private set; }
+            private readonly string _newAlias;
+            private readonly string _newName;
             private readonly string[] _originalPropertyAliases;
 
 
             public bool HasAliasChanged()
             {
-                return (string.Compare(OriginalAlias, NewAlias, StringComparison.OrdinalIgnoreCase) != 0);
+                return (string.Compare(_originalAlias, _newAlias, StringComparison.OrdinalIgnoreCase) != 0);
             }
             public bool HasNameChanged()
             {
-                return (string.Compare(OriginalName, NewName, StringComparison.OrdinalIgnoreCase) != 0);
+                return (string.Compare(_originalName, _newName, StringComparison.OrdinalIgnoreCase) != 0);
             }
 
             /// <summary>
@@ -339,7 +339,7 @@ namespace umbraco.controls
 
                     // Only if the doctype alias changed, cause a regeneration of the xml cache file since
                     // the xml element names will need to be updated to reflect the new alias
-                    if (asyncState.HasAliasChanged(_contentType) || asyncState.HasAnyPropertyAliasChanged(_contentType))
+                    if (asyncState.HasAliasChanged() || asyncState.HasAnyPropertyAliasChanged(_contentType))
                         RegenerateXmlCaches();
 
                     Trace.Write("ContentTypeControlNew", "task completing");
@@ -1038,25 +1038,81 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         }
 
         /// <summary>
+        /// Called asynchronously in order to delete a content type property
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <param name="cb"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        private IAsyncResult BeginAsyncDeleteOperation(object sender, EventArgs e, AsyncCallback cb, object state)
+        {
+            Trace.Write("ContentTypeControlNew", "Start async operation");
+
+            //get the args from the async state
+            var args = (GenericPropertyWrapper)state;
+
+            //start the task
+            var result = _asyncDeleteTask.BeginInvoke(args, cb, args);
+            return result;
+        }
+
+        /// <summary>
+        /// Occurs once the async database delete operation has completed
+        /// </summary>
+        /// <param name="ar"></param>
+        /// <remarks>
+        /// This updates the UI elements
+        /// </remarks>
+        private void EndAsyncDeleteOperation(IAsyncResult ar)
+        {
+            Trace.Write("ContentTypeControlNew", "ending async operation");
+            
+            // reload content type (due to caching)
+            LoadContentType(_contentType.Id);
+            BindDataGenericProperties(true);
+            
+            Trace.Write("ContentTypeControlNew", "async operation ended");
+
+            //complete it
+            _asyncDeleteTask.EndInvoke(ar);
+        }
+
+        /// <summary>
         /// Removes a PropertyType from the current ContentType when user clicks "red x"
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         protected void gpw_Delete(object sender, EventArgs e)
         {
-            var gpw = (GenericPropertyWrapper)sender;
+            //Add the async operation to the page
+            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncDeleteOperation, EndAsyncDeleteOperation, HandleAsyncSaveTimeout, (GenericPropertyWrapper)sender));
 
-            if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
+            //create the save task to be executed async
+            _asyncDeleteTask = genericPropertyWrapper =>
             {
-                _contentType.ContentTypeItem.RemovePropertyType(gpw.PropertyType.Alias);
-                _contentType.Save();
-            }
+                Trace.Write("ContentTypeControlNew", "executing task");
 
-            gpw.GenricPropertyControl.PropertyType.delete();
+                if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
+                {
+                    _contentType.ContentTypeItem.RemovePropertyType(genericPropertyWrapper.PropertyType.Alias);
+                    _contentType.Save();
+                }
 
-            LoadContentType(_contentType.Id);
-            BindDataGenericProperties(true);
+                //delete the property
+                genericPropertyWrapper.GenricPropertyControl.PropertyType.delete();
+                
+                //we need to re-generate the xml structures because we're removing a content type property
+                RegenerateXmlCaches();
+
+                Trace.Write("ContentTypeControlNew", "task completing");
+            };
+
+            //execute the async tasks
+            Page.ExecuteRegisteredAsyncTasks();
+
         }
+
 
         #endregion
 

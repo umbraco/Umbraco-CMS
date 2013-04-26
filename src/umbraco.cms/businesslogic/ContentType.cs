@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Linq;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;

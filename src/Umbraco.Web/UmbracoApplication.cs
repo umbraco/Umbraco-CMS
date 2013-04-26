@@ -18,10 +18,7 @@ namespace Umbraco.Web
 	/// </summary>
     public class UmbracoApplication : UmbracoApplicationBase
 	{
-            //don't output the MVC version header (security)
-            MvcHandler.DisableMvcResponseHeader = true;
-
-		
+           
 	    protected override IBootManager GetBootManager()
 	    {
             return new WebBootManager(this);	        
