@@ -62,6 +62,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {41, typeof (ServerRegistrationDto)}
                                                                           };
         #endregion
+        
         /// <summary>
         /// Drops all Umbraco tables in the db
         /// </summary>
@@ -76,29 +77,6 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 string tableName = tableNameAttribute == null ? item.Value.Name : tableNameAttribute.Value;
 
                 LogHelper.Info<DatabaseSchemaCreation>("Uninstall" + tableName);
-
-                try
-                {
-                    _database.DropTable(tableName);
-                }
-                catch (Exception ex)
-                {
-                    //swallow this for now, not sure how best to handle this with diff databases... though this is internal
-                    // and only used for unit tests. If this fails its because the table doesn't exist... generally!
-                    LogHelper.Error<DatabaseSchemaCreation>("Could not drop table " + tableName, ex);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Drops all Umbraco tables in the db
-        /// </summary>
-        internal void UninstallDatabaseSchema()
-        {
-            foreach (var item in OrderedTables.OrderByDescending(x => x.Key))
-            {
-                var tableNameAttribute = item.Value.FirstAttribute<TableNameAttribute>();
-                string tableName = tableNameAttribute == null ? item.Value.Name : tableNameAttribute.Value;
 
                 try
                 {

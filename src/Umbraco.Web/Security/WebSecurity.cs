@@ -366,34 +366,23 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <value>The umbraco user context ID.</value>
         public string UmbracoUserContextId
-        {
-
-            //TODO: Clean this up!! We also have extension methods in StringExtensions for decrypting/encrypting in med trust
-            // ... though an existing cookie may fail decryption, in that case they'd just get logged out. no problems.
-
+        {            
             get
             {
-                // zb-00004 #29956 : refactor cookies names & handling
                 if (StateHelper.Cookies.HasCookies && StateHelper.Cookies.UserContext.HasValue)
-                    return StateHelper.Cookies.UserContext.GetValue();
-                try
                 {
-                    var encTicket = StateHelper.Cookies.UserContext.GetValue();
-                    if (string.IsNullOrEmpty(encTicket) == false)
+                    try
                     {
-                        var formsAuthenticationTicket = FormsAuthentication.Decrypt(encTicket);
-                        if (formsAuthenticationTicket != null)
-                            return formsAuthenticationTicket.UserData;
+                        var encTicket = StateHelper.Cookies.UserContext.GetValue();
+                        if (string.IsNullOrEmpty(encTicket) == false)
+                        {
+                            return encTicket.DecryptWithMachineKey();
+                        }
                     }
-                }
-                catch (HttpException)
-                {
-                    // we swallow this type of exception as it happens if a legacy (pre 4.8.1) cookie is set
-                }
-                catch (ArgumentException ex)
-                {
-                    // we swallow this one because it's 99.99% certaincy is legacy based. We'll still log it, though
-                    LogHelper.Error(typeof(WebSecurity), "An error occurred reading auth cookie value", ex);
+                    catch (HttpException ex)
+                    {
+                        // we swallow this type of exception as it happens if a legacy (pre 4.8.1) cookie is set
+                    }
                 }
                 return "";
             }
@@ -408,19 +397,11 @@ namespace Umbraco.Web.Security
 
                     if (string.IsNullOrEmpty(value) == false)
                     {
-                        var ticket = new FormsAuthenticationTicket(1,
-                        value,
-                        DateTime.Now,
-                        DateTime.Now.AddDays(1),
-                        false,
-                        value,
-                        FormsAuthentication.FormsCookiePath);
+                        // Encrypt the value
+                        var encTicket = value.EncryptWithMachineKey();
 
-                        // Encrypt the ticket.
-                        FormsAuthentication.Encrypt(ticket);
-                        
                         // Create new cookie.
-                        StateHelper.Cookies.UserContext.SetValue(value, 1);
+                        StateHelper.Cookies.UserContext.SetValue(encTicket, 1);
                     }
                     else
                     {

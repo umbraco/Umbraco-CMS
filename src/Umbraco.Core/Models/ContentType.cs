@@ -161,13 +161,23 @@ namespace Umbraco.Core.Models
         {
             base.ResetDirtyProperties();
 
+            //loop through each property group to reset the property types
+            var propertiesReset = new List<int>();
+
             foreach (var propertyGroup in PropertyGroups)
             {
                 propertyGroup.ResetDirtyProperties();
                 foreach (var propertyType in propertyGroup.PropertyTypes)
-                {
+                {                    
                     propertyType.ResetDirtyProperties();
+                    propertiesReset.Add(propertyType.Id);
                 }
+            }
+            //then loop through our property type collection since some might not exist on a property group
+            //but don't re-reset ones we've already done.
+            foreach (var propertyType in PropertyTypes.Where(x => propertiesReset.Contains(x.Id) == false))
+            {
+                propertyType.ResetDirtyProperties();
             }
         }
 

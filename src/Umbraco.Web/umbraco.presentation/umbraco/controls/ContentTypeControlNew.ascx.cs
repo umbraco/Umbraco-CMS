@@ -91,13 +91,13 @@ namespace umbraco.controls
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            pp_newTab.Text = ui.Text("newtab", CurrentUser);
-            pp_alias.Text = ui.Text("alias", CurrentUser);
-            pp_name.Text = ui.Text("name", CurrentUser);
-            pp_allowedChildren.Text = ui.Text("allowedchildnodetypes", CurrentUser);
-            pp_description.Text = ui.Text("editcontenttype", "description", CurrentUser);
-            pp_icon.Text = ui.Text("icon", CurrentUser);
-            pp_thumbnail.Text = ui.Text("editcontenttype", "thumbnail", CurrentUser);
+            pp_newTab.Text = ui.Text("newtab", Security.CurrentUser);
+            pp_alias.Text = ui.Text("alias", Security.CurrentUser);
+            pp_name.Text = ui.Text("name", Security.CurrentUser);
+            pp_allowedChildren.Text = ui.Text("allowedchildnodetypes", Security.CurrentUser);
+            pp_description.Text = ui.Text("editcontenttype", "description", Security.CurrentUser);
+            pp_icon.Text = ui.Text("icon", Security.CurrentUser);
+            pp_thumbnail.Text = ui.Text("editcontenttype", "thumbnail", Security.CurrentUser);
 
 
             // we'll disable this...
@@ -334,6 +334,13 @@ namespace umbraco.controls
                         _contentType.AllowAtRoot = allowAtRoot.Checked;
                     
                         _contentType.Save();
+
+                        // Only if the doctype alias changed, cause a regeneration of the xml cache file since
+                        // the xml element names will need to be updated to reflect the new alias
+                        if (asyncState.HasAliasChanged() || asyncState.HasAnyPropertyAliasChanged(_contentType))
+                        {
+                            _contentType.RebuildXmlStructuresForContent();
+                        }
                     }
 
                     Trace.Write("ContentTypeControlNew", "task completing");
@@ -1056,34 +1063,34 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         protected void gpw_Delete(object sender, EventArgs e)
         {
             //Add the async operation to the page
-            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncDeleteOperation, EndAsyncDeleteOperation, HandleAsyncSaveTimeout, (GenericPropertyWrapper)sender));
+            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncDeleteOperation, EndAsyncDeleteOperation, HandleAsyncSaveTimeout, (GenericPropertyWrapper) sender));
 
             //create the save task to be executed async
             _asyncDeleteTask = genericPropertyWrapper =>
-            {
-                Trace.Write("ContentTypeControlNew", "executing task");
+                {
+                    Trace.Write("ContentTypeControlNew", "executing task");
 
-            if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
-            {
-                _contentType.ContentTypeItem.RemovePropertyType(gpw.PropertyType.Alias);
-                _contentType.Save();
-            }
-            else
-            {
-                //if it is not a document type or a media type, then continue to call the legacy delete() method.
-                //the new API for document type and media type's will ensure that the data is removed correctly and that
-                //the cache is flushed correctly (using events).  If it is not one of these types, we'll rever to the 
-                //legacy operation (... like for members i suppose ?)
-                gpw.GenricPropertyControl.PropertyType.delete();    
-               
-            };
-	Trace.Write("ContentTypeControlNew", "task completing");
-            
+                    if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
+                    {
+                        _contentType.ContentTypeItem.RemovePropertyType(genericPropertyWrapper.PropertyType.Alias);
+                        _contentType.Save();
+                    }
+                    else
+                    {
+                        //if it is not a document type or a media type, then continue to call the legacy delete() method.
+                        //the new API for document type and media type's will ensure that the data is removed correctly and that
+                        //the cache is flushed correctly (using events).  If it is not one of these types, we'll rever to the 
+                        //legacy operation (... like for members i suppose ?)
+                        genericPropertyWrapper.GenricPropertyControl.PropertyType.delete();
+
+                    }
+
+                    Trace.Write("ContentTypeControlNew", "task completing");
+                };
+
             //execute the async tasks
             Page.ExecuteRegisteredAsyncTasks();
-
         }
-
 
         #endregion
 
