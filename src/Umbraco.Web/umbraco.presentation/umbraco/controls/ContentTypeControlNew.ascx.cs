@@ -63,11 +63,13 @@ namespace umbraco.controls
 
         //the async saving task
         private Action<SaveAsyncState> _asyncSaveTask;
+        //the async delete property task
+        private Action<GenericPropertyWrapper> _asyncDeleteTask;
 
         override protected void OnInit(EventArgs e)
         {
             base.OnInit(e);
-            
+
             LoadContentType();
 
             SetupInfoPane();
@@ -78,17 +80,17 @@ namespace umbraco.controls
             SetupGenericPropertiesPane();
             SetupTabPane();
 
-        }
+        }        
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            pp_newTab.Text = ui.Text("newtab", UmbracoEnsuredPage.CurrentUser);
-            pp_alias.Text = ui.Text("alias", UmbracoEnsuredPage.CurrentUser);
-            pp_name.Text = ui.Text("name", UmbracoEnsuredPage.CurrentUser);
-            pp_allowedChildren.Text = ui.Text("allowedchildnodetypes", UmbracoEnsuredPage.CurrentUser);
-            pp_description.Text = ui.Text("editcontenttype", "description");
-            pp_icon.Text = ui.Text("icon", UmbracoEnsuredPage.CurrentUser);
-            pp_thumbnail.Text = ui.Text("editcontenttype", "thumbnail");
+            pp_newTab.Text = ui.Text("newtab", CurrentUser);
+            pp_alias.Text = ui.Text("alias", CurrentUser);
+            pp_name.Text = ui.Text("name", CurrentUser);
+            pp_allowedChildren.Text = ui.Text("allowedchildnodetypes", CurrentUser);
+            pp_description.Text = ui.Text("editcontenttype", "description", CurrentUser);
+            pp_icon.Text = ui.Text("icon", CurrentUser);
+            pp_thumbnail.Text = ui.Text("editcontenttype", "thumbnail", CurrentUser);
 
 
             // we'll disable this...
@@ -130,20 +132,24 @@ namespace umbraco.controls
                 string originalAlias, 
                 string originalName,
                 string newAlias,
-                string newName)
+                string newName
+                string[] originalPropertyAliases)
             {
                 SaveArgs = saveArgs;
-                OriginalAlias = originalAlias;
-                OriginalName = originalName;
+                _originalAlias = originalAlias;
+                _originalName = originalName;
                 NewAlias = newAlias;
+                _originalPropertyAliases = originalPropertyAliases;
                 NewName = newName;
             }
 
             public SaveClickEventArgs SaveArgs { get; private set; }
-            public string OriginalAlias { get; private set; }
-            public string OriginalName { get; private set; }
+            private readonly string _originalAlias;
+            private readonly string _originalName;
             public string NewAlias { get; private set; }
             public string NewName { get; private set; }
+            private readonly string[] _originalPropertyAliases;
+
 
             public bool HasAliasChanged()
             {
@@ -152,6 +158,23 @@ namespace umbraco.controls
             public bool HasNameChanged()
             {
                 return (string.Compare(OriginalName, NewName, StringComparison.OrdinalIgnoreCase) != 0);
+            }
+
+            /// <summary>
+            /// Returns true if any property has been removed or if any alias has changed
+            /// </summary>
+            /// <param name="contentType"></param>
+            /// <returns></returns>
+            public bool HasAnyPropertyAliasChanged(ContentType contentType)
+            {                
+                var newAliases = contentType.PropertyTypes.Select(x => x.Alias).ToArray();
+                //if any have been removed, return true
+                if (newAliases.Length < _originalPropertyAliases.Count())
+                {
+                    return true;
+                }
+                //otherwise ensure that all of the original aliases are still existing
+                return newAliases.ContainsAll(_originalPropertyAliases) == false;
             }
         }
 
@@ -233,7 +256,7 @@ namespace umbraco.controls
             var state = new SaveAsyncState(new SaveClickEventArgs("Saved")
                 {
                     IconType = BasePage.speechBubbleIcon.success
-                }, _contentType.Alias, _contentType.Text, txtAlias.Text, txtName.Text);
+                }, _contentType.Alias, _contentType.Text, txtAlias.Text, txtName.Text, _contentType.PropertyTypes.Select(x => x.Alias).ToArray());
 
             //Add the async operation to the page
             Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncSaveOperation, EndAsyncSaveOperation, HandleAsyncSaveTimeout, state));
@@ -310,13 +333,13 @@ namespace umbraco.controls
 
                         _contentType.AllowedChildContentTypeIDs = SaveAllowedChildTypes();
                         _contentType.AllowAtRoot = allowAtRoot.Checked;
-
+                    
                         _contentType.Save();
                     }
 
                     // Only if the doctype alias changed, cause a regeneration of the xml cache file since
                     // the xml element names will need to be updated to reflect the new alias
-                    if (asyncState.HasAliasChanged())
+                    if (asyncState.HasAliasChanged(_contentType) || asyncState.HasAnyPropertyAliasChanged(_contentType))
                         RegenerateXmlCaches();
 
                     Trace.Write("ContentTypeControlNew", "task completing");
@@ -347,6 +370,10 @@ namespace umbraco.controls
             {
                 _contentType = new cms.businesslogic.media.MediaType(docTypeId);
             }
+            else if (Request.Path.ToLowerInvariant().Contains("editmembertype.aspx"))
+            {
+                _contentType = new cms.businesslogic.member.MemberType(docTypeId);
+            }
             else
             {
                 _contentType = new ContentType(docTypeId);
@@ -356,10 +383,19 @@ namespace umbraco.controls
         /// <summary>
         /// Regenerates the XML caches. Used after a document type alias has been changed.
         /// </summary>
+        /// <remarks>
+        /// We only regenerate any XML cache based on if this is a Document type, not a media type or 
+        /// a member type.
+        /// </remarks>
         private void RegenerateXmlCaches()
         {
-            Document.RePublishAll();
-            library.RefreshContent();
+            _contentType.RebuildXmlStructuresForContent();
+
+            //special case for DocumentType's
+            if (_contentType is DocumentType)
+            {
+                library.RefreshContent();    
+            }
         }
 
         /// <summary>

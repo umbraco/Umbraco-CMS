@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Runtime.CompilerServices;
 using System.Linq;
+using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -245,6 +246,84 @@ namespace umbraco.cms.businesslogic
         #endregion
 
         #region Public Properties
+
+        #region Regenerate Xml Structures
+
+        /// <summary>
+        /// Used to rebuild all of the xml structures for content of the current content type in the cmsContentXml table
+        /// </summary>
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        internal void RebuildXmlStructuresForContent()
+        {
+            //Clears all xml structures in the cmsContentXml table for the current content type
+            ClearXmlStructuresForContent();
+            foreach (var i in GetContentIdsForContentType())
+            {
+                RebuildXmlStructureForContentItem(i);
+            }            
+        }
+
+        /// <summary>
+        /// Returns all content ids associated with this content type
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// This will generally just return the content ids associated with this content type but in the case
+        /// of a DocumentType where we can have inherited types, this will return all content Ids that are of 
+        /// this content type or any descendant types as well.
+        /// </remarks>
+        internal virtual IEnumerable<int> GetContentIdsForContentType()
+        {
+            var ids = new List<int>();
+            //get all the content item ids of the current content type
+            using (var dr = SqlHelper.ExecuteReader(@"SELECT DISTINCT cmsContent.nodeId FROM cmsContent 
+                                                INNER JOIN cmsContentType ON cmsContent.contentType = cmsContentType.nodeId 
+                                                WHERE cmsContentType.nodeId = @nodeId",
+                                                    SqlHelper.CreateParameter("@nodeId", this.Id)))
+            {
+                while (dr.Read())
+                {
+                    ids.Add(dr.GetInt("nodeId"));
+                }
+                dr.Close();
+            }
+            return ids;
+        } 
+
+        /// <summary>
+        /// Rebuilds the xml structure for the content item by id
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <remarks>
+        /// This is not thread safe
+        /// </remarks>
+        internal virtual void RebuildXmlStructureForContentItem(int contentId)
+        {
+            var xd = new XmlDocument();
+            try
+            {
+                new Content(contentId).XmlGenerate(xd);
+            }
+            catch (Exception ee)
+            {
+                LogHelper.Error<ContentType>("Error generating xml", ee);
+            }
+        }
+
+        /// <summary>
+        /// Clears all xml structures in the cmsContentXml table for the current content type
+        /// </summary>
+        internal virtual void ClearXmlStructuresForContent()
+        {
+            //Remove all items from the cmsContentXml table that are of this current content type
+            SqlHelper.ExecuteNonQuery(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                        (SELECT DISTINCT cmsContent.nodeId FROM cmsContent 
+                                            INNER JOIN cmsContentType ON cmsContent.contentType = cmsContentType.nodeId 
+                                            WHERE cmsContentType.nodeId = @nodeId)",
+                                      SqlHelper.CreateParameter("@nodeId", this.Id));
+        } 
+
+        #endregion
 
         /// <summary>
         /// The Alias of the ContentType, is used for import/export and more human readable initialization see: GetByAlias 

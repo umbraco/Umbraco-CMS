@@ -280,6 +280,86 @@ namespace umbraco.cms.businesslogic.web
 
         #region Public Methods
 
+        #region Regenerate Xml Structures
+
+        /// <summary>
+        /// This will return all PUBLISHED content Ids that are of this content type or any descendant types as well.
+        /// </summary>
+        /// <returns></returns>
+        internal override IEnumerable<int> GetContentIdsForContentType()
+        {
+            var ids = new List<int>();
+            int? currentContentTypeId = this.Id;
+            while (currentContentTypeId != null)
+            {
+                //get all the content item ids of the current content type
+                using (var dr = SqlHelper.ExecuteReader(@"SELECT DISTINCT cmsDocument.nodeId FROM cmsDocument
+                                                        INNER JOIN cmsContent ON cmsContent.nodeId = cmsDocument.nodeId
+                                                        INNER JOIN cmsContentType ON cmsContent.contentType = cmsContentType.nodeId
+                                                        WHERE cmsContentType.nodeId = @contentTypeId AND cmsDocument.published = 1",
+                                                        SqlHelper.CreateParameter("@contentTypeId", currentContentTypeId)))
+                {
+                    while (dr.Read())
+                    {
+                        ids.Add(dr.GetInt("nodeId"));
+                    }
+                    dr.Close();
+                }
+
+                //lookup the child content type if there is one
+                currentContentTypeId = SqlHelper.ExecuteScalar<int?>("SELECT nodeId FROM cmsContentType WHERE masterContentType=@contentTypeId",
+                                                                     SqlHelper.CreateParameter("@contentTypeId", currentContentTypeId));
+            }
+            return ids;
+        } 
+
+        /// <summary>
+        /// Rebuilds the xml structure for the content item by id
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <remarks>
+        /// This is not thread safe
+        /// </remarks>
+        internal override void RebuildXmlStructureForContentItem(int contentId)
+        {
+            var xd = new XmlDocument();
+            try
+            {
+                new Document(contentId).XmlGenerate(xd);
+            }
+            catch (Exception ee)
+            {
+                LogHelper.Error<DocumentType>("Error generating xml", ee);
+            }
+        }
+
+        /// <summary>
+        /// Clears all xml structures in the cmsContentXml table for the current content type and any of it's descendant types
+        /// </summary>
+        /// <remarks>
+        /// This is not thread safe
+        /// </remarks>
+        internal override void ClearXmlStructuresForContent()
+        {
+            int? currentContentTypeId = this.Id;
+            while (currentContentTypeId != null)
+            {
+                //Remove all items from the cmsContentXml table that are of this current content type
+                SqlHelper.ExecuteNonQuery(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                        (SELECT DISTINCT cmsContent.nodeId FROM cmsContent 
+                                            INNER JOIN cmsContentType ON cmsContent.contentType = cmsContentType.nodeId 
+                                            WHERE cmsContentType.nodeId = @contentTypeId)",
+                                          SqlHelper.CreateParameter("@contentTypeId", currentContentTypeId));
+
+                //lookup the child content type if there is one
+                currentContentTypeId = SqlHelper.ExecuteScalar<int?>("SELECT nodeId FROM cmsContentType WHERE masterContentType=@contentTypeId",
+                                                                     SqlHelper.CreateParameter("@contentTypeId", currentContentTypeId));
+            }
+            
+        } 
+
+        #endregion
+
         [Obsolete("Obsolete, Use RemoveTemplate() on Umbraco.Core.Models.ContentType", false)]
         public void RemoveTemplate(int templateId)
         {

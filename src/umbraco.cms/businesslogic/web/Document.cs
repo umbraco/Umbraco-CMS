@@ -402,22 +402,26 @@ namespace umbraco.cms.businesslogic.web
             var children = ApplicationContext.Current.Services.ContentService.GetChildrenByName(NodeId, searchString);
             return children.Select(x => new Document(x)).ToList();
         }
-        
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.RePublishAll()", false)]
+                
+        /// <summary>
+        /// This will clear out the cmsContentXml table for all Documents (not media or members) and then
+        /// rebuild the xml for each Docuemtn item and store it in this table.
+        /// </summary>
+        /// <remarks>
+        /// This method is thread safe
+        /// </remarks>
         [MethodImpl(MethodImplOptions.Synchronized)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.RePublishAll()", false)]
         public static void RePublishAll()
         {
-            XmlDocument xd = new XmlDocument();
+            var xd = new XmlDocument();
 
-            if (!DataLayerHelper.IsEmbeddedDatabase(SqlHelper.ConnectionString))
-            {
-                SqlHelper.ExecuteNonQuery("truncate table cmsContentXml");
-            }
-            else
-            {
-                SqlHelper.ExecuteNonQuery("delete from cmsContentXml");
-            }
-            IRecordsReader dr = SqlHelper.ExecuteReader("select nodeId from cmsDocument where published = 1");
+            //Remove all Documents (not media or members), only Documents are stored in the cmsDocument table
+            SqlHelper.ExecuteNonQuery(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                        (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+                                            INNER JOIN cmsDocument ON cmsContentXml.nodeId = cmsDocument.nodeId)");
+            
+            var dr = SqlHelper.ExecuteReader("select nodeId from cmsDocument where published = 1");
 
             while (dr.Read())
             {
@@ -427,7 +431,7 @@ namespace umbraco.cms.businesslogic.web
                 }
                 catch (Exception ee)
                 {
-					LogHelper.Error<Document>("Error generating xml", ee);
+                    LogHelper.Error<Document>("Error generating xml", ee);                    
                 }
             }
             dr.Close();
