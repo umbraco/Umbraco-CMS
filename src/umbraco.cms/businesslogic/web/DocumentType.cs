@@ -345,7 +345,27 @@ namespace umbraco.cms.businesslogic.web
             var xd = new XmlDocument();
             try
             {
-                new Document(contentId).XmlGenerate(xd);
+                //create the document in optimized mode! 
+                // (not sure why we wouldn't always do that ?!)
+
+                new Document(true, contentId).XmlGenerate(xd);
+
+                //The benchmark results that I found based contructing the Document object with 'true' for optimized
+                //mode, vs using the normal ctor. Clearly optimized mode is better!
+                /*
+                 * The average page rendering time (after 10 iterations) for submitting /umbraco/dialogs/republish?xml=true when using 
+                 * optimized mode is
+                 * 
+                 * 0.060400555555556
+                 * 
+                 * The average page rendering time (after 10 iterations) for submitting /umbraco/dialogs/republish?xml=true when not
+                 * using optimized mode is
+                 * 
+                 * 0.107037777777778
+                 *                      
+                 * This means that by simply changing this to use optimized mode, it is a 45% improvement!
+                 * 
+                 */
             }
             catch (Exception ee)
             {
