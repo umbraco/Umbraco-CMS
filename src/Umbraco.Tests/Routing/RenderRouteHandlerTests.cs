@@ -38,6 +38,8 @@ namespace Umbraco.Tests.Routing
 
         protected override void FreezeResolution()
         {
+            DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
+
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
                 PluginManager.Current.ResolveSurfaceControllers());
             UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(

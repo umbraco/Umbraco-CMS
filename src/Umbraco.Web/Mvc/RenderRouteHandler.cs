@@ -236,12 +236,13 @@ namespace Umbraco.Web.Mvc
 		/// <returns></returns>
 		internal virtual RouteDefinition GetUmbracoRouteDefinition(RequestContext requestContext, PublishedContentRequest publishedContentRequest)
 		{
-			var defaultControllerName = ControllerExtensions.GetControllerName<RenderMvcController>();
+		    var defaultControllerType = DefaultRenderMvcControllerResolver.Current.GetDefaultControllerType();
+            var defaultControllerName = ControllerExtensions.GetControllerName(defaultControllerType);
 			//creates the default route definition which maps to the 'UmbracoController' controller
 			var def = new RouteDefinition
 				{
 					ControllerName = defaultControllerName,
-					ControllerType = typeof(RenderMvcController),
+                    ControllerType = defaultControllerType,
 					PublishedContentRequest = publishedContentRequest,
 					ActionName = ((Route)requestContext.RouteData.Route).Defaults["action"].ToString(),
 					HasHijackedRoute = false
@@ -260,12 +261,12 @@ namespace Umbraco.Web.Mvc
 
 			//check if there's a custom controller assigned, base on the document type alias.
             var controllerType = _controllerFactory.GetControllerTypeInternal(requestContext, publishedContentRequest.PublishedContent.DocumentTypeAlias);
-            
+
 			//check if that controller exists
 		    if (controllerType != null)
 		    {
                 //ensure the controller is of type 'RenderMvcController'
-		        if (controllerType.IsSubclassOf(typeof (RenderMvcController)))
+                if (TypeHelper.IsTypeAssignableFrom<RenderMvcController>(controllerType))
 		        {
 		            //set the controller and name to the custom one
 		            def.ControllerType = controllerType;

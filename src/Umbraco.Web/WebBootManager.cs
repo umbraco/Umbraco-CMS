@@ -235,6 +235,9 @@ namespace Umbraco.Web
         {
             base.InitializeResolvers();
 
+            //set the default RenderMvcController
+            DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
+
             //Override the ServerMessengerResolver to set a username/password for the distributed calls
             ServerMessengerResolver.Current.SetServerMessenger(new DefaultServerMessenger(() =>
             {

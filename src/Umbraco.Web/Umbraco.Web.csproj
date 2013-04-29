@@ -330,6 +330,7 @@
     <Compile Include="BaseRest\RestExtensionMethodAttribute.cs" />
     <Compile Include="BaseRest\RestExtensionMethodInfo.cs" />
     <Compile Include="ContextualPublishedCacheExtensions.cs" />
+    <Compile Include="Mvc\DefaultRenderMvcControllerResolver.cs" />
     <Compile Include="PublishedCache\ContextualPublishedContentCache.cs" />
     <Compile Include="PublishedCache\ContextualPublishedCacheOfT.cs" />
     <Compile Include="PublishedCache\ContextualPublishedCache.cs" />
