@@ -1365,7 +1365,7 @@ namespace Umbraco.Core.Services
             using (new WriteLock(Locker))
             {
                 //Has this content item previously been published? If so, we don't need to refresh the children
-                var previouslyPublished = HasPublishedVersion(content.Id);
+                var previouslyPublished = content.HasIdentity && HasPublishedVersion(content.Id); //content might not have an id
                 var publishStatus = new PublishStatus(content, PublishStatusType.Success); //initially set to success
 
                 //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
@@ -1379,7 +1379,7 @@ namespace Umbraco.Core.Services
                 }
 
                 //Content contains invalid property values and can therefore not be published - fire event?
-                if (!content.IsValid())
+                if (content.IsValid() == false)
                 {
                     LogHelper.Info<ContentService>(
                         string.Format(
