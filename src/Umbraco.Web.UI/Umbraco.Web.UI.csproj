@@ -257,10 +257,6 @@
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.webservices\umbraco.webservices.csproj">
-      <Project>{CBDB56AC-FF02-4421-9FD4-ED82E339D8E2}</Project>
-      <Name>umbraco.webservices</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>Umbraco.Web</Name>
@@ -644,13 +640,6 @@
     <Content Include="Umbraco\Plugins\UGoLive\throbber.gif" />
     <Content Include="Umbraco\Plugins\UGoLive\tick.png" />
     <Content Include="Umbraco\Settings\Views\EditView.aspx" />
-    <Content Include="Umbraco\Webservices\Api\DocumentService.asmx" />
-    <Content Include="Umbraco\Webservices\Api\FileService.asmx" />
-    <Content Include="Umbraco\Webservices\Api\MaintanceService.asmx" />
-    <Content Include="Umbraco\Webservices\Api\MediaService.asmx" />
-    <Content Include="Umbraco\Webservices\Api\MemberService.asmx" />
-    <Content Include="Umbraco\Webservices\Api\StylesheetService.asmx" />
-    <Content Include="Umbraco\Webservices\Api\TemplateService.asmx" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.min.js" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Lib\codemirror.css" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Lib\codemirror.js" />
