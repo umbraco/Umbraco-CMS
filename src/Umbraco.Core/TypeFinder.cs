@@ -268,7 +268,7 @@ namespace Umbraco.Core
                     "umbraco.interfaces,",										
 					"umbraco.providers,",
 					"Umbraco.Web.UI,",
-					"umbraco.webservices",
+                    "umbraco.webservices",
                     "Lucene.",
                     "Examine,",
                     "Examine.",

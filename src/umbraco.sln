@@ -34,8 +34,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.datalayer", "umbrac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.controls", "umbraco.controls\umbraco.controls.csproj", "{6EDD2061-82F2-461B-BB6E-879245A832DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.webservices", "umbraco.webservices\umbraco.webservices.csproj", "{CBDB56AC-FF02-4421-9FD4-ED82E339D8E2}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCE4Umbraco", "SQLCE4Umbraco\SqlCE4Umbraco.csproj", "{5BA5425F-27A7-4677-865E-82246498AA2E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.MacroEngines", "umbraco.MacroEngines\umbraco.MacroEngines.csproj", "{89C09045-1064-466B-B94A-DB3AFE2A5853}"
