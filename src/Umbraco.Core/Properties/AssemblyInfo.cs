@@ -29,11 +29,11 @@ using System.Security.Permissions;
 [assembly: InternalsVisibleTo("businesslogic")]
 [assembly: InternalsVisibleTo("cms")]
 [assembly: InternalsVisibleTo("umbraco.editorControls")]
+[assembly: InternalsVisibleTo("umbraco.webservices")]
 [assembly: InternalsVisibleTo("umbraco.datalayer")]
 [assembly: InternalsVisibleTo("umbraco.MacroEngines")]
 
 [assembly: InternalsVisibleTo("umbraco.editorControls")]
-[assembly: InternalsVisibleTo("umbraco.webservices")]
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
 [assembly: InternalsVisibleTo("Umbraco.Core")]
 [assembly: InternalsVisibleTo("Umbraco.Web")]
