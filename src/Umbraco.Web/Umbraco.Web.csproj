@@ -2150,11 +2150,8 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>xcopy /s /y "$(ProjectDir)umbraco.presentation\*.aspx" "$(ProjectDir)..\Umbraco.Web.UI\"
-xcopy /s /y "$(ProjectDir)umbraco.presentation\*.ascx" "$(ProjectDir)..\Umbraco.Web.UI\"
-xcopy /s /y "$(ProjectDir)umbraco.presentation\*.asmx" "$(ProjectDir)..\Umbraco.Web.UI\"
-xcopy /s /y "$(ProjectDir)umbraco.presentation\*.ashx" "$(ProjectDir)..\Umbraco.Web.UI\"
-xcopy /s /y "$(ProjectDir)umbraco.presentation\*.master" "$(ProjectDir)..\Umbraco.Web.UI\"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
