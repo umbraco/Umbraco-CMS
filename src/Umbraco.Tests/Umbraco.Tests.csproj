@@ -157,12 +157,14 @@
     <Compile Include="CodeFirst\Attributes\SortOrderAttribute.cs" />
     <Compile Include="CodeFirst\CodeFirstTests.cs" />
     <Compile Include="CodeFirst\ContentTypeBase.cs" />
+    <Compile Include="CodeFirst\ContentTypeMapper.cs" />
     <Compile Include="CodeFirst\Definitions\ContentTypeDefinitionFactory.cs" />
     <Compile Include="CodeFirst\Definitions\Conventions.cs" />
     <Compile Include="CodeFirst\Definitions\DependencyField.cs" />
     <Compile Include="CodeFirst\Definitions\PropertyDefinition.cs" />
     <Compile Include="CodeFirst\Mvc\UmbracoTemplatePage`T.cs" />
     <Compile Include="CodeFirst\PluginManagerExtensions.cs" />
+    <Compile Include="CodeFirst\StronglyTypedMapperTest.cs" />
     <Compile Include="CodeFirst\TestModels\AdvancedContentPage.cs" />
     <Compile Include="CodeFirst\TestModels\Composition\Base.cs" />
     <Compile Include="CodeFirst\TestModels\Composition\Meta.cs" />
@@ -172,6 +174,8 @@
     <Compile Include="CodeFirst\TestModels\DecoratedModelPage.cs" />
     <Compile Include="CodeFirst\TestModels\Home.cs" />
     <Compile Include="CodeFirst\TestModels\ModelWithNewDataType.cs" />
+    <Compile Include="CodeFirst\TestModels\NewsArticle.cs" />
+    <Compile Include="CodeFirst\TestModels\NewsLandingPage.cs" />
     <Compile Include="CodeFirst\TestModels\NumericModel.cs" />
     <Compile Include="CodeFirst\TestModels\PlainPocoType.cs" />
     <Compile Include="CodeFirst\TestModels\SimpleContentPage.cs" />
