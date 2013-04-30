@@ -143,7 +143,8 @@ namespace Umbraco.Core
 					{
 						try
 						{
-							var foundAssembly = safeDomainAssemblies.FirstOrDefault(a => a.GetAssemblyFile() == assemblyName.GetAssemblyFile());
+							var foundAssembly =
+								safeDomainAssemblies.FirstOrDefault(a => a.GetAssemblyFile() == assemblyName.GetAssemblyFile());
 							if (foundAssembly != null)
 							{
 								binFolderAssemblies.Add(foundAssembly);
@@ -255,10 +256,16 @@ namespace Umbraco.Core
 			return FindClassesOfTypeWithAttribute<T, TAttribute>(assemblies, true);
 		}
 
-		public static IEnumerable<Type> FindClassesOfTypeWithAttribute<T, TAttribute>(IEnumerable<Assembly> assemblies, bool onlyConcreteClasses)
+		public static IEnumerable<Type> FindClassesOfTypeWithAttribute<T, TAttribute>(IEnumerable<Assembly> assemblies,
+		                                                                              bool onlyConcreteClasses)
 			where TAttribute : Attribute
 		{
 			if (assemblies == null) throw new ArgumentNullException("assemblies");
+
+			// a assembly cant contain types that are assignable to a type it doesn't reference
+			assemblies = RemoveAssembliesThatDontReferenceAssemblyOfType(typeof (T), assemblies);
+			// a assembly cant contain types with a attribute it doesn't reference
+			assemblies = RemoveAssembliesThatDontReferenceAssemblyOfType(typeof (TAttribute), assemblies);
 
 			var l = new List<Type>();
 			foreach(var a in assemblies)
@@ -330,22 +337,56 @@ namespace Umbraco.Core
 		/// <param name="assemblies">The assemblies.</param>
 		/// <param name="onlyConcreteClasses">if set to <c>true</c> only concrete classes.</param>
 		/// <returns></returns>
-		public static IEnumerable<Type> FindClassesWithAttribute(Type type, IEnumerable<Assembly> assemblies, bool onlyConcreteClasses)
+		public static IEnumerable<Type> FindClassesWithAttribute(Type type, IEnumerable<Assembly> assemblies,
+		                                                         bool onlyConcreteClasses)
 		{
 			if (assemblies == null) throw new ArgumentNullException("assemblies");
 			if (!TypeHelper.IsTypeAssignableFrom<Attribute>(type))
 				throw new ArgumentException("The type specified: " + type + " is not an Attribute type");
+			// a assembly cant contain types with a attribute it doesn't reference
+			assemblies = RemoveAssembliesThatDontReferenceAssemblyOfType(type, assemblies);
 
 			var l = new List<Type>();
 			foreach (var a in assemblies)
 			{
 				var types = from t in GetTypesWithFormattedException(a)
-							where !t.IsInterface && t.GetCustomAttributes(type, false).Any() && (!onlyConcreteClasses || (t.IsClass && !t.IsAbstract))
+				            where
+					            !t.IsInterface && t.GetCustomAttributes(type, false).Any() &&
+					            (!onlyConcreteClasses || (t.IsClass && !t.IsAbstract))
 							select t;
 				l.AddRange(types);
 			}
 
 			return l;
+		}
+		/// <summary>
+		/// Removes assemblies that doesn't reference the assembly of the type we are looking for.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <param name="assemblies"></param>
+		/// <returns></returns>
+		private static IEnumerable<Assembly> RemoveAssembliesThatDontReferenceAssemblyOfType(Type type, IEnumerable<Assembly> assemblies)
+		{
+			// Avoid scanning assembly if it doesn't contain a reference to the assembly containing the type we are looking for 
+			// to the assembly containing the attribute we are looking for
+			var assemblyNameOfType = type.Assembly.GetName().Name;
+
+		    return assemblies
+		        .Where(assembly => assembly == type.Assembly
+		                           || HasReferenceToAssemblyWithName(assembly, assemblyNameOfType)).ToList();
+		}
+		/// <summary>
+		/// checks if the assembly has a reference with the same name as the expected assembly name.
+		/// </summary>
+		/// <param name="assembly"></param>
+		/// <param name="expectedAssemblyName"></param>
+		/// <returns></returns>
+		private static bool HasReferenceToAssemblyWithName(Assembly assembly, string expectedAssemblyName)
+		{
+			return assembly
+				.GetReferencedAssemblies()
+				.Select(a => a.Name)
+				.Contains(expectedAssemblyName, StringComparer.Ordinal);
 		}
 
 		/// <summary>
@@ -388,12 +429,17 @@ namespace Umbraco.Core
 
 		private static IEnumerable<Type> GetTypes(Type assignTypeFrom, IEnumerable<Assembly> assemblies, bool onlyConcreteClasses)
 		{
+			// a assembly cant contain types that are assignable to a type it doesn't reference
+			assemblies = RemoveAssembliesThatDontReferenceAssemblyOfType(assignTypeFrom, assemblies);
+
 			var l = new List<Type>();
 			foreach (var a in assemblies)
 			{
-				var types = from t in GetTypesWithFormattedException(a)
-				            where !t.IsInterface && assignTypeFrom.IsAssignableFrom(t) && (!onlyConcreteClasses || (t.IsClass && !t.IsAbstract))
-				            select t;
+			    var types = from t in GetTypesWithFormattedException(a)
+			                where
+			                    !t.IsInterface && assignTypeFrom.IsAssignableFrom(t) &&
+			                    (!onlyConcreteClasses || (t.IsClass && !t.IsAbstract))
+			                select t;
 				l.AddRange(types);
 			}
 			return l;			
@@ -411,7 +457,7 @@ namespace Umbraco.Core
 				sb.AppendLine("Could not load types from assembly " + a.FullName + ", errors:");
 				foreach (var loaderException in ex.LoaderExceptions.WhereNotNull())
 				{
-					sb.AppendLine("Exception: " + loaderException.ToString());
+					sb.AppendLine("Exception: " + loaderException);
 				}
 				throw new ReflectionTypeLoadException(ex.Types, ex.LoaderExceptions, sb.ToString());
 			}
