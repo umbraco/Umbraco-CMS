@@ -292,6 +292,7 @@
     <Compile Include="Dynamics\ExtensionMethods.cs" />
     <Compile Include="Dynamics\Grouping.cs" />
     <Compile Include="HttpRequestExtensions.cs" />
+    <Compile Include="HttpUrlHelperExtensions.cs" />
     <Compile Include="Install\FilePermissionHelper.cs" />
     <Compile Include="Install\InstallerStep.cs" />
     <Compile Include="Install\InstallHelper.cs" />
@@ -331,6 +332,7 @@
     <Compile Include="BaseRest\RestExtensionMethodInfo.cs" />
     <Compile Include="ContextualPublishedCacheExtensions.cs" />
     <Compile Include="Mvc\DefaultRenderMvcControllerResolver.cs" />
+    <Compile Include="Mvc\QueryStringFilterAttribute.cs" />
     <Compile Include="PublishedCache\ContextualPublishedContentCache.cs" />
     <Compile Include="PublishedCache\ContextualPublishedCacheOfT.cs" />
     <Compile Include="PublishedCache\ContextualPublishedCache.cs" />

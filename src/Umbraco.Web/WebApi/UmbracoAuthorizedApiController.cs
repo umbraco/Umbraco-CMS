@@ -10,6 +10,16 @@ namespace Umbraco.Web.WebApi
     [UmbracoAuthorize]
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
     {
+        protected UmbracoAuthorizedApiController()
+        {
+            
+        }
+
+        protected UmbracoAuthorizedApiController(UmbracoContext umbracoContext)
+            : base(umbracoContext)
+        {
+        }
+
         private User _user;
         private bool _userisValidated = false;
 

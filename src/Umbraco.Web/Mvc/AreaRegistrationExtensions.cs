@@ -54,7 +54,7 @@ namespace Umbraco.Web.Mvc
                 //create a new route with custom name, specified url, and the namespace of the controller plugin
                 controllerPluginRoute = routes.MapRoute(
                     //name
-                    string.Format("umbraco-{0}", controllerType.FullName),
+                    string.Format("umbraco-{0}-{1}", area.AreaName, controllerName),
                     //url format
                     url,
                     //set the namespace of the controller to match
@@ -73,7 +73,7 @@ namespace Umbraco.Web.Mvc
             {
                 controllerPluginRoute = routes.MapHttpRoute(
                     //name
-                    string.Format("umbraco-{0}-{1}", "api", controllerType.FullName),
+                    string.Format("umbraco-{0}-{1}-{2}", "api", area.AreaName, controllerName),
                     //url format
                     url,
                     new { controller = controllerName, id = defaultId });

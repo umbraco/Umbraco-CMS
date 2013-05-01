@@ -14,7 +14,7 @@ using System.Xml;
 
 namespace Umbraco.Core
 {
-	internal static class ObjectExtensions
+	public static class ObjectExtensions
 	{
 		
 		//private static readonly ConcurrentDictionary<Type, Func<object>> ObjectFactoryCache = new ConcurrentDictionary<Type, Func<object>>();
@@ -36,7 +36,7 @@ namespace Umbraco.Core
 		/// <typeparam name="T"></typeparam>
 		/// <param name="input">The input.</param>
 		/// <returns></returns>
-		public static T SafeCast<T>(this object input)
+		internal static T SafeCast<T>(this object input)
 		{
 			if (ReferenceEquals(null, input) || ReferenceEquals(default(T), input)) return default(T);
 			if (input is T) return (T)input;
@@ -165,7 +165,7 @@ namespace Umbraco.Core
 			return Attempt<object>.False;
 		}
 
-		public static void CheckThrowObjectDisposed(this IDisposable disposable, bool isDisposed, string objectname)
+		internal static void CheckThrowObjectDisposed(this IDisposable disposable, bool isDisposed, string objectname)
 		{
 			//TODO: Localise this exception
 			if (isDisposed)
@@ -246,7 +246,7 @@ namespace Umbraco.Core
 		/// <param name="o"></param>
 		/// <param name="ignoreProperties"></param>
 		/// <returns></returns>
-		public static IDictionary<string, TVal> ToDictionary<T, TProperty, TVal>(this T o,
+        internal static IDictionary<string, TVal> ToDictionary<T, TProperty, TVal>(this T o,
 																				 params Expression<Func<T, TProperty>>[] ignoreProperties)
 		{
 			return o.ToDictionary<TVal>(ignoreProperties.Select(e => o.GetPropertyInfo(e)).Select(propInfo => propInfo.Name).ToArray());
@@ -258,7 +258,7 @@ namespace Umbraco.Core
 		/// <param name="o"></param>
 		/// <param name="ignoreProperties">Properties to ignore</param>
 		/// <returns></returns>
-		public static IDictionary<string, TVal> ToDictionary<TVal>(this object o, params string[] ignoreProperties)
+		internal static IDictionary<string, TVal> ToDictionary<TVal>(this object o, params string[] ignoreProperties)
 		{
 			if (o != null)
 			{
@@ -277,7 +277,7 @@ namespace Umbraco.Core
 			return new Dictionary<string, TVal>();
 		}
 
-		public static string ToDebugString(this object obj, int levels = 0)
+		internal static string ToDebugString(this object obj, int levels = 0)
 		{
 			if (obj == null) return "{null}";
 			try
@@ -346,7 +346,7 @@ namespace Umbraco.Core
 		/// <param name="value"></param>
 		/// <param name="type"></param>
 		/// <returns></returns>
-		public static Attempt<string> TryConvertToXmlString(this object value, Type type)
+		internal static Attempt<string> TryConvertToXmlString(this object value, Type type)
 		{
 			try
 			{
@@ -365,7 +365,7 @@ namespace Umbraco.Core
 		/// <param name="value"></param>
 		/// <param name="type">The Type can only be a primitive type or Guid and byte[] otherwise an exception is thrown</param>
 		/// <returns></returns>
-		public static string ToXmlString(this object value, Type type)
+		internal static string ToXmlString(this object value, Type type)
 		{
 			if (type == typeof(string)) return ((string)value).IsNullOrWhiteSpace() ? "" : (string)value;
 			if (type == typeof(bool)) return XmlConvert.ToString((bool)value);

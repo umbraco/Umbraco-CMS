@@ -42,3 +42,4 @@ using System.Security.Permissions;
 [assembly: InternalsVisibleTo("Umbraco.Courier.Persistence")]
 
 [assembly: InternalsVisibleTo("Concorde.Sync")]
+[assembly: InternalsVisibleTo("Umbraco.Belle")]
