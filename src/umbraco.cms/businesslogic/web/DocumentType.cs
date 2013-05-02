@@ -167,7 +167,7 @@ namespace umbraco.cms.businesslogic.web
                 while (dr.Read())
                 {
                     //check if the document id has already been added
-                    if (documentTypes.Where(x => x.Id == dr.Get<int>("id")).Count() == 0)
+                    if (documentTypes.Any(x => x.Id == dr.Get<int>("id")) == false)
                     {
                         //create the DocumentType object without setting up
                         DocumentType dt = new DocumentType(dr.Get<int>("id"), true);
@@ -183,7 +183,7 @@ namespace umbraco.cms.businesslogic.web
                     else
                     {
                         //we've already created the document type with this id, so we'll add the rest of it's templates to itself
-                        var dt = documentTypes.Where(x => x.Id == dr.Get<int>("id")).Single();
+                        var dt = documentTypes.Single(x => x.Id == dr.Get<int>("id"));
                         dt.PopulateDocumentTypeNodeFromReader(dr);
                     }
                 }
@@ -340,7 +340,27 @@ namespace umbraco.cms.businesslogic.web
             var xd = new XmlDocument();
             try
             {
-                new Document(contentId).XmlGenerate(xd);
+                //create the document in optimized mode! 
+                // (not sure why we wouldn't always do that ?!)
+
+                new Document(true, contentId).XmlGenerate(xd);
+
+                //The benchmark results that I found based contructing the Document object with 'true' for optimized
+                //mode, vs using the normal ctor. Clearly optimized mode is better!
+                /*
+                 * The average page rendering time (after 10 iterations) for submitting /umbraco/dialogs/republish?xml=true when using 
+                 * optimized mode is
+                 * 
+                 * 0.060400555555556
+                 * 
+                 * The average page rendering time (after 10 iterations) for submitting /umbraco/dialogs/republish?xml=true when not
+                 * using optimized mode is
+                 * 
+                 * 0.107037777777778
+                 *                      
+                 * This means that by simply changing this to use optimized mode, it is a 45% improvement!
+                 * 
+                 */
             }
             catch (Exception ee)
             {

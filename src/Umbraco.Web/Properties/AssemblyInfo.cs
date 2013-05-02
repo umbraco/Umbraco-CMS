@@ -29,5 +29,5 @@ using System.Security;
 
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
 [assembly: InternalsVisibleTo("umbraco.MacroEngines")]
-[assembly: InternalsVisibleTo("umbraco.webservices")]
+[assembly: InternalsVisibleTo("umbraco.webservices")] 
 [assembly: InternalsVisibleTo("Umbraco.Web.UI")]

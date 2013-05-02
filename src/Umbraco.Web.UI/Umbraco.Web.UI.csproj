@@ -252,10 +252,6 @@
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.webservices\umbraco.webservices.csproj">
-      <Project>{CBDB56AC-FF02-4421-9FD4-ED82E339D8E2}</Project>
-      <Name>umbraco.webservices</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>Umbraco.Web</Name>
@@ -509,13 +505,6 @@
     <Content Include="Umbraco\plugins\uGoLive\throbber.gif" />
     <Content Include="Umbraco\plugins\uGoLive\tick.png" />
     <Content Include="Umbraco\settings\views\EditView.aspx" />
-    <Content Include="Umbraco\webservices\api\DocumentService.asmx" />
-    <Content Include="Umbraco\webservices\api\FileService.asmx" />
-    <Content Include="Umbraco\webservices\api\MaintanceService.asmx" />
-    <Content Include="Umbraco\webservices\api\MediaService.asmx" />
-    <Content Include="Umbraco\webservices\api\MemberService.asmx" />
-    <Content Include="Umbraco\webservices\api\StylesheetService.asmx" />
-    <Content Include="Umbraco\webservices\api\TemplateService.asmx" />
     <Content Include="umbraco_client\CodeMirror\js\lib\codemirror.css" />
     <Content Include="umbraco_client\CodeMirror\js\lib\codemirror.js" />
     <Content Include="umbraco_client\CodeMirror\js\lib\util\closetag.js" />
