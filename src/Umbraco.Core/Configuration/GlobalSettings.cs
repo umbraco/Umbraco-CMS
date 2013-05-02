@@ -28,7 +28,7 @@ namespace Umbraco.Core.Configuration
         #region Private static fields
         
 		// CURRENT UMBRACO VERSION ID
-    	private const string CurrentUmbracoVersion = "4.11.8";
+    	private const string CurrentUmbracoVersion = "4.11.9";
 
         private static readonly object Locker = new object();
         //make this volatile so that we can ensure thread safety with a double check lock
