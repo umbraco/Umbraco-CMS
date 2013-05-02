@@ -1,3 +1,4 @@
+using System;
 using System.Web;
 using Umbraco.Core.Configuration;
 
@@ -16,7 +17,12 @@ namespace Umbraco.Core.Persistence
 		private readonly string _connectionStringName;
         private readonly string _connectionString;
 		private readonly string _providerName;
-		private static volatile UmbracoDatabase _globalInstance = null;
+        
+        //very important to have ThreadStatic:
+        // see: http://issues.umbraco.org/issue/U4-2172
+        [ThreadStatic]
+        private static volatile UmbracoDatabase _nonHttpInstance;
+
 		private static readonly object Locker = new object();
 
 		/// <summary>
@@ -55,24 +61,24 @@ namespace Umbraco.Core.Persistence
 			//no http context, create the singleton global object
 			if (HttpContext.Current == null)
 			{
-				if (_globalInstance == null)
+                if (_nonHttpInstance == null)
 				{
 					lock (Locker)
 					{
 						//double check
-						if (_globalInstance == null)
+                        if (_nonHttpInstance == null)
 						{
-						    _globalInstance = string.IsNullOrEmpty(_providerName) == false && string.IsNullOrEmpty(_providerName) == false
+                            _nonHttpInstance = string.IsNullOrEmpty(_providerName) == false && string.IsNullOrEmpty(_providerName) == false
 						                          ? new UmbracoDatabase(_connectionString, _providerName)
 						                          : new UmbracoDatabase(_connectionStringName);
 						}
 					}
 				}
-				return _globalInstance;
+                return _nonHttpInstance;
 			}
 
 			//we have an http context, so only create one per request
-			if (!HttpContext.Current.Items.Contains(typeof(DefaultDatabaseFactory)))
+			if (HttpContext.Current.Items.Contains(typeof(DefaultDatabaseFactory)) == false)
 			{
 				HttpContext.Current.Items.Add(typeof (DefaultDatabaseFactory),
                                               string.IsNullOrEmpty(_providerName) == false && string.IsNullOrEmpty(_providerName) == false
