@@ -45,7 +45,8 @@ namespace umbraco.presentation.create
                     new HttpContextWrapper(Context),
                     BasePage.Current.getUser(),
                     helper.Request("nodeType"),
-                    createMacroVal, template.SelectedValue + "|||" + rename.Text + "." + filetype.SelectedValue);
+                    createMacroVal, 
+                    template.SelectedValue + "|||" + rename.Text + "." + filetype.SelectedValue);
 
                 BasePage.Current.ClientTools
                     .ChangeContentFrameUrl(returnUrl)

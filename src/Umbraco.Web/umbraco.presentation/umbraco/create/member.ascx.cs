@@ -93,9 +93,9 @@ namespace umbraco.cms.presentation.create.controls
                     new HttpContextWrapper(Context),
                     BasePage.Current.getUser(),
                     helper.Request("nodeType"),
-                    memberType,
+                    -1,                    
                     rename.Text + emailAppend,
-                    -1);
+                    memberType);
 
 				BasePage.Current.ClientTools
 					.ChangeContentFrameUrl(returnUrl)

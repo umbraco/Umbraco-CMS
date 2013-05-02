@@ -73,9 +73,9 @@ namespace umbraco.cms.presentation.create.controls
 			        new HttpContextWrapper(Context),
 			        BasePage.Current.getUser(),
 			        helper.Request("nodeType"),
-			        int.Parse(nodeType.SelectedValue),
+			        int.Parse(Request["nodeID"]),                    
 			        rename.Text,
-			        int.Parse(Request["nodeID"]));
+                    int.Parse(nodeType.SelectedValue));
 
 				BasePage.Current.ClientTools
 					.ChangeContentFrameUrl(returnUrl)

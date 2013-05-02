@@ -66,9 +66,9 @@ namespace umbraco.cms.presentation.create.controls
                     new HttpContextWrapper(Context),
                     BasePage.Current.getUser(),
                     helper.Request("nodeType"),
-                    int.Parse(masterTypeVal),
+                    createTemplateVal,
 					rename.Text,
-                    createTemplateVal);
+                    int.Parse(masterTypeVal));
 
 				BasePage.Current.ClientTools
 					.ChangeContentFrameUrl(returnUrl)
