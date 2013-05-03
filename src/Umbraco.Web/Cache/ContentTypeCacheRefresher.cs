@@ -215,10 +215,12 @@ namespace Umbraco.Web.Cache
                     // zpqrtbnk: no, not here, in fact the caches should subsribe to refresh events else we
                     // are creating a nasty dependency - but keep it like that for the time being while
                     // SD is cleaning cache refreshers up.
-
-                    var contentCache = UmbracoContext.Current.ContentCache.InnerCache as PublishedContentCache;
-                    if (contentCache != null)
-                        contentCache.RoutesCache.Clear();
+                    if (UmbracoContext.Current != null)
+                    {
+                        var contentCache = UmbracoContext.Current.ContentCache.InnerCache as PublishedContentCache;
+                        if (contentCache != null)
+                            contentCache.RoutesCache.Clear();
+                    }
                 }                
             }
         }

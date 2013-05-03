@@ -282,6 +282,7 @@
     <Compile Include="Cache\StylesheetPropertyCacheRefresher.cs" />
     <Compile Include="Cache\TemplateCacheRefresher.cs" />
     <Compile Include="Cache\UserCacheRefresher.cs" />
+    <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />
     <Compile Include="Dynamics\DynamicExpression.cs" />
     <Compile Include="Dynamics\DynamicGrouping.cs" />
