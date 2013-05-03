@@ -34,6 +34,27 @@ namespace umbraco.presentation.preview
 
         private int _userId = -1;
 
+        public PreviewContent()
+        {
+            _initialized = false;
+        }
+
+        private readonly object _initLock = new object();
+        private bool _initialized = true;
+
+        public void EnsureInitialized(User user, string previewSet, bool validate, Action initialize)
+        {
+            lock (_initLock)
+            {
+                if (_initialized) return;
+
+                _userId = user.Id;
+                ValidPreviewSet = UpdatePreviewPaths(new Guid(previewSet), validate);
+                initialize();
+                _initialized = true;
+            }
+        }
+
         public PreviewContent(User user)
         {
             _userId = user.Id;
