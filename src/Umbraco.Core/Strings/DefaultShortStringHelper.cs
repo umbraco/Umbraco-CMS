@@ -119,7 +119,7 @@ namespace Umbraco.Core.Strings
             bool breakTermsOnUpper = true, bool allowLeadingDigits = false, bool allowUnderscoreInTerm = false)
         {
             EnsureNotFrozen();
-            if (!_configs.ContainsKey(culture))
+            if (_configs.ContainsKey(culture) == false)
                 _configs[culture] = new Dictionary<CleanStringType, HelperConfig>();
             _configs[culture][stringRole] = new HelperConfig(preFilter, breakTermsOnUpper, allowLeadingDigits, allowUnderscoreInTerm);
             return this;
@@ -691,10 +691,9 @@ function validateSafeAlias(id, value, immediate, callback) {{
             // then we cannot break words on uppercase chars
             var input = text;
 
-            // because we shouldn't be adding any extra char
             // it's faster to use an array than a StringBuilder
             var ilen = input.Length;
-            var output = new char[ilen];
+            var output = new char[ilen * 2]; // twice the length should be OK in all cases
 
             //var termFilter = config.TermFilter;
 
@@ -710,7 +709,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
                 switch (state)
                 {
                     case StateBreak:
-                        if (isTerm && (opos > 0 || (!isUnder && (config.AllowLeadingDigits || !isDigit))))
+                        if (isTerm && (opos > 0 || (isUnder == false && (config.AllowLeadingDigits || isDigit == false))))
                         {
                             ipos = i;
                             if (opos > 0 && separator != char.MinValue)
@@ -720,7 +719,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
                         break;
 
                     case StateWord:
-                        if (!isTerm || (config.BreakTermsOnUpper && isUpper))
+                        if (isTerm == false || (config.BreakTermsOnUpper && isUpper))
                         {
                             CopyUtf8Term(input, ipos, output, ref opos, i - ipos, caseType, culture, /*termFilter,*/ false);
                             ipos = i;
@@ -731,9 +730,9 @@ function validateSafeAlias(id, value, immediate, callback) {{
                         break;
 
                     case StateAcronym:
-                        if (!isTerm || isLower || isDigit)
+                        if (isTerm == false || isLower || isDigit)
                         {
-                            if (isLower && !config.GreedyAcronyms)
+                            if (isLower && config.GreedyAcronyms == false)
                                 i -= 1;
                             CopyUtf8Term(input, ipos, output, ref opos, i - ipos, caseType, culture, /*termFilter,*/ true);
                             ipos = i;
