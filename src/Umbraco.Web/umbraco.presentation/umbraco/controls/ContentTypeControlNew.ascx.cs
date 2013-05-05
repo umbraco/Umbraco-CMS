@@ -67,7 +67,7 @@ namespace umbraco.controls
         //the async saving task
         private Action<SaveAsyncState> _asyncSaveTask;
         //the async delete property task
-        private Action<GenericPropertyWrapper> _asyncDeleteTask;
+        private Action<DeleteAsyncState> _asyncDeleteTask;
 
         override protected void OnInit(EventArgs e)
         {
@@ -111,6 +111,23 @@ namespace umbraco.controls
             }
 
             checkTxtAliasJs.Text = string.Format("checkAlias('{0}');", txtAlias.ClientID);
+        }
+
+        /// <summary>
+        /// A class to track the async state for deleting a doc type property
+        /// </summary>
+        private class DeleteAsyncState
+        {
+            public Umbraco.Web.UmbracoContext UmbracoContext { get; private set; }
+            public GenericPropertyWrapper GenericPropertyWrapper { get; private set; }
+
+            public DeleteAsyncState(
+                Umbraco.Web.UmbracoContext umbracoContext,
+                GenericPropertyWrapper genericPropertyWrapper)
+            {
+                UmbracoContext = umbracoContext;
+                GenericPropertyWrapper = genericPropertyWrapper;
+            }
         }
 
         /// <summary>
@@ -1027,7 +1044,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             Trace.Write("ContentTypeControlNew", "Start async operation");
 
             //get the args from the async state
-            var args = (GenericPropertyWrapper)state;
+            var args = (DeleteAsyncState)state;
 
             //start the task
             var result = _asyncDeleteTask.BeginInvoke(args, cb, args);
@@ -1062,17 +1079,24 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         /// <param name="e"></param>
         protected void gpw_Delete(object sender, EventArgs e)
         {
+            var state = new DeleteAsyncState(
+                UmbracoContext,
+                (GenericPropertyWrapper)sender);
+
             //Add the async operation to the page
-            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncDeleteOperation, EndAsyncDeleteOperation, HandleAsyncSaveTimeout, (GenericPropertyWrapper) sender));
+            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncDeleteOperation, EndAsyncDeleteOperation, HandleAsyncSaveTimeout, state));
 
             //create the save task to be executed async
-            _asyncDeleteTask = genericPropertyWrapper =>
+            _asyncDeleteTask = asyncState =>
                 {
                     Trace.Write("ContentTypeControlNew", "executing task");
 
+                    //we need to re-set the UmbracoContext since it will be nulled and our cache handlers need it
+                    global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
+
                     if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
                     {
-                        _contentType.ContentTypeItem.RemovePropertyType(genericPropertyWrapper.PropertyType.Alias);
+                        _contentType.ContentTypeItem.RemovePropertyType(asyncState.GenericPropertyWrapper.PropertyType.Alias);
                         _contentType.Save();
                     }
                     else
@@ -1081,7 +1105,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                         //the new API for document type and media type's will ensure that the data is removed correctly and that
                         //the cache is flushed correctly (using events).  If it is not one of these types, we'll rever to the 
                         //legacy operation (... like for members i suppose ?)
-                        genericPropertyWrapper.GenricPropertyControl.PropertyType.delete();
+                        asyncState.GenericPropertyWrapper.GenricPropertyControl.PropertyType.delete();
 
                     }
 
