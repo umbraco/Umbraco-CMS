@@ -79,7 +79,7 @@ namespace Umbraco.Tests.PublishedCache
 
             var cache = new PublishedContentCache
                 {
-                    GetXmlDelegate = (user, preview) =>
+                    GetXmlDelegate = (context, preview) =>
                         {
                             var doc = new XmlDocument();
                             doc.LoadXml(GetXml());
@@ -102,7 +102,7 @@ namespace Umbraco.Tests.PublishedCache
             var cache = _umbracoContext.ContentCache.InnerCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
-            cache.GetXmlDelegate = (user, preview) =>
+            cache.GetXmlDelegate = (context, preview) =>
             {
 				var doc = new XmlDocument();
 				doc.LoadXml(GetLegacyXml());

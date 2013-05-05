@@ -66,7 +66,10 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		internal void UpdateOnMissingTemplate()
 		{
+            var __readonly = _readonly;
+		    _readonly = false;
 			_engine.UpdateRequestOnMissingTemplate();
+		    _readonly = __readonly;
 		}
 
 		/// <summary>

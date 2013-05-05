@@ -40,7 +40,49 @@ namespace Umbraco.Core
             return new XPathDocument(new XmlTextReader(new StringReader(xml)));
         }
 
-	    /// <summary>
+        /// <summary>
+        /// Tries to create a new <c>XPathDocument</c> from an xml string.
+        /// </summary>
+        /// <param name="xml">The xml string.</param>
+        /// <param name="doc">The XPath document.</param>
+        /// <returns>A value indicating whether it has been possible to create the document.</returns>
+        public static bool TryCreateXPathDocument(string xml, out XPathDocument doc)
+        {
+            try
+            {
+                doc = new XPathDocument(new XmlTextReader(new StringReader(xml)));
+                return true;
+            }
+            catch (Exception)
+            {
+                doc = null;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Tries to create a new <c>XPathDocument</c> from a property value.
+        /// </summary>
+        /// <param name="alias">The alias of the property.</param>
+        /// <param name="value">The value of the property.</param>
+        /// <param name="doc">The XPath document.</param>
+        /// <returns>A value indicating whether it has been possible to create the document.</returns>
+        public static bool TryCreateXPathDocumentFromPropertyValue(string alias, object value, out XPathDocument doc)
+        {
+            // In addition, DynamicNode strips dashes in elements or attributes
+            // names but really, this is ugly enough, and using dashes should be
+            // illegal in content type or property aliases anyway.
+
+            doc = null;
+            var xml = value as string;
+            if (xml == null) return false;
+            xml = xml.Trim();
+            if (xml.StartsWith("<") == false || xml.EndsWith(">") == false || xml.Contains('/') == false) return false;
+            if (UmbracoSettings.NotDynamicXmlDocumentElements.Any(x => x.InvariantEquals(alias))) return false;
+            return TryCreateXPathDocument(xml, out doc);
+        }
+        
+        /// <summary>
 	    /// Sorts the children of the parentNode that match the xpath selector 
 	    /// </summary>
 	    /// <param name="parentNode"></param>

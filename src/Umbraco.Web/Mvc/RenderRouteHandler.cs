@@ -101,6 +101,12 @@ namespace Umbraco.Web.Mvc
 			requestContext.RouteData.DataTokens.Add("umbraco-context", UmbracoContext); //required for UmbracoTemplatePage
 		}
 
+        private void UpdateRouteDataForRequest(RenderModel renderModel, RequestContext requestContext)
+        {
+            requestContext.RouteData.DataTokens["umbraco"] = renderModel;
+            // the rest should not change -- it's only the published content that has changed
+        }
+
 		/// <summary>
 		/// Checks the request and query strings to see if it matches the definition of having a Surface controller
 		/// posted value, if so, then we return a PostedDataProxyInfo object with the correct information.
@@ -358,7 +364,11 @@ namespace Umbraco.Web.Mvc
 					return handler;
 
 				// else we are running Mvc
-				// update the route definition
+                // update the route data - because the PublishedContent has changed
+                UpdateRouteDataForRequest(
+                    new RenderModel(publishedContentRequest.PublishedContent, publishedContentRequest.Culture),
+                    requestContext);
+                // update the route definition
 				routeDef = GetUmbracoRouteDefinition(requestContext, publishedContentRequest);
 			}
 

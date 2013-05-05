@@ -133,6 +133,7 @@ namespace Umbraco.Tests.CoreStrings
         [TestCase("汉#字*/漢?字", "")]
         [TestCase("Réalösk fix bran#lo'sk", "realosk-fix-bran-losk")]
         [TestCase("200 ways to be happy", "200-ways-to-be-happy")]
+        [TestCase("aBCdEfGhIJK", "a-b-cd-ef-gh-ijk")]
         #endregion
         public void CleanStringForUrlSegment(string input, string expected)
         {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml;
 using System.Xml.XPath;
@@ -322,8 +323,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         #region Legacy Xml
 
-        private PreviewContent _previewContent;
-        private Func<User, bool, XmlDocument> _xmlDelegate;
+        static readonly ConditionalWeakTable<UmbracoContext, PreviewContent> PreviewContentCache
+            = new ConditionalWeakTable<UmbracoContext, PreviewContent>();
+
+        private Func<UmbracoContext, bool, XmlDocument> _xmlDelegate;
 
         /// <summary>
         /// Gets/sets the delegate used to retreive the Xml content, generally the setter is only used for unit tests
@@ -334,22 +337,22 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// mostly because the 'content' object heavily relies on HttpContext, SQL connections and a bunch of other stuff
         /// that when run inside of a unit test fails.
         /// </remarks>
-        internal Func<User, bool, XmlDocument> GetXmlDelegate
+        internal Func<UmbracoContext, bool, XmlDocument> GetXmlDelegate
         {
             get
             {
-                return _xmlDelegate ?? (_xmlDelegate = (user, preview) =>
+                return _xmlDelegate ?? (_xmlDelegate = (context, preview) =>
                 {
                     if (preview)
                     {
-                        if (_previewContent == null)
+                        var previewContent = PreviewContentCache.GetOrCreateValue(context); // will use the ctor with no parameters
+                        previewContent.EnsureInitialized(context.UmbracoUser, StateHelper.Cookies.Preview.GetValue(), true, () =>
                         {
-                            _previewContent = new PreviewContent(user, new Guid(StateHelper.Cookies.Preview.GetValue()), true);
-                            if (_previewContent.ValidPreviewSet)
-                                _previewContent.LoadPreviewset();
-                        }
-                        if (_previewContent.ValidPreviewSet)
-                            return _previewContent.XmlContent;
+                            if (previewContent.ValidPreviewSet)
+                                previewContent.LoadPreviewset();
+                        });
+                        if (previewContent.ValidPreviewSet)
+                            return previewContent.XmlContent;
                     }
                     return content.Instance.XmlContent;
                 });
@@ -362,7 +365,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         internal XmlDocument GetXml(UmbracoContext umbracoContext, bool preview)
         {
-            return GetXmlDelegate(umbracoContext.UmbracoUser, preview);
+            return GetXmlDelegate(umbracoContext, preview);
         }
 
         #endregion

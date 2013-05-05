@@ -286,7 +286,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             var cache = new PublishedContentCache();
 
-            cache.GetXmlDelegate = (user, preview) =>
+            cache.GetXmlDelegate = (context, preview) =>
                 {
                     var doc = new XmlDocument();
                     doc.LoadXml(GetXmlContent(templateId));
