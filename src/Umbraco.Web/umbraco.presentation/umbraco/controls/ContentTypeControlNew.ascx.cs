@@ -64,7 +64,7 @@ namespace umbraco.controls
         //the async saving task
         private Action<SaveAsyncState> _asyncSaveTask;
         //the async delete property task
-        private Action<GenericPropertyWrapper> _asyncDeleteTask;
+        private Action<DeleteAsyncState> _asyncDeleteTask;
 
         override protected void OnInit(EventArgs e)
         {
@@ -123,11 +123,29 @@ namespace umbraco.controls
         }
 
         /// <summary>
+        /// A class to track the async state for deleting a doc type property
+        /// </summary>
+        private class DeleteAsyncState
+        {
+            public Umbraco.Web.UmbracoContext UmbracoContext { get; private set; }
+            public GenericPropertyWrapper GenericPropertyWrapper { get; private set; }
+
+            public DeleteAsyncState(
+                Umbraco.Web.UmbracoContext umbracoContext,
+                GenericPropertyWrapper genericPropertyWrapper)
+            {
+                UmbracoContext = umbracoContext;
+                GenericPropertyWrapper = genericPropertyWrapper;
+            }
+        }
+
+        /// <summary>
         /// A class to track the async state for saving the doc type
         /// </summary>
         private class SaveAsyncState
         {
             public SaveAsyncState(
+                Umbraco.Web.UmbracoContext umbracoContext,
                 SaveClickEventArgs saveArgs, 
                 string originalAlias, 
                 string originalName,
@@ -135,6 +153,7 @@ namespace umbraco.controls
                 string newName,
                 string[] originalPropertyAliases)
             {
+                UmbracoContext = umbracoContext;
                 SaveArgs = saveArgs;
                 _originalAlias = originalAlias;
                 _originalName = originalName;
@@ -143,6 +162,7 @@ namespace umbraco.controls
                 _newName = newName;
             }
 
+            public Umbraco.Web.UmbracoContext UmbracoContext { get; private set; }
             public SaveClickEventArgs SaveArgs { get; private set; }
             private readonly string _originalAlias;
             private readonly string _originalName;
@@ -253,7 +273,9 @@ namespace umbraco.controls
         protected void save_click(object sender, ImageClickEventArgs e)
         {
 
-            var state = new SaveAsyncState(new SaveClickEventArgs("Saved")
+            var state = new SaveAsyncState(
+                Umbraco.Web.UmbracoContext.Current,
+                new SaveClickEventArgs("Saved")
                 {
                     IconType = BasePage.speechBubbleIcon.success
                 }, _contentType.Alias, _contentType.Text, txtAlias.Text, txtName.Text, _contentType.PropertyTypes.Select(x => x.Alias).ToArray());
@@ -265,6 +287,9 @@ namespace umbraco.controls
             _asyncSaveTask = asyncState =>
                 {
                     Trace.Write("ContentTypeControlNew", "executing task");
+
+                    //we need to re-set the UmbracoContext since it will be nulled and our cache handlers need it
+                    global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
 
                     //NOTE The saving of the 5 properties (Name, Alias, Icon, Description and Thumbnail) are divided
                     //to avoid the multiple cache flushing when each property is set using the legacy ContentType class,
@@ -823,6 +848,8 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                         {
                             var tab = gpData.Tabs.FirstOrDefault(x => x.Id == gpData.Tab);
                             if (tab != null)
+                (GenericPropertyWrapper)sender);
+
                             {
                                 var caption = tab.GetRawCaption();
                                 contentTypeItem.AddPropertyType(propertyType, caption);

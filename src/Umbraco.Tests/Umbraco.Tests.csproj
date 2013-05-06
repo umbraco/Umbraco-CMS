@@ -306,6 +306,7 @@
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
     <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
     <Compile Include="TestHelpers\ExamineHelpers\IndexInitializer.cs" />
+    <Compile Include="TypeHelperTests.cs" />
     <Compile Include="UriUtilityTests.cs" />
     <Compile Include="Resolvers\MacroFieldEditorsResolverTests.cs" />
     <Compile Include="MacroEngineFactoryTests.cs" />
