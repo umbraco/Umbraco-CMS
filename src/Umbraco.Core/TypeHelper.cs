@@ -30,8 +30,7 @@ namespace Umbraco.Core
         {
             //check if it is the app_code assembly.
             //check if it is App_global.asax assembly
-            var appCodeAssembly = Assembly.Load("App_Code");
-            if (assignTypeFrom.Assembly == appCodeAssembly || assignTypeFrom.Assembly.FullName.StartsWith("App_global.asax"))
+            if (assignTypeFrom.Assembly.IsAppCodeAssembly() || assignTypeFrom.Assembly.IsGlobalAsaxAssembly())
             {
                 return Enumerable.Empty<Assembly>().ToArray();
             }
