@@ -342,6 +342,7 @@
     <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
     <Compile Include="UmbracoExamine\ContentServiceTest.cs" />
     <Compile Include="UmbracoExamine\EventsTest.cs" />
+    <Compile Include="TypeHelperTests.cs" />
     <Compile Include="UmbracoExamine\ExamineBaseTest.cs" />
     <Compile Include="UmbracoExamine\IndexInitializer.cs" />
     <Compile Include="UmbracoExamine\IndexTest.cs" />

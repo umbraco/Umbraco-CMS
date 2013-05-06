@@ -131,6 +131,23 @@ namespace umbraco.controls
         }
 
         /// <summary>
+        /// A class to track the async state for deleting a doc type property
+        /// </summary>
+        private class DeleteAsyncState
+        {
+            public Umbraco.Web.UmbracoContext UmbracoContext { get; private set; }
+            public GenericPropertyWrapper GenericPropertyWrapper { get; private set; }
+
+            public DeleteAsyncState(
+                Umbraco.Web.UmbracoContext umbracoContext,
+                GenericPropertyWrapper genericPropertyWrapper)
+            {
+                UmbracoContext = umbracoContext;
+                GenericPropertyWrapper = genericPropertyWrapper;
+            }
+        }
+
+        /// <summary>
         /// A class to track the async state for saving the doc type
         /// </summary>
         private class SaveAsyncState
