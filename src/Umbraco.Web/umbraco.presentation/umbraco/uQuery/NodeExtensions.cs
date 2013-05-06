@@ -238,7 +238,8 @@ namespace umbraco
         /// <returns>Nodes as IEnumerable</returns>
         public static IEnumerable<Node> GetDescendantNodes(this Node node, Func<Node, bool> func)
         {
-            return GetDescendantNodes((INode)node, (Func<INode, bool>) func).Cast<Node>();
+            Func<INode, bool> convertedFunc = x => func((Node)x);
+            return GetDescendantNodes((INode)node, convertedFunc).Cast<Node>();
         }
 
         /// <summary>
@@ -322,7 +323,8 @@ namespace umbraco
         /// <returns>Nodes as IEnumerable</returns>
         public static IEnumerable<Node> GetChildNodes(this Node node, Func<Node, bool> func)
         {
-            return GetChildNodes((INode)node, (Func<INode, bool>) func).Cast<Node>();
+            Func<INode, bool> convertedFunc = x => func((Node)x);
+            return GetChildNodes((INode)node, convertedFunc).Cast<Node>();
         }
 
         /// <summary>
