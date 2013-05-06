@@ -92,7 +92,7 @@ namespace Umbraco.Core.Persistence
 		{
 			if (HttpContext.Current == null)
 			{
-				_globalInstance.Dispose();
+                _nonHttpInstance.Dispose();
 			}
 			else
 			{

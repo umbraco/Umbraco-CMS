@@ -848,8 +848,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                         {
                             var tab = gpData.Tabs.FirstOrDefault(x => x.Id == gpData.Tab);
                             if (tab != null)
-                (GenericPropertyWrapper)sender);
-
                             {
                                 var caption = tab.GetRawCaption();
                                 contentTypeItem.AddPropertyType(propertyType, caption);
@@ -1077,7 +1075,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             Trace.Write("ContentTypeControlNew", "Start async operation");
 
             //get the args from the async state
-            var args = (GenericPropertyWrapper)state;
+            var args = (DeleteAsyncState)state;
 
             //start the task
             var result = _asyncDeleteTask.BeginInvoke(args, cb, args);
@@ -1112,22 +1110,29 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         /// <param name="e"></param>
         protected void gpw_Delete(object sender, EventArgs e)
         {
+            var state = new DeleteAsyncState(
+                Umbraco.Web.UmbracoContext.Current,
+                (GenericPropertyWrapper)sender);
+
             //Add the async operation to the page
-            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncDeleteOperation, EndAsyncDeleteOperation, HandleAsyncSaveTimeout, (GenericPropertyWrapper)sender));
+            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncDeleteOperation, EndAsyncDeleteOperation, HandleAsyncSaveTimeout, state));
 
             //create the save task to be executed async
-            _asyncDeleteTask = genericPropertyWrapper =>
+            _asyncDeleteTask = asyncState =>
             {
                 Trace.Write("ContentTypeControlNew", "executing task");
 
+                //we need to re-set the UmbracoContext since it will be nulled and our cache handlers need it
+                global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
+
                 if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
                 {
-                    _contentType.ContentTypeItem.RemovePropertyType(genericPropertyWrapper.PropertyType.Alias);
+                    _contentType.ContentTypeItem.RemovePropertyType(asyncState.GenericPropertyWrapper.PropertyType.Alias);
                     _contentType.Save();
                 }
 
                 //delete the property
-                genericPropertyWrapper.GenricPropertyControl.PropertyType.delete();
+                asyncState.GenericPropertyWrapper.GenricPropertyControl.PropertyType.delete();
                 
                 //we need to re-generate the xml structures because we're removing a content type property
                 RegenerateXmlCaches();
