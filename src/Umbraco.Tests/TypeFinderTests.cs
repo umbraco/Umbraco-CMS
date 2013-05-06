@@ -16,7 +16,6 @@ using SqlCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Tests;
-using Umbraco.Tests.PartialTrust;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.BaseRest;
 using umbraco;
@@ -30,8 +29,9 @@ using umbraco.uicontrols;
 
 namespace Umbraco.Tests
 {
-	/// <summary>
-	/// Full Trust benchmark tests for typefinder and the old typefinder
+    
+    /// <summary>
+	/// Tests for typefinder
 	/// </summary>
 	[TestFixture]	
 	public class TypeFinderTests
