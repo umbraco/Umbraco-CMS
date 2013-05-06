@@ -68,8 +68,7 @@ namespace Umbraco.Core.Persistence
 						//double check
                         if (_nonHttpInstance == null)
 						{
-                            _nonHttpInstance = string.IsNullOrEmpty(_providerName) == false && string.IsNullOrEmpty(_providerName) == false
-						                      string.IsNullOrEmpty(_providerName) == false
+                            _nonHttpInstance = string.IsNullOrEmpty(_connectionString) == false && string.IsNullOrEmpty(_providerName) == false
 						                          ? new UmbracoDatabase(_connectionString, _providerName)
 						                          : new UmbracoDatabase(_connectionStringName);
 						}
@@ -82,8 +81,7 @@ namespace Umbraco.Core.Persistence
 			if (HttpContext.Current.Items.Contains(typeof(DefaultDatabaseFactory)) == false)
 			{
 			    HttpContext.Current.Items.Add(typeof (DefaultDatabaseFactory),
-			                                  string.IsNullOrEmpty(_connectionString) == false &&
-			                                  string.IsNullOrEmpty(_providerName) == false
+			                                  string.IsNullOrEmpty(_connectionString) == false && string.IsNullOrEmpty(_providerName) == false
 			                                      ? new UmbracoDatabase(_connectionString, _providerName)
 			                                      : new UmbracoDatabase(_connectionStringName));
 			}

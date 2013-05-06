@@ -64,7 +64,7 @@ namespace Umbraco.Tests
 			        typeof(ISqlHelper).Assembly,
 			        typeof(ICultureDictionary).Assembly,
                     typeof(Tag).Assembly,
-                    typeof(UmbracoExamine.BaseUmbracoIndexer).Assembly
+                    typeof(global::UmbracoExamine.BaseUmbracoIndexer).Assembly
 			    };
 
 		}
