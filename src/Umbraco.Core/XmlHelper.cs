@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -16,7 +17,72 @@ namespace Umbraco.Core
     /// </summary>
     public class XmlHelper
     {
-	    /// <summary>
+        /// <summary>
+        /// Gets a value indicating whether a specified string contains only xml whitespace characters.
+        /// </summary>
+        /// <param name="s">The string.</param>
+        /// <returns><c>true</c> if the string contains only xml whitespace characters.</returns>
+        /// <remarks>As per XML 1.1 specs, space, \t, \r and \n.</remarks>
+        public static bool IsXmlWhitespace(string s)
+        {
+            // as per xml 1.1 specs - anything else is significant whitespace
+            s = s.Trim(' ', '\t', '\r', '\n');
+            return s.Length == 0;
+        }
+
+        /// <summary>
+        /// Creates a new <c>XPathDocument</c> from an xml string.
+        /// </summary>
+        /// <param name="xml">The xml string.</param>
+        /// <returns>An <c>XPathDocument</c> created from the xml string.</returns>
+        public static XPathDocument CreateXPathDocument(string xml)
+        {
+            return new XPathDocument(new XmlTextReader(new StringReader(xml)));
+        }
+
+        /// <summary>
+        /// Tries to create a new <c>XPathDocument</c> from an xml string.
+        /// </summary>
+        /// <param name="xml">The xml string.</param>
+        /// <param name="doc">The XPath document.</param>
+        /// <returns>A value indicating whether it has been possible to create the document.</returns>
+        public static bool TryCreateXPathDocument(string xml, out XPathDocument doc)
+        {
+            try
+            {
+                doc = new XPathDocument(new XmlTextReader(new StringReader(xml)));
+                return true;
+            }
+            catch (Exception)
+            {
+                doc = null;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Tries to create a new <c>XPathDocument</c> from a property value.
+        /// </summary>
+        /// <param name="alias">The alias of the property.</param>
+        /// <param name="value">The value of the property.</param>
+        /// <param name="doc">The XPath document.</param>
+        /// <returns>A value indicating whether it has been possible to create the document.</returns>
+        public static bool TryCreateXPathDocumentFromPropertyValue(string alias, object value, out XPathDocument doc)
+        {
+            // In addition, DynamicNode strips dashes in elements or attributes
+            // names but really, this is ugly enough, and using dashes should be
+            // illegal in content type or property aliases anyway.
+
+            doc = null;
+            var xml = value as string;
+            if (xml == null) return false;
+            xml = xml.Trim();
+            if (xml.StartsWith("<") == false || xml.EndsWith(">") == false || xml.Contains('/') == false) return false;
+            if (UmbracoSettings.NotDynamicXmlDocumentElements.Any(x => x.InvariantEquals(alias))) return false;
+            return TryCreateXPathDocument(xml, out doc);
+        }
+        
+        /// <summary>
 	    /// Sorts the children of the parentNode that match the xpath selector 
 	    /// </summary>
 	    /// <param name="parentNode"></param>
@@ -71,6 +137,60 @@ namespace Umbraco.Core
                 }
             }
         }
+        
+
+        public static string StripDashesInElementOrAttributeNames(string xml)
+        {
+            using (var outputms = new MemoryStream())
+            {
+                using (TextWriter outputtw = new StreamWriter(outputms))
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        using (var tw = new StreamWriter(ms))
+                        {
+                            tw.Write(xml);
+                            tw.Flush();
+                            ms.Position = 0;
+                            using (var tr = new StreamReader(ms))
+                            {
+                                bool IsInsideElement = false, IsInsideQuotes = false;
+                                int ic = 0;
+                                while ((ic = tr.Read()) != -1)
+                                {
+                                    if (ic == (int)'<' && !IsInsideQuotes)
+                                    {
+                                        if (tr.Peek() != (int)'!')
+                                        {
+                                            IsInsideElement = true;
+                                        }
+                                    }
+                                    if (ic == (int)'>' && !IsInsideQuotes)
+                                    {
+                                        IsInsideElement = false;
+                                    }
+                                    if (ic == (int)'"')
+                                    {
+                                        IsInsideQuotes = !IsInsideQuotes;
+                                    }
+                                    if (!IsInsideElement || ic != (int)'-' || IsInsideQuotes)
+                                    {
+                                        outputtw.Write((char)ic);
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                    outputtw.Flush();
+                    outputms.Position = 0;
+                    using (TextReader outputtr = new StreamReader(outputms))
+                    {
+                        return outputtr.ReadToEnd();
+                    }
+                }
+            }
+        }
 
 		/// <summary>
         /// Imports a XML node from text.
@@ -78,7 +198,7 @@ namespace Umbraco.Core
         /// <param name="text">The text.</param>
         /// <param name="xmlDoc">The XML doc.</param>
         /// <returns></returns>
-        internal static XmlNode ImportXmlNodeFromText(string text, ref XmlDocument xmlDoc)
+		public static XmlNode ImportXmlNodeFromText(string text, ref XmlDocument xmlDoc)
         {
             xmlDoc.LoadXml(text);
             return xmlDoc.FirstChild;
@@ -138,7 +258,7 @@ namespace Umbraco.Core
         /// <param name="name">The node name.</param>
         /// <param name="value">The node value.</param>
         /// <returns>A XmlNode</returns>
-        public static XmlNode AddCDataNode(XmlDocument xd, string name, string value)
+		public static XmlNode AddCDataNode(XmlDocument xd, string name, string value)
         {
             var temp = xd.CreateNode(XmlNodeType.Element, name, "");
             temp.AppendChild(xd.CreateCDataSection(value));
@@ -150,7 +270,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="n">The XmlNode.</param>
         /// <returns>the value as a string</returns>
-		internal static string GetNodeValue(XmlNode n)
+		public static string GetNodeValue(XmlNode n)
         {
             var value = string.Empty;
             if (n == null || n.FirstChild == null)
@@ -166,13 +286,13 @@ namespace Umbraco.Core
         /// <returns>
         /// 	<c>true</c> if the specified string appears to be XML; otherwise, <c>false</c>.
         /// </returns>
-		internal static bool CouldItBeXml(string xml)
+		public static bool CouldItBeXml(string xml)
         {
-            if (!string.IsNullOrEmpty(xml))
+            if (string.IsNullOrEmpty(xml) == false)
             {
                 xml = xml.Trim();
 
-                if (xml.StartsWith("<") && xml.EndsWith(">"))
+                if (xml.StartsWith("<") && xml.EndsWith(">") && xml.Contains("/"))
                 {
                     return true;
                 }
@@ -189,7 +309,7 @@ namespace Umbraco.Core
         /// <param name="rootName">Name of the root.</param>
         /// <param name="elementName">Name of the element.</param>
         /// <returns>Returns an <c>System.Xml.XmlDocument</c> representation of the delimited string data.</returns>
-		internal static XmlDocument Split(string data, string[] separator, string rootName, string elementName)
+		public static XmlDocument Split(string data, string[] separator, string rootName, string elementName)
         {
             return Split(new XmlDocument(), data, separator, rootName, elementName);
         }
@@ -203,7 +323,7 @@ namespace Umbraco.Core
         /// <param name="rootName">Name of the root node.</param>
         /// <param name="elementName">Name of the element node.</param>
         /// <returns>Returns an <c>System.Xml.XmlDocument</c> representation of the delimited string data.</returns>
-		internal static XmlDocument Split(XmlDocument xml, string data, string[] separator, string rootName, string elementName)
+		public static XmlDocument Split(XmlDocument xml, string data, string[] separator, string rootName, string elementName)
         {
             // load new XML document.
             xml.LoadXml(string.Concat("<", rootName, "/>"));
@@ -232,7 +352,7 @@ namespace Umbraco.Core
 		/// </summary>
 		/// <param name="tag"></param>
 		/// <returns></returns>
-		internal static Dictionary<string, string> GetAttributesFromElement(string tag)
+		public static Dictionary<string, string> GetAttributesFromElement(string tag)
 		{
 			var m =
 				Regex.Matches(tag, "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"",
