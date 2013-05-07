@@ -794,7 +794,7 @@ namespace umbraco.MacroEngines
                 {
                     try
                     {
-                        XElement e = XElement.Parse(DynamicXml.StripDashesInElementOrAttributeNames(sResult), LoadOptions.None);
+                        XElement e = XElement.Parse(XmlHelper.StripDashesInElementOrAttributeNames(sResult), LoadOptions.None);
                         if (e != null)
                         {
                             //check that the document element is not one of the disallowed elements
