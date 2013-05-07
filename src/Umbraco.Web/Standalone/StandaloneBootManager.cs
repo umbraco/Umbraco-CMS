@@ -18,12 +18,14 @@ namespace Umbraco.Web.Standalone
         // fixme - could we inherit from WebBootManager?
         // fixme - highly experimental, probably not complete!
 
-        private readonly IEnumerable<Type> _appEventHandlers;
+        private readonly IEnumerable<Type> _handlersToAdd;
+        private readonly IEnumerable<Type> _handlersToRemove;
 
-        public StandaloneBootManager(UmbracoApplicationBase umbracoApplication, IEnumerable<Type> appEventHandlers)
+        public StandaloneBootManager(UmbracoApplicationBase umbracoApplication, IEnumerable<Type> handlersToAdd, IEnumerable<Type> handlersToRemove)
             : base(umbracoApplication)
         {
-            _appEventHandlers = appEventHandlers;
+            _handlersToAdd = handlersToAdd;
+            _handlersToRemove = handlersToRemove;
 
             // this is only here to ensure references to the assemblies needed for
             // the DataTypesResolver otherwise they won't be loaded into the AppDomain.
@@ -37,8 +39,10 @@ namespace Umbraco.Web.Standalone
         protected override void InitializeApplicationEventsResolver()
         {
             base.InitializeApplicationEventsResolver();
-            foreach (var type in _appEventHandlers)
+            foreach (var type in _handlersToAdd)
                 ApplicationEventsResolver.Current.AddType(type);
+            foreach (var type in _handlersToRemove)
+                ApplicationEventsResolver.Current.RemoveType(type);
         }
 
         protected override void InitializeResolvers()

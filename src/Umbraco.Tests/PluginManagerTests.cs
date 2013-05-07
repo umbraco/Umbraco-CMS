@@ -316,7 +316,7 @@ namespace Umbraco.Tests
         public void Resolves_DataTypes()
         {
             var types = PluginManager.Current.ResolveDataTypes();
-            Assert.AreEqual(37, types.Count());
+            Assert.AreEqual(38, types.Count());
         }
 
         [Test]

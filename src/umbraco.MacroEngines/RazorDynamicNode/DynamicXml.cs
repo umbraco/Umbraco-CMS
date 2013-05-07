@@ -8,6 +8,7 @@ using System.Xml.XPath;
 using System.Collections;
 using System.IO;
 using System.Web;
+using Umbraco.Core;
 
 namespace umbraco.MacroEngines
 {
@@ -381,9 +382,10 @@ namespace umbraco.MacroEngines
             return test(this) ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
         }
 
+        [Obsolete("Use XmlHelper.StripDashesInElementOrAttributeNames instead")]
         public static string StripDashesInElementOrAttributeNames(string xml)
         {
-        	return Umbraco.Core.Dynamics.DynamicXml.StripDashesInElementOrAttributeNames(xml);
+            return XmlHelper.StripDashesInElementOrAttributeNames(xml);
         }
     }
 }

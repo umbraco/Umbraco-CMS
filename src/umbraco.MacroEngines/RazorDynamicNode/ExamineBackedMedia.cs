@@ -467,13 +467,18 @@ namespace umbraco.MacroEngines
         public IProperty GetProperty(string alias, out bool propertyExists)
         {
             string value = null;
-            if (Values.TryGetValue(alias, out value))
+
+            //First, try to get the 'raw' value, if that doesn't work try to get the normal one
+            if (Values.TryGetValue(UmbracoContentIndexer.RawFieldPrefix + alias, out value)
+                || Values.TryGetValue(alias, out value))
             {
                 propertyExists = true;
                 return new PropertyResult(alias, value, Guid.Empty);
             }
+
             propertyExists = false;
             return null;
         }
+
     }
 }

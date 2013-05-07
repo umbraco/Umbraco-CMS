@@ -3,52 +3,34 @@ using Umbraco.Core;
 
 namespace umbraco.editorControls.memberpicker
 {
-	/// <summary>
-	/// Summary description for MemberPickerDataType.
-	/// </summary>
-	public class MemberPickerDataType : cms.businesslogic.datatype.BaseDataType,interfaces.IDataType
-	{
-		private interfaces.IDataEditor _Editor;
-		private interfaces.IData _baseData;
-		private interfaces.IDataPrevalue _prevalueeditor;
+    public class MemberPickerDataType : cms.businesslogic.datatype.BaseDataType, interfaces.IDataType
+    {
+        private interfaces.IDataEditor _editor;
+        private interfaces.IData _baseData;
+        private interfaces.IDataPrevalue _prevalueeditor;
 
-		public override interfaces.IDataEditor DataEditor 
-		{
-			get
-			{
-				if (_Editor == null)
-					_Editor = new memberPicker(Data);
-				return _Editor;
-			}
-		}
+        public override interfaces.IDataEditor DataEditor
+        {
+            get { return _editor ?? (_editor = new memberPicker(Data)); }
+        }
 
-		public override interfaces.IData Data 
-		{
-			get 
-			{
-				if (_baseData == null)
-					_baseData = new cms.businesslogic.datatype.DefaultData(this);
-				return _baseData;
-			}
-		}
-		public override string DataTypeName 
-		{
-			get {return "Member Picker";}
-		}
+        public override interfaces.IData Data
+        {
+            get { return _baseData ?? (_baseData = new cms.businesslogic.datatype.DefaultData(this)); }
+        }
+        public override string DataTypeName
+        {
+            get { return "Member Picker"; }
+        }
 
-		public override Guid Id 
-		{
+        public override Guid Id
+        {
 			get { return new Guid(Constants.PropertyEditors.MemberPicker); }
-		}
+        }
 
-		public override interfaces.IDataPrevalue PrevalueEditor 
-		{
-			get 
-			{
-				if (_prevalueeditor == null)
-					_prevalueeditor = new DefaultPrevalueEditor(this,false);
-				return _prevalueeditor;
-			}
-		}
-	}
+        public override interfaces.IDataPrevalue PrevalueEditor
+        {
+            get { return _prevalueeditor ?? (_prevalueeditor = new DefaultPrevalueEditor(this, false)); }
+        }
+    }
 }

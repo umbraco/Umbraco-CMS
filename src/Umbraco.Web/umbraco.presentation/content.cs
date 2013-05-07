@@ -1057,24 +1057,27 @@ namespace umbraco
                 {
 					LogHelper.Debug<content>("Republishing starting");
 
-                    // Lets cache the DTD to save on the DB hit on the subsequent use
-                    string dtd = DocumentType.GenerateDtd();
+                    lock (DbReadSyncLock)
+                    {
 
-                    // Prepare an XmlDocument with an appropriate inline DTD to match
-                    // the expected content
-                    var xmlDoc = new XmlDocument();
-                    InitContentDocument(xmlDoc, dtd);
+                        // Lets cache the DTD to save on the DB hit on the subsequent use
+                        string dtd = DocumentType.GenerateDtd();
 
-                    // Esben Carlsen: At some point we really need to put all data access into to a tier of its own.
-                    // CLN - added checks that document xml is for a document that is actually published.
-                    string sql =
-                        @"select umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, cmsContentXml.xml from umbracoNode 
+                        // Prepare an XmlDocument with an appropriate inline DTD to match
+                        // the expected content
+                        var xmlDoc = new XmlDocument();
+                        InitContentDocument(xmlDoc, dtd);
+
+                        // Esben Carlsen: At some point we really need to put all data access into to a tier of its own.
+                        // CLN - added checks that document xml is for a document that is actually published.
+                        string sql =
+                            @"select umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, cmsContentXml.xml from umbracoNode 
 inner join cmsContentXml on cmsContentXml.nodeId = umbracoNode.id and umbracoNode.nodeObjectType = @type
 where umbracoNode.id in (select cmsDocument.nodeId from cmsDocument where cmsDocument.published = 1)
 order by umbracoNode.level, umbracoNode.sortOrder";
 
-                    lock (DbReadSyncLock)
-                    {
+
+
                         using (
                             IRecordsReader dr = SqlHelper.ExecuteReader(sql,
                                                                         SqlHelper.CreateParameter("@type",
@@ -1122,30 +1125,30 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                                 }
                             }
                         }
-                    }
 
-					LogHelper.Debug<content>("Xml Pages loaded");
+                        LogHelper.Debug<content>("Xml Pages loaded");
 
-                    try
-                    {
-                        // If we got to here we must have successfully retrieved the content from the DB so
-                        // we can safely initialise and compose the final content DOM. 
-                        // Note: We are reusing the XmlDocument used to create the xml nodes above so 
-                        // we don't have to import them into a new XmlDocument
+                        try
+                        {
+                            // If we got to here we must have successfully retrieved the content from the DB so
+                            // we can safely initialise and compose the final content DOM. 
+                            // Note: We are reusing the XmlDocument used to create the xml nodes above so 
+                            // we don't have to import them into a new XmlDocument
 
-                        // Initialise the document ready for the final composition of content
-                        InitContentDocument(xmlDoc, dtd);
+                            // Initialise the document ready for the final composition of content
+                            InitContentDocument(xmlDoc, dtd);
 
-                        // Start building the content tree recursively from the root (-1) node
-                        GenerateXmlDocument(hierarchy, nodeIndex, -1, xmlDoc.DocumentElement);
+                            // Start building the content tree recursively from the root (-1) node
+                            GenerateXmlDocument(hierarchy, nodeIndex, -1, xmlDoc.DocumentElement);
 
-						LogHelper.Debug<content>("Done republishing Xml Index");
+                            LogHelper.Debug<content>("Done republishing Xml Index");
 
-                        return xmlDoc;
-                    }
-                    catch (Exception ee)
-                    {
-                        LogHelper.Error<content>("Error while generating XmlDocument from database", ee);
+                            return xmlDoc;
+                        }
+                        catch (Exception ee)
+                        {
+                            LogHelper.Error<content>("Error while generating XmlDocument from database", ee);
+                        }
                     }
                 }
                 catch (OutOfMemoryException ee)

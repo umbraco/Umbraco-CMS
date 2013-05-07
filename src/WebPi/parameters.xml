@@ -123,7 +123,7 @@
 	This is used to create a login and assign permissions. The SQL tags indicates it is a parameter required for SQL. 
 	The DbAdminPassword tag indicates it should be used when the user is creating a new database. 
 	If they're not, it can be filled in with the DbUserPassword value. -->
-  <parameter name="Database Administrator Password" description="Password that is associated with the database administrator account." tags="Password, SQL, DbAdminPassword">
+  <parameter name="Database Administrator Password" description="Password that is associated with the database administrator account." tags="Password, SQL, DbAdminPassword,NoStore">
   </parameter>
 
   <!-- This is the hidden admin connection string used to run the database scripts -->

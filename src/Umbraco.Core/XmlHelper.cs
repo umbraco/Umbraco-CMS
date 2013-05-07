@@ -192,6 +192,7 @@ namespace Umbraco.Core
             }
         }
 
+
 		/// <summary>
         /// Imports a XML node from text.
         /// </summary>
@@ -288,11 +289,11 @@ namespace Umbraco.Core
         /// </returns>
 		public static bool CouldItBeXml(string xml)
         {
-            if (!string.IsNullOrEmpty(xml))
+            if (string.IsNullOrEmpty(xml) == false)
             {
                 xml = xml.Trim();
 
-                if (xml.StartsWith("<") && xml.EndsWith(">"))
+                if (xml.StartsWith("<") && xml.EndsWith(">") && xml.Contains("/"))
                 {
                     return true;
                 }
