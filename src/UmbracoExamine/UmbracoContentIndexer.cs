@@ -11,6 +11,8 @@ using System.Xml.Linq;
 using Examine;
 using Examine.Config;
 using Examine.Providers;
+using Lucene.Net.Documents;
+using Umbraco.Core;
 using umbraco.cms.businesslogic;
 using UmbracoExamine.DataServices;
 using Examine.LuceneEngine;
@@ -68,6 +70,11 @@ namespace UmbracoExamine
         /// </summary>
         public const string IndexPathFieldName = "__Path";
         public const string NodeTypeAliasFieldName = "__NodeTypeAlias";
+
+        /// <summary>
+        /// The prefix added to a field when it is duplicated in order to store the original raw value.
+        /// </summary>
+        public const string RawFieldPrefix = "__Raw_";
 
         /// <summary>
         /// A type that defines the type of index for each Umbraco field (non user defined fields)
@@ -169,11 +176,25 @@ namespace UmbracoExamine
             base.OnIndexingError(e);
         }
 
-        //protected override void OnDocumentWriting(DocumentWritingEventArgs docArgs)
-        //{
-        //    DataService.LogService.AddVerboseLog(docArgs.NodeId, string.Format("({0}) DocumentWriting event for node ({1})", this.Name, LuceneIndexFolder.FullName));
-        //    base.OnDocumentWriting(docArgs);
-        //}
+        /// <summary>
+        /// This ensures that the special __Raw_ fields are indexed
+        /// </summary>
+        /// <param name="docArgs"></param>
+        protected override void OnDocumentWriting(DocumentWritingEventArgs docArgs)
+        {
+            var d = docArgs.Document;
+            foreach (var f in docArgs.Fields.Where(x => x.Key.StartsWith(RawFieldPrefix)))
+            {                
+                d.Add(new Field(
+                   f.Key,
+                   f.Value,
+                   Field.Store.YES,
+                   Field.Index.NO, //don't index this field, we never want to search by it 
+                   Field.TermVector.NO));   
+            }            
+
+            base.OnDocumentWriting(docArgs);
+        }
 
         protected override void OnNodeIndexed(IndexedNodeEventArgs e)
         {
@@ -282,13 +303,22 @@ namespace UmbracoExamine
         /// <param name="e"></param>
         protected override void OnGatheringNodeData(IndexingNodeDataEventArgs e)
         {
-            //strip html of all users fields
+            //strip html of all users fields if we detect it has HTML in it. 
+            //if that is the case, we'll create a duplicate 'raw' copy of it so that we can return
+            //the value of the field 'as-is'.
             // Get all user data that we want to index and store into a dictionary 
             foreach (var field in IndexerData.UserFields)
             {
                 if (e.Fields.ContainsKey(field.Name))
                 {
-                    e.Fields[field.Name] = DataService.ContentService.StripHtml(e.Fields[field.Name]);
+                    //check if the field value has html
+                    if (XmlHelper.CouldItBeXml(e.Fields[field.Name]))
+                    {
+                        //First save the raw value to a raw field, we will change the policy of this field by detecting the prefix later
+                        e.Fields[RawFieldPrefix + field.Name] = e.Fields[field.Name];
+                        //now replace the original value with the stripped html
+                        e.Fields[field.Name] = DataService.ContentService.StripHtml(e.Fields[field.Name]);    
+                    }
                 }
             }
 
@@ -365,8 +395,8 @@ namespace UmbracoExamine
         /// <returns></returns>
         protected override FieldIndexTypes GetPolicy(string fieldName)
         {
-            var def = IndexFieldPolicies.Where(x => x.Name == fieldName);
-            return (!def.Any() ? FieldIndexTypes.ANALYZED : def.Single().IndexType);
+            var def = IndexFieldPolicies.Where(x => x.Name == fieldName).ToArray();
+            return (def.Any() == false ? FieldIndexTypes.ANALYZED : def.Single().IndexType);
         }
 
         /// <summary>
