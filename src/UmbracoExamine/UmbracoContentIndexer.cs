@@ -180,6 +180,7 @@ namespace UmbracoExamine
         /// This ensures that the special __Raw_ fields are indexed
         /// </summary>
         /// <param name="docArgs"></param>
+        [SecuritySafeCritical]
         protected override void OnDocumentWriting(DocumentWritingEventArgs docArgs)
         {
             var d = docArgs.Document;
@@ -301,6 +302,7 @@ namespace UmbracoExamine
         /// ensure our special Path field is added to the collection
         /// </summary>
         /// <param name="e"></param>
+        [SecuritySafeCritical]
         protected override void OnGatheringNodeData(IndexingNodeDataEventArgs e)
         {
             //strip html of all users fields if we detect it has HTML in it. 
