@@ -1125,30 +1125,30 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                                 }
                             }
                         }
-                    }
 
-					LogHelper.Debug<content>("Xml Pages loaded");
+                        LogHelper.Debug<content>("Xml Pages loaded");
 
-                    try
-                    {
-                        // If we got to here we must have successfully retrieved the content from the DB so
-                        // we can safely initialise and compose the final content DOM. 
-                        // Note: We are reusing the XmlDocument used to create the xml nodes above so 
-                        // we don't have to import them into a new XmlDocument
+                        try
+                        {
+                            // If we got to here we must have successfully retrieved the content from the DB so
+                            // we can safely initialise and compose the final content DOM. 
+                            // Note: We are reusing the XmlDocument used to create the xml nodes above so 
+                            // we don't have to import them into a new XmlDocument
 
-                        // Initialise the document ready for the final composition of content
-                        InitContentDocument(xmlDoc, dtd);
+                            // Initialise the document ready for the final composition of content
+                            InitContentDocument(xmlDoc, dtd);
 
-                        // Start building the content tree recursively from the root (-1) node
-                        GenerateXmlDocument(hierarchy, nodeIndex, -1, xmlDoc.DocumentElement);
+                            // Start building the content tree recursively from the root (-1) node
+                            GenerateXmlDocument(hierarchy, nodeIndex, -1, xmlDoc.DocumentElement);
 
-						LogHelper.Debug<content>("Done republishing Xml Index");
+                            LogHelper.Debug<content>("Done republishing Xml Index");
 
-                        return xmlDoc;
-                    }
-                    catch (Exception ee)
-                    {
-                        LogHelper.Error<content>("Error while generating XmlDocument from database", ee);
+                            return xmlDoc;
+                        }
+                        catch (Exception ee)
+                        {
+                            LogHelper.Error<content>("Error while generating XmlDocument from database", ee);
+                        }
                     }
                 }
                 catch (OutOfMemoryException ee)
