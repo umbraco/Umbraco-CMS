@@ -137,7 +137,10 @@ namespace umbraco
 
 			foreach (var member in members)
 			{
-				dictionary.Add(member.Id, member.LoginName);
+				if (member != null)
+				{
+					dictionary.Add(member.Id, member.LoginName);
+				}
 			}
 
 			return dictionary;
