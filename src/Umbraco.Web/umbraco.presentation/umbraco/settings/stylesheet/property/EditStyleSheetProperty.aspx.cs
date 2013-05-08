@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Data;
@@ -8,98 +8,150 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using Umbraco.Web;
 using umbraco.cms.presentation.Trees;
 
 namespace umbraco.cms.presentation.settings.stylesheet
 {
-	/// <summary>
-	/// Summary description for EditStyleSheetProperty.
-	/// </summary>
-	public partial class EditStyleSheetProperty : BasePages.UmbracoEnsuredPage
-	{
-	    public EditStyleSheetProperty()
-	    {
+    /// <summary>
+    /// Summary description for EditStyleSheetProperty.
+    /// </summary>
+    public partial class EditStyleSheetProperty : BasePages.UmbracoEnsuredPage
+    {
+        public EditStyleSheetProperty()
+        {
             CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
-	        
-	    }
 
-		private cms.businesslogic.web.StylesheetProperty stylesheetproperty;
-		private DropDownList ddl = new DropDownList();
-		
-		protected void Page_Load(object sender, System.EventArgs e)
-		{
-			stylesheetproperty = new cms.businesslogic.web.StylesheetProperty(int.Parse(Request.QueryString["id"]));
-            Panel1.Text = ui.Text("stylesheet", "editstylesheetproperty", base.getUser());
+        }
 
-            if (!IsPostBack) {
-                stylesheetproperty.RefreshFromFile();
-                NameTxt.Text = stylesheetproperty.Text;
-                Content.Text = stylesheetproperty.value;
-                AliasTxt.Text = stylesheetproperty.Alias;
+        private businesslogic.web.StylesheetProperty _stylesheetproperty;
+        private DropDownList _ddl = new DropDownList();
 
-				ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadStylesheetProperty>().Tree.Alias)
-					.SyncTree(helper.Request("id"), false);
-            }		
-		
-			ImageButton bt = Panel1.Menu.NewImageButton();
-			bt.Click += new System.Web.UI.ImageClickEventHandler(save_click);
-			bt.ImageUrl = UmbracoPath +"/images/editor/save.gif";
-			bt.AlternateText = ui.Text("save");
-		    bt.ID = "save";
-			setupPreView();
-		}
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            _stylesheetproperty = new businesslogic.web.StylesheetProperty(int.Parse(Request.QueryString["id"]));
+            Panel1.Text = ui.Text("stylesheet", "editstylesheetproperty", UmbracoUser);
 
-		protected override void OnPreRender(EventArgs e)
-		{
-            prStyles.Attributes["style"] = stylesheetproperty.value;
-			
-            base.OnPreRender (e);
-		}
+            if (IsPostBack == false)
+            {
+                _stylesheetproperty.RefreshFromFile();
+                NameTxt.Text = _stylesheetproperty.Text;
+                Content.Text = _stylesheetproperty.value;
+                AliasTxt.Text = _stylesheetproperty.Alias;
 
-		private void setupPreView() 
-		{
-            prStyles.Attributes["style"] = stylesheetproperty.value;
-		}
+                ClientTools
+                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadStylesheetProperty>().Tree.Alias)
+                    .SyncTree(Request.GetItemAsString("id"), false);
+            }
+            else
+            {
+                //true = force reload from server on post back
+                ClientTools
+                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadStylesheetProperty>().Tree.Alias)
+                    .SyncTree(Request.GetItemAsString("id"), true);
+            }
 
-		private void save_click(object sender, System.Web.UI.ImageClickEventArgs e) 
-		{
-			stylesheetproperty.value = Content.Text;
-			stylesheetproperty.Text = NameTxt.Text;
-			stylesheetproperty.Alias = AliasTxt.Text;
+            
 
-			try 
-			{
-				stylesheetproperty.StyleSheet().saveCssToFile();
-			} 
-			catch {}
-            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editStylesheetPropertySaved", base.getUser()), "");
-			setupPreView();
+            ImageButton bt = Panel1.Menu.NewImageButton();
+            bt.Click += SaveClick;
+            bt.ImageUrl = UmbracoPath + "/images/editor/save.gif";
+            bt.AlternateText = ui.Text("save");
+            bt.ID = "save";
+            SetupPreView();
+        }
 
-            stylesheetproperty.Save();
-		}
+        protected override void OnPreRender(EventArgs e)
+        {
+            prStyles.Attributes["style"] = _stylesheetproperty.value;
 
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-			Content.TextMode = TextBoxMode.MultiLine;
-			Content.Height = 250;
-			Content.Width = 300;
-			
-		}
-		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
-		}
-		#endregion
-	}
+            base.OnPreRender(e);
+        }
+
+        private void SetupPreView()
+        {
+            prStyles.Attributes["style"] = _stylesheetproperty.value;
+        }
+
+        private void SaveClick(object sender, ImageClickEventArgs e)
+        {
+            _stylesheetproperty.value = Content.Text;
+            _stylesheetproperty.Text = NameTxt.Text;
+            _stylesheetproperty.Alias = AliasTxt.Text;
+
+            try
+            {
+                _stylesheetproperty.StyleSheet().saveCssToFile();
+            }
+            catch { }
+            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editStylesheetPropertySaved", UmbracoUser), "");
+            SetupPreView();
+
+            _stylesheetproperty.Save();
+        }
+
+
+        override protected void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+            Content.TextMode = TextBoxMode.MultiLine;
+            Content.Height = 250;
+            Content.Width = 300;
+        }
+
+
+        /// <summary>
+        /// Panel1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.UmbracoPanel Panel1;
+
+        /// <summary>
+        /// Pane7 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane7;
+
+        /// <summary>
+        /// NameTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox NameTxt;
+
+        /// <summary>
+        /// AliasTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox AliasTxt;
+
+        /// <summary>
+        /// Content control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox Content;
+
+        /// <summary>
+        /// prStyles control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl prStyles;
+    }
 }

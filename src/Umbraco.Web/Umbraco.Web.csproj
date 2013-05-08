@@ -373,6 +373,9 @@
     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
@@ -1491,13 +1494,6 @@
       <DependentUpon>editScript.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx.cs">
-      <DependentUpon>EditStyleSheetProperty.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx.designer.cs">
-      <DependentUpon>EditStyleSheetProperty.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\templateControls\Script.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\BaseMediaTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadDLRScripts.cs" />
@@ -1957,7 +1953,6 @@
     <Content Include="umbraco.presentation\umbraco\settings\EditMediaType.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx" />
     <Content Include="umbraco.presentation\umbraco\users\EditUser.aspx" />
     <Content Include="umbraco.presentation\umbraco\users\EditUserType.aspx" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
