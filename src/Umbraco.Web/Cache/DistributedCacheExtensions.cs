@@ -110,23 +110,59 @@ namespace Umbraco.Web.Cache
 
         #region Data type cache
         /// <summary>
-        /// Refreshes the cache amongst servers for a template
+        /// Refreshes the cache amongst servers for a data type
         /// </summary>
         /// <param name="dc"></param>
-        /// <param name="dataTypeId"></param>
-        public static void RefreshDataTypeCache(this DistributedCache dc, int dataTypeId)
+        /// <param name="dataType"></param>
+        public static void RefreshDataTypeCache(this DistributedCache dc, global::umbraco.cms.businesslogic.datatype.DataTypeDefinition dataType)
         {
-            dc.Refresh(new Guid(DistributedCache.DataTypeCacheRefresherId), dataTypeId);
+            if (dataType != null)
+            {
+                dc.RefreshByJson(new Guid(DistributedCache.DataTypeCacheRefresherId),
+                    DataTypeCacheRefresher.SerializeToJsonPayload(dataType));
+            }       
         }
 
         /// <summary>
-        /// Removes the cache amongst servers for a template
+        /// Removes the cache amongst servers for a data type
         /// </summary>
         /// <param name="dc"></param>
-        /// <param name="dataTypeId"></param>
-        public static void RemoveDataTypeCache(this DistributedCache dc, int dataTypeId)
+        /// <param name="dataType"></param>
+        public static void RemoveDataTypeCache(this DistributedCache dc, global::umbraco.cms.businesslogic.datatype.DataTypeDefinition dataType)
         {
-            dc.Remove(new Guid(DistributedCache.DataTypeCacheRefresherId), dataTypeId);
+            if (dataType != null)
+            {
+                dc.RefreshByJson(new Guid(DistributedCache.DataTypeCacheRefresherId),
+                    DataTypeCacheRefresher.SerializeToJsonPayload(dataType));
+            }  
+        }
+
+        /// <summary>
+        /// Refreshes the cache amongst servers for a data type
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="dataType"></param>
+        public static void RefreshDataTypeCache(this DistributedCache dc, IDataTypeDefinition dataType)
+        {
+            if (dataType != null)
+            {
+                dc.RefreshByJson(new Guid(DistributedCache.DataTypeCacheRefresherId),
+                    DataTypeCacheRefresher.SerializeToJsonPayload(dataType));
+            }
+        }
+
+        /// <summary>
+        /// Removes the cache amongst servers for a data type
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="dataType"></param>
+        public static void RemoveDataTypeCache(this DistributedCache dc, IDataTypeDefinition dataType)
+        {
+            if (dataType != null)
+            {
+                dc.RefreshByJson(new Guid(DistributedCache.DataTypeCacheRefresherId),
+                    DataTypeCacheRefresher.SerializeToJsonPayload(dataType));
+            }
         }
 
         #endregion

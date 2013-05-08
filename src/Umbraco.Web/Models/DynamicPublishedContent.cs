@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using System.Web;
@@ -20,6 +21,7 @@ namespace Umbraco.Web.Models
 	/// <summary>
 	/// The base dynamic model for views
 	/// </summary>
+    [DebuggerDisplay("Content Id: {Id}, Name: {Name}")]
     public class DynamicPublishedContent : DynamicObject, IPublishedContent, IOwnerCollectionAware<IPublishedContent>
 	{
 		protected internal IPublishedContent PublishedContent { get; private set; }

@@ -203,22 +203,22 @@ namespace Umbraco.Web.Cache
         #region DataType event handlers
         static void DataTypeServiceSaved(IDataTypeService sender, Core.Events.SaveEventArgs<IDataTypeDefinition> e)
         {
-            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshDataTypeCache(x.Id));
+            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshDataTypeCache(x));
         }
 
         static void DataTypeServiceDeleted(IDataTypeService sender, Core.Events.DeleteEventArgs<IDataTypeDefinition> e)
         {
-            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveDataTypeCache(x.Id));
+            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveDataTypeCache(x));
         }
 
         static void DataTypeDefinitionSaving(global::umbraco.cms.businesslogic.datatype.DataTypeDefinition sender, System.EventArgs e)
         {
-            DistributedCache.Instance.RefreshDataTypeCache(sender.Id);
+            DistributedCache.Instance.RefreshDataTypeCache(sender);
         }
 
         static void DataTypeDefinitionDeleting(global::umbraco.cms.businesslogic.datatype.DataTypeDefinition sender, System.EventArgs e)
         {
-            DistributedCache.Instance.RemoveDataTypeCache(sender.Id);
+            DistributedCache.Instance.RemoveDataTypeCache(sender);
         } 
         #endregion
 

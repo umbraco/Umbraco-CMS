@@ -65,10 +65,17 @@ namespace Umbraco.Core.Services
                             select doc;
 
                 var contents = ParseDocumentRootXml(roots, parentId);
-                if(contents.Any())
-                    _contentService.Save(contents, userId);
+                var importContent = contents as IContent[] ?? contents.ToArray();
+                if (importContent.Any())
+                {
+                    _contentService.Save(importContent, userId);
 
-                return contents;
+                    //Don't just save, also publish
+                    foreach (var content in importContent)
+                        _contentService.Publish(content, userId);
+                }
+
+                return importContent;
             }
 
             var attribute = element.Attribute("isDoc");
@@ -77,10 +84,18 @@ namespace Umbraco.Core.Services
                 //This is a single doc import
                 var elements = new List<XElement> { element };
                 var contents = ParseDocumentRootXml(elements, parentId);
-                if (contents.Any())
-                    _contentService.Save(contents, userId);
+                var importContent = contents as IContent[] ?? contents.ToArray();
+                
+                if (importContent.Any())
+                {
+                    _contentService.Save(importContent, userId);
 
-                return contents;
+                    //Don't just save, also publish
+                    foreach (var content in importContent)
+                        _contentService.Publish(content, userId);
+                }
+
+                return importContent;
             }
 
             throw new ArgumentException(
@@ -221,7 +236,7 @@ namespace Umbraco.Core.Services
             _importedContentTypes = new Dictionary<string, IContentType>();
             var documentTypes = name.Equals("DocumentTypes")
                                     ? (from doc in element.Elements("DocumentType") select doc).ToList()
-                                    : new List<XElement> {element};
+                                    : new List<XElement> { element };
             //NOTE it might be an idea to sort the doctype XElements based on dependencies
             //before creating the doc types - should also allow for a better structure/inheritance support.
             foreach (var documentType in documentTypes)
@@ -357,7 +372,7 @@ namespace Umbraco.Core.Services
 
         private void UpdateContentTypesTabs(IContentType contentType, XElement tabElement)
         {
-            if(tabElement == null)
+            if (tabElement == null)
                 return;
 
             var tabs = tabElement.Elements("Tab");
@@ -391,10 +406,10 @@ namespace Umbraco.Core.Services
                         dataTypeDefinition = dataTypeDefinitions.First();
                     }
                 }
-                
+
                 // For backwards compatibility, if no datatype with that ID can be found, we're letting this fail silently.
                 // This means that the property will not be created.
-                if(dataTypeDefinition == null)
+                if (dataTypeDefinition == null)
                 {
                     LogHelper.Warn<PackagingService>(string.Format("Packager: Error handling creation of PropertyType '{0}'. Could not find DataTypeDefintion with unique id '{1}' nor one referencing the DataType with control id '{2}'. Did the package creator forget to package up custom datatypes?",
                                                         property.Element("Name").Value, dataTypeDefinitionId, dataTypeId));
@@ -403,7 +418,7 @@ namespace Umbraco.Core.Services
 
                 var propertyType = new PropertyType(dataTypeDefinition)
                                        {
-                                           Alias = property.Element("Alias").Value, 
+                                           Alias = property.Element("Alias").Value,
                                            Name = property.Element("Name").Value,
                                            Description = property.Element("Description").Value,
                                            Mandatory = property.Element("Mandatory").Value.ToLowerInvariant().Equals("true"),
@@ -499,7 +514,7 @@ namespace Umbraco.Core.Services
             var dataTypes = new Dictionary<string, IDataTypeDefinition>();
             var dataTypeElements = name.Equals("DataTypes")
                                        ? (from doc in element.Elements("DataType") select doc).ToList()
-                                       : new List<XElement> {element.Element("DataType")};
+                                       : new List<XElement> { element.Element("DataType") };
 
             foreach (var dataTypeElement in dataTypeElements)
             {
@@ -641,13 +656,13 @@ namespace Umbraco.Core.Services
                 {
                     template.MasterTemplateAlias = masterElement.Value;
                     var masterTemplate = templates.FirstOrDefault(x => x.Alias == masterElement.Value);
-                    if(masterTemplate != null)
+                    if (masterTemplate != null)
                         template.MasterTemplateId = new Lazy<int>(() => masterTemplate.Id);
                 }
                 templates.Add(template);
             }
 
-            if(templates.Any())
+            if (templates.Any())
                 _fileService.SaveTemplate(templates, userId);
 
             return templates;
