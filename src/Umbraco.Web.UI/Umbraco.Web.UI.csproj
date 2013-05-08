@@ -497,6 +497,13 @@
     <Compile Include="Umbraco\Settings\EditTemplate.aspx.designer.cs">
       <DependentUpon>editTemplate.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\settings\Stylesheet\editstylesheet.aspx.cs">
+      <DependentUpon>editstylesheet.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\settings\Stylesheet\editstylesheet.aspx.designer.cs">
+      <DependentUpon>editstylesheet.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Settings\Views\EditView.aspx.cs">
       <DependentUpon>EditView.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -820,6 +827,7 @@
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
     <Content Include="Umbraco_Client\Editors\DirectoryBrowser.css" />
     <Content Include="Umbraco_Client\Editors\EditMacro.css" />
+    <Content Include="Umbraco_Client\Editors\EditStyleSheet.js" />
     <Content Include="Umbraco_Client\Editors\EditView.js" />
     <Content Include="Umbraco_Client\FileUploader\Js\jquery.fileUploader.js" />
     <Content Include="Umbraco_Client\FolderBrowser\Css\folderbrowser.css" />
