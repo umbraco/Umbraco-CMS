@@ -394,9 +394,17 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 						
 						if (results.Any())
 						{
-						    return useLuceneSort 
-                                ? results.Select(ConvertFromSearchResult) //will already be sorted by lucene
-                                : results.Select(ConvertFromSearchResult).OrderBy(x => x.SortOrder);
+						    return useLuceneSort
+						               ? results.Select(ConvertFromSearchResult) //will already be sorted by lucene
+						               : results.Select(ConvertFromSearchResult).OrderBy(x => x.SortOrder);
+						}
+						else
+						{
+						    //if there's no result then return null. Previously we defaulted back to library.GetMedia below
+                            //but this will always get called for when we are getting descendents since many items won't have 
+                            //children and then we are hitting the database again!
+                            //So instead we're going to rely on Examine to have the correct results like it should.
+						    return Enumerable.Empty<IPublishedContent>();
 						}
 					}
 					catch (FileNotFoundException)
@@ -405,16 +413,19 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 						//See this thread: http://examine.cdodeplex.com/discussions/264341
 						//Catch the exception here for the time being, and just fallback to GetMedia
 					}	
-				}				
+				}
+
+                //falling back to get media
 
 				var media = library.GetMedia(parentId, true);
 				if (media != null && media.Current != null)
 				{
+				    media.MoveNext();
 					xpath = media.Current;
 				}
 				else
 				{
-					return null;
+                    return Enumerable.Empty<IPublishedContent>();
 				}
 			}
 
@@ -422,7 +433,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			var item = xpath.Select("//*[@id='" + parentId + "']");
 			if (item.Current == null)
 			{
-				return null;
+                return Enumerable.Empty<IPublishedContent>();
 			}
 			var children = item.Current.SelectChildren(XPathNodeType.Element);
 
