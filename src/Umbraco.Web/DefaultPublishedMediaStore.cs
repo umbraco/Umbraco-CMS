@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.XPath;
@@ -365,9 +366,17 @@ namespace Umbraco.Web
 						
 						if (results.Any())
 						{
-						    return useLuceneSort 
-                                ? results.Select(ConvertFromSearchResult) //will already be sorted by lucene
-                                : results.Select(ConvertFromSearchResult).OrderBy(x => x.SortOrder);
+						    return useLuceneSort
+						               ? results.Select(ConvertFromSearchResult) //will already be sorted by lucene
+						               : results.Select(ConvertFromSearchResult).OrderBy(x => x.SortOrder);
+						}
+						else
+						{
+						    //if there's no result then return null. Previously we defaulted back to library.GetMedia below
+                            //but this will always get called for when we are getting descendents since many items won't have 
+                            //children and then we are hitting the database again!
+                            //So instead we're going to rely on Examine to have the correct results like it should.
+						    return Enumerable.Empty<IPublishedContent>();
 						}
 					}
 					catch (FileNotFoundException)
@@ -378,23 +387,27 @@ namespace Umbraco.Web
 					}	
 				}				
 
+
+                //falling back to get media
+
 				var media = library.GetMedia(parentId, true);
 				if (media != null && media.Current != null)
 				{
+				    media.MoveNext();
 					xpath = media.Current;
 				}
 				else
 				{
-					return null;
+                    return Enumerable.Empty<IPublishedContent>();
 				}
 			}
 
-			//The xpath might be the whole xpath including the current ones ancestors so we need to select the current node
-			var item = xpath.Select("//*[@id='" + parentId + "']");
-			if (item.Current == null)
-			{
-				return null;
-			}
+            //The xpath might be the whole xpath including the current ones ancestors so we need to select the current node
+            var item = xpath.Select("//*[@id='" + parentId + "']");
+            if (item.Current == null)
+            {
+                return Enumerable.Empty<IPublishedContent>();
+            }
 			var children = item.Current.SelectChildren(XPathNodeType.Element);
 
 			var mediaList = new List<IPublishedContent>();

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -218,6 +219,7 @@ namespace Umbraco.Tests.PublishedContent
 		}
 	}
 
+    [DebuggerDisplay("Content Id: {Id}, Name: {Name}")]
     public class PublishedContentWrapper : IPublishedContent, IOwnerCollectionAware<IPublishedContent>
 	{
 		protected IPublishedContent WrappedContent { get; private set; }
