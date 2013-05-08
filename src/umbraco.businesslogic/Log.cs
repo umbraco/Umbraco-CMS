@@ -347,7 +347,7 @@ namespace umbraco.BusinessLogic
         {
             var query = "select {0} userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc {1}";
             
-            query = SqlHelper.ConnectionString.ToLowerInvariant().Contains(";datalayer=MySql".ToLowerInvariant())
+            query = SqlHelper.GetType().ToString().ToLowerInvariant().Contains("MySql.MySqlHelper".ToLowerInvariant())
                 ? string.Format(query, string.Empty, "limit 0," + numberOfResults)
                 : string.Format(query, "top " + numberOfResults, string.Empty);
 
