@@ -3,7 +3,8 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Threading;
-
+using System.Web.UI.WebControls;
+using Umbraco.Core;
 using umbraco.DataLayer;
 using System.Collections.Generic;
 using System.Reflection;
@@ -344,8 +345,13 @@ namespace umbraco.BusinessLogic
         [Obsolete("Use the Instance.GetLogItems method which return a list of LogItems instead")]
         internal static IRecordsReader GetLogReader(User user, LogTypes type, DateTime sinceDate, int numberOfResults)
         {
-            return SqlHelper.ExecuteReader(
-                "select top " + numberOfResults + " userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
+            var query = "select {0} userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc {1}";
+            
+            query = SqlHelper.ConnectionString.ToLowerInvariant().Contains(";datalayer=MySql".ToLowerInvariant())
+                ? string.Format(query, string.Empty, "limit 0," + numberOfResults)
+                : string.Format(query, "top " + numberOfResults, string.Empty);
+
+            return SqlHelper.ExecuteReader(query,
                 SqlHelper.CreateParameter("@logHeader", type.ToString()),
                 SqlHelper.CreateParameter("@user", user.Id),
                 SqlHelper.CreateParameter("@dateStamp", sinceDate));
