@@ -55,7 +55,7 @@ namespace umbraco.uicontrols
         {
             get
             {
-                return !UmbracoSettings.ScriptDisableEditor; // && HttpContext.Current.Request.Browser.Browser != "IE";
+                return UmbracoSettings.ScriptDisableEditor == false;
             }
         }
 
@@ -86,18 +86,6 @@ namespace umbraco.uicontrols
                 ClientDependencyLoader.Instance.RegisterDependency(2, "CodeMirror/js/lib/codemirror.css", "UmbracoClient", ClientDependencyType.Css);
                 ClientDependencyLoader.Instance.RegisterDependency(3, "CodeMirror/css/umbracoCustom.css", "UmbracoClient", ClientDependencyType.Css);
                 ClientDependencyLoader.Instance.RegisterDependency(4, "CodeArea/styles.css", "UmbracoClient", ClientDependencyType.Css);
-
-
-
-                //if (AutoSuggest && HttpContext.Current.Request.Browser.Browser != "IE")
-                //{
-                //    ClientDependencyLoader.Instance.RegisterDependency(3, "CodeMirror/js/lib/util/simple-hint-customized.js", "UmbracoClient", ClientDependencyType.Javascript);
-
-                //    ClientDependencyLoader.Instance.RegisterDependency(4, "CodeMirror/js/lib/util/" + CodeBase.ToString().ToLower() + "-hint.js", "UmbracoClient", ClientDependencyType.Javascript);
-                //    ClientDependencyLoader.Instance.RegisterDependency(5, "CodeMirror/js/lib/util/" + CodeBase.ToString().ToLower() + "-hints.js", "UmbracoClient", ClientDependencyType.Javascript);
-
-                //    ClientDependencyLoader.Instance.RegisterDependency(4, "CodeMirror/js/lib/util/simple-hint.css", "UmbracoClient", ClientDependencyType.Css);
-                //}
             }
         }
 
@@ -107,16 +95,14 @@ namespace umbraco.uicontrols
             CodeTextBox = new TextBox();
             CodeTextBox.ID = "CodeTextBox";
 
-            if (!CodeMirrorEnabled)
+            if (CodeMirrorEnabled == false)
             {
                 CodeTextBox.Attributes.Add("class", "codepress");
                 CodeTextBox.Attributes.Add("wrap", "off");
             }
 
             CodeTextBox.TextMode = TextBoxMode.MultiLine;
-
-            //this.CssClass = "codepress";
-
+            
             this.Controls.Add(CodeTextBox);
 
         }
@@ -128,7 +114,7 @@ namespace umbraco.uicontrols
         {
             get
             {
-                if (!CodeMirrorEnabled)
+                if (CodeMirrorEnabled == false)
                     return CodeTextBox.ClientID;
                 else
                     return base.ClientID;
@@ -142,7 +128,7 @@ namespace umbraco.uicontrols
             var jsEventCode = "";
 
 
-            if (!CodeMirrorEnabled)
+            if (CodeMirrorEnabled == false)
             {
                 CodeTextBox.RenderControl(writer);
                 jsEventCode = RenderBasicEditor();
@@ -176,7 +162,7 @@ namespace umbraco.uicontrols
 					var UmbEditor;                 
                     $(document).ready(function () {
                         //create the editor
-                       UmbEditor = new Umbraco.Controls.CodeEditor.UmbracoEditor(" + (!CodeMirrorEnabled).ToString().ToLower() + @", '" + this.ClientID + @"');
+                       UmbEditor = new Umbraco.Controls.CodeEditor.UmbracoEditor(" + (CodeMirrorEnabled == false).ToString().ToLower() + @", '" + this.ClientID + @"');
                        var m_textEditor = jQuery('#" + this.ClientID + @"');
                    
                        //with codemirror adding divs for line numbers, we need to target a different element
@@ -185,12 +171,7 @@ namespace umbraco.uicontrols
                        jQuery(window).resize(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });
             	       jQuery(document).ready(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });
                     });";
-                /* 
-               if (!UmbracoSettings.ScriptDisableEditor && HttpContext.Current.Request.Browser.Browser == "IE")
-               {
-                   jsEventCode += "jQuery('<p style=\"color:#999\">" + ui.Text("codemirroriewarning").Replace("'", "\\'") + "</p>').insertAfter('#" + this.ClientID + "');";
-               }*/
-
+  
             }
 
             jsEventCode = string.Format(@"<script type=""text/javascript"">{0}</script>", jsEventCode);
@@ -213,18 +194,7 @@ namespace umbraco.uicontrols
             var extraKeys = "";
             var editorMimetype = "";
 
-//            if (AutoSuggest && HttpContext.Current.Request.Browser.Browser != "IE")
-//            {
-//                extraKeys = @",
-//                               extraKeys: {
-//                                    ""'@'"": function(cm) { CodeMirror.{lang}Hint(cm, '@'); },
-//                                    ""'.'"": function(cm) { CodeMirror.{lang}Hint(cm, '.'); },
-//                                    ""Ctrl-Space"": function(cm) { CodeMirror.{lang}Hint(cm, ''); }
-//                                }".Replace("{lang}", CodeBase.ToString().ToLower());
-//            }
-
-
-            if (!string.IsNullOrEmpty(EditorMimeType))
+            if (string.IsNullOrEmpty(EditorMimeType) == false)
                 editorMimetype = @", 
                                      mode: """ + EditorMimeType + "\"";
 
@@ -249,61 +219,6 @@ namespace umbraco.uicontrols
                                   
                                     updateLineInfo(codeEditor);
                                 ";
-
-
-            /*
-            string[] parserFiles = new string[] { "tokenizejavascript.js", "parsejavascript.js" };
-            string[] cssFile = new string[] { "jscolors.css", "umbracoCustom.css" };
-
-            switch (CodeBase)
-            {                    
-                case EditorType.JavaScript:
-parserFiles = new string[] { "tokenizejavascript.js", "parsejavascript.js" };
-                    cssFile = new string[] { "jscolors.css", "umbracoCustom.css" };
-                    break;
-                case EditorType.Css:
-                    parserFiles = new string[] { "parsecss.js" };
-                    cssFile = new string[] { "csscolors.css", "umbracoCustom.css" };
-                    break;
-                case EditorType.Python:
-                    parserFiles = new string[] { "parsepython.js" };
-                    cssFile = new string[] { "pythoncolors.css", "umbracoCustom.css" };
-                    break;
-                case EditorType.XML:
-                    parserFiles = new string[] { "parsexml.js" };
-                    cssFile = new string[] { "xmlcolors.css", "umbracoCustom.css" };
-                    break;
-                case EditorType.HTML:
-                    parserFiles = new string[] { "parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js" };
-                    cssFile = new string[] { "xmlcolors.css", "jscolors.css", "csscolors.css", "umbracoCustom.css" };
-                    break;
-            }
-            
-            var jsEventCode = @"
-                            var textarea = document.getElementById('" + CodeTextBox.ClientID + @"');
-                            var codeEditor = CodeMirror.fromTextArea(textarea, {
-                                width: ""100%"",
-                                height: ""100%"",
-                                tabMode: ""shift"",
-                                textWrapping: false,
-                                lineNumbers: true,
-                                parserfile: [" + string.Join(",",
-                                               parserFiles
-                                                    .Select(x => string.Format(@"""{0}""", x))
-                                                    .ToArray()) + @"],
-                                stylesheet: [" + string.Join(",",
-
-                                               cssFile
-                                                    .Select(x => string.Format(@"""{0}""", IOHelper.ResolveUrl(SystemDirectories.Umbraco_client) + @"/CodeMirror/css/" + x))
-                                                    .ToArray()) + @"],
-                                path: """ + IOHelper.ResolveUrl(SystemDirectories.Umbraco_client) + @"/CodeMirror/js/"",
-                                content: textarea.value,             
-                                autoMatchParens: false,"
-                                    + (string.IsNullOrEmpty(ClientSaveMethod) ? "" : @"saveFunction: " + ClientSaveMethod + ",") + @"
-                                onChange: function() {}});
-
-                                ";
-            */
 
             return jsEventCode;
         }
