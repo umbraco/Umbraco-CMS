@@ -11,10 +11,11 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.IO;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using umbraco.cms.presentation.Trees;
-using umbraco.IO;
 using System.Linq;
 using umbraco.cms.helpers;
+using umbraco.uicontrols;
 
 namespace umbraco.cms.presentation.settings.scripts
 {
@@ -36,18 +37,20 @@ namespace umbraco.cms.presentation.settings.scripts
         protected umbraco.uicontrols.PropertyPanel pp_name;
         protected umbraco.uicontrols.PropertyPanel pp_path;
 
+        protected MenuIconI SaveButton;
+
         private string file;
 
-        protected void Page_Load(object sender, System.EventArgs e)
+        protected override void OnLoad(EventArgs e)
         {
-
+            base.OnLoad(e);
             NameTxt.Text = file;
 
             string path = "";
             if (file.StartsWith("~/"))
-				path = Umbraco.Core.IO.IOHelper.ResolveUrl(file);
+                path = Umbraco.Core.IO.IOHelper.ResolveUrl(file);
             else
-				path = Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Scripts + "/" + file);
+                path = Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Scripts + "/" + file);
 
 
             lttPath.Text = "<a target='_blank' href='" + path + "'>" + path + "</a>";
@@ -60,19 +63,19 @@ namespace umbraco.cms.presentation.settings.scripts
             }
 
             var dirs = Umbraco.Core.IO.SystemDirectories.Scripts;
-			if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
+            if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
                 dirs += "," + Umbraco.Core.IO.SystemDirectories.MvcViews;
 
             // validate file
-			Umbraco.Core.IO.IOHelper.ValidateEditPath(Umbraco.Core.IO.IOHelper.MapPath(path), dirs.Split(','));
-            
+            Umbraco.Core.IO.IOHelper.ValidateEditPath(Umbraco.Core.IO.IOHelper.MapPath(path), dirs.Split(','));
+
             // validate extension
-			Umbraco.Core.IO.IOHelper.ValidateFileExtension(Umbraco.Core.IO.IOHelper.MapPath(path), exts);
+            Umbraco.Core.IO.IOHelper.ValidateFileExtension(Umbraco.Core.IO.IOHelper.MapPath(path), exts);
 
 
             StreamReader SR;
             string S;
-			SR = File.OpenText(Umbraco.Core.IO.IOHelper.MapPath(path));
+            SR = File.OpenText(Umbraco.Core.IO.IOHelper.MapPath(path));
             S = SR.ReadToEnd();
             SR.Close();
 
@@ -91,25 +94,22 @@ namespace umbraco.cms.presentation.settings.scripts
             }
         }
 
-
-
-        #region Web Form Designer generated code
         override protected void OnInit(EventArgs e)
         {
+            base.OnInit(e);
 
             file = Request.QueryString["file"].TrimStart('/');
 
             //need to change the editor type if it is XML
             if (file.EndsWith("xml"))
-                editorSource.CodeBase = umbraco.uicontrols.CodeArea.EditorType.XML;
+                editorSource.CodeBase = uicontrols.CodeArea.EditorType.XML;
             else if (file.EndsWith("master"))
-                editorSource.CodeBase = umbraco.uicontrols.CodeArea.EditorType.HTML;
+                editorSource.CodeBase = uicontrols.CodeArea.EditorType.HTML;
 
-            uicontrols.MenuIconI save = Panel1.Menu.NewIcon();
-            save.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
-            save.OnClickCommand = "doSubmit()";
-            save.AltText = "Save File";
-            save.ID = "save";
+            SaveButton = Panel1.Menu.NewIcon();
+            SaveButton.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
+            SaveButton.AltText = "Save File";
+            SaveButton.ID = "save";
 
             if (editorSource.CodeBase == uicontrols.CodeArea.EditorType.HTML)
             {
@@ -117,19 +117,19 @@ namespace umbraco.cms.presentation.settings.scripts
                 Panel1.Menu.InsertSplitter();
                 uicontrols.MenuIconI umbField = Panel1.Menu.NewIcon();
                 umbField.ImageURL = UmbracoPath + "/images/editor/insField.gif";
-                umbField.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDATA", ui.Text("template", "insertPageField"), 640, 550);
+                umbField.OnClickCommand = BasePages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDATA", ui.Text("template", "insertPageField"), 640, 550);
                 umbField.AltText = ui.Text("template", "insertPageField");
 
                 // TODO: Update icon
                 uicontrols.MenuIconI umbDictionary = Panel1.Menu.NewIcon();
                 umbDictionary.ImageURL = GlobalSettings.Path + "/images/editor/dictionaryItem.gif";
-                umbDictionary.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY", ui.Text("template", "insertDictionaryItem"), 640, 550);
+                umbDictionary.OnClickCommand = BasePages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY", ui.Text("template", "insertDictionaryItem"), 640, 550);
                 umbDictionary.AltText = "Insert umbraco dictionary item";
 
                 uicontrols.MenuIconI umbMacro = Panel1.Menu.NewIcon();
                 umbMacro.ImageURL = UmbracoPath + "/images/editor/insMacro.gif";
                 umbMacro.AltText = ui.Text("template", "insertMacro");
-                umbMacro.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/editMacro.aspx?objectId=" + editorSource.ClientID, ui.Text("template", "insertMacro"), 470, 530);
+                umbMacro.OnClickCommand = BasePages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/editMacro.aspx?objectId=" + editorSource.ClientID, ui.Text("template", "insertMacro"), 470, 530);
 
                 // Help
                 Panel1.Menu.InsertSplitter();
@@ -141,23 +141,8 @@ namespace umbraco.cms.presentation.settings.scripts
 
             }
 
-
-            this.Load += new System.EventHandler(Page_Load);
-            InitializeComponent();
-            base.OnInit(e);
-
         }
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-
-        }
-
-
+        
 
         protected override void OnPreRender(EventArgs e)
         {
@@ -165,7 +150,6 @@ namespace umbraco.cms.presentation.settings.scripts
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/codeEditorSave.asmx"));
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
         }
-        #endregion
 
     }
 }
