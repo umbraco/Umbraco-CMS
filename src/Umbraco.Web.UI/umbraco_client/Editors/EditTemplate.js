@@ -122,9 +122,6 @@
 
         submitFailure: function(t) {
             top.UmbSpeechBubble.ShowMessage('error', this._opts.text.templateErrorHeader, this._opts.text.templateErrorText);
-
-            UmbClientMgr.mainTree().setActiveTreeType('templates');
-            UmbClientMgr.mainTree().syncTree(this._opts.treeSyncPath, true);
         }
     });
 })(jQuery);

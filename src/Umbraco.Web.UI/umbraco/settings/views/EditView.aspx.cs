@@ -45,6 +45,23 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			get { return _template == null ? ViewEditorType.PartialView : ViewEditorType.Template; }
 		}
 
+        protected string TemplateTreeSyncPath { get; private set; }
+	    
+        /// <summary>
+        /// This view is shared between different trees so we'll look for the query string
+        /// </summary>
+        protected string CurrentTreeType
+	    {
+	        get
+	        {
+	            if (Request.QueryString["treeType"].IsNullOrWhiteSpace())
+	            {
+	                return TreeDefinitionCollection.Instance.FindTree<PartialViewsTree>().Tree.Alias;
+	            }
+	            return Request.QueryString["treeType"];
+	        }
+	    }
+
 		/// <summary>
 		/// Returns the original file name that the editor was loaded with
 		/// </summary>
@@ -89,9 +106,6 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 					AliasTxt.Text = _template.Alias;
 					editorSource.Text = _template.Design;
 
-					ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<PartialViewsTree>().Tree.Alias)
-					.SyncTree("-1,init," + _template.Path.Replace("-1,", ""), false);
 				}
 				else
 				{
@@ -105,13 +119,13 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 						var s = sr.ReadToEnd();
 						editorSource.Text = s;
 					}					
-					
-					//string path = DeepLink.GetTreePathFromFilePath(file);
-					//ClientTools
-					//	.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadPython>().Tree.Alias)
-					//	.SyncTree(path, false);
+				
 				}							
 			}
+            
+            ClientTools
+                .SetActiveTreeType(CurrentTreeType)
+                .SyncTree(TemplateTreeSyncPath, false);
 		}
 
 
@@ -122,12 +136,14 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			//check if a templateId is assigned, meaning we are editing a template
 			if (!Request.QueryString["templateID"].IsNullOrWhiteSpace())
 			{
-				_template = new Template(int.Parse(Request.QueryString["templateID"]));	
+				_template = new Template(int.Parse(Request.QueryString["templateID"]));
+                TemplateTreeSyncPath = "-1,init," + _template.Path.Replace("-1,", "");
 			}
 			else if (!Request.QueryString["file"].IsNullOrWhiteSpace())
 			{
 				//we are editing a view (i.e. partial view)
 				OriginalFileName = HttpUtility.UrlDecode(Request.QueryString["file"]);
+                TemplateTreeSyncPath = "-1,init," + Path.GetFileName(OriginalFileName);
 			}
 			else
 			{
