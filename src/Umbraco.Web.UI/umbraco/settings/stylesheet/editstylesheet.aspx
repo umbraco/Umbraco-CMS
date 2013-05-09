@@ -25,6 +25,7 @@
                     }
                 });
                 editor.init();
+            });
                 
                 //bind save shortcut
                 UmbClientMgr.appActions().bindSaveShortCut();

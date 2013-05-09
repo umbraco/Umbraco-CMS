@@ -111,12 +111,18 @@
             UmbClientMgr.mainTree().setActiveTreeType(this._opts.currentTreeType);
 
             var newFilePath = this._opts.nameTxtBox.val();
-            //we need to pass in the newId parameter so it knows which node to resync after retreival from the server
-            UmbClientMgr.mainTree().syncTree(this._opts.treeSyncPath, true, null, newFilePath.split("/")[1]);
+
+            if (this._opts.editorType == "Template") {
+                //templates are different because they are ID based, whereas view files are file based without a static id
+                UmbClientMgr.mainTree().syncTree(this._opts.treeSyncPath, true);
+            }
+            else {
+                //we need to pass in the newId parameter so it knows which node to resync after retreival from the server
+                UmbClientMgr.mainTree().syncTree(this._opts.treeSyncPath, true, null, newFilePath.split("/")[1]);
+            }
 
             //then we need to update our current tree sync path to represent the new one
             this._updateNewProperties(newFilePath);
-
         },
         
         submitFailure: function (err, header) {

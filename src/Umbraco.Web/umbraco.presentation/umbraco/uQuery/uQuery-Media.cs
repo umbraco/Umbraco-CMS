@@ -149,7 +149,10 @@ namespace umbraco
 
 			foreach (var mediaItem in media)
 			{
-				dictionary.Add(mediaItem.Id, mediaItem.Text);
+				if (mediaItem != null && mediaItem.Id != -1)
+				{
+					dictionary.Add(mediaItem.Id, mediaItem.Text);
+				}
 			}
 
 			return dictionary;
