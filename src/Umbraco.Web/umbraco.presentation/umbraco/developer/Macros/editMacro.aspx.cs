@@ -79,6 +79,10 @@ namespace umbraco.cms.presentation.developer
 			{
 				int macroID = Convert.ToInt32(Request.QueryString["macroID"]);
 
+                ClientTools
+                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadMacros>().Tree.Alias)
+                    .SyncTree("-1,init," + m_macro.Id.ToString(), true); //true forces the reload
+
 				string tempMacroAssembly = macroAssembly.Text;
 				string tempMacroType = macroType.Text;
 				string tempCachePeriod = cachePeriod.Text;

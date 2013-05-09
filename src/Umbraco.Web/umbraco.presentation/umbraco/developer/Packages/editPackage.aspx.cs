@@ -10,6 +10,7 @@ using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
+using umbraco.cms.presentation.Trees;
 using umbraco.controls;
 using umbraco.IO;
 
@@ -33,10 +34,11 @@ namespace umbraco.presentation.developer.packages
         protected ContentPicker cp;
         private cms.businesslogic.packager.PackageInstance pack;
         private cms.businesslogic.packager.CreatedPackage createdPackage;
-    
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Request.QueryString["id"] != null) {
+            if (Request.QueryString["id"] != null)
+            {
                 createdPackage = cms.businesslogic.packager.CreatedPackage.GetById(int.Parse(Request.QueryString["id"]));
                 pack = createdPackage.Data;
 
@@ -46,18 +48,26 @@ namespace umbraco.presentation.developer.packages
                 content.Controls.Add(cp);
 
                 bt_submitButton.Attributes.Add("onClick", "window.location = 'submitpackage.aspx?id=" + pack.Id.ToString() + "'; return false;");
-                
-                if (!String.IsNullOrEmpty(pack.PackagePath)) {
+
+                if (string.IsNullOrEmpty(pack.PackagePath) == false)
+                {
                     packageUmbFile.Text = " &nbsp; <a href='" + Page.ResolveClientUrl(pack.PackagePath) + "'>Download</a>";
 
                     if (cms.businesslogic.packager.repositories.Repository.getAll().Count > 0)
-                        bt_submitButton.Visible = true;                   
+                        bt_submitButton.Visible = true;
 
-                } else {
+                }
+                else
+                {
                     packageUmbFile.Text = "<em>This package is not published</em>";
                 }
 
-                if (!Page.IsPostBack) {
+                if (Page.IsPostBack == false)
+                {
+                    ClientTools
+                        .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadPackages>().Tree.Alias)
+                        .SyncTree("-1,init," + loadPackages.PACKAGE_TREE_PREFIX + createdPackage.Data.Id, false);
+
                     packageAuthorName.Text = pack.Author;
                     packageAuthorUrl.Text = pack.AuthorUrl;
                     packageLicenseName.Text = pack.License;
@@ -71,26 +81,28 @@ namespace umbraco.presentation.developer.packages
                     tb_actions.Text = pack.Actions;
 
                     cp.Value = pack.ContentNodeId.ToString();
-                    
+
                     //startNode.Value = pack.ContentNodeId.ToString();
 
                     packageContentSubdirs.Checked = pack.ContentLoadChildNodes;
-                    
+
 
                     /*TEMPLATES */
                     Template[] umbTemplates = Template.GetAllAsList().ToArray();
-                    foreach (Template tmp in umbTemplates) {
+                    foreach (Template tmp in umbTemplates)
+                    {
                         ListItem li = new ListItem(tmp.Text, tmp.Id.ToString());
 
-                        if(pack.Templates.Contains(tmp.Id.ToString()))
+                        if (pack.Templates.Contains(tmp.Id.ToString()))
                             li.Selected = true;
-                        
+
                         templates.Items.Add(li);
                     }
 
                     /* DOC TYPES */
                     DocumentType[] docs = DocumentType.GetAllAsList().ToArray();
-                    foreach (DocumentType dc in docs) {
+                    foreach (DocumentType dc in docs)
+                    {
                         ListItem li = new ListItem(dc.Text, dc.Id.ToString());
                         if (pack.Documenttypes.Contains(dc.Id.ToString()))
                             li.Selected = true;
@@ -100,7 +112,8 @@ namespace umbraco.presentation.developer.packages
 
                     /*Stylesheets */
                     StyleSheet[] sheets = StyleSheet.GetAll();
-                    foreach (StyleSheet st in sheets) {
+                    foreach (StyleSheet st in sheets)
+                    {
                         ListItem li = new ListItem(st.Text, st.Id.ToString());
                         if (pack.Stylesheets.Contains(st.Id.ToString()))
                             li.Selected = true;
@@ -110,7 +123,8 @@ namespace umbraco.presentation.developer.packages
                     }
                     /* MACROS */
                     Macro[] umbMacros = Macro.GetAll();
-                    foreach (Macro m in umbMacros) {
+                    foreach (Macro m in umbMacros)
+                    {
                         ListItem li = new ListItem(m.Name, m.Id.ToString());
                         if (pack.Macros.Contains(m.Id.ToString()))
                             li.Selected = true;
@@ -120,7 +134,8 @@ namespace umbraco.presentation.developer.packages
 
                     /*Langauges */
                     Language[] umbLanguages = Language.getAll;
-                    foreach (Language l in umbLanguages) {
+                    foreach (Language l in umbLanguages)
+                    {
                         ListItem li = new ListItem(l.FriendlyName, l.id.ToString());
                         if (pack.Languages.Contains(l.id.ToString()))
                             li.Selected = true;
@@ -130,7 +145,8 @@ namespace umbraco.presentation.developer.packages
 
                     /*Dictionary Items*/
                     Dictionary.DictionaryItem[] umbDictionary = Dictionary.getTopMostItems;
-                    foreach (Dictionary.DictionaryItem d in umbDictionary) {
+                    foreach (Dictionary.DictionaryItem d in umbDictionary)
+                    {
 
                         string liName = d.key;
                         if (d.hasChildren)
@@ -146,7 +162,8 @@ namespace umbraco.presentation.developer.packages
 
                     /*Data types */
                     cms.businesslogic.datatype.DataTypeDefinition[] umbDataType = cms.businesslogic.datatype.DataTypeDefinition.GetAll();
-                    foreach (cms.businesslogic.datatype.DataTypeDefinition umbDtd in umbDataType) {
+                    foreach (cms.businesslogic.datatype.DataTypeDefinition umbDtd in umbDataType)
+                    {
 
                         ListItem li = new ListItem(umbDtd.Text, umbDtd.Id.ToString());
 
@@ -161,6 +178,12 @@ namespace umbraco.presentation.developer.packages
                     packageFilesRepeater.DataBind();
 
                     packageControlPath.Text = pack.LoadControl;
+                }
+                else
+                {
+                    ClientTools
+                        .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadPackages>().Tree.Alias)
+                        .SyncTree("-1,init," + loadPackages.PACKAGE_TREE_PREFIX + createdPackage.Data.Id, true);
                 }
             }
         }
