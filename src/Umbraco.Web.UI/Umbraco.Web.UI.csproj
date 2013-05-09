@@ -323,6 +323,13 @@
     <Compile Include="Umbraco\Developer\Packages\StarterKits.aspx.designer.cs">
       <DependentUpon>StarterKits.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Developer\Python\EditPython.aspx.cs">
+      <DependentUpon>editPython.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Developer\Python\EditPython.aspx.designer.cs">
+      <DependentUpon>editPython.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Dialogs\EditMacro.aspx.cs">
       <DependentUpon>EditMacro.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -372,6 +379,7 @@
     </Compile>
     <Compile Include="Umbraco\settings\Stylesheet\editstylesheet.aspx.cs">
       <DependentUpon>editstylesheet.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Umbraco\settings\Stylesheet\editstylesheet.aspx.designer.cs">
       <DependentUpon>editstylesheet.aspx</DependentUpon>
@@ -695,9 +703,10 @@
     <Content Include="umbraco_Client\Editors\DirectoryBrowser.css" />
     <Content Include="Umbraco_Client\Dialogs\EditMacro.js" />
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
+    <Content Include="Umbraco_Client\Editors\EditMacroScripts.js" />
     <Content Include="Umbraco_Client\Editors\EditXslt.css" />
     <Content Include="Umbraco_Client\Editors\EditXslt.js" />
-	<Content Include="Umbraco_Client\Editors\EditScript.js" />
+    <Content Include="Umbraco_Client\Editors\EditScript.js" />
     <Content Include="Umbraco_Client\Editors\EditMacro.css" />
     <Content Include="Umbraco_Client\Editors\EditStyleSheet.js" />
     <Content Include="Umbraco_Client\Editors\EditTemplate.js" />

@@ -383,6 +383,9 @@
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\StarterKits.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1153,13 +1156,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\SubmitPackage.aspx.designer.cs">
       <DependentUpon>SubmitPackage.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx.cs">
-      <DependentUpon>editPython.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx.designer.cs">
-      <DependentUpon>editPython.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\getXsltStatus.asmx.cs">
       <DependentUpon>getXsltStatus.asmx</DependentUpon>
@@ -1944,10 +1940,7 @@
     <Content Include="umbraco.presentation\install\steps\welcome.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\cacheBrowser.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="umbraco.presentation\umbraco\cacheBrowser.aspx" />    
     <Content Include="umbraco.presentation\umbraco\members\ViewMembers.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertImage.aspx">
       <SubType>ASPXCodeBehind</SubType>
