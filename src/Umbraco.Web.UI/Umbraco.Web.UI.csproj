@@ -436,6 +436,13 @@
     <Compile Include="Umbraco\Developer\Packages\StarterKits.aspx.designer.cs">
       <DependentUpon>StarterKits.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Developer\Python\EditPython.aspx.cs">
+      <DependentUpon>editPython.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Developer\Python\EditPython.aspx.designer.cs">
+      <DependentUpon>editPython.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Dialogs\EditMacro.aspx.cs">
       <DependentUpon>EditMacro.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -832,6 +839,7 @@
     <Content Include="Umbraco_Client\Dialogs\PublishDialog.css" />
     <Content Include="Umbraco_Client\Dialogs\PublishDialog.js" />
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
+    <Content Include="Umbraco_Client\Editors\EditMacroScripts.js" />
     <Content Include="Umbraco_Client\Editors\EditXslt.css" />
     <Content Include="Umbraco_Client\Editors\EditXslt.js" />
     <Content Include="Umbraco_Client\Editors\EditScript.js" />

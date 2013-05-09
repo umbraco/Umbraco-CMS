@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,6 +17,7 @@ using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.presentation.Trees;
 using umbraco.cms.helpers;
+using umbraco.uicontrols;
 
 namespace umbraco.cms.presentation.developer
 {
@@ -28,12 +29,16 @@ namespace umbraco.cms.presentation.developer
 
         }
 
-        private List<string> allowedExtensions = new List<string>();
-        protected PlaceHolder buttons;
-        protected uicontrols.CodeArea CodeArea1;
+        protected MenuIconI SaveButton;
 
-        private void Page_Load(object sender, System.EventArgs e)
+        private readonly List<string> _allowedExtensions = new List<string>();
+        protected PlaceHolder buttons;
+        protected CodeArea CodeArea1;
+
+        protected override void OnLoad(EventArgs e)
         {
+            base.OnLoad(e);
+
             UmbracoPanel1.hasMenu = true;
 
             if (!IsPostBack)
@@ -48,28 +53,26 @@ namespace umbraco.cms.presentation.developer
 
         private List<string> validScriptingExtensions()
         {
-            if (allowedExtensions.Count == 0)
+            if (_allowedExtensions.Count == 0)
             {
                 foreach (MacroEngineLanguage lang in MacroEngineFactory.GetSupportedUILanguages())
                 {
-                    if (!allowedExtensions.Contains(lang.Extension))
-                        allowedExtensions.Add(lang.Extension);
+                    if (!_allowedExtensions.Contains(lang.Extension))
+                        _allowedExtensions.Add(lang.Extension);
                 }
             }
 
-            return allowedExtensions;
+            return _allowedExtensions;
         }
 
         protected override void OnInit(EventArgs e)
         {
-            InitializeComponent();
             base.OnInit(e);
 
-            uicontrols.MenuIconI save = UmbracoPanel1.Menu.NewIcon();
-            save.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
-            save.OnClickCommand = "doSubmit()";
-            save.AltText = "Save scripting File";
-            save.ID = "save";
+            SaveButton = UmbracoPanel1.Menu.NewIcon();
+            SaveButton.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
+            SaveButton.AltText = "Save scripting File";
+            SaveButton.ID = "save";
 
             // Add source and filename
             String file = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + Request.QueryString["file"]);
@@ -89,17 +92,84 @@ namespace umbraco.cms.presentation.developer
             pythonSource.Text = S;
         }
 
-        private void InitializeComponent()
-        {
-            this.Load += new System.EventHandler(this.Page_Load);
-        }
-
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
 
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices) + "/codeEditorSave.asmx"));
-			ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices) + "/legacyAjaxCalls.asmx"));
+            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices) + "/legacyAjaxCalls.asmx"));
         }
+
+        /// <summary>
+        /// UmbracoPanel1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.UmbracoPanel UmbracoPanel1;
+
+        /// <summary>
+        /// Pane1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane1;
+
+        /// <summary>
+        /// pp_filename control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_filename;
+
+        /// <summary>
+        /// pythonFileName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox pythonFileName;
+
+        /// <summary>
+        /// pp_testing control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_testing;
+
+        /// <summary>
+        /// SkipTesting control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox SkipTesting;
+
+        /// <summary>
+        /// pp_errorMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_errorMsg;
+
+        /// <summary>
+        /// pythonSource control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.CodeArea pythonSource;
     }
 }
