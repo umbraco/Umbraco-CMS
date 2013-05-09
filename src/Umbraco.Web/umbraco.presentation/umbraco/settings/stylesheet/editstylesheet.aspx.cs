@@ -17,20 +17,25 @@ namespace umbraco.cms.presentation.settings.stylesheet
     {
         private StyleSheet stylesheet;
 
+        protected MenuIconI SaveButton;
+
         public editstylesheet()
         {
             CurrentApp = DefaultApps.settings.ToString();
         }
 
-        protected void Page_Load(object sender, EventArgs e)
-        {            
-            var save = Panel1.Menu.NewIcon();
-            save.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
 
-            save.OnClickCommand = "Umbraco.Editors.EditStyleSheet.save('" + editorSource.ClientID + "', '" + NameTxt.ClientID + "', '" + NameTxt.Text + "', '" + Request.QueryString["id"] + "')";
-            
-            save.AltText = "Save stylesheet";
-            save.ID = "save";
+            SaveButton = Panel1.Menu.NewIcon();
+            SaveButton.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
+            SaveButton.AltText = "Save stylesheet";
+            SaveButton.ID = "save";
+        }
+
+        protected void Page_Load(object sender, EventArgs e)
+        {                        
             Panel1.Text = ui.Text("stylesheet", "editstylesheet", getUser());
             pp_name.Text = ui.Text("name", getUser());
             pp_path.Text = ui.Text("path", getUser());
