@@ -26,9 +26,10 @@
                 });
                 editor.init();
             });
+            $(document).ready(function () {
+                UmbClientMgr.appActions().bindSaveShortCut();
+            });
         })(jQuery);
-
-        
         
     </script>
 </asp:Content>
