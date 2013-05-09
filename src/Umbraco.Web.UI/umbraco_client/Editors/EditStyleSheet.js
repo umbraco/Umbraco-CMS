@@ -39,9 +39,6 @@
 
             submitFailure: function(t) {
                 top.UmbSpeechBubble.ShowMessage('error', this._opts.text.cssErrorHeader, this._opts.text.cssErrorText);
-                
-                UmbClientMgr.mainTree().setActiveTreeType('stylesheets');
-                UmbClientMgr.mainTree().syncTree("-1,init," + this._opts.cssId, true);
             }
         },
         {

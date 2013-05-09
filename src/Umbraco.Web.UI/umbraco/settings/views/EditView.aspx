@@ -24,6 +24,8 @@
             $(document).ready(function () {
                 //create and assign a new EditView object
                 editViewEditor = new Umbraco.Editors.EditView({
+                    treeSyncPath: "<%=TemplateTreeSyncPath%>",
+                    currentTreeType: "<%=CurrentTreeType%>",
                     editorType: "<%= EditorType.ToString() %>",
                     originalFileName: "<%=OriginalFileName %>",
                     restServiceLocation: "<%= Url.GetSaveFileServicePath() %>",                    
