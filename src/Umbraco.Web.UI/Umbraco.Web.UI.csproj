@@ -697,6 +697,7 @@
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
     <Content Include="Umbraco_Client\Editors\EditMacro.css" />
     <Content Include="Umbraco_Client\Editors\EditStyleSheet.js" />
+    <Content Include="Umbraco_Client\Editors\EditTemplate.js" />
     <Content Include="Umbraco_Client\Editors\EditView.js" />
     <Content Include="Umbraco_Client\FileUploader\Js\jquery.fileUploader.js" />
     <Content Include="Umbraco_Client\FolderBrowser\Css\folderbrowser.css" />
