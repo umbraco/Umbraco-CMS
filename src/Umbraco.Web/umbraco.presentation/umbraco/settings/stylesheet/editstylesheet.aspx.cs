@@ -23,11 +23,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         }
 
         protected void Page_Load(object sender, EventArgs e)
-        {
-            ClientTools
-                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadStylesheets>().Tree.Alias)
-                    .SyncTree("-1,init," + Request.GetItemAsString("id"), false);
-
+        {            
             var save = Panel1.Menu.NewIcon();
             save.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
 
@@ -51,6 +47,10 @@ namespace umbraco.cms.presentation.settings.stylesheet
             {
                 NameTxt.Text = stylesheet.Text;
                 editorSource.Text = stylesheet.Content;
+
+                ClientTools
+                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadStylesheets>().Tree.Alias)
+                    .SyncTree("-1,init," + Request.GetItemAsString("id"), false);
             }
         }
 

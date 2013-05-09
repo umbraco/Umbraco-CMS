@@ -376,6 +376,13 @@
     <Compile Include="Umbraco\settings\Stylesheet\editstylesheet.aspx.designer.cs">
       <DependentUpon>editstylesheet.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\settings\Stylesheet\Property\EditStyleSheetProperty.aspx.cs">
+      <DependentUpon>EditStyleSheetProperty.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\settings\Stylesheet\Property\EditStyleSheetProperty.aspx.designer.cs">
+      <DependentUpon>EditStyleSheetProperty.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Settings\Views\EditView.aspx.cs">
       <DependentUpon>EditView.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
