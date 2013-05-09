@@ -1887,7 +1887,9 @@
     <Content Include="Config\feedProxy.config" />
     <Content Include="Umbraco_Client\ui\ui-lightness\jquery-ui.custom.css" />
     <Content Include="Config\applications.config" />
-    <Content Include="Config\trees.config" />
+    <Content Include="Config\trees.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Config\applications.Release.config">
       <DependentUpon>applications.config</DependentUpon>
       <SubType>Designer</SubType>

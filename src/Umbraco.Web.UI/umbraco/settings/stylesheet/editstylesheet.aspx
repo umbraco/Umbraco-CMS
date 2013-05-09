@@ -26,9 +26,10 @@
                 });
                 editor.init();
             });
-            $(document).ready(function () {
-                UmbClientMgr.appActions().bindSaveShortCut();
-            });
+            
+            //bind save shortcut
+            UmbClientMgr.appActions().bindSaveShortCut();
+            
         })(jQuery);
         
     </script>
