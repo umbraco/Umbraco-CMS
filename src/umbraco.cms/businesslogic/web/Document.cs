@@ -859,7 +859,7 @@ namespace umbraco.cms.businesslogic.web
         public bool PublishWithChildrenWithResult(User u)
         {
             var result = ((ContentService)ApplicationContext.Current.Services.ContentService)
-                .PublishWithChildrenInternal(Content, u.Id);
+                .PublishWithChildrenInternal(Content, u.Id, true);
             //This used to just return false only when the parent content failed, otherwise would always return true so we'll
             // do the same thing for the moment
             return result.Single(x => x.Result.ContentItem.Id == Id).Success;
