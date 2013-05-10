@@ -54,7 +54,7 @@ namespace Umbraco.Core
         {
             if (GlobalSettings.DebugMode)
             {
-                if (!String.IsNullOrEmpty(Request["umbDebug"]) || Request.Path.Contains(Umbraco.Core.IO.SystemDirectories.Umbraco) )
+                if (!String.IsNullOrEmpty(Request["umbDebug"]))
                     Umbraco.Core.Profiling.Profiler.Instance.Start();
             }
         }
@@ -63,7 +63,7 @@ namespace Umbraco.Core
         {
             if (GlobalSettings.DebugMode)
             {
-                if (!String.IsNullOrEmpty(Request["umbDebug"]) || Request.Path.Contains(Umbraco.Core.IO.SystemDirectories.Umbraco))
+                if (!String.IsNullOrEmpty(Request["umbDebug"]))
                     Umbraco.Core.Profiling.Profiler.Instance.Stop();
             }
         }
