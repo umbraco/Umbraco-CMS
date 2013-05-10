@@ -199,7 +199,7 @@ namespace umbraco.BusinessLogic
             else
                 return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
                 "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
-                SqlHelper.CreateParameter("@logHeader", type),
+                SqlHelper.CreateParameter("@logHeader", type.ToString()),
                 SqlHelper.CreateParameter("@dateStamp", sinceDate)));
         }
 
@@ -231,7 +231,7 @@ namespace umbraco.BusinessLogic
             else
                 return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
                 "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
-                SqlHelper.CreateParameter("@logHeader", type),
+                SqlHelper.CreateParameter("@logHeader", type.ToString()),
                 SqlHelper.CreateParameter("@user", user.Id),
                 SqlHelper.CreateParameter("@dateStamp", sinceDate)));
         }
