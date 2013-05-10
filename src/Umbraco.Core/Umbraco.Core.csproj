@@ -42,6 +42,9 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
+    <Reference Include="MiniProfiler">
+      <HintPath>..\packages\MiniProfiler.2.1.0\lib\net40\MiniProfiler.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -518,6 +521,7 @@
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkRepository.cs" />
     <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWorkProvider.cs" />
+    <Compile Include="Profiling\Profiler.cs" />
     <Compile Include="PropertyEditors\Attributes\PropertyEditorAttribute.cs" />
     <Compile Include="PropertyEditors\Attributes\ShowLabelAttribute.cs" />
     <Compile Include="PropertyEditors\BlankPreValueModel.cs" />

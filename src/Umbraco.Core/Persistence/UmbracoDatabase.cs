@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Data.Common;
+using StackExchange.Profiling;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Persistence
@@ -39,6 +40,13 @@ namespace Umbraco.Core.Persistence
 		public UmbracoDatabase(string connectionStringName) : base(connectionStringName)
 		{
 		}
+
+        public override IDbConnection OnConnectionOpened(IDbConnection connection)
+        {
+            // wrap the connection with a profiling connection that tracks timings 
+            return new StackExchange.Profiling.Data.ProfiledDbConnection(connection as DbConnection, MiniProfiler.Current);
+        }
+
 
         public override void OnException(Exception x)
         {

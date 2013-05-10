@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -9,205 +10,225 @@ using System.Web.UI.WebControls;
 using mp = umbraco.presentation.masterpages;
 namespace umbraco.presentation.umbraco.masterpages
 {
-	public class umbracoPage : mp.umbracoPage { }
-	public class umbracoDialog : mp.umbracoDialog { }
+    public class umbracoPage : mp.umbracoPage { }
+    public class umbracoDialog : mp.umbracoDialog { }
 }
 
 namespace umbraco.presentation.masterpages
 {
-	public delegate void MasterPageLoadHandler(object sender, System.EventArgs e);
+    public delegate void MasterPageLoadHandler(object sender, System.EventArgs e);
 
-	public partial class umbracoPage : System.Web.UI.MasterPage
-	{
+    public partial class umbracoPage : System.Web.UI.MasterPage
+    {
 
-		public new static event MasterPageLoadHandler Load;
-		public new static event MasterPageLoadHandler Init;
+        public new static event MasterPageLoadHandler Load;
+        public new static event MasterPageLoadHandler Init;
 
-		protected void Page_Load(object sender, EventArgs e)
-		{
-			ClientLoader.DataBind();
-			FireOnLoad(e);
-		}
-
-		protected override void OnInit(EventArgs e)
-		{
-			base.OnInit(e);
-
-			if (Init != null)
-			{
-				Init(this, e);
-			}
-		}
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            ClientLoader.DataBind();
+            FireOnLoad(e);
+        }
 
 
-		protected virtual void FireOnLoad(EventArgs e)
-		{
-			if (Load != null)
-			{
-				Load(this, e);
-			}
-		}
+        protected override void Render(HtmlTextWriter writer)
+        {
+            // get base output
+            StringWriter baseWriter = new StringWriter();
+            base.Render(new HtmlTextWriter(baseWriter));
+            string baseOutput = baseWriter.ToString();
 
-		/// <summary>
-		/// ClientLoader control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::umbraco.uicontrols.UmbracoClientDependencyLoader ClientLoader;
+            // profiling
+            if (!String.IsNullOrEmpty(Request.QueryString["umbDebug"]) && GlobalSettings.DebugMode)
+            {
+                baseOutput = baseOutput.Replace("</body>",
+                                                Umbraco.Core.Profiling.Profiler.Instance.Render() + "</body>");
+            }
 
-		/// <summary>
-		/// CssInclude1 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::ClientDependency.Core.Controls.CssInclude CssInclude1;
 
-		/// <summary>
-		/// CssInclude2 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::ClientDependency.Core.Controls.CssInclude CssInclude2;
+            // write modified output
+            writer.Write(baseOutput);
+        }
 
-		/// <summary>
-		/// JsInclude1 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::ClientDependency.Core.Controls.JsInclude JsInclude1;
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
 
-		/// <summary>
-		/// JsInclude2 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::ClientDependency.Core.Controls.JsInclude JsInclude2;
+            if (Init != null)
+            {
+                Init(this, e);
+            }
+        }
 
-		/// <summary>
-		/// JsInclude8 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::ClientDependency.Core.Controls.JsInclude JsInclude8;
 
-		/// <summary>
-		/// JsInclude9 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::ClientDependency.Core.Controls.JsInclude JsInclude9;
+        protected virtual void FireOnLoad(EventArgs e)
+        {
+            if (Load != null)
+            {
+                Load(this, e);
+            }
+        }
 
-		/// <summary>
-		/// JsInclude4 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::ClientDependency.Core.Controls.JsInclude JsInclude4;
+        /// <summary>
+        /// ClientLoader control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.UmbracoClientDependencyLoader ClientLoader;
 
-		/// <summary>
-		/// JsInclude5 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::ClientDependency.Core.Controls.JsInclude JsInclude5;
+        /// <summary>
+        /// CssInclude1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.CssInclude CssInclude1;
 
-		/// <summary>
-		/// JsInclude6 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::ClientDependency.Core.Controls.JsInclude JsInclude6;
+        /// <summary>
+        /// CssInclude2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.CssInclude CssInclude2;
 
-		/// <summary>
-		/// JsInclude7 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::ClientDependency.Core.Controls.JsInclude JsInclude7;
+        /// <summary>
+        /// JsInclude1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude1;
 
-		/// <summary>
-		/// JsInclude3 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::ClientDependency.Core.Controls.JsInclude JsInclude3;
+        /// <summary>
+        /// JsInclude2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude2;
 
-		/// <summary>
-		/// JsIncludeHotkeys control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::ClientDependency.Core.Controls.JsInclude JsIncludeHotkeys;
+        /// <summary>
+        /// JsInclude8 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude8;
 
-		/// <summary>
-		/// head control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.WebControls.ContentPlaceHolder head;
+        /// <summary>
+        /// JsInclude9 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude9;
 
-		/// <summary>
-		/// form1 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.HtmlControls.HtmlForm form1;
+        /// <summary>
+        /// JsInclude4 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude4;
 
-		/// <summary>
-		/// ScriptManager1 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.ScriptManager ScriptManager1;
+        /// <summary>
+        /// JsInclude5 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude5;
 
-		/// <summary>
-		/// body control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.WebControls.ContentPlaceHolder body;
+        /// <summary>
+        /// JsInclude6 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude6;
 
-		/// <summary>
-		/// footer control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.WebControls.ContentPlaceHolder footer;
-	}
+        /// <summary>
+        /// JsInclude7 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude7;
+
+        /// <summary>
+        /// JsInclude3 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude3;
+
+        /// <summary>
+        /// JsIncludeHotkeys control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsIncludeHotkeys;
+
+        /// <summary>
+        /// head control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ContentPlaceHolder head;
+
+        /// <summary>
+        /// form1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlForm form1;
+
+        /// <summary>
+        /// ScriptManager1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.ScriptManager ScriptManager1;
+
+        /// <summary>
+        /// body control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ContentPlaceHolder body;
+
+        /// <summary>
+        /// footer control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ContentPlaceHolder footer;
+    }
 }

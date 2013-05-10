@@ -388,5 +388,9 @@
         }
 
     </script>
+    <%if(!String.IsNullOrEmpty(Request["umbDebug"]) && umbraco.GlobalSettings.DebugMode)
+      {
+          Response.Write(Umbraco.Core.Profiling.Profiler.Instance.Render());
+      }%>
 </body>
 </html>

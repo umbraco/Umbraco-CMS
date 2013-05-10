@@ -5,6 +5,8 @@ using System.Text;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Mvc;
+using StackExchange.Profiling;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
@@ -46,6 +48,24 @@ namespace Umbraco.Core
         protected void Application_Start(object sender, EventArgs e)
         {
             StartApplication(sender, e);
+        }
+
+        protected void Application_BeginRequest()
+        {
+            if (GlobalSettings.DebugMode)
+            {
+                if (!String.IsNullOrEmpty(Request["umbDebug"]) || Request.Path.Contains(Umbraco.Core.IO.SystemDirectories.Umbraco) )
+                    Umbraco.Core.Profiling.Profiler.Instance.Start();
+            }
+        }
+
+        protected void Application_EndRequest()
+        {
+            if (GlobalSettings.DebugMode)
+            {
+                if (!String.IsNullOrEmpty(Request["umbDebug"]) || Request.Path.Contains(Umbraco.Core.IO.SystemDirectories.Umbraco))
+                    Umbraco.Core.Profiling.Profiler.Instance.Stop();
+            }
         }
 
         /// <summary>

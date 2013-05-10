@@ -23,11 +23,32 @@ namespace umbraco.presentation.masterpages
             }
         }
 
+        protected override void OnPreRender(EventArgs e)
+        {
+            base.OnPreRender(e);
+        }
+
         protected override void Render(HtmlTextWriter writer)
         {
             if (!m_LiveEditingContext.Enabled)
             {
-                base.Render(writer);
+                // profiling
+                if (!String.IsNullOrEmpty(Request.QueryString["umbDebug"]) && GlobalSettings.DebugMode)
+                {
+                    StringWriter baseWriter = new StringWriter();
+                    base.Render(new HtmlTextWriter(baseWriter));
+                    string baseOutput = baseWriter.ToString();
+
+                    baseOutput = baseOutput.Replace("</body>",
+                                                    Umbraco.Core.Profiling.Profiler.Instance.Render() + "</body>");
+                    writer.Write(baseOutput);
+                }
+
+                else
+                {
+
+                    base.Render(writer);
+                }
             }
             else
             {
