@@ -13,7 +13,7 @@ namespace Umbraco.Core.Profiling
         /// <returns></returns>
         public static IDisposable Step<T>(this IProfiler profiler, string name)
         {
-            return profiler.Step(string.Format(typeof (T).Name + ", " + name));
+            return profiler.Step(string.Format("[" + typeof (T).Name + "] " + name));
         }
     }
 }
