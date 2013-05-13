@@ -1,3 +1,3 @@
 tinyMCE.addI18n('en.umbracoembed', {
-    desc: 'Embed third party media',
+    desc: 'Embed third party media'
 });
