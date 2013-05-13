@@ -147,7 +147,8 @@ namespace umbraco.cms.businesslogic
 
         public static Guid GetDataType(string contentTypeAlias, string propertyTypeAlias)
         {
-            var key = new System.Tuple<string, string>(contentTypeAlias, propertyTypeAlias);
+            //propertyTypeAlias needs to be invariant, so we will store uppercase
+            var key = new System.Tuple<string, string>(contentTypeAlias, propertyTypeAlias.ToUpper());
 
             
             return PropertyTypeCache.GetOrAdd(
