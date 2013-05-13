@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 
 //This is only in case an upgrade goes wrong and the the /masterpages/ files are not copied over
 //which would result in an error. so we have kept the old namespaces intact with references to new ones
+using Umbraco.Core.Profiling;
 using mp = umbraco.presentation.masterpages;
 namespace umbraco.presentation.umbraco.masterpages
 {
@@ -34,15 +35,14 @@ namespace umbraco.presentation.masterpages
         protected override void Render(HtmlTextWriter writer)
         {
             // get base output
-            StringWriter baseWriter = new StringWriter();
+            var baseWriter = new StringWriter();
             base.Render(new HtmlTextWriter(baseWriter));
-            string baseOutput = baseWriter.ToString();
+            var baseOutput = baseWriter.ToString();
 
             // profiling
-            if (!String.IsNullOrEmpty(Request.QueryString["umbDebug"]) && GlobalSettings.DebugMode)
+            if (string.IsNullOrEmpty(Request.QueryString["umbDebug"]) == false && GlobalSettings.DebugMode)
             {
-                baseOutput = baseOutput.Replace("</body>",
-                                                Umbraco.Core.Profiling.Profiler.Instance.Render() + "</body>");
+                baseOutput = baseOutput.Replace("</body>", ProfilerResolver.Current.Profiler.Render() + "</body>");
             }
 
 

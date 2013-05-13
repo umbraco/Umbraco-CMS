@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Web.UI;
+using Umbraco.Core.Profiling;
 using umbraco.presentation.LiveEditing;
 using umbraco.presentation.LiveEditing.Controls;
 using System.IO;
@@ -30,17 +31,16 @@ namespace umbraco.presentation.masterpages
 
         protected override void Render(HtmlTextWriter writer)
         {
-            if (!m_LiveEditingContext.Enabled)
+            if (m_LiveEditingContext.Enabled == false)
             {
                 // profiling
-                if (!String.IsNullOrEmpty(Request.QueryString["umbDebug"]) && GlobalSettings.DebugMode)
+                if (string.IsNullOrEmpty(Request.QueryString["umbDebug"]) == false && GlobalSettings.DebugMode)
                 {
-                    StringWriter baseWriter = new StringWriter();
+                    var baseWriter = new StringWriter();
                     base.Render(new HtmlTextWriter(baseWriter));
-                    string baseOutput = baseWriter.ToString();
+                    var baseOutput = baseWriter.ToString();
 
-                    baseOutput = baseOutput.Replace("</body>",
-                                                    Umbraco.Core.Profiling.Profiler.Instance.Render() + "</body>");
+                    baseOutput = baseOutput.Replace("</body>", ProfilerResolver.Current.Profiler.Render() + "</body>");
                     writer.Write(baseOutput);
                 }
 

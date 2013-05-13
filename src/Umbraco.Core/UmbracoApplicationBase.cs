@@ -26,6 +26,11 @@ namespace Umbraco.Core
         public static event EventHandler ApplicationStarted;
 
         /// <summary>
+        /// Called when the HttpApplication.Init() is fired, allows developers to subscribe to the HttpApplication events
+        /// </summary>
+        public static event EventHandler ApplicationInit;
+
+        /// <summary>
         /// Boots up the Umbraco application
         /// </summary>
         internal void StartApplication(object sender, EventArgs e)
@@ -50,22 +55,13 @@ namespace Umbraco.Core
             StartApplication(sender, e);
         }
 
-        protected void Application_BeginRequest()
+        /// <summary>
+        /// Override init and raise the event
+        /// </summary>
+        public override void Init()
         {
-            if (GlobalSettings.DebugMode)
-            {
-                if (!String.IsNullOrEmpty(Request["umbDebug"]))
-                    Umbraco.Core.Profiling.Profiler.Instance.Start();
-            }
-        }
-
-        protected void Application_EndRequest()
-        {
-            if (GlobalSettings.DebugMode)
-            {
-                if (!String.IsNullOrEmpty(Request["umbDebug"]))
-                    Umbraco.Core.Profiling.Profiler.Instance.Stop();
-            }
+            base.Init();
+            OnApplicationInit(this, new EventArgs());
         }
 
         /// <summary>
@@ -88,6 +84,17 @@ namespace Umbraco.Core
         {
             if (ApplicationStarted != null)
                 ApplicationStarted(sender, e);
+        }
+
+        /// <summary>
+        /// Called to raise the ApplicationInit event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnApplicationInit(object sender, EventArgs e)
+        {
+            if (ApplicationInit != null)
+                ApplicationInit(sender, e);
         }
 
         /// <summary>

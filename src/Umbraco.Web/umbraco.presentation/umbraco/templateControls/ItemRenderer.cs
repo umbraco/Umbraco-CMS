@@ -11,6 +11,7 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Macros;
+using Umbraco.Core.Profiling;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
@@ -133,7 +134,7 @@ namespace umbraco.presentation.templateControls
         /// <param name="item">The item.</param>
         public virtual void Load(Item item)
         {
-            using (Umbraco.Core.Profiling.Profiler.Instance.Step(string.Format("Item: {0}", item.Field)))
+            using (ProfilerResolver.Current.Profiler.Step(string.Format("Item: {0}", item.Field)))
             {
                 ParseMacros(item);
             }
@@ -151,7 +152,7 @@ namespace umbraco.presentation.templateControls
 
             string elementText = GetFieldContents(item);
 
-            using (Umbraco.Core.Profiling.Profiler.Instance.Step("Parsing Macros"))
+            using (ProfilerResolver.Current.Profiler.Step("Parsing Macros"))
             {
 
                 MacroTagParser.ParseMacros(

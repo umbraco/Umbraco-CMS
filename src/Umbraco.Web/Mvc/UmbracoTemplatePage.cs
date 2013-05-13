@@ -6,6 +6,7 @@ using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Profiling;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Mvc
@@ -93,7 +94,7 @@ namespace Umbraco.Web.Mvc
                         }
                         else
                         {
-                            var profilerMarkup = Core.Profiling.Profiler.Instance.Render();
+                            var profilerMarkup = ProfilerResolver.Current.Profiler.Render();
                             text = text.Substring(0, pos) + profilerMarkup + text.Substring(pos, text.Length - pos);
                         }
                         base.WriteLiteral(text);

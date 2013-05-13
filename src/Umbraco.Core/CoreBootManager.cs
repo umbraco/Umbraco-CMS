@@ -10,6 +10,7 @@ using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Macros;
@@ -186,6 +187,9 @@ namespace Umbraco.Core
 		/// </summary>
 		protected virtual void InitializeResolvers()
 		{
+            //By default we'll initialize the Log profiler (in the web project, we'll override with the web profiler)
+            ProfilerResolver.Current = new ProfilerResolver(new LogProfiler());
+
             //by default we'll use the standard configuration based sync
             ServerRegistrarResolver.Current = new ServerRegistrarResolver(
                 new ConfigServerRegistrar()); 

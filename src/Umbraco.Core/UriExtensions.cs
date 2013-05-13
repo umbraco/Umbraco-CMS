@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Umbraco.Core
@@ -8,6 +10,19 @@ namespace Umbraco.Core
     /// </summary>
     public static class UriExtensions
     {
+        /// <summary>
+        /// This is a performance tweak to check if this is a .css, .js or .ico, .jpg, .jpeg, .png, .gif file request since
+        /// .Net will pass these requests through to the module when in integrated mode.
+        /// We want to ignore all of these requests immediately.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        internal static bool IsClientSideRequest(this Uri url)
+        {
+            var toIgnore = new[] { ".js", ".css", ".ico", ".png", ".jpg", ".jpeg", ".gif" };
+            return toIgnore.Any(x => Path.GetExtension(url.LocalPath).InvariantEquals(x));
+        }
+
         /// <summary>
         /// Rewrites the path of uri.
         /// </summary>

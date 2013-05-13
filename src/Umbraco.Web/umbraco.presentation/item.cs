@@ -4,6 +4,7 @@ using System.Web;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Profiling;
 
 namespace umbraco
 {
@@ -97,7 +98,7 @@ namespace umbraco
         /// <returns></returns>
         private string GetRecursiveValueLegacy(IDictionary elements)
         {
-            using (Umbraco.Core.Profiling.Profiler.Instance.Step("Checking recusively"))
+            using (ProfilerResolver.Current.Profiler.Step("Checking recusively"))
             {
                 var content = "";
 
@@ -118,7 +119,7 @@ namespace umbraco
                     if (currentNode == null || currentNode.FirstChild == null || string.IsNullOrEmpty(currentNode.FirstChild.Value) || string.IsNullOrEmpty(currentNode.FirstChild.Value.Trim()))
                         continue;
 
-                    Umbraco.Core.Profiling.Profiler.Instance.Step("Found recursive value on " +
+                    ProfilerResolver.Current.Profiler.Step("Found recursive value on " +
                                                                   splitpath[splitpath.Length - i - 1]);
                     HttpContext.Current.Trace.Write("item.recursive", "Item loaded from " + splitpath[splitpath.Length - i - 1]);
                     content = currentNode.FirstChild.Value;
@@ -131,7 +132,7 @@ namespace umbraco
 
         private void ParseItem(IDictionary attributes)
         {
-            using (Umbraco.Core.Profiling.Profiler.Instance.Step("Start parsing " + _fieldName))
+            using (ProfilerResolver.Current.Profiler.Step("Start parsing " + _fieldName))
             {
                 HttpContext.Current.Trace.Write("item", "Start parsing '" + _fieldName + "'");
                 if (helper.FindAttribute(attributes, "textIfEmpty") != "" && _fieldContent == "")

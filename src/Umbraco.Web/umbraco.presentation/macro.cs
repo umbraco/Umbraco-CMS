@@ -22,6 +22,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Profiling;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Macros;
@@ -235,7 +236,7 @@ namespace umbraco
                                                    Name, Model.MacroType, Model.CacheDuration)
                                    : string.Format("Render Inline Macro, Cache: {2})",
                                                    Name, Model.MacroType, Model.CacheDuration);
-            using (Umbraco.Core.Profiling.Profiler.Instance.Step(macroInfo))
+            using (ProfilerResolver.Current.Profiler.Step(macroInfo))
             {
                 TraceInfo("renderMacro", macroInfo);
 
@@ -287,7 +288,7 @@ namespace umbraco
                                                                                    "Error loading Partial View script (file: " +
                                                                                    ScriptFile + ")", macroErrorEventArgs);
                                                                        };
-                            Umbraco.Core.Profiling.Profiler.Instance.Step("Partial View Added: " + Model.TypeName);
+                            ProfilerResolver.Current.Profiler.Step("Partial View Added: " + Model.TypeName);
                             TraceInfo("umbracoMacro", "Partial View added (" + Model.TypeName + ")");
                             try
                             {
@@ -322,7 +323,7 @@ namespace umbraco
                         case (int) MacroTypes.UserControl:
                             try
                             {
-                                Umbraco.Core.Profiling.Profiler.Instance.Step("UserControl Added: " + Model.TypeName);
+                                ProfilerResolver.Current.Profiler.Step("UserControl Added: " + Model.TypeName);
                                 TraceInfo("umbracoMacro", "Usercontrol added (" + Model.TypeName + ")");
 
                                 // Add tilde for v4 defined macros
@@ -365,7 +366,7 @@ namespace umbraco
                         case (int) MacroTypes.CustomControl:
                             try
                             {
-                                Umbraco.Core.Profiling.Profiler.Instance.Step("CustomControl Added: " + Model.TypeName + "." + Model.TypeAssembly);
+                                ProfilerResolver.Current.Profiler.Step("CustomControl Added: " + Model.TypeName + "." + Model.TypeAssembly);
                                 TraceInfo("umbracoMacro", "Custom control added (" + Model.TypeName + ")");
                                 TraceInfo("umbracoMacro", "ScriptAssembly (" + Model.TypeAssembly + ")");
                                 macroControl = loadControl(Model.TypeAssembly, ScriptType, Model, pageElements);
@@ -438,7 +439,7 @@ namespace umbraco
 
                             try
                             {
-                                Umbraco.Core.Profiling.Profiler.Instance.Step("MacroEngineScript Added: " + ScriptFile);
+                                using (ProfilerResolver.Current.Profiler.Step("MacroEngineScript Added: " + ScriptFile);
                                 TraceInfo("umbracoMacro", "MacroEngine script added (" + ScriptFile + ")");
                                 ScriptingMacroResult result = loadMacroScript(Model);
                                 macroControl = new LiteralControl(result.Result);
@@ -539,7 +540,7 @@ namespace umbraco
                             if (!(macroControl is LiteralControl))
                                 macroControl = new LiteralControl(outputCacheString);
 
-                            Umbraco.Core.Profiling.Profiler.Instance.Step("MacroContent Saved To Cache: " + Model.CacheIdentifier);
+                            ProfilerResolver.Current.Profiler.Step("MacroContent Saved To Cache: " + Model.CacheIdentifier);
                             TraceInfo("renderMacro",
                                       string.Format("Macro Content saved to cache '{0}'.", Model.CacheIdentifier));
                         }
@@ -554,7 +555,7 @@ namespace umbraco
 
                             dateAddedCacheKey = CacheKeys.MacroControlDateAddedCacheKey + Model.CacheIdentifier;
 
-                            Umbraco.Core.Profiling.Profiler.Instance.Step("MacroContent Saved To Cache: " + Model.CacheIdentifier);
+                            ProfilerResolver.Current.Profiler.Step("MacroContent Saved To Cache: " + Model.CacheIdentifier);
                             TraceInfo("renderMacro",
                                       string.Format("Macro Control saved to cache '{0}'.", Model.CacheIdentifier));
                         }
@@ -605,14 +606,14 @@ namespace umbraco
                         if (MacroNeedsToBeClearedFromCache(Model, CacheKeys.MacroHtmlDateAddedCacheKey + Model.CacheIdentifier, fileInfo))
                         {
                             macroHtml = null;
-                            Umbraco.Core.Profiling.Profiler.Instance.Step("Macro removed from cache due to file change: " + Model.CacheIdentifier);
+                            ProfilerResolver.Current.Profiler.Step("Macro removed from cache due to file change: " + Model.CacheIdentifier);
                             TraceInfo("renderMacro",
                                       string.Format("Macro removed from cache due to file change '{0}'.",
                                                     Model.CacheIdentifier));
                         }
                         else
                         {
-                            Umbraco.Core.Profiling.Profiler.Instance.Step("Macro Content loaded from cache: " + Model.CacheIdentifier);
+                            ProfilerResolver.Current.Profiler.Step("Macro Content loaded from cache: " + Model.CacheIdentifier);
                             TraceInfo("renderMacro",
                                       string.Format("Macro Content loaded from cache '{0}'.",
                                                     Model.CacheIdentifier));
@@ -632,7 +633,7 @@ namespace umbraco
 
                         if (MacroNeedsToBeClearedFromCache(Model, CacheKeys.MacroControlDateAddedCacheKey + Model.CacheIdentifier, fileInfo))
                         {
-                            Umbraco.Core.Profiling.Profiler.Instance.Step("Macro removed from cache due to file change: " + Model.CacheIdentifier);
+                            ProfilerResolver.Current.Profiler.Step("Macro removed from cache due to file change: " + Model.CacheIdentifier);
                             TraceInfo("renderMacro",
                                       string.Format("Macro removed from cache due to file change '{0}'.",
                                                     Model.CacheIdentifier));
@@ -640,7 +641,7 @@ namespace umbraco
                         }
                         else
                         {
-                            Umbraco.Core.Profiling.Profiler.Instance.Step("Macro Control loaded from cache: " + Model.CacheIdentifier);
+                            ProfilerResolver.Current.Profiler.Step("Macro Control loaded from cache: " + Model.CacheIdentifier);
                             TraceInfo("renderMacro",
                                       string.Format("Macro Control loaded from cache '{0}'.",
                                                     Model.CacheIdentifier));
@@ -696,7 +697,7 @@ namespace umbraco
 
                     if (macroFile.LastWriteTime.CompareTo(dateMacroAdded) == 1)
                     {
-                        Umbraco.Core.Profiling.Profiler.Instance.Step("Macro needs to be removed from cache due to file change: " + model.CacheIdentifier);
+                        ProfilerResolver.Current.Profiler.Step("Macro needs to be removed from cache due to file change: " + model.CacheIdentifier);
                         TraceInfo("renderMacro", string.Format("Macro needs to be removed from cache due to file change '{0}'.", model.CacheIdentifier));
                         return true;
                     }
@@ -871,7 +872,7 @@ namespace umbraco
                         var transformed = GetXsltTransformResult(macroXml, xsltFile);
                         var result = CreateControlsFromText(transformed);
 
-                        Umbraco.Core.Profiling.Profiler.Instance.Step("After performing transformation");
+                        ProfilerResolver.Current.Profiler.Step("After performing transformation");
                         TraceInfo("umbracoMacro", "After performing transformation");
 
                         return result;
