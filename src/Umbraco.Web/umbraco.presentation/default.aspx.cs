@@ -6,6 +6,7 @@ using System.Web.UI;
 using System.IO;
 using System.Xml;
 using System.Text.RegularExpressions;
+using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Profiling;
@@ -45,7 +46,7 @@ namespace umbraco
         protected override void OnPreInit(EventArgs e)
         {
             base.OnPreInit(e);
-            using (ProfilerResolver.Current.Profiler.Step<UmbracoDefault>("PreInit"))
+            using (MiniProfiler.Current.Step<UmbracoDefault>("PreInit"))
             {
 
                 // handle the infamous umbDebugShowTrace, etc
@@ -82,7 +83,7 @@ namespace umbraco
 
         protected override void OnInit(EventArgs e)
         {
-            using (ProfilerResolver.Current.Profiler.Step<UmbracoDefault>("Init"))
+            using (MiniProfiler.Current.Step<UmbracoDefault>("Init"))
             {
 
                 base.OnInit(e);
@@ -119,7 +120,7 @@ namespace umbraco
 
         protected override void OnLoad(EventArgs e)
         {
-            using (ProfilerResolver.Current.Profiler.Step<UmbracoDefault>("Load"))
+            using (MiniProfiler.Current.Step<UmbracoDefault>("Load"))
             {
                 base.OnLoad(e);
 
@@ -133,7 +134,7 @@ namespace umbraco
 
         protected override void Render(HtmlTextWriter writer)
         {
-            using (ProfilerResolver.Current.Profiler.Step<UmbracoDefault>("Render"))
+            using (MiniProfiler.Current.Step<UmbracoDefault>("Render"))
             {
 
                 // do the original rendering

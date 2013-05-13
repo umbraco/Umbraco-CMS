@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 
 //This is only in case an upgrade goes wrong and the the /masterpages/ files are not copied over
 //which would result in an error. so we have kept the old namespaces intact with references to new ones
+using StackExchange.Profiling;
 using Umbraco.Core.Profiling;
 using mp = umbraco.presentation.masterpages;
 namespace umbraco.presentation.umbraco.masterpages
@@ -42,7 +43,7 @@ namespace umbraco.presentation.masterpages
             // profiling
             if (string.IsNullOrEmpty(Request.QueryString["umbDebug"]) == false && GlobalSettings.DebugMode)
             {
-                baseOutput = baseOutput.Replace("</body>", ProfilerResolver.Current.Profiler.Render() + "</body>");
+                baseOutput = baseOutput.Replace("</body>", MiniProfiler.RenderIncludes() + "</body>");
             }
 
 

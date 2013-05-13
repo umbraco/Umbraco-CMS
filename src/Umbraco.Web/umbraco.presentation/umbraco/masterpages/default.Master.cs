@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Web.UI;
+using StackExchange.Profiling;
 using Umbraco.Core.Profiling;
 using umbraco.presentation.LiveEditing;
 using umbraco.presentation.LiveEditing.Controls;
@@ -40,7 +41,7 @@ namespace umbraco.presentation.masterpages
                     base.Render(new HtmlTextWriter(baseWriter));
                     var baseOutput = baseWriter.ToString();
 
-                    baseOutput = baseOutput.Replace("</body>", ProfilerResolver.Current.Profiler.Render() + "</body>");
+                    baseOutput = baseOutput.Replace("</body>", MiniProfiler.RenderIncludes() + "</body>");
                     writer.Write(baseOutput);
                 }
 

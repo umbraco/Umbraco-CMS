@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
+using StackExchange.Profiling.MVCHelpers;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
@@ -72,13 +73,16 @@ namespace Umbraco.Web
                 new MasterControllerFactory(FilteredControllerFactoriesResolver.Current));
 
             //set the render view engine
-            ViewEngines.Engines.Add(new RenderViewEngine());
+            ViewEngines.Engines.Add(new ProfilingViewEngine(new RenderViewEngine()));
             //set the plugin view engine
-            ViewEngines.Engines.Add(new PluginViewEngine());
+            ViewEngines.Engines.Add(new ProfilingViewEngine(new PluginViewEngine()));
 
             //set model binder
             ModelBinders.Binders.Add(new KeyValuePair<Type, IModelBinder>(typeof(RenderModel), new RenderModelBinder()));
 
+            //add the profiling action filter
+            GlobalFilters.Filters.Add(new ProfilingActionFilter());
+            
             return this;
         }
 
@@ -235,9 +239,6 @@ namespace Umbraco.Web
         protected override void InitializeResolvers()
         {
             base.InitializeResolvers();
-
-            //Set the profiler to be the web profiler
-            ProfilerResolver.Current.SetProfiler(new WebProfiler());
 
             //set the default RenderMvcController
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));

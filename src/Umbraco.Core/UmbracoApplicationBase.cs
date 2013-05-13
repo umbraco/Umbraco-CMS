@@ -26,11 +26,6 @@ namespace Umbraco.Core
         public static event EventHandler ApplicationStarted;
 
         /// <summary>
-        /// Called when the HttpApplication.Init() is fired, allows developers to subscribe to the HttpApplication events
-        /// </summary>
-        public static event EventHandler ApplicationInit;
-
-        /// <summary>
         /// Boots up the Umbraco application
         /// </summary>
         internal void StartApplication(object sender, EventArgs e)
@@ -53,16 +48,48 @@ namespace Umbraco.Core
         protected void Application_Start(object sender, EventArgs e)
         {
             StartApplication(sender, e);
+
+            if (SystemUtilities.GetCurrentTrustLevel() < AspNetHostingPermissionLevel.High)
+            {
+                //If we don't have a high enough trust level we cannot bind to the events
+                LogHelper.Info<UmbracoApplicationBase>("Cannot use the MiniProfiler since the application is running in Medium trust");
+            }
         }
 
         /// <summary>
-        /// Override init and raise the event
+        /// Initializes the mini profiler for the request
         /// </summary>
-        public override void Init()
+        protected void Application_BeginRequest()
         {
-            base.Init();
-            OnApplicationInit(this, new EventArgs());
+            if (GlobalSettings.DebugMode == false) return;
+            var request = TryGetRequest();
+            if (request.Success == false) return;
+            if (request.Result.Url.IsClientSideRequest()) return;
+            if (SystemUtilities.GetCurrentTrustLevel() < AspNetHostingPermissionLevel.High) return;
+            if (string.IsNullOrEmpty(request.Result["umbDebug"]) == false)
+            {
+                //start the profiler
+                MiniProfiler.Start();
+            }
         }
+
+        /// <summary>
+        /// Closes the mini profiler for the request
+        /// </summary>    
+        protected void Application_EndRequest()
+        {
+            if (GlobalSettings.DebugMode == false) return;      
+            var request = TryGetRequest();
+            if (request.Success == false) return;
+            if (request.Result.Url.IsClientSideRequest()) return;
+            if (SystemUtilities.GetCurrentTrustLevel() < AspNetHostingPermissionLevel.High) return;
+            if (string.IsNullOrEmpty(request.Result["umbDebug"]) == false)
+            {
+                //stop the profiler
+                MiniProfiler.Stop();
+            }
+        }
+
 
         /// <summary>
         /// Developers can override this method to modify objects on startup
@@ -85,18 +112,7 @@ namespace Umbraco.Core
             if (ApplicationStarted != null)
                 ApplicationStarted(sender, e);
         }
-
-        /// <summary>
-        /// Called to raise the ApplicationInit event
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnApplicationInit(object sender, EventArgs e)
-        {
-            if (ApplicationInit != null)
-                ApplicationInit(sender, e);
-        }
-
+        
         /// <summary>
         /// A method that can be overridden to invoke code when the application has an error.
         /// </summary>
@@ -145,6 +161,23 @@ namespace Umbraco.Core
         }
 
         protected abstract IBootManager GetBootManager();
+
+        /// <summary>
+        /// Gets the request object from the app instance if it is available
+        /// </summary>
+        /// <returns></returns>
+        private Attempt<HttpRequestBase> TryGetRequest()
+        {            
+            try
+            {
+                var req = Request;
+                return new Attempt<HttpRequestBase>(true, new HttpRequestWrapper(req));
+            }
+            catch (HttpException ex)
+            {
+                return new Attempt<HttpRequestBase>(ex);
+            }
+        }
 
     }
 }

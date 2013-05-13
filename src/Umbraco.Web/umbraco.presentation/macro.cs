@@ -17,6 +17,7 @@ using System.Web.UI.WebControls;
 using System.Xml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
+using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
@@ -235,7 +236,7 @@ namespace umbraco
                                 ? string.Format("Render Inline Macro, Cache: {0})", Model.CacheDuration)
                                 : string.Format("Render Macro: {0}, type: {1}, cache: {2})", Name, Model.MacroType, Model.CacheDuration);
 
-            using (ProfilerResolver.Current.Profiler.Step<macro>(macroInfo))
+            using (MiniProfiler.Current.Step<macro>(macroInfo))
             {
                 TraceInfo("renderMacro", macroInfo);
 
@@ -281,7 +282,7 @@ namespace umbraco
                                     return GetControlForErrorBehavior("Error loading Partial View script (file: " + ScriptFile + ")", macroErrorEventArgs);
                                 };
 
-                            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing Partial View: " + Model.TypeName))
+                            using (MiniProfiler.Current.Step<macro>("Executing Partial View: " + Model.TypeName))
                             {
                                 TraceInfo("umbracoMacro", "Partial View added (" + Model.TypeName + ")");
                                 try
@@ -317,7 +318,7 @@ namespace umbraco
                             }
                         case (int) MacroTypes.UserControl:
 
-                            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing UserControl: " + Model.TypeName))
+                            using (MiniProfiler.Current.Step<macro>("Executing UserControl: " + Model.TypeName))
                             {
                                 try
                                 {
@@ -361,7 +362,7 @@ namespace umbraco
                             
                         case (int) MacroTypes.CustomControl:
 
-                            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing CustomControl: " + Model.TypeName + "." + Model.TypeAssembly))
+                            using (MiniProfiler.Current.Step<macro>("Executing CustomControl: " + Model.TypeName + "." + Model.TypeAssembly))
                             {
                                 try
                                 {
@@ -423,7 +424,7 @@ namespace umbraco
                                     return GetControlForErrorBehavior("Error loading MacroEngine script (file: " + ScriptFile + ")", macroErrorEventArgs);
                                 };
 
-                            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing MacroEngineScript: " + ScriptFile))
+                            using (MiniProfiler.Current.Step<macro>("Executing MacroEngineScript: " + ScriptFile))
                             {
                                 try
                                 {
@@ -500,7 +501,7 @@ namespace umbraco
                     {
                         string dateAddedCacheKey;
 
-                        using (ProfilerResolver.Current.Profiler.Step<macro>("Saving MacroContent To Cache: " + Model.CacheIdentifier))
+                        using (MiniProfiler.Current.Step<macro>("Saving MacroContent To Cache: " + Model.CacheIdentifier))
                         {
 
                             // NH: Scripts and XSLT can be generated as strings, but not controls as page events wouldn't be hit (such as Page_Load, etc)
@@ -830,7 +831,7 @@ namespace umbraco
                 return new LiteralControl(string.Empty);
             }
 
-            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing XSLT: " + XsltFile))
+            using (MiniProfiler.Current.Step<macro>("Executing XSLT: " + XsltFile))
             {
                 XmlDocument macroXml = null;
 
@@ -859,7 +860,7 @@ namespace umbraco
                 {
                     var xsltFile = getXslt(XsltFile);
 
-                    using (ProfilerResolver.Current.Profiler.Step<macro>("Performing transformation"))
+                    using (MiniProfiler.Current.Step<macro>("Performing transformation"))
                     {
                         try
                         {
@@ -1681,8 +1682,8 @@ namespace umbraco
             //Trace out to profiling... doesn't actually profile, just for informational output.
             if (excludeProfiling == false)
             {
-                //NOTE: we cannot even do this since it throws an exception, need to use using clause: ProfilerResolver.Current.Profiler.Step(message).Dispose();
-                using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}, Error: {1}", message, ex)))
+                //NOTE: we cannot even do this since it throws an exception, need to use using clause: MiniProfiler.Current.Step(message).Dispose();
+                using (MiniProfiler.Current.Step(string.Format("{0}, Error: {1}", message, ex)))
                 {
                 }
             }

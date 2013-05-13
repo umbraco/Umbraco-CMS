@@ -1,4 +1,5 @@
 using System;
+using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
@@ -94,7 +95,7 @@ namespace Umbraco.Web.Mvc
                         }
                         else
                         {
-                            var profilerMarkup = ProfilerResolver.Current.Profiler.Render();
+                            var profilerMarkup = MiniProfiler.RenderIncludes();
                             text = text.Substring(0, pos) + profilerMarkup + text.Substring(pos, text.Length - pos);
                         }
                         base.WriteLiteral(text);
