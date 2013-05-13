@@ -2,6 +2,7 @@
 using System.Web;
 using StackExchange.Profiling;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Profiling
 {
@@ -10,18 +11,15 @@ namespace Umbraco.Core.Profiling
     /// </summary>
     public class WebProfiler : IProfiler
     {
-        private readonly UmbracoApplicationBase _umbracoApplication;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="umbracoApplication"></param>
         /// <remarks>
         /// Binds to application events to enable the MiniProfiler
         /// </remarks>
-        internal WebProfiler(UmbracoApplicationBase umbracoApplication)
+        internal WebProfiler()
         {
-            _umbracoApplication = umbracoApplication;
             UmbracoApplicationBase.ApplicationInit += UmbracoApplicationApplicationInit;
         }
 
@@ -34,8 +32,17 @@ namespace Umbraco.Core.Profiling
         {
             var app = sender as HttpApplication;
             if (app == null) return;
-            app.BeginRequest += UmbracoApplicationBeginRequest;
-            app.EndRequest += UmbracoApplicationEndRequest;
+
+            if (SystemUtilities.GetCurrentTrustLevel() < AspNetHostingPermissionLevel.High)
+            {
+                //If we don't have a high enough trust level we cannot bind to the events
+                LogHelper.Info<WebProfiler>("Cannot start the WebProfiler since the application is running in Medium trust");
+            }
+            else
+            {
+                app.BeginRequest += UmbracoApplicationBeginRequest;
+                app.EndRequest += UmbracoApplicationEndRequest;   
+            }            
         }
 
         /// <summary>

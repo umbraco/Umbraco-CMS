@@ -234,10 +234,10 @@ namespace umbraco
             var macroInfo = (Model.MacroType == MacroTypes.Script && Model.Name.IsNullOrWhiteSpace())
                                 ? string.Format("Render Inline Macro, Cache: {0})", Model.CacheDuration)
                                 : string.Format("Render Macro: {0}, type: {1}, cache: {2})", Name, Model.MacroType, Model.CacheDuration);
-            
-            using (ProfilerResolver.Current.Profiler.Step(macroInfo))
+
+            using (ProfilerResolver.Current.Profiler.Step<macro>(macroInfo))
             {
-                TraceInfo("renderMacro", macroInfo, excludeProfiling: true);
+                TraceInfo("renderMacro", macroInfo);
 
                 StateHelper.SetContextValue(MacrosAddedKey, StateHelper.GetContextValue<int>(MacrosAddedKey) + 1);
 
@@ -281,7 +281,7 @@ namespace umbraco
                                     return GetControlForErrorBehavior("Error loading Partial View script (file: " + ScriptFile + ")", macroErrorEventArgs);
                                 };
 
-                            using (ProfilerResolver.Current.Profiler.Step("Executing Partial View: " + Model.TypeName))
+                            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing Partial View: " + Model.TypeName))
                             {
                                 TraceInfo("umbracoMacro", "Partial View added (" + Model.TypeName + ")");
                                 try
@@ -316,8 +316,8 @@ namespace umbraco
                                 break;
                             }
                         case (int) MacroTypes.UserControl:
-                            
-                            using (ProfilerResolver.Current.Profiler.Step("Executing UserControl: " + Model.TypeName))
+
+                            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing UserControl: " + Model.TypeName))
                             {
                                 try
                                 {
@@ -360,8 +360,8 @@ namespace umbraco
                             }
                             
                         case (int) MacroTypes.CustomControl:
-                            
-                            using (ProfilerResolver.Current.Profiler.Step("Executing CustomControl: " + Model.TypeName + "." + Model.TypeAssembly))
+
+                            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing CustomControl: " + Model.TypeName + "." + Model.TypeAssembly))
                             {
                                 try
                                 {
@@ -423,7 +423,7 @@ namespace umbraco
                                     return GetControlForErrorBehavior("Error loading MacroEngine script (file: " + ScriptFile + ")", macroErrorEventArgs);
                                 };
 
-                            using (ProfilerResolver.Current.Profiler.Step("Executing MacroEngineScript: " + ScriptFile))
+                            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing MacroEngineScript: " + ScriptFile))
                             {
                                 try
                                 {
@@ -500,7 +500,7 @@ namespace umbraco
                     {
                         string dateAddedCacheKey;
 
-                        using (ProfilerResolver.Current.Profiler.Step("Saving MacroContent To Cache: " + Model.CacheIdentifier))
+                        using (ProfilerResolver.Current.Profiler.Step<macro>("Saving MacroContent To Cache: " + Model.CacheIdentifier))
                         {
 
                             // NH: Scripts and XSLT can be generated as strings, but not controls as page events wouldn't be hit (such as Page_Load, etc)
@@ -830,7 +830,7 @@ namespace umbraco
                 return new LiteralControl(string.Empty);
             }
 
-            using (ProfilerResolver.Current.Profiler.Step("Executing XSLT: " + XsltFile))
+            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing XSLT: " + XsltFile))
             {
                 XmlDocument macroXml = null;
 
@@ -859,7 +859,7 @@ namespace umbraco
                 {
                     var xsltFile = getXslt(XsltFile);
 
-                    using (ProfilerResolver.Current.Profiler.Step("Performing transformation"))
+                    using (ProfilerResolver.Current.Profiler.Step<macro>("Performing transformation"))
                     {
                         try
                         {
@@ -1661,34 +1661,16 @@ namespace umbraco
             }
         }
 
-        private static void TraceInfo(string category, string message, bool excludeProfiling = false)
+        private static void TraceInfo(string category, string message)
         {
             if (HttpContext.Current != null)
-                HttpContext.Current.Trace.Write(category, message);
-            
-            //Trace out to profiling... doesn't actually profile, just for informational output.
-            if (excludeProfiling == false)
-            {
-                //NOTE: we cannot even do this since it throws an exception, need to use using clause: ProfilerResolver.Current.Profiler.Step(message).Dispose();
-                using (ProfilerResolver.Current.Profiler.Step(message))
-                {
-                }
-            }
+                HttpContext.Current.Trace.Write(category, message);            
         }
 
-        private static void TraceWarn(string category, string message, bool excludeProfiling = false)
+        private static void TraceWarn(string category, string message)
         {
             if (HttpContext.Current != null)
 				HttpContext.Current.Trace.Warn(category, message);
-
-            //Trace out to profiling... doesn't actually profile, just for informational output.
-            if (excludeProfiling == false)
-            {
-                //NOTE: we cannot even do this since it throws an exception, need to use using clause: ProfilerResolver.Current.Profiler.Step(message).Dispose();
-                using (ProfilerResolver.Current.Profiler.Step(message))
-                {
-                }
-            }
         }
 
         private static void TraceWarn(string category, string message, Exception ex, bool excludeProfiling = false)

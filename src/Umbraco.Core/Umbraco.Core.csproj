@@ -523,6 +523,7 @@
     <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWorkProvider.cs" />
     <Compile Include="Profiling\IProfiler.cs" />
     <Compile Include="Profiling\LogProfiler.cs" />
+    <Compile Include="Profiling\ProfilerExtensions.cs" />
     <Compile Include="Profiling\ProfilerResolver.cs" />
     <Compile Include="Profiling\WebProfiler.cs" />
     <Compile Include="PropertyEditors\Attributes\PropertyEditorAttribute.cs" />

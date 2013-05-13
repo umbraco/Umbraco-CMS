@@ -127,9 +127,6 @@ namespace umbraco
                                            !string.IsNullOrEmpty(currentNode.FirstChild.Value) &&
                                            !string.IsNullOrEmpty(currentNode.FirstChild.Value.Trim()))
                                         {
-                                            ProfilerResolver.Current.Profiler.Step("Loaded Recursively from " +
-                                                                                          splitpath[
-                                                                                              splitpath.Length - i - 1]);
                                             HttpContext.Current.Trace.Write("parameter.recursive", "Item loaded from " + splitpath[splitpath.Length - i - 1]);
                                             attributeValue = currentNode.FirstChild.Value;
                                             break;

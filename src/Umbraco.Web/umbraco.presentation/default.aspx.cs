@@ -45,11 +45,11 @@ namespace umbraco
         protected override void OnPreInit(EventArgs e)
         {
             base.OnPreInit(e);
-            using (ProfilerResolver.Current.Profiler.Step("PreInit"))
+            using (ProfilerResolver.Current.Profiler.Step<UmbracoDefault>("PreInit"))
             {
 
                 // handle the infamous umbDebugShowTrace, etc
-                Page.Trace.IsEnabled &= GlobalSettings.DebugMode && !String.IsNullOrWhiteSpace(Request["umbDebugShowTrace"]);
+                Page.Trace.IsEnabled &= GlobalSettings.DebugMode && string.IsNullOrWhiteSpace(Request["umbDebugShowTrace"]) == false;
 
                 // get the document request and the page
                 _docRequest = UmbracoContext.Current.PublishedContentRequest;
@@ -82,7 +82,7 @@ namespace umbraco
 
         protected override void OnInit(EventArgs e)
         {
-            using (ProfilerResolver.Current.Profiler.Step("Init"))
+            using (ProfilerResolver.Current.Profiler.Step<UmbracoDefault>("Init"))
             {
 
                 base.OnInit(e);
@@ -119,7 +119,7 @@ namespace umbraco
 
         protected override void OnLoad(EventArgs e)
         {
-            using (ProfilerResolver.Current.Profiler.Step("Load"))
+            using (ProfilerResolver.Current.Profiler.Step<UmbracoDefault>("Load"))
             {
                 base.OnLoad(e);
 
@@ -133,7 +133,7 @@ namespace umbraco
 
         protected override void Render(HtmlTextWriter writer)
         {
-            using (ProfilerResolver.Current.Profiler.Step("Render"))
+            using (ProfilerResolver.Current.Profiler.Step<UmbracoDefault>("Render"))
             {
 
                 // do the original rendering
