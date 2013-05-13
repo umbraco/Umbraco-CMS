@@ -545,9 +545,10 @@
     </Compile>
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
-    <None Include="Xslt\Web.config">
-      <SubType>Designer</SubType>
-    </None>
+    <Content Include="Umbraco\Xslt\Web.config">
+      <SubType>
+      </SubType>
+    </Content>
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
@@ -2516,6 +2517,7 @@
     <Content Include="Config\log4net.config" />
     <Content Include="Config\FileSystemProviders.config" />
     <Content Include="Config\EmbeddedMedia.config" />
+    <Content Include="Xslt\Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Code\" />
