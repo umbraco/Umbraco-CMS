@@ -236,9 +236,9 @@ namespace umbraco
                                 ? string.Format("Render Inline Macro, Cache: {0})", Model.CacheDuration)
                                 : string.Format("Render Macro: {0}, type: {1}, cache: {2})", Name, Model.MacroType, Model.CacheDuration);
 
-            using (ProfilerResolver.Current.Profiler.Step<macro>(macroInfo))
+            using (DisposableTimer.TraceDuration<macro>(macroInfo))
             {
-                TraceInfo("renderMacro", macroInfo);
+                TraceInfo("renderMacro", macroInfo, excludeProfiling:true);
 
                 StateHelper.SetContextValue(MacrosAddedKey, StateHelper.GetContextValue<int>(MacrosAddedKey) + 1);
 
@@ -282,9 +282,9 @@ namespace umbraco
                                     return GetControlForErrorBehavior("Error loading Partial View script (file: " + ScriptFile + ")", macroErrorEventArgs);
                                 };
 
-                            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing Partial View: " + Model.TypeName))
+                            using (DisposableTimer.TraceDuration<macro>("Executing Partial View: " + Model.TypeName))
                             {
-                                TraceInfo("umbracoMacro", "Partial View added (" + Model.TypeName + ")");
+                                TraceInfo("umbracoMacro", "Partial View added (" + Model.TypeName + ")", excludeProfiling:true);
                                 try
                                 {
                                     var result = LoadPartialViewMacro(Model);
@@ -318,11 +318,11 @@ namespace umbraco
                             }
                         case (int) MacroTypes.UserControl:
 
-                            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing UserControl: " + Model.TypeName))
+                            using (DisposableTimer.TraceDuration<macro>("Executing UserControl: " + Model.TypeName))
                             {
                                 try
                                 {
-                                    TraceInfo("umbracoMacro", "Usercontrol added (" + Model.TypeName + ")");
+                                    TraceInfo("umbracoMacro", "Usercontrol added (" + Model.TypeName + ")", excludeProfiling:true);
 
                                     // Add tilde for v4 defined macros
                                     if (string.IsNullOrEmpty(Model.TypeName) == false &&
@@ -362,11 +362,11 @@ namespace umbraco
                             
                         case (int) MacroTypes.CustomControl:
 
-                            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing CustomControl: " + Model.TypeName + "." + Model.TypeAssembly))
+                            using (DisposableTimer.TraceDuration<macro>("Executing CustomControl: " + Model.TypeName + "." + Model.TypeAssembly))
                             {
                                 try
                                 {
-                                    TraceInfo("umbracoMacro", "Custom control added (" + Model.TypeName + "), ScriptAssembly: " + Model.TypeAssembly);
+                                    TraceInfo("umbracoMacro", "Custom control added (" + Model.TypeName + "), ScriptAssembly: " + Model.TypeAssembly, excludeProfiling: true);
                                     macroControl = loadControl(Model.TypeAssembly, ScriptType, Model, pageElements);
                                     break;
                                 }
@@ -424,11 +424,11 @@ namespace umbraco
                                     return GetControlForErrorBehavior("Error loading MacroEngine script (file: " + ScriptFile + ")", macroErrorEventArgs);
                                 };
 
-                            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing MacroEngineScript: " + ScriptFile))
+                            using (DisposableTimer.TraceDuration<macro>("Executing MacroEngineScript: " + ScriptFile))
                             {
                                 try
                                 {
-                                    TraceInfo("umbracoMacro", "MacroEngine script added (" + ScriptFile + ")");
+                                    TraceInfo("umbracoMacro", "MacroEngine script added (" + ScriptFile + ")", excludeProfiling: true);
                                     ScriptingMacroResult result = loadMacroScript(Model);
                                     macroControl = new LiteralControl(result.Result);
                                     if (result.ResultException != null)
@@ -501,7 +501,7 @@ namespace umbraco
                     {
                         string dateAddedCacheKey;
 
-                        using (ProfilerResolver.Current.Profiler.Step<macro>("Saving MacroContent To Cache: " + Model.CacheIdentifier))
+                        using (DisposableTimer.TraceDuration<macro>("Saving MacroContent To Cache: " + Model.CacheIdentifier))
                         {
 
                             // NH: Scripts and XSLT can be generated as strings, but not controls as page events wouldn't be hit (such as Page_Load, etc)
@@ -831,7 +831,7 @@ namespace umbraco
                 return new LiteralControl(string.Empty);
             }
 
-            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing XSLT: " + XsltFile))
+            using (DisposableTimer.TraceDuration<macro>("Executing XSLT: " + XsltFile))
             {
                 XmlDocument macroXml = null;
 
@@ -860,14 +860,12 @@ namespace umbraco
                 {
                     var xsltFile = getXslt(XsltFile);
 
-                    using (ProfilerResolver.Current.Profiler.Step<macro>("Performing transformation"))
+                    using (DisposableTimer.TraceDuration<macro>("Performing transformation"))
                     {
                         try
                         {
                             var transformed = GetXsltTransformResult(macroXml, xsltFile);
                             var result = CreateControlsFromText(transformed);
-
-                            TraceInfo("umbracoMacro", "After performing transformation");
 
                             return result;
                         }
@@ -875,14 +873,7 @@ namespace umbraco
                         {
                             Exceptions.Add(e);
                             LogHelper.WarnWithException<macro>("Error parsing XSLT file", e);
-                            // inner exception code by Daniel Lindstr?m from SBBS.se
-                            Exception ie = e;
-                            while (ie != null)
-                            {
-                                TraceWarn("umbracoMacro InnerException", ie.Message, ie);
-                                ie = ie.InnerException;
-                            }
-
+                            
                             var macroErrorEventArgs = new MacroErrorEventArgs { Name = Model.Name, Alias = Model.Alias, ItemKey = Model.Xslt, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour };
                             var macroControl = GetControlForErrorBehavior("Error parsing XSLT file: \\xslt\\" + XsltFile, macroErrorEventArgs);
                             //if it is null, then we are supposed to throw the (original) exception
@@ -989,13 +980,15 @@ namespace umbraco
         {
             TextWriter tw = new StringWriter();
 
-            TraceInfo("umbracoMacro", "Before adding extensions");
             XsltArgumentList xslArgs;
-            xslArgs = AddXsltExtensions();
-            var lib = new library();
-            xslArgs.AddExtensionObject("urn:umbraco.library", lib);
-			TraceInfo("umbracoMacro", "After adding extensions");
-
+            
+            using (DisposableTimer.DebugDuration<macro>("Adding XSLT Extensions"))
+            {                
+                xslArgs = AddXsltExtensions();
+                var lib = new library();
+                xslArgs.AddExtensionObject("urn:umbraco.library", lib);
+            }
+            
             // Add parameters
             if (parameters == null || !parameters.ContainsKey("currentPage"))
             {
@@ -1008,8 +1001,10 @@ namespace umbraco
             }
 
             // Do transformation
-			TraceInfo("umbracoMacro", "Before performing transformation");
-            xslt.Transform(macroXml.CreateNavigator(), xslArgs, tw);
+            using (DisposableTimer.DebugDuration<macro>("Executing XSLT transform"))
+            {
+                xslt.Transform(macroXml.CreateNavigator(), xslArgs, tw);
+            }                       
 			return TemplateUtilities.ResolveUrlsFromTextString(tw.ToString());
         }
 
@@ -1026,11 +1021,13 @@ namespace umbraco
         {
             TextWriter tw = new StringWriter();
 
-            TraceInfo("umbracoMacro", "Before adding extensions");
-            XsltArgumentList xslArgs = AddXsltExtensions();
-            var lib = new library();
-            xslArgs.AddExtensionObject("urn:umbraco.library", lib);
-            TraceInfo("umbracoMacro", "After adding extensions");
+            XsltArgumentList xslArgs;
+            using (DisposableTimer.DebugDuration<macro>("Adding XSLT Extensions"))
+            {
+                xslArgs = AddXsltExtensions();
+                var lib = new library();
+                xslArgs.AddExtensionObject("urn:umbraco.library", lib);
+            }
 
             // Add parameters
             if (parameters == null || !parameters.ContainsKey("currentPage"))
@@ -1045,8 +1042,10 @@ namespace umbraco
             }
 
             // Do transformation
-            TraceInfo("umbracoMacro", "Before performing transformation");
-            xslt.Transform(macroNavigator, xslArgs, tw);
+            using (DisposableTimer.DebugDuration<macro>("Executing XSLT transform"))
+            {
+                xslt.Transform(macroNavigator, xslArgs, tw);
+            }
             return TemplateUtilities.ResolveUrlsFromTextString(tw.ToString());
         }
 
@@ -1305,7 +1304,6 @@ namespace umbraco
 		internal ScriptingMacroResult LoadPartialViewMacro(MacroModel macro)
 		{
 			var retVal = new ScriptingMacroResult();
-			TraceInfo("umbracoMacro", "Rendering Partial View Macro");
 			IMacroEngine engine = null;
 			
 			engine = MacroEngineFactory.GetEngine(PartialViewMacroEngine.EngineName);
@@ -1320,7 +1318,6 @@ namespace umbraco
 					retVal.ResultException = result.ResultException;
 				}
 			}
-			TraceInfo("umbracoMacro", "Rendering Partial View Macro [done]");
 			retVal.Result = ret;
 			return retVal;
 		}
@@ -1328,7 +1325,6 @@ namespace umbraco
         public ScriptingMacroResult loadMacroScript(MacroModel macro)
         {
             var retVal = new ScriptingMacroResult();
-            TraceInfo("umbracoMacro", "Loading IMacroEngine script");
             string ret = String.Empty;
             IMacroEngine engine = null;
             if (!String.IsNullOrEmpty(macro.ScriptCode))
@@ -1354,7 +1350,6 @@ namespace umbraco
                     retVal.ResultException = result.ResultException;
                 }
             }
-            TraceInfo("umbracoMacro", "Loading IMacroEngine script [done]");
             retVal.Result = ret;
             return retVal;
         }
@@ -1363,7 +1358,6 @@ namespace umbraco
         public DLRMacroResult loadMacroDLR(MacroModel macro)
         {
             var retVal = new DLRMacroResult();
-            TraceInfo("umbracoMacro", "Loading IMacroEngine script");
             var ret = new LiteralControl();
             IMacroEngine engine = null;
             if (!String.IsNullOrEmpty(macro.ScriptCode))
@@ -1389,7 +1383,6 @@ namespace umbraco
                     retVal.ResultException = result.ResultException;
                 }
             }
-            TraceInfo("umbracoMacro", "Loading IMacroEngine script [done]");
             retVal.Control = ret;
             return retVal;
         }
@@ -1662,16 +1655,32 @@ namespace umbraco
             }
         }
 
-        private static void TraceInfo(string category, string message)
+        private static void TraceInfo(string category, string message, bool excludeProfiling = false)
         {
             if (HttpContext.Current != null)
-                HttpContext.Current.Trace.Write(category, message);            
+                HttpContext.Current.Trace.Write(category, message);
+
+            //Trace out to profiling... doesn't actually profile, just for informational output.
+            if (excludeProfiling == false)
+            {
+                using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}", message)))
+                {
+                }
+            }
         }
 
-        private static void TraceWarn(string category, string message)
+        private static void TraceWarn(string category, string message, bool excludeProfiling = false)
         {
             if (HttpContext.Current != null)
 				HttpContext.Current.Trace.Warn(category, message);
+
+            //Trace out to profiling... doesn't actually profile, just for informational output.
+            if (excludeProfiling == false)
+            {
+                using (ProfilerResolver.Current.Profiler.Step(string.Format("Warning: {0}", message)))
+                {
+                }
+            }
         }
 
         private static void TraceWarn(string category, string message, Exception ex, bool excludeProfiling = false)
@@ -1682,8 +1691,7 @@ namespace umbraco
             //Trace out to profiling... doesn't actually profile, just for informational output.
             if (excludeProfiling == false)
             {
-                //NOTE: we cannot even do this since it throws an exception, need to use using clause: MiniProfiler.Current.Step(message).Dispose();
-                using (MiniProfiler.Current.Step(string.Format("{0}, Error: {1}", message, ex)))
+                using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}, Error: {1}", message, ex)))
                 {
                 }
             }

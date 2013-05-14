@@ -109,6 +109,11 @@ namespace Umbraco.Core
             return TraceDuration(typeof(T), startMessage, completeMessage);
         }
 
+        public static DisposableTimer TraceDuration<T>(string startMessage)
+        {
+            return TraceDuration(typeof(T), startMessage, "Complete");
+        }
+
         /// <summary>
         /// Adds a start and end log entry as Info and tracks how long it takes until disposed.
         /// </summary>
@@ -134,6 +139,11 @@ namespace Umbraco.Core
         public static DisposableTimer DebugDuration<T>(string startMessage, string completeMessage)
         {
             return DebugDuration(typeof(T), startMessage, completeMessage);
+        }
+
+        public static DisposableTimer DebugDuration<T>(string startMessage)
+        {
+            return DebugDuration(typeof(T), startMessage, "Complete");
         }
 
         /// <summary>
