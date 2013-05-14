@@ -46,7 +46,7 @@ namespace umbraco
         protected override void OnPreInit(EventArgs e)
         {
             base.OnPreInit(e);
-            using (ProfilerResolver.Current.Profiler.Step<UmbracoDefault>("PreInit"))
+            using (DisposableTimer.DebugDuration<UmbracoDefault>("PreInit"))
             {
 
                 // handle the infamous umbDebugShowTrace, etc
@@ -83,7 +83,7 @@ namespace umbraco
 
         protected override void OnInit(EventArgs e)
         {
-            using (ProfilerResolver.Current.Profiler.Step<UmbracoDefault>("Init"))
+            using (DisposableTimer.DebugDuration<UmbracoDefault>("Init"))
             {
 
                 base.OnInit(e);
@@ -120,7 +120,7 @@ namespace umbraco
 
         protected override void OnLoad(EventArgs e)
         {
-            using (ProfilerResolver.Current.Profiler.Step<UmbracoDefault>("Load"))
+            using (DisposableTimer.DebugDuration<UmbracoDefault>("Load"))
             {
                 base.OnLoad(e);
 
@@ -134,7 +134,7 @@ namespace umbraco
 
         protected override void Render(HtmlTextWriter writer)
         {
-            using (ProfilerResolver.Current.Profiler.Step<UmbracoDefault>("Render"))
+            using (DisposableTimer.DebugDuration<UmbracoDefault>("Render"))
             {
 
                 // do the original rendering

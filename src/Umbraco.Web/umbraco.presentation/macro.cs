@@ -236,7 +236,7 @@ namespace umbraco
                                 ? string.Format("Render Inline Macro, Cache: {0})", Model.CacheDuration)
                                 : string.Format("Render Macro: {0}, type: {1}, cache: {2})", Name, Model.MacroType, Model.CacheDuration);
 
-            using (DisposableTimer.TraceDuration<macro>(macroInfo))
+            using (DisposableTimer.DebugDuration<macro>(macroInfo))
             {
                 TraceInfo("renderMacro", macroInfo, excludeProfiling:true);
 
@@ -282,7 +282,7 @@ namespace umbraco
                                     return GetControlForErrorBehavior("Error loading Partial View script (file: " + ScriptFile + ")", macroErrorEventArgs);
                                 };
 
-                            using (DisposableTimer.TraceDuration<macro>("Executing Partial View: " + Model.TypeName))
+                            using (DisposableTimer.DebugDuration<macro>("Executing Partial View: " + Model.TypeName))
                             {
                                 TraceInfo("umbracoMacro", "Partial View added (" + Model.TypeName + ")", excludeProfiling:true);
                                 try
@@ -318,7 +318,7 @@ namespace umbraco
                             }
                         case (int) MacroTypes.UserControl:
 
-                            using (DisposableTimer.TraceDuration<macro>("Executing UserControl: " + Model.TypeName))
+                            using (DisposableTimer.DebugDuration<macro>("Executing UserControl: " + Model.TypeName))
                             {
                                 try
                                 {
@@ -362,7 +362,7 @@ namespace umbraco
                             
                         case (int) MacroTypes.CustomControl:
 
-                            using (DisposableTimer.TraceDuration<macro>("Executing CustomControl: " + Model.TypeName + "." + Model.TypeAssembly))
+                            using (DisposableTimer.DebugDuration<macro>("Executing CustomControl: " + Model.TypeName + "." + Model.TypeAssembly))
                             {
                                 try
                                 {
@@ -424,7 +424,7 @@ namespace umbraco
                                     return GetControlForErrorBehavior("Error loading MacroEngine script (file: " + ScriptFile + ")", macroErrorEventArgs);
                                 };
 
-                            using (DisposableTimer.TraceDuration<macro>("Executing MacroEngineScript: " + ScriptFile))
+                            using (DisposableTimer.DebugDuration<macro>("Executing MacroEngineScript: " + ScriptFile))
                             {
                                 try
                                 {
@@ -501,7 +501,7 @@ namespace umbraco
                     {
                         string dateAddedCacheKey;
 
-                        using (DisposableTimer.TraceDuration<macro>("Saving MacroContent To Cache: " + Model.CacheIdentifier))
+                        using (DisposableTimer.DebugDuration<macro>("Saving MacroContent To Cache: " + Model.CacheIdentifier))
                         {
 
                             // NH: Scripts and XSLT can be generated as strings, but not controls as page events wouldn't be hit (such as Page_Load, etc)
@@ -831,7 +831,7 @@ namespace umbraco
                 return new LiteralControl(string.Empty);
             }
 
-            using (DisposableTimer.TraceDuration<macro>("Executing XSLT: " + XsltFile))
+            using (DisposableTimer.DebugDuration<macro>("Executing XSLT: " + XsltFile))
             {
                 XmlDocument macroXml = null;
 
@@ -860,7 +860,7 @@ namespace umbraco
                 {
                     var xsltFile = getXslt(XsltFile);
 
-                    using (DisposableTimer.TraceDuration<macro>("Performing transformation"))
+                    using (DisposableTimer.DebugDuration<macro>("Performing transformation"))
                     {
                         try
                         {
@@ -981,7 +981,7 @@ namespace umbraco
             TextWriter tw = new StringWriter();
 
             XsltArgumentList xslArgs;
-            
+
             using (DisposableTimer.DebugDuration<macro>("Adding XSLT Extensions"))
             {                
                 xslArgs = AddXsltExtensions();

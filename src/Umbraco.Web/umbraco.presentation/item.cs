@@ -99,7 +99,7 @@ namespace umbraco
         /// <returns></returns>
         private string GetRecursiveValueLegacy(IDictionary elements)
         {
-            using (ProfilerResolver.Current.Profiler.Step<item>("Checking recusively"))
+            using (DisposableTimer.DebugDuration<item>("Checking recusively"))
             {
                 var content = "";
 
@@ -131,7 +131,7 @@ namespace umbraco
 
         private void ParseItem(IDictionary attributes)
         {
-            using (ProfilerResolver.Current.Profiler.Step<item>("Start parsing " + _fieldName))
+            using (DisposableTimer.DebugDuration<item>("Start parsing " + _fieldName))
             {
                 HttpContext.Current.Trace.Write("item", "Start parsing '" + _fieldName + "'");
                 if (helper.FindAttribute(attributes, "textIfEmpty") != "" && _fieldContent == "")
