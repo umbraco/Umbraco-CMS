@@ -7,29 +7,38 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Tests.TestHelpers;
 using umbraco.interfaces;
 
 namespace Umbraco.Tests.BootManagers
 {
     [TestFixture]
-    public class CoreBootManagerTests
+    public class CoreBootManagerTests : BaseUmbracoApplicationTest
     {
 
         private TestApp _testApp;
 
         [SetUp]
-        public void Setup()
+        public override void Initialize()
         {
+            base.Initialize();
             _testApp = new TestApp();
         }
 
         [TearDown]
-        public void TearDown()
+        public override void TearDown()
         {
+            base.TearDown();
+
             _testApp = null;
             
-            ApplicationEventsResolver.Reset();
-            SqlSyntaxProvidersResolver.Reset();
+            //ApplicationEventsResolver.Reset();
+            //SqlSyntaxProvidersResolver.Reset();
+        }
+
+        protected override void FreezeResolution()
+        {
+            //don't freeze resolution, we'll do that in the boot manager
         }
 
         /// <summary>
