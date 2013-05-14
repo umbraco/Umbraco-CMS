@@ -69,6 +69,12 @@ namespace Umbraco.Core.ObjectResolution
 
 		#endregion
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the resolver can resolve objects before resolution is frozen.
+        /// </summary>
+        /// <remarks>This is false by default and is used for some special internal resolvers.</remarks>
+        internal bool CanResolveBeforeFrozen { get; set; }
+
 		/// <summary>
 		/// Gets a value indicating whether the resolved object instance can be null.
 		/// </summary>
@@ -96,7 +102,10 @@ namespace Umbraco.Core.ObjectResolution
 		{
 			get
 			{
-				Resolution.EnsureIsFrozen();
+                // ensure we can
+                if (CanResolveBeforeFrozen == false)
+                    Resolution.EnsureIsFrozen();
+
 				using (new ReadLock(_lock))
 				{
 					if (!_canBeNull && _value == null)

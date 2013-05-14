@@ -53,8 +53,9 @@ namespace Umbraco.Core
 			if (_isInitialized)
 				throw new InvalidOperationException("The boot manager has already been initialized");
 
-			LogHelper.Info<CoreBootManager>("Umbraco application starting");
-			_timer = DisposableTimer.Start(x => LogHelper.Info<CoreBootManager>("Umbraco application startup complete" + " (took " + x + "ms)"));
+	        InitializeProfilerResolver();
+
+            _timer = DisposableTimer.Start<CoreBootManager>("Umbraco application starting", x => LogHelper.Info<CoreBootManager>("Umbraco application startup complete" + " (took " + x + "ms)"));
 
 			//create database and service contexts for the app context
 			var dbFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName);
@@ -92,6 +93,20 @@ namespace Umbraco.Core
         {
             //create the ApplicationContext
             ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext);
+        }
+
+        /// <summary>
+        /// Special method to initialize the ProfilerResolver
+        /// </summary>
+        protected virtual void InitializeProfilerResolver()
+        {
+            //By default we'll initialize the Log profiler (in the web project, we'll override with the web profiler)
+            ProfilerResolver.Current = new ProfilerResolver(new LogProfiler())
+                {
+                    //This is another special resolver that needs to be resolvable before resolution is frozen
+                    //since it is used for profiling the application startup
+                    CanResolveBeforeFrozen = true
+                };
         }
 
         /// <summary>
@@ -186,9 +201,7 @@ namespace Umbraco.Core
 		/// Create the resolvers
 		/// </summary>
 		protected virtual void InitializeResolvers()
-		{
-            //By default we'll initialize the Log profiler (in the web project, we'll override with the web profiler)
-            ProfilerResolver.Current = new ProfilerResolver(new LogProfiler());
+		{           
 
             //by default we'll use the standard configuration based sync
             ServerRegistrarResolver.Current = new ServerRegistrarResolver(

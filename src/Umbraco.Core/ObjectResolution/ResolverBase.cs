@@ -13,7 +13,7 @@ namespace Umbraco.Core.ObjectResolution
             //add itself to the internal collection
             ResolverCollection.Add(this, resetAction);
         }
-        
+
     }
 
 	/// <summary>

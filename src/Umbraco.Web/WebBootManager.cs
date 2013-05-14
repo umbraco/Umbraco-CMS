@@ -100,6 +100,17 @@ namespace Umbraco.Web
         }
 
         /// <summary>
+        /// Ensure the current profiler is the web profiler
+        /// </summary>
+        protected override void InitializeProfilerResolver()
+        {
+            base.InitializeProfilerResolver();
+
+            //Set the profiler to be the web profiler
+            ProfilerResolver.Current.SetProfiler(new WebProfiler());
+        }
+
+        /// <summary>
         /// Adds custom types to the ApplicationEventsResolver
         /// </summary>
         protected override void InitializeApplicationEventsResolver()
@@ -239,9 +250,6 @@ namespace Umbraco.Web
         protected override void InitializeResolvers()
         {
             base.InitializeResolvers();
-
-            //Set the profiler to be the web profiler
-            ProfilerResolver.Current.SetProfiler(new WebProfiler());
 
             //set the default RenderMvcController
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));

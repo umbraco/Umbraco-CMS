@@ -33,5 +33,7 @@ namespace Umbraco.Core.Profiling
         {
             get { return Value; }
         }
+
+        
     }
 }

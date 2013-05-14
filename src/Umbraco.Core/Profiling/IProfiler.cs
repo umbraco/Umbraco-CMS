@@ -7,7 +7,6 @@ namespace Umbraco.Core.Profiling
     /// </summary>
     internal interface IProfiler
     {
-
         /// <summary>
         /// Render the UI to display the profiler 
         /// </summary>
@@ -18,7 +17,7 @@ namespace Umbraco.Core.Profiling
         string Render();
 
         /// <summary>
-        /// Profile a step
+        /// Profile an operation
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
@@ -26,7 +25,7 @@ namespace Umbraco.Core.Profiling
         /// Use the 'using(' syntax
         /// </remarks>
         IDisposable Step(string name);
-
+   
         /// <summary>
         /// Start the profiler
         /// </summary>
