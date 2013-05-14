@@ -55,7 +55,7 @@ namespace Umbraco.Core
 
 	        InitializeProfilerResolver();
 
-            _timer = DisposableTimer.Start<CoreBootManager>("Umbraco application starting", x => LogHelper.Info<CoreBootManager>("Umbraco application startup complete" + " (took " + x + "ms)"));
+            _timer = DisposableTimer.DebugDuration<CoreBootManager>("Umbraco application starting", "Umbraco application startup complete");
 
 			//create database and service contexts for the app context
 			var dbFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName);
