@@ -11,7 +11,7 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// A CacheProvider that wraps the logic of the HttpRuntime.Cache
     /// </summary>
-    internal class HttpRuntimeCacheProvider : CacheProviderBase
+    internal class HttpRuntimeCacheProvider : RuntimeCacheProviderBase
     {
         private readonly System.Web.Caching.Cache _cache;
         private static readonly object Locker = new object();
