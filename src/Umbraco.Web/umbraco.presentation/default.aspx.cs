@@ -46,7 +46,7 @@ namespace umbraco
         protected override void OnPreInit(EventArgs e)
         {
             base.OnPreInit(e);
-            using (MiniProfiler.Current.Step<UmbracoDefault>("PreInit"))
+            using (ProfilerResolver.Current.Profiler.Step<UmbracoDefault>("PreInit"))
             {
 
                 // handle the infamous umbDebugShowTrace, etc
@@ -83,7 +83,7 @@ namespace umbraco
 
         protected override void OnInit(EventArgs e)
         {
-            using (MiniProfiler.Current.Step<UmbracoDefault>("Init"))
+            using (ProfilerResolver.Current.Profiler.Step<UmbracoDefault>("Init"))
             {
 
                 base.OnInit(e);
@@ -120,7 +120,7 @@ namespace umbraco
 
         protected override void OnLoad(EventArgs e)
         {
-            using (MiniProfiler.Current.Step<UmbracoDefault>("Load"))
+            using (ProfilerResolver.Current.Profiler.Step<UmbracoDefault>("Load"))
             {
                 base.OnLoad(e);
 
@@ -134,7 +134,7 @@ namespace umbraco
 
         protected override void Render(HtmlTextWriter writer)
         {
-            using (MiniProfiler.Current.Step<UmbracoDefault>("Render"))
+            using (ProfilerResolver.Current.Profiler.Step<UmbracoDefault>("Render"))
             {
 
                 // do the original rendering

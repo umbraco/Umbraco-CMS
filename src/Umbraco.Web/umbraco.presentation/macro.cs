@@ -236,7 +236,7 @@ namespace umbraco
                                 ? string.Format("Render Inline Macro, Cache: {0})", Model.CacheDuration)
                                 : string.Format("Render Macro: {0}, type: {1}, cache: {2})", Name, Model.MacroType, Model.CacheDuration);
 
-            using (MiniProfiler.Current.Step<macro>(macroInfo))
+            using (ProfilerResolver.Current.Profiler.Step<macro>(macroInfo))
             {
                 TraceInfo("renderMacro", macroInfo);
 
@@ -282,7 +282,7 @@ namespace umbraco
                                     return GetControlForErrorBehavior("Error loading Partial View script (file: " + ScriptFile + ")", macroErrorEventArgs);
                                 };
 
-                            using (MiniProfiler.Current.Step<macro>("Executing Partial View: " + Model.TypeName))
+                            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing Partial View: " + Model.TypeName))
                             {
                                 TraceInfo("umbracoMacro", "Partial View added (" + Model.TypeName + ")");
                                 try
@@ -318,7 +318,7 @@ namespace umbraco
                             }
                         case (int) MacroTypes.UserControl:
 
-                            using (MiniProfiler.Current.Step<macro>("Executing UserControl: " + Model.TypeName))
+                            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing UserControl: " + Model.TypeName))
                             {
                                 try
                                 {
@@ -362,7 +362,7 @@ namespace umbraco
                             
                         case (int) MacroTypes.CustomControl:
 
-                            using (MiniProfiler.Current.Step<macro>("Executing CustomControl: " + Model.TypeName + "." + Model.TypeAssembly))
+                            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing CustomControl: " + Model.TypeName + "." + Model.TypeAssembly))
                             {
                                 try
                                 {
@@ -424,7 +424,7 @@ namespace umbraco
                                     return GetControlForErrorBehavior("Error loading MacroEngine script (file: " + ScriptFile + ")", macroErrorEventArgs);
                                 };
 
-                            using (MiniProfiler.Current.Step<macro>("Executing MacroEngineScript: " + ScriptFile))
+                            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing MacroEngineScript: " + ScriptFile))
                             {
                                 try
                                 {
@@ -501,7 +501,7 @@ namespace umbraco
                     {
                         string dateAddedCacheKey;
 
-                        using (MiniProfiler.Current.Step<macro>("Saving MacroContent To Cache: " + Model.CacheIdentifier))
+                        using (ProfilerResolver.Current.Profiler.Step<macro>("Saving MacroContent To Cache: " + Model.CacheIdentifier))
                         {
 
                             // NH: Scripts and XSLT can be generated as strings, but not controls as page events wouldn't be hit (such as Page_Load, etc)
@@ -831,7 +831,7 @@ namespace umbraco
                 return new LiteralControl(string.Empty);
             }
 
-            using (MiniProfiler.Current.Step<macro>("Executing XSLT: " + XsltFile))
+            using (ProfilerResolver.Current.Profiler.Step<macro>("Executing XSLT: " + XsltFile))
             {
                 XmlDocument macroXml = null;
 
@@ -860,7 +860,7 @@ namespace umbraco
                 {
                     var xsltFile = getXslt(XsltFile);
 
-                    using (MiniProfiler.Current.Step<macro>("Performing transformation"))
+                    using (ProfilerResolver.Current.Profiler.Step<macro>("Performing transformation"))
                     {
                         try
                         {

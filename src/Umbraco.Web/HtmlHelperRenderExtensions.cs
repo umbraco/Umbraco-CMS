@@ -10,17 +10,29 @@ using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
+using Umbraco.Core.Profiling;
 using Umbraco.Web.Mvc;
 using umbraco;
 using umbraco.cms.businesslogic.member;
 
 namespace Umbraco.Web
 {
-	/// <summary>
+
+    /// <summary>
 	/// HtmlHelper extensions for use in templates
 	/// </summary>
 	public static class HtmlHelperRenderExtensions
 	{
+        /// <summary>
+        /// Renders the markup for the profiler
+        /// </summary>
+        /// <param name="helper"></param>
+        /// <returns></returns>
+        public static IHtmlString RenderProfiler(this HtmlHelper helper)
+        {
+            return new HtmlString(ProfilerResolver.Current.Profiler.Render());
+        }
+
         /// <summary>
         /// Renders a partial view that is found in the specified area
         /// </summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Web;
+using System.Web.Mvc;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -9,6 +10,7 @@ using System.Web.UI.WebControls;
 //which would result in an error. so we have kept the old namespaces intact with references to new ones
 using StackExchange.Profiling;
 using Umbraco.Core.Profiling;
+using Umbraco.Web;
 using mp = umbraco.presentation.masterpages;
 namespace umbraco.presentation.umbraco.masterpages
 {
@@ -43,9 +45,9 @@ namespace umbraco.presentation.masterpages
             // profiling
             if (string.IsNullOrEmpty(Request.QueryString["umbDebug"]) == false && GlobalSettings.DebugMode)
             {
-                baseOutput = baseOutput.Replace("</body>", MiniProfiler.RenderIncludes() + "</body>");
+                var htmlHelper = new HtmlHelper(new ViewContext(), new ViewPage());
+                baseOutput = baseOutput.Replace("</body>", htmlHelper.RenderProfiler() + "</body>");
             }
-
 
             // write modified output
             writer.Write(baseOutput);

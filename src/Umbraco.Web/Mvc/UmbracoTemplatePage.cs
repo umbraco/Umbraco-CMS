@@ -95,7 +95,7 @@ namespace Umbraco.Web.Mvc
                         }
                         else
                         {
-                            var profilerMarkup = MiniProfiler.RenderIncludes();
+                            var profilerMarkup = this.Html.RenderProfiler();
                             text = text.Substring(0, pos) + profilerMarkup + text.Substring(pos, text.Length - pos);
                         }
                         base.WriteLiteral(text);

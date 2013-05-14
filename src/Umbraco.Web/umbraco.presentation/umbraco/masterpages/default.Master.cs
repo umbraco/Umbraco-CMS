@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Web.Mvc;
 using System.Web.UI;
 using StackExchange.Profiling;
 using Umbraco.Core.Profiling;
+using Umbraco.Web;
 using umbraco.presentation.LiveEditing;
 using umbraco.presentation.LiveEditing.Controls;
 using System.IO;
@@ -41,7 +43,8 @@ namespace umbraco.presentation.masterpages
                     base.Render(new HtmlTextWriter(baseWriter));
                     var baseOutput = baseWriter.ToString();
 
-                    baseOutput = baseOutput.Replace("</body>", MiniProfiler.RenderIncludes() + "</body>");
+                    var htmlHelper = new HtmlHelper(new ViewContext(), new ViewPage());
+                    baseOutput = baseOutput.Replace("</body>", htmlHelper.RenderProfiler() + "</body>");
                     writer.Write(baseOutput);
                 }
 

@@ -240,6 +240,9 @@ namespace Umbraco.Web
         {
             base.InitializeResolvers();
 
+            //Set the profiler to be the web profiler
+            ProfilerResolver.Current.SetProfiler(new WebProfiler());
+
             //set the default RenderMvcController
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
 
