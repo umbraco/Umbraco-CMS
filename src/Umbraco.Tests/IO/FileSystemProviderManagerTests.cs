@@ -14,7 +14,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void Can_Get_Base_File_System()
         {
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider(FileSystemProvider.Media);
+            var fs = FileSystemProviderManager.Current.GetUnderlyingFileSystemProvider(FileSystemProviderConstants.Media);
 
             Assert.NotNull(fs);
         }

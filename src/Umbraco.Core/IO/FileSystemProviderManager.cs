@@ -9,9 +9,8 @@ using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.IO
-{
-	[UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1156", "Will be declared public after 4.10")]
-    internal class FileSystemProviderManager
+{	
+    public class FileSystemProviderManager
     {
         private readonly FileSystemProvidersSection _config;
 
@@ -28,7 +27,7 @@ namespace Umbraco.Core.IO
 
         #region Constructors
 
-        public FileSystemProviderManager()
+        internal FileSystemProviderManager()
         {
             _config = (FileSystemProvidersSection)ConfigurationManager.GetSection("FileSystemProviders");
         }
@@ -48,7 +47,15 @@ namespace Umbraco.Core.IO
 		private readonly ConcurrentDictionary<string, ProviderConstructionInfo> _providerLookup = new ConcurrentDictionary<string, ProviderConstructionInfo>();
 		private readonly ConcurrentDictionary<Type, string> _wrappedProviderLookup = new ConcurrentDictionary<Type, string>(); 
 
-        public IFileSystem GetFileSystemProvider(string alias)
+        /// <summary>
+        /// Returns the underlying (non-typed) file system provider for the alias specified
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// It is recommended to use the typed GetFileSystemProvider method instead to get a strongly typed provider instance.
+        /// </remarks>
+        public IFileSystem GetUnderlyingFileSystemProvider(string alias)
         {
 			//either get the constructor info from cache or create it and add to cache
 	        var ctorInfo = _providerLookup.GetOrAdd(alias, s =>
@@ -88,6 +95,11 @@ namespace Umbraco.Core.IO
 	        return fs;
         }
 
+        /// <summary>
+        /// Returns the strongly typed file system provider
+        /// </summary>
+        /// <typeparam name="TProviderTypeFilter"></typeparam>
+        /// <returns></returns>
         public TProviderTypeFilter GetFileSystemProvider<TProviderTypeFilter>()
 			where TProviderTypeFilter : FileSystemWrapper
         {
@@ -111,7 +123,7 @@ namespace Umbraco.Core.IO
 			        return attr.Alias;
 		        });
 			
-            var innerFs = GetFileSystemProvider(alias);
+            var innerFs = GetUnderlyingFileSystemProvider(alias);
 	        var outputFs = Activator.CreateInstance(typeof (TProviderTypeFilter), innerFs);
 	        return (TProviderTypeFilter)outputFs;
         }
