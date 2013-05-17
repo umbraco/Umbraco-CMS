@@ -184,6 +184,32 @@ namespace Umbraco.Tests.Services
             Assert.That(homeDoc.ContentTypeId, Is.EqualTo(ctHomePage.Id));
         }
 
+        [Test]
+        public void Can_Create_And_Save_ContentType_Composition()
+        {
+            /*
+             * Global
+             * - Components
+             * - Category
+             */
+            var service = ServiceContext.ContentTypeService;
+            var global = MockedContentTypes.CreateSimpleContentType("global", "Global");
+            service.Save(global);
+
+            var components = MockedContentTypes.CreateSimpleContentType("components", "Components", global);
+            service.Save(components);
+
+            var component = MockedContentTypes.CreateSimpleContentType("component", "Component", components);
+            service.Save(component);
+
+            var category = MockedContentTypes.CreateSimpleContentType("category", "Category", global);
+            service.Save(category);
+
+            var success = category.AddContentType(component);
+
+            Assert.That(success, Is.False);
+        }
+
 		private IEnumerable<IContentType> CreateContentTypeHierarchy()
 		{
 			//create the master type

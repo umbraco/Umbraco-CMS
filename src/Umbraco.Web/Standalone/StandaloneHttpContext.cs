@@ -9,7 +9,7 @@ namespace Umbraco.Web.Standalone
     /// <summary>
     /// An Http context for use in standalone applications.
     /// </summary>
-    class StandaloneHttpContext : HttpContextBase
+    internal class StandaloneHttpContext : HttpContextBase
     {
         // fixme - what shall we implement here?
 

@@ -13,7 +13,7 @@ namespace Umbraco.Web.Standalone
     /// <summary>
     /// A boot manager for use in standalone applications.
     /// </summary>
-    class StandaloneBootManager : CoreBootManager
+    internal class StandaloneBootManager : CoreBootManager
     {
         // fixme - could we inherit from WebBootManager?
         // fixme - highly experimental, probably not complete!

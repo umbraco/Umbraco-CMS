@@ -165,7 +165,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets the <see cref="IMacroService"/>
+        /// Gets the <see cref="UserService"/>
         /// </summary>
         internal IUserService UserService
         {

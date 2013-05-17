@@ -692,6 +692,9 @@
     <Compile Include="Services\PackagingService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Services\UserService.cs" />
+    <Compile Include="Standalone\ServiceContextManager.cs" />
+    <Compile Include="Standalone\StandaloneCoreApplication.cs" />
+    <Compile Include="Standalone\StandaloneCoreBootManager.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />
     <Compile Include="TopologicalSorter.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />

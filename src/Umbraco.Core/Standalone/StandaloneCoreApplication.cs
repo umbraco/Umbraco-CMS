@@ -1,20 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Umbraco.Core;
 
-namespace Umbraco.Web.Standalone
+namespace Umbraco.Core.Standalone
 {
-    /// <summary>
-    /// An application standalone applications.
-    /// </summary>
-    internal class StandaloneApplication : UmbracoApplicationBase
+    internal class StandaloneCoreApplication : UmbracoApplicationBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="StandaloneApplication"/> class.
+        /// Initializes a new instance of the <see cref="StandaloneCoreApplication"/> class.
         /// </summary>
-        protected StandaloneApplication(){ }
+        protected StandaloneCoreApplication() { }
 
         /// <summary>
         /// Provides the application boot manager.
@@ -22,23 +16,23 @@ namespace Umbraco.Web.Standalone
         /// <returns>An application boot manager.</returns>
         protected override IBootManager GetBootManager()
         {
-            return new StandaloneBootManager(this, _handlersToAdd, _handlersToRemove);
+            return new StandaloneCoreBootManager(this, _handlersToAdd, _handlersToRemove);
         }
 
         #region Application
 
-        private static StandaloneApplication _application;
+        private static StandaloneCoreApplication _application;
         private static bool _started;
         private static readonly object AppLock = new object();
 
         /// <summary>
         /// Gets the instance of the standalone Umbraco application.
         /// </summary>
-        public static StandaloneApplication GetApplication()
+        public static StandaloneCoreApplication GetApplication()
         {
             lock (AppLock)
             {
-                return _application ?? (_application = new StandaloneApplication());
+                return _application ?? (_application = new StandaloneCoreApplication());
             }
         }
 
@@ -71,7 +65,7 @@ namespace Umbraco.Web.Standalone
         /// <remarks>Types implementing <see cref="IApplicationEventHandler"/> from within
         /// an executable are not automatically discovered by Umbraco and have to be
         /// explicitely associated with the application using this method.</remarks>
-        public StandaloneApplication WithApplicationEventHandler<T>()
+        public StandaloneCoreApplication WithApplicationEventHandler<T>()
             where T : IApplicationEventHandler
         {
             _handlersToAdd.Add(typeof(T));
@@ -83,7 +77,7 @@ namespace Umbraco.Web.Standalone
         /// </summary>
         /// <typeparam name="T">The type to dissociate.</typeparam>
         /// <returns>The application.</returns>
-        public StandaloneApplication WithoutApplicationEventHandler<T>()
+        public StandaloneCoreApplication WithoutApplicationEventHandler<T>()
             where T : IApplicationEventHandler
         {
             _handlersToRemove.Add(typeof(T));
@@ -98,7 +92,7 @@ namespace Umbraco.Web.Standalone
         /// <remarks>Types implementing <see cref="IApplicationEventHandler"/> from within
         /// an executable are not automatically discovered by Umbraco and have to be
         /// explicitely associated with the application using this method.</remarks>
-        public StandaloneApplication WithApplicationEventHandler(Type type)
+        public StandaloneCoreApplication WithApplicationEventHandler(Type type)
         {
             if (type.Implements<IApplicationEventHandler>() == false)
                 throw new ArgumentException("Type does not implement IApplicationEventHandler.", "type");
@@ -111,29 +105,13 @@ namespace Umbraco.Web.Standalone
         /// </summary>
         /// <param name="type">The type to dissociate.</param>
         /// <returns>The application.</returns>
-        public StandaloneApplication WithoutApplicationEventHandler(Type type)
+        public StandaloneCoreApplication WithoutApplicationEventHandler(Type type)
         {
             if (type.Implements<IApplicationEventHandler>() == false)
                 throw new ArgumentException("Type does not implement IApplicationEventHandler.", "type");
             _handlersToRemove.Add(type);
             return this;
         }
-
-        #endregion
-
-        #region Shortcuts to contexts
-
-        /// <summary>
-        /// Gets the current <see cref="ApplicationContext"/>.
-        /// </summary>
-        /// <remarks>This is a shortcut for scripts to be able to do <c>$app.ApplicationContext</c>.</remarks>
-        public ApplicationContext ApplicationContext { get { return ApplicationContext.Current; } }
-
-        /// <summary>
-        /// Gets the current <see cref="UmbracoContext"/>.
-        /// </summary>
-        /// <remarks>This is a shortcut for scripts to be able to do <c>$app.UmbracoContext</c>.</remarks>
-        public UmbracoContext UmbracoContext { get { return UmbracoContext.Current; } }
 
         #endregion
     }

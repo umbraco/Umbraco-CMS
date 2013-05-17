@@ -284,6 +284,7 @@
     <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />
+    <Compile Include="Standalone\ServiceContextManager.cs" />
     <Compile Include="Standalone\StandaloneApplication.cs" />
     <Compile Include="Standalone\StandaloneBootManager.cs" />
     <Compile Include="Standalone\StandaloneHttpContext.cs" />
