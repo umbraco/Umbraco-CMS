@@ -3,34 +3,39 @@
     ValidateRequest="False" %>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <asp:Content ID="DocTypeContent" ContentPlaceHolderID="DocType" runat="server">
     <!DOCTYPE html>
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
+    
+    <umb:JsInclude ID="JsInclude1" runat="server" FilePath="Editors/EditScript.js" PathNameAlias="UmbracoClient" />
+
     <script language="javascript" type="text/javascript">
 
-        function doSubmit() {
-            var codeVal = jQuery('#<%= editorSource.ClientID %>').val();
-            //if CodeMirror is not defined, then the code editor is disabled.
-            if (typeof (CodeMirror) != "undefined") {
-                codeVal = UmbEditor.GetCode();
-            }
-            umbraco.presentation.webservices.codeEditorSave.SaveScript(jQuery('#<%= NameTxt.ClientID %>').val(), '<%= NameTxt.Text %>', codeVal, submitSucces, submitFailure);
-        }
-
-        function submitSucces(t) {
-            if (t != 'true') {
-                top.UmbSpeechBubble.ShowMessage('error', '<%= umbraco.ui.Text("speechBubbles", "fileErrorHeader") %>', '<%= umbraco.ui.Text("speechBubbles", "fileErrorText") %>');
-            }
-            else {
-                top.UmbSpeechBubble.ShowMessage('save', '<%= umbraco.ui.Text("speechBubbles", "fileSavedHeader") %>', '')
-            }
-        }
-        function submitFailure(t) {
-            top.UmbSpeechBubble.ShowMessage('error', '<%= umbraco.ui.Text("speechBubbles", "fileErrorHeader") %>', '<%= umbraco.ui.Text("speechBubbles", "fileErrorText") %>')
-        }    
+        (function ($) {
+            $(document).ready(function () {
+                var editor = new Umbraco.Editors.EditScript({
+                    nameTxtBox: $('#<%= NameTxt.ClientID %>'),
+                    originalFileName: '<%= NameTxt.Text %>',
+                    saveButton: $("#<%= ((Control)SaveButton).ClientID %>"),
+                    editorSourceElement: $('#<%= editorSource.ClientID %>'),
+                    text: {
+                        fileErrorHeader: '<%= umbraco.ui.Text("speechBubbles", "fileErrorHeader") %>',
+                        fileSavedHeader: '<%= umbraco.ui.Text("speechBubbles", "fileSavedHeader") %>',
+                        fileSavedText: '',
+                        fileErrorText: '<%= umbraco.ui.Text("speechBubbles", "fileErrorText") %>',
+                    }
+                });
+                editor.init();
+                
+                //bind save shortcut
+                UmbClientMgr.appActions().bindSaveShortCut();
+            });
+        })(jQuery);
+        
     </script>
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server">
@@ -48,9 +53,5 @@
             </cc1:PropertyPanel>
         </cc1:Pane>
     </cc1:UmbracoPanel>
-    <script type="text/javascript">
-        jQuery(document).ready(function () {
-            UmbClientMgr.appActions().bindSaveShortCut();
-        });
-    </script>
+    
 </asp:Content>

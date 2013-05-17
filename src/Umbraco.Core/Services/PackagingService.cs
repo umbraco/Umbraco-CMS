@@ -65,17 +65,10 @@ namespace Umbraco.Core.Services
                             select doc;
 
                 var contents = ParseDocumentRootXml(roots, parentId);
-                var importContent = contents as IContent[] ?? contents.ToArray();
-                if (importContent.Any())
-                {
-                    _contentService.Save(importContent, userId);
+                if (contents.Any())
+                    _contentService.Save(contents, userId);
 
-                    //Don't just save, also publish
-                    foreach (var content in importContent)
-                        _contentService.Publish(content, userId);
-                }
-
-                return importContent;
+                return contents;
             }
 
             var attribute = element.Attribute("isDoc");
@@ -84,18 +77,10 @@ namespace Umbraco.Core.Services
                 //This is a single doc import
                 var elements = new List<XElement> { element };
                 var contents = ParseDocumentRootXml(elements, parentId);
-                var importContent = contents as IContent[] ?? contents.ToArray();
-                
-                if (importContent.Any())
-                {
-                    _contentService.Save(importContent, userId);
+                if (contents.Any())
+                    _contentService.Save(contents, userId);
 
-                    //Don't just save, also publish
-                    foreach (var content in importContent)
-                        _contentService.Publish(content, userId);
-                }
-
-                return importContent;
+                return contents;
             }
 
             throw new ArgumentException(

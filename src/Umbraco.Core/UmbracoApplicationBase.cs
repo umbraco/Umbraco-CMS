@@ -2,6 +2,8 @@
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Mvc;
+using StackExchange.Profiling;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
@@ -19,6 +21,11 @@ namespace Umbraco.Core
 
         public static event EventHandler ApplicationStarting;
         public static event EventHandler ApplicationStarted;
+
+        /// <summary>
+        /// Called when the HttpApplication.Init() is fired, allows developers to subscribe to the HttpApplication events
+        /// </summary>
+        public static event EventHandler ApplicationInit;
 
         /// <summary>
         /// Boots up the Umbraco application
@@ -46,6 +53,15 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Override init and raise the event
+        /// </summary>
+        public override void Init()
+        {
+            base.Init();
+            OnApplicationInit(this, new EventArgs());
+        }
+
+        /// <summary>
         /// Developers can override this method to modify objects on startup
         /// </summary>
         /// <param name="sender"></param>
@@ -65,6 +81,17 @@ namespace Umbraco.Core
         {
             if (ApplicationStarted != null)
                 ApplicationStarted(sender, e);
+        }
+
+        /// <summary>
+        /// Called to raise the ApplicationInit event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnApplicationInit(object sender, EventArgs e)
+        {
+            if (ApplicationInit != null)
+                ApplicationInit(sender, e);
         }
 
         /// <summary>

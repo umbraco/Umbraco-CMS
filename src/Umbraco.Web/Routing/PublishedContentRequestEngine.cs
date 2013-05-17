@@ -325,7 +325,7 @@ namespace Umbraco.Web.Routing
 			// the first successful finder, if any, will set this.PublishedContent, and may also set this.Template
 			// some finders may implement caching
 
-			using (DisposableTimer.DebugDuration<PluginManager>(
+            using (DisposableTimer.DebugDuration<PublishedContentRequestEngine>(
 				() => string.Format("{0}Begin finders", tracePrefix),
 				() => string.Format("{0}End finders, {1}", tracePrefix, (_pcr.HasPublishedContent ? "a document was found" : "no document was found"))))
 			{

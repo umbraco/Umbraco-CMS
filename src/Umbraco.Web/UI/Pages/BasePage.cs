@@ -54,6 +54,18 @@ namespace Umbraco.Web.UI.Pages
 		    get { return _url ?? (_url = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData()))); }
 	    }
 
+        private HtmlHelper _html;
+        /// <summary>
+        /// Returns a HtmlHelper
+        /// </summary>        
+        /// <remarks>
+        /// This html helper is created with an empty context and page so it may not have all of the functionality expected.
+        /// </remarks>
+        public HtmlHelper Html
+        {
+            get { return _html ?? (_html = new HtmlHelper(new ViewContext(), new ViewPage())); }
+        }
+
         /// <summary>
         /// Returns the current ApplicationContext
         /// </summary>

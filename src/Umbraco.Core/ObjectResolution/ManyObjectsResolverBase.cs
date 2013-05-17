@@ -170,7 +170,7 @@ namespace Umbraco.Core.ObjectResolution
 			get
 			{
 				// ensure we can
-				if (!CanResolveBeforeFrozen)
+				if (CanResolveBeforeFrozen == false)
 					Resolution.EnsureIsFrozen();
 
 				// note: we apply .ToArray() to the output of CreateInstance() because that is an IEnumerable that

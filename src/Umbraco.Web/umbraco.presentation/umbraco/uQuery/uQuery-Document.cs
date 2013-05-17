@@ -136,7 +136,10 @@ namespace umbraco
 
 			foreach (var document in documents)
 			{
-				dictionary.Add(document.Id, document.Text);
+				if (document != null && document.Id != -1) // to compensate for the root document now throwing a null error on it's .Text property
+				{
+					dictionary.Add(document.Id, document.Text);
+				}
 			}
 
 			return dictionary;

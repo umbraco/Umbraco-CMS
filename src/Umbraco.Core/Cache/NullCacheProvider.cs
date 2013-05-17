@@ -5,7 +5,7 @@ using System.Web.Caching;
 
 namespace Umbraco.Core.Cache
 {
-    internal class NullCacheProvider : CacheProviderBase
+    internal class NullCacheProvider : RuntimeCacheProviderBase
     {
         public override void ClearAllCache()
         {

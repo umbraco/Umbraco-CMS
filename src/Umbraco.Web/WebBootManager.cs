@@ -5,12 +5,14 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
+using StackExchange.Profiling.MVCHelpers;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Dictionary;
@@ -71,13 +73,16 @@ namespace Umbraco.Web
                 new MasterControllerFactory(FilteredControllerFactoriesResolver.Current));
 
             //set the render view engine
-            ViewEngines.Engines.Add(new RenderViewEngine());
+            ViewEngines.Engines.Add(new ProfilingViewEngine(new RenderViewEngine()));
             //set the plugin view engine
-            ViewEngines.Engines.Add(new PluginViewEngine());
+            ViewEngines.Engines.Add(new ProfilingViewEngine(new PluginViewEngine()));
 
             //set model binder
             ModelBinders.Binders.Add(new KeyValuePair<Type, IModelBinder>(typeof(RenderModel), new RenderModelBinder()));
 
+            //add the profiling action filter
+            GlobalFilters.Filters.Add(new ProfilingActionFilter());
+            
             return this;
         }
 
@@ -92,6 +97,17 @@ namespace Umbraco.Web
             //before we do anything, we'll ensure the umbraco context
             //see: http://issues.umbraco.org/issue/U4-1717
             UmbracoContext.EnsureContext(new HttpContextWrapper(UmbracoApplication.Context), ApplicationContext);
+        }
+
+        /// <summary>
+        /// Ensure the current profiler is the web profiler
+        /// </summary>
+        protected override void InitializeProfilerResolver()
+        {
+            base.InitializeProfilerResolver();
+
+            //Set the profiler to be the web profiler
+            ProfilerResolver.Current.SetProfiler(new WebProfiler());
         }
 
         /// <summary>

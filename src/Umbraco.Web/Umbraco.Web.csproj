@@ -126,6 +126,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.Mvc.FixedDisplayModes.1.0.1\lib\net40\Microsoft.Web.Mvc.FixedDisplayModes.dll</HintPath>
     </Reference>
+    <Reference Include="MiniProfiler, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b44f9351044011a3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MiniProfiler.2.1.0\lib\net40\MiniProfiler.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -554,6 +558,9 @@
     <Compile Include="umbraco.presentation\umbraco\create\MacroPartialViewTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\PartialViewTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\StarterKits.aspx.cs">
@@ -1184,13 +1191,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\SubmitPackage.aspx.designer.cs">
       <DependentUpon>SubmitPackage.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx.cs">
-      <DependentUpon>editPython.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx.designer.cs">
-      <DependentUpon>editPython.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\getXsltStatus.asmx.cs">
       <DependentUpon>getXsltStatus.asmx</DependentUpon>
@@ -1877,9 +1877,6 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\uploadImage.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\members\ViewMembers.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertImage.aspx">
       <SubType>ASPXCodeBehind</SubType>

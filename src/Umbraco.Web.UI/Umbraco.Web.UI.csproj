@@ -127,6 +127,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.Mvc.FixedDisplayModes.1.0.1\lib\net40\Microsoft.Web.Mvc.FixedDisplayModes.dll</HintPath>
     </Reference>
+    <Reference Include="MiniProfiler, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b44f9351044011a3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MiniProfiler.2.1.0\lib\net40\MiniProfiler.dll</HintPath>
+    </Reference>
     <Reference Include="MySql.Data, Version=6.6.4.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MySql.Data.6.6.4\lib\net40\MySql.Data.dll</HintPath>
@@ -436,6 +440,13 @@
     <Compile Include="Umbraco\Developer\Packages\StarterKits.aspx.designer.cs">
       <DependentUpon>StarterKits.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Developer\Python\EditPython.aspx.cs">
+      <DependentUpon>editPython.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Developer\Python\EditPython.aspx.designer.cs">
+      <DependentUpon>editPython.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Dialogs\EditMacro.aspx.cs">
       <DependentUpon>EditMacro.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -534,6 +545,10 @@
     </Compile>
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
+    <Content Include="Umbraco\Xslt\Web.config">
+      <SubType>
+      </SubType>
+    </Content>
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
@@ -832,9 +847,14 @@
     <Content Include="Umbraco_Client\Dialogs\PublishDialog.css" />
     <Content Include="Umbraco_Client\Dialogs\PublishDialog.js" />
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
+    <Content Include="Umbraco_Client\Editors\EditMacroScripts.js" />
+    <Content Include="Umbraco_Client\Editors\EditXslt.css" />
+    <Content Include="Umbraco_Client\Editors\EditXslt.js" />
+    <Content Include="Umbraco_Client\Editors\EditScript.js" />
     <Content Include="Umbraco_Client\Editors\DirectoryBrowser.css" />
     <Content Include="Umbraco_Client\Editors\EditMacro.css" />
     <Content Include="Umbraco_Client\Editors\EditStyleSheet.js" />
+    <Content Include="Umbraco_Client\Editors\EditTemplate.js" />
     <Content Include="Umbraco_Client\Editors\EditView.js" />
     <Content Include="Umbraco_Client\FileUploader\Js\jquery.fileUploader.js" />
     <Content Include="Umbraco_Client\FolderBrowser\Css\folderbrowser.css" />
@@ -2027,7 +2047,9 @@
     <Content Include="Config\feedProxy.config" />
     <Content Include="Umbraco_Client\ui\ui-lightness\jquery-ui.custom.css" />
     <Content Include="Config\applications.config" />
-    <Content Include="Config\trees.config" />
+    <Content Include="Config\trees.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Config\applications.Release.config">
       <DependentUpon>applications.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -2495,6 +2517,7 @@
     <Content Include="Config\log4net.config" />
     <Content Include="Config\FileSystemProviders.config" />
     <Content Include="Config\EmbeddedMedia.config" />
+    <Content Include="Xslt\Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Code\" />
@@ -2508,7 +2531,6 @@
     <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
     <Folder Include="Umbraco_Client\Tags\images\" />
     <Folder Include="UserControls\" />
-    <Folder Include="Xslt\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

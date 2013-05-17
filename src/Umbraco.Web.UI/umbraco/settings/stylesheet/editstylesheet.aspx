@@ -8,32 +8,29 @@
     <cdf:JsInclude runat="server" FilePath="Editors/EditStyleSheet.js" PathNameAlias="UmbracoClient"></cdf:JsInclude>
 
     <script type="text/javascript">
-
-        function doSubmit() {
-            //this is the method that is assigned to the save button from the code behind
-            var codeVal = jQuery('#<%= editorSource.ClientID %>').val();
-            //if CodeMirror is not defined, then the code editor is disabled.
-            if (typeof (CodeMirror) != "undefined") {
-                codeVal = UmbEditor.GetCode();
-            }
-            var processor = new Umbraco.Editors.EditStyleSheet({
-                codeVal: codeVal,
-                fileName: jQuery('#<%= NameTxt.ClientID %>').val(),
-                oldName: '<%= NameTxt.Text %>',
-                cssId: '<%= Request.QueryString["id"] %>',
-                text: {
-                    cssErrorHeader: '<%= umbraco.ui.Text("speechBubbles", "cssErrorHeader") %>',
-                    cssSavedHeader: '<%= umbraco.ui.Text("speechBubbles", "cssSavedHeader") %>',
-                    cssSavedText: '<%= umbraco.ui.Text("speechBubbles", "cssSavedText") %>',
-                    cssErrorText: 'Please make sure that you have permissions set correctly',
-                }
-            });
-            processor.save();
-        }
         
-        jQuery(document).ready(function () {
-            UmbClientMgr.appActions().bindSaveShortCut();
-        });
+        (function ($) {
+            $(document).ready(function () {
+                var editor = new Umbraco.Editors.EditStyleSheet({
+                    nameTxtBox: $('#<%= NameTxt.ClientID %>'),
+                    originalFileName: '<%= NameTxt.Text %>',
+                    cssId: '<%= Request.QueryString["id"] %>',
+                    saveButton: $("#<%= ((Control)SaveButton).ClientID %>"),
+                    editorSourceElement: $('#<%= editorSource.ClientID %>'), 
+                    text: {
+                        cssErrorHeader: '<%= umbraco.ui.Text("speechBubbles", "cssErrorHeader") %>',
+                        cssSavedHeader: '<%= umbraco.ui.Text("speechBubbles", "cssSavedHeader") %>',
+                        cssSavedText: '<%= umbraco.ui.Text("speechBubbles", "cssSavedText") %>',
+                        cssErrorText: 'Please make sure that you have permissions set correctly',
+                    }
+                });
+                editor.init();
+            });
+                
+                //bind save shortcut
+                UmbClientMgr.appActions().bindSaveShortCut();
+            });
+        })(jQuery);
         
     </script>
 </asp:Content>

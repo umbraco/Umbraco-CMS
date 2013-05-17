@@ -210,7 +210,7 @@
     </div>
     <script type="text/javascript">
         var hasEmbeddedDlls = <%= HasEmbeddedDatabaseFiles.ToString().ToLower() %>;
-        var currentVersion = '<%=UmbracoVersion.Current.ToString(3)%>';
+        var currentVersion = '<%=UmbracoVersion.Current.ToString(3)%> <%=UmbracoVersion.CurrentComment%> ';
         var configured = <%= IsConfigured.ToString().ToLower() %>;
 
         jQuery(document).ready(function(){
@@ -281,7 +281,7 @@
                     <div class="success">
                         <p>
                             Umbraco
-				            <%=UmbracoVersion.Current.ToString(3)%>
+				            <%=UmbracoVersion.Current.ToString(3)%> <%=UmbracoVersion.CurrentComment%>
 				            has now been copied to your database. Press <b>Continue</b> to proceed.
                         </p>
                     </div>

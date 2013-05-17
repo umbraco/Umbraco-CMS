@@ -4,6 +4,9 @@
 <%@ Import Namespace="System.Web.Script.Serialization" %>
 
 <%@ Register Src="controls/Tree/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
+<%@ Import Namespace="StackExchange.Profiling" %>
+<%@ Import Namespace="Umbraco.Core.Profiling" %>
+<%@ Import Namespace="Umbraco.Web" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="uc1" TagName="quickSearch" Src="Search/QuickSearch.ascx" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
@@ -388,5 +391,9 @@
         }
 
     </script>
+    <%if(string.IsNullOrEmpty(Request["umbDebug"]) == false && umbraco.GlobalSettings.DebugMode)
+      {
+          Response.Write(Html.RenderProfiler());
+      }%>
 </body>
 </html>

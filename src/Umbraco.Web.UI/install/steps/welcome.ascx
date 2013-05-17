@@ -31,7 +31,7 @@
 		 <asp:PlaceHolder ID="ph_upgrade" runat="server" Visible="false">
             <h1>Upgrading Umbraco</h1>
             <p>
-                Welcome to the umbraco upgrade wizard. This will make sure that you upgrade safely from your old version to <strong>Umbraco version <%=UmbracoVersion.Current.ToString(3) %></strong> 
+                Welcome to the umbraco upgrade wizard. This will make sure that you upgrade safely from your old version to <strong>Umbraco version <%=UmbracoVersion.Current.ToString(3) %> <%=UmbracoVersion.CurrentComment %></strong> 
             </p>
             <p>
                 As this is an upgrade, <strong>the wizard might skip steps</strong> that are only needed for new umbraco installations. It might also ask you questions you've already answered once. But do not worry, 

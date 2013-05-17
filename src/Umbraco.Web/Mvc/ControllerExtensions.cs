@@ -22,6 +22,16 @@ namespace Umbraco.Web.Mvc
         }
 
         /// <summary>
+        /// Return the controller name from the controller instance
+        /// </summary>
+        /// <param name="controllerInstance"></param>
+        /// <returns></returns>
+	    internal static string GetControllerName(this IController controllerInstance)
+	    {
+	        return GetControllerName(controllerInstance.GetType());
+	    }
+
+	    /// <summary>
         /// Return the controller name from the controller type
         /// </summary>
         /// <typeparam name="T"></typeparam>

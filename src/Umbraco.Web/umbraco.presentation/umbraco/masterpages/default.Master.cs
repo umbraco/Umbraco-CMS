@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Web.Mvc;
 using System.Web.UI;
+using StackExchange.Profiling;
+using Umbraco.Core.Profiling;
+using Umbraco.Web;
 using umbraco.presentation.LiveEditing;
 using umbraco.presentation.LiveEditing.Controls;
 using System.IO;
@@ -23,11 +27,32 @@ namespace umbraco.presentation.masterpages
             }
         }
 
+        protected override void OnPreRender(EventArgs e)
+        {
+            base.OnPreRender(e);
+        }
+
         protected override void Render(HtmlTextWriter writer)
         {
-            if (!m_LiveEditingContext.Enabled)
+            if (m_LiveEditingContext.Enabled == false)
             {
-                base.Render(writer);
+                // profiling
+                if (string.IsNullOrEmpty(Request.QueryString["umbDebug"]) == false && GlobalSettings.DebugMode)
+                {
+                    var baseWriter = new StringWriter();
+                    base.Render(new HtmlTextWriter(baseWriter));
+                    var baseOutput = baseWriter.ToString();
+
+                    var htmlHelper = new HtmlHelper(new ViewContext(), new ViewPage());
+                    baseOutput = baseOutput.Replace("</body>", htmlHelper.RenderProfiler() + "</body>");
+                    writer.Write(baseOutput);
+                }
+
+                else
+                {
+
+                    base.Render(writer);
+                }
             }
             else
             {

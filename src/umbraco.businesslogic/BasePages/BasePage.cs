@@ -267,9 +267,16 @@ namespace umbraco.BasePages
                             return encTicket.DecryptWithMachineKey();
                         }
                     }
-                    catch (HttpException ex)
+                    catch (Exception ex)
                     {
-                        // we swallow this type of exception as it happens if a legacy (pre 4.8.1) cookie is set
+                        if (ex is ArgumentException || ex is FormatException || ex is HttpException)
+                        {
+                            StateHelper.Cookies.UserContext.Clear();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
                 }
                 return "";

@@ -41,7 +41,7 @@ namespace Umbraco.Web
             }
 
 			// do not process if client-side request
-			if (IsClientSideRequest(httpContext.Request.Url))
+			if (httpContext.Request.Url.IsClientSideRequest())
 				return;
 
 			//write the trace output for diagnostics at the end of the request
@@ -66,7 +66,7 @@ namespace Umbraco.Web
 		void ProcessRequest(HttpContextBase httpContext)
 		{
 			// do not process if client-side request
-			if (IsClientSideRequest(httpContext.Request.Url))
+			if (httpContext.Request.Url.IsClientSideRequest())
 				return;
 
 			if (UmbracoContext.Current == null)
@@ -186,19 +186,6 @@ namespace Umbraco.Web
 		#endregion
 
 		#region Route helper methods
-
-		/// <summary>
-		/// This is a performance tweak to check if this is a .css, .js or .ico, .jpg, .jpeg, .png, .gif file request since
-		/// .Net will pass these requests through to the module when in integrated mode.
-		/// We want to ignore all of these requests immediately.
-		/// </summary>
-		/// <param name="url"></param>
-		/// <returns></returns>
-		internal bool IsClientSideRequest(Uri url)
-		{
-			var toIgnore = new[] { ".js", ".css", ".ico", ".png", ".jpg", ".jpeg", ".gif" };
-			return toIgnore.Any(x => Path.GetExtension(url.LocalPath).InvariantEquals(x));
-		}
 
 		/// <summary>
 		/// Checks the current request and ensures that it is routable based on the structure of the request and URI

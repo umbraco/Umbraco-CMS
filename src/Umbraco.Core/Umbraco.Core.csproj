@@ -42,6 +42,9 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
+    <Reference Include="MiniProfiler">
+      <HintPath>..\packages\MiniProfiler.2.1.0\lib\net40\MiniProfiler.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -113,13 +116,15 @@
     <Compile Include="Auditing\IAuditWriteProvider.cs" />
     <Compile Include="CacheHelper.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
+    <Compile Include="Cache\CacheProviderBase.cs" />
     <Compile Include="Cache\CacheRefresherBase.cs" />
     <Compile Include="Cache\CacheRefresherEventArgs.cs" />
-    <Compile Include="Cache\CacheProviderBase.cs" />
+    <Compile Include="Cache\RuntimeCacheProviderBase.cs" />
     <Compile Include="Cache\HttpRuntimeCacheProvider.cs" />
     <Compile Include="Cache\IJsonCacheRefresher.cs" />
     <Compile Include="Cache\JsonCacheRefresherBase.cs" />
     <Compile Include="Cache\NullCacheProvider.cs" />
+    <Compile Include="Cache\StaticCacheProvider.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
     <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoObjectTypeAttribute.cs" />
@@ -524,6 +529,11 @@
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkRepository.cs" />
     <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWorkProvider.cs" />
+    <Compile Include="Profiling\IProfiler.cs" />
+    <Compile Include="Profiling\LogProfiler.cs" />
+    <Compile Include="Profiling\ProfilerExtensions.cs" />
+    <Compile Include="Profiling\ProfilerResolver.cs" />
+    <Compile Include="Profiling\WebProfiler.cs" />
     <Compile Include="PropertyEditors\Attributes\PropertyEditorAttribute.cs" />
     <Compile Include="PropertyEditors\Attributes\ShowLabelAttribute.cs" />
     <Compile Include="PropertyEditors\BlankPreValueModel.cs" />
@@ -753,7 +763,7 @@
     <Compile Include="IfExtensions.cs" />
     <Compile Include="PluginManager.cs" />
     <Compile Include="IO\FileSecurityException.cs" />
-    <Compile Include="IO\FileSystemProvider.cs" />
+    <Compile Include="IO\FileSystemProviderConstants.cs" />
     <Compile Include="IO\FileSystemProviderManager.cs" />
     <Compile Include="IO\IFileSystem.cs" />
     <Compile Include="IO\IOHelper.cs" />

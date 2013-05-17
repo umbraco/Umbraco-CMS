@@ -17,11 +17,13 @@ using System.Web.UI.WebControls;
 using System.Xml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
+using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Profiling;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Macros;
@@ -230,203 +232,256 @@ namespace umbraco
 
         public Control renderMacro(Hashtable pageElements, int pageId)
         {
-	        TraceInfo("renderMacro",
-	                  string.Format("Rendering started (macro: {0}, type: {1}, cacheRate: {2})",
-	                                Name, MacroType, Model.CacheDuration));
+            var macroInfo = (Model.MacroType == MacroTypes.Script && Model.Name.IsNullOrWhiteSpace())
+                                ? string.Format("Render Inline Macro, Cache: {0})", Model.CacheDuration)
+                                : string.Format("Render Macro: {0}, type: {1}, cache: {2})", Name, Model.MacroType, Model.CacheDuration);
 
-            StateHelper.SetContextValue(MacrosAddedKey, StateHelper.GetContextValue<int>(MacrosAddedKey) + 1);
-
-            // zb-00037 #29875 : parse attributes here (and before anything else)
-            foreach (MacroPropertyModel prop in Model.Properties)
-                prop.Value = helper.parseAttribute(pageElements, prop.Value);
-
-            Model.CacheIdentifier = GetCacheIdentifier(Model, pageElements, pageId);
-
-            string macroHtml;
-            Control macroControl;
-            //get the macro from cache if it is there
-            GetMacroFromCache(out macroHtml, out macroControl);
-
-            // FlorisRobbemont: Empty macroHtml (not null, but "") doesn't mean a re-render is necessary
-            if (macroHtml == null && macroControl == null)
+            using (DisposableTimer.DebugDuration<macro>(macroInfo))
             {
-                var renderFailed = false;
-                var macroType = Model.MacroType != MacroTypes.Unknown 
-                    ? (int)Model.MacroType 
-                    : MacroType;
+                TraceInfo("renderMacro", macroInfo, excludeProfiling:true);
 
-                switch (macroType)
+                StateHelper.SetContextValue(MacrosAddedKey, StateHelper.GetContextValue<int>(MacrosAddedKey) + 1);
+
+                // zb-00037 #29875 : parse attributes here (and before anything else)
+                foreach (MacroPropertyModel prop in Model.Properties)
+                    prop.Value = helper.parseAttribute(pageElements, prop.Value);
+
+                Model.CacheIdentifier = GetCacheIdentifier(Model, pageElements, pageId);
+
+                string macroHtml;
+                Control macroControl;
+                //get the macro from cache if it is there
+                GetMacroFromCache(out macroHtml, out macroControl);
+
+                // FlorisRobbemont: Empty macroHtml (not null, but "") doesn't mean a re-render is necessary
+                if (macroHtml == null && macroControl == null)
                 {
-					case (int)MacroTypes.PartialView:
+                    var renderFailed = false;
+                    var macroType = Model.MacroType != MacroTypes.Unknown
+                                        ? (int) Model.MacroType
+                                        : MacroType;
 
-                        //error handler for partial views, is an action because we need to re-use it twice below
-                        Func<Exception, Control> handleError = e =>
-                            {
-                                LogHelper.WarnWithException<macro>("Error loading Partial View (file: " + ScriptFile + ")", true, e);
-                                // Invoke any error handlers for this macro
-                                var macroErrorEventArgs = new MacroErrorEventArgs { Name = Model.Name, Alias = Model.Alias, ItemKey = Model.ScriptName, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour };
-                                return GetControlForErrorBehavior("Error loading Partial View script (file: " + ScriptFile + ")", macroErrorEventArgs);
-                            };
+                    switch (macroType)
+                    {
+                        case (int) MacroTypes.PartialView:
 
-						TraceInfo("umbracoMacro", "Partial View added (" + Model.TypeName + ")");
-						try
-						{							
-							var result = LoadPartialViewMacro(Model);
-							macroControl = new LiteralControl(result.Result);
-							if (result.ResultException != null)
-							{
-								renderFailed = true;
-                                Exceptions.Add(result.ResultException);
-                                macroControl = handleError(result.ResultException);
-                                //if it is null, then we are supposed to throw the exception
-                                if (macroControl == null)
+                            //error handler for partial views, is an action because we need to re-use it twice below
+                            Func<Exception, Control> handleError = e =>
                                 {
-                                    throw result.ResultException;
-                                }
-							}
-						}
-						catch (Exception e)
-						{
-							renderFailed = true;
-							Exceptions.Add(e);						    
-						    macroControl = handleError(e);
-                            //if it is null, then we are supposed to throw the (original) exception
-                            // see: http://issues.umbraco.org/issue/U4-497 at the end
-                            if (macroControl == null)
-                            {
-                                throw;
-                            }
-						}
+                                    LogHelper.WarnWithException<macro>("Error loading Partial View (file: " + ScriptFile + ")", true, e);
+                                    // Invoke any error handlers for this macro
+                                    var macroErrorEventArgs =
+                                        new MacroErrorEventArgs
+                                            {
+                                                Name = Model.Name,
+                                                Alias = Model.Alias,
+                                                ItemKey = Model.ScriptName,
+                                                Exception = e,
+                                                Behaviour = UmbracoSettings.MacroErrorBehaviour
+                                            };
+                                    return GetControlForErrorBehavior("Error loading Partial View script (file: " + ScriptFile + ")", macroErrorEventArgs);
+                                };
 
-		                break;
-                    case (int)MacroTypes.UserControl:
-                        try
-                        {
-							TraceInfo("umbracoMacro","Usercontrol added (" + Model.TypeName + ")");
+                            using (DisposableTimer.DebugDuration<macro>("Executing Partial View: " + Model.TypeName))
+                            {
+                                TraceInfo("umbracoMacro", "Partial View added (" + Model.TypeName + ")", excludeProfiling:true);
+                                try
+                                {
+                                    var result = LoadPartialViewMacro(Model);
+                                    macroControl = new LiteralControl(result.Result);
+                                    if (result.ResultException != null)
+                                    {
+                                        renderFailed = true;
+                                        Exceptions.Add(result.ResultException);
+                                        macroControl = handleError(result.ResultException);
+                                        //if it is null, then we are supposed to throw the exception
+                                        if (macroControl == null)
+                                        {
+                                            throw result.ResultException;
+                                        }
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    renderFailed = true;
+                                    Exceptions.Add(e);
+                                    macroControl = handleError(e);
+                                    //if it is null, then we are supposed to throw the (original) exception
+                                    // see: http://issues.umbraco.org/issue/U4-497 at the end
+                                    if (macroControl == null)
+                                    {
+                                        throw;
+                                    }
+                                }
+
+                                break;
+                            }
+                        case (int) MacroTypes.UserControl:
+
+                            using (DisposableTimer.DebugDuration<macro>("Executing UserControl: " + Model.TypeName))
+                            {
+                                try
+                                {
+                                    TraceInfo("umbracoMacro", "Usercontrol added (" + Model.TypeName + ")", excludeProfiling:true);
+
+                                    // Add tilde for v4 defined macros
+                                    if (string.IsNullOrEmpty(Model.TypeName) == false &&
+                                        Model.TypeName.StartsWith("~") == false)
+                                        Model.TypeName = "~/" + Model.TypeName;
+
+                                    macroControl = loadUserControl(ScriptType, Model, pageElements);
+                                    break;
+                                }
+                                catch (Exception e)
+                                {
+                                    renderFailed = true;
+                                    Exceptions.Add(e);
+                                    LogHelper.WarnWithException<macro>("Error loading userControl (" + Model.TypeName + ")", true, e);
+
+                                    // Invoke any error handlers for this macro
+                                    var macroErrorEventArgs = new MacroErrorEventArgs
+                                    {
+                                        Name = Model.Name,
+                                        Alias = Model.Alias,
+                                        ItemKey = Model.TypeName,
+                                        Exception = e,
+                                        Behaviour = UmbracoSettings.MacroErrorBehaviour
+                                    };
+
+                                    macroControl = GetControlForErrorBehavior("Error loading userControl '" + Model.TypeName + "'", macroErrorEventArgs);
+                                    //if it is null, then we are supposed to throw the (original) exception
+                                    // see: http://issues.umbraco.org/issue/U4-497 at the end
+                                    if (macroControl == null)
+                                    {
+                                        throw;
+                                    }
+
+                                    break;
+                                }
+                            }
                             
-                            // Add tilde for v4 defined macros
-                            if (string.IsNullOrEmpty(Model.TypeName) == false && Model.TypeName.StartsWith("~") == false)
-                                Model.TypeName = "~/" + Model.TypeName;
+                        case (int) MacroTypes.CustomControl:
 
-                            macroControl = loadUserControl(ScriptType, Model, pageElements);
-                            break;
-                        }
-                        catch (Exception e)
-                        {
-                            renderFailed = true;
-                            Exceptions.Add(e);
-							LogHelper.WarnWithException<macro>("Error loading userControl (" + Model.TypeName + ")", true, e);
-
-                            // Invoke any error handlers for this macro
-                            var macroErrorEventArgs = new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, ItemKey = Model.TypeName, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour};
-
-                            macroControl = GetControlForErrorBehavior("Error loading userControl '" + Model.TypeName + "'", macroErrorEventArgs);
-                            //if it is null, then we are supposed to throw the (original) exception
-                            // see: http://issues.umbraco.org/issue/U4-497 at the end
-                            if (macroControl == null)
+                            using (DisposableTimer.DebugDuration<macro>("Executing CustomControl: " + Model.TypeName + "." + Model.TypeAssembly))
                             {
-                                throw;
-                            }
-
-                            break;
-                        }
-                    case (int)MacroTypes.CustomControl:
-                        try
-                        {
-	                        TraceInfo("umbracoMacro", "Custom control added (" + Model.TypeName + ")");
-	                        TraceInfo("umbracoMacro", "ScriptAssembly (" + Model.TypeAssembly + ")");
-                            macroControl = loadControl(Model.TypeAssembly, ScriptType, Model, pageElements);
-                            break;
-                        }
-                        catch (Exception e)
-                        {
-                            renderFailed = true;
-                            Exceptions.Add(e);
-
-	                        LogHelper.WarnWithException<macro>("Error loading customControl (Assembly: " + Model.TypeAssembly + ", Type: '" + Model.TypeName + "'", true, e);
-
-                            // Invoke any error handlers for this macro
-                            var macroErrorEventArgs = new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, ItemKey = Model.TypeAssembly, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour};
-
-                            macroControl = GetControlForErrorBehavior("Error loading customControl (Assembly: " + Model.TypeAssembly + ", Type: '" + Model.TypeName + "'", macroErrorEventArgs);
-                            //if it is null, then we are supposed to throw the (original) exception
-                            // see: http://issues.umbraco.org/issue/U4-497 at the end
-                            if (macroControl == null)
-                            {
-                                throw;
-                            }
-
-                            break;
-                        }
-                    case (int)MacroTypes.XSLT:
-                        macroControl = LoadMacroXslt(this, Model, pageElements, true);
-                        break;
-                    case (int)MacroTypes.Script:
-
-                        //error handler for partial views, is an action because we need to re-use it twice below
-                        Func<Exception, Control> handleMacroScriptError = e =>
-                        {
-                            LogHelper.WarnWithException<macro>("Error loading MacroEngine script (file: " + ScriptFile + ", Type: '" + Model.TypeName + "'", true, e);
-
-                            // Invoke any error handlers for this macro
-                            var macroErrorEventArgs = new MacroErrorEventArgs { Name = Model.Name, Alias = Model.Alias, ItemKey = ScriptFile, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour };
-
-                            return GetControlForErrorBehavior("Error loading MacroEngine script (file: " + ScriptFile + ")", macroErrorEventArgs);
-                        };
-                        
-                        try
-                        {
-	                        TraceInfo("umbracoMacro", "MacroEngine script added (" + ScriptFile + ")");
-                            ScriptingMacroResult result = loadMacroScript(Model);
-                            macroControl = new LiteralControl(result.Result);
-                            if (result.ResultException != null)
-                            {
-                                renderFailed = true;
-                                Exceptions.Add(result.ResultException);
-                                macroControl = handleMacroScriptError(result.ResultException);
-                                //if it is null, then we are supposed to throw the exception
-                                if (macroControl == null)
+                                try
                                 {
-                                    throw result.ResultException;
+                                    TraceInfo("umbracoMacro", "Custom control added (" + Model.TypeName + "), ScriptAssembly: " + Model.TypeAssembly, excludeProfiling: true);
+                                    macroControl = loadControl(Model.TypeAssembly, ScriptType, Model, pageElements);
+                                    break;
+                                }
+                                catch (Exception e)
+                                {
+                                    renderFailed = true;
+                                    Exceptions.Add(e);
+
+                                    LogHelper.WarnWithException<macro>(
+                                        "Error loading customControl (Assembly: " + Model.TypeAssembly + ", Type: '" +
+                                        Model.TypeName + "'", true, e);
+
+                                    // Invoke any error handlers for this macro
+                                    var macroErrorEventArgs = new MacroErrorEventArgs
+                                    {
+                                        Name = Model.Name,
+                                        Alias = Model.Alias,
+                                        ItemKey = Model.TypeAssembly,
+                                        Exception = e,
+                                        Behaviour = UmbracoSettings.MacroErrorBehaviour
+                                    };
+
+                                    macroControl = GetControlForErrorBehavior("Error loading customControl (Assembly: " + Model.TypeAssembly + ", Type: '" + Model.TypeName + "'", macroErrorEventArgs);
+                                    //if it is null, then we are supposed to throw the (original) exception
+                                    // see: http://issues.umbraco.org/issue/U4-497 at the end
+                                    if (macroControl == null)
+                                    {
+                                        throw;
+                                    }
+
+                                    break;
                                 }
                             }
-                            break;
-                        }
-                        catch (Exception e)
-                        {
-                            renderFailed = true;
-                            Exceptions.Add(e);
+                        case (int) MacroTypes.XSLT:                            
+                            macroControl = LoadMacroXslt(this, Model, pageElements, true);
+                            break;                                                           
+                        case (int) MacroTypes.Script:
 
-                            macroControl = handleMacroScriptError(e);
-                            //if it is null, then we are supposed to throw the (original) exception
-                            // see: http://issues.umbraco.org/issue/U4-497 at the end
-                            if (macroControl == null)
+                            //error handler for partial views, is an action because we need to re-use it twice below
+                            Func<Exception, Control> handleMacroScriptError = e =>
+                                {
+                                    LogHelper.WarnWithException<macro>("Error loading MacroEngine script (file: " + ScriptFile + ", Type: '" + Model.TypeName + "'", true, e);
+
+                                    // Invoke any error handlers for this macro
+                                    var macroErrorEventArgs =
+                                        new MacroErrorEventArgs
+                                            {
+                                                Name = Model.Name,
+                                                Alias = Model.Alias,
+                                                ItemKey = ScriptFile,
+                                                Exception = e,
+                                                Behaviour = UmbracoSettings.MacroErrorBehaviour
+                                            };
+
+                                    return GetControlForErrorBehavior("Error loading MacroEngine script (file: " + ScriptFile + ")", macroErrorEventArgs);
+                                };
+
+                            using (DisposableTimer.DebugDuration<macro>("Executing MacroEngineScript: " + ScriptFile))
                             {
-                                throw;
+                                try
+                                {
+                                    TraceInfo("umbracoMacro", "MacroEngine script added (" + ScriptFile + ")", excludeProfiling: true);
+                                    ScriptingMacroResult result = loadMacroScript(Model);
+                                    macroControl = new LiteralControl(result.Result);
+                                    if (result.ResultException != null)
+                                    {
+                                        renderFailed = true;
+                                        Exceptions.Add(result.ResultException);
+                                        macroControl = handleMacroScriptError(result.ResultException);
+                                        //if it is null, then we are supposed to throw the exception
+                                        if (macroControl == null)
+                                        {
+                                            throw result.ResultException;
+                                        }
+                                    }
+                                    break;
+                                }
+                                catch (Exception e)
+                                {
+                                    renderFailed = true;
+                                    Exceptions.Add(e);
+
+                                    macroControl = handleMacroScriptError(e);
+                                    //if it is null, then we are supposed to throw the (original) exception
+                                    // see: http://issues.umbraco.org/issue/U4-497 at the end
+                                    if (macroControl == null)
+                                    {
+                                        throw;
+                                    }
+                                    break;
+                                }
                             }
-
+                        case (int) MacroTypes.Unknown:
+                        default:
+                            if (GlobalSettings.DebugMode)
+                            {
+                                macroControl = new LiteralControl("&lt;Macro: " + Name + " (" + ScriptAssembly + "," + ScriptType + ")&gt;");
+                            }
                             break;
-                        }
-                    case (int)MacroTypes.Unknown:
-                    default:
-                        if (GlobalSettings.DebugMode)
-                            macroControl = new LiteralControl("&lt;Macro: " + Name + " (" + ScriptAssembly + "," + ScriptType + ")&gt;");
-                        break;
-                }
+                    }
 
-                //add to cache if render is successful
-                if (!renderFailed)
+                    //add to cache if render is successful
+                    if (renderFailed == false)
+                    {
+                        macroControl = AddMacroResultToCache(macroControl);
+                    }
+
+                }
+                else if (macroControl == null)
                 {
-                    macroControl = AddMacroResultToCache(macroControl);
+                    macroControl = new LiteralControl(macroHtml);
                 }
 
+                return macroControl;
             }
-            else if (macroControl == null)
-            {
-                macroControl = new LiteralControl(macroHtml);
-            }
-
-            return macroControl;
         }
 
         /// <summary>
@@ -446,57 +501,63 @@ namespace umbraco
                     {
                         string dateAddedCacheKey;
 
-                        // NH: Scripts and XSLT can be generated as strings, but not controls as page events wouldn't be hit (such as Page_Load, etc)
-                        if (CacheMacroAsString(Model))
+                        using (DisposableTimer.DebugDuration<macro>("Saving MacroContent To Cache: " + Model.CacheIdentifier))
                         {
-                            var outputCacheString = "";
 
-                            using (var sw = new StringWriter())
+                            // NH: Scripts and XSLT can be generated as strings, but not controls as page events wouldn't be hit (such as Page_Load, etc)
+                            if (CacheMacroAsString(Model))
                             {
-                                var hw = new HtmlTextWriter(sw);
-                                macroControl.RenderControl(hw);
+                                var outputCacheString = "";
 
-                                outputCacheString = sw.ToString();
+                                using (var sw = new StringWriter())
+                                {
+                                    var hw = new HtmlTextWriter(sw);
+                                    macroControl.RenderControl(hw);
+
+                                    outputCacheString = sw.ToString();
+                                }
+
+                                //insert the cache string result
+                                ApplicationContext.Current.ApplicationCache.InsertCacheItem(
+                                    CacheKeys.MacroHtmlCacheKey + Model.CacheIdentifier,
+                                    CacheItemPriority.NotRemovable,
+                                    new TimeSpan(0, 0, Model.CacheDuration),
+                                    () => outputCacheString);
+
+                                dateAddedCacheKey = CacheKeys.MacroHtmlDateAddedCacheKey + Model.CacheIdentifier;
+
+                                // zb-00003 #29470 : replace by text if not already text
+                                // otherwise it is rendered twice
+                                if (!(macroControl is LiteralControl))
+                                    macroControl = new LiteralControl(outputCacheString);
+
+                                TraceInfo("renderMacro",
+                                          string.Format("Macro Content saved to cache '{0}'.", Model.CacheIdentifier));
+                            }
+                            else
+                            {
+                                //insert the cache control result
+                                ApplicationContext.Current.ApplicationCache.InsertCacheItem(
+                                    CacheKeys.MacroControlCacheKey + Model.CacheIdentifier,
+                                    CacheItemPriority.NotRemovable,
+                                    new TimeSpan(0, 0, Model.CacheDuration),
+                                    () => new MacroCacheContent(macroControl, macroControl.ID));
+
+                                dateAddedCacheKey = CacheKeys.MacroControlDateAddedCacheKey + Model.CacheIdentifier;
+
+                                TraceInfo("renderMacro",
+                                          string.Format("Macro Control saved to cache '{0}'.", Model.CacheIdentifier));
                             }
 
-                            //insert the cache string result
+                            //insert the date inserted (so we can check file modification date)
                             ApplicationContext.Current.ApplicationCache.InsertCacheItem(
-                                CacheKeys.MacroHtmlCacheKey + Model.CacheIdentifier,
+                                dateAddedCacheKey,
                                 CacheItemPriority.NotRemovable,
                                 new TimeSpan(0, 0, Model.CacheDuration),
-                                () => outputCacheString);
-
-                            dateAddedCacheKey = CacheKeys.MacroHtmlDateAddedCacheKey + Model.CacheIdentifier;
-
-                            // zb-00003 #29470 : replace by text if not already text
-                            // otherwise it is rendered twice
-                            if (!(macroControl is LiteralControl))
-                                macroControl = new LiteralControl(outputCacheString);
-
-                            TraceInfo("renderMacro",
-                                      string.Format("Macro Content saved to cache '{0}'.", Model.CacheIdentifier));
-                        }
-                        else
-                        {
-                            //insert the cache control result
-                            ApplicationContext.Current.ApplicationCache.InsertCacheItem(
-                                CacheKeys.MacroControlCacheKey + Model.CacheIdentifier,
-                                CacheItemPriority.NotRemovable,
-                                new TimeSpan(0, 0, Model.CacheDuration),
-                                () => new MacroCacheContent(macroControl, macroControl.ID));
-
-                            dateAddedCacheKey = CacheKeys.MacroControlDateAddedCacheKey + Model.CacheIdentifier;
+                                () => DateTime.Now);
                             
-                            TraceInfo("renderMacro",
-                                      string.Format("Macro Control saved to cache '{0}'.", Model.CacheIdentifier));
                         }
-
-                        //insert the date inserted (so we can check file modification date)
-                        ApplicationContext.Current.ApplicationCache.InsertCacheItem(
-                            dateAddedCacheKey,
-                            CacheItemPriority.NotRemovable,
-                            new TimeSpan(0, 0, Model.CacheDuration),
-                            () => DateTime.Now);
+                        
                     }
                 }
             }
@@ -519,7 +580,7 @@ namespace umbraco
             macroHtml = null;
             macroControl = null;
 
-            if (!UmbracoContext.Current.InPreviewMode && Model.CacheDuration > 0)
+            if (UmbracoContext.Current.InPreviewMode == false && Model.CacheDuration > 0)
             {
                 var macroFile = GetMacroFile(Model);
                 var fileInfo = new FileInfo(HttpContext.Current.Server.MapPath(macroFile));
@@ -764,7 +825,13 @@ namespace umbraco
         // will pick XmlDocument or Navigator mode depending on the capabilities of the published caches
         internal Control LoadMacroXslt(macro macro, MacroModel model, Hashtable pageElements, bool throwError)
         {
-            if (XsltFile.Trim() != string.Empty)
+            if (XsltFile.Trim() == string.Empty)
+            {
+                TraceWarn("macro", "Xslt is empty");
+                return new LiteralControl(string.Empty);
+            }
+
+            using (DisposableTimer.DebugDuration<macro>("Executing XSLT: " + XsltFile))
             {
                 XmlDocument macroXml = null;
 
@@ -793,37 +860,31 @@ namespace umbraco
                 {
                     var xsltFile = getXslt(XsltFile);
 
-                    try
+                    using (DisposableTimer.DebugDuration<macro>("Performing transformation"))
                     {
-                        var transformed = GetXsltTransformResult(macroXml, xsltFile);
-                        var result = CreateControlsFromText(transformed);
-
-                        TraceInfo("umbracoMacro", "After performing transformation");
-
-                        return result;
-                    }
-                    catch (Exception e)
-                    {
-                        Exceptions.Add(e);
-                        LogHelper.WarnWithException<macro>("Error parsing XSLT file", e);
-                        // inner exception code by Daniel Lindstr?m from SBBS.se
-                        Exception ie = e;
-                        while (ie != null)
+                        try
                         {
-                            TraceWarn("umbracoMacro InnerException", ie.Message, ie);
-                            ie = ie.InnerException;
-                        }
+                            var transformed = GetXsltTransformResult(macroXml, xsltFile);
+                            var result = CreateControlsFromText(transformed);
 
-                        var macroErrorEventArgs = new MacroErrorEventArgs { Name = Model.Name, Alias = Model.Alias, ItemKey = Model.Xslt, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour };
-                        var macroControl = GetControlForErrorBehavior("Error parsing XSLT file: \\xslt\\" + XsltFile, macroErrorEventArgs);
-                        //if it is null, then we are supposed to throw the (original) exception
-                        // see: http://issues.umbraco.org/issue/U4-497 at the end
-                        if (macroControl == null && throwError)
-                        {
-                            throw;
+                            return result;
                         }
-                        return macroControl;
-                    }
+                        catch (Exception e)
+                        {
+                            Exceptions.Add(e);
+                            LogHelper.WarnWithException<macro>("Error parsing XSLT file", e);
+                            
+                            var macroErrorEventArgs = new MacroErrorEventArgs { Name = Model.Name, Alias = Model.Alias, ItemKey = Model.Xslt, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour };
+                            var macroControl = GetControlForErrorBehavior("Error parsing XSLT file: \\xslt\\" + XsltFile, macroErrorEventArgs);
+                            //if it is null, then we are supposed to throw the (original) exception
+                            // see: http://issues.umbraco.org/issue/U4-497 at the end
+                            if (macroControl == null && throwError)
+                            {
+                                throw;
+                            }
+                            return macroControl;
+                        }   
+                    }                    
                 }
                 catch (Exception e)
                 {
@@ -841,10 +902,7 @@ namespace umbraco
                     }
                     return macroControl;
                 }
-            }
-
-            TraceWarn("macro", "Xslt is empty");
-            return new LiteralControl(string.Empty);
+            }            
         }
 
         // gets the control for the macro, using GetXsltTransform methods for execution
@@ -922,13 +980,15 @@ namespace umbraco
         {
             TextWriter tw = new StringWriter();
 
-            TraceInfo("umbracoMacro", "Before adding extensions");
             XsltArgumentList xslArgs;
-            xslArgs = AddXsltExtensions();
-            var lib = new library();
-            xslArgs.AddExtensionObject("urn:umbraco.library", lib);
-			TraceInfo("umbracoMacro", "After adding extensions");
 
+            using (DisposableTimer.DebugDuration<macro>("Adding XSLT Extensions"))
+            {                
+                xslArgs = AddXsltExtensions();
+                var lib = new library();
+                xslArgs.AddExtensionObject("urn:umbraco.library", lib);
+            }
+            
             // Add parameters
             if (parameters == null || !parameters.ContainsKey("currentPage"))
             {
@@ -941,8 +1001,10 @@ namespace umbraco
             }
 
             // Do transformation
-			TraceInfo("umbracoMacro", "Before performing transformation");
-            xslt.Transform(macroXml.CreateNavigator(), xslArgs, tw);
+            using (DisposableTimer.DebugDuration<macro>("Executing XSLT transform"))
+            {
+                xslt.Transform(macroXml.CreateNavigator(), xslArgs, tw);
+            }                       
 			return TemplateUtilities.ResolveUrlsFromTextString(tw.ToString());
         }
 
@@ -959,11 +1021,13 @@ namespace umbraco
         {
             TextWriter tw = new StringWriter();
 
-            TraceInfo("umbracoMacro", "Before adding extensions");
-            XsltArgumentList xslArgs = AddXsltExtensions();
-            var lib = new library();
-            xslArgs.AddExtensionObject("urn:umbraco.library", lib);
-            TraceInfo("umbracoMacro", "After adding extensions");
+            XsltArgumentList xslArgs;
+            using (DisposableTimer.DebugDuration<macro>("Adding XSLT Extensions"))
+            {
+                xslArgs = AddXsltExtensions();
+                var lib = new library();
+                xslArgs.AddExtensionObject("urn:umbraco.library", lib);
+            }
 
             // Add parameters
             if (parameters == null || !parameters.ContainsKey("currentPage"))
@@ -978,8 +1042,10 @@ namespace umbraco
             }
 
             // Do transformation
-            TraceInfo("umbracoMacro", "Before performing transformation");
-            xslt.Transform(macroNavigator, xslArgs, tw);
+            using (DisposableTimer.DebugDuration<macro>("Executing XSLT transform"))
+            {
+                xslt.Transform(macroNavigator, xslArgs, tw);
+            }
             return TemplateUtilities.ResolveUrlsFromTextString(tw.ToString());
         }
 
@@ -1238,7 +1304,6 @@ namespace umbraco
 		internal ScriptingMacroResult LoadPartialViewMacro(MacroModel macro)
 		{
 			var retVal = new ScriptingMacroResult();
-			TraceInfo("umbracoMacro", "Rendering Partial View Macro");
 			IMacroEngine engine = null;
 			
 			engine = MacroEngineFactory.GetEngine(PartialViewMacroEngine.EngineName);
@@ -1253,7 +1318,6 @@ namespace umbraco
 					retVal.ResultException = result.ResultException;
 				}
 			}
-			TraceInfo("umbracoMacro", "Rendering Partial View Macro [done]");
 			retVal.Result = ret;
 			return retVal;
 		}
@@ -1261,7 +1325,6 @@ namespace umbraco
         public ScriptingMacroResult loadMacroScript(MacroModel macro)
         {
             var retVal = new ScriptingMacroResult();
-            TraceInfo("umbracoMacro", "Loading IMacroEngine script");
             string ret = String.Empty;
             IMacroEngine engine = null;
             if (!String.IsNullOrEmpty(macro.ScriptCode))
@@ -1287,7 +1350,6 @@ namespace umbraco
                     retVal.ResultException = result.ResultException;
                 }
             }
-            TraceInfo("umbracoMacro", "Loading IMacroEngine script [done]");
             retVal.Result = ret;
             return retVal;
         }
@@ -1296,7 +1358,6 @@ namespace umbraco
         public DLRMacroResult loadMacroDLR(MacroModel macro)
         {
             var retVal = new DLRMacroResult();
-            TraceInfo("umbracoMacro", "Loading IMacroEngine script");
             var ret = new LiteralControl();
             IMacroEngine engine = null;
             if (!String.IsNullOrEmpty(macro.ScriptCode))
@@ -1322,7 +1383,6 @@ namespace umbraco
                     retVal.ResultException = result.ResultException;
                 }
             }
-            TraceInfo("umbracoMacro", "Loading IMacroEngine script [done]");
             retVal.Control = ret;
             return retVal;
         }
@@ -1595,22 +1655,46 @@ namespace umbraco
             }
         }
 
-        private static void TraceInfo(string category, string message)
+        private static void TraceInfo(string category, string message, bool excludeProfiling = false)
         {
             if (HttpContext.Current != null)
                 HttpContext.Current.Trace.Write(category, message);
+
+            //Trace out to profiling... doesn't actually profile, just for informational output.
+            if (excludeProfiling == false)
+            {
+                using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}", message)))
+                {
+                }
+            }
         }
 
-        private static void TraceWarn(string category, string message)
+        private static void TraceWarn(string category, string message, bool excludeProfiling = false)
         {
             if (HttpContext.Current != null)
 				HttpContext.Current.Trace.Warn(category, message);
+
+            //Trace out to profiling... doesn't actually profile, just for informational output.
+            if (excludeProfiling == false)
+            {
+                using (ProfilerResolver.Current.Profiler.Step(string.Format("Warning: {0}", message)))
+                {
+                }
+            }
         }
 
-		private static void TraceWarn(string category, string message, Exception ex)
+        private static void TraceWarn(string category, string message, Exception ex, bool excludeProfiling = false)
 		{
 			if (HttpContext.Current != null)
 				HttpContext.Current.Trace.Warn(category, message, ex);
+
+            //Trace out to profiling... doesn't actually profile, just for informational output.
+            if (excludeProfiling == false)
+            {
+                using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}, Error: {1}", message, ex)))
+                {
+                }
+            }
 		}
 
         public static string renderMacroStartTag(Hashtable attributes, int pageId, Guid versionId)
