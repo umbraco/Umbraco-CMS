@@ -140,6 +140,21 @@ namespace Umbraco.Core.Services
                 return repository.GetByQuery(query);
             }
         }
+
+        /// <summary>
+        /// Gets a list of <see cref="Relation"/> objects by their child or parent Id.
+        /// Using this method will get you all relations regards of it being a child or parent relation.
+        /// </summary>
+        /// <param name="id">Id of the child or parent to retrieve relations for</param>
+        /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
+        public IEnumerable<Relation> GetByParentOrChildId(int id)
+        {
+            using (var repository = _repositoryFactory.CreateRelationRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = new Query<Relation>().Where(x => x.ChildId == id || x.ParentId == id);
+                return repository.GetByQuery(query);
+            }
+        }
         
         /// <summary>
         /// Gets a list of <see cref="Relation"/> objects by the Name of the <see cref="RelationType"/>
