@@ -182,7 +182,7 @@ namespace umbraco.cms.businesslogic.media
             _mediaType = mediaType;
 
             base.PopulateContentTypeFromContentTypeBase(_mediaType);
-            base.PopulateCMSNodeFromContentTypeBase(_mediaType, _objectType);
+            base.PopulateCMSNodeFromUmbracoEntity(_mediaType, _objectType);
         }
         #endregion
 

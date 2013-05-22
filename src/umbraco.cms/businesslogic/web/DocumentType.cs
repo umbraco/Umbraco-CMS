@@ -642,7 +642,7 @@ namespace umbraco.cms.businesslogic.web
                 _defaultTemplate = _contentType.DefaultTemplate.Id;
 
             base.PopulateContentTypeFromContentTypeBase(_contentType);
-            base.PopulateCMSNodeFromContentTypeBase(_contentType, _objectType);
+            base.PopulateCMSNodeFromUmbracoEntity(_contentType, _objectType);
         }
         #endregion
 

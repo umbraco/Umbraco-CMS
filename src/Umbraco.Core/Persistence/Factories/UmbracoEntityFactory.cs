@@ -28,12 +28,9 @@ namespace Umbraco.Core.Persistence.Factories
                                  UmbracoFile = dto.UmbracoFile ?? string.Empty
                              };
 
-            entity.IsPublished = dto.PublishedVersion != default(Guid) ||
-                                 (dto.NewestVersion != default(Guid) && dto.PublishedVersion == dto.NewestVersion);
-            entity.IsDraft = dto.NewestVersion != default(Guid) &&
-                             (dto.PublishedVersion == default(Guid) || dto.PublishedVersion != dto.NewestVersion);
-            entity.HasPendingChanges = dto.PublishedVersion != default(Guid) && dto.NewestVersion != default(Guid) &&
-                                       dto.PublishedVersion != dto.NewestVersion;
+            entity.IsPublished = dto.PublishedVersion != default(Guid) || (dto.NewestVersion != default(Guid) && dto.PublishedVersion == dto.NewestVersion);
+            entity.IsDraft = dto.NewestVersion != default(Guid) && (dto.PublishedVersion == default(Guid) || dto.PublishedVersion != dto.NewestVersion);
+            entity.HasPendingChanges = (dto.PublishedVersion != default(Guid) && dto.NewestVersion != default(Guid)) && dto.PublishedVersion != dto.NewestVersion;
 
             return entity;
         }

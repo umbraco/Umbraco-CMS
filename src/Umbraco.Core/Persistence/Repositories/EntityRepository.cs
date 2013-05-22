@@ -262,7 +262,7 @@ namespace Umbraco.Core.Persistence.Repositories
             [Column("publishedVerison")]
             public Guid PublishedVersion { get; set; }
 
-            [Column("newestVerison")]
+            [Column("newestVersion")]
             public Guid NewestVersion { get; set; }
 
             [Column("alias")]

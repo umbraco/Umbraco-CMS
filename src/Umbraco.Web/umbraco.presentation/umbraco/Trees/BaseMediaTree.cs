@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -58,15 +59,14 @@ function openMedia(id) {
 
         //Updated Render method for improved performance, but currently not usable because of backwards compatibility 
         //with the OnBeforeTreeRender/OnAfterTreeRender events, which sends an array for legacy Media items.
-        /*public override void Render(ref XmlTree tree)
+        public override void Render(ref XmlTree tree)
         {
             _timer = DisposableTimer.Start(x => LogHelper.Debug<BaseMediaTree>("Media tree loaded" + " (took " + x + "ms)"));
 
-            var service = base.Services.EntityService;
-            var entities = service.GetChildren(m_id, UmbracoObjectTypes.Media);
+            var entities = Services.EntityService.GetChildren(m_id, UmbracoObjectTypes.Media).ToArray();
             
             var args = new TreeEventArgs(tree);
-            OnBeforeTreeRender(entities, args);
+            OnBeforeTreeRender(entities, args, false);
 
             foreach (UmbracoEntity entity in entities)
             {
@@ -124,10 +124,10 @@ function openMedia(id) {
             //stop the timer and log the output
             _timer.Dispose();
 
-            OnAfterTreeRender(entities, args);
-        }*/
+            OnAfterTreeRender(entities, args, false);
+        }
 
-        public override void Render(ref XmlTree tree)
+        /*public override void Render(ref XmlTree tree)
         {
             //_timer = DisposableTimer.Start(x => LogHelper.Debug<BaseMediaTree>("Media tree loaded" + " (took " + x + "ms)"));
           
@@ -202,7 +202,7 @@ function openMedia(id) {
             }
             //_timer.Dispose();
             OnAfterTreeRender(docs, args);
-        }
+        }*/
 
         /// <summary>
 		/// Returns the value for a link in WYSIWYG mode, by default only media items that have a 

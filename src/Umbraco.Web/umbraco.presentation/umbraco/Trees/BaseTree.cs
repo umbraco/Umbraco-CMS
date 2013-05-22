@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
+using umbraco.cms.businesslogic.media;
+using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 
 namespace umbraco.cms.presentation.Trees
@@ -521,6 +525,36 @@ namespace umbraco.cms.presentation.Trees
         {
             if (AfterTreeRender != null)
                 AfterTreeRender(sender, e);
+        }
+
+        protected internal virtual void OnBeforeTreeRender(IEnumerable<IUmbracoEntity> sender, TreeEventArgs e, bool isContent)
+        {
+            if (BeforeTreeRender != null)
+            {
+                if (isContent)
+                {
+                    BeforeTreeRender(sender.Select(x => new Document(x, false)).ToArray(), e);
+                }
+                else
+                {
+                    BeforeTreeRender(sender.Select(x => new Media(x, false)).ToArray(), e);
+                }
+            }
+        }
+
+        protected internal virtual void OnAfterTreeRender(IEnumerable<IUmbracoEntity> sender, TreeEventArgs e, bool isContent)
+        {
+            if (AfterTreeRender != null)
+            {
+                if (isContent)
+                {
+                    AfterTreeRender(sender.Select(x => new Document(x, false)).ToArray(), e);
+                }
+                else
+                {
+                    AfterTreeRender(sender.Select(x => new Media(x, false)).ToArray(), e);
+                }
+            }
         }
 
         /// <summary>

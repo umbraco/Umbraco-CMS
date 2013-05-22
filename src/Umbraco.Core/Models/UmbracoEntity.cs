@@ -171,7 +171,7 @@ namespace Umbraco.Core.Models
 
         public bool IsDraft
         {
-            get { return _isPublished; }
+            get { return _isDraft; }
             set
             {
                 SetPropertyValueAndDetectChanges(o =>

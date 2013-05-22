@@ -54,6 +54,13 @@ namespace umbraco.cms.businesslogic.media
 
         public Media(Guid id, bool noSetup) : base(id, noSetup) { }
 
+        internal Media(IUmbracoEntity entity, bool noSetup = true)
+            : base(entity)
+        {
+            if (noSetup == false)
+                setupNode();
+        }
+
         internal Media(IMedia media) : base(media)
         {
             SetupNode(media);
@@ -376,7 +383,7 @@ namespace umbraco.cms.businesslogic.media
             MediaItem = media;
 
             //Setting private properties from IContentBase replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
-            base.PopulateCMSNodeFromContentBase(MediaItem, _objectType);
+            base.PopulateCMSNodeFromUmbracoEntity(MediaItem, _objectType);
 
             //If the version is empty we update with the latest version from the current IContent.
             if (Version == Guid.Empty)

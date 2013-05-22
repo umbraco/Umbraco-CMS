@@ -106,6 +106,21 @@ namespace umbraco.cms.businesslogic.web
             }
         }
 
+        /// <summary>
+        /// Internal initialization of a legacy Document object using the new IUmbracoEntity object
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="noSetup"></param>
+        internal Document(IUmbracoEntity entity, bool noSetup = true) : base(entity)
+        {
+            if(noSetup == false)
+                setupNode();
+        }
+
+        /// <summary>
+        /// Internal initialization of a legacy Document object using the new IContent object
+        /// </summary>
+        /// <param name="content"></param>
         internal Document(IContent content) : base(content)
         {
             SetupNode(content);
@@ -1384,7 +1399,7 @@ namespace umbraco.cms.businesslogic.web
         {
             Content = content;
             //Setting private properties from IContentBase replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
-            base.PopulateCMSNodeFromContentBase(Content, _objectType);
+            base.PopulateCMSNodeFromUmbracoEntity(Content, _objectType);
 
             //If the version is empty we update with the latest version from the current IContent.
             if (Version == Guid.Empty)

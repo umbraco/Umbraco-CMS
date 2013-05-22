@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using umbraco.cms.businesslogic.property;
 using umbraco.DataLayer;
 using System.Runtime.CompilerServices;
@@ -52,6 +53,8 @@ namespace umbraco.cms.businesslogic
         protected Content(Guid id) : base(id) { }
 
         protected Content(Guid id, bool noSetup) : base(id, noSetup) { }
+
+        protected internal Content(IUmbracoEntity entity) : base(entity) { }
 
         protected internal Content(IContentBase contentBase)
             : base(contentBase)
@@ -121,7 +124,7 @@ namespace umbraco.cms.businesslogic
                     if (o == null)
                         return null;
                     int contentTypeId;
-                    if (!int.TryParse(o.ToString(), out contentTypeId))
+                    if (int.TryParse(o.ToString(), out contentTypeId) == false)
                         return null;
                     try
                     {
