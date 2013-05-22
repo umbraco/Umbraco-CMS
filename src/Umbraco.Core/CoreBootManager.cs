@@ -129,6 +129,17 @@ namespace Umbraco.Core
             ApplicationEventsResolver.Current.AddType<PublishedContentHelper>();
         }
 
+        /// <summary>
+        /// Special method to extend the use of Umbraco by enabling the consumer to overwrite
+        /// the absolute path to the root of an Umbraco site/solution, which is used for stuff
+        /// like Umbraco.Core.IO.IOHelper.MapPath etc.
+        /// </summary>
+        /// <param name="rootPath">Absolute</param>
+        protected virtual void InitializeApplicationRootPath(string rootPath)
+        {
+            Umbraco.Core.IO.IOHelper.SetRootDirectory(rootPath);
+        }
+
 		/// <summary>
 		/// Fires after initialization and calls the callback to allow for customizations to occur & 
         /// Ensure that the OnApplicationStarting methods of the IApplicationEvents are called
