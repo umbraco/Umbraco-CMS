@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Web.Caching;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Profiling;
 using umbraco;
 using umbraco.cms.businesslogic.macro;
 
@@ -20,11 +18,17 @@ namespace Umbraco.Tests.Macros
         {
             //we DO want cache enabled for these tests
             ApplicationContext.Current = new ApplicationContext(true);
+            ProfilerResolver.Current = new ProfilerResolver(new LogProfiler())
+                                           {
+                                               CanResolveBeforeFrozen = true
+                                           };
         }
 
         [TearDown]
         public void TearDown()
         {
+            ProfilerResolver.Current.DisposeIfDisposable();
+            ProfilerResolver.Reset();
             ApplicationContext.Current.ApplicationCache.ClearAllCache();
             ApplicationContext.Current.DisposeIfDisposable();
             ApplicationContext.Current = null;
