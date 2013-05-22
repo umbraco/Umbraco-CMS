@@ -241,7 +241,7 @@ namespace Umbraco.Core.IO
         /// <returns></returns>
         internal static string GetRootDirectorySafe()
         {
-            if (!String.IsNullOrEmpty(_rootDir))
+            if (string.IsNullOrEmpty(_rootDir) == false)
             {
                 return _rootDir;
             }
@@ -250,7 +250,12 @@ namespace Umbraco.Core.IO
 			var uri = new Uri(codeBase);
 			var path = uri.LocalPath;
         	var baseDirectory = Path.GetDirectoryName(path);
-            _rootDir = baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin") - 1);
+            if (string.IsNullOrEmpty(baseDirectory))
+                throw new Exception("No root directory could be resolved. Please ensure that your Umbraco solution is correctly configured.");
+
+            _rootDir = baseDirectory.Contains("bin")
+                           ? baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin", StringComparison.OrdinalIgnoreCase) - 1)
+                           : baseDirectory;
 
             return _rootDir;
 
