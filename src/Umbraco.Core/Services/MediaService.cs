@@ -701,6 +701,58 @@ namespace Umbraco.Core.Services
 	    }
 
         /// <summary>
+        /// Sorts a collection of <see cref="IMedia"/> objects by updating the SortOrder according
+        /// to the ordering of items in the passed in <see cref="SortedSet{T}"/>.
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="userId"></param>
+        /// <param name="raiseEvents"></param>
+        /// <returns>True if sorting succeeded, otherwise False</returns>
+        public bool Sort(SortedSet<IMedia> items, int userId = 0, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(items), this))
+                    return false;
+            }
+
+            var shouldBeCached = new List<IMedia>();
+
+            using (new WriteLock(Locker))
+            {
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+                {
+                    int i = 0;
+                    foreach (var media in items)
+                    {
+                        media.SortOrder = i;
+                        i++;
+
+                        repository.AddOrUpdate(media);
+                        shouldBeCached.Add(media);
+                    }
+
+                    uow.Commit();
+
+                    foreach (var content in shouldBeCached)
+                    {
+                        //Create and Save ContentXml DTO
+                        var xml = content.ToXml();
+                        CreateAndSaveMediaXml(xml, content.Id, uow.Database);
+                    }
+                }
+            }
+
+            if (raiseEvents)
+                Saved.RaiseEvent(new SaveEventArgs<IMedia>(items, false), this);
+
+            Audit.Add(AuditTypes.Sort, "Sorting Media performed by user", userId, 0);
+
+            return true;
+        }
+
+        /// <summary>
         /// Rebuilds all xml content in the cmsContentXml table for all media
         /// </summary>
         /// <param name="contentTypeIds">
@@ -764,58 +816,6 @@ namespace Umbraco.Core.Services
                 }
                 Audit.Add(AuditTypes.Publish, "RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
             }
-        }
-
-        /// <summary>
-        /// Sorts a collection of <see cref="IMedia"/> objects by updating the SortOrder according
-        /// to the ordering of items in the passed in <see cref="SortedSet{T}"/>.
-        /// </summary>
-        /// <param name="items"></param>
-        /// <param name="userId"></param>
-        /// <param name="raiseEvents"></param>
-        /// <returns>True if sorting succeeded, otherwise False</returns>
-        public bool Sort(SortedSet<IMedia> items, int userId = 0, bool raiseEvents = true)
-        {
-            if (raiseEvents)
-            {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(items), this))
-                    return false;
-            }
-
-            var shouldBeCached = new List<IMedia>();
-
-            using (new WriteLock(Locker))
-            {
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateMediaRepository(uow))
-                {
-                    int i = 0;
-                    foreach (var media in items)
-                    {
-                        media.SortOrder = i;
-                        i++;
-
-                        repository.AddOrUpdate(media);
-                        shouldBeCached.Add(media);
-                    }
-
-                    uow.Commit();
-
-                    foreach (var content in shouldBeCached)
-                    {
-                        //Create and Save ContentXml DTO
-                        var xml = content.ToXml();
-                        CreateAndSaveMediaXml(xml, content.Id, uow.Database);
-                    }
-                }
-            }
-
-            if (raiseEvents)
-                Saved.RaiseEvent(new SaveEventArgs<IMedia>(items, false), this);
-
-            Audit.Add(AuditTypes.Sort, "Sorting Media performed by user", userId, 0);
-
-            return true;
         }
 
         /// <summary>

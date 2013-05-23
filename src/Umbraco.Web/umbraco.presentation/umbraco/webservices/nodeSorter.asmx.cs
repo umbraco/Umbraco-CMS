@@ -1,19 +1,19 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
 using System.Web.Script.Services;
 using System.Web.Services;
 using System.Xml;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Caching;
-using Umbraco.Web;
+using Umbraco.Core.Models;
 using Umbraco.Web.WebServices;
-using Umbraco.Web.Security;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
-using Umbraco.Core;
 
 namespace umbraco.presentation.webservices
 {
@@ -32,42 +32,40 @@ namespace umbraco.presentation.webservices
             if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
             {
                 var parent = new SortNode { Id = ParentId };
-
-                var nodes = new ArrayList();
-                var cmsNode = new cms.businesslogic.CMSNode(ParentId);
+                var nodes = new List<SortNode>();
+                var entityService = base.ApplicationContext.Services.EntityService;
 
                 // Root nodes?
                 if (ParentId == -1)
                 {
-                    if (App == Constants.Applications.Media)
+                    if (App == "media")
                     {
-                        foreach (cms.businesslogic.media.Media child in cms.businesslogic.media.Media.GetRootMedias())
-                            nodes.Add(new SortNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime));
+                        var rootMedia = entityService.GetRootEntities(UmbracoObjectTypes.Media);
+                        nodes.AddRange(rootMedia.Select(media => new SortNode(media.Id, media.SortOrder, media.Name, media.CreateDate)));
                     }
                     else
-                        foreach (Document child in Document.GetRootDocuments())
-                            nodes.Add(new SortNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime));
+                    {
+                        var rootContent = entityService.GetRootEntities(UmbracoObjectTypes.Document);
+                        nodes.AddRange(rootContent.Select(content => new SortNode(content.Id, content.SortOrder, content.Name, content.CreateDate)));
+                    }
                 }
                 else
                 {
                     // "hack for stylesheet"
-                    if (App == Constants.Applications.Settings)
+                    if (App == "settings")
                     {
+                        var cmsNode = new cms.businesslogic.CMSNode(ParentId);
                         var styleSheet = new StyleSheet(cmsNode.Id);
-                        foreach (var child in styleSheet.Properties)
-                            nodes.Add(new SortNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime));
-
+                        nodes.AddRange(styleSheet.Properties.Select(child => new SortNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime)));
                     }
                     else
                     {
-                        //store children array here because iterating over an Array property object is very inneficient.
-                        var children = cmsNode.Children;
-                        foreach (cms.businesslogic.CMSNode child in children)
-                            nodes.Add(new SortNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime));
+                        var children = entityService.GetChildren(ParentId);
+                        nodes.AddRange(children.Select(child => new SortNode(child.Id, child.SortOrder, child.Name, child.CreateDate)));
                     }
                 }
 
-                parent.SortNodes = (SortNode[])nodes.ToArray(typeof(SortNode));
+                parent.SortNodes = nodes.ToArray();
 
                 return parent;
             }
@@ -78,80 +76,86 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public void UpdateSortOrder(int ParentId, string SortOrder)
         {
-            //TODO: The amount of processing this method takes is HUGE. We should look at 
-            // refactoring this to use purely the new APIs and see how much faster we can make it!
+            if (AuthorizeRequest() == false) return;
+            if (SortOrder.Trim().Length <= 0) return;
 
+            var isContent = helper.Request("app") == "content" | helper.Request("app") == "";
+            var isMedia = helper.Request("app") == "media";
+
+            //ensure user is authorized for the app requested
+            if (isContent && AuthorizeRequest(DefaultApps.content.ToString()) == false) return;
+            if (isMedia && AuthorizeRequest(DefaultApps.media.ToString()) == false) return;
+
+            var ids = SortOrder.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            if (isContent)
+                SortContent(ids, ParentId);
+
+            if (isMedia)
+                SortMedia(ids);
+        }
+
+        private void SortMedia(string[] ids)
+        {
+            var mediaService = base.ApplicationContext.Services.MediaService;
+            var sortedMedia = new SortedSet<IMedia>(new ItemSortOrderComparer());
             try
             {
-                if (AuthorizeRequest() == false) return;
-                if (SortOrder.Trim().Length <= 0) return;
-                var ids = SortOrder.Split(',');
-
-                var isContent = Context.Request.GetItemAsString("app") == Constants.Applications.Content | helper.Request("app") == "";
-                var isMedia = Context.Request.GetItemAsString("app") == Constants.Applications.Media;
-
-                //ensure user is authorized for the app requested
-                if (isContent && AuthorizeRequest(DefaultApps.content.ToString()) == false) return;
-                if (isMedia && AuthorizeRequest(DefaultApps.media.ToString()) == false) return;
-
                 for (var i = 0; i < ids.Length; i++)
                 {
-                    if (ids[i] == "" || ids[i].Trim() == "") continue;
+                    var id = int.Parse(ids[i]);
+                    var m = mediaService.GetById(id);
+                    m.SortOrder = i;
+                    sortedMedia.Add(m);
+                }
 
-                    if (isContent)
-                    {
-                        var document = new Document(int.Parse(ids[i]))
-                            {
-                                sortOrder = i
-                            };
-
-                        if (document.Published)
-                        {
-                            document.SaveAndPublish(UmbracoUser);
-
-                        }
-                        else
-                        {
-                            //we need to save it if it is not published to persist the sort order value
-                            document.Save();
-                        }
-                    }
-                        // to update the sortorder of the media node in the XML, re-save the node....
-                    else if (isMedia)
-                    {
-                        var media = new cms.businesslogic.media.Media(int.Parse(ids[i]))
-                            {
-                                sortOrder = i
-                            };
-                        media.Save();                        
-                    }
-
-                    // Refresh sort order on cached xml
-                    if (isContent)
-                    {
-                        XmlNode parentNode = ParentId == -1
-                                                 ? content.Instance.XmlContent.DocumentElement
-                                                 : content.Instance.XmlContent.GetElementById(ParentId.ToString());
-
-                        //only try to do the content sort if the the parent node is available... 
-                        if (parentNode != null)
-                            content.SortNodes(ref parentNode);
-
-                        // Load balancing - then refresh entire cache
-                            // NOTE: SD: This seems a bit excessive to do simply for sorting! I'm going to leave this here for now but 
-                            //  the sort order should be updated in distributed calls when an item is Published (and it most likely is)
-                            //  but I guess this was put here for a reason at some point.
-                        if (UmbracoSettings.UseDistributedCalls)
-                            library.RefreshContent();
-
-                        // fire actionhandler, check for content
-                        BusinessLogic.Actions.Action.RunActionHandlers(new Document(ParentId), ActionSort.Instance);
-                    }
-                }                
+                // Save Media with new sort order and update content xml in db accordingly
+                var sorted = mediaService.Sort(sortedMedia);
             }
             catch (Exception ex)
             {
-                LogHelper.Error<nodeSorter>("Could not update sort order", ex);
+                LogHelper.Error<nodeSorter>("Could not update media sort order", ex);
+            }
+        }
+
+        private void SortContent(string[] ids, int parentId)
+        {
+            var contentService = base.ApplicationContext.Services.ContentService;
+            var sortedContent = new SortedSet<IContent>(new ItemSortOrderComparer());
+            try
+            {
+                for (var i = 0; i < ids.Length; i++)
+                {
+                    var id = int.Parse(ids[i]);
+                    var c = contentService.GetById(id);
+                    c.SortOrder = i;
+                    sortedContent.Add(c);
+                }
+
+                // Save content with new sort order and update db+cache accordingly
+                var sorted = contentService.Sort(sortedContent);
+
+                // Refresh sort order on cached xml
+                XmlNode parentNode = parentId == -1
+                                            ? content.Instance.XmlContent.DocumentElement
+                                            : content.Instance.XmlContent.GetElementById(parentId.ToString(CultureInfo.InvariantCulture));
+
+                //only try to do the content sort if the the parent node is available... 
+                if (parentNode != null)
+                    content.SortNodes(ref parentNode);
+
+                // Load balancing - then refresh entire cache
+                // NOTE: SD: This seems a bit excessive to do simply for sorting! I'm going to leave this here for now but 
+                //  the sort order should be updated in distributed calls when an item is Published (and it most likely is)
+                //  but I guess this was put here for a reason at some point.
+                if (UmbracoSettings.UseDistributedCalls)
+                    library.RefreshContent();
+
+                // fire actionhandler, check for content
+                BusinessLogic.Actions.Action.RunActionHandlers(new Document(parentId), ActionSort.Instance);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<nodeSorter>("Could not update content sort order", ex);
             }
         }
     }
@@ -176,7 +180,7 @@ namespace umbraco.presentation.webservices
             get { return _sortNodes != null ? _sortNodes.Length : 0; }
             set { int test = value; }
         }
-        
+
         public SortNode(int Id, int SortOrder, string Name, DateTime CreateDate)
         {
             _id = Id;
@@ -192,7 +196,7 @@ namespace umbraco.presentation.webservices
             get { return _createDate; }
             set { _createDate = value; }
         }
-        
+
         private string _name;
 
         public string Name
@@ -200,7 +204,7 @@ namespace umbraco.presentation.webservices
             get { return _name; }
             set { _name = value; }
         }
-        
+
         private int _sortOrder;
 
         public int SortOrder
@@ -215,6 +219,19 @@ namespace umbraco.presentation.webservices
         {
             get { return _id; }
             set { _id = value; }
+        }
+    }
+
+    public class ItemSortOrderComparer : IComparer<IContentBase>
+    {
+        public int Compare(IContentBase x, IContentBase y)
+        {
+            if (x.SortOrder > y.SortOrder)
+            {
+                return y.Id;
+            }
+
+            return x.Id;
         }
     }
 }

@@ -1446,24 +1446,9 @@ namespace Umbraco.Core.Services
                 var publishStatus = new PublishStatus(content, PublishStatusType.Success); //initially set to success
 
                 //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
-                if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
-                {
-                    LogHelper.Info<ContentService>(
-                        string.Format(
-                            "Content '{0}' with Id '{1}' could not be published because its parent is not published.",
-                            content.Name, content.Id));
-                    publishStatus.StatusType = PublishStatusType.FailedPathNotPublished;
-                }
-
+                publishStatus.StatusType = CheckAndLogIsPublishable(content);
                 //Content contains invalid property values and can therefore not be published - fire event?
-                if (content.IsValid() == false)
-                {
-                    LogHelper.Info<ContentService>(
-                        string.Format(
-                            "Content '{0}' with Id '{1}' could not be published because of invalid properties.",
-                            content.Name, content.Id));
-                    publishStatus.StatusType = PublishStatusType.FailedContentInvalid;
-                }
+                publishStatus.StatusType = CheckAndLogIsValid(content);
 
                 //if we're still successful, then publish using the strategy
                 if (publishStatus.StatusType == PublishStatusType.Success)
@@ -1553,27 +1538,7 @@ namespace Umbraco.Core.Services
 
                     //Preview Xml
                     var xml = content.ToXml();
-                    var previewPoco = new PreviewXmlDto
-                    {
-                        NodeId = content.Id,
-                        Timestamp = DateTime.Now,
-                        VersionId = content.Version,
-                        Xml = xml.ToString(SaveOptions.None)
-                    };
-                    var previewExists =
-                        uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
-                                                                   new { Id = content.Id, Version = content.Version }) != 0;
-                    int previewResult = previewExists
-                                            ? uow.Database.Update<PreviewXmlDto>(
-                                                "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
-                                                new
-                                                {
-                                                    Xml = previewPoco.Xml,
-                                                    Timestamp = previewPoco.Timestamp,
-                                                    Id = previewPoco.NodeId,
-                                                    Version = previewPoco.VersionId
-                                                })
-                                            : Convert.ToInt32(uow.Database.Insert(previewPoco));
+                    CreateAndSavePreviewXml(xml, content.Id, content.Version, uow.Database);
                 }
 
                 if (raiseEvents)
@@ -1617,7 +1582,7 @@ namespace Umbraco.Core.Services
             return true;
         }
 
-        private bool CheckAndLogIsPublishable(IContent content)
+        private PublishStatusType CheckAndLogIsPublishable(IContent content)
         {
             //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
             if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
@@ -1626,13 +1591,13 @@ namespace Umbraco.Core.Services
                     string.Format(
                         "Content '{0}' with Id '{1}' could not be published because its parent is not published.",
                         content.Name, content.Id));
-                return false;
+                return PublishStatusType.FailedPathNotPublished;
             }
 
-            return true;
+            return PublishStatusType.Success;
         }
 
-        private bool CheckAndLogIsValid(IContent content)
+        private PublishStatusType CheckAndLogIsValid(IContent content)
         {
             //Content contains invalid property values and can therefore not be published - fire event?
             if (content.IsValid() == false)
@@ -1641,10 +1606,10 @@ namespace Umbraco.Core.Services
                     string.Format(
                         "Content '{0}' with Id '{1}' could not be published because of invalid properties.",
                         content.Name, content.Id));
-                return false;
+                return PublishStatusType.FailedContentInvalid;
             }
 
-            return true;
+            return PublishStatusType.Success;
         }
 
         private void CreateAndSavePreviewXml(XElement xml, int id, Guid version, UmbracoDatabase db)
