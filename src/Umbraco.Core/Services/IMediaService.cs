@@ -184,5 +184,15 @@ namespace Umbraco.Core.Services
         /// <param name="mediaPath">Path of the media item to retreive (for example: /media/1024/koala_403x328.jpg)</param>
         /// <returns><see cref="IMedia"/></returns>
         IMedia GetMediaByPath(string mediaPath);
+
+        /// <summary>
+        /// Sorts a collection of <see cref="IMedia"/> objects by updating the SortOrder according
+        /// to the ordering of items in the passed in <see cref="SortedSet{T}"/>.
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="userId"></param>
+        /// <param name="raiseEvents"></param>
+        /// <returns>True if sorting succeeded, otherwise False</returns>
+        bool Sort(SortedSet<IMedia> items, int userId = 0, bool raiseEvents = true);
     }
 }
