@@ -651,18 +651,14 @@ namespace Umbraco.Core.Services
 	                uow.Commit();
 
 	                var xml = media.ToXml();
-	                var poco = new ContentXmlDto {NodeId = media.Id, Xml = xml.ToString(SaveOptions.None)};
-	                var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new {Id = media.Id}) != null;
-	                int result = exists
-	                                 ? uow.Database.Update(poco)
-	                                 : Convert.ToInt32(uow.Database.Insert(poco));
+	                CreateAndSaveMediaXml(xml, media.Id, uow.Database);
 	            }
-
-	            if (raiseEvents)
-	                Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this);
-
-	            Audit.Add(AuditTypes.Save, "Save Media performed by user", media.CreatorId, media.Id);
 	        }
+
+            if (raiseEvents)
+                Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this);
+
+            Audit.Add(AuditTypes.Save, "Save Media performed by user", userId, media.Id);
 	    }
 
 	    /// <summary>
@@ -679,6 +675,7 @@ namespace Umbraco.Core.Services
 				return;
             }
 
+	        var mediaXml = new Dictionary<int, Lazy<XElement>>();
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 			{
@@ -690,6 +687,11 @@ namespace Umbraco.Core.Services
 
 				//commit the whole lot in one go
 				uow.Commit();
+
+			    foreach (var media in medias)
+			    {
+                    CreateAndSaveMediaXml(media.ToXml(), media.Id, uow.Database);
+			    }
 			}
 
             if(raiseEvents)
@@ -765,6 +767,58 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Sorts a collection of <see cref="IMedia"/> objects by updating the SortOrder according
+        /// to the ordering of items in the passed in <see cref="SortedSet{T}"/>.
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="userId"></param>
+        /// <param name="raiseEvents"></param>
+        /// <returns>True if sorting succeeded, otherwise False</returns>
+        public bool Sort(SortedSet<IMedia> items, int userId = 0, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(items), this))
+                    return false;
+            }
+
+            var shouldBeCached = new List<IMedia>();
+
+            using (new WriteLock(Locker))
+            {
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+                {
+                    int i = 0;
+                    foreach (var media in items)
+                    {
+                        media.SortOrder = i;
+                        i++;
+
+                        repository.AddOrUpdate(media);
+                        shouldBeCached.Add(media);
+                    }
+
+                    uow.Commit();
+
+                    foreach (var content in shouldBeCached)
+                    {
+                        //Create and Save ContentXml DTO
+                        var xml = content.ToXml();
+                        CreateAndSaveMediaXml(xml, content.Id, uow.Database);
+                    }
+                }
+            }
+
+            if (raiseEvents)
+                Saved.RaiseEvent(new SaveEventArgs<IMedia>(items, false), this);
+
+            Audit.Add(AuditTypes.Sort, "Sorting Media performed by user", userId, 0);
+
+            return true;
+        }
+
+        /// <summary>
         /// Updates the Path and Level on a collection of <see cref="IMedia"/> objects
         /// based on the Parent's Path and Level.
         /// </summary>
@@ -788,6 +842,13 @@ namespace Umbraco.Core.Services
                 }
             }
             return list;
+        }
+
+        private void CreateAndSaveMediaXml(XElement xml, int id, UmbracoDatabase db)
+        {
+            var poco = new ContentXmlDto { NodeId = id, Xml = xml.ToString(SaveOptions.None) };
+            var exists = db.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = id }) != null;
+            int result = exists ? db.Update(poco) : Convert.ToInt32(db.Insert(poco));
         }
 
 		#region Event Handlers

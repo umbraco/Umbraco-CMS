@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Xml.Linq;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
@@ -302,6 +301,18 @@ namespace Umbraco.Core.Services
         /// <param name="content"><see cref="IContent"/> to retrieve ancestors for</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetAncestors(IContent content);
+        /// Sorts a collection of <see cref="IContent"/> objects by updating the SortOrder according
+        /// to the ordering of items in the passed in <see cref="SortedSet{T}"/>.
+        /// </summary>
+        /// <remarks>
+        /// Using this method will ensure that the Published-state is maintained upon sorting
+        /// so the cache is updated accordingly - as needed.
+        /// </remarks>
+        /// <param name="items"></param>
+        /// <param name="userId"></param>
+        /// <param name="raiseEvents"></param>
+        /// <returns>True if sorting succeeded, otherwise False</returns>
+        bool Sort(SortedSet<IContent> items, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Gets the parent of the current content as an <see cref="IContent"/> item.
