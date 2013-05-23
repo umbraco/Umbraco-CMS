@@ -14,6 +14,7 @@ namespace Umbraco.Core.Services
     {
         private Lazy<ContentService> _contentService;
         private Lazy<UserService> _userService;
+        private Lazy<MemberService> _memberService;
         private Lazy<MediaService> _mediaService;
         private Lazy<ContentTypeService> _contentTypeService;
         private Lazy<DataTypeService> _dataTypeService;
@@ -55,6 +56,9 @@ namespace Umbraco.Core.Services
 
 			if (_userService == null)
 				_userService = new Lazy<UserService>(() => new UserService(provider, repositoryFactory.Value));
+
+            if (_memberService == null)
+                _memberService = new Lazy<MemberService>(() => new MemberService(provider, repositoryFactory.Value));
 
             if (_contentService == null)
 				_contentService = new Lazy<ContentService>(() => new ContentService(provider, repositoryFactory.Value, publishingStrategy));
@@ -170,6 +174,14 @@ namespace Umbraco.Core.Services
         internal IUserService UserService
         {
 			get { return _userService.Value; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="MemberService"/>
+        /// </summary>
+        internal IMemberService MemberService
+        {
+            get { return _memberService.Value; }
         }
     }
 }

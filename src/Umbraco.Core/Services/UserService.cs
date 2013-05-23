@@ -1,13 +1,13 @@
-using System;
-using System.Web;
+using System.Globalization;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// Represents the UserService, which is an easy access to operations involving <see cref="IProfile"/> and eventually Users and Members.
+    /// Represents the UserService, which is an easy access to operations involving <see cref="IProfile"/>, <see cref="IMembershipUser"/> and eventually Backoffice Users.
     /// </summary>
     internal class UserService : IUserService
     {
@@ -29,69 +29,6 @@ namespace Umbraco.Core.Services
         #region Implementation of IUserService
 
         /// <summary>
-        /// Gets an <see cref="IProfile"/> for the current BackOffice User.
-        /// </summary>
-        /// <param name="httpContext">HttpContext to fetch the user through</param>
-        /// <returns><see cref="IProfile"/> containing the Name and Id of the logged in BackOffice User</returns>
-        public IProfile GetCurrentBackOfficeUser(HttpContextBase httpContext)
-        {
-            Mandate.That(httpContext != null,
-                         () =>
-                         new ArgumentException(
-                             "The HttpContext which is used to retrieve information about the currently logged in backoffice user was null and can therefor not be used",
-                             "HttpContextBase"));
-            if (httpContext == null) return null;
-
-            var cookie = httpContext.Request.Cookies["UMB_UCONTEXT"];
-            Mandate.That(cookie != null, () => new ArgumentException("The Cookie containing the UserContext Guid Id was null", "Cookie"));
-            if (cookie == null) return null;
-
-            string contextId = cookie.Value;
-            string cacheKey = string.Concat("UmbracoUserContext", contextId);
-
-            int userId = 0;
-
-            if(HttpRuntime.Cache[cacheKey] == null)
-            {
-                using (var uow = _uowProvider.GetUnitOfWork())
-                {
-					userId =
-						uow.Database.ExecuteScalar<int>(
-							"select userID from umbracoUserLogins where contextID = @ContextId",
-							new { ContextId = new Guid(contextId) });
-
-					HttpRuntime.Cache.Insert(cacheKey, userId,
-											 null,
-											 System.Web.Caching.Cache.NoAbsoluteExpiration,
-											 new TimeSpan(0, (int)(Umbraco.Core.Configuration.GlobalSettings.TimeOutInMinutes / 10), 0));    
-                }                
-            }
-            else
-            {
-                userId = (int) HttpRuntime.Cache[cacheKey];
-            }
-
-            var profile = GetProfileById(userId);
-            return profile;
-        }
-
-        /// <summary>
-        /// Gets an <see cref="IProfile"/> for the current BackOffice User.
-        /// </summary>
-        /// <remarks>
-        /// Requests the current HttpContext, so this method will only work in a web context.
-        /// </remarks>
-        /// <returns><see cref="IProfile"/> containing the Name and Id of the logged in BackOffice User</returns>
-        public IProfile GetCurrentBackOfficeUser()
-        {
-            var context = HttpContext.Current;
-            Mandate.That<Exception>(context != null);
-
-            var wrapper = new HttpContextWrapper(context);
-            return GetCurrentBackOfficeUser(wrapper);
-        }
-
-        /// <summary>
         /// Gets an IProfile by User Id.
         /// </summary>
         /// <param name="id">Id of the User to retrieve</param>
@@ -101,6 +38,35 @@ namespace Umbraco.Core.Services
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
             {
                 return repository.GetProfileById(id);
+            }
+        }
+
+        public IMembershipUser CreateUser(string name, string login, string password, IUserType userType)
+        {
+            return CreateUser(name, login, password, userType.Id);
+        }
+
+        public IMembershipUser CreateUser(string name, string login, string password, int userTypeId)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateUserRepository(uow))
+            {
+                var dto = new UserDto
+                              {
+                                  UserLanguage = Umbraco.Core.Configuration.GlobalSettings.DefaultUILanguage,
+                                  Login = login,
+                                  UserName = name,
+                                  Email = string.Empty,
+                                  Type = short.Parse(userTypeId.ToString(CultureInfo.InvariantCulture)),
+                                  ContentStartId = -1,
+                                  MediaStartId = -1,
+                                  Password = password
+                              };
+
+                //TODO Check if user exists and throw?
+                uow.Database.Insert(dto);
+
+                return new User(new UserType());
             }
         }
 
