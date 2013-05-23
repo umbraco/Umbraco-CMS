@@ -301,7 +301,7 @@ namespace Umbraco.Core.Services
             using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
             {
                 var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
-                var contents = repository.GetByQuery(query);
+                var contents = repository.GetByQuery(query).OrderBy(x => x.SortOrder);
 
                 return contents;
             }
