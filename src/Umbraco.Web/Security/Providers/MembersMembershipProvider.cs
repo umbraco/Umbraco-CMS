@@ -1,42 +1,32 @@
-﻿using System;
-using System.Security.Cryptography;
-using System.Text;
-using System.Web.Security;
+﻿using System.Web.Security;
+using Umbraco.Core;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.Models.Membership.Providers
+namespace Umbraco.Web.Security.Providers
 {
     /// <summary>
-    /// Custom Membership Provider for Umbraco Users (User authentication for Umbraco Backend CMS)  
+    /// Custom Membership Provider for Umbraco Members (User authentication for Umbraco based Websites)  
     /// </summary>
-    internal class UsersMembershipProvider : MembershipProvider
+    internal class MembersMembershipProvider : MembershipProvider
     {
-        private IUserService _userService;
+        private IMemberService _memberService;
 
-        protected IUserService MemberService
+        protected IMemberService MemberService
         {
             get
             {
-                if (_userService == null)
+                if (_memberService == null)
                 {
-                    _userService = ApplicationContext.Current.Services.UserService;
+                    _memberService = ApplicationContext.Current.Services.MemberService;
                 }
 
-                return _userService;
+                return _memberService;
             }
         }
 
         public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer,
                                                   bool isApproved, object providerUserKey, out MembershipCreateStatus status)
         {
-            //Assuming the password is hashed
-            var hash = new HMACSHA1();
-            hash.Key = Encoding.Unicode.GetBytes(password);
-            var encodedPassword = Convert.ToBase64String(hash.ComputeHash(Encoding.Unicode.GetBytes(password)));
-
-            //var user = _userService.CreateUser();
-            //status = MembershipCreateStatus.Success;
-            //return new UmbracoMembershipUser<User>(user);
             throw new System.NotImplementedException();
         }
 

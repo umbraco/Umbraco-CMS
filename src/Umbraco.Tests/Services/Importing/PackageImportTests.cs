@@ -225,6 +225,29 @@ namespace Umbraco.Tests.Services.Importing
         }
 
         [Test]
+        public void PackagingService_Can_Export_Single_DocType()
+        {
+            // Arrange
+            string strXml = ImportResources.SingleDocType;
+            var docTypeElement = XElement.Parse(strXml);
+            var packagingService = ServiceContext.PackagingService;
+
+            // Act
+            var contentTypes = packagingService.ImportContentTypes(docTypeElement);
+            var contentType = contentTypes.FirstOrDefault();
+            var element = packagingService.Export(contentType);
+
+            // Assert
+            Assert.That(element, Is.Not.Null);
+            Assert.That(element.Element("Info"), Is.Not.Null);
+            Assert.That(element.Element("Structure"), Is.Not.Null);
+            Assert.That(element.Element("GenericProperties"), Is.Not.Null);
+            Assert.That(element.Element("Tabs"), Is.Not.Null);
+            //Can't compare this XElement because the templates are not imported (they don't exist)
+            //Assert.That(XNode.DeepEquals(docTypeElement, element), Is.True);
+        }
+
+        [Test]
         public void PackagingService_Can_ReImport_Single_DocType()
         {
             // Arrange

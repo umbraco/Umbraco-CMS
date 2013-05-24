@@ -196,8 +196,6 @@
     <Compile Include="Models\IDictionaryTranslation.cs" />
     <Compile Include="Models\IFile.cs" />
     <Compile Include="Models\ILanguage.cs" />
-    <Compile Include="Models\Membership\Providers\MembersMembershipProvider.cs" />
-    <Compile Include="Models\Membership\Providers\UsersMembershipProvider.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipUser.cs" />
     <Compile Include="Models\ServerRegistration.cs" />
     <Compile Include="Models\ITemplate.cs" />
