@@ -530,16 +530,6 @@
     <Compile Include="Profiling\ProfilerExtensions.cs" />
     <Compile Include="Profiling\ProfilerResolver.cs" />
     <Compile Include="Profiling\WebProfiler.cs" />
-    <Compile Include="PropertyEditors\Attributes\PropertyEditorAttribute.cs" />
-    <Compile Include="PropertyEditors\Attributes\ShowLabelAttribute.cs" />
-    <Compile Include="PropertyEditors\BlankPreValueModel.cs" />
-    <Compile Include="PropertyEditors\EditorModel.cs" />
-    <Compile Include="PropertyEditors\EditorModel`T.cs" />
-    <Compile Include="PropertyEditors\IValueModel.cs" />
-    <Compile Include="PropertyEditors\PreValueDefinition.cs" />
-    <Compile Include="PropertyEditors\PreValueModel.cs" />
-    <Compile Include="PropertyEditors\PropertyEditor.cs" />
-    <Compile Include="PropertyEditors\PropertyEditor`T.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dynamics\ClassFactory.cs" />
@@ -800,6 +790,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Packaging\" />
+    <Folder Include="PropertyEditors\Attributes\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
