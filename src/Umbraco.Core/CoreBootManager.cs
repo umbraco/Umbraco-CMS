@@ -212,7 +212,18 @@ namespace Umbraco.Core
 		/// Create the resolvers
 		/// </summary>
 		protected virtual void InitializeResolvers()
-		{           
+		{
+
+            //setup custom resolvers... this is only temporary until we move into the umbraco core
+            PropertyEditorResolver.Current = new PropertyEditorResolver(() => PluginManager.Current.ResolvePropertyEditors());
+            //setup the validators resolver with our predefined validators
+            ValidatorsResolver.Current = new ValidatorsResolver(new[]
+                {
+                    new Lazy<Type>(() => typeof (RequiredValueValidator)),
+                    new Lazy<Type>(() => typeof (RegexValueValidator)),
+                    new Lazy<Type>(() => typeof (ValueTypeValueValidator)),
+                    new Lazy<Type>(() => typeof (DelimitedValueValidator))
+                });
 
             //by default we'll use the standard configuration based sync
             ServerRegistrarResolver.Current = new ServerRegistrarResolver(

@@ -149,6 +149,7 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data">
       <Name>System.Data</Name>
@@ -168,6 +169,7 @@
     <Reference Include="System.Net.Http.WebRequest, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.WebRequest.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -288,6 +290,15 @@
     <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />
+    <Compile Include="Models\ContentEditing\ContentItemBase.cs" />
+    <Compile Include="Models\ContentEditing\ContentItemDisplay.cs" />
+    <Compile Include="Models\ContentEditing\ContentItemDto.cs" />
+    <Compile Include="Models\ContentEditing\ContentItemFile.cs" />
+    <Compile Include="Models\ContentEditing\ContentItemSave.cs" />
+    <Compile Include="Models\ContentEditing\ContentPropertyBase.cs" />
+    <Compile Include="Models\ContentEditing\ContentPropertyCollection.cs" />
+    <Compile Include="Models\ContentEditing\ContentPropertyDisplay.cs" />
+    <Compile Include="Models\ContentEditing\ContentPropertyDto.cs" />
     <Compile Include="Standalone\ServiceContextManager.cs" />
     <Compile Include="Standalone\StandaloneApplication.cs" />
     <Compile Include="Standalone\StandaloneBootManager.cs" />
@@ -382,6 +393,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="UrlHelperExtensions.cs" />
+    <Compile Include="WebApi\ContentItemBinder.cs" />
+    <Compile Include="WebApi\Filters\ContentItemValidationFilterAttribute.cs" />
+    <Compile Include="WebApi\Filters\FileUploadCleanupFilterAttribute.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerResolver.cs" />
@@ -630,6 +644,7 @@
     </Compile>
     <Compile Include="WebApi\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoAuthorizedApiController.cs" />
+    <Compile Include="WebApi\ValidationFilterAttribute.cs" />
     <Compile Include="WebBootManager.cs" />
     <Compile Include="Routing\LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />

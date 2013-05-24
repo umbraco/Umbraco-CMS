@@ -49,6 +49,9 @@
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.ComponentModel.DataAnnotations.dll</HintPath>
+    </Reference>
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
@@ -163,6 +166,15 @@
     <Compile Include="Events\SaveEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
+    <Compile Include="Manifest\ManifestBuilder.cs" />
+    <Compile Include="Manifest\ManifestParser.cs" />
+    <Compile Include="Manifest\PackageManifest.cs" />
+    <Compile Include="Manifest\PropertyEditorConverter.cs" />
+    <Compile Include="Manifest\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Media\MediaSubfolderCounter.cs" />
     <Compile Include="Models\ContentBase.cs" />
     <Compile Include="Models\ContentExtensions.cs" />
@@ -532,6 +544,20 @@
     <Compile Include="Profiling\ProfilerExtensions.cs" />
     <Compile Include="Profiling\ProfilerResolver.cs" />
     <Compile Include="Profiling\WebProfiler.cs" />
+    <Compile Include="PropertyEditors\DelimitedValueValidator.cs" />
+    <Compile Include="PropertyEditors\ManifestValidator.cs" />
+    <Compile Include="PropertyEditors\ManifestValueValidator.cs" />
+    <Compile Include="PropertyEditors\PreValueEditor.cs" />
+    <Compile Include="PropertyEditors\PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorAttribute.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorResolver.cs" />
+    <Compile Include="PropertyEditors\RegexValueValidator.cs" />
+    <Compile Include="PropertyEditors\RequiredValueValidator.cs" />
+    <Compile Include="PropertyEditors\ValidatorBase.cs" />
+    <Compile Include="PropertyEditors\ValidatorsResolver.cs" />
+    <Compile Include="PropertyEditors\ValueEditor.cs" />
+    <Compile Include="PropertyEditors\ValueTypeValueValidator.cs" />
+    <Compile Include="PropertyEditors\ValueValidatorAttribute.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dynamics\ClassFactory.cs" />
@@ -666,6 +692,7 @@
     <Compile Include="Serialization\IFormatter.cs" />
     <Compile Include="Serialization\ISerializer.cs" />
     <Compile Include="Serialization\IStreamedResult.cs" />
+    <Compile Include="Serialization\JsonCreationConverter.cs" />
     <Compile Include="Serialization\JsonNetSerializer.cs" />
     <Compile Include="Serialization\SerializationExtensions.cs" />
     <Compile Include="Serialization\SerializationService.cs" />
@@ -788,11 +815,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Manifest\Main.js" />
     <Content Include="Strings\Notes.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Packaging\" />
-    <Folder Include="PropertyEditors\Attributes\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Manifest\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

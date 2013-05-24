@@ -425,6 +425,14 @@ namespace Umbraco.Core
         private IEnumerable<Assembly> _assemblies;
 
         /// <summary>
+        /// Returns all found property editors
+        /// </summary>
+        internal IEnumerable<Type> ResolvePropertyEditors()
+        {
+            return ResolveTypes<PropertyEditor>();
+        } 
+
+        /// <summary>
         /// Returns all available IApplicationStartupHandler objects
         /// </summary>
         /// <returns></returns>
