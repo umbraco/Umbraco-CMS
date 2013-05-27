@@ -11,14 +11,12 @@ namespace Umbraco.Web.UI.JavaScript
     /// main Umbraco initialization output.
     /// </summary>
     internal class RequireJsInit
-    {
-        private readonly DirectoryInfo _pluginsDir;
+    {        
         private readonly ManifestParser _parser;
 
-        public RequireJsInit(DirectoryInfo pluginsDir)
+        public RequireJsInit(ManifestParser parser)
         {
-            _pluginsDir = pluginsDir;
-            _parser = new ManifestParser(_pluginsDir);
+            _parser = parser;
         }
 
         private static readonly Regex Token = new Regex("(\"##\\w+?##\")", RegexOptions.Compiled);

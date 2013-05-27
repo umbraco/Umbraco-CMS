@@ -292,6 +292,9 @@
     <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />
+    <Compile Include="Models\Mapping\ContentModelMapper.cs" />
+    <Compile Include="Mvc\BackOfficeController.cs" />
+    <Compile Include="Mvc\BackOfficeScriptsController.cs" />
     <Compile Include="UI\JavaScript\RequireJsInit.cs" />
     <Compile Include="UI\JavaScript\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -402,6 +405,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="UrlHelperExtensions.cs" />
+    <Compile Include="WebApi\ContentEditorApiController.cs" />
     <Compile Include="WebApi\ContentItemBinder.cs" />
     <Compile Include="WebApi\Filters\ContentItemValidationFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\FileUploadCleanupFilterAttribute.cs" />

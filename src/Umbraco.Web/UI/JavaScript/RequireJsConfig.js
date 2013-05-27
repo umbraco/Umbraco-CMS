@@ -1,13 +1,7 @@
-﻿{
-    
-    /*NOTE: This is actually /Belle/js because we are loading in requireJs from /Belle already*/
-    baseUrl: 'js',
-    
+﻿{   
     waitSeconds: 120,
     paths: {
         jquery: '../lib/jquery/jquery-1.8.2.min',
-        jqueryCookie: '../lib/jquery/jquery.cookie',
-        bootstrap: '../lib/bootstrap/js/bootstrap',
         underscore: '../lib/underscore/underscore',
         angular: '../lib/angular/angular',
         angularResource: '../lib/angular/angular-resource',
@@ -15,7 +9,7 @@
         text: '../lib/require/text',
         async: '../lib/require/async',
         namespaceMgr: '../lib/Umbraco/NamespaceManager',
-        myApp: '../../../Content/JavaScript/myApp'
+        myApp: '../js/myApp'
     },
     shim: {
         'angular' : {'exports' : 'angular'},

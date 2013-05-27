@@ -17,7 +17,7 @@ namespace Umbraco.Web.UI.JavaScript
 
         internal static string Parse(Dictionary<string, object> items)
         {
-            var vars = JsResources.ServerVariables;
+            var vars = Resources.ServerVariables;
 
             if (Parsing != null)
             {

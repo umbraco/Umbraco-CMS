@@ -147,6 +147,16 @@ namespace Umbraco.Web
         {
             var umbracoPath = GlobalSettings.UmbracoMvcArea;
 
+            //Create the back office route
+            // TODO: Change this to the normal route, currently it is /Belle for dev testing
+            var backOfficeRoute = RouteTable.Routes.MapRoute(
+                "Umbraco_back_office",
+                //umbracoPath + "/{action}/{id}",
+                "Belle/{action}/{id}",
+                new { controller = "BackOffice", action = "Default", id = UrlParameter.Optional },
+                new[]{"Umbraco.Web.Mvc"});
+            backOfficeRoute.DataTokens.Add("area", umbracoPath);
+
             //Create the front-end route
             var defaultRoute = RouteTable.Routes.MapRoute(
                 "Umbraco_default",

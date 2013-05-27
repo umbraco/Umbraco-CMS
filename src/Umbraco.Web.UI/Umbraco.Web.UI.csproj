@@ -393,11 +393,11 @@
       <DependentUpon>Title.ascx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Umbraco\controls\ContentTypeControlNew.ascx.cs">
+    <Compile Include="Umbraco\Controls\ContentTypeControlNew.ascx.cs">
       <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Umbraco\controls\ContentTypeControlNew.ascx.designer.cs">
+    <Compile Include="Umbraco\Controls\ContentTypeControlNew.ascx.designer.cs">
       <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Create.aspx.cs">
@@ -497,11 +497,11 @@
     <Compile Include="Umbraco\Search\QuickSearch.ascx.designer.cs">
       <DependentUpon>QuickSearch.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\settings\EditNodeTypeNew.aspx.cs">
+    <Compile Include="Umbraco\Settings\EditNodeTypeNew.aspx.cs">
       <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Umbraco\settings\EditNodeTypeNew.aspx.designer.cs">
+    <Compile Include="Umbraco\Settings\EditNodeTypeNew.aspx.designer.cs">
       <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Settings\EditTemplate.aspx.cs">
@@ -510,18 +510,18 @@
     <Compile Include="Umbraco\Settings\EditTemplate.aspx.designer.cs">
       <DependentUpon>editTemplate.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\settings\Stylesheet\editstylesheet.aspx.cs">
+    <Compile Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx.cs">
       <DependentUpon>editstylesheet.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Umbraco\settings\Stylesheet\editstylesheet.aspx.designer.cs">
+    <Compile Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx.designer.cs">
       <DependentUpon>editstylesheet.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\settings\Stylesheet\Property\EditStyleSheetProperty.aspx.cs">
+    <Compile Include="Umbraco\Settings\Stylesheet\Property\EditStyleSheetProperty.aspx.cs">
       <DependentUpon>EditStyleSheetProperty.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Umbraco\settings\Stylesheet\Property\EditStyleSheetProperty.aspx.designer.cs">
+    <Compile Include="Umbraco\Settings\Stylesheet\Property\EditStyleSheetProperty.aspx.designer.cs">
       <DependentUpon>EditStyleSheetProperty.aspx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Settings\Views\EditView.aspx.cs">
@@ -547,6 +547,7 @@
     </Compile>
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
+    <Content Include="Umbraco\Js\umbraco.app.js" />
     <Content Include="Umbraco\Xslt\Web.config">
       <SubType>
       </SubType>
@@ -871,9 +872,9 @@
     <Content Include="Umbraco_Client\Installer\Images\pbar.gif" />
     <Content Include="Umbraco_Client\Installer\Js\PackageInstaller.js" />
     <Content Include="Umbraco_Client\Splitbutton\InsertMacroSplitButton.js" />
-    <Content Include="Umbraco_Client\tablesorting\img\asc.gif" />
-    <Content Include="Umbraco_Client\tablesorting\img\desc.gif" />
-    <Content Include="Umbraco_Client\tablesorting\jquery.tablesorter.min.js" />
+    <Content Include="Umbraco_Client\Tablesorting\img\asc.gif" />
+    <Content Include="Umbraco_Client\Tablesorting\img\desc.gif" />
+    <Content Include="Umbraco_Client\Tablesorting\jquery.tablesorter.min.js" />
     <Content Include="Umbraco_Client\Splitbutton\jquery.splitbutton.js" />
     <Content Include="Umbraco_Client\Tablesorting\Img\asc.gif" />
     <Content Include="Umbraco_Client\Tablesorting\Img\desc.gif" />
@@ -2073,6 +2074,8 @@
     </Content>
     <Content Include="Umbraco\Scripting\templates\cshtml\MultinodeTree-picker.cshtml" />
     <Content Include="Umbraco\Scripting\templates\cshtml\TwitterFeed.cshtml" />
+    <Content Include="Umbraco\Views\Default.cshtml" />
+    <Content Include="Umbraco\Views\Web.config" />
     <None Include="Umbraco_client\CodeMirror\js\mode\coffeescript\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\pascal\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\perl\LICENSE" />
@@ -2530,6 +2533,7 @@
     <Folder Include="MasterPages\" />
     <Folder Include="Media\" />
     <Folder Include="Scripts\" />
+    <Folder Include="Umbraco\lib\" />
     <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
     <Folder Include="Umbraco_Client\Tags\images\" />
     <Folder Include="UserControls\" />

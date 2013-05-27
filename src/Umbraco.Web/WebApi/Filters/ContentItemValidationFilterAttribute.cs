@@ -7,6 +7,7 @@ using System.Web.Http.Filters;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Models.Mapping;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -20,14 +21,16 @@ namespace Umbraco.Web.WebApi.Filters
     internal class ContentItemValidationFilterAttribute : ActionFilterAttribute
     {
         private readonly ApplicationContext _applicationContext;
+        private readonly ContentModelMapper _contentMapper;
 
-        public ContentItemValidationFilterAttribute(ApplicationContext applicationContext)
+        public ContentItemValidationFilterAttribute(ApplicationContext applicationContext, ContentModelMapper contentMapper)
         {
             _applicationContext = applicationContext;
+            _contentMapper = contentMapper;
         }
 
         public ContentItemValidationFilterAttribute()
-            : this(ApplicationContext.Current)
+            : this(ApplicationContext.Current, new ContentModelMapper(ApplicationContext.Current))
         {
             
         }
@@ -79,19 +82,7 @@ namespace Umbraco.Web.WebApi.Filters
                 return false;
             }
 
-            //TODO: Convert this over to a mapping engine, just need people to vote on podio for my question about that.
-            found = new ContentItemDto
-                {
-                    Id = item.Id,
-                    Properties = item.Properties.Select(p => new ContentPropertyDto
-                        {
-                            Alias = p.Alias,
-                            Description = p.PropertyType.Description,
-                            Label = p.PropertyType.Name,
-                            Id = p.Id,
-                            DataType = _applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(p.PropertyType.DataTypeDefinitionId)
-                        }).ToList()
-                };
+            found = _contentMapper.ToContentItemDto(item);
             return true;
         }
 
