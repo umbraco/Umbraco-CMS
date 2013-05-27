@@ -292,6 +292,12 @@
     <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />
+    <Compile Include="UI\JavaScript\RequireJsInit.cs" />
+    <Compile Include="UI\JavaScript\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Models\ContentEditing\ContentItemBase.cs" />
     <Compile Include="Models\ContentEditing\ContentItemDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentItemDto.cs" />
@@ -374,6 +380,7 @@
     <Compile Include="Search\LuceneIndexerExtensions.cs" />
     <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
+    <Compile Include="UI\JavaScript\ServerVariablesParser.cs" />
     <Compile Include="umbraco.presentation\LegacyClasses.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -1794,6 +1801,10 @@
     <Compile Include="WebServices\UmbracoWebService.cs">
       <SubType>Component</SubType>
     </Compile>
+    <EmbeddedResource Include="UI\JavaScript\Main.js" />
+    <EmbeddedResource Include="UI\JavaScript\RequireJsConfig.js" />
+    <EmbeddedResource Include="UI\JavaScript\RequireJsInitialize.js" />
+    <EmbeddedResource Include="UI\JavaScript\ServerVariables.js" />
     <Content Include="umbraco.presentation\umbracobase\readme.txt" />
     <Content Include="umbraco.presentation\umbraco\controls\Tree\CustomTreeService.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx" />
@@ -2010,6 +2021,10 @@
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <EmbeddedResource Include="UI\JavaScript\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Mvc\Strings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>

@@ -16,7 +16,6 @@ namespace Umbraco.Core.Manifest
     internal class ManifestParser
     {
         private readonly DirectoryInfo _pluginsDir;
-        private static readonly Regex Token = new Regex("(\"##\\w+?##\")", RegexOptions.Compiled);
         //used to strip comments
         private static readonly Regex Comments = new Regex("(/\\*.*\\*/)", RegexOptions.Compiled);
 
@@ -45,21 +44,6 @@ namespace Umbraco.Core.Manifest
             //get all Manifest.js files in the appropriate folders
             var manifestFileContents = GetAllManfifestFileContents(_pluginsDir);
             return CreateManifests(manifestFileContents.ToArray());
-        }
-
-        /// <summary>
-        /// Processes all found manifest files and outputs the main.js file containing all plugin manifests
-        /// </summary>
-        public string GetJavascriptInitialization(JObject umbracoConfig, JArray umbracoInit)
-        {                       
-
-            foreach (var m in GetManifests())
-            {
-                MergeJObjects(umbracoConfig, m.JavaScriptConfig, true);
-                MergeJArrays(umbracoInit, m.JavaScriptInitialize);
-            }
-
-            return ParseMain(umbracoConfig.ToString(), umbracoInit.ToString());
         }
 
         /// <summary>
@@ -250,42 +234,6 @@ namespace Umbraco.Core.Manifest
             }
         }
 
-        ///// <summary>
-        ///// Returns the default config as a JObject
-        ///// </summary>
-        ///// <returns></returns>
-        //internal static JObject GetDefaultConfig()
-        //{
-        //    var config = JsResources.RequireJsConfig;
-        //    var jObj = JsonConvert.DeserializeObject<JObject>(config);
-        //    return jObj;
-        //}
-
-        ///// <summary>
-        ///// Returns the default config as a JArray
-        ///// </summary>
-        ///// <returns></returns>
-        //internal static JArray GetDefaultInitialization()
-        //{
-        //    var init = JsResources.RequireJsInitialize;
-        //    var jArr = JsonConvert.DeserializeObject<JArray>(init);
-        //    return jArr;
-        //}
-
-        /// <summary>
-        /// Parses the JsResources.Main and replaces the replacement tokens accordingly.
-        /// </summary>
-        /// <param name="replacements"></param>
-        /// <returns></returns>
-        internal static string ParseMain(params string[] replacements)
-        {
-            var count = 0;
-            return Token.Replace(Resources.Main, match =>
-                {
-                    var replaced = replacements[count];
-                    count++;
-                    return replaced;
-                });
-        }
+        
     }
 }

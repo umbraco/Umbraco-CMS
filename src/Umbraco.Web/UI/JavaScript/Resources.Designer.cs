@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Umbraco.Core.Manifest {
+namespace Umbraco.Web.UI.JavaScript {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Manifest {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Umbraco.Core.Manifest.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Umbraco.Web.UI.JavaScript.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -78,6 +78,60 @@ namespace Umbraco.Core.Manifest {
         internal static string Main {
             get {
                 return ResourceManager.GetString("Main", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///    
+        ///    /*NOTE: This is actually /Belle/js because we are loading in requireJs from /Belle already*/
+        ///    baseUrl: &apos;js&apos;,
+        ///    
+        ///    waitSeconds: 120,
+        ///    paths: {
+        ///        jquery: &apos;../lib/jquery/jquery-1.8.2.min&apos;,
+        ///        jqueryCookie: &apos;../lib/jquery/jquery.cookie&apos;,
+        ///        bootstrap: &apos;../lib/bootstrap/js/bootstrap&apos;,
+        ///        underscore: &apos;../lib/underscore/underscore&apos;,
+        ///        angular: &apos;../lib/angular/angular&apos;,
+        ///        angularResource: &apos;../lib/angular/angular-resource&apos;,
+        ///        statemanager: &apos;../ [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string RequireJsConfig {
+            get {
+                return ResourceManager.GetString("RequireJsConfig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [
+        ///    &apos;angular&apos;,
+        ///    &apos;jquery&apos;,
+        ///    &apos;underscore&apos;,
+        ///    &apos;namespaceMgr&apos;,
+        ///    &apos;myApp&apos;
+        ///].
+        /// </summary>
+        internal static string RequireJsInitialize {
+            get {
+                return ResourceManager.GetString("RequireJsInitialize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to //TODO: This would be nicer as an angular module so it can be injected into stuff... that&apos;d be heaps nicer, but
+        ///// how to do that when this is not a regular JS file, it is a server side JS file and RequireJS seems to only want
+        ///// to force load JS files ?
+        ///
+        /////create the namespace (NOTE: This loads before any dependencies so we don&apos;t have a namespace mgr so we just create it manually)
+        ///var Umbraco = {};
+        ///Umbraco.Sys = {};
+        /////define a global static object
+        ///Umbraco.Sys.ServerVariables = ##Variables## ;.
+        /// </summary>
+        internal static string ServerVariables {
+            get {
+                return ResourceManager.GetString("ServerVariables", resourceCulture);
             }
         }
     }
