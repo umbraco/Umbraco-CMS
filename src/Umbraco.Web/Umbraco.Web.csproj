@@ -1768,6 +1768,7 @@
     <Compile Include="WebServices\BulkPublishController.cs" />
     <Compile Include="WebServices\CoreStringsController.cs" />
     <Compile Include="WebServices\DomainsApiController.cs" />
+    <Compile Include="WebServices\EmbedMediaService.cs" />
     <Compile Include="WebServices\ExamineManagementApiController.cs" />
     <Compile Include="WebServices\FolderBrowserService.cs" />
     <Compile Include="WebServices\UmbracoAuthorizedHttpHandler.cs" />
