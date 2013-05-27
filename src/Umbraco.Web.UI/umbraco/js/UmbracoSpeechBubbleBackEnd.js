@@ -34,7 +34,7 @@ UmbracoSpeechBubble.prototype.ShowMessage = function (icon, header, message, don
         if (!dontAutoHide) {
             jQuery("#" + this.id).fadeIn("slow").animate({ opacity: 1.0 }, 5000).fadeOut("fast");
         } else {
-            speechBubble.jQuery(".speechClose").show();
+            jQuery(".speechClose").show();
             jQuery("#" + this.id).fadeIn("slow");
         }
     } else {
