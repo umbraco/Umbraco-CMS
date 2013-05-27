@@ -29,9 +29,8 @@
                 
                 //bind save shortcut
                 UmbClientMgr.appActions().bindSaveShortCut();
-            });
-        })(jQuery);
-        
+            })(jQuery);
+
     </script>
 </asp:Content>
 
