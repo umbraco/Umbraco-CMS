@@ -12,19 +12,11 @@ namespace Umbraco.Web.Security.Providers
     /// </summary>
     internal class UsersMembershipProvider : MembershipProvider
     {
-        private IUserService _userService;
+        private IMembershipUserService _userService;
 
-        protected IUserService MemberService
+        protected IMembershipUserService UserService
         {
-            get
-            {
-                if (_userService == null)
-                {
-                    _userService = ApplicationContext.Current.Services.UserService;
-                }
-
-                return _userService;
-            }
+            get { return _userService ?? (_userService = ApplicationContext.Current.Services.UserService); }
         }
 
         public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer,
