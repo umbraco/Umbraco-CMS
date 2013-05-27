@@ -56,8 +56,13 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
-        /// that this Content is based on.
+        /// that this Content should based on.
         /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IContent without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new content objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
         /// <param name="name">Name of the Content object</param>
         /// <param name="parentId">Id of Parent for the new Content</param>
         /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
@@ -66,7 +71,7 @@ namespace Umbraco.Core.Services
         public IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = 0)
         {
             var contentType = FindContentTypeByAlias(contentTypeAlias);
-            var content = new Content(name, parentId, contentType); ;
+            var content = new Content(name, parentId, contentType);
 
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
             {
@@ -86,8 +91,13 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
-        /// that this Content is based on.
+        /// that this Content should based on.
         /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IContent without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new content objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
         /// <param name="name">Name of the Content object</param>
         /// <param name="parent">Parent <see cref="IContent"/> object for the new Content</param>
         /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
@@ -106,6 +116,86 @@ namespace Umbraco.Core.Services
 
             content.CreatorId = userId;
             content.WriterId = userId;
+
+            Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parent), this);
+
+            Audit.Add(AuditTypes.New, "", content.CreatorId, content.Id);
+
+            return content;
+        }
+
+        /// <summary>
+        /// Creates and saves an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+        /// that this Content should based on.
+        /// </summary>
+        /// <remarks>
+        /// This method returns an <see cref="IContent"/> object that has been persisted to the database
+        /// and therefor has an identity.
+        /// </remarks>
+        /// <param name="name">Name of the Content object</param>
+        /// <param name="parentId">Id of Parent for the new Content</param>
+        /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
+        /// <returns><see cref="IContent"/></returns>
+        public IContent CreateContentWithIdentity(string name, int parentId, string contentTypeAlias, int userId = 0)
+        {
+            var contentType = FindContentTypeByAlias(contentTypeAlias);
+            var content = new Content(name, parentId, contentType);
+
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
+            {
+                content.WasCancelled = true;
+                return content;
+            }
+
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                content.CreatorId = userId;
+                content.WriterId = userId;
+                repository.AddOrUpdate(content);
+                uow.Commit();
+            }
+
+            Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this);
+
+            Audit.Add(AuditTypes.New, "", content.CreatorId, content.Id);
+
+            return content;
+        }
+
+        /// <summary>
+        /// Creates and saves an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+        /// that this Content should based on.
+        /// </summary>
+        /// <remarks>
+        /// This method returns an <see cref="IContent"/> object that has been persisted to the database
+        /// and therefor has an identity.
+        /// </remarks>
+        /// <param name="name">Name of the Content object</param>
+        /// <param name="parent">Parent <see cref="IContent"/> object for the new Content</param>
+        /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
+        /// <returns><see cref="IContent"/></returns>
+        public IContent CreateContentWithIdentity(string name, IContent parent, string contentTypeAlias, int userId = 0)
+        {
+            var contentType = FindContentTypeByAlias(contentTypeAlias);
+            var content = new Content(name, parent, contentType);
+
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parent), this))
+            {
+                content.WasCancelled = true;
+                return content;
+            }
+
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                content.CreatorId = userId;
+                content.WriterId = userId;
+                repository.AddOrUpdate(content);
+                uow.Commit();
+            }
 
             Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parent), this);
 
@@ -1347,7 +1437,7 @@ namespace Umbraco.Core.Services
             using (new WriteLock(Locker))
             {
                 //Has this content item previously been published? If so, we don't need to refresh the children
-                var previouslyPublished = HasPublishedVersion(content.Id);
+                var previouslyPublished = content.HasIdentity && HasPublishedVersion(content.Id);
                 var validForPublishing = CheckAndLogIsPublishable(content) && CheckAndLogIsValid(content);
 
                 //Publish and then update the database with new status
@@ -1559,7 +1649,7 @@ namespace Umbraco.Core.Services
                 var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
                 var types = repository.GetByQuery(query);
 
-                if (!types.Any())
+                if (types.Any() == false)
                     throw new Exception(
                         string.Format("No ContentType matching the passed in Alias: '{0}' was found",
                                       contentTypeAlias));

@@ -324,6 +324,7 @@ namespace Umbraco.Core.Services
                     var template = _fileService.GetTemplate(alias);
                     if (template != null)
                     {
+                        if(allowedTemplates.Any(x => x.Id == template.Id)) continue;
                         allowedTemplates.Add(template);
                     }
                     else

@@ -37,8 +37,13 @@ namespace Umbraco.Core.Services
 
 	    /// <summary>
 	    /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
-	    /// that this Media is based on.
+        /// that this Media should based on.
 	    /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IMedia without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new media objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
         /// <param name="name">Name of the Media object</param>
 	    /// <param name="parentId">Id of Parent for the new Media item</param>
 	    /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
@@ -46,25 +51,7 @@ namespace Umbraco.Core.Services
 	    /// <returns><see cref="IMedia"/></returns>
 	    public IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = 0)
 	    {
-            IMediaType mediaType;
-	        
-	        var uow = _uowProvider.GetUnitOfWork();
-	        using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
-	        {
-	            var query = Query<IMediaType>.Builder.Where(x => x.Alias == mediaTypeAlias);
-	            var mediaTypes = repository.GetByQuery(query);
-
-	            if (!mediaTypes.Any())
-	                throw new Exception(string.Format("No MediaType matching the passed in Alias: '{0}' was found",
-	                                                  mediaTypeAlias));
-
-	            mediaType = mediaTypes.First();
-
-	            if (mediaType == null)
-	                throw new Exception(string.Format("MediaType matching the passed in Alias: '{0}' was null",
-	                                                  mediaTypeAlias));
-	        }
-
+            var mediaType = FindMediaTypeByAlias(mediaTypeAlias);
 	        var media = new Models.Media(name, parentId, mediaType);
 
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this))
@@ -84,8 +71,13 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
-        /// that this Media is based on.
+        /// that this Media should based on.
         /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IMedia without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new media objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
         /// <param name="name">Name of the Media object</param>
         /// <param name="parent">Parent <see cref="IMedia"/> for the new Media item</param>
         /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
@@ -93,25 +85,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia CreateMedia(string name, IMedia parent, string mediaTypeAlias, int userId = 0)
         {
-            IMediaType mediaType;
-
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
-            {
-                var query = Query<IMediaType>.Builder.Where(x => x.Alias == mediaTypeAlias);
-                var mediaTypes = repository.GetByQuery(query);
-
-                if (!mediaTypes.Any())
-                    throw new Exception(string.Format("No MediaType matching the passed in Alias: '{0}' was found",
-                                                      mediaTypeAlias));
-
-                mediaType = mediaTypes.First();
-
-                if (mediaType == null)
-                    throw new Exception(string.Format("MediaType matching the passed in Alias: '{0}' was null",
-                                                      mediaTypeAlias));
-            }
-
+            var mediaType = FindMediaTypeByAlias(mediaTypeAlias);
             var media = new Models.Media(name, parent, mediaType);
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parent), this))
             {
@@ -120,6 +94,94 @@ namespace Umbraco.Core.Services
             }
 
             media.CreatorId = userId;
+
+            Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parent), this);
+
+            Audit.Add(AuditTypes.New, "", media.CreatorId, media.Id);
+
+            return media;
+        }
+
+        /// <summary>
+        /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
+        /// that this Media should based on.
+        /// </summary>
+        /// <remarks>
+        /// This method returns an <see cref="IMedia"/> object that has been persisted to the database
+        /// and therefor has an identity.
+        /// </remarks>
+        /// <param name="name">Name of the Media object</param>
+        /// <param name="parentId">Id of Parent for the new Media item</param>
+        /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
+        /// <param name="userId">Optional id of the user creating the media item</param>
+        /// <returns><see cref="IMedia"/></returns>
+        public IMedia CreateMediaWithIdentity(string name, int parentId, string mediaTypeAlias, int userId = 0)
+        {
+            var mediaType = FindMediaTypeByAlias(mediaTypeAlias);
+            var media = new Models.Media(name, parentId, mediaType);
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this))
+            {
+                media.WasCancelled = true;
+                return media;
+            }
+
+            using (new WriteLock(Locker))
+            {
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+                {
+                    media.CreatorId = userId;
+                    repository.AddOrUpdate(media);
+                    uow.Commit();
+
+                    var xml = media.ToXml();
+                    CreateAndSaveMediaXml(xml, media.Id, uow.Database);
+                }
+            }
+
+            Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId), this);
+
+            Audit.Add(AuditTypes.New, "", media.CreatorId, media.Id);
+
+            return media;
+        }
+
+        /// <summary>
+        /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
+        /// that this Media should based on.
+        /// </summary>
+        /// <remarks>
+        /// This method returns an <see cref="IMedia"/> object that has been persisted to the database
+        /// and therefor has an identity.
+        /// </remarks>
+        /// <param name="name">Name of the Media object</param>
+        /// <param name="parent">Parent <see cref="IMedia"/> for the new Media item</param>
+        /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
+        /// <param name="userId">Optional id of the user creating the media item</param>
+        /// <returns><see cref="IMedia"/></returns>
+        public IMedia CreateMediaWithIdentity(string name, IMedia parent, string mediaTypeAlias, int userId = 0)
+        {
+            var mediaType = FindMediaTypeByAlias(mediaTypeAlias);
+            var media = new Models.Media(name, parent, mediaType);
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parent), this))
+            {
+                media.WasCancelled = true;
+                return media;
+            }
+
+            using (new WriteLock(Locker))
+            {
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+                {
+                    media.CreatorId = userId;
+                    repository.AddOrUpdate(media);
+                    uow.Commit();
+
+                    var xml = media.ToXml();
+                    CreateAndSaveMediaXml(xml, media.Id, uow.Database);
+                }
+            }
 
             Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parent), this);
 
@@ -730,6 +792,28 @@ namespace Umbraco.Core.Services
             var poco = new ContentXmlDto { NodeId = id, Xml = xml.ToString(SaveOptions.None) };
             var exists = db.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = id }) != null;
             int result = exists ? db.Update(poco) : Convert.ToInt32(db.Insert(poco));
+        }
+
+        private IMediaType FindMediaTypeByAlias(string mediaTypeAlias)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
+            {
+                var query = Query<IMediaType>.Builder.Where(x => x.Alias == mediaTypeAlias);
+                var mediaTypes = repository.GetByQuery(query);
+
+                if (mediaTypes.Any() == false)
+                    throw new Exception(string.Format("No MediaType matching the passed in Alias: '{0}' was found",
+                                                      mediaTypeAlias));
+
+                var mediaType = mediaTypes.First();
+
+                if (mediaType == null)
+                    throw new Exception(string.Format("MediaType matching the passed in Alias: '{0}' was null",
+                                                      mediaTypeAlias));
+
+                return mediaType;
+            }
         }
 
 		#region Event Handlers

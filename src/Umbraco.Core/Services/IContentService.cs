@@ -11,8 +11,13 @@ namespace Umbraco.Core.Services
     {
         /// <summary>
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
-        /// that this Content is based on.
+        /// that this Content should based on.
         /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IContent without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new content objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
         /// <param name="name">Name of the Content object</param>
         /// <param name="parentId">Id of Parent for the new Content</param>
         /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
@@ -22,8 +27,13 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
-        /// that this Content is based on.
+        /// that this Content should based on.
         /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IContent without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new content objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
         /// <param name="name">Name of the Content object</param>
         /// <param name="parent">Parent <see cref="IContent"/> object for the new Content</param>
         /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
@@ -301,5 +311,35 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents"></param>
         /// <returns>True if sorting succeeded, otherwise False</returns>
         bool Sort(SortedSet<IContent> items, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Creates and saves an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+        /// that this Content should based on.
+        /// </summary>
+        /// <remarks>
+        /// This method returns an <see cref="IContent"/> object that has been persisted to the database
+        /// and therefor has an identity.
+        /// </remarks>
+        /// <param name="name">Name of the Content object</param>
+        /// <param name="parent">Parent <see cref="IContent"/> object for the new Content</param>
+        /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
+        /// <returns><see cref="IContent"/></returns>
+        IContent CreateContentWithIdentity(string name, IContent parent, string contentTypeAlias, int userId = 0);
+
+        /// <summary>
+        /// Creates and saves an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+        /// that this Content should based on.
+        /// </summary>
+        /// <remarks>
+        /// This method returns an <see cref="IContent"/> object that has been persisted to the database
+        /// and therefor has an identity.
+        /// </remarks>
+        /// <param name="name">Name of the Content object</param>
+        /// <param name="parentId">Id of Parent for the new Content</param>
+        /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
+        /// <returns><see cref="IContent"/></returns>
+        IContent CreateContentWithIdentity(string name, int parentId, string contentTypeAlias, int userId = 0);
     }
 }
