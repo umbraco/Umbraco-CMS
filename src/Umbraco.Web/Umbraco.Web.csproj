@@ -1803,6 +1803,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="WebServices\EmbedMediaService.cs" />
     <Compile Include="WebServices\FolderBrowserService.cs" />
     <Compile Include="WebServices\UmbracoAuthorizedHttpHandler.cs" />
     <Compile Include="WebServices\UmbracoAuthorizedWebService.cs">
