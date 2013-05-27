@@ -317,7 +317,7 @@ namespace Umbraco.Tests
         public void Resolves_RestExtensions()
         {
             var types = PluginManager.Current.ResolveRestExtensions();
-            Assert.AreEqual(2, types.Count());
+            Assert.AreEqual(3, types.Count());
         }
 
         [Test]
