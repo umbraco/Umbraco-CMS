@@ -61,8 +61,13 @@ namespace umbraco
             // Create template?
             if (ParentID == 1)
             {
-                var template = new Template(string.Empty, _alias, _alias);
-                ApplicationContext.Current.Services.FileService.SaveTemplate(template, _userID);
+                //TODO: We are creating a legacy template first because it contains the correct logic used to save templates, the
+                // new API is not yet complete. See: http://issues.umbraco.org/issue/U4-2243, http://issues.umbraco.org/issue/U4-2277, http://issues.umbraco.org/issue/U4-2276
+                var legacyTemplate = cms.businesslogic.template.Template.MakeNew(_alias, BusinessLogic.User.GetUser(_userID));
+
+                var template = ApplicationContext.Current.Services.FileService.GetTemplate(legacyTemplate.Id);
+                //var template = new Template(string.Empty, _alias, _alias);
+                //ApplicationContext.Current.Services.FileService.SaveTemplate(template, _userID);
 
                 contentType.AllowedTemplates = new[] {template};
                 contentType.DefaultTemplateId = template.Id;
