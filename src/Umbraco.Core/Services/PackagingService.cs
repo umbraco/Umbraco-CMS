@@ -192,6 +192,71 @@ namespace Umbraco.Core.Services
 
         #region ContentTypes
 
+        public XElement Export(IContentType contentType)
+        {
+            var info = new XElement("Info",
+                                    new XElement("Name", contentType.Name),
+                                    new XElement("Alias", contentType.Alias),
+                                    new XElement("Icon", contentType.Icon),
+                                    new XElement("Thumbnail", contentType.Thumbnail),
+                                    new XElement("Description", contentType.Description),
+                                    new XElement("AllowAtRoot", contentType.AllowedAsRoot.ToString()));
+
+            var masterContentType = contentType.CompositionAliases().FirstOrDefault();
+            if(masterContentType != null)
+                info.Add(new XElement("Master", masterContentType));
+
+            var allowedTemplates = new XElement("AllowedTemplates");
+            foreach (var template in contentType.AllowedTemplates)
+            {
+                allowedTemplates.Add(new XElement("Template", template.Alias));
+            }
+            info.Add(allowedTemplates);
+            if(contentType.DefaultTemplate != null && contentType.DefaultTemplate.Id != 0)
+                info.Add(new XElement("DefaultTemplate", contentType.DefaultTemplate.Alias));
+            else
+                info.Add(new XElement("DefaultTemplate", ""));
+
+            var structure = new XElement("Structure");
+            foreach (var allowedType in contentType.AllowedContentTypes)
+            {
+                structure.Add(new XElement("DocumentType", allowedType.Alias));
+            }
+
+            var genericProperties = new XElement("GenericProperties");
+            foreach (var propertyType in contentType.PropertyTypes)
+            {
+                var definition = _dataTypeService.GetDataTypeDefinitionById(propertyType.DataTypeDefinitionId);
+                var propertyGroup = contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+                var genericProperty = new XElement("GenericProperty",
+                                                   new XElement("Name", propertyType.Name),
+                                                   new XElement("Alias", propertyType.Alias),
+                                                   new XElement("Type", propertyType.DataTypeId.ToString()),
+                                                   new XElement("Definition", definition.Key),
+                                                   new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
+                                                   new XElement("Mandatory", propertyType.Mandatory.ToString()),
+                                                   new XElement("Validation", propertyType.ValidationRegExp),
+                                                   new XElement("Description", new XCData(propertyType.Description)));
+                genericProperties.Add(genericProperty);
+            }
+            
+            var tabs = new XElement("Tabs");
+            foreach (var propertyGroup in contentType.PropertyGroups)
+            {
+                var tab = new XElement("Tab",
+                                       new XElement("Id", propertyGroup.Id.ToString()),
+                                       new XElement("Caption", propertyGroup.Name));
+                tabs.Add(tab);
+            }
+
+            var xml = new XElement("DocumentType",
+                                   info,
+                                   structure,
+                                   genericProperties,
+                                   tabs);
+            return xml;
+        }
+
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentType"/>
         /// </summary>
@@ -324,6 +389,7 @@ namespace Umbraco.Core.Services
                     var template = _fileService.GetTemplate(alias);
                     if (template != null)
                     {
+                        if(allowedTemplates.Any(x => x.Id == template.Id)) continue;
                         allowedTemplates.Add(template);
                     }
                     else

@@ -1,26 +1,19 @@
 ﻿using System.Web.Security;
+using Umbraco.Core;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.Models.Membership.Providers
+namespace Umbraco.Web.Security.Providers
 {
     /// <summary>
     /// Custom Membership Provider for Umbraco Members (User authentication for Umbraco based Websites)  
     /// </summary>
     internal class MembersMembershipProvider : MembershipProvider
     {
-        private IMemberService _memberService;
+        private IMembershipMemberService _memberService;
 
-        protected IMemberService MemberService
+        protected IMembershipMemberService MemberService
         {
-            get
-            {
-                if (_memberService == null)
-                {
-                    _memberService = ApplicationContext.Current.Services.MemberService;
-                }
-
-                return _memberService;
-            }
+            get { return _memberService ?? (_memberService = ApplicationContext.Current.Services.MemberService); }
         }
 
         public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer,

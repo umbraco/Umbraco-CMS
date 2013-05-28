@@ -294,6 +294,8 @@
     <Compile Include="Configuration\WebRouting.cs" />
     <Compile Include="Models\Mapping\ContentModelMapper.cs" />
     <Compile Include="Mvc\BackOfficeController.cs" />
+    <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
+    <Compile Include="Security\Providers\UsersMembershipProvider.cs" />
     <Compile Include="Mvc\BackOfficeScriptsController.cs" />
     <Compile Include="UI\JavaScript\RequireJsInit.cs" />
     <Compile Include="UI\JavaScript\Resources.Designer.cs">
@@ -1794,6 +1796,7 @@
     <Compile Include="WebServices\BulkPublishController.cs" />
     <Compile Include="WebServices\CoreStringsController.cs" />
     <Compile Include="WebServices\DomainsApiController.cs" />
+    <Compile Include="WebServices\EmbedMediaService.cs" />
     <Compile Include="WebServices\ExamineManagementApiController.cs" />
     <Compile Include="WebServices\FolderBrowserService.cs" />
     <Compile Include="WebServices\UmbracoAuthorizedHttpHandler.cs" />

@@ -2,28 +2,21 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Web.Security;
+using Umbraco.Core;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.Models.Membership.Providers
+namespace Umbraco.Web.Security.Providers
 {
     /// <summary>
     /// Custom Membership Provider for Umbraco Users (User authentication for Umbraco Backend CMS)  
     /// </summary>
     internal class UsersMembershipProvider : MembershipProvider
     {
-        private IUserService _userService;
+        private IMembershipUserService _userService;
 
-        protected IUserService MemberService
+        protected IMembershipUserService UserService
         {
-            get
-            {
-                if (_userService == null)
-                {
-                    _userService = ApplicationContext.Current.Services.UserService;
-                }
-
-                return _userService;
-            }
+            get { return _userService ?? (_userService = ApplicationContext.Current.Services.UserService); }
         }
 
         public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer,

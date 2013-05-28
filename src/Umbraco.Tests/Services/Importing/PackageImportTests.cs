@@ -163,6 +163,30 @@ namespace Umbraco.Tests.Services.Importing
         }
 
         [Test]
+        public void PackagingService_Can_Import_StandardMvc_ContentTypes_And_Templates_Xml()
+        {
+            // Arrange
+            string strXml = ImportResources.StandardMvc_Package;
+            var xml = XElement.Parse(strXml);
+            var dataTypeElement = xml.Descendants("DataTypes").First();
+            var templateElement = xml.Descendants("Templates").First();
+            var docTypeElement = xml.Descendants("DocumentTypes").First();
+
+            // Act
+            var dataTypeDefinitions = ServiceContext.PackagingService.ImportDataTypeDefinitions(dataTypeElement);
+            var templates = ServiceContext.PackagingService.ImportTemplates(templateElement);
+            var contentTypes = ServiceContext.PackagingService.ImportContentTypes(docTypeElement);
+            var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
+
+            //Assert - Re-Import contenttypes doesn't throw
+            Assert.DoesNotThrow(() => ServiceContext.PackagingService.ImportContentTypes(docTypeElement));
+            Assert.That(contentTypes.Count(), Is.EqualTo(numberOfDocTypes));
+            Assert.That(dataTypeDefinitions, Is.Not.Null);
+            Assert.That(dataTypeDefinitions.Any(), Is.True);
+            Assert.That(templates.Any(), Is.True);
+        }
+
+        [Test]
         public void PackagingService_Can_Import_Content_Package_Xml()
         {
             // Arrange
@@ -222,6 +246,29 @@ namespace Umbraco.Tests.Services.Importing
             Assert.That(contentTypes.Any(), Is.True);
             Assert.That(contentTypes.Any(x => x.HasIdentity == false), Is.False);
             Assert.That(contentTypes.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void PackagingService_Can_Export_Single_DocType()
+        {
+            // Arrange
+            string strXml = ImportResources.SingleDocType;
+            var docTypeElement = XElement.Parse(strXml);
+            var packagingService = ServiceContext.PackagingService;
+
+            // Act
+            var contentTypes = packagingService.ImportContentTypes(docTypeElement);
+            var contentType = contentTypes.FirstOrDefault();
+            var element = packagingService.Export(contentType);
+
+            // Assert
+            Assert.That(element, Is.Not.Null);
+            Assert.That(element.Element("Info"), Is.Not.Null);
+            Assert.That(element.Element("Structure"), Is.Not.Null);
+            Assert.That(element.Element("GenericProperties"), Is.Not.Null);
+            Assert.That(element.Element("Tabs"), Is.Not.Null);
+            //Can't compare this XElement because the templates are not imported (they don't exist)
+            //Assert.That(XNode.DeepEquals(docTypeElement, element), Is.True);
         }
 
         [Test]

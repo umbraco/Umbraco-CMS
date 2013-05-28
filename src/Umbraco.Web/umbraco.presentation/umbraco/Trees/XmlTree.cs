@@ -50,7 +50,7 @@ namespace umbraco.cms.presentation.Trees
 
 		private void Init()
 		{
-			m_JSSerializer = new JSONSerializer();
+            m_JSSerializer = new JSONSerializer { MaxJsonLength = int.MaxValue };
 
 			switch (m_TreeType)
 			{
