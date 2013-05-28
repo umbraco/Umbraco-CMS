@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -24,6 +25,6 @@ namespace Umbraco.Web.Models.ContentEditing
         public string View { get; set; }
 
         [DataMember(Name = "config")]
-        public string Config { get; set; }
+        public IEnumerable<string> Config { get; set; }
     }
 }

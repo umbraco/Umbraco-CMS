@@ -1,0 +1,16 @@
+﻿<div ng-controller="MyPackage.PropertyEditors.CsvEditor">
+    
+    <div ng-repeat="item in values">
+        <ng-form name="multiFormVal">
+            <input name="myPackage_multiVal" type="text" ng-model="item.value" 
+                   val-bubble   
+                   val-server="'value' + $index" />
+        
+            <span class="validation-message" val-msg-for="myPackage_multiVal" val-toggle-msg="valServer">{{multiFormVal.myPackage_multiVal.errorMsg}}</span>
+
+            <br />
+        </ng-form>
+    </div>    
+    
+    <span>{{model.value}}</span>
+</div>

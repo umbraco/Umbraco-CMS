@@ -39,7 +39,7 @@ namespace Umbraco.Web.Models.Mapping
                                     Id = p.Id,
                                     Description = p.PropertyType.Description,
                                     Label = p.PropertyType.Name,
-                                    Config = _applicationContext.Services.DataTypeService.GetPreValueAsString(p.PropertyType.DataTypeDefinitionId),
+                                    Config = _applicationContext.Services.DataTypeService.GetPreValuesByDataTypeId(p.PropertyType.DataTypeDefinitionId),
                                     Value = p.Value.ToString(),
                                     View = editor.ValueEditor.View
                                 };

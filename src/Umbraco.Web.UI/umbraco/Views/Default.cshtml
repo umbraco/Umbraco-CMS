@@ -98,7 +98,8 @@
         <div>{{model}}</div>
     </form>
 
-    <script src="@Url.Content(GlobalSettings.Path.EnsureEndsWith('/') + "lib/require/require.min.js")" type="text/javascript"></script>
+    @*<script src="@Url.Content(GlobalSettings.Path.EnsureEndsWith('/') + "lib/require/require.min.js")" type="text/javascript"></script>*@
+    <script src="lib/require/require.min.js" type="text/javascript"></script>
     <script src="@Url.Action("Application", "BackOfficeScripts")" type="text/javascript"></script>
     
 </body>

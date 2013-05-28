@@ -283,6 +283,13 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="App_Plugins\MyPackage\Controllers\ServerSidePropertyEditorsController.cs" />
+    <Compile Include="App_Plugins\MyPackage\PropertyEditors\FileUploadPropertyEditor.cs" />
+    <Compile Include="App_Plugins\MyPackage\PropertyEditors\PostcodePropertyEditor.cs" />
+    <Compile Include="App_Plugins\MyPackage\PropertyEditors\PostcodeValidator.cs" />
+    <Compile Include="App_Plugins\MyPackage\PropertyEditors\ServerInfoPropertyEditor.cs" />
+    <Compile Include="App_Plugins\MyPackage\System\MyStartupHandler.cs" />
+    <Compile Include="App_Plugins\MyPackage\Trees\LegacyTestTree.cs" />
     <Compile Include="Install\Default.aspx.cs">
       <DependentUpon>default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -545,6 +552,15 @@
     <Compile Include="Umbraco\Umbraco.aspx.designer.cs">
       <DependentUpon>umbraco.aspx</DependentUpon>
     </Compile>
+    <Content Include="App_Plugins\MyPackage\Common\Js\MyPackage.js" />
+    <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\CsvEditor.js" />
+    <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\FileUploadEditor.js" />
+    <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\PostcodeEditor.js" />
+    <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\RegexEditor.js" />
+    <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\CsvEditor.html" />
+    <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\FileUploadEditor.html" />
+    <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\PostcodeEditor.html" />
+    <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\RegexEditor.html" />
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Umbraco\Js\umbraco.app.js" />
@@ -552,6 +568,9 @@
       <SubType>
       </SubType>
     </Content>
+    <Content Include="App_Plugins\MyPackage\Package.manifest" />
+    <Content Include="App_Plugins\MyPackage\Views\ServerSidePropertyEditors\ServerEnvironment.cshtml" />
+    <Content Include="App_Plugins\MyPackage\Views\Web.config" />
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
@@ -2527,13 +2546,13 @@
   <ItemGroup>
     <Folder Include="App_Code\" />
     <Folder Include="App_Data\" />
-    <Folder Include="App_Plugins\" />
+    <Folder Include="App_Plugins\MyPackage\Common\Css\" />
+    <Folder Include="App_Plugins\MyPackage\PropertyEditors\Css\" />
     <Folder Include="Css\" />
     <Folder Include="MacroScripts\" />
     <Folder Include="MasterPages\" />
     <Folder Include="Media\" />
     <Folder Include="Scripts\" />
-    <Folder Include="Umbraco\lib\" />
     <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
     <Folder Include="Umbraco_Client\Tags\images\" />
     <Folder Include="UserControls\" />
