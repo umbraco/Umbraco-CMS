@@ -13,7 +13,7 @@ using Umbraco.Web.BaseRest;
 
 namespace Umbraco.Web.WebServices
 {
-	//TODO: Can we convert this to MVC please instead of /base?
+    //TODO: Can we convert this to MVC please instead of /base?
 
     [RestExtension("FolderBrowserService")]
     public class FolderBrowserService
@@ -21,22 +21,13 @@ namespace Umbraco.Web.WebServices
         [RestExtensionMethod(ReturnXml = false)]
         public static string GetChildren(int parentId)
         {
-            var service = ApplicationContext.Current.Services.EntityService;
-            var parentMedia = service.Get(parentId, UmbracoObjectTypes.Media);
-            var mediaPath = parentMedia == null ? parentId.ToString(CultureInfo.InvariantCulture) : parentMedia.Path;
-
-            var currentUser = User.GetCurrent();
-            var data = new List<object>();
-
-            // Check user is logged in
-            if (currentUser == null)
-                throw new UnauthorizedAccessException("You must be logged in to use this service");
-
-            // Check user is allowed to access selected media item
-            if (!("," + mediaPath + ",").Contains("," + currentUser.StartMediaId + ","))
-                throw new UnauthorizedAccessException("You do not have access to this Media node");
+            var currentUser = GetCurrentUser();
+            AuthorizeAccess(parentId, currentUser);
 
             // Get children and filter
+            var data = new List<object>();
+            var service = ApplicationContext.Current.Services.EntityService;
+
             var entities = service.GetChildren(parentId, UmbracoObjectTypes.Media);
             //TODO: Only fetch files, not containers
             foreach (UmbracoEntity entity in entities)
@@ -51,9 +42,9 @@ namespace Umbraco.Web.WebServices
                     MediaTypeAlias = entity.ContentTypeAlias,
                     EditUrl = string.Format("editMedia.aspx?id={0}", entity.Id),
                     FileUrl = entity.UmbracoFile,
-                    ThumbnailUrl = !string.IsNullOrEmpty(thumbUrl)
-                        ? thumbUrl
-                        : IOHelper.ResolveUrl(SystemDirectories.Umbraco + "/images/thumbnails/" + entity.ContentTypeThumbnail)
+                    ThumbnailUrl = string.IsNullOrEmpty(thumbUrl)
+                        ? IOHelper.ResolveUrl(string.Format("{0}/images/thumbnails/{1}", SystemDirectories.Umbraco, entity.ContentTypeThumbnail))
+                        : thumbUrl
                 };
 
                 data.Add(item);
@@ -65,22 +56,48 @@ namespace Umbraco.Web.WebServices
         [RestExtensionMethod(ReturnXml = false)]
         public static string Delete(string nodeIds)
         {
+            var currentUser = GetCurrentUser();
+
             var nodeIdParts = nodeIds.Split(',');
 
-            foreach (var nodeIdPart in nodeIdParts.Where(x => !string.IsNullOrEmpty(x)))
+            foreach (var nodeIdPart in nodeIdParts.Where(x => string.IsNullOrEmpty(x) == false))
             {
-                var nodeId = 0;
-                if (!Int32.TryParse(nodeIdPart, out nodeId)) 
+                int nodeId;
+                if (Int32.TryParse(nodeIdPart, out nodeId) == false)
                     continue;
-                
+
                 var node = new global::umbraco.cms.businesslogic.media.Media(nodeId);
+                AuthorizeAccess(node, currentUser);
+
                 node.delete(("," + node.Path + ",").Contains(",-21,"));
             }
 
-            return new JavaScriptSerializer().Serialize(new
-            {
-                success = true
-            });
+            return new JavaScriptSerializer().Serialize(new { success = true });
+        }
+
+        private static User GetCurrentUser()
+        {
+            var currentUser = User.GetCurrent();
+            if (currentUser == null)
+                throw new UnauthorizedAccessException("You must be logged in to use this service");
+
+            return currentUser;
+        }
+
+        private static void AuthorizeAccess(global::umbraco.cms.businesslogic.media.Media mediaItem, User currentUser)
+        {
+            if (("," + mediaItem.Path + ",").Contains("," + currentUser.StartMediaId + ",") == false)
+                throw new UnauthorizedAccessException("You do not have access to this Media node");
+        }
+
+        private static void AuthorizeAccess(int parentId, User currentUser)
+        {
+            var service = ApplicationContext.Current.Services.EntityService;
+            var parentMedia = service.Get(parentId, UmbracoObjectTypes.Media);
+            var mediaPath = parentMedia == null ? parentId.ToString(CultureInfo.InvariantCulture) : parentMedia.Path;
+
+            if (("," + mediaPath + ",").Contains("," + currentUser.StartMediaId + ",") == false)
+                throw new UnauthorizedAccessException("You do not have access to this Media node");
         }
     }
 }
