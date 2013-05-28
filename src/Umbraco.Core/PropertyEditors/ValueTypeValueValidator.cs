@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -13,34 +14,13 @@ namespace Umbraco.Core.PropertyEditors
     [ValueValidator("ValueType")]
     internal sealed class ValueTypeValueValidator : ManifestValueValidator
     {
-        public override IEnumerable<ValidationResult> Validate(object value, string config, string preValues, PropertyEditor editor)
+        public override IEnumerable<ValidationResult> Validate(string value, string config, string preValues, PropertyEditor editor)
         {
-            //TODO: localize these!
-
-            Type valueType;
-            //convert the string to a known type
-            switch (editor.ValueEditor.ValueType.ToUpper())
+            var attempt = editor.ValueEditor.TryConvertValueToCrlType(value);
+            if (attempt.Success == false)
             {
-                case "INT":
-                    valueType = typeof (int);
-                    break;
-                case "STRING":
-                case "TEXT":
-                    valueType = typeof (string);
-                    break;
-                case "DATETIME":
-                case "DATE":
-                case "TIME":
-                    valueType = typeof(string);
-                    break;
-                default:
-                    throw new FormatException("The valueType parameter does not match a known value type");
-            }
-
-            var attempt = value.TryConvertTo(valueType);
-            if (!attempt.Success)
-            {
-                yield return new ValidationResult(string.Format("Value is not of type {0} and cannot be converted", valueType));
+                //TODO: localize these!
+                yield return new ValidationResult(string.Format("Value is not of type {0} and cannot be converted", editor.ValueEditor.GetDatabaseType()));
             }            
         }
     }

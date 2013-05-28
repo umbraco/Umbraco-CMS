@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
-using Umbraco.Belle.System.PropertyEditors;
 using Umbraco.Core;
+using Umbraco.Core.PropertyEditors;
 
-namespace Umbraco.Belle.App_Plugins.MyPackage.PropertyEditors
+namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
 {
     /// <summary>
     /// Validates a postcode

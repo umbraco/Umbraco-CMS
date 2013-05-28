@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -7,7 +8,9 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using Newtonsoft.Json;
+using Umbraco.Core;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Models.Mapping;
 
 namespace Umbraco.Web.WebApi
 {
@@ -16,6 +19,28 @@ namespace Umbraco.Web.WebApi
     /// </summary>
     internal class ContentItemBinder : IModelBinder
     {
+        private readonly ApplicationContext _applicationContext;
+        private readonly ContentModelMapper _contentModelMapper;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="applicationContext"></param>
+        /// <param name="contentModelMapper"></param>
+        internal ContentItemBinder(ApplicationContext applicationContext, ContentModelMapper contentModelMapper)
+        {
+            _applicationContext = applicationContext;
+            _contentModelMapper = contentModelMapper;
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public ContentItemBinder()
+            : this(ApplicationContext.Current, new ContentModelMapper(ApplicationContext.Current))
+        {            
+        }
+
         public bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
         {
             //NOTE: Validation is done in the filter
@@ -95,6 +120,15 @@ namespace Umbraco.Web.WebApi
                         FilePath = file.LocalFileName,
                         PropertyId = propertyId
                     });
+            }
+
+            //finally, let's lookup the real content item and create the DTO item
+            model.PersistedContent = _applicationContext.Services.ContentService.GetById(model.Id);
+            model.ContentDto = _contentModelMapper.ToContentItemDto(model.PersistedContent);
+            //we will now assign all of the values in the 'save' model to the DTO object
+            foreach (var p in model.Properties)
+            {
+                model.ContentDto.Properties.Single(x => x.Id == p.Id).Value = p.Value;
             }
 
             return model;

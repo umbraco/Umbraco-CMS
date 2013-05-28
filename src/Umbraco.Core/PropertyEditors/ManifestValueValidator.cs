@@ -37,6 +37,6 @@ namespace Umbraco.Core.PropertyEditors
         /// the validation message applies to the entire property type being validated. If there is a field name applied to a 
         /// validation result we will try to match that field name up with a field name on the item itself.
         /// </returns>
-        public abstract IEnumerable<ValidationResult> Validate(object value, string config, string preValues, PropertyEditor editor);
+        public abstract IEnumerable<ValidationResult> Validate(string value, string config, string preValues, PropertyEditor editor);
     }
 }

@@ -21,18 +21,13 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="preValues">The current pre-values stored for the data type</param>
         /// <param name="editor"></param>
         /// <returns></returns>
-        public override IEnumerable<ValidationResult> Validate(object value, string config, string preValues, PropertyEditor editor)
+        public override IEnumerable<ValidationResult> Validate(string value, string config, string preValues, PropertyEditor editor)
         {
             //TODO: localize these!
-
-            if (!(value is string))
-            {
-                throw new InvalidOperationException("The value parameter must be a string for this validator type");
-            }
-
+            
             var delimiter = ",";
             Regex regex = null;
-            if (!config.IsNullOrWhiteSpace())
+            if (config.IsNullOrWhiteSpace() == false)
             {
                 var json = JsonConvert.DeserializeObject<JObject>(config);
                 if (json["delimiter"] != null)
@@ -46,15 +41,15 @@ namespace Umbraco.Core.PropertyEditors
                 }
             }
 
-            var stringVal = (string) value;
+            var stringVal = value;
             var split = stringVal.Split(new[] {delimiter}, StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 0; i < split.Length; i++)
+            for (var i = 0; i < split.Length; i++)
             {
                 var s = split[i];                
                 //next if we have a regex statement validate with that
                 if (regex != null)
                 {
-                    if (!regex.IsMatch(s))
+                    if (regex.IsMatch(s) == false)
                     {
                         yield return new ValidationResult("The item at index " + i + " did not match the expression " + regex,
                             new[]

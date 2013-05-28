@@ -1,9 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
 {
+    /// <summary>
+    /// Represents the value editor for the property editor during content editing
+    /// </summary>
     public class ValueEditor
     {
         /// <summary>
@@ -44,5 +49,100 @@ namespace Umbraco.Core.PropertyEditors
         [JsonProperty("validation")]
         public IEnumerable<ValidatorBase> Validators { get; set; }
 
+        /// <summary>
+        /// Returns the true DataTypeDatabaseType from the string representation ValueType
+        /// </summary>
+        /// <returns></returns>
+        public DataTypeDatabaseType GetDatabaseType()
+        {
+            switch (ValueType.ToUpper())
+            {
+                case "INT":
+                case "INTEGER":
+                    return DataTypeDatabaseType.Integer;
+                case "STRING":
+                    return DataTypeDatabaseType.Nvarchar;
+                case "TEXT":
+                    return DataTypeDatabaseType.Ntext;
+                case "DATETIME":
+                case "DATE":
+                case "TIME":
+                    return DataTypeDatabaseType.Date;
+                default:
+                    throw new FormatException("The ValueType does not match a known value type");
+            }
+        }
+
+        /// <summary>
+        /// Used to try to convert the string value to the correct CLR type based on the DatabaseDataType specified for this value editor
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        internal Attempt<object> TryConvertValueToCrlType(string value)
+        {
+            Type valueType;
+            //convert the string to a known type
+            switch (GetDatabaseType())
+            {
+                case DataTypeDatabaseType.Ntext:
+                case DataTypeDatabaseType.Nvarchar:
+                    valueType = typeof(string);
+                    break;
+                case DataTypeDatabaseType.Integer:
+                    valueType = typeof(int);
+                    break;
+                case DataTypeDatabaseType.Date:
+                    valueType = typeof(DateTime);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            return value.TryConvertTo(valueType);
+        }
+
+        /// <summary>
+        /// A method to deserialize the string value that has been saved in the content editor
+        /// to an object to be stored in the database.
+        /// </summary>
+        /// <param name="editorValue"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// By default this will attempt to automatically convert the string value to the value type supplied by ValueType.
+        /// 
+        /// If overridden then the object returned must match the type supplied in the ValueType, otherwise persisting the 
+        /// value to the DB will fail when it tries to validate the value type.
+        /// </remarks>
+        public virtual object DeserializeValue(string editorValue)
+        {
+            var result = TryConvertValueToCrlType(editorValue);
+            if (result.Success == false)
+            {
+                throw new InvalidOperationException("The value " + editorValue + " cannot be converted to the type " + GetDatabaseType());
+            }
+            return result.Result;
+        }
+
+        /// <summary>
+        /// A method used to serialize the databse value to a string value which is then used to be sent
+        /// to the editor in JSON format.
+        /// </summary>
+        /// <param name="dbValue"></param>
+        /// <returns></returns>
+        public virtual string SerializeValue(object dbValue)
+        {
+            switch (GetDatabaseType())
+            {
+                case DataTypeDatabaseType.Ntext:                    
+                case DataTypeDatabaseType.Nvarchar:                    
+                case DataTypeDatabaseType.Integer:
+                    //we can just ToString() any of these types
+                    return dbValue.ToString();
+                case DataTypeDatabaseType.Date:
+                    //Dates will be formatted in 'o' format (otherwise known as xml format)
+                    return dbValue.ToXmlString<DateTime>();
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }            
+        }
     }
 }

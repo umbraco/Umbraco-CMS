@@ -390,7 +390,18 @@ namespace Umbraco.Core
 			throw new NotSupportedException("Cannot convert type " + type.FullName + " to a string using ToXmlString as it is not supported by XmlConvert");
 		}
 
-		private static string GetEnumPropertyDebugString(object enumItem, int levels)
+        /// <summary>
+        /// Returns an XmlSerialized safe string representation for the value and type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+	    internal static string ToXmlString<T>(this object value)
+	    {
+	        return value.ToXmlString(typeof (T));
+	    }
+
+	    private static string GetEnumPropertyDebugString(object enumItem, int levels)
 		{
 			try
 			{

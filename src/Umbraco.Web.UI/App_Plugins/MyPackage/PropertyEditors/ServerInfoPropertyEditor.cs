@@ -2,9 +2,8 @@
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
-using Umbraco.Belle.System.PropertyEditors;
 
-namespace Umbraco.Belle.App_Plugins.MyPackage.PropertyEditors
+namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
 {
     [PropertyEditor("AD056473-492B-47F8-9613-5A4936666C67", "Server Info")]
     public class ServerInfoPropertyEditor : PropertyEditor

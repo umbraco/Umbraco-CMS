@@ -10,17 +10,29 @@ using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.WebApi
 {
+
+    /// <summary>
+    /// The API controller used for editing content
+    /// </summary>
     [PluginController("UmbracoEditors")]
     [ValidationFilter]
     public class ContentEditorApiController : UmbracoApiController
     {
         private readonly ContentModelMapper _contentModelMapper;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public ContentEditorApiController()
             : this(UmbracoContext.Current, new ContentModelMapper(UmbracoContext.Current.Application))
         {            
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        /// <param name="contentModelMapper"></param>
         internal ContentEditorApiController(UmbracoContext umbracoContext, ContentModelMapper contentModelMapper)
             : base(umbracoContext)
         {
@@ -70,6 +82,21 @@ namespace Umbraco.Web.WebApi
             // * Our model has been bound
             // * and validated
             // * any file attachments have been saved to their temporary location for us to use
+            // * we have a reference to the DTO object and the persisted object
+
+            //Now, we just need to save the data
+
+            //Save the property values
+            foreach (var p in contentItem.ContentDto.Properties)
+            {
+                var prop = contentItem.PersistedContent.Properties[p.Alias];
+
+                //TODO: We need to get the persistable value from the property editor, not just the posted RAW string value.
+                prop.Value = p.Value;
+            }
+            
+            //save the item
+            ApplicationContext.Services.ContentService.Save(contentItem.PersistedContent);
 
             return Request.CreateResponse(HttpStatusCode.OK, "success!");
         }

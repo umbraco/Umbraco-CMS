@@ -11,18 +11,13 @@ namespace Umbraco.Core.PropertyEditors
     [ValueValidator("Regex")]
     internal sealed class RegexValueValidator : ManifestValueValidator
     {
-        public override IEnumerable<ValidationResult> Validate(object value, string config, string preValues, PropertyEditor editor)
+        public override IEnumerable<ValidationResult> Validate(string value, string config, string preValues, PropertyEditor editor)
         {
             //TODO: localize these!
-
-            if (!(value is string))
-            {
-                throw new InvalidOperationException("The value parameter must be a string for this validator type");
-            }
-
-            var regex = new Regex((string) config);
             
-            if (!regex.IsMatch((string)value))
+            var regex = new Regex(config);
+            
+            if (!regex.IsMatch(value))
             {
                 yield return new ValidationResult("Value is invalid, it does not match the correct pattern");
             }            

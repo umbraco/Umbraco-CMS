@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
@@ -21,16 +22,14 @@ namespace Umbraco.Web.WebApi.Filters
     internal class ContentItemValidationFilterAttribute : ActionFilterAttribute
     {
         private readonly ApplicationContext _applicationContext;
-        private readonly ContentModelMapper _contentMapper;
 
-        public ContentItemValidationFilterAttribute(ApplicationContext applicationContext, ContentModelMapper contentMapper)
+        public ContentItemValidationFilterAttribute(ApplicationContext applicationContext)
         {
             _applicationContext = applicationContext;
-            _contentMapper = contentMapper;
         }
 
         public ContentItemValidationFilterAttribute()
-            : this(ApplicationContext.Current, new ContentModelMapper(ApplicationContext.Current))
+            : this(ApplicationContext.Current)
         {
             
         }
@@ -57,10 +56,9 @@ namespace Umbraco.Web.WebApi.Filters
             }
 
             //now do each validation step
-            ContentItemDto existingContent;
-            if (!ValidateExistingContent(contentItem, actionContext, out existingContent)) return;
-            if (!ValidateProperties(contentItem, existingContent, actionContext)) return;
-            if (!ValidateData(contentItem, existingContent, actionContext)) return;
+            if (!ValidateExistingContent(contentItem, actionContext)) return;
+            if (!ValidateProperties(contentItem, actionContext)) return;
+            if (!ValidateData(contentItem, actionContext)) return;
         }
 
         /// <summary>
@@ -68,21 +66,16 @@ namespace Umbraco.Web.WebApi.Filters
         /// </summary>
         /// <param name="postedItem"></param>
         /// <param name="actionContext"></param>
-        /// <param name="found"></param>
         /// <returns></returns>
-        private bool ValidateExistingContent(ContentItemSave postedItem, HttpActionContext actionContext, out ContentItemDto found)
-        {
-            var item = _applicationContext.Services.ContentService.GetById(postedItem.Id);
-            
-            if (item == null)
+        private bool ValidateExistingContent(ContentItemSave postedItem, HttpActionContext actionContext)
+        {            
+            if (postedItem.PersistedContent == null)
             {
                 var message = string.Format("content with id: {0} was not found", postedItem.Id);
                 actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
-                found = null;
                 return false;
             }
 
-            found = _contentMapper.ToContentItemDto(item);
             return true;
         }
 
@@ -91,14 +84,14 @@ namespace Umbraco.Web.WebApi.Filters
         /// </summary>
         /// <param name="postedItem"></param>
         /// <param name="actionContext"></param>
-        /// <param name="realItem"></param>
         /// <returns></returns>
-        private bool ValidateProperties(ContentItemSave postedItem, ContentItemDto realItem, HttpActionContext actionContext)
+        //private bool ValidateProperties(ContentItemSave postedItem, ContentItemDto realItem, HttpActionContext actionContext)
+        private bool ValidateProperties(ContentItemSave postedItem, HttpActionContext actionContext)
         {
             foreach (var p in postedItem.Properties)
             {
                 //ensure the property actually exists in our server side properties
-                if (!realItem.Properties.Contains(p))
+                if (postedItem.ContentDto.Properties.Contains(p) == false)
                 {
                     //TODO: Do we return errors here ? If someone deletes a property whilst their editing then should we just
                     //save the property data that remains? Or inform them they need to reload... not sure. This problem exists currently too i think.
@@ -112,9 +105,9 @@ namespace Umbraco.Web.WebApi.Filters
         }
 
         //TODO: Validate the property type data
-        private bool ValidateData(ContentItemSave postedItem, ContentItemDto realItem, HttpActionContext actionContext)
+        private bool ValidateData(ContentItemSave postedItem, HttpActionContext actionContext)
         {
-            foreach (var p in realItem.Properties)
+            foreach (var p in postedItem.ContentDto.Properties)
             {
                 var editor = PropertyEditorResolver.Current.GetById(p.DataType.ControlId);
                 if (editor == null)
