@@ -6,6 +6,6 @@ define(['myApp'], function (app) {
 
     MyPackage.PropertyEditors.PostcodeEditor = function ($scope, $http, $filter) {
         //change the config json model into something usable
-        $scope.model.config = $scope.$eval($scope.model.config);
+        $scope.model.config = { country : $scope.model.config[0] };
     };
 });

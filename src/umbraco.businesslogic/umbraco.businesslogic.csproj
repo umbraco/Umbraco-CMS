@@ -234,10 +234,6 @@
     <Compile Include="Utils\JSONSerializer.cs" />
     <Compile Include="Utils\SerializableData.cs" />
     <Compile Include="Utils\Singleton.cs" />
-    <Compile Include="Utils\TypeFinder.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Utils\TypeResolver.cs" />
     <Compile Include="xmlHelper.cs">
       <SubType>Code</SubType>
     </Compile>

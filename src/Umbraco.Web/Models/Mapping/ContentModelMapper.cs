@@ -43,7 +43,7 @@ namespace Umbraco.Web.Models.Mapping
                                     Value = editor.ValueEditor.SerializeValue(p.Value),
                                     View = editor.ValueEditor.View
                                 };
-                        })
+                        }).ToArray()
                 };
         }
 
