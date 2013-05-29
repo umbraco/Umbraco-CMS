@@ -13,8 +13,13 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
         protected override ValueEditor CreateValueEditor()
         {
             //TODO: Ensure we assign custom validation for uploaded file types!
+            
+            var baseEditor = base.CreateValueEditor();
 
-            return new FileUploadValueEditor();
+            return new FileUploadValueEditor
+                {
+                    View = baseEditor.View
+                };
         }
     }
 }

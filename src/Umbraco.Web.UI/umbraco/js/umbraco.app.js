@@ -455,11 +455,8 @@ define(['angular', 'namespaceMgr'], function (angular) {
             link: function (scope, el, attrs) {
                 el.bind('change', function (event) {
                     var files = event.target.files;
-                    //iterate files since 'multiple' may be specified on the element
-                    for (var i = 0;i<files.length;i++) {
-                        //emit event upward
-                        scope.$emit("fileSelected", { file: files[i] });
-                    }                                       
+                    //emit event upward
+                    scope.$emit("filesSelected", { files: files });                           
                 });
             }
         };
@@ -612,9 +609,19 @@ define(['angular', 'namespaceMgr'], function (angular) {
     
     Umbraco.Content.ContentController = function ($scope, $element, $http, u$ContentHelper, u$ServerValidation) {
         
-        //initialize the data model
+        //initialize the data model and methods
         $scope.model = {};
         $scope.files = [];
+        $scope.addFiles = function(propertyId, files) {
+            //this will clear the files for the current property and then add the new ones for the current property
+            $scope.files = _.reject($scope.files, function(item) {
+                return item.id == propertyId;
+            });
+            for (var i = 0; i < files.length; i++) {
+                //save the file object to the scope's files collection
+                $scope.files.push({ id: propertyId, file: files[i] });
+            }
+        };
         //model for updating the UI
         $scope.ui = {
             working: false,
@@ -659,6 +666,9 @@ define(['angular', 'namespaceMgr'], function (angular) {
 
             $scope.ui.working = true;
 
+            //broadcast an event downward
+            $scope.$broadcast("contentSaving", null);
+
             $http({
                 method: 'POST',
                 url: saveContentUrl,
@@ -683,6 +693,15 @@ define(['angular', 'namespaceMgr'], function (angular) {
             }).
                 success(function(data, status, headers, config) {
                     alert("success!");
+                    
+                    //clear the files
+                    $scope.files = [];
+
+                    //broadcast an event downward
+                    $scope.$broadcast("contentSaved", null);
+
+                    //set the model to the value returned by the server
+                    $scope.model = data;                    
                     $scope.ui.working = false;
                     $scope.ui.waitingOnValidation = false;
                     $scope.serverErrors.reset();

@@ -1,6 +1,20 @@
 ﻿<div ng-controller="MyPackage.PropertyEditors.FileUploadEditor">
-    <input type="file" umb-file-upload multiple/>
-    <ul>
-        <li ng-repeat="file in files">{{file.file.name}}</li>
-    </ul>
+    
+    <div ng-hide="clearFiles">
+        <div class="file-uploader">
+            <input type="file" umb-file-upload multiple />
+        </div>
+        <ul ng-show="files.length > 0">
+            <li ng-repeat="file in files">{{file.file.name}}</li>
+        </ul>
+    </div>
+
+    <div ng-show="persistedFiles.length > 0">
+        <p>Current files</p>
+        <ul>
+            <li ng-repeat="file in persistedFiles">{{file}}</li>
+        </ul>
+        <input type="checkbox" name="myPackage_clearFiles" ng-model="clearFiles" />
+        <label for="myPackage_clearFiles">Clear files</label>
+    </div>
 </div>

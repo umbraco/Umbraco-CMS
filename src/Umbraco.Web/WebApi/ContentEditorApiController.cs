@@ -78,7 +78,7 @@ namespace Umbraco.Web.WebApi
         /// <returns></returns>
         [ContentItemValidationFilter]
         [FileUploadCleanupFilter]
-        public HttpResponseMessage PostSaveContent(
+        public ContentItemDisplay PostSaveContent(
             [ModelBinder(typeof(ContentItemBinder))]
             ContentItemSave contentItem)
         {
@@ -113,7 +113,8 @@ namespace Umbraco.Web.WebApi
             //save the item
             ApplicationContext.Services.ContentService.Save(contentItem.PersistedContent);
 
-            return Request.CreateResponse(HttpStatusCode.OK, "success!");
+            //return the updated model
+            return _contentModelMapper.ToContentItemDisplay(contentItem.PersistedContent);
         }
 
     }

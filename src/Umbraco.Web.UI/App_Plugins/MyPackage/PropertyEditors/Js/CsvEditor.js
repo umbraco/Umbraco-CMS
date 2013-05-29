@@ -21,7 +21,14 @@ define(['namespaceMgr'], function () {
             }
         }
 
-        //set the scope values to bind on our view to the new object
+        //if there was no data then initialize with 5 values... we should configure that in pre-vals
+        if (values.length == 0) {
+            for (var x = 0; x < 5; x++) {
+                values.push({ index: x, value: "" });
+            }
+        }
+
+        //set the scope values to bind on our view to the new object.
         $scope.values = values;
 
         //set up listeners for the object to write back to our comma delimited property value
