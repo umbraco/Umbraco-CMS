@@ -788,6 +788,15 @@ namespace Umbraco.Core.Services
                     int i = 0;
                     foreach (var media in items)
                     {
+                        //If the current sort order equals that of the media
+                        //we don't need to update it, so just increment the sort order
+                        //and continue.
+                        if (media.SortOrder == i)
+                        {
+                            i++;
+                            continue;
+                        }
+
                         media.SortOrder = i;
                         i++;
 
