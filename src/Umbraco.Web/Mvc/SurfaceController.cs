@@ -114,7 +114,7 @@ namespace Umbraco.Web.Mvc
                 else
                 {
                     //exit the loop
-                    currentRouteData = null;
+                    currentContext = null;
                 }
             }
             return new Attempt<RouteDefinition>(
