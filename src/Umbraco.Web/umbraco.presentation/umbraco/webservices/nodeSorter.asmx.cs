@@ -97,14 +97,13 @@ namespace umbraco.presentation.webservices
         private void SortMedia(string[] ids)
         {
             var mediaService = base.ApplicationContext.Services.MediaService;
-            var sortedMedia = new SortedSet<IMedia>(new ItemSortOrderComparer());
+            var sortedMedia = new List<IMedia>();
             try
             {
                 for (var i = 0; i < ids.Length; i++)
                 {
                     var id = int.Parse(ids[i]);
                     var m = mediaService.GetById(id);
-                    m.SortOrder = i;
                     sortedMedia.Add(m);
                 }
 
@@ -120,14 +119,13 @@ namespace umbraco.presentation.webservices
         private void SortContent(string[] ids, int parentId)
         {
             var contentService = base.ApplicationContext.Services.ContentService;
-            var sortedContent = new SortedSet<IContent>(new ItemSortOrderComparer());
+            var sortedContent = new List<IContent>();
             try
             {
                 for (var i = 0; i < ids.Length; i++)
                 {
                     var id = int.Parse(ids[i]);
                     var c = contentService.GetById(id);
-                    c.SortOrder = i;
                     sortedContent.Add(c);
                 }
 
@@ -219,19 +217,6 @@ namespace umbraco.presentation.webservices
         {
             get { return _id; }
             set { _id = value; }
-        }
-    }
-
-    public class ItemSortOrderComparer : IComparer<IContentBase>
-    {
-        public int Compare(IContentBase x, IContentBase y)
-        {
-            if (x.SortOrder > y.SortOrder)
-            {
-                return y.Id;
-            }
-
-            return x.Id;
         }
     }
 }
