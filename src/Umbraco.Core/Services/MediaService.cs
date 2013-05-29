@@ -711,13 +711,13 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Sorts a collection of <see cref="IMedia"/> objects by updating the SortOrder according
-        /// to the ordering of items in the passed in <see cref="SortedSet{T}"/>.
+        /// to the ordering of items in the passed in <see cref="IEnumerable{T}"/>.
         /// </summary>
         /// <param name="items"></param>
         /// <param name="userId"></param>
         /// <param name="raiseEvents"></param>
         /// <returns>True if sorting succeeded, otherwise False</returns>
-        public bool Sort(SortedSet<IMedia> items, int userId = 0, bool raiseEvents = true)
+        public bool Sort(IEnumerable<IMedia> items, int userId = 0, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
