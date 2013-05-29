@@ -1131,6 +1131,15 @@ namespace Umbraco.Core.Services
                     int i = 0;
                     foreach (var content in items)
                     {
+                        //If the current sort order equals that of the content
+                        //we don't need to update it, so just increment the sort order
+                        //and continue.
+                        if (content.SortOrder == i)
+                        {
+                            i++;
+                            continue;
+                        }
+
                         content.SortOrder = i;
                         content.WriterId = userId;
                         i++;
