@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
 
-namespace Umbraco.Belle.App_Plugins.MyPackage.Controllers
+namespace Umbraco.Web.UI.App_Plugins.MyPackage.Controllers
 {
 
     public class ServerSidePropertyEditorsController : Controller

@@ -128,7 +128,7 @@ namespace umbraco.cms.presentation
 
         private void UpdateMediaFileLinksLiteral()
         {
-            var uploadField = new Factory().GetNewObject(new Guid(Constants.PropertyEditors.UploadField));
+            var uploadField = DataTypesResolver.Current.GetById(new Guid(Constants.PropertyEditors.UploadField));
 
             // always clear, incase the upload file was removed
             this._mediaFileLinksLiteral.Text = string.Empty;

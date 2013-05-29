@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Id of the DataType control
         /// </summary>
-        Guid ControlId { get; }
+        Guid ControlId { get; set; }
 
         /// <summary>
         /// Gets or Sets the DatabaseType for which the DataType's value is saved as

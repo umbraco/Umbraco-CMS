@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
-using Umbraco.Belle.System;
 using Umbraco.Core;
-using umbraco.businesslogic;
+using Umbraco.Web.UI.JavaScript;
 
-namespace Umbraco.Belle.App_Plugins.MyPackage.System
+namespace Umbraco.Web.UI.App_Plugins.MyPackage.System
 {
     public class MyStartupHandler : ApplicationEventHandler
     {

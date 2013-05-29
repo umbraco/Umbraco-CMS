@@ -296,7 +296,6 @@
     <Compile Include="PublishedContent\DynamicNodeTests.cs" />
     <Compile Include="ObjectExtensionsTests.cs" />
     <Compile Include="PublishedCache\PublishedContentCacheTests.cs" />
-    <Compile Include="DataTypeFactoryTests.cs" />
     <Compile Include="Resolvers\LazyManyObjectResolverTests.cs" />
     <Compile Include="Resolvers\ManyResolverTests.cs" />
     <Compile Include="Resolvers\SingleResolverTests.cs" />

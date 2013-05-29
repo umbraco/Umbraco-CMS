@@ -1,9 +1,16 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core;
+using Umbraco.Core.IO;
+using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using umbraco.cms.presentation.Trees;
-using umbraco.IO;
+using umbraco.interfaces;
 
 namespace umbraco.cms.presentation.developer
 {
@@ -15,68 +22,78 @@ namespace umbraco.cms.presentation.developer
 
         }
         protected ImageButton save;
-        private cms.businesslogic.datatype.DataTypeDefinition dt;
-        cms.businesslogic.datatype.controls.Factory f;
+        
         private int _id = 0;
-        private interfaces.IDataPrevalue _prevalue;
+        private IDataPrevalue _prevalue;
+        private IDataTypeDefinition _dataTypeDefinition;
 
-        protected void Page_Load(object sender, System.EventArgs e)
+        protected void Page_Load(object sender, EventArgs e)
         {
             pp_name.Text = ui.Text("name");
             pp_renderControl.Text = ui.Text("renderControl");
             pane_settings.Text = ui.Text("settings");
             pp_guid.Text = ui.Text("guid");
 
-
             _id = int.Parse(Request.QueryString["id"]);
-            dt = cms.businesslogic.datatype.DataTypeDefinition.GetDataTypeDefinition(_id);
 
-
-            f = new cms.businesslogic.datatype.controls.Factory();
-
-            if (!IsPostBack)
+            _dataTypeDefinition = ApplicationContext.Services.DataTypeService.GetDataTypeDefinitionById(_id);
+            
+            if (IsPostBack == false)
             {
-                txtName.Text = dt.Text;
+                txtName.Text = _dataTypeDefinition.Name;
 
-                SortedList datatypes = new SortedList();
+                //get the legacy data types
+                var datatypes = DataTypesResolver.Current.DataTypes
+                    .ToDictionary(df => df.Id, df => "(legacy) " + df.DataTypeName);
 
-                foreach (interfaces.IDataType df in f.GetAll())
-                    datatypes.Add(df.DataTypeName + "|" + Guid.NewGuid().ToString(), df.Id);
+                //get the new property editors
+                var propEditors = PropertyEditorResolver.Current.PropertyEditors
+                    .ToDictionary(pe => pe.Id, pe => pe.Name);
 
-                IDictionaryEnumerator ide = datatypes.GetEnumerator();
-
-                string datatTypeId = dt.DataType != null ? dt.DataType.Id.ToString() : String.Empty;
-                while (ide.MoveNext())
+                //join the lists
+                var combined = propEditors.Concat(datatypes);
+                
+                foreach (var item in combined)
                 {
-                    ListItem li = new ListItem();
-                    li.Text = ide.Key.ToString().Substring(0, ide.Key.ToString().IndexOf("|"));
-                    li.Value = ide.Value.ToString();
+                    var li = new ListItem
+                        {
 
-                    if (!String.IsNullOrEmpty(datatTypeId) && li.Value.ToString() == datatTypeId) li.Selected = true;
+                            Text = item.Value,
+                            Value = item.Key.ToString()
+                        };
+
+                    if (_dataTypeDefinition.ControlId != default(Guid) && li.Value == _dataTypeDefinition.ControlId.ToString())
+                    {
+                        li.Selected = true;
+                    }
+
                     ddlRenderControl.Items.Add(li);
-                }
+                }     
 
                 ClientTools
                     .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadDataTypes>().Tree.Alias)
-                    .SyncTree("-1,init," + _id.ToString(), false);
+                    .SyncTree("-1,init," + _id.ToString(CultureInfo.InvariantCulture), false);
 
             }
 
-            if (dt.DataType != null)
-                litGuid.Text = dt.DataType.Id.ToString();
-            Panel1.Text = umbraco.ui.Text("edit") + " datatype: " + dt.Text;
-            insertPrevalueEditor();
+            if (_dataTypeDefinition.ControlId != default(Guid))
+            {
+                litGuid.Text = _dataTypeDefinition.ControlId.ToString();
+            }
+
+            Panel1.Text = ui.Text("edit") + " datatype: " + _dataTypeDefinition.Name;
+            InsertPrevalueEditor();
         }
 
-        private void insertPrevalueEditor()
+        private void InsertPrevalueEditor()
         {
             try
             {
                 if (ddlRenderControl.SelectedIndex >= 0)
                 {
-                    interfaces.IDataType o = f.DataType(new Guid(ddlRenderControl.SelectedValue));
+                    var o = DataTypesResolver.Current.GetById(new Guid(ddlRenderControl.SelectedValue));
 
-                    o.DataTypeDefinitionId = dt.Id;
+                    o.DataTypeDefinitionId = _dataTypeDefinition.Id;
                     _prevalue = o.PrevalueEditor;
 
                     if (o.PrevalueEditor.Editor != null)
@@ -97,44 +114,26 @@ namespace umbraco.cms.presentation.developer
             if (_prevalue != null)
                 _prevalue.Save();
 
-            dt.Text = txtName.Text;
+            _dataTypeDefinition.ControlId = new Guid(ddlRenderControl.SelectedValue);
+            _dataTypeDefinition.Name = txtName.Text;
 
-            dt.DataType = f.DataType(new Guid(ddlRenderControl.SelectedValue));
-            dt.Save();
+            ApplicationContext.Services.DataTypeService.Save(_dataTypeDefinition, UmbracoUser.Id);
 
             ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "dataTypeSaved", null), "");
 
-            ClientTools.SyncTree(dt.Path, true);
+            ClientTools.SyncTree("-1,init," + _id.ToString(CultureInfo.InvariantCulture), true);
         }
-
-
-        #region Web Form Designer generated code
-
 
         override protected void OnInit(EventArgs e)
         {
             save = Panel1.Menu.NewImageButton();
             save.ID = "save";
-            save.Click += new System.Web.UI.ImageClickEventHandler(save_click);
+            save.Click += save_click;
             save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
 
             Panel1.hasMenu = true;
 
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
             base.OnInit(e);
         }
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-
-        }
-        #endregion
     }
 }

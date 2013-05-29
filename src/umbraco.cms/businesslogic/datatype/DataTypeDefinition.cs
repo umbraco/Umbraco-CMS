@@ -55,9 +55,8 @@ namespace umbraco.cms.businesslogic.datatype
             {
                 if (_controlId == Guid.Empty) 
                     return null;
-                
-                controls.Factory factory = new controls.Factory();
-                var dt = factory.DataType(_controlId);
+
+                var dt = DataTypesResolver.Current.GetById(_controlId);
 
                 if (dt != null)
                     dt.DataTypeDefinitionId = Id;
@@ -157,16 +156,12 @@ namespace umbraco.cms.businesslogic.datatype
 
 
             //Make sure that the dtd is not already present
-            if (!CMSNode.IsNode(new Guid(_def)))
+            if (IsNode(new Guid(_def)) == false)
             {
-                BusinessLogic.User u = BusinessLogic.User.GetCurrent();
+                var u = BusinessLogic.User.GetCurrent() ?? BusinessLogic.User.GetUser(0);
 
-                if (u == null)
-                    u = BusinessLogic.User.GetUser(0);
-
-                var f = new controls.Factory();
-                DataTypeDefinition dtd = MakeNew(u, _name, new Guid(_def));
-                var dataType = f.DataType(new Guid(_id));
+                var dtd = MakeNew(u, _name, new Guid(_def));
+                var dataType = DataTypesResolver.Current.GetById(new Guid(_id));
                 if (dataType == null)
                     throw new NullReferenceException("Could not resolve a data type with id " + _id);
 
@@ -238,17 +233,16 @@ namespace umbraco.cms.businesslogic.datatype
         public static DataTypeDefinition MakeNew(BusinessLogic.User u, string Text, Guid UniqueId)
         {
 
-            int newId = CMSNode.MakeNew(-1, _objectType, u.Id, 1, Text, UniqueId).Id;
-            cms.businesslogic.datatype.controls.Factory f = new cms.businesslogic.datatype.controls.Factory();
+            var newId = MakeNew(-1, _objectType, u.Id, 1, Text, UniqueId).Id;
 
             // initial control id changed to empty to ensure that it'll always work no matter if 3rd party configurators fail
             // ref: http://umbraco.codeplex.com/workitem/29788
-            Guid FirstcontrolId = Guid.Empty;
+            var firstcontrolId = Guid.Empty;
 
             SqlHelper.ExecuteNonQuery("Insert into cmsDataType (nodeId, controlId, dbType) values (" + newId.ToString() + ",@controlId,'Ntext')",
-                SqlHelper.CreateParameter("@controlId", FirstcontrolId));
+                SqlHelper.CreateParameter("@controlId", firstcontrolId));
 
-            DataTypeDefinition dtd = new DataTypeDefinition(newId);
+            var dtd = new DataTypeDefinition(newId);
             dtd.OnNew(EventArgs.Empty);
 
             return dtd;

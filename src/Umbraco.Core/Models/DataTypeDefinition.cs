@@ -170,7 +170,7 @@ namespace Umbraco.Core.Models
         public Guid ControlId
         {
             get { return _controlId; }
-            private set 
+            set 
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {

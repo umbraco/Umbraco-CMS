@@ -165,8 +165,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             unitOfWork.Commit();
 
             // Act
+            var newId = Guid.NewGuid();
             var definition = repository.Get(dataTypeDefinition.Id);
             definition.Name = "AgeDataType Updated";
+            definition.ControlId = newId;
             repository.AddOrUpdate(definition);
             unitOfWork.Commit();
 
@@ -175,6 +177,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Assert
             Assert.That(definitionUpdated, Is.Not.Null);
             Assert.That(definitionUpdated.Name, Is.EqualTo("AgeDataType Updated"));
+            Assert.That(definitionUpdated.ControlId, Is.EqualTo(newId));
         }
 
         [Test]

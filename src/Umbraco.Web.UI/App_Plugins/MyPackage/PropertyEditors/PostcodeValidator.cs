@@ -12,19 +12,20 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
     /// </summary>
     internal class PostcodeValidator : ValidatorBase
     {
-        public override IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
+        
+        public override IEnumerable<ValidationResult> Validate(string value, string preValues, PropertyEditor editor)
         {
-            var stringVal = value.ToString();
+            var stringVal = value;
 
             if (preValues.IsNullOrWhiteSpace()) yield break;
             var asJson = JObject.Parse(preValues);
             if (asJson["country"] == null) yield break;
-            
+
             if (asJson["country"].ToString() == "Australia")
             {
-                if (!Regex.IsMatch(stringVal, "^\\d{4}$"))
+                if (Regex.IsMatch(stringVal, "^\\d{4}$") == false)
                 {
-                    yield return new ValidationResult("Australian postcodes must be a 4 digit number", 
+                    yield return new ValidationResult("Australian postcodes must be a 4 digit number",
                         new[]
                             {
                                 //we only store a single value for this editor so the 'member' or 'field' 
