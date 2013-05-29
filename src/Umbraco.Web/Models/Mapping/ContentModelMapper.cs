@@ -58,7 +58,8 @@ namespace Umbraco.Web.Models.Mapping
                             Description = p.PropertyType.Description,
                             Label = p.PropertyType.Name,
                             Id = p.Id,
-                            DataType = _applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(p.PropertyType.DataTypeDefinitionId)
+                            DataType = _applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(p.PropertyType.DataTypeDefinitionId),
+                            PropertyEditor = PropertyEditorResolver.Current.GetById(p.PropertyType.DataTypeId)
                         }).ToList()
                 };
         }

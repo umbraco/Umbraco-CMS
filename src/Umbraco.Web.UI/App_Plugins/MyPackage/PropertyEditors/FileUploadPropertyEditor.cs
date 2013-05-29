@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
 {
@@ -13,16 +12,9 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
         /// <returns></returns>
         protected override ValueEditor CreateValueEditor()
         {
-            var editor = base.CreateValueEditor();
+            //TODO: Ensure we assign custom validation for uploaded file types!
 
-            editor.Validators = new List<ValidatorBase> { new PostcodeValidator() };
-
-            return editor;
+            return new FileUploadValueEditor();
         }
-    }
-
-    internal class FileUploadValueEditor : ValueEditor
-    {
-        
     }
 }

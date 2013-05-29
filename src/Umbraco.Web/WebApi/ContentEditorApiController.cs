@@ -1,8 +1,12 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using Umbraco.Core;
+using Umbraco.Core.Models.Editors;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
@@ -88,11 +92,22 @@ namespace Umbraco.Web.WebApi
 
             //Save the property values
             foreach (var p in contentItem.ContentDto.Properties)
-            {
-                var prop = contentItem.PersistedContent.Properties[p.Alias];
+            {                
+                //get the dbo property
+                var dboProperty = contentItem.PersistedContent.Properties[p.Alias];
 
-                //TODO: We need to get the persistable value from the property editor, not just the posted RAW string value.
-                prop.Value = p.Value;
+                //create the property data to send to the property editor
+                var d = new Dictionary<string, object>();
+                //add the files if any
+                var files = contentItem.UploadedFiles.Where(x => x.PropertyId == p.Id).ToArray();
+                if (files.Any())
+                {
+                    d.Add("files", files);
+                }
+                var data = new ContentPropertyData(p.Value, d);
+
+                //get the deserialized value from the property editor
+                dboProperty.Value = p.PropertyEditor.ValueEditor.DeserializeValue(data, dboProperty.Value);
             }
             
             //save the item

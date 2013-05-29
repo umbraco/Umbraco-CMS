@@ -286,6 +286,7 @@
     </Compile>
     <Compile Include="App_Plugins\MyPackage\Controllers\ServerSidePropertyEditorsController.cs" />
     <Compile Include="App_Plugins\MyPackage\PropertyEditors\FileUploadPropertyEditor.cs" />
+    <Compile Include="App_Plugins\MyPackage\PropertyEditors\FileUploadValueEditor.cs" />
     <Compile Include="App_Plugins\MyPackage\PropertyEditors\PostcodePropertyEditor.cs" />
     <Compile Include="App_Plugins\MyPackage\PropertyEditors\PostcodeValidator.cs" />
     <Compile Include="App_Plugins\MyPackage\PropertyEditors\ServerInfoPropertyEditor.cs" />

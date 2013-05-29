@@ -109,7 +109,7 @@ namespace Umbraco.Web.WebApi.Filters
         {
             foreach (var p in postedItem.ContentDto.Properties)
             {
-                var editor = PropertyEditorResolver.Current.GetById(p.DataType.ControlId);
+                var editor = p.PropertyEditor;
                 if (editor == null)
                 {
                     var message = string.Format("The property editor with id: {0} was not found for property with id {1}", p.DataType.ControlId, p.Id);

@@ -30,7 +30,7 @@ namespace Umbraco.Web.WebApi.Filters
                     //cleanup any files associated
                     foreach (var f in contentItem.UploadedFiles)
                     {
-                        File.Delete(f.FilePath);
+                        File.Delete(f.TempFilePath);
                     }
                 }
             }

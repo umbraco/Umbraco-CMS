@@ -97,6 +97,8 @@ namespace Umbraco.Web.WebApi
             //get the files
             foreach (var file in result.FileData)
             {
+                //The name that has been assigned in JS has 2 parts and the second part indicates the property id 
+                // for which the file belongs.
                 var parts = file.Headers.ContentDisposition.Name.Trim(new char[] { '\"' }).Split('_');
                 if (parts.Length != 2)
                 {
@@ -115,10 +117,14 @@ namespace Umbraco.Web.WebApi
                         ReasonPhrase = "The request was not formatted correctly the file name's 2nd part must be an integer"
                     });
                 }
+
+                var fileName = file.Headers.ContentDisposition.FileName.Trim(new char[] {'\"'});
+
                 model.UploadedFiles.Add(new ContentItemFile
                     {
-                        FilePath = file.LocalFileName,
-                        PropertyId = propertyId
+                        TempFilePath = file.LocalFileName,
+                        PropertyId = propertyId,
+                        FileName = fileName
                     });
             }
 

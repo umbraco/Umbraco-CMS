@@ -11,8 +11,13 @@
         public int PropertyId { get; set; }
 
         /// <summary>
+        /// The original file name
+        /// </summary>
+        public string FileName { get; set; }
+
+        /// <summary>
         /// The file path for the uploaded file for where the MultipartFormDataStreamProvider has saved the temp file
         /// </summary>
-        public string FilePath { get; set; }
+        public string TempFilePath { get; set; }
     }
 }

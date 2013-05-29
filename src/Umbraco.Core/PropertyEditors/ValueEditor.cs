@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -105,6 +106,10 @@ namespace Umbraco.Core.PropertyEditors
         /// to an object to be stored in the database.
         /// </summary>
         /// <param name="editorValue"></param>
+        /// <param name="currentValue">
+        /// The current value that has been persisted to the database for this editor. This value may be usesful for 
+        /// how the value then get's deserialized again to be re-persisted. In most cases it will probably not be used.
+        /// </param>
         /// <returns></returns>
         /// <remarks>
         /// By default this will attempt to automatically convert the string value to the value type supplied by ValueType.
@@ -112,9 +117,9 @@ namespace Umbraco.Core.PropertyEditors
         /// If overridden then the object returned must match the type supplied in the ValueType, otherwise persisting the 
         /// value to the DB will fail when it tries to validate the value type.
         /// </remarks>
-        public virtual object DeserializeValue(string editorValue)
+        public virtual object DeserializeValue(ContentPropertyData editorValue, object currentValue)
         {
-            var result = TryConvertValueToCrlType(editorValue);
+            var result = TryConvertValueToCrlType(editorValue.Value);
             if (result.Success == false)
             {
                 throw new InvalidOperationException("The value " + editorValue + " cannot be converted to the type " + GetDatabaseType());
