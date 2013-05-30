@@ -6,34 +6,17 @@
 
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
     <base href="@GlobalSettings.Path.EnsureEndsWith('/')" />
-    <title></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Umbraco</title>
+    <link rel="stylesheet" href="assets/css/umbraco.css" />
 
     @*Currently this needs to be loaded before anything*@
     <script src="@Url.Action("ServerVariables", "BackOfficeScripts")" type="text/javascript"></script>
 
     <style type="text/css">
-        body
-        {
-            font-family: sans-serif;
-        }
-
-        .formSubmitted input.ng-invalid.ng-dirty
-        {
-            background-color: #FA787E;
-        }
-
-        .formSubmitted input.ng-valid.ng-dirty
-        {
-            background-color: #78FA89;
-        }
-
-        .content-properties
-        {
-            border: 1px dashed orange;
-        }
-
         .validation-message
         {
             color: #FA787E;
@@ -58,49 +41,14 @@
             {
                 font-style: italic;
             }
-
-        .content-property
-        {
-            background-color: #EEEEEE;
-            margin: 5px;
-            padding: 5px;
-        }
     </style>
 </head>
-<body>
+<body ng-controller="MainController" id="umbracoMainPageBody">
+    
+    <div ng-include="index.html"></div>
 
-    <form name="contentForm" ng-controller="Umbraco.Content.ContentController" ng-class="{formFailed:ui.formSubmitted}" ng-submit="save()" novalidate>
-
-        <div class="content-properties">
-            <div>ID: <span>{{model.id}}</span></div>
-            <div>Name: <span>{{model.name}}</span></div>
-        </div>
-
-        <val-summary></val-summary>
-
-        <div ng-repeat="model in model.properties" class="content-property">
-            <ng-form name="propertyForm">
-            <div>
-            
-                <val-property-message></val-property-message>
-
-                <div style="font-style: italic;">{{model.label}}</div>
-                <div style="font-size: 9px;">{{model.description}}</div>            
-            </div>
-        
-            <umb-content-property></umb-content-property>
-        </ng-form>
-        </div>
-        <hr />
-        <button ng-disabled="!ui.canSubmit()">Save</button>
-        <hr />
-        <div>Posting value:</div>
-        <div>{{model}}</div>
-    </form>
-
-    @*<script src="@Url.Content(GlobalSettings.Path.EnsureEndsWith('/') + "lib/require/require.min.js")" type="text/javascript"></script>*@
     <script src="lib/require/require.min.js" type="text/javascript"></script>
     <script src="@Url.Action("Application", "BackOfficeScripts")" type="text/javascript"></script>
-    
+
 </body>
 </html>
