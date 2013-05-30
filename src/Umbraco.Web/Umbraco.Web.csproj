@@ -293,10 +293,9 @@
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />
     <Compile Include="Models\Mapping\ContentModelMapper.cs" />
-    <Compile Include="Mvc\BackOfficeController.cs" />
+    <Compile Include="UI\Controllers\BackOfficeController.cs" />
     <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
     <Compile Include="Security\Providers\UsersMembershipProvider.cs" />
-    <Compile Include="Mvc\BackOfficeScriptsController.cs" />
     <Compile Include="UI\JavaScript\RequireJsInit.cs" />
     <Compile Include="UI\JavaScript\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

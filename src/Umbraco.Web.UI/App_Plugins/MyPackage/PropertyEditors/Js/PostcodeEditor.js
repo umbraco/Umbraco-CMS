@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-define(['myApp'], function (app) {
+define(['namespaceMgr'], function () {
     
     Umbraco.Sys.registerNamespace("MyPackage.PropertyEditors");
 

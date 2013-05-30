@@ -16,6 +16,7 @@ namespace Umbraco.Core.Manifest
     internal class ManifestParser
     {
         private readonly DirectoryInfo _pluginsDir;
+        
         //used to strip comments
         private static readonly Regex Comments = new Regex("(/\\*.*\\*/)", RegexOptions.Compiled);
 
@@ -102,7 +103,7 @@ namespace Umbraco.Core.Manifest
             {
                 if (m.IsNullOrWhiteSpace()) continue;
 
-                //remove any comments first
+                //remove any comments first, NOTE: I think JSON.Net will do this for us! but we'll leave it here for now
                 Comments.Replace(m, match => "");
 
                 

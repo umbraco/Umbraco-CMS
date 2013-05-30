@@ -19,6 +19,15 @@ namespace Umbraco.Web.UI.JavaScript
             _parser = parser;
         }
 
+        //used to strip comments
+        internal static readonly Regex Comments = new Regex("(/\\*.*\\*/)", RegexOptions.Compiled);
+        //used for dealing with js functions inside of json (which is not a supported json syntax)
+        private const string PrefixJavaScriptObject = "@@@@";
+        private static readonly Regex JsFunctionParser = new Regex(string.Format("(\"{0}(.*?)\")+", PrefixJavaScriptObject),
+                                                                    RegexOptions.Multiline
+                                                                    | RegexOptions.CultureInvariant
+                                                                    | RegexOptions.Compiled);
+        //used to replace the tokens in the js main
         private static readonly Regex Token = new Regex("(\"##\\w+?##\")", RegexOptions.Compiled);
 
         /// <summary>
@@ -65,11 +74,17 @@ namespace Umbraco.Web.UI.JavaScript
         internal static string ParseMain(params string[] replacements)
         {
             var count = 0;
+
             return Token.Replace(Resources.Main, match =>
             {
                 var replaced = replacements[count];
+
+                //we need to cater for the special syntax when we have js function() objects contained in the json
+                var jsFunctionParsed = JsFunctionParser.Replace(replaced, "$2");
+
                 count++;
-                return replaced;
+
+                return jsFunctionParsed;
             });
         }
 

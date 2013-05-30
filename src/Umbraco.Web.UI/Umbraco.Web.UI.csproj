@@ -565,7 +565,8 @@
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\RegexEditor.html" />
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
-    <Content Include="Umbraco\Js\umbraco.app.js" />
+    <Content Include="Umbraco\Views\temp_content_editor.html" />
+    <Content Include="Umbraco\Views\index.html" />
     <Content Include="Umbraco\Xslt\Web.config">
       <SubType>
       </SubType>
@@ -2096,7 +2097,7 @@
     <Content Include="Umbraco\Scripting\templates\cshtml\MultinodeTree-picker.cshtml" />
     <Content Include="Umbraco\Scripting\templates\cshtml\TwitterFeed.cshtml" />
     <Content Include="Umbraco\Views\Default.cshtml" />
-    <Content Include="Umbraco\Views\Web.config" />
+    <None Include="Umbraco\Views\Web.config.bak" />
     <None Include="Umbraco_client\CodeMirror\js\mode\coffeescript\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\pascal\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\perl\LICENSE" />

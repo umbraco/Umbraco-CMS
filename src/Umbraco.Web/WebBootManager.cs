@@ -23,6 +23,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.UI.Controllers;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic;
@@ -147,6 +148,8 @@ namespace Umbraco.Web
         {
             var umbracoPath = GlobalSettings.UmbracoMvcArea;
 
+            //TODO: We should probably create a 'real' Umbraco area
+
             //Create the back office route
             // TODO: Change this to the normal route, currently it is /Belle for dev testing
             var backOfficeRoute = RouteTable.Routes.MapRoute(
@@ -154,7 +157,7 @@ namespace Umbraco.Web
                 //umbracoPath + "/{action}/{id}",
                 "Belle/{action}/{id}",
                 new { controller = "BackOffice", action = "Default", id = UrlParameter.Optional },
-                new[]{"Umbraco.Web.Mvc"});
+                new[] { typeof(BackOfficeController).Namespace });
             backOfficeRoute.DataTokens.Add("area", umbracoPath);
 
             //Create the front-end route
@@ -173,6 +176,9 @@ namespace Umbraco.Web
                 );
             installPackageRoute.DataTokens.Add("area", umbracoPath);
 
+            //plugin controllers must come first because the next route will catch many things
+            RoutePluginControllers();
+
             //Create the REST/web/script service routes
             var webServiceRoutes = RouteTable.Routes.MapRoute(
                 "Umbraco_web_services",
@@ -182,8 +188,7 @@ namespace Umbraco.Web
                 new string[] { "Umbraco.Web.WebServices" }
                 );
             webServiceRoutes.DataTokens.Add("area", umbracoPath);
-
-            RoutePluginControllers();
+            
         }
         
         private void RoutePluginControllers()

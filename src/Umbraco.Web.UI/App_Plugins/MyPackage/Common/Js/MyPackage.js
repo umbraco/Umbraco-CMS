@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-define(['myApp'], function (app) {
+define(['app'], function (app) {
 
     app.directive('valPostcode', function () {
 

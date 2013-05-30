@@ -14,6 +14,8 @@ namespace Umbraco.Tests.AngularIntegration
     public class RequireJsInitTests
     {
 
+        
+
         [Test]
         public void Get_Default_Config()
         {
@@ -40,6 +42,23 @@ namespace Umbraco.Tests.AngularIntegration
 
             Assert.IsTrue(result.StartsWith("require.config({Hello});"));
             Assert.IsTrue(result.Contains("require([World]"));
+        }
+
+        [Test]
+        public void Parse_Main_With_JS_Function()
+        {
+            var result = RequireJsInit.ParseMain(@"{ 
+                waitSeconds: 120, 
+                paths: {
+                    jquery: '../lib/jquery/jquery-1.8.2.min'
+                },
+                shim: {
+                    'tinymce':""@@@@{exports:'tinyMCE',init:function() { this.tinymce.DOM.events.domLoaded = true; return this.tinymce; } }""
+                }
+            }", "[World]");
+
+            Assert.IsFalse(result.Contains("@@@@"));
+            Assert.IsTrue(result.Contains("'tinymce':{exports:'tinyMCE',init:function()"));
         }
 
     }

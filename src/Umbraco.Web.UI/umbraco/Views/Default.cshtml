@@ -1,4 +1,6 @@
-﻿@{
+﻿@using Umbraco.Core
+@inherits System.Web.Mvc.WebViewPage
+@{
     Layout = null;
 }
 
@@ -14,7 +16,7 @@
     <link rel="stylesheet" href="assets/css/umbraco.css" />
 
     @*Currently this needs to be loaded before anything*@
-    <script src="@Url.Action("ServerVariables", "BackOfficeScripts")" type="text/javascript"></script>
+    <script src="@Url.Action("ServerVariables", "BackOffice")" type="text/javascript"></script>
 
     <style type="text/css">
         .validation-message
@@ -43,12 +45,16 @@
             }
     </style>
 </head>
-<body ng-controller="MainController" id="umbracoMainPageBody">
+<body ng-controller="ContainerController">
     
-    <div ng-include="index.html"></div>
+    <div ng-include="applicationView"></div>
 
-    <script src="lib/require/require.min.js" type="text/javascript"></script>
-    <script src="@Url.Action("Application", "BackOfficeScripts")" type="text/javascript"></script>
+    <script  src="lib/require/require.min.js" type="text/javascript"></script>
+    
+    @*We cannot use the data-main attribute above because we need to load in the application 
+    via a server side JavaScript request, so we just request it after requirejs*@
+    <script src="@Url.Action("Application", "BackOffice")" type="text/javascript"></script>
 
 </body>
 </html>
+
