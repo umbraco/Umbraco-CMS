@@ -815,7 +815,7 @@ namespace umbraco.cms.businesslogic.packager
             _license = _packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/package/license").FirstChild.Value;
             _licenseUrl = _packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/package/license").Attributes.GetNamedItem("url").Value;
             _reqMajor = int.Parse(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/package/requirements/major").FirstChild.Value);
-            _reqMinor = int.Parse(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/package/requirements/major").FirstChild.Value);
+            _reqMinor = int.Parse(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/package/requirements/minor").FirstChild.Value);
             _reqPatch = int.Parse(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/package/requirements/patch").FirstChild.Value);
             _authorName = _packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/author/name").FirstChild.Value;
             _authorUrl = _packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/author/website").FirstChild.Value;
