@@ -29,28 +29,34 @@ namespace Umbraco.Web.Trees
             controllerContext.Configuration.Formatters.Remove(controllerContext.Configuration.Formatters.XmlFormatter);
         }
 
-        ///// <summary>
-        ///// Returns the tree nodes for an application
-        ///// </summary>
-        ///// <param name="application"></param>
-        ///// <param name="queryStrings"></param>
-        ///// <returns></returns>
-        //[HttpQueryStringFilter("queryStrings")]
-        //public TreeNodeCollection GetApplicationTrees(string application, FormDataCollection queryStrings)
-        //{
-        //    if (application == null) throw new ArgumentNullException("application");
-            
-        //    //find all tree definitions that have the current application alias
-        //    var appTrees = ApplicationTree.getApplicationTree(application);
-        //    if (appTrees.Count() == 1)
-        //    {
-        //        return GetNodeCollection(appTrees.Single(), "-1", queryStrings);
-        //    }
-        //    foreach (var tree in appTrees)
-        //    {
+        /// <summary>
+        /// Returns the tree nodes for an application
+        /// </summary>
+        /// <param name="application"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        [HttpQueryStringFilter("queryStrings")]
+        public TreeNodeCollection GetApplicationTrees(string application, FormDataCollection queryStrings)
+        {
+            if (application == null) throw new ArgumentNullException("application");
+
+            //find all tree definitions that have the current application alias
+            var appTrees = ApplicationTree.getApplicationTree(application).Where(x => x.Initialize).ToArray();
+            if (appTrees.Count() == 1)
+            {
+                //return the nodes for the one tree assigned
+                return GetNodeCollection(appTrees.Single(), "-1", queryStrings);
+            }
+
+            var collection = new TreeNodeCollection();
+            foreach (var tree in appTrees)
+            {
+                //return the root nodes for each tree in the app
+                //collection.Add(); //GetNodeCollection(tree, "-1", queryStrings);
                 
-        //    }
-        //}
+            }
+            return null;
+        }
 
         /// <summary>
         /// Returns the tree data for a specific tree for the children of the id
@@ -114,7 +120,6 @@ namespace Umbraco.Web.Trees
             var instance = (TreeApiController)DependencyResolver.Current.GetService(foundControllerTree);
             instance.ControllerContext = ControllerContext;
             instance.Request = Request;
-
             //return it's data
             return new Attempt<TreeNodeCollection>(true, instance.GetNodes(id, formCollection));
         }

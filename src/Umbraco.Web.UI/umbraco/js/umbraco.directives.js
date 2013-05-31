@@ -11,7 +11,7 @@ define(['angular'], function (angular) {
     * @name umbraco.directive:leftColumn
     * @restrict E
     **/
-    var leftColumnDirective = function () {
+    function leftColumnDirective() {
         return {
             restrict: "E",    // restrict to an element
             replace: true,   // replace the html element with the template
@@ -29,7 +29,7 @@ define(['angular'], function (angular) {
     * @name umbraco.directive:login 
     * @restrict E
     **/
-    var loginDirective = function () {
+    function loginDirective() {
         return {
             restrict: "E",    // restrict to an element
             replace: true,   // replace the html element with the template
@@ -47,7 +47,7 @@ define(['angular'], function (angular) {
     * @name umbraco.directive:notifications 
     * @restrict E
     **/
-    var notificationDirective = function () {
+    function notificationDirective() {
         return {
             restrict: "E",    // restrict to an element
             replace: true,   // replace the html element with the template

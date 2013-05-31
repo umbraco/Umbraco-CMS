@@ -244,14 +244,25 @@ angular.module('umbraco.services.section', [])
 	};
 
 });
-angular.module('umbraco.services.tree', [])
-.factory('tree', function () {
+
+angular.module('umbraco.services.tree', ["umbraco.resources.trees"])
+.factory('tree', function ($http, umbTreeResource) {
 		//implement this in local storage
 		var treeArray = [];
 		var currentSection = "content";
 
 		return {
 		    getTree: function (section) {
+
+		        umbTreeResource.loadApplication(section)
+		            .then(function (data) {
+
+		                //this will be called once the tree app data has loaded
+		                alert("woot!");
+
+		            }, function (reason) {
+		                alert('Failed: ' + reason);
+		            });
 
 				if (treeArray[section] !== undefined){
 					return treeArray[section];

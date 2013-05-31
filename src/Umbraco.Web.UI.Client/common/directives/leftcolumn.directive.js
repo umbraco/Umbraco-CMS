@@ -7,7 +7,7 @@ define(['angular'], function (angular) {
     * @name umbraco.directive:leftColumn
     * @restrict E
     **/
-    var leftColumnDirective = function () {
+    function leftColumnDirective() {
         return {
             restrict: "E",    // restrict to an element
             replace: true,   // replace the html element with the template
