@@ -145,6 +145,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AngularIntegration\ContentModelSerializationTests.cs" />
     <Compile Include="AngularIntegration\RequireJsInitTests.cs" />
     <Compile Include="AngularIntegration\ServerVariablesParserTests.cs" />
     <Compile Include="Auditing\AuditTests.cs" />
@@ -190,6 +191,7 @@
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
     <Compile Include="Integration\CreateContent.cs" />
+    <Compile Include="Models\Mapping\ContentWebModelMappingTests.cs" />
     <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="Manifest\ManifestParserTests.cs" />
     <Compile Include="TestHelpers\BaseSeleniumTest.cs" />

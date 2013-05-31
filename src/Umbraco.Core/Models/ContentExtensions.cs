@@ -106,6 +106,32 @@ namespace Umbraco.Core.Models
         #endregion
 
         /// <summary>
+        /// Returns properties that do not belong to a group
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public static IEnumerable<Property> GetNonGroupedProperties(this IContentBase content)
+        {
+            var propertyIdsInTabs = content.PropertyGroups.SelectMany(pg => pg.PropertyTypes).Select(pt => pt.Id);
+            return content.Properties.Where(property => propertyIdsInTabs.Contains(property.PropertyTypeId) == false);
+        }
+
+        /// <summary>
+        /// Returns the Property object for the given property group
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="propertyGroup"></param>
+        /// <returns></returns>
+        public static IEnumerable<Property> GetPropertiesForGroup(this IContentBase content, PropertyGroup propertyGroup)
+        {
+            //get the properties for the current tab
+            return content.Properties
+                          .Where(property => propertyGroup.PropertyTypes
+                                                          .Select(propertyType => propertyType.Id)
+                                                          .Contains(property.PropertyTypeId));
+        } 
+
+        /// <summary>
         /// Set property values by alias with an annonymous object
         /// </summary>
         public static void PropertyValues(this IContent content, object value)

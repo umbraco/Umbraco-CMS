@@ -7,6 +7,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
 {
     public class MockedContentTypes
     {
+        
+
         public static ContentType CreateTextpageContentType(string alias = "textPage", string name = "Text Page")
         {
             var contentType = new ContentType(-1)
@@ -159,6 +161,18 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                   };
 
             contentType.PropertyGroups.Add(new PropertyGroup(collection) { Name = "Content", SortOrder = 1 });
+
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
+
+            return contentType;
+        }
+
+        public static ContentType CreateSimpleContentType(string alias, string name, PropertyTypeCollection groupedCollection, PropertyTypeCollection nonGroupedCollection)
+        {
+            var contentType = CreateSimpleContentType(alias, name, groupedCollection);
+            //now add the non-grouped properties
+            nonGroupedCollection.ForEach(pt => contentType.AddPropertyType(pt));
 
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);

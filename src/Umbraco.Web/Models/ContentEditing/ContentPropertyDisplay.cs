@@ -26,5 +26,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "config")]
         public IEnumerable<string> Config { get; set; }
+
+        [DataMember(Name = "hideLabel")]
+        public bool HideLabel { get; set; }
     }
 }

@@ -292,10 +292,22 @@
     <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />
+    <Compile Include="Models\ContentEditing\Tab.cs" />
     <Compile Include="Models\Mapping\ContentModelMapper.cs" />
-    <Compile Include="UI\Controllers\BackOfficeController.cs" />
+    <Compile Include="FormDataCollectionExtensions.cs" />
+    <Compile Include="Trees\ISearchableTree.cs" />
+    <Compile Include="Trees\LegacyTreeDataAdapter.cs" />
+    <Compile Include="Trees\SearchResultItem.cs" />
+    <Compile Include="Trees\TreeApiController.cs" />
+    <Compile Include="Trees\TreeNode.cs" />
+    <Compile Include="Trees\TreeNodeCollection.cs" />
+    <Compile Include="Trees\TreeQueryStringParameters.cs" />
+    <Compile Include="Trees\ApplicationTreeApiController.cs" />
+    <Compile Include="Editors\BackOfficeController.cs" />
     <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
     <Compile Include="Security\Providers\UsersMembershipProvider.cs" />
+    <Compile Include="Trees\TestTreeApiController.cs" />
+    <Compile Include="Trees\UrlHelperExtensions.cs" />
     <Compile Include="UI\JavaScript\RequireJsInit.cs" />
     <Compile Include="UI\JavaScript\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -308,7 +320,6 @@
     <Compile Include="Models\ContentEditing\ContentItemFile.cs" />
     <Compile Include="Models\ContentEditing\ContentItemSave.cs" />
     <Compile Include="Models\ContentEditing\ContentPropertyBase.cs" />
-    <Compile Include="Models\ContentEditing\ContentPropertyCollection.cs" />
     <Compile Include="Models\ContentEditing\ContentPropertyDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentPropertyDto.cs" />
     <Compile Include="Standalone\ServiceContextManager.cs" />
@@ -407,10 +418,11 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="UrlHelperExtensions.cs" />
-    <Compile Include="WebApi\ContentEditorApiController.cs" />
-    <Compile Include="WebApi\ContentItemBinder.cs" />
+    <Compile Include="Editors\ContentEditorApiController.cs" />
+    <Compile Include="WebApi\Binders\ContentItemBinder.cs" />
     <Compile Include="WebApi\Filters\ContentItemValidationFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\FileUploadCleanupFilterAttribute.cs" />
+    <Compile Include="WebApi\Filters\HttpQueryStringFilterAttribute.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerResolver.cs" />

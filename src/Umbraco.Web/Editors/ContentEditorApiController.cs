@@ -4,15 +4,15 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
-using Umbraco.Core;
 using Umbraco.Core.Models.Editors;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi;
+using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 
-namespace Umbraco.Web.WebApi
+namespace Umbraco.Web.Editors
 {
 
     /// <summary>

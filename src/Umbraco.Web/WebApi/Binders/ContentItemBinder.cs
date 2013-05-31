@@ -12,7 +12,7 @@ using Umbraco.Core;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 
-namespace Umbraco.Web.WebApi
+namespace Umbraco.Web.WebApi.Binders
 {
     /// <summary>
     /// Binds the content model to the controller action for the posted multi-part Post

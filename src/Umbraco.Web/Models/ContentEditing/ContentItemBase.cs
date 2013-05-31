@@ -16,21 +16,27 @@ namespace Umbraco.Web.Models.ContentEditing
         protected ContentItemBase()
         {
             //ensure its not null
-            Properties = new List<T>();
+            _properties = new List<T>();
         }
+
+        private IEnumerable<T> _properties;
 
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
         public int Id { get; set; }
 
         [DataMember(Name = "properties")]
-        public IEnumerable<T> Properties { get; set; }
+        public virtual IEnumerable<T> Properties
+        {
+            get { return _properties; }
+            set { _properties = value; }
+        }
 
         /// <summary>
         /// The real persisted content object
         /// </summary>
         [JsonIgnore]
-        public IContent PersistedContent { get; set; }
+        internal IContent PersistedContent { get; set; }
 
         /// <summary>
         /// The DTO object used to gather all required content data including data type information etc... for use with validation

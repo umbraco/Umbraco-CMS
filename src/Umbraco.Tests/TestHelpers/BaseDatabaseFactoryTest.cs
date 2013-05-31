@@ -56,17 +56,6 @@ namespace Umbraco.Tests.TestHelpers
             var path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            ApplicationContext.Current = new ApplicationContext(
-				//assign the db context
-				new DatabaseContext(new DefaultDatabaseFactory()),
-				//assign the service context
-				new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy()),
-                //disable cache
-                false)
-                {
-                    IsReady = true
-                };
-
             DatabaseContext.Initialize();
 
             CreateDatabase();

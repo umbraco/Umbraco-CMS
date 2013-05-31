@@ -135,6 +135,8 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         public virtual string SerializeValue(object dbValue)
         {
+            if (dbValue == null) return string.Empty;
+
             switch (GetDatabaseType())
             {
                 case DataTypeDatabaseType.Ntext:                    

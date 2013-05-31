@@ -20,30 +20,62 @@ namespace Umbraco.Web.Models.Mapping
             _applicationContext = applicationContext;
         }
 
+        private ContentPropertyDisplay ToContentPropertyDisplay(Property property)
+        {
+            var editor = PropertyEditorResolver.Current.GetById(property.PropertyType.DataTypeId);
+            if (editor == null)
+            {
+                throw new NullReferenceException("The property editor with id " + property.PropertyType.DataTypeId + " does not exist");
+            }
+            return new ContentPropertyDisplay
+            {
+                Alias = property.Alias,
+                Id = property.Id,
+                Description = property.PropertyType.Description,
+                Label = property.PropertyType.Name,
+                Config = _applicationContext.Services.DataTypeService.GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId),
+                Value = editor.ValueEditor.SerializeValue(property.Value),
+                View = editor.ValueEditor.View
+            };
+        }
+
         public ContentItemDisplay ToContentItemDisplay(IContent content)
-        {            
+        {
+            //create the list of tabs for properties assigned to tabs.
+            var tabs = content.PropertyGroups.Select(propertyGroup =>
+                {
+                    //get the properties for the current tab
+                    var propertiesForTab = content.GetPropertiesForGroup(propertyGroup);
+
+                    //convert the properties to ContentPropertyDisplay objects
+                    var displayProperties = propertiesForTab
+                        .Select(ToContentPropertyDisplay);
+
+                    //return the tab with the tab properties
+                    return new Tab<ContentPropertyDisplay>
+                        {
+                            Alias = propertyGroup.Name,
+                            Label = propertyGroup.Name,
+                            Properties = displayProperties
+                        };
+                }).ToList();
+
+            //now add the generic properties tab for any properties that don't belong to a tab
+            var orphanProperties = content.GetNonGroupedProperties();
+
+            //now add the generic properties tab
+            tabs.Add(new Tab<ContentPropertyDisplay>
+                {
+                    Label = "Generic properties",
+                    Alias = "Generic properties",
+                    Properties = orphanProperties.Select(ToContentPropertyDisplay)
+                });
+
             return new ContentItemDisplay
                 {
                     Id = content.Id,
                     Name = content.Name,
-                    Properties = content.Properties.Select(p =>
-                        {
-                            var editor = PropertyEditorResolver.Current.GetById(p.PropertyType.DataTypeId);
-                            if (editor == null)
-                            {
-                                throw new NullReferenceException("The property editor with id " + p.PropertyType.DataTypeId + " does not exist");
-                            }
-                            return new ContentPropertyDisplay
-                                {
-                                    Alias = p.Alias,
-                                    Id = p.Id,
-                                    Description = p.PropertyType.Description,
-                                    Label = p.PropertyType.Name,
-                                    Config = _applicationContext.Services.DataTypeService.GetPreValuesByDataTypeId(p.PropertyType.DataTypeDefinitionId),
-                                    Value = editor.ValueEditor.SerializeValue(p.Value),
-                                    View = editor.ValueEditor.View
-                                };
-                        }).ToArray()
+                    Tabs = tabs
                 };
         }
 
