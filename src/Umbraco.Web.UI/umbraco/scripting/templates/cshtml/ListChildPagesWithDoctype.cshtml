@@ -10,8 +10,14 @@
 
 @{    
 	@*Build a query and return the visible items *@
-	var selection= Model.Textpages.Where(query).Where("Visible");
+    var selection= Model.Textpages.Where("Visible");
+    
+    @*
+       Example of more querying, if you have a true/false property with the alias of shouldBeFeatured:
+       var selection= Model.Textpages.Where("shouldBeFeatured == true").Where("Visible");
+    *@
 }
+
 
 @*Determine if there are any nodes in the selection, then render list *@
 @if(selection.Any()){
