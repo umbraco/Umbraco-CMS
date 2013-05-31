@@ -74,15 +74,19 @@ namespace umbraco.editorControls.imagecropper
 
         private static Image CropImage(Image img, Rectangle cropArea)
         {
-            var bmpImage = new Bitmap(img);
-
             if (cropArea.Right > img.Width)
                 cropArea.Width -= (cropArea.Right - img.Width);
 
             if (cropArea.Bottom > img.Height)
                 cropArea.Height -= (cropArea.Bottom - img.Height);
 
-            var bmpCrop = bmpImage.Clone(cropArea, bmpImage.PixelFormat);
+            var bmpCrop = new Bitmap(cropArea.Width, cropArea.Height);
+
+            using (var graphics = Graphics.FromImage(bmpCrop))
+            {
+                graphics.DrawImage(img, new Rectangle(0, 0, bmpCrop.Width, bmpCrop.Height), cropArea, GraphicsUnit.Pixel);
+            }
+
             return bmpCrop;
         }
 
