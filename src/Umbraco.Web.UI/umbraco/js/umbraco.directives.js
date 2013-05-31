@@ -5,6 +5,62 @@
  */
 'use strict';
 define(['angular'], function (angular) {
+
+    /**
+    * @ngdoc directive 
+    * @name umbraco.directive:leftColumn
+    * @restrict E
+    **/
+    var leftColumnDirective = function () {
+        return {
+            restrict: "E",    // restrict to an element
+            replace: true,   // replace the html element with the template
+            template: '<div ng-include="leftColumnViewFile"></div>',
+            link: function (scope, el, attrs) {
+                //set the loginViewFile
+                scope.leftColumnViewFile = "views/directives/umb-leftcolumn.html";
+            }
+        };
+    };
+    angular.module('umbraco').directive("umbLeftColumn", leftColumnDirective);
+
+    /**
+    * @ngdoc directive 
+    * @name umbraco.directive:login 
+    * @restrict E
+    **/
+    var loginDirective = function () {
+        return {
+            restrict: "E",    // restrict to an element
+            replace: true,   // replace the html element with the template
+            template: '<div ng-include="loginViewFile"></div>',
+            link: function (scope, el, attrs) {
+                //set the loginViewFile
+                scope.loginViewFile = "views/directives/umb-login.html";
+            }
+        };
+    };
+    angular.module('umbraco').directive("umbLogin", loginDirective);
+
+    /**
+    * @ngdoc directive 
+    * @name umbraco.directive:notifications 
+    * @restrict E
+    **/
+    var notificationDirective = function () {
+        return {
+            restrict: "E",    // restrict to an element
+            replace: true,   // replace the html element with the template
+            template: '<div ng-include="notificationViewFile"></div>',
+            link: function (scope, el, attrs) {
+                //set the notificationViewFile
+                scope.notificationViewFile = "views/directives/umb-notifications.html";
+            }
+        };
+    };
+    angular.module('umbraco').directive("umbNotifications", notificationDirective);
+
+
 angular.module('umbraco.directives', [])
 .directive('val-regex', function () {
 

@@ -45,9 +45,19 @@
             }
     </style>
 </head>
-<body ng-controller="ContainerController" id="umbracoMainPageBody">
-    
-    <div ng-include="applicationView"></div>
+<body ng-controller="MainController" id="umbracoMainPageBody">
+        
+    <div ng-show="authenticated" ng-cloak ng-animate="'fade'" id="layout" class="clearfix" ng-click="closeDialogs($event)">
+        
+        <umb-left-column></umb-left-column>
+
+        <section id="contentwrapper">
+            <div id="contentcolumn"><div ng-view></div></div>
+        </section>
+    </div>
+
+    <umg-login></umg-login>
+    <umb-notifications></umb-notifications>
 
     <script  src="lib/require/require.min.js" type="text/javascript"></script>
     

@@ -244,31 +244,14 @@ angular.module('umbraco.services.section', [])
 	};
 
 });
-
 angular.module('umbraco.services.tree', [])
-.factory('tree', function ($http) {
+.factory('tree', function () {
 		//implement this in local storage
 		var treeArray = [];
 		var currentSection = "content";
 
-		var treeApplicationUrl = Umbraco.Sys.ServerVariables.treeApplicationApiBaseUrl + "GetTreeData?treeType=" + 1166;
-
 		return {
 		    getTree: function (section) {
-
-
-		        //go and get the tree data
-                //TODO: this should be in a resource
-		        $http.get(getContentUrl, section).
-                    success(function (data, status, headers, config) {
-                        //set the model to the value returned by the server
-                        $scope.model = data;
-                        $scope.ui.working = false;
-                    }).
-                    error(function (data, status, headers, config) {
-                        alert("failed!");
-                        $scope.ui.working = false;
-                    });
 
 				if (treeArray[section] !== undefined){
 					return treeArray[section];
