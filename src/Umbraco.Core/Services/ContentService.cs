@@ -1186,7 +1186,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Sorts a collection of <see cref="IContent"/> objects by updating the SortOrder according
-        /// to the ordering of items in the passed in <see cref="SortedSet{T}"/>.
+        /// to the ordering of items in the passed in <see cref="IEnumerable{T}"/>.
         /// </summary>
         /// <remarks>
         /// Using this method will ensure that the Published-state is maintained upon sorting
@@ -1196,7 +1196,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         /// <param name="raiseEvents"></param>
         /// <returns>True if sorting succeeded, otherwise False</returns>
-        public bool Sort(SortedSet<IContent> items, int userId = 0, bool raiseEvents = true)
+        public bool Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -1215,6 +1215,15 @@ namespace Umbraco.Core.Services
                     int i = 0;
                     foreach (var content in items)
                     {
+                        //If the current sort order equals that of the content
+                        //we don't need to update it, so just increment the sort order
+                        //and continue.
+                        if (content.SortOrder == i)
+                        {
+                            i++;
+                            continue;
+                        }
+
                         content.SortOrder = i;
                         content.WriterId = userId;
                         i++;

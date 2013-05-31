@@ -61,7 +61,7 @@ function openMedia(id) {
         //with the OnBeforeTreeRender/OnAfterTreeRender events, which sends an array for legacy Media items.
         public override void Render(ref XmlTree tree)
         {
-            _timer = DisposableTimer.Start(x => LogHelper.Debug<BaseMediaTree>("Media tree loaded" + " (took " + x + "ms)"));
+            //_timer = DisposableTimer.Start(x => LogHelper.Debug<BaseMediaTree>("Media tree loaded" + " (took " + x + "ms)"));
 
             var entities = Services.EntityService.GetChildren(m_id, UmbracoObjectTypes.Media).ToArray();
             
@@ -79,15 +79,16 @@ function openMedia(id) {
 
                 xNode.Icon = entity.ContentTypeIcon;
                 xNode.OpenIcon = entity.ContentTypeIcon;
-
-                xNode.Menu = this.ShowContextMenu ? new List<IAction>(new IAction[] { ActionRefresh.Instance }) : null;
-
+                        
                 if (IsDialog == false)
                 {
+                    if(this.ShowContextMenu == false)
+                        xNode.Menu = null;
                     xNode.Action = "javascript:openMedia(" + entity.Id + ");";
                 }
                 else
                 {
+                    xNode.Menu = this.ShowContextMenu ? new List<IAction>(new IAction[] { ActionRefresh.Instance }) : null;
                     if (this.DialogMode == TreeDialogModes.fulllink)
                     {
                         if (string.IsNullOrEmpty(entity.UmbracoFile) == false)
@@ -122,87 +123,10 @@ function openMedia(id) {
             }
 
             //stop the timer and log the output
-            _timer.Dispose();
+            //_timer.Dispose();
 
             OnAfterTreeRender(entities, args, false);
         }
-
-        /*public override void Render(ref XmlTree tree)
-        {
-            //_timer = DisposableTimer.Start(x => LogHelper.Debug<BaseMediaTree>("Media tree loaded" + " (took " + x + "ms)"));
-          
-			Media[] docs = new Media(m_id).Children;
-
-            var args = new TreeEventArgs(tree);
-            OnBeforeTreeRender(docs, args);
-
-            foreach (Media dd in docs)
-            {
-                XmlTreeNode xNode = XmlTreeNode.Create(this);
-                xNode.NodeID = dd.Id.ToString();
-                xNode.Text = dd.Text;
-
-                // Check for dialog behaviour
-                if (!this.IsDialog)
-                {
-                    if (!this.ShowContextMenu)
-                        xNode.Menu = null;
-                    xNode.Action = "javascript:openMedia(" + dd.Id + ");";
-                }
-                else
-                {
-                    if (this.ShowContextMenu)
-                        xNode.Menu = new List<IAction>(new IAction[] { ActionRefresh.Instance });
-                    else
-                        xNode.Menu = null;
-                    if (this.DialogMode == TreeDialogModes.fulllink)
-                    {
-                        string nodeLink = GetLinkValue(dd, dd.Id.ToString());
-                        if (!String.IsNullOrEmpty(nodeLink))
-                        {
-                            xNode.Action = "javascript:openMedia('" + nodeLink + "');";
-                        }
-                        else
-                        {
-                            if (string.Equals(dd.ContentType.Alias, Constants.Conventions.MediaTypes.Folder, StringComparison.OrdinalIgnoreCase))
-                            {
-                                xNode.Action = "javascript:jQuery('.umbTree #" + dd.Id.ToString() + "').click();";
-                            }
-                            else
-                            {
-                                xNode.Action = null;
-                                xNode.Style.DimNode();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        xNode.Action = "javascript:openMedia('" + dd.Id.ToString() + "');";
-                    }
-                }
-
-				xNode.HasChildren = dd.HasChildren;
-                if (this.IsDialog)
-                    xNode.Source = GetTreeDialogUrl(dd.Id);
-                else
-                    xNode.Source = GetTreeServiceUrl(dd.Id);                    
-
-                if (dd.ContentType != null)
-                {
-                    xNode.Icon = dd.ContentType.IconUrl;
-                    xNode.OpenIcon = dd.ContentType.IconUrl;                    
-                }
-
-                OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
-                if (xNode != null)
-                {
-                    tree.Add(xNode);
-                    OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
-                }
-            }
-            //_timer.Dispose();
-            OnAfterTreeRender(docs, args);
-        }*/
 
         /// <summary>
 		/// Returns the value for a link in WYSIWYG mode, by default only media items that have a 
