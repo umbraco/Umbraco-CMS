@@ -29,25 +29,30 @@ namespace Umbraco.Web.WebServices
             var service = ApplicationContext.Current.Services.EntityService;
 
             var entities = service.GetChildren(parentId, UmbracoObjectTypes.Media);
-            //TODO: Only fetch files, not containers
             foreach (UmbracoEntity entity in entities)
             {
-                var thumbUrl = ThumbnailProvidersResolver.Current.GetThumbnailUrl(entity.UmbracoFile);
-                var item = new
-                {
-                    Id = entity.Id,
-                    Path = entity.Path,
-                    Name = entity.Name,
-                    Tags = string.Join(",", Tag.GetTags(entity.Id).Select(x => x.TagCaption)),
-                    MediaTypeAlias = entity.ContentTypeAlias,
-                    EditUrl = string.Format("editMedia.aspx?id={0}", entity.Id),
-                    FileUrl = entity.UmbracoFile,
-                    ThumbnailUrl = string.IsNullOrEmpty(thumbUrl)
-                        ? IOHelper.ResolveUrl(string.Format("{0}/images/thumbnails/{1}", SystemDirectories.Umbraco, entity.ContentTypeThumbnail))
-                        : thumbUrl
-                };
+                var properties = entity.UmbracoProperties.Where(x => x.DataTypeControlId == new Guid(Constants.PropertyEditors.UploadField)).ToList();
+                if(properties.Any() == false) continue;
 
-                data.Add(item);
+                foreach (var property in properties)
+                {
+                    var thumbUrl = ThumbnailProvidersResolver.Current.GetThumbnailUrl(property.Value);
+                    var item = new
+                    {
+                        Id = entity.Id,
+                        Path = entity.Path,
+                        Name = entity.Name,
+                        Tags = string.Join(",", Tag.GetTags(entity.Id).Select(x => x.TagCaption)),
+                        MediaTypeAlias = entity.ContentTypeAlias,
+                        EditUrl = string.Format("editMedia.aspx?id={0}", entity.Id),
+                        FileUrl = property.Value,
+                        ThumbnailUrl = string.IsNullOrEmpty(thumbUrl)
+                            ? IOHelper.ResolveUrl(string.Format("{0}/images/thumbnails/{1}", SystemDirectories.Umbraco, entity.ContentTypeThumbnail))
+                            : thumbUrl
+                    };
+
+                    data.Add(item);
+                }
             }
 
             return new JavaScriptSerializer().Serialize(data);

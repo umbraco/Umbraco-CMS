@@ -91,9 +91,10 @@ function openMedia(id) {
                     xNode.Menu = this.ShowContextMenu ? new List<IAction>(new IAction[] { ActionRefresh.Instance }) : null;
                     if (this.DialogMode == TreeDialogModes.fulllink)
                     {
-                        if (string.IsNullOrEmpty(entity.UmbracoFile) == false)
+                        string nodeLink = GetLinkValue(entity);
+                        if (string.IsNullOrEmpty(nodeLink) == false)
                         {
-                            xNode.Action = "javascript:openMedia('" + entity.UmbracoFile + "');";
+                            xNode.Action = "javascript:openMedia('" + nodeLink + "');";
                         }
                         else
                         {
@@ -143,11 +144,31 @@ function openMedia(id) {
 			foreach (Property p in props)
 			{				
 				Guid currId = p.PropertyType.DataTypeDefinition.DataType.Id;
-				if (LinkableMediaDataTypes.Contains(currId) &&  !String.IsNullOrEmpty(p.Value.ToString()))
+				if (LinkableMediaDataTypes.Contains(currId) &&  string.IsNullOrEmpty(p.Value.ToString()) == false)
 				{
 					return p.Value.ToString();
 				}
 			}
+            return "";
+        }
+
+        /// <summary>
+        /// NOTE: New implementation of the legacy GetLinkValue. This is however a bit quirky as a media item can have multiple "Linkable DataTypes".
+        /// Returns the value for a link in WYSIWYG mode, by default only media items that have a 
+        /// DataTypeUploadField are linkable, however, a custom tree can be created which overrides
+        /// this method, or another GUID for a custom data type can be added to the LinkableMediaDataTypes
+        /// list on application startup.
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        internal virtual string GetLinkValue(UmbracoEntity entity)
+        {
+            foreach (var property in entity.UmbracoProperties)
+            {
+                if (LinkableMediaDataTypes.Contains(property.DataTypeControlId) &&
+                    string.IsNullOrEmpty(property.Value) == false)
+                    return property.Value;
+            }
             return "";
         }
 

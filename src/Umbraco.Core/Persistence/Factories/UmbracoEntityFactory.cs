@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
@@ -25,12 +26,25 @@ namespace Umbraco.Core.Persistence.Factories
                                  ContentTypeAlias = dto.Alias ?? string.Empty,
                                  ContentTypeIcon = dto.Icon ?? string.Empty,
                                  ContentTypeThumbnail = dto.Thumbnail ?? string.Empty,
-                                 UmbracoFile = dto.UmbracoFile ?? string.Empty
+                                 UmbracoProperties = new List<UmbracoEntity.UmbracoProperty>()
                              };
 
             entity.IsPublished = dto.PublishedVersion != default(Guid) || (dto.NewestVersion != default(Guid) && dto.PublishedVersion == dto.NewestVersion);
             entity.IsDraft = dto.NewestVersion != default(Guid) && (dto.PublishedVersion == default(Guid) || dto.PublishedVersion != dto.NewestVersion);
             entity.HasPendingChanges = (dto.PublishedVersion != default(Guid) && dto.NewestVersion != default(Guid)) && dto.PublishedVersion != dto.NewestVersion;
+
+            if (dto.UmbracoPropertyDtos != null)
+            {
+                foreach (var propertyDto in dto.UmbracoPropertyDtos)
+                {
+                    entity.UmbracoProperties.Add(new UmbracoEntity.UmbracoProperty
+                                                      {
+                                                          DataTypeControlId =
+                                                              propertyDto.DataTypeControlId,
+                                                          Value = propertyDto.UmbracoFile
+                                                      });
+                }
+            }
 
             return entity;
         }

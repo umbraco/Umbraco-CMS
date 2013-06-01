@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Umbraco.Core.Models.EntityBase;
 
@@ -21,7 +22,6 @@ namespace Umbraco.Core.Models
         private bool _isDraft;
         private bool _hasPendingChanges;
         private string _contentTypeAlias;
-        private string _umbracoFile;
         private Guid _nodeObjectTypeId;
 
         private static readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.CreatorId);
@@ -38,7 +38,6 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo ContentTypeAliasSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeAlias);
         private static readonly PropertyInfo ContentTypeIconSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeIcon);
         private static readonly PropertyInfo ContentTypeThumbnailSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeThumbnail);
-        private static readonly PropertyInfo UmbracoFileSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.UmbracoFile);
         private static readonly PropertyInfo NodeObjectTypeIdSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, Guid>(x => x.NodeObjectTypeId);
         private string _contentTypeIcon;
         private string _contentTypeThumbnail;
@@ -234,19 +233,6 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public string UmbracoFile
-        {
-            get { return _umbracoFile; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _umbracoFile = value;
-                    return _umbracoFile;
-                }, _umbracoFile, UmbracoFileSelector);
-            }
-        }
-
         public Guid NodeObjectTypeId
         {
             get { return _nodeObjectTypeId; }
@@ -258,6 +244,14 @@ namespace Umbraco.Core.Models
                     return _nodeObjectTypeId;
                 }, _nodeObjectTypeId, NodeObjectTypeIdSelector);  
             }
+        }
+
+        public IList<UmbracoProperty> UmbracoProperties { get; set; }
+
+        internal class UmbracoProperty
+        {
+            public Guid DataTypeControlId { get; set; }
+            public string Value { get; set; }
         }
     }
 }

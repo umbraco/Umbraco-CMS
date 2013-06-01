@@ -128,7 +128,12 @@ namespace Umbraco.Tests.Services
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Count(), Is.EqualTo(3));
-            Assert.That(entities.Any(x => ((UmbracoEntity)x).UmbracoFile != string.Empty), Is.True);
+            //Assert.That(entities.Any(x => ((UmbracoEntity)x).UmbracoFile != string.Empty), Is.True);
+            Assert.That(
+                entities.Any(
+                    x =>
+                    ((UmbracoEntity) x).UmbracoProperties.Any(
+                        y => y.DataTypeControlId == new Guid(Constants.PropertyEditors.UploadField))), Is.True);
         }
 
         public override void CreateTestData()

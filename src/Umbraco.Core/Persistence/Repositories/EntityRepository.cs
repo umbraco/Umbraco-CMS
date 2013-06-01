@@ -45,7 +45,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IUmbracoEntity Get(int id)
         {
-            var sql = GetBaseWhere(GetBase, false, id);
+            var sql = GetBaseWhere(GetBase, false, false, id);
             var nodeDto = _work.Database.FirstOrDefault<UmbracoEntityDto>(sql);
             if (nodeDto == null)
                 return null;
@@ -58,8 +58,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IUmbracoEntity Get(int id, Guid objectTypeId)
         {
-            bool isContentOrMedia = objectTypeId == new Guid(Constants.ObjectTypes.Document) || objectTypeId == new Guid(Constants.ObjectTypes.Media);
-            var sql = GetBaseWhere(GetBase, isContentOrMedia, objectTypeId, id).Append(GetGroupBy(isContentOrMedia));
+            bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
+            bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
+            var sql = GetBaseWhere(GetBase, isContent, isMedia, objectTypeId, id).Append(GetGroupBy(isContent, isMedia));
             var nodeDto = _work.Database.FirstOrDefault<UmbracoEntityDto>(sql);
             if (nodeDto == null)
                 return null;
@@ -81,10 +82,13 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                bool isContentOrMedia = objectTypeId == new Guid(Constants.ObjectTypes.Document) || objectTypeId == new Guid(Constants.ObjectTypes.Media);
-                var sql = GetBaseWhere(GetBase, isContentOrMedia, objectTypeId).Append(GetGroupBy(isContentOrMedia));
-                var dtos = _work.Database.Fetch<UmbracoEntityDto>(sql);
-
+                bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
+                bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
+                var sql = GetBaseWhere(GetBase, isContent, isMedia, objectTypeId).Append(GetGroupBy(isContent, isMedia));
+                var dtos = isMedia
+                               ? _work.Database.Fetch<UmbracoEntityDto, UmbracoPropertyDto, UmbracoEntityDto>(
+                                   new UmbracoEntityRelator().Map, sql)
+                               : _work.Database.Fetch<UmbracoEntityDto>(sql);
                 var factory = new UmbracoEntityFactory();
 
                 foreach (var dto in dtos)
@@ -97,9 +101,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query)
         {
-            var sqlClause = GetBase(false);
+            var sqlClause = GetBase(false, false);
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
-            var sql = translator.Translate().Append(GetGroupBy(false));
+            var sql = translator.Translate().Append(GetGroupBy(false, false));
 
             var dtos = _work.Database.Fetch<UmbracoEntityDto>(sql);
 
@@ -111,12 +115,16 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId)
         {
-            bool isContentOrMedia = objectTypeId == new Guid(Constants.ObjectTypes.Document) || objectTypeId == new Guid(Constants.ObjectTypes.Media);
-            var sqlClause = GetBaseWhere(GetBase, isContentOrMedia, objectTypeId);
+            bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
+            bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
+            var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, objectTypeId);
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
-            var sql = translator.Translate().Append(GetGroupBy(isContentOrMedia));
+            var sql = translator.Translate().Append(GetGroupBy(isContent, isMedia));
 
-            var dtos = _work.Database.Fetch<UmbracoEntityDto>(sql);
+            var dtos = isMedia
+                           ? _work.Database.Fetch<UmbracoEntityDto, UmbracoPropertyDto, UmbracoEntityDto>(
+                               new UmbracoEntityRelator().Map, sql)
+                           : _work.Database.Fetch<UmbracoEntityDto>(sql);
 
             var factory = new UmbracoEntityFactory();
             var list = dtos.Select(factory.BuildEntity).Cast<IUmbracoEntity>().ToList();
@@ -128,7 +136,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Sql Statements
 
-        protected virtual Sql GetBase(bool isContentOrMedia)
+        protected virtual Sql GetBase(bool isContent, bool isMedia)
         {
             var columns = new List<object>
                               {
@@ -146,14 +154,19 @@ namespace Umbraco.Core.Persistence.Repositories
                                   "COUNT(parent.parentID) as children"
                               };
 
-            if (isContentOrMedia)
+            if (isContent || isMedia)
             {
                 columns.Add("published.versionId as publishedVerison");
                 columns.Add("latest.versionId as newestVersion");
                 columns.Add("contenttype.alias");
                 columns.Add("contenttype.icon");
                 columns.Add("contenttype.thumbnail");
+            }
+
+            if (isMedia)
+            {
                 columns.Add("property.dataNvarchar as umbracoFile");
+                columns.Add("property.controlId");
             }
 
             var sql = new Sql()
@@ -162,7 +175,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .LeftJoin("umbracoNode parent").On("parent.parentID = umbracoNode.id");
 
 
-            if (isContentOrMedia)
+            if (isContent || isMedia)
             {
                 sql.InnerJoin("cmsContent content").On("content.nodeId = umbracoNode.id")
                    .LeftJoin("cmsContentType contenttype").On("contenttype.nodeId = content.contentType")
@@ -171,40 +184,51 @@ namespace Umbraco.Core.Persistence.Repositories
                    .On("umbracoNode.id = published.nodeId")
                    .LeftJoin(
                        "(SELECT nodeId, versionId FROM cmsDocument WHERE newest = 1 GROUP BY nodeId, versionId) as latest")
-                   .On("umbracoNode.id = latest.nodeId")
-                   .LeftJoin(
-                       "(SELECT contentNodeId, dataNvarchar FROM cmsPropertyData INNER JOIN cmsPropertyType ON cmsPropertyType.id = cmsPropertyData.propertytypeid"+
-                       " INNER JOIN cmsDataType ON cmsPropertyType.dataTypeId = cmsDataType.nodeId WHERE cmsDataType.controlId = '"+ Constants.PropertyEditors.UploadField +"') as property")
+                   .On("umbracoNode.id = latest.nodeId");
+            }
+
+            /*if (isContent)
+            {
+                sql.LeftJoin(
+                    "(SELECT contentNodeId, versionId, dataNvarchar, controlId FROM cmsPropertyData INNER JOIN cmsPropertyType ON cmsPropertyType.id = cmsPropertyData.propertytypeid" +
+                    " INNER JOIN cmsDataType ON cmsPropertyType.dataTypeId = cmsDataType.nodeId) as property")
+                   .On("umbracoNode.id = property.contentNodeId AND latest.versionId = property.versionId");
+            }*/
+            if (isMedia)
+            {
+                sql.LeftJoin(
+                    "(SELECT contentNodeId, versionId, dataNvarchar, controlId FROM cmsPropertyData INNER JOIN cmsPropertyType ON cmsPropertyType.id = cmsPropertyData.propertytypeid" +
+                    " INNER JOIN cmsDataType ON cmsPropertyType.dataTypeId = cmsDataType.nodeId) as property")
                    .On("umbracoNode.id = property.contentNodeId");
             }
 
             return sql;
         }
 
-        protected virtual Sql GetBaseWhere(Func<bool, Sql> baseQuery, bool isContentOrMedia, Guid id)
+        protected virtual Sql GetBaseWhere(Func<bool, bool, Sql> baseQuery, bool isContent, bool isMedia, Guid id)
         {
-            var sql = baseQuery(isContentOrMedia)
+            var sql = baseQuery(isContent, isMedia)
                 .Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = id });
             return sql;
         }
 
-        protected virtual Sql GetBaseWhere(Func<bool, Sql> baseQuery, bool isContentOrMedia, int id)
+        protected virtual Sql GetBaseWhere(Func<bool, bool, Sql> baseQuery, bool isContent, bool isMedia, int id)
         {
-            var sql = baseQuery(isContentOrMedia)
+            var sql = baseQuery(isContent, isMedia)
                 .Where("umbracoNode.id = @Id", new { Id = id })
-                .Append(GetGroupBy(isContentOrMedia));
+                .Append(GetGroupBy(isContent, isMedia));
             return sql;
         }
 
-        protected virtual Sql GetBaseWhere(Func<bool, Sql> baseQuery, bool isContentOrMedia, Guid objectId, int id)
+        protected virtual Sql GetBaseWhere(Func<bool, bool, Sql> baseQuery, bool isContent, bool isMedia, Guid objectId, int id)
         {
-            var sql = baseQuery(isContentOrMedia)
+            var sql = baseQuery(isContent, isMedia)
                 .Where("umbracoNode.id = @Id AND umbracoNode.nodeObjectType = @NodeObjectType",
                        new {Id = id, NodeObjectType = objectId});
             return sql;
         }
 
-        protected virtual Sql GetGroupBy(bool isContentOrMedia)
+        protected virtual Sql GetGroupBy(bool isContent, bool isMedia)
         {
             var columns = new List<object>
                               {
@@ -221,14 +245,19 @@ namespace Umbraco.Core.Persistence.Repositories
                                   "umbracoNode.createDate"
                               };
 
-            if (isContentOrMedia)
+            if (isContent || isMedia)
             {
                 columns.Add("published.versionId");
                 columns.Add("latest.versionId");
                 columns.Add("contenttype.alias");
                 columns.Add("contenttype.icon");
                 columns.Add("contenttype.thumbnail");
+            }
+
+            if (isMedia)
+            {
                 columns.Add("property.dataNvarchar");
+                columns.Add("property.controlId");
             }
 
             var sql = new Sql()
@@ -274,8 +303,56 @@ namespace Umbraco.Core.Persistence.Repositories
             [Column("thumbnail")]
             public string Thumbnail { get; set; }
 
+            [ResultColumn]
+            public List<UmbracoPropertyDto> UmbracoPropertyDtos { get; set; }
+        }
+
+        [ExplicitColumns]
+        internal class UmbracoPropertyDto
+        {
+            [Column("controlId")]
+            public Guid DataTypeControlId { get; set; }
+
             [Column("umbracoFile")]
             public string UmbracoFile { get; set; }
+        }
+
+        internal class UmbracoEntityRelator
+        {
+            internal UmbracoEntityDto Current;
+
+            internal UmbracoEntityDto Map(UmbracoEntityDto a, UmbracoPropertyDto p)
+            {
+                // Terminating call.  Since we can return null from this function
+                // we need to be ready for PetaPoco to callback later with null
+                // parameters
+                if (a == null)
+                    return Current;
+
+                // Is this the same UmbracoEntityDto as the current one we're processing
+                if (Current != null && Current.UniqueId == a.UniqueId)
+                {
+                    // Yes, just add this UmbracoPropertyDto to the current UmbracoEntityDto's collection
+                    Current.UmbracoPropertyDtos.Add(p);
+
+                    // Return null to indicate we're not done with this UmbracoEntityDto yet
+                    return null;
+                }
+
+                // This is a different UmbracoEntityDto to the current one, or this is the 
+                // first time through and we don't have a Tab yet
+
+                // Save the current UmbracoEntityDto
+                var prev = Current;
+
+                // Setup the new current UmbracoEntityDto
+                Current = a;
+                Current.UmbracoPropertyDtos = new List<UmbracoPropertyDto>();
+                Current.UmbracoPropertyDtos.Add(p);
+
+                // Return the now populated previous UmbracoEntityDto (or null if first time through)
+                return prev;
+            }
         }
         #endregion
     }

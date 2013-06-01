@@ -36,6 +36,14 @@ namespace umbraco.editorControls.MultiNodeTreePicker
         /// </summary>
         private int? m_DeterminedStartNodeId = null;
 
+        protected override bool LoadMinimalDocument
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         /// <summary>
         /// Returns the Document object of the starting node for the current User. This ensures
         /// that the Document object is only instantiated once.
