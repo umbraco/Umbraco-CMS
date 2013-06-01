@@ -23,7 +23,7 @@ define(['angular'], function (angular) {
 
     //Handles the section area of the app
     angular.module('umbraco').controller("NavigationController",
-        function ($scope, $window, $log, tree, section, $rootScope, $routeParams, dialog) {
+        function ($scope, $window, $log, tree, section, $rootScope, $routeParams, dialog, $q) {
             loadTree($routeParams.section);
 
             $scope.currentSection = $routeParams.section;
@@ -114,7 +114,17 @@ define(['angular'], function (angular) {
 
             function loadTree(section) {
                 $scope.currentSection = section;
-                $scope.tree = tree.getTree($scope.currentSection);
+
+                //NOTE: We use .when here because getTree may return a promise or
+                // simply a cached value.
+                $q.when(tree.getTree($scope.currentSection))
+                    .then(function (data) {
+                        //set the data once we have it
+                        $scope.tree = data;
+                    }, function (reason) {
+                        alert(reason);
+                        return;
+                    });
             }
 
             //function to turn navigation areas on/off

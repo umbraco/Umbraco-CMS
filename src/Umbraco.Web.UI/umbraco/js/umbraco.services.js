@@ -246,7 +246,7 @@ angular.module('umbraco.services.section', [])
 });
 
 angular.module('umbraco.services.tree', ["umbraco.resources.trees"])
-.factory('tree', function ($http, umbTreeResource) {
+.factory('tree', function ($http, $q, umbTreeResource) {
 		//implement this in local storage
 		var treeArray = [];
 		var currentSection = "content";
@@ -254,20 +254,42 @@ angular.module('umbraco.services.tree', ["umbraco.resources.trees"])
 		return {
 		    getTree: function (section) {
 
+		        if (!section) {
+		            throw "No section defined";
+		        }
+
+		        var deferred = $q.defer();
+
+                //return the cache if it exists
+		        if (treeArray[section] !== undefined) {
+		            return treeArray[section];
+		        }
+
 		        umbTreeResource.loadApplication(section)
 		            .then(function (data) {
 
 		                //this will be called once the tree app data has loaded
-		                alert("woot!");
+		                var result = {
+		                    name: section,
+		                    alias: section,
+                            nodes: data
+		                };
+		                //cache this result
+                        //TODO: We'll need to un-cache this in many circumstances
+		                treeArray[section] = result;
+                        //return the data result as promised
+		                deferred.resolve(treeArray[section]);
 
 		            }, function (reason) {
-		                alert('Failed: ' + reason);
+                        //bubble up the rejection
+		                deferred.reject(reason);
+		                return;
 		            });
 
-				if (treeArray[section] !== undefined){
-					return treeArray[section];
-				}
-			
+		        return deferred.promise;
+
+                //NOTE: The below will never be hit, it is legacy code from the mock data services
+
 				var t;
 				switch(section){
 
