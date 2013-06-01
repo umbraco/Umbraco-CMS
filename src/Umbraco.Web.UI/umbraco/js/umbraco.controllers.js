@@ -106,9 +106,16 @@ define(['angular'], function (angular) {
                 if (node.expanded) {
                     node.expanded = false;
                     node.children = [];
-                } else {
-                    node.children = tree.getChildren(node, $scope.currentSection);
-                    node.expanded = true;
+                }
+                else {
+                    tree.getChildren(node, $scope.currentSection)
+                        .then(function (data) {
+                            node.children = data;
+                            node.expanded = true;
+                        }, function (reason) {
+                            alert(reason);
+                            return;
+                        });
                 }
             };
 

@@ -295,10 +295,12 @@
     <Compile Include="Models\ContentEditing\Tab.cs" />
     <Compile Include="Models\Mapping\ContentModelMapper.cs" />
     <Compile Include="FormDataCollectionExtensions.cs" />
+    <Compile Include="Trees\LegacyTreeApiController.cs" />
     <Compile Include="Trees\ISearchableTree.cs" />
     <Compile Include="Trees\LegacyTreeDataAdapter.cs" />
     <Compile Include="Trees\SearchResultItem.cs" />
     <Compile Include="Trees\TreeApiController.cs" />
+    <Compile Include="Trees\ApplicationTreeExtensions.cs" />
     <Compile Include="Trees\TreeNode.cs" />
     <Compile Include="Trees\TreeNodeCollection.cs" />
     <Compile Include="Trees\TreeQueryStringParameters.cs" />
@@ -1870,7 +1872,9 @@
     <Content Include="umbraco.presentation\umbraco\controls\Images\UploadMediaImage.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx" />
+    <Content Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\actions\delete.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\editContent.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\preview.aspx" />

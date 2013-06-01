@@ -88,12 +88,12 @@ namespace Umbraco.Web.Trees
         private TreeNodeCollection GetNodeCollection(ApplicationTree configTree, string id, FormDataCollection queryStrings)
         {
             if (configTree == null) throw new ArgumentNullException("configTree");
-            var byControllerAttempt = TryLoadFromControllerTree(configTree, id, queryStrings);
+            var byControllerAttempt = configTree.TryLoadFromControllerTree(id, queryStrings, ControllerContext, Request);
             if (byControllerAttempt.Success)
             {
                 return byControllerAttempt.Result;
             }
-            var legacyAttempt = TryLoadFromLegacyTree(configTree, id, queryStrings);
+            var legacyAttempt = configTree.TryLoadFromLegacyTree(id, queryStrings, Url);
             if (legacyAttempt.Success)
             {
                 return legacyAttempt.Result;
@@ -101,58 +101,7 @@ namespace Umbraco.Web.Trees
 
             throw new ApplicationException("Could not render a tree for type " + configTree.Alias);
         }
-
-        private Attempt<TreeNodeCollection> TryLoadFromControllerTree(ApplicationTree appTree, string id, FormDataCollection formCollection)
-        {
-            //get reference to all TreeApiControllers
-            var controllerTrees = UmbracoApiControllerResolver.Current.RegisteredUmbracoApiControllers
-                                                              .Where(TypeHelper.IsTypeAssignableFrom<TreeApiController>)
-                                                              .ToArray();
-
-            //find the one we're looking for
-            var foundControllerTree = controllerTrees.FirstOrDefault(x => x.GetFullNameWithAssembly() == appTree.Type);
-            if (foundControllerTree == null)
-            {
-                return new Attempt<TreeNodeCollection>(new InstanceNotFoundException("Could not find tree of type " + appTree.Type + " in any loaded DLLs"));
-            }
-
-            //instantiate it, since we are proxying, we need to setup the instance with our current context
-            var instance = (TreeApiController)DependencyResolver.Current.GetService(foundControllerTree);
-            instance.ControllerContext = ControllerContext;
-            instance.Request = Request;
-            //return it's data
-            return new Attempt<TreeNodeCollection>(true, instance.GetNodes(id, formCollection));
-        }
-
-        private Attempt<TreeNodeCollection> TryLoadFromLegacyTree(ApplicationTree appTree, string id, FormDataCollection formCollection)
-        {
-            //This is how the legacy trees worked....
-            var treeDef = TreeDefinitionCollection.Instance.FindTree(appTree.Alias);
-            if (treeDef == null)
-            {
-                return new Attempt<TreeNodeCollection>(new InstanceNotFoundException("Could not find tree of type " + appTree.Alias));
-            }
-
-            var bTree = treeDef.CreateInstance();
-            var treeParams = new TreeParams();
-
-            //we currently only support an integer id or a string id, we'll refactor how this works
-            //later but we'll get this working first
-            int startId;
-            if (int.TryParse(id, out startId))
-            {
-                treeParams.StartNodeID = startId;
-            }
-            else
-            {
-                treeParams.NodeKey = id;
-            }
-            var xTree = new XmlTree();
-            bTree.SetTreeParameters(treeParams);
-            bTree.Render(ref xTree);
-
-            return new Attempt<TreeNodeCollection>(true, LegacyTreeDataAdapter.ConvertFromLegacy(xTree));
-        }
+        
 
         //Temporary, but necessary until we refactor trees in general
         internal class TreeParams : ITreeService
