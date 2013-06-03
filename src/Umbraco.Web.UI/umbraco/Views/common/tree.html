@@ -1,31 +1,19 @@
-﻿<style>
-    
-    ul.umb-tree li ul li ul {
-        padding-left: 20px;
-    }
+﻿<script type="text/ng-template"  id="tree_item_renderer.html">
+        <div ng-style="setTreePadding(node)">
+            <ins ng-class="{'icon-caret-right': !node.expanded, 'icon-caret-down': node.expanded}" 
+                 ng-click="getTreeChildren(node)"></ins>
 
-</style>
+            <i class="icon umb-tree-icon sprTree {{node.icon}}"></i>
 
-<script type="text/ng-template"  id="tree_item_renderer.html">
-    <div>
-        <ins ng-hide="node.hasChildren" style="background:none;width:18px;"></ins>
+            <a ng-href="#{{node.view}}">{{node.name}}</a>
+            <i class="umb-options" ng-click="showCon    textMenu(node, $event)"><i></i><i></i><i></i></i>
+        </div>
 
-        <ins ng-show="node.hasChildren"
-             ng-class="{'icon-caret-right': !node.expanded, 'icon-caret-down': node.expanded}" 
-             ng-click="getTreeChildren(node)"></ins>
-
-        <i class="{{node|umbTreeIconClass:'icon umb-tree-icon sprTree'}}" style="{{node|umbTreeIconImage}}">
-        </i>
-
-        <a ng-href="#{{node.view}}">{{node.name}}</a>
-        <i class="umb-options" ng-click="showContextMenu(node, $event)"><i></i><i></i><i></i></i>
-    </div>
-
-    <ul ng-class="{collapsed: !node.expanded}">
-        <li ng-repeat="node in node.children" 
-            ng-class="{current:node.id == selectedId}" 
-            ng-include="'tree_item_renderer.html'"></li>
-    </ul>
+        <ul ng-class="{collapsed: !node.expanded}">
+            <li ng-repeat="node in node.children" 
+                ng-class="{current:node.id == selectedId}" 
+                ng-include="'tree_item_renderer.html'"></li>
+        </ul>
 </script>
 
 
@@ -38,7 +26,7 @@
         </div>
 
         <ul>
-            <li class="file" ng-repeat="node in tree.nodes" 
+            <li class="file" ng-repeat="node in tree.children" 
              ng-class="{current:node.id == selectedId}" 
              ng-include="'tree_item_renderer.html'"></li>
         </ul>

@@ -27,8 +27,7 @@
 
     <!-- navigation container -->
     <div id="navigation" class="fill shadow umb-panel umb-modalcolumn"
-        ng-show="ui.showNavigation"
-        ng-animate="'slide'">
+       >
         <!-- the search -->
         <div id="search-form" ng-animate="'slide'">
             <div class="umb-panel-header">
@@ -63,10 +62,8 @@
 
         <!-- the tree -->
         <div id="tree" class="span5 umb-scrollable umb-panel" auto-scale="0" ng-animate="'slide'">
-            <div ng-include="'views/common/tree.html'"></div>
-        </div>
-
-
+            <umb-tree section="{{currentSection}}"></umb-tree>
+        </div>        
 
         <!-- The context menu -->
         <div id='contextMenu' class="umb-modalcolumn fill shadow umb-panel"
@@ -101,4 +98,5 @@
             </div>
         </div>
     </div>
+
 </div>

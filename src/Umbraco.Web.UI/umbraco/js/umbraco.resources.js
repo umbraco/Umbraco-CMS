@@ -1,15 +1,16 @@
-/*! umbraco - v0.0.1-SNAPSHOT - 2013-05-28
+/*! umbraco - v0.0.1-SNAPSHOT - 2013-06-03
  * http://umbraco.github.io/Belle
  * Copyright (c) 2013 Per Ploug, Anders Stenteberg & Shannon Deminick;
  * Licensed MIT
  */
 'use strict';
-define(['angular', 'app'], function (angular, app) {
+define(['app', 'angular'], function (app, angular) {
+
 
     /**
- * @ngdoc factory 
- * @name umbraco.resources.trees.umbTreeResource     
-**/
+    * @ngdoc factory 
+    * @name umbraco.resources.trees.umbTreeResource     
+    **/
     function umbTreeResource($q, $http) {
 
         /** internal method to get the tree app url */
@@ -62,7 +63,9 @@ define(['angular', 'app'], function (angular, app) {
     }
     angular.module('umbraco.resources.trees', []).factory('umbTreeResource', umbTreeResource);
 
-angular.module('umbraco.resources.content', [])
+
+
+    angular.module('umbraco.resources.content', [])
 .factory('contentFactory', function () {
 
     var contentArray = [];
@@ -101,7 +104,8 @@ angular.module('umbraco.resources.content', [])
                         { alias: "bodyText", label: "Body Text", description:"Here you enter the primary article contents", view: "umbraco.rte", value: "<p>askjdkasj lasjd</p>" },
                         { alias: "textarea", label: "textarea", view: "umbraco.textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
                         { alias: "map", label: "Map", view: "umbraco.googlemaps", value: "37.4419,-122.1419", config: { mapType: "ROADMAP", zoom: 4 } },
-                        { alias: "media", label: "Media picker", view: "umbraco.mediapicker", value: "" }
+                        { alias: "media", label: "Media picker", view: "umbraco.mediapicker", value: "" },
+                        { alias: "content", label: "Content picker", view: "umbraco.contentpicker", value: "" }
                     ]
                 },
                 {
