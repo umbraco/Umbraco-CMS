@@ -567,7 +567,6 @@
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Umbraco\lib\Umbraco\Extensions.js" />
     <Content Include="Umbraco\Views\temp_content_editor.html" />
-    <Content Include="Umbraco\Views\index.html" />
     <Content Include="Umbraco\Xslt\Web.config">
       <SubType>
       </SubType>
@@ -2556,6 +2555,7 @@
     <Folder Include="MasterPages\" />
     <Folder Include="Media\" />
     <Folder Include="Scripts\" />
+    <Folder Include="Umbraco\assets\img\" />
     <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
     <Folder Include="Umbraco_Client\Tags\images\" />
     <Folder Include="UserControls\" />
