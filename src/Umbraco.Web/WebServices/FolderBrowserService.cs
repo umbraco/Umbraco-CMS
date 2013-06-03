@@ -29,10 +29,12 @@ namespace Umbraco.Web.WebServices
             var service = ApplicationContext.Current.Services.EntityService;
 
             var entities = service.GetChildren(parentId, UmbracoObjectTypes.Media);
-            //TODO: Only fetch files, not containers
             foreach (UmbracoEntity entity in entities)
             {
-                var thumbUrl = ThumbnailProvidersResolver.Current.GetThumbnailUrl(entity.UmbracoFile);
+                var uploadFieldProperty = entity.UmbracoProperties.FirstOrDefault(x => x.DataTypeControlId == new Guid(Constants.PropertyEditors.UploadField));
+
+                var thumbnailUrl = uploadFieldProperty == null ? "" : ThumbnailProvidersResolver.Current.GetThumbnailUrl(uploadFieldProperty.Value);
+
                 var item = new
                 {
                     Id = entity.Id,
@@ -41,13 +43,16 @@ namespace Umbraco.Web.WebServices
                     Tags = string.Join(",", Tag.GetTags(entity.Id).Select(x => x.TagCaption)),
                     MediaTypeAlias = entity.ContentTypeAlias,
                     EditUrl = string.Format("editMedia.aspx?id={0}", entity.Id),
-                    FileUrl = entity.UmbracoFile,
-                    ThumbnailUrl = string.IsNullOrEmpty(thumbUrl)
+                    FileUrl = uploadFieldProperty == null 
+                        ? "" 
+                        : uploadFieldProperty.Value,
+                    ThumbnailUrl = string.IsNullOrEmpty(thumbnailUrl)
                         ? IOHelper.ResolveUrl(string.Format("{0}/images/thumbnails/{1}", SystemDirectories.Umbraco, entity.ContentTypeThumbnail))
-                        : thumbUrl
+                        : thumbnailUrl
                 };
 
                 data.Add(item);
+
             }
 
             return new JavaScriptSerializer().Serialize(data);

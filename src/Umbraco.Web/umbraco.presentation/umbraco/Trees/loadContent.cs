@@ -54,6 +54,14 @@ namespace umbraco
             }
         }
 
+        protected override bool LoadMinimalDocument
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         /// <summary>
         /// Creates the root node context menu for the content tree.
         /// Depending on the current User's permissions, this menu will change.

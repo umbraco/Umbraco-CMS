@@ -24,6 +24,7 @@
                 useMasterPages: <%=umbraco.UmbracoSettings.UseAspNetMasterPages.ToString().ToLower()%>,
                 templateId: <%= Request.QueryString["templateID"] %>,
                 masterTemplateId: jQuery('#<%= MasterTemplate.ClientID %>').val(),
+                masterPageDropDown: $("#<%= MasterTemplate.ClientID %>"),
                 treeSyncPath: '<%=TemplateTreeSyncPath%>',
                 text: {
                     templateErrorHeader: "<%= umbraco.ui.Text("speechBubbles", "templateErrorHeader") %>",

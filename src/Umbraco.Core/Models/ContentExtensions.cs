@@ -543,10 +543,7 @@ namespace Umbraco.Core.Models
             x.Add(new XAttribute("writerName", content.GetWriterProfile().Name));
             x.Add(new XAttribute("writerID", content.WriterId));
             x.Add(new XAttribute("template", content.Template == null ? "0" : content.Template.Id.ToString()));
-            if (UmbracoSettings.UseLegacyXmlSchema)
-            {
-                x.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
-            }
+            x.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
 
             return x;
         }
@@ -567,10 +564,7 @@ namespace Umbraco.Core.Models
             x.Add(new XAttribute("writerID", media.CreatorId));
             x.Add(new XAttribute("version", media.Version));
             x.Add(new XAttribute("template", 0));
-            if (UmbracoSettings.UseLegacyXmlSchema)
-            {
-                x.Add(new XAttribute("nodeTypeAlias", media.ContentType.Alias));
-            }
+            x.Add(new XAttribute("nodeTypeAlias", media.ContentType.Alias));
 
             return x;
         }

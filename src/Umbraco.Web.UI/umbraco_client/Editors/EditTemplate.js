@@ -102,7 +102,7 @@
             var self = this;
 
             umbraco.presentation.webservices.codeEditorSave.SaveTemplate(
-                templateName, templateAlias, codeVal, self._opts.templateId, self._opts.masterTemplateId,
+                templateName, templateAlias, codeVal, self._opts.templateId, this._opts.masterPageDropDown.val(),
                 function(t) { self.submitSucces(t); },
                 function(t) { self.submitFailure(t); });
 

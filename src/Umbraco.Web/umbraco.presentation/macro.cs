@@ -1230,8 +1230,12 @@ namespace umbraco
                     { }
                     break;
 
-                case "contentPicker":
-                    var currentNode = macroXml.ImportNode(umbracoXml.GetElementById(contentId), true);
+                case "contentCurrent":
+                    var importNode = macroPropertyValue == string.Empty
+                        ? umbracoXml.GetElementById(contentId)
+                        : umbracoXml.GetElementById(macroPropertyValue);
+
+                    var currentNode = macroXml.ImportNode(importNode, true);
 
                     // remove all sub content nodes
                     foreach (XmlNode n in currentNode.SelectNodes("node|*[@isDoc]"))

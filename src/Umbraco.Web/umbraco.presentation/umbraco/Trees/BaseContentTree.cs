@@ -26,6 +26,15 @@ namespace umbraco.cms.presentation.Trees
         private User _user;
 
         /// <summary>
+        /// Determines whether the (legacy) Document object passed to the OnRenderNode-method
+        /// should be initialized with a full set of properties.
+        /// By default the Document will be initialized, so setting the boolean to True will
+        /// ensure that the Document object is loaded with a minimum set of properties to 
+        /// improve performance.
+        /// </summary>
+        protected virtual bool LoadMinimalDocument { get; set; }
+
+        /// <summary>
         /// Returns the current User. This ensures that we don't instantiate a new User object 
         /// each time.
         /// </summary>
@@ -108,7 +117,7 @@ function openContent(id) {
                 {
                     XmlTreeNode node = CreateNode(e, allowedUserOptions);
 
-                    OnRenderNode(ref node, new Document(entity));
+                    OnRenderNode(ref node, new Document(entity, LoadMinimalDocument));
 
                     OnBeforeNodeRender(ref Tree, ref node, EventArgs.Empty);
                     if (node != null)
