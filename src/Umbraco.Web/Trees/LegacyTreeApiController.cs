@@ -10,13 +10,12 @@ using umbraco.businesslogic;
 
 namespace Umbraco.Web.Trees
 {
-    //NOTE: We will of course have to authorized this but changing the base class once integrated
 
     /// <summary>
     /// This is used to output JSON from legacy trees
     /// </summary>
     [PluginController("UmbracoTrees")]
-    public class LegacyTreeApiController : UmbracoApiController //UmbracoAuthorizedApiController
+    public class LegacyTreeApiController : UmbracoAuthorizedApiController
     {
         /// <summary>
         /// Convert a legacy tree to a new tree result

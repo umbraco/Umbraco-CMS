@@ -13,10 +13,8 @@ using umbraco.cms.presentation.Trees;
 namespace Umbraco.Web.Trees
 {
 
-    //NOTE: We will of course have to authorized this but changing the base class once integrated
-
     [PluginController("UmbracoTrees")]
-    public class ApplicationTreeApiController : UmbracoApiController //UmbracoAuthorizedApiController
+    public class ApplicationTreeApiController : UmbracoAuthorizedApiController
     {
 
         /// <summary>

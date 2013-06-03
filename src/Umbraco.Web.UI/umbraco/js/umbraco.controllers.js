@@ -7,20 +7,7 @@
 
 define(['angular'], function (angular) {
 
-    /**
-    * @ngdoc controller
-    * @name umbraco.ContainerController
-    * @function
-    * 
-    * @description
-    * The container controller which is used to load in the html templates so html devs need not worry about the razor markup
-    */
-    var containerController = function ($scope) {
-        $scope.applicationView = "views/index.html";
-    };    
-    angular.module('umbraco').controller("ContainerController", containerController);
-
-
+   
     //Handles the section area of the app
     angular.module('umbraco').controller("NavigationController",
         function ($scope, $window, $log, tree, section, $rootScope, $routeParams, dialog, $q) {

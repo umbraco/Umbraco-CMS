@@ -12,7 +12,7 @@ namespace Umbraco.Web.Trees
     /// <summary>
     /// The base controller for all tree requests
     /// </summary>    
-    public abstract class TreeApiController : UmbracoApiController //UmbracoAuthorizedApiController
+    public abstract class TreeApiController : UmbracoAuthorizedApiController
     {
         /// <summary>
         /// Remove the xml formatter... only support JSON!
