@@ -6377,19 +6377,19 @@ legend + .control-group {
 }
 
 .umb-tree li.current > div {
-  background: #2e8aea;
+  /*background: #2e8aea;*/
 }
 
 .umb-tree li.current > div i.umb-options i {
-  background: #fff;
-  border-color: #2e8aea;
+  /*background: #fff;
+  border-color: #2e8aea;*/
 }
 
 .umb-tree li.current > div a,
 .umb-tree li.current > div i.icon {
-  color: white !important;
+  /*color: white !important;
   background: #2e8aea;
-  border-color: #2e8aea;
+  border-color: #2e8aea;*/
 }
 
 .umb-tree li.root div {
@@ -6569,8 +6569,8 @@ i.umb-options i {
 
 .umb-actions a:hover,
 .umb-actions li.selected {
-  color: #fff;
-  background: #2e8aea;
+  /*color: #fff;
+  background: #2e8aea;*/
 }
 
 .umb-actions a:hover i {
