@@ -89,7 +89,8 @@ function openMedia(id) {
                         {
                             if (dd.ContentType.Alias.ToLower() == "folder")
                             {
-                                xNode.Action = "javascript:jQuery('.umbTree #" + dd.Id.ToString() + "').click();";
+                                //#U4-2254 - Inspiration to use void from here: http://stackoverflow.com/questions/4924383/jquery-object-object-error
+                                xNode.Action = "javascript:void jQuery('.umbTree #" + dd.Id.ToString() + "').click();";
                             }
                             else
                             {
