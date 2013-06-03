@@ -86,9 +86,10 @@ define(['angular'], function (angular) {
                 $scope.ui.mode("default-hidenav");
             };
 
-            $scope.setTreePadding = function (item) {
-                return { 'padding-left': (item.level * 20) + "px" };
-            };
+            //$scope.setTreePadding = function (item) {
+            //    return { 'padding-left': (item.level * 20) + "px" };
+            //};
+
             $scope.getTreeChildren = function (node) {
                 if (node.expanded) {
                     node.expanded = false;

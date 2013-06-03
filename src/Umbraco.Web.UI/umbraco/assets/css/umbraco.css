@@ -6364,15 +6364,16 @@ legend + .control-group {
 }
 
 .umb-tree {
-  width: auto;
-  min-width: 100%;
+  /*width: auto;
+  min-width: 100%;*/
   margin: 0;
+  display:block;  
 }
 
 .umb-tree li {
   display: block;
-  width: auto;
-  min-width: 100%;
+  /*width: auto;
+  min-width: 100%;*/
 }
 
 .umb-tree li.current > div {
@@ -6400,9 +6401,9 @@ legend + .control-group {
 }
 
 .umb-tree ul {
-  display: table;
-  width: 100%;
-  min-width: 100%;
+  display: block;
+  /*width: 100%;
+  min-width: 100%;*/
   padding: 0;
   margin: 0;
 }
