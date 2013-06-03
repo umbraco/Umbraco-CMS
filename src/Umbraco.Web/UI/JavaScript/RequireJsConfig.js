@@ -4,6 +4,7 @@
     paths: {
         jquery: '../lib/jquery/jquery-1.8.2.min',
         jqueryCookie: '../lib/jquery/jquery.cookie',
+        umbracoExtensions: '../lib/umbraco/extensions',
         bootstrap: '../lib/bootstrap/js/bootstrap',
         underscore: '../lib/underscore/underscore',
         angular: '../lib/angular/angular.min',
@@ -21,6 +22,7 @@
         css: '../lib/require/css'
     },
     shim: {
+        'umbracoExtensions' : {'exports' : 'umbracoExtensions'},
         'angular' : {'exports' : 'angular'},
         'angular-resource': { deps: ['angular'] },
         'bootstrap': { deps: ['jquery'] },

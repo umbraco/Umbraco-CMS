@@ -1,8 +1,9 @@
-﻿[
+﻿[    
     'angular',
-    'app',
+    'app',    
     'jquery',
     'jqueryCookie',
+    'umbracoExtensions',
     'bootstrap',
     'umbraco.resources',
     'umbraco.directives',

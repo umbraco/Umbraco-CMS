@@ -1,6 +1,6 @@
 require.config("##RequireJsConfig##");
 
-require("##RequireJsInitialize##", function (angular, app) {
+require("##RequireJsInitialize##", function (angular, app, jQuery) {
 
     //This function will be called when all the dependencies
     //listed above are loaded. Note that this function could

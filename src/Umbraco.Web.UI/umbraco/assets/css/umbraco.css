@@ -7,6 +7,52 @@
  *
  */
 
+
+.sprTree {
+   background-image: url(../img/legacytreesprites.png);   
+   display:inline-block;
+}
+.sprTreeDeveloperCacheItem {background-position: -6px -8px ! important;}
+.sprTreeDeveloperCacheTypes {background-position: -6px -40px ! important;}
+.sprTreeDeveloperMacro {background-position: -6px -72px ! important;}
+.sprTreeDeveloperPython {background-position: -6px -104px ! important; width: 15px; height: 15px}
+.sprTreeDeveloperRegistry {background-position: -6px -135px ! important;}
+.sprTreeDoc {background-position: -6px -199px ! important;}
+.sprTreeDoc2 {background-position: -6px -231px ! important;}
+.sprTreeDoc3 {background-position: -6px -263px ! important;}
+.sprTreeDoc4 {background-position: -6px -295px ! important;}
+.sprTreeDoc5 {background-position: -6px -327px ! important;}
+.sprTreeDocPic {background-position: -6px -359px ! important;}
+.sprTreeFolder {background-position: -6px -391px ! important;}
+.sprTreeFolder_o {background-position: -6px -423px ! important;}
+.sprTreeMediaFile {background-position: -6px -455px ! important;}
+.sprTreeMediaMovie {background-position: -6px -487px ! important;}
+.sprTreemediaFile {background-position: -6px -519px ! important;}
+.sprTreeMediaPhoto {background-position: -6px -551px ! important;}
+.sprTreeMember {background-position: -6px -583px ! important;}
+.sprTreeMemberGroup {background-position: -6px -615px ! important;}
+.sprTreeMemberType {background-position: -6px -647px ! important;}
+.sprTreeNewsletter {background-position: -6px -679px ! important;}
+.sprTreePackage {background-position: -6px -711px ! important;}
+.sprTreeRepository {background-position: -6px -743px ! important;}
+.sprTreeSettingAgent {background-position: -6px -775px ! important;}
+.sprTreeSettingCss {background-position: -6px -807px ! important;}
+.sprTreeSettingCssItem {background-position: -6px -839px ! important;}
+.sprTreeSettingDataType {background-position: -6px -871px ! important;}
+.sprTreeSettingDataTypeChild {background-position: -6px -903px ! important;}
+.sprTreeSettingDomain {background-position: -6px -935px ! important;}
+.sprTreeSettingLanguage {background-position: -6px -967px ! important;}
+.sprTreeSettingScript {background-position: -6px -999px ! important;}
+.sprTreeSettingTemplate {background-position: -6px -1031px ! important;}
+.sprTreeSettingXml {background-position: -6px -1063px ! important;}
+.sprTreeStatistik {background-position: -6px -1095px ! important;}
+.sprTreeUser {background-position: -6px -1127px ! important;}
+.sprTreeUserGroup {background-position: -6px -1159px ! important;}
+.sprTreeUserType {background-position: -6px -1191px ! important;}
+.sprNew{background-position: -6px -339px;}
+
+
+
 .clearfix {
   *zoom: 1;
 }
@@ -6364,32 +6410,33 @@ legend + .control-group {
 }
 
 .umb-tree {
-  /*width: auto;
-  min-width: 100%;*/
+  width: auto;
+  min-width: 100%;
   margin: 0;
-  display:block;  
 }
 
 .umb-tree li {
   display: block;
-  /*width: auto;
-  min-width: 100%;*/
+  width: auto;
+  min-width: 100%;
 }
 
-.umb-tree li.current > div {
-  /*background: #2e8aea;*/
+.umb-tree li.current > div,
+.umb-tree div.selected {
+  background: #2e8aea;
 }
 
-.umb-tree li.current > div i.umb-options i {
-  /*background: #fff;
-  border-color: #2e8aea;*/
+.umb-tree li.current > div i.umb-options i,
+.umb-tree div.selected i {
+  background: #fff;
+  border-color: #2e8aea;
 }
 
 .umb-tree li.current > div a,
 .umb-tree li.current > div i.icon {
-  /*color: white !important;
+  color: white !important;
   background: #2e8aea;
-  border-color: #2e8aea;*/
+  border-color: #2e8aea;
 }
 
 .umb-tree li.root div {
@@ -6401,9 +6448,9 @@ legend + .control-group {
 }
 
 .umb-tree ul {
-  display: block;
-  /*width: 100%;
-  min-width: 100%;*/
+  display: table;
+  width: 100%;
+  min-width: 100%;
   padding: 0;
   margin: 0;
 }
@@ -6569,8 +6616,8 @@ i.umb-options i {
 
 .umb-actions a:hover,
 .umb-actions li.selected {
-  /*color: #fff;
-  background: #2e8aea;*/
+  color: #fff;
+  background: #2e8aea;
 }
 
 .umb-actions a:hover i {

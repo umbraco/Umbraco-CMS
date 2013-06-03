@@ -303,7 +303,6 @@
     <Compile Include="Trees\ApplicationTreeExtensions.cs" />
     <Compile Include="Trees\TreeNode.cs" />
     <Compile Include="Trees\TreeNodeCollection.cs" />
-    <Compile Include="Trees\TreeNodeSerializer.cs" />
     <Compile Include="Trees\TreeQueryStringParameters.cs" />
     <Compile Include="Trees\ApplicationTreeApiController.cs" />
     <Compile Include="Editors\BackOfficeController.cs" />

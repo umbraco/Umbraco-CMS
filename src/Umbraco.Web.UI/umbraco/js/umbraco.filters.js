@@ -28,7 +28,7 @@ define(['app', 'angular'], function (app, angular) {
             if (treeNode.iconIsClass) {
                 return "";
             }
-            return "<img src='" + treeNode.iconFilePath + "'></img>";
+            return "background-image: url('" + treeNode.iconFilePath + "');";
         };
     };
     angular.module('umbraco.filters').filter("umbTreeIconImage", treeIconImageFilter);
@@ -41,10 +41,11 @@ define(['app', 'angular'], function (app, angular) {
     **/
     function treeIconClassFilter() {
         return function (treeNode, standardClasses) {
+
             if (treeNode.iconIsClass) {
-                return standardClasses + " " + treeNode.icon;
+                return standardClasses + " " + (treeNode.icon.startsWith('.') ? treeNode.icon.trimStart('.') : treeNode.icon);
             }
-            return standardClasses;
+            return standardClasses + " icon-custom-file";
         };
     };
     angular.module('umbraco.filters').filter("umbTreeIconClass", treeIconClassFilter);
