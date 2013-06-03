@@ -223,7 +223,7 @@ angular.module('umbraco.services.search', [])
 		}
 	};
 });
-angular.module('umbraco.services.section', ['umbraco.resources.trees'])
+angular.module('umbraco.services.section', [])
 .factory('section', function ($rootScope) {
 
 	var currentSection = "content";
@@ -245,7 +245,7 @@ angular.module('umbraco.services.section', ['umbraco.resources.trees'])
 
 });
 angular.module('umbraco.services.tree', [])
-.factory('tree', function ($q, umbTreeResource) {
+.factory('tree', function () {
 		//implement this in local storage
 		var treeArray = [];
 		var currentSection = "content";
@@ -256,103 +256,77 @@ angular.module('umbraco.services.tree', [])
 				if(options === undefined){
 					options = {};
 				}
-                
+
 				var section = options.section || 'content';
 				var cacheKey = options.cachekey || '';
 				cacheKey += "_" + section;	
 
-				var deferred = $q.defer();
-
-			    //return the cache if it exists
 				if (treeArray[cacheKey] !== undefined){
 					return treeArray[cacheKey];
 				}
 				
-				umbTreeResource.loadApplication(section)
- 		            .then(function (data) {
- 		                //this will be called once the tree app data has loaded
- 		                var result = {
- 		                    name: section,
- 		                    alias: section,
- 		                    children: data
- 		                };
- 		                //cache this result
- 		                //TODO: We'll need to un-cache this in many circumstances
- 		                treeArray[cacheKey] = result;
- 		                //return the data result as promised
- 		                deferred.resolve(treeArray[cacheKey]);
- 		            }, function (reason) {
- 		                //bubble up the rejection
- 		                deferred.reject(reason);
- 		                return;
- 		            });
+				var t;
+				switch(section){
 
-				return deferred.promise;
+					case "content":
+					t = {
+						name: section,
+						alias: section,
 
-			    //NOTE: The below will never be hit, it is legacy code from the mock data services
+						children: [
+							{ name: "My website", id: 1234, icon: "icon-home", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1, defaultAction: "create" },
+							{ name: "Components", id: 1235, icon: "icon-cogs", view: section + "/edit/" + 1235, children: [], expanded: false, level: 1, defaultAction: "create"  },
+							{ name: "Archieve", id: 1236, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, level: 1, defaultAction: "create"  },
+							{ name: "Recycle Bin", id: 1237, icon: "icon-trash", view: section + "/trash/view/", children: [], expanded: false, level: 1, defaultAction: "create"  }
+						]
+					};
+					break;
 
-				//var t;
-				//switch(section){
+					case "developer":
+					t = {
+						name: section,
+						alias: section,
 
-				//	case "content":
-				//	t = {
-				//		name: section,
-				//		alias: section,
+						children: [
+						{ name: "Data types", id: 1234, icon: "icon-folder-close", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1 },
+						{ name: "Macros", id: 1235, icon: "icon-folder-close", view: section + "/edit/" + 1235, children: [], expanded: false, level: 1 },
+						{ name: "Pacakges", id: 1236, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, level: 1 },
+						{ name: "XSLT Files", id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, level: 1 },
+						{ name: "Razor Files", id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, level: 1 }
+						]
+					};
+					break;
+					case "settings":
+					t = {
+						name: section,
+						alias: section,
 
-				//		children: [
-				//			{ name: "My website", id: 1234, icon: "icon-home", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1, defaultAction: "create" },
-				//			{ name: "Components", id: 1235, icon: "icon-cogs", view: section + "/edit/" + 1235, children: [], expanded: false, level: 1, defaultAction: "create"  },
-				//			{ name: "Archieve", id: 1236, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, level: 1, defaultAction: "create"  },
-				//			{ name: "Recycle Bin", id: 1237, icon: "icon-trash", view: section + "/trash/view/", children: [], expanded: false, level: 1, defaultAction: "create"  }
-				//		]
-				//	};
-				//	break;
+						children: [
+						{ name: "Stylesheets", id: 1234, icon: "icon-folder-close", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1 },
+						{ name: "Templates", id: 1235, icon: "icon-folder-close", view: section + "/edit/" + 1235, children: [], expanded: false, level: 1 },
+						{ name: "Dictionary", id: 1236, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, level: 1 },
+						{ name: "Media types", id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, level: 1 },
+						{ name: "Document types", id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, level: 1 }
+						]
+					};
+					break;
+					default: 
+					t = {
+						name: section,
+						alias: section,
 
-				//	case "developer":
-				//	t = {
-				//		name: section,
-				//		alias: section,
+						children: [
+						{ name: "random-name-" + section, id: 1234, icon: "icon-home", defaultAction: "create", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1 },
+						{ name: "random-name-" + section, id: 1235, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1235, children: [], expanded: false, level: 1 },
+						{ name: "random-name-" + section, id: 1236, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1236, children: [], expanded: false, level: 1 },
+						{ name: "random-name-" + section, id: 1237, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1237, children: [], expanded: false, level: 1 }
+						]
+					};
+					break;
+				}				
 
-				//		children: [
-				//		{ name: "Data types", id: 1234, icon: "icon-folder-close", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1 },
-				//		{ name: "Macros", id: 1235, icon: "icon-folder-close", view: section + "/edit/" + 1235, children: [], expanded: false, level: 1 },
-				//		{ name: "Pacakges", id: 1236, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, level: 1 },
-				//		{ name: "XSLT Files", id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, level: 1 },
-				//		{ name: "Razor Files", id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, level: 1 }
-				//		]
-				//	};
-				//	break;
-				//	case "settings":
-				//	t = {
-				//		name: section,
-				//		alias: section,
-
-				//		children: [
-				//		{ name: "Stylesheets", id: 1234, icon: "icon-folder-close", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1 },
-				//		{ name: "Templates", id: 1235, icon: "icon-folder-close", view: section + "/edit/" + 1235, children: [], expanded: false, level: 1 },
-				//		{ name: "Dictionary", id: 1236, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, level: 1 },
-				//		{ name: "Media types", id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, level: 1 },
-				//		{ name: "Document types", id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, level: 1 }
-				//		]
-				//	};
-				//	break;
-				//	default: 
-				//	t = {
-				//		name: section,
-				//		alias: section,
-
-				//		children: [
-				//		{ name: "random-name-" + section, id: 1234, icon: "icon-home", defaultAction: "create", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1 },
-				//		{ name: "random-name-" + section, id: 1235, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1235, children: [], expanded: false, level: 1 },
-				//		{ name: "random-name-" + section, id: 1236, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1236, children: [], expanded: false, level: 1 },
-				//		{ name: "random-name-" + section, id: 1237, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1237, children: [], expanded: false, level: 1 }
-				//		]
-				//	};
-				//	break;
-				//}				
-
-				//treeArray[cacheKey] = t;
-				//return treeArray[cacheKey];
+				treeArray[cacheKey] = t;
+				return treeArray[cacheKey];
 			},
 
 			getActions: function(treeItem, section){
@@ -411,16 +385,12 @@ angular.module('umbraco.services.tree', [])
 			getChildren: function (options) {
 
 				if(options === undefined){
-				    throw "No options object defined for getChildren";
-				}
-				if (options.node === undefined) {
-				    throw "No node defined on options object for getChildren";
+					options = {};
 				}
 				var section = options.section || 'content';
 				var treeItem = options.node;
 
-                //NOTE: the level is generated on the client side during data retreival
-				var childLevel = (treeItem.level ? treeItem.level : 1) + 1;
+				var iLevel = treeItem.level + 1;
 
 				//hack to have create as default content action
 				var action;
@@ -428,34 +398,12 @@ angular.module('umbraco.services.tree', [])
 					action = "create";
 				}
 
-				if (!options.node) {
-			        throw "No node defined";
-			    }
-
-			    var deferred = $q.defer();
-			    umbTreeResource.loadNodes(section, treeItem)
-                    .then(function (data) {
-                        //now that we have the data, we need to add the childLevel property to each item
-                        for (var i = 0; i < data.length; i++) {
-                            data[i].level = childLevel;
-                        }
-                        deferred.resolve(data);
-                    }, function (reason) {
-                        //bubble up the rejection
-                        deferred.reject(reason);
-                        return;
-                    });
-
-			    return deferred.promise;
-
-			    //NOTE: The below will never get hit it is legacy mock data
-
-				//return [
-				//	{ name: "child-of-" + treeItem.name, id: iLevel + "" + 1234, icon: "icon-file-alt", view: section + "/edit/" + iLevel + "" + 1234, children: [], expanded: false, level: iLevel, defaultAction: action },
-				//	{ name: "random-name-" + section, id: iLevel + "" + 1235, icon: "icon-file-alt", view: section + "/edit/" + iLevel + "" + 1235, children: [], expanded: false, level: iLevel, defaultAction: action  },
-				//	{ name: "random-name-" + section, id: iLevel + "" + 1236, icon: "icon-file-alt", view: section + "/edit/" + iLevel + "" + 1236, children: [], expanded: false, level: iLevel, defaultAction: action  },
-				//	{ name: "random-name-" + section, id: iLevel + "" + 1237, icon: "icon-file-alt", view: "common/legacy/1237?p=" + encodeURI("developer/contentType.aspx?idequal1234"), children: [], expanded: false, level: iLevel, defaultAction: action  }
-				//];
+				return [
+					{ name: "child-of-" + treeItem.name, id: iLevel + "" + 1234, icon: "icon-file-alt", view: section + "/edit/" + iLevel + "" + 1234, children: [], expanded: false, level: iLevel, defaultAction: action },
+					{ name: "random-name-" + section, id: iLevel + "" + 1235, icon: "icon-file-alt", view: section + "/edit/" + iLevel + "" + 1235, children: [], expanded: false, level: iLevel, defaultAction: action  },
+					{ name: "random-name-" + section, id: iLevel + "" + 1236, icon: "icon-file-alt", view: section + "/edit/" + iLevel + "" + 1236, children: [], expanded: false, level: iLevel, defaultAction: action  },
+					{ name: "random-name-" + section, id: iLevel + "" + 1237, icon: "icon-file-alt", view: "common/legacy/1237?p=" + encodeURI("developer/contentType.aspx?idequal1234"), children: [], expanded: false, level: iLevel, defaultAction: action  }
+				];
 			}
 		};
 	});
