@@ -4,7 +4,7 @@
  * Licensed MIT
  */
 'use strict';
-define(['angular'], function (angular) {
+define(['angular', 'app'], function (angular, app) {
 
     /**
     * @ngdoc directive 

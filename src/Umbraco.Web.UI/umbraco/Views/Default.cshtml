@@ -63,7 +63,9 @@
     
     @*We cannot use the data-main attribute above because we need to load in the application 
     via a server side JavaScript request, so we just request it after requirejs*@
-    <script src="@Url.Action("Application", "BackOffice")" type="text/javascript"></script>
+    <script type="text/javascript">
+        require(["@Url.Action("Application", "BackOffice").EnsureEndsWith('/')"]);
+    </script>
 
 </body>
 </html>

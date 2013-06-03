@@ -5,7 +5,7 @@
  * Licensed MIT
  */
 
-define(['angular'], function (angular) {
+define(['angular', 'app'], function (angular, app) {
 
    
     //Handles the section area of the app

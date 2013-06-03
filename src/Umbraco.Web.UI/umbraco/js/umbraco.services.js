@@ -1,5 +1,5 @@
 'use strict';
-define(['angular'], function (angular) {
+define(['angular', 'app'], function (angular, app) {
 angular.module('umbraco.services.dialog', [])
 .factory('dialog', ['$rootScope', '$compile', '$http', '$timeout', '$q', '$templateCache', function($rootScope, $compile, $http, $timeout, $q, $templateCache) {
 	
