@@ -17,6 +17,46 @@ angular.module('umbraco.filters', [])
             };
         });
 
+    /**
+    * @ngdoc filter 
+    * @name umbraco.filters:umbTreeIconImage
+    * @restrict E
+    * @description This will properly render the tree icon image based on the tree icon set on the server
+    **/
+    function treeIconImageFilter() {
+        return function (treeNode) {
+            if (treeNode.iconIsClass) {
+                return "";
+            }
+            return "background-image: url('" + treeNode.iconFilePath + "');height:16px;background-position:2px 0px";
+        };
+    };
+    angular.module('umbraco.filters').filter("umbTreeIconImage", treeIconImageFilter);
+
+    /**
+    * @ngdoc filter 
+    * @name umbraco.filters:umbTreeIconClass
+    * @restrict E
+    * @description This will properly render the tree icon class based on the tree icon set on the server
+    **/
+    function treeIconClassFilter() {
+        return function (treeNode, standardClasses) {
+
+            if (treeNode.iconIsClass) {
+                //if it is a legacy class then we'll add a custom 'icon-' class so styles work properly
+                var classes = standardClasses + " " + (treeNode.icon.startsWith('.') ? treeNode.icon.trimStart('.') : treeNode.icon);
+                if (treeNode.icon.startsWith('.')) {
+                    //its legacy
+                    classes += " icon-legacy";
+                }
+                return classes;
+            }
+            //we need an 'icon-' class in there for certain styles to work so if it is image based we'll add this
+            return standardClasses + " icon-custom-file";
+        };
+    };
+    angular.module('umbraco.filters').filter("umbTreeIconClass", treeIconClassFilter);
+
 
 return app;
 });

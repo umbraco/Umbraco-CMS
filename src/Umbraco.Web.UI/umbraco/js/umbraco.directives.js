@@ -4,7 +4,63 @@
  * Licensed MIT
  */
 'use strict';
-define(['app','angular'], function (app, angular) {
+define(['app', 'angular'], function (app, angular) {
+
+    /**
+    * @ngdoc directive 
+    * @name umbraco.directive:leftColumn
+    * @restrict E
+    **/
+    function leftColumnDirective() {
+        return {
+            restrict: "E",    // restrict to an element
+            replace: true,   // replace the html element with the template
+            template: '<div ng-include="leftColumnViewFile"></div>',
+            link: function (scope, el, attrs) {
+                //set the loginViewFile
+                scope.leftColumnViewFile = "views/directives/umb-leftcolumn.html";
+            }
+        };
+    };
+    angular.module('umbraco').directive("umbLeftColumn", leftColumnDirective);
+
+    /**
+    * @ngdoc directive 
+    * @name umbraco.directive:login 
+    * @restrict E
+    **/
+    function loginDirective() {
+        return {
+            restrict: "E",    // restrict to an element
+            replace: true,   // replace the html element with the template
+            template: '<div ng-include="loginViewFile"></div>',
+            link: function (scope, el, attrs) {
+                //set the loginViewFile
+                scope.loginViewFile = "views/directives/umb-login.html";
+            }
+        };
+    };
+    angular.module('umbraco').directive("umbLogin", loginDirective);
+
+    /**
+    * @ngdoc directive 
+    * @name umbraco.directive:notifications 
+    * @restrict E
+    **/
+    function notificationDirective() {
+        return {
+            restrict: "E",    // restrict to an element
+            replace: true,   // replace the html element with the template
+            template: '<div ng-include="notificationViewFile"></div>',
+            link: function (scope, el, attrs) {
+                //set the notificationViewFile
+                scope.notificationViewFile = "views/directives/umb-notifications.html";
+            }
+        };
+    };
+    angular.module('umbraco').directive("umbNotifications", notificationDirective);
+
+
 angular.module('umbraco.directives', [])
 .directive('val-regex', function () {
 
@@ -250,7 +306,7 @@ angular.module('umbraco.directives', [])
 })
 
 
-.directive('umbTree', function ($compile, $log, tree) {
+.directive('umbTree', function ($compile, $log, tree, $q) {
   return {
       restrict: 'E',
       terminal: true,
@@ -288,8 +344,9 @@ angular.module('umbraco.directives', [])
 
         var treeTemplate = '<ul ng-class="{collapsed: !node.expanded}"><li ng-repeat="val in node.children"><umb-tree section="{{section}}" preventdefault="{{preventdefault}}" showheader="{{showheader}}" showoptions="{{showoptions}}" node="val"></umb-tree></li></ul>';                
         var itemTemplate = '<div ng-style="setTreePadding(node)">' +
-                              '<ins ng-class="{\'icon-caret-right\': !node.expanded, \'icon-caret-down\': node.expanded}" ng-click="load(node)"></ins>' +
-                              '<i class="icon umb-tree-icon sprTree {{node.icon}}"></i>' +
+                                '<ins ng-hide="node.hasChildren" style="background:none;width:18px;"></ins>' +
+                                '<ins ng-show="node.hasChildren" ng-class="{\'icon-caret-right\': !node.expanded, \'icon-caret-down\': node.expanded}" ng-click="load(node)"></ins>' +
+                              '<i class="{{node | umbTreeIconClass:\'icon umb-tree-icon sprTree\'}}" style="{{node | umbTreeIconImage}}"></i>' +
                                 '<a ng-click="select(this, node, $event)" ng-href="#{{node.view}}" ' + _preventDefault + '>{{node.name}}</a>';
         if(showoptions){
             itemTemplate +=  '<i class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></i>';
@@ -297,8 +354,18 @@ angular.module('umbraco.directives', [])
         itemTemplate +=     '</div>';
 
 
-        if(scope.node === undefined){
-            scope.tree = tree.getTree({section:scope.section, cachekey: scope.cachekey});
+        if(scope.node === undefined){            
+            //NOTE: We use .when here because getTree may return a promise or
+            // simply a cached value.
+            $q.when(tree.getTree({section:scope.section, cachekey: scope.cachekey}))
+                .then(function (data) {
+                    //set the data once we have it
+                    scope.tree = data;
+                }, function (reason) {
+                    alert(reason);
+                    return;
+                });
+
             template = rootTemplate;
         }else{
             template = itemTemplate + treeTemplate;
@@ -315,14 +382,21 @@ angular.module('umbraco.directives', [])
         };
 
         scope.load = function (node) {
-                  if (node.expanded){
-                      node.expanded = false;
-                      node.children = [];
-                  }else {
-                      node.children =  tree.getChildren({node: node, section: scope.section});
-                      node.expanded = true;
-                  }   
-          };
+            if (node.expanded) {
+                node.expanded = false;
+                node.children = [];
+            }
+            else {
+                tree.getChildren({ node: node, section: scope.section })
+                    .then(function (data) {
+                        node.children = data;
+                        node.expanded = true;
+                    }, function (reason) {
+                        alert(reason);
+                        return;
+                    });
+            }
+        };
 
           scope.setTreePadding = function(node) {
               return { 'padding-left': (node.level * 20) + "px" };
