@@ -691,6 +691,7 @@
     <Compile Include="Serialization\IStreamedResult.cs" />
     <Compile Include="Serialization\JsonCreationConverter.cs" />
     <Compile Include="Serialization\JsonNetSerializer.cs" />
+    <Compile Include="Serialization\JsonToStringConverter.cs" />
     <Compile Include="Serialization\SerializationExtensions.cs" />
     <Compile Include="Serialization\SerializationService.cs" />
     <Compile Include="Serialization\StreamedResult.cs" />

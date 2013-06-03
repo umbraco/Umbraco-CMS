@@ -13,7 +13,8 @@
              ng-class="{'icon-caret-right': !node.expanded, 'icon-caret-down': node.expanded}" 
              ng-click="getTreeChildren(node)"></ins>
 
-        <i class="icon umb-tree-icon sprTree {{node.icon}}"></i>
+        <i class="{{node|umbTreeIconClass:'icon umb-tree-icon sprTree'}}" ng-bind-html-unsafe="node|umbTreeIconImage">            
+        </i>
 
         <a ng-href="#{{node.view}}">{{node.name}}</a>
         <i class="umb-options" ng-click="showContextMenu(node, $event)"><i></i><i></i><i></i></i>

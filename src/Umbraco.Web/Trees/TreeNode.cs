@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Trees
 {
@@ -64,6 +65,33 @@ namespace Umbraco.Web.Trees
         /// </summary>
         [DataMember(Name = "icon")]
         public string Icon { get; set; }
+
+        /// <summary>
+        /// Returns true if the icon represents a CSS class instead of a file path
+        /// </summary>
+        [DataMember(Name = "iconIsClass")]
+        public bool IconIsClass
+        {
+            get
+            {
+                //if it starts with a '.' or doesn't contain a '.' at all then it is a class
+                return Icon.StartsWith(".") || Icon.Contains(".") == false;
+            }
+        }
+
+        /// <summary>
+        /// Returns the icon file path if the icon is not a class, otherwise returns an empty string
+        /// </summary>
+        [DataMember(Name = "iconFilePath")]
+        public string IconFilePath
+        {
+            get
+            {
+                return IconIsClass
+                           ? string.Empty
+                           : IOHelper.ResolveUrl("~/umbraco/images/umbraco/" + Icon);
+            }
+        }
 
         /// <summary>
         /// The URL path for the editor for this model
