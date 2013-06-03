@@ -9,7 +9,8 @@
 
 
 .sprTree {
-   background-image: url(../img/legacytreesprites.png);   
+   background: url(../img/legacytreesprites.png) no-repeat;   
+
    display:inline-block;
 }
 .sprTreeDeveloperCacheItem {background-position: -6px -8px ! important;}

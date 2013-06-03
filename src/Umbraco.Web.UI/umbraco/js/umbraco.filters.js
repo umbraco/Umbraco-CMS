@@ -26,6 +26,10 @@ angular.module('umbraco.filters', [])
     function treeIconImageFilter() {
         return function (treeNode) {
             if (treeNode.iconIsClass) {
+                if (treeNode.icon.startsWith('.')) {
+                    //its legacy so add some width/height
+                    return "height:16px;width:16px;";
+                }
                 return "";
             }
             return "background-image: url('" + treeNode.iconFilePath + "');height:16px;background-position:2px 0px";
@@ -42,13 +46,8 @@ angular.module('umbraco.filters', [])
     function treeIconClassFilter() {
         return function (treeNode, standardClasses) {
 
-            if (treeNode.iconIsClass) {
-                //if it is a legacy class then we'll add a custom 'icon-' class so styles work properly
-                var classes = standardClasses + " " + (treeNode.icon.startsWith('.') ? treeNode.icon.trimStart('.') : treeNode.icon);
-                if (treeNode.icon.startsWith('.')) {
-                    //its legacy
-                    classes += " icon-legacy";
-                }
+            if (treeNode.iconIsClass) {                
+                var classes = standardClasses + " " + (treeNode.icon.startsWith('.') ? treeNode.icon.trimStart('.') : treeNode.icon);                
                 return classes;
             }
             //we need an 'icon-' class in there for certain styles to work so if it is image based we'll add this
