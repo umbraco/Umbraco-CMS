@@ -6,7 +6,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// <summary>
     /// A model representing a content item to be saved
     /// </summary>
-    public class ContentItemSave : ContentItemBase<ContentPropertyBase>
+    public class ContentItemSave : ContentItemBasic<ContentPropertyBase>
     {
         public ContentItemSave()
         {

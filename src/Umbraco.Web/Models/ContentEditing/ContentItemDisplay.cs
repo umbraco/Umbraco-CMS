@@ -10,7 +10,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// <summary>
     /// A model representing a content item to be displayed in the back office
     /// </summary>    
-    public class ContentItemDisplay : ContentItemBase<ContentPropertyDisplay>
+    public class ContentItemDisplay : ContentItemBasic<ContentPropertyDisplay>
     {
         public ContentItemDisplay()
         {

@@ -10,7 +10,29 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    //TODO: Convert this over to mapping engine if people agree to it
+    internal class ContentTypeModelMapper
+    {
+        private readonly ApplicationContext _applicationContext;
+
+        public ContentTypeModelMapper(ApplicationContext applicationContext)
+        {
+            _applicationContext = applicationContext;
+        }
+
+        public ContentTypeBasic ToContentItemBasic(IContentType contentType)
+        {
+            return new ContentTypeBasic
+                {
+                    Alias = contentType.Alias,
+                    Id = contentType.Id,
+                    Description = contentType.Description,
+                    Icon = contentType.Icon,
+                    Name = contentType.Name
+                };
+        }
+    }
+
+
     internal class ContentModelMapper
     {
         private readonly ApplicationContext _applicationContext;
@@ -79,7 +101,7 @@ namespace Umbraco.Web.Models.Mapping
                 };
         }
 
-        public ContentItemDto ToContentItemDto(IContent content)
+        internal ContentItemDto ToContentItemDto(IContent content)
         {
             return new ContentItemDto
                 {

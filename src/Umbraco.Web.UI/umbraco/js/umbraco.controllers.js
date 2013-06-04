@@ -89,6 +89,7 @@ angular.module('umbraco').controller("NavigationController",
         $scope.ui.mode("default-hidenav");
     };
 
+    //SD: Pretty sure this is not used ?!
     function loadTree(section) {
         $scope.currentSection = section;
         
@@ -268,8 +269,16 @@ angular.module("umbraco").controller("Umbraco.Common.LegacyController",
 	function($scope, $routeParams){
 		$scope.legacyPath = decodeURI($routeParams.p);
 	});
-angular.module('umbraco').controller("Umbraco.Editors.ContentCreateController", function ($scope, $routeParams,contentTypeFactory) {	
-	$scope.allowedTypes  = contentTypeFactory.getAllowedTypes($scope.currentNode.id);	
+angular.module('umbraco').controller("Umbraco.Editors.ContentCreateController", function ($scope, $routeParams, contentTypeResource) {
+
+    //get the allowed content types and update the property when it resolves
+    contentTypeResource.getAllowedTypes($scope.currentNode.id)
+        .then(function (data) {
+            $scope.allowedTypes = data;
+        }, function (reason) {
+            alert(reason);
+            return;
+        });
 });
 angular.module("umbraco").controller("Umbraco.Editors.ContentEditController", function ($scope, $routeParams, contentFactory, notifications) {
 	
@@ -452,7 +461,7 @@ angular.module("umbraco").controller("Umbraco.Editors.GridController", function(
        })
 });
 angular.module("umbraco")
-    .controller("Umbraco.Editors.ListViewController", function ($rootScope, $scope, contentFactory, contentTypeFactory) {
+    .controller("Umbraco.Editors.ListViewController", function ($rootScope, $scope, contentFactory, contentTypeResource) {
         $scope.options = {
             take: 10,
             offset: 0,
@@ -462,7 +471,15 @@ angular.module("umbraco")
         };
 
         $scope.pagination = new Array(100);
-        $scope.listViewAllowedTypes = contentTypeFactory.getAllowedTypes($scope.content.id);
+
+        //get the allowed content types and update the property when it resolves
+        contentTypeResource.getAllowedTypes($scope.content.id)
+            .then(function (data) {
+                $scope.listViewAllowedTypes = data;
+            }, function (reason) {
+                alert(reason);
+                return;
+            });
         
         $scope.next = function(){
             if($scope.options.offset < $scope.listViewResultSet.pages){

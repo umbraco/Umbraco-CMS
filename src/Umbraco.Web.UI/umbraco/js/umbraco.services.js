@@ -287,7 +287,7 @@ angular.module('umbraco.services.section', [])
 
 });
 angular.module('umbraco.services.tree', [])
-.factory('tree', function ($q, umbTreeResource) {
+.factory('tree', function ($q, treeResource) {
 		//implement this in local storage
 		var treeArray = [];
 		var currentSection = "content";
@@ -310,7 +310,7 @@ angular.module('umbraco.services.tree', [])
 					return treeArray[cacheKey];
 				}
 				
-				umbTreeResource.loadApplication(section)
+			    treeResource.loadApplication(section)
  		            .then(function (data) {
  		                //this will be called once the tree app data has loaded
  		                var result = {
@@ -475,7 +475,7 @@ angular.module('umbraco.services.tree', [])
 			    }
 
 			    var deferred = $q.defer();
-			    umbTreeResource.loadNodes(section, treeItem)
+			    treeResource.loadNodes(section, treeItem)
                     .then(function (data) {
                         //now that we have the data, we need to add the childLevel property to each item
                         for (var i = 0; i < data.length; i++) {

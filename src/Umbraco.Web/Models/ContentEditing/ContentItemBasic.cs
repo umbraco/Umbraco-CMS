@@ -10,10 +10,10 @@ namespace Umbraco.Web.Models.ContentEditing
     /// A model representing a basic content item
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
-    public abstract class ContentItemBase<T>
+    public abstract class ContentItemBasic<T>
         where T: ContentPropertyBase
     {
-        protected ContentItemBase()
+        protected ContentItemBasic()
         {
             //ensure its not null
             _properties = new List<T>();
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [JsonIgnore]
         internal ContentItemDto ContentDto { get; set; }
 
-        protected bool Equals(ContentItemBase<T> other)
+        protected bool Equals(ContentItemBasic<T> other)
         {
             return Id == other.Id;
         }
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Models.ContentEditing
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            var other = obj as ContentItemBase<T>;
+            var other = obj as ContentItemBasic<T>;
             return other != null && Equals(other);
         }
 

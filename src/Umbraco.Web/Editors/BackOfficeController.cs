@@ -48,7 +48,8 @@ namespace Umbraco.Web.Editors
                 {
                     {"umbracoPath", GlobalSettings.Path},
                     {"contentEditorApiBaseUrl", Url.GetUmbracoApiService<ContentEditorApiController>("PostSaveContent").TrimEnd("PostSaveContent")},
-                    {"treeApplicationApiBaseUrl", Url.GetUmbracoApiService<ApplicationTreeApiController>("GetTreeData").TrimEnd("GetTreeData")}
+                    {"treeApplicationApiBaseUrl", Url.GetUmbracoApiService<ApplicationTreeApiController>("GetTreeData").TrimEnd("GetTreeData")},
+                    {"contentTypeApiBaseUrl", Url.GetUmbracoApiService<ContentTypeApiController>("GetAllowedChildrenForContent").TrimEnd("GetAllowedChildrenForContent")}
                 };
 
             return JavaScript(ServerVariablesParser.Parse(d));

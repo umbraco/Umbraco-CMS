@@ -14,13 +14,12 @@ using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {
-
     /// <summary>
     /// The API controller used for editing content
     /// </summary>
     [PluginController("UmbracoEditors")]
     [ValidationFilter]
-    public class ContentEditorApiController : UmbracoApiController
+    public class ContentEditorApiController : UmbracoAuthorizedApiController
     {
         private readonly ContentModelMapper _contentModelMapper;
 
@@ -60,7 +59,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public ContentItemDisplay GetContent(int id)
         {
-            var foundContent = ApplicationContext.Services.ContentService.GetById(id);
+            var foundContent = Services.ContentService.GetById(id);
             if (foundContent == null)
             {
                 ModelState.AddModelError("id", string.Format("content with id: {0} was not found", id));
@@ -111,7 +110,7 @@ namespace Umbraco.Web.Editors
             }
             
             //save the item
-            ApplicationContext.Services.ContentService.Save(contentItem.PersistedContent);
+            Services.ContentService.Save(contentItem.PersistedContent);
 
             //return the updated model
             return _contentModelMapper.ToContentItemDisplay(contentItem.PersistedContent);

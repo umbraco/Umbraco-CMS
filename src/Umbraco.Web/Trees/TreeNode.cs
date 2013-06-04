@@ -36,7 +36,7 @@ namespace Umbraco.Web.Trees
         /// <summary>
         /// The unique identifier for the node
         /// </summary>
-        [DataMember(Name = "nodeId")]
+        [DataMember(Name = "id")]
         public string NodeId { get; private set; }
 
         /// <summary>

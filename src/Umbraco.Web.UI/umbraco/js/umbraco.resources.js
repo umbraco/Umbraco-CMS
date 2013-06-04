@@ -9,9 +9,10 @@ define(['app', 'angular'], function (app, angular) {
 
     /**
     * @ngdoc factory 
-    * @name umbraco.resources.trees.umbTreeResource     
+    * @name umbraco.resources.treeResource     
+    * @description Loads in data for trees
     **/
-    function umbTreeResource($q, $http) {
+    function treeResource($q, $http) {
 
         /** internal method to get the tree app url */
         function getTreeAppUrl(section) {
@@ -61,8 +62,75 @@ define(['app', 'angular'], function (app, angular) {
             }
         };
     }
-    angular.module('umbraco').factory('umbTreeResource', umbTreeResource);
+    angular.module('umbraco').factory('treeResource', treeResource);
 
+    /**
+    * @ngdoc factory 
+    * @name umbraco.resources.contentTypeResource
+    * @description Loads in data for content types
+    **/
+    function contentTypeResource($q, $http) {
+
+        /** internal method to get the tree app url */
+        function getChildContentTypesUrl(contentId) {
+            return Umbraco.Sys.ServerVariables.contentTypeApiBaseUrl + "GetAllowedChildrenForContent?contentId=" + contentId;
+        }
+
+        return {
+
+            //return a content type with a given ID
+            getContentType: function (id) {
+
+                return {
+                    name: "News Article",
+                    alias: "newsArticle",
+                    id: id,
+                    tabs: []
+                };
+
+            },
+            //return all available types
+            all: function () {
+                return [];
+            },
+
+            //return children inheriting a given type
+            children: function (id) {
+                return [];
+            },
+
+            //return all content types a type inherits from
+            parents: function (id) {
+                return [];
+            },
+
+            //return all types allowed under given document
+            getAllowedTypes: function (contentId) {
+
+                var deferred = $q.defer();
+
+                //go and get the tree data
+                $http.get(getChildContentTypesUrl(contentId)).
+                    success(function (data, status, headers, config) {
+                        deferred.resolve(data);
+                    }).
+                    error(function (data, status, headers, config) {
+                        deferred.reject('Failed to retreive data for content id ' + contentId);
+                    });
+
+                return deferred.promise;
+
+                //OLD TEST DATA
+                //return [
+                //{ name: "News Article", description: "Standard news article", alias: "newsArticle", id: 1234, cssClass: "file" },
+                //{ name: "News Area", description: "Area to hold all news articles, there should be only one", alias: "newsArea", id: 1234, cssClass: "suitcase" },
+                //{ name: "Employee", description: "Employee profile information page", alias: "employee", id: 1234, cssClass: "user" }
+                //];
+            }
+
+        };
+    }
+    angular.module('umbraco.resources.contentType', []).factory('contentTypeResource', contentTypeResource);
 
 
     angular.module('umbraco.resources.content', [])
@@ -204,47 +272,49 @@ define(['app', 'angular'], function (app, angular) {
     return factory;
 });
 
-angular.module('umbraco.resources.contentType', [])
-.factory('contentTypeFactory', function () {
-    return {
+//angular.module('umbraco.resources.contentType', [])
+//.factory('contentTypeFactory', function () {
+//    return {
 
-        //return a content type with a given ID
-        getContentType: function(id){
+//        //return a content type with a given ID
+//        getContentType: function(id){
 
-          return {
-              name: "News Article",
-              alias: "newsArticle",
-              id: id,
-              tabs:[]
-          };
+//          return {
+//              name: "News Article",
+//              alias: "newsArticle",
+//              id: id,
+//              tabs:[]
+//          };
 
-        },
-        //return all availabel types
-        all: function(){
-            return [];
-        },
+//        },
+//        //return all available types
+//        all: function(){
+//            return [];
+//        },
 
-        //return children inheriting a given type
-        children: function(id){
-            return [];
-        },
+//        //return children inheriting a given type
+//        children: function(id){
+//            return [];
+//        },
 
-        //return all content types a type inherite from
-        parents: function(id){
-            return [];
-        },
+//        //return all content types a type inherits from
+//        parents: function(id){
+//            return [];
+//        },
 
-        //return all types allowed under given document
-        getAllowedTypes: function(documentId){
-          return [
-          {name: "News Article", description: "Standard news article", alias: "newsArticle", id: 1234, cssClass:"file"},
-          {name: "News Area", description: "Area to hold all news articles, there should be only one", alias: "newsArea", id: 1234, cssClass:"suitcase"},
-          {name: "Employee", description: "Employee profile information page",  alias: "employee", id: 1234, cssClass:"user"}
-          ];
-        }
+//        //return all types allowed under given document
+//        getAllowedTypes: function(documentId){
+//          return [
+//          {name: "News Article", description: "Standard news article", alias: "newsArticle", id: 1234, cssClass:"file"},
+//          {name: "News Area", description: "Area to hold all news articles, there should be only one", alias: "newsArea", id: 1234, cssClass:"suitcase"},
+//          {name: "Employee", description: "Employee profile information page",  alias: "employee", id: 1234, cssClass:"user"}
+//          ];
+//        }
 
-      };
-});
+//      };
+//});
+
+
 angular.module('umbraco.resources.localization', [])
 .factory('localizationFactory', function () {
   var localizationArray = [];

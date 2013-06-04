@@ -292,6 +292,8 @@
     <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />
+    <Compile Include="Editors\ContentTypeApiController.cs" />
+    <Compile Include="Models\ContentEditing\ContentTypeBasic.cs" />
     <Compile Include="Models\ContentEditing\Tab.cs" />
     <Compile Include="Models\Mapping\ContentModelMapper.cs" />
     <Compile Include="FormDataCollectionExtensions.cs" />
@@ -316,7 +318,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Models\ContentEditing\ContentItemBase.cs" />
+    <Compile Include="Models\ContentEditing\ContentItemBasic.cs" />
     <Compile Include="Models\ContentEditing\ContentItemDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentItemDto.cs" />
     <Compile Include="Models\ContentEditing\ContentItemFile.cs" />
