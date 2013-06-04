@@ -221,7 +221,7 @@ angular.module('umbraco.directives', [])
         restrict: 'E',
         replace: true,
         transclude: 'true',
-        templateUrl: '/belle/views/directives/umb-panel.html'
+        templateUrl: 'views/directives/umb-panel.html'
     };
 })
 
@@ -230,7 +230,7 @@ angular.module('umbraco.directives', [])
         restrict: 'E',
         replace: true,
         transclude: 'true',
-        templateUrl: '/belle/views/directives/umb-header.html',
+        templateUrl: 'views/directives/umb-header.html',
 
         compile: function compile(tElement, tAttrs, transclude) {
               return function postLink(scope, iElement, iAttrs, controller) {
@@ -275,7 +275,7 @@ angular.module('umbraco.directives', [])
         restrict: 'E',
         replace: true,
         transclude: 'true',
-        templateUrl: '/belle/views/directives/umb-tab-view.html'
+        templateUrl: 'views/directives/umb-tab-view.html'
     };
 })
 
@@ -290,7 +290,7 @@ angular.module('umbraco.directives', [])
                     id: '@'
                 },
 
-        templateUrl: '/belle/views/directives/umb-tab.html'
+        templateUrl: 'views/directives/umb-tab.html'
     };
 })
 
@@ -301,7 +301,7 @@ angular.module('umbraco.directives', [])
         restrict: 'E',
         replace: true,
         transclude: 'true',
-        templateUrl: '/belle/views/directives/umb-property.html'
+        templateUrl: 'views/directives/umb-property.html'
     };
 })
 
