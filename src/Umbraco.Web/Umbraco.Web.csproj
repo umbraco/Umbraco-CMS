@@ -295,8 +295,11 @@
     <Compile Include="Editors\ContentTypeApiController.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeBasic.cs" />
     <Compile Include="Models\ContentEditing\Tab.cs" />
+    <Compile Include="Models\ContentEditing\UserBasic.cs" />
     <Compile Include="Models\Mapping\ContentModelMapper.cs" />
     <Compile Include="FormDataCollectionExtensions.cs" />
+    <Compile Include="Models\Mapping\ContentTypeModelMapper.cs" />
+    <Compile Include="Models\Mapping\ProfileModelMapper.cs" />
     <Compile Include="Mvc\BackOfficeArea.cs" />
     <Compile Include="Trees\LegacyTreeApiController.cs" />
     <Compile Include="Trees\ISearchableTree.cs" />

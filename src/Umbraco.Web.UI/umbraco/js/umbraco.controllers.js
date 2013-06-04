@@ -280,17 +280,17 @@ angular.module('umbraco').controller("Umbraco.Editors.ContentCreateController", 
             return;
         });
 });
-angular.module("umbraco").controller("Umbraco.Editors.ContentEditController", function ($scope, $routeParams, contentFactory, notifications) {
+angular.module("umbraco").controller("Umbraco.Editors.ContentEditController", function ($scope, $routeParams, contentResource, notifications) {
 	
 	if($routeParams.create)
-		$scope.content = contentFactory.getContentScaffold($routeParams.parentId, $routeParams.doctype);
+		$scope.content = contentResource.getContentScaffold($routeParams.parentId, $routeParams.doctype);
 	else
-		$scope.content = contentFactory.getContent($routeParams.id);
+		$scope.content = contentResource.getContent($routeParams.id);
 
 
 	$scope.saveAndPublish = function (cnt) {
 		cnt.publishDate = new Date();
-		contentFactory.publishContent(cnt);
+		contentResource.publishContent(cnt);
 
 		notifications.success("Published", "Content has been saved and published");
 	};
@@ -298,7 +298,7 @@ angular.module("umbraco").controller("Umbraco.Editors.ContentEditController", fu
 	$scope.save = function (cnt) {
 		cnt.updateDate = new Date();
 
-		contentFactory.saveContent(cnt);
+		contentResource.saveContent(cnt);
 		notifications.success("Saved", "Content has been saved");
 	};
 	
@@ -461,7 +461,7 @@ angular.module("umbraco").controller("Umbraco.Editors.GridController", function(
        })
 });
 angular.module("umbraco")
-    .controller("Umbraco.Editors.ListViewController", function ($rootScope, $scope, contentFactory, contentTypeResource) {
+    .controller("Umbraco.Editors.ListViewController", function ($rootScope, $scope, contentResource, contentTypeResource) {
         $scope.options = {
             take: 10,
             offset: 0,
@@ -518,7 +518,7 @@ angular.module("umbraco")
         /*Pagination is done by an array of objects, due angularJS's funky way of monitoring state
         with simple values */
         $scope.reloadView = function(){
-                $scope.listViewResultSet = contentFactory.getChildren($scope.content.id, $scope.options);
+                $scope.listViewResultSet = contentResource.getChildren($scope.content.id, $scope.options);
                 
                 $scope.pagination = [];
                 for (var i = $scope.listViewResultSet.pages - 1; i >= 0; i--) {

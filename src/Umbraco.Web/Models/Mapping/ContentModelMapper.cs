@@ -10,55 +10,28 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class ContentTypeModelMapper
-    {
-        private readonly ApplicationContext _applicationContext;
-
-        public ContentTypeModelMapper(ApplicationContext applicationContext)
-        {
-            _applicationContext = applicationContext;
-        }
-
-        public ContentTypeBasic ToContentItemBasic(IContentType contentType)
-        {
-            return new ContentTypeBasic
-                {
-                    Alias = contentType.Alias,
-                    Id = contentType.Id,
-                    Description = contentType.Description,
-                    Icon = contentType.Icon,
-                    Name = contentType.Name
-                };
-        }
-    }
-
-
     internal class ContentModelMapper
     {
         private readonly ApplicationContext _applicationContext;
+        private readonly ProfileModelMapper _profileMapper;
 
-        public ContentModelMapper(ApplicationContext applicationContext)
+        public ContentModelMapper(ApplicationContext applicationContext, ProfileModelMapper profileMapper)
         {
             _applicationContext = applicationContext;
+            _profileMapper = profileMapper;
         }
 
         private ContentPropertyDisplay ToContentPropertyDisplay(Property property)
         {
-            var editor = PropertyEditorResolver.Current.GetById(property.PropertyType.DataTypeId);
-            if (editor == null)
-            {
-                throw new NullReferenceException("The property editor with id " + property.PropertyType.DataTypeId + " does not exist");
-            }
-            return new ContentPropertyDisplay
-            {
-                Alias = property.Alias,
-                Id = property.Id,
-                Description = property.PropertyType.Description,
-                Label = property.PropertyType.Name,
-                Config = _applicationContext.Services.DataTypeService.GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId),
-                Value = editor.ValueEditor.SerializeValue(property.Value),
-                View = editor.ValueEditor.View
-            };
+            return CreateProperty<ContentPropertyDisplay>(property, (display, originalProp, propEditor) =>
+                {
+                    //set the display properties after mapping
+                    display.Alias = originalProp.Alias;
+                    display.Description = originalProp.PropertyType.Description;
+                    display.Label = property.PropertyType.Name;
+                    display.Config = _applicationContext.Services.DataTypeService.GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId);
+                    display.View = propEditor.ValueEditor.View;
+                });
         }
 
         public ContentItemDisplay ToContentItemDisplay(IContent content)
@@ -92,31 +65,102 @@ namespace Umbraco.Web.Models.Mapping
                     Alias = "Generic properties",
                     Properties = orphanProperties.Select(ToContentPropertyDisplay)
                 });
-
-            return new ContentItemDisplay
+            
+            var result = CreateContent<ContentItemDisplay, ContentPropertyDisplay>(content, (display, originalContent) =>
                 {
-                    Id = content.Id,
-                    Name = content.Name,
-                    Tabs = tabs
-                };
+                    //set display props after the normal properties are alraedy mapped
+                    display.Name = originalContent.Name;
+                    display.Tabs = tabs;
+                    display.Icon = originalContent.ContentType.Icon;
+                    //look up the published version of this item if it is not published
+                    if (content.Published)
+                    {
+                        display.PublishDate = content.UpdateDate;
+                    }
+                    else if (content.HasPublishedVersion())
+                    {
+                        var published = _applicationContext.Services.ContentService.GetPublishedVersion(content.Id);
+                        display.PublishDate = published.UpdateDate;
+                    }
+                    else
+                    {
+                        display.PublishDate = null;
+                    }
+                    
+                }, null, false);
+
+            return result;
         }
 
         internal ContentItemDto ToContentItemDto(IContent content)
         {
-            return new ContentItemDto
+            return CreateContent<ContentItemDto, ContentPropertyDto>(content, null, (propertyDto, originalProperty, propEditor) =>
                 {
-                    Id = content.Id,
-                    Properties = content.Properties.Select(p => new ContentPropertyDto
-                        {
-                            Alias = p.Alias,
-                            Description = p.PropertyType.Description,
-                            Label = p.PropertyType.Name,
-                            Id = p.Id,
-                            DataType = _applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(p.PropertyType.DataTypeDefinitionId),
-                            PropertyEditor = PropertyEditorResolver.Current.GetById(p.PropertyType.DataTypeId)
-                        }).ToList()
-                };
+                    propertyDto.Alias = originalProperty.Alias;
+                    propertyDto.Description = originalProperty.PropertyType.Description;
+                    propertyDto.Label = originalProperty.PropertyType.Name;
+                    propertyDto.DataType = _applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(originalProperty.PropertyType.DataTypeDefinitionId);
+                    propertyDto.PropertyEditor = PropertyEditorResolver.Current.GetById(originalProperty.PropertyType.DataTypeId);
+                });
         }
 
+        /// <summary>
+        /// Creates a new content item
+        /// </summary>
+        /// <typeparam name="TContent"></typeparam>
+        /// <typeparam name="TContentProperty"></typeparam>
+        /// <param name="content"></param>
+        /// <param name="contentCreatedCallback"></param>
+        /// <param name="propertyCreatedCallback"></param>
+        /// <param name="createProperties"></param>
+        /// <returns></returns>
+        private TContent CreateContent<TContent, TContentProperty>(IContent content,
+            Action<TContent, IContent> contentCreatedCallback = null,
+            Action<TContentProperty, Property, PropertyEditor> propertyCreatedCallback = null, 
+            bool createProperties = true)
+            where TContent : ContentItemBasic<TContentProperty>, new()
+            where TContentProperty : ContentPropertyBase, new()
+        {
+            var result = new TContent
+                {
+                    Id = content.Id,
+                    Owner = _profileMapper.ToBasicUser(content.GetCreatorProfile()),
+                    Updator = _profileMapper.ToBasicUser(content.GetWriterProfile()),
+                    ParentId = content.ParentId,                                     
+                    UpdateDate = content.UpdateDate,
+                    CreateDate = content.CreateDate
+                };
+            if (createProperties) 
+                result.Properties = content.Properties.Select(p => CreateProperty(p, propertyCreatedCallback));
+            if (contentCreatedCallback != null) 
+                contentCreatedCallback(result, content);
+            return result;
+        }
+
+        /// <summary>
+        /// Creates the property with the basic property values mapped
+        /// </summary>
+        /// <typeparam name="TContentProperty"></typeparam>
+        /// <param name="property"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        private static TContentProperty CreateProperty<TContentProperty>(
+            Property property, 
+            Action<TContentProperty, Property, PropertyEditor> callback = null)
+            where TContentProperty : ContentPropertyBase, new()
+        {
+            var editor = PropertyEditorResolver.Current.GetById(property.PropertyType.DataTypeId);
+            if (editor == null)
+            {
+                throw new NullReferenceException("The property editor with id " + property.PropertyType.DataTypeId + " does not exist");
+            }
+            var result = new TContentProperty
+                {
+                    Id = property.Id,
+                    Value = editor.ValueEditor.SerializeValue(property.Value)
+                };
+            if (callback != null) callback(result, property, editor);
+            return result;
+        }
     }
 }

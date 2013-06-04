@@ -27,7 +27,7 @@ namespace Umbraco.Web.Editors
         /// Constructor
         /// </summary>
         public ContentEditorApiController()
-            : this(UmbracoContext.Current, new ContentModelMapper(UmbracoContext.Current.Application))
+            : this(UmbracoContext.Current, new ContentModelMapper(UmbracoContext.Current.Application, new ProfileModelMapper()))
         {            
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
@@ -31,6 +32,21 @@ namespace Umbraco.Web.Models.ContentEditing
             get { return _properties; }
             set { _properties = value; }
         }
+
+        [DataMember(Name = "updateDate")]
+        public DateTime UpdateDate { get; set; }
+
+        [DataMember(Name = "createDate")]
+        public DateTime CreateDate { get; set; }
+
+        [DataMember(Name = "parentId")]
+        public int ParentId { get; set; }
+
+        [DataMember(Name = "owner")]
+        public UserBasic Owner { get; set; }
+        
+        [DataMember(Name = "updator")]
+        public UserBasic Updator { get; set; }
 
         /// <summary>
         /// The real persisted content object

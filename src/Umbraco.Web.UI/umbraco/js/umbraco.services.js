@@ -292,6 +292,16 @@ angular.module('umbraco.services.tree', [])
 		var treeArray = [];
 		var currentSection = "content";
 
+        /** ensures there's a view and level property on each tree node */
+		function ensureLevelAndView(treeNodes, section, level) {
+            //if no level is set, then we make it 1		    
+		    var childLevel = (level ? level : 1);
+		    for (var i = 0; i < treeNodes.length; i++) {
+		        treeNodes[i].level = childLevel;
+		        treeNodes[i].view = section + "/edit/" + treeNodes[i].id;
+		    }
+		}
+
 		return {
 			getTree: function (options) {
 
@@ -318,6 +328,8 @@ angular.module('umbraco.services.tree', [])
  		                    alias: section,
  		                    children: data
  		                };
+ 		                //ensure the view is added to each tree node
+ 		                ensureLevelAndView(result.children, section);
  		                //cache this result
  		                //TODO: We'll need to un-cache this in many circumstances
  		                treeArray[cacheKey] = result;
@@ -461,9 +473,6 @@ angular.module('umbraco.services.tree', [])
 				var section = options.section || 'content';
 				var treeItem = options.node;
 
-                //NOTE: the level is generated on the client side during data retreival
-				var childLevel = (treeItem.level ? treeItem.level : 1) + 1;
-
 				//hack to have create as default content action
 				var action;
 				if(section === "content"){
@@ -477,10 +486,8 @@ angular.module('umbraco.services.tree', [])
 			    var deferred = $q.defer();
 			    treeResource.loadNodes(section, treeItem)
                     .then(function (data) {
-                        //now that we have the data, we need to add the childLevel property to each item
-                        for (var i = 0; i < data.length; i++) {
-                            data[i].level = childLevel;
-                        }
+                        //now that we have the data, we need to add the level property to each item and the view
+                        ensureLevelAndView(data, section, treeItem.level + 1);
                         deferred.resolve(data);
                     }, function (reason) {
                         //bubble up the rejection

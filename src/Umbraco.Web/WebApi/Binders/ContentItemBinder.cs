@@ -37,7 +37,7 @@ namespace Umbraco.Web.WebApi.Binders
         /// Constructor
         /// </summary>
         public ContentItemBinder()
-            : this(ApplicationContext.Current, new ContentModelMapper(ApplicationContext.Current))
+            : this(ApplicationContext.Current, new ContentModelMapper(ApplicationContext.Current, new ProfileModelMapper()))
         {            
         }
 
