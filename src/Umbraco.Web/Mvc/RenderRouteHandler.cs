@@ -155,7 +155,7 @@ namespace Umbraco.Web.Mvc
 				ReservedAdditionalKeys.Area }.Contains(x.Key)))
 			{
 				// Populate route with additional values which aren't reserved values so they eventually to action parameters
-				requestContext.RouteData.Values.Add(item.Key, item.Value);
+			    requestContext.RouteData.Values[item.Key] = item.Value;
 			}
 
 			//return the proxy info without the surface id... could be a local controller.
