@@ -1,5 +1,47 @@
 'use strict';
-define(['app','angular'], function (app, angular) {
+define(['app', 'angular', 'underscore'], function (app, angular, underscore) {
+
+    /**
+    * @ngdoc factory
+    * @name umbraco.services.tree:treeIconHelper
+    * @description A helper service for dealing with tree icons, mostly dealing with legacy tree icons
+    **/
+    function treeIconHelper() {
+
+        var converter = [
+            { oldIcon: ".sprTreeFolder", newIcon: "icon-folder-close" },
+            { oldIcon: ".sprTreeFolder_o", newIcon: "icon-folder-open" },
+            { oldIcon: ".sprTreeMediaFile", newIcon: "icon-music" },
+            { oldIcon: ".sprTreeMediaMovie", newIcon: "icon-movie" },
+            { oldIcon: ".sprTreeMediaPhoto", newIcon: "icon-picture" }
+        ];
+
+        return {
+            /** If the tree node has a legacy icon */
+            isLegacyIcon: function(treeNode){
+                if (treeNode.iconIsClass) {
+                    if (treeNode.icon.startsWith('.')) {
+                        return true;
+                    }                    
+                }
+                return false;
+            },
+            /** If we detect that the tree node has legacy icons that can be converted, this will convert them */
+            convertFromLegacy: function (treeNode) {
+                if (this.isLegacyIcon(treeNode)) {
+                    //its legacy so convert it if we can
+                    var found = _.find(converter, function (item) {
+                        return item.oldIcon.toLowerCase() == treeNode.icon.toLowerCase();
+                    });
+                    return (found ? found.newIcon : treeNode.icon);
+                }
+                treeNode.icon;
+            }
+        }
+    }
+    angular.module('umbraco').factory('treeIconHelper', treeIconHelper);
+
+
 angular.module('umbraco.services.dialog', [])
 .factory('dialog', ['$rootScope', '$compile', '$http', '$timeout', '$q', '$templateCache', function($rootScope, $compile, $http, $timeout, $q, $templateCache) {
 	
@@ -223,7 +265,7 @@ angular.module('umbraco.services.search', [])
 		}
 	};
 });
-angular.module('umbraco.services.section', ['umbraco.resources.trees'])
+angular.module('umbraco.services.section', [])
 .factory('section', function ($rootScope) {
 
 	var currentSection = "content";

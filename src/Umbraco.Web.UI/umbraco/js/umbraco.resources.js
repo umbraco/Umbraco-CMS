@@ -61,7 +61,7 @@ define(['app', 'angular'], function (app, angular) {
             }
         };
     }
-    angular.module('umbraco.resources.trees', []).factory('umbTreeResource', umbTreeResource);
+    angular.module('umbraco').factory('umbTreeResource', umbTreeResource);
 
 
 

@@ -346,30 +346,12 @@ angular.module('umbraco.directives', [])
         var itemTemplate = '<div ng-style="setTreePadding(node)">' +
                                 '<ins ng-hide="node.hasChildren" style="background:none;width:18px;"></ins>' +
                                 '<ins ng-show="node.hasChildren" ng-class="{\'icon-caret-right\': !node.expanded, \'icon-caret-down\': node.expanded}" ng-click="load(node)"></ins>' +
-                              '<i class="{{node | umbTreeIconClass:\'icon umb-tree-icon sprTree\'}}" style="{{node | umbTreeIconImage}}"></i>' +
+                              '<i class="{{node | umbTreeIconClass:\'icon umb-tree-icon sprTree\'}}" style="{{node | umbTreeIconStyle}}"></i>' +
                                 '<a ng-click="select(this, node, $event)" ng-href="#{{node.view}}" ' + _preventDefault + '>{{node.name}}</a>';
         if(showoptions){
             itemTemplate +=  '<i class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></i>';
         }  
         itemTemplate +=     '</div>';
-
-
-        if(scope.node === undefined){            
-            //NOTE: We use .when here because getTree may return a promise or
-            // simply a cached value.
-            $q.when(tree.getTree({section:scope.section, cachekey: scope.cachekey}))
-                .then(function (data) {
-                    //set the data once we have it
-                    scope.tree = data;
-                }, function (reason) {
-                    alert(reason);
-                    return;
-                });
-
-            template = rootTemplate;
-        }else{
-            template = itemTemplate + treeTemplate;
-        }
 
         scope.options = function(n, event){ 
             $log.log("emitting options");
@@ -402,11 +384,38 @@ angular.module('umbraco.directives', [])
               return { 'padding-left': (node.level * 20) + "px" };
           };
 
-          
+          function loadTree() {
 
-          var newElement = angular.element(template);
-          $compile(newElement)(scope);
-          element.replaceWith(newElement);
+              if (scope.node === undefined) {
+                  //NOTE: We use .when here because getTree may return a promise or
+                  // simply a cached value.
+                  $q.when(tree.getTree({ section: scope.section, cachekey: scope.cachekey }))
+                      .then(function (data) {
+                          //set the data once we have it
+                          scope.tree = data;
+                      }, function (reason) {
+                          alert(reason);
+                          return;
+                      });
+
+                  template = rootTemplate;
+              }
+              else {
+                  template = itemTemplate + treeTemplate;
+              }
+
+              var newElement = angular.element(template);
+              $compile(newElement)(scope);
+              element.replaceWith(newElement);
+          }
+
+          scope.$watch("section", function (newVal, oldVal) {
+              if (newVal !== oldVal) {
+                  $log.info("loading tree for section " + newVal);
+                  loadTree();
+              }
+          });
+          loadTree();
       }
   };
 })
