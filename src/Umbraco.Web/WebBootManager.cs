@@ -147,19 +147,7 @@ namespace Umbraco.Web
         protected internal void CreateRoutes()
         {
             var umbracoPath = GlobalSettings.UmbracoMvcArea;
-
-            //TODO: We should probably create a 'real' Umbraco area
-
-            //Create the back office route
-            // TODO: Change this to the normal route, currently it is /Belle for dev testing
-            var backOfficeRoute = RouteTable.Routes.MapRoute(
-                "Umbraco_back_office",
-                //umbracoPath + "/{action}/{id}",
-                "Belle/{action}/{id}",
-                new { controller = "BackOffice", action = "Default", id = UrlParameter.Optional },
-                new[] { typeof(BackOfficeController).Namespace });
-            backOfficeRoute.DataTokens.Add("area", umbracoPath);
-
+            
             //Create the front-end route
             var defaultRoute = RouteTable.Routes.MapRoute(
                 "Umbraco_default",
@@ -168,27 +156,17 @@ namespace Umbraco.Web
                 );
             defaultRoute.RouteHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory());
 
-            //Create the install routes
-            var installPackageRoute = RouteTable.Routes.MapRoute(
-                "Umbraco_install_packages",
-                "Install/PackageInstaller/{action}/{id}",
-                new { controller = "InstallPackage", action = "Index", id = UrlParameter.Optional }
-                );
-            installPackageRoute.DataTokens.Add("area", umbracoPath);
+            //register all back office routes
+            RouteBackOfficeControllers();
 
             //plugin controllers must come first because the next route will catch many things
             RoutePluginControllers();
+        }
 
-            //Create the REST/web/script service routes
-            var webServiceRoutes = RouteTable.Routes.MapRoute(
-                "Umbraco_web_services",
-                umbracoPath + "/RestServices/{controller}/{action}/{id}",
-                new { controller = "SaveFileController", action = "Index", id = UrlParameter.Optional },
-                //look in this namespace for controllers
-                new string[] { "Umbraco.Web.WebServices" }
-                );
-            webServiceRoutes.DataTokens.Add("area", umbracoPath);
-            
+        private void RouteBackOfficeControllers()
+        {
+            var backOfficeArea = new BackOfficeArea();
+            RouteTable.Routes.RegisterArea(backOfficeArea);
         }
         
         private void RoutePluginControllers()
@@ -241,6 +219,7 @@ namespace Umbraco.Web
                 route.DataTokens = new RouteValueDictionary();
             }
             route.DataTokens.Add("Namespaces", new[] {meta.ControllerNamespace}); //look in this namespace to create the controller
+            route.DataTokens.Add("UseNamespaceFallback", false); //Don't look anywhere else except this namespace!
             route.DataTokens.Add("umbraco", "api"); //ensure the umbraco token is set
         }
 
@@ -255,6 +234,7 @@ namespace Umbraco.Web
                 // 4.10 release so we can't include it now :(
                 new[] { meta.ControllerNamespace }); //look in this namespace to create the controller
             route.DataTokens.Add("umbraco", "surface"); //ensure the umbraco token is set                
+            route.DataTokens.Add("UseNamespaceFallback", false); //Don't look anywhere else except this namespace!
             //make it use our custom/special SurfaceMvcHandler
             route.RouteHandler = new SurfaceRouteHandler();
         }

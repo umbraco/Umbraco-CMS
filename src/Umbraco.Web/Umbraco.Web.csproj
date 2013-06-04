@@ -297,6 +297,7 @@
     <Compile Include="Models\ContentEditing\Tab.cs" />
     <Compile Include="Models\Mapping\ContentModelMapper.cs" />
     <Compile Include="FormDataCollectionExtensions.cs" />
+    <Compile Include="Mvc\BackOfficeArea.cs" />
     <Compile Include="Trees\LegacyTreeApiController.cs" />
     <Compile Include="Trees\ISearchableTree.cs" />
     <Compile Include="Trees\LegacyTreeDataAdapter.cs" />

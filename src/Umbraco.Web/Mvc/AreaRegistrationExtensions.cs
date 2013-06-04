@@ -86,6 +86,9 @@ namespace Umbraco.Web.Mvc
                 controllerPluginRoute.DataTokens.Add("Namespaces", new[] {controllerType.Namespace});
             }
 
+            //Don't look anywhere else except this namespace!
+            controllerPluginRoute.DataTokens.Add("UseNamespaceFallback", false);
+
             //constraints: only match controllers ending with 'controllerSuffixName' and only match this controller's ID for this route            
             controllerPluginRoute.Constraints = new RouteValueDictionary(
                 new Dictionary<string, object>
