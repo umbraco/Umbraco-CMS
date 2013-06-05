@@ -3,17 +3,21 @@
     <div class="control-group umb-control-group"
          ng-class="{hidelabel:model.hideLabel}" >
 
-        <div class="umb-el-wrap">
+        <ng-form name="propertyForm">
 
-            <label class="control-label" ng-hide="model.hideLabel" for="{{model.alias}}">
+            <div class="umb-el-wrap">
 
-                {{model.label}}
-                <small>{{model.description}}</small>
-            </label>
+                <label class="control-label" ng-hide="model.hideLabel" for="{{model.alias}}">
 
-            <div class="controls controls-row" >
-               <ng-include src="model.editorView | propertyEditor"></ng-include>    
+                    {{model.label}}
+                    <small>{{model.description}}</small>
+                </label>
+
+                <div class="controls controls-row" >
+                   <ng-include src="model.editorView | propertyEditor"></ng-include>    
+                </div>
             </div>
-        </div>
+
+        </ng-form>
     </div>
 </div>

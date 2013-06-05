@@ -1,6 +1,41 @@
 'use strict';
 define(['app', 'angular', 'underscore'], function (app, angular, underscore) {
 
+
+    /**
+    * @ngdoc factory
+    * @name umbraco.services:umbFormHelper
+    * @description Returns the current form object applied to the scope or null if one is not found
+    **/
+    function umbFormHelper() {
+        return {
+            getCurrentForm: function(scope) {
+                //NOTE: There isn't a way in angular to get a reference to the current form object since the form object
+                // is just defined as a property of the scope when it is named but you'll always need to know the name which
+                // isn't very convenient. If we want to watch for validation changes we need to get a form reference.
+                // The way that we detect the form object is a bit hackerific in that we detect all of the required properties 
+                // that exist on a form object.
+
+                var form = null;
+                var requiredFormProps = ["$error", "$name", "$dirty", "$pristine", "$valid", "$invalid", "$addControl", "$removeControl", "$setValidity", "$setDirty"];
+                for (var p in scope) {
+                    if (_.isObject(scope[p]) && !_.isFunction(scope[p]) && !_.isArray(scope[p]) && p.substr(0, 1) != "$") {
+                        var props = _.keys(scope[p]);
+                        if (props.length < requiredFormProps.length) continue;
+                        if (_.every(requiredFormProps, function(item) {
+                            return _.contains(props, item);
+                        })) {
+                            form = scope[p];
+                            break;
+                        }
+                    }
+                }
+                return form;
+            }  
+        };
+    }
+    angular.module('umbraco').factory('umbFormHelper', umbFormHelper);
+
     /**
     * @ngdoc factory
     * @name umbraco.services.tree:treeIconHelper

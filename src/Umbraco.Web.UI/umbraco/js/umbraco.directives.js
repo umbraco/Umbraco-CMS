@@ -6,6 +6,283 @@
 'use strict';
 define(['app', 'angular', 'underscore'], function (app, angular, _) {
 
+
+    /**
+    * @ngdoc directive 
+    * @name umbraco.directive:umbFileUpload
+    * @description A directive applied to a file input box so that outer scopes can listen for when a file is selected
+    **/
+    function umbFileUpload() {
+        return {
+            scope: true,        //create a new scope
+            link: function (scope, el, attrs) {
+                el.bind('change', function (event) {
+                    var files = event.target.files;
+                    //emit event upward
+                    scope.$emit("filesSelected", { files: files });                           
+                });
+            }
+        };
+    }
+
+    /**
+    * @ngdoc directive 
+    * @name umbraco.directive:valSummary
+    * @restrict E
+    * @description This directive will display a validation summary for the current form based on the 
+                    content properties of the current content item.
+    **/
+    function valSummary() {
+        return {
+            scope: true,   // create a new scope for this directive
+            replace: true,   // replace the html element with the template
+            restrict: "E",    // restrict to an element
+            template: '<ul class="validation-summary"><li ng-repeat="model in validationSummary">{{model}}</li></ul>',
+            link: function (scope, element, attr, ctrl) {
+
+                //create properties on our custom scope so we can use it in our template
+                scope.validationSummary = [];
+
+                //create a flag for us to be able to reference in the below closures for watching.
+                var showValidation = false;
+
+                //add a watch to update our waitingOnValidation flag for use in the below closures
+                scope.$watch("$parent.ui.waitingOnValidation", function (isWaiting, oldValue) {
+                    showValidation = isWaiting;
+                    if (scope.validationSummary.length > 0 && showValidation) {
+                        element.show();
+                    }
+                    else {
+                        element.hide();
+                    }
+                });
+
+                //if we are to show field property based errors.
+                //this requires listening for bubbled events from valBubble directive.
+
+                scope.$parent.$on("valBubble", function (evt, args) {
+                    var msg = "The value assigned for the property " + args.scope.model.label + " is invalid";
+                    var exists = _.contains(scope.validationSummary, msg);
+
+                    //we need to check if the entire property is valid, even though the args says this field is valid there
+                    // may be multiple values attached to a content property. The easiest way to do this is check the DOM
+                    // just like we are doing for the property level validation message.
+                    var propertyHasErrors = args.element.closest(".content-property").find(".ng-invalid").length > 0;
+
+                    if (args.isValid && exists && !propertyHasErrors) {
+                        //it is valid but we have a val msg for it so we'll need to remove the message
+                        scope.validationSummary = _.reject(scope.validationSummary, function (item) {
+                            return item == msg;
+                        });
+                    }
+                    else if (!args.isValid && !exists) {
+                        //it is invalid and we don't have a msg for it already
+                        scope.validationSummary.push(msg);
+                    }
+
+                    //show the summary if there are errors and the form has been submitted
+                    if (showValidation && scope.validationSummary.length > 0) {
+                        element.show();
+                    }
+                });
+                //listen for form invalidation so we know when to hide it
+                scope.$watch("contentForm.$error", function (errors) {
+                    //check if there is an error and hide the summary if not
+                    var hasError = _.find(errors, function (err) {
+                        return (err.length && err.length > 0);
+                    });
+                    if (!hasError) {
+                        element.hide();
+                    }
+                }, true);
+            }
+        };
+    }
+
+    /**
+    * @ngdoc directive 
+    * @name umbraco.directive:valToggleMsg
+    * @restrict A
+    * @description This directive will bubble up a notification via an emit event (upwards)
+                    describing the state of the validation element. This is useful for 
+                    parent elements to know about child element validation state.
+    **/
+    function valBubble(umbFormHelper) {
+        return {
+            require: 'ngModel',
+            restrict: "A",
+            link: function (scope, element, attr, ctrl) {
+
+                if (!attr.name) {
+                    throw "valBubble must be set on an input element that has a 'name' attribute";
+                }
+                
+                var currentForm = umbFormHelper.getCurrentForm(scope);
+                if (!currentForm || !currentForm.$name)
+                    throw "valBubble requires that a name is assigned to the ng-form containing the validated input";
+
+                //watch the current form's validation for the current field name
+                scope.$watch(currentForm.$name + "." + ctrl.$name + ".$valid", function (isValid, lastValue) {
+                    if (isValid != undefined) {
+                        //emit an event upwards 
+                        scope.$emit("valBubble", {
+                            isValid: isValid,       // if the field is valid
+                            element: element,       // the element that the validation applies to
+                            expression: this.exp,   // the expression that was watched to check validity
+                            scope: scope,           // the current scope
+                            ctrl: ctrl              // the current controller
+                        });
+                    }
+                });
+            }
+        };
+    }
+    angular.module('umbraco').directive("valBubble", valBubble);
+
+    /**
+    * @ngdoc directive 
+    * @name umbraco.directive:valToggleMsg
+    * @restrict A
+    * @description This directive will show/hide an error based on: is the value + the given validator invalid? AND, has the form been submitted ?
+    **/
+    function valToggleMsg(umbFormHelper) {
+        return {
+            restrict: "A",
+            link: function (scope, element, attr, ctrl) {
+                
+                if (!attr.valToggleMsg)
+                    throw "valToggleMsg requires that a reference to a validator is specified";
+                if (!attr.valMsgFor)
+                    throw "valToggleMsg requires that the attribute valMsgFor exists on the element";
+
+                //create a flag for us to be able to reference in the below closures for watching.
+                var showValidation = false;
+                var hasError = false;
+
+                var currentForm = umbFormHelper.getCurrentForm(scope);
+                if (!currentForm || !currentForm.$name)
+                    throw "valToggleMsg requires that a name is assigned to the ng-form containing the validated input";
+
+                //add a watch to the validator for the value (i.e. $parent.myForm.value.$error.required )
+                scope.$watch(currentForm.$name + "." + attr.valMsgFor + ".$error." + attr.valToggleMsg, function (isInvalid, oldValue) {
+                    hasError = isInvalid;
+                    if (hasError && showValidation) {
+                        element.show();
+                    }
+                    else {
+                        element.hide();
+                    }
+                });
+
+                //add a watch to update our waitingOnValidation flag for use in the above closure
+                scope.$watch("$parent.ui.waitingOnValidation", function (isWaiting, oldValue) {
+                    showValidation = isWaiting;
+                    if (hasError && showValidation) {
+                        element.show();
+                    }
+                    else {
+                        element.hide();
+                    }
+                });
+            }
+        };
+    }
+    angular.module('umbraco').directive("valToggleMsg", valToggleMsg);
+
+    /**
+    * @ngdoc directive 
+    * @name umbraco.directive:valRegex
+    * @restrict A
+    * @description A custom directive to allow for matching a value against a regex string.
+    *               NOTE: there's already an ng-pattern but this requires that a regex expression is set, not a regex string
+    **/
+    function valRegex() {
+        return {
+            require: 'ngModel',
+            restrict: "A",
+            link: function (scope, elm, attrs, ctrl) {
+
+                var regex = new RegExp(scope.$eval(attrs.valRegex));
+
+                var patternValidator = function (viewValue) {
+                    //NOTE: we don't validate on empty values, use required validator for that
+                    if (!viewValue || regex.test(viewValue)) {
+                        // it is valid
+                        ctrl.$setValidity('valRegex', true);
+                        //assign a message to the validator
+                        ctrl.errorMsg = "";
+                        return viewValue;
+                    }
+                    else {
+                        // it is invalid, return undefined (no model update)
+                        ctrl.$setValidity('valRegex', false);
+                        //assign a message to the validator
+                        ctrl.errorMsg = "Value is invalid, it does not match the correct pattern";
+                        return undefined;
+                    }
+                };
+
+                ctrl.$formatters.push(patternValidator);
+                ctrl.$parsers.push(patternValidator);
+            }
+        };
+    }
+    angular.module('umbraco').directive("valRegex", valRegex);
+
+    /**
+    * @ngdoc directive 
+    * @name umbraco.directive:valServer
+    * @restrict A
+    * @description This directive is used to associate a field with a server-side validation response
+    *               so that the validators in angular are updated based on server-side feedback.
+    **/
+    function valServer() {
+        return {
+            require: 'ngModel',
+            restrict: "A",
+            link: function (scope, element, attr, ctrl) {
+                if (!scope.model || !scope.model.alias)
+                    throw "valServer can only be used in the scope of a content property object";
+                var parentErrors = scope.$parent.serverErrors;
+                if (!parentErrors) return;
+
+                var fieldName = scope.$eval(attr.valServer);
+
+                //subscribe to the changed event of the element. This is required because when we
+                // have a server error we actually invalidate the form which means it cannot be 
+                // resubmitted. So once a field is changed that has a server error assigned to it
+                // we need to re-validate it for the server side validator so the user can resubmit
+                // the form. Of course normal client-side validators will continue to execute.
+                element.keydown(function () {
+                    if (ctrl.$invalid) {
+                        ctrl.$setValidity('valServer', true);
+                    }
+                });
+                element.change(function () {
+                    if (ctrl.$invalid) {
+                        ctrl.$setValidity('valServer', true);
+                    }
+                });
+                //TODO: DO we need to watch for other changes on the element ?
+
+                //subscribe to the server validation changes
+                parentErrors.subscribe(scope.model, fieldName, function (isValid, propertyErrors, allErrors) {
+                    if (!isValid) {
+                        ctrl.$setValidity('valServer', false);
+                        //assign an error msg property to the current validator
+                        ctrl.errorMsg = propertyErrors[0].errorMsg;
+                    }
+                    else {
+                        ctrl.$setValidity('valServer', true);
+                        //reset the error message
+                        ctrl.errorMsg = "";
+                    }
+                }, true);
+            }
+        };
+    }
+    angular.module('umbraco').directive("valServer", valServer);
+
     /**
     * @ngdoc directive 
     * @name umbraco.directive:leftColumn
@@ -62,35 +339,6 @@ define(['app', 'angular', 'underscore'], function (app, angular, _) {
 
 
 angular.module('umbraco.directives', [])
-.directive('val-regex', function () {
-
-        /// <summary>
-        ///     A custom directive to allow for matching a value against a regex string.
-        ///     NOTE: there's already an ng-pattern but this requires that a regex expression is set, not a regex string
-        ///</summary>
-
-        return {
-            require: 'ngModel',
-            link: function (scope, elm, attrs, ctrl) {
-
-                var regex = new RegExp(scope.$eval(attrs.valRegex));
-
-                ctrl.$parsers.unshift(function (viewValue) {
-                    if (regex.test(viewValue)) {
-                        // it is valid
-                        ctrl.$setValidity('val-regex', true);
-                        return viewValue;
-                    }
-                    else {
-                        // it is invalid, return undefined (no model update)
-                        ctrl.$setValidity('val-regex', false);
-                        return undefined;
-                    }
-                });
-            }
-        };
-    })
-
 .directive('appVersion', ['version', function (version) {
     return function (scope, elm, attrs) {
         elm.text(version);
