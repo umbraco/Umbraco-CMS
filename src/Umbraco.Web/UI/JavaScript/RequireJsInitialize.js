@@ -12,5 +12,6 @@
     'umbraco.controllers',
     'sample.propertyeditor.controller',
     'sampletwo.propertyeditor.controller',
-    'routes'
+    'routes',
+    'namespaceMgr'
 ]

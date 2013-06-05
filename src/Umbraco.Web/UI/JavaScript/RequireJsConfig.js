@@ -19,7 +19,8 @@
         tinymce: '../lib/tinymce/tinymce.min',
         text: '../lib/require/text',
         async: '../lib/require/async',
-        css: '../lib/require/css'
+        css: '../lib/require/css',
+        namespaceMgr: '../lib/Umbraco/NamespaceManager',
     },
     shim: {
         'umbracoExtensions' : {'exports' : 'umbracoExtensions'},

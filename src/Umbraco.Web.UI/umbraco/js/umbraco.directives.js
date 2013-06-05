@@ -301,7 +301,37 @@ angular.module('umbraco.directives', [])
         restrict: 'E',
         replace: true,
         transclude: 'true',
-        templateUrl: 'views/directives/umb-property.html'
+        templateUrl: 'views/directives/umb-property.html',
+        link: function (scope, element, attrs) {
+            //let's make a requireJs call to try and retrieve the associated js 
+            // for this view, only if its an absolute path, meaning its external to umbraco
+            if (scope.model.view && scope.model.view != "" && scope.model.view.startsWith('/')) {
+                //get the js file which exists at ../Js/EditorName.js
+                var lastSlash = scope.model.view.lastIndexOf("/");
+                var fullViewName = scope.model.view.substring(lastSlash + 1, scope.model.view.length);
+                var viewName = fullViewName.indexOf(".") > 0
+                    ? fullViewName.substring(0, fullViewName.indexOf("."))
+                    : fullViewName;
+                var jsPath = scope.model.view.substring(0, lastSlash + 1) + "../Js/" + viewName + ".js";
+                require([jsPath],
+                    function () {
+                        //the script loaded so load the view
+                        //NOTE: The use of $apply because we're operating outside of the angular scope with this callback.
+                        scope.$apply(function () {
+                            scope.model.editorView = scope.model.view;
+                        });
+                    }, function (err) {
+                        //an error occurred... most likely there is no JS file to load for this editor
+                        //NOTE: The use of $apply because we're operating outside of the angular scope with this callback.
+                        scope.$apply(function () {
+                            scope.model.editorView = scope.model.view;
+                        });
+                    });
+            }
+            else {
+                scope.model.editorView = scope.model.view;
+            }
+        }
     };
 })
 
@@ -392,83 +422,93 @@ angular.module('umbraco.directives', [])
                       .then(function (data) {
                           //set the data once we have it
                           scope.tree = data;
+                          template = rootTemplate;
+
+                          var newElement = angular.element(template);
+                          $compile(newElement)(scope);
+                          element.replaceWith(newElement);
+
                       }, function (reason) {
                           alert(reason);
                           return;
-                      });
-
-                  template = rootTemplate;
+                      });                                   
               }
               else {
                   template = itemTemplate + treeTemplate;
-              }
 
-              var newElement = angular.element(template);
-              $compile(newElement)(scope);
-              element.replaceWith(newElement);
+                  var newElement = angular.element(template);
+                  $compile(newElement)(scope);
+                  element.replaceWith(newElement);
+              }
           }
 
           scope.$watch("section", function (newVal, oldVal) {
               if (newVal !== oldVal) {
+                  $log.info("loading tree for section " + newVal);
                   loadTree();
               }
           });
           loadTree();
       }
   };
-})
-
-.directive('include', function($compile, $http, $templateCache, $interpolate, $log) {
-
-  $log.log("loading view");
-
-  // Load a template, possibly from the $templateCache, and instantiate a DOM element from it
-  function loadTemplate(template) {
-    return $http.get(template, {cache:$templateCache}).then(function(response) {
-      return angular.element(response.data);
-    }, function(response) {
-      throw new Error('Template not found: ' + template);
-    });
-  }
-
-  return {
-    restrict:'E',
-    priority: 100,        // We need this directive to happen before ng-model
-    terminal: false,       // We are going to deal with this element
-    compile: function(element, attrs) {
-      // Extract the label and validation message info from the directive's original element
-      //var validationMessages = getValidationMessageMap(element);
-      //var labelContent = getLabelContent(element);
-
-      // Clear the directive's original element now that we have extracted what we need from it
-      element.html('');
-
-      return function postLink(scope, element, attrs) {
-
-        var path = scope.$eval(attrs.template);
-
-        // Load up the template for this kind of field, default to the simple input if none given
-        loadTemplate(path || 'error.html').then(function(templateElement) {
-          // Set up the scope - the template will have its own scope, which is a child of the directive's scope
-          var childScope = scope.$new();
-          
-          // Place our template as a child of the original element.
-          // This needs to be done before compilation to ensure that it picks up any containing form.
-          element.append(templateElement);
-
-          // We now compile and link our template here in the postLink function
-          // This allows the ng-model directive on our template's <input> element to access the ngFormController
-          $compile(templateElement)(childScope);
-
-          // Now that our template has been compiled and linked we can access the <input> element's ngModelController
-          //childScope.$field = inputElement.controller('ngModel');
-        });
-      };
-    }
-  };
 });
 
-
+    /*** not sure why we need this, we already have ng-include which should suffice ? unless its so we can load in the error ?
+        The other problem with this directive is that it runs too early. If we change the ng-include on umb-property to use
+        this directive instead, it the template will be empty because the actual umbProperty directive hasn't executed 
+        yet, this seems to execute before it.
+    
+    .directive('include', function($compile, $http, $templateCache, $interpolate, $log) {
+    
+      $log.log("loading view");
+    
+      // Load a template, possibly from the $templateCache, and instantiate a DOM element from it
+      function loadTemplate(template) {
+        return $http.get(template, {cache:$templateCache}).then(function(response) {
+          return angular.element(response.data);
+        }, function(response) {
+          throw new Error('Template not found: ' + template);
+        });
+      }
+    
+      return {
+        restrict:'E',
+        priority: 100,        // We need this directive to happen before ng-model
+        terminal: false,       // We are going to deal with this element
+        compile: function(element, attrs) {
+          // Extract the label and validation message info from the directive's original element
+          //var validationMessages = getValidationMessageMap(element);
+          //var labelContent = getLabelContent(element);
+    
+          // Clear the directive's original element now that we have extracted what we need from it
+          element.html('');
+    
+          return function postLink(scope, element, attrs) {
+    
+            var path = scope.$eval(attrs.template);
+    
+            // Load up the template for this kind of field, default to the simple input if none given
+            loadTemplate(path || 'error.html').then(function(templateElement) {
+              // Set up the scope - the template will have its own scope, which is a child of the directive's scope
+              var childScope = scope.$new();
+              
+              // Place our template as a child of the original element.
+              // This needs to be done before compilation to ensure that it picks up any containing form.
+              element.append(templateElement);
+    
+              // We now compile and link our template here in the postLink function
+              // This allows the ng-model directive on our template's <input> element to access the ngFormController
+              $compile(templateElement)(childScope);
+    
+              // Now that our template has been compiled and linked we can access the <input> element's ngModelController
+              //childScope.$field = inputElement.controller('ngModel');
+            });
+          };
+        }
+      };
+    });
+    
+    */
 
 return angular;
 });
