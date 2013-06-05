@@ -53,7 +53,10 @@
         <umb-left-column></umb-left-column>
 
         <section id="contentwrapper">
-            <div id="contentcolumn"><div ng-view></div></div>
+            <div id="contentcolumn">
+                {{ui | json}}
+                <div ng-view></div>
+            </div>
         </section>
     </div>
 

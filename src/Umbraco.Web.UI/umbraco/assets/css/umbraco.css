@@ -6405,9 +6405,89 @@ legend + .control-group {
   top: 0 !important;
   left: 100% !important;
   display: block;
-  width: 400px !important;
+  width: 440px !important;
   height: 100% !important;
-  margin-left: -400px;
+  margin-left: -440px;
+}
+
+/* MEDIA PICKER */
+
+.umb-modal .umb-btn-toolbar {
+  margin: 10px 0 0 0;
+}
+
+.umb-modal .form-search {
+  position: relative;
+  padding: 0;
+}
+
+.umb-modal .form-search input {
+  width: 350px;
+  padding: 4px 24px;
+}
+
+.umb-modal .form-search .icon-search {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  color: #d9d9d9;
+}
+
+.umb-modal i {
+  font-size: 14px;
+}
+
+.umb-modal .breadcrumb {
+  padding: 0;
+  background: none;
+}
+
+.umb-modal .thumbnail {
+  padding: 0;
+  border: none;
+}
+
+.umb-modal .thumbnails > li:nth-child(2) {
+  margin: 0 0 20px 0;
+}
+
+.umb-modal .thumbnails > li {
+  margin: 0 20px 20px 0;
+  background: #000000;
+}
+
+.umb-modal .thumbnail img {
+  height: 120px;
+}
+
+.umb-modal .thumbnails .selected img,
+.umb-modal .thumbnails img:hover {
+  opacity: 0.5;
+}
+
+.umb-modal .thumbnails > li.folder {
+  display: block;
+  width: 120px;
+  height: 120px;
+  font-size: 12px;
+  text-align: center;
+  background: #f8f8f8;
+}
+
+.umb-modal .thumbnails > li.folder .icon-folder-close {
+  display: block;
+  font-size: 96px;
+  color: #d9d9d9;
+}
+
+.umb-modal .thumbnails > li.folder a {
+  display: block;
+  width: 120px;
+  height: 120px;
+}
+
+.umb-modal .thumbnails > li.folder a:hover {
+  text-decoration: none;
 }
 
 .umb-tree {
@@ -6809,7 +6889,7 @@ i.umb-options i {
 
 .umb-panel-header .form-search .icon-search {
   position: absolute;
-  top: 20px;
+  top: 24px;
   left: 8px;
   color: #d9d9d9;
 }
@@ -7162,8 +7242,8 @@ label {
 }
 
 .thumbnails .selected {
-  background: #999999;
-  border-color: #999;
+  background: #000000;
+  border-color: #000000;
 }
 
 /* DASHBOARD */
