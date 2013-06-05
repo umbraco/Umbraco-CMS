@@ -131,7 +131,7 @@ define(['app', 'angular'], function (app, angular) {
     * @name umbraco.resources.contentResource
     * @description Loads in data for content
     **/
-    function contentTypeResource($q, $http) {
+    function contentResource($q, $http) {
         
         /** internal method to get the api url */
         function getContentUrl(contentId) {
@@ -143,9 +143,16 @@ define(['app', 'angular'], function (app, angular) {
 
                 var deferred = $q.defer();
 
-                //go and get the tree data
+                //go and get the data
                 $http.get(getContentUrl(id)).
                     success(function (data, status, headers, config) {
+                        //set the first tab to active
+                        _.each(data.tabs, function (item) {
+                            item.active = false;
+                        });
+                        if (data.tabs.length > 0)
+                            data.tabs[0].active = true;
+
                         deferred.resolve(data);
                     }).
                     error(function (data, status, headers, config) {
@@ -275,7 +282,7 @@ define(['app', 'angular'], function (app, angular) {
 
         };
     }
-    angular.module('umbraco.resources.content', []).factory('contentResource', contentTypeResource);
+    angular.module('umbraco.resources.content', []).factory('contentResource', contentResource);
 
 //    angular.module('umbraco.resources.content', [])
 //.factory('contentFactory', function () {

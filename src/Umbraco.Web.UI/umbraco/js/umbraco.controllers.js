@@ -165,13 +165,16 @@ angular.module('umbraco').controller("Umbraco.Editors.ContentCreateController", 
             return;
         });
 });
-angular.module("umbraco").controller("Umbraco.Editors.ContentEditController", function ($scope, $routeParams, contentResource, notifications) {
+angular.module("umbraco").controller("Umbraco.Editors.ContentEditController", function ($scope, $routeParams, contentResource, notifications, $q) {
 	
 	if($routeParams.create)
-		$scope.content = contentResource.getContentScaffold($routeParams.parentId, $routeParams.doctype);
-	else
-		$scope.content = contentResource.getContent($routeParams.id);
-
+	    $scope.content = contentResource.getContentScaffold($routeParams.parentId, $routeParams.doctype);
+	else {
+	    $q.when(contentResource.getContent($routeParams.id))
+            .then(function (data) {
+                $scope.content = data;
+            });
+	}
 
 	$scope.saveAndPublish = function (cnt) {
 		cnt.publishDate = new Date();

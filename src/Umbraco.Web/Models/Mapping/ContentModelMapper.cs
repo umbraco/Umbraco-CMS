@@ -49,6 +49,7 @@ namespace Umbraco.Web.Models.Mapping
                     //return the tab with the tab properties
                     return new Tab<ContentPropertyDisplay>
                         {
+                            Id = propertyGroup.Id,
                             Alias = propertyGroup.Name,
                             Label = propertyGroup.Name,
                             Properties = displayProperties
@@ -61,6 +62,7 @@ namespace Umbraco.Web.Models.Mapping
             //now add the generic properties tab
             tabs.Add(new Tab<ContentPropertyDisplay>
                 {
+                    Id = 0,
                     Label = "Generic properties",
                     Alias = "Generic properties",
                     Properties = orphanProperties.Select(ToContentPropertyDisplay)

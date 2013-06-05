@@ -53,7 +53,7 @@ define(['app', 'angular'], function (app, angular) {
             //if its not defined then return undefined
             if (!input) return input;
 
-            $log.info("Filtering property editor view: " + input);
+            //$log.info("Filtering property editor view: " + input);
 
             var path = String(input);
             if (path.startsWith('/')) {
