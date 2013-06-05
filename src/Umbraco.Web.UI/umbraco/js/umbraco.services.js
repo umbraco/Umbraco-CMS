@@ -452,7 +452,7 @@ angular.module('umbraco.services.section', [])
 
 });
 angular.module('umbraco.services.tree', [])
-.factory('tree', function ($q, treeResource) {
+.factory('treeService', function ($q, treeResource) {
 		//implement this in local storage
 		var treeArray = [];
 		var currentSection = "content";

@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Models.Mapping
             var contentType = MockedContentTypes.CreateSimpleContentType();
             var content = MockedContent.CreateSimpleContent(contentType);
 
-            var mapper = new ContentModelMapper(ApplicationContext);
+            var mapper = new ContentModelMapper(ApplicationContext, new ProfileModelMapper());
 
             var result = mapper.ToContentItemDisplay(content);
 
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Models.Mapping
             //ensure that nothing is marked as dirty
             content.ResetDirtyProperties(false);
 
-            var mapper = new ContentModelMapper(ApplicationContext);
+            var mapper = new ContentModelMapper(ApplicationContext, new ProfileModelMapper());
 
             var result = mapper.ToContentItemDisplay(content);
 

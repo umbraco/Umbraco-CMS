@@ -2172,7 +2172,7 @@
     <Content Include="Umbraco\Css\umbracoGui.css" />
     <Content Include="Umbraco\dashboard.aspx" />
     <Content Include="Umbraco\Dashboard\LatestEdits.ascx" />
-    <Content Include="Umbraco\_Default.aspx" />
+    <Content Include="Umbraco\Default.aspx" />
     <Content Include="Umbraco\Developer\Macros\assemblyBrowser.aspx" />
     <Content Include="Umbraco\Developer\autoDoc.aspx" />
     <Content Include="Umbraco\Developer\DataTypes\editDatatype.aspx" />

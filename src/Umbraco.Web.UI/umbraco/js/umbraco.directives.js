@@ -368,7 +368,7 @@ angular.module('umbraco.directives', [])
                 node.children = [];
             }
             else {
-                tree.getChildren({ node: node, section: scope.section })
+                treeService.getChildren({ node: node, section: scope.section })
                     .then(function (data) {
                         node.children = data;
                         node.expanded = true;
@@ -388,7 +388,7 @@ angular.module('umbraco.directives', [])
               if (scope.node === undefined) {
                   //NOTE: We use .when here because getTree may return a promise or
                   // simply a cached value.
-                  $q.when(tree.getTree({ section: scope.section, cachekey: scope.cachekey }))
+                  $q.when(treeService.getTree({ section: scope.section, cachekey: scope.cachekey }))
                       .then(function (data) {
                           //set the data once we have it
                           scope.tree = data;
