@@ -1,4 +1,4 @@
-<div id="leftcolumn" ng-controller="NavigationController" ng-mouseleave="hideSectionTree()">
+<div id="leftcolumn" ng-controller="NavigationController" ng-mouseleave="hideTree()">
     <div id="applications" ng-class="{faded:ui.stickyNavigation}">
         <ul class="sections">
             <li class="avatar">
@@ -9,8 +9,8 @@
 
             <li ng-repeat="section in sections">
                 <a href="#/{{section.alias}}"
-                    ng-mouseenter="showSectionTree(section)"
-                    ng-click="openSection(section)"
+                    ng-click="changeSection(section.alias)"
+                    ng-mouseenter="showTree(section.alias)"
                     prevent-default>
                     <i class="{{section.cssclass}}"></i><span>{{section.name}}</span>
                 </a>
@@ -19,7 +19,7 @@
             <li class="help">
                 <a class="help" href="#/help">
                     <img src="assets/img/applicationIcons/help.svg" style="height: 30px; width: 30px;" />
-                    <span>{{localization.app.help}}</span>
+                    <span>Help</span>
                 </a>
             </li>
         </ul>
@@ -47,7 +47,7 @@
         <div id="search-results" class="umb-scrollable umb-panel" auto-scale="0"
             ng-show="ui.showSearchResults" ng-animate="'slide'">
 
-            <h5>{{localization.app.search.searchResult}}</h5>
+            <h5>Search results</h5>
 
             <ul class="searchResults" ng-repeat="resultGroup in ui.searchResults">
                 <li class="umb-icon-item" ng-class="{selected:$index==ui.selectedSearchResult}" ng-repeat="result in resultGroup.matches">
@@ -62,7 +62,7 @@
 
         <!-- the tree -->
         <div id="tree" class="span5 umb-scrollable umb-panel" auto-scale="0" ng-animate="'slide'">
-            <umb-tree section="{{currentSection}}"></umb-tree>
+            <umb-tree section="{{ui.currentTree}}" ></umb-tree>
         </div>        
 
         <!-- The context menu -->
@@ -75,9 +75,9 @@
 
             <div class='umb-panel-body'>
                 <ul class="umb-actions">
-                    <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in contextMenu">
+                    <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in actions">
                         <a prevent-default
-                            ng-click="showContextDialog(currentNode,action,currentSection)">
+                            ng-click="showDialog(currentNode,action,currentSection)">
                             <i class="icon icon-{{action.cssclass}}"></i>
                             <span class="menu-label">{{action.name}}</span>
                         </a>

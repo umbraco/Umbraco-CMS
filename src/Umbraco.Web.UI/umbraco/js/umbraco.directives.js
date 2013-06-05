@@ -1,4 +1,4 @@
-/*! umbraco - v0.0.1-SNAPSHOT - 2013-06-03
+/*! umbraco - v0.0.1-SNAPSHOT - 2013-06-04
  * http://umbraco.github.io/Belle
  * Copyright (c) 2013 Per Ploug, Anders Stenteberg & Shannon Deminick;
  * Licensed MIT
@@ -306,7 +306,7 @@ angular.module('umbraco.directives', [])
 })
 
 
-.directive('umbTree', function ($compile, $log, tree, $q) {
+.directive('umbTree', function ($compile, $log, treeService, $q) {
   return {
       restrict: 'E',
       terminal: true,
@@ -349,17 +349,16 @@ angular.module('umbraco.directives', [])
                               '<i class="{{node | umbTreeIconClass:\'icon umb-tree-icon sprTree\'}}" style="{{node | umbTreeIconStyle}}"></i>' +
                                 '<a ng-click="select(this, node, $event)" ng-href="#{{node.view}}" ' + _preventDefault + '>{{node.name}}</a>';
         if(showoptions){
-            itemTemplate +=  '<i class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></i>';
+            itemTemplate +=  '<i class="umb-options" ng-click="options(this, node, $event)"><i></i><i></i><i></i></i>';
         }  
         itemTemplate +=     '</div>';
 
-        scope.options = function(n, event){ 
-            $log.log("emitting options");
-            scope.$emit("treeOptionsClick", n);
+
+        scope.options = function(e, n, ev){ 
+            scope.$emit("treeOptionsClick", {element: e, node: n, event: ev});
         };
 
         scope.select = function(e,n,ev){
-            $log.log("emitting select");
             scope.$emit("treeNodeSelect", {element: e, node: n, event: ev});
         };
 
@@ -411,7 +410,6 @@ angular.module('umbraco.directives', [])
 
           scope.$watch("section", function (newVal, oldVal) {
               if (newVal !== oldVal) {
-                  $log.info("loading tree for section " + newVal);
                   loadTree();
               }
           });
