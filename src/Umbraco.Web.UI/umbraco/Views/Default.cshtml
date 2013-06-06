@@ -1,4 +1,7 @@
-﻿@using Umbraco.Core
+﻿@using System.Web.Mvc.Html
+@using Umbraco.Core
+@using ClientDependency.Core
+@using ClientDependency.Core.Mvc
 @inherits System.Web.Mvc.WebViewPage
 @{
     Layout = null;
@@ -18,6 +21,8 @@
 
     @*Currently this needs to be loaded before anything*@
     <script src="@Url.Action("ServerVariables", "BackOffice")" type="text/javascript"></script>
+    
+    
 
     <style type="text/css">
         .validation-message

@@ -129,13 +129,17 @@ define(['app', 'angular'], function (app, angular) {
     /**
     * @ngdoc factory 
     * @name umbraco.resources.contentResource
-    * @description Loads in data for content
+    * @description Loads/saves in data for content
     **/
-    function contentResource($q, $http) {
+    function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         
         /** internal method to get the api url */
         function getContentUrl(contentId) {
             return Umbraco.Sys.ServerVariables.contentEditorApiBaseUrl + "GetContent?id=" + contentId;
+        }
+        /** internal method to get the api url for publishing */
+        function getSaveUrl() {
+            return Umbraco.Sys.ServerVariables.contentEditorApiBaseUrl + "PostSaveContent";
         }
 
         return {
@@ -271,13 +275,58 @@ define(['app', 'angular'], function (app, angular) {
                 return collection;
             },
 
-            //saves or updates a content object
-            saveContent: function (content) {                
-                alert("Saved: " + JSON.stringify(content));
+            /** saves or updates a content object */
+            saveContent: function (content) {
+
+                var deferred = $q.defer();
+
+                //save the data
+                umbRequestHelper.postMultiPartRequest(
+                    getSaveUrl(content.id),
+                    umbDataFormatter.formatContentPostData(content, "save"),
+                    function (data) {
+                        //TODO: transform the request callback and add the files associated with the request
+                    },
+                    function (data, status, headers, config) {
+                        //success callback
+
+                        //the data returned is the up-to-date data so the UI will refresh
+                        deferred.resolve(data);
+                    },
+                    function (data, status, headers, config) {
+                        //failure callback
+
+                        deferred.reject('Failed to publish data for content id ' + content.id);
+                    });
+
+                return deferred.promise;
             },
 
+            /** saves and publishes a content object */
             publishContent: function (content) {
-                alert("Published: " + JSON.stringify(content));
+
+                var deferred = $q.defer();
+
+                //save the data
+                umbRequestHelper.postMultiPartRequest(
+                    getSaveUrl(content.id),
+                    { key: "contentItem", value: umbDataFormatter.formatContentPostData(content, "publish") },
+                    function (data) {
+                        //TODO: transform the request callback and add the files associated with the request
+                    },
+                    function (data, status, headers, config) {
+                        //success callback
+
+                        //the data returned is the up-to-date data so the UI will refresh
+                        deferred.resolve(data);
+                    },
+                    function (data, status, headers, config) {
+                        //failure callback
+
+                        deferred.reject('Failed to publish data for content id ' + content.id);
+                    });
+
+                return deferred.promise;
             }
 
         };

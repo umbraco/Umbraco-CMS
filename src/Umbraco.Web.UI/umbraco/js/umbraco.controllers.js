@@ -177,15 +177,18 @@ angular.module("umbraco").controller("Umbraco.Editors.ContentEditController", fu
 	}
 
 	$scope.saveAndPublish = function (cnt) {
-		cnt.publishDate = new Date();
-		contentResource.publishContent(cnt);
-
-		notifications.success("Published", "Content has been saved and published");
+		
+	    contentResource.publishContent(cnt)
+            .then(function (data) {
+                //now we need to re-set the content model since the server will have updated it
+                $scope.content = data;
+                notifications.success("Published", "Content has been saved and published");
+            });
+		
 	};
 
 	$scope.save = function (cnt) {
-		cnt.updateDate = new Date();
-
+		
 		contentResource.saveContent(cnt);
 		notifications.success("Saved", "Content has been saved");
 	};

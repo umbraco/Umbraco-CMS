@@ -1,6 +1,101 @@
 'use strict';
 define(['app', 'angular', 'underscore'], function (app, angular, underscore) {
 
+    /**
+    * @ngdoc factory
+    * @name umbraco.services:umbRequestHelper
+    * @description A helper object used for sending requests to the server
+    **/
+    function umbRequestHelper($http) {
+        return {
+            /** Posts a multi-part mime request to the server */
+            postMultiPartRequest: function (url, jsonData, transformCallback, successCallback, failureCallback) {
+                
+                //validate input, jsonData can be an array of key/value pairs or just one key/value pair.
+                if (!jsonData) throw "jsonData cannot be null";
+                if (angular.isArray(jsonData)) {
+                    _.each(jsonData, function (item) {
+                        if (!item.key || !item.value) throw "jsonData array item must have both a key and a value property";
+                    })
+                }
+                else if (!jsonData.key || !jsonData.value) throw "jsonData object must have both a key and a value property";                
+                
+
+                $http({
+                    method: 'POST',
+                    url: url,
+                    //IMPORTANT!!! You might think this should be set to 'multipart/form-data' but this is not true because when we are sending up files
+                    // the request needs to include a 'boundary' parameter which identifies the boundary name between parts in this multi-part request
+                    // and setting the Content-type manually will not set this boundary parameter. For whatever reason, setting the Content-type to 'false'
+                    // will force the request to automatically populate the headers properly including the boundary parameter.
+                    headers: { 'Content-Type': false },
+                    transformRequest: function (data) {
+                        var formData = new FormData();
+                        //add the json data
+                        if (angular.isArray(data)) {
+                            _.each(data, function (item) {                                
+                                formData.append(item.key, !angular.isString(item.value) ? angular.toJson(item.value) : item.value);
+                            });                            
+                        }
+                        else {
+                            formData.append(data.key, !angular.isString(data.value) ? angular.toJson(data.value) : data.value);
+                        }
+
+                        //call the callback
+                        if (transformCallback) {                            
+                            transformCallback.apply(this, [formData]);
+                        }
+                        
+                        return formData;
+                    },
+                    data: jsonData
+                }).
+                success(function (data, status, headers, config) {
+                    if (successCallback) {
+                        successCallback.apply(this, [data, status, headers, config]);
+                    }
+                }).
+                error(function (data, status, headers, config) {
+                    if (failureCallback) {
+                        failureCallback.apply(this, [data, status, headers, config]);
+                    }
+                });
+            }
+        };
+    }
+    angular.module('umbraco').factory('umbRequestHelper', umbRequestHelper);
+
+    /**
+    * @ngdoc factory
+    * @name umbraco.services:umbDataFormatter
+    * @description A helper object used to format/transform JSON Umbraco data, mostly used for persisting data to the server
+    **/
+    function umbDataFormatter() {
+        return {
+            /** formats the display model used to display the content to the model used to save the content */
+            formatContentPostData: function (displayModel, action) {
+                //NOTE: the display model inherits from the save model so we can in theory just post up the display model but 
+                // we don't want to post all of the data as it is unecessary.
+                var saveModel = {
+                    id: displayModel.id,
+                    properties: [],
+                    //set the action on the save model
+                    action: action
+                };
+                _.each(displayModel.tabs, function(tab) {
+                    _.each(tab.properties, function (prop) {
+                        saveModel.properties.push({
+                            id: prop.id,
+                            value: prop.value
+                        });
+                    });
+                });
+
+                return saveModel;
+            }
+        };
+    }
+    angular.module('umbraco').factory('umbDataFormatter', umbDataFormatter);
 
     /**
     * @ngdoc factory

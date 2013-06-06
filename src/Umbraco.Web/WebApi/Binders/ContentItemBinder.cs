@@ -54,7 +54,7 @@ namespace Umbraco.Web.WebApi.Binders
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
 
-            var task = Task.Run(() => GetModel(actionContext.Request.Content, provider))
+            var task = Task.Run(() => GetModel(actionContext.Request, provider))
                 .ContinueWith(x =>
                 {
                     if (x.IsFaulted && x.Exception != null)
@@ -72,11 +72,16 @@ namespace Umbraco.Web.WebApi.Binders
         /// <summary>
         /// Builds the model from the request contents
         /// </summary>
-        /// <param name="content"></param>
+        /// <param name="request"></param>
         /// <param name="provider"></param>
         /// <returns></returns>
-        private async Task<ContentItemSave> GetModel(HttpContent content, MultipartFormDataStreamProvider provider)
+        private async Task<ContentItemSave> GetModel(HttpRequestMessage request, MultipartFormDataStreamProvider provider)
         {
+            //IMPORTANT!!! We need to ensure the umbraco context here because this is running in an async thread
+            UmbracoContext.EnsureContext(request.Properties["MS_HttpContext"] as HttpContextBase, ApplicationContext.Current);
+
+            var content = request.Content;
+
             var result = await content.ReadAsMultipartAsync(provider);
 
             if (result.FormData["contentItem"] == null)

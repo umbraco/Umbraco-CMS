@@ -11,9 +11,9 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
     {
         protected override ValueEditor CreateValueEditor()
         {
-            if (HttpContext.Current == null)
+            if (UmbracoContext.Current == null || UmbracoContext.Current.HttpContext == null)
             {
-                throw new InvalidOperationException("This property editor only works in a web context");
+                throw new InvalidOperationException("This property editor only works in an umbraco web context");
             }
             
             var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
