@@ -141,6 +141,43 @@ define(['app', 'angular'], function (app, angular) {
         function getSaveUrl() {
             return Umbraco.Sys.ServerVariables.contentEditorApiBaseUrl + "PostSaveContent";
         }
+        /** internal method process the saving of data and post processing the result */
+        function saveContentItem(content, action) {
+            var deferred = $q.defer();
+
+            //save the active tab id so we can set it when the data is returned.
+            var activeTab = _.find(content.tabs, function (item) {
+                return item.active
+            })
+            var activeTabIndex = (activeTab == undefined ? 0 : _.indexOf(content.tabs, activeTab));
+
+            //save the data
+            umbRequestHelper.postMultiPartRequest(
+                getSaveUrl(content.id),
+                { key: "contentItem", value: umbDataFormatter.formatContentPostData(content, action) },
+                function (data) {
+                    //TODO: transform the request callback and add the files associated with the request
+                },
+                function (data, status, headers, config) {
+                    //success callback
+
+                    //reset the tabs and set the active one
+                    _.each(data.tabs, function (item) {                        
+                            item.active = false;
+                    });
+                     data.tabs[activeTabIndex].active = true;
+
+                    //the data returned is the up-to-date data so the UI will refresh
+                    deferred.resolve(data);
+                },
+                function (data, status, headers, config) {
+                    //failure callback
+
+                    deferred.reject('Failed to publish data for content id ' + content.id);
+                });
+
+            return deferred.promise;
+        }
 
         return {
             getContent: function (id) {
@@ -277,56 +314,12 @@ define(['app', 'angular'], function (app, angular) {
 
             /** saves or updates a content object */
             saveContent: function (content) {
-
-                var deferred = $q.defer();
-
-                //save the data
-                umbRequestHelper.postMultiPartRequest(
-                    getSaveUrl(content.id),
-                    umbDataFormatter.formatContentPostData(content, "save"),
-                    function (data) {
-                        //TODO: transform the request callback and add the files associated with the request
-                    },
-                    function (data, status, headers, config) {
-                        //success callback
-
-                        //the data returned is the up-to-date data so the UI will refresh
-                        deferred.resolve(data);
-                    },
-                    function (data, status, headers, config) {
-                        //failure callback
-
-                        deferred.reject('Failed to publish data for content id ' + content.id);
-                    });
-
-                return deferred.promise;
+                return saveContentItem(content, "save");                
             },
 
             /** saves and publishes a content object */
             publishContent: function (content) {
-
-                var deferred = $q.defer();
-
-                //save the data
-                umbRequestHelper.postMultiPartRequest(
-                    getSaveUrl(content.id),
-                    { key: "contentItem", value: umbDataFormatter.formatContentPostData(content, "publish") },
-                    function (data) {
-                        //TODO: transform the request callback and add the files associated with the request
-                    },
-                    function (data, status, headers, config) {
-                        //success callback
-
-                        //the data returned is the up-to-date data so the UI will refresh
-                        deferred.resolve(data);
-                    },
-                    function (data, status, headers, config) {
-                        //failure callback
-
-                        deferred.reject('Failed to publish data for content id ' + content.id);
-                    });
-
-                return deferred.promise;
+                return saveContentItem(content, "publish");
             }
 
         };

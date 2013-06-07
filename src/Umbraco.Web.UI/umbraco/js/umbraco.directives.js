@@ -489,7 +489,7 @@ angular.module('umbraco.directives', [])
             if (!iAttrs.tabs)
                 throw "a 'tabs' attribute must be set for umbHeader which represents the collection of tabs";
 
-            var hasProcessed = false;
+            //var hasProcessed = false;
 
             //when the tabs change, we need to hack the planet a bit and force the first tab content to be active,
             //unfortunately twitter bootstrap tabs is not playing perfectly with angular.
@@ -497,10 +497,11 @@ angular.module('umbraco.directives', [])
 
                 //don't process if we cannot or have already done so
                 if (!newValue) return;
-                if (hasProcessed || !newValue.length || newValue.length == 0) return;
+                //if (hasProcessed || !newValue.length || newValue.length == 0) return;
+                if (!newValue.length || newValue.length == 0) return;
                 
                 //set the flag
-                hasProcessed = true;
+                //hasProcessed = true;
 
                 var $panes = $('div.tab-content');
                 var activeTab = _.find(newValue, function (item) {

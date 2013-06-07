@@ -293,6 +293,7 @@
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />
     <Compile Include="Editors\ContentTypeApiController.cs" />
+    <Compile Include="HttpCookieExtensions.cs" />
     <Compile Include="Models\ContentEditing\ContentSaveAction.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeBasic.cs" />
     <Compile Include="Models\ContentEditing\Tab.cs" />
