@@ -40,7 +40,7 @@ namespace Umbraco.Web.Models.Mapping
             var tabs = content.PropertyGroups.Select(propertyGroup =>
                 {
                     //get the properties for the current tab
-                    var propertiesForTab = content.GetPropertiesForGroup(propertyGroup);
+                    var propertiesForTab = content.GetPropertiesForGroup(propertyGroup).ToArray();
 
                     //convert the properties to ContentPropertyDisplay objects
                     var displayProperties = propertiesForTab
@@ -65,7 +65,7 @@ namespace Umbraco.Web.Models.Mapping
                     Id = 0,
                     Label = "Generic properties",
                     Alias = "Generic properties",
-                    Properties = orphanProperties.Select(ToContentPropertyDisplay)
+                    Properties = orphanProperties.Select(ToContentPropertyDisplay).ToArray()
                 });
             
             var result = CreateContent<ContentItemDisplay, ContentPropertyDisplay>(content, (display, originalContent) =>
@@ -132,8 +132,8 @@ namespace Umbraco.Web.Models.Mapping
                     UpdateDate = content.UpdateDate,
                     CreateDate = content.CreateDate
                 };
-            if (createProperties) 
-                result.Properties = content.Properties.Select(p => CreateProperty(p, propertyCreatedCallback));
+            if (createProperties)
+                result.Properties = content.Properties.Select(p => CreateProperty(p, propertyCreatedCallback)).ToArray();
             if (contentCreatedCallback != null) 
                 contentCreatedCallback(result, content);
             return result;

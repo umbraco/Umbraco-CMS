@@ -17,6 +17,8 @@ using System.Xml;
 using umbraco.presentation.preview;
 using Examine.Providers;
 using Examine;
+using IOHelper = Umbraco.Core.IO.IOHelper;
+using SystemDirectories = Umbraco.Core.IO.SystemDirectories;
 
 namespace Umbraco.Web
 {
@@ -345,9 +347,10 @@ namespace Umbraco.Web
             var currentUrl = request.Url.AbsolutePath;
             // zb-00004 #29956 : refactor cookies names & handling
             return
-                StateHelper.Cookies.Preview.HasValue // has preview cookie
+                //StateHelper.Cookies.Preview.HasValue // has preview cookie
+                HttpContext.Request.HasPreviewCookie()
                 && UmbracoUser != null // has user
-                && !currentUrl.StartsWith(Core.IO.IOHelper.ResolveUrl(Core.IO.SystemDirectories.Umbraco)); // is not in admin UI
+                && currentUrl.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)) == false; // is not in admin UI
         }
         
         private HttpRequestBase GetRequestFromContext()

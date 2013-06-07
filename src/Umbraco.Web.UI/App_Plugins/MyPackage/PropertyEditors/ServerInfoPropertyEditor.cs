@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
@@ -9,6 +11,10 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
     [PropertyEditor("AD056473-492B-47F8-9613-5A4936666C67", "Server Info")]
     public class ServerInfoPropertyEditor : PropertyEditor
     {
+        //cache the URL since these values get called numerous times.
+        private static string _viewPath;
+        private static ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
+
         protected override ValueEditor CreateValueEditor()
         {
             if (UmbracoContext.Current == null || UmbracoContext.Current.HttpContext == null)
@@ -16,9 +22,18 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
                 throw new InvalidOperationException("This property editor only works in an umbraco web context");
             }
             
-            var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
+            using (var lck = new UpgradeableReadLock(_locker))
+            {
+                if (_viewPath == null)
+                {
+                    lck.UpgradeToWriteLock();
+                    var urlHelper = new UrlHelper(new RequestContext(UmbracoContext.Current.HttpContext, new RouteData()));
+                    _viewPath = urlHelper.Action("ServerEnvironment", "ServerSidePropertyEditors", new { area = "MyPackage" });
+                }
+                return new ValueEditor(_viewPath);    
+            }
 
-            return new ValueEditor(urlHelper.Action("ServerEnvironment", "ServerSidePropertyEditors", new {area = "MyPackage"}));
+            
         }
 
         protected override PreValueEditor CreatePreValueEditor()

@@ -8,6 +8,7 @@ namespace umbraco.BusinessLogic
     /// <summary>
     /// The StateHelper class provides general helper methods for handling sessions, context, viewstate and cookies.
     /// </summary>
+    [Obsolete("DO NOT USE THIS ANYMORE! REPLACE ALL CALLS WITH NEW EXTENSION METHODS")]
     public class StateHelper
     {
 
