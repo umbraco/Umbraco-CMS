@@ -13,7 +13,7 @@ namespace Umbraco.Web.Models.Mapping
             _applicationContext = applicationContext;
         }
 
-        public ContentTypeBasic ToContentItemBasic(IContentType contentType)
+        public ContentTypeBasic ToContentTypeBasic(IContentType contentType)
         {
             return new ContentTypeBasic
                 {

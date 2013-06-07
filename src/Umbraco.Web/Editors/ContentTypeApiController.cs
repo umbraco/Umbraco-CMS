@@ -44,8 +44,12 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-            return Services.ContentTypeService.GetContentTypeChildren(contentItem.ContentTypeId)
-                           .Select(x => _contentTypeModelMapper.ToContentItemBasic(x));
+
+
+            return contentItem.ContentType.AllowedContentTypes
+                .Select(x => Services.ContentTypeService.GetContentType(x.Id.Value))
+                .Select(x => _contentTypeModelMapper.ToContentTypeBasic(x));
+            
         }
     }
 }
