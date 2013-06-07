@@ -73,8 +73,10 @@ namespace Umbraco.Core
                         {
                             //NOTE: we cannot use AppDomain.CurrentDomain.GetAssemblies() because this only returns assemblies that have
                             // already been loaded in to the app domain, instead we will look directly into the bin folder and load each one.
-                            var binFolder = Assembly.GetExecutingAssembly().GetAssemblyFile().Directory;
-                            var binAssemblyFiles = Directory.GetFiles(binFolder.FullName, "*.dll", SearchOption.TopDirectoryOnly).ToList();
+                            var binFolder = IOHelper.GetRootDirectoryBinFolder();
+                            var binAssemblyFiles = Directory.GetFiles(binFolder, "*.dll", SearchOption.TopDirectoryOnly).ToList();
+                            //var binFolder = Assembly.GetExecutingAssembly().GetAssemblyFile().Directory;
+                            //var binAssemblyFiles = Directory.GetFiles(binFolder.FullName, "*.dll", SearchOption.TopDirectoryOnly).ToList();
                             assemblies = new List<Assembly>();
                             foreach (var a in binAssemblyFiles)
                             {

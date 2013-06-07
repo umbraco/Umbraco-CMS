@@ -20,12 +20,16 @@ namespace Umbraco.Web.Standalone
 
         private readonly IEnumerable<Type> _handlersToAdd;
         private readonly IEnumerable<Type> _handlersToRemove;
+        private readonly string _baseDirectory;
 
-        public StandaloneBootManager(UmbracoApplicationBase umbracoApplication, IEnumerable<Type> handlersToAdd, IEnumerable<Type> handlersToRemove)
+        public StandaloneBootManager(UmbracoApplicationBase umbracoApplication, IEnumerable<Type> handlersToAdd, IEnumerable<Type> handlersToRemove, string baseDirectory)
             : base(umbracoApplication)
         {
             _handlersToAdd = handlersToAdd;
             _handlersToRemove = handlersToRemove;
+            _baseDirectory = baseDirectory;
+
+            base.InitializeApplicationRootPath(_baseDirectory);
 
             // this is only here to ensure references to the assemblies needed for
             // the DataTypesResolver otherwise they won't be loaded into the AppDomain.
@@ -63,7 +67,7 @@ namespace Umbraco.Web.Standalone
 				typeof (ContentFinderByPageIdQuery),
 				typeof (ContentFinderByNiceUrl),
 				typeof (ContentFinderByIdPath),
-                typeof(ContentFinderByNotFoundHandlers)
+                typeof (ContentFinderByNotFoundHandlers)
             );
 
             // fixme - what else?

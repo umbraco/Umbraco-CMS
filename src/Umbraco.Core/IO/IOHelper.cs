@@ -249,6 +249,32 @@ namespace Umbraco.Core.IO
             return _rootDir;
         }
 
+        internal static string GetRootDirectoryBinFolder()
+        {
+            string binFolder = string.Empty;
+            if (string.IsNullOrEmpty(_rootDir))
+            {
+                binFolder = Assembly.GetExecutingAssembly().GetAssemblyFile().Directory.FullName;
+                return binFolder;
+            }
+
+            binFolder = Path.Combine(GetRootDirectorySafe(), "bin");
+
+#if DEBUG
+            var debugFolder = Path.Combine(binFolder, "debug");
+            if (Directory.Exists(debugFolder))
+                return debugFolder;
+#endif   
+            var releaseFolder = Path.Combine(binFolder, "release");
+            if (Directory.Exists(releaseFolder))
+                return releaseFolder;
+
+            if (Directory.Exists(binFolder))
+                return binFolder;
+
+            return _rootDir;
+        }
+
         /// <summary>
         /// Allows you to overwrite RootDirectory, which would otherwise be resolved
         /// automatically upon application start.

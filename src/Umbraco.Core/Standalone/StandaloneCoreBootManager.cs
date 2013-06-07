@@ -10,12 +10,16 @@ namespace Umbraco.Core.Standalone
     {
         private readonly IEnumerable<Type> _handlersToAdd;
         private readonly IEnumerable<Type> _handlersToRemove;
+        private readonly string _baseDirectory;
 
-        public StandaloneCoreBootManager(UmbracoApplicationBase umbracoApplication, IEnumerable<Type> handlersToAdd, IEnumerable<Type> handlersToRemove)
+        public StandaloneCoreBootManager(UmbracoApplicationBase umbracoApplication, IEnumerable<Type> handlersToAdd, IEnumerable<Type> handlersToRemove, string baseDirectory)
             : base(umbracoApplication)
         {
             _handlersToAdd = handlersToAdd;
             _handlersToRemove = handlersToRemove;
+            _baseDirectory = baseDirectory;
+
+            base.InitializeApplicationRootPath(_baseDirectory);
 
             // this is only here to ensure references to the assemblies needed for
             // the DataTypesResolver otherwise they won't be loaded into the AppDomain.
@@ -25,8 +29,10 @@ namespace Umbraco.Core.Standalone
         protected override void InitializeApplicationEventsResolver()
         {
             base.InitializeApplicationEventsResolver();
+
             foreach (var type in _handlersToAdd)
                 ApplicationEventsResolver.Current.AddType(type);
+
             foreach (var type in _handlersToRemove)
                 ApplicationEventsResolver.Current.RemoveType(type);
         }
@@ -36,7 +42,7 @@ namespace Umbraco.Core.Standalone
             base.InitializeResolvers();
 
             //Mappers are not resolved, which could be because of a known TypeMapper issue
-            MappingResolver.Reset();
+            /*MappingResolver.Reset();
             MappingResolver.Current = new MappingResolver(
                 () =>
                 new List<Type>
@@ -47,7 +53,7 @@ namespace Umbraco.Core.Standalone
                         typeof (MediaTypeMapper),
                         typeof (DataTypeDefinitionMapper),
                         typeof (UmbracoEntityMapper)
-                    });
+                    });*/
         }
     }
 }
