@@ -24,7 +24,9 @@ namespace Umbraco.Web.Trees
                 //we need to convert the node source to our legacy tree controller
                 var source = urlHelper.GetUmbracoApiService<LegacyTreeApiController>("GetNodes");
                 //append the query strings
-                var query = x.Source.Split(new[] {'?'}, StringSplitOptions.RemoveEmptyEntries);
+                var query = x.Source.IsNullOrWhiteSpace()
+                    ? new string[] { }
+                    : x.Source.Split(new[] { '?' }, StringSplitOptions.RemoveEmptyEntries);
                 source += query.Length > 1 ? query[1].EnsureStartsWith('?') : "";
 
                 var node = new TreeNode(x.NodeID, source)
