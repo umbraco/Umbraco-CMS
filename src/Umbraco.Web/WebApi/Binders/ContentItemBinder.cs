@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -9,8 +10,10 @@ using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
+using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Web.WebApi.Binders
 {
@@ -133,8 +136,22 @@ namespace Umbraco.Web.WebApi.Binders
                     });
             }
 
-            //finally, let's lookup the real content item and create the DTO item
-            model.PersistedContent = _applicationContext.Services.ContentService.GetById(model.Id);
+            if (model.Action == ContentSaveAction.Publish && model.Action == ContentSaveAction.Save)
+            {
+                //finally, let's lookup the real content item and create the DTO item
+                model.PersistedContent = _applicationContext.Services.ContentService.GetById(model.Id);
+            }
+            else
+            {
+                //we are creating new content
+                var contentType = _applicationContext.Services.ContentTypeService.GetContentType(model.ContentTypeAlias);
+                if (contentType == null)
+                {
+                    throw new InvalidOperationException("No content type found wth alias " + model.ContentTypeAlias);
+                }
+                model.PersistedContent = new Content(model.Name, model.ParentId, contentType);               
+            }
+
             model.ContentDto = _contentModelMapper.ToContentItemDto(model.PersistedContent);
             //we will now assign all of the values in the 'save' model to the DTO object
             foreach (var p in model.Properties)

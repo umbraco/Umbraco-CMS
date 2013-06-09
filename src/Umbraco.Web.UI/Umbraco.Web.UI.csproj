@@ -566,7 +566,6 @@
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Umbraco\lib\Umbraco\Extensions.js" />
-    <Content Include="Umbraco\Views\temp_content_editor.html" />
     <Content Include="Umbraco\Xslt\Web.config">
       <SubType>
       </SubType>

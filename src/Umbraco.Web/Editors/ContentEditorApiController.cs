@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
@@ -72,6 +73,23 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Gets an empty content item for the 
+        /// </summary>
+        /// <param name="contentTypeAlias"></param>
+        /// <param name="parentId"></param>
+        /// <returns></returns>
+        public ContentItemDisplay GetEmptyContent(string contentTypeAlias, int parentId)
+        {
+            var contentType = Services.ContentTypeService.GetContentType(contentTypeAlias);
+            if (contentType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            var emptyContent = new Content("Empty", parentId, contentType);
+            return _contentModelMapper.ToContentItemDisplay(emptyContent);
+        }
+
+        /// <summary>
         /// Saves content
         /// </summary>
         /// <returns></returns>
@@ -91,7 +109,7 @@ namespace Umbraco.Web.Editors
 
             //Save the property values
             foreach (var p in contentItem.ContentDto.Properties)
-            {                
+            {
                 //get the dbo property
                 var dboProperty = contentItem.PersistedContent.Properties[p.Alias];
 

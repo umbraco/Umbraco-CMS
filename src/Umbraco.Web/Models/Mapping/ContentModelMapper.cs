@@ -130,7 +130,8 @@ namespace Umbraco.Web.Models.Mapping
                     Updator = _profileMapper.ToBasicUser(content.GetWriterProfile()),
                     ParentId = content.ParentId,                                     
                     UpdateDate = content.UpdateDate,
-                    CreateDate = content.CreateDate
+                    CreateDate = content.CreateDate,
+                    ContentTypeAlias = content.ContentType.Alias
                 };
             if (createProperties)
                 result.Properties = content.Properties.Select(p => CreateProperty(p, propertyCreatedCallback)).ToArray();
