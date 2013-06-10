@@ -58,7 +58,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ContentItemDisplay GetContent(int id)
+        public ContentItemDisplay GetById(int id)
         {
             var foundContent = Services.ContentService.GetById(id);
             if (foundContent == null)
@@ -94,11 +94,11 @@ namespace Umbraco.Web.Editors
         /// Saves content
         /// </summary>
         /// <returns></returns>
-        [ContentItemValidationFilter]
+        [ContentItemValidationFilter(typeof(ContentItemValidationHelper<IContent>))]
         [FileUploadCleanupFilter]
         public ContentItemDisplay PostSave(
             [ModelBinder(typeof(ContentItemBinder))]
-                ContentItemSave contentItem)
+                ContentItemSave<IContent> contentItem)
         {
             //If we've reached here it means:
             // * Our model has been bound
@@ -123,7 +123,7 @@ namespace Umbraco.Web.Editors
                     d.Add("files", files);
                 }
                 var data = new ContentPropertyData(p.Value, d);
-
+                
                 //get the deserialized value from the property editor
                 dboProperty.Value = p.PropertyEditor.ValueEditor.DeserializeValue(data, dboProperty.Value);
             }

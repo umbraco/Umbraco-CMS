@@ -1,10 +1,10 @@
 ﻿{    	
-	propertyEditors: [
+	propertyEditors: [		
 		{
-			id: "30CA72BD-A349-4386-B935-FA532DF24B4B",
+			id: "5e9b75ae-face-41c8-b47e-5f4b0fd82f83",
 			name: "Rich Text Editor",
 			editor: {
-				view: "~/umbraco/Views/propertyeditors/rte/rte.html"				
+				view: "~/umbraco/Views/propertyeditors/umbraco/rte/editor.html"				
 			}
 		},
 		{

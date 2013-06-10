@@ -70,3 +70,12 @@ src\Umbraco.Web.UI\[W]eb.config
 *.transformed
 
 node_modules
+src/Umbraco.Web.UI/umbraco/lib/*
+src/Umbraco.Web.UI/umbraco/js/umbraco.*
+src/Umbraco.Web.UI/umbraco/js/routes.js
+src/Umbraco.Web.UI/umbraco/js/main.js
+src/Umbraco.Web.UI/umbraco/js/app.js
+src/Umbraco.Web.UI/umbraco/Views/**/*.js
+src/Umbraco.Web.UI/umbraco/Views/**/*.css
+src/Umbraco.Web.UI/umbraco/Views/**/*.html
+src/Umbraco.Web.UI/umbraco/assets/*

@@ -10,98 +10,49 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class MediaModelMapper
+    internal class MediaModelMapper : BaseContentModelMapper
     {
-        private readonly ApplicationContext _applicationContext;
-        private readonly ProfileModelMapper _profileMapper;
-
         public MediaModelMapper(ApplicationContext applicationContext, ProfileModelMapper profileMapper)
+            : base(applicationContext, profileMapper)
         {
-            _applicationContext = applicationContext;
-            _profileMapper = profileMapper;
         }
-       
-        internal ContentItemBasic<ContentPropertyBasic> ToMediaItemSimple(IMedia media)
+
+        public ContentItemDto<IMedia> ToMediaItemDto(IMedia content)
         {
-            return CreateMedia<ContentItemBasic<ContentPropertyBasic>, ContentPropertyBasic>(media, null, null);
+            var result = base.ToContentItemDtoBase<IMedia>(content);
+            //NOTE: we don't need this for the dto and it's an extra lookup
+            //result.ContentTypeAlias = content.ContentType.Alias;
+            //result.Icon = content.ContentType.Icon;            
+            //result.Updator = ProfileMapper.ToBasicUser(content.GetWriterProfile());
+            return result;
+        }
+
+        public ContentItemBasic<ContentPropertyBasic, IMedia> ToMediaItemSimple(IMedia content)
+        {
+            var result = base.ToContentItemSimpleBase<IMedia>(content);
+            result.ContentTypeAlias = content.ContentType.Alias;
+            result.Icon = content.ContentType.Icon;
+            return result;
         } 
 
-        /// <summary>
-        /// Creates a new content item
-        /// </summary>
-        /// <typeparam name="TContent"></typeparam>
-        /// <typeparam name="TContentProperty"></typeparam>
-        /// <param name="media"></param>
-        /// <param name="contentCreatedCallback"></param>
-        /// <param name="propertyCreatedCallback"></param>
-        /// <param name="createProperties"></param>
-        /// <returns></returns>
-        private TContent CreateMedia<TContent, TContentProperty>(IMedia media,
-            Action<TContent, IMedia> contentCreatedCallback = null,
-            Action<TContentProperty, Property, PropertyEditor> propertyCreatedCallback = null, 
-            bool createProperties = true)
-            where TContent : ContentItemBasic<TContentProperty>, new()
-            where TContentProperty : ContentPropertyBasic, new()
+        public MediaItemDisplay ToMediaItemDisplay(IMedia media)
         {
-            var result = new TContent
-                {
-                    Id = media.Id,
-                    Owner = _profileMapper.ToBasicUser(media.GetCreatorProfile()),
-                    Updator = null,
-                    ParentId = media.ParentId,
-                    UpdateDate = media.UpdateDate,
-                    CreateDate = media.CreateDate,
-                    ContentTypeAlias = media.ContentType.Alias,
-                    Icon = media.ContentType.Icon,
-                    Name = media.Name
-                };
-            if (createProperties)
-                result.Properties = media.Properties.Select(p => CreateProperty(p, propertyCreatedCallback)).ToArray();
-            if (contentCreatedCallback != null)
-                contentCreatedCallback(result, media);
-            return result;
-        }
+            //create the list of tabs for properties assigned to tabs.
+            var tabs = GetTabs(media);
 
-        /// <summary>
-        /// Creates the property with the basic property values mapped
-        /// </summary>
-        /// <typeparam name="TContentProperty"></typeparam>
-        /// <param name="property"></param>
-        /// <param name="callback"></param>
-        /// <returns></returns>
-        private static TContentProperty CreateProperty<TContentProperty>(
-            Property property, 
-            Action<TContentProperty, Property, PropertyEditor> callback = null)
-            where TContentProperty : ContentPropertyBasic, new()
-        {
-            var editor = PropertyEditorResolver.Current.GetById(property.PropertyType.DataTypeId);
-            if (editor == null)
+            var result = CreateContent<MediaItemDisplay, ContentPropertyDisplay, IMedia>(media, (display, originalContent) =>
             {
-                //TODO: Remove this check as we shouldn't support this at all!
-                var legacyEditor = DataTypesResolver.Current.GetById(property.PropertyType.DataTypeId);
-                if (legacyEditor == null)
-                {
-                    throw new NullReferenceException("The property editor with id " + property.PropertyType.DataTypeId + " does not exist");   
-                }
+                //fill in the rest
+                display.ContentTypeAlias = media.ContentType.Alias;
+                display.Icon = media.ContentType.Icon;
 
-                var legacyResult = new TContentProperty
-                {
-                    Id = property.Id,
-                    Value = property.Value.ToString(),
-                    Alias = property.Alias
-                };
-                if (callback != null) callback(legacyResult, property, null);
-                return legacyResult;
+                //set display props after the normal properties are alraedy mapped
+                display.Name = originalContent.Name;
+                display.Tabs = tabs;
+            }, null, false);
 
-            }
-            var result = new TContentProperty
-                {
-                    Id = property.Id,
-                    Value = editor.ValueEditor.SerializeValue(property.Value),
-                    Alias = property.Alias
-                };
-            if (callback != null) callback(result, property, editor);
             return result;
         }
+
     }
 }

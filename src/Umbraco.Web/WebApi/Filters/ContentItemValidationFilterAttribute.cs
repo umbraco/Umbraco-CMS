@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -12,53 +13,35 @@ using Umbraco.Web.Models.Mapping;
 
 namespace Umbraco.Web.WebApi.Filters
 {
-    /// <summary>
-    /// Validates the content item
-    /// </summary>
-    /// <remarks>
-    /// There's various validation happening here both value validation and structure validation
-    /// to ensure that malicious folks are not trying to post invalid values or to invalid properties.
-    /// </remarks>
-    internal class ContentItemValidationFilterAttribute : ActionFilterAttribute
+    internal class ContentItemValidationHelper<TPersisted>
+        where TPersisted : IContentBase
     {
         private readonly ApplicationContext _applicationContext;
 
-        public ContentItemValidationFilterAttribute(ApplicationContext applicationContext)
+        public ContentItemValidationHelper(ApplicationContext applicationContext)
         {
             _applicationContext = applicationContext;
         }
 
-        public ContentItemValidationFilterAttribute()
+        public ContentItemValidationHelper()
             : this(ApplicationContext.Current)
         {
             
         }
 
-        /// <summary>
-        /// Returns true so that other filters can execute along with this one
-        /// </summary>
-        public override bool AllowMultiple
+        public void ValidateItem(HttpActionContext actionContext)
         {
-            get { return true; }
-        }
-
-        /// <summary>
-        /// Performs the validation
-        /// </summary>
-        /// <param name="actionContext"></param>
-        public override void OnActionExecuting(HttpActionContext actionContext)
-        {
-            var contentItem = actionContext.ActionArguments["contentItem"] as ContentItemSave;
+            var contentItem = actionContext.ActionArguments["contentItem"] as ContentItemSave<TPersisted>;
             if (contentItem == null)
             {
-                actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "No " + typeof(ContentItemSave) + " found in request");
+                actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "No " + typeof(ContentItemSave<IContent>) + " found in request");
                 return;
             }
 
             //now do each validation step
-            if (!ValidateExistingContent(contentItem, actionContext)) return;
-            if (!ValidateProperties(contentItem, actionContext)) return;
-            if (!ValidateData(contentItem, actionContext)) return;
+            if (ValidateExistingContent(contentItem, actionContext) == false) return;
+            if (ValidateProperties(contentItem, actionContext) == false) return;
+            if (ValidateData(contentItem, actionContext) == false) return;
         }
 
         /// <summary>
@@ -67,8 +50,8 @@ namespace Umbraco.Web.WebApi.Filters
         /// <param name="postedItem"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        private bool ValidateExistingContent(ContentItemSave postedItem, HttpActionContext actionContext)
-        {            
+        private bool ValidateExistingContent(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, HttpActionContext actionContext)
+        {
             if (postedItem.PersistedContent == null)
             {
                 var message = string.Format("content with id: {0} was not found", postedItem.Id);
@@ -86,7 +69,7 @@ namespace Umbraco.Web.WebApi.Filters
         /// <param name="actionContext"></param>
         /// <returns></returns>
         //private bool ValidateProperties(ContentItemSave postedItem, ContentItemDto realItem, HttpActionContext actionContext)
-        private bool ValidateProperties(ContentItemSave postedItem, HttpActionContext actionContext)
+        private bool ValidateProperties(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, HttpActionContext actionContext)
         {
             foreach (var p in postedItem.Properties)
             {
@@ -105,7 +88,7 @@ namespace Umbraco.Web.WebApi.Filters
         }
 
         //TODO: Validate the property type data
-        private bool ValidateData(ContentItemSave postedItem, HttpActionContext actionContext)
+        private bool ValidateData(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, HttpActionContext actionContext)
         {
             foreach (var p in postedItem.ContentDto.Properties)
             {
@@ -159,6 +142,44 @@ namespace Umbraco.Web.WebApi.Filters
 
             return actionContext.ModelState.IsValid;
         }
+    }
+
+    /// <summary>
+    /// Validates the content item
+    /// </summary>
+    /// <remarks>
+    /// There's various validation happening here both value validation and structure validation
+    /// to ensure that malicious folks are not trying to post invalid values or to invalid properties.
+    /// </remarks>
+    internal class ContentItemValidationFilterAttribute : ActionFilterAttribute 
+    {
+        private readonly Type _helperType;
+        private dynamic _helper;
+
+        public ContentItemValidationFilterAttribute(Type helperType)
+        {
+            _helperType = helperType;
+            _helper = Activator.CreateInstance(helperType);
+        }
+
+        /// <summary>
+        /// Returns true so that other filters can execute along with this one
+        /// </summary>
+        public override bool AllowMultiple
+        {
+            get { return true; }
+        }
+
+        /// <summary>
+        /// Performs the validation
+        /// </summary>
+        /// <param name="actionContext"></param>
+        public override void OnActionExecuting(HttpActionContext actionContext)
+        {
+            _helper.ValidateItem(actionContext);
+        }
+
+        
 
     }
 }

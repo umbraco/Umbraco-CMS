@@ -43,7 +43,7 @@ angular.module("umbraco.directives")
                   $q.when(treeService.getTree({ section: scope.section, cachekey: scope.cachekey }))
                       .then(function (data) {
                           //set the data once we have it
-                          scope.tree = data.children;
+                          scope.tree = data;
                       }, function (reason) {
                           alert(reason);
                           return;

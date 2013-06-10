@@ -78,7 +78,7 @@ namespace Umbraco.Web.WebApi.Binders
         /// <param name="request"></param>
         /// <param name="provider"></param>
         /// <returns></returns>
-        private async Task<ContentItemSave> GetModel(HttpRequestMessage request, MultipartFormDataStreamProvider provider)
+        private async Task<ContentItemSave<IContent>> GetModel(HttpRequestMessage request, MultipartFormDataStreamProvider provider)
         {
             //IMPORTANT!!! We need to ensure the umbraco context here because this is running in an async thread
             UmbracoContext.EnsureContext(request.Properties["MS_HttpContext"] as HttpContextBase, ApplicationContext.Current);
@@ -100,7 +100,7 @@ namespace Umbraco.Web.WebApi.Binders
             var contentItem = result.FormData["contentItem"];
 
             //transform the json into an object
-            var model = JsonConvert.DeserializeObject<ContentItemSave>(contentItem);
+            var model = JsonConvert.DeserializeObject<ContentItemSave<IContent>>(contentItem);
 
             //get the files
             foreach (var file in result.FileData)
@@ -136,7 +136,7 @@ namespace Umbraco.Web.WebApi.Binders
                     });
             }
 
-            if (model.Action == ContentSaveAction.Publish && model.Action == ContentSaveAction.Save)
+            if (model.Action == ContentSaveAction.Publish || model.Action == ContentSaveAction.Save)
             {
                 //finally, let's lookup the real content item and create the DTO item
                 model.PersistedContent = _applicationContext.Services.ContentService.GetById(model.Id);
