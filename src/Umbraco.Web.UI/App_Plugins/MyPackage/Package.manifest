@@ -1,6 +1,13 @@
 ﻿{    	
 	propertyEditors: [
 		{
+			id: "30CA72BD-A349-4386-B935-FA532DF24B4B",
+			name: "Rich Text Editor",
+			editor: {
+				view: "~/umbraco/Views/propertyeditors/rte/rte.html"				
+			}
+		},
+		{
 			id: "0BA0F832-D759-4526-9B3E-94BBFC98F92E",
 			name: "Regex",
 			editor: {

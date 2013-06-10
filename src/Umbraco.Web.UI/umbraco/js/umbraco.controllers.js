@@ -167,8 +167,12 @@ angular.module('umbraco').controller("Umbraco.Editors.ContentCreateController", 
 });
 angular.module("umbraco").controller("Umbraco.Editors.ContentEditController", function ($scope, $routeParams, contentResource, notifications, $q) {
 	
-	if($routeParams.create)
-	    $scope.content = contentResource.getContentScaffold($routeParams.parentId, $routeParams.doctype);
+    if ($routeParams.create) {
+        $q.when(contentResource.getContentScaffold($routeParams.id, $routeParams.doctype))
+            .then(function (data) {
+                $scope.content = data;
+            });        
+    }	    
 	else {
 	    $q.when(contentResource.getContent($routeParams.id))
             .then(function (data) {
@@ -177,14 +181,12 @@ angular.module("umbraco").controller("Umbraco.Editors.ContentEditController", fu
 	}
 
 	$scope.saveAndPublish = function (cnt) {
-		
-	    contentResource.publishContent(cnt)
-            .then(function (data) {
-                //now we need to re-set the content model since the server will have updated it
-                $scope.content = data;
-                notifications.success("Published", "Content has been saved and published");
-            });
-		
+	    contentResource.publishContent(cnt, $routeParams.create)
+                .then(function (data) {
+                    //now we need to re-set the content model since the server will have updated it
+                    $scope.content = data;
+                    notifications.success("Published", "Content has been saved and published");
+                });
 	};
 
 	$scope.save = function (cnt) {

@@ -26,6 +26,10 @@ namespace Umbraco.Web.Models.ContentEditing
         [Required]
         public int Id { get; set; }
 
+        [DataMember(Name = "name", IsRequired = true)]
+        [Required(AllowEmptyStrings = false)]
+        public string Name { get; set; }
+
         [DataMember(Name = "properties")]
         public virtual IEnumerable<T> Properties
         {
@@ -39,7 +43,8 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "createDate")]
         public DateTime CreateDate { get; set; }
 
-        [DataMember(Name = "parentId")]
+        [DataMember(Name = "parentId", IsRequired = true)]
+        [Required]
         public int ParentId { get; set; }
 
         [DataMember(Name = "owner")]
@@ -47,6 +52,10 @@ namespace Umbraco.Web.Models.ContentEditing
         
         [DataMember(Name = "updator")]
         public UserBasic Updator { get; set; }
+
+        [DataMember(Name = "contentTypeAlias", IsRequired = true)]
+        [Required(AllowEmptyStrings = false)]
+        public string ContentTypeAlias { get; set; }
 
         /// <summary>
         /// The real persisted content object

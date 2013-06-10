@@ -5,7 +5,24 @@
     /// </summary>
     public enum ContentSaveAction
     {
+        /// <summary>
+        /// Saves the content item, no publish
+        /// </summary>
         Save,
-        Publish
+
+        /// <summary>
+        /// Saves and publishes the content item
+        /// </summary>
+        Publish,
+
+        /// <summary>
+        /// Saves a new content item
+        /// </summary>
+        SaveNew,
+
+        /// <summary>
+        /// Saves an publishes a new content item
+        /// </summary>
+        PublishNew
     }
 }

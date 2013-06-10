@@ -78,6 +78,9 @@ define(['app', 'angular', 'underscore'], function (app, angular, underscore) {
                 // we don't want to post all of the data as it is unecessary.
                 var saveModel = {
                     id: displayModel.id,
+                    name: displayModel.name,
+                    parentId: displayModel.parentId,
+                    contentTypeAlias: displayModel.contentTypeAlias,
                     properties: [],
                     //set the action on the save model
                     action: action

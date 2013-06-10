@@ -137,6 +137,10 @@ define(['app', 'angular'], function (app, angular) {
         function getContentUrl(contentId) {
             return Umbraco.Sys.ServerVariables.contentEditorApiBaseUrl + "GetContent?id=" + contentId;
         }
+        /** internal method to get the api url */
+        function getEmptyContentUrl(contentTypeAlias, parentId) {
+            return Umbraco.Sys.ServerVariables.contentEditorApiBaseUrl + "GetEmptyContent?contentTypeAlias=" + contentTypeAlias + "&parentId=" + parentId;
+        }
         /** internal method to get the api url for publishing */
         function getSaveUrl() {
             return Umbraco.Sys.ServerVariables.contentEditorApiBaseUrl + "PostSaveContent";
@@ -253,25 +257,32 @@ define(['app', 'angular'], function (app, angular) {
 
                 // return undefined;
 
-                return content;
+                //return content;
             },
 
             /** returns an empty content object which can be persistent on the content service
                 requires the parent id and the alias of the content type to base the scaffold on */
             getContentScaffold: function (parentId, alias) {
 
-                //use temp storage for now...
+                var deferred = $q.defer();
 
-                var c = this.getContent(parentId);
-                c.name = "empty name";
+                //go and get the data
+                $http.get(getEmptyContentUrl(alias, parentId)).
+                    success(function (data, status, headers, config) {
+                        //set the first tab to active
+                        _.each(data.tabs, function (item) {
+                            item.active = false;
+                        });
+                        if (data.tabs.length > 0)
+                            data.tabs[0].active = true;
 
-                $.each(c.tabs, function (index, tab) {
-                    $.each(tab.properties, function (index, property) {
-                        property.value = "";
+                        deferred.resolve(data);
+                    }).
+                    error(function (data, status, headers, config) {
+                        deferred.reject('Failed to retreive data for empty content item type ' + alias);
                     });
-                });
 
-                return c;
+                return deferred.promise;
             },
 
             getChildren: function (parentId, options) {
@@ -313,13 +324,13 @@ define(['app', 'angular'], function (app, angular) {
             },
 
             /** saves or updates a content object */
-            saveContent: function (content) {
-                return saveContentItem(content, "save");                
+            saveContent: function (content, isNew) {
+                return saveContentItem(content, "save" + (isNew ? "New" : ""));
             },
 
             /** saves and publishes a content object */
-            publishContent: function (content) {
-                return saveContentItem(content, "publish");
+            publishContent: function (content, isNew) {
+                return saveContentItem(content, "publish" + (isNew ? "New" : ""));
             }
 
         };

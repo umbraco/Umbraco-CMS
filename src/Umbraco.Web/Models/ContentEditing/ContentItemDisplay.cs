@@ -15,11 +15,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public ContentItemDisplay()
         {
             Tabs = new List<Tab<ContentPropertyDisplay>>();
-        }
-
-        [DataMember(Name = "name", IsRequired = true)]
-        [Required(AllowEmptyStrings = false)]
-        public string Name { get; set; }
+        }        
 
         [DataMember(Name = "icon")]
         public string Icon { get; set; }
