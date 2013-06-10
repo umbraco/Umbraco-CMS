@@ -152,10 +152,26 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MacroPickerController", fu
 });
 //used for the media picker dialog
 angular.module("umbraco")
-.controller("Umbraco.Dialogs.MediaPickerController",
-	function ($scope, mediaResource) {	
-	$scope.images = mediaResource.rootMedia();
-});
+    .controller("Umbraco.Dialogs.MediaPickerController",
+        function($scope, mediaResource) {
+
+            mediaResource.rootMedia()
+                .then(function(data) {
+                    $scope.images = data;
+                });
+
+            $scope.selectMediaItem = function(image) {
+                if (image.contentTypeAlias.toLowerCase() == 'folder') {
+                    mediaResource.getChildren(image.id)
+                        .then(function(data) {
+                            $scope.images = data;
+                        });
+                } else if (image.contentTypeAlias.toLowerCase() == 'image') {
+                    $scope.select(image);
+                }
+            };
+
+        });
 angular.module("umbraco").controller("Umbraco.Common.LegacyController", 
 	function($scope, $routeParams){
 		$scope.legacyPath = decodeURI($routeParams.p);
@@ -446,10 +462,10 @@ angular.module("umbraco")
                 setup : function(editor) {
                         
                         editor.on('blur', function(e) {
-                            $scope.$apply(function(){
+                            $scope.$apply(function() {
                                 //$scope.model.value = e.getBody().innerHTML;
                                 $scope.model.value = editor.getContent();
-                            })
+                            });
                         });
 
                         editor.addButton('mediapicker', {
@@ -459,12 +475,17 @@ angular.module("umbraco")
                                 dialogService.mediaPicker({scope: $scope, callback: function(data){
                                  
                                     //really simple example on how to intergrate a service with tinyMCE
-                                    $(data.selection).each(function(i,img){
-                                            var data = {
-                                                src: img.thumbnail,
-                                                style: 'width: 100px; height: 100px',
-                                                id : '__mcenew'
-                                            };
+                                    $(data.selection).each(function (i, img) {
+
+                                        var imageProperty = _.find(img.properties, function(item) {
+                                            return item.alias == 'umbracoFile';
+                                        });
+
+                                        var data = {
+                                            src: imageProperty != null ? imageProperty.value : "nothing.jpg",
+                                            style: 'width: 100px; height: 100px',
+                                            id: '__mcenew'
+                                        };
                                             
                                             editor.insertContent(editor.dom.createHTML('img', data));
                                             var imgElm = editor.dom.get('__mcenew');
@@ -488,9 +509,9 @@ angular.module("umbraco")
             function bindValue(inst){
                 $log.log("woot");
 
-                $scope.$apply(function(){
+                $scope.$apply(function() {
                     $scope.model.value = inst.getBody().innerHTML;
-                })
+                });
             }
 
             function myHandleEvent(e){

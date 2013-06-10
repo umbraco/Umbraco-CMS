@@ -45,7 +45,7 @@ function valSummary() {
                 if (args.isValid && exists && !propertyHasErrors) {
                     //it is valid but we have a val msg for it so we'll need to remove the message
                     scope.validationSummary = _.reject(scope.validationSummary, function (item) {
-                        return item == msg;
+                        return item === msg;
                     });
                 }
                 else if (!args.isValid && !exists) {

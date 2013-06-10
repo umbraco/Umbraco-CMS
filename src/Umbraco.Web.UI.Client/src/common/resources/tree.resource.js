@@ -11,8 +11,9 @@ function treeResource($q, $http) {
     }
     /** internal method to get the tree node's children url */
     function getTreeNodesUrl(node) {
-        if (!node.childNodesUrl)
+        if (!node.childNodesUrl){
             throw "No childNodesUrl property found on the tree node, cannot load child nodes";
+        }
         return node.childNodesUrl;
     }
 

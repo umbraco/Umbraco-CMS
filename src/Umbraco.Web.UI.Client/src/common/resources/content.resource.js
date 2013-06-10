@@ -22,10 +22,10 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         var deferred = $q.defer();
 
         //save the active tab id so we can set it when the data is returned.
-        var activeTab = _.find(content.tabs, function (item) {
-            return item.active
-        })
-        var activeTabIndex = (activeTab == undefined ? 0 : _.indexOf(content.tabs, activeTab));
+        var activeTab = _.find(content.tabs, function(item) {
+            return item.active;
+        });
+        var activeTabIndex = (activeTab === undefined ? 0 : _.indexOf(content.tabs, activeTab));
 
         //save the data
         umbRequestHelper.postMultiPartRequest(
@@ -67,8 +67,9 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     _.each(data.tabs, function (item) {
                         item.active = false;
                     });
-                    if (data.tabs.length > 0)
+                    if (data.tabs.length > 0){
                         data.tabs[0].active = true;
+                    }
 
                     deferred.resolve(data);
                 }).
@@ -92,8 +93,9 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     _.each(data.tabs, function (item) {
                         item.active = false;
                     });
-                    if (data.tabs.length > 0)
+                    if (data.tabs.length > 0){
                         data.tabs[0].active = true;
+                    }
 
                     deferred.resolve(data);
                 }).

@@ -10,10 +10,13 @@ function valServer() {
         require: 'ngModel',
         restrict: "A",
         link: function (scope, element, attr, ctrl) {
-            if (!scope.model || !scope.model.alias)
+            if (!scope.model || !scope.model.alias){
                 throw "valServer can only be used in the scope of a content property object";
+            }
             var parentErrors = scope.$parent.serverErrors;
-            if (!parentErrors) return;
+            if (!parentErrors) {
+                return;
+            }
 
             var fieldName = scope.$eval(attr.valServer);
 
