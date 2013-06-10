@@ -2,7 +2,7 @@
 
 namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
 {
-    [PropertyEditor("23A66468-30E2-4537-8039-625F8BC5CA1E", "File upload",
+    [PropertyEditor("5032a6e6-69e3-491d-bb28-cd31cd11086c", "File upload",
         "~/App_Plugins/MyPackage/PropertyEditors/Views/FileUploadEditor.html")]
     public class FileUploadPropertyEditor : PropertyEditor
     {

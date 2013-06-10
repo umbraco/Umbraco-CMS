@@ -15,9 +15,9 @@ namespace Umbraco.Web.Models.Mapping
         {
         }
 
-        public ContentItemDto ToContentItemDto(IContent content)
+        public ContentItemDto<IContent> ToContentItemDto(IContent content)
         {
-            var result = base.ToContentItemDtoBase(content);
+            var result = base.ToContentItemDtoBase<IContent>(content);
             //NOTE: we don't need this for the dto and it's an extra lookup
             //result.ContentTypeAlias = content.ContentType.Alias;
             //result.Icon = content.ContentType.Icon;            
@@ -25,9 +25,9 @@ namespace Umbraco.Web.Models.Mapping
             return result;            
         }
 
-        public ContentItemBasic<ContentPropertyBasic> ToContentItemSimple(IContent content)
+        public ContentItemBasic<ContentPropertyBasic, IContent> ToContentItemSimple(IContent content)
         {
-            var result = base.ToContentItemSimpleBase(content);
+            var result = base.ToContentItemSimpleBase<IContent>(content);
             result.ContentTypeAlias = content.ContentType.Alias;
             result.Icon = content.ContentType.Icon;
             result.Updator = ProfileMapper.ToBasicUser(content.GetWriterProfile());
@@ -39,7 +39,7 @@ namespace Umbraco.Web.Models.Mapping
             //create the list of tabs for properties assigned to tabs.
             var tabs = GetTabs(content);
             
-            var result = CreateContent<ContentItemDisplay, ContentPropertyDisplay>(content, (display, originalContent) =>
+            var result = CreateContent<ContentItemDisplay, ContentPropertyDisplay, IContent>(content, (display, originalContent) =>
                 {
                     //fill in the rest
                     display.Updator = ProfileMapper.ToBasicUser(content.GetWriterProfile());

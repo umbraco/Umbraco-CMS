@@ -1,7 +1,8 @@
-﻿using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using System.Web.Http.Filters;
+using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
+using File = System.IO.File;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -24,7 +25,7 @@ namespace Umbraco.Web.WebApi.Filters
 
             if (actionExecutedContext.ActionContext.ActionArguments.Any())
             {
-                var contentItem = actionExecutedContext.ActionContext.ActionArguments.First().Value as ContentItemSave;   
+                var contentItem = actionExecutedContext.ActionContext.ActionArguments.First().Value as IHaveUploadedFiles;   
                 if (contentItem != null)
                 {
                     //cleanup any files associated

@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-    public abstract class TabbedContentItem<T> : ContentItemBasic<T> 
-        where T : ContentPropertyBasic
+    public abstract class TabbedContentItem<T, TPersisted> : ContentItemBasic<T, TPersisted> 
+        where T : ContentPropertyBasic where TPersisted : IContentBase
     {
         protected TabbedContentItem()
         {

@@ -43,7 +43,7 @@ function umbRequestHelper($http) {
 
                     //call the callback
                     if (transformCallback) {                            
-                        transformCallback.apply(this, [formData]);
+                        transformCallback.apply(this, [data, formData]);
                     }
                     
                     return formData;

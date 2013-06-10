@@ -17,9 +17,9 @@ namespace Umbraco.Web.Models.Mapping
         {
         }
 
-        public ContentItemDto ToMediaItemDto(IMedia content)
+        public ContentItemDto<IMedia> ToMediaItemDto(IMedia content)
         {
-            var result = base.ToContentItemDtoBase(content);
+            var result = base.ToContentItemDtoBase<IMedia>(content);
             //NOTE: we don't need this for the dto and it's an extra lookup
             //result.ContentTypeAlias = content.ContentType.Alias;
             //result.Icon = content.ContentType.Icon;            
@@ -27,9 +27,9 @@ namespace Umbraco.Web.Models.Mapping
             return result;
         }
 
-        public ContentItemBasic<ContentPropertyBasic> ToMediaItemSimple(IMedia content)
+        public ContentItemBasic<ContentPropertyBasic, IMedia> ToMediaItemSimple(IMedia content)
         {
-            var result = base.ToContentItemSimpleBase(content);
+            var result = base.ToContentItemSimpleBase<IMedia>(content);
             result.ContentTypeAlias = content.ContentType.Alias;
             result.Icon = content.ContentType.Icon;
             return result;
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Models.Mapping
             //create the list of tabs for properties assigned to tabs.
             var tabs = GetTabs(media);
 
-            var result = CreateContent<MediaItemDisplay, ContentPropertyDisplay>(media, (display, originalContent) =>
+            var result = CreateContent<MediaItemDisplay, ContentPropertyDisplay, IMedia>(media, (display, originalContent) =>
             {
                 //fill in the rest
                 display.ContentTypeAlias = media.ContentType.Alias;

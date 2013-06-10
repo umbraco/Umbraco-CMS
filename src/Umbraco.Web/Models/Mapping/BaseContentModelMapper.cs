@@ -20,9 +20,10 @@ namespace Umbraco.Web.Models.Mapping
             ProfileMapper = profileMapper;
         }
 
-        protected ContentItemDto ToContentItemDtoBase(IContentBase content)
+        protected ContentItemDto<TPersisted> ToContentItemDtoBase<TPersisted>(IContentBase content) 
+            where TPersisted : IContentBase
         {
-            return CreateContent<ContentItemDto, ContentPropertyDto>(content, null, (propertyDto, originalProperty, propEditor) =>
+            return CreateContent<ContentItemDto<TPersisted>, ContentPropertyDto, TPersisted>(content, null, (propertyDto, originalProperty, propEditor) =>
                 {
                     propertyDto.Alias = originalProperty.Alias;
                     propertyDto.Description = originalProperty.PropertyType.Description;
@@ -32,9 +33,10 @@ namespace Umbraco.Web.Models.Mapping
                 });
         }
 
-        protected ContentItemBasic<ContentPropertyBasic> ToContentItemSimpleBase(IContentBase content)
+        protected ContentItemBasic<ContentPropertyBasic, TPersisted> ToContentItemSimpleBase<TPersisted>(IContentBase content) 
+            where TPersisted : IContentBase
         {
-            return CreateContent<ContentItemBasic<ContentPropertyBasic>, ContentPropertyBasic>(content, null, null);
+            return CreateContent<ContentItemBasic<ContentPropertyBasic, TPersisted>, ContentPropertyBasic, TPersisted>(content, null, null);
         } 
 
         protected IList<Tab<ContentPropertyDisplay>> GetTabs(IContentBase content)
@@ -71,14 +73,15 @@ namespace Umbraco.Web.Models.Mapping
                 });
 
             return tabs;
-        } 
+        }
 
-        protected TContent CreateContent<TContent, TContentProperty>(IContentBase content,
-                                                                     Action<TContent, IContentBase> contentCreatedCallback = null,
-                                                                     Action<TContentProperty, Property, PropertyEditor> propertyCreatedCallback = null,
-                                                                     bool createProperties = true)
-            where TContent : ContentItemBasic<TContentProperty>, new()
-            where TContentProperty : ContentPropertyBasic, new()
+        protected TContent CreateContent<TContent, TContentProperty, TPersisted>(IContentBase content,
+            Action<TContent, IContentBase> contentCreatedCallback = null,
+            Action<TContentProperty, Property, PropertyEditor> propertyCreatedCallback = null,
+            bool createProperties = true)
+            where TContent : ContentItemBasic<TContentProperty, TPersisted>, new()
+            where TContentProperty : ContentPropertyBasic, new() 
+            where TPersisted : IContentBase
         {
             var result = new TContent
                 {
@@ -110,7 +113,12 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         //if there is no property editor it means that it is a legacy data type
                         // we cannot support editing with that so we'll just render the readonly value view.
-                        display.View = GlobalSettings.Path.EnsureEndsWith('/') + "views/propertyeditors/umbraco/readonlyvalue/readonlyvalue.html";
+                        display.View = GlobalSettings.Path.EnsureEndsWith('/') +
+                                       "views/propertyeditors/umbraco/readonlyvalue/readonlyvalue.html";
+                    }
+                    else
+                    {
+                        display.View = propEditor.ValueEditor.View;
                     }
                 
                 });

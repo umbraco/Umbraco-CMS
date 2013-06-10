@@ -11,8 +11,9 @@ namespace Umbraco.Web.Models.ContentEditing
     /// A model representing a basic content item
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
-    public class ContentItemBasic<T>
+    public class ContentItemBasic<T, TPersisted>
         where T: ContentPropertyBasic
+        where TPersisted : IContentBase
     {
         public ContentItemBasic()
         {
@@ -64,7 +65,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// The real persisted content object
         /// </summary>
         [JsonIgnore]
-        internal IContent PersistedContent { get; set; }
+        internal TPersisted PersistedContent { get; set; }
 
         /// <summary>
         /// The DTO object used to gather all required content data including data type information etc... for use with validation
@@ -74,9 +75,9 @@ namespace Umbraco.Web.Models.ContentEditing
         /// instead of having to look up all the data individually.
         /// </remarks>
         [JsonIgnore]
-        internal ContentItemDto ContentDto { get; set; }
+        internal ContentItemDto<TPersisted> ContentDto { get; set; }
 
-        protected bool Equals(ContentItemBasic<T> other)
+        protected bool Equals(ContentItemBasic<T, TPersisted> other)
         {
             return Id == other.Id;
         }
@@ -85,7 +86,7 @@ namespace Umbraco.Web.Models.ContentEditing
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            var other = obj as ContentItemBasic<T>;
+            var other = obj as ContentItemBasic<T, TPersisted>;
             return other != null && Equals(other);
         }
 
