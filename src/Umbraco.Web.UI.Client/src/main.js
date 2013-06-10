@@ -47,7 +47,7 @@ require.config({
 
 require( [
   'angular',
-  'app',
+  'app_dev',
   'jquery',
   'jqueryCookie',
   'bootstrap',
