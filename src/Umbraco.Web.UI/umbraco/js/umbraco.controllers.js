@@ -1,5 +1,5 @@
 'use strict';
-/*! umbraco - v0.0.1-SNAPSHOT - 2013-06-04
+/*! umbraco - v0.0.1-SNAPSHOT - 2013-06-10
  * http://umbraco.github.io/Belle
  * Copyright (c) 2013 Per Ploug, Anders Stenteberg & Shannon Deminick;
  * Licensed MIT
@@ -40,7 +40,7 @@ angular.module('umbraco').controller("NavigationController",
 });
 
 
-angular.module('umbraco').controller("SearchController", function ($scope, search, $log, navigationService) {
+angular.module('umbraco').controller("SearchController", function ($scope, searchService, $log, navigationService) {
 
     var currentTerm = "";
     $scope.deActivateSearch = function(){
@@ -53,7 +53,7 @@ angular.module('umbraco').controller("SearchController", function ($scope, searc
                 $scope.ui.selectedSearchResult = -1;
                 navigationService.showSearch();
                 currentTerm = term;
-                $scope.ui.searchResults = search.search(term, $scope.currentSection);
+                $scope.ui.searchResults = searchService.search(term, $scope.currentSection);
             }else{
                 $scope.ui.searchResults = [];
             }
@@ -82,48 +82,50 @@ angular.module('umbraco').controller("DashboardController", function ($scope, $r
 
 //handles authentication and other application.wide services
 angular.module('umbraco').controller("MainController", 
-    function ($scope, notifications, $routeParams, userFactory, navigationService) {
+    function ($scope, $routeParams, $rootScope, notificationsService, userService, navigationService) {
     
     //also be authed for e2e test
     var d = new Date();
     var weekday = new Array("Super Sunday", "Manic Monday", "Tremendous Tuesday", "Wonderfull Wednesday", "Thunder Thursday", "Friendly Friday", "Shiny Saturday");
     $scope.today = weekday[d.getDay()];
-
     
 
     $scope.signin = function () {
-        $scope.authenticated = userFactory.authenticate($scope.login, $scope.password);
+        $scope.authenticated = userService.authenticate($scope.login, $scope.password);
 
         if($scope.authenticated){
-            $scope.user = userFactory.getCurrentUser();
+            $scope.user = userService.getCurrentUser();
         }
     };
 
     $scope.signout = function () {
-        userFactory.signout();
+        userService.signout();
         $scope.authenticated = false;
     };
     
 
     //subscribes to notifications in the notification service
-    $scope.notifications = notifications.current;
-    $scope.$watch('notifications.current', function (newVal, oldVal, scope) {
+    $scope.notifications = notificationsService.current;
+    $scope.$watch('notificationsService.current', function (newVal, oldVal, scope) {
         if (newVal) {
             $scope.notifications = newVal;
         }
     });
 
     $scope.removeNotification = function(index) {
-        notifications.remove(index);
+        notificationsService.remove(index);
     };
 
     $scope.closeDialogs = function(event){
+
+        $rootScope.$emit("closeDialogs");
+
         if(navigationService.ui.stickyNavigation && $(event.target).parents(".umb-modalcolumn").size() == 0){ 
             navigationService.hideNavigation();
         }
     };
 
-    if (userFactory.authenticated) {
+    if (userService.authenticated) {
         $scope.signin();
     }
 });
@@ -132,7 +134,8 @@ angular.module('umbraco').controller("MainController",
 angular.module("umbraco").controller("Umbraco.Dialogs.ContentPickerController", function ($scope, mediaResource) {
 	
 	$scope.$on("treeNodeSelect", function(event, args){
-		$(args.event.target.parentElement).find("i").attr("class", "icon umb-tree-icon sprTree icon-check blue");
+		args.event.preventDefault();	
+		$(args.event.target.parentElement).find("i.umb-tree-icon").attr("class", "icon umb-tree-icon sprTree icon-check blue");
 		$scope.select(args.node);
 	});
 });
@@ -182,8 +185,11 @@ angular.module('umbraco').controller("Umbraco.Editors.ContentCreateController", 
             return;
         });
 });
-angular.module("umbraco").controller("Umbraco.Editors.ContentEditController", function ($scope, $routeParams, contentResource, notifications, $q) {
-	
+angular.module("umbraco")
+.controller("Umbraco.Editors.ContentEditController",
+	function ($scope, $routeParams, contentResource, notificationsService) {
+
+
     if ($routeParams.create) {
         $q.when(contentResource.getContentScaffold($routeParams.id, $routeParams.doctype))
             .then(function (data) {
@@ -209,9 +215,8 @@ angular.module("umbraco").controller("Umbraco.Editors.ContentEditController", fu
 	$scope.save = function (cnt) {
 		
 		contentResource.saveContent(cnt);
-		notifications.success("Saved", "Content has been saved");
+		notificationsService.success("Saved", "Content has been saved");
 	};
-	
 });
 angular.module("umbraco").controller("Umbraco.Editors.CodeMirrorController", function ($scope, $rootScope) {
     require(
@@ -239,16 +244,19 @@ angular.module("umbraco").controller("Umbraco.Editors.CodeMirrorController", fun
 });
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-angular.module('umbraco').controller("Umbraco.Editors.ContentPickerController", function($rootScope, $scope, dialog, $log){
+angular.module('umbraco')
+.controller("Umbraco.Editors.ContentPickerController",
+	function($scope, dialogService){
     $scope.openContentPicker =function(value){
-            var d = dialog.contentPicker({scope: $scope, callback: populate});
+            var d = dialogService.contentPicker({scope: $scope, callback: populate});
     };
 
     function populate(data){
-        $scope.model.value = data.selection;    
+        $scope.model.value = data.selection;
     }
 });
-angular.module("umbraco").controller("Umbraco.Editors.DatepickerController", function ($rootScope, $scope, notifications, $timeout) {
+angular.module("umbraco").controller("Umbraco.Editors.DatepickerController", 
+    function ($scope, notificationsService) {
     require(
         [
             'views/propertyeditors/umbraco/datepicker/bootstrap.datepicker.js',
@@ -272,7 +280,9 @@ angular.module("umbraco").controller("Umbraco.Editors.DatepickerController", fun
     );
 });
 
-angular.module("umbraco").controller("Umbraco.Editors.GoogleMapsController", function ($rootScope, $scope, notifications, $timeout) {
+angular.module("umbraco")
+.controller("Umbraco.Editors.GoogleMapsController", 
+    function ($rootScope, $scope, notificationsService, $timeout) {
     require(
         [
             'async!http://maps.google.com/maps/api/js?sensor=false'
@@ -295,7 +305,6 @@ angular.module("umbraco").controller("Umbraco.Editors.GoogleMapsController", fun
                 position: latLng,
                 draggable: true
             });
-            
              
             google.maps.event.addListener(marker, "dragend", function(e){
                 var newLat = marker.getPosition().lat();
@@ -306,15 +315,14 @@ angular.module("umbraco").controller("Umbraco.Editors.GoogleMapsController", fun
 
                 //call the notication engine
                 $rootScope.$apply(function () {
-                    notifications.warning("Your dragged a marker to", $scope.model.value);
+                    notificationsService.warning("Your dragged a marker to", $scope.model.value);
                 });
             });
 
             //hack to hook into tab switching for map resizing
             $('a[data-toggle="tab"]').on('shown', function (e) {
                 google.maps.event.trigger(map, 'resize');
-            })
-
+            });
 
         }
     );    
@@ -322,20 +330,21 @@ angular.module("umbraco").controller("Umbraco.Editors.GoogleMapsController", fun
 'use strict';
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-angular.module("umbraco").controller("Umbraco.Editors.GridController", function($rootScope, $scope, dialog, $log, macroFactory){
+angular.module("umbraco").controller("Umbraco.Editors.GridController", 
+  function($rootScope, $scope, dialogService, $log){
     //we most likely will need some iframe-motherpage interop here
     
     //we most likely will need some iframe-motherpage interop here
        $scope.openMediaPicker =function(){
-               var d = dialog.mediaPicker({scope: $scope, callback: renderImages});
+               var d = dialogService.mediaPicker({scope: $scope, callback: renderImages});
        };
 
        $scope.openPropertyDialog =function(){
-               var d = dialog.property({scope: $scope, callback: renderProperty});
+               var d = dialogService.property({scope: $scope, callback: renderProperty});
        };
 
        $scope.openMacroDialog =function(){
-               var d = dialog.macroPicker({scope: $scope, callback: renderMacro});
+               var d = dialogService.macroPicker({scope: $scope, callback: renderMacro});
        };
 
        function renderProperty(data){
@@ -343,7 +352,7 @@ angular.module("umbraco").controller("Umbraco.Editors.GridController", function(
        }
 
        function renderMacro(data){
-          $scope.currentElement.html( macroFactory.renderMacro(data.macro, -1) ); 
+       //   $scope.currentElement.html( macroFactory.renderMacro(data.macro, -1) ); 
        }
       
        function renderImages(data){
@@ -371,7 +380,8 @@ angular.module("umbraco").controller("Umbraco.Editors.GridController", function(
        })
 });
 angular.module("umbraco")
-    .controller("Umbraco.Editors.ListViewController", function ($rootScope, $scope, contentResource, contentTypeResource) {
+    .controller("Umbraco.Editors.ListViewController", 
+        function ($rootScope, $scope, contentResource, contentTypeResource) {
         $scope.options = {
             take: 10,
             offset: 0,
@@ -444,9 +454,10 @@ angular.module("umbraco")
 });
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-angular.module('umbraco').controller("Umbraco.Editors.MediaPickerController", function($rootScope, $scope, dialog, $log){
+angular.module('umbraco').controller("Umbraco.Editors.MediaPickerController", 
+	function($rootScope, $scope, dialogService, $log){
     $scope.openMediaPicker =function(value){
-            var d = dialog.mediaPicker({scope: $scope, callback: populate});
+            var d = dialogService.mediaPicker({scope: $scope, callback: populate});
     };
 
     function populate(data){
@@ -456,7 +467,7 @@ angular.module('umbraco').controller("Umbraco.Editors.MediaPickerController", fu
 });
 angular.module("umbraco")
     .controller("Umbraco.Editors.RTEController", 
-    function($rootScope, $scope, dialog, $log){
+    function($rootScope, $scope, dialogService, $log){
     require(
         [
             'tinymce'
@@ -484,7 +495,7 @@ angular.module("umbraco")
                             icon: 'media',
                             tooltip: 'Media Picker',
                             onclick: function(){
-                                dialog.mediaPicker({scope: $scope, callback: function(data){
+                                dialogService.mediaPicker({scope: $scope, callback: function(data){
                                  
                                     //really simple example on how to intergrate a service with tinyMCE
                                     $(data.selection).each(function(i,img){
@@ -536,29 +547,56 @@ angular.module("umbraco")
 
         });
 });
-angular.module("umbraco").controller("Umbraco.Editors.TagsController", 
-	function($rootScope, $scope, dialog, $log, tagsFactory) {	
-		
-		require( 
-		[
+angular.module("umbraco")
+.controller("Umbraco.Editors.TagsController",
+	function($rootScope, $scope, $log, tagsResource) {	
+		require(
+			[
 			'/belle/views/propertyeditors/umbraco/tags/bootstrap-tags.custom.js',
 			'css!/belle/views/propertyeditors/umbraco/tags/bootstrap-tags.custom.css'
-		],function(){
-		
+			],function(){
+
 			// Get data from tagsFactory
-			$scope.tags = tagsFactory.getTags("group");
+			$scope.tags = tagsResource.getTags("group");
 
 			// Initialize bootstrap-tags.js script
-	        var tags = $('#' + $scope.model.alias + "_tags").tags({
-	            tagClass: 'label-inverse'
-	        });
+			var tags = $('#' + $scope.model.alias + "_tags").tags({
+				tagClass: 'label-inverse'
+			});
 
-        	$.each($scope.tags, function(index, tag) {
+			$.each($scope.tags, function(index, tag) {
 				tags.addTag(tag.label);
-        	});
+			});
 		});
 	}
 );
+//this controller simply tells the dialogs service to open a mediaPicker window
+//with a specified callback, this callback will receive an object with a selection on it
+angular.module('umbraco').controller("Umbraco.Editors.EmbeddedContentController", 
+	function($rootScope, $scope, $log){
+    
+	$scope.showForm = false;
+	$scope.fakeData = [];
+
+	$scope.create = function(){
+		$scope.showForm = true;
+		$scope.fakeData = angular.copy($scope.model.config.fields);
+	};
+
+	$scope.show = function(){
+		$scope.showCode = true;
+	};
+
+	$scope.add = function(){
+		$scope.showForm = false;
+		if ( !($scope.model.value instanceof Array)) {
+			$scope.model.value = [];
+		}
+
+		$scope.model.value.push(angular.copy($scope.fakeData));
+		$scope.fakeData = [];
+	};
+});
 
 return angular;
 });
