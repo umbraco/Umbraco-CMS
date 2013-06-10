@@ -1,16 +1,15 @@
 ﻿/**
 * @ngdoc filter 
 * @name umbraco.filters:umbTreeIconClass
-* @restrict E
 * @description This will properly render the tree icon class based on the tree icon set on the server
 **/
-function treeIconClassFilter() {
+function treeIconClassFilter(treeIconHelper) {
     return function (treeNode, standardClasses) {
         if (treeNode.iconIsClass) {
-            return standardClasses + " " + treeNode.icon;
+            return standardClasses + " " + treeIconHelper.convertFromLegacy(treeNode);
         }
-        
-        return standardClasses;
+        //we need an 'icon-' class in there for certain styles to work so if it is image based we'll add this
+        return standardClasses + " icon-custom-file";
     };
 }
 angular.module('umbraco.filters').filter("umbTreeIconClass", treeIconClassFilter);
