@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
@@ -44,12 +47,31 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Gets the content json for the content id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public MediaItemDisplay GetById(int id)
+        {
+            var foundContent = Services.MediaService.GetById(id);
+            if (foundContent == null)
+            {
+                ModelState.AddModelError("id", string.Format("media with id: {0} was not found", id));
+                var errorResponse = Request.CreateErrorResponse(
+                    HttpStatusCode.NotFound,
+                    ModelState);
+                throw new HttpResponseException(errorResponse);
+            }
+            return _mediaModelMapper.ToMediaItemDisplay(foundContent);
+        }
+
+        /// <summary>
         /// Returns the root media objects
         /// </summary>
         public IEnumerable<ContentItemBasic<ContentPropertyBasic>> GetRootMedia()
         {
             return Services.MediaService.GetRootMedia()
-                           .Select(x => _mediaModelMapper.ToMediaItemSimple(x));
+                           .Select(x => _mediaModelMapper.ToContentItemSimple(x));
         }
 
         /// <summary>
@@ -58,7 +80,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ContentItemBasic<ContentPropertyBasic>> GetChildren(int parentId)
         {
             return Services.MediaService.GetChildren(parentId)
-                           .Select(x => _mediaModelMapper.ToMediaItemSimple(x));
+                           .Select(x => _mediaModelMapper.ToContentItemSimple(x));
         }
     }
 }

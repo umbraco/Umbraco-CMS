@@ -58,7 +58,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ContentItemDisplay GetContent(int id)
+        public ContentItemDisplay GetById(int id)
         {
             var foundContent = Services.ContentService.GetById(id);
             if (foundContent == null)

@@ -7,7 +7,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     /** internal method to get the api url */
     function getContentUrl(contentId) {
-        return Umbraco.Sys.ServerVariables.contentApiBaseUrl + "GetContent?id=" + contentId;
+        return Umbraco.Sys.ServerVariables.contentApiBaseUrl + "GetById?id=" + contentId;
     }
     /** internal method to get the api url */
     function getEmptyContentUrl(contentTypeAlias, parentId) {
@@ -56,7 +56,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
     }
 
     return {
-        getContent: function (id) {
+        getById: function (id) {
 
             var deferred = $q.defer();
 

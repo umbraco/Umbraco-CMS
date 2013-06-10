@@ -15,7 +15,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     /** internal method to get the api url */
     function getContentUrl(contentId) {
-        return Umbraco.Sys.ServerVariables.contentApiBaseUrl + "GetContent?id=" + contentId;
+        return Umbraco.Sys.ServerVariables.contentApiBaseUrl + "GetById?id=" + contentId;
     }
     /** internal method to get the api url */
     function getEmptyContentUrl(contentTypeAlias, parentId) {
@@ -64,7 +64,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
     }
 
     return {
-        getContent: function (id) {
+        getById: function (id) {
 
             var deferred = $q.defer();
 
@@ -235,6 +235,10 @@ angular.module('umbraco.resources').factory('contentTypeResource', contentTypeRe
 function mediaResource($q, $http) {
 
     /** internal method to get the api url */
+    function getMediaUrl(contentId) {
+        return Umbraco.Sys.ServerVariables.mediaApiBaseUrl + "GetById?id=" + contentId;
+    }
+    /** internal method to get the api url */
     function getRootMediaUrl() {
         return Umbraco.Sys.ServerVariables.mediaApiBaseUrl + "GetRootMedia";
     }
@@ -245,6 +249,30 @@ function mediaResource($q, $http) {
     }
 
     return {
+        getById: function (id) {
+
+            var deferred = $q.defer();
+
+            //go and get the data
+            $http.get(getMediaUrl(id)).
+                success(function (data, status, headers, config) {
+                    //set the first tab to active
+                    _.each(data.tabs, function (item) {
+                        item.active = false;
+                    });
+                    if (data.tabs.length > 0) {
+                        data.tabs[0].active = true;
+                    }
+
+                    deferred.resolve(data);
+                }).
+                error(function (data, status, headers, config) {
+                    deferred.reject('Failed to retreive data for media id ' + id);
+                });
+
+            return deferred.promise;
+        },
+
         rootMedia: function () {
 
             var deferred = $q.defer();

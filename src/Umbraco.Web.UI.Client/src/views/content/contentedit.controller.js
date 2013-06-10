@@ -10,7 +10,7 @@ angular.module("umbraco")
 	            });
 	    }
 	    else {
-	        contentResource.getContent($routeParams.id)
+	        contentResource.getById($routeParams.id)
 	            .then(function (data) {
 	                $scope.content = data;
 	            });
