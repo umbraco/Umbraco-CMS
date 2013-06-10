@@ -1,8 +1,8 @@
 ﻿/**
-* @ngdoc factory 
-* @name umbraco.resources.treeResource     
-* @description Loads in data for trees
-**/
+    * @ngdoc factory 
+    * @name umbraco.resources.treeResource     
+    * @description Loads in data for trees
+    **/
 function treeResource($q, $http) {
 
     /** internal method to get the tree app url */
@@ -11,22 +11,20 @@ function treeResource($q, $http) {
     }
     /** internal method to get the tree node's children url */
     function getTreeNodesUrl(node) {
-        if (!node.childNodesUrl){
+        if (!node.childNodesUrl)
             throw "No childNodesUrl property found on the tree node, cannot load child nodes";
-        }
-
         return node.childNodesUrl;
     }
 
     //the factory object returned
     return {
         /** Loads in the data to display the nodes for an application */
-        loadApplication: function (options) {
+        loadApplication: function (section) {
 
             var deferred = $q.defer();
 
             //go and get the tree data
-            $http.get(getTreeAppUrl(options.section)).
+            $http.get(getTreeAppUrl(section)).
                 success(function (data, status, headers, config) {
                     deferred.resolve(data);
                 }).

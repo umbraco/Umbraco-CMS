@@ -1,8 +1,8 @@
 /**
-* @ngdoc factory 
-* @name umbraco.resources.contentTypeResource
-* @description Loads in data for content types
-**/
+    * @ngdoc factory 
+    * @name umbraco.resources.contentTypeResource
+    * @description Loads in data for content types
+    **/
 function contentTypeResource($q, $http) {
 
     /** internal method to get the api url */
