@@ -1,0 +1,246 @@
+// Main
+// -------------------------
+
+
+// Utillity classes
+// @Per not sure where to put this part
+// -------------------------
+
+.fill {
+	height: 100%;
+	min-height: 100%;
+}
+.shadow {
+	box-shadow: 3px 0px 7px #dbdbdb;
+}
+
+.umb-scrollable, .umb-auto-overflow {
+	overflow: auto;
+}
+.umb-abstract {
+	display: block;
+	margin-top: 0px;
+	margin-bottom: 15px;
+	font-size: 14px;
+	color: #b3b3b3
+}
+
+h5{
+  text-transform: uppercase;
+  color: #b3b3b3;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+/* STYLES FOR SPECIFIC EDITOR COMPONENTS - for all property editors and other reusable editing components*/
+
+/* content picker */
+.umb-contentpicker-popover .search-holder {
+    padding: 10px;
+}
+
+
+/* CODEMIRROR DATATYPE */
+div.umb-codeeditor {
+    border: 1px solid #e8e8e8;
+}
+div.umb-codeeditor .umb-el-wrap {
+    padding: 0px;
+}
+div.umb-codeeditor .umb-btn-toolbar {
+    padding: 0px;
+    margin: 0px;
+    border-bottom: #e8e8e8 1px solid;
+    background: #f7f7f7
+}
+
+/* FILE UPLOAD*/
+.umb-fileupload .preview {
+    border-radius: 5px;
+    border: 1px solid #a0a0a0;
+    padding: 3px;
+    background: #efefef;
+    float: left;
+    margin-right: 30px;
+    margin-bottom: 30px
+}
+.umb-fileupload ul {
+    list-style: none;
+    vertical-align: middle;
+    margin-bottom: 0px
+}
+.umb-fileupload label {
+    vertical-align: middle;
+    padding-left: 7px;
+    font-weight: normal
+}
+.umb-fileupload .preview-file {
+    color: #666;
+    height: 45px;
+    width: 55px;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 10px;
+    padding-top: 27px
+}
+.umb-fileupload input {
+    font-size: 12px
+}
+
+
+/* MISC FORM ELEMENTS */
+.umb-form-actions {
+    background: none;
+    border: none
+}
+.datepicker td.active,
+.datepicker td span.active {
+    background: #f3762c !important;
+}
+.umb-datetime-picker div.info {
+    vertical-align: middle
+}
+
+.umb-userwidget img {
+    float: left;
+    margin-right: 15px;
+}
+.umb-userwidget small {
+    display: block
+}
+.popover-title {
+    display: none
+}
+
+
+/*BUTTONS */
+
+
+.umb-plus-btn a {
+  border: 2px dashed @grayLight;
+  width: 136px;
+  height: 136px;
+  line-height: 136px;
+  text-align: center;
+  font-size: 50px;
+  display: block;
+  color: @grayLight;
+  text-decoration: none;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  -ms-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+
+.umb-plus-btn a:hover {
+  border: 2px dashed @black;
+  color: @black
+}
+
+.umb-plus-btn i {
+    vertical-align: middle;
+    margin: auto
+}
+
+small.umb-detail,
+label small {
+  color: #b3b3b3 !important;
+  text-decoration: none;
+  display: block;
+  font-weight: normal
+}
+
+label {
+  padding-top: 8px !important;
+}
+
+
+/* FORM GRID */
+.umb-control-group {
+  padding: 30px 20px;
+}
+.umb-control-group .umb-el-wrap {
+  padding: 0
+}
+.umb-control-group label.control-label {
+  text-align: left
+}
+.umb-control-group label .help-block, 
+.umb-control-group label small {
+  font-size: 11px;
+  color: #a0a0a0;
+  line-height: 13px;
+  padding-top: 5px;
+}
+.umb-nolabel .controls {
+  margin-left: 0px;
+}
+
+.controls-row {
+  padding-top: 5px;
+  margin-left: 240px !important;
+}
+.controls-row label {
+  display: inline-block
+}
+
+.hidelabel .controls-row {
+  padding: 0px;
+  border: none;
+  margin: 0px !important;
+}
+
+.thumbnails .selected {
+  border-color: @black;
+  background: @black
+}
+
+/* DASHBOARD */
+.dashboardHideLink {
+  display: none;
+}
+.dashboardWrapper {
+  position: relative
+}
+.dashboardWrapper h2 {
+  padding: 0px 0px 0px 45px
+}
+.dashboardWrapper h3 {
+  font-size: 14px;
+  font-weight: bold
+}
+.dashboardIcon {
+  position: absolute;
+  top: 2px;
+  left: 2px
+}
+
+
+/* NOTIFICATIONS */
+.umb-notification ul {
+  list-style: none;
+  margin: 0;
+  margin-left: 80px;
+}
+.umb-notification li {
+  padding: 5px 30px 5px 20px;
+  text-shadow: none;
+  font-size: 12px;
+  margin: auto;
+  border: none;
+  border-radius: 0;
+}
+
+/* TABLE */
+.umb-table {
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+.umb-no-border {
+  border: none !important;
+}
+
+table thead a {
+  color: #333
+}

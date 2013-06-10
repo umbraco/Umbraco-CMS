@@ -1,0 +1,18 @@
+/* Show cursor when hovering dates and navigation arrows, to indicate they are clickable */
+.datepicker-days .day,
+.datepicker .add-on,
+.datepicker-days .icon-arrow-right {
+    cursor: pointer;
+}
+.datepicker-days .day:hover {
+    background: #f8f8f7;
+}
+/* Ensures that the "select" color is not shown when clicking arrows in the datepicker window */
+.datepicker-days .icon-arrow-right {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}

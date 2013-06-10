@@ -1,0 +1,56 @@
+// Gridview
+// -------------------------
+
+.editor {
+	border: 1px solid #cdcdcd;
+	text-align: center;
+	line-height: 100px;
+	position: relative;
+	-webkit-transition: all 500ms  ease-in-out;
+		-moz-transition: all 500ms  ease-in-out;
+        -ms-transition: all 500ms  ease-in-out;
+        -o-transition: all 500ms  ease-in-out;
+		transition: all 500ms  ease-in-out;
+	margin: 0 0 1.5% 0
+}
+
+.editor:hover {
+	border-color: #000
+}
+
+.editor:hover i {
+	opacity: 1
+}
+
+.editor i {
+	position: absolute;
+	top: 0;
+	font-size: 20px;
+	color: @white;
+	background: @black;
+	padding: 10px;
+	-webkit-transition: all 500ms  ease-in-out;
+		-moz-transition: all 500ms  ease-in-out;
+        -ms-transition: all 500ms  ease-in-out;
+        -o-transition: all 500ms  ease-in-out;
+		transition: all 500ms  ease-in-out;
+	opacity: 0
+}
+
+.editor i:hover {
+}
+
+.editor i.icon-move {
+	left: 0;
+	cursor: move
+}	
+
+.editor i.icon-edit {
+	right: 36px;
+	cursor: pointer
+}
+
+.editor i.icon-trash {
+	right: 0;
+	cursor: pointer
+}
