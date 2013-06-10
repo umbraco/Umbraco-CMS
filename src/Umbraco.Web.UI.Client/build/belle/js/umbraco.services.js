@@ -664,6 +664,9 @@ function umbDataFormatter() {
             var saveModel = {
                 id: displayModel.id,
                 properties: [],
+                name: displayModel.name,
+                contentTypeAlias : displayModel.contentTypeAlias,
+                parentId: displayModel.parentId,
                 //set the action on the save model
                 action: action
             };
@@ -671,6 +674,7 @@ function umbDataFormatter() {
                 _.each(tab.properties, function (prop) {
                     saveModel.properties.push({
                         id: prop.id,
+                        alias: prop.alias,
                         value: prop.value
                     });
                 });

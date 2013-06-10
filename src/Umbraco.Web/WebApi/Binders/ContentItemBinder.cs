@@ -136,7 +136,7 @@ namespace Umbraco.Web.WebApi.Binders
                     });
             }
 
-            if (model.Action == ContentSaveAction.Publish && model.Action == ContentSaveAction.Save)
+            if (model.Action == ContentSaveAction.Publish || model.Action == ContentSaveAction.Save)
             {
                 //finally, let's lookup the real content item and create the DTO item
                 model.PersistedContent = _applicationContext.Services.ContentService.GetById(model.Id);
