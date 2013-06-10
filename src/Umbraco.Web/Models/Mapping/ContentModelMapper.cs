@@ -106,6 +106,11 @@ namespace Umbraco.Web.Models.Mapping
                 });
         }
 
+        internal ContentItemBasic<ContentPropertyBasic> ToContentItemSimple(IContent content)
+        {
+            return CreateContent<ContentItemBasic<ContentPropertyBasic>, ContentPropertyBasic>(content, null, null);
+        } 
+
         /// <summary>
         /// Creates a new content item
         /// </summary>
@@ -121,7 +126,7 @@ namespace Umbraco.Web.Models.Mapping
             Action<TContentProperty, Property, PropertyEditor> propertyCreatedCallback = null, 
             bool createProperties = true)
             where TContent : ContentItemBasic<TContentProperty>, new()
-            where TContentProperty : ContentPropertyBase, new()
+            where TContentProperty : ContentPropertyBasic, new()
         {
             var result = new TContent
                 {
@@ -150,12 +155,25 @@ namespace Umbraco.Web.Models.Mapping
         private static TContentProperty CreateProperty<TContentProperty>(
             Property property, 
             Action<TContentProperty, Property, PropertyEditor> callback = null)
-            where TContentProperty : ContentPropertyBase, new()
+            where TContentProperty : ContentPropertyBasic, new()
         {
             var editor = PropertyEditorResolver.Current.GetById(property.PropertyType.DataTypeId);
             if (editor == null)
             {
-                throw new NullReferenceException("The property editor with id " + property.PropertyType.DataTypeId + " does not exist");
+                //TODO: Remove this check as we shouldn't support this at all!
+                var legacyEditor = DataTypesResolver.Current.GetById(property.PropertyType.DataTypeId);
+                if (legacyEditor == null)
+                {
+                    throw new NullReferenceException("The property editor with id " + property.PropertyType.DataTypeId + " does not exist");
+                }
+
+                var legacyResult = new TContentProperty
+                {
+                    Id = property.Id,
+                    Value = property.Value.ToString()
+                };
+                if (callback != null) callback(legacyResult, property, null);
+                return legacyResult;
             }
             var result = new TContentProperty
                 {

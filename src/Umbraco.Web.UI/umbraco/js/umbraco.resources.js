@@ -6,6 +6,44 @@
 'use strict';
 define(['app', 'angular'], function (app, angular) {
 
+    /**
+    * @ngdoc factory 
+    * @name umbraco.resources.treeResource     
+    * @description Loads in data for trees
+    **/
+    function mediaResource($q, $http) {
+        
+        /** internal method to get the api url */
+        function getRootMediaUrl(section) {
+            return Umbraco.Sys.ServerVariables.mediaApiBaseUrl + "GetRootMedia";
+        }
+
+        return {
+            rootMedia: function () {
+
+                var deferred = $q.defer();
+
+                //go and get the tree data
+                $http.get(getRootMediaUrl()).
+                    success(function (data, status, headers, config) {
+                        deferred.resolve(data);
+                    }).
+                    error(function (data, status, headers, config) {
+                        deferred.reject('Failed to retreive data for application tree ' + section);
+                    });
+
+                return deferred.promise;
+
+                return [
+                { id: 1234, src: "/Media/boston.jpg", thumbnail: "/Media/boston.jpg" },
+                { src: "/Media/bird.jpg", thumbnail: "/Media/bird.jpg" },
+                { src: "/Media/frog.jpg", thumbnail: "/Media/frog.jpg" }
+                ];
+            }
+        };
+    }
+    angular.module('umbraco.resources.media', []).factory('mediaResource', mediaResource);
+
 
     /**
     * @ngdoc factory 
@@ -125,7 +163,6 @@ define(['app', 'angular'], function (app, angular) {
     }
     angular.module('umbraco.resources.contentType', []).factory('contentTypeResource', contentTypeResource);
 
-
     /**
     * @ngdoc factory 
     * @name umbraco.resources.contentResource
@@ -135,15 +172,15 @@ define(['app', 'angular'], function (app, angular) {
         
         /** internal method to get the api url */
         function getContentUrl(contentId) {
-            return Umbraco.Sys.ServerVariables.contentEditorApiBaseUrl + "GetContent?id=" + contentId;
+            return Umbraco.Sys.ServerVariables.contentApiBaseUrl + "GetContent?id=" + contentId;
         }
         /** internal method to get the api url */
         function getEmptyContentUrl(contentTypeAlias, parentId) {
-            return Umbraco.Sys.ServerVariables.contentEditorApiBaseUrl + "GetEmptyContent?contentTypeAlias=" + contentTypeAlias + "&parentId=" + parentId;
+            return Umbraco.Sys.ServerVariables.contentApiBaseUrl + "GetEmptyContent?contentTypeAlias=" + contentTypeAlias + "&parentId=" + parentId;
         }
         /** internal method to get the api url for publishing */
         function getSaveUrl() {
-            return Umbraco.Sys.ServerVariables.contentEditorApiBaseUrl + "PostSaveContent";
+            return Umbraco.Sys.ServerVariables.contentApiBaseUrl + "PostSave";
         }
         /** internal method process the saving of data and post processing the result */
         function saveContentItem(content, action) {
@@ -603,19 +640,21 @@ angular.module('umbraco.resources.macro', [])
         }
     };
 });
-angular.module('umbraco.resources.media', [])
-.factory('mediaFactory', function () {
-    var mediaArray = [];
-    return {
-        rootMedia: function(){
-          return [
-          {id: 1234, src: "/Media/boston.jpg", thumbnail: "/Media/boston.jpg" },
-          {src: "/Media/bird.jpg", thumbnail: "/Media/bird.jpg" },
-          {src: "/Media/frog.jpg", thumbnail: "/Media/frog.jpg" }
-          ];
-      }
-  };
-});
+
+//angular.module('umbraco.resources.media', [])
+//.factory('mediaFactory', function () {
+//    var mediaArray = [];
+//    return {
+//        rootMedia: function(){
+//          return [
+//          {id: 1234, src: "/Media/boston.jpg", thumbnail: "/Media/boston.jpg" },
+//          {src: "/Media/bird.jpg", thumbnail: "/Media/bird.jpg" },
+//          {src: "/Media/frog.jpg", thumbnail: "/Media/frog.jpg" }
+//          ];
+//      }
+//  };
+//});
+
 angular.module('umbraco.resources.tags', [])
 .factory('tagsFactory', function () {
 	return {

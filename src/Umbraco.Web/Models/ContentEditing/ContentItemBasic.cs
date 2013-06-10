@@ -11,10 +11,10 @@ namespace Umbraco.Web.Models.ContentEditing
     /// A model representing a basic content item
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
-    public abstract class ContentItemBasic<T>
-        where T: ContentPropertyBase
+    public class ContentItemBasic<T>
+        where T: ContentPropertyBasic
     {
-        protected ContentItemBasic()
+        public ContentItemBasic()
         {
             //ensure its not null
             _properties = new List<T>();

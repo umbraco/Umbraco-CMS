@@ -7,7 +7,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// <summary>
     /// Represents a content property that is displayed in the UI
     /// </summary>
-    public class ContentPropertyDisplay : ContentPropertyBase
+    public class ContentPropertyDisplay : ContentPropertyBasic
     {
         [DataMember(Name = "label", IsRequired = true)]
         [Required]

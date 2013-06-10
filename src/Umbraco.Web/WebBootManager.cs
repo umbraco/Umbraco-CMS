@@ -178,7 +178,7 @@ namespace Umbraco.Web
                 SurfaceControllerResolver.Current.RegisteredSurfaceControllers.Concat(
                     UmbracoApiControllerResolver.Current.RegisteredUmbracoApiControllers).ToArray();
 
-            //local controllers do not contain the attribute 			
+            //local controllers do not contain the attribute
             var localControllers = pluginControllers.Where(x => PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
             foreach (var s in localControllers)
             {
@@ -211,8 +211,7 @@ namespace Umbraco.Web
             var route = RouteTable.Routes.MapHttpRoute(
                 string.Format("umbraco-{0}-{1}", "api", meta.ControllerName),
                 umbracoPath + "/Api/" + meta.ControllerName + "/{action}/{id}",//url to match
-                new { controller = meta.ControllerName, id = UrlParameter.Optional },
-                new { controller = @"(\w+)Api" }); //Must be suffixed with "Api" (i.e. MyApiController)
+                new { controller = meta.ControllerName, id = UrlParameter.Optional });
             //web api routes don't set the data tokens object
             if (route.DataTokens == null)
             {                
@@ -229,9 +228,7 @@ namespace Umbraco.Web
             var route = RouteTable.Routes.MapRoute(
                 string.Format("umbraco-{0}-{1}", "surface", meta.ControllerName),
                 umbracoPath + "/Surface/" + meta.ControllerName + "/{action}/{id}",//url to match
-                new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
-                //NOTE: There SHOULD be a constraint here to only match controllers with a "SurfaceController" suffix but we forgot to include it in the 
-                // 4.10 release so we can't include it now :(
+                new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },                
                 new[] { meta.ControllerNamespace }); //look in this namespace to create the controller
             route.DataTokens.Add("umbraco", "surface"); //ensure the umbraco token is set                
             route.DataTokens.Add("UseNamespaceFallback", false); //Don't look anywhere else except this namespace!
