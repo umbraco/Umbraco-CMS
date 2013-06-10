@@ -12,7 +12,7 @@ define(['namespaceMgr'], function () {
 
             //for legacy data, this will not be an array, just a string so convert to an array
             if (!$scope.model.value.startsWith('[')) {
-                $scope.model.value = "[file: '" + $scope.model.value + "']";
+                $scope.model.value = "[{\"file\": \"" + $scope.model.value + "\"}]";
             }
             
             $scope.persistedFiles = _.map(angular.fromJson($scope.model.value), function (item) {

@@ -28,8 +28,11 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
 
     $scope.save = function (cnt) {
         cnt.updateDate = new Date();
-        mediaResource.saveMedia(cnt, $routeParams.create, $scope.files);
-        notificationsService.success("Saved", "Media has been saved");
+        mediaResource.saveMedia(cnt, $routeParams.create, $scope.files)
+            .then(function (data) {
+                $scope.content = data;
+                notificationsService.success("Saved", "Media has been saved");
+            });        
     };
 }
 

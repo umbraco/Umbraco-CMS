@@ -95,8 +95,8 @@ namespace Umbraco.Web.Editors
         [ContentItemValidationFilter(typeof(ContentItemValidationHelper<IMedia>))]
         [FileUploadCleanupFilter]
         public MediaItemDisplay PostSave(
-            [ModelBinder(typeof(ContentItemBinder))]
-                ContentItemSave<IMedia> mediaItem)
+            [ModelBinder(typeof(MediaItemBinder))]
+                ContentItemSave<IMedia> contentItem)
         {
             //If we've reached here it means:
             // * Our model has been bound
@@ -106,16 +106,16 @@ namespace Umbraco.Web.Editors
 
             //Now, we just need to save the data
 
-            //Save the property values
-            foreach (var p in mediaItem.ContentDto.Properties)
+            //Save the property values (for properties that have a valid editor ... not legacy)
+            foreach (var p in contentItem.ContentDto.Properties.Where(x => x.PropertyEditor != null))
             {
                 //get the dbo property
-                var dboProperty = mediaItem.PersistedContent.Properties[p.Alias];
+                var dboProperty = contentItem.PersistedContent.Properties[p.Alias];
 
                 //create the property data to send to the property editor
                 var d = new Dictionary<string, object>();
                 //add the files if any
-                var files = mediaItem.UploadedFiles.Where(x => x.PropertyId == p.Id).ToArray();
+                var files = contentItem.UploadedFiles.Where(x => x.PropertyId == p.Id).ToArray();
                 if (files.Any())
                 {
                     d.Add("files", files);
@@ -127,10 +127,10 @@ namespace Umbraco.Web.Editors
             }
 
             //save the item
-            Services.MediaService.Save(mediaItem.PersistedContent);
+            Services.MediaService.Save(contentItem.PersistedContent);
 
             //return the updated model
-            return _mediaModelMapper.ToMediaItemDisplay(mediaItem.PersistedContent);
+            return _mediaModelMapper.ToMediaItemDisplay(contentItem.PersistedContent);
         }
     }
 }

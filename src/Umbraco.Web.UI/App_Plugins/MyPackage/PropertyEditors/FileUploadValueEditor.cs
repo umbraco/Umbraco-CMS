@@ -117,6 +117,13 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
                     //TODO: We need to remove any files that were previously persisted but are no longer persisted. FOr example, if we
                     // uploaded 5 files before and then only uploaded 3, then the last two should be deleted.
 
+                    //NOTE: We will save a simple string if there is only one media item, this is mostly for backwards compatibility and for
+                    // the current media pickers to work.                    
+                    if (newValue.Count == 1)
+                    {
+                        return newValue[0]["file"].ToString();
+                    }
+
                     return newValue.ToString(Formatting.None);
                 }
             }

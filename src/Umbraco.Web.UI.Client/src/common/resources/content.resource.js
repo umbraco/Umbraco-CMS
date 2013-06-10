@@ -19,46 +19,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
     }
     /** internal method process the saving of data and post processing the result */
     function saveContentItem(content, action, files) {
-        var deferred = $q.defer();
-
-        //save the active tab id so we can set it when the data is returned.
-        var activeTab = _.find(content.tabs, function(item) {
-            return item.active;
-        });
-        var activeTabIndex = (activeTab === undefined ? 0 : _.indexOf(content.tabs, activeTab));
-
-        //save the data
-        umbRequestHelper.postMultiPartRequest(
-            getSaveUrl(content.id),
-            { key: "contentItem", value: umbDataFormatter.formatContentPostData(content, action) },
-            function (data, formData) {                
-                //now add all of the assigned files
-                for (var f in files) {
-                    //each item has a property id and the file object, we'll ensure that the id is suffixed to the key
-                    // so we know which property it belongs to on the server side
-                    formData.append("file_" + files[f].id, files[f].file);
-                }
-
-            },
-            function (data, status, headers, config) {
-                //success callback
-
-                //reset the tabs and set the active one
-                _.each(data.tabs, function (item) {
-                    item.active = false;
-                });
-                data.tabs[activeTabIndex].active = true;
-
-                //the data returned is the up-to-date data so the UI will refresh
-                deferred.resolve(data);
-            },
-            function (data, status, headers, config) {
-                //failure callback
-
-                deferred.reject('Failed to publish data for content id ' + content.id);
-            });
-
-        return deferred.promise;
+        return umbRequestHelper.postSaveContent(getSaveUrl(content.id), content, action, files);
     }
 
     return {
