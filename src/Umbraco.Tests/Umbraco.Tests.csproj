@@ -206,6 +206,7 @@
     <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="TestHelpers\BaseSeleniumTest.cs" />
     <Compile Include="Integration\InstallPackage.cs" />
+    <Compile Include="CoreXml\NavigableNavigatorTests.cs" />
     <Compile Include="PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="CoreStrings\CmsHelperCasingTests.cs" />
     <Compile Include="CoreStrings\ShortStringHelperResolverTest.cs" />
