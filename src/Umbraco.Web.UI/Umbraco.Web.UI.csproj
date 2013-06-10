@@ -2595,7 +2595,7 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
   <Import Project="$(SolutionDir)umbraco.presentation.targets" Condition="$(BuildingInsideVisualStudio) == true" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(SolutionDir)"Umbraco.Web.UI.Client\build\belle\js\*.* "$(SolutionDir)"Umbraco.Web.UI\Umbraco\js /Y /F /E /D
-xcopy"$(SolutionDir)"Umbraco.Web.UI.Client\build\belle\assets\*.* "$(SolutionDir)"Umbraco.Web.UI\Umbraco\assets /Y /F /E /D
+xcopy "$(SolutionDir)"Umbraco.Web.UI.Client\build\belle\assets\*.* "$(SolutionDir)"Umbraco.Web.UI\Umbraco\assets /Y /F /E /D
 xcopy "$(SolutionDir)"Umbraco.Web.UI.Client\build\belle\lib\*.* "$(SolutionDir)"Umbraco.Web.UI\Umbraco\lib /Y /F /E /D
 xcopy "$(SolutionDir)"Umbraco.Web.UI.Client\build\belle\views\*.* "$(SolutionDir)"Umbraco.Web.UI\Umbraco\views /Y /F /E /D</PostBuildEvent>
   </PropertyGroup>
