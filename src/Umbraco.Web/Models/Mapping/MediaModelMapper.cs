@@ -17,6 +17,24 @@ namespace Umbraco.Web.Models.Mapping
         {
         }
 
+        public ContentItemDto ToMediaItemDto(IMedia content)
+        {
+            var result = base.ToContentItemDtoBase(content);
+            //NOTE: we don't need this for the dto and it's an extra lookup
+            //result.ContentTypeAlias = content.ContentType.Alias;
+            //result.Icon = content.ContentType.Icon;            
+            //result.Updator = ProfileMapper.ToBasicUser(content.GetWriterProfile());
+            return result;
+        }
+
+        public ContentItemBasic<ContentPropertyBasic> ToMediaItemSimple(IMedia content)
+        {
+            var result = base.ToContentItemSimpleBase(content);
+            result.ContentTypeAlias = content.ContentType.Alias;
+            result.Icon = content.ContentType.Icon;
+            return result;
+        } 
+
         public MediaItemDisplay ToMediaItemDisplay(IMedia media)
         {
             //create the list of tabs for properties assigned to tabs.

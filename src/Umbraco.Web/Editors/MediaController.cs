@@ -71,7 +71,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ContentItemBasic<ContentPropertyBasic>> GetRootMedia()
         {
             return Services.MediaService.GetRootMedia()
-                           .Select(x => _mediaModelMapper.ToContentItemSimple(x));
+                           .Select(x => _mediaModelMapper.ToMediaItemSimple(x));
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ContentItemBasic<ContentPropertyBasic>> GetChildren(int parentId)
         {
             return Services.MediaService.GetChildren(parentId)
-                           .Select(x => _mediaModelMapper.ToContentItemSimple(x));
+                           .Select(x => _mediaModelMapper.ToMediaItemSimple(x));
         }
     }
 }
