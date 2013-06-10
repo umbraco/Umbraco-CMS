@@ -1,0 +1,20 @@
+<div class="umb-panel" ng-controller="Umbraco.Dialogs.ContentPickerController">
+	<div class="umb-panel-header">
+		<div class="umb-el-wrap umb-panel-buttons">
+	        <div class="btn-toolbar umb-btn-toolbar">
+	         	<input type="button" ng-click="submit(dialogData)" class="btn btn-primary" value="select" />
+	        </div>
+		</div>
+	</div>
+	
+	<div class="umb-panel-body umb-scrollable" auto-scale="1">
+		<div class="tab-content umb-control-group">
+				<umb-tree 
+					section="content" 
+					cachekey="pickerDialog" 
+					showheader="false" 
+					showoptions="false">
+				</umb-tree>
+		</div>
+	</div>
+</div>

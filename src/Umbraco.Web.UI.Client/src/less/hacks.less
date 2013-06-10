@@ -1,0 +1,29 @@
+// Hacks
+// -------------------------
+
+/* CONTAINS ALL HACKS AND OTHER QUICK-FIXES THAT WE MUST HANDLE BEFORE A RELEASE */
+
+.controls-row img {
+	max-width: none;
+}
+
+.thumbnail img {
+	max-width: 100% !important
+}
+
+#mapCanvas img {
+  max-width: none !important;
+}
+
+/* ng-cloak support with requirejs */
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none;
+}
+
+/* TINYMCE OVERRIDES */
+
+.mce-tinymce{border: 1px solid @grayLight !important; }
+.mce-panel{background: @grayLighter !important; border-color: @grayLight !important;}
+
+.mce-btn-group, .mce-btn{border: none !important; background: none !important;}
+.mce-ico{font-size: 12px !important; color: @blackLight !important;}

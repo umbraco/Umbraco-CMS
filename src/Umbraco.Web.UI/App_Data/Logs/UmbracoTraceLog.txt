@@ -1,0 +1,25 @@
+2013-06-09 08:21:33,928 [5] ERROR Umbraco.Core.UmbracoApplicationBase - [Thread 1] An unhandled exception occurred
+System.Security.VerificationException: Operation could destabilize the runtime.
+   at Umbraco.Core.ObjectResolution.ResolverBase`1..ctor()
+   at Umbraco.Core.ObjectResolution.SingleObjectResolverBase`2..ctor(Boolean canBeNull) in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Core\ObjectResolution\SingleObjectResolverBase.cs:line 51
+   at Umbraco.Core.ObjectResolution.SingleObjectResolverBase`2..ctor(TResolved value) in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Core\ObjectResolution\SingleObjectResolverBase.cs:line 39
+   at Umbraco.Core.Profiling.ProfilerResolver..ctor(IProfiler profiler) in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Core\Profiling\ProfilerResolver.cs:line 14
+   at Umbraco.Core.CoreBootManager.InitializeProfilerResolver() in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Core\CoreBootManager.cs:line 104
+   at Umbraco.Web.WebBootManager.InitializeProfilerResolver() in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Web\WebBootManager.cs:line 108
+   at Umbraco.Core.CoreBootManager.Initialize() in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Core\CoreBootManager.cs:line 56
+   at Umbraco.Web.WebBootManager.Initialize() in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Web\WebBootManager.cs:line 66
+   at Umbraco.Core.UmbracoApplicationBase.StartApplication(Object sender, EventArgs e) in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Core\UmbracoApplicationBase.cs:line 39
+   at Umbraco.Core.UmbracoApplicationBase.Application_Start(Object sender, EventArgs e) in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Core\UmbracoApplicationBase.cs:line 52
+2013-06-09 08:22:24,990 [12] ERROR Umbraco.Core.UmbracoApplicationBase - [Thread 5] An unhandled exception occurred
+System.Security.VerificationException: Operation could destabilize the runtime.
+   at Umbraco.Core.ObjectResolution.ResolverBase`1..ctor()
+   at Umbraco.Core.ObjectResolution.SingleObjectResolverBase`2..ctor(Boolean canBeNull) in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Core\ObjectResolution\SingleObjectResolverBase.cs:line 51
+   at Umbraco.Core.ObjectResolution.SingleObjectResolverBase`2..ctor(TResolved value) in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Core\ObjectResolution\SingleObjectResolverBase.cs:line 39
+   at Umbraco.Core.Profiling.ProfilerResolver..ctor(IProfiler profiler) in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Core\Profiling\ProfilerResolver.cs:line 14
+   at Umbraco.Core.CoreBootManager.InitializeProfilerResolver() in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Core\CoreBootManager.cs:line 104
+   at Umbraco.Web.WebBootManager.InitializeProfilerResolver() in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Web\WebBootManager.cs:line 108
+   at Umbraco.Core.CoreBootManager.Initialize() in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Core\CoreBootManager.cs:line 56
+   at Umbraco.Web.WebBootManager.Initialize() in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Web\WebBootManager.cs:line 66
+   at Umbraco.Core.UmbracoApplicationBase.StartApplication(Object sender, EventArgs e) in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Core\UmbracoApplicationBase.cs:line 39
+   at Umbraco.Core.UmbracoApplicationBase.Application_Start(Object sender, EventArgs e) in \\psf\home\Documents\projects\Umbraco 7\src\Umbraco.Core\UmbracoApplicationBase.cs:line 52
+2013-06-10 15:15:58,882 [106] INFO  umbraco.BusinessLogic.Log - [Thread 108] Log scrubbed.  Removed all items older than 2013-06-09 15:15:58

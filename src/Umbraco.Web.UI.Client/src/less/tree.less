@@ -1,0 +1,320 @@
+// Tree
+// -------------------------
+
+.umb-tree {
+	margin: 0px;
+	min-width: 100%;
+	width: auto;
+}
+.umb-tree li {
+	display: block;
+	min-width: 100%;
+	width: auto;
+	display: block
+}
+.umb-tree li.current > div, .umb-tree div.selected {
+	background: #2e8aea;
+}
+.umb-tree li.current > div i.umb-options i, .umb-tree div.selected i{
+	background: #fff;
+	border-color: #2e8aea;
+}
+.umb-tree li.current > div a, 
+.umb-tree li.current > div i.icon{
+	color: white !important;
+	background: #2e8aea;
+	border-color: #2e8aea;
+}
+
+.umb-tree li.root div {
+	padding-left: 20px
+}
+
+.umb-tree * {
+	white-space: nowrap
+}
+.umb-tree ul {
+	padding: 0px;
+	margin: 0px;
+	min-width: 100%;
+	width: 100%;
+	display: table
+}
+.umb-tree a {
+	vertical-align: middle;
+	display: inline-block;
+}
+
+.umb-tree a:hover {
+	text-decoration: none
+}
+
+.umb-tree div {
+	vertical-align: middle;
+	padding: 5px 0 5px 0;
+	position: relative;
+}
+.umb-tree a.noSpr {
+	background-position: 0
+}
+
+.umb-tree div > i.umb-options {
+	visibility: hidden;
+}
+.umb-tree div:hover > i.umb-options {
+	visibility: visible;
+}
+
+.umb-tree li.root > div a, .umb-tree li.root h5 {
+	text-transform: uppercase;
+	color: #b3b3b3;
+	font-weight: bold;
+	font-size: 13px;
+}
+
+.umb-tree ins {
+	vertical-align: middle;
+	background: url(../img/applicationIcons/tree-arrow.png) no-repeat center center;
+	margin-left: -16px;
+	width: 16px;
+	height: 16px;
+	display: inline-block;
+	visibility: hidden;
+}
+.umb-tree li:hover ins {
+	visibility: visible;
+	cursor: pointer
+}
+.umb-tree .icon {
+	vertical-align: middle;
+	margin: 1px 13px 1px 0px;
+	color: #414141
+}
+.umb-tree i.noSpr {
+	display: inline-block;
+	margin-top: 1px;
+	width: 16px;
+	height: 16px;
+	line-height: 16px;
+}
+
+.umb-tree div:hover {
+	background: @grayLighter
+}
+
+i.umb-options {
+	visibility: hidden;	
+	cursor: pointer;
+	display: inline-block;
+	text-align: center;
+	height: 100%;
+	width: 45px;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+}
+
+i.umb-options i {
+	height: 6px !important;
+	width: 6px !important;
+	border-radius: 20px;
+	background: #333;
+	display: inline-block;
+	border: 3px solid @grayLighter;
+	margin: 10px -2px 0 0;
+}
+
+.hide-options .umb-options{display: none !important}
+.hide-header h5{display: none !important}
+
+.umb-icon-item {
+	padding: 2px;
+	padding-left: 55px;
+	display: block;
+	position: relative;
+
+}
+.umb-icon-item:hover {
+	background: #f8f8f8
+}
+.umb-icon-item i.icon {
+	position: absolute;
+	top: 8px;
+	left: 19px;
+}
+.umb-icon-item a:hover div {
+	text-decoration: underline;
+}
+
+.umb-icon-item a {
+	color: #525252;
+	padding-top: 3px;
+	height: 15px;
+	font-size: 12px;
+	text-decoration: none;
+}
+.umb-icon-item small {
+	color: #999;
+	font-size: 10px;
+	display: block
+}
+.umb-icon-item:hover .umb-options {
+	visibility: visible
+}
+.umb-icon-item .umb-spr {
+	float: left
+}
+
+// Tree context menu
+// -------------------------
+.umb-actions {
+	margin: 12px 0px 0px 0px;
+	padding: 0px;
+	list-style: none;
+}
+.umb-actions ul {
+}
+
+.umb-actions li.sep {
+	margin-top: 4px;
+	display: block;
+	border-top: 1px solid #efefef;
+}
+.umb-actions li.sep a {
+	margin-top: 4px;
+}
+.umb-actions a {
+	white-space: nowrap;
+	display: block;
+	font-size: 14px;
+	color: #414141;
+	padding: 4px 25px 4px 20px;
+	text-decoration: none;
+	cursor: pointer;
+}
+.umb-actions a:hover,
+.umb-actions li.selected {
+	color: #fff;
+	background: #2e8aea;
+}
+.umb-actions a:hover i {
+	color: #fff;
+}
+
+.umb-actions .menu-label {
+	display: inline-block;
+	vertical-align: middle;
+	padding-left: 15px;
+	padding-top: 2px;
+	text-transform: capitalize
+}
+.umb-actions i {
+	color: #999;
+	margin-top: 2px;
+	font-size: 18px;
+	vertical-align: middle;
+	color: #414141
+}
+
+.umb-actions-child {
+	list-style: none;
+	display: block;
+	margin: 0px;
+}
+.umb-actions-child li {
+	display: block;
+	width: 100%;
+}
+
+.umb-actions-child a.action {
+	display: block;
+	clear: both;
+	text-decoration: none;
+	width: 100%;
+}
+.umb-actions-child li .menu-label {
+	font-size: 12px;
+	margin-bottom: 10px;
+	color: #000
+}
+.umb-actions-child li a:hover {
+	color: #fff;
+	background-color: #2E8AEA
+}
+.umb-actions-child li a:hover * {
+	color: #fff !important
+}
+
+.umb-actions-child li .menu-label small {
+	font-size: 12px;
+	display: block;
+	clear: right;
+	line-height: 11px;
+	color: #ccc
+}
+.umb-actions-child li a:hover .menuLabel small {
+	text-decoration: none !important
+}
+.umb-actions-child li img {
+	height: 55px;
+	width: 55px;
+	float: left;
+	margin-left: 25px
+}
+.umb-actions-child i {
+	font-size: 24px;
+	vertical-align: top;
+	line-height: 36px
+}
+
+.umb-actions-child li.add {
+	margin-top: 20px;
+	border-top: 1px solid #e9e9e9;
+	padding-top: 20px;
+}
+.umb-actions-child li.add i {
+	opacity: 0.4;
+}
+
+
+// Tree icon colors
+// -------------------------
+
+.umb-tree i.icon.blue {
+	color: @blue;
+}
+.umb-tree i.icon.green {
+	color: @green;
+}
+.umb-tree i.icon.purple {
+	color: @purple
+}
+.umb-tree i.icon.orange {
+	color: @orange;
+}
+.umb-tree i.icon.red {
+	color: @red;
+}
+
+// Search
+// -------------------------
+/*
+.umb-search-field {
+	font-size: 12px;
+	width: 235px;
+	border-radius: 0 !important;
+	border-color: #f5f5f5;
+	padding: 5px 7px !important;
+	background: url(../img/applicationIcons/search.png) no-repeat 225px 8px #fff;
+	margin: 27px 20px 20px 20px;
+}
+*/
+#search-results h5 {
+	margin: 0px 0px 7px 20px;
+}
+#search-results ul {
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+	border-bottom: 1px solid #efefef
+}

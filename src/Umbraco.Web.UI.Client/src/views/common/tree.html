@@ -1,0 +1,34 @@
+﻿<script type="text/ng-template"  id="tree_item_renderer.html">
+        <div ng-style="setTreePadding(node)">
+            <ins ng-class="{'icon-caret-right': !node.expanded, 'icon-caret-down': node.expanded}" 
+                 ng-click="getTreeChildren(node)"></ins>
+
+            <i class="icon umb-tree-icon sprTree {{node.icon}}"></i>
+
+            <a ng-href="#{{node.view}}">{{node.name}}</a>
+            <i class="umb-options" ng-click="showCon    textMenu(node, $event)"><i></i><i></i><i></i></i>
+        </div>
+
+        <ul ng-class="{collapsed: !node.expanded}">
+            <li ng-repeat="node in node.children" 
+                ng-class="{current:node.id == selectedId}" 
+                ng-include="'tree_item_renderer.html'"></li>
+        </ul>
+</script>
+
+
+<ul class="umb-tree">
+    <li class="root">
+        <div>
+            <h5>
+                <a class="root-link">{{tree.name}}</a><i class="umb-options"><i></i><i></i><i></i></i>
+            </h5>
+        </div>
+
+        <ul>
+            <li class="file" ng-repeat="node in tree.children" 
+             ng-class="{current:node.id == selectedId}" 
+             ng-include="'tree_item_renderer.html'"></li>
+        </ul>
+    </li> 
+</ul>

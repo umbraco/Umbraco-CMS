@@ -1,0 +1,44 @@
+// Animations
+// -------------------------
+
+.fade-hide-setup, .fade-show-setup {
+	-webkit-transition: all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.3s;
+	-moz-transition: all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.3s;
+	-o-transition: all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.3s;
+	transition: all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.3s;
+}
+.fade-hide-setup {
+	opacity: 1;
+}
+.fade-hide-setup.fade-hide-start {
+	opacity: 0;
+}
+.fade-show-setup {
+	opacity: 0;
+}
+.fade-show-setup.fade-show-start {
+	opacity: 1;
+}
+
+.slide-hide-setup, .slide-show-setup {
+	-webkit-transition: all cubic-bezier(0.770, 0.000, 0.175, 1.000) 0.3s;
+	-moz-transition: all cubic-bezier(0.770, 0.000, 0.175, 1.000) 0.3s;
+	-o-transition: all cubic-bezier(0.770, 0.000, 0.175, 1.000) 0.3s;
+	transition: all cubic-bezier(0.770, 0.000, 0.175, 1.000) 0.3s;
+}
+
+.slide-hide-setup {
+	margin-left: 0;
+}
+
+.slide-hide-setup.slide-hide-start {
+	margin-left: -100%;
+}
+
+.slide-show-setup {
+	margin-left: -100%;
+}
+
+.slide-show-setup.slide-show-start {
+	margin-left: 0;
+}

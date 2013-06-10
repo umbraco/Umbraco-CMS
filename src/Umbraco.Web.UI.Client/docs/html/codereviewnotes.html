@@ -1,0 +1,198 @@
+<!DOCTYPE  html>
+<html>
+  <head>
+    <title>doc</title>
+    <style>
+      /*github.com style (c) Vasily Polovnyov <vast@whiteants.net>*/
+      pre code {
+        display: block; padding: 0.5em;
+        color: #333;
+        background: #f8f8ff
+      }
+      pre .comment,
+      pre .template_comment,
+      pre .diff .header,
+      pre .javadoc {
+        color: #998;
+        font-style: italic
+      }
+      pre .keyword,
+      pre .css .rule .keyword,
+      pre .winutils,
+      pre .javascript .title,
+      pre .nginx .title,
+      pre .subst,
+      pre .request,
+      pre .status {
+        color: #333;
+        font-weight: bold
+      }
+      pre .number,
+      pre .hexcolor,
+      pre .ruby .constant {
+        color: #099;
+      }
+      pre .string,
+      pre .tag .value,
+      pre .phpdoc,
+      pre .tex .formula {
+        color: #d14
+      }
+      pre .title,
+      pre .id {
+        color: #900;
+        font-weight: bold
+      }
+      pre .javascript .title,
+      pre .lisp .title,
+      pre .clojure .title,
+      pre .subst {
+        font-weight: normal
+      }
+      pre .class .title,
+      pre .haskell .type,
+      pre .vhdl .literal,
+      pre .tex .command {
+        color: #458;
+        font-weight: bold
+      }
+      pre .tag,
+      pre .tag .title,
+      pre .rules .property,
+      pre .django .tag .keyword {
+        color: #000080;
+        font-weight: normal
+      }
+      pre .attribute,
+      pre .variable,
+      pre .lisp .body {
+        color: #008080
+      }
+      pre .regexp {
+        color: #009926
+      }
+      pre .class {
+        color: #458;
+        font-weight: bold
+      }
+      pre .symbol,
+      pre .ruby .symbol .string,
+      pre .lisp .keyword,
+      pre .tex .special,
+      pre .prompt {
+        color: #990073
+      }
+      pre .built_in,
+      pre .lisp .title,
+      pre .clojure .built_in {
+        color: #0086b3
+      }
+      pre .preprocessor,
+      pre .pi,
+      pre .doctype,
+      pre .shebang,
+      pre .cdata {
+        color: #999;
+        font-weight: bold
+      }
+      pre .deletion {
+        background: #fdd
+      }
+      pre .addition {
+        background: #dfd
+      }
+      pre .diff .change {
+        background: #0086b3
+      }
+      pre .chunk {
+        color: #aaa
+      }
+    </style>
+  </head>
+  <body>  
+    <h1>Codereview with Peter Bacon Darwin</h1>
+<h2>Office at cogworks:</h2>
+<p>71-75 Shelton Street 
+London 
+WC2H 9JQ</p>
+<p>Meeting room 11 - 17</p>
+<h2>Issues to go through:</h2>
+<h3>Structure, dependencies and external libraries</h3>
+<ul>
+<li>review of modules structure and suggestions on how to handle loading things when needed.</li>
+<li><p>replace requireJs for dependency loading, so we dont have to load tinyMCE, googlemaps, etc
+on app start $script, yepNope, labjs?</p>
+</li>
+<li><p>get the app to load .aspx pages in an iframe instead of a &quot;normal&quot; view</p>
+<ul>
+<li>write directive for loading templates to replace ng-include</li>
+<li>if .aspx, load in iframe, </li>
+<li>if not found try default, finally load error msg    </li>
+</ul>
+</li>
+<li>Javascript as resources from dlls? - add a scriptService to load these? - yes 
+merge those resources into the umbraco.app.js file </li>
+</ul>
+<p><a href="http://briantford.com/blog/huuuuuge-angular-apps.html">http://briantford.com/blog/huuuuuge-angular-apps.html</a></p>
+<h3>Refactoring</h3>
+<ul>
+<li><p>Convert tree into directive, recursive, lazy-load</p>
+<ul>
+<li>$watchCollection $watch on the entire tree model</li>
+<li>reuse the old tree plugin to inject into dom instead of into angular</li>
+<li>10 levels of digest limit</li>
+<li>fine for CG, bad for release</li>
+</ul>
+</li>
+<li><p>best practices for directives, what should we convert?</p>
+</li>
+<li>other areas to convert?<ul>
+<li>for guidelines, look at angular/bootstrap-ui</li>
+<li>replace our components with ng-bootstrap or angular-strap</li>
+</ul>
+</li>
+</ul>
+<h3>Application logic</h3>
+<ul>
+<li>Authentication, force login, authenticate user against acccess to sections?</li>
+<li>whats the best way to handle urls, routes and state management, 
+so the tree, sections etc, syncs with urls and the state of the application</li>
+<li>tinyMCE directive angular-ui </li>
+<li>How to handle file-uploads<ul>
+<li>through a service?</li>
+<li>ng-upload? or jquery-upload-plugin thingy?</li>
+</ul>
+</li>
+<li>validation, ng-form $valid and directives should be enough<ul>
+<li>add remote directive: angular-app/admin/users/user-edit.js for directive code</li>
+</ul>
+</li>
+</ul>
+<h3>Dev experience</h3>
+<ul>
+<li><p>H Way to handle templates with missing controller? -&gt; replace ng-include? &lt;- yup
+  angular-app/samples/directives/fielddirective for code</p>
+<ul>
+<li>H generel exception handling with feedback to log or notifications service</li>
+<li>L jslint code on the server?<br>  <a href="http://madskristensen.net/post/Verify-JavaScript-syntax-using-C.aspx">http://madskristensen.net/post/Verify-JavaScript-syntax-using-C.aspx</a></li>
+<li>L automated setup of node, grunt, jasmine and karma, powershell and .sh?     </li>
+</ul>
+</li>
+</ul>
+<h3>Testing</h3>
+<ul>
+<li>Best way to test against service data, simply mock data in memory, or better way?</li>
+<li>Testing dom manipulating components, like modals</li>
+<li>e2e testing</li>
+<li>teamcity intergration</li>
+<li>testing templates</li>
+</ul>
+<h1>Notes</h1>
+<ul>
+<li>Javascript as resources? - add a scriptService to load these?  nope, they will compile into umbraco.app.js</li>
+<li>capture errors with javascript code, to not load it into the combined files
+(serverside jsLint) - mads blogpost for compiling js</li>
+</ul>
+
+  </body>
+</html>

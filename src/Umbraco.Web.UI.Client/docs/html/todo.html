@@ -1,0 +1,176 @@
+<!DOCTYPE  html>
+<html>
+  <head>
+    <title>doc</title>
+    <style>
+      /*github.com style (c) Vasily Polovnyov <vast@whiteants.net>*/
+      pre code {
+        display: block; padding: 0.5em;
+        color: #333;
+        background: #f8f8ff
+      }
+      pre .comment,
+      pre .template_comment,
+      pre .diff .header,
+      pre .javadoc {
+        color: #998;
+        font-style: italic
+      }
+      pre .keyword,
+      pre .css .rule .keyword,
+      pre .winutils,
+      pre .javascript .title,
+      pre .nginx .title,
+      pre .subst,
+      pre .request,
+      pre .status {
+        color: #333;
+        font-weight: bold
+      }
+      pre .number,
+      pre .hexcolor,
+      pre .ruby .constant {
+        color: #099;
+      }
+      pre .string,
+      pre .tag .value,
+      pre .phpdoc,
+      pre .tex .formula {
+        color: #d14
+      }
+      pre .title,
+      pre .id {
+        color: #900;
+        font-weight: bold
+      }
+      pre .javascript .title,
+      pre .lisp .title,
+      pre .clojure .title,
+      pre .subst {
+        font-weight: normal
+      }
+      pre .class .title,
+      pre .haskell .type,
+      pre .vhdl .literal,
+      pre .tex .command {
+        color: #458;
+        font-weight: bold
+      }
+      pre .tag,
+      pre .tag .title,
+      pre .rules .property,
+      pre .django .tag .keyword {
+        color: #000080;
+        font-weight: normal
+      }
+      pre .attribute,
+      pre .variable,
+      pre .lisp .body {
+        color: #008080
+      }
+      pre .regexp {
+        color: #009926
+      }
+      pre .class {
+        color: #458;
+        font-weight: bold
+      }
+      pre .symbol,
+      pre .ruby .symbol .string,
+      pre .lisp .keyword,
+      pre .tex .special,
+      pre .prompt {
+        color: #990073
+      }
+      pre .built_in,
+      pre .lisp .title,
+      pre .clojure .built_in {
+        color: #0086b3
+      }
+      pre .preprocessor,
+      pre .pi,
+      pre .doctype,
+      pre .shebang,
+      pre .cdata {
+        color: #999;
+        font-weight: bold
+      }
+      pre .deletion {
+        background: #fdd
+      }
+      pre .addition {
+        background: #dfd
+      }
+      pre .diff .change {
+        background: #0086b3
+      }
+      pre .chunk {
+        color: #aaa
+      }
+    </style>
+  </head>
+  <body>  
+    <h1>Things to do</h1>
+<h2>Structure</h2>
+<ul>
+<li>One module pr file idea, instead of registering everything on app.js</li>
+<li><p>Have core services, resources and other common items under umbraco</p>
+</li>
+<li><p>third party modules outside of the root umbraco module, but registered in app.js</p>
+</li>
+<li><p>to access 3rd party service:
+  ecomEditor.controller.js
+  angular.module(&quot;umbraco.myeditor&quot;, [&quot;ecommerce.services&quot;]).controller(&quot;ecom.editor&quot;, </p>
+<pre><code>  function(&quot;inventoryFactory&quot;){
+      do things...
+  });</code></pre>
+</li>
+<li><p>best way to setup services and controllers are: 
+.controller(&quot;name&quot;,[
+  &quot;service&quot;,
+  &quot;dependency&quot;,
+  function(s, d){</p>
+<p>  }
+]);</p>
+</li>
+<li><p>move logic from controllers to services, especcially around navigation</p>
+<ul>
+<li>easier for testing</li>
+<li>only keep view interactions, everything into a service</li>
+<li>looser testing on controllers</li>
+<li>for testing the dialogs, look in angular source or angular bootstrap projects</li>
+</ul>
+</li>
+</ul>
+<h2>Routing</h2>
+<p>Change /section/page/id to /section/area/page/id to support all section scenarios
+Have a fallback to defaults?</p>
+<h2>Legacy</h2>
+<ul>
+<li>for UmbClientTools we can access the services in angular from 
+  angular.element(&quot;body&quot;).injector().get(&quot;notifications&quot;);</li>
+<li>rootscope available in same location</li>
+<li>the bootstrap method returns the injector</li>
+</ul>
+<h2>ScriptLoaderService</h2>
+<pre><code>- Service to load required scripts for a controller using $script
+- remove requirejs dependency as it makes things muddy</code></pre>
+<h2>Authentication</h2>
+<p>Angular-app: common/security/interceptor.js , intercept http requests</p>
+<h2>Promises</h2>
+<pre><code>Use promises pattern for all our services
+$http.get(url)
+    .then(function(response){
+        return response.data;
+    }, function(response){
+        return $q.reject(&quot;http failed&quot;);
+    }).then(function(data){
+        alert(&quot;our data:&quot; + data);
+    })</code></pre>
+<h2>Think about rest services and authentication</h2>
+<p>Usecase: member picker editor, which fetches member-data</p>
+<h2>Avoid $resource and instead use $http</h2>
+<p>Sublime linter</p>
+
+  </body>
+</html>

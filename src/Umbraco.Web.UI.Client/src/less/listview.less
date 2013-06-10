@@ -1,0 +1,193 @@
+// Listview
+// -------------------------
+
+.umb-listview .dropdown-menu {
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0);
+  -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0);
+}
+
+.dropdown-menu > li > a:hover, 
+.dropdown-menu > li > a:focus, 
+.dropdown-submenu:hover > a, 
+.dropdown-submenu:focus > a {
+  color: @black;
+  background: @grayLighter;
+}
+
+.umb-listview table {
+	border: 1px solid @grayLight;
+}
+
+.umb-listview table caption {
+  background: @white;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.umb-sub-header {
+  padding: 0 0 20px 0
+}
+
+.umb-listview table form {
+  position: relative;
+  margin: 0
+}
+
+.umb-listview table form .icon-search {
+  position: absolute;
+  top: 8px;
+  left:5px;
+  color: @gray
+}
+
+.umb-listview table input[type="text"] {
+  background: none;
+  border: none;
+  -webkit-transition: all .5s;
+  -moz-transition: all .5s;
+  transition: all .5s;
+  width: 60px;
+  padding: 4px 0 4px 20px;
+  border: 1px solid @grayLighter
+}
+
+.umb-listview table input::-webkit-input-placeholder {
+   color: @gray;
+}
+
+.umb-listview table input:-moz-placeholder {
+   color: @gray;
+}
+
+.umb-listview table input::-moz-placeholder {
+   color: @gray;
+}
+
+.umb-listview table input:-ms-input-placeholder
+ {
+   color: @gray;
+}
+
+.umb-listview table input[type="text"]:focus {
+  width: 200px;
+  border: 1px solid @grayLight;
+  background: @white;
+  color: @black
+}
+
+.umb-listview .icon-star {
+  color: @grayLight
+}
+
+.umb-listview table thead {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  background-color: @grayLighter;
+}
+
+.umb-listview table tfoot {
+	background: @grayLighter;
+}
+
+.umb-listview table tfoot td:last-child {
+  border-left: none
+}
+
+.umb-listview table tfoot th {
+	padding: 0 20px;
+}
+
+.umb-listview .label {
+  color: @black;
+  text-shadow:none;
+  background: @grayLighter;
+  border: 1px solid @grayLight;
+  font-size: 11px;
+  font-weight: 400
+}
+
+.table-striped tbody > tr:nth-child(even) > td, .table-striped tbody > tr:nth-child(even) > th {
+  background-color: @grayLighter
+}
+
+.table-striped tbody > tr:nth-child(odd) > td, .table-striped tbody > tr:nth-child(odd) > th {
+  background: none
+}
+
+.umb-listview .pagination {
+  margin: 0;
+}
+
+.umb-listview .table th {
+  font-weight: normal
+}
+
+.umb-listview .showing {
+  padding: 8px 4px 2px 4px;
+  background: none;
+  font-size: 11px;
+  color: #b0b0b0
+}
+
+.umb-listview .pagination ul {
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0);
+  -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0);
+  background: none
+}
+
+.umb-listview .pagination ul > li > a, .pagination ul > li > span {
+  border:none;
+  padding: 8px 4px 2px 4px;
+  background: none;
+  font-size: 11px;
+  color: #b0b0b0
+}
+
+.umb-listview .pagination ul > li.active > a, .umb-listview .pagination ul > li > a:hover {
+  color: @black;
+}
+
+/* TEMP */
+
+.table-striped tbody td {
+  position: relative
+}
+
+.table-striped tbody input[type="checkbox"] {
+  display: block;
+  position: absolute;
+  top: 10px;
+  left:10px;
+  z-index: 5;
+}
+
+.table-striped tbody i {
+  display: block;
+  position: absolute;
+  top: 10px;
+  left:6px;
+  padding: 0 0 0 4px;
+  z-index: 6;
+  background: @white;
+  width: 20px;
+  height: 20px;
+}
+
+.table-striped tbody > tr:nth-child(even) > td i, .table-striped tbody > tr:nth-child(even) > th i{
+  background-color: @grayLighter
+}
+
+.table-striped tbody i:hover {
+  display: none !important
+}

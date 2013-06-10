@@ -1,0 +1,111 @@
+// Sections
+// -------------------------
+
+ul.sections {
+	margin: 0;
+	display: block;
+	background: @blackLight;
+	height: 100%;
+}
+
+ul.sections li {
+	border-bottom: 1px solid @grayDark;
+	display: block;
+	padding: 0px;
+	height: 56px;
+	padding: 23px 0 0 0
+}
+
+ul.sections li a {
+	display: inline-block;
+	text-decoration: none;
+	font-size: 10px;
+	text-align: center;
+	color: @grayLight;
+	-webkit-transition: color .2s linear;
+	-moz-transition: color .2s linear;
+	transition: color .2s linear;
+}
+
+ul.sections a span {
+	display: block;
+	visibility: hidden;
+	font-size: 10px;
+	line-height: 1em;
+	-webkit-transition: color .2s linear;
+	-moz-transition: color .2s linear;
+	transition: color .2s linear;
+}
+
+ul.sections:hover li a span {
+	visibility: visible;
+}
+
+
+// Avatar, Section & Help icons
+// -------------------------
+
+ul.sections li.avatar {
+	height: 69px;
+	padding: 30px 0 0 0;
+	text-align: center;
+}
+
+ul.sections li.avatar a {
+	margin: 0 auto;
+	width: 40px;
+	height: 40px;
+}
+
+ul.sections li.avatar a img {
+	border-radius: 500px;
+}
+
+.faded ul.sections li {
+	opacity: 0.4
+}
+
+ul.sections li i {
+	display: inline-block;
+	background-repeat: no-repeat;
+	background-position: 0 0;
+	width: 30px;
+	height: 30px
+}
+
+ul.sections li i.content {
+	background-image: url(../img/applicationIcons/Umbraco_icons-02.svg);
+}
+
+ul.sections li i.media {
+	background-image: url(../img/applicationIcons/Umbraco_icons-03.svg);
+}
+
+ul.sections li i.settings {
+	background-image: url(../img/applicationIcons/Umbraco_icons-05.svg);
+}
+
+ul.sections li i.developer {
+	background-image: url(../img/applicationIcons/Umbraco_icons-01.svg);
+}
+
+ul.sections li i.user {
+	background-image: url(../img/applicationIcons/Umbraco_icons-04.svg);
+}
+
+ul.sections li.help {
+	border-top: 1px solid @grayDark;
+	border-bottom: none;
+	margin: 0;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	display: block;
+	width: 100%;
+}
+
+ul.sections li.help a span {
+ 
+	visibility: hidden;// remove when helvicons is ready
+}
+

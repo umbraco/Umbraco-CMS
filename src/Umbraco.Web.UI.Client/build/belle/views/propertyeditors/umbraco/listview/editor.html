@@ -1,0 +1,68 @@
+
+<div class="umb-listview" ng-controller="Umbraco.Editors.ListViewController">
+	<div class="row-fluid">
+		<div class="umb-sub-header">
+			<div class="btn-group">
+				<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+					Create
+					<span class="caret"></span>
+				</a>
+				<ul class="dropdown-menu">
+					<li ng-repeat="contentType in listViewAllowedTypes">
+						<a href="#/content/edit/{{content.id}}?doctype={{contentType.alias}}&create=true">
+							<i class="icon-{{contentType.cssClass}}"></i> {{contentType.name}}</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<td with="20"><input type="checkbox"></td>
+					<td><a href="#" ng-click="sort('name')" prevent-default>Name <i class="icon-sort"></i></a></td>
+					<td><a href="#" ng-click="sort('updateDate')" prevent-default>Last updated  <i class="icon-sort"></i></a></td> 
+					<td><a href="#" ng-click="sort('owner')" prevent-default>Editor <i class="icon-sort"></i></a></td> 
+					<td with="20"><form class="pull-right">
+					<i class="icon-search"></i>
+					<input type="text" ng-model="options.filter" on-keyup="reloadView()">
+				</form></td>
+				</tr>
+			</thead>
+
+			<tbody>
+				<tr ng-repeat="result in listViewResultSet.resultSet">
+					<td><i class="{{result.icon}}"></i><input type="checkbox"></td> 
+					<td><a href="#/content/edit/{{result.id}}">{{result.name}}</a></td> 
+					<td>{{result.updateDate|date:'medium'}} 
+						<span class="label label-success">Publish</span>
+					</td>
+					<td>{{result.owner.name}} <span class="label">Admin</span></td>
+					<td></td>
+				</tr>
+			</tbody>
+
+			<tfoot ng-show="pagination.length > 0">
+				<tr>
+					<th colspan="5">
+						<div class="pull-left">
+							
+						</div>
+						<div class="pagination pagination-right">
+							<ul>
+								<li><a href="#" ng-click="prev()" prevent-default>Prev</a></li>
+
+								<li ng-repeat="pgn in pagination" 
+									ng-class="{active:$index==options.offset}">
+									<a href="#" ng-click="goToOffset($index)"  prevent-default>{{$index + 1}}</a>
+								</li>
+
+								<li><a href="#" ng-click="next()" prevent-default>Next</a></li>
+							</ul>
+						</div>
+
+					</th>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
