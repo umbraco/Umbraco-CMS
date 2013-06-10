@@ -47,7 +47,8 @@ namespace Umbraco.Web.Editors
             var d = new Dictionary<string, object>
                 {
                     {"umbracoPath", GlobalSettings.Path},
-                    {"contentEditorApiBaseUrl", Url.GetUmbracoApiService<ContentEditorApiController>("PostSaveContent").TrimEnd("PostSaveContent")},
+                    {"contentApiBaseUrl", Url.GetUmbracoApiService<ContentController>("PostSave").TrimEnd("PostSave")},
+                    {"mediaApiBaseUrl", Url.GetUmbracoApiService<MediaController>("GetRootMedia").TrimEnd("GetRootMedia")},
                     {"treeApplicationApiBaseUrl", Url.GetUmbracoApiService<ApplicationTreeApiController>("GetTreeData").TrimEnd("GetTreeData")},
                     {"contentTypeApiBaseUrl", Url.GetUmbracoApiService<ContentTypeApiController>("GetAllowedChildrenForContent").TrimEnd("GetAllowedChildrenForContent")}
                 };

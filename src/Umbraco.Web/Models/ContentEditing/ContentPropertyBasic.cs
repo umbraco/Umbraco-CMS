@@ -7,7 +7,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// Represents a content property to be saved
     /// </summary>
     [DataContract(Name = "property", Namespace = "")]
-    public class ContentPropertyBase
+    public class ContentPropertyBasic
     {
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
@@ -16,7 +16,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "value")]
         public string Value { get; set; }
 
-        protected bool Equals(ContentPropertyBase other)
+        protected bool Equals(ContentPropertyBasic other)
         {
             return Id == other.Id;
         }
@@ -25,7 +25,7 @@ namespace Umbraco.Web.Models.ContentEditing
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            var other = obj as ContentPropertyBase;
+            var other = obj as ContentPropertyBasic;
             return other != null && Equals(other);
         }
 

@@ -18,16 +18,16 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// The API controller used for editing content
     /// </summary>
-    [PluginController("UmbracoEditors")]
+    [PluginController("UmbracoApi")]
     [ValidationFilter]
-    public class ContentEditorApiController : UmbracoAuthorizedApiController
+    public class ContentController : UmbracoAuthorizedApiController
     {
         private readonly ContentModelMapper _contentModelMapper;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public ContentEditorApiController()
+        public ContentController()
             : this(UmbracoContext.Current, new ContentModelMapper(UmbracoContext.Current.Application, new ProfileModelMapper()))
         {            
         }
@@ -37,7 +37,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="umbracoContext"></param>
         /// <param name="contentModelMapper"></param>
-        internal ContentEditorApiController(UmbracoContext umbracoContext, ContentModelMapper contentModelMapper)
+        internal ContentController(UmbracoContext umbracoContext, ContentModelMapper contentModelMapper)
             : base(umbracoContext)
         {
             _contentModelMapper = contentModelMapper;
@@ -85,6 +85,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
+
             var emptyContent = new Content("Empty", parentId, contentType);
             return _contentModelMapper.ToContentItemDisplay(emptyContent);
         }
@@ -95,9 +96,9 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [ContentItemValidationFilter]
         [FileUploadCleanupFilter]
-        public ContentItemDisplay PostSaveContent(
+        public ContentItemDisplay PostSave(
             [ModelBinder(typeof(ContentItemBinder))]
-            ContentItemSave contentItem)
+                ContentItemSave contentItem)
         {
             //If we've reached here it means:
             // * Our model has been bound

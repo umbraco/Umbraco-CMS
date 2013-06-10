@@ -7,6 +7,8 @@ using System.Linq;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
+
+
     /// <summary>
     /// A model representing a content item to be displayed in the back office
     /// </summary>    

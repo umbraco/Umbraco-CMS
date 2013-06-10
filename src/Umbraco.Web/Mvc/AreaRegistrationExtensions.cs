@@ -36,7 +36,7 @@ namespace Umbraco.Web.Mvc
                                                     bool isMvc = true)
         {
             Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
-            Mandate.ParameterNotNullOrEmpty(controllerSuffixName, "controllerSuffixName");
+            Mandate.ParameterNotNull(controllerSuffixName, "controllerSuffixName");
             
             Mandate.ParameterNotNull(controllerType, "controllerType");
             Mandate.ParameterNotNull(routes, "routes");
