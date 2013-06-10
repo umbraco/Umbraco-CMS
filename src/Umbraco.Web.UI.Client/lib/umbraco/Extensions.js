@@ -47,7 +47,7 @@
         String.prototype.trimStart = function (str) {
             ///<summary>trims the start of the string</summary>
             if (this.startsWith(str)) {
-                return this.substring(str.length, this.length - 1);
+                return this.substring(str.length);
             }
             return this;
         };
