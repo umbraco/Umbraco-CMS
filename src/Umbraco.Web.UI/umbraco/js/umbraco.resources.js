@@ -14,8 +14,13 @@ define(['app', 'angular'], function (app, angular) {
     function mediaResource($q, $http) {
         
         /** internal method to get the api url */
-        function getRootMediaUrl(section) {
+        function getRootMediaUrl() {
             return Umbraco.Sys.ServerVariables.mediaApiBaseUrl + "GetRootMedia";
+        }
+
+        /** internal method to get the api url */
+        function getChildrenMediaUrl(parentId) {
+            return Umbraco.Sys.ServerVariables.mediaApiBaseUrl + "GetChildren?parentId=" + parentId
         }
 
         return {
@@ -33,12 +38,22 @@ define(['app', 'angular'], function (app, angular) {
                     });
 
                 return deferred.promise;
+            },
 
-                return [
-                { id: 1234, src: "/Media/boston.jpg", thumbnail: "/Media/boston.jpg" },
-                { src: "/Media/bird.jpg", thumbnail: "/Media/bird.jpg" },
-                { src: "/Media/frog.jpg", thumbnail: "/Media/frog.jpg" }
-                ];
+            getChildren: function (parentId) {
+
+                var deferred = $q.defer();
+
+                //go and get the tree data
+                $http.get(getChildrenMediaUrl(parentId)).
+                    success(function (data, status, headers, config) {
+                        deferred.resolve(data);
+                    }).
+                    error(function (data, status, headers, config) {
+                        deferred.reject('Failed to retreive data for application tree ' + section);
+                    });
+
+                return deferred.promise;
             }
         };
     }

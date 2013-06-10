@@ -51,5 +51,14 @@ namespace Umbraco.Web.Editors
             return Services.MediaService.GetRootMedia()
                            .Select(x => _mediaModelMapper.ToMediaItemSimple(x));
         }
+
+        /// <summary>
+        /// Returns the child media objects
+        /// </summary>
+        public IEnumerable<ContentItemBasic<ContentPropertyBasic>> GetChildren(int parentId)
+        {
+            return Services.MediaService.GetChildren(parentId)
+                           .Select(x => _mediaModelMapper.ToMediaItemSimple(x));
+        }
     }
 }

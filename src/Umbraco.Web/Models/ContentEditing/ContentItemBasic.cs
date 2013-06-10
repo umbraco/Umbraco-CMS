@@ -22,6 +22,9 @@ namespace Umbraco.Web.Models.ContentEditing
 
         private IEnumerable<T> _properties;
 
+        [DataMember(Name = "icon")]
+        public string Icon { get; set; }
+
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
         public int Id { get; set; }

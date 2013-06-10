@@ -72,8 +72,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     //set display props after the normal properties are alraedy mapped
                     display.Name = originalContent.Name;
-                    display.Tabs = tabs;
-                    display.Icon = originalContent.ContentType.Icon;
+                    display.Tabs = tabs;                    
                     //look up the published version of this item if it is not published
                     if (content.Published)
                     {
@@ -136,7 +135,9 @@ namespace Umbraco.Web.Models.Mapping
                     ParentId = content.ParentId,                                     
                     UpdateDate = content.UpdateDate,
                     CreateDate = content.CreateDate,
-                    ContentTypeAlias = content.ContentType.Alias
+                    ContentTypeAlias = content.ContentType.Alias,
+                    Icon = content.ContentType.Icon,
+                    Name = content.Name
                 };
             if (createProperties)
                 result.Properties = content.Properties.Select(p => CreateProperty(p, propertyCreatedCallback)).ToArray();
@@ -170,7 +171,8 @@ namespace Umbraco.Web.Models.Mapping
                 var legacyResult = new TContentProperty
                 {
                     Id = property.Id,
-                    Value = property.Value.ToString()
+                    Value = property.Value.ToString(),
+                    Alias = property.Alias
                 };
                 if (callback != null) callback(legacyResult, property, null);
                 return legacyResult;
@@ -178,7 +180,8 @@ namespace Umbraco.Web.Models.Mapping
             var result = new TContentProperty
                 {
                     Id = property.Id,
-                    Value = editor.ValueEditor.SerializeValue(property.Value)
+                    Value = editor.ValueEditor.SerializeValue(property.Value),
+                    Alias = property.Alias
                 };
             if (callback != null) callback(result, property, editor);
             return result;

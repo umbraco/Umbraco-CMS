@@ -18,9 +18,7 @@ namespace Umbraco.Web.Models.ContentEditing
         {
             Tabs = new List<Tab<ContentPropertyDisplay>>();
         }        
-
-        [DataMember(Name = "icon")]
-        public string Icon { get; set; }
+        
 
         [DataMember(Name = "publishDate")]
         public DateTime? PublishDate { get; set; }

@@ -16,6 +16,10 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "value")]
         public string Value { get; set; }
 
+        [DataMember(Name = "alias", IsRequired = true)]
+        [Required(AllowEmptyStrings = false)]
+        public string Alias { get; set; }
+
         protected bool Equals(ContentPropertyBasic other)
         {
             return Id == other.Id;

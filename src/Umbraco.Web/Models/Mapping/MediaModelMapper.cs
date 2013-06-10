@@ -51,7 +51,9 @@ namespace Umbraco.Web.Models.Mapping
                     ParentId = media.ParentId,
                     UpdateDate = media.UpdateDate,
                     CreateDate = media.CreateDate,
-                    ContentTypeAlias = media.ContentType.Alias
+                    ContentTypeAlias = media.ContentType.Alias,
+                    Icon = media.ContentType.Icon,
+                    Name = media.Name
                 };
             if (createProperties)
                 result.Properties = media.Properties.Select(p => CreateProperty(p, propertyCreatedCallback)).ToArray();
@@ -85,7 +87,8 @@ namespace Umbraco.Web.Models.Mapping
                 var legacyResult = new TContentProperty
                 {
                     Id = property.Id,
-                    Value = property.Value.ToString()
+                    Value = property.Value.ToString(),
+                    Alias = property.Alias
                 };
                 if (callback != null) callback(legacyResult, property, null);
                 return legacyResult;
@@ -94,7 +97,8 @@ namespace Umbraco.Web.Models.Mapping
             var result = new TContentProperty
                 {
                     Id = property.Id,
-                    Value = editor.ValueEditor.SerializeValue(property.Value)
+                    Value = editor.ValueEditor.SerializeValue(property.Value),
+                    Alias = property.Alias
                 };
             if (callback != null) callback(result, property, editor);
             return result;

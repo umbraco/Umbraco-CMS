@@ -31,8 +31,13 @@
 
 					<ul class="thumbnails">						
 						<li class="span2" ng-repeat="image in images">
-							<a href="#" class="thumbnail" ng-class="{selected: dialogData.selection.indexOf(image) > -1}" ng-click="select(image)" prevent-default>
-								<img ng-src="{{image.thumbnail}}" />
+							
+                            <a href="#" class="thumbnail" ng-class="{selected: dialogData.selection.indexOf(image) > -1}" 
+                                ng-click="selectMediaItem(image)" 
+                                prevent-default>
+								
+                                <img ng-src="{{image.thumbnail}}" />
+                                <span style="color:white;">{{image.name}}</span>
 							</a>
 						</li>
 					</ul>	

@@ -292,7 +292,6 @@
     <Compile Include="App_Plugins\MyPackage\PropertyEditors\ServerInfoPropertyEditor.cs" />
     <Compile Include="App_Plugins\MyPackage\System\MyStartupHandler.cs" />
     <Compile Include="App_Plugins\MyPackage\Trees\LegacyTestTree.cs" />
-    <Compile Include="App_Plugins\TestPackage\PropertyEditors\TestEditor.cs" />
     <Compile Include="Install\Default.aspx.cs">
       <DependentUpon>default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -564,8 +563,6 @@
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\FileUploadEditor.html" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\PostcodeEditor.html" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\RegexEditor.html" />
-    <Content Include="App_Plugins\TestPackage\PropertyEditors\Js\Test.js" />
-    <Content Include="App_Plugins\TestPackage\PropertyEditors\Views\Test.html" />
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Umbraco\lib\Umbraco\Extensions.js" />

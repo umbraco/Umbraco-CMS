@@ -13,10 +13,6 @@ namespace Umbraco.Web.Models.ContentEditing
         [Required]
         public string Label { get; set; }
 
-        [DataMember(Name = "alias", IsRequired = true)]
-        [Required(AllowEmptyStrings = false)]
-        public string Alias { get; set; }
-
         [DataMember(Name = "description")]
         public string Description { get; set; }
 

@@ -152,7 +152,20 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MediaPickerController", fu
     mediaResource.rootMedia()
         .then(function (data) {
             $scope.images = data;
-        });    
+        });
+
+    $scope.selectMediaItem = function (image) {
+        if (image.contentTypeAlias.toLowerCase() == 'folder') {
+            mediaResource.getChildren(image.id)
+            .then(function (data) {
+                $scope.images = data;
+            });
+        }
+        else if (image.contentTypeAlias.toLowerCase() == 'image') {
+            $scope.select(image);
+        }
+        
+    }
 });
 angular.module("umbraco").controller("Umbraco.Common.LegacyController", 
 	function($scope, $routeParams){
@@ -475,8 +488,13 @@ angular.module("umbraco")
                                  
                                     //really simple example on how to intergrate a service with tinyMCE
                                     $(data.selection).each(function(i,img){
+                                            
+                                        var imageProperty = _.find(img.properties, function (item) {
+                                            return item.alias == 'umbracoFile';
+                                        });
+
                                             var data = {
-                                                src: img.thumbnail,
+                                                src: imageProperty != null ? imageProperty.value : "nothing.jpg",
                                                 style: 'width: 100px; height: 100px',
                                                 id : '__mcenew'
                                             };
