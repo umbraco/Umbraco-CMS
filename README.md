@@ -1,10 +1,8 @@
 Umbraco CMS
 ===========
-![](http://download-codeplex.sec.s-msft.com/Download?ProjectName=umbraco&DownloadId=55656)
-
 ## Watch a five minute introduction video ##
 
-[http://umbraco.org/help-and-support/video-tutorials/getting-started/what-is-umbraco](http://umbraco.org/help-and-support/video-tutorials/getting-started/what-is-umbraco)
+[![ScreenShot](http://umbraco.com/images/whatisumbraco.png)](http://umbraco.org/help-and-support/video-tutorials/getting-started/what-is-umbraco)
 
 ## Umbraco - the simple, flexible and friendly ASP.NET CMS ##
 
