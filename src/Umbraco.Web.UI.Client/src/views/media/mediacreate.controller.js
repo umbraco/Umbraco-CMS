@@ -3,4 +3,4 @@ function mediaCreateController ($scope, $routeParams,contentTypeResource) {
 }
 
 angular.module('umbraco')
-    .controller("Umbraco.Editors.ContentCreateController", mediaCreateController);
+    .controller("Umbraco.Editors.MediaCreateController", mediaCreateController);

@@ -19,4 +19,4 @@ function mediaEditController($scope, $routeParams, contentResource, notification
 }
 
 angular.module("umbraco")
-    .controller("Umbraco.Editors.ContentEditController", mediaEditController);
+    .controller("Umbraco.Editors.MediaEditController", mediaEditController);
