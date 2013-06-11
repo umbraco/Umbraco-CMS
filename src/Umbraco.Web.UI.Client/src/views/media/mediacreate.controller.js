@@ -1,5 +1,5 @@
-function mediaCreateController ($scope, $routeParams,contentTypeResource) {
-    $scope.allowedTypes  = contentTypeResource.getAllowedTypes($scope.currentNode.id);
+function mediaCreateController ($scope, $routeParams,mediaTypeResource) {
+    $scope.allowedTypes = mediaTypeResource.getAllowedTypes($scope.currentNode.id);
 }
 
 angular.module('umbraco')

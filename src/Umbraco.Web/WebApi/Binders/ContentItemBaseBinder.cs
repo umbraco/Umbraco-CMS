@@ -135,18 +135,30 @@ namespace Umbraco.Web.WebApi.Binders
                 model.PersistedContent = CreateNew(model);
             }
 
-            model.ContentDto = Map(model);
-            //we will now assign all of the values in the 'save' model to the DTO object
-            foreach (var p in model.Properties)
-            {
-                model.ContentDto.Properties.Single(x => x.Id == p.Id).Value = p.Value;
-            }
-
+            //create the dto from the persisted model
+            model.ContentDto = MapFromPersisted(model);
+            
+            //now map all of the saved values to the dto
+            MapPropertyValuesFromSaved(model, model.ContentDto);
+            
             return model;
+        }
+
+        /// <summary>
+        /// we will now assign all of the values in the 'save' model to the DTO object
+        /// </summary>
+        /// <param name="saveModel"></param>
+        /// <param name="dto"></param>
+        private static void MapPropertyValuesFromSaved(ContentItemSave<TPersisted> saveModel, ContentItemDto<TPersisted> dto)
+        {          
+            foreach (var p in saveModel.Properties)
+            {
+                dto.Properties.Single(x => x.Alias == p.Alias).Value = p.Value;
+            }
         }
 
         protected abstract TPersisted GetExisting(ContentItemSave<TPersisted> model);
         protected abstract TPersisted CreateNew(ContentItemSave<TPersisted> model);
-        protected abstract ContentItemDto<TPersisted> Map(ContentItemSave<TPersisted> model);
+        protected abstract ContentItemDto<TPersisted> MapFromPersisted(ContentItemSave<TPersisted> model);
     }
 }

@@ -2,7 +2,7 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
 
     if ($routeParams.create) {
 
-        mediaResource.getContentScaffold($routeParams.id, $routeParams.doctype)
+        mediaResource.getScaffold($routeParams.id, $routeParams.doctype)
             .then(function (data) {
                 $scope.content = data;
             });

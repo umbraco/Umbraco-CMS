@@ -37,7 +37,7 @@ namespace Umbraco.Web.Editors
         /// Returns the allowed child content type objects for the content item id passed in
         /// </summary>
         /// <param name="contentId"></param>
-        public IEnumerable<object> GetAllowedChildrenForContent(int contentId)
+        public IEnumerable<object> GetAllowedChildren(int contentId)
         {
             var contentItem = Services.ContentService.GetById(contentId);
             if (contentItem == null)
@@ -50,6 +50,52 @@ namespace Umbraco.Web.Editors
                 .Select(x => Services.ContentTypeService.GetContentType(x.Id.Value))
                 .Select(x => _contentTypeModelMapper.ToContentTypeBasic(x));
             
+        }
+    }
+
+    /// <summary>
+    /// An API controller used for dealing with content types
+    /// </summary>
+    public class MediaTypeApiController : UmbracoAuthorizedApiController
+    {
+        private readonly MediaTypeModelMapper _mediaTypeModelMapper;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public MediaTypeApiController()
+            : this(UmbracoContext.Current, new MediaTypeModelMapper(UmbracoContext.Current.Application))
+        {
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        /// <param name="mediaModelMapper"></param>
+        internal MediaTypeApiController(UmbracoContext umbracoContext, MediaTypeModelMapper mediaModelMapper)
+            : base(umbracoContext)
+        {
+            _mediaTypeModelMapper = mediaModelMapper;
+        }
+
+        /// <summary>
+        /// Returns the allowed child content type objects for the content item id passed in
+        /// </summary>
+        /// <param name="contentId"></param>
+        public IEnumerable<object> GetAllowedChildren(int contentId)
+        {
+            var contentItem = Services.MediaService.GetById(contentId);
+            if (contentItem == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+
+            return contentItem.ContentType.AllowedContentTypes
+                .Select(x => Services.ContentTypeService.GetMediaType(x.Id.Value))
+                .Select(x => _mediaTypeModelMapper.ToMediaTypeBasic(x));
+
         }
     }
 }

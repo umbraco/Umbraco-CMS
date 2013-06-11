@@ -11,7 +11,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
     }
     /** internal method to get the api url */
     function getEmptyContentUrl(contentTypeAlias, parentId) {
-        return Umbraco.Sys.ServerVariables.contentApiBaseUrl + "GetEmptyContent?contentTypeAlias=" + contentTypeAlias + "&parentId=" + parentId;
+        return Umbraco.Sys.ServerVariables.contentApiBaseUrl + "GetEmpty?contentTypeAlias=" + contentTypeAlias + "&parentId=" + parentId;
     }
     /** internal method to get the api url for publishing */
     function getSaveUrl() {
@@ -49,7 +49,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /** returns an empty content object which can be persistent on the content service
             requires the parent id and the alias of the content type to base the scaffold on */
-        getContentScaffold: function (parentId, alias) {
+        getScaffold: function (parentId, alias) {
 
             var deferred = $q.defer();
 

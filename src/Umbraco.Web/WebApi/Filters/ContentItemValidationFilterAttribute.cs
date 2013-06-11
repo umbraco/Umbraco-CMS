@@ -104,7 +104,7 @@ namespace Umbraco.Web.WebApi.Filters
                 }
 
                 //get the posted value for this property
-                var postedValue = postedItem.Properties.Single(x => x.Id == p.Id).Value;
+                var postedValue = postedItem.Properties.Single(x => x.Alias == p.Alias).Value;
 
                 //get the pre-values for this property
                 var preValues = _applicationContext.Services.DataTypeService.GetPreValueAsString(p.DataType.Id);

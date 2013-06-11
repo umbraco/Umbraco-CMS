@@ -79,7 +79,7 @@ namespace Umbraco.Web.Editors
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
         /// <returns></returns>
-        public ContentItemDisplay GetEmptyContent(string contentTypeAlias, int parentId)
+        public ContentItemDisplay GetEmpty(string contentTypeAlias, int parentId)
         {
             var contentType = Services.ContentTypeService.GetContentType(contentTypeAlias);
             if (contentType == null)

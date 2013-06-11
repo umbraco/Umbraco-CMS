@@ -4,7 +4,7 @@ angular.module("umbraco")
 
 	    if ($routeParams.create) {
 
-	        contentResource.getContentScaffold($routeParams.id, $routeParams.doctype)
+	        contentResource.getScaffold($routeParams.id, $routeParams.doctype)
 	            .then(function (data) {
 	                $scope.content = data;
 	            });

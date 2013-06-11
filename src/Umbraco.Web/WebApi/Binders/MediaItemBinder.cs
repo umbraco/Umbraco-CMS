@@ -39,7 +39,7 @@ namespace Umbraco.Web.WebApi.Binders
             return new Core.Models.Media(model.Name, model.ParentId, contentType);
         }
 
-        protected override ContentItemDto<IMedia> Map(ContentItemSave<IMedia> model)
+        protected override ContentItemDto<IMedia> MapFromPersisted(ContentItemSave<IMedia> model)
         {
             return _mediaModelMapper.ToMediaItemDto(model.PersistedContent);
         }

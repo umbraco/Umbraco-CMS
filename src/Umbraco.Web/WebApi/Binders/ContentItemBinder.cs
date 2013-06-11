@@ -39,7 +39,7 @@ namespace Umbraco.Web.WebApi.Binders
             return new Content(model.Name, model.ParentId, contentType);     
         }
 
-        protected override ContentItemDto<IContent> Map(ContentItemSave<IContent> model)
+        protected override ContentItemDto<IContent> MapFromPersisted(ContentItemSave<IContent> model)
         {
             return _contentModelMapper.ToContentItemDto(model.PersistedContent);
         }

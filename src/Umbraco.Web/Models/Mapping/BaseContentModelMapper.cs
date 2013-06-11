@@ -149,7 +149,7 @@ namespace Umbraco.Web.Models.Mapping
                 var legacyResult = new TContentProperty
                     {
                         Id = property.Id,
-                        Value = property.Value.ToString(),
+                        Value = property.Value == null ? "" : property.Value.ToString(),
                         Alias = property.Alias
                     };
                 if (callback != null) callback(legacyResult, property, null);

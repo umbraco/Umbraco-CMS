@@ -7,7 +7,7 @@ function contentTypeResource($q, $http) {
 
     /** internal method to get the api url */
     function getChildContentTypesUrl(contentId) {
-        return Umbraco.Sys.ServerVariables.contentTypeApiBaseUrl + "GetAllowedChildrenForContent?contentId=" + contentId;
+        return Umbraco.Sys.ServerVariables.contentTypeApiBaseUrl + "GetAllowedChildren?contentId=" + contentId;
     }
 
     return {

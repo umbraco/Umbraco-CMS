@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -50,6 +51,24 @@ namespace Umbraco.Web.Editors
             : base(umbracoContext)
         {
             _mediaModelMapper = mediaModelMapper;
+        }
+
+        /// <summary>
+        /// Gets an empty content item for the 
+        /// </summary>
+        /// <param name="contentTypeAlias"></param>
+        /// <param name="parentId"></param>
+        /// <returns></returns>
+        public MediaItemDisplay GetEmpty(string contentTypeAlias, int parentId)
+        {
+            var contentType = Services.ContentTypeService.GetMediaType(contentTypeAlias);
+            if (contentType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var emptyContent = new Umbraco.Core.Models.Media("Empty", parentId, contentType);
+            return _mediaModelMapper.ToMediaItemDisplay(emptyContent);
         }
 
         /// <summary>
@@ -106,6 +125,9 @@ namespace Umbraco.Web.Editors
             // * we have a reference to the DTO object and the persisted object
 
             //Now, we just need to save the data
+
+            contentItem.PersistedContent.Name = contentItem.Name;
+            //TODO: We'll need to save the new template, publishat, etc... values here
 
             //Save the property values (for properties that have a valid editor ... not legacy)
             foreach (var p in contentItem.ContentDto.Properties.Where(x => x.PropertyEditor != null))
