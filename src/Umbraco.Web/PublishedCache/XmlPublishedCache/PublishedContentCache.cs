@@ -320,6 +320,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return xml.CreateNavigator();
         }
 
+        public virtual bool XPathNavigatorIsNavigable { get { return false; } }
+
         #endregion
 
         #region Legacy Xml
