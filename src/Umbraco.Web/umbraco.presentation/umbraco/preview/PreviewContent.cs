@@ -96,6 +96,8 @@ namespace umbraco.presentation.preview
                 //Inject preview xml
                 parentId = document.Level == 1 ? -1 : document.Parent.Id;
                 var previewXml = document.ToPreviewXml(XmlContent);
+                if (document.HasPendingChanges()) // HasPendingChanges is obsolete but what's the equivalent that wouldn't hit the DB?
+                    previewXml.Attributes.Append(XmlContent.CreateAttribute("isDraft"));
                 content.AppendDocumentXml(document.Id, document.Level, parentId, previewXml, XmlContent);
             }
 
@@ -103,7 +105,10 @@ namespace umbraco.presentation.preview
             {
                 foreach (var prevNode in documentObject.GetNodesForPreview(true))
                 {
-                    XmlContent = content.AppendDocumentXml(prevNode.NodeId, prevNode.Level, prevNode.ParentId, XmlContent.ReadNode(XmlReader.Create(new StringReader(prevNode.Xml))), XmlContent);
+                    var previewXml = XmlContent.ReadNode(XmlReader.Create(new StringReader(prevNode.Xml)));
+                    if (prevNode.IsDraft)
+                        previewXml.Attributes.Append(XmlContent.CreateAttribute("isDraft"));
+                    XmlContent = content.AppendDocumentXml(prevNode.NodeId, prevNode.Level, prevNode.ParentId, previewXml, XmlContent);
                 }
             }
 
