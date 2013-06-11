@@ -12,7 +12,12 @@
     <div ng-show="persistedFiles.length > 0">
         <p>Current files</p>
         <ul>
-            <li ng-repeat="file in persistedFiles">{{file}}</li>
+            <li ng-repeat="file in persistedFiles">
+                <div ng-switch on="file.isImage" >
+                    <img ng-src="{{getThumbnail(file)}}" ng-switch-when="true" alt="{{file.file}}"/>
+                    <span ng-switch-default>{{file.file}}</span>
+                </div>                
+            </li>
         </ul>
         <input type="checkbox" name="myPackage_clearFiles" ng-model="clearFiles" />
         <label for="myPackage_clearFiles">Clear files</label>

@@ -28,8 +28,7 @@ angular.module("umbraco")
 	        }
 	    };
 
-	    $scope.saveAndPublish = function (cnt) {
-	        cnt.publishDate = new Date();
+	    $scope.saveAndPublish = function (cnt) {	        
 	        contentResource.publishContent(cnt, $routeParams.create, $scope.files)
 	            .then(function(data) {
 	                $scope.content = data;
@@ -38,7 +37,6 @@ angular.module("umbraco")
 	    };
 
 	    $scope.save = function (cnt) {
-	        cnt.updateDate = new Date();
 	        contentResource.saveContent(cnt, $routeParams.create, $scope.files)
 	            .then(function (data) {
 	                $scope.content = data;

@@ -25,9 +25,18 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
             $scope.files.push({ id: propertyId, file: files[i] });
         }
     };
+    
+    //TODO: Clean this up and share this code with the content editor
+    $scope.saveAndPublish = function (cnt) {        
+        mediaResource.saveMedia(cnt, $routeParams.create, $scope.files)
+            .then(function (data) {
+                $scope.content = data;
+                notificationsService.success("Published", "Media has been saved and published");
+            });
+    };
 
-    $scope.save = function (cnt) {
-        cnt.updateDate = new Date();
+    //TODO: Clean this up and share this code with the content editor
+    $scope.save = function (cnt) {        
         mediaResource.saveMedia(cnt, $routeParams.create, $scope.files)
             .then(function (data) {
                 $scope.content = data;

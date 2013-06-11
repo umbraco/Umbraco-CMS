@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -21,6 +22,9 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
     /// </summary>
     internal class FileUploadValueEditor : ValueEditor
     {
+        //TODO: This needs to come from pre-values
+        private const string ThumbnailSizes = "100";
+
         /// <summary>
         /// Overrides the deserialize value so that we can save the file accordingly
         /// </summary>
@@ -106,9 +110,37 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
                         using (var fileStream = File.OpenRead(file.TempFilePath))
                         {
                             var umbracoFile = UmbracoFile.Save(fileStream, fileName);
-                            //add this to the persisted values
 
-                            newValue.Add(JObject.FromObject(new { file = umbracoFile.Url }));
+                            //create json to be saved
+                            var forPersisting = JObject.FromObject(new
+                                {
+                                    file = umbracoFile.Url,
+                                    isImage = false
+                                });
+
+
+                            if (umbracoFile.SupportsResizing)
+                            {
+                                forPersisting["isImage"] = true;
+
+                                // make default thumbnail
+                                umbracoFile.Resize(100, "thumb");
+
+                                // additional thumbnails configured as prevalues on the DataType
+                                char sep = (ThumbnailSizes.Contains("") == false && ThumbnailSizes.Contains(",")) ? ',' : ';';
+
+                                foreach (string thumb in ThumbnailSizes.Split(sep))
+                                {
+                                    int thumbSize;
+                                    if (thumb != "" && int.TryParse(thumb, out thumbSize))
+                                    {
+                                        umbracoFile.Resize(thumbSize, string.Format("thumb_{0}", thumbSize));
+                                    }
+                                }
+                            }
+                            
+                            //add this to the persisted values
+                            newValue.Add(forPersisting);
                         }
                         //now remove the temp file
                         File.Delete(file.TempFilePath);
@@ -116,13 +148,6 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
 
                     //TODO: We need to remove any files that were previously persisted but are no longer persisted. FOr example, if we
                     // uploaded 5 files before and then only uploaded 3, then the last two should be deleted.
-
-                    //NOTE: We will save a simple string if there is only one media item, this is mostly for backwards compatibility and for
-                    // the current media pickers to work.                    
-                    if (newValue.Count == 1)
-                    {
-                        return newValue[0]["file"].ToString();
-                    }
 
                     return newValue.ToString(Formatting.None);
                 }
