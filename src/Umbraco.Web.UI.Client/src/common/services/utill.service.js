@@ -14,9 +14,9 @@ function umbImageHelper() {
                 throw "The options objet does not contain the required parameters: imageModel, scope";
             }
 
-            if (options.imageModel.contentTypeAlias.toLowerCase() == "image") {
+            if (options.imageModel.contentTypeAlias.toLowerCase() === "image") {
                 var imageProp = _.find(options.imageModel.properties, function (item) {
-                    return item.alias == 'umbracoFile';
+                    return item.alias === 'umbracoFile';
                 });
                 var imageVal = options.scope.$eval(imageProp.value);
                 if (imageVal.length && imageVal.length >0 && imageVal[0].isImage) {
@@ -227,12 +227,14 @@ angular.module('umbraco.services').factory('umbFormHelper', umbFormHelper);
 function treeIconHelper() {
 
     var converter = [
-        { oldIcon: ".sprTreeFolder", newIcon: "icon-folder-close" },
-        { oldIcon: ".sprTreeFolder_o", newIcon: "icon-folder-open" },
-        { oldIcon: ".sprTreeMediaFile", newIcon: "icon-music" },
-        { oldIcon: ".sprTreeMediaMovie", newIcon: "icon-movie" },
-        { oldIcon: ".sprTreeMediaPhoto", newIcon: "icon-picture" }
-    ];
+            { oldIcon: ".sprTreeSettingDomain", newIcon: "icon-home" },
+            { oldIcon: ".sprTreeDoc", newIcon: "icon-file-alt" },
+            { oldIcon: ".sprTreeFolder", newIcon: "icon-folder-close" },
+            { oldIcon: ".sprTreeFolder_o", newIcon: "icon-folder-open" },
+            { oldIcon: ".sprTreeMediaFile", newIcon: "icon-music" },
+            { oldIcon: ".sprTreeMediaMovie", newIcon: "icon-movie" },
+            { oldIcon: ".sprTreeMediaPhoto", newIcon: "icon-picture" }
+        ];
 
     return {
         /** If the tree node has a legacy icon */
