@@ -2430,7 +2430,9 @@ xcopy "$(ProjectDir)"..\..\lib\SQLCE4\x86\*.* "$(TargetDir)x86\" /Y /F /E /D</Po
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>61637</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:61639</IISUrl>
+          <IISUrl>http://localhost:61644/Vdir</IISUrl>
+          <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
+          <IISAppRootUrl>http://localhost:61644/Vdir</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
