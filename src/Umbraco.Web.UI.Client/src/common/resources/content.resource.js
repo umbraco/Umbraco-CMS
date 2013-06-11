@@ -10,6 +10,14 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         return Umbraco.Sys.ServerVariables.contentApiBaseUrl + "GetById?id=" + contentId;
     }
     /** internal method to get the api url */
+    function getByIdsUrl(ids) {
+        var idQuery = "";
+        _.each(ids, function(item) {
+            idQuery += "ids=" + item + "&";
+        });
+        return Umbraco.Sys.ServerVariables.contentApiBaseUrl + "GetById?" + idQuery;
+    }
+    /** internal method to get the api url */
     function getEmptyContentUrl(contentTypeAlias, parentId) {
         return Umbraco.Sys.ServerVariables.contentApiBaseUrl + "GetEmpty?contentTypeAlias=" + contentTypeAlias + "&parentId=" + parentId;
     }
@@ -45,6 +53,22 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 });
 
             return deferred.promise; 
+        },
+        
+        getByIds: function (ids) {
+
+            var deferred = $q.defer();
+
+            //go and get the data
+            $http.get(getByIdsUrl(ids)).
+                success(function (data, status, headers, config) {                    
+                    deferred.resolve(data);
+                }).
+                error(function (data, status, headers, config) {
+                    deferred.reject('Failed to retreive data for content ids ' + ids);
+                });
+
+            return deferred.promise;
         },
 
         /** returns an empty content object which can be persistent on the content service

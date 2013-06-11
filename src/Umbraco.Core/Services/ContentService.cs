@@ -222,6 +222,19 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets an <see cref="IContent"/> object by Id
+        /// </summary>
+        /// <param name="ids">Ids of the Content to retrieve</param>
+        /// <returns><see cref="IContent"/></returns>
+        internal IEnumerable<IContent> GetByIds(IEnumerable<int> ids)
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(ids.ToArray());
+            }
+        }
+
+        /// <summary>
         /// Gets an <see cref="IContent"/> object by its 'UniqueId'
         /// </summary>
         /// <param name="key">Guid key of the Content to retrieve</param>

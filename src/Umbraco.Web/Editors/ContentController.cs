@@ -7,6 +7,7 @@ using System.Web.Http.ModelBinding;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
@@ -52,6 +53,13 @@ namespace Umbraco.Web.Editors
         {
             base.Initialize(controllerContext);
             controllerContext.Configuration.Formatters.Remove(controllerContext.Configuration.Formatters.XmlFormatter);
+        }
+
+        public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)
+        {
+            var foundContent = ((ContentService) Services.ContentService).GetByIds(ids);
+
+            return foundContent.Select(x => _contentModelMapper.ToContentItemDisplay(x));
         }
 
         /// <summary>
