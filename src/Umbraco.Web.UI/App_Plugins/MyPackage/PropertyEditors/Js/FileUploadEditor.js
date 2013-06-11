@@ -7,22 +7,42 @@ define(['namespaceMgr'], function () {
 
     MyPackage.PropertyEditors.FileUploadEditor = function ($scope, $element, $compile) {
         
+        /** Clears the file collections when content is saving (if we need to clear) or after saved */
+        function clearFiles() {
+            //TODO: There should be a better way! We don't want to have to know about the parent scope
+            //clear the parent files collection (we don't want to upload any!)
+            $scope.$parent.addFiles($scope.model.id, []);
+            //clear the current files
+            $scope.files = [];
+        }
+
+        //clear the current files
+        $scope.files = [];
         //create the property to show the list of files currently saved
         if ($scope.model.value != "") {
 
             //for legacy data, this will not be an array, just a string so convert to an array
             if (!$scope.model.value.startsWith('[')) {
-                $scope.model.value = "[file: '" + $scope.model.value + "']";
+                
+                //check if it ends with a common image extensions
+                var lowered = $scope.model.value.toLowerCase();
+                var isImage = false;
+                if (lowered.endsWith(".jpg") || lowered.endsWith(".gif") || lowered.endsWith(".jpeg") || lowered.endsWith(".png")) {
+                    isImage = true;
+                }
+                $scope.model.value = "[{\"file\": \"" + $scope.model.value + "\",\"isImage\":" + isImage +"}]";
             }
-            
-            $scope.persistedFiles = _.map(angular.fromJson($scope.model.value), function (item) {
-                return item.file;
-            });
+
+            $scope.persistedFiles = angular.fromJson($scope.model.value);
         }
         else {
             $scope.persistedFiles = [];
         }
-        
+
+        $scope.getThumbnail = function (file) {
+            var ext = file.file.substr(file.file.lastIndexOf('.'));
+            return file.file.substr(0, file.file.lastIndexOf('.')) + "_thumb" + ext;
+        };
 
         $scope.clearFiles = false;
 
@@ -30,22 +50,10 @@ define(['namespaceMgr'], function () {
         $scope.$watch("clearFiles", function(isCleared) {
             if (isCleared == true) {
                 $scope.model.value = "{clearFiles: true}";
+                clearFiles();
             }
             else {
                 $scope.model.value = "";
-            }
-        });
-
-        //listen for the saving event
-        $scope.$on("contentSaving", function() {
-            //if clear files is selected then we'll clear all the files that are about
-            // to be uploaded
-            if ($scope.clearFiles) {
-                //TODO: There should be a better way! We don't want to have to know about the parent scope
-                //clear the parent files collection (we don't want to upload any!)
-                $scope.$parent.addFiles($scope.model.id, []);
-                //clear the current files
-                $scope.files = [];
             }
         });
         

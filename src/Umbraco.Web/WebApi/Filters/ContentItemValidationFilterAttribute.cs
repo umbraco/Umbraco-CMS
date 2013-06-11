@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
@@ -96,8 +97,10 @@ namespace Umbraco.Web.WebApi.Filters
                 if (editor == null)
                 {
                     var message = string.Format("The property editor with id: {0} was not found for property with id {1}", p.DataType.ControlId, p.Id);
-                    actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
-                    return false;
+                    LogHelper.Warn<ContentItemValidationHelper<TPersisted>>(message);
+                    //actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
+                    //return false;
+                    continue;
                 }
 
                 //get the posted value for this property

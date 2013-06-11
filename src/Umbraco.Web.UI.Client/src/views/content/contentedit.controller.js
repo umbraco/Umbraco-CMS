@@ -28,15 +28,20 @@ angular.module("umbraco")
 	        }
 	    };
 
-	    $scope.saveAndPublish = function (cnt) {
-	        cnt.publishDate = new Date();
-	        contentResource.publishContent(cnt, $routeParams.create, $scope.files);
-	        notificationsService.success("Published", "Content has been saved and published");
+	    $scope.saveAndPublish = function (cnt) {	        
+	        contentResource.publishContent(cnt, $routeParams.create, $scope.files)
+	            .then(function(data) {
+	                $scope.content = data;
+	                notificationsService.success("Published", "Content has been saved and published");
+	            });	        
 	    };
 
 	    $scope.save = function (cnt) {
-	        cnt.updateDate = new Date();
-	        contentResource.saveContent(cnt, $routeParams.create, $scope.files);
-	        notificationsService.success("Saved", "Content has been saved");
+	        contentResource.saveContent(cnt, $routeParams.create, $scope.files)
+	            .then(function (data) {
+	                $scope.content = data;
+	                notificationsService.success("Saved", "Content has been saved");
+	            });
+	        
 	    };
 	});

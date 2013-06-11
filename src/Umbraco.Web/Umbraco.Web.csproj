@@ -434,7 +434,9 @@
     </Compile>
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="Editors\MediaController.cs" />
+    <Compile Include="WebApi\Binders\ContentItemBaseBinder.cs" />
     <Compile Include="WebApi\Binders\ContentItemBinder.cs" />
+    <Compile Include="WebApi\Binders\MediaItemBinder.cs" />
     <Compile Include="WebApi\Filters\ContentItemValidationFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\FileUploadCleanupFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\HttpQueryStringFilterAttribute.cs" />
