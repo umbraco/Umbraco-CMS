@@ -109,7 +109,7 @@ module.exports = function (grunt) {
             { dest: '<%= distdir %>/js', src : 'routes.js', expand: true, cwd: 'src/' }]
       },
       media: {
-        files: [{ dest: 'build/media', src : '*.*', expand: true, cwd: 'legacy_/media/' }]
+        files: [{ dest: 'build/media', src : '*.*', expand: true, cwd: 'media/' }]
       },
       sampleFiles: {
         files: [{ dest: '<%= distdir %>/js', src : '*.js', expand: true, cwd: 'src/sample files/' }]
