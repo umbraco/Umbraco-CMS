@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.Editors.RTEController", 
-    function($rootScope, $scope, dialogService, $log){
+    function($rootScope, $scope, dialogService, $log, umbImageHelper){
     require(
         [
             'tinymce'
@@ -33,15 +33,11 @@ angular.module("umbraco")
                                     //really simple example on how to intergrate a service with tinyMCE
                                     $(data.selection).each(function (i, img) {
 
-                                        var imageProperty = _.find(img.properties, function(item) {
-                                            return item.alias == 'umbracoFile';
-                                        });
-
-                                        var imageData = $scope.$eval(imageProperty.value);
+                                        var imagePropVal = umbImageHelper.getImagePropertyVaue({imageModel: img, scope: $scope});
 
                                         var data = {
-                                            src: (imageData != null && imageData.length && imageData.length > 0)
-                                                ? imageData[0].file
+                                            src: (imagePropVal != null && imagePropVal != "")
+                                                ? imagePropVal
                                                 : "nothing.jpg",
                                             style: 'width: 100px; height: 100px',
                                             id: '__mcenew'

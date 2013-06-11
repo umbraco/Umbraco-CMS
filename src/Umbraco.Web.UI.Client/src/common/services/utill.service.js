@@ -7,6 +7,31 @@
 **/
 function umbImageHelper() {
     return {
+        /** Returns the actual image path associated with the image property if there is one */
+        getImagePropertyVaue: function(options) {
+            if (!options && !options.imageModel && !options.scope) {
+                throw "The options objet does not contain the required parameters: imageModel, scope";
+            }
+            if (options.imageModel.contentTypeAlias.toLowerCase() == "image") {
+                var imageProp = _.find(options.imageModel.properties, function (item) {
+                    return item.alias == 'umbracoFile';
+                });
+                var imageVal;
+                //Legacy images will be saved as a string, not an array so we will convert the legacy values
+                // to our required structure.
+                if (imageProp.value.startsWith('[')) {
+                    imageVal = options.scope.$eval(imageProp.value);
+                }
+                else {
+                    imageVal = [{ file: imageProp.value, isImage: this.detectIfImageByExtension(imageProp.value) }];
+                }
+
+                if (imageVal.length && imageVal.length > 0 && imageVal[0].isImage) {
+                    return imageVal[0].file;
+                }
+            }
+            return "";
+        },
         /** formats the display model used to display the content to the model used to save the content */
         getThumbnail: function (options) {
             
@@ -14,20 +39,22 @@ function umbImageHelper() {
                 throw "The options objet does not contain the required parameters: imageModel, scope";
             }
 
-            if (options.imageModel.contentTypeAlias.toLowerCase() == "image") {
-                var imageProp = _.find(options.imageModel.properties, function (item) {
-                    return item.alias == 'umbracoFile';
-                });
-                var imageVal = options.scope.$eval(imageProp.value);
-                if (imageVal.length && imageVal.length >0 && imageVal[0].isImage) {
-                    return this.getThumbnailFromPath(imageVal[0].file);
-                }
+            var imagePropVal = this.getImagePropertyVaue(options);
+            if (imagePropVal != "") {
+                return this.getThumbnailFromPath(imagePropVal);
             }
             return "";
         },
         getThumbnailFromPath: function(imagePath) {
             var ext = imagePath.substr(imagePath.lastIndexOf('.'));
-            return imagePath.substr(0, imagePath.lastIndexOf('.')) + "_thumb" + ext;
+            return imagePath.substr(0, imagePath.lastIndexOf('.')) + "_thumb" + ".jpg";
+        },
+        detectIfImageByExtension: function(imagePath) {
+            var lowered = imagePath;
+            if (lowered.endsWith(".jpg") || lowered.endsWith(".gif") || lowered.endsWith(".jpeg") || lowered.endsWith(".png")) {
+                return true;
+            }
+            return false;
         }
     };
 }
