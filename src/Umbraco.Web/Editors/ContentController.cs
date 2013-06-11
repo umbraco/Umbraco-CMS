@@ -147,8 +147,17 @@ namespace Umbraco.Web.Editors
                 }
             }
             
-            //save the item
-            Services.ContentService.Save(contentItem.PersistedContent);
+            if (contentItem.Action == ContentSaveAction.Save || contentItem.Action == ContentSaveAction.SaveNew)
+            {
+                //save the item
+                Services.ContentService.Save(contentItem.PersistedContent);
+            }
+            else
+            {
+                //publish the item
+                Services.ContentService.SaveAndPublish(contentItem.PersistedContent);
+            }
+            
 
             //return the updated model
             return _contentModelMapper.ToContentItemDisplay(contentItem.PersistedContent);
