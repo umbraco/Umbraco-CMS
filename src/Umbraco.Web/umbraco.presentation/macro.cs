@@ -51,6 +51,7 @@ namespace umbraco
 
         /// <summary>Cache for <see cref="GetPredefinedXsltExtensions"/>.</summary>
         private static Dictionary<string, object> _predefinedExtensions;
+        private static XsltSettings _xsltSettings;
         private const string LoadUserControlKey = "loadUserControl";
         private readonly StringBuilder _content = new StringBuilder();
         private const string MacrosAddedKey = "macrosAdded";
@@ -59,6 +60,13 @@ namespace umbraco
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
+        }
+
+        static macro()
+        {
+            _xsltSettings = GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium
+                ? XsltSettings.TrustedXslt
+                : XsltSettings.Default;
         }
 
         #endregion
@@ -822,14 +830,7 @@ namespace umbraco
 
             try
             {
-                if (GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium)
-                {
-                    macroXslt.Load(xslReader, XsltSettings.TrustedXslt, xslResolver);
-                }
-                else
-                {
-                    macroXslt.Load(xslReader, XsltSettings.Default, xslResolver);
-                }
+                macroXslt.Load(xslReader, _xsltSettings, xslResolver);
             }
             finally
             {
