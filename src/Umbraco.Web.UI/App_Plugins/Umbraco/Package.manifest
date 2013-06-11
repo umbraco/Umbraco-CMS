@@ -4,14 +4,14 @@
 			id: "ec15c1e5-9d90-422a-aa52-4f7622c63bea",
 			name: "Textstring",
 			editor: {
-				view: "~/umbraco/Views/propertyeditors/umbraco/textstring/editor.html"				
+				view: "~/umbraco/Views/propertyeditors/umbraco/textstring/editor.html"
 			}
 		},
 		{
 			id: "67db8357-ef57-493e-91ac-936d305e0f2a",
-			name: "textarea",
+			name: "Textarea",
 			editor: {
-				view: "~/umbraco/Views/propertyeditors/umbraco/textarea/editor.html"				
+				view: "~/umbraco/Views/propertyeditors/umbraco/textarea/editor.html"
 			}
 		},
 		{
@@ -22,7 +22,7 @@
 			}
 		},
 		{
-			id: "67db8357-ef57-493e-91ac-936d305e0f2a",
+			id: "7e062c13-7c41-4ad9-b389-41d88aeef87c",
 			name: "Content Picker",
 			editor: {
 				view: "~/umbraco/Views/propertyeditors/umbraco/contentpicker/editor.html"				

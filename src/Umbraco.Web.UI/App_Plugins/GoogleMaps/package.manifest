@@ -1,0 +1,19 @@
+{    	
+	propertyEditors: [		
+		{
+			id: "0BA0F832-D759-4526-9B3E-94BBFC98F82E",
+			name: "Google Maps",
+			editor: {
+				view: "~/App_Plugins/GoogleMaps/PropertyEditors/Views/googlemaps.html"
+			}
+		}
+	],
+	config: {
+	    paths: {
+	        'googleMapsController': '~/App_Plugins/GoogleMaps/PropertyEditors/Js/googlemaps.controller'
+	    }
+	},
+	init: [
+	    'googleMapsController'
+	]
+}
