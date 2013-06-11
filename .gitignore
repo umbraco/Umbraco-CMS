@@ -57,7 +57,6 @@ src/Umbraco.Tests/config/404handlers.config
 src/Umbraco.Web.UI/Views/*.cshtml
 src/Umbraco.Web.UI/Views/*.vbhtml
 src/Umbraco.Tests/config/umbracoSettings.config
-src/Umbraco.Web.UI/App_Plugins/*
 src/Umbraco.Web.UI/Views/*
 src/packages/
 src/packages/repositories.config
