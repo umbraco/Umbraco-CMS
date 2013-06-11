@@ -37,8 +37,12 @@ angular.module("umbraco")
                                             return item.alias == 'umbracoFile';
                                         });
 
+                                        var imageData = $scope.$eval(imageProperty.value);
+
                                         var data = {
-                                            src: imageProperty != null ? imageProperty.value : "nothing.jpg",
+                                            src: (imageData != null && imageData.length && imageData.length > 0)
+                                                ? imageData[0].file
+                                                : "nothing.jpg",
                                             style: 'width: 100px; height: 100px',
                                             id: '__mcenew'
                                         };

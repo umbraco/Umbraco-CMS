@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Web.Models.ContentEditing;
@@ -123,7 +124,14 @@ namespace Umbraco.Web.Editors
                 var data = new ContentPropertyData(p.Value, d);
 
                 //get the deserialized value from the property editor
-                dboProperty.Value = p.PropertyEditor.ValueEditor.DeserializeValue(data, dboProperty.Value);
+                if (p.PropertyEditor == null)
+                {
+                    LogHelper.Warn<MediaController>("No property editor found for property " + p.Alias);
+                }
+                else
+                {
+                    dboProperty.Value = p.PropertyEditor.ValueEditor.DeserializeValue(data, dboProperty.Value);
+                }
             }
 
             //save the item

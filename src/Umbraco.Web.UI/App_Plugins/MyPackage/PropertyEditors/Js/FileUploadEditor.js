@@ -5,7 +5,7 @@ define(['namespaceMgr'], function () {
     
     Umbraco.Sys.registerNamespace("MyPackage.PropertyEditors");
 
-    MyPackage.PropertyEditors.FileUploadEditor = function ($scope, $element, $compile) {
+    MyPackage.PropertyEditors.FileUploadEditor = function ($scope, $element, $compile, umbImageHelper) {
         
         /** Clears the file collections when content is saving (if we need to clear) or after saved */
         function clearFiles() {
@@ -40,8 +40,7 @@ define(['namespaceMgr'], function () {
         }
 
         $scope.getThumbnail = function (file) {
-            var ext = file.file.substr(file.file.lastIndexOf('.'));
-            return file.file.substr(0, file.file.lastIndexOf('.')) + "_thumb" + ext;
+            return umbImageHelper.getThumbnailFromPath(file.file);            
         };
 
         $scope.clearFiles = false;

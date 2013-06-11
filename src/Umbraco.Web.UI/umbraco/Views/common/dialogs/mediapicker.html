@@ -37,11 +37,9 @@
 			               ng-click="selectMediaItem(image)" 
 			               prevent-default>
 							
-                            <div ng-switch on="image.isImage" >
-                                <img ng-src="{{image.thumbnail}}" ng-switch-when="true" alt="{{image.name}}"/>
-                                <span ng-switch-default>
-                                    <i class="icon-folder-close"></i>
-                                </span>
+                            <div ng-switch on="image.contentTypeAlias" >
+                                <img ng-src="{{image.thumbnail}}" ng-switch-when="Image" alt="{{image.name}}"/>
+                                <i ng-switch-default class="icon-folder-close"></i>
                             </div>       
 
 			                {{image.name}}

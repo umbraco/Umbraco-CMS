@@ -2,6 +2,39 @@
 
 /**
 * @ngdoc factory
+* @name umbraco.services:umbImageHelper
+* @description A helper object used for parsing image paths
+**/
+function umbImageHelper() {
+    return {
+        /** formats the display model used to display the content to the model used to save the content */
+        getThumbnail: function (options) {
+            
+            if (!options && !options.imageModel && !options.scope) {
+                throw "The options objet does not contain the required parameters: imageModel, scope";
+            }
+
+            if (options.imageModel.contentTypeAlias.toLowerCase() == "image") {
+                var imageProp = _.find(options.imageModel.properties, function (item) {
+                    return item.alias == 'umbracoFile';
+                });
+                var imageVal = options.scope.$eval(imageProp.value);
+                if (imageVal.length && imageVal.length >0 && imageVal[0].isImage) {
+                    return this.getThumbnailFromPath(imageVal[0].file);
+                }
+            }
+            return "";
+        },
+        getThumbnailFromPath: function(imagePath) {
+            var ext = imagePath.substr(imagePath.lastIndexOf('.'));
+            return imagePath.substr(0, imagePath.lastIndexOf('.')) + "_thumb" + ext;
+        }
+    };
+}
+angular.module('umbraco.services').factory('umbImageHelper', umbImageHelper);
+
+/**
+* @ngdoc factory
 * @name umbraco.services:umbRequestHelper
 * @description A helper object used for sending requests to the server
 **/
