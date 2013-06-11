@@ -14,7 +14,7 @@
         <ul class="thumbnails">
             <li class="thumbnail" ng-repeat="file in persistedFiles">
                 <div ng-switch on="file.isImage" >
-                    <img ng-src="{{getThumbnail(file)}}" ng-switch-when="true" alt="{{file.file}}"/>
+                    <img ng-src="{{file.thumbnail}}" ng-switch-when="true" alt="{{file.file}}"/>
                     <span ng-switch-default>{{file.file}}</span>
                 </div>                
             </li>

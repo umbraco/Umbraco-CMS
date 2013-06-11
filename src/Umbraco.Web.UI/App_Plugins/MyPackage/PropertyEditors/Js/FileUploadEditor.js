@@ -25,11 +25,7 @@ define(['namespaceMgr'], function () {
             if (!$scope.model.value.startsWith('[')) {
                 
                 //check if it ends with a common image extensions
-                var lowered = $scope.model.value.toLowerCase();
-                var isImage = false;
-                if (lowered.endsWith(".jpg") || lowered.endsWith(".gif") || lowered.endsWith(".jpeg") || lowered.endsWith(".png")) {
-                    isImage = true;
-                }
+                var isImage = umbImageHelper.detectIfImageByExtension($scope.model.value);                
                 $scope.model.value = "[{\"file\": \"" + $scope.model.value + "\",\"isImage\":" + isImage +"}]";
             }
 
@@ -39,9 +35,10 @@ define(['namespaceMgr'], function () {
             $scope.persistedFiles = [];
         }
 
-        $scope.getThumbnail = function (file) {
-            return umbImageHelper.getThumbnailFromPath(file.file);            
-        };
+        _.each($scope.persistedFiles, function(file) {
+            file.thumbnail = umbImageHelper.getThumbnailFromPath(file.file);
+        });
+        
 
         $scope.clearFiles = false;
 
