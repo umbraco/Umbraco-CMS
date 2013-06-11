@@ -56,7 +56,6 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         },
         
         getByIds: function (ids) {
-
             var deferred = $q.defer();
 
             //go and get the data

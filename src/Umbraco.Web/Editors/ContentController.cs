@@ -117,6 +117,9 @@ namespace Umbraco.Web.Editors
 
             //Now, we just need to save the data
 
+            contentItem.PersistedContent.Name = contentItem.Name;
+            //TODO: We'll need to save the new template, publishat, etc... values here
+
             //Save the property values
             foreach (var p in contentItem.ContentDto.Properties)
             {

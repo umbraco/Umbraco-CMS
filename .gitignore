@@ -78,3 +78,4 @@ src/Umbraco.Web.UI/umbraco/assets/*
 src/Umbraco.Web.UI.Client/build/*
 src/Umbraco.Web.UI.Client/build/*
 src/Umbraco.Web.UI.Client/build/belle/
+src/Umbraco.Web.UI/UserControls/
