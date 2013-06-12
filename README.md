@@ -11,7 +11,7 @@ For the first time on the Microsoft platform a free user and developer friendly 
 [More info at http://umbraco.org](http://umbraco.org)
 
 ## Downloading ##
-The downloadable Umbraco releases live at [http://our.umbraco.org/contribute/releases](Our Umbraco).
+The downloadable Umbraco releases live at [http://our.umbraco.org/contribute/releases](http://our.umbraco.org/contribute/releases).
 
 ## Forums ##
 We have a forum running on [http://our.umbraco.org](http://our.umbraco.org). The discussions area on CodePlex will be for discussions on developing the core, and not on Umbraco-implementations or extensions in general. For those topics, please use [http://our.umbraco.org](http://our.umbraco.org).
