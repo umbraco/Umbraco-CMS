@@ -6,15 +6,20 @@ Umbraco CMS
 
 ## Umbraco - the simple, flexible and friendly ASP.NET CMS ##
 
-**More than 177,000 sites trust Umbraco**  
-More than 177,000 sites trust Umbraco
-For the first time on the Microsoft platform a free user and developer friendly CMS that makes it quick and easy to create websites - or a breeze to build complex web applications. Umbraco has award-winning integration capabilities and supports your ASP.NET User and Custom Controls out of the box. It's a developers dream and your users will love it too. Used by more than 177,000 active websites including [http://daviscup.com](http://daviscup.com), [http://heinz.com](http://heinz.com), [http://peugeot.com](http://peugeot.com), [http://www.hersheys.com/](http://www.hersheys.com/) and **The Official ASP.NET and IIS.NET website from Microsoft** ([http://asp.net](http://asp.net) / [http://iis.net](http://iis.net)) you can be sure that the technology is proven, stable and scales.  
-[More info at http://umbraco.com](http://umbraco.com)
+**More than 177,000 sites trust Umbraco** 
+
+For the first time on the Microsoft platform a free user and developer friendly CMS that makes it quick and easy to create websites - or a breeze to build complex web applications. Umbraco has award-winning integration capabilities and supports your ASP.NET User and Custom Controls out of the box. It's a developers dream and your users will love it too. 
+
+Used by more than 177,000 active websites including [http://daviscup.com](http://daviscup.com), [http://heinz.com](http://heinz.com), [http://peugeot.com](http://peugeot.com), [http://www.hersheys.com/](http://www.hersheys.com/) and **The Official ASP.NET and IIS.NET website from Microsoft** ([http://asp.net](http://asp.net) / [http://iis.net](http://iis.net)) you can be sure that the technology is proven, stable and scales.  
+
+To view more examples please visit [http://umbraco.com/why-umbraco/#caseStudies](http://umbraco.com/why-umbraco/#caseStudies)
 
 ## Downloading ##
+
 The downloadable Umbraco releases live at [http://our.umbraco.org/contribute/releases](http://our.umbraco.org/contribute/releases).
 
 ## Forums ##
+
 We have a forum running on [http://our.umbraco.org](http://our.umbraco.org). The discussions group on [Google Groups](https://groups.google.com/forum/#!forum/umbraco-dev) is for discussions on developing the core, and not on Umbraco-implementations or extensions in general. For those topics, please use [http://our.umbraco.org](http://our.umbraco.org).
 
 ## Contribute to Umbraco ##
