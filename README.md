@@ -20,7 +20,7 @@ We have a forum running on [http://our.umbraco.org](http://our.umbraco.org). The
 
 If you want to contribute back to Umbraco you should check out our [guide to contributing](http://our.umbraco.org/contribute).
 
-## Submitting Issues ##
+## Found a bug? ##
 
 Another way you can contribute to Umbraco is by providing issue reports, for information on how to submit an issue report refer to our [online guide for reporting issues](http://our.umbraco.org/contribute/report-an-issue-or-request-a-feature).
 
