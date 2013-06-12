@@ -402,7 +402,7 @@ namespace Umbraco.Web.Cache
             {
                 DistributedCache.Instance.RefreshUserCache(sender.UserId);
             }
-            if (sender.Nodes.Any())
+            if (sender.NodeIds.Any())
             {
                 DistributedCache.Instance.RefreshAllUserCache();
             }
