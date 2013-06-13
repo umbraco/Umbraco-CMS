@@ -43,6 +43,7 @@ namespace Umbraco.Web
             //see: http://issues.umbraco.org/issue/U4-2059
             if (ApplicationContext.Current.OriginalRequestUrl.IsNullOrWhiteSpace())
             {
+                // the keepalive service will use that url
                 ApplicationContext.Current.OriginalRequestUrl = string.Format("{0}:{1}{2}", httpContext.Request.ServerVariables["SERVER_NAME"], httpContext.Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl(SystemDirectories.Umbraco));
             }
 
