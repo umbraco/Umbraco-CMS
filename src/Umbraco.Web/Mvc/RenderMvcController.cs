@@ -73,13 +73,13 @@ namespace Umbraco.Web.Mvc
 		/// <returns></returns>
 		protected bool EnsurePhsyicalViewExists(string template)
 		{
-			if (!System.IO.File.Exists(
-				Path.Combine(Server.MapPath(Constants.ViewLocation), template + ".cshtml")))
-			{
-				LogHelper.Warn<RenderMvcController>("No physical template file was found for template " + template);
-				return false;
-			}
-			return true;
+            var result = ViewEngines.Engines.FindView(ControllerContext, template, null);
+            if(result.View == null)
+            {
+                LogHelper.Warn<RenderMvcController>("No physical template file was found for template " + template);
+                return false;
+            }
+            return true;
 		}
 
 		/// <summary>
