@@ -249,7 +249,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var publishedState = ((Content) entity).PublishedState;
             //A new version should only be created if published state (or language) has changed
-            bool shouldCreateNewVersion = (((ICanBeDirty)entity).IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished) || ((ICanBeDirty)entity).IsPropertyDirty("Language");
+            bool shouldCreateNewVersion = ((Content)entity).Published || ((ICanBeDirty)entity).IsPropertyDirty("Language");
             if (shouldCreateNewVersion)
             {
                 //Updates Modified date and Version Guid
