@@ -44,6 +44,23 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IProfile GetProfileByUserName(string username)
+        {
+            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetProfileByUserName(username);
+            }
+        }
+
+        public IUser GetUserByUserName(string username)
+        {
+            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetUserByUserName(username);
+            }
+        }
+
+
         /// <summary>
         /// Gets an IUserType by its Alias
         /// </summary>

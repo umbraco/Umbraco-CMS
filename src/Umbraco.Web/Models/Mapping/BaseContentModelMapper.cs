@@ -12,12 +12,12 @@ namespace Umbraco.Web.Models.Mapping
     internal class BaseContentModelMapper
     {
         protected ApplicationContext ApplicationContext { get; private set; }
-        protected ProfileModelMapper ProfileMapper { get; private set; }
+        protected UserModelMapper UserMapper { get; private set; }
 
-        public BaseContentModelMapper(ApplicationContext applicationContext, ProfileModelMapper profileMapper)
+        public BaseContentModelMapper(ApplicationContext applicationContext, UserModelMapper userMapper)
         {
             ApplicationContext = applicationContext;
-            ProfileMapper = profileMapper;
+            UserMapper = userMapper;
         }
 
         protected ContentItemDto<TPersisted> ToContentItemDtoBase<TPersisted>(IContentBase content) 
@@ -86,7 +86,7 @@ namespace Umbraco.Web.Models.Mapping
             var result = new TContent
                 {
                     Id = content.Id,
-                    Owner = ProfileMapper.ToBasicUser(content.GetCreatorProfile()),
+                    Owner = UserMapper.ToUserBasic(content.GetCreatorProfile()),
                 
                     ParentId = content.ParentId,
                     UpdateDate = content.UpdateDate,

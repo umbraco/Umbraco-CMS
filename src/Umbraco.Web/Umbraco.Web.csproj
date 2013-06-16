@@ -292,6 +292,7 @@
     <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />
+    <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Editors\ContentController.cs" />
     <Compile Include="Editors\ContentTypeApiController.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
@@ -301,12 +302,13 @@
     <Compile Include="Models\ContentEditing\Tab.cs" />
     <Compile Include="Models\ContentEditing\TabbedContentItem.cs" />
     <Compile Include="Models\ContentEditing\UserBasic.cs" />
+    <Compile Include="Models\ContentEditing\UserDetail.cs" />
     <Compile Include="Models\Mapping\BaseContentModelMapper.cs" />
     <Compile Include="Models\Mapping\ContentModelMapper.cs" />
     <Compile Include="FormDataCollectionExtensions.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMapper.cs" />
     <Compile Include="Models\Mapping\MediaModelMapper.cs" />
-    <Compile Include="Models\Mapping\ProfileModelMapper.cs" />
+    <Compile Include="Models\Mapping\UserModelMapper.cs" />
     <Compile Include="Mvc\BackOfficeArea.cs" />
     <Compile Include="Trees\LegacyTreeApiController.cs" />
     <Compile Include="Trees\ISearchableTree.cs" />

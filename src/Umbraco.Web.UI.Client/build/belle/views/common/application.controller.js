@@ -83,11 +83,14 @@ angular.module('umbraco').controller("MainController",
     
 
     $scope.signin = function () {
-        $scope.authenticated = userService.authenticate($scope.login, $scope.password);
 
-        if($scope.authenticated){
-            $scope.user = userService.getCurrentUser();
-        }
+        userService.authenticate($scope.login, $scope.password)
+            .then(function(data) {
+                $scope.authenticated = data.authenticated;
+                $scope.user = data.user;
+            }, function(reason) {
+                alert(reason);
+            });
     };
 
     $scope.signout = function () {

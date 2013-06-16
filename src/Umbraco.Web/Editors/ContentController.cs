@@ -7,10 +7,12 @@ using System.Web.Http.ModelBinding;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
@@ -30,7 +32,7 @@ namespace Umbraco.Web.Editors
         /// Constructor
         /// </summary>
         public ContentController()
-            : this(UmbracoContext.Current, new ContentModelMapper(UmbracoContext.Current.Application, new ProfileModelMapper()))
+            : this(UmbracoContext.Current, new ContentModelMapper(UmbracoContext.Current.Application, new UserModelMapper()))
         {            
         }
 

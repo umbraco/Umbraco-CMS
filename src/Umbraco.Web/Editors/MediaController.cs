@@ -38,7 +38,7 @@ namespace Umbraco.Web.Editors
         /// Constructor
         /// </summary>
         public MediaController()
-            : this(UmbracoContext.Current, new MediaModelMapper(UmbracoContext.Current.Application, new ProfileModelMapper()))
+            : this(UmbracoContext.Current, new MediaModelMapper(UmbracoContext.Current.Application, new UserModelMapper()))
         {            
         }
 
