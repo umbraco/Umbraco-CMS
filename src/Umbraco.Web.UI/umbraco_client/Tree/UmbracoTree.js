@@ -206,6 +206,59 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                 this.setActiveTreeType(app);
 
+                if (app == "content" || app == "media") {
+                    // Reset the isAllowed cache when the content or media section is switched to.  This is to ensure that changes to
+                    //  the docuemnt types are imediatly reflected in isAllowed checkes and out of data data isn't causing problems. 
+                    var cache = new Array();
+                    this._debug("rebuildTree: adding draggable logic");
+                    // We need to pausee where for a few seconds to make sure the tree is initialised properly. 
+                    setTimeout(function () {
+                        // Make the content and media trees sortable.
+                        $("#JTree>ul").nestedSortable({
+                            listType: "ul",
+                            toleranceElement: '> a',
+                            handle: 'a',
+                            items: 'li',
+                            protectRoot: true,
+                            relocate: function (event, args) {
+                                // Show a confermation when moving documents. (This could be optinal with a config setting
+                                if (app == "media" || confirm("Are you sure you want to move the selected document?")) {
+                                    // Move the node and show a success/error message.
+                                    $.post('/umbraco/RestServices/Draggable/MoveNode',
+                                        { app: app, id: args.item.attr("id"), parent: args.item.parent().parent().attr("id"), index: args.item.index() })
+                                    .success(function (data) {
+                                        UmbSpeechBubble.ShowMessage(data.success ? "success" : "error", "Relocate Node", data.message)
+                                    })
+                                    .error(function (data) {
+                                        UmbSpeechBubble.ShowMessage("error", "Relocate Node", "The /Base call was not found.  Are you missing the backend .NET Code?");
+                                    });
+                                }
+                            },
+                            isAllowed: function (item, parent) {
+                                // Check to see if this content type is allowed here.  If not dont let the item move.
+                                if (typeof cache[parent.attr("id") + ":" + item.attr("id")] == "undefined") {
+                                    $.ajax({
+                                        url: '/umbraco/RestServices/Draggable/CanHaveNode',
+                                        type: 'GET',
+                                        async: false,
+                                        cache: false,
+                                        data: { app: app, id: item.attr("id"), parent: parent.attr("id") },
+                                        error: function () {
+                                            return false;
+                                        },
+                                        success: function (data) {
+                                            // Store the allowed status in a cache.
+                                            cache[parent.attr("id") + ":" + item.attr("id")] = data.success;
+                                        }
+                                    });
+                                }
+                                // use the cach to minimize excessive querieing.
+                                return cache[parent.attr("id") + ":" + item.attr("id")];
+                            }
+                        })
+                    }, 500);
+                }
+
                 if (saveData != null) {
                     this._debug("rebuildTree: rebuilding from cache: app = " + app);
 

@@ -16,6 +16,7 @@
 <umb:JsInclude ID="JsInclude7" runat="server" FilePath="Tree/jquery.tree.contextmenu.js" PathNameAlias="UmbracoClient" Priority="12"  />
 <umb:JsInclude ID="JsInclude12" runat="server" FilePath="Tree/jquery.tree.checkbox.js" PathNameAlias="UmbracoClient" Priority="12"  />
 <umb:JsInclude ID="JsInclude9" runat="server" FilePath="Tree/NodeDefinition.js" PathNameAlias="UmbracoClient" Priority="12"  />
+<umb:JsInclude ID="JsInclude13" runat="server" FilePath="Tree/jquery.mjs.nestedSortable.js" PathNameAlias="UmbracoClient" Priority="12" />
 <umb:JsInclude ID="JsInclude10" runat="server" FilePath="Tree/UmbracoTree.js" PathNameAlias="UmbracoClient" Priority="13" />
 
 
