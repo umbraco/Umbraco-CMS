@@ -150,7 +150,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public IProfile GetProfileByUserName(string username)
         {
             var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Username = username });
+            sql.Where("umbracoUser.userLogin = @Username", new { Username = username });
 
             var dto = Database.FirstOrDefault<UserDto>(sql);
 
@@ -163,7 +163,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public IUser GetUserByUserName(string username)
         {
             var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Username = username });
+            sql.Where("umbracoUser.userLogin = @Username", new { Username = username });
 
             var dto = Database.FirstOrDefault<UserDto>(sql);
             

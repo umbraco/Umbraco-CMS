@@ -12,7 +12,7 @@ namespace Umbraco.Web.Editors
     /// </summary>
     [PluginController("UmbracoApi")]
     [ValidationFilter]
-    public class AuthenticationController : UmbracoAuthorizedApiController
+    public class AuthenticationController : UmbracoApiController
     {
         private readonly UserModelMapper _userModelMapper;
 

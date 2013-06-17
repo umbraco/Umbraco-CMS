@@ -84,8 +84,8 @@ angular.module('umbraco').controller("MainController",
 
     //set properties
     $scope.authenticated = userService.authenticated;
-    $scope.login = "Hello";
-    $scope.password = "World";
+    $scope.login = "";
+    $scope.password = "";
 
     $scope.signin = function () {
 

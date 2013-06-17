@@ -40,7 +40,7 @@ angular.module('umbraco.services')
         logout: function () {
             $rootScope.$apply(function () {
                 authenticated = false;
-                jQuery.cookie('authed', null);
+                jQuery.cookie('UMB_UCONTEXT', null);
                 currentUser = undefined;
             });
         },

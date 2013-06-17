@@ -6,8 +6,8 @@
 function authResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     /** internal method to get the api url */
-    function getLoginUrl() {
-        return Umbraco.Sys.ServerVariables.authenticationApiBaseUrl + "PostLogin";
+    function getLoginUrl(username, password) {
+        return Umbraco.Sys.ServerVariables.authenticationApiBaseUrl + "PostLogin?username=" + username + "&password=" + password;
     }
     
 
@@ -16,7 +16,7 @@ function authResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
             var deferred = $q.defer();
             //send the data
-            $http.post(getLoginUrl(), {username: username, password: password}).
+            $http.post(getLoginUrl(username, password)).
                 success(function (data, status, headers, config) {                    
                     deferred.resolve(data);
                     
