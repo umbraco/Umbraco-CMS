@@ -80,7 +80,12 @@ angular.module('umbraco').controller("MainController",
     var d = new Date();
     var weekday = new Array("Super Sunday", "Manic Monday", "Tremendous Tuesday", "Wonderfull Wednesday", "Thunder Thursday", "Friendly Friday", "Shiny Saturday");
     $scope.today = weekday[d.getDay()];
-    
+
+
+    //set properties
+    $scope.authenticated = userService.authenticated;
+    $scope.login = "";
+    $scope.password = "";
 
     $scope.signin = function () {
 
@@ -97,7 +102,6 @@ angular.module('umbraco').controller("MainController",
         userService.signout();
         $scope.authenticated = false;
     };
-    
 
     //subscribes to notifications in the notification service
     $scope.notifications = notificationsService.current;
@@ -120,7 +124,7 @@ angular.module('umbraco').controller("MainController",
         }
     };
 
-    if (userService.authenticated) {
+    if ($scope.authenticated) {
         $scope.signin();
     }
 });
