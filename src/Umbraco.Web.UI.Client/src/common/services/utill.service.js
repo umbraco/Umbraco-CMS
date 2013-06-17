@@ -254,12 +254,14 @@ angular.module('umbraco.services').factory('umbFormHelper', umbFormHelper);
 function treeIconHelper() {
 
     var converter = [
-        { oldIcon: ".sprTreeFolder", newIcon: "icon-folder-close" },
-        { oldIcon: ".sprTreeFolder_o", newIcon: "icon-folder-open" },
-        { oldIcon: ".sprTreeMediaFile", newIcon: "icon-music" },
-        { oldIcon: ".sprTreeMediaMovie", newIcon: "icon-movie" },
-        { oldIcon: ".sprTreeMediaPhoto", newIcon: "icon-picture" }
-    ];
+                { oldIcon: ".sprTreeSettingDomain", newIcon: "icon-home" },
+                { oldIcon: ".sprTreeDoc", newIcon: "icon-file-alt" },
+                { oldIcon: ".sprTreeFolder", newIcon: "icon-folder-close" },
+                { oldIcon: ".sprTreeFolder_o", newIcon: "icon-folder-open" },
+                { oldIcon: ".sprTreeMediaFile", newIcon: "icon-music" },
+                { oldIcon: ".sprTreeMediaMovie", newIcon: "icon-movie" },
+                { oldIcon: ".sprTreeMediaPhoto", newIcon: "icon-picture" }
+            ];
 
     return {
         /** If the tree node has a legacy icon */
