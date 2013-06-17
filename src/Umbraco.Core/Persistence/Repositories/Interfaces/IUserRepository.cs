@@ -7,5 +7,6 @@ namespace Umbraco.Core.Persistence.Repositories
         IProfile GetProfileById(int id);
         IProfile GetProfileByUserName(string username);
         IUser GetUserByUserName(string username);
+        IUser GetUserById(int id);
     }
 }

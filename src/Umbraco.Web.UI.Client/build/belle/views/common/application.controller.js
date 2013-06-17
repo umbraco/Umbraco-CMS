@@ -74,7 +74,7 @@ angular.module('umbraco').controller("DashboardController", function ($scope, $r
 
 //handles authentication and other application.wide services
 angular.module('umbraco').controller("MainController", 
-    function ($scope, $routeParams, $rootScope, notificationsService, userService, navigationService) {
+    function ($scope, $routeParams, $rootScope, $timeout, notificationsService, userService, navigationService) {
     
     //also be authed for e2e test
     var d = new Date();
@@ -82,8 +82,8 @@ angular.module('umbraco').controller("MainController",
     $scope.today = weekday[d.getDay()];
 
 
-    //set properties
-    $scope.authenticated = userService.authenticated;
+    //set default properties
+    $scope.authenticated = null; //the null is important because we do an explicit bool check on this in the view    
     $scope.login = "";
     $scope.password = "";
 
@@ -123,8 +123,15 @@ angular.module('umbraco').controller("MainController",
             navigationService.hideNavigation();
         }
     };
-
-    if ($scope.authenticated) {
-        $scope.signin();
-    }
+        
+    //fetch the authorized status         
+    userService.isAuthenticated()
+            .then(function (data) {
+                $scope.authenticated = data.authenticated;
+                $scope.user = data.user;
+            }, function (reason) {
+                alert("An error occurred checking authentication.");
+                $scope.authenticated = false;
+                $scope.user = null;
+            });
 });

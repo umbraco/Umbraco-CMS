@@ -19,6 +19,13 @@ namespace Umbraco.Web.Security
     /// </summary>
     public class WebSecurity
     {
+        private readonly HttpContextBase _httpContext;
+
+        public WebSecurity(HttpContextBase httpContext)
+        {
+            _httpContext = httpContext;
+        }
+
         /// <summary>
         /// Returns true or false if the currently logged in member is authorized based on the parameters provided
         /// </summary>
@@ -288,10 +295,9 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Validates the current user
         /// </summary>
-        /// <param name="httpContext"></param>
         /// <param name="throwExceptions">set to true if you want exceptions to be thrown if failed</param>
         /// <returns></returns>
-        internal ValidateRequestAttempt ValidateCurrentUser(HttpContextBase httpContext, bool throwExceptions = false)
+        internal ValidateRequestAttempt ValidateCurrentUser(bool throwExceptions = false)
         {
             if (UmbracoUserContextId != "")
             {
@@ -303,7 +309,7 @@ namespace Umbraco.Web.Security
                     var user = User.GetUser(uid);
 
                     // Check for console access
-                    if (user.Disabled || (user.NoConsole && GlobalSettings.RequestIsInUmbracoApplication(httpContext) && GlobalSettings.RequestIsLiveEditRedirector(httpContext) == false))
+                    if (user.Disabled || (user.NoConsole && GlobalSettings.RequestIsInUmbracoApplication(_httpContext) && GlobalSettings.RequestIsLiveEditRedirector(_httpContext) == false))
                     {
                         if (throwExceptions) throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
                         return ValidateRequestAttempt.FailedNoPrivileges;
@@ -321,18 +327,17 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Authorizes the full request, checks for SSL and validates the current user
         /// </summary>
-        /// <param name="httpContext"></param>
         /// <param name="throwExceptions">set to true if you want exceptions to be thrown if failed</param>
         /// <returns></returns>
-        internal ValidateRequestAttempt AuthorizeRequest(HttpContextBase httpContext, bool throwExceptions = false)
+        internal ValidateRequestAttempt AuthorizeRequest(bool throwExceptions = false)
         {
             // check for secure connection
-            if (GlobalSettings.UseSSL && httpContext.Request.IsSecureConnection == false)
+            if (GlobalSettings.UseSSL && _httpContext.Request.IsSecureConnection == false)
             {
                 if (throwExceptions) throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
                 return ValidateRequestAttempt.FailedNoSsl;
             }
-            return ValidateCurrentUser(httpContext, throwExceptions);
+            return ValidateCurrentUser(throwExceptions);
         }
 
         /// <summary>

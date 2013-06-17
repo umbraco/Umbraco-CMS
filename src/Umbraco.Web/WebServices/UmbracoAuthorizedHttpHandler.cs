@@ -97,7 +97,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         protected bool AuthorizeRequest(bool throwExceptions = false)
         {
-            var result = Security.AuthorizeRequest(new HttpContextWrapper(HttpContext.Current), throwExceptions);
+            var result = Security.AuthorizeRequest(throwExceptions);
             return result == ValidateRequestAttempt.Success;
         }
 
@@ -110,7 +110,7 @@ namespace Umbraco.Web.WebServices
             {
                 if (!_hasValidated)
                 {
-                    Security.ValidateCurrentUser(new HttpContextWrapper(HttpContext.Current));
+                    Security.ValidateCurrentUser();
                     _hasValidated = true;
                 }
                 return Security.CurrentUser;

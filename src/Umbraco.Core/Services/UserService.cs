@@ -60,6 +60,14 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IUser GetUserById(int id)
+        {
+            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetUserById(id);
+            }
+        }
+
 
         /// <summary>
         /// Gets an IUserType by its Alias

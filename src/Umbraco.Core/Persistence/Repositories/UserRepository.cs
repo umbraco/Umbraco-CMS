@@ -175,8 +175,32 @@ namespace Umbraco.Core.Persistence.Repositories
                     Id = dto.Id,
                     Email = dto.Email,
                     Language = dto.UserLanguage,
-                    Name = dto.UserName
+                    Name = dto.UserName,
+                    NoConsole = dto.NoConsole,
+                    IsLockedOut = dto.Disabled
                 };
+
+        }
+
+        public IUser GetUserById(int id)
+        {
+            var sql = GetBaseQuery(false);
+            sql.Where(GetBaseWhereClause(), new { Id = id });
+
+            var dto = Database.FirstOrDefault<UserDto>(sql);
+
+            if (dto == null)
+                return null;
+
+            return new User(_userTypeRepository.Get(dto.Type))
+            {
+                Id = dto.Id,
+                Email = dto.Email,
+                Language = dto.UserLanguage,
+                Name = dto.UserName,
+                NoConsole = dto.NoConsole,
+                IsLockedOut = dto.Disabled
+            };
 
         }
 

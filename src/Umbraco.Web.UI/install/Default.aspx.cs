@@ -63,7 +63,7 @@ namespace Umbraco.Web.UI.Install
             // It's not considered an upgrade if the ConfigurationStatus is missing or empty.
             if (string.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus) == false)
             {
-                var result = Security.ValidateCurrentUser(new HttpContextWrapper(Context));
+                var result = Security.ValidateCurrentUser();
                 
                 if (result == ValidateRequestAttempt.FailedTimedOut || result == ValidateRequestAttempt.FailedNoPrivileges)
                 {
