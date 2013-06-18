@@ -1,12 +1,5 @@
 ﻿{    	
-	propertyEditors: [		
-		{
-			id: "ec15c1e5-9d90-422a-aa52-4f7622c63bea",
-			name: "Textstring",
-			editor: {
-				view: "~/umbraco/Views/propertyeditors/umbraco/textstring/editor.html"
-			}
-		},
+	propertyEditors: [				
 		{
 			id: "67db8357-ef57-493e-91ac-936d305e0f2a",
 			name: "Textarea",

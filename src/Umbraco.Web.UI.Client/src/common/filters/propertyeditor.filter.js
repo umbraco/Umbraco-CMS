@@ -17,7 +17,7 @@ function propertyEditorFilter($log) {
             return path;
         }
         else {
-            return "views/propertyeditors/" + path.replace('.', '/') + "/editor.html";
+            return "views/propertyeditors/umbraco/" + path.replace('.', '/') + "/editor.html";
         }       
     };
 }

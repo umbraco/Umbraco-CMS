@@ -40,7 +40,7 @@ namespace Umbraco.Web.Models.Mapping
 
         public UserBasic ToUserBasic(IProfile profile)
         {
-            return Mapper.Map<UserDetail>(profile);
+            return Mapper.Map<UserBasic>(profile);
         }
     }
 }
