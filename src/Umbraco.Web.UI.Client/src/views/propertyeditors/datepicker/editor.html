@@ -1,0 +1,6 @@
+<div ng-controller="Umbraco.Editors.DatepickerController">
+	<div class="input-append date datepicker" id="{{model.alias}}">
+		<input data-format="dd/MM/yyyy" type="text" value="{{model.value | date:'dd/MM/yyyy'}}" />
+		<span class="add-on"> <i class="icon-calendar"></i></span>
+	</div>
+</div>
