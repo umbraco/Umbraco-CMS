@@ -56,7 +56,17 @@
       
     
     </cc2:Pane>
-    
+
+    <cc2:Pane ID="pane_versions" runat="server" Text="Package version history" Visible="false">
+        <cc2:PropertyPanel ID="pp_versions" runat="server">
+            <asp:Repeater ID="rptr_versions" runat="server">
+                <HeaderTemplate><ul></HeaderTemplate>
+                <ItemTemplate><li><a href="installedPackage.aspx?id=<%# ((umbraco.cms.businesslogic.packager.InstalledPackage)Container.DataItem).Data.Id %>"><%# ((umbraco.cms.businesslogic.packager.InstalledPackage)Container.DataItem).Data.Version %></a></li></ItemTemplate>
+                <FooterTemplate></ul></FooterTemplate>
+            </asp:Repeater>
+        </cc2:PropertyPanel>
+    </cc2:Pane>
+
     <cc2:Pane ID="pane_options" runat="server" Text="Package options">
         <table border="0" style="width: 100%;">
         <tr><td class="propertyHeader" valign="top">

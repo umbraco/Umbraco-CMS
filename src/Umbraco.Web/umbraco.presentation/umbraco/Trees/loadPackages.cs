@@ -1,27 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.IO;
+using System.Linq;
 using System.Text;
 using System.Web;
 using System.Xml;
-using System.Configuration;
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
 using umbraco.businesslogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.contentitem;
-using umbraco.cms.businesslogic.datatype;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.media;
-using umbraco.cms.businesslogic.member;
-using umbraco.cms.businesslogic.property;
-using umbraco.cms.businesslogic.web;
-using umbraco.interfaces;
-using umbraco.DataLayer;
-using umbraco.BusinessLogic.Utils;
+using umbraco.cms.businesslogic.packager;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 
@@ -64,18 +48,24 @@ namespace umbraco
             switch (m_packageType)
             {
                 case "installed":
-                    foreach (cms.businesslogic.packager.InstalledPackage p in cms.businesslogic.packager.InstalledPackage.GetAllInstalledPackages())
+                    Version v;
+                    // Display the unique packages, ordered by the latest version number. [LK 2013-06-10]
+                    var uniquePackages = InstalledPackage.GetAllInstalledPackages()
+                        .OrderByDescending(x => Version.TryParse(x.Data.Version, out v) ? v : new Version())
+                        .GroupBy(x => x.Data.Name)
+                        .Select(x => x.First())
+                        .OrderBy(x => x.Data.Id);
+                    foreach (var p in uniquePackages)
                     {
-                        XmlTreeNode xNode = XmlTreeNode.Create(this);
-                        xNode.NodeID = PACKAGE_TREE_PREFIX + p.Data.Id.ToString();
+                        var xNode = XmlTreeNode.Create(this);
+                        xNode.NodeID = string.Concat(PACKAGE_TREE_PREFIX, p.Data.Id);
                         xNode.Text = p.Data.Name;
-                        xNode.Action = "javascript:openInstalledPackage('" + p.Data.Id.ToString() + "');";
+                        xNode.Action = string.Format("javascript:openInstalledPackage('{0}');", p.Data.Id);
                         xNode.Icon = "package.gif";
                         xNode.OpenIcon = "package.gif";
                         xNode.NodeType = "createdPackageInstance";
                         xNode.Menu = null;
                         tree.Add(xNode);
-
                     }
                     break;
 
