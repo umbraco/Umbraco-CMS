@@ -105,8 +105,8 @@ module.exports = function (grunt) {
       },
       app: {
         files: [
-            { dest: '<%= distdir %>/js', src : 'main.js', expand: true, cwd: 'src/' },
-            { dest: '<%= distdir %>/js', src : 'routes.js', expand: true, cwd: 'src/' }]
+            { dest: '<%= distdir %>/js', src : '*.js', expand: true, cwd: 'src/' }
+            ]
       },
       media: {
         files: [{ dest: 'build/media', src : '*.*', expand: true, cwd: 'media/' }]
@@ -130,73 +130,37 @@ module.exports = function (grunt) {
           process: true
         }
       },
-      app: {
-        src: ['src/app.js'],
-        dest: '<%= distdir %>/js/app.js',
-        options:{
-          banner: "<%= banner %>'use strict';\ndefine(['angular'], function (angular) {\n",
-          footer: "\n\nreturn app;\n});"
-        }
-      },
-      appDev: {
-          src: ['src/app_dev.js'],
-          dest: '<%= distdir %>/js/app_dev.js',
-          options: {
-              banner: "<%= banner %>'use strict';\ndefine(['angular'], function (angular) {\n",
-              footer: "\n\nreturn app;\n});"
-          }
-      },
       angular: {
         src:['vendor/angular/angular.min.js'],
         dest: '<%= distdir %>/lib/angular/angular.min.js'
       },
       controllers: {
         src:['src/views/**/*.controller.js'],
-        dest: '<%= distdir %>/js/umbraco.controllers.js',
-        options:{
-          banner: "'use strict';\n<%= banner %>\ndefine(['app', 'angular'], function (app, angular) {\n",
-          footer: "\n\nreturn angular;\n});"
-        }
+        dest: '<%= distdir %>/js/umbraco.controllers.js'
       },
       services: {
         src:['src/common/services/*.js'],
-        dest: '<%= distdir %>/js/umbraco.services.js',
-        options:{
-          banner: "'use strict';\ndefine(['app','angular'], function (app, angular) {\n",
-          footer: "\n\nreturn angular;\n});"
-        }
+        dest: '<%= distdir %>/js/umbraco.services.js'
+      },
+      security: {
+        src:['src/common/security/*.js'],
+        dest: '<%= distdir %>/js/umbraco.security.js'
       },
       resources: {
         src:['src/common/resources/*.js'],
-        dest: '<%= distdir %>/js/umbraco.resources.js',
-        options:{
-          banner: "<%= banner %>'use strict';\ndefine(['app', 'angular'], function (app, angular) {\n",
-          footer: "\n\nreturn angular;\n});"
-        }
+        dest: '<%= distdir %>/js/umbraco.resources.js'
       },
       mocks: {
         src:['src/common/mocks/**/*.js'],
-        dest: '<%= distdir %>/js/umbraco.mocks.js',
-        options:{
-          banner: "<%= banner %>'use strict';\ndefine(['app', 'angular'], function (app, angular) {\n",
-          footer: "\n\nreturn angular;\n});"
-        }
+        dest: '<%= distdir %>/js/umbraco.mocks.js'
       },
       directives: {
         src:['src/common/directives/*.js'],
-        dest: '<%= distdir %>/js/umbraco.directives.js',
-        options:{
-          banner: "<%= banner %>'use strict';\ndefine(['app','angular','underscore'], function (app, angular,_) {\n",
-          footer: "\n\nreturn angular;\n});"
-        }
+        dest: '<%= distdir %>/js/umbraco.directives.js'
       },
       filters: {
         src:['src/common/filters/*.js'],
-        dest: '<%= distdir %>/js/umbraco.filters.js',
-        options:{
-          banner: "<%= banner %>'use strict';\ndefine([ 'app','angular'], function (app,angular) {\n",
-          footer: "\n\nreturn app;\n});"
-        }
+        dest: '<%= distdir %>/js/umbraco.filters.js'
       }
     },
 

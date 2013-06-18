@@ -10,6 +10,8 @@ require.config({
     angular: '../lib/angular/angular.min',
     angularResource: '../lib/angular/angular-resource',
     
+    app: 'app_dev',
+
     codemirror: '../lib/codemirror/js/lib/codemirror',
     codemirrorJs: '../lib/codemirror/js/mode/javascript/javascript',
     codemirrorCss: '../lib/codemirror/js/mode/css/css',
@@ -57,6 +59,7 @@ require( [
   'umbraco.directives',
   'umbraco.filters',
   'umbraco.services',
+  'umbraco.security',
   'umbraco.controllers',
   'routes'
   ], function(angular, app, jQuery) {
@@ -68,4 +71,5 @@ require( [
   jQuery(document).ready(function () {
     angular.bootstrap(document, ['umbraco']);
   });
+  
 });

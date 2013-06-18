@@ -14,9 +14,8 @@
 
         <umb-left-column></umb-left-column>
 
-        <section id="Section1">
-            <div id="Div2">
-                {{ui | json}}
+        <section id="contentwrapper">
+            <div id="contentcolumn">
                 <div ng-view></div>
             </div>
         </section>
@@ -25,7 +24,8 @@
     <umb-login></umb-login>
     <umb-notifications></umb-notifications>
 
-    <script data-main="js/main" src="lib/require/require-2.1.0.js"></script>
 
+<script src="lib/yepnope/yepnope.min.js"></script>
+<script src="js/loader.js"></script>
 </body>
 </html>

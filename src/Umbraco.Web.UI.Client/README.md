@@ -8,22 +8,11 @@ Slides from the initial demonstration of Belle done at the Umbraco DK Fest can b
 http://rawgithub.com/umbraco/Belle/master/Presentation/index.html
   
 
-##Running the prebuilt site
+##Running the site with mocked data
 
-###Windows
-Right-click the `/build` folder and choose "open in webmatrix", run the website in webmatrix and browse to `localhost:xxxx/Belle/`, this should display the Belle login screen
+This won't require any database or setup, as everything is running through node. All you have to do is install 
+node and grunt on either windows or OSX and the entire setup is ready for you.
 
-###OSX
-Open a terminal inside the "/build" folder and run the command:
-
-	python -m SimpleHTTPServer 8080
-
-This will start a local webserver, hosting the site on `localhost:8080` browse to localhost:8080/Belle/ which should display the belle login screen.
-
-##Uing the dev environment
-_The dev environment is tad more tricky to get running, since it depends on a number of unit tests and automated tools, to produce the contents of the /build folder_
-
-_The dev environment is cross platform, so will work on both osx and windows, and do not currently have any dependencies to .net_
 
 ###Install node.js
 We need node to run tests and automated less compiling and other automated tasks. go to http://nodejs.org. Node.js is a powerfull javascript engine, which allows us to run all our tests and tasks written in javascript locally.
@@ -54,14 +43,10 @@ So run the command:
 
 Now that you have node and grunt installed, you can open `/Umbraco.Belle.Client` in either `cmd.exe` or terminal and run: 
 
-	grunt
+	grunt dev
 
-This will build the site, merge less files, run tests and create the /Build folder.
-
-###Automated builds and tests
-If you prefer to do test-driven developement, or just dont want to manually run `grunt` on every change, you can simply tell grunt to watch for any changes made in the project, by running:
-
-	grunt watch
+This will build the site, merge less files, run tests and create the /Build folder, and finally open the site in your
+browser.
 
 
 ##Limitations
@@ -86,14 +71,15 @@ conventions:
 
 ###Files
 - */belle/js/app.js:* Main umbraco application / modules
-- */belle/js/main.js:* require.js configuration for dependencies
+- */belle/js/loader.js:* yepnope configuration for dependencies
 - */belle/js/routes.js:* Application routes
 - */belle/js/umbraco.controllers.js:* Application controllers
 - */belle/js/umbraco.services.js:* Application services
+- */belle/js/umbraco.filters.js:* Application filters
 - */belle/js/umbraco.directives.js:* Application directives
 - */belle/js/umbraco.resources.js:* Application resources, like content, media, users, members etc
-
-
+- */belle/js/umbraco.mocks.js:* Fake Application resources, for running the app without a server
+ 
 ##Getting started
 The current app is built, following conventions from angularJs and bootstrap. To get started with the applicaton you will need to atleast know the basics of these frameworks 
 

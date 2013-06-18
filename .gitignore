@@ -4,6 +4,8 @@
 *.aps
 *.pch
 *.vspscc
+.DS_Store
+._.DS_Store
 [Bb]in
 [Db]ebug*/
 obj/
@@ -65,11 +67,14 @@ src/Umbraco.Web.UI/[Ww]eb.config
 webpihash.txt
 
 node_modules
+
 src/Umbraco.Web.UI/[Uu]mbraco/[Ll]ib/*
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/umbraco.*
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/routes.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/main.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/app.js
+
+src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/
 src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/**/*.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/**/*.css
 src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/**/*.html
@@ -79,3 +84,4 @@ src/Umbraco.Web.UI.Client/[Bb]uild/[Bb]elle/
 src/Umbraco.Web.UI/[Uu]ser[Cc]ontrols/
 build/_BuildOutput/
 src/Umbraco.Web.UI.Client/src/[Ll]ess/*.css
+

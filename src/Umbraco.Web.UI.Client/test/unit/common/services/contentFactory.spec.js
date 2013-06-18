@@ -11,10 +11,10 @@ describe('content factory tests', function () {
     describe('global content factory crud', function () {
 
         it('should return a content object, given an id', function () {
-            var doc1 = contentFactory.getContent(1234);
-
-            expect(doc1).toNotBe(undefined);
-            expect(doc1.id).toBe(1234);
+            var doc1 = contentFactory.getById(1234).then(function(doc1){
+                expect(doc1).toNotBe(undefined);
+                expect(doc1.id).toBe(1234);    
+            });
         });
 
         it('should return a content children collection given an id', function () {
