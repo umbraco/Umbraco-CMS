@@ -16,7 +16,7 @@ function _getNode(id){
                         id: 0,
                         active: true,
                         properties: [
-                        { alias: "list", label: "List", view: "umbraco.listview", value: "", hideLabel: true }
+                        { alias: "list", label: "List", view: "listview", value: "", hideLabel: true }
                         ]
                     },
                     {
@@ -24,11 +24,11 @@ function _getNode(id){
                         alias: "tab01",
                         id: 1,
                         properties: [
-                            { alias: "bodyText", label: "Body Text", description:"Here you enter the primary article contents", view: "umbraco.rte", value: "<p>askjdkasj lasjd</p>" },
-                            { alias: "textarea", label: "textarea", view: "umbraco.textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
-                            { alias: "map", label: "Map", view: "umbraco.googlemaps", value: "37.4419,-122.1419", config: { mapType: "ROADMAP", zoom: 4 } },
-                            { alias: "media", label: "Media picker", view: "umbraco.mediapicker", value: "" },
-                            { alias: "content", label: "Content picker", view: "umbraco.contentpicker", value: "" }
+                            { alias: "bodyText", label: "Body Text", description:"Here you enter the primary article contents", view: "rte", value: "<p>askjdkasj lasjd</p>" },
+                            { alias: "textarea", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
+                            { alias: "map", label: "Map", view: "googlemaps", value: "37.4419,-122.1419", config: { mapType: "ROADMAP", zoom: 4 } },
+                            { alias: "media", label: "Media picker", view: "mediapicker", value: "" },
+                            { alias: "content", label: "Content picker", view: "contentpicker", value: "" }
                         ]
                     },
                     {
@@ -36,8 +36,8 @@ function _getNode(id){
                         alias: "tab02",
                         id: 2,
                         properties: [
-                            { alias: "datepicker", label: "Datepicker", view: "umbraco.datepicker", config: { rows: 7 } },
-                            { alias: "tags", label: "Tags", view: "umbraco.tags", value: ""}
+                            { alias: "datepicker", label: "Datepicker", view: "datepicker", config: { rows: 7 } },
+                            { alias: "tags", label: "Tags", view: "tags", value: ""}
                         ]
                     },
                     {
@@ -45,21 +45,21 @@ function _getNode(id){
                         alias: "tab03",
                         id: 3,
                         properties: [
-                        { alias: "grid", label: "Grid", view: "umbraco.grid", controller: "umbraco.grid", value: "test", hideLabel: true }
+                        { alias: "grid", label: "Grid", view: "grid", controller: "umbraco.grid", value: "test", hideLabel: true }
                         ]
                     },{
                         label: "WIP",
                         alias: "tab04",
                         id: 4,
                         properties: [
-                            { alias: "tes", label: "Stuff", view: "umbraco.test", controller: "umbraco.embeddedcontent", value: "", 
+                            { alias: "tes", label: "Stuff", view: "test", controller: "umbraco.embeddedcontent", value: "",
                             
                             config: {
                                 fields: [
-                                            { alias: "embedded", label: "Embbeded", view: "umbraco.textstring", value: ""},
-                                            { alias: "embedded2", label: "Embbeded 2", view: "umbraco.contentpicker", value: ""},
-                                            { alias: "embedded3", label: "Embbeded 3", view: "umbraco.textarea", value: ""},
-                                            { alias: "embedded4", label: "Embbeded 4", view: "umbraco.datepicker", value: ""}
+                                            { alias: "embedded", label: "Embbeded", view: "textstring", value: ""},
+                                            { alias: "embedded2", label: "Embbeded 2", view: "contentpicker", value: ""},
+                                            { alias: "embedded3", label: "Embbeded 3", view: "textarea", value: ""},
+                                            { alias: "embedded4", label: "Embbeded 4", view: "datepicker", value: ""}
                                         ] 
                                     }
                             }
