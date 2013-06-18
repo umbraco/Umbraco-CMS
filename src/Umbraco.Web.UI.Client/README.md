@@ -79,7 +79,7 @@ conventions:
 - */belle/js/umbraco.directives.js:* Application directives
 - */belle/js/umbraco.resources.js:* Application resources, like content, media, users, members etc
 - */belle/js/umbraco.mocks.js:* Fake Application resources, for running the app without a server
-- 
+ 
 ##Getting started
 The current app is built, following conventions from angularJs and bootstrap. To get started with the applicaton you will need to atleast know the basics of these frameworks 
 
