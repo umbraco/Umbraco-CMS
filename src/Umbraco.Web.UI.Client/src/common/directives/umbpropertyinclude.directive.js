@@ -1,6 +1,15 @@
-
-//This is a specialized version of ng-include (yes the code is borrowed). We need to know if the property editor
-//contents requires a async JS call made before we compile.
+/**
+ * @ngdoc directive
+ * @name umbraco.directives:umbPropertyInclude
+ *
+ * @description
+ * This is a specialized version of ng-include (yes the code is borrowed). We need to know if the property editor
+ * contents requires a async JS call made before we compile.
+ * 
+ * @restrict A
+ * @element ANY
+ * @param umbPropEditorHelper {umbPropEditorHelper} a utility class for dealing with property editors/paths
+ */
 function umbPropertyInclude($http, $templateCache, $anchorScroll, $compile, umbPropEditorHelper) {
     return {
         restrict: "E",      //restrict to element
