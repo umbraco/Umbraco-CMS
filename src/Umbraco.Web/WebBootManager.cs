@@ -218,6 +218,7 @@ namespace Umbraco.Web
                 route.DataTokens = new RouteValueDictionary();
             }
             route.DataTokens.Add("Namespaces", new[] {meta.ControllerNamespace}); //look in this namespace to create the controller
+            route.DataTokens.Add("UseNamespaceFallback", false); //Don't look anywhere else except this namespace!
             route.DataTokens.Add("umbraco", "api"); //ensure the umbraco token is set
         }
         private void RouteLocalSurfaceController(Type controller, string umbracoPath)
@@ -229,6 +230,7 @@ namespace Umbraco.Web
                 new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
                 new[] { meta.ControllerNamespace }); //look in this namespace to create the controller
             route.DataTokens.Add("umbraco", "surface"); //ensure the umbraco token is set                
+            route.DataTokens.Add("UseNamespaceFallback", false); //Don't look anywhere else except this namespace!
             //make it use our custom/special SurfaceMvcHandler
             route.RouteHandler = new SurfaceRouteHandler();
         }
