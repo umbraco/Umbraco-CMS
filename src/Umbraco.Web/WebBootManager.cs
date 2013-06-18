@@ -20,6 +20,7 @@ using Umbraco.Web.Editors;
 using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Models;
+using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PublishedCache;
@@ -40,10 +41,10 @@ namespace Umbraco.Web
     {
         private readonly bool _isForTesting;
 
-		public WebBootManager(UmbracoApplicationBase umbracoApplication)
+        public WebBootManager(UmbracoApplicationBase umbracoApplication)
             : this(umbracoApplication, false)
         {
-			
+
         }
 
         /// <summary>
@@ -51,10 +52,10 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="umbracoApplication"></param>
         /// <param name="isForTesting"></param>
-		internal WebBootManager(UmbracoApplicationBase umbracoApplication, bool isForTesting)
+        internal WebBootManager(UmbracoApplicationBase umbracoApplication, bool isForTesting)
             : base(umbracoApplication)
         {
-			_isForTesting = isForTesting;			
+            _isForTesting = isForTesting;
         }
 
         /// <summary>
@@ -62,7 +63,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <returns></returns>
         public override IBootManager Initialize()
-        {            
+        {
             base.Initialize();
 
             // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
@@ -109,6 +110,15 @@ namespace Umbraco.Web
 
             //Set the profiler to be the web profiler
             ProfilerResolver.Current.SetProfiler(new WebProfiler());
+        }
+
+        /// <summary>
+        /// Configure the model mappers
+        /// </summary>
+        protected override void InitializeModelMappers()
+        {
+            base.InitializeModelMappers();
+            UserModelMapper.Configure();
         }
 
         /// <summary>
@@ -210,8 +220,8 @@ namespace Umbraco.Web
             var meta = PluginController.GetMetadata(controller);
             var route = RouteTable.Routes.MapHttpRoute(
                 string.Format("umbraco-{0}-{1}", "api", meta.ControllerName),
-                umbracoPath + "/Api/" + meta.ControllerName + "/{action}/{id}",//url to match
-                new { controller = meta.ControllerName, id = UrlParameter.Optional });
+                umbracoPath + "/Api/" + meta.ControllerName + "/{action}/{id}", //url to match
+                new {controller = meta.ControllerName, id = UrlParameter.Optional});                
             //web api routes don't set the data tokens object
             if (route.DataTokens == null)
             {                
@@ -221,7 +231,6 @@ namespace Umbraco.Web
             route.DataTokens.Add("UseNamespaceFallback", false); //Don't look anywhere else except this namespace!
             route.DataTokens.Add("umbraco", "api"); //ensure the umbraco token is set
         }
-
         private void RouteLocalSurfaceController(Type controller, string umbracoPath)
         {
             var meta = PluginController.GetMetadata(controller);

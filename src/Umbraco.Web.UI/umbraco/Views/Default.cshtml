@@ -51,7 +51,7 @@
 </head>
 <body ng-controller="MainController" id="umbracoMainPageBody">
         
-    <div ng-show="authenticated" ng-cloak ng-animate="'fade'" id="layout" class="clearfix" ng-click="closeDialogs($event)">
+    <div ng-hide="!authenticated" ng-cloak ng-animate="'fade'" id="layout" class="clearfix" ng-click="closeDialogs($event)">
         
         <umb-left-column></umb-left-column>
 

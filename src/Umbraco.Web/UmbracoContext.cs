@@ -135,7 +135,7 @@ namespace Umbraco.Web
 
             HttpContext = httpContext;            
             Application = applicationContext;
-            Security = new WebSecurity();
+            Security = new WebSecurity(HttpContext);
 
             ContentCache = publishedCaches.CreateContextualContentCache(this);
             MediaCache = publishedCaches.CreateContextualMediaCache(this);

@@ -12,8 +12,8 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class MediaModelMapper : BaseContentModelMapper
     {
-        public MediaModelMapper(ApplicationContext applicationContext, ProfileModelMapper profileMapper)
-            : base(applicationContext, profileMapper)
+        public MediaModelMapper(ApplicationContext applicationContext, UserModelMapper userMapper)
+            : base(applicationContext, userMapper)
         {
         }
 
@@ -23,7 +23,7 @@ namespace Umbraco.Web.Models.Mapping
             //NOTE: we don't need this for the dto and it's an extra lookup
             //result.ContentTypeAlias = content.ContentType.Alias;
             //result.Icon = content.ContentType.Icon;            
-            //result.Updator = ProfileMapper.ToBasicUser(content.GetWriterProfile());
+            //result.Updator = userMapper.ToUserBasic(content.GetWriterProfile());
             return result;
         }
 

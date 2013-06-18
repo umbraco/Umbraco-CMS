@@ -20,7 +20,7 @@ namespace Umbraco.Web.WebApi.Binders
         /// Constructor
         /// </summary>
         public MediaItemBinder()
-            : this(ApplicationContext.Current, new MediaModelMapper(ApplicationContext.Current, new ProfileModelMapper()))
+            : this(ApplicationContext.Current, new MediaModelMapper(ApplicationContext.Current, new UserModelMapper()))
         {
         }
 

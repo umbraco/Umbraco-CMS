@@ -51,7 +51,8 @@ namespace Umbraco.Web.Editors
                     {"mediaApiBaseUrl", Url.GetUmbracoApiService<MediaController>("GetRootMedia").TrimEnd("GetRootMedia")},
                     {"treeApplicationApiBaseUrl", Url.GetUmbracoApiService<ApplicationTreeApiController>("GetTreeData").TrimEnd("GetTreeData")},
                     {"contentTypeApiBaseUrl", Url.GetUmbracoApiService<ContentTypeApiController>("GetAllowedChildren").TrimEnd("GetAllowedChildren")},
-                    {"mediaTypeApiBaseUrl", Url.GetUmbracoApiService<MediaTypeApiController>("GetAllowedChildren").TrimEnd("GetAllowedChildren")}
+                    {"mediaTypeApiBaseUrl", Url.GetUmbracoApiService<MediaTypeApiController>("GetAllowedChildren").TrimEnd("GetAllowedChildren")},
+                    {"authenticationApiBaseUrl", Url.GetUmbracoApiService<AuthenticationController>("PostLogin").TrimEnd("PostLogin")}
                 };
 
             return JavaScript(ServerVariablesParser.Parse(d));

@@ -1,42 +1,54 @@
 angular.module('umbraco.services')
-.factory('userService', function () {
+.factory('userService', function (authResource, $q) {
 
-  var _currentUser,_authenticated = (jQuery.cookie('authed') === "authenticated");       
-  var _mockedU = { 
-    name: "Per Ploug", 
-    avatar: "assets/img/avatar.jpeg", 
-    id: 0,
-    authenticated: true,
-    locale: 'da-DK' 
-  };
+    var currentUser = null;    
 
-  if(_authenticated){
-    _currentUser = _mockedU; 
-  }
+    return {
+        
+        /** Returns a promise, sends a request to the server to check if the current cookie is authorized  */
+        isAuthenticated: function() {
+            var deferred = $q.defer();
 
-  return {
-    authenticated: _authenticated,
-    currentUser: _currentUser,
-    
-    authenticate: function(login, password){
-      _authenticated = true;
-      _currentUser = _mockedU;
-      
-      jQuery.cookie('authed', "authenticated", {expires: 1});
-      return _authenticated; 
-    },
-    
-    logout: function(){
-      $rootScope.$apply(function() {
-        _authenticated = false;
-        jQuery.cookie('authed', null);
-        _currentUser = undefined;
-      });
-    },
+            $q.when(authResource.isAuthenticated())
+                .then(function(data) {
+                    currentUser = data;
+                    //note, this can return null if they are not authenticated
+                    deferred.resolve({ user: data, authenticated: data == null ? false : true });
+                },
+                    function(reason) {
+                        deferred.reject(reason);
+                    });
 
-    getCurrentUser: function(){
-      return _currentUser;
-    }
-  };
-  
+            return deferred.promise;
+        },        
+
+        /** Returns a promise, sends a request to the server to validate the credentials  */
+        authenticate: function (login, password) {
+
+            var deferred = $q.defer();
+
+            $q.when(authResource.performLogin(login, password))
+                .then(function(data) {
+                    currentUser = data;
+                    deferred.resolve({ user: data, authenticated: true });
+                },
+                    function(reason) {
+                        deferred.reject(reason);
+                    });
+
+            return deferred.promise;
+        },
+
+        logout: function () {
+            $rootScope.$apply(function () {                
+                currentUser = undefined;
+            });
+        },
+
+        /** Returns the current user object, if null then calls to authenticated or authenticate must be called  */
+        getCurrentUser: function () {
+            return currentUser;
+        }
+    };
+
 });

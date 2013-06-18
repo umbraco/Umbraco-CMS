@@ -8,7 +8,10 @@ namespace Umbraco.Core.Standalone
         /// <summary>
         /// Initializes a new instance of the <see cref="StandaloneCoreApplication"/> class.
         /// </summary>
-        protected StandaloneCoreApplication() { }
+        protected StandaloneCoreApplication(string baseDirectory)
+        {
+            _baseDirectory = baseDirectory;
+        }
 
         /// <summary>
         /// Provides the application boot manager.
@@ -16,11 +19,12 @@ namespace Umbraco.Core.Standalone
         /// <returns>An application boot manager.</returns>
         protected override IBootManager GetBootManager()
         {
-            return new StandaloneCoreBootManager(this, _handlersToAdd, _handlersToRemove);
+            return new StandaloneCoreBootManager(this, _handlersToAdd, _handlersToRemove, _baseDirectory);
         }
 
         #region Application
 
+        private readonly string _baseDirectory;
         private static StandaloneCoreApplication _application;
         private static bool _started;
         private static readonly object AppLock = new object();
@@ -28,11 +32,11 @@ namespace Umbraco.Core.Standalone
         /// <summary>
         /// Gets the instance of the standalone Umbraco application.
         /// </summary>
-        public static StandaloneCoreApplication GetApplication()
+        public static StandaloneCoreApplication GetApplication(string baseDirectory)
         {
             lock (AppLock)
             {
-                return _application ?? (_application = new StandaloneCoreApplication());
+                return _application ?? (_application = new StandaloneCoreApplication(baseDirectory));
             }
         }
 

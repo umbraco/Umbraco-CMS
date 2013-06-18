@@ -28,7 +28,7 @@ namespace Umbraco.Web.UI.Pages
 
             try
             {
-                Security.ValidateCurrentUser(new HttpContextWrapper(Context), true);
+                Security.ValidateCurrentUser(true);
                 _hasValidated = true;
 
                 if (!Security.ValidateUserApp(CurrentApp))
@@ -80,7 +80,7 @@ namespace Umbraco.Web.UI.Pages
                 //throw exceptions if not valid (true)
                 if (!_hasValidated)
                 {
-                    Security.ValidateCurrentUser(new HttpContextWrapper(Context), true);
+                    Security.ValidateCurrentUser(true);
                     _hasValidated = true;
                 }
                 

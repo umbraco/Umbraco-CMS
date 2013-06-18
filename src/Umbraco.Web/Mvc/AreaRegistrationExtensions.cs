@@ -90,12 +90,14 @@ namespace Umbraco.Web.Mvc
             controllerPluginRoute.DataTokens.Add("UseNamespaceFallback", false);
 
             //constraints: only match controllers ending with 'controllerSuffixName' and only match this controller's ID for this route            
+            if (controllerSuffixName.IsNullOrWhiteSpace() == false)
+            {                
             controllerPluginRoute.Constraints = new RouteValueDictionary(
                 new Dictionary<string, object>
                     {
                         {"controller", @"(\w+)" + controllerSuffixName}
                     });
-
+            }
 
             //match this area
             controllerPluginRoute.DataTokens.Add("area", area.AreaName);

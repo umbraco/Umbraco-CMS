@@ -178,7 +178,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             var overlay = $("<div class='upload-overlay'>" +
                 "<div class='upload-panel'>" +
                 instructions +
-                "<form action=\"/umbraco/webservices/MediaUploader.ashx?format=json&action=upload&parentNodeId=" + this._parentId + "\" method=\"post\" enctype=\"multipart/form-data\">" +
+                "<form action=\"" + self._opts.umbracoPath + "/webservices/MediaUploader.ashx?format=json&action=upload&parentNodeId=" + this._parentId + "\" method=\"post\" enctype=\"multipart/form-data\">" +
                 "<input id='fileupload' type='file' name='file' multiple>" +
                 "<input type='hidden' name='name' />" +
                 "<input type='hidden' name='replaceExisting' />" +

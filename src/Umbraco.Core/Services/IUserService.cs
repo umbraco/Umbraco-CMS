@@ -15,6 +15,10 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IProfile"/></returns>
         IProfile GetProfileById(int id);
 
+        IProfile GetProfileByUserName(string username);
+        IUser GetUserByUserName(string username);
+        IUser GetUserById(int id);
+
         /// <summary>
         /// Gets an IUserType by its Alias
         /// </summary>

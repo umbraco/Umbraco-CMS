@@ -10,8 +10,8 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentModelMapper : BaseContentModelMapper
     {
        
-        public ContentModelMapper(ApplicationContext applicationContext, ProfileModelMapper profileMapper)
-            : base(applicationContext, profileMapper)
+        public ContentModelMapper(ApplicationContext applicationContext, UserModelMapper userMapper)
+            : base(applicationContext, userMapper)
         {
         }
 
@@ -21,7 +21,7 @@ namespace Umbraco.Web.Models.Mapping
             //NOTE: we don't need this for the dto and it's an extra lookup
             //result.ContentTypeAlias = content.ContentType.Alias;
             //result.Icon = content.ContentType.Icon;            
-            //result.Updator = ProfileMapper.ToBasicUser(content.GetWriterProfile());
+            //result.Updator = userMapper.ToUserBasic(content.GetWriterProfile());
             return result;            
         }
 
@@ -30,7 +30,7 @@ namespace Umbraco.Web.Models.Mapping
             var result = base.ToContentItemSimpleBase<IContent>(content);
             result.ContentTypeAlias = content.ContentType.Alias;
             result.Icon = content.ContentType.Icon;
-            result.Updator = ProfileMapper.ToBasicUser(content.GetWriterProfile());
+            result.Updator = UserMapper.ToUserBasic(content.GetWriterProfile());
             return result;
         } 
 
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Models.Mapping
             var result = CreateContent<ContentItemDisplay, ContentPropertyDisplay, IContent>(content, (display, originalContent) =>
                 {
                     //fill in the rest
-                    display.Updator = ProfileMapper.ToBasicUser(content.GetWriterProfile());
+                    display.Updator = UserMapper.ToUserBasic(content.GetWriterProfile());
                     display.ContentTypeAlias = content.ContentType.Alias;
                     display.Icon = content.ContentType.Icon;
 
