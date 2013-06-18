@@ -39,10 +39,10 @@ namespace Umbraco.Web
     {
         private readonly bool _isForTesting;
 
-		public WebBootManager(UmbracoApplicationBase umbracoApplication)
+        public WebBootManager(UmbracoApplicationBase umbracoApplication)
             : this(umbracoApplication, false)
         {
-			
+
         }
 
         /// <summary>
@@ -50,10 +50,10 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="umbracoApplication"></param>
         /// <param name="isForTesting"></param>
-		internal WebBootManager(UmbracoApplicationBase umbracoApplication, bool isForTesting)
+        internal WebBootManager(UmbracoApplicationBase umbracoApplication, bool isForTesting)
             : base(umbracoApplication)
         {
-			_isForTesting = isForTesting;			
+            _isForTesting = isForTesting;
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <returns></returns>
         public override IBootManager Initialize()
-        {            
+        {
             base.Initialize();
 
             // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
@@ -155,25 +155,17 @@ namespace Umbraco.Web
                 );
             defaultRoute.RouteHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory());
 
-            //Create the install routes
-            var installPackageRoute = RouteTable.Routes.MapRoute(
-                "Umbraco_install_packages",
-                "Install/PackageInstaller/{action}/{id}",
-                new { controller = "InstallPackage", action = "Index", id = UrlParameter.Optional }
-                );
-            installPackageRoute.DataTokens.Add("area", umbracoPath);
+            //register all back office routes
+            RouteBackOfficeControllers();
 
-            //Create the REST/web/script service routes
-            var webServiceRoutes = RouteTable.Routes.MapRoute(
-                "Umbraco_web_services",
-                umbracoPath + "/RestServices/{controller}/{action}/{id}",
-                new { controller = "SaveFileController", action = "Index", id = UrlParameter.Optional },
-                //look in this namespace for controllers
-                new string[] { "Umbraco.Web.WebServices" }
-                );
-            webServiceRoutes.DataTokens.Add("area", umbracoPath);
-
+            //plugin controllers must come first because the next route will catch many things
             RoutePluginControllers();
+        }
+
+        private void RouteBackOfficeControllers()
+        {
+            var backOfficeArea = new BackOfficeArea();
+            RouteTable.Routes.RegisterArea(backOfficeArea);
         }
         
         private void RoutePluginControllers()
@@ -228,7 +220,6 @@ namespace Umbraco.Web
             route.DataTokens.Add("Namespaces", new[] {meta.ControllerNamespace}); //look in this namespace to create the controller
             route.DataTokens.Add("umbraco", "api"); //ensure the umbraco token is set
         }
-
         private void RouteLocalSurfaceController(Type controller, string umbracoPath)
         {
             var meta = PluginController.GetMetadata(controller);
