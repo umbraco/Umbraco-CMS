@@ -20,6 +20,7 @@ using Umbraco.Web.Editors;
 using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Models;
+using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PublishedCache;
@@ -109,6 +110,15 @@ namespace Umbraco.Web
 
             //Set the profiler to be the web profiler
             ProfilerResolver.Current.SetProfiler(new WebProfiler());
+        }
+
+        /// <summary>
+        /// Configure the model mappers
+        /// </summary>
+        protected override void InitializeModelMappers()
+        {
+            base.InitializeModelMappers();
+            UserModelMapper.Configure();
         }
 
         /// <summary>

@@ -75,6 +75,8 @@ namespace Umbraco.Core
             //initialize the DatabaseContext
             dbContext.Initialize();
 
+            InitializeModelMappers();
+
             //now we need to call the initialize methods
             ApplicationEventsResolver.Current.ApplicationEventHandlers
                 .ForEach(x => x.OnApplicationInitialized(UmbracoApplication, ApplicationContext));
@@ -93,6 +95,14 @@ namespace Umbraco.Core
         {
             //create the ApplicationContext
             ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext);
+        }
+
+        /// <summary>
+        /// This method allows for configuration of model mappers
+        /// </summary>
+        protected virtual void InitializeModelMappers()
+        {
+            //TODO: There will most likely be AutoMapper configs to put in here, we know they exist in web for now so we'll leave this here for future use
         }
 
         /// <summary>

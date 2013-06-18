@@ -13,5 +13,11 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "locale", IsRequired = true)]
         [Required]
         public string Language { get; set; }
+
+        /// <summary>
+        /// The MD5 lowercase hash of the email which can be used by gravatar
+        /// </summary>
+        [DataMember(Name = "emailHash")]
+        public string EmailHash { get; set; }
     }
 }

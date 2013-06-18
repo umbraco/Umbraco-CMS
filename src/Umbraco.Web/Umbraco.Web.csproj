@@ -95,6 +95,9 @@
       <Project>{07fbc26b-2927-4a22-8d96-d644c667fecc}</Project>
       <Name>UmbracoExamine</Name>
     </ProjectReference>
+    <Reference Include="AutoMapper">
+      <HintPath>..\packages\AutoMapper.2.2.1\lib\net40\AutoMapper.dll</HintPath>
+    </Reference>
     <Reference Include="ClientDependency.Core, Version=1.7.0.2, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\ClientDependency.1.7.0.2\lib\ClientDependency.Core.dll</HintPath>
@@ -309,7 +312,6 @@
     <Compile Include="Models\Mapping\ContentTypeModelMapper.cs" />
     <Compile Include="Models\Mapping\MediaModelMapper.cs" />
     <Compile Include="Models\Mapping\UserModelMapper.cs" />
-    <Compile Include="Mvc\BackOfficeArea.cs" />
     <Compile Include="Trees\LegacyTreeApiController.cs" />
     <Compile Include="Trees\ISearchableTree.cs" />
     <Compile Include="Trees\LegacyTreeDataAdapter.cs" />
