@@ -373,7 +373,7 @@ namespace umbraco.providers.members
         {
             if (Member.GetMemberFromLoginName(username) != null)
                 status = MembershipCreateStatus.DuplicateUserName;
-            else if (Member.GetMemberFromEmail(email) != null)
+            else if (Member.GetMemberFromEmail(email) != null && RequiresUniqueEmail)
                 status = MembershipCreateStatus.DuplicateEmail;
             else
             {
