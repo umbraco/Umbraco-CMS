@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
@@ -15,12 +16,15 @@ namespace Umbraco.Web.Standalone
         private ServiceContext _serviceContext;
         private readonly StandaloneApplication _application;
 
-        public ServiceContextManager(string connectionString, string providerName)
+        public ServiceContextManager(string connectionString, string providerName, string baseDirectory)
         {
             _connectionString = connectionString;
             _providerName = providerName;
 
-            _application = StandaloneApplication.GetApplication();
+            Trace.WriteLine("Current AppDomain: " + AppDomain.CurrentDomain.FriendlyName);
+            Trace.WriteLine("Current AppDomain: " + AppDomain.CurrentDomain.BaseDirectory);
+
+            _application = StandaloneApplication.GetApplication(baseDirectory);
             _application.Start();
         }
 

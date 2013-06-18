@@ -321,7 +321,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Select("*")
                .From<ContentTypeAllowedContentTypeDto>()
                .LeftJoin<ContentTypeDto>()
-               .On<ContentTypeAllowedContentTypeDto, ContentTypeDto>(left => left.Id, right => right.NodeId)
+               .On<ContentTypeAllowedContentTypeDto, ContentTypeDto>(left => left.AllowedId, right => right.NodeId)
                .Where<ContentTypeAllowedContentTypeDto>(x => x.Id == id);
 
             var allowedContentTypeDtos = Database.Fetch<ContentTypeAllowedContentTypeDto, ContentTypeDto>(sql);

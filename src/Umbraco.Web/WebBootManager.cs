@@ -40,10 +40,10 @@ namespace Umbraco.Web
     {
         private readonly bool _isForTesting;
 
-		public WebBootManager(UmbracoApplicationBase umbracoApplication)
+        public WebBootManager(UmbracoApplicationBase umbracoApplication)
             : this(umbracoApplication, false)
         {
-			
+
         }
 
         /// <summary>
@@ -51,10 +51,10 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="umbracoApplication"></param>
         /// <param name="isForTesting"></param>
-		internal WebBootManager(UmbracoApplicationBase umbracoApplication, bool isForTesting)
+        internal WebBootManager(UmbracoApplicationBase umbracoApplication, bool isForTesting)
             : base(umbracoApplication)
         {
-			_isForTesting = isForTesting;			
+            _isForTesting = isForTesting;
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <returns></returns>
         public override IBootManager Initialize()
-        {            
+        {
             base.Initialize();
 
             // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
@@ -221,7 +221,6 @@ namespace Umbraco.Web
             route.DataTokens.Add("UseNamespaceFallback", false); //Don't look anywhere else except this namespace!
             route.DataTokens.Add("umbraco", "api"); //ensure the umbraco token is set
         }
-
         private void RouteLocalSurfaceController(Type controller, string umbracoPath)
         {
             var meta = PluginController.GetMetadata(controller);
