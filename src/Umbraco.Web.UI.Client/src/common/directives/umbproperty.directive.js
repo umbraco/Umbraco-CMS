@@ -1,5 +1,5 @@
 angular.module("umbraco.directives")
-    .directive('umbProperty', function(){
+    .directive('umbProperty', function (umbPropEditorHelper) {
         return {
             scope: true,
             restrict: 'E',
@@ -20,18 +20,18 @@ angular.module("umbraco.directives")
                             //the script loaded so load the view
                             //NOTE: The use of $apply because we're operating outside of the angular scope with this callback.
                             scope.$apply(function () {
-                                scope.model.editorView = scope.model.view;
+                                scope.model.editorView = umbPropEditorHelper.getViewPath(scope.model.view);
                             });
                         }, function (err) {
                             //an error occurred... most likely there is no JS file to load for this editor
                             //NOTE: The use of $apply because we're operating outside of the angular scope with this callback.
                             scope.$apply(function () {
-                                scope.model.editorView = scope.model.view;
+                                scope.model.editorView = umbPropEditorHelper.getViewPath(scope.model.view);
                             });
                         });
                 }
                 else {
-                    scope.model.editorView = scope.model.view;
+                    scope.model.editorView = umbPropEditorHelper.getViewPath(scope.model.view);
                 }
             }
         };

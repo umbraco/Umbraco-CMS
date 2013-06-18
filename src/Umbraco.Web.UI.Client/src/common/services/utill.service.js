@@ -2,6 +2,37 @@
 
 /**
 * @ngdoc factory
+* @name umbraco.services:umbPropertyEditorHelper
+* @description A helper object used for property editors
+**/
+function umbPropEditorHelper() {
+    return {
+        /**
+     * @ngdoc function
+     * @name getImagePropertyValue
+     * @methodOf umbPropEditorHelper
+     * @function    
+     *
+     * @description
+     * Returns the correct view path for a property editor, it will detect if it is a full virtual path but if not then default to the internal umbraco one
+     * 
+     * @param input {string} the view path currently stored for the property editor
+     */
+        getViewPath: function (input) {
+            var path = String(input);
+            if (path.startsWith('/')) {
+                return path;
+            }
+            else {
+                return "views/propertyeditors/" + path.replace('.', '/') + "/editor.html";
+            }
+        }
+    };
+}
+angular.module('umbraco.services').factory('umbPropEditorHelper', umbPropEditorHelper);
+
+/**
+* @ngdoc factory
 * @name umbraco.services:umbImageHelper
 * @description A helper object used for parsing image paths
 **/
