@@ -227,8 +227,6 @@ namespace Umbraco.Web
                 string.Format("umbraco-{0}-{1}", "surface", meta.ControllerName),
                 umbracoPath + "/Surface/" + meta.ControllerName + "/{action}/{id}",//url to match
                 new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
-                //NOTE: There SHOULD be a constraint here to only match controllers with a "SurfaceController" suffix but we forgot to include it in the 
-                // 4.10 release so we can't include it now :(
                 new[] { meta.ControllerNamespace }); //look in this namespace to create the controller
             route.DataTokens.Add("umbraco", "surface"); //ensure the umbraco token is set                
             //make it use our custom/special SurfaceMvcHandler

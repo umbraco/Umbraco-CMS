@@ -8,6 +8,7 @@ using umbraco.businesslogic;
 using umbraco.cms.businesslogic.packager;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
+using umbraco.interfaces;
 
 namespace umbraco
 {
