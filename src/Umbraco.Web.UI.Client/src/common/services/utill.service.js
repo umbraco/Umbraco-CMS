@@ -12,9 +12,9 @@ function umbImageHelper() {
             if (!options && !options.imageModel && !options.scope) {
                 throw "The options objet does not contain the required parameters: imageModel, scope";
             }
-            if (options.imageModel.contentTypeAlias.toLowerCase() == "image") {
+            if (options.imageModel.contentTypeAlias.toLowerCase() === "image") {
                 var imageProp = _.find(options.imageModel.properties, function (item) {
-                    return item.alias == 'umbracoFile';
+                    return item.alias === 'umbracoFile';
                 });
                 var imageVal;
                 //Legacy images will be saved as a string, not an array so we will convert the legacy values
@@ -40,7 +40,7 @@ function umbImageHelper() {
             }
 
             var imagePropVal = this.getImagePropertyVaue(options);
-            if (imagePropVal != "") {
+            if (imagePropVal !== "") {
                 return this.getThumbnailFromPath(imagePropVal);
             }
             return "";

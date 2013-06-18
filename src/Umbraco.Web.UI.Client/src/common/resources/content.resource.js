@@ -52,7 +52,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     deferred.reject('Failed to retreive data for content id ' + id);
                 });
 
-            return deferred.promise; 
+            return deferred.promise;
         },
         
         getByIds: function (ids) {

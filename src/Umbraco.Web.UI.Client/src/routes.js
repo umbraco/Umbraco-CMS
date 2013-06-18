@@ -1,8 +1,4 @@
-define([
-  'app'
-  ], function(app) {
-
-    return app.config(function ($routeProvider) {
+app.config(function ($routeProvider) {
         $routeProvider
         .when('/:section', {
             templateUrl: "views/common/dashboard.html"
@@ -27,6 +23,4 @@ define([
     }).config(function ($locationProvider) {
     //$locationProvider.html5Mode(false).hashPrefix('!'); //turn html5 mode off
     // $locationProvider.html5Mode(true);         //turn html5 mode on
-});
-
 });

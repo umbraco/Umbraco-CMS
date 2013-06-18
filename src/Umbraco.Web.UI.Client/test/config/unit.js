@@ -9,8 +9,12 @@ files = [
   'lib/jquery/jquery-1.8.2.min.js',
   'lib/angular/angular.min.js',
   'test/lib/angular/angular-mocks.js',
-  'src/app.js',
-  'src/common/**/*.js',
+  'src/app_dev.js',
+  'src/common/directives/*.js',
+  'src/common/filters/*.js',
+  'src/common/services/*.js',
+  'src/common/security/*.js',
+  'src/common/mocks/**/*.js',
   'src/views/**/*.controller.js',
   'test/unit/**/*.spec.js'
 ];

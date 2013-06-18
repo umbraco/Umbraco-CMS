@@ -67,8 +67,30 @@ angular.module('umbraco').controller("SearchController", function ($scope, searc
 });
 
 
-angular.module('umbraco').controller("DashboardController", function ($scope, $routeParams) {
+angular.module('umbraco').controller("DashboardController", function ($scope, $routeParams, scriptLoader) {
     $scope.name = $routeParams.section;
+
+    scriptLoader.load(['http://www.google.com/jsapi'])
+        .then(function(){
+            google.load("maps", "3",
+                        {
+                            callback: function () {
+                                
+                                //Google maps is available and all components are ready to use.
+                                var mapOptions = {
+                                   zoom: 8,
+                                   center: new google.maps.LatLng(-34.397, 150.644),
+                                   mapTypeId: google.maps.MapTypeId.ROADMAP
+                                 };
+
+                                var mapDiv = document.getElementById('test_map');
+                                var map = new google.maps.Map(mapDiv, mapOptions);
+
+                            },
+                            other_params: "sensor=false"
+                        });
+    });
+
 });
 
 
