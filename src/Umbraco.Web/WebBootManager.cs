@@ -210,8 +210,8 @@ namespace Umbraco.Web
             var meta = PluginController.GetMetadata(controller);
             var route = RouteTable.Routes.MapHttpRoute(
                 string.Format("umbraco-{0}-{1}", "api", meta.ControllerName),
-                umbracoPath + "/Api/" + meta.ControllerName + "/{action}/{id}",//url to match
-                new { controller = meta.ControllerName, id = UrlParameter.Optional });
+                umbracoPath + "/Api/" + meta.ControllerName + "/{action}/{id}", //url to match
+                new {controller = meta.ControllerName, id = UrlParameter.Optional});                
             //web api routes don't set the data tokens object
             if (route.DataTokens == null)
             {                
