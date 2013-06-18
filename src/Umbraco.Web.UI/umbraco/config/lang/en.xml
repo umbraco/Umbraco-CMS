@@ -985,4 +985,10 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="userTypes">User types</key>
     <key alias="writer">Writer</key>
   </area>
+  <area alias="moveNode">
+    <key alias="notAllowedAtRoot">The content type %0% isn't allowed at the root level.</key>
+    <key alias="notAllowedInNode">The content type %0% isn't allowed in a %1%.</key>
+    <key alias="treeNotSupported">Content Tree %0% is not supported.</key>
+    <key alias="nodeMoved">The %0% %1% has been moved into %2%.</key>
+  </area>
 </language>

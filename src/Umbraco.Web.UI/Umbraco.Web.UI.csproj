@@ -1706,6 +1706,7 @@
     <Content Include="Umbraco\LiveEditing\Modules\SkinModule\Js\initcolorpicker.js" />
     <Content Include="Umbraco_Client\MacroContainer\macroContainer.css" />
     <Content Include="Umbraco_Client\Mousewheel\jquery.mousewheel.js" />
+    <Content Include="Umbraco_Client\Tree\jquery.mjs.nestedSortable.js" />
     <Content Include="Umbraco_Client\Ui\base2.js" />
     <Content Include="Umbraco_Client\Ui\jquery.alphanumeric.js" />
     <Content Include="Umbraco_Client\Ui\jquery.tooltip.min.js" />

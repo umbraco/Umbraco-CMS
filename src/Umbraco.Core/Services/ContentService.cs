@@ -1036,7 +1036,8 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentRepository(uow))
                 {
-                    content.WriterId = userId;
+                    copy.CreatorId = userId;
+                    content.WriterId = userId; // Typo?
                     repository.AddOrUpdate(copy);
                     uow.Commit();
 
