@@ -3,33 +3,21 @@ angular.module('umbraco.services')
 
     var currentUser = null;    
 
-    //var _mockedU = {
-    //  name: "Per Ploug", 
-    //  avatar: "assets/img/avatar.jpeg", 
-    //  id: 0,
-    //  authenticated: true,
-    //  locale: 'da-DK' 
-    //};
-
-    //if(_authenticated){
-    //  _currentUser = _mockedU; 
-    //}
-
     return {
         
         /** Returns a promise, sends a request to the server to check if the current cookie is authorized  */
         isAuthenticated: function() {
             var deferred = $q.defer();
 
-            authResource.isAuthenticated()
-                .then(function (data) {
+            $q.when(authResource.isAuthenticated()
+                .then(function(data) {
                     currentUser = data;
                     //note, this can return null if they are not authenticated
                     deferred.resolve({ user: data, authenticated: data == null ? false : true });
                 },
-                function (reason) {
-                    deferred.reject(reason);
-                });
+                    function(reason) {
+                        deferred.reject(reason);
+                    }));
 
             return deferred.promise;
         },        
@@ -39,14 +27,14 @@ angular.module('umbraco.services')
 
             var deferred = $q.defer();
 
-            authResource.performLogin(login, password)
-                .then(function (data) {
+            $q.when(authResource.performLogin(login, password)
+                .then(function(data) {
                     currentUser = data;
                     deferred.resolve({ user: data, authenticated: true });
                 },
-                function (reason) {
-                    deferred.reject(reason);
-                });
+                    function(reason) {
+                        deferred.reject(reason);
+                    }));
 
             return deferred.promise;
         },
