@@ -9,7 +9,7 @@ angular.module('umbraco.services')
         isAuthenticated: function() {
             var deferred = $q.defer();
 
-            $q.when(authResource.isAuthenticated()
+            $q.when(authResource.isAuthenticated())
                 .then(function(data) {
                     currentUser = data;
                     //note, this can return null if they are not authenticated
@@ -17,7 +17,7 @@ angular.module('umbraco.services')
                 },
                     function(reason) {
                         deferred.reject(reason);
-                    }));
+                    });
 
             return deferred.promise;
         },        
@@ -27,14 +27,14 @@ angular.module('umbraco.services')
 
             var deferred = $q.defer();
 
-            $q.when(authResource.performLogin(login, password)
+            $q.when(authResource.performLogin(login, password))
                 .then(function(data) {
                     currentUser = data;
                     deferred.resolve({ user: data, authenticated: true });
                 },
                     function(reason) {
                         deferred.reject(reason);
-                    }));
+                    });
 
             return deferred.promise;
         },

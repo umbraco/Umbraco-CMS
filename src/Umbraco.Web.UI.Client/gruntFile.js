@@ -138,6 +138,14 @@ module.exports = function (grunt) {
           footer: "\n\nreturn app;\n});"
         }
       },
+      appDev: {
+          src: ['src/app_dev.js'],
+          dest: '<%= distdir %>/js/app_dev.js',
+          options: {
+              banner: "<%= banner %>'use strict';\ndefine(['angular'], function (angular) {\n",
+              footer: "\n\nreturn app;\n});"
+          }
+      },
       angular: {
         src:['vendor/angular/angular.min.js'],
         dest: '<%= distdir %>/lib/angular/angular.min.js'

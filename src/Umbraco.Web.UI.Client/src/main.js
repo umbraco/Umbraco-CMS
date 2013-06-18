@@ -1,6 +1,7 @@
 require.config({
   waitSeconds: 120,
   paths: {
+    app: 'app_dev',  
     jquery: '../lib/jquery/jquery-1.8.2.min',
     jqueryCookie: '../lib/jquery/jquery.cookie',
     umbracoExtensions: "../lib/umbraco/extensions",
@@ -47,7 +48,7 @@ require.config({
 
 require( [
   'angular',
-  'app_dev',
+  'app',
   'jquery',
   'jqueryCookie',
   'bootstrap',

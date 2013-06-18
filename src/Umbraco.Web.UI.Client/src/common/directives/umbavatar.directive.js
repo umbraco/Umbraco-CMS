@@ -11,7 +11,7 @@ function avatarDirective() {
         scope: {
             name: '@',
             email: '@',
-            hash: '@',
+            hash: '@'
         },
         link: function(scope, element, attr, ctrl) {
             //set the gravatar url
