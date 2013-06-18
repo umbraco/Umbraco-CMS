@@ -1,17 +1,16 @@
 <div id="leftcolumn" ng-controller="NavigationController" ng-mouseleave="hideTree()">
     <div id="applications" ng-class="{faded:ui.stickyNavigation}">
         <ul class="sections">
+            
             <li class="avatar">
-                <a href="#" title="{{user.name}}">
-                    <img ng-src="{{user.avatar}}" />
-                </a>
+                <umb-avatar name="{{user.name}}" email="{{user.email}}"></umb-avatar>
             </li>
 
             <li ng-repeat="section in sections">
                 <a href="#/{{section.alias}}"
-                    ng-click="changeSection(section.alias)"
-                    ng-mouseenter="showTree(section.alias)"
-                    prevent-default>
+                   ng-click="changeSection(section.alias)"
+                   ng-mouseenter="showTree(section.alias)"
+                   prevent-default>
                     <i class="{{section.cssclass}}"></i><span>{{section.name}}</span>
                 </a>
             </li>
