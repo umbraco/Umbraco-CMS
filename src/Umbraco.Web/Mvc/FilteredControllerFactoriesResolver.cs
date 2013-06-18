@@ -7,7 +7,7 @@ namespace Umbraco.Web.Mvc
 	/// <summary>
 	/// A resolver for storing IFilteredControllerFactories
 	/// </summary>
-	internal sealed class FilteredControllerFactoriesResolver : ManyObjectsResolverBase<FilteredControllerFactoriesResolver, IFilteredControllerFactory>
+	public sealed class FilteredControllerFactoriesResolver : ManyObjectsResolverBase<FilteredControllerFactoriesResolver, IFilteredControllerFactory>
 	{
 		/// <summary>
 		/// Constructor
