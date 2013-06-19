@@ -236,7 +236,7 @@ namespace umbraco.providers
             if (!User.validateCredentials(username, oldPassword))            
                 return false;
 
-            ValidatePasswordEventArgs args = new ValidatePasswordEventArgs(username, newPassword, true);
+            ValidatePasswordEventArgs args = new ValidatePasswordEventArgs(username, newPassword, false);
             OnValidatingPassword(args);
 
             if (args.Cancel)
