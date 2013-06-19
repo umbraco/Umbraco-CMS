@@ -278,6 +278,7 @@
     <Compile Include="DefaultPublishedMediaStore.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
+    <Compile Include="Mvc\BackOfficeArea.cs" />
     <Compile Include="Mvc\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="Mvc\NotChildAction.cs" />
     <Compile Include="Mvc\UmbracoAuthorizedController.cs" />
@@ -420,9 +421,9 @@
     <Compile Include="umbraco.presentation\umbraco\settings\modals\ShowUmbracoTags.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx.cs">
-       <SubType>ASPXCodeBehind</SubType>
-     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1941,7 +1942,7 @@
     <Content Include="umbraco.presentation\install\steps\welcome.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\cacheBrowser.aspx" />    
+    <Content Include="umbraco.presentation\umbraco\cacheBrowser.aspx" />
     <Content Include="umbraco.presentation\umbraco\members\ViewMembers.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertImage.aspx">
       <SubType>ASPXCodeBehind</SubType>

@@ -30,10 +30,10 @@ namespace Umbraco.Web
     {
         private readonly bool _isForTesting;
 
-		public WebBootManager(UmbracoApplicationBase umbracoApplication)
+        public WebBootManager(UmbracoApplicationBase umbracoApplication)
             : this(umbracoApplication, false)
         {
-			
+
         }
 
         /// <summary>
@@ -41,10 +41,10 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="umbracoApplication"></param>
         /// <param name="isForTesting"></param>
-		internal WebBootManager(UmbracoApplicationBase umbracoApplication, bool isForTesting)
+        internal WebBootManager(UmbracoApplicationBase umbracoApplication, bool isForTesting)
             : base(umbracoApplication)
         {
-			_isForTesting = isForTesting;			
+            _isForTesting = isForTesting;
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <returns></returns>
         public override IBootManager Initialize()
-        {            
+        {
             base.Initialize();
 
             // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
@@ -130,43 +130,36 @@ namespace Umbraco.Web
                 );
             defaultRoute.RouteHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory());
 
-            //Create the install routes
-            var installPackageRoute = RouteTable.Routes.MapRoute(
-                "Umbraco_install_packages",
-                "Install/PackageInstaller/{action}/{id}",
-                new { controller = "InstallPackage", action = "Index", id = UrlParameter.Optional }
-                );
-            installPackageRoute.DataTokens.Add("area", umbracoPath);
+            //register all back office routes
+            RouteBackOfficeControllers();
 
-            //Create the REST/web/script service routes
-            var webServiceRoutes = RouteTable.Routes.MapRoute(
-                "Umbraco_web_services",
-                umbracoPath + "/RestServices/{controller}/{action}/{id}",
-                new {controller = "SaveFileController", action = "Index", id = UrlParameter.Optional},
-                //VERY IMPORTANT! for this route, only match controllers in this namespace!
-                new string[] { "Umbraco.Web.WebServices" }
-                );
-            webServiceRoutes.DataTokens.Add("area", umbracoPath);
+            //plugin controllers must come first because the next route will catch many things
+            RoutePluginControllers();
+        }
 
-            //we need to find the surface controllers and route them
-            var surfaceControllers = SurfaceControllerResolver.Current.RegisteredSurfaceControllers.ToArray();
+        private void RouteBackOfficeControllers()
+        {
+            var backOfficeArea = new BackOfficeArea();
+            RouteTable.Routes.RegisterArea(backOfficeArea);
+        }
 
-            //local surface controllers do not contain the attribute 			
-            var localSurfaceControlleres = surfaceControllers.Where(x => PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
-            foreach (var s in localSurfaceControlleres)
+        private void RoutePluginControllers()
+        {
+            var umbracoPath = GlobalSettings.UmbracoMvcArea;
+
+            //we need to find the plugin controllers and route them
+            var pluginControllers =
+                SurfaceControllerResolver.Current.RegisteredSurfaceControllers.ToArray();
+
+            //local controllers do not contain the attribute 			
+            var localControllers = pluginControllers.Where(x => PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
+            foreach (var s in localControllers)
             {
-                var meta = PluginController.GetMetadata(s);
-                var route = RouteTable.Routes.MapRoute(
-                    string.Format("umbraco-{0}-{1}", "surface", meta.ControllerName),
-                    umbracoPath + "/Surface/" + meta.ControllerName + "/{action}/{id}",//url to match
-                    new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
-                    new[] { meta.ControllerNamespace }); //only match this namespace
-                route.DataTokens.Add("umbraco", "surface"); //ensure the umbraco token is set
+                RouteLocalSurfaceController(s, umbracoPath);
             }
 
             //need to get the plugin controllers that are unique to each area (group by)
-            //TODO: One day when we have more plugin controllers, we will need to do a group by on ALL of them to pass into the ctor of PluginControllerArea
-            var pluginSurfaceControlleres = surfaceControllers.Where(x => !PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
+            var pluginSurfaceControlleres = pluginControllers.Where(x => !PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
             var groupedAreas = pluginSurfaceControlleres.GroupBy(controller => PluginController.GetMetadata(controller).AreaName);
             //loop through each area defined amongst the controllers
             foreach (var g in groupedAreas)
@@ -178,7 +171,17 @@ namespace Umbraco.Web
             }
         }
 
-
+        private void RouteLocalSurfaceController(Type controller, string umbracoPath)
+        {
+            var meta = PluginController.GetMetadata(controller);
+            var route = RouteTable.Routes.MapRoute(
+                string.Format("umbraco-{0}-{1}", "surface", meta.ControllerName),
+                umbracoPath + "/Surface/" + meta.ControllerName + "/{action}/{id}",//url to match
+                new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
+                new[] { meta.ControllerNamespace }); //look in this namespace to create the controller
+            route.DataTokens.Add("umbraco", "surface"); //ensure the umbraco token is set                
+            route.DataTokens.Add("UseNamespaceFallback", false); //Don't look anywhere else except this namespace!
+        }
 
         /// <summary>
         /// Initializes all web based and core resolves 
@@ -212,7 +215,7 @@ namespace Umbraco.Web
 
             // the legacy 404 will run from within LookupByNotFoundHandlers below
             // so for the time being there is no last chance lookup
-			LastChanceLookupResolver.Current = new LastChanceLookupResolver();
+            LastChanceLookupResolver.Current = new LastChanceLookupResolver();
 
             DocumentLookupsResolver.Current = new DocumentLookupsResolver(
                 //add all known resolvers in the correct order, devs can then modify this list on application startup either by binding to events

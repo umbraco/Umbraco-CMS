@@ -7,7 +7,7 @@ using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Mvc
 {
-	internal static class AreaRegistrationExtensions
+	internal static class AreaRegistrationExtensions 
 	{
 		/// <summary>
 		/// Creates a custom individual route for the specified controller plugin. Individual routes
@@ -31,7 +31,7 @@ namespace Umbraco.Web.Mvc
 		                                           string umbracoTokenValue = "backoffice")
 		{
 			Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
-			Mandate.ParameterNotNullOrEmpty(controllerSuffixName, "controllerSuffixName");
+            Mandate.ParameterNotNull(controllerSuffixName, "controllerSuffixName");
 			Mandate.ParameterNotNullOrEmpty(defaultAction, "defaultAction");
 			Mandate.ParameterNotNull(controllerType, "controllerType");
 			Mandate.ParameterNotNull(routes, "routes");
@@ -60,13 +60,18 @@ namespace Umbraco.Web.Mvc
 						{ "id", defaultId }    
 					});
 
-			//constraints: only match controllers ending with 'controllerSuffixName' and only match this controller's ID for this route            
-			controllerPluginRoute.Constraints = new RouteValueDictionary(
-				new Dictionary<string, object>
+            //Don't look anywhere else except this namespace!
+            controllerPluginRoute.DataTokens.Add("UseNamespaceFallback", false);
+
+            //constraints: only match controllers ending with 'controllerSuffixName' and only match this controller's ID for this route            
+            if (controllerSuffixName.IsNullOrWhiteSpace() == false)
+            {                
+                controllerPluginRoute.Constraints = new RouteValueDictionary(
+                    new Dictionary<string, object>
 					{
 						{ "controller", @"(\w+)" + controllerSuffixName }
-					});
-			
+					});    
+            }
 			
 			//match this area
 			controllerPluginRoute.DataTokens.Add("area", area.AreaName);
