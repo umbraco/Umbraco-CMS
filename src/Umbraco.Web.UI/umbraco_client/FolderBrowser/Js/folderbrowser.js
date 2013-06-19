@@ -173,7 +173,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             var self = this;
 
             // Inject the upload overlay
-            var instructions = 'draggable' in document.createElement('span') ? "<h1>Drag files here to upload</h1> \<p>Or, click the button below to chose the items to upload</p>" : "<h1>Click the browse button below to chose the items to upload</h1>";
+            var instructions = 'draggable' in document.createElement('span') ? "<h1>Drag files here to upload</h1> \<p>Or, click the button below to choose the items to upload</p>" : "<h1>Click the browse button below to choose the items to upload</h1>";
 
             var overlay = $("<div class='upload-overlay'>" +
                 "<div class='upload-panel'>" +

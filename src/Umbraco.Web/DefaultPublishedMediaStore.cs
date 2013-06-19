@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using UmbracoExamine;
 using umbraco;
 using umbraco.cms.businesslogic;
 using Examine.LuceneEngine.SearchCriteria;
@@ -286,9 +287,9 @@ namespace Umbraco.Web
 					//ok it doesn't exist, we might assume now that Examine didn't index this property because the index is not set up correctly
 					//so before we go loading this from the database, we can check if the alias exists on the content type at all, this information
 					//is cached so will be quicker to look up.
-					if (dd.Properties.Any(x => x.Alias == "__NodeTypeAlias"))
+                    if (dd.Properties.Any(x => x.Alias == UmbracoContentIndexer.NodeTypeAliasFieldName))
 					{
-						var aliasesAndNames = ContentType.GetAliasesAndNames(dd.Properties.First(x => x.Alias.InvariantEquals("__NodeTypeAlias")).Value.ToString());
+						var aliasesAndNames = ContentType.GetAliasesAndNames(dd.Properties.First(x => x.Alias.InvariantEquals(UmbracoContentIndexer.NodeTypeAliasFieldName)).Value.ToString());
 						if (aliasesAndNames != null)
 						{
 							if (!aliasesAndNames.ContainsKey(alias))
@@ -310,7 +311,12 @@ namespace Umbraco.Web
 				}							
 			}
 			
-			return dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+            //We've made it here which means that the value is stored in the Examine index.
+            //We are going to check for a special field however, that is because in some cases we store a 'Raw'
+            //value in the index such as for xml/html.
+            var rawValue = dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals("__Raw_" + alias));
+		    return rawValue
+		           ?? dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 		}
 
 		/// <summary>
@@ -435,7 +441,7 @@ namespace Umbraco.Web
 				ValidateAndSetProperty(valueDictionary, val => SortOrder = int.Parse(val), "sortOrder");
 				ValidateAndSetProperty(valueDictionary, val => Name = val, "nodeName", "__nodeName");
 				ValidateAndSetProperty(valueDictionary, val => UrlName = val, "urlName");
-				ValidateAndSetProperty(valueDictionary, val => DocumentTypeAlias = val, "nodeTypeAlias", "__NodeTypeAlias");
+				ValidateAndSetProperty(valueDictionary, val => DocumentTypeAlias = val, "nodeTypeAlias", UmbracoContentIndexer.NodeTypeAliasFieldName);
 				ValidateAndSetProperty(valueDictionary, val => DocumentTypeId = int.Parse(val), "nodeType");
 				ValidateAndSetProperty(valueDictionary, val => WriterName = val, "writerName");
 				ValidateAndSetProperty(valueDictionary, val => CreatorName = val, "creatorName", "writerName"); //this is a bit of a hack fix for: U4-1132

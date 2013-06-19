@@ -84,8 +84,8 @@ namespace umbraco.cms.businesslogic.workflow
             {
                 // check if something was changed and display the changes otherwise display the fields
                 Property oldProperty = oldDoc.getProperty(p.PropertyType.Alias);
-                string oldText = oldProperty.Value.ToString();
-                string newText = p.Value.ToString();
+                string oldText = oldProperty.Value != null ? oldProperty.Value.ToString() : "";
+                string newText = p.Value != null ? p.Value.ToString() : "";
 
                 // replace html with char equivalent
                 ReplaceHTMLSymbols(ref oldText);
@@ -124,7 +124,7 @@ namespace umbraco.cms.businesslogic.workflow
                     summary.Append("<tr>");
                     summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'>" +
                                    p.PropertyType.Name + "</th>");
-                    summary.Append("<td style='text-align: left; vertical-align: top;'>" + p.Value.ToString() + "</td>");
+                    summary.Append("<td style='text-align: left; vertical-align: top;'>" + newText + "</td>");
                     summary.Append("</tr>");
                 }
                 summary.Append(

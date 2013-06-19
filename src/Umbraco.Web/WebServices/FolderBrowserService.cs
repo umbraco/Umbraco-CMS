@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Web;
 using System.Web.Script.Serialization;
-using Umbraco.Core;
 using Umbraco.Web.Media.ThumbnailProviders;
-using umbraco.BasePages;
 using umbraco.BusinessLogic;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.Tags;
-using umbraco.cms.businesslogic.media;
 using Umbraco.Web.BaseRest;
 
 namespace Umbraco.Web.WebServices
@@ -21,17 +16,12 @@ namespace Umbraco.Web.WebServices
         [RestExtensionMethod(ReturnXml = false)]
         public static string GetChildren(int parentId)
         {
+            var currentUser = GetCurrentUser();
+
             var parentMedia = new global::umbraco.cms.businesslogic.media.Media(parentId);
-            var currentUser = User.GetCurrent();
+            AuthorizeAccess(parentMedia, currentUser);
+
             var data = new List<object>();
-
-            // Check user is logged in
-            if (currentUser == null)
-                throw new UnauthorizedAccessException("You must be logged in to use this service");
-
-            // Check user is allowed to access selected media item
-            if(!("," + parentMedia.Path + ",").Contains("," + currentUser.StartMediaId + ","))
-                throw new UnauthorizedAccessException("You do not have access to this Media node");
 
             // Get children and filter
             //TODO: Only fetch files, not containers
@@ -39,8 +29,7 @@ namespace Umbraco.Web.WebServices
             foreach (var child in parentMedia.Children)
             {
                 var fileProp = child.getProperty("umbracoFile") ?? 
-                    child.GenericProperties.FirstOrDefault(x =>
-                        x.PropertyType.DataTypeDefinition.DataType.Id == new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+                    child.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id == new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
 
                 var fileUrl = fileProp != null ? fileProp.Value.ToString() : "";
                 var thumbUrl = ThumbnailProvidersResolver.Current.GetThumbnailUrl(fileUrl);
@@ -53,9 +42,9 @@ namespace Umbraco.Web.WebServices
                     MediaTypeAlias = child.ContentType.Alias,
                     EditUrl = string.Format("editMedia.aspx?id={0}", child.Id),
                     FileUrl = fileUrl,
-                    ThumbnailUrl = !string.IsNullOrEmpty(thumbUrl)
-                        ? thumbUrl
-                        : IOHelper.ResolveUrl(SystemDirectories.Umbraco + "/images/thumbnails/" + child.ContentType.Thumbnail)
+                    ThumbnailUrl = string.IsNullOrEmpty(thumbUrl)
+                        ? IOHelper.ResolveUrl(SystemDirectories.Umbraco + "/images/thumbnails/" + child.ContentType.Thumbnail)
+                        : thumbUrl
                 };
 
                 data.Add(item);
@@ -67,15 +56,19 @@ namespace Umbraco.Web.WebServices
         [RestExtensionMethod(ReturnXml = false)]
         public static string Delete(string nodeIds)
         {
-            var nodeIdParts = nodeIds.Split(',');
+            var currentUser = GetCurrentUser();
 
-            foreach (var nodeIdPart in nodeIdParts.Where(x => !string.IsNullOrEmpty(x)))
+            var nodeIdParts = nodeIds.Split(',');
+            
+            foreach (var nodeIdPart in nodeIdParts.Where(x => string.IsNullOrEmpty(x) == false))
             {
-                var nodeId = 0;
-                if (!Int32.TryParse(nodeIdPart, out nodeId)) 
+                int nodeId;
+                if (Int32.TryParse(nodeIdPart, out nodeId) == false) 
                     continue;
                 
                 var node = new global::umbraco.cms.businesslogic.media.Media(nodeId);
+                AuthorizeAccess(node, currentUser);
+
                 node.delete(("," + node.Path + ",").Contains(",-21,"));
             }
 
@@ -83,6 +76,21 @@ namespace Umbraco.Web.WebServices
             {
                 success = true
             });
+        }
+
+        private static User GetCurrentUser()
+        {
+            var currentUser = User.GetCurrent();
+            if (currentUser == null)
+                throw new UnauthorizedAccessException("You must be logged in to use this service");
+
+            return currentUser;
+        }
+
+        private static void AuthorizeAccess(global::umbraco.cms.businesslogic.media.Media mediaItem, User currentUser)
+        {
+            if (("," + mediaItem.Path + ",").Contains("," + currentUser.StartMediaId + ",") == false)
+                throw new UnauthorizedAccessException("You do not have access to this Media node");
         }
     }
 }

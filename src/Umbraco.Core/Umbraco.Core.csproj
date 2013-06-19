@@ -150,7 +150,7 @@
     <Compile Include="IfExtensions.cs" />
     <Compile Include="PluginManager.cs" />
     <Compile Include="IO\FileSecurityException.cs" />
-    <Compile Include="IO\FileSystemProvider.cs" />
+    <Compile Include="IO\FileSystemProviderConstants.cs" />
     <Compile Include="IO\FileSystemProviderManager.cs" />
     <Compile Include="IO\IFileSystem.cs" />
     <Compile Include="IO\IOHelper.cs" />

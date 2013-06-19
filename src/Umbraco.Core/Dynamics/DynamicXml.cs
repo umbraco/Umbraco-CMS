@@ -679,57 +679,10 @@ namespace Umbraco.Core.Dynamics
             return test(this) ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
         }
 
+        [Obsolete("Use XmlHelper.StripDashesInElementOrAttributeNames instead")]
         public static string StripDashesInElementOrAttributeNames(string xml)
         {
-            using (MemoryStream outputms = new MemoryStream())
-            {
-                using (TextWriter outputtw = new StreamWriter(outputms))
-                {
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        using (TextWriter tw = new StreamWriter(ms))
-                        {
-                            tw.Write(xml);
-                            tw.Flush();
-                            ms.Position = 0;
-                            using (TextReader tr = new StreamReader(ms))
-                            {
-                                bool IsInsideElement = false, IsInsideQuotes = false;
-                                int ic = 0;
-                                while ((ic = tr.Read()) != -1)
-                                {
-                                    if (ic == (int)'<' && !IsInsideQuotes)
-                                    {
-                                        if (tr.Peek() != (int)'!')
-                                        {
-                                            IsInsideElement = true;
-                                        }
-                                    }
-                                    if (ic == (int)'>' && !IsInsideQuotes)
-                                    {
-                                        IsInsideElement = false;
-                                    }
-                                    if (ic == (int)'"')
-                                    {
-                                        IsInsideQuotes = !IsInsideQuotes;
-                                    }
-                                    if (!IsInsideElement || ic != (int)'-' || IsInsideQuotes)
-                                    {
-                                        outputtw.Write((char)ic);
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                    outputtw.Flush();
-                    outputms.Position = 0;
-                    using (TextReader outputtr = new StreamReader(outputms))
-                    {
-                        return outputtr.ReadToEnd();
-                    }
-                }
-            }
+            return XmlHelper.StripDashesInElementOrAttributeNames(xml);
         }
 
 

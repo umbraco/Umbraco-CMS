@@ -122,6 +122,7 @@
     </Compile>
     <Compile Include="TestHelpers\ExamineHelpers\IndexInitializer.cs" />
     <Compile Include="UI\LegacyDialogTests.cs" />
+    <Compile Include="TypeHelperTests.cs" />
     <Compile Include="UriUtilityTests.cs" />
     <Compile Include="Resolvers\MacroFieldEditorsResolverTests.cs" />
     <Compile Include="MacroEngineFactoryTests.cs" />

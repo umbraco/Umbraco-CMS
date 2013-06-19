@@ -1273,7 +1273,7 @@ and node.nodeObjectType=@nodeObjectType";
                 Guid newVersion = createNewVersion(versionDate);
 
                 SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, updateDate, Text) "
-					+ "values (" + Id + ", 0, " + u.Id + ", @versionId, @text)",
+					+ "values (" + Id + ", 0, " + u.Id + ", @versionId, @updateDate, @text)",
                     SqlHelper.CreateParameter("@versionId", newVersion),
                     SqlHelper.CreateParameter("@updateDate", versionDate),
                     SqlHelper.CreateParameter("@text", Text));

@@ -168,6 +168,8 @@ namespace umbraco.presentation.webservices
         [ScriptMethod]
         public string ProgressStatus(string Key)
         {
+            AuthorizeRequest(true);
+
             return Application[helper.Request("key")].ToString();
         }
 

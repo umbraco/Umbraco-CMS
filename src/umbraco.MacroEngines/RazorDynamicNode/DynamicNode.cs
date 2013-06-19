@@ -789,18 +789,18 @@ namespace umbraco.MacroEngines
             if (result != null)
             {
                 //a really rough check to see if this may be valid xml
-                if (sResult.StartsWith("<") && sResult.EndsWith(">") && sResult.Contains("/"))
+                if (XmlHelper.CouldItBeXml(sResult))
                 {
                     try
                     {
-                        XElement e = XElement.Parse(DynamicXml.StripDashesInElementOrAttributeNames(sResult), LoadOptions.None);
+                        XElement e = XElement.Parse(XmlHelper.StripDashesInElementOrAttributeNames(sResult), LoadOptions.None);
                         if (e != null)
                         {
                             //check that the document element is not one of the disallowed elements
                             //allows RTE to still return as html if it's valid xhtml
                             string documentElement = e.Name.LocalName;
-                            if (!UmbracoSettings.NotDynamicXmlDocumentElements.Any(tag =>
-                                string.Equals(tag, documentElement, StringComparison.CurrentCultureIgnoreCase)))
+                            if (UmbracoSettings.NotDynamicXmlDocumentElements.Any(tag =>
+                                                                                  string.Equals(tag, documentElement, StringComparison.CurrentCultureIgnoreCase)) == false)
                             {
                                 result = new DynamicXml(e);
                                 return true;
