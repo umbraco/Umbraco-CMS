@@ -333,7 +333,7 @@ namespace Umbraco.Core.Services
             using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
             {
                 var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
-                var contents = repository.GetByQuery(query);
+                var contents = repository.GetByQuery(query).OrderBy(x => x.SortOrder);
 
                 return contents;
             }
@@ -1114,7 +1114,7 @@ namespace Umbraco.Core.Services
                 }
 
                 //Look for children and copy those as well
-                var children = GetChildren(content.Id).OrderBy(x => x.SortOrder);
+                var children = GetChildren(content.Id);
                 foreach (var child in children)
                 {
                     Copy(child, copy.Id, relateToOriginal, userId);

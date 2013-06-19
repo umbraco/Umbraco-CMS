@@ -296,7 +296,7 @@ namespace umbraco.providers.members
             Member m = Member.GetMemberFromLoginNameAndPassword(username, oldPassword);
             if (m == null) return false;
 
-            ValidatePasswordEventArgs args = new ValidatePasswordEventArgs(username, newPassword, true);
+            ValidatePasswordEventArgs args = new ValidatePasswordEventArgs(username, newPassword, false);
             OnValidatingPassword(args);
 
             if (args.Cancel)

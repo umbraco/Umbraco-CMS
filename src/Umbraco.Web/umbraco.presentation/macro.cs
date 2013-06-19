@@ -1607,7 +1607,6 @@ namespace umbraco
         {
 			Mandate.ParameterNotNullOrEmpty(fileName, "fileName");
 	        Mandate.ParameterNotNull(model, "model");
-			Mandate.ParameterNotNull(pageElements, "pageElements");
 
             try
             {

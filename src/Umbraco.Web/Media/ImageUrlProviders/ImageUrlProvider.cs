@@ -43,7 +43,7 @@ namespace Umbraco.Web.Media.ImageUrlProviders
             if (parameters.ContainsKey("thumb"))
                 thumb = parameters["thumb"];
 
-            if (!string.IsNullOrEmpty(thumb))
+            if (!string.IsNullOrEmpty(thumb) && filename.Contains("."))
             {
                 var lastIndexOf = filename.LastIndexOf('.');
                 var name = filename.Substring(0, lastIndexOf);
@@ -59,7 +59,7 @@ namespace Umbraco.Web.Media.ImageUrlProviders
             if (parameters.ContainsKey("crop"))
                 crop = parameters["crop"];
 
-            if (!string.IsNullOrEmpty(crop))
+            if (!string.IsNullOrEmpty(crop) && filename.Contains("."))
             {
                 var lastIndexOf = filename.LastIndexOf('.');
                 var name = filename.Substring(0, lastIndexOf);

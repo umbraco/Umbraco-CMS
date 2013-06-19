@@ -1035,5 +1035,34 @@ namespace Umbraco.Core
         {
             return ShortStringHelper.CleanStringForSafeFileName(text, culture);
         }
+        
+        /// <summary>
+        /// An extension method that returns a new string in which all occurrences of a 
+        /// specified string in the current instance are replaced with another specified string.
+        /// StringComparison specifies the type of search to use for the specified string.
+        /// </summary>
+        /// <param name="source">Current instance of the string</param>
+        /// <param name="oldString">Specified string to replace</param>
+        /// <param name="newString">Specified string to inject</param>
+        /// <param name="stringComparison">String Comparison object to specify search type</param>
+        /// <returns>Updated string</returns>
+        public static string Replace(this string source, string oldString, string newString, StringComparison stringComparison)
+        {
+            var index = source.IndexOf(oldString, stringComparison);
+
+            // Determine if we found a match
+            var matchFound = index >= 0;
+
+            if (matchFound)
+            {
+                // Remove the old text
+                source = source.Remove(index, oldString.Length);
+
+                // Add the replacemenet text
+                source = source.Insert(index, newString);
+            }
+
+            return source;
+        }
     }
 }
