@@ -1030,7 +1030,7 @@ namespace Umbraco.Core.Services
                 }
 
                 //Look for children and copy those as well
-                var children = GetChildren(content.Id).OrderBy(x => x.SortOrder);
+                var children = GetChildren(content.Id);
                 foreach (var child in children)
                 {
                     Copy(child, copy.Id, relateToOriginal, userId);

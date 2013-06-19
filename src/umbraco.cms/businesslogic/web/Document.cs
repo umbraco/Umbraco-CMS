@@ -391,7 +391,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetChildren()", false)]
         public static Document[] GetChildrenForTree(int NodeId)
         {
-            var children = ApplicationContext.Current.Services.ContentService.GetChildren(NodeId).OrderBy(c => c.SortOrder);
+            var children = ApplicationContext.Current.Services.ContentService.GetChildren(NodeId);
             var list = children.Select(x => new Document(x));
             return list.ToArray();
         }

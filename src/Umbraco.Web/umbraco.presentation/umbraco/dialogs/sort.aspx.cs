@@ -78,7 +78,7 @@ namespace umbraco.cms.presentation
                     else
                     {
                         var children = contentService.GetChildren(parentId);
-                        foreach (var child in children.OrderBy(x => x.SortOrder))
+                        foreach (var child in children)
                             _nodes.Add(CreateNode(child.Id, child.SortOrder, child.Name, child.CreateDate, icon));
                     }
                 }
