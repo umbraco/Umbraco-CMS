@@ -217,11 +217,13 @@ namespace umbraco.cms.businesslogic.member
                 throw new ArgumentException("The loginname must be different from an empty string", "loginName");
 
             // Test for e-mail
-            if (Email != "" && Member.GetMemberFromEmail(Email) != null)
+            if (Email != "" && Member.GetMemberFromEmail(Email) != null && Membership.Providers[UmbracoMemberProviderName].RequiresUniqueEmail)
                 throw new Exception(String.Format("Duplicate Email! A member with the e-mail {0} already exists", Email));
             else if (Member.GetMemberFromLoginName(loginName) != null)
                 throw new Exception(String.Format("Duplicate User name! A member with the user name {0} already exists", loginName));
 
+            // Lowercased to prevent duplicates
+            Email = Email.ToLowerInvariant();
             Guid newId = Guid.NewGuid();
 
             //create the cms node first
@@ -286,7 +288,7 @@ namespace umbraco.cms.businesslogic.member
         }
 
         /// <summary>
-        /// Retrieve a Member given an email
+        /// Retrieve a Member given an email, the first if there multiple members with same email
         /// 
         /// Used when authentifying the Member
         /// </summary>
@@ -299,7 +301,7 @@ namespace umbraco.cms.businesslogic.member
 
             object o = SqlHelper.ExecuteScalar<object>(
                 "select nodeID from cmsMember where Email = @email",
-                SqlHelper.CreateParameter("@email", email));
+                SqlHelper.CreateParameter("@email", email.ToLower()));
 
             if (o == null)
                 return null;
@@ -309,6 +311,35 @@ namespace umbraco.cms.businesslogic.member
                 return null;
 
             return new Member(tmpId);
+        }
+
+        /// <summary>
+        /// Retrieve Members given an email
+        /// 
+        /// Used when authentifying a Member
+        /// </summary>
+        /// <param name="email">The email of the member(s)</param>
+        /// <returns>The members with the specified email</returns>
+        public static Member[] GetMembersFromEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return null;
+
+            var tmp = new List<Member>();
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(m_SQLOptimizedMany.Trim(),
+                                        "Email = @email",
+                                        "umbracoNode.text"),
+                                            SqlHelper.CreateParameter("@nodeObjectType", Member._objectType),
+                                            SqlHelper.CreateParameter("@email", email.ToLower())))
+            {
+                while (dr.Read())
+                {
+                    Member m = new Member(dr.GetInt("id"), true);
+                    m.PopulateMemberFromReader(dr);
+                    tmp.Add(m);
+                }
+            }
+            return tmp.ToArray();
         }
 
         /// <summary>
@@ -520,13 +551,18 @@ namespace umbraco.cms.businesslogic.member
                        SqlHelper.CreateParameter("@id", Id));
                 }
 
-                return m_Email;
+                return m_Email.ToLower();
             }
             set
             {
+                var m = Member.GetMemberFromEmail(value);
+                if (m != null && Membership.Providers[UmbracoMemberProviderName].RequiresUniqueEmail)
+                {
+                    throw new Exception(String.Format("Duplicate Email! A member with the e-mail {0} already exists", value.ToLower()));
+                }
                 SqlHelper.ExecuteNonQuery(
                     "update cmsMember set Email = @email where nodeId = @id",
-                    SqlHelper.CreateParameter("@id", Id), SqlHelper.CreateParameter("@email", value));
+                    SqlHelper.CreateParameter("@id", Id), SqlHelper.CreateParameter("@email", value.ToLower()));
             }
         }
         #endregion

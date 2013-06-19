@@ -123,7 +123,7 @@ namespace umbraco.cms.presentation.create.controls
         /// <param name="e"></param>
         protected void EmailExistsCheck(object sender, ServerValidateEventArgs e)
         {
-            if (Email.Text != "" && Member.GetMemberFromEmail(Email.Text.ToLower()) != null)
+            if (Email.Text != "" && Member.GetMemberFromEmail(Email.Text.ToLower()) != null && Membership.Providers[Member.UmbracoMemberProviderName].RequiresUniqueEmail)
                 e.IsValid = false;
             else
                 e.IsValid = true;
