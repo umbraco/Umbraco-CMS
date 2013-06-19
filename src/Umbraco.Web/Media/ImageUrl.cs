@@ -11,10 +11,17 @@ namespace Umbraco.Web.Media
 {
     public class ImageUrl
     {
+        [Obsolete("Use TryGetImageUrl() instead")]
         public static string GetImageUrl(string specifiedSrc, string field, string provider, string parameters, int? nodeId = null)
         {
             string url;
+            var found = TryGetImageUrl(specifiedSrc, field, provider, parameters, nodeId, out url);
 
+            return found ? url : string.Empty;
+        }
+
+        public static bool TryGetImageUrl(string specifiedSrc, string field, string provider, string parameters, int? nodeId, out string url)
+        {
             var imageUrlProvider = GetProvider(provider);
 
             var parsedParameters = string.IsNullOrEmpty(parameters) ? new NameValueCollection() : HttpUtility.ParseQueryString(parameters);
@@ -24,6 +31,7 @@ namespace Umbraco.Web.Media
             if (string.IsNullOrEmpty(field))
             {
                 url = imageUrlProvider.GetImageUrlFromFileName(specifiedSrc, queryValues);
+                return true;
             }
             else
             {
@@ -56,13 +64,18 @@ namespace Umbraco.Web.Media
                     }
                 }
 
-                int mediaId;
-                url = int.TryParse(fieldValue, out mediaId)
-                          ? imageUrlProvider.GetImageUrlFromMedia(mediaId, queryValues)
-                          : imageUrlProvider.GetImageUrlFromFileName(fieldValue, queryValues);
+                if (!string.IsNullOrWhiteSpace(fieldValue))
+                {
+                    int mediaId;
+                    url = int.TryParse(fieldValue, out mediaId)
+                              ? imageUrlProvider.GetImageUrlFromMedia(mediaId, queryValues)
+                              : imageUrlProvider.GetImageUrlFromFileName(fieldValue, queryValues);
+                    return true;
+                }
             }
 
-            return url;
+            url = string.Empty;
+            return false;
         }
 
         private static IImageUrlProvider GetProvider(string provider)
