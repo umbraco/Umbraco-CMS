@@ -24,7 +24,9 @@ function umbPropEditorHelper() {
                 return path;
             }
             else {
-                return "views/propertyeditors/" + path.replace('.', '/') + "/editor.html";
+                var pathName = path.replace('.', '/');
+                //i.e. views/propertyeditors/fileupload/fileupload.html
+                return "views/propertyeditors/" + pathName + "/" + pathName + ".html";
             }
         }
     };

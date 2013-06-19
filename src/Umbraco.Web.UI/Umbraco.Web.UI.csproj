@@ -285,8 +285,6 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="App_Plugins\MyPackage\Controllers\ServerSidePropertyEditorsController.cs" />
-    <Compile Include="App_Plugins\MyPackage\PropertyEditors\FileUploadPropertyEditor.cs" />
-    <Compile Include="App_Plugins\MyPackage\PropertyEditors\FileUploadValueEditor.cs" />
     <Compile Include="App_Plugins\MyPackage\PropertyEditors\PostcodePropertyEditor.cs" />
     <Compile Include="App_Plugins\MyPackage\PropertyEditors\PostcodeValidator.cs" />
     <Compile Include="App_Plugins\MyPackage\PropertyEditors\ServerInfoPropertyEditor.cs" />
@@ -556,11 +554,9 @@
     </Compile>
     <Content Include="App_Plugins\MyPackage\Common\Js\MyPackage.js" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\CsvEditor.js" />
-    <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\FileUploadEditor.js" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\PostcodeEditor.js" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\RegexEditor.js" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\CsvEditor.html" />
-    <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\FileUploadEditor.html" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\PostcodeEditor.html" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\RegexEditor.html" />
     <Content Include="Config\Splashes\booting.aspx" />

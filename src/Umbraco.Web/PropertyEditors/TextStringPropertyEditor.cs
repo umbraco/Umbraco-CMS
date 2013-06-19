@@ -13,5 +13,4 @@ namespace Umbraco.Web.PropertyEditors
     public class TextStringPropertyEditor : PropertyEditor
     {        
     }
-
 }

@@ -19,9 +19,6 @@
     <link rel="stylesheet" href="assets/css/umbraco.css" />
     <link rel="stylesheet" href="../umbraco_client/tree/treeicons.css" />
 
-    @*Currently this needs to be loaded before anything*@
-    <script src="@Url.Action("ServerVariables", "BackOffice")" type="text/javascript"></script>
-
     <style type="text/css">
         .validation-message
         {
@@ -51,8 +48,8 @@
 </head>
 <body ng-controller="MainController" id="umbracoMainPageBody">
          
-    <div ng-hide="!authenticated" ng-cloak ng-animate="'fade'" id="layout" class="clearfix" ng-click="closeDialogs($event)">
-        
+    <div ng-hide="!authenticated" ng-cloak ng-animate="'fade'" id="Div1" class="clearfix" ng-click="closeDialogs($event)">
+
         <umb-left-column></umb-left-column>
 
         <section id="contentwrapper">
@@ -62,10 +59,13 @@
         </section>
     </div>
 
-    <umb-notifications></umb-notifications>  
+    <umb-login></umb-login>
+    <umb-notifications></umb-notifications>
     
-    <script type="text/javascript" src="lib/yepnope/yepnope.min.js"></script>
     
+    @*Currently this needs to be loaded before anything*@
+    <script src="@Url.Action("ServerVariables", "BackOffice")" type="text/javascript"></script>
+    <script type="text/javascript" src="lib/yepnope/yepnope.min.js"></script>    
     <script type="text/javascript" src="@Url.Action("Application", "BackOffice")"></script>
     
 </body>

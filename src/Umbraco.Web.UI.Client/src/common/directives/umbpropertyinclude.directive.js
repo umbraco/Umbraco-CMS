@@ -10,7 +10,7 @@
  * @element ANY
  * @param umbPropEditorHelper {umbPropEditorHelper} a utility class for dealing with property editors/paths
  */
-function umbPropertyInclude($http, $templateCache, $anchorScroll, $compile, umbPropEditorHelper) {
+function umbPropertyInclude($http, $templateCache, $anchorScroll, $compile, umbPropEditorHelper, scriptLoader) {
     return {
         restrict: "E",      //restrict to element
         terminal: true,
@@ -50,7 +50,7 @@ function umbPropertyInclude($http, $templateCache, $anchorScroll, $compile, umbP
 
                             //before we compile, we need to check if we need to make a js call
                             //now we need to parse the contents to see if there's an ng-controller directive 
-                            if (!isNonUmbraco &&  /ng-controller=["'][\w\.]+["']/.test(contents)) {
+                            if (isNonUmbraco && /ng-controller=["'][\w\.]+["']/.test(response)) {
                                 //ok, there's a controller declared, we will assume there's javascript to go and get
 
                                 //get the js file which exists at ../Js/EditorName.js
@@ -59,23 +59,11 @@ function umbPropertyInclude($http, $templateCache, $anchorScroll, $compile, umbP
                                 var viewName = fullViewName.indexOf(".") > 0 ? fullViewName.substring(0, fullViewName.indexOf(".")) : fullViewName;
                                 var jsPath = scope.model.view.substring(0, lastSlash + 1) + "../Js/" + viewName + ".js";
 
-                                require([jsPath],
-                                    function() {
-                                        //the script loaded so load the view
-                                        //NOTE: The use of $apply because we're operating outside of the angular scope with this callback.
-                                        scope.$apply(function () {
-                                            element.html(contents);
-                                            $compile(contents)(childScope);
-                                        });
-                                    }, function(err) {
-                                        //an error occurred... most likely there is no JS file to load for this editor
-                                        //NOTE: The use of $apply because we're operating outside of the angular scope with this callback.
-                                        scope.$apply(function () {
-                                            element.html(contents);
-                                            $compile(contents)(childScope);
-                                        });
-                                    });
-
+                                scriptLoader.load([jsPath], scope).then(function () {
+                                    //the script loaded so load the view
+                                    element.html(contents);
+                                    $compile(contents)(childScope);
+                                });
                             }
                             else {
                                 element.html(contents);
