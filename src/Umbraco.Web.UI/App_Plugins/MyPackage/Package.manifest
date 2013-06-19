@@ -35,16 +35,8 @@
 				]				
 			}
 		}
-	],
-    config: {
-        paths: {
-            myPackageCommon: '~/App_Plugins/MyPackage/Common/Js/MyPackage'
-        },
-        shim: {
-            'myPackageCommon': { 'exports': 'myPackageCommon' }
-        }
-    },
-    init: [
-        'myPackageCommon'
+	],    
+    javascript: [
+        '~/App_Plugins/MyPackage/Common/Js/MyPackage.js'
     ]
 }

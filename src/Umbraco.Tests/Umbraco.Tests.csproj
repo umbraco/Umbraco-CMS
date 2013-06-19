@@ -146,7 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AngularIntegration\ContentModelSerializationTests.cs" />
-    <Compile Include="AngularIntegration\RequireJsInitTests.cs" />
+    <Compile Include="AngularIntegration\JsInitializationTests.cs" />
     <Compile Include="AngularIntegration\ServerVariablesParserTests.cs" />
     <Compile Include="Auditing\AuditTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />

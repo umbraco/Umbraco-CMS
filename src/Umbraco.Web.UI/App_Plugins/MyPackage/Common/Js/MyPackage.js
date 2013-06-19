@@ -1,8 +1,11 @@
 ﻿'use strict';
 
-define(['app'], function (app) {
+(function () {
+    
+    angular.module("myPackage.directives", []);
+    angular.module("myPackage.controllers", []);
 
-    app.directive('valPostcode', function () {
+    angular.module("myPackage.directives").directive('valPostcode', function () {
 
         /// <summary>
         /// A custom directive to validate for postcodes
@@ -51,4 +54,4 @@ define(['app'], function (app) {
             }
         };
     });
-});
+})();

@@ -328,12 +328,7 @@
     <Compile Include="Security\Providers\UsersMembershipProvider.cs" />
     <Compile Include="Trees\TestTreeApiController.cs" />
     <Compile Include="Trees\UrlHelperExtensions.cs" />
-    <Compile Include="UI\JavaScript\RequireJsInit.cs" />
-    <Compile Include="UI\JavaScript\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
+    <Compile Include="UI\JavaScript\JsInitialization.cs" />
     <Compile Include="Models\ContentEditing\ContentItemBasic.cs" />
     <Compile Include="Models\ContentEditing\ContentItemDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentItemDto.cs" />
@@ -416,6 +411,11 @@
     <Compile Include="Search\LuceneIndexerExtensions.cs" />
     <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
+    <Compile Include="UI\JavaScript\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="UI\JavaScript\ServerVariablesParser.cs" />
     <Compile Include="UI\CdfLogger.cs" />
     <Compile Include="umbraco.presentation\LegacyClasses.cs" />
@@ -1844,8 +1844,7 @@
       <SubType>Component</SubType>
     </Compile>
     <EmbeddedResource Include="UI\JavaScript\Main.js" />
-    <EmbeddedResource Include="UI\JavaScript\RequireJsConfig.js" />
-    <EmbeddedResource Include="UI\JavaScript\RequireJsInitialize.js" />
+    <EmbeddedResource Include="UI\JavaScript\JsInitialize.js" />
     <EmbeddedResource Include="UI\JavaScript\ServerVariables.js" />
     <Content Include="umbraco.presentation\umbracobase\readme.txt" />
     <Content Include="umbraco.presentation\umbraco\controls\Tree\CustomTreeService.asmx" />

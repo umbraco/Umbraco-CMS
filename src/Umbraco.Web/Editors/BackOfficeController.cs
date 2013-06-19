@@ -32,8 +32,8 @@ namespace Umbraco.Web.Editors
         {
             var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
             var parser = new ManifestParser(plugins);
-            var requireJs = new RequireJsInit(parser);
-            var result = requireJs.GetJavascriptInitialization(RequireJsInit.GetDefaultConfig(), RequireJsInit.GetDefaultInitialization());
+            var requireJs = new JsInitialization(parser);
+            var result = requireJs.GetJavascriptInitialization(JsInitialization.GetDefaultInitialization());
             return JavaScript(result);
         }
 

@@ -71,8 +71,6 @@ namespace Umbraco.Core.Manifest
             return currDir.GetFiles("Package.manifest")
                           .Select(f => File.ReadAllText(f.FullName))
                           .ToList();
-
-            return Enumerable.Empty<string>();
         }
 
         /// <summary>
@@ -109,18 +107,11 @@ namespace Umbraco.Core.Manifest
                 
                 var deserialized = JsonConvert.DeserializeObject<JObject>(m);
 
-                //validate the config
-                var config = deserialized.Properties().Where(x => x.Name == "config").ToArray();
-                if (config.Length > 1)
-                {
-                    throw new FormatException("The manifest is not formatted correctly contains more than one 'config' element");
-                }
-
-                //validate the init
-                var init = deserialized.Properties().Where(x => x.Name == "init").ToArray();
+                //validate the javascript
+                var init = deserialized.Properties().Where(x => x.Name == "javascript").ToArray();
                 if (init.Length > 1)
                 {
-                    throw new FormatException("The manifest is not formatted correctly contains more than one 'init' element");
+                    throw new FormatException("The manifest is not formatted correctly contains more than one 'javascript' element");
                 }
                 
                 //validate the property editors section
@@ -130,7 +121,7 @@ namespace Umbraco.Core.Manifest
                     throw new FormatException("The manifest is not formatted correctly contains more than one 'propertyEditors' element");
                 }
 
-                var jConfig = config.Any() ? (JObject) deserialized["config"] : new JObject();
+                var jConfig = init.Any() ? (JArray)deserialized["javascript"] : new JArray();
                 ReplaceVirtualPaths(jConfig);
 
                 //replace virtual paths for each property editor
@@ -152,8 +143,7 @@ namespace Umbraco.Core.Manifest
 
                 var manifest = new PackageManifest()
                     {
-                        JavaScriptConfig = jConfig,
-                        JavaScriptInitialize = init.Any() ? (JArray)deserialized["init"] : new JArray(),
+                        JavaScriptInitialize = jConfig,
                         PropertyEditors = propEditors.Any() ? (JArray)deserialized["propertyEditors"] : new JArray(),
                     };
                 result.Add(manifest);
@@ -164,31 +154,52 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Replaces any virtual paths found in properties
         /// </summary>
+        /// <param name="jarr"></param>
+        private static void ReplaceVirtualPaths(JArray jarr)
+        {
+            foreach (var i in jarr)
+            {
+                ReplaceVirtualPaths(i);
+            }
+        }
+
+        /// <summary>
+        /// Replaces any virtual paths found in properties
+        /// </summary>
+        /// <param name="jToken"></param>
+        private static void ReplaceVirtualPaths(JToken jToken)
+        {
+            if (jToken.Type == JTokenType.Object)
+            {
+                //recurse
+                ReplaceVirtualPaths((JObject)jToken);
+            }
+            else
+            {
+                var value = jToken as JValue;
+                if (value != null)
+                {
+                    if (value.Type == JTokenType.String)
+                    {
+                        if (value.Value<string>().StartsWith("~/"))
+                        {
+                            //replace the virtual path
+                            value.Value = IOHelper.ResolveUrl(value.Value<string>());
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Replaces any virtual paths found in properties
+        /// </summary>
         /// <param name="jObj"></param>
         private static void ReplaceVirtualPaths(JObject jObj)
         {
             foreach (var p in jObj.Properties().Select(x => x.Value))
-            {                
-                if (p.Type == JTokenType.Object)
-                {
-                    //recurse
-                    ReplaceVirtualPaths((JObject) p);
-                }                
-                else
-                {
-                    var value = p as JValue;
-                    if (value != null)
-                    {
-                        if (value.Type == JTokenType.String)
-                        {
-                            if (value.Value<string>().StartsWith("~/"))
-                            {
-                                //replace the virtual path
-                                value.Value = IOHelper.ResolveUrl(value.Value<string>());
-                            }
-                        }
-                    }
-                }
+            {
+                ReplaceVirtualPaths(p);
             }
         }
 

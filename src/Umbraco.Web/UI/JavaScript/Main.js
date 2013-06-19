@@ -1,13 +1,11 @@
-require.config("##RequireJsConfig##");
+yepnope({
 
-require("##RequireJsInitialize##", function (angular, app, jQuery) {
+    load: "##JsInitialize##",
 
-    //This function will be called when all the dependencies
-    //listed above are loaded. Note that this function could
-    //be called before the page is loaded.
-    //This callback is optional.
+    complete: function () {
+        jQuery(document).ready(function () {
+            angular.bootstrap(document, ['umbraco']);
+        });
 
-    jQuery(document).ready(function () {
-        angular.bootstrap(document, ['umbraco']);
-    });
+    }
 });

@@ -1,12 +1,8 @@
 ﻿'use strict';
 
-//requires namespaceMgr
-define(['namespaceMgr'], function () {
-    
-    Umbraco.Sys.registerNamespace("MyPackage.PropertyEditors");
+(function() {
+    function fileUploadEditorController($scope, $element, $compile, umbImageHelper) {
 
-    MyPackage.PropertyEditors.FileUploadEditor = function ($scope, $element, $compile, umbImageHelper) {
-        
         /** Clears the file collections when content is saving (if we need to clear) or after saved */
         function clearFiles() {
             //TODO: There should be a better way! We don't want to have to know about the parent scope
@@ -23,10 +19,10 @@ define(['namespaceMgr'], function () {
 
             //for legacy data, this will not be an array, just a string so convert to an array
             if (!$scope.model.value.startsWith('[')) {
-                
+
                 //check if it ends with a common image extensions
-                var isImage = umbImageHelper.detectIfImageByExtension($scope.model.value);                
-                $scope.model.value = "[{\"file\": \"" + $scope.model.value + "\",\"isImage\":" + isImage +"}]";
+                var isImage = umbImageHelper.detectIfImageByExtension($scope.model.value);
+                $scope.model.value = "[{\"file\": \"" + $scope.model.value + "\",\"isImage\":" + isImage + "}]";
             }
 
             $scope.persistedFiles = angular.fromJson($scope.model.value);
@@ -35,15 +31,15 @@ define(['namespaceMgr'], function () {
             $scope.persistedFiles = [];
         }
 
-        _.each($scope.persistedFiles, function(file) {
+        _.each($scope.persistedFiles, function (file) {
             file.thumbnail = umbImageHelper.getThumbnailFromPath(file.file);
         });
-        
+
 
         $scope.clearFiles = false;
 
         //listen for clear files changes to set our model to be sent up to the server
-        $scope.$watch("clearFiles", function(isCleared) {
+        $scope.$watch("clearFiles", function (isCleared) {
             if (isCleared == true) {
                 $scope.model.value = "{clearFiles: true}";
                 clearFiles();
@@ -52,10 +48,10 @@ define(['namespaceMgr'], function () {
                 $scope.model.value = "";
             }
         });
-        
+
         //listen for when a file is selected
         $scope.$on("filesSelected", function (event, args) {
-            $scope.$apply(function() {
+            $scope.$apply(function () {
                 //set the parent files collection
                 $scope.$parent.addFiles($scope.model.id, args.files);
                 //clear the current files
@@ -67,8 +63,9 @@ define(['namespaceMgr'], function () {
                 //set clear files to false, this will reset the model too
                 $scope.clearFiles = false;
             });
-        });        
+        });
 
     };
     
-});
+    angular.module("myPackage.controllers").controller('MyPackage.PropertyEditors.FileUploadEditor', fileUploadEditorController);
+})();

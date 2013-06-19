@@ -1,11 +1,8 @@
 ﻿'use strict';
 
-//requires namespaceMgr
-define(['namespaceMgr'], function () {
+(function() {
     
-    Umbraco.Sys.registerNamespace("MyPackage.PropertyEditors");
-
-    MyPackage.PropertyEditors.CsvEditor = function ($scope, $http, $filter) {
+    function csvEditorController($scope, $http, $filter) {
 
         var values = [];
 
@@ -40,7 +37,7 @@ define(['namespaceMgr'], function () {
             //write the csv value back to the property
             $scope.model.value = csv.join();
         }, true);
-
     };
-    
-});
+
+    angular.module("myPackage.controllers").controller('MyPackage.PropertyEditors.CsvEditorController', csvEditorController);
+})();

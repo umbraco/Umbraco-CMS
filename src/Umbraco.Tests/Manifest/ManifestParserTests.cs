@@ -139,16 +139,16 @@ namespace Umbraco.Belle.Tests
         public void Create_Manifest_From_File_Content()
         {
             var content1 = "{}";
-            var content2 = "{config: {}, init: []}";
-            var content3 = "{config: {paths: {blah: 'mypath.js'}, shim: {'blah' : {'exports': 'blah'}}}, init: []}";
-            var content4 = "{propertyEditors: [], config: {paths: {blah: 'mypath.js'}, shim: {'blah' : {'exports': 'blah'}}}, init: []}";
+            var content2 = "{javascript: []}";
+            var content3 = "{javascript: ['~/test.js', '~/test2.js']}";
+            var content4 = "{propertyEditors: [], javascript: ['~/test.js', '~/test2.js']}";
 
             var result = ManifestParser.CreateManifests(null, content1, content2, content3, content4);
 
             Assert.AreEqual(4, result.Count());
-            Assert.AreEqual(0, result.ElementAt(1).JavaScriptConfig.Properties().Count());
-            Assert.AreEqual(2, result.ElementAt(2).JavaScriptConfig.Properties().Count());
-            Assert.AreEqual(2, result.ElementAt(3).JavaScriptConfig.Properties().Count());
+            Assert.AreEqual(0, result.ElementAt(1).JavaScriptInitialize.Count);
+            Assert.AreEqual(2, result.ElementAt(2).JavaScriptInitialize.Count);
+            Assert.AreEqual(2, result.ElementAt(3).JavaScriptInitialize.Count);
         }
 
         

@@ -8,11 +8,6 @@ namespace Umbraco.Core.Manifest
     internal class PackageManifest
     {
         /// <summary>
-        /// The json configuration used to configure the JS dependencies
-        /// </summary>
-        public JObject JavaScriptConfig { get; set; }
-
-        /// <summary>
         /// The json array used to initialize the application with the JS dependencies required
         /// </summary>
         public JArray JavaScriptInitialize { get; set; }

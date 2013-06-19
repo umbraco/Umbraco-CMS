@@ -1,11 +1,12 @@
 ﻿'use strict';
 
-define(['namespaceMgr'], function () {
+(function() {
     
-    Umbraco.Sys.registerNamespace("MyPackage.PropertyEditors");
-
-    MyPackage.PropertyEditors.PostcodeEditor = function ($scope, $http, $filter) {
+    function postcodeEditor($scope, $http, $filter) {
         //change the config json model into something usable
-        $scope.model.config = { country : $scope.model.config[0] };
+        $scope.model.config = { country: $scope.model.config[0] };
     };
-});
+    
+    angular.module("myPackage.controllers").controller('MyPackage.PropertyEditors.PostcodeEditor', postcodeEditor);
+    
+})();

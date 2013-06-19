@@ -1,10 +1,11 @@
 ﻿'use strict';
 
-define(['namespaceMgr'], function () {
-    
-    Umbraco.Sys.registerNamespace("MyPackage.PropertyEditors");
+(function() {
 
-    MyPackage.PropertyEditors.RegexEditor = function ($scope, $http, $filter) {
+    function regexEditor($scope, $http, $filter) {
         var asdf = "";
     };
-});
+
+    angular.module("myPackage.controllers").controller('MyPackage.PropertyEditors.RegexEditor', regexEditor);
+
+})();
