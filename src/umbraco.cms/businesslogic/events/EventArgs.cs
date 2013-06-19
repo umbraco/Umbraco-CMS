@@ -63,5 +63,36 @@ namespace umbraco.cms.businesslogic {
         public bool CancelChildren { get; set; }
     }
 
-    
+
+    // Provides information on the macro that caused an error
+    public class MacroErrorEventArgs : System.EventArgs
+    {
+        /// <summary>
+        /// Name of the faulting macro. 
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Alias of the faulting macro. 
+        /// </summary>
+        public string Alias { get; set; }
+
+        /// <summary>
+        /// Filename of the faulting macro.
+        /// </summary>
+        public string File { get; set; }
+
+        /// <summary>
+        /// Exception raised.
+        /// </summary>
+        public Exception Exception { get; set; }
+
+        /// <summary>
+        /// Gets or sets the desired behaviour when a matching macro causes an error. See
+        /// <see cref="MacroErrorBehaviour"/> for definitions. By setting this in your event
+        /// you can override the default behaviour defined in UmbracoSettings.config.
+        /// </summary>
+        /// <value>Macro error behaviour enum.</value>
+        public MacroErrorBehaviour Behaviour { get; set; }
+    }
 }

@@ -319,7 +319,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="loginName">Member login</param>
         /// <param name="password">Member password</param>
         /// <returns>The member with the credentials - null if none exists</returns>
-        [Obsolete("Log members in via the standard Forms Authentiaction login")]
+        
         public static Member GetMemberFromLoginNameAndPassword(string loginName, string password)
         {
             if (IsMember(loginName))
