@@ -28,9 +28,9 @@ namespace Umbraco.Web.Trees
 			//NOTE: Notice the Partials%2f string below, this is a URLEncoded string of "Partials/" so that the editor knows
 			// to load the file from the correct location
 			javascript.Append(
-				@"
+                @"
 		                 function openPartialView(id) {
-		                    UmbClientMgr.contentFrame('Settings/Views/EditView.aspx?file=Partials%2f' + id);
+		                    UmbClientMgr.contentFrame('Settings/Views/EditView.aspx?treeType=partialViews&file=Partials%2f' + id);
 					    }
 		                ");
 		}

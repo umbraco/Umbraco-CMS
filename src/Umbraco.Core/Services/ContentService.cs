@@ -56,8 +56,13 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
-        /// that this Content is based on.
+        /// that this Content should based on.
         /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IContent without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new content objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
         /// <param name="name">Name of the Content object</param>
         /// <param name="parentId">Id of Parent for the new Content</param>
         /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
@@ -66,7 +71,7 @@ namespace Umbraco.Core.Services
         public IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = 0)
         {
             var contentType = FindContentTypeByAlias(contentTypeAlias);
-            var content = new Content(name, parentId, contentType); ;
+            var content = new Content(name, parentId, contentType);
 
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
             {
@@ -86,8 +91,13 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
-        /// that this Content is based on.
+        /// that this Content should based on.
         /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IContent without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new content objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
         /// <param name="name">Name of the Content object</param>
         /// <param name="parent">Parent <see cref="IContent"/> object for the new Content</param>
         /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
@@ -106,6 +116,86 @@ namespace Umbraco.Core.Services
 
             content.CreatorId = userId;
             content.WriterId = userId;
+
+            Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parent), this);
+
+            Audit.Add(AuditTypes.New, "", content.CreatorId, content.Id);
+
+            return content;
+        }
+
+        /// <summary>
+        /// Creates and saves an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+        /// that this Content should based on.
+        /// </summary>
+        /// <remarks>
+        /// This method returns an <see cref="IContent"/> object that has been persisted to the database
+        /// and therefor has an identity.
+        /// </remarks>
+        /// <param name="name">Name of the Content object</param>
+        /// <param name="parentId">Id of Parent for the new Content</param>
+        /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
+        /// <returns><see cref="IContent"/></returns>
+        public IContent CreateContentWithIdentity(string name, int parentId, string contentTypeAlias, int userId = 0)
+        {
+            var contentType = FindContentTypeByAlias(contentTypeAlias);
+            var content = new Content(name, parentId, contentType);
+
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
+            {
+                content.WasCancelled = true;
+                return content;
+            }
+
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                content.CreatorId = userId;
+                content.WriterId = userId;
+                repository.AddOrUpdate(content);
+                uow.Commit();
+            }
+
+            Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this);
+
+            Audit.Add(AuditTypes.New, "", content.CreatorId, content.Id);
+
+            return content;
+        }
+
+        /// <summary>
+        /// Creates and saves an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+        /// that this Content should based on.
+        /// </summary>
+        /// <remarks>
+        /// This method returns an <see cref="IContent"/> object that has been persisted to the database
+        /// and therefor has an identity.
+        /// </remarks>
+        /// <param name="name">Name of the Content object</param>
+        /// <param name="parent">Parent <see cref="IContent"/> object for the new Content</param>
+        /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
+        /// <returns><see cref="IContent"/></returns>
+        public IContent CreateContentWithIdentity(string name, IContent parent, string contentTypeAlias, int userId = 0)
+        {
+            var contentType = FindContentTypeByAlias(contentTypeAlias);
+            var content = new Content(name, parent, contentType);
+
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parent), this))
+            {
+                content.WasCancelled = true;
+                return content;
+            }
+
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                content.CreatorId = userId;
+                content.WriterId = userId;
+                repository.AddOrUpdate(content);
+                uow.Commit();
+            }
 
             Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parent), this);
 
@@ -1010,6 +1100,92 @@ namespace Umbraco.Core.Services
             return content;
         }
 
+        /// <summary>
+        /// Sorts a collection of <see cref="IContent"/> objects by updating the SortOrder according
+        /// to the ordering of items in the passed in <see cref="IEnumerable{T}"/>.
+        /// </summary>
+        /// <remarks>
+        /// Using this method will ensure that the Published-state is maintained upon sorting
+        /// so the cache is updated accordingly - as needed.
+        /// </remarks>
+        /// <param name="items"></param>
+        /// <param name="userId"></param>
+        /// <param name="raiseEvents"></param>
+        /// <returns>True if sorting succeeded, otherwise False</returns>
+        public bool Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(items), this))
+                    return false;
+            }
+
+            var shouldBePublished = new List<IContent>();
+            var shouldBeSaved = new List<IContent>();
+
+            using (new WriteLock(Locker))
+            {
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateContentRepository(uow))
+                {
+                    int i = 0;
+                    foreach (var content in items)
+                    {
+                        //If the current sort order equals that of the content
+                        //we don't need to update it, so just increment the sort order
+                        //and continue.
+                        if (content.SortOrder == i)
+                        {
+                            i++;
+                            continue;
+                        }
+
+                        content.SortOrder = i;
+                        content.WriterId = userId;
+                        i++;
+
+                        if (content.Published)
+                        {
+                            var published = _publishingStrategy.Publish(content, userId);
+                            shouldBePublished.Add(content);
+                        }
+                        else
+                            shouldBeSaved.Add(content);
+
+                        repository.AddOrUpdate(content);
+                    }
+
+                    uow.Commit();
+
+                    foreach (var content in shouldBeSaved)
+                    {
+                        //Create and Save PreviewXml DTO
+                        var xml = content.ToXml();
+                        CreateAndSavePreviewXml(xml, content.Id, content.Version, uow.Database);
+                    }
+
+                    foreach (var content in shouldBePublished)
+                    {
+                        //Create and Save PreviewXml DTO
+                        var xml = content.ToXml();
+                        CreateAndSavePreviewXml(xml, content.Id, content.Version, uow.Database);
+                        //Create and Save ContentXml DTO
+                        CreateAndSaveContentXml(xml, content.Id, uow.Database);
+                    }
+                }
+            }
+
+            if (raiseEvents)
+                Saved.RaiseEvent(new SaveEventArgs<IContent>(items, false), this);
+
+            if(shouldBePublished.Any())
+                _publishingStrategy.PublishingFinalized(shouldBePublished, false);
+
+            Audit.Add(AuditTypes.Sort, "Sorting content performed by user", userId, 0);
+
+            return true;
+        }
+
         #region Internal Methods
 
         /// <summary>
@@ -1096,9 +1272,11 @@ namespace Umbraco.Core.Services
                 {
                     if (!contentTypeIds.Any())
                     {
-                        //since we're updating all records, it will be much faster to just clear the table first
-                        uow.Database.TruncateTable("cmsContentXml");
-
+                        //Remove all Document records from the cmsContentXml table (DO NOT REMOVE Media/Members!)
+                        uow.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+                                                    INNER JOIN cmsDocument ON cmsContentXml.nodeId = cmsDocument.nodeId)");
+                        
                         //get all content items that are published
                         //  Consider creating a Path query instead of recursive method:
                         //  var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith("-1"));
@@ -1268,28 +1446,8 @@ namespace Umbraco.Core.Services
             using (new WriteLock(Locker))
             {
                 //Has this content item previously been published? If so, we don't need to refresh the children
-                var previouslyPublished = HasPublishedVersion(content.Id);
-                var validForPublishing = true;
-
-                //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
-                if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
-                {
-                    LogHelper.Info<ContentService>(
-                        string.Format(
-                            "Content '{0}' with Id '{1}' could not be published because its parent is not published.",
-                            content.Name, content.Id));
-                    validForPublishing = false;
-                }
-
-                //Content contains invalid property values and can therefore not be published - fire event?
-                if (!content.IsValid())
-                {
-                    LogHelper.Info<ContentService>(
-                        string.Format(
-                            "Content '{0}' with Id '{1}' could not be published because of invalid properties.",
-                            content.Name, content.Id));
-                    validForPublishing = false;
-                }
+                var previouslyPublished = content.HasIdentity && HasPublishedVersion(content.Id);
+                var validForPublishing = CheckAndLogIsPublishable(content) && CheckAndLogIsValid(content);
 
                 //Publish and then update the database with new status
                 bool published = validForPublishing && _publishingStrategy.Publish(content, userId);
@@ -1306,37 +1464,12 @@ namespace Umbraco.Core.Services
 
                     var xml = content.ToXml();
                     //Preview Xml
-                    var previewPoco = new PreviewXmlDto
-                        {
-                            NodeId = content.Id,
-                            Timestamp = DateTime.Now,
-                            VersionId = content.Version,
-                            Xml = xml.ToString(SaveOptions.None)
-                        };
-                    var previewExists =
-                        uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
-                                                        new { Id = content.Id, Version = content.Version }) != 0;
-                    int previewResult = previewExists
-                                            ? uow.Database.Update<PreviewXmlDto>(
-                                                "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
-                                                new
-                                                    {
-                                                        Xml = previewPoco.Xml,
-                                                        Timestamp = previewPoco.Timestamp,
-                                                        Id = previewPoco.NodeId,
-                                                        Version = previewPoco.VersionId
-                                                    })
-                                            : Convert.ToInt32(uow.Database.Insert(previewPoco));
+                    CreateAndSavePreviewXml(xml, content.Id, content.Version, uow.Database);
 
                     if (published)
                     {
                         //Content Xml
-                        var contentPoco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
-                        var contentExists = uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = content.Id }) != 0;
-                        int contentResult = contentExists
-                                                ? uow.Database.Update(contentPoco)
-                                                : Convert.ToInt32(uow.Database.Insert(contentPoco));
-
+                        CreateAndSaveContentXml(xml, content.Id, uow.Database);
                     }
                 }
 
@@ -1456,6 +1589,68 @@ namespace Umbraco.Core.Services
             return true;
         }
 
+        private bool CheckAndLogIsPublishable(IContent content)
+        {
+            //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
+            if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
+            {
+                LogHelper.Info<ContentService>(
+                    string.Format(
+                        "Content '{0}' with Id '{1}' could not be published because its parent is not published.",
+                        content.Name, content.Id));
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool CheckAndLogIsValid(IContent content)
+        {
+            //Content contains invalid property values and can therefore not be published - fire event?
+            if (content.IsValid() == false)
+            {
+                LogHelper.Info<ContentService>(
+                    string.Format(
+                        "Content '{0}' with Id '{1}' could not be published because of invalid properties.",
+                        content.Name, content.Id));
+                return false;
+            }
+
+            return true;
+        }
+
+        private void CreateAndSavePreviewXml(XElement xml, int id, Guid version, UmbracoDatabase db)
+        {
+            var previewPoco = new PreviewXmlDto
+            {
+                NodeId = id,
+                Timestamp = DateTime.Now,
+                VersionId = version,
+                Xml = xml.ToString(SaveOptions.None)
+            };
+            var previewExists =
+                db.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
+                                                new { Id = id, Version = version }) != 0;
+            int previewResult = previewExists
+                                    ? db.Update<PreviewXmlDto>(
+                                        "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
+                                        new
+                                            {
+                                                Xml = previewPoco.Xml,
+                                                Timestamp = previewPoco.Timestamp,
+                                                Id = previewPoco.NodeId,
+                                                Version = previewPoco.VersionId
+                                            })
+                                    : Convert.ToInt32(db.Insert(previewPoco));
+        }
+
+        private void CreateAndSaveContentXml(XElement xml, int id, UmbracoDatabase db)
+        {
+            var contentPoco = new ContentXmlDto { NodeId = id, Xml = xml.ToString(SaveOptions.None) };
+            var contentExists = db.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = id }) != 0;
+            int contentResult = contentExists ? db.Update(contentPoco) : Convert.ToInt32(db.Insert(contentPoco));
+        }
+
         private IContentType FindContentTypeByAlias(string contentTypeAlias)
         {
             using (var repository = _repositoryFactory.CreateContentTypeRepository(_uowProvider.GetUnitOfWork()))
@@ -1463,7 +1658,7 @@ namespace Umbraco.Core.Services
                 var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
                 var types = repository.GetByQuery(query);
 
-                if (!types.Any())
+                if (types.Any() == false)
                     throw new Exception(
                         string.Format("No ContentType matching the passed in Alias: '{0}' was found",
                                       contentTypeAlias));

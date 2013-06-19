@@ -22,6 +22,24 @@ namespace Umbraco.Web
 	public static class HtmlHelperRenderExtensions
 	{
         /// <summary>
+        /// Renders a partial view that is found in the specified area
+        /// </summary>
+        /// <param name="helper"></param>
+        /// <param name="partial"></param>
+        /// <param name="area"></param>
+        /// <param name="model"></param>
+        /// <param name="viewData"></param>
+        /// <returns></returns>
+        public static MvcHtmlString AreaPartial(this HtmlHelper helper, string partial, string area, object model = null, ViewDataDictionary viewData = null)
+        {
+            var originalArea = helper.ViewContext.RouteData.DataTokens["area"];
+            helper.ViewContext.RouteData.DataTokens["area"] = area;	        
+            var result = helper.Partial(partial, model, viewData);
+            helper.ViewContext.RouteData.DataTokens["area"] = originalArea;
+            return result;
+        }
+
+	    /// <summary>
         /// Will render the preview badge when in preview mode which is not required ever unless the MVC page you are
         /// using does not inherit from UmbracoTemplatePage
         /// </summary>

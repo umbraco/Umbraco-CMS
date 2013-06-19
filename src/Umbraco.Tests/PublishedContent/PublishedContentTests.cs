@@ -222,6 +222,10 @@ namespace Umbraco.Tests.PublishedContent
 			var propVal2 = doc.GetPropertyValue<IHtmlString>("content");
 			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<IHtmlString>(propVal2.GetType()));
 			Assert.AreEqual("<div>This is some content</div>", propVal2.ToString());
+
+            var propVal3 = doc.GetPropertyValue("Content");
+            Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<IHtmlString>(propVal3.GetType()));
+            Assert.AreEqual("<div>This is some content</div>", propVal3.ToString());
 		}
 
 		[Test]

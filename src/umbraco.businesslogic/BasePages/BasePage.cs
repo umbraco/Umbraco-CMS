@@ -251,29 +251,29 @@ namespace umbraco.BasePages
         {
             get
             {
-                // zb-00004 #29956 : refactor cookies names & handling
                 if (StateHelper.Cookies.HasCookies && StateHelper.Cookies.UserContext.HasValue)
-                    return StateHelper.Cookies.UserContext.GetValue();
-                else
                 {
                     try
                     {
-                        string encTicket = StateHelper.Cookies.UserContext.GetValue();
-                        if (!String.IsNullOrEmpty(encTicket))
-                            return FormsAuthentication.Decrypt(encTicket).UserData;
+                        var encTicket = StateHelper.Cookies.UserContext.GetValue();
+                        if (string.IsNullOrEmpty(encTicket) == false)
+                        {
+                            return encTicket.DecryptWithMachineKey();
+                        }
                     }
-                    catch (HttpException ex)
+                    catch (Exception ex)
                     {
                         // we swallow this type of exception as it happens if a legacy (pre 4.8.1) cookie is set
-                    }
-                    catch (ArgumentException ex)
-                    {
-                        // we swallow this one because it's 99.99% certaincy is legacy based. We'll still log it, though
-                        LogHelper.Error<BasePage>("An error occurred reading auth cookie value", ex);
-
+                        if (ex is ArgumentException || ex is FormatException || ex is HttpException)
+                        {
+                            StateHelper.Cookies.UserContext.Clear();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
                 }
-
                 return "";
             }
             set
@@ -285,25 +285,15 @@ namespace umbraco.BasePages
                     if (StateHelper.Cookies.UserContext.HasValue)
                         StateHelper.Cookies.ClearAll();
 
-                    if (!String.IsNullOrEmpty(value))
-                    {
-                        FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(1,
-                        value,
-                        DateTime.Now,
-                        DateTime.Now.AddDays(1),
-                        false,
-                        value,
-                        FormsAuthentication.FormsCookiePath);
-
-                        // Encrypt the ticket.
-                        string encTicket = FormsAuthentication.Encrypt(ticket);
-
+                    if (string.IsNullOrEmpty(value) == false)
+                    {                        
+                        // Encrypt the value
+                        var encTicket = value.EncryptWithMachineKey();
 
                         // Create new cookie.
-                    StateHelper.Cookies.UserContext.SetValue(value, 1);
-                        
-
-                    } else
+                        StateHelper.Cookies.UserContext.SetValue(encTicket, 1);
+                    }
+                    else
                     {
                         StateHelper.Cookies.UserContext.Clear();
                     }

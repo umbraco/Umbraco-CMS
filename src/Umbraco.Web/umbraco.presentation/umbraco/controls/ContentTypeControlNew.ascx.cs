@@ -63,11 +63,13 @@ namespace umbraco.controls
 
         //the async saving task
         private Action<SaveAsyncState> _asyncSaveTask;
+        //the async delete property task
+        private Action<DeleteAsyncState> _asyncDeleteTask;
 
         override protected void OnInit(EventArgs e)
         {
             base.OnInit(e);
-            
+
             LoadContentType();
 
             SetupInfoPane();
@@ -78,17 +80,17 @@ namespace umbraco.controls
             SetupGenericPropertiesPane();
             SetupTabPane();
 
-        }
+        }        
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            pp_newTab.Text = ui.Text("newtab", UmbracoEnsuredPage.CurrentUser);
-            pp_alias.Text = ui.Text("alias", UmbracoEnsuredPage.CurrentUser);
-            pp_name.Text = ui.Text("name", UmbracoEnsuredPage.CurrentUser);
-            pp_allowedChildren.Text = ui.Text("allowedchildnodetypes", UmbracoEnsuredPage.CurrentUser);
-            pp_description.Text = ui.Text("editcontenttype", "description");
-            pp_icon.Text = ui.Text("icon", UmbracoEnsuredPage.CurrentUser);
-            pp_thumbnail.Text = ui.Text("editcontenttype", "thumbnail");
+            pp_newTab.Text = ui.Text("newtab", CurrentUser);
+            pp_alias.Text = ui.Text("alias", CurrentUser);
+            pp_name.Text = ui.Text("name", CurrentUser);
+            pp_allowedChildren.Text = ui.Text("allowedchildnodetypes", CurrentUser);
+            pp_description.Text = ui.Text("editcontenttype", "description", CurrentUser);
+            pp_icon.Text = ui.Text("icon", CurrentUser);
+            pp_thumbnail.Text = ui.Text("editcontenttype", "thumbnail", CurrentUser);
 
 
             // we'll disable this...
@@ -121,37 +123,78 @@ namespace umbraco.controls
         }
 
         /// <summary>
+        /// A class to track the async state for deleting a doc type property
+        /// </summary>
+        private class DeleteAsyncState
+        {
+            public Umbraco.Web.UmbracoContext UmbracoContext { get; private set; }
+            public GenericPropertyWrapper GenericPropertyWrapper { get; private set; }
+
+            public DeleteAsyncState(
+                Umbraco.Web.UmbracoContext umbracoContext,
+                GenericPropertyWrapper genericPropertyWrapper)
+            {
+                UmbracoContext = umbracoContext;
+                GenericPropertyWrapper = genericPropertyWrapper;
+            }
+        }
+
+        /// <summary>
         /// A class to track the async state for saving the doc type
         /// </summary>
         private class SaveAsyncState
         {
             public SaveAsyncState(
+                Umbraco.Web.UmbracoContext umbracoContext,
                 SaveClickEventArgs saveArgs, 
                 string originalAlias, 
                 string originalName,
                 string newAlias,
-                string newName)
+                string newName,
+                string[] originalPropertyAliases)
             {
+                UmbracoContext = umbracoContext;
                 SaveArgs = saveArgs;
-                OriginalAlias = originalAlias;
-                OriginalName = originalName;
-                NewAlias = newAlias;
-                NewName = newName;
+                _originalAlias = originalAlias;
+                _originalName = originalName;
+                _newAlias = newAlias;
+                _originalPropertyAliases = originalPropertyAliases;
+                _newName = newName;
             }
 
+            public Umbraco.Web.UmbracoContext UmbracoContext { get; private set; }
             public SaveClickEventArgs SaveArgs { get; private set; }
-            public string OriginalAlias { get; private set; }
-            public string OriginalName { get; private set; }
-            public string NewAlias { get; private set; }
-            public string NewName { get; private set; }
+            private readonly string _originalAlias;
+            private readonly string _originalName;
+            private readonly string _newAlias;
+            private readonly string _newName;
+            private readonly string[] _originalPropertyAliases;
+
 
             public bool HasAliasChanged()
             {
-                return (string.Compare(OriginalAlias, NewAlias, StringComparison.OrdinalIgnoreCase) != 0);
+                return (string.Compare(_originalAlias, _newAlias, StringComparison.OrdinalIgnoreCase) != 0);
             }
             public bool HasNameChanged()
             {
-                return (string.Compare(OriginalName, NewName, StringComparison.OrdinalIgnoreCase) != 0);
+                return (string.Compare(_originalName, _newName, StringComparison.OrdinalIgnoreCase) != 0);
+            }
+
+            /// <summary>
+            /// Returns true if any property has been removed or if any alias has changed
+            /// </summary>
+            /// <param name="contentType"></param>
+            /// <returns></returns>
+            public bool HasAnyPropertyAliasChanged(ContentType contentType)
+            {                
+                var newAliases = contentType.PropertyTypes.Select(x => x.Alias).ToArray();
+                //if any have been removed, return true
+                if (newAliases.Length < _originalPropertyAliases.Count())
+                {
+                    return true;
+                }
+                //otherwise ensure that all of the original aliases are still existing
+                return newAliases.ContainsAll(_originalPropertyAliases) == false;
             }
         }
 
@@ -230,10 +273,12 @@ namespace umbraco.controls
         protected void save_click(object sender, ImageClickEventArgs e)
         {
 
-            var state = new SaveAsyncState(new SaveClickEventArgs("Saved")
+            var state = new SaveAsyncState(
+                Umbraco.Web.UmbracoContext.Current,
+                new SaveClickEventArgs("Saved")
                 {
                     IconType = BasePage.speechBubbleIcon.success
-                }, _contentType.Alias, _contentType.Text, txtAlias.Text, txtName.Text);
+                }, _contentType.Alias, _contentType.Text, txtAlias.Text, txtName.Text, _contentType.PropertyTypes.Select(x => x.Alias).ToArray());
 
             //Add the async operation to the page
             Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncSaveOperation, EndAsyncSaveOperation, HandleAsyncSaveTimeout, state));
@@ -242,6 +287,9 @@ namespace umbraco.controls
             _asyncSaveTask = asyncState =>
                 {
                     Trace.Write("ContentTypeControlNew", "executing task");
+
+                    //we need to re-set the UmbracoContext since it will be nulled and our cache handlers need it
+                    global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
 
                     //NOTE The saving of the 5 properties (Name, Alias, Icon, Description and Thumbnail) are divided
                     //to avoid the multiple cache flushing when each property is set using the legacy ContentType class,
@@ -310,13 +358,13 @@ namespace umbraco.controls
 
                         _contentType.AllowedChildContentTypeIDs = SaveAllowedChildTypes();
                         _contentType.AllowAtRoot = allowAtRoot.Checked;
-
+                    
                         _contentType.Save();
                     }
 
                     // Only if the doctype alias changed, cause a regeneration of the xml cache file since
                     // the xml element names will need to be updated to reflect the new alias
-                    if (asyncState.HasAliasChanged())
+                    if (asyncState.HasAliasChanged() || asyncState.HasAnyPropertyAliasChanged(_contentType))
                         RegenerateXmlCaches();
 
                     Trace.Write("ContentTypeControlNew", "task completing");
@@ -347,6 +395,10 @@ namespace umbraco.controls
             {
                 _contentType = new cms.businesslogic.media.MediaType(docTypeId);
             }
+            else if (Request.Path.ToLowerInvariant().Contains("editmembertype.aspx"))
+            {
+                _contentType = new cms.businesslogic.member.MemberType(docTypeId);
+            }
             else
             {
                 _contentType = new ContentType(docTypeId);
@@ -356,10 +408,19 @@ namespace umbraco.controls
         /// <summary>
         /// Regenerates the XML caches. Used after a document type alias has been changed.
         /// </summary>
+        /// <remarks>
+        /// We only regenerate any XML cache based on if this is a Document type, not a media type or 
+        /// a member type.
+        /// </remarks>
         private void RegenerateXmlCaches()
         {
-            Document.RePublishAll();
-            library.RefreshContent();
+            _contentType.RebuildXmlStructuresForContent();
+
+            //special case for DocumentType's
+            if (_contentType is DocumentType)
+            {
+                library.RefreshContent();    
+            }
         }
 
         /// <summary>
@@ -1002,25 +1063,88 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         }
 
         /// <summary>
+        /// Called asynchronously in order to delete a content type property
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <param name="cb"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        private IAsyncResult BeginAsyncDeleteOperation(object sender, EventArgs e, AsyncCallback cb, object state)
+        {
+            Trace.Write("ContentTypeControlNew", "Start async operation");
+
+            //get the args from the async state
+            var args = (DeleteAsyncState)state;
+
+            //start the task
+            var result = _asyncDeleteTask.BeginInvoke(args, cb, args);
+            return result;
+        }
+
+        /// <summary>
+        /// Occurs once the async database delete operation has completed
+        /// </summary>
+        /// <param name="ar"></param>
+        /// <remarks>
+        /// This updates the UI elements
+        /// </remarks>
+        private void EndAsyncDeleteOperation(IAsyncResult ar)
+        {
+            Trace.Write("ContentTypeControlNew", "ending async operation");
+            
+            // reload content type (due to caching)
+            LoadContentType(_contentType.Id);
+            BindDataGenericProperties(true);
+            
+            Trace.Write("ContentTypeControlNew", "async operation ended");
+
+            //complete it
+            _asyncDeleteTask.EndInvoke(ar);
+        }
+
+        /// <summary>
         /// Removes a PropertyType from the current ContentType when user clicks "red x"
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         protected void gpw_Delete(object sender, EventArgs e)
         {
-            var gpw = (GenericPropertyWrapper)sender;
+            var state = new DeleteAsyncState(
+                Umbraco.Web.UmbracoContext.Current,
+                (GenericPropertyWrapper)sender);
 
-            if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
+            //Add the async operation to the page
+            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncDeleteOperation, EndAsyncDeleteOperation, HandleAsyncSaveTimeout, state));
+
+            //create the save task to be executed async
+            _asyncDeleteTask = asyncState =>
             {
-                _contentType.ContentTypeItem.RemovePropertyType(gpw.PropertyType.Alias);
-                _contentType.Save();
-            }
+                Trace.Write("ContentTypeControlNew", "executing task");
 
-            gpw.GenricPropertyControl.PropertyType.delete();
+                //we need to re-set the UmbracoContext since it will be nulled and our cache handlers need it
+                global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
 
-            LoadContentType(_contentType.Id);
-            BindDataGenericProperties(true);
+                if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
+                {
+                    _contentType.ContentTypeItem.RemovePropertyType(asyncState.GenericPropertyWrapper.PropertyType.Alias);
+                    _contentType.Save();
+                }
+
+                //delete the property
+                asyncState.GenericPropertyWrapper.GenricPropertyControl.PropertyType.delete();
+                
+                //we need to re-generate the xml structures because we're removing a content type property
+                RegenerateXmlCaches();
+
+                Trace.Write("ContentTypeControlNew", "task completing");
+            };
+
+            //execute the async tasks
+            Page.ExecuteRegisteredAsyncTasks();
+
         }
+
 
         #endregion
 

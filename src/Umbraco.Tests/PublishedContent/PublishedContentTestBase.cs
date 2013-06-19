@@ -30,7 +30,7 @@ namespace Umbraco.Tests.PublishedContent
             //need to specify a custom callback for unit tests
             PublishedContentHelper.GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
                 {
-                    if (propertyAlias == "content")
+                    if (propertyAlias.InvariantEquals("content"))
                     {
                         //return the rte type id
                         return Guid.Parse("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");

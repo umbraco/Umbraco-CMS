@@ -8,6 +8,21 @@
         //private methods/variables
         _opts: null,
 
+        _updateNewProperties: function(filePath) {
+            /// <summary>Updates the current treeSyncPath and original file name to have the new file name</summary>
+            
+            //update the originalFileName prop
+            this._opts.originalFileName = filePath;
+
+            //re-create the new path
+            var subPath = this._opts.treeSyncPath.split(",");
+            //remove the last element
+            subPath.pop();
+            //add the new element
+            subPath.push(filePath.split("/")[1]);
+            this._opts.treeSyncPath = subPath.join();
+        },
+
         // Constructor
         constructor: function (opts) {
             // Merge options with default
@@ -92,10 +107,26 @@
         
         submitSuccess: function (err, header) {
             top.UmbSpeechBubble.ShowMessage('save', header, err);
+            
+            UmbClientMgr.mainTree().setActiveTreeType(this._opts.currentTreeType);
+
+            var newFilePath = this._opts.nameTxtBox.val();
+
+            if (this._opts.editorType == "Template") {
+                //templates are different because they are ID based, whereas view files are file based without a static id
+                UmbClientMgr.mainTree().syncTree(this._opts.treeSyncPath, true);
+            }
+            else {
+                //we need to pass in the newId parameter so it knows which node to resync after retreival from the server
+                UmbClientMgr.mainTree().syncTree(this._opts.treeSyncPath, true, null, newFilePath.split("/")[1]);
+            }
+
+            //then we need to update our current tree sync path to represent the new one
+            this._updateNewProperties(newFilePath);
         },
         
         submitFailure: function (err, header) {
-            top.UmbSpeechBubble.ShowMessage('error', header, err);
+            top.UmbSpeechBubble.ShowMessage('error', header, err);                       
         },
         
         changeMasterPageFile: function ( ) {

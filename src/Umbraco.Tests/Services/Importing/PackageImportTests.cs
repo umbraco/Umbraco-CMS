@@ -163,6 +163,30 @@ namespace Umbraco.Tests.Services.Importing
         }
 
         [Test]
+        public void PackagingService_Can_Import_StandardMvc_ContentTypes_And_Templates_Xml()
+        {
+            // Arrange
+            string strXml = ImportResources.StandardMvc_Package;
+            var xml = XElement.Parse(strXml);
+            var dataTypeElement = xml.Descendants("DataTypes").First();
+            var templateElement = xml.Descendants("Templates").First();
+            var docTypeElement = xml.Descendants("DocumentTypes").First();
+
+            // Act
+            var dataTypeDefinitions = ServiceContext.PackagingService.ImportDataTypeDefinitions(dataTypeElement);
+            var templates = ServiceContext.PackagingService.ImportTemplates(templateElement);
+            var contentTypes = ServiceContext.PackagingService.ImportContentTypes(docTypeElement);
+            var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
+
+            //Assert - Re-Import contenttypes doesn't throw
+            Assert.DoesNotThrow(() => ServiceContext.PackagingService.ImportContentTypes(docTypeElement));
+            Assert.That(contentTypes.Count(), Is.EqualTo(numberOfDocTypes));
+            Assert.That(dataTypeDefinitions, Is.Not.Null);
+            Assert.That(dataTypeDefinitions.Any(), Is.True);
+            Assert.That(templates.Any(), Is.True);
+        }
+
+        [Test]
         public void PackagingService_Can_Import_Content_Package_Xml()
         {
             // Arrange

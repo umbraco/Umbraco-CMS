@@ -51,7 +51,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             functionToCall: "",
             nodeKey: ""
         };
-    }
+    };
 
     Umbraco.Controls.UmbracoTree = function() {
         /// <summary>
@@ -100,10 +100,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 if (this._opts.appActions != null) {
                     var _this = this;
                     //wrapped functions maintain scope
-                    this._opts.appActions.addEventHandler("nodeDeleting", function(E) { _this.onNodeDeleting(E) });
-                    this._opts.appActions.addEventHandler("nodeDeleted", function(E) { _this.onNodeDeleted(E) });
-                    this._opts.appActions.addEventHandler("nodeRefresh", function(E) { _this.onNodeRefresh(E) });
-                    this._opts.appActions.addEventHandler("publicError", function(E, err) { _this.onPublicError(E, err) });
+                    this._opts.appActions.addEventHandler("nodeDeleting", function (E) { _this.onNodeDeleting(E); });
+                    this._opts.appActions.addEventHandler("nodeDeleted", function (E) { _this.onNodeDeleted(E); });
+                    this._opts.appActions.addEventHandler("nodeRefresh", function (E) { _this.onNodeRefresh(E); });
+                    this._opts.appActions.addEventHandler("publicError", function (E, err) { _this.onPublicError(E, err); });
                 }
 
                 this._containerId = jItem.attr("id");
@@ -309,19 +309,20 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 }
             },
 
-            syncTree: function(path, forceReload, supressChildReload) {
+            syncTree: function(path, forceReload, supressChildReload, newId) {
                 /// <summary>
                 /// Syncronizes the tree with the path supplied and makes that node visible/selected.
                 /// </summary>
                 /// <param name="path">The path of the node</param>
                 /// <param name="forceReload">If true, will ensure that the node to be synced is synced with data from the server</param>
+                /// <param name="newId">This parameter is only used when we don't have a real unique ID for a node, for example for a file. If a filename changes we don't know what the new one is since we are syncing the tree to the old original path. Once we retreive the results the sync the tree we need to find the result by it's new id and update the node.</param>
 
                 this._debug("syncTree: " + path + ", " + forceReload);
 
                 //set the flag so that multiple synces aren't attempted
                 this._isSyncing = true;
 
-                this._syncTree.call(this, path, forceReload, null, null, supressChildReload);
+                this._syncTree.call(this, path, forceReload, null, null, supressChildReload, newId);
 
             },
 
@@ -864,7 +865,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 this._tree.open_branch(liNode, false, callback);
             },
             
-            _syncTree: function(path, forceReload, numPaths, numAsync, supressChildReload) {
+            _syncTree: function(path, forceReload, numPaths, numAsync, supressChildReload, newId) {
                 /// <summary>
                 /// This is the internal method that will recursively search for the nodes to sync. If an invalid path is 
                 /// passed to this method, it will raise an event which can be handled.
@@ -873,6 +874,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 /// <param name="forceReload">If true, will ensure that the node to be synced is synced with data from the server</param>
                 /// <param name="numPaths">the number of id's deep to search starting from the end of the path. Used in recursion.</param>
                 /// <param name="numAsync">the number of async calls made so far to sync. Used in recursion and used to determine if the found node has been loaded by ajax.</param>
+                /// <param name="newId">This parameter is only used when we don't have a real unique ID for a node, for example for a file. If a filename changes we don't know what the new one is since we are syncing the tree to the old original path. Once we retreive the results the sync the tree we need to find the result by it's new id and update the node.</param>
 
                 this._debug("_syncTree");
 
@@ -917,6 +919,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     this._debug("_syncTree: found! numAsync: " + numAsync + ", forceReload: " + forceReload + ", doReload: " + doReload);                                        
                     if (doReload) {
                         this._actionNode = this.getNodeDef(found);
+                        //we need to change the id if the newId parameter is set
+                        if (newId) {
+                            this._actionNode.nodeId = newId;
+                        }                        
                         if (supressChildReload === undefined) {
                             this.reloadActionNode(false, true, null);
                         } else {

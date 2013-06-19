@@ -25,9 +25,9 @@ namespace Umbraco.Web.Trees
 			//NOTE: Notice the MacroPartials%2f string below, this is a URLEncoded string of "MacroPartials/" so that the editor knows
 			// to load the file from the correct location
 			javascript.Append(
-				@"
+                @"
 		                 function openMacroPartialView(id) {
-		                    UmbClientMgr.contentFrame('Settings/Views/EditView.aspx?file=MacroPartials%2f' + id);
+		                    UmbClientMgr.contentFrame('Settings/Views/EditView.aspx?treeType=partialViewMacros&file=MacroPartials%2f' + id);
 					    }
 		                ");
 		}

@@ -236,10 +236,6 @@
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.webservices\umbraco.webservices.csproj">
-      <Project>{CBDB56AC-FF02-4421-9FD4-ED82E339D8E2}</Project>
-      <Name>umbraco.webservices</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>Umbraco.Web</Name>
@@ -327,6 +323,13 @@
     <Compile Include="Umbraco\Developer\Packages\StarterKits.aspx.designer.cs">
       <DependentUpon>StarterKits.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Developer\Python\EditPython.aspx.cs">
+      <DependentUpon>editPython.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Developer\Python\EditPython.aspx.designer.cs">
+      <DependentUpon>editPython.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Dialogs\EditMacro.aspx.cs">
       <DependentUpon>EditMacro.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -373,6 +376,20 @@
     </Compile>
     <Compile Include="Umbraco\Settings\EditTemplate.aspx.designer.cs">
       <DependentUpon>editTemplate.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Umbraco\settings\Stylesheet\editstylesheet.aspx.cs">
+      <DependentUpon>editstylesheet.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\settings\Stylesheet\editstylesheet.aspx.designer.cs">
+      <DependentUpon>editstylesheet.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Umbraco\settings\Stylesheet\Property\EditStyleSheetProperty.aspx.cs">
+      <DependentUpon>EditStyleSheetProperty.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\settings\Stylesheet\Property\EditStyleSheetProperty.aspx.designer.cs">
+      <DependentUpon>EditStyleSheetProperty.aspx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Settings\Views\EditView.aspx.cs">
       <DependentUpon>EditView.aspx</DependentUpon>
@@ -518,13 +535,6 @@
     <Content Include="Umbraco\Plugins\UGoLive\throbber.gif" />
     <Content Include="Umbraco\Plugins\UGoLive\tick.png" />
     <Content Include="Umbraco\Settings\Views\EditView.aspx" />
-    <Content Include="Umbraco\Webservices\Api\DocumentService.asmx" />
-    <Content Include="Umbraco\Webservices\Api\FileService.asmx" />
-    <Content Include="Umbraco\Webservices\Api\MaintanceService.asmx" />
-    <Content Include="Umbraco\Webservices\Api\MediaService.asmx" />
-    <Content Include="Umbraco\Webservices\Api\MemberService.asmx" />
-    <Content Include="Umbraco\Webservices\Api\StylesheetService.asmx" />
-    <Content Include="Umbraco\Webservices\Api\TemplateService.asmx" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Lib\codemirror.css" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Lib\codemirror.js" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\closetag.js" />
@@ -693,7 +703,13 @@
     <Content Include="umbraco_Client\Editors\DirectoryBrowser.css" />
     <Content Include="Umbraco_Client\Dialogs\EditMacro.js" />
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
+    <Content Include="Umbraco_Client\Editors\EditMacroScripts.js" />
+    <Content Include="Umbraco_Client\Editors\EditXslt.css" />
+    <Content Include="Umbraco_Client\Editors\EditXslt.js" />
+    <Content Include="Umbraco_Client\Editors\EditScript.js" />
     <Content Include="Umbraco_Client\Editors\EditMacro.css" />
+    <Content Include="Umbraco_Client\Editors\EditStyleSheet.js" />
+    <Content Include="Umbraco_Client\Editors\EditTemplate.js" />
     <Content Include="Umbraco_Client\Editors\EditView.js" />
     <Content Include="Umbraco_Client\FileUploader\Js\jquery.fileUploader.js" />
     <Content Include="Umbraco_Client\FolderBrowser\Css\folderbrowser.css" />
@@ -1882,7 +1898,9 @@
     <Content Include="Config\feedProxy.config" />
     <Content Include="Umbraco_Client\ui\ui-lightness\jquery-ui.custom.css" />
     <Content Include="Config\applications.config" />
-    <Content Include="Config\trees.config" />
+    <Content Include="Config\trees.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Config\applications.Release.config">
       <DependentUpon>applications.config</DependentUpon>
       <SubType>Designer</SubType>

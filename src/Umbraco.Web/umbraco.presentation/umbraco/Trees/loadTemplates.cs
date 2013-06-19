@@ -52,7 +52,7 @@ namespace umbraco
                 }   
                 
                  function openView(id) {
-                    UmbClientMgr.contentFrame('settings/views/editView.aspx?templateID=' + id);
+                    UmbClientMgr.contentFrame('settings/views/editView.aspx?treeType=templates&templateID=' + id);
 			    }
 
                 function openSkin(id) {

@@ -9,54 +9,30 @@
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="head" runat="server" ID="cp2">
-    <style type="text/css">
-        #errorDiv
-        {
-            margin-bottom: 10px;
-        }
-        #errorDiv a
-        {
-            float: right;
-        }
-        .propertyItemheader
-        {
-            width: 200px !important;
-        }
-    </style>
+    
+    <umb:JsInclude ID="JsInclude2" runat="server" FilePath="Editors/EditXslt.js" PathNameAlias="UmbracoClient" />
+    <umb:CssInclude ID="CssInclude1" runat="server" FilePath="Editors/EditXslt.css" PathNameAlias="UmbracoClient" />
+
     <script type="text/javascript">
 
-        var xsltSnippet = "";
+        (function ($) {
+            $(document).ready(function () {
+                var editor = new Umbraco.Editors.EditXslt({
+                    nameTxtBox: $('#<%= xsltFileName.ClientID %>'),
+                    originalFileName: '<%= xsltFileName.Text %>',
+                    saveButton: $("#<%= ((Control)SaveButton).ClientID %>"),
+                    editorSourceElement: $('#<%= editorSource.ClientID %>'),
+                    skipTestingCheckBox: $("#<%= SkipTesting.ClientID %>"),
+                });
+                editor.init();
 
-        function closeErrorDiv() {
-            jQuery('#errorDiv').hide();
-        }
+                //bind save shortcut
+                UmbClientMgr.appActions().bindSaveShortCut();
+            });
+        })(jQuery);
 
-        function doSubmit() {
-            closeErrorDiv();
-
-            var codeVal = jQuery('#<%= editorSource.ClientID %>').val();
-            //if CodeMirror is not defined, then the code editor is disabled.
-            if (typeof (CodeMirror) != "undefined") {
-                codeVal = UmbEditor.GetCode();
-            }
-
-            umbraco.presentation.webservices.codeEditorSave.SaveXslt(jQuery('#<%= xsltFileName.ClientID %>').val(), '<%= xsltFileName.Text %>', codeVal, document.getElementById('<%= SkipTesting.ClientID %>').checked, submitSucces, submitFailure);
-        }
-
-        function submitSucces(t) {
-            if (t != 'true') {
-                top.UmbSpeechBubble.ShowMessage('error', 'Saving Xslt file failed', '');
-                jQuery('#errorDiv').html('<p><a href="#" onclick=\'closeErrorDiv()\'>Hide Errors</a><strong>Error occured</strong></p><p>' + t + '</p>');
-                jQuery('#errorDiv').slideDown('fast');
-            }
-            else {
-                top.UmbSpeechBubble.ShowMessage('save', 'Xslt file saved', '')
-            }
-        }
-        function submitFailure(t) {
-            top.UmbSpeechBubble.ShowMessage('warning', 'Xslt file could not be saved', '')
-        }
-
+        //TODO: Move these to EditXslt.js one day
+        var xsltSnippet = "";        
         function xsltVisualize() {
 
             xsltSnippet = UmbEditor.IsSimpleEditor
@@ -71,7 +47,6 @@
             }
 
             UmbClientMgr.openModalWindow('<%= umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/developer/xslt/xsltVisualize.aspx', 'Visualize XSLT', true, 550, 650);
-
         }
 		  
     </script>
@@ -92,15 +67,9 @@
                 <div id="errorDiv" style="display: none;" class="error">
                     test</div>
             </cc1:PropertyPanel>
-            <cc1:CodeArea ID="editorSource" CodeBase="XML" ClientSaveMethod="doSubmit" runat="server"
-                AutoResize="true" OffSetX="47" OffSetY="55" />
+            <cc1:CodeArea ID="editorSource" CodeBase="XML" runat="server" AutoResize="true" OffSetX="47" OffSetY="55" />
         </cc1:Pane>
     </cc1:UmbracoPanel>
-    <script type="text/javascript">
-        jQuery(document).ready(function () {
-            UmbClientMgr.appActions().bindSaveShortCut();
-        });
-    </script>
 </asp:Content>
 <asp:Content ContentPlaceHolderID="footer" runat="server">
     <asp:Literal ID="editorJs" runat="server"></asp:Literal>

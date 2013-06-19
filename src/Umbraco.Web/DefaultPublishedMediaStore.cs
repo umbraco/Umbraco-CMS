@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.XPath;
@@ -293,9 +294,9 @@ namespace Umbraco.Web
 					//ok it doesn't exist, we might assume now that Examine didn't index this property because the index is not set up correctly
 					//so before we go loading this from the database, we can check if the alias exists on the content type at all, this information
 					//is cached so will be quicker to look up.
-					if (dd.Properties.Any(x => x.Alias == "__NodeTypeAlias"))
+                    if (dd.Properties.Any(x => x.Alias == UmbracoContentIndexer.NodeTypeAliasFieldName))
 					{
-						var aliasesAndNames = ContentType.GetAliasesAndNames(dd.Properties.First(x => x.Alias.InvariantEquals("__NodeTypeAlias")).Value.ToString());
+						var aliasesAndNames = ContentType.GetAliasesAndNames(dd.Properties.First(x => x.Alias.InvariantEquals(UmbracoContentIndexer.NodeTypeAliasFieldName)).Value.ToString());
 						if (aliasesAndNames != null)
 						{
 							if (!aliasesAndNames.ContainsKey(alias))
@@ -317,7 +318,12 @@ namespace Umbraco.Web
 				}							
 			}
 			
-			return dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+            //We've made it here which means that the value is stored in the Examine index.
+            //We are going to check for a special field however, that is because in some cases we store a 'Raw'
+            //value in the index such as for xml/html.
+            var rawValue = dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals("__Raw_" + alias));
+		    return rawValue
+		           ?? dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 		}
 
 		/// <summary>
@@ -360,9 +366,17 @@ namespace Umbraco.Web
 						
 						if (results.Any())
 						{
-						    return useLuceneSort 
-                                ? results.Select(ConvertFromSearchResult) //will already be sorted by lucene
-                                : results.Select(ConvertFromSearchResult).OrderBy(x => x.SortOrder);
+						    return useLuceneSort
+						               ? results.Select(ConvertFromSearchResult) //will already be sorted by lucene
+						               : results.Select(ConvertFromSearchResult).OrderBy(x => x.SortOrder);
+						}
+						else
+						{
+						    //if there's no result then return null. Previously we defaulted back to library.GetMedia below
+                            //but this will always get called for when we are getting descendents since many items won't have 
+                            //children and then we are hitting the database again!
+                            //So instead we're going to rely on Examine to have the correct results like it should.
+						    return Enumerable.Empty<IPublishedContent>();
 						}
 					}
 					catch (FileNotFoundException)
@@ -373,23 +387,27 @@ namespace Umbraco.Web
 					}	
 				}				
 
+
+                //falling back to get media
+
 				var media = library.GetMedia(parentId, true);
 				if (media != null && media.Current != null)
 				{
+				    media.MoveNext();
 					xpath = media.Current;
 				}
 				else
 				{
-					return null;
+                    return Enumerable.Empty<IPublishedContent>();
 				}
 			}
 
-			//The xpath might be the whole xpath including the current ones ancestors so we need to select the current node
-			var item = xpath.Select("//*[@id='" + parentId + "']");
-			if (item.Current == null)
-			{
-				return null;
-			}
+            //The xpath might be the whole xpath including the current ones ancestors so we need to select the current node
+            var item = xpath.Select("//*[@id='" + parentId + "']");
+            if (item.Current == null)
+            {
+                return Enumerable.Empty<IPublishedContent>();
+            }
 			var children = item.Current.SelectChildren(XPathNodeType.Element);
 
 			var mediaList = new List<IPublishedContent>();

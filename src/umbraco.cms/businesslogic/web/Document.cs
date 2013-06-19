@@ -402,32 +402,57 @@ namespace umbraco.cms.businesslogic.web
             var children = ApplicationContext.Current.Services.ContentService.GetChildrenByName(NodeId, searchString);
             return children.Select(x => new Document(x)).ToList();
         }
-        
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.RePublishAll()", false)]
+                
+        /// <summary>
+        /// This will clear out the cmsContentXml table for all Documents (not media or members) and then
+        /// rebuild the xml for each Docuemtn item and store it in this table.
+        /// </summary>
+        /// <remarks>
+        /// This method is thread safe
+        /// </remarks>
         [MethodImpl(MethodImplOptions.Synchronized)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.RePublishAll()", false)]
         public static void RePublishAll()
         {
-            XmlDocument xd = new XmlDocument();
+            var xd = new XmlDocument();
 
-            if (!DataLayerHelper.IsEmbeddedDatabase(SqlHelper.ConnectionString))
-            {
-                SqlHelper.ExecuteNonQuery("truncate table cmsContentXml");
-            }
-            else
-            {
-                SqlHelper.ExecuteNonQuery("delete from cmsContentXml");
-            }
-            IRecordsReader dr = SqlHelper.ExecuteReader("select nodeId from cmsDocument where published = 1");
+            //Remove all Documents (not media or members), only Documents are stored in the cmsDocument table
+            SqlHelper.ExecuteNonQuery(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                        (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+                                            INNER JOIN cmsDocument ON cmsContentXml.nodeId = cmsDocument.nodeId)");
+            
+            var dr = SqlHelper.ExecuteReader("select nodeId from cmsDocument where published = 1");
 
             while (dr.Read())
             {
                 try
                 {
-                    new Document(dr.GetInt("nodeId")).XmlGenerate(xd);
+                    //create the document in optimized mode! 
+                    // (not sure why we wouldn't always do that ?!)
+
+                    new Document(true, dr.GetInt("nodeId"))
+                        .XmlGenerate(xd);
+
+                    //The benchmark results that I found based contructing the Document object with 'true' for optimized
+                    //mode, vs using the normal ctor. Clearly optimized mode is better!
+                    /*
+                     * The average page rendering time (after 10 iterations) for submitting /umbraco/dialogs/republish?xml=true when using 
+                     * optimized mode is
+                     * 
+                     * 0.060400555555556
+                     * 
+                     * The average page rendering time (after 10 iterations) for submitting /umbraco/dialogs/republish?xml=true when not
+                     * using optimized mode is
+                     * 
+                     * 0.107037777777778
+                     *                      
+                     * This means that by simply changing this to use optimized mode, it is a 45% improvement!
+                     * 
+                     */
                 }
                 catch (Exception ee)
                 {
-					LogHelper.Error<Document>("Error generating xml", ee);
+                    LogHelper.Error<Document>("Error generating xml", ee);                    
                 }
             }
             dr.Close();

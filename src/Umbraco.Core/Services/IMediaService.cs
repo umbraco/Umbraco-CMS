@@ -11,8 +11,13 @@ namespace Umbraco.Core.Services
     {
         /// <summary>
         /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
-        /// that this Media is based on.
+        /// that this Media should based on.
         /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IMedia without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new media objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
         /// <param name="name">Name of the Media object</param>
         /// <param name="parentId">Id of Parent for the new Media item</param>
         /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
@@ -22,8 +27,13 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
-        /// that this Media is based on.
+        /// that this Media should based on.
         /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IMedia without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new media objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
         /// <param name="name">Name of the Media object</param>
         /// <param name="parent">Parent <see cref="IMedia"/> for the new Media item</param>
         /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
@@ -184,5 +194,45 @@ namespace Umbraco.Core.Services
         /// <param name="mediaPath">Path of the media item to retreive (for example: /media/1024/koala_403x328.jpg)</param>
         /// <returns><see cref="IMedia"/></returns>
         IMedia GetMediaByPath(string mediaPath);
+
+        /// <summary>
+        /// Sorts a collection of <see cref="IMedia"/> objects by updating the SortOrder according
+        /// to the ordering of items in the passed in <see cref="IEnumerable{T}"/>.
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="userId"></param>
+        /// <param name="raiseEvents"></param>
+        /// <returns>True if sorting succeeded, otherwise False</returns>
+        bool Sort(IEnumerable<IMedia> items, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
+        /// that this Media should based on.
+        /// </summary>
+        /// <remarks>
+        /// This method returns an <see cref="IMedia"/> object that has been persisted to the database
+        /// and therefor has an identity.
+        /// </remarks>
+        /// <param name="name">Name of the Media object</param>
+        /// <param name="parent">Parent <see cref="IMedia"/> for the new Media item</param>
+        /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
+        /// <param name="userId">Optional id of the user creating the media item</param>
+        /// <returns><see cref="IMedia"/></returns>
+        IMedia CreateMediaWithIdentity(string name, IMedia parent, string mediaTypeAlias, int userId = 0);
+
+        /// <summary>
+        /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
+        /// that this Media should based on.
+        /// </summary>
+        /// <remarks>
+        /// This method returns an <see cref="IMedia"/> object that has been persisted to the database
+        /// and therefor has an identity.
+        /// </remarks>
+        /// <param name="name">Name of the Media object</param>
+        /// <param name="parentId">Id of Parent for the new Media item</param>
+        /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
+        /// <param name="userId">Optional id of the user creating the media item</param>
+        /// <returns><see cref="IMedia"/></returns>
+        IMedia CreateMediaWithIdentity(string name, int parentId, string mediaTypeAlias, int userId = 0);
     }
 }

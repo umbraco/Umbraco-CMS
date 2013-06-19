@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Umbraco.Core;
@@ -17,6 +18,7 @@ namespace Umbraco.Web.Models
 	/// This also ensures that we have an OwnersCollection property so that the IsFirst/IsLast/Index helper methods work 
     /// when referenced inside the result of a collection. http://issues.umbraco.org/issue/U4-1797
 	/// </remarks>
+    [DebuggerDisplay("Content Id: {Id}, Name: {Name}")]
     public abstract class PublishedContentBase : IPublishedContent, IOwnerCollectionAware<IPublishedContent>
 	{
 		private string _url;

@@ -7,11 +7,11 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml;
 using System.Xml.Xsl;
+using Umbraco.Core.IO;
 using umbraco.BasePages;
 using umbraco.uicontrols;
 using System.Net;
 using umbraco.cms.presentation.Trees;
-using umbraco.IO;
 using umbraco.cms.helpers;
 
 namespace umbraco.cms.presentation.developer
@@ -25,9 +25,10 @@ namespace umbraco.cms.presentation.developer
 		{
 			CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
 		}
+
 		protected PlaceHolder buttons;
 
-
+        protected MenuIconI SaveButton;
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
@@ -44,28 +45,20 @@ namespace umbraco.cms.presentation.developer
 
 		}
 
-		#region Web Form Designer generated code
-
 		protected override void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
+		{			
 			base.OnInit(e);
-
-
-			uicontrols.MenuIconI save = UmbracoPanel1.Menu.NewIcon();
-			save.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
-			save.OnClickCommand = "doSubmit()";
-			save.AltText = "Save Xslt File";
-			save.ID = "save";
+            
+            SaveButton = UmbracoPanel1.Menu.NewIcon();
+            SaveButton.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
+            SaveButton.AltText = "Save Xslt File";
+            SaveButton.ID = "save";
 
 			UmbracoPanel1.Menu.InsertSplitter();
 
-			uicontrols.MenuIconI tmp = UmbracoPanel1.Menu.NewIcon();
-			tmp.ImageURL = umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/images/editor/insField.GIF";
-			tmp.OnClickCommand = ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/developer/xslt/xsltinsertvalueof.aspx?objectId=" + editorSource.ClientID, "Insert value", 750, 250);
+			var tmp = UmbracoPanel1.Menu.NewIcon();
+			tmp.ImageURL = IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/images/editor/insField.GIF";
+			tmp.OnClickCommand = ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/developer/xslt/xsltinsertvalueof.aspx?objectId=" + editorSource.ClientID, "Insert value", 750, 250);
 			//"umbracoInsertField(document.getElementById('editorSource'), 'xsltInsertValueOf', '','felt', 750, 230, '');";
 			tmp.AltText = "Insert xslt:value-of";
 
@@ -104,7 +97,7 @@ namespace umbraco.cms.presentation.developer
 
 
 			// Add source and filename
-			String file = IOHelper.MapPath(SystemDirectories.Xslt + "/" + Request.QueryString["file"]);
+			var file = IOHelper.MapPath(SystemDirectories.Xslt + "/" + Request.QueryString["file"]);
 
 			// validate file
 			IOHelper.ValidateEditPath(file, SystemDirectories.Xslt);
@@ -129,19 +122,10 @@ namespace umbraco.cms.presentation.developer
 		{
 			base.OnPreRender(e);
 
-			ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.Webservices) + "/codeEditorSave.asmx"));
-			ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.Webservices) + "/legacyAjaxCalls.asmx"));
+			ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices) + "/codeEditorSave.asmx"));
+			ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices) + "/legacyAjaxCalls.asmx"));
 		}
 
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
-		}
-
-		#endregion
 
 		/// <summary>
 		/// JsInclude1 control.

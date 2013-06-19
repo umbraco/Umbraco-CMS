@@ -454,6 +454,9 @@ namespace umbraco.BusinessLogic
                     if (GlobalSettings.UseSSL)
                         cookie.Secure = true;
 
+                    //ensure http only, this should only be able to be accessed via the server
+                    cookie.HttpOnly = true;
+
                     cookie.Expires = expires;
                     ResponseCookie = cookie;
 

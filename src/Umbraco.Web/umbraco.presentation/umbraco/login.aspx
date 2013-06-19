@@ -59,7 +59,7 @@
 <body>
     <form id="Form1" method="post" runat="server">
     <cc1:UmbracoPanel Style="text-align: left;" ID="Panel1" runat="server" Height="347px"
-        Width="340px" Text="Umbraco 4 login" AutoResize="false">
+        Width="340px" Text="Umbraco login" AutoResize="false">
         <div style="padding: 70px 0px 0px 0px;">
             <p style="margin: 0px; padding: 5px 0px 20px 0px; color: #999">
                 <asp:Literal ID="TopText" runat="server"></asp:Literal>

@@ -426,6 +426,15 @@ namespace Umbraco.Web
 
 					DisposeHttpContextItems(httpContext);
 				};
+
+            //disable asp.net headers (security)
+		    app.PreSendRequestHeaders += (sender, args) =>
+		        {
+                    var httpContext = ((HttpApplication)sender).Context;
+                    httpContext.Response.Headers.Remove("Server");
+                    //this doesn't normally work since IIS sets it but we'll keep it here anyways.
+                    httpContext.Response.Headers.Remove("X-Powered-By");
+		        };
 		}
 
 		public void Dispose()
