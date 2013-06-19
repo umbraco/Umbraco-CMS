@@ -952,7 +952,10 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentRepository(uow))
                 {
-                    content.WriterId = userId;
+                    // Update the create author and last edit author
+                    copy.CreatorId = userId;
+                    copy.WriterId = userId;
+
                     repository.AddOrUpdate(copy);
                     uow.Commit();
 

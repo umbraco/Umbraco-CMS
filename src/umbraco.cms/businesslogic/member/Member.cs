@@ -91,7 +91,7 @@ namespace umbraco.cms.businesslogic.member
         /// 
         /// Note: is ressource intensive, use with care.
         /// </summary>
-        [Obsolete("Use System.Web.Security.Membership.GetAllUsers()")]
+        
         public static Member[] GetAll
         {
             get
@@ -146,13 +146,13 @@ namespace umbraco.cms.businesslogic.member
         /// </summary>
         /// <param name="letter">The first letter</param>
         /// <returns></returns>
-        [Obsolete("Use System.Web.Security.Membership.FindUsersByName(string letter)")]
+        
         public static Member[] getMemberFromFirstLetter(char letter)
         {
             return GetMemberByName(letter.ToString(), true);
         }
 
-        [Obsolete("Use System.Web.Security.Membership.FindUsersByName(string letter)")]
+        
         public static Member[] GetMemberByName(string usernameToMatch, bool matchByNameInsteadOfLogin)
         {
             string field = matchByNameInsteadOfLogin ? "umbracoNode.text" : "cmsMember.loginName";
@@ -184,7 +184,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="mbt">Member type</param>
         /// <param name="u">The umbraco usercontext</param>
         /// <returns>The new member</returns>
-        [Obsolete("Use System.Web.Security.Membership.CreateUser")]
+        
         public static Member MakeNew(string Name, MemberType mbt, User u)
         {
             return MakeNew(Name, "", "", mbt, u);
@@ -199,7 +199,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="u">The umbraco usercontext</param>
         /// <param name="Email">The email of the user</param>
         /// <returns>The new member</returns>
-        [Obsolete("Use System.Web.Security.Membership.CreateUser")]
+        
         public static Member MakeNew(string Name, string Email, MemberType mbt, User u)
         {
             return MakeNew(Name, "", Email, mbt, u);
@@ -213,7 +213,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="u">The umbraco usercontext</param>
         /// <param name="Email">The email of the user</param>
         /// <returns>The new member</returns>
-        [Obsolete("Use System.Web.Security.Membership.CreateUser")]
+        
         public static Member MakeNew(string Name, string LoginName, string Email, MemberType mbt, User u)
         {
             var loginName = (!String.IsNullOrEmpty(LoginName)) ? LoginName : Name;
@@ -265,7 +265,7 @@ namespace umbraco.cms.businesslogic.member
         /// </summary>
         /// <param name="loginName">The unique Loginname</param>
         /// <returns>The member with the specified loginname - null if no Member with the login exists</returns>
-        [Obsolete("Use System.Web.Security.Membership.GetUser")]
+        
         public static Member GetMemberFromLoginName(string loginName)
         {
             if (String.IsNullOrEmpty(loginName))
@@ -298,7 +298,7 @@ namespace umbraco.cms.businesslogic.member
         /// </summary>
         /// <param name="email">The email of the member</param>
         /// <returns>The member with the specified email - null if no Member with the email exists</returns>
-        [Obsolete("Use System.Web.Security.Membership.GetUserNameByEmail")]
+        
         public static Member GetMemberFromEmail(string email)
         {
             if (string.IsNullOrEmpty(email))
@@ -326,7 +326,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="loginName">Member login</param>
         /// <param name="password">Member password</param>
         /// <returns>The member with the credentials - null if none exists</returns>
-        [Obsolete("Log members in via the standard Forms Authentiaction login")]
+        
         public static Member GetMemberFromLoginNameAndPassword(string loginName, string password)
         {
             if (IsMember(loginName))
@@ -668,7 +668,7 @@ namespace umbraco.cms.businesslogic.member
         /// <summary>
         /// Deltes the current member
         /// </summary>
-        [Obsolete("Use System.Web.Security.Membership.DeleteUser")]
+        
         public override void delete()
         {
             DeleteEventArgs e = new DeleteEventArgs();
@@ -712,7 +712,7 @@ namespace umbraco.cms.businesslogic.member
         /// </summary>
         /// <param name="GroupId">The id of the group which the member is being added to</param>
         [MethodImpl(MethodImplOptions.Synchronized)]
-        [Obsolete("Use System.Web.Security.Roles.AddUserToRole")]
+        
         public void AddGroup(int GroupId)
         {
             AddGroupEventArgs e = new AddGroupEventArgs();
@@ -738,7 +738,7 @@ namespace umbraco.cms.businesslogic.member
         /// Removes the member from the MemberGroup specified
         /// </summary>
         /// <param name="GroupId">The MemberGroup from which the Member is removed</param>
-        [Obsolete("Use System.Web.Security.Roles.RemoveUserFromRole")]
+        
         public void RemoveGroup(int GroupId)
         {
             RemoveGroupEventArgs e = new RemoveGroupEventArgs();
