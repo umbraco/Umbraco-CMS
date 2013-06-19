@@ -28,6 +28,7 @@ namespace umbraco.cms.presentation.members
 
 		protected PlaceHolder MemberPasswordTxt = new PlaceHolder();
 		protected TextBox MemberEmail = new TextBox();
+        protected CustomValidator MemberEmailExistCheck = new CustomValidator();
 		protected controls.DualSelectbox _memberGroups = new controls.DualSelectbox();
 
 
@@ -65,8 +66,15 @@ namespace umbraco.cms.presentation.members
                 MemberLoginNameVal.EnableClientScript = false;
                 MemberLoginNameVal.Display = ValidatorDisplay.Dynamic;
 
+                MemberEmailExistCheck.ErrorMessage = ui.Text("errorHandling", "errorExistsWithoutTab", "E-mail", BasePages.UmbracoEnsuredPage.CurrentUser);
+                MemberEmailExistCheck.EnableClientScript = false;
+                MemberEmailExistCheck.ValidateEmptyText = false;
+                MemberEmailExistCheck.ControlToValidate = MemberEmail.ID;
+                MemberEmailExistCheck.ServerValidate += MemberEmailExistCheck_ServerValidate;
+
                 _contentControl.PropertiesPane.addProperty(ui.Text("login"), ph);
                 _contentControl.PropertiesPane.addProperty(ui.Text("password"), MemberPasswordTxt);
+                _contentControl.PropertiesPane.addProperty("", MemberEmailExistCheck);
                 _contentControl.PropertiesPane.addProperty("Email", MemberEmail);
             }
             else
@@ -131,6 +139,14 @@ namespace umbraco.cms.presentation.members
                 m_MemberShipPanel.Controls.Add(p);
 
 		}
+
+        void MemberEmailExistCheck_ServerValidate(object source, ServerValidateEventArgs args)
+        {
+            if (MemberEmail.Text != "" && Member.GetMemberFromEmail(MemberEmail.Text.ToLower()) != null && Membership.Providers[Member.UmbracoMemberProviderName].RequiresUniqueEmail)
+                args.IsValid = false;
+            else
+                args.IsValid = true;
+        }
 
         void MenuSaveClick(object sender, ImageClickEventArgs e)
         {
