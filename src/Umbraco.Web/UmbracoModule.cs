@@ -133,9 +133,9 @@ namespace Umbraco.Web
             if (pcr.IsRedirect)
             {
                 if (pcr.IsRedirectPermanent)
-                    response.Redirect(pcr.RedirectUrl, false); // do not end response
-                else
                     response.RedirectPermanent(pcr.RedirectUrl, false); // do not end response
+                else
+                    response.Redirect(pcr.RedirectUrl, false); // do not end response
                 end = true;
             }
             else if (pcr.Is404)
