@@ -5,6 +5,7 @@ using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
+using Umbraco.Core;
 using Umbraco.Web.Routing;
 using umbraco;
 using umbraco.NodeFactory;

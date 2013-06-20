@@ -1,17 +1,19 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml;
+using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation;
-using umbraco.cms.businesslogic.media;
 using System.Linq;
 using umbraco.cms.businesslogic;
 using umbraco.cms.presentation.user;
 using umbraco.interfaces;
+using Umbraco.Web;
 
 namespace umbraco.dialogs
 {
@@ -22,13 +24,13 @@ namespace umbraco.dialogs
     {
 
         protected override void OnInit(EventArgs e)
-        {            
+        {
             CurrentApp = Request["app"];
 
             base.OnInit(e);
         }
 
-		protected void Page_Load(object sender, EventArgs e)
+        protected void Page_Load(object sender, EventArgs e)
         {
             JTree.DataBind();
 
@@ -48,7 +50,7 @@ namespace umbraco.dialogs
                     ok.Text = ui.Text("general", "ok", this.getUser());
                     ok.Attributes.Add("style", "width: 60px");
 
-                    var documentType = new DocumentType(int.Parse(helper.Request("id")));
+                    var documentType = new DocumentType(int.Parse(Request.GetItemAsString("id")));
 
                     //Load master types... 
                     masterType.Attributes.Add("style", "width: 350px;");
@@ -72,81 +74,74 @@ namespace umbraco.dialogs
                     pane_settings.Visible = false;
 
                     // Caption and properies on BUTTON
-                    ok.Text = ui.Text("general", "ok", this.getUser());
+                    ok.Text = ui.Text("general", "ok", getUser());
                     ok.Attributes.Add("style", "width: 60px");
                     ok.Attributes.Add("disabled", "true");
 
-                    var cmsNode = new CMSNode(int.Parse(helper.Request("id")));
+                    IContentBase currContent;
+                    if (CurrentApp == "content")
+                    {
+                        currContent = Services.ContentService.GetById(Request.GetItemAs<int>("id"));
+                    }
+                    else
+                    {
+                        currContent = Services.MediaService.GetById(Request.GetItemAs<int>("id"));
+                    }
 
                     var validAction = true;
-                    if (CurrentApp == "content" && cmsNode.HasChildren)
-                        validAction = ValidAction(helper.Request("mode") == "cut" ? 'M' : 'O');
-
-
-                    if (helper.Request("mode") == "cut")
+                    if (CurrentApp == "content" && Umbraco.Core.Models.ContentExtensions.HasChildren(currContent, Services))
                     {
-                        pane_form.Text = ui.Text("moveOrCopy", "moveTo", cmsNode.Text, base.getUser());
+                        validAction = ValidAction(currContent, Request.GetItemAsString("mode") == "cut" ? 'M' : 'O');
+                    }
+
+                    if (Request.GetItemAsString("mode") == "cut")
+                    {
+                        pane_form.Text = ui.Text("moveOrCopy", "moveTo", currContent.Name, getUser());
                         pp_relate.Visible = false;
                     }
                     else
                     {
-                        pane_form.Text = ui.Text("moveOrCopy", "copyTo", cmsNode.Text, base.getUser());
+                        pane_form.Text = ui.Text("moveOrCopy", "copyTo", currContent.Name, getUser());
                         pp_relate.Visible = true;
                     }
 
                     if (validAction == false)
                     {
-                        ScriptManager.RegisterStartupScript(this, this.GetType(), "notvalid", "notValid();", true);
+                        ScriptManager.RegisterStartupScript(this, GetType(), "notvalid", "notValid();", true);
                     }
                 }
             }
 
         }
 
-        private bool ValidAction(char actionLetter)
+        private bool ValidAction(IContentBase cmsNode, char actionLetter)
         {
-            var cmsNode = new CMSNode(int.Parse(helper.Request("id")));
             var currentAction = BusinessLogic.Actions.Action.GetPermissionAssignable().First(a => a.Letter == actionLetter);
             return CheckPermissions(cmsNode, currentAction);
         }
 
-        private bool CheckPermissions(CMSNode node, IAction currentAction)
-        {                       
+        private bool CheckPermissions(IContentBase node, IAction currentAction)
+        {
             var currUserPermissions = new UserPermissions(CurrentUser);
             var lstCurrUserActions = currUserPermissions.GetExistingNodePermission(node.Id);
 
             if (lstCurrUserActions.Contains(currentAction) == false)
                 return false;
 
-            if (node.HasChildren)
+            
+            if (Umbraco.Core.Models.ContentExtensions.HasChildren(node, Services))
             {
-                foreach (CMSNode child in node.Children)
-                    if (CheckPermissions(child, currentAction) == false)
-                        return false;
+                return Umbraco.Core.Models.ContentExtensions.Children(node, Services)
+                    .All(child => CheckPermissions(child, currentAction));
             }
             return true;
         }
 
-        //PPH moving multiple nodes and publishing them aswell.
-        private void handleChildNodes(cms.businesslogic.web.Document document)
-        {
-            //store children array here because iterating over an Array object is very inneficient.
-            var children = document.Children;
-            foreach (Document child in children.Where(child => child.Published))
-            {
-                child.Publish(new BusinessLogic.User(0));
-
-                //using library.publish to support load balancing.
-                library.UpdateDocumentCache(child.Id);
-                if (child.HasChildren)
-                    handleChildNodes(child);
-            }
-        }
 
         //PPH Handle doctype copies..
         private void HandleDocumentTypeCopy()
         {
-            var documentType = new DocumentType(int.Parse(helper.Request("id")));
+            var documentType = new DocumentType(int.Parse(Request.GetItemAsString("id")));
 
             //Documentype exists.. create new doc type... 
             var alias = rename.Text;
@@ -200,53 +195,66 @@ namespace umbraco.dialogs
         public void HandleMoveOrCopy(object sender, EventArgs e)
         {
             if (CurrentApp == "settings")
-	            HandleDocumentTypeCopy();
-	        else
+                HandleDocumentTypeCopy();
+            else
                 HandleDocumentMoveOrCopy();
-	    }
+        }
 
         protected override void OnPreRender(EventArgs e)
         {
-	        base.OnPreRender(e);        
-	        ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/cmsnode.asmx"));
-	        ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
-	    }
+            base.OnPreRender(e);
+            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/cmsnode.asmx"));
+            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
+        }
 
         private void HandleDocumentMoveOrCopy()
         {
-            if (helper.Request("copyTo") != "" && helper.Request("id") != "")
+            if (Request.GetItemAsString("copyTo") != "" && Request.GetItemAsString("id") != "")
             {
                 // Check if the current node is allowed at new position
                 var nodeAllowed = false;
 
-                var currentNode = new cms.businesslogic.Content(int.Parse(helper.Request("id")));
-
-				var newNode = new cms.businesslogic.Content(int.Parse(helper.Request("copyTo")));
+                IContentBase currContent;
+                IContentBase parentContent;
+                IContentTypeBase parentContentType;
+                if (CurrentApp == "content")
+                {
+                    currContent = Services.ContentService.GetById(Request.GetItemAs<int>("id"));
+                    parentContent = Services.ContentService.GetById(Request.GetItemAs<int>("copyTo"));
+                    parentContentType = Services.ContentTypeService.GetContentType(parentContent.ContentTypeId);
+                }
+                else
+                {
+                    currContent = Services.MediaService.GetById(Request.GetItemAs<int>("id"));
+                    parentContent = Services.MediaService.GetById(Request.GetItemAs<int>("copyTo"));
+                    parentContentType = Services.ContentTypeService.GetMediaType(parentContent.ContentTypeId);
+                }
 
                 // Check on contenttypes
-                if (int.Parse(helper.Request("copyTo")) == -1)
+                if (Request.GetItemAs<int>("copyTo") == -1)
                 {
                     nodeAllowed = true;
                 }
                 else
                 {
-                    if (newNode.ContentType.AllowedChildContentTypeIDs.Where(c => c == currentNode.ContentType.Id).Any())
+                    var allowedChildContentTypeIds = parentContentType.AllowedContentTypes.Select(x => x.Id).ToArray();
+                    if (allowedChildContentTypeIds.Any(x => x.Value == currContent.ContentTypeId))
                     {
                         nodeAllowed = true;
                     }
 
                     if (nodeAllowed == false)
                     {
-                        feedback.Text = ui.Text("moveOrCopy", "notAllowedByContentType", base.getUser());
+                        feedback.Text = ui.Text("moveOrCopy", "notAllowedByContentType", getUser());
                         feedback.type = uicontrols.Feedback.feedbacktype.error;
                     }
                     else
                     {
                         // Check on paths
-                        if ((string.Format(",{0},", newNode.Path)).IndexOf(string.Format(",{0},", currentNode.Id)) > -1)
+                        if ((string.Format(",{0},", parentContent.Path)).IndexOf(string.Format(",{0},", currContent.Id)) > -1)
                         {
                             nodeAllowed = false;
-                            feedback.Text = ui.Text("moveOrCopy", "notAllowedByPath", base.getUser());
+                            feedback.Text = ui.Text("moveOrCopy", "notAllowedByPath", getUser());
                             feedback.type = uicontrols.Feedback.feedbacktype.error;
                         }
                     }
@@ -258,46 +266,171 @@ namespace umbraco.dialogs
                     pane_form_notice.Visible = false;
                     panel_buttons.Visible = false;
 
-                    var newNodeCaption = newNode.Id == -1 ? ui.Text(CurrentApp) : newNode.Text;
+                    var newNodeCaption = Request.GetItemAs<int>("copyTo") == -1 
+                        ? ui.Text(CurrentApp) 
+                        : parentContent.Name;
 
-                    string[] nodes = { currentNode.Text, newNodeCaption };
+                    string[] nodes = { currContent.Name, newNodeCaption };
 
                     if (Request["mode"] == "cut")
                     {
                         if (CurrentApp == "content")
                         {
-                            //PPH changed this to document instead of cmsNode to handle republishing.
-                            var documentId = int.Parse(helper.Request("id"));
-                            var document = new Document(documentId);
-                            document.Move(int.Parse(helper.Request("copyTo")));
-                            library.RefreshContent();
+                            Services.ContentService.Move((IContent)currContent, Request.GetItemAs<int>("copyTo"), getUser().Id);
                         }
                         else
                         {
-                            var media = new Media(int.Parse(UmbracoContext.Current.Request["id"]));
-                            media.Move(int.Parse(UmbracoContext.Current.Request["copyTo"]));
-                            media = new Media(int.Parse(UmbracoContext.Current.Request["id"]));
-                            media.XmlGenerate(new XmlDocument());
-                            library.ClearLibraryCacheForMedia(media.Id);
+                            Services.MediaService.Move((IMedia)currContent, Request.GetItemAs<int>("copyTo"), getUser().Id);
+                            library.ClearLibraryCacheForMedia(currContent.Id);
                         }
 
                         feedback.Text = ui.Text("moveOrCopy", "moveDone", nodes, getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
                         feedback.type = uicontrols.Feedback.feedbacktype.success;
 
                         // refresh tree
-                        ClientTools.MoveNode(currentNode.Id.ToString(), newNode.Path);
+                        ClientTools.MoveNode(currContent.Id.ToString(), parentContent.Path);
                     }
                     else
                     {
-                        var document = new Document(int.Parse(helper.Request("id")));
-                        document.Copy(int.Parse(helper.Request("copyTo")), this.getUser(), RelateDocuments.Checked);
-                        feedback.Text = ui.Text("moveOrCopy", "copyDone", nodes, base.getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+                        //NOTE: We ONLY support Copy on content not media for some reason.
+
+                        Services.ContentService.Copy((IContent)currContent, Request.GetItemAs<int>("copyTo"), RelateDocuments.Checked, getUser().Id);
+                        
+                        feedback.Text = ui.Text("moveOrCopy", "copyDone", nodes, getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
                         feedback.type = uicontrols.Feedback.feedbacktype.success;
-                        ClientTools.CopyNode(currentNode.Id.ToString(), newNode.Path);
+
+                        // refresh tree
+                        ClientTools.CopyNode(currContent.Id.ToString(), parentContent.Path);
                     }
                 }
             }
         }
+
+        /// <summary>
+        /// JsInclude1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude1;
+
+        /// <summary>
+        /// feedback control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Feedback feedback;
+
+        /// <summary>
+        /// pane_form control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane pane_form;
+
+        /// <summary>
+        /// JTree control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.controls.Tree.TreeControl JTree;
+
+        /// <summary>
+        /// pp_relate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_relate;
+
+        /// <summary>
+        /// RelateDocuments control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox RelateDocuments;
+
+        /// <summary>
+        /// pane_form_notice control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder pane_form_notice;
+
+        /// <summary>
+        /// pane_settings control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane pane_settings;
+
+        /// <summary>
+        /// PropertyPanel1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel1;
+
+        /// <summary>
+        /// masterType control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListBox masterType;
+
+        /// <summary>
+        /// rename control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox rename;
+
+        /// <summary>
+        /// RequiredFieldValidator1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
+
+        /// <summary>
+        /// panel_buttons control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel panel_buttons;
+
+        /// <summary>
+        /// ok control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button ok;
 
     }
 }

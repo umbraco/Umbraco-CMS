@@ -334,6 +334,13 @@
       <DependentUpon>EditMacro.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Umbraco\Dialogs\MoveOrCopy.aspx.cs">
+      <DependentUpon>moveOrCopy.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Dialogs\MoveOrCopy.aspx.designer.cs">
+      <DependentUpon>moveOrCopy.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\dialogs\Sort.aspx.cs">
       <DependentUpon>sort.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2353,7 +2360,9 @@
       <SubType>Designer</SubType>
     </None>
     <Content Include="Config\404handlers.config" />
-    <Content Include="Config\Dashboard.config" />
+    <Content Include="Config\Dashboard.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Config\metablogConfig.config" />
     <Content Include="Config\restExtensions.config">
       <SubType>Designer</SubType>
