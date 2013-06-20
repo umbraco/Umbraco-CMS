@@ -663,9 +663,10 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             var inTab = new Hashtable();
             int counter = 0;
 
+            PropertyTypes.Controls.Add(new LiteralControl("<div id='tabs-container'>"));  // opens draggable container for properties on tabs
+
             foreach (ContentType.TabI tab in tabs)
             {
-                bool hasProperties = false;
                 string tabCaption = tab.ContentType == _contentType.Id ? tab.GetRawCaption() : tab.GetRawCaption() + " (inherited from " + new ContentType(tab.ContentType).Text + ")";
                 PropertyTypes.Controls.Add(new LiteralControl("<div class='genericPropertyListBox'><h2 class=\"propertypaneTitel\">Tab: " + tabCaption + "</h2>"));
 
@@ -676,13 +677,13 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                 var propertyGroupId = tab.Id;
 
+                var propSort = new HtmlInputHidden();
+                propSort.ID = "propSort_" + propertyGroupId.ToString() + "_Content";
+                PropertyTypes.Controls.Add(propSort);
+                _sortLists.Add(propSort);
+
                 if (propertyTypes.Any(x => x.ContentTypeId == _contentType.Id))
                 {
-                    var propSort = new HtmlInputHidden();
-                    propSort.ID = "propSort_" + propertyGroupId.ToString() + "_Content";
-                    PropertyTypes.Controls.Add(propSort);
-                    _sortLists.Add(propSort);
-
                     PropertyTypes.Controls.Add(new LiteralControl("<ul class='genericPropertyList' id=\"t_" + propertyGroupId.ToString() + "_Contents\">"));
 
                     foreach (cms.businesslogic.propertytype.PropertyType pt in propertyTypes)
@@ -706,36 +707,19 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                         inTab.Add(pt.Id.ToString(), "");
                         counter++;
-                        hasProperties = true;
                     }
 
                     PropertyTypes.Controls.Add(new LiteralControl("</ul>"));
-
-                    var jsSortable = @"                            
-                                (function($) {
-                                    var propSortId = ""#" + propSort.ClientID + @""";
-                                    $(document).ready(function() {
-                                        $(propSortId).next("".genericPropertyList"").sortable({containment: 'parent', tolerance: 'pointer',
-                                            update: function(event, ui) { 
-                                                $(propSortId).val($(this).sortable('serialize'));
-                                            }});
-                                    });
-                                })(jQuery);";
-
-                    Page.ClientScript.RegisterStartupScript(this.GetType(), propSort.ClientID, jsSortable, true);
-
-                    if (!hasProperties)
-                    {
-                        AddNoPropertiesDefinedMessage();
-                    }
-
-                    PropertyTypes.Controls.Add(new LiteralControl("</div>"));
                 }
                 else
                 {
                     AddNoPropertiesDefinedMessage();
-                    PropertyTypes.Controls.Add(new LiteralControl("</div>"));
                 }
+
+                var jsSortable = GetJavaScriptForPropertySorting(propSort.ClientID);
+                Page.ClientScript.RegisterStartupScript(this.GetType(), propSort.ClientID, jsSortable, true);
+
+                PropertyTypes.Controls.Add(new LiteralControl("</div>"));
             }
 
             // Generic properties tab
@@ -748,10 +732,9 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
             var propSort_gp = new HtmlInputHidden();
             propSort_gp.ID = "propSort_general_Content";
-            propertiesPH.Controls.Add(propSort_gp);
+            PropertyTypes.Controls.Add(propSort_gp);
             _sortLists.Add(propSort_gp);
-
-
+            
             propertiesPH.Controls.Add(new LiteralControl("<ul class='genericPropertyList' id=\"t_general_Contents\">"));
             foreach (cms.businesslogic.propertytype.PropertyType pt in _contentType.PropertyTypes)
             {
@@ -785,28 +768,72 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
             propertiesPH.Controls.Add(new LiteralControl("</ul>"));
 
-            var jsSortable_gp = @"                
-                    (function($) {
-                        var propSortId = ""#" + propSort_gp.ClientID + @""";
-                        $(document).ready(function() {
-                            $(propSortId).next("".genericPropertyList"").sortable({containment: 'parent', tolerance: 'pointer',
-                                update: function(event, ui) { 
-                                    $(propSortId).val($(this).sortable('serialize'));
-                                }});
-                        });
-                    })(jQuery);";
+            var jsSortable_gp = GetJavaScriptForPropertySorting(propSort_gp.ClientID);
 
             Page.ClientScript.RegisterStartupScript(this.GetType(), "propSort_gp", jsSortable_gp, true);
 
 
             if (!propertyTabHasProperties)
             {
-                PropertyTypes.Controls.Add(new LiteralControl("<div style=\"margin: 10px; padding: 4px; border: 1px solid #ccc;\">No properties defined on this tab. Click on the \"add a new property\" link at the top to create a new property.</div>"));
+                AddNoPropertiesDefinedMessage();
                 PropertyTypes.Controls.Remove(PropertyTypes.FindControl("propertiesPH"));
             }
             else
+            {
                 PropertyTypes.Controls.Add(propertiesPH);
+            }
 
+            PropertyTypes.Controls.Add(new LiteralControl("</div>")); // closes draggable container for properties on tabs
+
+        }
+
+        private string GetJavaScriptForPropertySorting(string propSortClientId)
+        {
+            return @"(function($) {
+                        var propSortId = ""#" + propSortClientId + @""";
+                        $(document).ready(function() {
+                            $(propSortId).next("".genericPropertyList"").sortable({
+                                containment: '#tabs-container', 
+                                connectWith: '.genericPropertyList', 
+                                cancel: 'li.no-properties-on-tab, .propertyForm div[id^=""editbody""]',
+                                tolerance: 'pointer',
+                                update: function(event, ui) { 
+
+                                    // Save new sort details for tab
+                                    $(propSortId).val($(this).sortable('serialize'));
+
+                                    // Handle move to new tab
+                                    // - find tab name
+                                    var tabName = $(this).siblings('h2').text().replace('Tab: ', '');
+
+                                    // - find tab drop-down for item and set option selected that matches tab name
+                                    var tabDropDownList = $(""select[name$='ddlTab']"", ui.item);
+                                    $('option', tabDropDownList).each(function() {
+                                        if ($(this).text() == tabName) {
+                                            $(this).attr('selected', 'selected');            
+                                        }                        
+                                    });
+
+                                    // Remove any no properties messages for tabs that now have a property
+                                    $('li.no-properties-on-tab', $(this)).remove();
+
+                                    // Add a no properties message for tabs that now have no properties
+                                    $('#tabs-container ul.genericPropertyList:not(:has(li))').append('" + GetHtmlForNoPropertiesMessageListItem() + @"');
+                                    
+                                }});
+                        });
+                    })(jQuery);";
+        }
+
+        private void AddNoPropertiesDefinedMessage()
+        {
+            // Create no properties message as a ul in order to allow dragging of properties to it from other tabs
+            PropertyTypes.Controls.Add(new LiteralControl("<ul class=\"genericPropertyList\">" + GetHtmlForNoPropertiesMessageListItem() + "</ul>"));
+        }
+
+        private string GetHtmlForNoPropertiesMessageListItem()
+        {
+            return @"<li class=""no-properties-on-tab"">No properties defined on this tab. Click on the ""add a new property"" link at the top to create a new property.</li></ul>";
         }
 
         private void SavePropertyType(SaveClickEventArgs e, IContentTypeComposition contentTypeItem)
@@ -863,6 +890,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 }
             }
         }
+
         private void UpdatePropertyTypes(IContentTypeComposition contentTypeItem)
         {
             //Loop through the _genericProperties ArrayList and update all existing PropertyTypes
@@ -910,29 +938,17 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 cms.businesslogic.cache.Cache.ClearCacheItem("ContentType_PropertyTypes_Content:" + contentTypeItem.Id);
                 _contentType.ClearVirtualTabs();
             }
-        
-            //Update the SortOrder of the PropertyTypes
+
+            // Sort order
             foreach (HtmlInputHidden propSorter in _sortLists)
             {
                 if (propSorter.Value.Trim() != "")
                 {
-                    string tabId = propSorter.ID;
-                    // remove leading "propSort_" and trailing "_Content"
-                    tabId = tabId.Substring(9, tabId.Length - 9 - 8);
-                    // calc the position of the prop SO i.e. after "t_<tabId>Contents[]="
-                    int propSOPosition = "t_".Length + tabId.Length + "Contents[]=".Length + 1;
-
-                    string[] tempSO = propSorter.Value.Split("&".ToCharArray());
-                    for (int i = 0; i < tempSO.Length; i++)
+                    string[] newSortOrders = propSorter.Value.Split("&".ToCharArray());
+                    for (int i = 0; i < newSortOrders.Length; i++)
                     {
-                        string propSO = tempSO[i].Substring(propSOPosition);
-                        int propertyTypeId = int.Parse(propSO);
-                        if (contentTypeItem.PropertyTypes != null &&
-                            contentTypeItem.PropertyTypes.Any(x => x.Id == propertyTypeId))
-                        {
-                            var propertyType = contentTypeItem.PropertyTypes.First(x => x.Id == propertyTypeId);
-                            propertyType.SortOrder = i;
-                        }
+                        int id = int.Parse(newSortOrders[i].Split("=".ToCharArray())[1]);
+                        cms.businesslogic.propertytype.PropertyType.GetPropertyType(id).SortOrder = i;
                     }
                 }
             }
@@ -1007,11 +1023,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                     }
                 }
             }
-        }
-
-        private void AddNoPropertiesDefinedMessage()
-        {
-            PropertyTypes.Controls.Add(new LiteralControl("<div style=\"margin: 10px; padding: 4px; border: 1px solid #ccc;\">No properties defined on this tab. Click on the \"add a new property\" link at the top to create a new property.</div>"));
         }
 
         private bool DoesPropertyTypeAliasExist(GenericProperty gpData)
