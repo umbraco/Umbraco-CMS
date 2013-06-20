@@ -30,6 +30,8 @@ namespace Umbraco.Tests.UmbracoExamine
 		    var path = svc.MapPath("/App_Data/Converting_file_to_PDF.pdf");
 		    var f = new FileInfo(path);
 		    var dir = f.Directory;
+            //ensure the folder is there
+            System.IO.Directory.CreateDirectory(dir.FullName);
             var pdfs = new[] { TestFiles.Converting_file_to_PDF, TestFiles.PDFStandards, TestFiles.SurviorFlipCup, TestFiles.windows_vista };
             var names = new[] { "Converting_file_to_PDF.pdf", "PDFStandards.pdf", "SurviorFlipCup.pdf", "windows_vista.pdf" };
 		    for (int index = 0; index < pdfs.Length; index++)
