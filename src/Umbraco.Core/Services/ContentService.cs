@@ -346,7 +346,7 @@ namespace Umbraco.Core.Services
             using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
             {
                 var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
-                var contents = repository.GetByQuery(query);
+                var contents = repository.GetByQuery(query).OrderBy(x => x.SortOrder);
 
                 return contents;
             }
@@ -1049,7 +1049,10 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentRepository(uow))
                 {
-                    content.WriterId = userId;
+                    // Update the create author and last edit author
+                    copy.CreatorId = userId;
+                    copy.WriterId = userId;
+
                     repository.AddOrUpdate(copy);
                     uow.Commit();
 
@@ -1124,7 +1127,7 @@ namespace Umbraco.Core.Services
                 }
 
                 //Look for children and copy those as well
-                var children = GetChildren(content.Id).OrderBy(x => x.SortOrder);
+                var children = GetChildren(content.Id);
                 foreach (var child in children)
                 {
                     Copy(child, copy.Id, relateToOriginal, userId);

@@ -16,10 +16,15 @@ namespace umbraco.presentation.templateControls
         {
             int id;
             bool hasid = int.TryParse(NodeId, out id);
-            int? nodeId = hasid ? id : (int?) null;
-            
-            Src = ImageUrl.GetImageUrl(Src, Field, Provider, Parameters, nodeId);
-            base.Render(writer);
+            int? nodeId = hasid ? id : (int?)null;
+
+            string url;
+            bool imageFound = ImageUrl.TryGetImageUrl(Src, Field, Provider, Parameters, nodeId, out url);
+            Src = url;
+            if (imageFound)
+            {
+                base.Render(writer);
+            }
         }
     }
 }

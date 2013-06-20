@@ -37,6 +37,7 @@ using umbraco.NodeFactory;
 using umbraco.presentation.templateControls;
 using Content = umbraco.cms.businesslogic.Content;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
+using MacroErrorEventArgs = Umbraco.Core.Events.MacroErrorEventArgs;
 
 namespace umbraco
 {
@@ -1606,7 +1607,6 @@ namespace umbraco
         {
 			Mandate.ParameterNotNullOrEmpty(fileName, "fileName");
 	        Mandate.ParameterNotNull(model, "model");
-			Mandate.ParameterNotNull(pageElements, "pageElements");
 
             try
             {

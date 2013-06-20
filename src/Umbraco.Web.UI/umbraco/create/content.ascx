@@ -18,7 +18,7 @@
 
 <div style="margin-right: 15px;">
 	<asp:Button id="sbmt" Runat="server" style="Width: 90px; margin-right: 6px;" onclick="sbmt_Click"></asp:Button>
-	<em> or </em>  
+	<em> <%= umbraco.ui.Text("or") %> </em>  
 	<a href="#" style="color: Blue; margin-left: 6px;" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
 	
 	<!--
