@@ -319,11 +319,19 @@ namespace Umbraco.Web
 		                       LegacyAttributes = attributesForItem
 		                   };
 
-            //this is here to figure out if this request is in the context of a partial
-            if (_umbracoContext.PublishedContentRequest.PublishedContent.Id != currentPage.Id)
+            //here we are going to check if we are in the context of an Umbraco routed page, if we are we 
+            //will leave the NodeId empty since the underlying ItemRenderer will work ever so slightly faster
+            //since it already knows about the current page. Otherwise, we'll assign the id based on our
+            //currently assigned node. The PublishedContentRequest will be null if:
+            // * we are rendering a partial view or child action
+            // * we are rendering a view from a custom route
+            if (_umbracoContext.PublishedContentRequest == null 
+                || _umbracoContext.PublishedContentRequest.PublishedContent.Id != currentPage.Id)
+            {
                 item.NodeId = currentPage.Id.ToString();
-            
-		
+            }
+                
+		    
 			var containerPage = new FormlessPage();
 			containerPage.Controls.Add(item);
 
