@@ -97,12 +97,12 @@ namespace umbraco.dialogs
 
                     if (Request.GetItemAsString("mode") == "cut")
                     {
-                        pane_form.Text = ui.Text("moveOrCopy", "moveTo", cmsNode.Text, UmbracoUser);
+                        pane_form.Text = ui.Text("moveOrCopy", "moveTo", currContent.Name, UmbracoUser);
                         pp_relate.Visible = false;
                     }
                     else
                     {
-                        pane_form.Text = ui.Text("moveOrCopy", "copyTo", cmsNode.Text, UmbracoUser);
+                        pane_form.Text = ui.Text("moveOrCopy", "copyTo", currContent.Name, UmbracoUser);
                         pp_relate.Visible = true;
                     }
 
