@@ -322,6 +322,7 @@
     <Compile Include="Trees\LegacyTreeApiController.cs" />
     <Compile Include="Trees\ISearchableTree.cs" />
     <Compile Include="Trees\LegacyTreeDataAdapter.cs" />
+    <Compile Include="Trees\LegacyTreeParams.cs" />
     <Compile Include="Trees\SearchResultItem.cs" />
     <Compile Include="Trees\TreeApiController.cs" />
     <Compile Include="Trees\ApplicationTreeExtensions.cs" />

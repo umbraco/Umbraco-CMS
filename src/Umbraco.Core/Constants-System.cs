@@ -21,6 +21,7 @@
 			/// The integer identifier for media's recycle bin.
 			/// </summary>
 			public const int RecycleBinMedia = -21;
+
 		}
 	}
 }

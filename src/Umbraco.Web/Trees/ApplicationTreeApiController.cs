@@ -8,7 +8,6 @@ using Umbraco.Core.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using umbraco.cms.presentation.Trees;
 
 namespace Umbraco.Web.Trees
 {
@@ -49,12 +48,11 @@ namespace Umbraco.Web.Trees
             var collection = new TreeNodeCollection();
             foreach (var tree in appTrees)
             {
-                var rootNodes = GetNodeCollection(tree, "-1", queryStrings);
                 //return the root nodes for each tree in the app
-                //collection.Add(); //GetNodeCollection(tree, "-1", queryStrings);
-
+                var rootNode = GetRoot(tree, queryStrings);                
+                collection.Add(rootNode); 
             }
-            return null;
+            return collection;
         }
 
         /// <summary>
@@ -75,6 +73,23 @@ namespace Umbraco.Web.Trees
                 throw new InstanceNotFoundException("Could not find tree of type " + treeType + " in the trees.config");
 
             return GetNodeCollection(foundConfigTree, id, queryStrings);
+        }
+
+        private TreeNode GetRoot(ApplicationTree configTree, FormDataCollection queryStrings)
+        {
+            if (configTree == null) throw new ArgumentNullException("configTree");
+            var byControllerAttempt = configTree.TryGetRootNodeFromControllerTree(queryStrings, ControllerContext, Request);
+            if (byControllerAttempt.Success)
+            {
+                return byControllerAttempt.Result;
+            }
+            var legacyAttempt = configTree.TryGetRootNodeFromLegacyTree(queryStrings, Url);
+            if (legacyAttempt.Success)
+            {
+                return legacyAttempt.Result;
+            }
+
+            throw new ApplicationException("Could not get root node for tree type " + configTree.Alias);
         }
 
         /// <summary>
@@ -102,16 +117,7 @@ namespace Umbraco.Web.Trees
         }
         
 
-        //Temporary, but necessary until we refactor trees in general
-        internal class TreeParams : ITreeService
-        {
-            public string NodeKey { get; set; }
-            public int StartNodeID { get; set; }
-            public bool ShowContextMenu { get; set; }
-            public bool IsDialog { get; set; }
-            public TreeDialogModes DialogMode { get; set; }
-            public string FunctionToCall { get; set; }
-        }
-
     }
+
+    
 }

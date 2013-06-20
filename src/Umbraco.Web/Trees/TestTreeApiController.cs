@@ -20,9 +20,9 @@ namespace Umbraco.Web.Trees
             return collection;
         }
 
-        protected override string RootNodeId
-        {
-            get { return (-1).ToString(CultureInfo.InvariantCulture); }
-        }
+        //protected override string RootNodeId
+        //{
+        //    get { return (-1).ToString(CultureInfo.InvariantCulture); }
+        //}
     }
 }

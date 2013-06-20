@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Core.Trees
+﻿using System.Diagnostics;
+
+namespace Umbraco.Core.Trees
 {
+    [DebuggerDisplay("Tree - {Title} ({ApplicationAlias})")]
     internal class ApplicationTree
     {
         /// <summary>

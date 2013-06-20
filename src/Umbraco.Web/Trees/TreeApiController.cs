@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
+using Umbraco.Core;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using umbraco.businesslogic;
@@ -57,10 +59,10 @@ namespace Umbraco.Web.Trees
         /// </remarks>
         protected abstract TreeNodeCollection GetTreeData(string id, FormDataCollection queryStrings);
 
-        /// <summary>
-        /// Returns the root node for the tree
-        /// </summary>
-        protected abstract string RootNodeId { get; }
+        ///// <summary>
+        ///// Returns the root node for the tree
+        ///// </summary>
+        //protected abstract string RootNodeId { get; }
         
         /// <summary>
         /// The name to display on the root node
@@ -95,10 +97,14 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected virtual TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
-            var getChildNodesUrl = Url.GetTreeUrl(GetType(), RootNodeId, queryStrings);
+            var getChildNodesUrl = Url.GetTreeUrl(
+                GetType(), 
+                Constants.System.Root.ToString(CultureInfo.InvariantCulture), 
+                queryStrings);
+
             var isDialog = queryStrings.GetValue<bool>(TreeQueryStringParameters.DialogMode);
             //var node = new TreeNode(RootNodeId, BackOfficeRequestContext.RegisteredComponents.MenuItems, jsonUrl)
-            var node = new TreeNode(RootNodeId, getChildNodesUrl)
+            var node = new TreeNode(Constants.System.Root.ToString(CultureInfo.InvariantCulture), getChildNodesUrl)
                 {
                     HasChildren = true,
 
@@ -161,7 +167,7 @@ namespace Umbraco.Web.Trees
         protected bool AddRootNodeToCollection(string id, FormDataCollection queryStrings)
         {                       
             //if its the root model
-            if (id == RootNodeId)
+            if (id == Constants.System.Root.ToString(CultureInfo.InvariantCulture))
             {
                 //get the root model
                 var rootNode = CreateRootNode(queryStrings);
