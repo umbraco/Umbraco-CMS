@@ -508,7 +508,7 @@ namespace Umbraco.Core
                     foreach (var typeToSearch in subTypesToSearch)
                     {
                         //recursively find the types inheriting from this sub type in the other non-scanned assemblies.
-                        var foundTypes = GetClasses(typeToSearch, otherAssemblies, onlyConcreteClasses);
+                        var foundTypes = GetClasses(typeToSearch, otherAssemblies, onlyConcreteClasses, additionalFilter);
                         foundAssignableTypes.AddRange(foundTypes);
                     }
                     
