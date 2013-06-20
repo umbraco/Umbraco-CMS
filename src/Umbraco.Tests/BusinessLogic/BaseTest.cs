@@ -4,10 +4,10 @@ using System.Configuration;
 using NUnit.Framework;
 using SqlCE4Umbraco;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Tests.TestHelpers;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
-using umbraco.IO;
 using GlobalSettings = umbraco.GlobalSettings;
 
 namespace Umbraco.Tests.BusinessLogic
@@ -85,7 +85,7 @@ namespace Umbraco.Tests.BusinessLogic
 
         private void InitializeTreeConfigFile()
         {
-            ApplicationTree.TreeConfigFilePath = IOHelper.MapPath(SystemDirectories.Config + "/" + ApplicationTree.TreeConfigFileName, false);
+            Core.Trees.ApplicationTreeCollection.TreeConfigFilePath = IOHelper.MapPath(SystemDirectories.Config + "/" + Core.Trees.ApplicationTreeCollection.TreeConfigFileName, false);
         }
 
     }

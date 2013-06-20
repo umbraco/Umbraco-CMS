@@ -21,7 +21,7 @@ using MigrationsVersionFourNineZero = Umbraco.Core.Persistence.Migrations.Upgrad
 
 namespace Umbraco.Core
 {
-	/// <summary>
+    /// <summary>
 	/// A bootstrapper for the Umbraco application which initializes all objects for the Core of the application 
 	/// </summary>
 	/// <remarks>

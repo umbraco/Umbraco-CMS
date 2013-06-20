@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Xml.Linq;
+using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
@@ -18,95 +19,9 @@ namespace umbraco.BusinessLogic
     /// An application tree is a collection of nodes belonging to one or more application(s).
     /// Through this class new application trees can be created, modified and deleted. 
     /// </summary>
+    [Obsolete("This has been superceded by Umbraco.Core.Trees.ApplicationTree and Umbraco.Core.Trees.ApplicationTreeCollection")]
     public class ApplicationTree
     {
-
-        internal const string TreeConfigFileName = "trees.config";
-        private static string _treeConfig;
-        private static readonly object Locker = new object();
-
-        /// <summary>
-        /// gets/sets the trees.config file path
-        /// </summary>
-        /// <remarks>
-        /// The setter is generally only going to be used in unit tests, otherwise it will attempt to resolve it using the IOHelper.MapPath
-        /// </remarks>
-        internal static string TreeConfigFilePath
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(_treeConfig))
-                {
-                    _treeConfig = IOHelper.MapPath(SystemDirectories.Config + "/" + TreeConfigFileName);
-                }
-                return _treeConfig;
-            }
-            set { _treeConfig = value; }
-        }
-
-        /// <summary>
-        /// The cache storage for all application trees
-        /// </summary>
-        private static List<ApplicationTree> AppTrees
-        {
-            get
-            {
-                return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                    CacheKeys.ApplicationTreeCacheKey,
-                    () =>
-                        {
-                            var list = new List<ApplicationTree>();
-
-                            LoadXml(doc =>
-                            {
-                                foreach (var addElement in doc.Root.Elements("add").OrderBy(x =>
-                                {
-                                    var sortOrderAttr = x.Attribute("sortOrder");
-                                    return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
-                                }))
-                                {
-
-                                    var applicationAlias = (string)addElement.Attribute("application");
-                                    var type = (string)addElement.Attribute("type");
-                                    var assembly = (string)addElement.Attribute("assembly");
-
-                                    //check if the tree definition (applicationAlias + type + assembly) is already in the list
-
-                                    if (!list.Any(tree => tree.ApplicationAlias.InvariantEquals(applicationAlias)
-                                        && tree.Type.InvariantEquals(type)
-                                        && tree.AssemblyName.InvariantEquals(assembly)))
-                                    {
-                                        list.Add(new ApplicationTree(
-                                                     addElement.Attribute("silent") != null ? Convert.ToBoolean(addElement.Attribute("silent").Value) : false,
-                                                     addElement.Attribute("initialize") != null ? Convert.ToBoolean(addElement.Attribute("initialize").Value) : true,
-                                                     addElement.Attribute("sortOrder") != null ? Convert.ToByte(addElement.Attribute("sortOrder").Value) : (byte)0,
-                                                     addElement.Attribute("application").Value,
-                                                     addElement.Attribute("alias").Value,
-                                                     addElement.Attribute("title").Value,
-                                                     addElement.Attribute("iconClosed").Value,
-                                                     addElement.Attribute("iconOpen").Value,
-                                                     (string)addElement.Attribute("assembly"), //this could be empty: http://issues.umbraco.org/issue/U4-1360
-                                                     addElement.Attribute("type").Value,
-                                                     addElement.Attribute("action") != null ? addElement.Attribute("action").Value : ""));
-                                    }
-
-
-                                }
-                            }, false);
-
-                            return list;
-                        });
-            }            
-        }
-
-        /// <summary>
-        /// Gets the SQL helper.
-        /// </summary>
-        /// <value>The SQL helper.</value>
-        public static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="ApplicationTree"/> is silent.
@@ -226,28 +141,8 @@ namespace umbraco.BusinessLogic
         /// <param name="action">The action.</param>
         public static void MakeNew(bool silent, bool initialize, byte sortOrder, string applicationAlias, string alias, string title, string iconClosed, string iconOpened, string assemblyName, string type, string action)
         {
-            LoadXml(doc =>
-            {
-                var el = doc.Root.Elements("add").SingleOrDefault(x => x.Attribute("alias").Value == alias && x.Attribute("application").Value == applicationAlias);
-
-                if (el == null)
-                {
-                doc.Root.Add(new XElement("add",
-                    new XAttribute("silent", silent),
-                    new XAttribute("initialize", initialize),
-                    new XAttribute("sortOrder", sortOrder),
-                    new XAttribute("alias", alias),
-                    new XAttribute("application", applicationAlias),
-                    new XAttribute("title", title),
-                    new XAttribute("iconClosed", iconClosed),
-                    new XAttribute("iconOpen", iconOpened),
-                    new XAttribute("assembly", assemblyName),
-                    new XAttribute("type", type),
-                    new XAttribute("action", string.IsNullOrEmpty(action) ? "" : action)));
-                }
-            }, true);
-
-            OnNew(new ApplicationTree(silent, initialize, sortOrder, applicationAlias, alias, title, iconClosed, iconOpened, assemblyName, type, action), new EventArgs());
+            Umbraco.Core.Trees.ApplicationTreeCollection.MakeNew(initialize, sortOrder, applicationAlias, alias, title, iconClosed, iconOpened,
+                assemblyName.IsNullOrWhiteSpace() ? type : string.Format("{0}.{1},{0}", assemblyName, type));
         }
 
         /// <summary>
@@ -255,30 +150,8 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public void Save()
         {
-            LoadXml(doc =>
-            {
-                var el = doc.Root.Elements("add").SingleOrDefault(x => x.Attribute("alias").Value == this.Alias && x.Attribute("application").Value == this.ApplicationAlias);
-
-                if (el != null)
-                {
-                    el.RemoveAttributes();
-
-                    el.Add(new XAttribute("silent", this.Silent));
-                    el.Add(new XAttribute("initialize", this.Initialize));
-                    el.Add(new XAttribute("sortOrder", this.SortOrder));
-                    el.Add(new XAttribute("alias", this.Alias));
-                    el.Add(new XAttribute("application", this.ApplicationAlias));
-                    el.Add(new XAttribute("title", this.Title));
-                    el.Add(new XAttribute("iconClosed", this.IconClosed));
-                    el.Add(new XAttribute("iconOpen", this.IconOpened));
-                    el.Add(new XAttribute("assembly", this.AssemblyName));
-                    el.Add(new XAttribute("type", this.Type));
-                    el.Add(new XAttribute("action", string.IsNullOrEmpty(this.Action) ? "" : this.Action));
-                }
-
-            }, true);
-
-            OnUpdated(this, new EventArgs());
+            Umbraco.Core.Trees.ApplicationTreeCollection.SaveTree(
+                Mapper.Map<ApplicationTree, Umbraco.Core.Trees.ApplicationTree>(this));
         }
 
         /// <summary>
@@ -286,18 +159,9 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public void Delete()
         {
-            //SqlHelper.ExecuteNonQuery("delete from umbracoAppTree where appAlias = @appAlias AND treeAlias = @treeAlias",
-            //    SqlHelper.CreateParameter("@appAlias", this.ApplicationAlias), SqlHelper.CreateParameter("@treeAlias", this.Alias));
-
-            LoadXml(doc =>
-            {
-                doc.Root.Elements("add").Where(x => x.Attribute("application") != null && x.Attribute("application").Value == this.ApplicationAlias &&
-                x.Attribute("alias") != null && x.Attribute("alias").Value == this.Alias).Remove();
-            }, true);
-
-            OnDeleted(this, new EventArgs());
+            Umbraco.Core.Trees.ApplicationTreeCollection.DeleteTree(
+                Mapper.Map<ApplicationTree, Umbraco.Core.Trees.ApplicationTree>(this));
         }
-
 
         /// <summary>
         /// Gets an ApplicationTree by it's tree alias.
@@ -306,8 +170,8 @@ namespace umbraco.BusinessLogic
         /// <returns>An ApplicationTree instance</returns>
         public static ApplicationTree getByAlias(string treeAlias)
         {
-            return AppTrees.Find(t => (t.Alias == treeAlias));
-
+            return Mapper.Map<Umbraco.Core.Trees.ApplicationTree, ApplicationTree>(
+                Umbraco.Core.Trees.ApplicationTreeCollection.GetByAlias(treeAlias));
         }
 
         /// <summary>
@@ -316,7 +180,9 @@ namespace umbraco.BusinessLogic
         /// <returns>Returns a ApplicationTree Array</returns>
         public static ApplicationTree[] getAll()
         {
-            return AppTrees.OrderBy(x => x.SortOrder).ToArray();
+            return Umbraco.Core.Trees.ApplicationTreeCollection.GetAll()
+                          .Select(Mapper.Map<Umbraco.Core.Trees.ApplicationTree, ApplicationTree>)
+                          .ToArray();
         }
 
         /// <summary>
@@ -326,7 +192,9 @@ namespace umbraco.BusinessLogic
         /// <returns>Returns a ApplicationTree Array</returns>
         public static ApplicationTree[] getApplicationTree(string applicationAlias)
         {
-            return getApplicationTree(applicationAlias, false);
+            return Umbraco.Core.Trees.ApplicationTreeCollection.GetApplicationTree(applicationAlias)
+                          .Select(Mapper.Map<Umbraco.Core.Trees.ApplicationTree, ApplicationTree>)
+                          .ToArray();
         }
 
         /// <summary>
@@ -337,68 +205,10 @@ namespace umbraco.BusinessLogic
         /// <returns>Returns a ApplicationTree Array</returns>
         public static ApplicationTree[] getApplicationTree(string applicationAlias, bool onlyInitializedApplications)
         {
-            var list = AppTrees.FindAll(
-                t =>
-                    {
-                        if (onlyInitializedApplications)
-                            return (t.ApplicationAlias == applicationAlias && t.Initialize);
-                        return (t.ApplicationAlias == applicationAlias);
-                    }
-                );
-
-            return list.OrderBy(x => x.SortOrder).ToArray();
+            return Umbraco.Core.Trees.ApplicationTreeCollection.GetApplicationTree(applicationAlias, onlyInitializedApplications)
+                          .Select(Mapper.Map<Umbraco.Core.Trees.ApplicationTree, ApplicationTree>)
+                          .ToArray();
         }
 
-        internal static void LoadXml(Action<XDocument> callback, bool saveAfterCallback)
-        {
-            lock (Locker)
-            {
-                var doc = File.Exists(TreeConfigFilePath)
-                    ? XDocument.Load(TreeConfigFilePath)
-                    : XDocument.Parse("<?xml version=\"1.0\"?><trees />");
-                if (doc.Root != null)
-                {
-                    callback.Invoke(doc);
-
-                    if (saveAfterCallback)
-                    {
-                        Directory.CreateDirectory(Path.GetDirectoryName(TreeConfigFilePath));
-
-                        doc.Save(TreeConfigFilePath);
-
-                        //remove the cache now that it has changed  SD: I'm leaving this here even though it
-                        // is taken care of by events as well, I think unit tests may rely on it being cleared here.
-                        ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.ApplicationTreeCacheKey);
-                    }
-                }
-            }
-        }
-
-        internal static event TypedEventHandler<ApplicationTree, EventArgs> Deleted;
-        private static void OnDeleted(ApplicationTree app, EventArgs args)
-        {
-            if (Deleted != null)
-            {
-                Deleted(app, args);
-            }
-        }
-
-        internal static event TypedEventHandler<ApplicationTree, EventArgs> New;
-        private static void OnNew(ApplicationTree app, EventArgs args)
-        {
-            if (New != null)
-            {
-                New(app, args);
-            }
-        }
-
-        internal static event TypedEventHandler<ApplicationTree, EventArgs> Updated;
-        private static void OnUpdated(ApplicationTree app, EventArgs args)
-        {
-            if (Updated != null)
-            {
-                Updated(app, args);
-            }
-        }
     }
 }

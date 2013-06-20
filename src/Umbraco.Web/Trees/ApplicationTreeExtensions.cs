@@ -12,6 +12,7 @@ using Umbraco.Core;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
 using umbraco.cms.presentation.Trees;
+using ApplicationTree = Umbraco.Core.Trees.ApplicationTree;
 using UrlHelper = System.Web.Http.Routing.UrlHelper;
 
 namespace Umbraco.Web.Trees

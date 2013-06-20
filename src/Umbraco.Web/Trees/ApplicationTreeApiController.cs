@@ -4,10 +4,10 @@ using System.Management.Instrumentation;
 using System.Net.Http.Formatting;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using umbraco.BusinessLogic;
 using umbraco.cms.presentation.Trees;
 
 namespace Umbraco.Web.Trees
@@ -39,7 +39,7 @@ namespace Umbraco.Web.Trees
             if (application == null) throw new ArgumentNullException("application");
 
             //find all tree definitions that have the current application alias
-            var appTrees = ApplicationTree.getApplicationTree(application).Where(x => x.Initialize).ToArray();
+            var appTrees = ApplicationTreeCollection.GetApplicationTree(application).Where(x => x.Initialize).ToArray();
             if (appTrees.Count() == 1)
             {
                 //return the nodes for the one tree assigned
@@ -49,9 +49,10 @@ namespace Umbraco.Web.Trees
             var collection = new TreeNodeCollection();
             foreach (var tree in appTrees)
             {
+                var rootNodes = GetNodeCollection(tree, "-1", queryStrings);
                 //return the root nodes for each tree in the app
                 //collection.Add(); //GetNodeCollection(tree, "-1", queryStrings);
-                
+
             }
             return null;
         }
@@ -69,7 +70,7 @@ namespace Umbraco.Web.Trees
             if (treeType == null) throw new ArgumentNullException("treeType");
 
             //get the configured tree
-            var foundConfigTree = ApplicationTree.getByAlias(treeType);
+            var foundConfigTree = ApplicationTreeCollection.GetByAlias(treeType);
             if (foundConfigTree == null) 
                 throw new InstanceNotFoundException("Could not find tree of type " + treeType + " in the trees.config");
 
