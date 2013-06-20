@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web.Http.Routing;
 using Umbraco.Core;
+using umbraco.BusinessLogic.Actions;
 using umbraco.cms.presentation.Trees;
+using umbraco.interfaces;
 
 namespace Umbraco.Web.Trees
 {
@@ -24,13 +28,31 @@ namespace Umbraco.Web.Trees
             source += query.Length > 1 ? query[1].EnsureStartsWith('?') : "";
 
             //TODO: Might need to add stuff to additional attributes
-
-            return new TreeNode(xmlTreeNode.NodeID, source)
+            
+            var node = new TreeNode(xmlTreeNode.NodeID, source)
             {
                 HasChildren = xmlTreeNode.HasChildren,
                 Icon = xmlTreeNode.Icon,
-                Title = xmlTreeNode.Text
+                Title = xmlTreeNode.Text                
             };
+            var menuItems = xmlTreeNode.Menu.ToArray();
+            var numAdded = 0;
+            foreach (var t in menuItems)
+            {
+                if (t is ContextMenuSeperator && numAdded > 0)
+                {
+                    //if it is a seperator, then update the previous menu item that we've added to be flagged
+                    //with a seperator
+                    node.Menu.ElementAt(numAdded - 1).Seperator = true;
+                }
+                else
+                {
+                    node.AddMenuItem(t);
+                    numAdded++;   
+                }
+            }
+
+            return node;
         }
 
         internal static TreeNodeCollection ConvertFromLegacy(XmlTree xmlTree, UrlHelper urlHelper)

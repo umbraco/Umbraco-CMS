@@ -6,7 +6,7 @@
 function treeIconStyleFilter(treeIconHelper) {
     return function (treeNode) {
         if (treeNode.iconIsClass) {
-            var converted = treeIconHelper.convertFromLegacy(treeNode);
+            var converted = treeIconHelper.convertFromLegacyTreeNodeIcon(treeNode);
             if (converted.startsWith('.')) {
                 //its legacy so add some width/height
                 return "height:16px;width:16px;";

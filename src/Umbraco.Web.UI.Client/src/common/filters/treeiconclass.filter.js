@@ -6,7 +6,7 @@
 function treeIconClassFilter(treeIconHelper) {
     return function (treeNode, standardClasses) {
         if (treeNode.iconIsClass !== false) {
-            return standardClasses + " " + treeIconHelper.convertFromLegacy(treeNode);
+            return standardClasses + " " + treeIconHelper.convertFromLegacyTreeNodeIcon(treeNode);
         }
         //we need an 'icon-' class in there for certain styles to work so if it is image based we'll add this
         return standardClasses + " icon-custom-file";

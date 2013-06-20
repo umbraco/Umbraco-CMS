@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Umbraco.Core;
 using Umbraco.Core.IO;
+using umbraco.interfaces;
 
 namespace Umbraco.Web.Trees
 {
@@ -11,14 +13,12 @@ namespace Umbraco.Web.Trees
     [DataContract(Name = "node", Namespace = "")]
     public class TreeNode
     {
-        //private readonly IEnumerable<Lazy<MenuItem, MenuItemMetadata>> _menuItems;
+        private readonly List<MenuItem> _menuItems = new List<MenuItem>();
 
-        //public TreeNode(string nodeId, IEnumerable<Lazy<MenuItem, MenuItemMetadata>> menuItems, string jsonUrl)
         public TreeNode(string nodeId, string getChildNodesUrl)
         {
             //_menuItems = menuItems;
             //Style = new NodeStyle();
-            //MenuActions = new List<Lazy<MenuItem, MenuItemMetadata>>();
             NodeId = nodeId;
             AdditionalData = new Dictionary<string, object>();
             ChildNodesUrl = getChildNodesUrl;
@@ -50,14 +50,12 @@ namespace Umbraco.Web.Trees
         /// </summary>
         [DataMember(Name = "name")]
         public string Title { get; set; }
-        
-        ///// <summary>
-        ///// Gets or sets the node path.
-        ///// </summary>
-        ///// <value>
-        ///// The node path.
-        ///// </value>
-        //public string NodePath { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the node path.
+        /// </summary>
+        [DataMember(Name = "path")]
+        public string Path { get; set; }
 
         /// <summary>
         /// The icon to use for the node, this can be either a path to an image or a Css class. 
@@ -117,55 +115,80 @@ namespace Umbraco.Web.Trees
         [DataMember(Name = "metaData")]
         public Dictionary<string, object> AdditionalData { get; private set; }
 
-        ///// <summary>
-        ///// A collection of context menu actions to apply for the model
-        ///// </summary>
-        //internal List<Lazy<MenuItem, MenuItemMetadata>> MenuActions { get; private set; }
+        /// <summary>
+        /// A collection of context menu actions to apply for the model
+        /// </summary>
+        [DataMember(Name = "menu")]
+        public IEnumerable<MenuItem> Menu
+        {
+            get { return _menuItems; }
+        }
 
-        ///// <summary>
-        ///// Adds a menu item
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        //public void AddMenuItem<T>()
-        //   where T : MenuItem
-        //{
-        //    AddMenuItem<T>(null);
-        //}
+        /// <summary>
+        /// Adds a menu item
+        /// </summary>
+        public void AddMenuItem(IAction action)
+        {
+            _menuItems.Add(new MenuItem(action));
+        }
 
-        ///// <summary>
-        ///// Adds a menu item with a key value pair which is merged to the AdditionalData bag
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="key"></param>
-        ///// <param name="value"></param>
-        //public void AddMenuItem<T>(string key, string value)
-        //   where T : MenuItem
-        //{
-        //    AddMenuItem<T>(new Dictionary<string, object> { { key, value } });
-        //}
-       
-        ///// <summary>
-        ///// Adds a menu item with a dictionary which is merged to the AdditionalData bag
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="additionalData"></param>
-        //public void AddMenuItem<T>(IDictionary<string, object> additionalData)
-        //   where T : MenuItem
-        //{
-        //    var item = _menuItems.GetItem<T>();
-        //    if (item != null)
-        //    {
-        //        MenuActions.Add(item);
-        //        if (additionalData != null)
-        //        {
-        //            //merge the additional data!
-        //            AdditionalData = AdditionalData.MergeLeft(additionalData);                   
-        //        }
+        /// <summary>
+        /// Adds a menu item
+        /// </summary>
+        public void AddMenuItem(MenuItem item)
+        {
+            _menuItems.Add(item);
+        }
 
-        //        //validate the data in the meta data bag
-        //        item.Value.ValidateRequiredData(AdditionalData);
-        //    }
-        //}
+        //TODO: Implement more overloads for MenuItem with dictionary vals
+
+        /// <summary>
+        /// Adds a menu item
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public void AddMenuItem<T>()
+           where T : IAction
+        {
+            AddMenuItem<T>(null);
+        }
+
+        /// <summary>
+        /// Adds a menu item with a key value pair which is merged to the AdditionalData bag
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public void AddMenuItem<T>(string key, string value)
+           where T : IAction
+        {
+            AddMenuItem<T>(new Dictionary<string, object> { { key, value } });
+        }
+
+        /// <summary>
+        /// Adds a menu item with a dictionary which is merged to the AdditionalData bag
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="additionalData"></param>
+        public void AddMenuItem<T>(IDictionary<string, object> additionalData)
+           where T : IAction
+        {
+            var item = ActionsResolver.Current.GetAction<T>();
+            if (item != null)
+            {
+                _menuItems.Add(new MenuItem(item));
+                if (additionalData != null)
+                {
+                    //merge the additional data!
+                    AdditionalData = AdditionalData.MergeLeft(additionalData);
+                }
+
+                //TODO: Once we implement 'real' menu items, not just IActions we can implement this since
+                // people may need to pass specific data to their menu items
+                
+                ////validate the data in the meta data bag
+                //item.ValidateRequiredData(AdditionalData);
+            }
+        }
 
     }
 }

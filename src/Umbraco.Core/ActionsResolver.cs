@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Umbraco.Core.ObjectResolution;
 using umbraco.interfaces;
@@ -32,6 +33,17 @@ namespace Umbraco.Core
 				return Values;
 			}
 		}
+
+        /// <summary>
+        /// Gets an Action if it exists.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        internal IAction GetAction<T>()
+            where T : IAction
+        {
+            return Actions.SingleOrDefault(x => x.GetType() == typeof (T));
+        }
 
 		protected override IEnumerable<IAction> CreateInstances()
 		{					

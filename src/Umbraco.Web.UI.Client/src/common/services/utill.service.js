@@ -287,35 +287,60 @@ angular.module('umbraco.services').factory('umbFormHelper', umbFormHelper);
 function treeIconHelper() {
 
     var converter = [
-                { oldIcon: ".sprTreeSettingDomain", newIcon: "icon-home" },
-                { oldIcon: ".sprTreeDoc", newIcon: "icon-file-alt" },
-                { oldIcon: ".sprTreeFolder", newIcon: "icon-folder-close" },
-                { oldIcon: ".sprTreeFolder_o", newIcon: "icon-folder-open" },
-                { oldIcon: ".sprTreeMediaFile", newIcon: "icon-music" },
-                { oldIcon: ".sprTreeMediaMovie", newIcon: "icon-movie" },
-                { oldIcon: ".sprTreeMediaPhoto", newIcon: "icon-picture" }
-            ];
+        { oldIcon: ".sprNew", newIcon: "plus" },
+        { oldIcon: ".sprDelete", newIcon: "remove" },
+        { oldIcon: ".sprMove", newIcon: "move" },
+        { oldIcon: ".sprCopy", newIcon: "copy" },
+        { oldIcon: ".sprSort", newIcon: "sort" },
+        { oldIcon: ".sprPublish", newIcon: "globe" },
+        { oldIcon: ".sprRollback", newIcon: "undo" },
+        { oldIcon: ".sprProtect", newIcon: "lock" },
+        { oldIcon: ".sprAudit", newIcon: "time" },
+        { oldIcon: ".sprNotify", newIcon: "envelope" },
+        { oldIcon: ".sprDomain", newIcon: "home" },
+        { oldIcon: ".sprPermission", newIcon: "group" },
+        { oldIcon: ".sprRefresh", newIcon: "refresh" },
+        
+        { oldIcon: ".sprTreeSettingDomain", newIcon: "icon-home" },
+        { oldIcon: ".sprTreeDoc", newIcon: "icon-file-alt" },
+        { oldIcon: ".sprTreeFolder", newIcon: "icon-folder-close" },
+        { oldIcon: ".sprTreeFolder_o", newIcon: "icon-folder-open" },
+        { oldIcon: ".sprTreeMediaFile", newIcon: "icon-music" },
+        { oldIcon: ".sprTreeMediaMovie", newIcon: "icon-movie" },
+        { oldIcon: ".sprTreeMediaPhoto", newIcon: "icon-picture" }
+    ];
 
     return {
-        /** If the tree node has a legacy icon */
-        isLegacyIcon: function(treeNode){
-            if (treeNode.iconIsClass) {
-                if (treeNode.icon.startsWith('.')) {
-                    return true;
-                }                    
+        /** If the icon is legacy */
+        isLegacyIcon: function (icon) {
+            if (icon.startsWith('.')) {
+                return true;
             }
             return false;
         },
-        /** If we detect that the tree node has legacy icons that can be converted, this will convert them */
-        convertFromLegacy: function (treeNode) {
-            if (this.isLegacyIcon(treeNode)) {
+        /** If the tree node has a legacy icon */
+        isLegacyTreeNodeIcon: function(treeNode){
+            if (treeNode.iconIsClass) {
+                return this.isLegacyIcon(treeNode.icon);
+            }
+            return false;
+        },
+        /** Converts the icon from legacy to a new one if an old one is detected */
+        convertFromLegacyIcon: function (icon) {
+            if (this.isLegacyIcon(icon)) {
                 //its legacy so convert it if we can
                 var found = _.find(converter, function (item) {
-                    return item.oldIcon.toLowerCase() === treeNode.icon.toLowerCase();
+                    return item.oldIcon.toLowerCase() === icon.toLowerCase();
                 });
-                return (found ? found.newIcon : treeNode.icon);
+                return (found ? found.newIcon : icon);
             }
-
+            return icon;
+        },
+        /** If we detect that the tree node has legacy icons that can be converted, this will convert them */
+        convertFromLegacyTreeNodeIcon: function (treeNode) {
+            if (this.isLegacyTreeNodeIcon(treeNode)) {
+                return this.convertFromLegacyIcon(treeNode.icon);
+            }
             return treeNode.icon;
         }
     };

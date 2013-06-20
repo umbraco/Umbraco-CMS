@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Manifest;
 using Umbraco.Core;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
 
@@ -12,7 +13,7 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// A controller to render out the default back office view and JS results
     /// </summary>
-    public class BackOfficeController : Controller
+    public class BackOfficeController : UmbracoController
     {
 
         /// <summary>
