@@ -16,6 +16,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models
 {
@@ -104,6 +105,50 @@ namespace Umbraco.Core.Models
             return ApplicationContext.Current.Services.MediaService.GetById(media.ParentId);
         }
         #endregion
+
+        /// <summary>
+        /// Checks if the IContentBase has children
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is a bit of a hack because we need to type check!
+        /// </remarks>
+        internal static bool HasChildren(IContentBase content, ServiceContext services)
+        {
+            if (content is IContent)
+            {
+                return services.ContentService.HasChildren(content.Id);
+            }
+            if (content is IMedia)
+            {
+                return services.MediaService.HasChildren(content.Id);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns the children for the content base item
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is a bit of a hack because we need to type check!
+        /// </remarks>
+        internal static IEnumerable<IContentBase> Children(IContentBase content, ServiceContext services)
+        {
+            if (content is IContent)
+            {
+                return services.ContentService.GetChildren(content.Id);
+            }
+            if (content is IMedia)
+            {
+                return services.MediaService.GetChildren(content.Id);
+            }
+            return null;
+        }
 
         /// <summary>
         /// Set property values by alias with an annonymous object

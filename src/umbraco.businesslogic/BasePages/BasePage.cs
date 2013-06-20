@@ -83,6 +83,30 @@ namespace umbraco.BasePages
         }
 
         /// <summary>
+        /// Returns the current ApplicationContext
+        /// </summary>
+        public ApplicationContext ApplicationContext
+        {
+            get { return ApplicationContext.Current; }
+        }
+
+        /// <summary>
+        /// Returns a ServiceContext
+        /// </summary>
+        public ServiceContext Services
+        {
+            get { return ApplicationContext.Services; }
+        }
+
+        /// <summary>
+        /// Returns a DatabaseContext
+        /// </summary>
+        public DatabaseContext DatabaseContext
+        {
+            get { return ApplicationContext.DatabaseContext; }
+        }
+
+        /// <summary>
         /// Returns the current BasePage for the current request. 
         /// This assumes that the current page is a BasePage, otherwise, returns null;
         /// </summary>

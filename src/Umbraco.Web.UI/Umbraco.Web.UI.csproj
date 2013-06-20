@@ -451,6 +451,13 @@
       <DependentUpon>EditMacro.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Umbraco\Dialogs\MoveOrCopy.aspx.cs">
+      <DependentUpon>moveOrCopy.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Dialogs\MoveOrCopy.aspx.designer.cs">
+      <DependentUpon>moveOrCopy.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\dialogs\Sort.aspx.cs">
       <DependentUpon>sort.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
