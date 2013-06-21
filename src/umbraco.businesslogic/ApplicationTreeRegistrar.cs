@@ -23,6 +23,7 @@ namespace umbraco.BusinessLogic
 			var types = PluginManager.Current.ResolveAttributedTrees();
 
         	var items = types
+        		.Where(x => x.GetCustomAttributes<TreeAttribute>(false).Any())
         		.Select(x =>
         		        new Tuple<Type, TreeAttribute>(x, x.GetCustomAttributes<TreeAttribute>(false).Single()))
         		.Where(x => ApplicationTree.getByAlias(x.Item2.Alias) == null);
