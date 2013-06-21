@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Configuration;
+using System.Web.Hosting;
 using System.Web.Routing;
 using System.Xml;
 using System.Xml.Linq;
@@ -331,7 +332,13 @@ namespace Umbraco.Core.Configuration
             {
                 try
                 {
-                    return bool.Parse(ConfigurationManager.AppSettings["umbracoDebugMode"]);
+                    if (HttpContext.Current != null)
+                    {
+                        return HttpContext.Current.IsDebuggingEnabled;
+                    }
+                    //go and get it from config directly
+                    var section = ConfigurationManager.GetSection("system.web/compilation") as CompilationSection;
+                    return section != null && section.Debug;
                 }
                 catch
                 {
