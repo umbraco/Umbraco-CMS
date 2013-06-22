@@ -3,6 +3,7 @@ using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -11,7 +12,7 @@ using umbraco.BusinessLogic;
 namespace Umbraco.Tests.ContentStores
 {
 	[TestFixture]
-	public class PublishContentStoreTests
+    public class PublishContentStoreTests
 	{
 		private FakeHttpContextFactory _httpContextFactory;
 		private UmbracoContext _umbracoContext;
@@ -74,6 +75,8 @@ namespace Umbraco.Tests.ContentStores
 			_umbracoContext = new UmbracoContext(_httpContextFactory.HttpContext, 
 				new ApplicationContext(), 
 				new DefaultRoutesCache(false));
+            
+            UmbracoSettings.UseLegacyXmlSchema = false;
 
 			_umbracoContext.GetXmlDelegate = () =>
 				{
