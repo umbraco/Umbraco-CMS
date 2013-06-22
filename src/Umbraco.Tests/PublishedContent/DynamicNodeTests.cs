@@ -83,6 +83,8 @@ namespace Umbraco.Tests.PublishedContent
 
         public override void TearDown()
         {
+            //TODO: Deleting the umbracoSettings.config file makes a lot of tests fail
+
             //var currDir = new DirectoryInfo(TestHelper.CurrentAssemblyDirectory);
 
             //var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
