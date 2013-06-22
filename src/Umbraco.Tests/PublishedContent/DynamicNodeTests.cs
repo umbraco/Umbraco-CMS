@@ -83,11 +83,11 @@ namespace Umbraco.Tests.PublishedContent
 
         public override void TearDown()
         {
-            var currDir = new DirectoryInfo(TestHelper.CurrentAssemblyDirectory);
+            //var currDir = new DirectoryInfo(TestHelper.CurrentAssemblyDirectory);
 
-            var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
-            if (File.Exists(umbracoSettingsFile))
-                File.Delete(umbracoSettingsFile);
+            //var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
+            //if (File.Exists(umbracoSettingsFile))
+            //    File.Delete(umbracoSettingsFile);
 
             base.TearDown();
         }

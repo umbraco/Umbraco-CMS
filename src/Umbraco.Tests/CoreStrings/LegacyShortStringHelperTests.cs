@@ -34,15 +34,13 @@ namespace Umbraco.Tests.CoreStrings
         [TearDown]
         public void TearDown()
         {
-            var currDir = new DirectoryInfo(TestHelpers.TestHelper.CurrentAssemblyDirectory);
-            
-            var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
-            if (File.Exists(umbracoSettingsFile))
-                File.Delete(umbracoSettingsFile);
+            //TODO: Deleting the umbracoSettings.config file makes a lot of tests fail
 
-            var configPath = Path.Combine(currDir.Parent.Parent.FullName, "config");
-            if (Directory.Exists(configPath))
-                Directory.Delete(configPath);
+            //var currDir = new DirectoryInfo(TestHelpers.TestHelper.CurrentAssemblyDirectory);
+            
+            //var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
+            //if (File.Exists(umbracoSettingsFile))
+            //    File.Delete(umbracoSettingsFile);
         }
 
 
