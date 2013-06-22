@@ -30,13 +30,20 @@ namespace Umbraco.Tests.PublishedContent
             base.Initialize();
             //copy the umbraco settings file over
             var currDir = new DirectoryInfo(TestHelper.CurrentAssemblyDirectory);
-            File.Copy(
-                currDir.Parent.Parent.Parent.GetDirectories("Umbraco.Web.UI")
-                    .First()
-                    .GetDirectories("config").First()
-                    .GetFiles("umbracoSettings.Release.config").First().FullName,
-                Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
-                true);
+
+            var configPath = Path.Combine(currDir.Parent.Parent.FullName, "config");
+            if (Directory.Exists(configPath) == false)
+                Directory.CreateDirectory(configPath);
+
+            var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
+            if (File.Exists(umbracoSettingsFile) == false)
+                File.Copy(
+                    currDir.Parent.Parent.Parent.GetDirectories("Umbraco.Web.UI")
+                        .First()
+                        .GetDirectories("config").First()
+                        .GetFiles("umbracoSettings.Release.config").First().FullName,
+                    Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
+                    true);
 
             UmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
 
@@ -76,6 +83,12 @@ namespace Umbraco.Tests.PublishedContent
 
         public override void TearDown()
         {
+            var currDir = new DirectoryInfo(TestHelper.CurrentAssemblyDirectory);
+
+            var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
+            if (File.Exists(umbracoSettingsFile))
+                File.Delete(umbracoSettingsFile);
+
             base.TearDown();
         }
 
