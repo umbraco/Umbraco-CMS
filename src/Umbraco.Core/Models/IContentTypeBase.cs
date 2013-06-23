@@ -65,6 +65,12 @@ namespace Umbraco.Core.Models
         void RemovePropertyType(string propertyTypeAlias);
 
         /// <summary>
+        /// Removes a PropertyGroup from the current ContentType
+        /// </summary>
+        /// <param name="propertyTypeAlias">Name of the <see cref="PropertyGroup"/> to remove</param>
+        void RemovePropertyGroup(string propertyGroupName);
+
+        /// <summary>
         /// Sets the ParentId from the lazy integer id
         /// </summary>
         /// <param name="id">Id of the Parent</param>
