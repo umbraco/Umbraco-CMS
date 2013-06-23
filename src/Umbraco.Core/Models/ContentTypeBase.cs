@@ -410,7 +410,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Removes a PropertyGroup from the current ContentType
         /// </summary>
-        /// <param name="propertyTypeAlias">Name of the <see cref="PropertyGroup"/> to remove</param>
+        /// <param name="propertyGroupName">Name of the <see cref="PropertyGroup"/> to remove</param>
         public void RemovePropertyGroup(string propertyGroupName)
         {
             PropertyGroups.RemoveItem(propertyGroupName);
