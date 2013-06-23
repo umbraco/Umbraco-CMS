@@ -97,6 +97,14 @@ namespace Umbraco.Core.Models
             return this.Any(x => x.Name == groupName);
         }
 
+        public void RemoveItem(string propertyGroupName)
+        {
+            var key = IndexOfKey(propertyGroupName);
+            //Only removes an item if the key was found
+            if (key != -1)
+                RemoveItem(key);
+        }
+
         public int IndexOfKey(string key)
         {
             for (var i = 0; i < this.Count; i++)
