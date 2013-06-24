@@ -80,6 +80,10 @@ namespace umbraco.dialogs
 
                     var cmsNode = new CMSNode(int.Parse(Request.GetItemAsString("id")));
 
+                    // Preselect the parent of the seslected item.
+                    if(cmsNode.ParentId > 0)
+                        JTree.SelectedNodePath = cmsNode.Parent.Path;
+
                     var validAction = true;
                     if (CurrentApp == Constants.Applications.Content && cmsNode.HasChildren)
                         validAction = ValidAction(Request.GetItemAsString("mode") == "cut" ? 'M' : 'O');
