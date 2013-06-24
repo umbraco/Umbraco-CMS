@@ -1,3 +1,4 @@
+using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace Umbraco.Web.Mvc
@@ -22,17 +23,27 @@ namespace Umbraco.Web.Mvc
 			return dataToken == null || string.IsNullOrWhiteSpace(dataToken.ToString());
 		}
 
-		/// <remarks>
-		/// We always set the correct ActionInvoker on our custom created controller, this is very important for route hijacking!
-		/// </remarks>
+        /// <summary>
+        /// Creates the controller
+        /// </summary>
+        /// <param name="requestContext"></param>
+        /// <param name="controllerName"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// We always set the correct ActionInvoker on our custom created controller, this is very important for route hijacking!
+        /// </remarks>
+        public override IController CreateController(RequestContext requestContext, string controllerName)
+        {
+ 	         var instance = base.CreateController(requestContext, controllerName);
+             var controllerInstance = instance as Controller;
+             if (controllerInstance != null)
+             {
+                 //set the action invoker!
+                 controllerInstance.ActionInvoker = new RenderActionInvoker();
+             }
 
-		    var controllerInstance = instance as Controller;
-            if (controllerInstance != null)
-            {
-                //set the action invoker!
-                controllerInstance.ActionInvoker = new RenderActionInvoker();
-            }
-
-		    return instance;
+             return instance;
+        }
+		    
 	}
 }

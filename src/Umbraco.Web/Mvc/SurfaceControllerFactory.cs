@@ -4,11 +4,10 @@ using System.Web.Routing;
 
 namespace Umbraco.Web.Mvc
 {
-    //NOTE: We currently are not using this at all and should/could probably remove it!
-
 	/// <summary>
 	/// Creates SurfaceControllers
 	/// </summary>
+	[Obsolete("This is not used in the codebase and will be removed from the core in future versions")]
 	public class SurfaceControllerFactory : RenderControllerFactory
 	{
 		/// <summary>

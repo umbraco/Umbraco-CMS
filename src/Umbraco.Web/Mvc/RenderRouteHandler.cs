@@ -272,7 +272,8 @@ namespace Umbraco.Web.Mvc
 		    if (controllerType != null)
 		    {
                 //ensure the controller is of type 'IRenderMvcController' and ControllerBase
-                if (TypeHelper.IsTypeAssignableFrom<RenderMvcController>(controllerType))
+                if (TypeHelper.IsTypeAssignableFrom<IRenderMvcController>(controllerType)
+                    && TypeHelper.IsTypeAssignableFrom<ControllerBase>(controllerType))
 		        {
 		            //set the controller and name to the custom one
 		            def.ControllerType = controllerType;

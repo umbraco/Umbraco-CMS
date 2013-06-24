@@ -15,7 +15,7 @@ namespace Umbraco.Web.Mvc
     /// <summary>
     /// A controller to render front-end requests
     /// </summary>
-    public class RenderMvcController : UmbracoController
+    public class RenderMvcController : UmbracoController, IRenderMvcController
 	{
 
 		public RenderMvcController()

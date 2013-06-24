@@ -36,14 +36,14 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Returns an instance of the default controller instance.
         /// </summary>
-        public RenderMvcController GetControllerInstance()
+        public IRenderMvcController GetControllerInstance()
         {
             //try the dependency resolver, then the activator
             var instance = DependencyResolver.Current.GetService(Value) ?? Activator.CreateInstance(Value);
-            var result = instance as RenderMvcController;
+            var result = instance as IRenderMvcController;
             if (result == null)
             {
-                throw new InvalidOperationException("Could not create an instance of " + Value + " for the default RenderMvcController");
+                throw new InvalidOperationException("Could not create an instance of " + Value + " for the default " + typeof(IRenderMvcController).Name);
             }
             return result;
         }
@@ -64,9 +64,9 @@ namespace Umbraco.Web.Mvc
         /// <param name="type"></param>
         private void ValidateType(Type type)
         {
-            if (TypeHelper.IsTypeAssignableFrom<RenderMvcController>(type) == false)
+            if (TypeHelper.IsTypeAssignableFrom<IRenderMvcController>(type) == false)
             {
-                throw new InvalidOperationException("The Type specified (" + type + ") is not of type " + typeof(RenderMvcController));
+                throw new InvalidOperationException("The Type specified (" + type + ") is not of type " + typeof(IRenderMvcController));
             }
         }
 
