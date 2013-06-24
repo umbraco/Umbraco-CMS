@@ -369,6 +369,7 @@
     <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericPropertyInherited.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1815,7 +1816,9 @@
     <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx" />
+    <Content Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\create\DLRScripting.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

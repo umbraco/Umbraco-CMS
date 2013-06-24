@@ -44,6 +44,25 @@ namespace umbraco.cms.businesslogic.propertytype
             return PropertyType.GetPropertyTypesByGroup(Id);
         }
 
+        public IEnumerable<PropertyType> GetPropertyTypes(bool includeInheritedProperties)
+        {
+            var list = PropertyType.GetPropertyTypesByGroup(Id);
+
+            if (includeInheritedProperties && ParentId != 0)
+            {
+                var ct = ContentType.GetContentType(ContentTypeId);
+                if (ct.ParentId > -1)
+                {
+                    var parent = ContentType.GetContentType(ct.ParentId);
+                    var propertyGroup = parent.PropertyTypeGroups.SingleOrDefault(x => x.ParentId == ParentId || x.Id == ParentId);
+                    if (propertyGroup != null)
+                        list = list.Concat(propertyGroup.GetPropertyTypes(true));
+                }
+            }
+
+            return list;
+        }
+
         //TODO: Verify support for master doctypes / mixins!
         public IEnumerable<PropertyTypeGroup> GetPropertyTypeGroups()
         {

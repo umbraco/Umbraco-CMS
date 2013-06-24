@@ -646,12 +646,12 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                 var propertyGroup = propertyTypeGroups.SingleOrDefault(x => x.ParentId == tab.Id);
                 var propertyTypes = propertyGroup == null
-                                        ? tab.GetPropertyTypes(_contentType.Id, false)
-                                        : propertyGroup.GetPropertyTypes();
+                                        ? tab.GetPropertyTypes(_contentType.Id, true)
+                                        : propertyGroup.GetPropertyTypes(true);
 
                 var propertyGroupId = tab.Id;
 
-                if (propertyTypes.Any(x => x.ContentTypeId == _contentType.Id))
+                if (true) //propertyTypes.Any(x => x.ContentTypeId == _contentType.Id))
                 {
                     var propSort = new HtmlInputHidden();
                     propSort.ID = "propSort_" + propertyGroupId.ToString() + "_Content";
@@ -660,11 +660,22 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                     PropertyTypes.Controls.Add(new LiteralControl("<ul class='genericPropertyList' id=\"t_" + propertyGroupId.ToString() + "_Contents\">"));
 
-                    foreach (cms.businesslogic.propertytype.PropertyType pt in propertyTypes)
+                    foreach (cms.businesslogic.propertytype.PropertyType pt in propertyTypes.OrderBy(s => s.SortOrder))
                     {
-                        //If the PropertyType doesn't belong on this ContentType skip it and continue to the next one
-                        if (pt.ContentTypeId != _contentType.Id) continue;
+                        //If the PropertyType doesn't belong on this ContentType add a disabled version for reference.
+                        if (pt.ContentTypeId != _contentType.Id)
+                        {
+                            var gpw_inh = new GenericPropertyInherited();
+                            gpw_inh.ID = "gpw_" + pt.Id;
+                            gpw_inh.PropertyType = pt;
+                            gpw_inh.ContentType = pt.ContentTypeId != _contentType.Id ? ContentType.GetContentType(pt.ContentTypeId) : _contentType;
+                            gpw_inh.FullId = "t_" + propertyGroupId.ToString() + "_Contents_" + +pt.Id;
 
+                            PropertyTypes.Controls.Add(gpw_inh);
+
+                            continue;
+                        }
+                        
                         var gpw = new GenericPropertyWrapper();
                         gpw.ID = "gpw_" + pt.Id;
                         gpw.PropertyType = pt;
@@ -901,6 +912,11 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                         {
                             var propertyType = contentTypeItem.PropertyTypes.First(x => x.Id == propertyTypeId);
                             propertyType.SortOrder = i;
+                        }
+                        else
+                        {
+                            // Update property directly.  This can include inherited properties.
+                            cms.businesslogic.propertytype.PropertyType.GetPropertyType(propertyTypeId).SortOrder = i;
                         }
                     }
                 }
