@@ -1,55 +1,55 @@
 angular.module('umbraco.services')
-.factory('navigationService', function ($rootScope, $routeParams, $log, dialogService, treeService) {
+.factory('navigationService', function ($rootScope, $routeParams, $log, $location, dialogService, treeService) {
 
-	var _currentSection = $routeParams.section;
-	var _currentId = $routeParams.id;
-	var _currentNode;
-	var _ui = {};
+	var currentSection = $routeParams.section;
+	var currentId = $routeParams.id;
+	var currentNode;
+	var ui = {};
 
-	function _setMode(mode){
+	function setMode(mode){
 		switch(mode)
 		{
 			case 'tree':
-			_ui.showNavigation = true;
-			_ui.showContextMenu = false;
-			_ui.showContextMenuDialog = false;
-			_ui.stickyNavigation = false;
+			ui.showNavigation = true;
+			ui.showContextMenu = false;
+			ui.showContextMenuDialog = false;
+			ui.stickyNavigation = false;
 
 			$("#search-form input").focus();
 			break;
 			case 'menu':
-			_ui.showNavigation = true;
-			_ui.showContextMenu = true;
-			_ui.showContextMenuDialog = false;
-			_ui.stickyNavigation = true;
+			ui.showNavigation = true;
+			ui.showContextMenu = true;
+			ui.showContextMenuDialog = false;
+			ui.stickyNavigation = true;
 			break;
 			case 'dialog':
-			_ui.stickyNavigation = true;
-			_ui.showNavigation = true;
-			_ui.showContextMenu = false;
-			_ui.showContextMenuDialog = true;
+			ui.stickyNavigation = true;
+			ui.showNavigation = true;
+			ui.showContextMenu = false;
+			ui.showContextMenuDialog = true;
 			break;
 			case 'search':
-			_ui.stickyNavigation = false;
-			_ui.showNavigation = true;
-			_ui.showContextMenu = false;
-			_ui.showSearchResults = true;
-			_ui.showContextMenuDialog = false;
+			ui.stickyNavigation = false;
+			ui.showNavigation = true;
+			ui.showContextMenu = false;
+			ui.showSearchResults = true;
+			ui.showContextMenuDialog = false;
 			break;      
 			default:
-			_ui.showNavigation = false;
-			_ui.showContextMenu = false;
-			_ui.showContextMenuDialog = false;
-			_ui.showSearchResults = false;
-			_ui.stickyNavigation = false;
+			ui.showNavigation = false;
+			ui.showContextMenu = false;
+			ui.showContextMenuDialog = false;
+			ui.showSearchResults = false;
+			ui.stickyNavigation = false;
 			break;
 		}
 	}
 
 	return {
-		currentNode: _currentNode,
+		currentNode: currentNode,
 		mode: "default",
-		ui: _ui,
+		ui: ui,
 
 		sections: function(){
 			return [
@@ -61,9 +61,23 @@ angular.module('umbraco.services')
 				];		
 		},
 
+	    /**
+         * @ngdoc function
+         * @name loadLegacyIFrame
+         * @methodOf navigationService
+         * @function
+         *
+         * @description
+         * Shows the legacy iframe and loads in the content based on the source url
+         * @param source {String} The URL to load into the iframe
+         */
+		loadLegacyIFrame: function (source) {
+            $location.path("/framed/" + encodeURIComponent(source));
+        },
+
 		changeSection: function(sectionAlias){
 			if(this.ui.stickyNavigation){
-				_setMode("default-opensection");
+				setMode("default-opensection");
 				this.ui.currentSection = selectedSection;
 				this.showTree(selectedSection);
 			}
@@ -73,7 +87,7 @@ angular.module('umbraco.services')
 			if(!this.ui.stickyNavigation && sectionAlias !== this.ui.currentTree){
 				$log.log("show tree" + sectionAlias);
 				this.ui.currentTree = sectionAlias;
-				_setMode("tree");
+				setMode("tree");
 			}
 		},
 
@@ -81,7 +95,7 @@ angular.module('umbraco.services')
 			if(!this.ui.stickyNavigation){
 				$log.log("hide tree");
 				this.ui.currentTree = "";
-				_setMode("default-hidesectiontree");
+				setMode("default-hidesectiontree");
 			}
 		},
 
@@ -101,9 +115,10 @@ angular.module('umbraco.services')
 								action: act,
 								section: this.ui.currentTree
 							});
-			}else{
-				_setMode("menu");
-				_ui.actions = treeService.getActions({node: args.node, section: this.ui.currentTree});
+			}
+			else {
+				setMode("menu");
+				ui.actions = treeService.getActions({node: args.node, section: this.ui.currentTree});
 				
 
 				this.ui.currentNode = args.node;
@@ -112,17 +127,17 @@ angular.module('umbraco.services')
 		},
 
 		hideMenu: function () {
-			_selectedId = $routeParams.id;
+			var selectedId = $routeParams.id;
 			this.ui.currentNode = undefined;
 			this.ui.actions = [];
-			_setMode("tree");
+			setMode("tree");
 		},
 
 		showDialog: function (args) {
-			_setMode("dialog");
+			setMode("dialog");
 
-			var _scope = args.scope || $rootScope.$new();
-			_scope.currentNode = args.node;
+			var scope = args.scope || $rootScope.$new();
+			scope.currentNode = args.node;
 
 			//this.currentNode = item;
 			this.ui.dialogTitle = args.action.name;
@@ -131,7 +146,7 @@ angular.module('umbraco.services')
 			var d = dialogService.append(
 						{
 							container: $("#dialog div.umb-panel-body"),
-							scope: _scope,
+							scope: scope,
 							template: templateUrl
 						});
 		},
@@ -142,11 +157,11 @@ angular.module('umbraco.services')
 		},
 
 		showSearch: function() {
-			_setMode("search");
+			setMode("search");
 		},
 
 		hideSearch: function() {
-			_setMode("default-hidesearch");
+			setMode("default-hidesearch");
 		},
 
 		hideNavigation: function(){
@@ -154,7 +169,7 @@ angular.module('umbraco.services')
 			this.ui.actions = [];
 			this.ui.currentNode = undefined;
 
-			_setMode("default");
+			setMode("default");
 		}
 	};
 

@@ -108,12 +108,13 @@ namespace Umbraco.Web.Trees
                 {
                     HasChildren = true,
 
-                    //THIS IS TEMPORARY UNTIL WE FIGURE OUT HOW WE ARE LOADING STUFF (I.E. VIEW NAMES, ACTION NAMES, DUNNO)
-                    EditorUrl = queryStrings.HasKey(TreeQueryStringParameters.OnNodeClick) //has a node click handler?
-                                    ? queryStrings.Get(TreeQueryStringParameters.OnNodeClick) //return node click handler
-                                    : isDialog //is in dialog mode without a click handler ?
-                                          ? "#" //return empty string, otherwise, return an editor URL:
-                                          : "mydashboard", 
+                    ////THIS IS TEMPORARY UNTIL WE FIGURE OUT HOW WE ARE LOADING STUFF (I.E. VIEW NAMES, ACTION NAMES, DUNNO)
+                    //EditorUrl = queryStrings.HasKey(TreeQueryStringParameters.OnNodeClick) //has a node click handler?
+                    //                ? queryStrings.Get(TreeQueryStringParameters.OnNodeClick) //return node click handler
+                    //                : isDialog //is in dialog mode without a click handler ?
+                    //                      ? "#" //return empty string, otherwise, return an editor URL:
+                    //                      : "mydashboard", 
+
                     Title = RootNodeDisplayName
                 };
 
@@ -182,126 +183,126 @@ namespace Umbraco.Web.Trees
 
         #region Create TreeNode methods
 
-        /// <summary>
-        /// Helper method to create tree nodes and automatically generate the json url
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="queryStrings"></param>
-        /// <param name="title"></param>
-        /// <param name="editorUrl"></param>
-        /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl)
-        {
-            var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
-            //var node = new TreeNode(id, BackOfficeRequestContext.RegisteredComponents.MenuItems, jsonUrl) { Title = title, EditorUrl = editorUrl };
-            var node = new TreeNode(id, jsonUrl) { Title = title, EditorUrl = editorUrl };
-            return node;
-        }
+        ///// <summary>
+        ///// Helper method to create tree nodes and automatically generate the json url
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <param name="queryStrings"></param>
+        ///// <param name="title"></param>
+        ///// <param name="editorUrl"></param>
+        ///// <returns></returns>
+        //public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl)
+        //{
+        //    var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
+        //    //var node = new TreeNode(id, BackOfficeRequestContext.RegisteredComponents.MenuItems, jsonUrl) { Title = title, EditorUrl = editorUrl };
+        //    var node = new TreeNode(id, jsonUrl) { Title = title, EditorUrl = editorUrl };
+        //    return node;
+        //}
 
-        /// <summary>
-        /// Helper method to create tree nodes and automatically generate the json url
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="queryStrings"></param>
-        /// <param name="title"></param>
-        /// <param name="editorUrl"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, string action)
-        {
-            var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
-            //var node = new TreeNode(id, BackOfficeRequestContext.RegisteredComponents.MenuItems, jsonUrl) { Title = title, EditorUrl = editorUrl };
-            var node = new TreeNode(id, jsonUrl) { Title = title, EditorUrl = editorUrl };
-            return node;
-        }
+        ///// <summary>
+        ///// Helper method to create tree nodes and automatically generate the json url
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <param name="queryStrings"></param>
+        ///// <param name="title"></param>
+        ///// <param name="editorUrl"></param>
+        ///// <param name="action"></param>
+        ///// <returns></returns>
+        //public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, string action)
+        //{
+        //    var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
+        //    //var node = new TreeNode(id, BackOfficeRequestContext.RegisteredComponents.MenuItems, jsonUrl) { Title = title, EditorUrl = editorUrl };
+        //    var node = new TreeNode(id, jsonUrl) { Title = title, EditorUrl = editorUrl };
+        //    return node;
+        //}
 
-        /// <summary>
-        /// Helper method to create tree nodes and automatically generate the json url
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="queryStrings"></param>
-        /// <param name="title"></param>
-        /// <param name="editorUrl"></param>
-        /// <param name="action"></param>
-        /// <param name="icon"></param>
-        /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, string action, string icon)
-        {
-            var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
-            //var node = new TreeNode(id, BackOfficeRequestContext.RegisteredComponents.MenuItems, jsonUrl) { Title = title, EditorUrl = editorUrl };
-            var node = new TreeNode(id, jsonUrl) { Title = title, EditorUrl = editorUrl };
-            return node;
-        }
+        ///// <summary>
+        ///// Helper method to create tree nodes and automatically generate the json url
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <param name="queryStrings"></param>
+        ///// <param name="title"></param>
+        ///// <param name="editorUrl"></param>
+        ///// <param name="action"></param>
+        ///// <param name="icon"></param>
+        ///// <returns></returns>
+        //public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, string action, string icon)
+        //{
+        //    var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
+        //    //var node = new TreeNode(id, BackOfficeRequestContext.RegisteredComponents.MenuItems, jsonUrl) { Title = title, EditorUrl = editorUrl };
+        //    var node = new TreeNode(id, jsonUrl) { Title = title, EditorUrl = editorUrl };
+        //    return node;
+        //}
 
-        /// <summary>
-        /// Helper method to create tree nodes and automatically generate the json url
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="queryStrings"></param>
-        /// <param name="title"></param>
-        /// <param name="editorUrl"></param>
-        /// <param name="action"></param>
-        /// <param name="hasChildren"></param>
-        /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, string action, bool hasChildren)
-        {
-            var treeNode = CreateTreeNode(id, queryStrings, title, editorUrl, action);
-            treeNode.HasChildren = hasChildren;
-            return treeNode;
-        }
+        ///// <summary>
+        ///// Helper method to create tree nodes and automatically generate the json url
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <param name="queryStrings"></param>
+        ///// <param name="title"></param>
+        ///// <param name="editorUrl"></param>
+        ///// <param name="action"></param>
+        ///// <param name="hasChildren"></param>
+        ///// <returns></returns>
+        //public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, string action, bool hasChildren)
+        //{
+        //    var treeNode = CreateTreeNode(id, queryStrings, title, editorUrl, action);
+        //    treeNode.HasChildren = hasChildren;
+        //    return treeNode;
+        //}
 
-        /// <summary>
-        /// Helper method to create tree nodes and automatically generate the json url
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="queryStrings"></param>
-        /// <param name="title"></param>
-        /// <param name="editorUrl"></param>
-        /// <param name="action"></param>
-        /// <param name="hasChildren"></param>
-        /// <param name="icon"></param>
-        /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, string action, bool hasChildren, string icon)
-        {
-            var treeNode = CreateTreeNode(id, queryStrings, title, editorUrl, action);
-            treeNode.HasChildren = hasChildren;
-            treeNode.Icon = icon;
-            return treeNode;
-        }
+        ///// <summary>
+        ///// Helper method to create tree nodes and automatically generate the json url
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <param name="queryStrings"></param>
+        ///// <param name="title"></param>
+        ///// <param name="editorUrl"></param>
+        ///// <param name="action"></param>
+        ///// <param name="hasChildren"></param>
+        ///// <param name="icon"></param>
+        ///// <returns></returns>
+        //public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, string action, bool hasChildren, string icon)
+        //{
+        //    var treeNode = CreateTreeNode(id, queryStrings, title, editorUrl, action);
+        //    treeNode.HasChildren = hasChildren;
+        //    treeNode.Icon = icon;
+        //    return treeNode;
+        //}
 
-        /// <summary>
-        /// Helper method to create tree nodes and automatically generate the json url
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="queryStrings"></param>
-        /// <param name="title"></param>
-        /// <param name="editorUrl"></param>
-        /// <param name="hasChildren"></param>
-        /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, bool hasChildren)
-        {
-            var treeNode = CreateTreeNode(id, queryStrings, title, editorUrl);
-            treeNode.HasChildren = hasChildren;
-            return treeNode;
-        }
+        ///// <summary>
+        ///// Helper method to create tree nodes and automatically generate the json url
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <param name="queryStrings"></param>
+        ///// <param name="title"></param>
+        ///// <param name="editorUrl"></param>
+        ///// <param name="hasChildren"></param>
+        ///// <returns></returns>
+        //public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, bool hasChildren)
+        //{
+        //    var treeNode = CreateTreeNode(id, queryStrings, title, editorUrl);
+        //    treeNode.HasChildren = hasChildren;
+        //    return treeNode;
+        //}
 
-        /// <summary>
-        /// Helper method to create tree nodes and automatically generate the json url
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="queryStrings"></param>
-        /// <param name="title"></param>
-        /// <param name="editorUrl"></param>
-        /// <param name="hasChildren"></param>
-        /// <param name="icon"></param>
-        /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, bool hasChildren, string icon)
-        {
-            var treeNode = CreateTreeNode(id, queryStrings, title, editorUrl);
-            treeNode.HasChildren = hasChildren;
-            treeNode.Icon = icon;
-            return treeNode;
-        } 
+        ///// <summary>
+        ///// Helper method to create tree nodes and automatically generate the json url
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <param name="queryStrings"></param>
+        ///// <param name="title"></param>
+        ///// <param name="editorUrl"></param>
+        ///// <param name="hasChildren"></param>
+        ///// <param name="icon"></param>
+        ///// <returns></returns>
+        //public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, bool hasChildren, string icon)
+        //{
+        //    var treeNode = CreateTreeNode(id, queryStrings, title, editorUrl);
+        //    treeNode.HasChildren = hasChildren;
+        //    treeNode.Icon = icon;
+        //    return treeNode;
+        //} 
 
         #endregion
 

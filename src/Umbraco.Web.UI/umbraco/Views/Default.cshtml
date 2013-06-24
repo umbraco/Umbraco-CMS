@@ -40,10 +40,10 @@
             color: #fa787e;
         }
 
-            .validation-summary span
-            {
-                font-style: italic;
-            }
+        .validation-summary span
+        {
+            font-style: italic;
+        }
     </style>
 </head>
 <body ng-controller="MainController" id="umbracoMainPageBody">
@@ -65,7 +65,12 @@
     
     @*Currently this needs to be loaded before anything*@
     <script src="@Url.Action("ServerVariables", "BackOffice")" type="text/javascript"></script>
-    <script type="text/javascript" src="lib/yepnope/yepnope.min.js"></script>    
+
+    @*Now we need to load in some legacy stuff*@
+    <script src="@Url.Action("LegacyTreeJs", "BackOffice")" type="text/javascript"></script>    
+    
+    @*And finally we can load in our angular app*@
+    <script type="text/javascript" src="lib/yepnope/yepnope.min.js"></script>
     <script type="text/javascript" src="@Url.Action("Application", "BackOffice")"></script>
     
 </body>

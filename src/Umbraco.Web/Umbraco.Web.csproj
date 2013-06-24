@@ -321,7 +321,8 @@
     <Compile Include="PropertyEditors\TrueFalsePropertyEditor.cs" />
     <Compile Include="Trees\LegacyTreeApiController.cs" />
     <Compile Include="Trees\ISearchableTree.cs" />
-    <Compile Include="Trees\LegacyTreeDataAdapter.cs" />
+    <Compile Include="Trees\LegacyTreeDataConverter.cs" />
+    <Compile Include="Trees\LegacyTreeJavascript.cs" />
     <Compile Include="Trees\LegacyTreeParams.cs" />
     <Compile Include="Trees\MenuItem.cs" />
     <Compile Include="Trees\SearchResultItem.cs" />

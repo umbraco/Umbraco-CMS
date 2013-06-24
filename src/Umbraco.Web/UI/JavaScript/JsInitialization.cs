@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
 
 namespace Umbraco.Web.UI.JavaScript
@@ -40,7 +41,9 @@ namespace Umbraco.Web.UI.JavaScript
                 ManifestParser.MergeJArrays(umbracoInit, m.JavaScriptInitialize);
             }
 
-            return ParseMain(umbracoInit.ToString());
+            return ParseMain(
+                umbracoInit.ToString(),
+                IOHelper.ResolveUrl(SystemDirectories.Umbraco));
         }
 
         /// <summary>

@@ -5,6 +5,8 @@
     'lib/bootstrap/js/bootstrap.js',
     'lib/underscore/underscore.js',
     'lib/umbraco/Extensions.js',
+    'lib/umbraco/NamespaceManager.js',
+    'lib/umbraco/LegacyUmbClientMgr.js',
 
     'js/app.js',
 

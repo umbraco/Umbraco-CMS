@@ -7,6 +7,14 @@
 body *{outline: none;}
 
 
+/* STYLES FOR Legacy iframe content */
+
+html > body > form > div.panel{
+    width:100%;
+    height:100%;
+}
+
+
 /*CREATE DIALOG */				
 .createDescription 
 {

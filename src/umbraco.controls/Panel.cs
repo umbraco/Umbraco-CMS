@@ -124,7 +124,12 @@ namespace umbraco.uicontrols
                 {
                     writer.WriteLine("Number of child controls : " + this.Controls.Count);
                 }
-                writer.WriteLine("<div id=\"" + this.ClientID + "\" class=\"panel\" style=\"height:" + this.Height.Value + "px;width:" + this.Width.Value + "px;\">");
+
+                //SD:NOTE: Removed any height / width changes because in Belle we don't want these set and there are not auto calculations. 
+                // when these are there the styles get all mucked up for legacy stuff
+                //writer.WriteLine("<div id=\"" + this.ClientID + "\" class=\"panel\" style=\"height:" + this.Height.Value + "px;width:" + this.Width.Value + "px;\">");
+                
+                writer.WriteLine("<div id=\"" + this.ClientID + "\" class=\"panel\" >");
                 writer.WriteLine("<div class=\"boxhead\">");
                 writer.WriteLine("<h2 id=\"" + this.ClientID + "Label\">" + this.Text + "</h2>");
                 writer.WriteLine("</div>");
@@ -143,7 +148,11 @@ namespace umbraco.uicontrols
                 if (this.hasMenu)
                     upHeight = upHeight - 34;
 
-                writer.WriteLine("<div id=\"" + this.ClientID + "_content\" class=\"content\" style=\"width: auto; height:" + (upHeight) + "px;\">");
+                //SD:NOTE: Removed any height / width changes because in Belle we don't want these set and there are not auto calculations. 
+                // when these are there the styles get all mucked up for legacy stuff
+                //writer.WriteLine("<div id=\"" + this.ClientID + "_content\" class=\"content\" style=\"width: auto; height:" + (upHeight) + "px;\">");
+
+                writer.WriteLine("<div id=\"" + this.ClientID + "_content\" class=\"content\" style=\"width: auto;\">");
 
                 string styleString = "";
 

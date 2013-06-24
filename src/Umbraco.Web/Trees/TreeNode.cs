@@ -91,11 +91,26 @@ namespace Umbraco.Web.Trees
             }
         }
 
+        ///// <summary>
+        ///// The URL path for the editor for this model
+        ///// </summary>
+        ///// <remarks>
+        ///// If this is set then the UI will attempt to load the result of this URL into an IFrame
+        ///// for the editor.
+        ///// 
+        ///// Generally for use with Legacy trees
+        ///// </remarks>
+        //[DataMember(Name = "editorUrl")]
+        //internal string EditorUrl { get; set; }
+
         /// <summary>
-        /// The URL path for the editor for this model
+        /// A JS method/codeblock to be called when the tree node is clicked
         /// </summary>
-        [DataMember(Name = "editorUrl")]
-        public string EditorUrl { get; set; }
+        /// <remarks>
+        /// This should only be used for legacy trees
+        /// </remarks>
+        [DataMember(Name = "jsClickCallback")]
+        internal string OnClickCallback { get; set; }
 
         /// <summary>
         /// The JSON url to load the nodes children

@@ -1,5 +1,5 @@
 angular.module("umbraco.directives")
-.directive('umbTreeItem', function($compile, $http, $templateCache, $interpolate, $log, treeService) {
+.directive('umbTreeItem', function($compile, $http, $templateCache, $interpolate, $log, $location, treeService) {
   return {
     restrict: 'E',
     replace: true,
@@ -14,7 +14,7 @@ angular.module("umbraco.directives")
         '<ins ng-hide="node.hasChildren" style="background:none;width:18px;"></ins>' +        
         '<ins ng-show="node.hasChildren" ng-class="{\'icon-caret-right\': !node.expanded, \'icon-caret-down\': node.expanded}" ng-click="load(node)"></ins>' +
        '<i class="{{node | umbTreeIconClass:\'icon umb-tree-icon sprTree\'}}" style="{{node | umbTreeIconStyle}}"></i>' +
-       '<a ng-click="select(this, node, $event)" ng-href="#{{node.view}}">{{node.name}}</a>' +
+       '<a ng-click="select(this, node, $event)" >{{node.name}}</a>' +
        '<i class="umb-options" ng-click="options(this, node, $event)"><i></i><i></i><i></i></i>' +
        '</div>'+
        '</li>',
@@ -25,8 +25,46 @@ angular.module("umbraco.directives")
           scope.$emit("treeOptionsClick", {element: e, node: n, event: ev});
         };
 
+        /**
+         * @ngdoc function
+         * @name select
+         * @methodOf umbraco.directives.umbTreeItem
+         * @function
+         *
+         * @description
+         * Handles the click event of a tree node
+
+         * @param n {object} The tree node object associated with the click
+         */
         scope.select = function(e,n,ev){
-          scope.$emit("treeNodeSelect", {element: e, node: n, event: ev});
+
+            //here we need to check for some legacy tree code
+            if (n.jsClickCallback && n.jsClickCallback != "") {
+                //this is a legacy tree node!                
+                var js;
+                if (n.jsClickCallback.startsWith("javascript:")) {
+                    js = n.jsClickCallback.substr("javascript:".length);
+                }
+                else {
+                    js = n.jsClickCallback;
+                }
+                try {
+                    var func = eval(js);
+                    //this is normally not necessary since the eval above should execute the method and will return nothing.
+                    if (func != null && (typeof func === "function")) {
+                        func.call();
+                    }
+                }
+                catch(e) {
+                    $log.error("Error evaluating js callback from legacy tree node: " + e);
+                }
+            }
+            else {
+                //not legacy, lets just set the route value
+                $location.path(n.view);
+            }
+
+            scope.$emit("treeNodeSelect", { element: e, node: n, event: ev });
         };
 
         scope.load = function (node) {

@@ -94,13 +94,13 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
             //    windowMgr: function() 
             //        return null;
             //    },
-            contentFrameAndSection: function(app, rightFrameUrl){
+            contentFrameAndSection: function(app, rightFrameUrl) {
                 //this.appActions().shiftApp(app, this.uiKeys()['sections_' + app]);
                 var self = this;
-                self.mainWindow().UmbClientMgr.historyManager().addHistory(app,true);
-                window.setTimeout(function(){
+                self.mainWindow().UmbClientMgr.historyManager().addHistory(app, true);
+                window.setTimeout(function() {
                     self.mainWindow().UmbClientMgr.contentFrame(rightFrameUrl);
-                },200);
+                }, 200);
             },
             contentFrame: function(strLocation) {
                 /// <summary>
@@ -131,14 +131,14 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
 
                     this._debug("contentFrame: parsed location: " + strLocation);
                     var self = this;
-                    window.setTimeout(function(){
+                    window.setTimeout(function() {
                         if (typeof self.mainWindow().right != "undefined") {
                             self.mainWindow().right.location.href = strLocation;
                         }
                         else {
                             self.mainWindow().location.href = strLocation; //set the current windows location if the right frame doesn't exist int he current context
                         }
-                    },200);
+                    }, 200);
                 }
             },
             openModalWindow: function(url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback) {
@@ -198,8 +198,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
             set_isDirty: function(value) {
                 this._isDirty = value;
             }
-        }
-    }
+        };
+    };
 })(jQuery);
 
 //define alias for use throughout application

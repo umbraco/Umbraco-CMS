@@ -84,7 +84,7 @@ namespace Umbraco.Web.Trees
             var bTree = treeDef.CreateInstance();
             var treeParams = new LegacyTreeParams(formCollection);
             bTree.SetTreeParameters(treeParams);
-            return new Attempt<TreeNode>(true, LegacyTreeDataAdapter.ConvertFromLegacy(bTree.RootNode, urlHelper));
+            return new Attempt<TreeNode>(true, LegacyTreeDataConverter.ConvertFromLegacy(bTree.RootNode, urlHelper));
         }
 
         private static Attempt<TreeDefinition> TryGetLegacyTreeDef(this ApplicationTree appTree)
@@ -123,7 +123,7 @@ namespace Umbraco.Web.Trees
             bTree.SetTreeParameters(treeParams);
             bTree.Render(ref xTree);
 
-            return new Attempt<TreeNodeCollection>(true, LegacyTreeDataAdapter.ConvertFromLegacy(xTree, urlHelper));
+            return new Attempt<TreeNodeCollection>(true, LegacyTreeDataConverter.ConvertFromLegacy(xTree, urlHelper));
         }
 
     }

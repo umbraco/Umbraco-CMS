@@ -1,1 +1,3 @@
-<iframe ng-controller="Umbraco.Common.LegacyController" style="width: 100%; height: 100%;" src="{{legacyPath}}"></iframe>
+<div ng-controller="LegacyController"  id="legacyContainer" style="width: 100%; height: 100%;overflow: hidden;">
+    <iframe ng-src="{{legacyPath}}"></iframe>
+</div>
