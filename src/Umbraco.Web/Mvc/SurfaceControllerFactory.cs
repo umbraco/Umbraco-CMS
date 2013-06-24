@@ -4,6 +4,8 @@ using System.Web.Routing;
 
 namespace Umbraco.Web.Mvc
 {
+    //NOTE: We currently are not using this at all and should/could probably remove it!
+
 	/// <summary>
 	/// Creates SurfaceControllers
 	/// </summary>
