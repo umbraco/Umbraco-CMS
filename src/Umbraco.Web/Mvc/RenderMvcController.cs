@@ -11,8 +11,11 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Mvc
 {
-	public class RenderMvcController : Controller
-	{
+    /// <summary>
+    /// The default controller that is executed for rendering MVC content in Umbraco
+    /// </summary>
+    public class RenderMvcController : Controller, IRenderMvcController
+    {
 
 		public RenderMvcController()
 		{

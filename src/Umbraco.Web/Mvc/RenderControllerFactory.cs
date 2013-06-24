@@ -54,12 +54,24 @@ namespace Umbraco.Web.Mvc
 		/// The controller.
 		/// </returns>
 		/// <param name="requestContext">The request context.</param><param name="controllerName">The name of the controller.</param>
+		/// <remarks>
+		/// We always set the correct ActionInvoker on our custom created controller, this is very important for route hijacking!
+		/// </remarks>
 		public virtual IController CreateController(RequestContext requestContext, string controllerName)
 		{
 			Type controllerType = GetControllerType(requestContext, controllerName) ??
 			                      _innerFactory.GetControllerType(requestContext, ControllerExtensions.GetControllerName(typeof(RenderMvcController)));
 
-			return _innerFactory.GetControllerInstance(requestContext, controllerType);
+			var instance = _innerFactory.GetControllerInstance(requestContext, controllerType);
+
+		    var controllerInstance = instance as Controller;
+            if (controllerInstance != null)
+            {
+                //set the action invoker!
+                controllerInstance.ActionInvoker = new RenderActionInvoker();
+            }
+
+		    return instance;
 		}
 
 		/// <summary>
