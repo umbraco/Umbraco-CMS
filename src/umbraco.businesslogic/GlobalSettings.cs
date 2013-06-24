@@ -224,6 +224,7 @@ namespace umbraco
         /// Returns a string value to determine if umbraco should disbable xslt extensions
         /// </summary>
         /// <value><c>"true"</c> if version xslt extensions are disabled, otherwise, <c>"false"</c></value>
+        [Obsolete("This is no longer used and will be removed from the codebase in future releases")]
         public static string DisableXsltExtensions
         {
 			get { return Umbraco.Core.Configuration.GlobalSettings.DisableXsltExtensions; }
@@ -233,6 +234,7 @@ namespace umbraco
         /// Returns a string value to determine if umbraco should use Xhtml editing mode in the wysiwyg editor
         /// </summary>
         /// <value><c>"true"</c> if Xhtml mode is enable, otherwise, <c>"false"</c></value>
+        [Obsolete("This is no longer used and will be removed from the codebase in future releases")]
         public static string EditXhtmlMode
         {
 			get { return Umbraco.Core.Configuration.GlobalSettings.EditXhtmlMode; }

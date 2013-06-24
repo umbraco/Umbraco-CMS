@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.IO
 {
@@ -96,7 +97,7 @@ namespace Umbraco.Core.IO
         {
             get
             {
-                if (ContentCacheXmlIsEphemeral && SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
+                if (GlobalSettings.ContentCacheXmlStoredInCodeGen && SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
                 {
                     return Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco.config");
                 }
@@ -104,19 +105,10 @@ namespace Umbraco.Core.IO
             }
         }
 
-        internal static bool ContentCacheXmlIsEphemeral
+        [Obsolete("Use GlobalSettings.ContentCacheXmlStoredInCodeGen instead")]
+        internal static bool ContentCacheXmlStoredInCodeGen
         {
-            get
-            {
-                bool returnValue = false;
-                string configSetting = ConfigurationManager.AppSettings["umbracoContentXMLUseLocalTemp"];
-
-                if (!string.IsNullOrEmpty(configSetting))
-                    if(bool.TryParse(configSetting, out returnValue))
-                        return returnValue;
-
-                return false;
-            }
+            get { return GlobalSettings.ContentCacheXmlStoredInCodeGen; }
         }
     }
 }

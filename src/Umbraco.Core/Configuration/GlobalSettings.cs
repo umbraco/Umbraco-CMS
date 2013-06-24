@@ -116,13 +116,16 @@ namespace Umbraco.Core.Configuration
         /// Gets the name of the content XML file.
         /// </summary>
         /// <value>The content XML.</value>
+        /// <remarks>
+        /// Defaults to ~/App_Data/umbraco.config
+        /// </remarks>
         public static string ContentXmlFile
         {
             get
             {
                 return ConfigurationManager.AppSettings.ContainsKey("umbracoContentXML")
                     ? ConfigurationManager.AppSettings["umbracoContentXML"]
-                    : string.Empty;
+                    : "~/App_Data/umbraco.config";
             }
         }
 
@@ -136,7 +139,7 @@ namespace Umbraco.Core.Configuration
             {
                 return ConfigurationManager.AppSettings.ContainsKey("umbracoStorageDirectory")
                     ? ConfigurationManager.AppSettings["umbracoStorageDirectory"]
-                    : string.Empty;
+                    : "~/App_Data";
             }
         }
 
@@ -437,13 +440,24 @@ namespace Umbraco.Core.Configuration
         /// Returns a string value to determine if umbraco should disbable xslt extensions
         /// </summary>
         /// <value><c>"true"</c> if version xslt extensions are disabled, otherwise, <c>"false"</c></value>
+        [Obsolete("This is no longer used and will be removed from the codebase in future releases")]
         public static string DisableXsltExtensions
         {
             get
             {
                 return ConfigurationManager.AppSettings.ContainsKey("umbracoDisableXsltExtensions")
                     ? ConfigurationManager.AppSettings["umbracoDisableXsltExtensions"]
-                    : string.Empty;
+                    : "false";
+            }
+        }
+
+        internal static bool ContentCacheXmlStoredInCodeGen
+        {
+            get
+            {
+                //defaults to false
+                return ConfigurationManager.AppSettings.ContainsKey("umbracoContentXMLUseLocalTemp") 
+                    && bool.Parse(ConfigurationManager.AppSettings["umbracoContentXMLUseLocalTemp"]); //default to false
             }
         }
 
@@ -451,14 +465,10 @@ namespace Umbraco.Core.Configuration
         /// Returns a string value to determine if umbraco should use Xhtml editing mode in the wysiwyg editor
         /// </summary>
         /// <value><c>"true"</c> if Xhtml mode is enable, otherwise, <c>"false"</c></value>
+        [Obsolete("This is no longer used and will be removed from the codebase in future releases")]
         public static string EditXhtmlMode
         {
-            get
-            {
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoEditXhtmlMode")
-                    ? ConfigurationManager.AppSettings["umbracoEditXhtmlMode"]
-                    : string.Empty;
-            }
+            get { return "true"; }
         }
 
         /// <summary>
@@ -483,9 +493,10 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
+                //the default will be 'profiler'
                 return ConfigurationManager.AppSettings.ContainsKey("umbracoProfileUrl")
                     ? ConfigurationManager.AppSettings["umbracoProfileUrl"]
-                    : string.Empty;
+                    : "profiler";
             }
         }
 

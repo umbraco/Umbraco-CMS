@@ -1,6 +1,6 @@
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using umbraco;
 using Umbraco.Core;
 
 namespace Umbraco.Web.Routing

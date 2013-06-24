@@ -71,7 +71,7 @@ namespace umbraco.IO
 
 		public static bool ContentCacheXmlIsEphemeral
 		{
-			get { return Umbraco.Core.IO.SystemFiles.ContentCacheXmlIsEphemeral; }
+			get { return Umbraco.Core.IO.SystemFiles.ContentCacheXmlStoredInCodeGen; }
 		}
 	}
 }
