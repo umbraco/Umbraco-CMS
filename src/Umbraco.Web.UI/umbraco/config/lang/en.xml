@@ -50,7 +50,7 @@
     <key alias="domainHelp">
       <![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080" or
         "https://www.example.com/".<br /><br />One-level paths in domains are supported, eg. "example.com/en". However, they
-        they should be avoided. Better use the culture setting above.]]>
+        should be avoided. Better use the culture setting above.]]>
     </key>
     <key alias="domainUpdated">Domain '%0%' has been updated</key>
     <key alias="orEdit">Edit Current Domains</key>
