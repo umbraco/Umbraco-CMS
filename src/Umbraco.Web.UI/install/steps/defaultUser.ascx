@@ -33,7 +33,7 @@
 
 											<div class="row">
 												<asp:label AssociatedControlID="tb_email" runat="server">Email:</asp:label>
-												<span><asp:TextBox ID="tb_email" CssClass="text" type="text" Text="admin@domain.com" runat="server"  /></span>
+												<span><asp:TextBox ID="tb_email" CssClass="text" type="text" Text="admin@example.com" runat="server"  /></span>
                                                 <asp:RequiredFieldValidator Display="Dynamic" CssClass="invalidaing" ControlToValidate="tb_email" runat="server" ErrorMessage="Email is a mandatory field" />
 											</div>
 
