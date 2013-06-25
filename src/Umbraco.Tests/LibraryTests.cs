@@ -27,19 +27,34 @@ namespace Umbraco.Tests
 			UmbracoContext.Current = routingContext.UmbracoContext;
 
             var currDir = new DirectoryInfo(TestHelper.CurrentAssemblyDirectory);
-            File.Copy(
-                currDir.Parent.Parent.Parent.GetDirectories("Umbraco.Web.UI")
-                    .First()
-                    .GetDirectories("config").First()
-                    .GetFiles("umbracoSettings.Release.config").First().FullName,
-                Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
-                true);
+
+            var configPath = Path.Combine(currDir.Parent.Parent.FullName, "config");
+            if (Directory.Exists(configPath) == false)
+                Directory.CreateDirectory(configPath);
+
+            var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
+            if (File.Exists(umbracoSettingsFile) == false)
+                File.Copy(
+                    currDir.Parent.Parent.Parent.GetDirectories("Umbraco.Web.UI")
+                        .First()
+                        .GetDirectories("config").First()
+                        .GetFiles("umbracoSettings.Release.config").First().FullName,
+                    Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
+                    true);
 
             Core.Configuration.UmbracoSettings.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
 		}
 
 		public override void TearDown()
 		{
+            //TODO: Deleting the umbracoSettings.config file makes a lot of tests fail
+
+            //var currDir = new DirectoryInfo(TestHelper.CurrentAssemblyDirectory);
+
+            //var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
+            //if (File.Exists(umbracoSettingsFile))
+            //    File.Delete(umbracoSettingsFile);
+            
 			base.TearDown();
 			UmbracoContext.Current = null;
 		}

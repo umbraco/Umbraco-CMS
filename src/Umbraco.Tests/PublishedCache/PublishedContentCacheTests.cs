@@ -4,6 +4,7 @@ using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
@@ -77,6 +78,7 @@ namespace Umbraco.Tests.PublishedCache
 			//ensure the StateHelper is using our custom context
 			StateHelper.HttpContext = _httpContextFactory.HttpContext;
 
+			UmbracoSettings.UseLegacyXmlSchema = false;
             var cache = new PublishedContentCache
                 {
                     GetXmlDelegate = (context, preview) =>

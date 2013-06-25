@@ -463,7 +463,7 @@ Hallo %0%,
 
 die Aufgabe '%1%' (von Benutzer '%3%') an der Seite '%2%' wurde ausgeführt.
 
-Zum Bearbeiten verwenden Sie bitte diesen Link: http://%4%/umbraco/actions/editContent.aspx?id=%5%
+Zum Bearbeiten verwenden Sie bitte diesen Link: http://%4%/actions/editContent.aspx?id=%5%
 
 Einen schönen Tag wünscht
 Ihr freundlicher Umbraco-Robot
@@ -474,9 +474,9 @@ Ihr freundlicher Umbraco-Robot
 <p>die Aufgabe <strong>'%1%'</strong> (von Benutzer '%3%') an der Seite <a href="%7%"><strong>'%2%'</strong></a> wurde ausgeführt.</p>
 <div style="margin: 8px 0; padding: 8px; display: block;">
 	<br />
-	<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/umbraco/actions/publish.aspx?id=%5%">&nbsp;&nbsp;VERÖFFENTLICHEN&nbsp;&nbsp;</a> &nbsp; 
-	<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/umbraco/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BEARBEITEN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
-	<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/umbraco/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;LÖSCHEN&nbsp;&nbsp;&nbsp;&nbsp;</a>
+	<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;VERÖFFENTLICHEN&nbsp;&nbsp;</a> &nbsp; 
+	<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BEARBEITEN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+	<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;LÖSCHEN&nbsp;&nbsp;&nbsp;&nbsp;</a>
 	<br />
 </div>
 <p>
@@ -487,9 +487,9 @@ Ihr freundlicher Umbraco-Robot
  </p>
 <div style="margin: 8px 0; padding: 8px; display: block;">
 	<br />
-	<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/umbraco/actions/publish.aspx?id=%5%">&nbsp;&nbsp;VERÖFFENTLICHEN&nbsp;&nbsp;</a> &nbsp; 
-	<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/umbraco/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BEARBEITEN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
-	<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/umbraco/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;LÖSCHEN&nbsp;&nbsp;&nbsp;&nbsp;</a>
+	<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;VERÖFFENTLICHEN&nbsp;&nbsp;</a> &nbsp; 
+	<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BEARBEITEN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+	<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;LÖSCHEN&nbsp;&nbsp;&nbsp;&nbsp;</a>
 	<br />
 </div>
 <p>Einen schönen Tag wünscht<br />Ihr freundlicher Umbraco-Robot</p>

@@ -413,6 +413,7 @@
     <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
     <Compile Include="Mvc\BackOfficeArea.cs" />
     <Compile Include="Mvc\ControllerFactoryExtensions.cs" />
+    <Compile Include="Mvc\IRenderMvcController.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\RoutesCache.cs" />
     <Compile Include="Routing\UrlProviderMode.cs" />

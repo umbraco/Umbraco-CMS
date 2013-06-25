@@ -22,8 +22,8 @@ namespace Umbraco.Web.Mvc
 			//now we need to check if it exists, if not we need to return the Index by default
 			if (ad == null)
 			{
-				//check if the controller is an instance of RenderMvcController
-				if (controllerContext.Controller is RenderMvcController)
+                //check if the controller is an instance of IRenderMvcController
+				if (controllerContext.Controller is IRenderMvcController)
 				{
 					return new ReflectedActionDescriptor(controllerContext.Controller.GetType().GetMethod("Index"), "Index", controllerDescriptor);
 				}
