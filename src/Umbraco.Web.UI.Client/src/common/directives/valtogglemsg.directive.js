@@ -20,11 +20,9 @@ function valToggleMsg(angularHelper) {
             var showValidation = false;
             var hasError = false;
 
-            var currentForm = angularHelper.getCurrentForm(scope);
-            if (!currentForm || !currentForm.$name){
-                throw "valToggleMsg requires that a name is assigned to the ng-form containing the validated input";
-            }
-
+            //ensure there is a form object assigned.
+            var currentForm = angularHelper.getRequiredCurrentForm(scope);
+            
             //add a watch to the validator for the value (i.e. $parent.myForm.value.$error.required )
             scope.$watch(currentForm.$name + "." + attr.valMsgFor + ".$error." + attr.valToggleMsg, function (isInvalid, oldValue) {
                 hasError = isInvalid;
@@ -36,16 +34,21 @@ function valToggleMsg(angularHelper) {
                 }
             });
 
-            //add a watch to update our waitingOnValidation flag for use in the above closure
-            scope.$watch("$parent.ui.waitingOnValidation", function (isWaiting, oldValue) {
-                showValidation = isWaiting;
-                if (hasError && showValidation) {
+            scope.$on("saving", function(ev, args) {
+                showValidation = true;
+                if (hasError) {
                     element.show();
                 }
                 else {
                     element.hide();
                 }
             });
+            
+            scope.$on("saved", function (ev, args) {
+                showValidation = false;
+                element.hide();
+            });
+
         }
     };
 }

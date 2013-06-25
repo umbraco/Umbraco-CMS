@@ -1,37 +1,39 @@
-﻿<umb-panel ng-controller="Umbraco.Editors.ContentEditController">  
-    <umb-header tabs="content.tabs">
-            <div class="span4">
-                <input type="text" placeholder="Enter a page title" headline ng-model="content.name" />
-            </div>
+﻿<ng-form name="contentForm">
+    <umb-panel ng-controller="Umbraco.Editors.ContentEditController">  
+        <umb-header tabs="content.tabs">
+                <div class="span4">
+                    <input type="text" placeholder="Enter a page title" headline ng-model="content.name" />
+                </div>
 
-            <div class="span8">
-                <div class="btn-toolbar pull-right umb-btn-toolbar">
-                    <div class="btn-group">
-                        <a class="btn" ng-click="preview(content)" 
-                        data-shortcut="ctrl+s">Preview page</a>
-                    </div>
+                <div class="span8">
+                    <div class="btn-toolbar pull-right umb-btn-toolbar">
+                        <div class="btn-group">
+                            <a class="btn" ng-click="preview(content)" 
+                            data-shortcut="ctrl+s">Preview page</a>
+                        </div>
 
-                    <div class="btn-group">
-                        <a class="btn btn-success" href="#" ng-click="saveAndPublish(content)"
-                           prevent-default data-shortcut="ctrl+p">Publish</a>
+                        <div class="btn-group">
+                            <a class="btn btn-success" href="#" ng-click="saveAndPublish(content)"
+                               prevent-default data-shortcut="ctrl+p">Publish</a>
 
-                        <a class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                            <span class="caret"></span>
-                        </a>
+                            <a class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                                <span class="caret"></span>
+                            </a>
 
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                            <li><a href="#" ng-click="save(content)"
-                                   prevent-default data-shortcut="ctrl+s">Save draft</a></li>
-                        </ul>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                <li><a href="#" ng-click="save(content)"
+                                       prevent-default data-shortcut="ctrl+s">Save draft</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
-    </umb-header>
+        </umb-header>
 
-    <umb-tab-view>
-        <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" 
-            ng-repeat="tab in content.tabs">
-            <umb-property ng-repeat="model in tab.properties"></umb-property>
-        </umb-tab>
-    </umb-tab-view>
-</umb-panel>
+        <umb-tab-view>
+            <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" 
+                ng-repeat="tab in content.tabs">
+                <umb-property ng-repeat="model in tab.properties"></umb-property>
+            </umb-tab>
+        </umb-tab-view>
+    </umb-panel>
+</ng-form>

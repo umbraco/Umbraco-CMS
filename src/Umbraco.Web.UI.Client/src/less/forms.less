@@ -342,28 +342,32 @@ input[type="checkbox"][readonly] {
 
 
 
+//SD: NOTE: Had to change these to use our 'form' prefixed colors since we cannot
+// whare colors with the notifications/alerts
+
 // FORM FIELD FEEDBACK STATES
 // --------------------------
 
 // Warning
 .control-group.warning {
-  .formFieldState(@warningText, @warningText, @warningBackground);
+  .formFieldState(@formWarningText, @formWarningText, @formWarningBackground);
 }
 // Error
 .control-group.error {
-  .formFieldState(@errorText, @errorText, @errorBackground);
+  .formFieldState(@formErrorText, @formErrorText, @formErrorBackground);
 }
 // Success
 .control-group.success {
-  .formFieldState(@successText, @successText, @successBackground);
+  .formFieldState(@formSuccessText, @formSuccessText, @formSuccessBackground);
 }
 // Success
 .control-group.info {
-  .formFieldState(@infoText, @infoText, @infoBackground);
+  .formFieldState(@formInfoText, @formInfoText, @formInfoBackground);
 }
 
-// HTML5 invalid states
+// HTML5 invalid states 
 // Shares styles with the .control-group.error above
+
 input:focus:invalid,
 textarea:focus:invalid,
 select:focus:invalid {
@@ -375,6 +379,19 @@ select:focus:invalid {
     .box-shadow(@shadow);
   }
 }
+
+//SD: NOTE: Put this here instead of angular styles
+/*input.ng-invalid,
+textarea.ng-invalid,
+select.ng-invalid {
+  color: #b94a48;
+  border-color: #ee5f5b;
+  &:focus {
+    border-color: darken(#ee5f5b, 10%);
+    @shadow: 0 0 6px lighten(#ee5f5b, 20%);
+    .box-shadow(@shadow);
+  }
+}*/
 
 
 

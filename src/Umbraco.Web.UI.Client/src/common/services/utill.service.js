@@ -77,6 +77,24 @@ function angularHelper() {
             }
 
             return form;
+        },
+        
+        /**
+         * @ngdoc function
+         * @name validateHasForm
+         * @methodOf angularHelper
+         * @function
+         *
+         * @description
+         * This will validate that the current scope has an assigned form object, if it doesn't an exception is thrown, if
+         * it does we return the form object.
+         */
+        getRequiredCurrentForm: function(scope) {
+            var currentForm = this.getCurrentForm(scope);
+            if (!currentForm || !currentForm.$name) {
+                throw "The current scope requires a current form object (or ng-form) with a name assigned to it";
+            }
+            return currentForm;
         }
     };
 }
@@ -220,7 +238,12 @@ function umbRequestHelper($http, $q, umbDataFormatter) {
                 function (data, status, headers, config) {
                     //failure callback
 
-                    deferred.reject('Failed to save data for media id ' + content.id);
+                    deferred.reject({
+                        data: data,
+                        status: status,
+                        headers: headers,
+                        config: config
+                    });
                 });
 
             return deferred.promise;

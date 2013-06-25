@@ -234,7 +234,7 @@
 @heroUnitLeadColor:               inherit;
 
 
-// Form states and alerts
+// alerts
 // -------------------------
 @warningText:             @white;
 @warningBackground:       @orange;
@@ -251,6 +251,28 @@
 @infoText:                @white;
 @infoBackground:          @purple;
 @infoBorder:              transparent;
+
+// SD: Had to duplicate the above but prefix with 'form' with the bootstrap original colors
+// because we cannot share the above alert colors with forms otherwise we end up with white
+// text and giant red backgrounds.
+
+// Form states
+// -------------------------
+@formWarningText:             #c09853;
+@formWarningBackground:       #fcf8e3;
+@formWarningBorder:           darken(spin(@warningBackground, -10), 3%);
+
+@formErrorText:               #b94a48;
+@formErrorBackground:         #f2dede;
+@formErrorBorder:             darken(spin(@errorBackground, -10), 3%);
+
+@formSuccessText:             #468847;
+@formSuccessBackground:       #dff0d8;
+@formSuccessBorder:           darken(spin(@successBackground, -10), 5%);
+
+@formInfoText:                #3a87ad;
+@formInfoBackground:          #d9edf7;
+@formInfoBorder:              darken(spin(@infoBackground, -10), 7%);
 
 
 // Tooltips and popovers
