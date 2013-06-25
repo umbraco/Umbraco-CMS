@@ -37,6 +37,9 @@
 		}
 	],    
     javascript: [
-        '~/App_Plugins/MyPackage/Common/Js/MyPackage.js'
+        '~/App_Plugins/MyPackage/Common/Js/MyPackage.js',
+		'~/App_Plugins/MyPackage/PropertyEditors/Js/CsvEditor.js',
+		'~/App_Plugins/MyPackage/PropertyEditors/Js/PostcodeEditor.js',
+		'~/App_Plugins/MyPackage/PropertyEditors/Js/RegexEditor.js'
     ]
 }

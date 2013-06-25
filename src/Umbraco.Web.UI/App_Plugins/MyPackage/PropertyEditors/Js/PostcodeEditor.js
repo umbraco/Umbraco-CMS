@@ -7,6 +7,6 @@
         $scope.model.config = { country: $scope.model.config[0] };
     };
     
-    angular.module("myPackage.controllers").controller('MyPackage.PropertyEditors.PostcodeEditor', postcodeEditor);
+    angular.module("umbraco").controller('MyPackage.PropertyEditors.PostcodeEditor', postcodeEditor);
     
 })();

@@ -143,12 +143,12 @@ angular.module('umbraco.services')
 			this.ui.dialogTitle = args.action.name;
 
 			var templateUrl = "views/" + this.ui.currentTree + "/" + args.action.alias + ".html";
-			var d = dialogService.append(
-						{
-							container: $("#dialog div.umb-panel-body"),
-							scope: scope,
-							template: templateUrl
-						});
+		    var d = dialogService.append(
+		        {
+		            container: $("#dialog div.umb-panel-body"),
+		            scope: scope,
+		            template: templateUrl
+		        });
 		},
 
 		hideDialog: function() {

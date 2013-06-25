@@ -4,7 +4,7 @@
     * @restrict A
     * @description This directive will show/hide an error based on: is the value + the given validator invalid? AND, has the form been submitted ?
     **/
-function valToggleMsg(umbFormHelper) {
+function valToggleMsg(angularHelper) {
     return {
         restrict: "A",
         link: function (scope, element, attr, ctrl) {
@@ -20,7 +20,7 @@ function valToggleMsg(umbFormHelper) {
             var showValidation = false;
             var hasError = false;
 
-            var currentForm = umbFormHelper.getCurrentForm(scope);
+            var currentForm = angularHelper.getCurrentForm(scope);
             if (!currentForm || !currentForm.$name){
                 throw "valToggleMsg requires that a name is assigned to the ng-form containing the validated input";
             }

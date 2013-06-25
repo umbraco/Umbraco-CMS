@@ -6,7 +6,7 @@
                 describing the state of the validation element. This is useful for 
                 parent elements to know about child element validation state.
 **/
-function valBubble(umbFormHelper) {
+function valBubble(angularHelper) {
     return {
         require: 'ngModel',
         restrict: "A",
@@ -16,7 +16,7 @@ function valBubble(umbFormHelper) {
                 throw "valBubble must be set on an input element that has a 'name' attribute";
             }
             
-            var currentForm = umbFormHelper.getCurrentForm(scope);
+            var currentForm = angularHelper.getCurrentForm(scope);
             if (!currentForm || !currentForm.$name){
                 throw "valBubble requires that a name is assigned to the ng-form containing the validated input";
             }
