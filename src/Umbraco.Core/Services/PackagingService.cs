@@ -45,6 +45,17 @@ namespace Umbraco.Core.Services
             _importedContentTypes = new Dictionary<string, IContentType>();
         }
 
+        #region Generic export methods
+        
+        internal void ExportToFile(string absoluteFilePath, string nodeType, int id)
+        {
+            var contentType = _contentTypeService.GetContentType(id);
+            var xml = Export(contentType);
+            xml.Save(absoluteFilePath);
+        }
+
+        #endregion
+
         #region Content
 
         /// <summary>
