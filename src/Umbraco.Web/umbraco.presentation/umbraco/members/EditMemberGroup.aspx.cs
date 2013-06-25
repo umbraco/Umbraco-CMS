@@ -33,6 +33,10 @@ namespace umbraco.presentation.members
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
             _memberGroupId = !String.IsNullOrEmpty(memberGroupName.Value) ? memberGroupName.Value : Request.QueryString["id"];
+
+            // Restore any escaped apostrophe for name look up
+            _memberGroupId = _memberGroupId.Replace("\\'", "'");
+
             if (!IsPostBack)
 			{
                 ClientTools
