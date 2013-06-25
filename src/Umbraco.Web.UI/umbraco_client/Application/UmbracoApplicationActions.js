@@ -181,6 +181,15 @@ Umbraco.Application.Actions = function () {
 
         },
 
+        actionChangeDocType: function () {
+            /// <summary></summary>
+
+            if (UmbClientMgr.mainTree().getActionNode().nodeId != '0' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
+                UmbClientMgr.openModalWindow("dialogs/changeDocType.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&app=' + this._currApp + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_changeDocType'], true, 600, 600);
+            }
+
+        },
+
         actionRights: function () {
             /// <summary></summary>
 
@@ -368,8 +377,10 @@ Umbraco.Application.Actions = function () {
                         });
                 }
                 else {
+                    console.log(UmbClientMgr.mainTree().getActionNode());
                     umbraco.presentation.webservices.legacyAjaxCalls.Delete(
-                        UmbClientMgr.mainTree().getActionNode().nodeId, "",
+                        UmbClientMgr.mainTree().getActionNode().nodeId,
+                        UmbClientMgr.mainTree().getActionNode().nodeName,
                         UmbClientMgr.mainTree().getActionNode().nodeType,
                         function () {
                             _this._debug("actionDelete: Raising event");

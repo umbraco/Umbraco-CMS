@@ -64,15 +64,22 @@ namespace umbraco.presentation.webservices
         [ScriptMethod]
         public void Delete(string nodeId, string alias, string nodeType)
         {
-
             AuthorizeRequest(true);
 
             //check which parameters to pass depending on the types passed in
             int intNodeID;
-            if (int.TryParse(nodeId, out intNodeID) && nodeType != "member") // Fix for #26965 - numeric member login gets parsed as nodeId
+            if (nodeType == "memberGroup")
+            {
+                presentation.create.dialogHandler_temp.Delete(nodeType, 0, alias);
+            }
+            else if (int.TryParse(nodeId, out intNodeID) && nodeType != "member") // Fix for #26965 - numeric member login gets parsed as nodeId
+            {
                 presentation.create.dialogHandler_temp.Delete(nodeType, intNodeID, alias);
+            }
             else
+            {
                 presentation.create.dialogHandler_temp.Delete(nodeType, 0, nodeId);
+            }
         }
         
         /// <summary>
