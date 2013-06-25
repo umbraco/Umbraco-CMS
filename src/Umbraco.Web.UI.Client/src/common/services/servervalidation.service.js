@@ -28,7 +28,13 @@ function serverValidationService() {
             if (!contentProperty || !callback) {
                 return;
             }
-            callbacks.push({ propertyAlias: contentProperty.alias, fieldName: fieldName, callback: callback });
+            //don't add it if it already exists
+            var exists = _.find(callbacks, function(item) {
+                return item.propertyAlias === contentProperty.alias && item.fieldName === fieldName;
+            });
+            if (!exists) {
+                callbacks.push({ propertyAlias: contentProperty.alias, fieldName: fieldName, callback: callback });
+            }            
         },
         
         /**
@@ -38,13 +44,15 @@ function serverValidationService() {
          * @function
          *
          * @description
-         * Gets all callbacks that has been registered using the subscribe method for the contentProperty + fieldName combo
+         * Gets all callbacks that has been registered using the subscribe method for the contentProperty + fieldName combo.
+         * This will always return any callbacks registered for just the property (i.e. field name is empty) and for ones with an 
+         * explicit field name set.
          */
         getCallbacks: function (contentProperty, fieldName) {            
             var found = _.filter(callbacks, function (item) {
-                return (item.propertyAlias === contentProperty.alias);
-                //returns any callback that have been registered directly against
-                //&& (item.fieldName === fieldName || (item.fieldName === undefined || item.fieldName === "")));
+                return (item.propertyAlias === contentProperty.alias
+                //returns any callback that have been registered directly against the field and for only the property
+                && (item.fieldName === fieldName || (item.fieldName === undefined || item.fieldName === "")));
             });
             return found;
         },
