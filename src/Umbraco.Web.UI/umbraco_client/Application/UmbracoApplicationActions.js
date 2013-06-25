@@ -377,8 +377,10 @@ Umbraco.Application.Actions = function () {
                         });
                 }
                 else {
+                    console.log(UmbClientMgr.mainTree().getActionNode());
                     umbraco.presentation.webservices.legacyAjaxCalls.Delete(
-                        UmbClientMgr.mainTree().getActionNode().nodeId, "",
+                        UmbClientMgr.mainTree().getActionNode().nodeId,
+                        UmbClientMgr.mainTree().getActionNode().nodeName,
                         UmbClientMgr.mainTree().getActionNode().nodeType,
                         function () {
                             _this._debug("actionDelete: Raising event");
