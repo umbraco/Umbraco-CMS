@@ -1,6 +1,6 @@
   .panel {
     margin: 0 auto; /* center for now */
-    width: 17em; /* ems so it will grow */
+    
     background: url(images/panel_bg.gif) top repeat-x;
     font-size: 100%;
     padding: 0px;

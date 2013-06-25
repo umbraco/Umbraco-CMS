@@ -1,6 +1,33 @@
 /*Contains multiple services for various helper tasks */
 
 /**
+ * @ngdoc function
+ * @name umbraco.services.angularHelper
+ * @function
+ *
+ * @description
+ * Some angular helper/extension methods
+ */
+function angularHelper() {
+    return {
+        
+        /**
+         * @ngdoc function
+         * @name safeApply
+         * @methodOf angularHelper
+         * @function
+         *
+         * @description
+         * This checks if a digest/apply is already occuring, if not it will force an apply call
+         */
+        safeApply: function (scope, fn) {
+            (scope.$$phase || scope.$root.$$phase) ? fn() : scope.$apply(fn);
+        }  
+    };
+}
+angular.module('umbraco.services').factory('angularHelper', angularHelper);
+
+/**
 * @ngdoc factory
 * @name umbraco.services:umbPropertyEditorHelper
 * @description A helper object used for property editors

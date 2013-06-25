@@ -14,8 +14,12 @@ function avatarDirective() {
             hash: '@'
         },
         link: function(scope, element, attr, ctrl) {
-            //set the gravatar url
-            scope.gravatar = "http://www.gravatar.com/avatar/" + scope.hash + "?s=40";
+
+            scope.$watch("hash", function (val) {
+                //set the gravatar url
+                scope.gravatar = "http://www.gravatar.com/avatar/" + val + "?s=40";
+            });
+            
         }
     };
 }

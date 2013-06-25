@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-.factory('notificationsService', function ($rootScope, $timeout) {
+.factory('notificationsService', function ($rootScope, $timeout, angularHelper) {
 
 	var nArray = [];
 
@@ -9,7 +9,7 @@ angular.module('umbraco.services')
 
 
 		$timeout(function () {
-			$rootScope.$apply(function() {
+		    angularHelper.safeApply($rootScope, function () {
 				nArray.splice(index, 1);
 			});
 			
@@ -19,20 +19,30 @@ angular.module('umbraco.services')
 	}
 
 	return {
-		success: function (headline, message) {
-			return add({ headline: headline, message: message, type: 'success', time: new Date() });
+	    success: function (headline, message) {
+	        angularHelper.safeApply($rootScope, function () {
+	            return add({ headline: headline, message: message, type: 'success', time: new Date() });
+	        });
 		},
-		error: function (headline, message) {
-			return add({ headline: headline, message: message, type: 'error', time: new Date() });
+	    error: function (headline, message) {
+	        angularHelper.safeApply($rootScope, function() {
+	            return add({ headline: headline, message: message, type: 'error', time: new Date() });
+	        });			
 		},
-		warning: function (headline, message) {
-			return add({ headline: headline, message: message, type: 'warning', time: new Date() });
+	    warning: function (headline, message) {
+	        angularHelper.safeApply($rootScope, function() {
+	            return add({ headline: headline, message: message, type: 'warning', time: new Date() });
+	        });
 		},
-		remove: function (index) {
-			nArray.splice(index, 1);
+	    remove: function (index) {
+	        angularHelper.safeApply($rootScope, function() {
+	            nArray.splice(index, 1);
+	        });
 		},
-		removeAll: function () {
-			nArray = [];
+	    removeAll: function () {
+	        angularHelper.safeApply($rootScope, function() {
+	            nArray = [];
+	        });
 		},
 
 		current: nArray,
