@@ -62,7 +62,7 @@ function valPropertyMsg(angularHelper, serverValidationService) {
                 if (hasError && scope.errorMsg === "") {
                     scope.errorMsg = serverValidationService.getError(currentProperty, "");
                 }
-                else {
+                else if (!hasError) {
                     scope.errorMsg = "";
                 }
             });
