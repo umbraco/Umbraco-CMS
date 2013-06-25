@@ -47,6 +47,21 @@ jQuery(document).ready(function() {
         dataUrl: "<%#umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)%>/webservices/TreeDataService.ashx",
         serviceUrl: "<%#umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)%>/webservices/TreeClientService.asmx/GetInitAppTreeData"});
         
+    <%if(!String.IsNullOrEmpty(this.SelectedNodePath)) {%>
+    setTimeout(function() {
+        treeApi = jQuery("#<%=ClientID%>").UmbracoTreeAPI();
+		        treeApi.syncTree('<%=this.SelectedNodePath%>', true, true);
+
+				// select the parent node once found.
+				var iv = setInterval(function() {
+				var node = treeApi.findNode('<%=this.SelectedNodePath%>'.split(',').pop(), true);
+				if(node != false) {
+					treeApi.selectNode(node, false, true);
+					clearInterval(iv);
+				}
+    }, 500);
+    <% } %>
+
      //add event handler for ajax errors, this will refresh the whole application
     var mainTree = UmbClientMgr.mainTree();
     if (mainTree != null) {

@@ -49,7 +49,16 @@ jQuery(document).ready(function() {
         
     <%if(!String.IsNullOrEmpty(this.SelectedNodePath)) {%>
     setTimeout(function() {
-        jQuery("#<%=ClientID%>").UmbracoTreeAPI().syncTree('<%=this.SelectedNodePath%>', true, true);
+        treeApi = jQuery("#<%=ClientID%>").UmbracoTreeAPI();
+		        treeApi.syncTree('<%=this.SelectedNodePath%>', true, true);
+
+				// select the parent node once found.
+				var iv = setInterval(function() {
+				var node = treeApi.findNode('<%=this.SelectedNodePath%>'.split(',').pop(), true);
+				if(node != false) {
+					treeApi.selectNode(node, false, true);
+					clearInterval(iv);
+				}
     }, 500);
     <% } %>
 
