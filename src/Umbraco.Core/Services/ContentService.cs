@@ -1091,6 +1091,7 @@ namespace Umbraco.Core.Services
             {
                 content.WriterId = userId;
                 content.CreatorId = userId;
+                content.ChangePublishedState(PublishedState.Unpublished);
 
                 repository.AddOrUpdate(content);
                 uow.Commit();
