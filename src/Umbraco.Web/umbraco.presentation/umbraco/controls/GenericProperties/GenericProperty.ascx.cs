@@ -127,7 +127,7 @@ namespace umbraco.controls.GenericProperties
 			tbValidation.Text = "";
 			tbDescription.Text = "";
 			ddlTab.SelectedIndex = 0;
-			ddlTypes.SelectedIndex = 0;
+            SetDefaultDocumentTypeProperty();
 			checkMandatory.Checked = false;
 		}
 
@@ -192,13 +192,24 @@ namespace umbraco.controls.GenericProperties
 			if (_dataTypeDefinitions != null) 
 			{
 				ddlTypes.Items.Clear();
+                var itemSelected = false;
 				foreach(cms.businesslogic.datatype.DataTypeDefinition dt in _dataTypeDefinitions) 
 				{
-					ListItem li = new ListItem(dt.Text, dt.Id.ToString());
-					if (_pt != null && _pt.DataTypeDefinition.Id == dt.Id)
-						li.Selected = true;
+					var li = new ListItem(dt.Text, dt.Id.ToString());
+                    if ((_pt != null && _pt.DataTypeDefinition.Id == dt.Id))
+                    {
+                        li.Selected = true;
+                        itemSelected = true;
+                    }
+
 					ddlTypes.Items.Add(li);
 				}
+
+                // If item not selected from previous edit or load, set to default according to settings
+                if (!itemSelected)
+                {
+                    SetDefaultDocumentTypeProperty();
+                }
 			}
 
 			// tabs
@@ -230,6 +241,19 @@ namespace umbraco.controls.GenericProperties
 			if (_pt != null && _pt.Description != "")
 				tbDescription.Text = _pt.GetRawDescription();
 		}
+
+        private void SetDefaultDocumentTypeProperty()
+        {
+            var itemToSelect = ddlTypes.Items.FindByText(GlobalSettings.DefaultDocumentTypeProperty);
+            if (itemToSelect != null)
+            {
+                itemToSelect.Selected = true;
+            }
+            else
+            {
+                ddlTypes.SelectedIndex = -1;
+            }
+        }
 
 		protected void defaultDeleteHandler(object sender, System.EventArgs e) 
 		{
