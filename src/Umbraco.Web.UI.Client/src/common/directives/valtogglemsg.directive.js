@@ -4,10 +4,23 @@
     * @restrict A
     * @description This directive will show/hide an error based on: is the value + the given validator invalid? AND, has the form been submitted ?
     **/
-function valToggleMsg(angularHelper) {
+function valToggleMsg() {
     return {
+        require: "^form",
         restrict: "A",
-        link: function (scope, element, attr, ctrl) {
+
+        /**
+         * @ngdoc function
+         * @name link
+         * @methodOf valPropertyMsg
+         * @function
+         *
+         * @description
+         * The linking function for the directive
+         *
+         * @param formCtrl {FormController} Our directive requries a reference to a form controller which gets passed in to this parameter
+         */
+        link: function (scope, element, attr, formCtrl) {
 
             if (!attr.valToggleMsg){
                 throw "valToggleMsg requires that a reference to a validator is specified";
@@ -20,11 +33,8 @@ function valToggleMsg(angularHelper) {
             var showValidation = false;
             var hasError = false;
 
-            //ensure there is a form object assigned.
-            var currentForm = angularHelper.getRequiredCurrentForm(scope);
-            
             //add a watch to the validator for the value (i.e. $parent.myForm.value.$error.required )
-            scope.$watch(currentForm.$name + "." + attr.valMsgFor + ".$error." + attr.valToggleMsg, function (isInvalid, oldValue) {
+            scope.$watch(formCtrl.$name + "." + attr.valMsgFor + ".$error." + attr.valToggleMsg, function (isInvalid, oldValue) {
                 hasError = isInvalid;
                 if (hasError && showValidation) {
                     element.show();

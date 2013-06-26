@@ -371,7 +371,7 @@ input[type="checkbox"][readonly] {
 input:focus:invalid,
 textarea:focus:invalid,
 select:focus:invalid {
-  color: #b94a48;
+  color: @formErrorText;
   border-color: #ee5f5b;
   &:focus {
     border-color: darken(#ee5f5b, 10%);
@@ -379,20 +379,6 @@ select:focus:invalid {
     .box-shadow(@shadow);
   }
 }
-
-//SD: NOTE: Put this here instead of angular styles
-/*input.ng-invalid,
-textarea.ng-invalid,
-select.ng-invalid {
-  color: #b94a48;
-  border-color: #ee5f5b;
-  &:focus {
-    border-color: darken(#ee5f5b, 10%);
-    @shadow: 0 0 6px lighten(#ee5f5b, 20%);
-    .box-shadow(@shadow);
-  }
-}*/
-
 
 
 // FORM ACTIONS

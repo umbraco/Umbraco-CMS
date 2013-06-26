@@ -7,16 +7,25 @@
     *    and when an error is detected for this property we'll show the error message and then we need 
     *    to emit the valBubble event so that any parent listening can update it's UI (like the validation summary)
     **/
-function valPropertyMsg(angularHelper, serverValidationService) {
+function valPropertyMsg(serverValidationService) {
     return {        
+        require: "^form",   //require that this directive is contained within an ngForm
         replace: true,      //replace the element with the template
         restrict: "E",      //restrict to element
         template: "<div ng-show=\"errorMsg != ''\" class='alert alert-error' >{{errorMsg}}</div>",
-        link: function (scope, element, attrs, ctrl) {
-
-            //ensure there is a form object assigned.
-            //NOTE: This only works if we are not creating a new scope, very important!
-            var currentForm = angularHelper.getRequiredCurrentForm(scope);
+        
+        /**
+         * @ngdoc function
+         * @name link
+         * @methodOf valPropertyMsg
+         * @function
+         *
+         * @description
+         * The linking function for the directive
+         *
+         * @param formCtrl {FormController} Our directive requries a reference to a form controller which gets passed in to this parameter
+         */
+        link: function (scope, element, attrs, formCtrl) {
             
             if (!attrs.property) {
                 throw "the valPropertyMsg requires an attribute 'property' set which equals the current content property object";
@@ -31,7 +40,7 @@ function valPropertyMsg(angularHelper, serverValidationService) {
             scope.errorMsg = "";
 
             //listen for form validation
-            scope.$watch(currentForm.$name + ".$valid", function (isValid, oldValue) {
+            scope.$watch(formCtrl.$name + ".$valid", function (isValid, oldValue) {
                 if (isValid === undefined) {
                     return;
                 }
@@ -92,7 +101,7 @@ function valPropertyMsg(angularHelper, serverValidationService) {
                         isValid: false,         // it is INVALID
                         element: element,       // the element that the validation applies to
                         scope: scope,           // the scope
-                        ctrl: ctrl              // the current controller
+                        formCtrl: formCtrl      // the current form controller
                     });
                 }
                 else {
@@ -102,7 +111,7 @@ function valPropertyMsg(angularHelper, serverValidationService) {
                         isValid: true,          // it is VALID
                         element: element,       // the element that the validation applies to
                         scope: scope,           // the scope
-                        ctrl: ctrl              // the current controller
+                        formCtrl: formCtrl      // the current form controller
                     });
                 }
             });
