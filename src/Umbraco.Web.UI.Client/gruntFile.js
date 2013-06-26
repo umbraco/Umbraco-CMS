@@ -7,17 +7,19 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-recess');
-  grunt.loadNpmTasks('grunt-testacular');
+
+  grunt.loadNpmTasks('grunt-karma');
+  
   grunt.loadNpmTasks('grunt-open');
   grunt.loadNpmTasks('grunt-markdown');
   grunt.loadNpmTasks('grunt-contrib-connect');
 
   // Default task.
-  grunt.registerTask('default', ['jshint:dev','build','testacular:unit']);
+  grunt.registerTask('default', ['jshint:dev','build','karma:unit']);
   grunt.registerTask('dev', ['jshint:dev', 'build', 'webserver', 'open:dev', 'watch']);
 
   //run by the watch task
-  grunt.registerTask('watch-build', ['jshint:dev','recess:build','testacular:unit','concat','copy']);
+  grunt.registerTask('watch-build', ['jshint:dev','recess:build','karma:unit','concat','copy']);
   
   //triggered from grunt dev or grunt
   grunt.registerTask('build', ['clean','concat','recess:build','copy']);
@@ -30,12 +32,6 @@ module.exports = function (grunt) {
   grunt.registerTask('timestamp', function() {
     grunt.log.subhead(Date());
   });
-
-  var testacularConfig = function(configFile, customOptions) {
-    var options = { configFile: configFile, keepalive: true };
-    var travisOptions = process.env.TRAVIS && { browsers: ['Firefox'], reporters: 'dots' };
-    return grunt.util._.extend(options, customOptions, travisOptions);
-  };
 
   // Project configuration.
   grunt.initConfig({
@@ -116,10 +112,10 @@ module.exports = function (grunt) {
       }
     },
 
-    testacular: {
-      unit: { options: testacularConfig('test/config/unit.js') },
-      e2e: { options: testacularConfig('test/config/e2e.js') },
-      watch: { options: testacularConfig('test/config/unit.js', {singleRun:false, autoWatch: true}) }
+    karma: {
+      unit: { configFile: 'test/config/karma.conf.js', keepalive: true },
+      e2e: { configFile: 'test/config/e2e.js', keepalive: true },
+      watch: { configFile: 'test/config/unit.js', singleRun:false, autoWatch: true, keepalive: true }
     },
 
     concat:{

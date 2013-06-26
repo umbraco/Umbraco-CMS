@@ -19,6 +19,12 @@ files = [
   'test/unit/**/*.spec.js'
 ];
 
+plugins = [
+      'karma-jasmine',
+      'karma-chrome-launcher',
+      'karma-phantomjs-launcher'
+    ];
+
 // use dots reporter, as travis terminal does not support escaping sequences
 // possible values: 'dots' || 'progress'
 reporters = 'progress';
@@ -51,7 +57,7 @@ autoWatchInterval = 0;
 // - Opera
 // - Safari
 // - PhantomJS
-browsers = ['Chrome'];
+browsers = ['PhantomJS'];
 
 // Continuous Integration mode
 // if true, it capture browsers, run tests and exit
