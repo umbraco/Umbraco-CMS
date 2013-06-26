@@ -12,15 +12,8 @@ using ClientDependency.Core;
 
 namespace umbraco.uicontrols {
 
-	[ClientDependency(ClientDependencyType.Css, "menuicon/style.css", "UmbracoClient")]
     public class MenuImageButton : System.Web.UI.WebControls.ImageButton, MenuIconI {
         private string _OnClickCommand = "";
-
-
-        public override string ID {
-            get { return base.ID; }
-            set { base.ID = value; }
-        }
 
         public string AltText {
             get { return this.AlternateText; }
@@ -49,23 +42,19 @@ namespace umbraco.uicontrols {
             set { _OnClickCommand = value; }
         }
 
-        protected override void OnLoad(System.EventArgs EventArguments) {
+        protected override void CreateChildControls()
+        {
+            this.Width = Unit.Pixel(20);
+            this.Height = Unit.Pixel(20);
+            this.Style.Clear();
+            this.Attributes.Add("class", "btn btn-default editorIcon");
 
 
-            this.Width = Unit.Pixel(22);
-            this.Height = Unit.Pixel(23);
-            this.Style.Add("border", "0px");
-            this.Attributes.Add("class", "editorIcon");
-            this.Attributes.Add("onMouseover", "this.className='editorIconOver'");
-            this.Attributes.Add("onMouseout", "this.className='editorIcon'");
-            this.Attributes.Add("onMouseup", "this.className='editorIconOver'");
-            this.Attributes.Add("onMouseDown", "this.className='editorIconDown'");
-
-            if (_OnClickCommand != "") {
+            if (_OnClickCommand != "")
+            {
                 this.Attributes.Add("onClick", OnClickCommand);
             }
+            base.CreateChildControls();
         }
-
-
     }
 }

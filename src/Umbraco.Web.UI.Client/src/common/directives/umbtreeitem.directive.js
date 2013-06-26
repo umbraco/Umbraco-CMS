@@ -39,7 +39,7 @@ angular.module("umbraco.directives")
         scope.select = function(e,n,ev){
 
             //here we need to check for some legacy tree code
-            if (n.jsClickCallback && n.jsClickCallback != "") {
+            if (n.jsClickCallback && n.jsClickCallback !== "") {
                 //this is a legacy tree node!                
                 var js;
                 if (n.jsClickCallback.startsWith("javascript:")) {

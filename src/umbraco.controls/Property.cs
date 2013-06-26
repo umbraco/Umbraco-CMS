@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Web.UI;
 
-namespace umbraco.uicontrols {
-    public class PropertyPanel  : System.Web.UI.WebControls.Panel {
-        public PropertyPanel() {
+namespace umbraco.uicontrols
+{
+    public class PropertyPanel : System.Web.UI.WebControls.Panel
+    {
+        public PropertyPanel()
+        {
 
         }
 
@@ -14,39 +18,50 @@ namespace umbraco.uicontrols {
             get { return m_Text; }
             set { m_Text = value; }
         }
-                
 
-        protected override void OnLoad(System.EventArgs EventArguments) {
+        protected override void OnLoad(System.EventArgs EventArguments)
+        {
         }
 
-        protected override void Render(System.Web.UI.HtmlTextWriter writer) {
-
+        protected override void Render(System.Web.UI.HtmlTextWriter writer)
+        {
+            this.ViewStateMode = ViewStateMode.Disabled;
             this.CreateChildControls();
             string styleString = "";
 
-            foreach (string key in this.Style.Keys) {
+            foreach (string key in this.Style.Keys)
+            {
                 styleString += key + ":" + this.Style[key] + ";";
             }
 
-            writer.WriteLine("<div class=\"propertyItem\" style='" + styleString + "'>");
-            if (m_Text != string.Empty) {
-                writer.WriteLine("<div class=\"propertyItemheader\">" + m_Text + "</div>");
-                writer.WriteLine("<div class=\"propertyItemContent\">");
+            var inGroup = this.Parent.GetType() == typeof(PropertyGroup);
+
+            if (string.IsNullOrEmpty(m_Text))
+                CssClass += " hideLabel";
+
+          
+            writer.WriteLine("<div class=\"umb-el-wrap " + CssClass + "\">");
+
+
+            if (m_Text != string.Empty)
+            {
+                writer.WriteLine("<label class=\"control-label\" for=\"inputPassword\">" + m_Text + "</label>");
             }
 
-            try {
+            writer.WriteLine("<div class=\"controls controls-row\">");
+
+            try
+            {
                 this.RenderChildren(writer);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 writer.WriteLine("Error creating control <br />");
                 writer.WriteLine(ex.ToString());
             }
 
-            if (m_Text != string.Empty)
-                writer.WriteLine("</div>");
+            writer.WriteLine("</div></div>");
 
-            writer.WriteLine("</div>");
-            
-            
         }
 
     }

@@ -89,8 +89,11 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="DataAttributes.cs" />
     <Compile Include="DatePicker\DateTimePicker.cs" />
     <Compile Include="FieldDropDownList.cs" />
+    <Compile Include="MenuButton.cs" />
+    <Compile Include="MenuSplitButton.cs" />
     <Compile Include="ProgressBar.cs" />
     <Compile Include="TreePicker\BaseTreePicker.cs" />
     <Compile Include="TreePicker\BaseTreePickerScripts.Designer.cs">
@@ -141,6 +144,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PropertyGroup.cs" />
     <Content Include="TreePicker\BaseTreePicker.js" />
   </ItemGroup>
   <ItemGroup>

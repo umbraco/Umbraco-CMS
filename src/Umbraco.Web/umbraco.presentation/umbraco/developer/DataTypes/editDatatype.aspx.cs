@@ -120,7 +120,6 @@ namespace umbraco.cms.presentation.developer
             ApplicationContext.Services.DataTypeService.Save(_dataTypeDefinition, UmbracoUser.Id);
 
             ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "dataTypeSaved", null), "");
-
             ClientTools.SyncTree("-1,init," + _id.ToString(CultureInfo.InvariantCulture), true);
         }
 

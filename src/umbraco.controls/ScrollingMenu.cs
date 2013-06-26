@@ -9,83 +9,102 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using ClientDependency.Core;
-using Umbraco.Core.IO;
+using umbraco.IO;
 
 
-namespace umbraco.uicontrols {
+namespace umbraco.uicontrols
+{
 
-    [ToolboxData("<{0}:ScrollingMenu runat=server></{0}:ScrollingMenu>")]    
-	[ClientDependency(ClientDependencyType.Javascript, "scrollingmenu/javascript.js", "UmbracoClient")]
-	[ClientDependency(ClientDependencyType.Css, "scrollingmenu/style.css", "UmbracoClient")]
-	public class ScrollingMenu : System.Web.UI.WebControls.WebControl 
-	{
-        private readonly ArrayList _icons = new ArrayList();
-        private string _iconIds;
-        private int _extraMenuWidth = 0;
-        private readonly string _clientFilesPath = IOHelper.ResolveUrl( SystemDirectories.UmbracoClient) + "/scrollingmenu/";
+    [ToolboxData("<{0}:ScrollingMenu runat=server></{0}:ScrollingMenu>")]
+    public class ScrollingMenu : System.Web.UI.WebControls.PlaceHolder
+    {
+        public ArrayList Icons = new ArrayList();
+        private string iconIds;
+        private int extraMenuWidth = 0;
 
-        public MenuIconI NewIcon(int index) 
-		{
+        public MenuIconI NewIcon(int Index)
+        {
+            MenuIcon Icon = new MenuIcon();
+            Icons.Insert(Index, Icon);
+            return Icon;
+        }
+
+        public MenuIconI NewIcon()
+        {
             MenuIcon icon = new MenuIcon();
-            _icons.Insert(index, icon);
+            Icons.Add(icon);
             return icon;
         }
 
-        public MenuIconI NewIcon() 
-		{
-            MenuIcon icon = new MenuIcon();
-            _icons.Add(icon);
-            return icon;
+        public MenuSplitButton NewSplitButton()
+        {
+            var menu = new MenuSplitButton();
+            Icons.Add(menu);
+            return menu;
         }
 
-        public MenuImageButton NewImageButton() 
-		{
+        public MenuButton NewButton(int index = -1)
+        {
+            MenuButton btn = new MenuButton();
+
+            if (index > -1)
+                Icons.Insert(index, btn);
+            else
+                Icons.Add(btn);
+
+            return btn;
+        }
+
+        public MenuImageButton NewImageButton()
+        {
             MenuImageButton icon = new MenuImageButton();
-            _icons.Add(icon);
+            Icons.Add(icon);
             return icon;
         }
 
-        public MenuImageButton NewImageButton(int index) 
-		{
+        public MenuImageButton NewImageButton(int Index)
+        {
             MenuImageButton icon = new MenuImageButton();
-            _icons.Insert(index, icon);
+            Icons.Insert(Index, icon);
             return icon;
         }
 
-        public DropDownList NewDropDownList() 
-		{
-            DropDownList icon = new DropDownList();
-            _icons.Add(icon);
-            return icon;
-        }
-        
-		public void NewElement(string elementName, string elementId, string elementClass, int extraWidth) 
-		{
-            _icons.Add(new LiteralControl("<" + elementName + " class=\"" + elementClass + "\" id=\"" + elementId + "\"></" + elementName + ">"));
-            _extraMenuWidth = _extraMenuWidth + extraWidth;
+
+        public System.Web.UI.WebControls.DropDownList NewDropDownList()
+        {
+            DropDownList Icon = new DropDownList();
+            Icons.Add(Icon);
+            return Icon;
         }
 
-	    /// <summary>
-	    /// Inserts a new web control into the scrolling menu
-	    /// </summary>
-	    /// <param name="control"></param>
-	    /// <param name="extraWidth">The additional width to extend the scrolling menu by if the control being inserted is wider than the standard</param>
-	    public void InsertNewControl(Control control, int extraWidth = 0)
-		{
-			_icons.Add(control);
-			_extraMenuWidth = _extraMenuWidth + extraWidth;
-		}
+        public void NewElement(string ElementName, string ElementId, string ElementClass, int ExtraWidth)
+        {
+            Icons.Add(new LiteralControl("<" + ElementName + " class=\"" + ElementClass + "\" id=\"" + ElementId + "\"></" + ElementName + ">"));
+            extraMenuWidth = extraMenuWidth + ExtraWidth;
+        }
 
-        public void InsertSplitter() 
-		{
+        public void InsertSplitter()
+        {
             Splitter icon = new Splitter();
-            _icons.Add(icon);
+            Icons.Add(icon);
         }
-        public void InsertSplitter(int index) 
-		{
+        public void InsertSplitter(int Index)
+        {
             Splitter icon = new Splitter();
-            _icons.Insert(index, icon);
+            Icons.Insert(Index, icon);
         }
+
+        /// <summary>
+        /// Inserts a new web control into the scrolling menu
+        /// </summary>
+        /// <param name="control"></param>
+        /// <param name="extraWidth">The additional width to extend the scrolling menu by if the control being inserted is wider than the standard</param>
+        public void InsertNewControl(Control control, int extraWidth = 0)
+        {
+           Icons.Add(control);
+           // _extraMenuWidth = _extraMenuWidth + extraWidth;
+        }
+
 
         /// <summary>
         /// Finds the index of the n-th Splitter in this Menu
@@ -95,115 +114,54 @@ namespace umbraco.uicontrols {
         public int FindSplitter(int n)
         {
             var count = 0;
-            for(var i=0; i<_icons.Count; i++)
+            for (var i = 0; i < Icons.Count; i++)
             {
-               if (_icons[i].GetType() == typeof(Splitter))
-               {
-                   count++;
+                if (Icons[i].GetType() == typeof(Splitter))
+                {
+                    count++;
 
-                   if (count == n)
-                       return i;
-               }
+                    if (count == n)
+                        return i;
+                }
             }
 
             return -1;
         }
 
-        protected override void OnLoad(EventArgs e) 
-		{
-			base.OnLoad(e);
-            if (base.Visible)
+
+        private HtmlGenericControl toolbar;
+        private HtmlGenericControl wrap;
+        private HtmlGenericControl group;
+
+        protected override void CreateChildControls()
+        {   
+            toolbar = new HtmlGenericControl { TagName = "div" };
+            toolbar.Attributes.Add("class", "btn-toolbar umb-btn-toolbar");
+            this.Controls.Add(toolbar);
+
+            group = new HtmlGenericControl { TagName = "div", ID = this.ClientID + "_group" };
+            group.Attributes.Add("class", "btn-group");
+            toolbar.Controls.Add(group);
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            foreach (Control item in Icons)
             {
-                SetupMenu();                
+                group.Controls.Add(item);
+                if (item.ID != "")
+                    iconIds = iconIds + item.ID + ",";
             }
+            base.OnLoad(e);
         }
+        
+       
 
-        private static System.Web.UI.WebControls.Image ScrollImage() 
-		{
-            System.Web.UI.WebControls.Image functionReturnValue = null;
-            functionReturnValue = new System.Web.UI.WebControls.Image();
-            functionReturnValue.Width = Unit.Pixel(7);
-            functionReturnValue.Height = Unit.Pixel(20);
-            functionReturnValue.BorderWidth = Unit.Pixel(0);
-            functionReturnValue.Attributes.Add("align", "absMiddle");
-            functionReturnValue.CssClass = "editorArrow";
-            functionReturnValue.Attributes.Add("onMouseOut", "this.className = 'editorArrow'; scrollStop();");
-            return functionReturnValue;
-        }
-
-        private void SetupMenu() 
-		{
-            // Calculate innerlayer max width 32 pixel per icon
-            var scrollingLayerWidth = _icons.Count * 26 + _extraMenuWidth;
-
-            Table container = new Table();
-            container.ID = String.Format("{0}_tableContainer", this.ID);
-            TableRow tr = new TableRow();
-            tr.ID = String.Format("{0}_tableContainerRow", this.ID);
-            container.Rows.Add(tr);
-
-            // // scroll-left image
-            TableCell td = new TableCell();
-            td.ID = String.Format("{0}_tableContainerLeft", this.ID);
-            System.Web.UI.WebControls.Image scrollL = ScrollImage();
-            scrollL.ImageUrl = _clientFilesPath + "images/arrawBack.gif";
-            scrollL.Attributes.Add("onMouseOver", "this.className = 'editorArrowOver'; scrollR('" + this.ClientID + "_sl','" + this.ClientID + "_slh'," + scrollingLayerWidth + ");");
-            td.Controls.Add(scrollL);
-            tr.Cells.Add(td);
-
-            // // Menulayers
-            td = new TableCell();
-            td.ID = String.Format("{0}_tableContainerButtons", this.ID);
-
-            HtmlGenericControl outerLayer = new HtmlGenericControl();
-            outerLayer.TagName = "div";
-            outerLayer.ID = this.ID + "_slh";
-            outerLayer.Attributes.Add("class", "slh");
-            outerLayer.Style.Add("height", "26px");
-            string tmp = this.Width.ToString();
-
-            outerLayer.Style.Add("width", (this.Width.Value - 18).ToString() + "px");
-            td.Controls.Add(outerLayer);
-
-            HtmlGenericControl menuLayer = new HtmlGenericControl();
-            menuLayer.TagName = "div";
-            menuLayer.ID = this.ID + "_sl";
-            menuLayer.Style.Add("top", "0px");
-            menuLayer.Style.Add("left", "0px");
-            menuLayer.Attributes.Add("class", "sl");
-            menuLayer.Style.Add("height", "26px");
-            menuLayer.Style.Add("width", scrollingLayerWidth + "px");
-
-            HtmlGenericControl nobr = new HtmlGenericControl();
-            nobr.TagName = "nobr";
-            nobr.ID = String.Format("{0}_nobr", this.ID);
-            menuLayer.Controls.Add(nobr);
-
-            // // add all icons to the menu layer
-            foreach (Control item in _icons) {
-                menuLayer.Controls.Add(item);
-
-                if (item.ID != "") {
-                    _iconIds = _iconIds + item.ID + ",";
-                }
-            }
-
-            outerLayer.Controls.Add(new LiteralControl("<script>RegisterScrollingMenuButtons('" + this.ClientID + "', '" + _iconIds + "');</script>"));
-
-            outerLayer.Controls.Add(menuLayer);
-
-            tr.Cells.Add(td);
-
-            // // scroll-right image
-            td = new TableCell();
-            td.ID = String.Format("{0}_tableContainerRight", this.ID);
-            System.Web.UI.WebControls.Image scrollR = ScrollImage();
-            scrollR.ImageUrl = _clientFilesPath + "images/arrowForward.gif";
-            scrollR.Attributes.Add("onMouseOver", "this.className = 'editorArrowOver'; scrollL('" + this.ClientID + "_sl','" + this.ClientID + "_slh'," + scrollingLayerWidth + ");");
-            td.Controls.Add(scrollR);
-            tr.Cells.Add(td);
-
-            this.Controls.Add(container);
+        protected override void OnInit(EventArgs e)
+        {
+            
+            EnsureChildControls();
+            base.OnInit(e);
         }
 
     }
