@@ -45,6 +45,8 @@ namespace Umbraco.Core.IO
         {
             if (virtualPath.StartsWith("~"))
                 return virtualPath.Replace("~", SystemDirectories.Root).Replace("//", "/");
+            else if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
+                return virtualPath;
             else
                 return VirtualPathUtility.ToAbsolute(virtualPath, SystemDirectories.Root);
         }
