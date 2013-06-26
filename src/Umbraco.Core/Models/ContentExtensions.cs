@@ -512,38 +512,7 @@ namespace Umbraco.Core.Models
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         internal static XElement ToDeepXml(this IContent content)
         {
-            var xml = content.ToXml();
-            
-            var descendants = content.Descendants().ToArray();
-            var currentChildren = descendants.Where(x => x.ParentId == content.Id);
-            AddChildXml(descendants, currentChildren, xml);      
-
-            return xml;
-        }
-
-        /// <summary>
-        /// Used by ToDeepXml to recursively add children
-        /// </summary>
-        /// <param name="originalDescendants"></param>
-        /// <param name="currentChildren"></param>
-        /// <param name="currentXml"></param>
-        private static void AddChildXml(
-            IContent[] originalDescendants, 
-            IEnumerable<IContent> currentChildren, 
-            XElement currentXml)
-        {
-            foreach (var child in currentChildren)
-            {
-                //add the child's xml
-                var childXml = child.ToXml();
-                currentXml.Add(childXml);
-                //copy local (out of closure)
-                var c = child;
-                //get this item's children                
-                var children = originalDescendants.Where(x => x.ParentId == c.Id);
-                //recurse and add it's children to the child xml element
-                AddChildXml(originalDescendants, children, childXml);
-            }
+            return ApplicationContext.Current.Services.PackagingService.Export(content, true);
         }
 
         /// <summary>
@@ -553,18 +522,7 @@ namespace Umbraco.Core.Models
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         public static XElement ToXml(this IContent content)
         {
-			//nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-			var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
-
-            var x = content.ToXml(nodeName);
-            x.Add(new XAttribute("nodeType", content.ContentType.Id));
-            x.Add(new XAttribute("creatorName", content.GetCreatorProfile().Name));
-            x.Add(new XAttribute("writerName", content.GetWriterProfile().Name));
-            x.Add(new XAttribute("writerID", content.WriterId));
-            x.Add(new XAttribute("template", content.Template == null ? "0" : content.Template.Id.ToString()));
-            x.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
-
-            return x;
+            return ApplicationContext.Current.Services.PackagingService.Export(content);
         }
 
         /// <summary>
@@ -574,49 +532,8 @@ namespace Umbraco.Core.Models
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         public static XElement ToXml(this IMedia media)
         {
-            //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
-
-            var x = media.ToXml(nodeName);
-            x.Add(new XAttribute("nodeType", media.ContentType.Id));
-            x.Add(new XAttribute("writerName", media.GetCreatorProfile().Name));
-            x.Add(new XAttribute("writerID", media.CreatorId));
-            x.Add(new XAttribute("version", media.Version));
-            x.Add(new XAttribute("template", 0));
-            x.Add(new XAttribute("nodeTypeAlias", media.ContentType.Alias));
-
-            return x;
+            return ApplicationContext.Current.Services.PackagingService.Export(media);
         }
-
-        /// <summary>
-        /// Creates the xml representation for the <see cref="IContentBase"/> object
-        /// </summary>
-        /// <param name="contentBase"><see cref="IContent"/> to generate xml for</param>
-        /// <param name="nodeName"></param>
-        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
-        private static XElement ToXml(this IContentBase contentBase, string nodeName)
-        {
-            // note: that one will take care of umbracoUrlName
-            var url = contentBase.GetUrlSegment();
-
-			var xml = new XElement(nodeName,
-                                   new XAttribute("id", contentBase.Id),
-                                   new XAttribute("parentID", contentBase.Level > 1 ? contentBase.ParentId : -1),
-                                   new XAttribute("level", contentBase.Level),
-                                   new XAttribute("creatorID", contentBase.CreatorId),
-                                   new XAttribute("sortOrder", contentBase.SortOrder),
-                                   new XAttribute("createDate", contentBase.CreateDate.ToString("s")),
-                                   new XAttribute("updateDate", contentBase.UpdateDate.ToString("s")),
-                                   new XAttribute("nodeName", contentBase.Name),
-                                   new XAttribute("urlName", url),
-                                   new XAttribute("path", contentBase.Path),
-                                   new XAttribute("isDoc", ""));
-
-            foreach (var property in contentBase.Properties.Where(p => p != null))
-				xml.Add(property.ToXml());
-
-			return xml;
-		}
 
         /// <summary>
         /// Creates the xml representation for the <see cref="IContent"/> object

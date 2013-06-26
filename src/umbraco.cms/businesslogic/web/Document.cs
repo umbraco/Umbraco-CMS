@@ -930,7 +930,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                _published = ((ContentService)ApplicationContext.Current.Services.ContentService).UnPublish(Content);
+                _published = ApplicationContext.Current.Services.ContentService.UnPublish(Content);
                 
                 FireAfterUnPublish(e);
             }
