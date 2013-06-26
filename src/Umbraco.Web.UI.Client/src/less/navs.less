@@ -141,9 +141,9 @@
 }
 
 //SD: NOTE: Added tab error states
-.nav-tabs > li.error > a,
-.nav-tabs > li.error > a:hover,
-.nav-tabs > li.error > a:focus {
+.show-validation .nav-tabs > li.error > a,
+.show-validation .nav-tabs > li.error > a:hover,
+.show-validation .nav-tabs > li.error > a:focus {
   color: @formErrorText;
   border-top-color: @formErrorBorder;
   border-left-color: @formErrorBorder;
@@ -151,30 +151,15 @@
   background-color: @formErrorBackground;
 }
 
-.nav-tabs > li.active.error > a,
-.nav-tabs > li.active.error > a:hover,
-.nav-tabs > li.active.error > a:focus {
+.show-validation .nav-tabs > li.active.error > a,
+.show-validation .nav-tabs > li.active.error > a:hover,
+.show-validation .nav-tabs > li.active.error > a:focus {
   color: @formErrorText;
   border-top-color: @formErrorBorder;
   border-left-color: @formErrorBorder;
   border-right-color: @formErrorBorder;
   background-color: @bodyBackground;
 }
-
-/*.nav-tabs > .active.error > a,
-.nav-tabs > .active.error > a:hover,
-.nav-tabs > .active.error > a:focus {
-  color: @formErrorText;
-  border-top-color: @formErrorBorder;
-  border-left-color: @formErrorBorder;
-  border-left-color: @formErrorBorder;
-  background-color: @formErrorBackground;
-  &:focus {
-    border-color: darken(#ee5f5b, 10%);
-    @shadow: 0 0 6px lighten(#ee5f5b, 20%);
-    .box-shadow(@shadow);
-  }
-}*/
 
 
 // PILLS
