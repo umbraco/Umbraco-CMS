@@ -635,7 +635,7 @@ namespace umbraco.cms.businesslogic.member
                             string dbType = property.PropertyType.DataTypeDefinition.DbType;
                             if (dbType.Equals("Integer"))
                             {
-                                if (property.Value is bool)
+                                if (property.Value is bool || property.PropertyType.DataTypeDefinition.DataType.Id == new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a"))
                                 {
                                     int val = Convert.ToInt32(property.Value);
                                     poco.Integer = val;

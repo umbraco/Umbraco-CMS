@@ -71,6 +71,140 @@ namespace Umbraco.Tests.Services
             Assert.That(addedContentType, Is.True);
         }
 
+        [Test]
+        public void Can_Remove_ContentType_Composition_From_ContentType()
+        {
+            //Test for U4-2234
+            var cts = ServiceContext.ContentTypeService;
+            //Arrange
+            var component = CreateComponent();
+            cts.Save(component);
+            var banner = CreateBannerComponent(component);
+            cts.Save(banner);
+            var site = CreateSite();
+            cts.Save(site);
+            var homepage = CreateHomepage(site);
+            cts.Save(homepage);
+
+            //Add banner to homepage
+            var added = homepage.AddContentType(banner);
+            cts.Save(homepage);
+
+            //Assert composition
+            var bannerExists = homepage.ContentTypeCompositionExists(banner.Alias);
+            var bannerPropertyExists = homepage.CompositionPropertyTypes.Any(x => x.Alias.Equals("bannerName"));
+            Assert.That(added, Is.True);
+            Assert.That(bannerExists, Is.True);
+            Assert.That(bannerPropertyExists, Is.True);
+            Assert.That(homepage.CompositionPropertyTypes.Count(), Is.EqualTo(6));
+
+            //Remove banner from homepage
+            var removed = homepage.RemoveContentType(banner.Alias);
+            cts.Save(homepage);
+
+            //Assert composition
+            var bannerStillExists = homepage.ContentTypeCompositionExists(banner.Alias);
+            var bannerPropertyStillExists = homepage.CompositionPropertyTypes.Any(x => x.Alias.Equals("bannerName"));
+            Assert.That(removed, Is.True);
+            Assert.That(bannerStillExists, Is.False);
+            Assert.That(bannerPropertyStillExists, Is.False);
+            Assert.That(homepage.CompositionPropertyTypes.Count(), Is.EqualTo(4));
+        }
+
+        private ContentType CreateComponent()
+        {
+            var component = new ContentType(-1)
+                                  {
+                                      Alias = "component",
+                                      Name = "Component",
+                                      Description = "ContentType used for Component grouping",
+                                      Icon = ".sprTreeDoc3",
+                                      Thumbnail = "doc.png",
+                                      SortOrder = 1,
+                                      CreatorId = 0,
+                                      Trashed = false
+                                  };
+
+            var contentCollection = new PropertyTypeCollection();
+            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "componentGroup", Name = "Component Group", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            component.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Component", SortOrder = 1 });
+
+            return component;
+        }
+
+        private ContentType CreateBannerComponent(ContentType parent)
+        {
+            var banner = new ContentType(parent)
+                                {
+                                    Alias = "banner",
+                                    Name = "Banner Component",
+                                    Description = "ContentType used for Banner Component",
+                                    Icon = ".sprTreeDoc3",
+                                    Thumbnail = "doc.png",
+                                    SortOrder = 1,
+                                    CreatorId = 0,
+                                    Trashed = false
+                                };
+
+            var propertyType = new PropertyType(new Guid(), DataTypeDatabaseType.Ntext)
+                {
+                    Alias = "bannerName",
+                    Name = "Banner Name",
+                    Description = "",
+                    HelpText = "",
+                    Mandatory = false,
+                    SortOrder = 2,
+                    DataTypeDefinitionId = -88
+                };
+            banner.AddPropertyType(propertyType, "Component");
+            return banner;
+        }
+
+        private ContentType CreateSite()
+        {
+            var site = new ContentType(-1)
+                           {
+                               Alias = "site",
+                               Name = "Site",
+                               Description = "ContentType used for Site inheritence",
+                               Icon = ".sprTreeDoc3",
+                               Thumbnail = "doc.png",
+                               SortOrder = 2,
+                               CreatorId = 0,
+                               Trashed = false
+                           };
+
+            var contentCollection = new PropertyTypeCollection();
+            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "hostname", Name = "Hostname", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            site.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Site Settings", SortOrder = 1 });
+
+            return site;
+        }
+
+        private ContentType CreateHomepage(ContentType parent)
+        {
+            var contentType = new ContentType(parent)
+                             {
+                                 Alias = "homepage",
+                                 Name = "Homepage",
+                                 Description = "ContentType used for the Homepage",
+                                 Icon = ".sprTreeDoc3",
+                                 Thumbnail = "doc.png",
+                                 SortOrder = 1,
+                                 CreatorId = 0,
+                                 Trashed = false
+                             };
+
+            var contentCollection = new PropertyTypeCollection();
+            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "bodyText", Name = "Body Text", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -87 });
+            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "author", Name = "Author", Description = "Name of the author", HelpText = "", Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -88 });
+
+            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+
+            return contentType;
+        }
+
 		private IEnumerable<IContentType> CreateContentTypeHierarchy()
 		{
 			//create the master type
