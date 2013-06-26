@@ -52,6 +52,11 @@ function valServer(serverValidationService) {
                     ctrl.errorMsg = "";
                 }
             });
+            
+            //when the element is disposed we need to unsubscribe!
+            element.bind('$destroy', function () {
+                serverValidationService.unsubscribe(currentProperty, fieldName);
+            });
         }
     };
 }

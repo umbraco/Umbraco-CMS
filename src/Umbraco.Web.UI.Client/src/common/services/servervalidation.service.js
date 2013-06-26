@@ -37,6 +37,17 @@ function serverValidationService() {
             }            
         },
         
+        unsubscribe: function(contentProperty, fieldName) {
+            if (!contentProperty) {
+                return;
+            }
+            callbacks = _.reject(callbacks, function (item) {
+                return item.propertyAlias == contentProperty.alias &&
+                (item.fieldName == fieldName ||
+                    ((item.fieldName == undefined || item.fieldName == "") && (fieldName == undefined || fieldName == "")));
+            });
+        },
+        
         /**
          * @ngdoc function
          * @name getCallbacks

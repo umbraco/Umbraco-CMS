@@ -115,6 +115,11 @@ function valPropertyMsg(serverValidationService) {
                     });
                 }
             });
+            
+            //when the element is disposed we need to unsubscribe!
+            element.bind('$destroy', function () {
+                serverValidationService.unsubscribe(currentProperty, "");
+            });
         }
     };
 }

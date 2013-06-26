@@ -17,6 +17,7 @@ function ContentEditController($scope, $routeParams, contentResource, notificati
      * @description
      * A function to handle what happens when we have validation issues from the server side
      */
+
     function handleSaveError(err) {
         //When the status is a 403 status, we have validation errors.
         //Otherwise the error is probably due to invalid data (i.e. someone mucking around with the ids or something).
@@ -24,7 +25,7 @@ function ContentEditController($scope, $routeParams, contentResource, notificati
         if (err.status == 403) {
             //now we need to look through all the validation errors
             if (err.data && err.data.ModelState) {
-                
+
                 //get a list of properties since they are contained in tabs
                 var allProps = [];
                 for (var i = 0; i < $scope.content.tabs.length; i++) {
@@ -54,6 +55,9 @@ function ContentEditController($scope, $routeParams, contentResource, notificati
                             //add a generic error for the property, no reference to a specific field
                             serverValidationService.addError(contentProperty, "", err.data.ModelState[e][0]);
                         }
+
+                        //add to notifications
+                        notificationsService.error("Validation", err.data.ModelState[e][0]);
                     }
                 }
 

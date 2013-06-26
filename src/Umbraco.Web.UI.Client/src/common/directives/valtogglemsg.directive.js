@@ -33,7 +33,7 @@ function valToggleMsg() {
             var showValidation = false;
             var hasError = false;
 
-            //add a watch to the validator for the value (i.e. $parent.myForm.value.$error.required )
+            //add a watch to the validator for the value (i.e. myForm.value.$error.required )
             scope.$watch(formCtrl.$name + "." + attr.valMsgFor + ".$error." + attr.valToggleMsg, function (isInvalid, oldValue) {
                 hasError = isInvalid;
                 if (hasError && showValidation) {
