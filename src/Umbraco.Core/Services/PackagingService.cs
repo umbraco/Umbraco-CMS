@@ -512,7 +512,7 @@ namespace Umbraco.Core.Services
                 foreach (var templateElement in allowedTemplatesElement.Elements("Template"))
                 {
                     var alias = templateElement.Value;
-                    var template = _fileService.GetTemplate(alias);
+                    var template = _fileService.GetTemplate(alias.ToSafeAlias());
                     if (template != null)
                     {
                         if(allowedTemplates.Any(x => x.Id == template.Id)) continue;
@@ -532,7 +532,7 @@ namespace Umbraco.Core.Services
 
             if (string.IsNullOrEmpty(defaultTemplateElement.Value) == false)
             {
-                var defaultTemplate = _fileService.GetTemplate(defaultTemplateElement.Value);
+                var defaultTemplate = _fileService.GetTemplate(defaultTemplateElement.Value.ToSafeAlias());
                 if (defaultTemplate != null)
                 {
                     contentType.SetDefaultTemplate(defaultTemplate);
