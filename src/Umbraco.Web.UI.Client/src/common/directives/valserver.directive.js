@@ -11,8 +11,9 @@ function valServer(serverValidationService) {
         restrict: "A",
         link: function (scope, element, attr, ctrl) {
             
-            if (!scope.model || !scope.model.alias)
+            if (!scope.model || !scope.model.alias){
                 throw "valServer can only be used in the scope of a content property object";
+            }
             var currentProperty = scope.model;
 
             var fieldName = scope.$eval(attr.valServer);
