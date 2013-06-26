@@ -189,7 +189,7 @@ namespace Umbraco.Core.Persistence.Repositories
                    .Where<NodeDto>(x => x.NodeObjectType == new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"))
                    .Where<ContentDto>(x => x.ContentTypeId == entity.Id);
 
-                var contentDtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+                var contentDtos = Database.Fetch<ContentDto, NodeDto>(sql);
                 //Loop through all tracked keys, which corresponds to the ContentTypes that has been removed from the composition
                 foreach (var key in compositionBase.RemovedContentTypeKeyTracker)
                 {
