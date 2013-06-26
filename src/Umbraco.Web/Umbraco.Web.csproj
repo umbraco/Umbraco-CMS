@@ -297,7 +297,7 @@
     <Compile Include="Configuration\WebRouting.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Editors\ContentController.cs" />
-    <Compile Include="Editors\ContentTypeApiController.cs" />
+    <Compile Include="Editors\ContentTypeController.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
     <Compile Include="Models\ContentEditing\ContentSaveAction.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeBasic.cs" />

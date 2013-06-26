@@ -4,10 +4,23 @@
     * @restrict A
     * @description This directive will show/hide an error based on: is the value + the given validator invalid? AND, has the form been submitted ?
     **/
-function valToggleMsg(umbFormHelper) {
+function valToggleMsg() {
     return {
+        require: "^form",
         restrict: "A",
-        link: function (scope, element, attr, ctrl) {
+
+        /**
+         * @ngdoc function
+         * @name link
+         * @methodOf valPropertyMsg
+         * @function
+         *
+         * @description
+         * The linking function for the directive
+         *
+         * @param formCtrl {FormController} Our directive requries a reference to a form controller which gets passed in to this parameter
+         */
+        link: function (scope, element, attr, formCtrl) {
 
             if (!attr.valToggleMsg){
                 throw "valToggleMsg requires that a reference to a validator is specified";
@@ -20,13 +33,8 @@ function valToggleMsg(umbFormHelper) {
             var showValidation = false;
             var hasError = false;
 
-            var currentForm = umbFormHelper.getCurrentForm(scope);
-            if (!currentForm || !currentForm.$name){
-                throw "valToggleMsg requires that a name is assigned to the ng-form containing the validated input";
-            }
-
-            //add a watch to the validator for the value (i.e. $parent.myForm.value.$error.required )
-            scope.$watch(currentForm.$name + "." + attr.valMsgFor + ".$error." + attr.valToggleMsg, function (isInvalid, oldValue) {
+            //add a watch to the validator for the value (i.e. myForm.value.$error.required )
+            scope.$watch(formCtrl.$name + "." + attr.valMsgFor + ".$error." + attr.valToggleMsg, function (isInvalid, oldValue) {
                 hasError = isInvalid;
                 if (hasError && showValidation) {
                     element.show();
@@ -36,16 +44,21 @@ function valToggleMsg(umbFormHelper) {
                 }
             });
 
-            //add a watch to update our waitingOnValidation flag for use in the above closure
-            scope.$watch("$parent.ui.waitingOnValidation", function (isWaiting, oldValue) {
-                showValidation = isWaiting;
-                if (hasError && showValidation) {
+            scope.$on("saving", function(ev, args) {
+                showValidation = true;
+                if (hasError) {
                     element.show();
                 }
                 else {
                     element.hide();
                 }
             });
+            
+            scope.$on("saved", function (ev, args) {
+                showValidation = false;
+                element.hide();
+            });
+
         }
     };
 }

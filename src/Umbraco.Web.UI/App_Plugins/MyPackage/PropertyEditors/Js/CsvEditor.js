@@ -39,5 +39,5 @@
         }, true);
     };
 
-    angular.module("myPackage.controllers").controller('MyPackage.PropertyEditors.CsvEditorController', csvEditorController);
+    angular.module("umbraco").controller('MyPackage.PropertyEditors.CsvEditorController', csvEditorController);
 })();

@@ -6,6 +6,6 @@
         var asdf = "";
     };
 
-    angular.module("myPackage.controllers").controller('MyPackage.PropertyEditors.RegexEditor', regexEditor);
+    angular.module("umbraco").controller('MyPackage.PropertyEditors.RegexEditor', regexEditor);
 
 })();

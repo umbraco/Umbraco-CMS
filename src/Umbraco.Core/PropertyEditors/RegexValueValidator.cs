@@ -19,7 +19,7 @@ namespace Umbraco.Core.PropertyEditors
             
             if (!regex.IsMatch(value))
             {
-                yield return new ValidationResult("Value is invalid, it does not match the correct pattern");
+                yield return new ValidationResult("Value is invalid, it does not match the correct pattern", new[] {"value"});
             }            
         }
     }

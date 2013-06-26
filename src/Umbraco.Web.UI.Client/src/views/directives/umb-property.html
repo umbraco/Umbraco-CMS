@@ -1,9 +1,10 @@
 <div class="umb-pane">
+    <ng-form name="propertyForm">
+        
+        <div class="control-group umb-control-group"
+             ng-class="{hidelabel:model.hideLabel, error: propertyForm.$invalid}" >
 
-    <div class="control-group umb-control-group"
-         ng-class="{hidelabel:model.hideLabel}" >
-
-        <ng-form name="propertyForm">
+            <val-property-msg property="model"></val-property-msg>
 
             <div class="umb-el-wrap">
 
@@ -14,10 +15,10 @@
                 </label>
 
                 <div class="controls controls-row" >
-                   <umb-property-include src="model.view"></umb-property-include>    
+                    <ng-include src="propertyEditorView"></ng-include>
                 </div>
             </div>
+        </div>
 
-        </ng-form>
-    </div>
+    </ng-form>
 </div>

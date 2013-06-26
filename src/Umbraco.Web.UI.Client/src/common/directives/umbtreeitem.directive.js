@@ -41,9 +41,10 @@ angular.module("umbraco.directives")
             //here we need to check for some legacy tree code
             if (n.jsClickCallback && n.jsClickCallback !== "") {
                 //this is a legacy tree node!                
+                var jsPrefix = "javascript:";
                 var js;
-                if (n.jsClickCallback.startsWith("javascript:")) {
-                    js = n.jsClickCallback.substr("javascript:".length);
+                if (n.jsClickCallback.startsWith(jsPrefix)) {
+                    js = n.jsClickCallback.substr(jsPrefix.length);
                 }
                 else {
                     js = n.jsClickCallback;
@@ -55,8 +56,8 @@ angular.module("umbraco.directives")
                         func.call();
                     }
                 }
-                catch(e) {
-                    $log.error("Error evaluating js callback from legacy tree node: " + e);
+                catch(ex) {
+                    $log.error("Error evaluating js callback from legacy tree node: " + ex);
                 }
             }
             else {

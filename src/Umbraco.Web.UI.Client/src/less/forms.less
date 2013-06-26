@@ -351,32 +351,38 @@ input[type="checkbox"][readonly] {
 
 
 
+//SD: NOTE: Had to change these to use our 'form' prefixed colors since we cannot
+// whare colors with the notifications/alerts. Also had to change them so that 
+// we do not show any errors unless the containing element has the show-validation
+// class assigned.
+
 // FORM FIELD FEEDBACK STATES
 // --------------------------
 
 // Warning
-.control-group.warning {
-  .formFieldState(@warningText, @warningText, @warningBackground);
+.show-validation .control-group.warning {
+  .formFieldState(@formWarningText, @formWarningText, @formWarningBackground);
 }
 // Error
-.control-group.error {
-  .formFieldState(@errorText, @errorText, @errorBackground);
+.show-validation .control-group.error {
+  .formFieldState(@formErrorText, @formErrorText, @formErrorBackground);
 }
 // Success
-.control-group.success {
-  .formFieldState(@successText, @successText, @successBackground);
+.show-validation .control-group.success {
+  .formFieldState(@formSuccessText, @formSuccessText, @formSuccessBackground);
 }
 // Success
-.control-group.info {
-  .formFieldState(@infoText, @infoText, @infoBackground);
+.show-validation .control-group.info {
+  .formFieldState(@formInfoText, @formInfoText, @formInfoBackground);
 }
 
-// HTML5 invalid states
+// HTML5 invalid states 
 // Shares styles with the .control-group.error above
-input:focus:invalid,
-textarea:focus:invalid,
-select:focus:invalid {
-  color: #b94a48;
+
+.show-validation input:focus:invalid,
+.show-validation textarea:focus:invalid,
+.show-validation select:focus:invalid {
+  color: @formErrorText;
   border-color: #ee5f5b;
   &:focus {
     border-color: darken(#ee5f5b, 10%);
@@ -384,7 +390,6 @@ select:focus:invalid {
     .box-shadow(@shadow);
   }
 }
-
 
 
 // FORM ACTIONS

@@ -228,7 +228,13 @@ module.exports = function (grunt) {
            noarg:true,
            sub:true,
            boss:true,
-           eqnull:true,
+           eqnull: true,
+             //NOTE: we need to use eval sometimes so ignore it
+           evil: true,
+             //NOTE: we need to check for strings such as "javascript:" so don't throw errors regarding those
+           scripturl: true,
+             //NOTE: we ignore tabs vs spaces because enforcing that causes lots of errors depending on the text editor being used
+           smarttabs: true,
            globals:{}
          } 
       },
@@ -243,7 +249,13 @@ module.exports = function (grunt) {
            noarg:true,
            sub:true,
            boss:true,
-           eqnull:true,
+           eqnull: true,
+             //NOTE: we need to use eval sometimes so ignore it
+           evil: true,
+            //NOTE: we need to check for strings such as "javascript:" so don't throw errors regarding those
+           scripturl: true,
+            //NOTE: we ignore tabs vs spaces because enforcing that causes lots of errors depending on the text editor being used
+           smarttabs: true,
            globalstrict:true,
            globals:{$:false, jQuery:false,define:false,require:false,window:false}
          } 

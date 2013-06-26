@@ -5,20 +5,22 @@
     * @description This directive is used to associate a field with a server-side validation response
     *               so that the validators in angular are updated based on server-side feedback.
     **/
-function valServer() {
+function valServer(serverValidationService) {
     return {
         require: 'ngModel',
         restrict: "A",
         link: function (scope, element, attr, ctrl) {
+            
             if (!scope.model || !scope.model.alias){
                 throw "valServer can only be used in the scope of a content property object";
             }
-            var parentErrors = scope.$parent.serverErrors;
-            if (!parentErrors) {
-                return;
-            }
+            var currentProperty = scope.model;
 
             var fieldName = scope.$eval(attr.valServer);
+            if (!fieldName) {
+                //eval returned nothing so just use the string
+                fieldName = attr.valServer;
+            }
 
             //subscribe to the changed event of the element. This is required because when we
             // have a server error we actually invalidate the form which means it cannot be 
@@ -34,11 +36,11 @@ function valServer() {
                 if (ctrl.$invalid) {
                     ctrl.$setValidity('valServer', true);
                 }
-            });
+            });            
             //TODO: DO we need to watch for other changes on the element ?
 
             //subscribe to the server validation changes
-            parentErrors.subscribe(scope.model, fieldName, function (isValid, propertyErrors, allErrors) {
+            serverValidationService.subscribe(currentProperty, fieldName, function (isValid, propertyErrors, allErrors) {
                 if (!isValid) {
                     ctrl.$setValidity('valServer', false);
                     //assign an error msg property to the current validator
@@ -49,7 +51,12 @@ function valServer() {
                     //reset the error message
                     ctrl.errorMsg = "";
                 }
-            }, true);
+            });
+            
+            //when the element is disposed we need to unsubscribe!
+            element.bind('$destroy', function () {
+                serverValidationService.unsubscribe(currentProperty, fieldName);
+            });
         }
     };
 }
