@@ -50,9 +50,8 @@ function serverValidationService() {
          */
         getCallbacks: function (contentProperty, fieldName) {            
             var found = _.filter(callbacks, function (item) {
-                return (item.propertyAlias === contentProperty.alias
                 //returns any callback that have been registered directly against the field and for only the property
-                && (item.fieldName === fieldName || (item.fieldName === undefined || item.fieldName === "")));
+                return (item.propertyAlias === contentProperty.alias && (item.fieldName === fieldName || (item.fieldName === undefined || item.fieldName === "")));
             });
             return found;
         },
