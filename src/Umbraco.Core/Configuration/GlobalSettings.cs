@@ -223,20 +223,6 @@ namespace Umbraco.Core.Configuration
             }
         }
 
-        /// <summary>
-        /// Gets the default document property ('TextString' by default)
-        /// </summary>
-        /// <value>The default document property.</value>
-        public static string DefaultDocumentTypeProperty
-        {
-            get
-            {
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoDefaultDocumentTypeProperty")
-                    ? ConfigurationManager.AppSettings["umbracoDefaultDocumentTypeProperty"]
-                    : "Textstring";
-            }
-        }
-
         public const string UmbracoConnectionName = "umbracoDbDSN";
         public const string UmbracoMigrationName = "Umbraco";
 

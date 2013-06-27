@@ -582,6 +582,16 @@ namespace umbraco
         }
 
         /// <summary>
+        /// Gets the default document type property used when adding new properties through the back-office
+        /// </summary>
+        /// <value>Configured text for the default document type property</value>
+        /// <remarks>If undefined, 'Textstring' is the default</remarks>
+        public static string DefaultDocumentTypeProperty
+        {
+            get { return Umbraco.Core.Configuration.UmbracoSettings.DefaultDocumentTypeProperty; }
+        }
+
+        /// <summary>
         /// Configuration regarding webservices
         /// </summary>
         /// <remarks>Put in seperate class for more logik/seperation</remarks>

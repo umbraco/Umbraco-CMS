@@ -244,7 +244,7 @@ namespace umbraco.controls.GenericProperties
 
         private void SetDefaultDocumentTypeProperty()
         {
-            var itemToSelect = ddlTypes.Items.FindByText(GlobalSettings.DefaultDocumentTypeProperty);
+            var itemToSelect = ddlTypes.Items.FindByText(UmbracoSettings.DefaultDocumentTypeProperty);
             if (itemToSelect != null)
             {
                 itemToSelect.Selected = true;

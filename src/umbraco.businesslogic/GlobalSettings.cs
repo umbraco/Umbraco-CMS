@@ -127,16 +127,6 @@ namespace umbraco
         }
 
         /// <summary>
-        /// Sets the default document type property used when adding new properties through the back-office
-        /// </summary>
-        /// <value>Alias of document type property</value>
-        /// <remarks>If missing or empty, 'TextString' is the default</remarks>
-        public static string DefaultDocumentTypeProperty
-        {
-            get { return Umbraco.Core.Configuration.GlobalSettings.DefaultDocumentTypeProperty; }
-        }
-
-        /// <summary>
         /// Saves a setting into the configuration file.
         /// </summary>
         /// <param name="key">Key of the setting to be saved.</param>
