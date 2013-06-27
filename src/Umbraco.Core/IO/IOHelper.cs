@@ -49,12 +49,12 @@ namespace Umbraco.Core.IO
                 return VirtualPathUtility.ToAbsolute(virtualPath, SystemDirectories.Root);
         }
 
-		public static string AbsoluteUrl(string pathOrUrl)
-		{
-			return Uri.IsWellFormedUriString(pathOrUrl, UriKind.Absolute)
-			 ? pathOrUrl
-			 : Umbraco.Core.IO.IOHelper.ResolveUrl(pathOrUrl);
-		}
+        public static string AbsoluteUrl(string pathOrUrl)
+        {
+            return Uri.IsWellFormedUriString(pathOrUrl, UriKind.Absolute)
+		        ? pathOrUrl
+                : Umbraco.Core.IO.IOHelper.ResolveUrl(pathOrUrl);
+        }
 
 		[Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ResolveUrlsFromTextString instead, this method on this class will be removed in future versions")]
         internal static string ResolveUrlsFromTextString(string text)

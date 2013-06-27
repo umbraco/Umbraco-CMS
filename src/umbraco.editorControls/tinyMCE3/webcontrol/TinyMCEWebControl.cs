@@ -330,7 +330,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
 
                 if (imageMedia == null)
                 {
-					tempTag = string.Format("{0} src=\"{1}\" />", tempTag, IOHelper.AbsoluteUrl(orgSrc));
+                    tempTag = string.Format("{0} src=\"{1}\" />", tempTag, IOHelper.AbsoluteUrl(orgSrc));
                 }
                 else
                 {
