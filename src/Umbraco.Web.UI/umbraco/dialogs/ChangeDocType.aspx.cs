@@ -118,7 +118,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 
         private void PopulatePropertyMappingWithSources()
         {
-            PropertyMappingRepeater.DataSource = _content.ContentType.PropertyTypes;
+            PropertyMappingRepeater.DataSource = GetPropertiesOfContentType(_content.ContentType);
             PropertyMappingRepeater.DataBind();
         }
 
@@ -127,6 +127,9 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
             // Get selected new document type
             var contentType = GetSelectedDocumentType();
 
+            // Get properties of new document type (including any from parent types)
+            var properties = GetPropertiesOfContentType(contentType);
+            
             // Loop through list of source properties and populate destination options with all those of same property type
             foreach (RepeaterItem ri in PropertyMappingRepeater.Items)
             {
@@ -134,10 +137,10 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                 {
                     // Get data type from hidden field
                     var dataTypeId = Guid.Parse(((HiddenField)ri.FindControl("DataTypeId")).Value);
-
+                                        
                     // Bind destination list with properties that match data type
                     var ddl = (DropDownList)ri.FindControl("DestinationProperty");
-                    ddl.DataSource = contentType.PropertyTypes.Where(x => x.DataTypeId == dataTypeId);                    
+                    ddl.DataSource = properties.Where(x => x.DataTypeId == dataTypeId);                    
                     ddl.DataValueField = "Alias";
                     ddl.DataTextField = "Name";
                     ddl.DataBind();
@@ -157,6 +160,18 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
         private IContentType GetSelectedDocumentType()
         {
             return ApplicationContext.Current.Services.ContentTypeService.GetContentType(int.Parse(NewDocumentTypeList.SelectedItem.Value));
+        }
+
+        private IEnumerable<PropertyType> GetPropertiesOfContentType(IContentType contentType)
+        {
+            var properties = contentType.PropertyTypes.ToList();
+            while (contentType.ParentId > -1)
+            {
+                contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(contentType.ParentId);
+                properties.AddRange(contentType.PropertyTypes);
+            }
+
+            return properties.OrderBy(x => x.Name);
         }
 
         private void DisplayNotAvailable()
