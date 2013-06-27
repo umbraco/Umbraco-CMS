@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Services
             Assert.That(ctHomePage.HasIdentity, Is.True);
             Assert.That(homeDoc.HasIdentity, Is.True);
             Assert.That(homeDoc.ContentTypeId, Is.EqualTo(ctHomePage.Id));
-            Assert.That(addedContentType, Is.True);
+            Assert.That(addedContentType, Is.False);//False because its already added via the ContentType ctor
         }
 
         [Test]
