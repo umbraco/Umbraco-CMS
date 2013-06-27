@@ -215,6 +215,9 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                     ApplicationContext.Current.Services.ContentService.Publish(_content, user.Id);
                 }
 
+                // Sync the tree
+                ClientTools.SyncTree(_content.Path, true);
+
                 SuccessPlaceholder.Visible = true;
                 SaveAndCancelPlaceholder.Visible = false;
                 ValidationPlaceholder.Visible = false;
