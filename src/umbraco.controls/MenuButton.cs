@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.IO;
 
 namespace umbraco.uicontrols
 {
-    public class MenuButton : System.Web.UI.WebControls.LinkButton
+    internal class MenuButton : System.Web.UI.WebControls.LinkButton
     {
         public MenuButtonType ButtonType { get; set; }
-        public DataAttributes Data { get; private set; }
+        internal DataAttributes Data { get; private set; }
         public string Hotkey { get; set; }
 
         public string Icon { get; set; }
@@ -25,7 +26,7 @@ namespace umbraco.uicontrols
             //setup a hotkey if present
             if (ButtonType == MenuButtonType.Primary && String.IsNullOrEmpty(Hotkey))
                 Data.Add("shortcut", "ctrl+" + this.Text.ToLower()[0]);
-            else if (!String.IsNullOrEmpty(Hotkey))
+            else if (!string.IsNullOrEmpty(Hotkey))
                 Data.Add("shortcut", Hotkey);
 
             Data.AppendTo(this);
@@ -42,7 +43,7 @@ namespace umbraco.uicontrols
                     this.ToolTip = this.Text;
 
                     if (i.Contains("."))
-                        this.Text = "<img src='" + umbraco.IO.IOHelper.ResolveUrl(Icon) + "' alt='" + this.ToolTip + "'/> " + this.ToolTip;
+                        this.Text = "<img src='" + IOHelper.ResolveUrl(Icon) + "' alt='" + this.ToolTip + "'/> " + this.ToolTip;
                     else
                         this.Text = "<i class='icon icon-" + Icon.Replace("icon-", "") + "'></i> " + this.ToolTip;
                 }

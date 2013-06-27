@@ -8,7 +8,7 @@ using System.Web.UI.WebControls;
 
 namespace umbraco.uicontrols
 {
-    public class DataAttributes : Dictionary<string,string>
+    internal class DataAttributes : Dictionary<string,string>
     {
         public DataAttributes()
         {

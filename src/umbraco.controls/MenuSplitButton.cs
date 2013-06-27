@@ -7,7 +7,7 @@ using System.Web.UI.WebControls;
 
 namespace umbraco.uicontrols
 {
-    public class MenuSplitButton : Panel
+    internal class MenuSplitButton : Panel
     {
 
         public string Text { get; set; }

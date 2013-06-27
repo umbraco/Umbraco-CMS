@@ -19,3 +19,4 @@ using System.Runtime.InteropServices;
 [assembly: Guid("1292737a-7e2d-464a-9850-9380792f668e")]
 
 [assembly: InternalsVisibleTo("Umbraco.Web.UI")]
+[assembly: InternalsVisibleTo("umbraco")]

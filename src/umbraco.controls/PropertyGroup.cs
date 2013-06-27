@@ -34,17 +34,17 @@ namespace umbraco.uicontrols
             writer.WriteLine("</div>");
         }
 
-        public void addProperty(string Caption, Control C)
+        public void AddProperty(string caption, Control c)
         {
 
             PropertyPanel pp = new PropertyPanel();
-            pp.Controls.Add(C);
-            pp.Text = Caption;
+            pp.Controls.Add(c);
+            pp.Text = caption;
 
             this.Controls.Add(pp);
         }
 
-        public void addProperty(Control ctrl)
+        public void AddProperty(Control ctrl)
         {
 
             PropertyPanel pp = new PropertyPanel();

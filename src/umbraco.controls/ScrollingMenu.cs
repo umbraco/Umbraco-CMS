@@ -36,14 +36,14 @@ namespace umbraco.uicontrols
             return icon;
         }
 
-        public MenuSplitButton NewSplitButton()
+        internal MenuSplitButton NewSplitButton()
         {
             var menu = new MenuSplitButton();
             Icons.Add(menu);
             return menu;
         }
 
-        public MenuButton NewButton(int index = -1)
+        internal MenuButton NewButton(int index = -1)
         {
             MenuButton btn = new MenuButton();
 
