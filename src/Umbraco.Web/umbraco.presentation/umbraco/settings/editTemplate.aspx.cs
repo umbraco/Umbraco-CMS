@@ -4,13 +4,13 @@ using System.IO;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.skinning;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.presentation.Trees;
 using umbraco.DataLayer;
-using umbraco.IO;
 using umbraco.uicontrols;
 using System.Linq;
 
@@ -33,9 +33,9 @@ namespace umbraco.cms.presentation.settings
 			base.OnPreRender(e);
 
 			ScriptManager.GetCurrent(Page).Services.Add(
-				new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.Webservices + "/codeEditorSave.asmx")));
+				new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices + "/codeEditorSave.asmx")));
 			ScriptManager.GetCurrent(Page).Services.Add(
-				new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.Webservices + "/legacyAjaxCalls.asmx")));
+                new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices + "/legacyAjaxCalls.asmx")));
 		}
 
         protected string TemplateTreeSyncPath { get; private set; }
@@ -105,9 +105,9 @@ namespace umbraco.cms.presentation.settings
             save.ID = "save";
 
 			Panel1.Text = ui.Text("edittemplate");
-			pp_name.Text = ui.Text("name", base.getUser());
-			pp_alias.Text = ui.Text("alias", base.getUser());
-			pp_masterTemplate.Text = ui.Text("mastertemplate", base.getUser());
+			pp_name.Text = ui.Text("name", UmbracoUser);
+            pp_alias.Text = ui.Text("alias", UmbracoUser);
+            pp_masterTemplate.Text = ui.Text("mastertemplate", UmbracoUser);
 
 
 			// Editing buttons
