@@ -1,21 +1,11 @@
 ﻿using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
 
-using System.Xml.XPath;
 using System.Xml;
 using Umbraco.Core.IO;
 
 namespace umbraco.cms.presentation
 {
-
     public class Create : BasePages.UmbracoEnsuredPage
     {
         protected umbWindow createWindow;
@@ -43,18 +33,17 @@ namespace umbraco.cms.presentation
             {
                 throw new ArgumentException("The create dialog for \"" + nodeType + "\" does not match anything defined in the \"" + SystemFiles.CreateUiXml + "\". This could mean an incorrectly installed package or a corrupt UI file");
             }
-            //title.Text = ui.Text("create") + " " + ui.Text(def.SelectSingleNode("./header").FirstChild.Value.ToLower(), base.getUser());
+
             try
             {
-                //headerTitle.Text = title.Text;
-                UI.Controls.Add(LoadControl(SystemDirectories.Umbraco + def.SelectSingleNode("./usercontrol").FirstChild.Value));
+                var virtualPath = SystemDirectories.Umbraco + def.SelectSingleNode("./usercontrol").FirstChild.Value;
+                var mainControl = LoadControl(virtualPath);
+                UI.Controls.Add(mainControl);
             }
             catch (Exception ex)
             {
                 throw new ArgumentException("ERROR CREATING CONTROL FOR NODETYPE: " + nodeType, ex);
             }
         }
-
-
     }
 }
