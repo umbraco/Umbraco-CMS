@@ -8,6 +8,7 @@ using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 using umbraco;
+using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Web.WebServices
 {
@@ -26,11 +27,13 @@ namespace Umbraco.Web.WebServices
         [HttpPost]
         public JsonResult PublishDocument(int documentId, bool publishDescendants, bool includeUnpublished)
         {
-            var doc = Services.ContentService.GetById(documentId);
-            var contentService = (ContentService) Services.ContentService;
-            if (!publishDescendants)
+            var content = Services.ContentService.GetById(documentId);
+            var doc = new Document(content);
+            //var contentService = (ContentService) Services.ContentService;
+            if (publishDescendants == false)
             {
-                var result = contentService.SaveAndPublishInternal(doc);
+                //var result = contentService.SaveAndPublishInternal(content);
+                var result = doc.SaveAndPublish(UmbracoUser.Id);
                 return Json(new
                     {
                         success = result.Success,
@@ -39,13 +42,14 @@ namespace Umbraco.Web.WebServices
             }
             else
             {
-                var result = ((ContentService) Services.ContentService)
-                    .PublishWithChildrenInternal(doc, UmbracoUser.Id, includeUnpublished)
-                    .ToArray();
+                /*var result = ((ContentService) Services.ContentService)
+                    .PublishWithChildrenInternal(content, UmbracoUser.Id, includeUnpublished)
+                    .ToArray();*/
+                var result = doc.PublishWithSubs(UmbracoUser.Id, includeUnpublished);
                 return Json(new
                     {
                         success = result.All(x => x.Success),
-                        message = GetMessageForStatuses(result.Select(x => x.Result), doc)
+                        message = GetMessageForStatuses(result.Select(x => x.Result), content)
                     });
             }
         }
@@ -63,7 +67,7 @@ namespace Umbraco.Web.WebServices
             foreach (var msg in statuses
                 .Where(x => ((int)x.StatusType) >= 10)
                 .Select(GetMessageForStatus)
-                .Where(msg => !msg.IsNullOrWhiteSpace()))
+                .Where(msg => msg.IsNullOrWhiteSpace() == false))
             {
                 sb.AppendLine(msg.Trim());
             }
