@@ -252,7 +252,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                     // Add language
                     if (config["language"] == null)
                         config["language"] = "en";
-
+					
                     if (languages.IndexOf(config["language"]) == -1)
                         languages.Add(config["language"]);
 
@@ -323,14 +323,14 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                 while (ide.MoveNext())
                     tempTag += string.Format(" {0}=\"{1}\"", ide.Key, ide.Value);
 
-                orgSrc = IOHelper.ResolveUrl(orgSrc.Replace("%20", " "));
+                orgSrc = IOHelper.AbsoluteUrl(orgSrc.Replace("%20", " "));
 
                 var mediaService = ApplicationContext.Current.Services.MediaService;
                 var imageMedia = mediaService.GetMediaByPath(orgSrc);
 
                 if (imageMedia == null)
                 {
-                    tempTag = string.Format("{0} src=\"{1}\" />", tempTag, IOHelper.ResolveUrl(orgSrc));
+					tempTag = string.Format("{0} src=\"{1}\" />", tempTag, IOHelper.AbsoluteUrl(orgSrc));
                 }
                 else
                 {
