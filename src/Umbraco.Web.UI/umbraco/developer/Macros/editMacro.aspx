@@ -223,9 +223,28 @@
             </FooterTemplate>
         </asp:Repeater>
     </cc1:Pane>
-    <script type="text/javascript">
-        jQuery(document).ready(function () {
-            UmbClientMgr.appActions().bindSaveShortCut();
-        });
-    </script>
+    <asp:PlaceHolder runat="server">
+        <script type="text/javascript">
+            jQuery(document).ready(function () {
+                UmbClientMgr.appActions().bindSaveShortCut();
+
+                (function ($) {
+                    // U4-667: Make the "Render content in editor" checkbox dependent on the "Use in editor checkbox"
+                    var useInEditorCheckBox = $("#<%= macroEditor.ClientID %>");
+                    var renderInEditorCheckBox = $("#<%= macroRenderContent.ClientID %>");
+
+                    toggle();
+
+                    useInEditorCheckBox.on("change", function() {
+                        toggle();
+                    });
+                    
+                    function toggle() {
+                        var disabled = useInEditorCheckBox.is(":checked") == false;
+                        renderInEditorCheckBox.prop("disabled", disabled);
+                    }
+                })(jQuery);
+            });
+        </script>
+    </asp:PlaceHolder>
 </asp:Content>
