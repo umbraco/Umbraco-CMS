@@ -45,8 +45,9 @@
         </cc1:PropertyPanel>
 
         <asp:PlaceHolder ID="NotAvailablePlaceholder" runat="server" Visible="false">        
-            <br />
-            <p><%=umbraco.ui.Text("changeDocType", "docTypeCannotBeChanged") %></p>
+            <div class="propertyItem notice" style="padding: 10px">     
+                <p><%=umbraco.ui.Text("changeDocType", "docTypeCannotBeChanged") %></p>
+            </div>
         </asp:PlaceHolder>
     </cc1:Pane>
 

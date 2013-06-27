@@ -165,6 +165,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
             NewTemplatePropertyPanel.Visible = false;
             SavePlaceholder.Visible = false;
             NotAvailablePlaceholder.Visible = true;
+            ChangeDocTypePropertyMappingPane.Visible = false;
         }
 
         protected void NewDocumentTypeList_SelectedIndexChanged(object sender, EventArgs e)
