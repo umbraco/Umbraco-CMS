@@ -667,8 +667,14 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
             foreach (ContentType.TabI tab in tabs)
             {
-                string tabCaption = tab.ContentType == _contentType.Id ? tab.GetRawCaption() : tab.GetRawCaption() + " (inherited from " + new ContentType(tab.ContentType).Text + ")";
-                PropertyTypes.Controls.Add(new LiteralControl("<div class='genericPropertyListBox'><h2 class=\"propertypaneTitel\">Tab: " + tabCaption + "</h2>"));
+                string tabName = tab.GetRawCaption();
+                string tabCaption = tabName;
+                if (tab.ContentType != _contentType.Id) 
+                {
+                    tabCaption += " (inherited from " + new ContentType(tab.ContentType).Text + ")";
+                }
+
+                PropertyTypes.Controls.Add(new LiteralControl("<div class='genericPropertyListBox'><h2 data-tabname='" + tabName + "' class=\"propertypaneTitel\">Tab: " + tabCaption + "</h2>"));
 
                 var propertyGroup = propertyTypeGroups.SingleOrDefault(x => x.ParentId == tab.Id);
                 var propertyTypes = propertyGroup == null
@@ -727,7 +733,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             bool propertyTabHasProperties = false;
             var propertiesPH = new PlaceHolder();
             propertiesPH.ID = "propertiesPH";
-            PropertyTypes.Controls.Add(new LiteralControl("<h2 class=\"propertypaneTitel\">Tab: Generic Properties</h2>"));
+            PropertyTypes.Controls.Add(new LiteralControl("<h2 data-tabname=\"Generic Properties\" class=\"propertypaneTitel\">Tab: Generic Properties</h2>"));
             PropertyTypes.Controls.Add(propertiesPH);
 
             var propSort_gp = new HtmlInputHidden();
@@ -804,7 +810,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                                     // Handle move to new tab
                                     // - find tab name
-                                    var tabName = $(this).siblings('h2').text().replace('Tab: ', '');
+                                    var tabName = $(this).siblings('h2').attr('data-tabname');
 
                                     // - find tab drop-down for item and set option selected that matches tab name
                                     var tabDropDownList = $(""select[name$='ddlTab']"", ui.item);
