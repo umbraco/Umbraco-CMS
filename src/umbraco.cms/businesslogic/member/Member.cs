@@ -632,6 +632,7 @@ namespace umbraco.cms.businesslogic.member
                                     poco.Integer = property.Value != null && string.IsNullOrEmpty(property.Value.ToString())
                                           ? 0
                                           : Convert.ToInt32(property.Value);
+                                                       : Convert.ToInt32(property.Value);
                                 }
                                 else
                                 {
