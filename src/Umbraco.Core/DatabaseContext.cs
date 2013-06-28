@@ -144,12 +144,10 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="server">Name or address of the database server</param>
         /// <param name="databaseName">Name of the database</param>
-        /// <param name="useIntegratedSecurity">To enable integrated security in the connection 
-        /// string (only for SQL Server).</param>
         /// <param name="user">Database Username</param>
         /// <param name="password">Database Password</param>
         /// <param name="databaseProvider">Type of the provider to be used (Sql, Sql Azure, Sql Ce, MySql)</param>
-        public void ConfigureDatabaseConnection(string server, string databaseName, bool useIntegratedSecurity, string user, string password, string databaseProvider)
+        public void ConfigureDatabaseConnection(string server, string databaseName, string user, string password, string databaseProvider)
         {
             string connectionString;
             string providerName = "System.Data.SqlClient";
@@ -164,15 +162,22 @@ namespace Umbraco.Core
             }
             else
             {
-                if (useIntegratedSecurity)
-                {
-                    connectionString = String.Format("Server={0};Database={1};Integrated Security=true", server, databaseName);
-                }
-                else
-                {
-                    connectionString = string.Format("server={0};database={1};user id={2};password={3}", server, databaseName, user, password);
-                }
+                connectionString = string.Format("server={0};database={1};user id={2};password={3}", server, databaseName, user, password);
             }
+
+            SaveConnectionString(connectionString, providerName);
+            Initialize(providerName);
+        }
+
+        /// <summary>
+        /// Configures a ConnectionString for the Umbraco database that uses Microsoft SQL Server integrated security.
+        /// </summary>
+        /// <param name="server">Name or address of the database server</param>
+        /// <param name="databaseName">Name of the database</param>
+        public void ConfigureIntegratedSecurityDatabaseConnection(string server, string databaseName)
+        {
+            const string providerName = "System.Data.SqlClient";
+            string connectionString = String.Format("Server={0};Database={1};Integrated Security=true", server, databaseName);
 
             SaveConnectionString(connectionString, providerName);
             Initialize(providerName);

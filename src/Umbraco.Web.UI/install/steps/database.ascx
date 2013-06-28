@@ -72,10 +72,15 @@
                                             var databaseType = databaseTypeSelect.val();
                                             
                                             if (databaseType == "SqlServer") {
-                                                // Only show the integrated security option when it's supported
-                                                integratedSecurityCheckBox.closest("div").show();
+                                                // Only show and enable the integrated security option when it's supported
+                                                integratedSecurityCheckBox
+                                                    .removeAttr("disabled")
+                                                    .closest("div").show();
+                                                
                                             } else {
-                                                integratedSecurityCheckBox.closest("div").hide();
+                                                integratedSecurityCheckBox
+                                                    .attr("disabled", "disabled")
+                                                    .closest("div").hide();
                                             }
 
                                             if (integratedSecurityCheckBox.is(":checked")) {
