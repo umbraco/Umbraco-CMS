@@ -1,4 +1,5 @@
 // Based loosely around work by Witold Szczerba - https://github.com/witoldsz/angular-http-auth
+
 angular.module('umbraco.security.service', [
   'umbraco.security.retryQueue',    // Keeps track of failed requests that need to be retried once the user logs in
   'umbraco.services'
@@ -20,6 +21,8 @@ angular.module('umbraco.security.service', [
       throw new Error('Trying to open a dialog that is already open!');
     }
 
+    alert("here a dialog would appear");
+    
     //loginDialog = $dialog.dialog();
     //loginDialog.open('security/login/form.tpl.html', 'LoginFormController').then(onLoginDialogClose);
   }
