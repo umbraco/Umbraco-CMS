@@ -204,9 +204,10 @@ namespace umbraco.presentation.install.steps
                 }
                 else
                 {
+
+
                     ApplicationContext.Current.DatabaseContext.ConfigureDatabaseConnection(DatabaseServer.Text, DatabaseName.Text,
-                                                                        DatabaseUsername.Text, DatabasePassword.Text,
-                                                                        DatabaseType.SelectedValue);
+                        DatabaseIntegratedSecurity.Checked, DatabaseUsername.Text, DatabasePassword.Text, DatabaseType.SelectedValue);
                 }
             }
             catch (Exception ex)
