@@ -10,9 +10,10 @@ yepnope({
 		
 		'js/app_dev.js',
 
-		'js/umbraco.mocks.js',
+		'js/umbraco.httpbackend.js',
 		'js/umbraco.directives.js',
 		'js/umbraco.filters.js',
+		'js/umbraco.resources.js',
 		'js/umbraco.services.js',
 		'js/umbraco.security.js',
 		'js/umbraco.controllers.js',

@@ -17,7 +17,7 @@ module.exports = function (grunt) {
   // Default task.
   grunt.registerTask('default', ['jshint:dev','build','karma:unit']);
   grunt.registerTask('dev', ['jshint:dev', 'build', 'webserver', 'open:dev', 'watch']);
-
+  
   //run by the watch task
   grunt.registerTask('watch-build', ['jshint:dev','recess:build','karma:unit','concat','copy']);
   
@@ -63,6 +63,7 @@ module.exports = function (grunt) {
     },
 
     distdir: 'build/belle',
+    vsdir: '../Umbraco.Web.Ui/umbraco',
     pkg: grunt.file.readJSON('package.json'),
     banner:
     '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n' +
@@ -109,6 +110,9 @@ module.exports = function (grunt) {
       },
       sampleFiles: {
         files: [{ dest: '<%= distdir %>/js', src : '*.js', expand: true, cwd: 'src/sample files/' }]
+      },
+      vs: {
+        files: [{ dest: '<%= vsdir %>/assets', src : '**', expand: true, cwd: '<%= distdir %>' }]
       }
     },
 
@@ -198,7 +202,7 @@ module.exports = function (grunt) {
     },
 
     watch:{
-      build: {
+      dev: {
         files:['<%= src.everything %>'],
         tasks:['watch-build','timestamp']
       }
