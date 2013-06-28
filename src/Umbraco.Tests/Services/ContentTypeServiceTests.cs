@@ -158,33 +158,46 @@ namespace Umbraco.Tests.Services
 			}
 		}
 
-        [Test]
-        public void Can_Save_ContentType_Structure_And_Create_Content_Based_On_It()
-        {
-            // Arrange
-            var cs = ServiceContext.ContentService;
-            var cts = ServiceContext.ContentTypeService;
-            var dtdYesNo = ServiceContext.DataTypeService.GetDataTypeDefinitionById(-49);
-            var ctBase = new ContentType(-1) { Name = "Base", Alias = "Base", Icon = "folder.gif", Thumbnail = "folder.png" };
-            ctBase.AddPropertyType(new PropertyType(dtdYesNo) { Name = "Hide From Navigation", Alias = Constants.Conventions.Content.NaviHide } /*,"Navigation"*/ );
-            cts.Save(ctBase);
+	    [Test]
+	    public void Can_Save_ContentType_Structure_And_Create_Content_Based_On_It()
+	    {
+	        // Arrange
+	        var cs = ServiceContext.ContentService;
+	        var cts = ServiceContext.ContentTypeService;
+	        var dtdYesNo = ServiceContext.DataTypeService.GetDataTypeDefinitionById(-49);
+	        var ctBase = new ContentType(-1) {Name = "Base", Alias = "Base", Icon = "folder.gif", Thumbnail = "folder.png"};
+	        ctBase.AddPropertyType(new PropertyType(dtdYesNo)
+	                                   {
+	                                       Name = "Hide From Navigation",
+	                                       Alias = Constants.Conventions.Content.NaviHide
+	                                   }
+	            /*,"Navigation"*/);
+	        cts.Save(ctBase);
 
-            var ctHomePage = new ContentType(ctBase) { Name = "Home Page", Alias = "HomePage", Icon = "settingDomain.gif", Thumbnail = "folder.png", AllowedAsRoot = true };
-            ctHomePage.AddPropertyType(new PropertyType(dtdYesNo) { Name = "Some property", Alias = "someProperty" }  /*,"Navigation"*/ );
-            cts.Save(ctHomePage);
+	        var ctHomePage = new ContentType(ctBase)
+	                             {
+	                                 Name = "Home Page",
+	                                 Alias = "HomePage",
+	                                 Icon = "settingDomain.gif",
+	                                 Thumbnail = "folder.png",
+	                                 AllowedAsRoot = true
+	                             };
+	        ctHomePage.AddPropertyType(new PropertyType(dtdYesNo) {Name = "Some property", Alias = "someProperty"}
+	            /*,"Navigation"*/);
+	        cts.Save(ctHomePage);
 
-            // Act
-            var homeDoc = cs.CreateContent("Home Page", -1, "HomePage");
-            cs.SaveAndPublish(homeDoc);
+	        // Act
+	        var homeDoc = cs.CreateContent("Home Page", -1, "HomePage");
+	        cs.SaveAndPublish(homeDoc);
 
-            // Assert
-            Assert.That(ctBase.HasIdentity, Is.True);
-            Assert.That(ctHomePage.HasIdentity, Is.True);
-            Assert.That(homeDoc.HasIdentity, Is.True);
-            Assert.That(homeDoc.ContentTypeId, Is.EqualTo(ctHomePage.Id));
-            Assert.That(addedContentType, Is.False);//False because its already added via the ContentType ctor
+	        // Assert
+	        Assert.That(ctBase.HasIdentity, Is.True);
+	        Assert.That(ctHomePage.HasIdentity, Is.True);
+	        Assert.That(homeDoc.HasIdentity, Is.True);
+	        Assert.That(homeDoc.ContentTypeId, Is.EqualTo(ctHomePage.Id));
+	    }
 
-        [Test]
+	    [Test]
         public void Can_Create_And_Save_ContentType_Composition()
         {
             /*
