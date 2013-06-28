@@ -430,10 +430,10 @@ namespace umbraco.cms.businesslogic.template
 			switch (DetermineRenderingEngine(t, design))
 			{
 				case RenderingEngine.Mvc:
-					ViewHelper.CreateViewFile(t, true);
+					ViewHelper.CreateViewFile(t);
 					break;
 				case RenderingEngine.WebForms:
-					MasterPageHelper.CreateMasterPage(t, true);
+					MasterPageHelper.CreateMasterPage(t);
 					break;
 			}
 
