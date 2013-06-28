@@ -12,7 +12,8 @@ namespace umbraco.ActionHandlers
     /// It ensures that new content nodes gets a unique name, and thereby avoiding conflictiong URLs.
     /// It can be disabled in the umbracoSettings.config file.
     /// </summary>
-    public class umbEnsureUniqueName : umbraco.BusinessLogic.Actions.IActionHandler
+    [Obsolete("This handler is no longer used")]
+    public class umbEnsureUniqueName : IActionHandler
     {
         public umbEnsureUniqueName()
         {
@@ -82,7 +83,7 @@ namespace umbraco.ActionHandlers
         /// <returns></returns>
         public interfaces.IAction[] ReturnActions()
         {
-            interfaces.IAction[] _retVal = { ActionNew.Instance };
+            interfaces.IAction[] _retVal = {  };
             return _retVal;
         }
 

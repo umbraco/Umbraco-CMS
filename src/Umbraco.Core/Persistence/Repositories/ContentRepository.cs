@@ -27,6 +27,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
+
+            EnsureUniqueNaming = true;
         }
 
 		public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
@@ -34,7 +36,11 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
+
+		    EnsureUniqueNaming = true;
         }
+
+        public bool EnsureUniqueNaming { get; set; }
 
         #region Overrides of RepositoryBase<IContent>
 
@@ -180,6 +186,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((Content)entity).AddingEntity();
 
+            //Ensure unique name on the same level
+            entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
+
             var factory = new ContentFactory(NodeObjectTypeId, entity.Id);
             var dto = factory.BuildDto(entity);
 
@@ -259,6 +268,9 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 entity.UpdateDate = DateTime.Now;
             }
+
+            //Ensure unique name on the same level
+            entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
 
             //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
             if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
@@ -486,6 +498,78 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             return new PropertyCollection(properties);
+        }
+
+        private string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
+        {
+            if (EnsureUniqueNaming == false)
+                return nodeName;
+
+            var sql = new Sql();
+            sql.Select("*")
+               .From<NodeDto>()
+               .Where<NodeDto>(x => x.ParentId == parentId && x.Text.StartsWith(nodeName));
+
+            int uniqueNumber = 1;
+            var currentName = nodeName;
+
+            var dtos = Database.Fetch<NodeDto>(sql);
+            if (dtos.Any())
+            {
+                var results = dtos.OrderBy(x => x.Text, new SimilarNodeNameComparer());
+                foreach (var dto in results)
+                {
+                    if(id != 0 && id == dto.NodeId) continue;
+
+                    if (dto.Text.ToLowerInvariant().Equals(currentName.ToLowerInvariant()))
+                    {
+                        currentName = nodeName + string.Format(" ({0})", uniqueNumber);
+                        uniqueNumber++;
+                    }
+                }
+            }
+
+            return currentName;
+        }
+
+        /// <summary>
+        /// Comparer that takes into account the duplicate index of a node name
+        /// This is needed as a normal alphabetic sort would go Page (1), Page (10), Page (2) etc.
+        /// </summary>
+        private class SimilarNodeNameComparer : IComparer<string>
+        {
+            public int Compare(string x, string y)
+            {
+                if (x.LastIndexOf(')') == x.Length - 1 && y.LastIndexOf(')') == y.Length - 1)
+                {
+                    if (x.ToLower().Substring(0, x.LastIndexOf('(')) == y.ToLower().Substring(0, y.LastIndexOf('(')))
+                    {
+                        int xDuplicateIndex = ExtractDuplicateIndex(x);
+                        int yDuplicateIndex = ExtractDuplicateIndex(y);
+
+                        if (xDuplicateIndex != 0 && yDuplicateIndex != 0)
+                        {
+                            return xDuplicateIndex.CompareTo(yDuplicateIndex);
+                        }
+                    }
+                }
+                return String.Compare(x.ToLower(), y.ToLower(), StringComparison.Ordinal);
+            }
+
+            private int ExtractDuplicateIndex(string text)
+            {
+                int index = 0;
+
+                if (text.LastIndexOf('(') != -1 && text.LastIndexOf('(') < text.Length - 2)
+                {
+                    int startPos = text.LastIndexOf('(') + 1;
+                    int length = text.Length - 1 - startPos;
+
+                    int.TryParse(text.Substring(startPos, length), out index);
+                }
+
+                return index;
+            }
         }
     }
 }

@@ -637,8 +637,10 @@ namespace umbraco.cms.businesslogic.member
                             {
                                 if (property.Value is bool || property.PropertyType.DataTypeDefinition.DataType.Id == new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a"))
                                 {
-                                    int val = Convert.ToInt32(property.Value);
-                                    poco.Integer = val;
+                                    poco.Integer = property.Value != null &&
+                                                   string.IsNullOrEmpty(property.Value.ToString())
+                                                       ? 0
+                                                       : Convert.ToInt32(property.Value);
                                 }
                                 else
                                 {
