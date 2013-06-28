@@ -23,7 +23,6 @@ function toggleTree(sender) {
 }
 
 function resizePage(sender) {
-//    alert(jQuery(window) + ", " + sender);
     var dashboard = jQuery("#rightDIV");
     var dashboardFrame = jQuery("#right");
     var tree = jQuery("#leftDIV");
@@ -63,51 +62,11 @@ function resizePage(sender) {
         treeToggle.show();
         uiArea.show();
     }
-    
-    /*
-    var dashboard = document.getElementById("rightDIV");
-    var dashboardFrame = document.getElementById("right");
-    var tree = document.getElementById("leftDIV");
-    var appIcons = document.getElementById("PlaceHolderAppIcons");
-    var uiArea = document.getElementById("uiArea");
-
-    var clientHeight = getViewportHeight() - 48;
-    var clientWidth = getViewportWidth();
-
-    var leftWidth = parseInt(clientWidth * 0.25);
-    var rightWidth = clientWidth - leftWidth - 35; // parseInt(clientWidth*0.65);
-
-
-    // check if appdock is present
-    var treeHeight = parseInt(clientHeight-5);
-
-    if (appIcons != null) {
-        treeHeight = treeHeight - 135;
-        resizeGuiWindow("PlaceHolderAppIcons", leftWidth, 140);
-    }
-
-    resizeGuiWindow("treeWindow", leftWidth, treeHeight)
-
-    if (tree.style.display == "none") {
-        var frameWidth = getViewportWidth() - 24;
-        dashboard.style.width = frameWidth + "px";
-    } else if (rightWidth > 0) {
-        dashboard.style.width = rightWidth + "px";
-    }
-    if (clientHeight > 0) {
-        dashboard.style.height = (clientHeight) + "px";
-        //dashboardFrame.style.height = (clientHeight) + "px";
-
-        document.getElementById('treeToggle').style.height = (clientHeight) + "px";
-    }
-    document.getElementById('treeToggle').style.visibility = "visible";
-
-    uiArea.style.visibility = "visible";
-    */
+     
 }
 
 function resizeGuiWindow(windowName, newWidth, newHeight, window) {
-    resizePanelTo(windowName, false, newWidth, newHeight);
+    //This no longer does anything and shouldn't be used.
 }
 
 function resizeGuiWindowWithTabs(windowName, newWidth, newHeight) {

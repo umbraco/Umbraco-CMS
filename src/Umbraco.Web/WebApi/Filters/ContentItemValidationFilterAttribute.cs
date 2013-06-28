@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
+using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -88,7 +89,6 @@ namespace Umbraco.Web.WebApi.Filters
             return true;
         }
 
-        //TODO: Validate the property type data
         private bool ValidateData(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, HttpActionContext actionContext)
         {
             foreach (var p in postedItem.ContentDto.Properties)
@@ -133,6 +133,26 @@ namespace Umbraco.Web.WebApi.Filters
                                 actionContext.ModelState.AddModelError(string.Format("{0}.{1}", p.Alias, field), result.ErrorMessage);
                             }
                         }
+                    }
+                }
+
+                //Now we need to validate the property based on the PropertyType validation (i.e. regex and required)
+                // NOTE: These will become legacy once we have pre-value overrides.
+                if (p.IsRequired)
+                {
+                    foreach (var result in p.PropertyEditor.ValueEditor.RequiredValidator.Validate(postedValue, "", preValues, editor))
+                    {
+                        //add a model state error for the entire property
+                        actionContext.ModelState.AddModelError(p.Alias, result.ErrorMessage);
+                    }
+                }
+
+                if (!p.ValidationRegExp.IsNullOrWhiteSpace())
+                {
+                    foreach (var result in p.PropertyEditor.ValueEditor.RegexValidator.Validate(postedValue, p.ValidationRegExp, preValues, editor))
+                    {
+                        //add a model state error for the entire property
+                        actionContext.ModelState.AddModelError(p.Alias, result.ErrorMessage);
                     }
                 }
             }

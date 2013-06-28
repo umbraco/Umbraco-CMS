@@ -11,7 +11,7 @@ namespace Umbraco.Core.PropertyEditors
     /// A validator that validates a delimited set of values against a common regex
     /// </summary>
     [ValueValidator("Delimited")]
-    internal sealed class DelimitedValueValidator : ManifestValueValidator
+    internal sealed class DelimitedValueValidator : ValueValidator
     {
         /// <summary>
         /// Performs the validation

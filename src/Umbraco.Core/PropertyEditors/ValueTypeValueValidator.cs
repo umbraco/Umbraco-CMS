@@ -12,7 +12,7 @@ namespace Umbraco.Core.PropertyEditors
     /// This is a special validator type that is executed against all property editors no matter if they've defined this validator or not.
     /// </remarks>
     [ValueValidator("ValueType")]
-    internal sealed class ValueTypeValueValidator : ManifestValueValidator
+    internal sealed class ValueTypeValueValidator : ValueValidator
     {
         public override IEnumerable<ValidationResult> Validate(string value, string config, string preValues, PropertyEditor editor)
         {

@@ -51,6 +51,34 @@ namespace Umbraco.Core.PropertyEditors
         public IEnumerable<ValidatorBase> Validators { get; set; }
 
         /// <summary>
+        /// Returns the validator used for the required field validation which is specified on the PropertyType
+        /// </summary>
+        /// <remarks>
+        /// This will become legacy as soon as we implement overridable pre-values.
+        /// 
+        /// The default validator used is the RequiredValueValidator but this can be overridden by property editors
+        /// if they need to do some custom validation, or if the value being validated is a json object.
+        /// </remarks>
+        internal virtual ValueValidator RequiredValidator
+        {
+            get { return new RequiredValueValidator(); }
+        }
+
+        /// <summary>
+        /// Returns the validator used for the regular expression field validation which is specified on the PropertyType
+        /// </summary>
+        /// <remarks>
+        /// This will become legacy as soon as we implement overridable pre-values.
+        /// 
+        /// The default validator used is the RegexValueValidator but this can be overridden by property editors
+        /// if they need to do some custom validation, or if the value being validated is a json object.
+        /// </remarks>
+        internal virtual ValueValidator RegexValidator
+        {
+            get { return new RegexValueValidator(); }
+        }
+
+        /// <summary>
         /// Returns the true DataTypeDatabaseType from the string representation ValueType
         /// </summary>
         /// <returns></returns>

@@ -25,6 +25,8 @@ namespace Umbraco.Web.Models.Mapping
         {
             return CreateContent<ContentItemDto<TPersisted>, ContentPropertyDto, TPersisted>(content, null, (propertyDto, originalProperty, propEditor) =>
                 {
+                    propertyDto.IsRequired = originalProperty.PropertyType.Mandatory;
+                    propertyDto.ValidationRegExp = originalProperty.PropertyType.ValidationRegExp;
                     propertyDto.Alias = originalProperty.Alias;
                     propertyDto.Description = originalProperty.PropertyType.Description;
                     propertyDto.Label = originalProperty.PropertyType.Name;

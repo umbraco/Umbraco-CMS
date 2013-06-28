@@ -547,7 +547,7 @@
     <Compile Include="Profiling\WebProfiler.cs" />
     <Compile Include="PropertyEditors\DelimitedValueValidator.cs" />
     <Compile Include="PropertyEditors\ManifestValidator.cs" />
-    <Compile Include="PropertyEditors\ManifestValueValidator.cs" />
+    <Compile Include="PropertyEditors\ValueValidator.cs" />
     <Compile Include="PropertyEditors\PreValueEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorAttribute.cs" />

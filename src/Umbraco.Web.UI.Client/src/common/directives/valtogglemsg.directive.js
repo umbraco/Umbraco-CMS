@@ -12,7 +12,7 @@ function valToggleMsg() {
         /**
          * @ngdoc function
          * @name link
-         * @methodOf valPropertyMsg
+         * @methodOf valServer
          * @function
          *
          * @description

@@ -27,12 +27,12 @@ namespace Umbraco.Core.PropertyEditors
         [JsonConverter(typeof(JsonToStringConverter))]
         public string Config { get; set; }
 
-        private ManifestValueValidator _validatorInstance;
+        private ValueValidator _validatorInstance;
 
         /// <summary>
         /// Gets the ValueValidator instance
         /// </summary>
-        internal ManifestValueValidator ValidatorInstance
+        internal ValueValidator ValidatorInstance
         {
             get
             {
@@ -41,7 +41,7 @@ namespace Umbraco.Core.PropertyEditors
                     var val = ValidatorsResolver.Current.GetValidator(Type);
                     if (val == null)
                     {
-                        throw new InvalidOperationException("No " + typeof(ManifestValueValidator) +  " could be found for the type name of " + Type);
+                        throw new InvalidOperationException("No " + typeof(ValueValidator) +  " could be found for the type name of " + Type);
                     }
                     _validatorInstance = val;
                 }

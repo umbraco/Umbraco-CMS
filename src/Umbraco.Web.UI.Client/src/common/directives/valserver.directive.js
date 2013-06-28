@@ -22,23 +22,19 @@ function valServer(serverValidationService) {
                 fieldName = attr.valServer;
             }
 
-            //subscribe to the changed event of the element. This is required because when we
+            //subscribe to the changed event of the view model. This is required because when we
             // have a server error we actually invalidate the form which means it cannot be 
             // resubmitted. So once a field is changed that has a server error assigned to it
             // we need to re-validate it for the server side validator so the user can resubmit
             // the form. Of course normal client-side validators will continue to execute.
-            element.keydown(function () {
+            ctrl.$viewChangeListeners.push(function () {
                 if (ctrl.$invalid) {
                     ctrl.$setValidity('valServer', true);
+                    //emit the event upwards
+                    scope.$emit("serverRevalidated", { modelCtrl: ctrl });
                 }
             });
-            element.change(function () {
-                if (ctrl.$invalid) {
-                    ctrl.$setValidity('valServer', true);
-                }
-            });            
-            //TODO: DO we need to watch for other changes on the element ?
-
+            
             //subscribe to the server validation changes
             serverValidationService.subscribe(currentProperty, fieldName, function (isValid, propertyErrors, allErrors) {
                 if (!isValid) {
@@ -54,6 +50,8 @@ function valServer(serverValidationService) {
             });
             
             //when the element is disposed we need to unsubscribe!
+            // NOTE: this is very important otherwise when this controller re-binds the previous subscriptsion will remain
+            // but they are a different callback instance than the above.
             element.bind('$destroy', function () {
                 serverValidationService.unsubscribe(currentProperty, fieldName);
             });

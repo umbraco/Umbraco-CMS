@@ -7,7 +7,7 @@ namespace Umbraco.Core.PropertyEditors
     /// A validator that validates that the value is not null or empty (if it is a string)
     /// </summary>
     [ValueValidator("Required")]
-    internal sealed class RequiredValueValidator : ManifestValueValidator
+    internal sealed class RequiredValueValidator : ValueValidator
     {
         public override IEnumerable<ValidationResult> Validate(string value, string config, string preValues, PropertyEditor editor)
         {
