@@ -15,18 +15,24 @@ function authResource($q, $http, umbDataFormatter, umbRequestHelper) {
         return Umbraco.Sys.ServerVariables.authenticationApiBaseUrl + "GetCurrentUser";
     }
 
+    var _currentUser;
+    
+
     return {
-        
+        currentUser: _currentUser,
+
         /** Logs the user in if the credentials are good */
         performLogin: function (username, password) {
 
             var deferred = $q.defer();
             //send the data
             $http.post(getLoginUrl(username, password)).
-                success(function (data, status, headers, config) {                    
+                success(function (data, status, headers, config) {
+                    _currentUser = data;
                     deferred.resolve(data);                    
                 }).
                 error(function (data, status, headers, config) {
+                    _currentUser = data;
                     deferred.reject('Login failed for user ' + username);
                 });
 

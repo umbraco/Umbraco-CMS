@@ -2,10 +2,19 @@
 
 angular.module('umbraco.security.service', [
   'umbraco.security.retryQueue',    // Keeps track of failed requests that need to be retried once the user logs in
+  'umbraco.resources',
   'umbraco.services'
 ])
+.factory('security', ['$http', '$q', '$location', 'securityRetryQueue', 'authResource', 'dialogService', '$log',
+  function ($http, $q, $location, queue, authResource, dialogService, $log) {
 
-.factory('security', ['$http', '$q', '$location', 'securityRetryQueue', 'dialogService', function($http, $q, $location, queue, $dialog) {
+  // Register a handler for when an item is added to the retry queue
+  queue.onItemAddedCallbacks.push(function (retryItem) {
+        if (queue.hasMore()) {
+            service.showLogin();
+        }
+   });
+    
 
   // Redirect to the given url (defaults to '/')
   function redirect(url) {
@@ -21,14 +30,12 @@ angular.module('umbraco.security.service', [
       throw new Error('Trying to open a dialog that is already open!');
     }
 
-    alert("here a dialog would appear");
-    
-    //loginDialog = $dialog.dialog();
-    //loginDialog.open('security/login/form.tpl.html', 'LoginFormController').then(onLoginDialogClose);
+    loginDialog = dialogService.open({template: 'views/common/dialogs/login.html', show: true, callback: onLoginDialogClose});
   }
+      
   function closeLoginDialog(success) {
     if (loginDialog) {
-      loginDialog.close(success);
+        loginDialog = null;
     }
   }
 
@@ -42,12 +49,6 @@ angular.module('umbraco.security.service', [
     }
   }
 
-  // Register a handler for when an item is added to the retry queue
-  queue.onItemAddedCallbacks.push(function(retryItem) {
-    if ( queue.hasMore() ) {
-      service.showLogin();
-    }
-  });
 
   // The public API of the service
   var service = {
@@ -92,10 +93,8 @@ angular.module('umbraco.security.service', [
       if ( service.isAuthenticated() ) {
         return $q.when(service.currentUser);
       } else {
-        return $http.get('/current-user').then(function(response) {
-          service.currentUser = response.data.user;
-          return service.currentUser;
-        });
+        service.currentUser = authResource.currentUser;
+        return service.currentUser;
       }
     },
 

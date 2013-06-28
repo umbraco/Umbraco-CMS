@@ -1,0 +1,13 @@
+﻿<div id="login" class="umb-modalcolumn" ng-controller="Umbraco.Dialogs.LoginController">
+    <div class="form">
+        <h1>Hey {{today}}!, log in below</h1>
+        <div class="control-group">
+            <input type="text" ng-model="login" class="input-xlarge" placeholder="Enter your username" />
+        </div>
+        <div class="control-group">
+            <input type="password" ng-model="password" class="input-xlarge" placeholder="Enter your password" />
+        </div>
+
+        <input type="button" ng-click="loginClick(login, password)" class="btn" value="Login" />
+    </div>
+</div>

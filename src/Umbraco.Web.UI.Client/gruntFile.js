@@ -112,7 +112,7 @@ module.exports = function (grunt) {
         files: [{ dest: '<%= distdir %>/js', src : '*.js', expand: true, cwd: 'src/sample files/' }]
       },
       vs: {
-        files: [{ dest: '<%= vsdir %>/assets', src : '**', expand: true, cwd: '<%= distdir %>' }]
+        files: [{ dest: '<%= vsdir %>', src : '**', expand: true, cwd: '<%= distdir %>' }]
       }
     },
 

@@ -20,25 +20,6 @@ function MainController($scope, $routeParams, $rootScope, $timeout, notification
     $scope.login = "";
     $scope.password = "";
 
-    /**
-     * @ngdoc function
-     * @name signin
-     * @methodOf MainController
-     * @function
-     *
-     * @description
-     * signs the user in
-     */
-    $scope.signin = function () {
-
-        userService.authenticate($scope.login, $scope.password)
-            .then(function (data) {
-                $scope.authenticated = data.authenticated;
-                $scope.user = data.user;
-            }, function (reason) {
-                alert(reason);
-            });
-    };
 
     $scope.signout = function () {
         userService.signout();
@@ -58,7 +39,6 @@ function MainController($scope, $routeParams, $rootScope, $timeout, notification
     };
 
     $scope.closeDialogs = function (event) {
-
         $rootScope.$emit("closeDialogs");
 
         if (navigationService.ui.stickyNavigation && $(event.target).parents(".umb-modalcolumn").size() == 0) {

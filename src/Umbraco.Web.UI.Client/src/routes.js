@@ -32,4 +32,10 @@ app.config(function ($routeProvider) {
     }).config(function ($locationProvider) {
     //$locationProvider.html5Mode(false).hashPrefix('!'); //turn html5 mode off
     // $locationProvider.html5Mode(true);         //turn html5 mode on
-});
+    });
+
+app.run(['security', function (security) {
+    // Get the current user when the application starts
+    // (in case they are still logged in from a previous session)
+    security.requestCurrentUser();
+}]);
