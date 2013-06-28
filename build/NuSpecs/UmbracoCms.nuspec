@@ -21,7 +21,7 @@
   <files>
 	<file src="..\_BuildOutput\WebApp\bin\amd64\**" target="Content\bin\amd64" />
 	<file src="..\_BuildOutput\WebApp\bin\x86\**" target="Content\bin\x86" />
-	<file src="..\_BuildOutput\Configs\**" target="Content\config" exclude="..\_BuildOutput\Configs\Web.config" />
+	<file src="..\_BuildOutput\Configs\**" target="Content\config" exclude="..\_BuildOutput\Configs\Web.config.transform" />
 	<file src="..\_BuildOutput\WebApp\css\**" target="Content\css" />
 	<file src="..\_BuildOutput\WebApp\macroScripts\**" target="Content\macroScripts" />
 	<file src="..\_BuildOutput\WebApp\masterpages\**" target="Content\masterpages" />
