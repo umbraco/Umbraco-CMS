@@ -803,6 +803,12 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                                 connectWith: '.genericPropertyList', 
                                 cancel: 'li.no-properties-on-tab, .propertyForm div[id^=""editbody""]',
                                 tolerance: 'pointer',
+                                start: function() {
+                                    $('#tabs-container').addClass('doc-type-property-drop-zone');
+                                },
+                                stop: function() {
+                                    $('#tabs-container').removeClass('doc-type-property-drop-zone');
+                                },
                                 update: function(event, ui) { 
 
                                     // Save new sort details for tab

@@ -746,3 +746,5 @@ table.tabs-table input[type=submit] { text-align: right;  }
 table.tabs-table tr.propertyContent input.sort-order {display: none;}
 
 li.no-properties-on-tab {background: none; background-color: #fff; cursor: default; }
+
+.doc-type-property-drop-zone { border: dashed 1px #ccc; padding: 4px; }
