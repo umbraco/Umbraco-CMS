@@ -839,7 +839,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
         private string GetHtmlForNoPropertiesMessageListItem()
         {
-            return @"<li class=""no-properties-on-tab"">No properties defined on this tab. Click on the ""add a new property"" link at the top to create a new property.</li></ul>";
+            return @"<li class=""no-properties-on-tab"">" + ui.Text("settings", "noPropertiesDefinedOnTab") + "</li></ul>";
         }
 
         private void SavePropertyType(SaveClickEventArgs e, IContentTypeComposition contentTypeItem)
