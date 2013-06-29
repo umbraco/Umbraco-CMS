@@ -945,7 +945,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 _contentType.ClearVirtualTabs();
             }
 
-            // Sort order
+            //Update the SortOrder of the PropertyTypes
             foreach (HtmlInputHidden propSorter in _sortLists)
             {
                 if (propSorter.Value.Trim() != "")
@@ -953,8 +953,13 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                     string[] newSortOrders = propSorter.Value.Split("&".ToCharArray());
                     for (int i = 0; i < newSortOrders.Length; i++)
                     {
-                        int id = int.Parse(newSortOrders[i].Split("=".ToCharArray())[1]);
-                        cms.businesslogic.propertytype.PropertyType.GetPropertyType(id).SortOrder = i;
+                        var propertyTypeId = int.Parse(newSortOrders[i].Split("=".ToCharArray())[1]);
+                        if (contentTypeItem.PropertyTypes != null &&
+                            contentTypeItem.PropertyTypes.Any(x => x.Id == propertyTypeId))
+                        {
+                            var propertyType = contentTypeItem.PropertyTypes.First(x => x.Id == propertyTypeId);
+                            propertyType.SortOrder = i;
+                        }
                     }
                 }
             }
