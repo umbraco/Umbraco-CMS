@@ -84,6 +84,7 @@
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
     <key alias="changeDocTypeInstruction2">Then confirm and/or amend the mapping of properties from the current type to the new, and click Save.</key>
+    <key alias="contentRepublished">The content has been re-published.</key>    
     <key alias="currentProperty">Current Property</key>
     <key alias="currentType">Current type</key>
     <key alias="docTypeCannotBeChanged">The document type cannot be changed, as there are no alternatives valid for this location.</key>    
@@ -91,10 +92,11 @@
     <key alias="mapToProperty">Map to Property</key>
     <key alias="newTemplate">New Template</key>
     <key alias="newType">New Type</key>
-    <key alias="none">none</key>
+    <key alias="none">none</key>    
     <key alias="selectedContent">Content</key>
     <key alias="selectNewDocType">Select New Document Type</key>
-    <key alias="successMessage">The document type of the selected content has been successfully changed and the properties mapped.</key>
+    <key alias="successMessage">The document type of the selected content has been successfully changed to [new type] and the following properties mapped:</key>
+    <key alias="to">to</key>
     <key alias="validationErrorPropertyWithMoreThanOneMapping">Could not complete property mapping as one or more properties have more than one mapping defined.</key>
     <key alias="validDocTypesNote">Only alternate types valid for the current location are displayed.</key>    
   </area>  

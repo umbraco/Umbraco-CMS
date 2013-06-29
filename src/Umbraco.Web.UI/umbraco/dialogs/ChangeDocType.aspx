@@ -72,6 +72,7 @@
                     <td>
                         <%# DataBinder.Eval(Container, "DataItem.Name") %>
                         <asp:HiddenField ID="Alias" runat="server" Value='<%#DataBinder.Eval(Container, "DataItem.Alias")%>' />
+                        <asp:HiddenField ID="Name" runat="server" Value='<%#DataBinder.Eval(Container, "DataItem.Name")%>' />
                         <asp:HiddenField ID="DataTypeId" runat="server" Value='<%#DataBinder.Eval(Container, "DataItem.DataTypeId")%>' />
                     </td>
                     <td><asp:DropDownList id="DestinationProperty" runat="server" /></td>
@@ -86,7 +87,9 @@
     <asp:PlaceHolder ID="SuccessPlaceholder" runat="server" Visible="false">
         <br />
         <div class="success" style="padding: 10px">        
-            <%=umbraco.ui.Text("changeDocType", "successMessage") %>            
+            <asp:Literal ID="SuccessMessage" runat="server" />
+            <asp:Literal ID="PropertiesMappedMessage" runat="server" />
+            <asp:Literal ID="ContentPublishedMessage" runat="server" />
             <br /><br />
             <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("defaultdialogs", "closeThisWindow") %></a>  
         </div>

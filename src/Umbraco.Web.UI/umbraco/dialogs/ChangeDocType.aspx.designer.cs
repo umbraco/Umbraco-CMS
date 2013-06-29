@@ -139,6 +139,33 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs {
         protected global::System.Web.UI.WebControls.PlaceHolder SuccessPlaceholder;
         
         /// <summary>
+        /// SuccessMessage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal SuccessMessage;
+        
+        /// <summary>
+        /// PropertiesMappedMessage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal PropertiesMappedMessage;
+        
+        /// <summary>
+        /// ContentPublishedMessage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ContentPublishedMessage;
+        
+        /// <summary>
         /// ValidationPlaceholder control.
         /// </summary>
         /// <remarks>

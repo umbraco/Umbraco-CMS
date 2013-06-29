@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.BasePages;
@@ -11,6 +12,14 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 {
     public partial class ChangeDocType : UmbracoEnsuredPage
     {
+        class PropertyMapping
+        {
+            public string FromName { get; set; }
+            public string ToName { get; set; }
+            public string ToAlias { get; set; }
+            public object Value { get; set; }
+        }
+
         private IContent _content;
  
         protected void Page_Load(object sender, EventArgs e)
@@ -194,14 +203,14 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
             if (IsPropertyMappingValid())
             {
                 // For all properties to be mapped, save the values to a temporary list
-                var propertyValues = SaveMappedPropertyValues();
+                var propertyMappings = SavePropertyMappings();
 
                 // Get flag for if content already published
                 var wasPublished = _content.Published;
                 
-                // Change the document type
+                // Change the document type passing flag to clear the properties
                 var newContentType = GetSelectedDocumentType();
-                _content.ChangeContentType(newContentType);
+                _content.ChangeContentType(newContentType, true);
 
                 // Set the template if one has been selected
                 if (NewTemplateList.SelectedItem != null)
@@ -209,16 +218,19 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                     var templateId = int.Parse(NewTemplateList.SelectedItem.Value);
                     if (templateId > 0)
                     {
-                        var template = ApplicationContext.Current.Services.FileService.GetTemplate(templateId);
-                        _content.Template = template;
+                        _content.Template = ApplicationContext.Current.Services.FileService.GetTemplate(templateId);
                     }
                 }
 
                 // Set the property values
-                foreach (var propertyValue in propertyValues)
+                var propertiesMappedMessageBuilder = new StringBuilder("<ul>");
+                foreach (var propertyMapping in propertyMappings)
                 {
-                    _content.SetValue(propertyValue.Key, propertyValue.Value);
+                    propertiesMappedMessageBuilder.AppendFormat("<li>{0} {1} {2}</li>", 
+                        propertyMapping.FromName, global::umbraco.ui.Text("changeDocType", "to"), propertyMapping.ToName);
+                    _content.SetValue(propertyMapping.ToAlias, propertyMapping.Value);
                 }
+                propertiesMappedMessageBuilder.Append("</ul>");
 
                 // Save
                 var user = global::umbraco.BusinessLogic.User.GetCurrent();
@@ -233,9 +245,23 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                 // Sync the tree
                 ClientTools.SyncTree(_content.Path, true);
 
+                // Display success message
+                SuccessMessage.Text = global::umbraco.ui.Text("changeDocType", "successMessage").Replace("[new type]", "<strong>" + newContentType.Name + "</strong>");
+                PropertiesMappedMessage.Text = propertiesMappedMessageBuilder.ToString();
+                if (wasPublished)
+                {
+                    ContentPublishedMessage.Text = global::umbraco.ui.Text("changeDocType", "contentRepublished");
+                    ContentPublishedMessage.Visible = true;
+                }
+                else
+                {
+                    ContentPublishedMessage.Visible = false;
+                }
                 SuccessPlaceholder.Visible = true;
                 SaveAndCancelPlaceholder.Visible = false;
                 ValidationPlaceholder.Visible = false;
+                ChangeDocTypePane.Visible = false;
+                ChangeDocTypePropertyMappingPane.Visible = false;
             }
             else
             {
@@ -269,10 +295,10 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
             return true;
         }
 
-        private IList<KeyValuePair<string, object>> SaveMappedPropertyValues()
+        private IList<PropertyMapping> SavePropertyMappings()
         {
             // Create list of mapped property values for assignment after the document type is changed
-            var mappedPropertyValues = new List<KeyValuePair<string, object>>();
+            var mappedPropertyValues = new List<PropertyMapping>();
             foreach (RepeaterItem ri in PropertyMappingRepeater.Items)
             {
                 if (ri.ItemType == ListItemType.Item || ri.ItemType == ListItemType.AlternatingItem)
@@ -287,7 +313,13 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                         var sourcePropertyValue = _content.GetValue(sourceAlias);
 
                         // Add to list
-                        mappedPropertyValues.Add(new KeyValuePair<string,object>(mappedAlias, sourcePropertyValue));
+                        mappedPropertyValues.Add(new PropertyMapping
+                            {
+                                FromName = ((HiddenField)ri.FindControl("Name")).Value,
+                                ToName = ddl.SelectedItem.Text,
+                                ToAlias = mappedAlias,
+                                Value = sourcePropertyValue
+                            });
                     }
                 }
             }
