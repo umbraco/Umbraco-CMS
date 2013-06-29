@@ -245,6 +245,9 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                 // Sync the tree
                 ClientTools.SyncTree(_content.Path, true);
 
+                // Reload the page if the content was already being viewed
+                ClientTools.ReloadContentFrameUrlIfPathLoaded("/editContent.aspx?id=" + _content.Id);
+
                 // Display success message
                 SuccessMessage.Text = global::umbraco.ui.Text("changeDocType", "successMessage").Replace("[new type]", "<strong>" + newContentType.Name + "</strong>");
                 PropertiesMappedMessage.Text = propertiesMappedMessageBuilder.ToString();

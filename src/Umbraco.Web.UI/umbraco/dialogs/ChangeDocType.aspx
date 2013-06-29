@@ -85,6 +85,7 @@
     </cc1:Pane>
 
     <asp:PlaceHolder ID="SuccessPlaceholder" runat="server" Visible="false">
+        <h2 class="propertypaneTitel"><%=umbraco.ui.Text("changeDocType", "docTypeChanged") %></h2>
         <br />
         <div class="success" style="padding: 10px">        
             <asp:Literal ID="SuccessMessage" runat="server" />

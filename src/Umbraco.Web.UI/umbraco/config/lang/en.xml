@@ -87,7 +87,8 @@
     <key alias="contentRepublished">The content has been re-published.</key>    
     <key alias="currentProperty">Current Property</key>
     <key alias="currentType">Current type</key>
-    <key alias="docTypeCannotBeChanged">The document type cannot be changed, as there are no alternatives valid for this location.</key>    
+    <key alias="docTypeCannotBeChanged">The document type cannot be changed, as there are no alternatives valid for this location.</key>
+    <key alias="docTypeChanged">Document Type Changed</key>    
     <key alias="mapProperties">Map Properties</key>
     <key alias="mapToProperty">Map to Property</key>
     <key alias="newTemplate">New Template</key>
