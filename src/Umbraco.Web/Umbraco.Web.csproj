@@ -288,6 +288,7 @@
     <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />
+    <Compile Include="DictionarySection.cs" />
     <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
     <Compile Include="Security\Providers\UsersMembershipProvider.cs" />
     <Compile Include="Standalone\ServiceContextManager.cs" />
@@ -1827,12 +1828,16 @@
     <Content Include="umbraco.presentation\umbraco\controls\Images\UploadMediaImage.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx" />
+    <Content Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\actions\delete.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\editContent.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\preview.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\publish.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\mediaPicker.aspx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\mediaPicker.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\webservices\MacroContainerService.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\empty.htm" />
@@ -1867,12 +1872,16 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\cruds.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\emptyTrashcan.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\exportDocumenttype.aspx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\exportDocumenttype.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\imageViewer.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\importDocumenttype.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\insertMacro.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\insertTable.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\moveOrCopy.aspx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\moveOrCopy.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\notifications.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\protectPage.aspx" />

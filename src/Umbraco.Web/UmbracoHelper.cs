@@ -362,6 +362,16 @@ namespace Umbraco.Web
 			return _cultureDictionary[key];
 		}
 
+        /// <summary>
+        /// Returns a dictionary section(folder) for clearner dictionary queries.
+        /// </summary>
+        /// <param name="key">Name of the dictionary folder. (All key in this folder must start with this key also.)</param>
+        /// <returns>DictionarySection</returns>
+        public DictionarySection GetDictionarySection(string key)
+        {
+            return new DictionarySection(this, key);
+        }
+
 		#endregion
 
 		#region Membership
