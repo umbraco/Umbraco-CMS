@@ -3,8 +3,6 @@
 * @name umbraco.resources.treeResource     
 * @description Loads in data for trees
 **/
-function treeResource($q) {
-
     function _getChildren(options){
         if(options === undefined){
             options = {};
@@ -28,7 +26,7 @@ function treeResource($q) {
         ];
     }
     
-    function getMenuItems() {
+    function _getMenuItems() {
         return [
         { name: "Create", cssclass: "plus", alias: "create" },
 
@@ -52,18 +50,7 @@ function treeResource($q) {
     }
 
     var treeArray = [];
-    function _getApplication(options){
-        if(options === undefined){
-            options = {};
-        }
-
-        var section = options.section || 'content';
-        var cacheKey = options.cachekey || '';
-        cacheKey += "_" + section; 
-
-        if (treeArray[cacheKey] !== undefined){
-            return treeArray[cacheKey];
-        }
+    function _getApplication(section){
         
         var t;
         switch(section){
@@ -105,29 +92,6 @@ function treeResource($q) {
             break;
         }               
 
-        treeArray[cacheKey] = t;
-        return treeArray[cacheKey];
+        //treeArray[cacheKey] = t;
+        return t;
     }
-
-
-    //the factory object returned
-    return {
-        /** Loads in the data to display the nodes for an application */
-        loadApplication: function (options) {
-            var deferred = $q.defer();
-            deferred.resolve(_getApplication(options));
-            return deferred.promise;
-        },
-
-        /** Loads in the data to display the child nodes for a given node */
-        loadNodes: function (options) {
-
-            var deferred = $q.defer();
-            var data = _getChildren(options);
-            deferred.resolve(data);
-            return deferred.promise;
-        }
-    };
-}
-
-angular.module('umbraco.mocks.resources').factory('treeResource', treeResource);

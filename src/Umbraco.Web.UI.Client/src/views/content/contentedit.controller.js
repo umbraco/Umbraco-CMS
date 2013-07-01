@@ -65,7 +65,8 @@ function ContentEditController($scope, $routeParams, contentResource, notificati
         }
         else {
             //TODO: Implement an overlay showing the full YSOD like we had in v5
-            alert("failed!");
+            //alert("failed!");
+            notificationsService.error("Validation failed", err);
         }
     }
 

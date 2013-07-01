@@ -1,7 +1,7 @@
 // Login
 // -------------------------
 
-#login {
+.login-overlay {
   width: 100%;
   height: 100%;
   background: @blackLight url(../img/application/logo.png) no-repeat 20px 30px fixed !important;
@@ -10,9 +10,15 @@
   z-index: 2000;
   top: 0px;
   left: 0px;
+  margin: 0 !Important;
+  padding: 0;
 }
 
-#login .form {
+.login-overlay .umb-modalcolumn{
+  background: none;
+}
+
+.login-overlay .form {
   display: block;
   padding-top: 100px;
   padding-left: 165px;
@@ -20,7 +26,7 @@
   text-align: right
 }
 
-#login h1 {
+.login-overlay h1 {
   display: block;
   text-align: right;
   color: @white;

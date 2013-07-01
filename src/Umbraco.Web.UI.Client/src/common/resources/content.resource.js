@@ -121,7 +121,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             var _id = 0;
             for (var i = 0; i < collection.take; i++) {
                 _id = (parentId + i) * options.offset;
-                var cnt = this.getContent(_id);
+                var cnt = this.getById(_id);
 
                 //here we fake filtering
                 if (options.filter !== '') {

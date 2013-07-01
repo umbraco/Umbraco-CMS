@@ -1,5 +1,5 @@
 angular.module("umbraco.directives")
-  .directive('umbTree', function ($compile, $log, $q, treeService) {
+  .directive('umbTree', function ($compile, $log, $q, treeService, notificationsService) {
     
     return {
       restrict: 'E',
@@ -45,7 +45,8 @@ angular.module("umbraco.directives")
                           //set the data once we have it
                           scope.tree = data;
                       }, function (reason) {
-                          alert(reason);
+
+                          notificationsService.error("Tree Error", reason);
                           return;
                       });   
 

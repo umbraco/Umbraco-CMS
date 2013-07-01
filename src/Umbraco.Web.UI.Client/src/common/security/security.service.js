@@ -30,7 +30,11 @@ angular.module('umbraco.security.service', [
       throw new Error('Trying to open a dialog that is already open!');
     }
 
-    loginDialog = dialogService.open({template: 'views/common/dialogs/login.html', show: true, callback: onLoginDialogClose});
+    loginDialog = dialogService.open({
+                      template: 'views/common/dialogs/login.html', 
+                      modalClass: "login-overlay", 
+                      show: true, 
+                      callback: onLoginDialogClose});
   }
       
   function closeLoginDialog(success) {

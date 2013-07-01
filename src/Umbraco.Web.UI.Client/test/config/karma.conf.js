@@ -8,16 +8,17 @@ module.exports = function(karma) {
     // list of files / patterns to load in the browser
     files: [
        'lib/jquery/jquery-1.8.2.min.js',
-	  'lib/angular/angular.min.js',
-	  'test/lib/angular/angular-mocks.js',
-	  'src/app_dev.js',
-	  'src/common/directives/*.js',
-	  'src/common/filters/*.js',
-	  'src/common/services/*.js',
-	  'src/common/security/*.js',
-	  'src/common/mocks/**/*.js',
-	  'src/views/**/*.controller.js',
-	  'test/unit/**/*.spec.js'
+        'lib/angular/angular.min.js',
+        'test/lib/angular/angular-mocks.js',
+        'src/app.js',
+        'src/common/directives/*.js',
+        'src/common/filters/*.js',
+        'src/common/services/*.js',
+        'src/common/security/*.js',
+        'src/common/mocks/*.js',
+        'src/common/resources/*.js',
+        'src/views/**/*.controller.js',
+        'test/unit/**/*.spec.js'
     ],
 
     // list of files to exclude
@@ -27,11 +28,6 @@ module.exports = function(karma) {
     // possible values: 'dots', 'progress', 'junit', 'teamcity'
     // CLI --reporters progress
     reporters: ['progress'],
-
-    junitReporter: {
-      // will be resolved to basePath (in the same way as files/exclude patterns)
-      outputFile: 'test-results.xml'
-    },
 
     // web server port
     // CLI --port 9876
@@ -86,8 +82,7 @@ module.exports = function(karma) {
       'karma-jasmine',
       'karma-chrome-launcher',
       'karma-firefox-launcher',
-      'karma-phantomjs-launcher',
-      'karma-junit-reporter'
+      'karma-phantomjs-launcher'
     ]
   });
 };

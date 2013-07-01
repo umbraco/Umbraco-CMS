@@ -1,6 +1,5 @@
 ﻿angular.module("umbraco").controller("Umbraco.Dialogs.LoginController", function ($scope, userService) {
-    alert("login");
-   
+    
     /**
      * @ngdoc function
      * @name signin
@@ -11,12 +10,12 @@
      * signs the user in
      */
     $scope.loginClick = function (login, password) {
-        alert("wat");
         
         userService.authenticate(login, password)
             .then(function (data) {
                 $scope.authenticated = data.authenticated;
                 $scope.user = data.user;
+                $scope.submit(null);
             }, function (reason) {
                 alert(reason);
             });

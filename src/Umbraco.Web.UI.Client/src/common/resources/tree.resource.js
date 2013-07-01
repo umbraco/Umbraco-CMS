@@ -9,6 +9,7 @@ function treeResource($q, $http) {
     function getTreeAppUrl(section) {
         return Umbraco.Sys.ServerVariables.treeApplicationApiBaseUrl + "GetApplicationTrees?application=" + section;
     }
+    
     /** internal method to get the tree node's children url */
     function getTreeNodesUrl(node) {
         if (!node.childNodesUrl){

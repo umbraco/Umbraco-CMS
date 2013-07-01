@@ -14,6 +14,7 @@ Umbraco.Sys.ServerVariables = {
     "contentTypeApiBaseUrl": "/umbraco/Api/ContentType/",
     "mediaTypeApiBaseUrl": "/umbraco/Api/MediaTypeApi/",
     "authenticationApiBaseUrl": "/umbraco/UmbracoApi/Authentication/",
+    
     "MyPackage": {
         "serverEnvironmentView": "/Belle/PropertyEditors/ServerSidePropertyEditors/ServerEnvironment"
     }

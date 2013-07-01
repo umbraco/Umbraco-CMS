@@ -108,9 +108,11 @@ module.exports = function (grunt) {
       media: {
         files: [{ dest: 'build/media', src : '*.*', expand: true, cwd: 'media/' }]
       },
-      sampleFiles: {
-        files: [{ dest: '<%= distdir %>/js', src : '*.js', expand: true, cwd: 'src/sample files/' }]
+      
+      mocks: {
+        files: [{ dest: '<%= distdir %>/js', src : '*.js', expand: true, cwd: 'src/common/mocks/' }]
       },
+
       vs: {
         files: [{ dest: '<%= vsdir %>', src : '**', expand: true, cwd: '<%= distdir %>' }]
       }

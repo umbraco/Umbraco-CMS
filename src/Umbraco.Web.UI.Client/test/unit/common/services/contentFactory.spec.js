@@ -1,7 +1,8 @@
 describe('content factory tests', function () {
     var $scope, contentFactory;
 
-    beforeEach(module('umbraco.mocks.resources'));
+    beforeEach(module('umbraco.services'));
+    beforeEach(module('umbraco.resources'));
 
     beforeEach(inject(function($injector) {
       $scope = $injector.get('$rootScope');
