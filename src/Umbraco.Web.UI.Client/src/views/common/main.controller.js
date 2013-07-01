@@ -9,23 +9,9 @@
  * 
  */
 function MainController($scope, $routeParams, $rootScope, $timeout, notificationsService, userService, navigationService) {
-    //also be authed for e2e test
-    var d = new Date();
-    var weekday = new Array("Super Sunday", "Manic Monday", "Tremendous Tuesday", "Wonderfull Wednesday", "Thunder Thursday", "Friendly Friday", "Shiny Saturday");
-    $scope.today = weekday[d.getDay()];
-
-
     //set default properties
     $scope.authenticated = null; //the null is important because we do an explicit bool check on this in the view    
-    $scope.login = "";
-    $scope.password = "";
-
-
-    $scope.signout = function () {
-        userService.signout();
-        $scope.authenticated = false;
-    };
-
+    
     //subscribes to notifications in the notification service
     $scope.notifications = notificationsService.current;
     $scope.$watch('notificationsService.current', function (newVal, oldVal, scope) {
@@ -52,7 +38,7 @@ function MainController($scope, $routeParams, $rootScope, $timeout, notification
             $scope.authenticated = data.authenticated;
             $scope.user = data.user;
         }, function (reason) {
-            alert("An error occurred checking authentication.");
+            notificationsService.error("An error occurred checking authentication.");
             $scope.authenticated = false;
             $scope.user = null;
         });
