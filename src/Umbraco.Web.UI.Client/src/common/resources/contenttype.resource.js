@@ -15,13 +15,16 @@ function contentTypeResource($q, $http) {
         //return a content type with a given ID
         getContentType: function (id) {
 
-            return {
+            var deferred = $q.defer();
+            var data = {
                 name: "News Article",
                 alias: "newsArticle",
                 id: id,
                 tabs: []
             };
-
+            
+            deferred.resolve(data);
+            return deferred.promise;
         },
         //return all available types
         all: function () {
@@ -41,14 +44,19 @@ function contentTypeResource($q, $http) {
         //return all types allowed under given document
         getAllowedTypes: function (contentId) {
 
+
             var deferred = $q.defer();
 
             //go and get the tree data
             $http.get(getChildContentTypesUrl(contentId)).
                 success(function (data, status, headers, config) {
+                    
+                    console.log("success");
+                    
                     deferred.resolve(data);
                 }).
                 error(function (data, status, headers, config) {
+                    console.log("wrong");
                     deferred.reject('Failed to retreive data for content id ' + contentId);
                 });
 

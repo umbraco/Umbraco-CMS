@@ -45,6 +45,7 @@ angular.module('umbraco.security.service', [
 
   function onLoginDialogClose(success) {
     loginDialog = null;
+
     if ( success ) {
       queue.retryAll();
     } else {
@@ -108,11 +109,6 @@ angular.module('umbraco.security.service', [
     // Is the current user authenticated?
     isAuthenticated: function(){
       return !!service.currentUser;
-    },
-    
-    // Is the current user an adminstrator?
-    isAdmin: function() {
-      return !!(service.currentUser && service.currentUser.admin);
     }
   };
 

@@ -31,4 +31,4 @@ function sectionResource($q, $http) {
     };
 }
 
-angular.module('umbraco.resources').factory('treeResource', treeResource);
+angular.module('umbraco.resources').factory('sectionResource', sectionResource);

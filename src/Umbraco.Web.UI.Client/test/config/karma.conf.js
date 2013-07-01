@@ -9,14 +9,15 @@ module.exports = function(karma) {
     files: [
        'lib/jquery/jquery-1.8.2.min.js',
         'lib/angular/angular.min.js',
+        'lib/underscore/underscore.js',
         'test/lib/angular/angular-mocks.js',
-        'src/app.js',
+        'src/app_dev.js',
         'src/common/directives/*.js',
         'src/common/filters/*.js',
         'src/common/services/*.js',
         'src/common/security/*.js',
-        'src/common/mocks/*.js',
         'src/common/resources/*.js',
+        'src/common/mocks/**/*.js',
         'src/views/**/*.controller.js',
         'test/unit/**/*.spec.js'
     ],
@@ -44,7 +45,7 @@ module.exports = function(karma) {
     // level of logging
     // possible values: karma.LOG_DISABLE || karma.LOG_ERROR || karma.LOG_WARN || karma.LOG_INFO || karma.LOG_DEBUG
     // CLI --log-level debug
-    logLevel: karma.LOG_INFO,
+    logLevel: karma.LOG_DEBUG,
 
     // enable / disable watching file and executing tests whenever any file changes
     // CLI --auto-watch --no-auto-watch

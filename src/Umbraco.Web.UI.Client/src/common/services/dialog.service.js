@@ -43,7 +43,8 @@ angular.module('umbraco.services')
 					};
 					
 					scope.hide = function() {
-						$modal.modal('hide');
+					    $modal.modal('hide');
+					    $('body').remove($modal);
 					};
 
 					scope.show = function() {
@@ -51,8 +52,10 @@ angular.module('umbraco.services')
 					};
 
 					scope.submit = function(data){
-						callback(data);
-						$modal.modal('hide');
+					    $modal.modal('hide');
+					    $('body').remove($modal);
+
+					    callback(data);
 					};
 
 					scope.select = function(item){

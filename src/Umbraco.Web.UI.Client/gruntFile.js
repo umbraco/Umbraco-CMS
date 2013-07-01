@@ -19,7 +19,7 @@ module.exports = function (grunt) {
   grunt.registerTask('dev', ['jshint:dev', 'build', 'webserver', 'open:dev', 'watch']);
   
   //run by the watch task
-  grunt.registerTask('watch-build', ['jshint:dev','recess:build','karma:unit','concat','copy']);
+  grunt.registerTask('watch-build', ['jshint:dev','recess:build','concat','copy','karma:unit']);
   
   //triggered from grunt dev or grunt
   grunt.registerTask('build', ['clean','concat','recess:build','copy']);
@@ -152,9 +152,9 @@ module.exports = function (grunt) {
         src:['src/common/resources/*.js'],
         dest: '<%= distdir %>/js/umbraco.resources.js'
       },
-      mocks: {
-        src:['src/common/mocks/**/*.js'],
-        dest: '<%= distdir %>/js/umbraco.mocks.js'
+      testing: {
+        src:['src/common/mocks/resources/*.js'],
+        dest: '<%= distdir %>/js/umbraco.testing.js'
       },
       directives: {
         src:['src/common/directives/*.js'],

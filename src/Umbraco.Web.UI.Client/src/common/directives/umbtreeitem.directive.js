@@ -1,5 +1,5 @@
 angular.module("umbraco.directives")
-.directive('umbTreeItem', function($compile, $http, $templateCache, $interpolate, $log, $location, treeService) {
+.directive('umbTreeItem', function($compile, $http, $templateCache, $interpolate, $log, $location, treeService, notificationsService) {
   return {
     restrict: 'E',
     replace: true,
@@ -10,14 +10,15 @@ angular.module("umbraco.directives")
       node:'='
     },
 
-    template: '<li><div ng-style="setTreePadding(node)">' +
+    template: '<li><div ng-style="setTreePadding(node)" ng-class="{\'loading\': node.loading}">' +
         '<ins ng-hide="node.hasChildren" style="background:none;width:18px;"></ins>' +        
-        '<ins ng-show="node.hasChildren" ng-class="{\'icon-caret-right\': !node.expanded, \'icon-caret-down\': node.expanded}" ng-click="load(node)"></ins>' +
-       '<i class="{{node | umbTreeIconClass:\'icon umb-tree-icon sprTree\'}}" style="{{node | umbTreeIconStyle}}"></i>' +
-       '<a ng-click="select(this, node, $event)" >{{node.name}}</a>' +
-       '<i class="umb-options" ng-click="options(this, node, $event)"><i></i><i></i><i></i></i>' +
-       '</div>'+
-       '</li>',
+        '<ins ng-show="node.hasChildren" ng-class="{\'icon-caret-right\': !node.expanded, \'icon-caret-down\': node.expanded}" ng-click="load(this, node)"></ins>' +
+        '<i class="{{node | umbTreeIconClass:\'icon umb-tree-icon sprTree\'}}" style="{{node | umbTreeIconStyle}}"></i>' +
+        '<a ng-click="select(this, node, $event)" >{{node.name}}</a>' +
+        '<i class="umb-options" ng-click="options(this, node, $event)"><i></i><i></i><i></i></i>' +
+        '<div ng-show="node.loading" class="l"><div></div></div>' +
+        '</div>' +
+        '</li>',
 
     link: function (scope, element, attrs) {
       
@@ -68,18 +69,29 @@ angular.module("umbraco.directives")
             scope.$emit("treeNodeSelect", { element: e, node: n, event: ev });
         };
 
-        scope.load = function (node) {
+        scope.load = function (arrow, node) {
+
           if (node.expanded){
             node.expanded = false;
             node.children = [];
+            
           }else {
+            
+            node.loading = true;
 
             treeService.getChildren( { node: node, section: scope.section } )
                 .then(function (data) {
+                    node.loading = false;
+                   // $(arrow).parent().remove(loader);
+                    
                     node.children = data;
                     node.expanded = true;
                 }, function (reason) {
-                    alert(reason);
+                  //  $(arrow).parent().remove(loader);
+                    node.loading = false;
+                    notificationsService.error(reason);
+                    
+                    //alert(reason);
                     return;
                 });
             }   

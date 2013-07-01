@@ -13,7 +13,7 @@ function treeIconStyleFilter(treeIconHelper) {
             }
             return "";
         }
-        return "background-image: url('" + treeNode.iconFilePath + "');height:16px;background-position:2px 0px";
+        return "background-image: url('" + treeNode.iconFilePath + "');height:16px; background-position:2px 0px; background-repeat: no-repeat";
     };
 }
 angular.module('umbraco.filters').filter("umbTreeIconStyle", treeIconStyleFilter);

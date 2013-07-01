@@ -1,21 +1,42 @@
 describe('content factory tests', function () {
-    var $scope, contentFactory;
+    var $rootScope, $httpBackend, contentFactory;
 
     beforeEach(module('umbraco.services'));
     beforeEach(module('umbraco.resources'));
+    beforeEach(module('umbraco.httpbackend'));
 
-    beforeEach(inject(function($injector) {
-      $scope = $injector.get('$rootScope');
-      contentFactory = $injector.get('contentResource');
+    beforeEach(inject(function ($injector) {
+        $rootScope = $injector.get('$rootScope');
+        $httpBackend = $injector.get('$httpBackend');
+        contentFactory = $injector.get('contentResource');
     }));
 
-    describe('global content factory crud', function () {
+    afterEach(function () {
+        $httpBackend.verifyNoOutstandingExpectation();
+        $httpBackend.verifyNoOutstandingRequest();
+    });
 
+
+    describe('global content factory crud', function () {
         it('should return a content object, given an id', function () {
-            var doc1 = contentFactory.getById(1234).then(function(doc1){
-                expect(doc1).toNotBe(undefined);
-                expect(doc1.id).toBe(1234);    
+            var doc = "meh";
+            contentFactory.getById(1234).then(function (result) {
+                doc = result;
             });
+            
+            console.log("doc:", doc);
+            $rootScope.$root.$digest();
+          
+
+            //$scope.$apply();
+            
+            //.then(function (doc1) {
+                console.log("doc:", doc);
+                
+                expect(doc).toNotBe(undefined);
+                expect(doc.id).toBe(1234);    
+            //});
+            
         });
 
         it('should return a content children collection given an id', function () {

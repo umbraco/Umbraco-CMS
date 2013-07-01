@@ -13,9 +13,7 @@
         
         userService.authenticate(login, password)
             .then(function (data) {
-                $scope.authenticated = data.authenticated;
-                $scope.user = data.user;
-                $scope.submit(null);
+                $scope.submit(data);
             }, function (reason) {
                 alert(reason);
             });

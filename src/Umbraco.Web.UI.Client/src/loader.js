@@ -11,8 +11,8 @@ yepnope({
 		
 		'js/umbraco.servervariables.js',		
 		'js/app_dev.js',
-		'js/umbraco.httpbackend.helper.js',
 		'js/umbraco.httpbackend.js',
+        'js/umbraco.testing.js',
 
 		'js/umbraco.directives.js',
 		'js/umbraco.filters.js',
