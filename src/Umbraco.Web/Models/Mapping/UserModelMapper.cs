@@ -1,26 +1,27 @@
 ﻿using System;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class UserModelMapper
+    internal class UserModelMapper : MapperConfiguration
     {
-        /// <summary>
-        /// Configures the automapper mappings
-        /// </summary>
-        internal static void Configure()
+
+        #region Mapper config
+        public override void ConfigureMappings(IConfiguration config)
         {
-            Mapper.CreateMap<IUser, UserDetail>()
+            config.CreateMap<IUser, UserDetail>()
                   .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))
                   .ForMember(
                       detail => detail.EmailHash,
                       opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().ToMd5()));
-            Mapper.CreateMap<IProfile, UserBasic>()
+            config.CreateMap<IProfile, UserBasic>()
                   .ForMember(detail => detail.UserId, opt => opt.MapFrom(profile => GetIntId(profile.Id)));
-        }
+        } 
+        #endregion
 
         private static int GetIntId(object id)
         {
@@ -41,6 +42,6 @@ namespace Umbraco.Web.Models.Mapping
         public UserBasic ToUserBasic(IProfile profile)
         {
             return Mapper.Map<UserBasic>(profile);
-        }
+        }        
     }
 }

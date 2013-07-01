@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using AutoMapper;
 using NUnit.Framework;
 using SqlCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models.Mapping;
+using Umbraco.Core.Sections;
 using Umbraco.Tests.TestHelpers;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -33,10 +36,23 @@ namespace Umbraco.Tests.BusinessLogic
         public void Initialize()
         {
             ApplicationContext.Current = new ApplicationContext(false){IsReady = true};
+            InitializeMappers();
             InitializeDatabase();
             InitializeApps();
             InitializeAppConfigFile();
             InitializeTreeConfigFile();
+        }
+
+        private void InitializeMappers()
+        {
+            Mapper.Initialize(configuration =>
+                {
+                    var mappers = PluginManager.Current.FindAndCreateInstances<IMapperConfiguration>();
+                    foreach (var mapper in mappers)
+                    {
+                        mapper.ConfigureMappings(configuration);
+                    }
+                });
         }
 
         private void ClearDatabase()
@@ -71,7 +87,7 @@ namespace Umbraco.Tests.BusinessLogic
 
         private void InitializeApps()
         {
-            Application.MakeNew("content", "content", "file", 0);
+            SectionCollection.MakeNew("content", "content", "file", 0);
             //Application.SetTestApps(new List<Application>()
             //    {
             //        new Application(Constants.Applications.Content, "content", "content", 0)
@@ -80,7 +96,7 @@ namespace Umbraco.Tests.BusinessLogic
 
         private void InitializeAppConfigFile()
         {
-            Application.AppConfigFilePath = IOHelper.MapPath(SystemDirectories.Config + "/" + Application.AppConfigFileName, false);
+            SectionCollection.AppConfigFilePath = IOHelper.MapPath(SystemDirectories.Config + "/" + SectionCollection.AppConfigFileName, false);
         }
 
         private void InitializeTreeConfigFile()

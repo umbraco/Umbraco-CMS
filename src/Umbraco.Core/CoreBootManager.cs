@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using AutoMapper;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
@@ -100,9 +103,19 @@ namespace Umbraco.Core
         /// <summary>
         /// This method allows for configuration of model mappers
         /// </summary>
-        protected virtual void InitializeModelMappers()
+        /// <remarks>
+        /// Model mappers MUST be defined on ApplicationEventHandler instances with the interface IMapperConfiguration.
+        /// This allows us to search for less types on startup.
+        /// </remarks>
+        protected void InitializeModelMappers()
         {
-            //TODO: There will most likely be AutoMapper configs to put in here, we know they exist in web for now so we'll leave this here for future use
+            Mapper.Initialize(configuration =>
+                {
+                    foreach (var m in ApplicationEventsResolver.Current.ApplicationEventHandlers.OfType<IMapperConfiguration>())
+                    {
+                        m.ConfigureMappings(configuration);
+                    }
+                });
         }
 
         /// <summary>
@@ -135,8 +148,6 @@ namespace Umbraco.Core
             {
                 CanResolveBeforeFrozen = true
             };
-            //add custom types here that are internal
-            ApplicationEventsResolver.Current.AddType<PublishedContentHelper>();
         }
 
         /// <summary>
@@ -280,10 +291,6 @@ namespace Umbraco.Core
 
 			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
 				PluginManager.Current.ResolvePropertyEditorValueConverters());
-			//add the internal ones, these are not public currently so need to add them manually
-			PropertyEditorValueConvertersResolver.Current.AddType<DatePickerPropertyEditorValueConverter>();
-			PropertyEditorValueConvertersResolver.Current.AddType<TinyMcePropertyEditorValueConverter>();
-			PropertyEditorValueConvertersResolver.Current.AddType<YesNoPropertyEditorValueConverter>();
 
             // this is how we'd switch over to DefaultShortStringHelper _and_ still use
             // UmbracoSettings UrlReplaceCharacters...

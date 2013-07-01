@@ -51,6 +51,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper, Version=2.2.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\AutoMapper.2.2.1\lib\net40\AutoMapper.dll</HintPath>
+    </Reference>
     <Reference Include="Examine, Version=0.1.51.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Examine.0.1.51.2941\lib\Examine.dll</HintPath>
@@ -288,8 +292,8 @@
     <Compile Include="Publishing\PublishingStrategyTests.cs" />
     <Compile Include="Resolvers\ActionsResolverTests.cs" />
     <Compile Include="AsynchronousRollingFileAppenderTests.cs" />
-    <Compile Include="BusinessLogic\ApplicationTest.cs" />
-    <Compile Include="BusinessLogic\ApplicationTreeTest.cs" />
+    <Compile Include="TreesAndSections\SectionTests.cs" />
+    <Compile Include="TreesAndSections\ApplicationTreeTest.cs" />
     <Compile Include="BusinessLogic\BaseTest.cs" />
     <Compile Include="CacheRefresherFactoryTests.cs" />
     <Compile Include="PublishedContent\DynamicPublishedContentCustomExtensionMethods.cs" />

@@ -113,22 +113,11 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Configure the model mappers
-        /// </summary>
-        protected override void InitializeModelMappers()
-        {
-            base.InitializeModelMappers();
-            UserModelMapper.Configure();
-        }
-
-        /// <summary>
         /// Adds custom types to the ApplicationEventsResolver
         /// </summary>
         protected override void InitializeApplicationEventsResolver()
         {
             base.InitializeApplicationEventsResolver();
-            ApplicationEventsResolver.Current.AddType<CacheHelperExtensions.CacheHelperApplicationEventListener>();
-            ApplicationEventsResolver.Current.AddType<LegacyScheduledTasks>();
             //We need to remove these types because we've obsoleted them and we don't want them executing:
             ApplicationEventsResolver.Current.RemoveType<global::umbraco.LibraryCacheRefresher>();
         }
@@ -291,10 +280,10 @@ namespace Umbraco.Web
             UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
                 PluginManager.Current.ResolveUmbracoApiControllers());
 
-            //the base creates the PropertyEditorValueConvertersResolver but we want to modify it in the web app and replace
-            //the TinyMcePropertyEditorValueConverter with the RteMacroRenderingPropertyEditorValueConverter
-            PropertyEditorValueConvertersResolver.Current.RemoveType<TinyMcePropertyEditorValueConverter>();
-            PropertyEditorValueConvertersResolver.Current.AddType<RteMacroRenderingPropertyEditorValueConverter>();
+            //the base creates the PropertyEditorValueConvertersResolver but we want to modify it in the web app and remove
+            //the TinyMcePropertyEditorValueConverter since when the web app is loaded the RteMacroRenderingPropertyEditorValueConverter
+            //is found and we'll use that instead.
+            PropertyEditorValueConvertersResolver.Current.RemoveType<TinyMcePropertyEditorValueConverter>();            
 
             PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
                 new PublishedCache.XmlPublishedCache.PublishedContentCache(),

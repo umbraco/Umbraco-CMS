@@ -3,8 +3,11 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Xml.Linq;
+using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Sections;
 using umbraco.BusinessLogic.Utils;
 using umbraco.DataLayer;
 using umbraco.businesslogic;
@@ -12,75 +15,47 @@ using umbraco.interfaces;
 
 namespace umbraco.BusinessLogic
 {
-    public class ApplicationRegistrar : IApplicationStartupHandler
+    public class ApplicationRegistrar : ApplicationEventHandler, IMapperConfiguration
     {
-        private ISqlHelper _sqlHelper;
-        protected ISqlHelper SqlHelper
+        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
-            get
+            // Load all Applications by attribute and add them to the XML config
+            var types = PluginManager.Current.ResolveApplications();
+
+            //since applications don't populate their metadata from the attribute and because it is an interface, 
+            //we need to interrogate the attributes for the data. Would be better to have a base class that contains 
+            //metadata populated by the attribute. Oh well i guess.
+            var attrs = types.Select(x => x.GetCustomAttributes<ApplicationAttribute>(false).Single())
+                             .Where(x => SectionCollection.GetByAlias(x.Alias) == null)
+                             .ToArray();
+
+            var allAliases = SectionCollection.Sections.Select(x => x.Alias).Concat(attrs.Select(x => x.Alias));
+            
+            SectionCollection.LoadXml(doc =>
             {
-                if (_sqlHelper == null)
+                foreach (var attr in attrs)
                 {
-                    try
-                    {
-                        var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
-                        _sqlHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false);
-                    }
-                    catch { }
+                    doc.Root.Add(new XElement("add",
+                                              new XAttribute("alias", attr.Alias),
+                                              new XAttribute("name", attr.Name),
+                                              new XAttribute("icon", attr.Icon),
+                                              new XAttribute("sortOrder", attr.SortOrder)));
                 }
-                return _sqlHelper;
-            }
+            }, true);
         }
 
-        public ApplicationRegistrar()
+        public void ConfigureMappings(IConfiguration config)
         {
-
-			//don't do anything if the application is not configured!
-			if (!ApplicationContext.Current.IsConfigured)
-				return;
-
-            // Load all Applications by attribute and add them to the XML config
-        	var types = PluginManager.Current.ResolveApplications();
-
-			//since applications don't populate their metadata from the attribute and because it is an interface, 
-			//we need to interrogate the attributes for the data. Would be better to have a base class that contains 
-			//metadata populated by the attribute. Oh well i guess.
-			var attrs = types.Select(x => x.GetCustomAttributes<ApplicationAttribute>(false).Single())
-                .Where(x => Application.getByAlias(x.Alias) == null);
-
-            var allAliases = Application.getAll().Select(x => x.alias).Concat(attrs.Select(x => x.Alias));
-            var inString = "'" + string.Join("','", allAliases) + "'";
-			
-            Application.LoadXml(doc =>
-                {
-                    foreach (var attr in attrs)
-                    {
-                        doc.Root.Add(new XElement("add",
-                                                  new XAttribute("alias", attr.Alias),
-                                                  new XAttribute("name", attr.Name),
-                                                  new XAttribute("icon", attr.Icon),
-                                                  new XAttribute("sortOrder", attr.SortOrder)));
-                    }
-                    
-                    var db = ApplicationContext.Current.DatabaseContext.Database;
-                    var exist = db.TableExist("umbracoApp");
-                    if (exist)
-                    {
-                        var dbApps = SqlHelper.ExecuteReader("SELECT * FROM umbracoApp WHERE appAlias NOT IN (" + inString + ")");
-                        while (dbApps.Read())
-                        {
-                            doc.Root.Add(new XElement("add",
-                                                      new XAttribute("alias", dbApps.GetString("appAlias")),
-                                                      new XAttribute("name", dbApps.GetString("appName")),
-                                                      new XAttribute("icon", dbApps.GetString("appIcon")),
-                                                      new XAttribute("sortOrder", dbApps.GetByte("sortOrder"))));
-                        }
-                    }
-
-                }, true);
-            
-            //TODO Shouldn't this be enabled and then delete the whole table?
-            //SqlHelper.ExecuteNonQuery("DELETE FROM umbracoApp");
+            config.CreateMap<Umbraco.Core.Sections.Section, Application>()
+                  .ForMember(x => x.alias, expression => expression.MapFrom(x => x.Alias))
+                  .ForMember(x => x.icon, expression => expression.MapFrom(x => x.Icon))
+                  .ForMember(x => x.name, expression => expression.MapFrom(x => x.Name))
+                  .ForMember(x => x.sortOrder, expression => expression.MapFrom(x => x.SortOrder)).ReverseMap();
+            config.CreateMap<Application, Umbraco.Core.Sections.Section>()
+                  .ForMember(x => x.Alias, expression => expression.MapFrom(x => x.alias))
+                  .ForMember(x => x.Icon, expression => expression.MapFrom(x => x.icon))
+                  .ForMember(x => x.Name, expression => expression.MapFrom(x => x.name))
+                  .ForMember(x => x.SortOrder, expression => expression.MapFrom(x => x.sortOrder));
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Xml.Linq;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using umbraco.businesslogic;
@@ -17,21 +18,20 @@ namespace umbraco.BusinessLogic
     /// <summary>
     /// A startup handler for dealing with trees
     /// </summary>
-    public class ApplicationTreeRegistrar : ApplicationEventHandler
+    public class ApplicationTreeRegistrar : ApplicationEventHandler, IMapperConfiguration
     {
 
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
-            ConfigureMappings();
             ScanTrees();
         }
 
         /// <summary>
         /// Configures automapper model mappings
         /// </summary>
-        private static void ConfigureMappings()
+        public void ConfigureMappings(IConfiguration config)
         {
-            Mapper.CreateMap<Umbraco.Core.Trees.ApplicationTree, ApplicationTree>()
+            config.CreateMap<Umbraco.Core.Trees.ApplicationTree, ApplicationTree>()
                   .ReverseMap(); //two way
         }
 

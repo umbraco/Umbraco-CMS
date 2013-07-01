@@ -211,6 +211,8 @@
     <Compile Include="Models\IDictionaryTranslation.cs" />
     <Compile Include="Models\IFile.cs" />
     <Compile Include="Models\ILanguage.cs" />
+    <Compile Include="Models\Mapping\IMapperConfiguration.cs" />
+    <Compile Include="Models\Mapping\MapperConfiguration.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipUser.cs" />
     <Compile Include="Models\ServerRegistration.cs" />
     <Compile Include="Models\ITemplate.cs" />
@@ -688,6 +690,8 @@
     <Compile Include="Publishing\PublishStatus.cs" />
     <Compile Include="Publishing\PublishStatusType.cs" />
     <Compile Include="RenderingEngine.cs" />
+    <Compile Include="Sections\Section.cs" />
+    <Compile Include="Sections\SectionCollection.cs" />
     <Compile Include="Serialization\AbstractSerializationService.cs" />
     <Compile Include="Serialization\Formatter.cs" />
     <Compile Include="Serialization\IFormatter.cs" />

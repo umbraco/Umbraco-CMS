@@ -3,6 +3,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Sections;
 using Umbraco.Core.Services;
 using Umbraco.Core.Trees;
 using umbraco;
@@ -30,8 +31,8 @@ namespace Umbraco.Web.Cache
             ApplicationTreeCollection.New += ApplicationTreeNew;
 
             //bind to application events
-            Application.Deleted += ApplicationDeleted;
-            Application.New += ApplicationNew;
+            SectionCollection.Deleted += ApplicationDeleted;
+            SectionCollection.New += ApplicationNew;
 
             //bind to user type events
             UserType.Deleted += UserTypeDeleted;
@@ -145,12 +146,12 @@ namespace Umbraco.Web.Cache
         #endregion
 
         #region Application event handlers
-        static void ApplicationNew(Application sender, System.EventArgs e)
+        static void ApplicationNew(Section sender, System.EventArgs e)
         {
             DistributedCache.Instance.RefreshAllApplicationCache();
         }
 
-        static void ApplicationDeleted(Application sender, System.EventArgs e)
+        static void ApplicationDeleted(Section sender, System.EventArgs e)
         {
             DistributedCache.Instance.RefreshAllApplicationCache();
         } 
