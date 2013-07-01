@@ -560,7 +560,8 @@ namespace Umbraco.Core
 
 			try
 			{
-				return a.GetExportedTypes();
+				//return a.GetExportedTypes();
+			    return a.GetTypes();
 			}
 			catch (ReflectionTypeLoadException ex)
 			{

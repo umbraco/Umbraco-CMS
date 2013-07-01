@@ -1,6 +1,8 @@
-﻿using NUnit.Framework;
+﻿using AutoMapper;
+using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -22,8 +24,9 @@ namespace Umbraco.Tests.TestHelpers
         {
             TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
-            SetupPluginManager();
+            SetupPluginManager();            
             SetupApplicationContext();
+            InitializeMappers();
             FreezeResolution();
         }
 
@@ -38,6 +41,18 @@ namespace Umbraco.Tests.TestHelpers
             ApplicationContext.Current.DisposeIfDisposable();
             ApplicationContext.Current = null;
             ResetPluginManager();
+        }
+
+        private void InitializeMappers()
+        {
+            Mapper.Initialize(configuration =>
+            {
+                var mappers = PluginManager.Current.FindAndCreateInstances<IMapperConfiguration>();
+                foreach (var mapper in mappers)
+                {
+                    mapper.ConfigureMappings(configuration);
+                }
+            });
         }
 
         /// <summary>
