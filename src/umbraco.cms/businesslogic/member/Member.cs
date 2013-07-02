@@ -223,7 +223,7 @@ namespace umbraco.cms.businesslogic.member
                 throw new Exception(String.Format("Duplicate User name! A member with the user name {0} already exists", loginName));
 
             // Lowercased to prevent duplicates
-            Email = Email.ToLowerInvariant();
+            Email = Email.ToLower();
             Guid newId = Guid.NewGuid();
 
             //create the cms node first
@@ -555,14 +555,23 @@ namespace umbraco.cms.businesslogic.member
             }
             set
             {
-                var m = Member.GetMemberFromEmail(value);
-                if (m != null && Membership.Providers[UmbracoMemberProviderName].RequiresUniqueEmail)
+                var oldEmail = Email;
+                var newEmail = value.ToLower();
+                var requireUniqueEmail = Membership.Providers[UmbracoMemberProviderName].RequiresUniqueEmail;
+                var howManyMembersWithEmail = Member.GetMembersFromEmail(newEmail).Length;
+                if (((oldEmail == newEmail && howManyMembersWithEmail > 1) ||
+                    (oldEmail != newEmail && howManyMembersWithEmail > 0))
+                    && requireUniqueEmail)
                 {
-                    throw new Exception(String.Format("Duplicate Email! A member with the e-mail {0} already exists", value.ToLower()));
+                    // If the value hasn't changed and there are more than 1 member with that email, then throw
+                    // If the value has changed and there are any member with that new email, then throw
+                    throw new Exception(String.Format("Duplicate Email! A member with the e-mail {0} already exists", newEmail));
                 }
                 SqlHelper.ExecuteNonQuery(
                     "update cmsMember set Email = @email where nodeId = @id",
-                    SqlHelper.CreateParameter("@id", Id), SqlHelper.CreateParameter("@email", value.ToLower()));
+                    SqlHelper.CreateParameter("@id", Id), SqlHelper.CreateParameter("@email", newEmail));
+                // Set the backing field to new value
+                m_Email = newEmail;
             }
         }
         #endregion
@@ -618,10 +627,11 @@ namespace umbraco.cms.businesslogic.member
                             string dbType = property.PropertyType.DataTypeDefinition.DbType;
                             if (dbType.Equals("Integer"))
                             {
-                                if (property.Value is bool)
+                                if (property.Value is bool || property.PropertyType.DataTypeDefinition.DataType.Id == new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a"))
                                 {
-                                    int val = Convert.ToInt32(property.Value);
-                                    poco.Integer = val;
+                                    poco.Integer = property.Value != null && string.IsNullOrEmpty(property.Value.ToString())
+                                          ? 0
+                                          : Convert.ToInt32(property.Value);
                                 }
                                 else
                                 {

@@ -75,7 +75,7 @@ namespace Umbraco.Core.Models
             if (contentType.ContentTypeComposition.Any(x => x.CompositionAliases().Any(ContentTypeCompositionExists)))
                 return false;
 
-            if (!ContentTypeCompositionExists(contentType.Alias))
+            if (ContentTypeCompositionExists(contentType.Alias) == false)
             {
                 _contentTypeComposition.Add(contentType);
                 OnPropertyChanged(ContentTypeCompositionSelector);

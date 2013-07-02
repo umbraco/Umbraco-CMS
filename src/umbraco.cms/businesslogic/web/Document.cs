@@ -10,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Caching;
+using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
@@ -914,11 +915,74 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                var publishedResults = ((ContentService)ApplicationContext.Current.Services.ContentService)
+                IEnumerable<Attempt<PublishStatus>> publishedResults = ((ContentService)ApplicationContext.Current.Services.ContentService)
                     .PublishWithChildrenInternal(Content, u.Id);
 
                 FireAfterPublish(e);
             }
+        }
+
+        [Obsolete("Don't use! Only used internally to support the legacy events", false)]
+        internal IEnumerable<Attempt<PublishStatus>> PublishWithSubs(int userId, bool includeUnpublished)
+        {
+            PublishEventArgs e = new PublishEventArgs();
+            FireBeforePublish(e);
+
+            IEnumerable<Attempt<PublishStatus>> publishedResults = Enumerable.Empty<Attempt<PublishStatus>>();
+
+            if (!e.Cancel)
+            {
+                publishedResults = ((ContentService) ApplicationContext.Current.Services.ContentService)
+                    .PublishWithChildrenInternal(Content, userId, includeUnpublished);
+
+                FireAfterPublish(e);
+            }
+
+            return publishedResults;
+        }
+
+        [Obsolete("Don't use! Only used internally to support the legacy events", false)]
+        internal Attempt<PublishStatus> SaveAndPublish(int userId)
+        {
+            var result = new Attempt<PublishStatus>(false,
+                                                    new PublishStatus(Content,
+                                                                      PublishStatusType
+                                                                          .FailedCancelledByEvent));
+            foreach (var property in GenericProperties)
+            {
+                Content.SetValue(property.PropertyType.Alias, property.Value);
+            }
+
+            var saveArgs = new SaveEventArgs();
+            FireBeforeSave(saveArgs);
+
+            if (!saveArgs.Cancel)
+            {
+                var publishArgs = new PublishEventArgs();
+                FireBeforePublish(publishArgs);
+
+                if (!publishArgs.Cancel)
+                {
+                    //NOTE: The 'false' parameter will cause the PublishingStrategy events to fire which will ensure that the cache is refreshed.
+                    result = ((ContentService)ApplicationContext.Current.Services.ContentService)
+                        .SaveAndPublishInternal(Content, userId);
+                    base.VersionDate = Content.UpdateDate;
+                    this.UpdateDate = Content.UpdateDate;
+
+                    //NOTE: This is just going to call the CMSNode Save which will launch into the CMSNode.BeforeSave and CMSNode.AfterSave evenths
+                    // which actually do dick all and there's no point in even having them there but just in case for some insane reason someone
+                    // has bound to those events, I suppose we'll need to keep this here.
+                    base.Save();
+
+                    //Launch the After Save event since we're doing 2 things in one operation: Saving and publishing.
+                    FireAfterSave(saveArgs);
+
+                    //Now we need to fire the After publish event
+                    FireAfterPublish(publishArgs);
+                }
+            }
+
+            return result;
         }
 
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.UnPublish()", false)]
@@ -930,7 +994,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                _published = ((ContentService)ApplicationContext.Current.Services.ContentService).UnPublish(Content);
+                _published = ApplicationContext.Current.Services.ContentService.UnPublish(Content);
                 
                 FireAfterUnPublish(e);
             }
