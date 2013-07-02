@@ -24,6 +24,8 @@ namespace Umbraco.Core.Services
         private Lazy<ServerRegistrationService> _serverRegistrationService;
         private Lazy<EntityService> _entityService;
         private Lazy<RelationService> _relationService;
+        private Lazy<ApplicationTreeService> _treeService;
+        private Lazy<SectionService> _sectionService;
 
 		/// <summary>
 		/// Constructor
@@ -31,9 +33,9 @@ namespace Umbraco.Core.Services
 		/// <param name="dbUnitOfWorkProvider"></param>
 		/// <param name="fileUnitOfWorkProvider"></param>
 		/// <param name="publishingStrategy"></param>
-		internal ServiceContext(IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, IUnitOfWorkProvider fileUnitOfWorkProvider, BasePublishingStrategy publishingStrategy)
+		internal ServiceContext(IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, IUnitOfWorkProvider fileUnitOfWorkProvider, BasePublishingStrategy publishingStrategy, CacheHelper cache)
 		{   
-			BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy, 
+			BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy, cache,
 				//this needs to be lazy because when we create the service context it's generally before the
 				//resolvers have been initialized!
 				new Lazy<RepositoryFactory>(() => RepositoryResolver.Current.Factory));
@@ -46,6 +48,7 @@ namespace Umbraco.Core.Services
 			IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, 
 			IUnitOfWorkProvider fileUnitOfWorkProvider, 
 			BasePublishingStrategy publishingStrategy, 
+            CacheHelper cache,
 			Lazy<RepositoryFactory> repositoryFactory)
         {
             var provider = dbUnitOfWorkProvider;
@@ -86,6 +89,12 @@ namespace Umbraco.Core.Services
 
             if(_relationService == null)
                 _relationService = new Lazy<RelationService>(() => new RelationService(provider, repositoryFactory.Value, _entityService.Value));
+
+            if (_treeService == null)
+                _treeService = new Lazy<ApplicationTreeService>(() => new ApplicationTreeService(cache));
+
+            if (_sectionService == null)
+                _sectionService = new Lazy<SectionService>(() => new SectionService(provider, repositoryFactory.Value, _entityService.Value, _treeService.Value, cache));
         }
 
         /// <summary>
@@ -182,6 +191,22 @@ namespace Umbraco.Core.Services
         internal IMemberService MemberService
         {
             get { return _memberService.Value; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="SectionService"/>
+        /// </summary>
+        internal SectionService SectionService
+        {
+            get { return _sectionService.Value; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ApplicationTreeService"/>
+        /// </summary>
+        internal ApplicationTreeService ApplicationTreeService
+        {
+            get { return _treeService.Value; }
         }
     }
 }

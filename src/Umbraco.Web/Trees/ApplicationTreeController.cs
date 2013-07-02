@@ -4,7 +4,8 @@ using System.Management.Instrumentation;
 using System.Net.Http.Formatting;
 using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Trees;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -38,7 +39,7 @@ namespace Umbraco.Web.Trees
             if (application == null) throw new ArgumentNullException("application");
 
             //find all tree definitions that have the current application alias
-            var appTrees = ApplicationTreeCollection.GetApplicationTree(application).Where(x => x.Initialize).ToArray();
+            var appTrees = ApplicationContext.Current.Services.ApplicationTreeService.GetApplicationTrees(application).Where(x => x.Initialize).ToArray();
             if (appTrees.Count() == 1)
             {
                 //return the nodes for the one tree assigned

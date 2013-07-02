@@ -40,7 +40,10 @@ namespace Umbraco.Web.Standalone
                     _serviceContext = new ServiceContext(
                         new PetaPocoUnitOfWorkProvider(dbFactory),
                         new FileUnitOfWorkProvider(),
-                        new PublishingStrategy());
+                        new PublishingStrategy(),
+                        //SD: Not sure if this is correct? Should we be using HttpRuntime.Cache here since this is for 'Web' ?
+                        //  just not quite sure what this standalone stuff is :)
+                        new CacheHelper(new System.Web.Caching.Cache(), true));
 
                     //initialize the DatabaseContext
                     dbContext.Initialize(_providerName);

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -37,11 +38,14 @@ namespace Umbraco.Tests.Services
 			//overwrite the local object
 			ApplicationContext.DatabaseContext = new DatabaseContext(_dbFactory);
 
+            //disable cache
+            var cacheHelper = new CacheHelper(new NullCacheProvider(), false);
+
 			//here we are going to override the ServiceContext because normally with our test cases we use a 
 			//global Database object but this is NOT how it should work in the web world or in any multi threaded scenario.
 			//we need a new Database object for each thread.
-			_uowProvider = new PerThreadPetaPocoUnitOfWorkProvider(_dbFactory);			
-			ApplicationContext.Services = new ServiceContext(_uowProvider, new FileUnitOfWorkProvider(), new PublishingStrategy());
+			_uowProvider = new PerThreadPetaPocoUnitOfWorkProvider(_dbFactory);
+            ApplicationContext.Services = new ServiceContext(_uowProvider, new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper);
 
 			CreateTestData();
 		}

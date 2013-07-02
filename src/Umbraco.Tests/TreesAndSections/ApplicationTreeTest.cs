@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
-using Umbraco.Core.Sections;
-using Umbraco.Core.Trees;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using System;
 using System.Linq;
@@ -26,22 +25,22 @@ namespace Umbraco.Tests.TreesAndSections
         {
             //create new app
             var name = Guid.NewGuid().ToString("N");
-            SectionCollection.MakeNew(name, name, "icon.jpg");
+            ApplicationContext.Services.SectionService.MakeNew(name, name, "icon.jpg");
 
             //check if it exists
-            var app = SectionCollection.GetByAlias(name);
+            var app = ApplicationContext.Services.SectionService.GetByAlias(name);
             Assert.IsNotNull(app);
 
             //create the new app tree assigned to the new app
-            ApplicationTreeCollection.MakeNew(false, 0, app.Alias, name, name, "icon.jpg", "icon.jpg", "nulltype");
-            var tree = ApplicationTreeCollection.GetByAlias(name);
+            ApplicationContext.Services.ApplicationTreeService.MakeNew(false, 0, app.Alias, name, name, "icon.jpg", "icon.jpg", "nulltype");
+            var tree = ApplicationContext.Services.ApplicationTreeService.GetByAlias(name);
             Assert.IsNotNull(tree);
 
             //now delete the app
-            SectionCollection.DeleteSection(app);
+            ApplicationContext.Services.SectionService.DeleteSection(app);
 
             //check that the tree is gone
-            Assert.AreEqual(0, ApplicationTree.getApplicationTree(name).Count());
+            Assert.AreEqual(0, ApplicationContext.Services.ApplicationTreeService.GetApplicationTrees(name).Count());
         }
 
 

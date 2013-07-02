@@ -11,7 +11,8 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Sections;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using umbraco.DataLayer;
 using System.Runtime.CompilerServices;
 using umbraco.businesslogic;
@@ -131,7 +132,7 @@ namespace umbraco.BusinessLogic
         /// <param name="icon">The application icon, which has to be located in umbraco/images/tray folder.</param>
         public static void MakeNew(string name, string alias, string icon)
         {
-            SectionCollection.MakeNew(name, alias, icon);
+            ApplicationContext.Current.Services.SectionService.MakeNew(name, alias, icon);
         }
 
         /// <summary>
@@ -143,7 +144,7 @@ namespace umbraco.BusinessLogic
         /// <param name="sortOrder">The sort order.</param>
         public static void MakeNew(string name, string alias, string icon, int sortOrder)
         {
-            SectionCollection.MakeNew(name, alias, icon, sortOrder);
+            ApplicationContext.Current.Services.SectionService.MakeNew(name, alias, icon, sortOrder);
         }
 
         /// <summary>
@@ -154,7 +155,7 @@ namespace umbraco.BusinessLogic
         public static Application getByAlias(string appAlias)
         {
             return Mapper.Map<Section, Application>(
-                SectionCollection.GetByAlias(appAlias));
+                ApplicationContext.Current.Services.SectionService.GetByAlias(appAlias));
         }
 
         /// <summary>
@@ -162,7 +163,7 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public void Delete()
         {
-            SectionCollection.DeleteSection(Mapper.Map<Application, Section>(this));
+            ApplicationContext.Current.Services.SectionService.DeleteSection(Mapper.Map<Application, Section>(this));
         }
 
         /// <summary>
@@ -171,7 +172,7 @@ namespace umbraco.BusinessLogic
         /// <returns>Returns a Application Array</returns>
         public static List<Application> getAll()
         {
-            return SectionCollection.Sections.Select(Mapper.Map<Section, Application>).ToList();
+            return ApplicationContext.Current.Services.SectionService.GetSections().Select(Mapper.Map<Section, Application>).ToList();
         }
 
         /// <summary>

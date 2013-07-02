@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using AutoMapper;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -38,7 +39,8 @@ namespace Umbraco.Core
 		private bool _isStarted = false;
 		private bool _isComplete = false;
         private readonly UmbracoApplicationBase _umbracoApplication;
-		protected ApplicationContext ApplicationContext { get; private set; }
+		protected ApplicationContext ApplicationContext { get; set; }
+        protected CacheHelper ApplicationCache { get; set; }
 
 	    protected UmbracoApplicationBase UmbracoApplication
 	    {
@@ -60,6 +62,8 @@ namespace Umbraco.Core
 
             _timer = DisposableTimer.DebugDuration<CoreBootManager>("Umbraco application starting", "Umbraco application startup complete");
 
+	        CreateApplicationCache();
+
 			//create database and service contexts for the app context
 			var dbFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName);
 		    Database.Mapper = new PetaPocoMapper();
@@ -67,7 +71,8 @@ namespace Umbraco.Core
 			var serviceContext = new ServiceContext(
 				new PetaPocoUnitOfWorkProvider(dbFactory), 
 				new FileUnitOfWorkProvider(), 
-				new PublishingStrategy());
+				new PublishingStrategy(),
+                ApplicationCache);
 
             CreateApplicationContext(dbContext, serviceContext);
 
@@ -97,7 +102,15 @@ namespace Umbraco.Core
         protected virtual void CreateApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
         {
             //create the ApplicationContext
-            ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext);
+            ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext, ApplicationCache);
+        }
+
+        /// <summary>
+        /// Creates and assigns the ApplicationCache based on a new instance of System.Web.Caching.Cache
+        /// </summary>
+        protected virtual void CreateApplicationCache()
+        {
+            ApplicationCache = new CacheHelper(new System.Web.Caching.Cache(), true);
         }
 
         /// <summary>

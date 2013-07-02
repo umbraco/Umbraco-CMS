@@ -5,9 +5,10 @@ using System.Linq;
 using System.Xml.Linq;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Sections;
+using Umbraco.Core.Services;
 using umbraco.BusinessLogic.Utils;
 using umbraco.DataLayer;
 using umbraco.businesslogic;
@@ -26,12 +27,12 @@ namespace umbraco.BusinessLogic
             //we need to interrogate the attributes for the data. Would be better to have a base class that contains 
             //metadata populated by the attribute. Oh well i guess.
             var attrs = types.Select(x => x.GetCustomAttributes<ApplicationAttribute>(false).Single())
-                             .Where(x => SectionCollection.GetByAlias(x.Alias) == null)
+                             .Where(x => applicationContext.Services.SectionService.GetByAlias(x.Alias) == null)
                              .ToArray();
 
-            var allAliases = SectionCollection.Sections.Select(x => x.Alias).Concat(attrs.Select(x => x.Alias));
-            
-            SectionCollection.LoadXml(doc =>
+            var allAliases = applicationContext.Services.SectionService.GetSections().Select(x => x.Alias).Concat(attrs.Select(x => x.Alias));
+
+            applicationContext.Services.SectionService.LoadXml(doc =>
             {
                 foreach (var attr in attrs)
                 {
@@ -46,12 +47,12 @@ namespace umbraco.BusinessLogic
 
         public void ConfigureMappings(IConfiguration config)
         {
-            config.CreateMap<Umbraco.Core.Sections.Section, Application>()
+            config.CreateMap<Section, Application>()
                   .ForMember(x => x.alias, expression => expression.MapFrom(x => x.Alias))
                   .ForMember(x => x.icon, expression => expression.MapFrom(x => x.Icon))
                   .ForMember(x => x.name, expression => expression.MapFrom(x => x.Name))
                   .ForMember(x => x.sortOrder, expression => expression.MapFrom(x => x.SortOrder)).ReverseMap();
-            config.CreateMap<Application, Umbraco.Core.Sections.Section>()
+            config.CreateMap<Application, Section>()
                   .ForMember(x => x.Alias, expression => expression.MapFrom(x => x.alias))
                   .ForMember(x => x.Icon, expression => expression.MapFrom(x => x.icon))
                   .ForMember(x => x.Name, expression => expression.MapFrom(x => x.name))

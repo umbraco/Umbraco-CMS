@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-	/// <summary>
+    /// <summary>
 	/// Defines the base implementation of a Repository
 	/// </summary>
 	/// <remarks>

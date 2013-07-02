@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -15,7 +16,7 @@ namespace Umbraco.Web.Editors
     {
         public IEnumerable<Section> GetSections()
         {
-            return Core.Sections.SectionCollection.Sections.Select(Mapper.Map<Core.Sections.Section, Section>);
+            return Services.SectionService.GetSections().Select(Mapper.Map<Core.Models.Section, Section>);
         } 
     }
 }

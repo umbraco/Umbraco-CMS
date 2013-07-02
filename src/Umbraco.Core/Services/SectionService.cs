@@ -3,18 +3,41 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
-using Umbraco.Core.Trees;
+using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.UnitOfWork;
+using File = System.IO.File;
 
-namespace Umbraco.Core.Sections
+namespace Umbraco.Core.Services
 {
-    public class SectionCollection
+    internal class SectionService
     {
+        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
+        private readonly RepositoryFactory _repositoryFactory;
+        private readonly EntityService _entityService;
+        private readonly ApplicationTreeService _applicationTreeService;
+        private readonly CacheHelper _cache;
+
+        public SectionService(
+            IDatabaseUnitOfWorkProvider uowProvider, 
+            RepositoryFactory repositoryFactory,
+            EntityService entityService, 
+            ApplicationTreeService applicationTreeService, 
+            CacheHelper cache)
+        {
+            if (applicationTreeService == null) throw new ArgumentNullException("applicationTreeService");
+            if (cache == null) throw new ArgumentNullException("cache");
+            _uowProvider = uowProvider;
+            _repositoryFactory = repositoryFactory;
+            _entityService = entityService;
+            _applicationTreeService = applicationTreeService;
+            _cache = cache;
+        }
+
         internal const string AppConfigFileName = "applications.config";
         private static string _appConfig;
         private static readonly object Locker = new object();
@@ -41,13 +64,11 @@ namespace Umbraco.Core.Sections
         /// <summary>
         /// The cache storage for all applications
         /// </summary>
-        internal static IEnumerable<Section> Sections
+        internal IEnumerable<Section> GetSections()
         {
-            get
-            {
-                return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                    CacheKeys.ApplicationsCacheKey,
-                    () =>
+            return _cache.GetCacheItem(
+                CacheKeys.ApplicationsCacheKey,
+                () =>
                     {
                         ////used for unit tests
                         //if (_testApps != null)
@@ -56,27 +77,25 @@ namespace Umbraco.Core.Sections
                         var tmp = new List<Section>();
 
                         LoadXml(doc =>
-                        {
-                            foreach (var addElement in doc.Root.Elements("add").OrderBy(x =>
                             {
-                                var sortOrderAttr = x.Attribute("sortOrder");
-                                return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
-                            }))
-                            {
-                                var sortOrderAttr = addElement.Attribute("sortOrder");
-                                tmp.Add(new Section(addElement.Attribute("name").Value,
+                                foreach (var addElement in doc.Root.Elements("add").OrderBy(x =>
+                                    {
+                                        var sortOrderAttr = x.Attribute("sortOrder");
+                                        return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
+                                    }))
+                                {
+                                    var sortOrderAttr = addElement.Attribute("sortOrder");
+                                    tmp.Add(new Section(addElement.Attribute("name").Value,
                                                         addElement.Attribute("alias").Value,
                                                         addElement.Attribute("icon").Value,
                                                         sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0));
-                            }
-
-                        }, false);
+                                }
+                            }, false);
                         return tmp;
                     });
-            }
         }
 
-        internal static void LoadXml(Action<XDocument> callback, bool saveAfterCallback)
+        internal void LoadXml(Action<XDocument> callback, bool saveAfterCallback)
         {
             lock (Locker)
             {
@@ -97,10 +116,38 @@ namespace Umbraco.Core.Sections
 
                         //remove the cache so it gets re-read ... SD: I'm leaving this here even though it
                         // is taken care of by events as well, I think unit tests may rely on it being cleared here.
-                        ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.ApplicationsCacheKey);
+                        _cache.ClearCacheItem(CacheKeys.ApplicationsCacheKey);
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Get the user's allowed sections
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public IEnumerable<Section> GetAllowedSections(int userId)
+        {
+            var allApps = GetSections();
+            var apps = new List<Section>();
+
+            using (var repository = _repositoryFactory.CreateUserSectionRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(id);
+            }
+
+            //using (IRecordsReader appIcons = SqlHelper.ExecuteReader("select app from umbracoUser2app where [user] = @userID", SqlHelper.CreateParameter("@userID", this.Id)))
+            //{
+            //    while (appIcons.Read())
+            //    {
+            //        var app = allApps.SingleOrDefault(x => x.alias == appIcons.GetString("app"));
+            //        if (app != null)
+            //            apps.Add(app);
+            //    }
+            //}
+
+            return apps;
         }
 
         /// <summary>
@@ -108,9 +155,9 @@ namespace Umbraco.Core.Sections
         /// </summary>
         /// <param name="appAlias">The application alias.</param>
         /// <returns></returns>
-        public static Section GetByAlias(string appAlias)
+        public Section GetByAlias(string appAlias)
         {
-            return Sections.FirstOrDefault(t => t.Alias == appAlias);
+            return GetSections().FirstOrDefault(t => t.Alias == appAlias);
         }
 
         /// <summary>
@@ -120,9 +167,9 @@ namespace Umbraco.Core.Sections
         /// <param name="alias">The application alias.</param>
         /// <param name="icon">The application icon, which has to be located in umbraco/images/tray folder.</param>
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static void MakeNew(string name, string alias, string icon)
+        public void MakeNew(string name, string alias, string icon)
         {
-            MakeNew(name, alias, icon, Sections.Max(x => x.SortOrder) + 1);
+            MakeNew(name, alias, icon, GetSections().Max(x => x.SortOrder) + 1);
         }
 
         /// <summary>
@@ -133,9 +180,9 @@ namespace Umbraco.Core.Sections
         /// <param name="icon">The icon.</param>
         /// <param name="sortOrder">The sort order.</param>
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static void MakeNew(string name, string alias, string icon, int sortOrder)
+        public void MakeNew(string name, string alias, string icon, int sortOrder)
         {            
-            if (Sections.All(x => x.Alias != alias))
+            if (GetSections().All(x => x.Alias != alias))
             {
                 LoadXml(doc =>
                 {
@@ -154,7 +201,7 @@ namespace Umbraco.Core.Sections
         /// <summary>
         /// Deletes the section
         /// </summary>        
-        public static void DeleteSection(Section section)
+        public void DeleteSection(Section section)
         {
             lock (Locker)
             {
@@ -164,10 +211,10 @@ namespace Umbraco.Core.Sections
                     new { appAlias = section.Alias });
 
                 //delete the assigned trees
-                var trees = ApplicationTreeCollection.GetApplicationTree(section.Alias);
+                var trees = _applicationTreeService.GetApplicationTrees(section.Alias);
                 foreach (var t in trees)
                 {
-                    ApplicationTreeCollection.DeleteTree(t);
+                    _applicationTreeService.DeleteTree(t);
                 }
 
                 LoadXml(doc =>

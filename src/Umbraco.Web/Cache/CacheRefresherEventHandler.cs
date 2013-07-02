@@ -3,16 +3,14 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Sections;
 using Umbraco.Core.Services;
-using Umbraco.Core.Trees;
 using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.member;
 using System.Linq;
 using umbraco.cms.businesslogic.web;
-using ApplicationTree = Umbraco.Core.Trees.ApplicationTree;
+using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
 using Template = umbraco.cms.businesslogic.template.Template;
 
@@ -26,13 +24,13 @@ namespace Umbraco.Web.Cache
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {   
             //bind to application tree events
-            ApplicationTreeCollection.Deleted += ApplicationTreeDeleted;
-            ApplicationTreeCollection.Updated += ApplicationTreeUpdated;
-            ApplicationTreeCollection.New += ApplicationTreeNew;
+            ApplicationTreeService.Deleted += ApplicationTreeDeleted;
+            ApplicationTreeService.Updated += ApplicationTreeUpdated;
+            ApplicationTreeService.New += ApplicationTreeNew;
 
             //bind to application events
-            SectionCollection.Deleted += ApplicationDeleted;
-            SectionCollection.New += ApplicationNew;
+            SectionService.Deleted += ApplicationDeleted;
+            SectionService.New += ApplicationNew;
 
             //bind to user type events
             UserType.Deleted += UserTypeDeleted;

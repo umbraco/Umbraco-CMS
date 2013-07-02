@@ -10,6 +10,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
+using Umbraco.Core.Services;
 using umbraco.DataLayer;
 
 namespace umbraco.BusinessLogic
@@ -141,7 +142,7 @@ namespace umbraco.BusinessLogic
         /// <param name="action">The action.</param>
         public static void MakeNew(bool silent, bool initialize, byte sortOrder, string applicationAlias, string alias, string title, string iconClosed, string iconOpened, string assemblyName, string type, string action)
         {
-            Umbraco.Core.Trees.ApplicationTreeCollection.MakeNew(initialize, sortOrder, applicationAlias, alias, title, iconClosed, iconOpened,
+            ApplicationContext.Current.Services.ApplicationTreeService.MakeNew(initialize, sortOrder, applicationAlias, alias, title, iconClosed, iconOpened,
                 assemblyName.IsNullOrWhiteSpace() ? type : string.Format("{0}.{1},{0}", assemblyName, type));
         }
 
@@ -150,8 +151,8 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public void Save()
         {
-            Umbraco.Core.Trees.ApplicationTreeCollection.SaveTree(
-                Mapper.Map<ApplicationTree, Umbraco.Core.Trees.ApplicationTree>(this));
+            ApplicationContext.Current.Services.ApplicationTreeService.SaveTree(
+                Mapper.Map<ApplicationTree, Umbraco.Core.Models.ApplicationTree>(this));
         }
 
         /// <summary>
@@ -159,8 +160,8 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public void Delete()
         {
-            Umbraco.Core.Trees.ApplicationTreeCollection.DeleteTree(
-                Mapper.Map<ApplicationTree, Umbraco.Core.Trees.ApplicationTree>(this));
+            ApplicationContext.Current.Services.ApplicationTreeService.DeleteTree(
+                Mapper.Map<ApplicationTree, Umbraco.Core.Models.ApplicationTree>(this));
         }
 
         /// <summary>
@@ -170,8 +171,8 @@ namespace umbraco.BusinessLogic
         /// <returns>An ApplicationTree instance</returns>
         public static ApplicationTree getByAlias(string treeAlias)
         {
-            return Mapper.Map<Umbraco.Core.Trees.ApplicationTree, ApplicationTree>(
-                Umbraco.Core.Trees.ApplicationTreeCollection.GetByAlias(treeAlias));
+            return Mapper.Map<Umbraco.Core.Models.ApplicationTree, ApplicationTree>(
+                ApplicationContext.Current.Services.ApplicationTreeService.GetByAlias(treeAlias));
         }
 
         /// <summary>
@@ -180,8 +181,8 @@ namespace umbraco.BusinessLogic
         /// <returns>Returns a ApplicationTree Array</returns>
         public static ApplicationTree[] getAll()
         {
-            return Umbraco.Core.Trees.ApplicationTreeCollection.GetAll()
-                          .Select(Mapper.Map<Umbraco.Core.Trees.ApplicationTree, ApplicationTree>)
+            return ApplicationContext.Current.Services.ApplicationTreeService.GetAll()
+                          .Select(Mapper.Map<Umbraco.Core.Models.ApplicationTree, ApplicationTree>)
                           .ToArray();
         }
 
@@ -192,8 +193,8 @@ namespace umbraco.BusinessLogic
         /// <returns>Returns a ApplicationTree Array</returns>
         public static ApplicationTree[] getApplicationTree(string applicationAlias)
         {
-            return Umbraco.Core.Trees.ApplicationTreeCollection.GetApplicationTree(applicationAlias)
-                          .Select(Mapper.Map<Umbraco.Core.Trees.ApplicationTree, ApplicationTree>)
+            return ApplicationContext.Current.Services.ApplicationTreeService.GetApplicationTrees(applicationAlias)
+                          .Select(Mapper.Map<Umbraco.Core.Models.ApplicationTree, ApplicationTree>)
                           .ToArray();
         }
 
@@ -205,8 +206,8 @@ namespace umbraco.BusinessLogic
         /// <returns>Returns a ApplicationTree Array</returns>
         public static ApplicationTree[] getApplicationTree(string applicationAlias, bool onlyInitializedApplications)
         {
-            return Umbraco.Core.Trees.ApplicationTreeCollection.GetApplicationTree(applicationAlias, onlyInitializedApplications)
-                          .Select(Mapper.Map<Umbraco.Core.Trees.ApplicationTree, ApplicationTree>)
+            return ApplicationContext.Current.Services.ApplicationTreeService.GetApplicationTrees(applicationAlias, onlyInitializedApplications)
+                          .Select(Mapper.Map<Umbraco.Core.Models.ApplicationTree, ApplicationTree>)
                           .ToArray();
         }
 

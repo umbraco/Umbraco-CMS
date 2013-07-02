@@ -294,7 +294,6 @@
     <Compile Include="AsynchronousRollingFileAppenderTests.cs" />
     <Compile Include="TreesAndSections\SectionTests.cs" />
     <Compile Include="TreesAndSections\ApplicationTreeTest.cs" />
-    <Compile Include="BusinessLogic\BaseTest.cs" />
     <Compile Include="CacheRefresherFactoryTests.cs" />
     <Compile Include="PublishedContent\DynamicPublishedContentCustomExtensionMethods.cs" />
     <Compile Include="PublishedContent\DynamicPublishedContentTests.cs" />
