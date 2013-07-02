@@ -33,7 +33,7 @@ namespace Umbraco.Web
         /// <returns>string</returns>
         public string GetDictionaryValue(string key)
         {
-            return Umbraco.GetDictionaryValue(Section + key);
+            return Umbraco.GetDictionaryValue(Section + "." + key);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Umbraco.Web
         /// <returns>DictionarySection</returns>
         public DictionarySection GetDictionarySection(string key)
         {
-            return new DictionarySection(Umbraco, Section + key);
+            return new DictionarySection(Umbraco, Section + "." + key);
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Umbraco.Web
         {
             get
             {
-                return Umbraco.GetDictionaryValue(Section + key);
+                return Umbraco.GetDictionaryValue(Section + "." + key);
             }
         }
     }

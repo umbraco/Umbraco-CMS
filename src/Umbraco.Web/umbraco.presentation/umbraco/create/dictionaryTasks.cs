@@ -58,7 +58,10 @@ namespace umbraco
             // Create new dictionary item if name no already exist
             if (ParentID > 0)
             {
-                int id = cms.businesslogic.Dictionary.DictionaryItem.addKey(Alias, "", new cms.businesslogic.Dictionary.DictionaryItem(ParentID).key);
+                // Prepend parent keys to keep unique
+                var parentKey = new cms.businesslogic.Dictionary.DictionaryItem(ParentID).key;
+
+                int id = cms.businesslogic.Dictionary.DictionaryItem.addKey(parentKey + "." + Alias, "", parentKey);
                 m_returnUrl = string.Format("settings/editDictionaryItem.aspx?id={0}", id);
             }
             else
