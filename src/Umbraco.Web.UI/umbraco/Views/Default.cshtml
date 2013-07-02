@@ -47,9 +47,7 @@
     </style>*@
 </head>
 <body ng-controller="MainController" id="umbracoMainPageBody">
-         
     <div ng-cloak id="Div1" class="clearfix" ng-click="closeDialogs($event)">
-
         <umb-left-column></umb-left-column>
 
         <section id="contentwrapper">
@@ -57,6 +55,7 @@
                 <div ng-view></div>
             </div>
         </section>
+
     </div>
 
     <umb-notifications></umb-notifications>

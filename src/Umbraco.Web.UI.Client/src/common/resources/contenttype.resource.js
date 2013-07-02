@@ -3,7 +3,7 @@
     * @name umbraco.resources.contentTypeResource
     * @description Loads in data for content types
     **/
-function contentTypeResource($q, $http) {
+function contentTypeResource($q, $http, $rootScope) {
 
     /** internal method to get the api url */
     function getChildContentTypesUrl(contentId) {
@@ -43,15 +43,15 @@ function contentTypeResource($q, $http) {
 
         //return all types allowed under given document
         getAllowedTypes: function (contentId) {
-            var deferred = $q.defer();
-            $http.get(getChildContentTypesUrl(contentId))
-                .success(function (data, status, headers, config) {
-                    deferred.resolve(data);
-                }).
-                error(function (data, status, headers, config) {
-                    deferred.reject('Failed to retreive data for content id ' + contentId);
+           //var deferred = $q.defer();
+           //getChildContentTypesUrl(contentId))
+
+            return $http.get(getChildContentTypesUrl(contentId))  
+                .then(function(response) {
+                    return response.data;
+                },function(response) {
+                    throw new Error('Failed to retreive data for content id ' + contentId);
                 });
-            return deferred.promise;
         }
 
     };

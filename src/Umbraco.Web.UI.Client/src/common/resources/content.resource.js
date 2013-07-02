@@ -33,9 +33,26 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
     return {
         getById: function (id) {
 
+            return  $http.get(getContentUrl(id))  
+                .then(function(response) {
+
+                    _.each(response.data.tabs, function (item) {
+                        item.active = false;
+                    });
+                    if (response.data.tabs.length > 0){
+                        response.data.tabs[0].active = true;
+                    }    
+
+                    return response.data;
+                },function(response) {
+                    throw new Error('Failed to retreive data for content id ' + id);
+                });    
+
+               /* 
+
             var deferred = $q.defer();
 
- 
+            
             //go and get the data
             $http.get(getContentUrl(id)).
                 success(function (data, status, headers, config) {
@@ -53,7 +70,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     deferred.reject('Failed to retreive data for content id ' + id);
                 });
 
-            return deferred.promise;
+            return deferred.promise;*/
         },
         
         getByIds: function (ids) {

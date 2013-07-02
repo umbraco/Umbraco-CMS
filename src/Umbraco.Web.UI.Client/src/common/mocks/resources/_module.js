@@ -1,1 +1,1 @@
-﻿angular.module("umbraco.mocks", ['ngMockE2E']);
+﻿angular.module("umbraco.mocks", []);

@@ -21,8 +21,9 @@ angular.module('umbraco.mocks').
       }
 
       function returnNodebyId(status, data, headers) {
-          var id = mocksUtills.getParameterByName(data, "id") || 1234;
-          
+          var id = mocksUtills.getParameterByName(data, "id") || "1234";
+          id = parseInt(id, 10);
+
           var node = {
               name: "My content with id: " + id,
               updateDate: new Date(),

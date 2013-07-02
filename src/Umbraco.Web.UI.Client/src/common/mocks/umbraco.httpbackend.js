@@ -21,5 +21,4 @@ function initBackEnd($httpBackend, contentMocks, treeMocks, userMocks, contentTy
 }
 
 
-
 umbracoAppDev.run(initBackEnd);
