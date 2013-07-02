@@ -35,14 +35,10 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
             var deferred = $q.defer();
 
-           
-
+ 
             //go and get the data
             $http.get(getContentUrl(id)).
                 success(function (data, status, headers, config) {
-                    
-                    console.log("getting by id success");
-                    
                     //set the first tab to active
                     _.each(data.tabs, function (item) {
                         item.active = false;
@@ -54,7 +50,6 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     deferred.resolve(data);
                 }).
                 error(function (data, status, headers, config) {
-                    console.log("getting by id - error");
                     deferred.reject('Failed to retreive data for content id ' + id);
                 });
 

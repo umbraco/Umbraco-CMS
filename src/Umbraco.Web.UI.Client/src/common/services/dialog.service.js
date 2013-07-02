@@ -8,8 +8,8 @@ angular.module('umbraco.services')
 		}
 
 		var scope = options.scope || $rootScope.$new(),
-			animationClass = options.animation || "slide",
-			modalClass = options.modalClass || "",
+			animationClass = options.animation || "fade",
+			modalClass = options.modalClass || "umb-modalcolumn",
 			templateUrl = options.template || "views/common/notfound.html";
 
 		var callback = options.callback;
