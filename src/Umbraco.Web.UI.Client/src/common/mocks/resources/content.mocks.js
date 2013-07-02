@@ -80,12 +80,13 @@ angular.module('umbraco.mocks').
 
       return {
           register: function() {
-              
-              $httpBackend
-		        .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoApi/Content/GetById'))
-		        .respond(returnNodebyId);
-
-                
+            $httpBackend
+		          .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoApi/Content/GetById'))
+		          .respond(returnNodebyId);
+          },
+          expectGetById: function() {
+            $httpBackend
+              .expectGET(mocksUtills.urlRegex('/umbraco/UmbracoApi/Content/GetById'));
           }
       };
   }]);

@@ -43,23 +43,14 @@ function contentTypeResource($q, $http) {
 
         //return all types allowed under given document
         getAllowedTypes: function (contentId) {
-
-
             var deferred = $q.defer();
-
-            //go and get the tree data
-            $http.get(getChildContentTypesUrl(contentId)).
-                success(function (data, status, headers, config) {
-                    
-                    console.log("success");
-                    
+            $http.get(getChildContentTypesUrl(contentId))
+                .success(function (data, status, headers, config) {
                     deferred.resolve(data);
                 }).
                 error(function (data, status, headers, config) {
-                    console.log("wrong");
                     deferred.reject('Failed to retreive data for content id ' + contentId);
                 });
-
             return deferred.promise;
         }
 

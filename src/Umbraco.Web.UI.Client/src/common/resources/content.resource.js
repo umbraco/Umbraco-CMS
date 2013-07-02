@@ -33,12 +33,12 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
     return {
         getById: function (id) {
 
-            var deferred = $q.defer();
+//            var deferred = $q.defer();
 
-           
+            return $http.get("/umbraco/UmbracoApi/Content/GetById?id=" + id);        
 
             //go and get the data
-            $http.get(getContentUrl(id)).
+            /*$http.get(getContentUrl(id)).
                 success(function (data, status, headers, config) {
                     
                     console.log("getting by id success");
@@ -58,7 +58,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     deferred.reject('Failed to retreive data for content id ' + id);
                 });
 
-            return deferred.promise;
+            return deferred.promise;*/
         },
         
         getByIds: function (ids) {
