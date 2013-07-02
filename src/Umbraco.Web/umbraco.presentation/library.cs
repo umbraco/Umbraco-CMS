@@ -1330,6 +1330,16 @@ namespace umbraco
         }
 
         /// <summary>
+        /// Gets the dictionary item with the specified key.
+        /// </summary>
+        /// <param name="Key">The key.</param>
+        /// <returns>A dictionary section for futher querying.</returns>
+        public static Umbraco.Web.DictionarySection GetDictionarySection(string Key)
+        {
+            return GetUmbracoHelper().GetDictionarySection(Key);
+        }
+
+        /// <summary>
         /// Gets the current page.
         /// </summary>
         /// <returns>An XpathNodeIterator containing the current page as Xml.</returns>

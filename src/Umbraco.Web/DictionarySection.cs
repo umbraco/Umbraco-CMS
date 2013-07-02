@@ -47,6 +47,17 @@ namespace Umbraco.Web
         }
 
         /// <summary>
+        ///  Get this sections dictionary value.
+        /// </summary>
+        public string Value
+        {
+            get
+            {
+                return Umbraco.GetDictionaryValue(Section);
+            }
+        }
+
+        /// <summary>
         /// Get a dictionary value by combining the section key and child key.
         /// </summary>
         /// <param name="key">child key.</param>
