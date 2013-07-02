@@ -155,8 +155,27 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
             },
             openModalWindow: function(url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback) {
                 //need to create the modal on the top window if the top window has a client manager, if not, create it on the current window                
+                
+                //get our angular navigation service
+                var injector = getRootInjector();
+                var dialogService = injector.get("dialogService");
+                
+                var dialog = dialogService.open({
+                    template: url,
+                    width: width,
+                    height: height,
+                    iframe: true,
+                    show: true,
+                    callback: function (result) {
+                        dialog.hide();
+                    }
+                });
 
-                throw "Not implemented!";
+               // var m = new Umbraco.Controls.ModalWindow();
+               // this._modal.push(m);
+               // m.open(url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback);
+
+                //throw "Not implemented!";
 
                 ////if this is the top window, or if the top window doesn't have a client manager, create the modal in this manager
                 //if (window == this.mainWindow() || !this.mainWindow().UmbClientMgr) {
