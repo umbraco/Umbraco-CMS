@@ -25,68 +25,68 @@ angular.module('umbraco.mocks').
           ];
       }
 
-      function _getChildren(options) {
-          if (options === undefined) {
-              options = {};
-          }
-          var section = options.section || 'content';
-          var treeItem = options.node;
+      function returnChildren(status, data, headers) {
+          
+          var id = mocksUtills.getParameterByName(data, "id");
+          var section = mocksUtills.getParameterByName(data, "treeType");
+          var level = mocksUtills.getParameterByName(data, "level")+1;
 
-          var iLevel = treeItem.level + 1;
-
+          var url = "/umbraco/UmbracoTrees/ApplicationTreeApi/GetChildren?treeType=" + section + "&id=1234&level=" + level;
           //hack to have create as default content action
           var action;
           if (section === "content") {
               action = "create";
           }
 
-          return [
-              { name: "child-of-" + treeItem.name, id: iLevel + "" + 1234, icon: "icon-file-alt", view: section + "/edit/" + iLevel + "" + 1234, children: [], expanded: false, hasChildren: true, level: iLevel, defaultAction: action, menu: getMenuItems() },
-              { name: "random-name-" + section, id: iLevel + "" + 1235, icon: "icon-file-alt", view: section + "/edit/" + iLevel + "" + 1235, children: [], expanded: false, hasChildren: true, level: iLevel, defaultAction: action, menu: getMenuItems() },
-              { name: "random-name-" + section, id: iLevel + "" + 1236, icon: "icon-file-alt", view: section + "/edit/" + iLevel + "" + 1236, children: [], expanded: false, hasChildren: true, level: iLevel, defaultAction: action, menu: getMenuItems() },
-              { name: "random-name-" + section, id: iLevel + "" + 1237, icon: "icon-file-alt", view: "common/legacy/1237?p=" + encodeURI("developer/contentType.aspx?idequal1234"), children: [], expanded: false, hasChildren: true, level: iLevel, defaultAction: action, menu: getMenuItems() }
+          var children = [
+              { name: "child-of-" + section, childNodesUrl:url, id: level + "" + 1234, icon: "icon-file-alt", view: section + "/edit/" + level + "" + 1234, children: [], expanded: false, hasChildren: true, level: level, defaultAction: action, menu: getMenuItems() },
+              { name: "random-name-" + section, childNodesUrl:url, id: level + "" + 1235, icon: "icon-file-alt", view: section + "/edit/" + level + "" + 1235, children: [], expanded: false, hasChildren: true, level: level, defaultAction: action, menu: getMenuItems() },
+              { name: "random-name-" + section, childNodesUrl:url, id: level + "" + 1236, icon: "icon-file-alt", view: section + "/edit/" + level + "" + 1236, children: [], expanded: false, hasChildren: true, level: level, defaultAction: action, menu: getMenuItems() },
+              { name: "random-name-" + section, childNodesUrl:url, id: level + "" + 1237, icon: "icon-file-alt", view: "common/legacy/1237?p=" + encodeURI("developer/contentType.aspx?idequal1234"), children: [], expanded: false, hasChildren: true, level: level, defaultAction: action, menu: getMenuItems() }
           ];
+
+          return [200, children, null];
       }
 
       function returnApplicationTrees(status, data, headers) {
           var section = mocksUtills.getParameterByName(data, "application");
-
+          var url = "/umbraco/UmbracoTrees/ApplicationTreeApi/GetChildren?treeType=" + section + "&id=1234&level=1";
           var t;
           switch (section) {
 
               case "content":
                   t = [
-                          { name: "My website", id: 1234, icon: "icon-home", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menu: getMenuItems() },
-                          { name: "Components", id: 1235, icon: "icon-cogs", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menu: getMenuItems() },
-                          { name: "Archieve", id: 1236, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menu: getMenuItems() },
-                          { name: "Recycle Bin", id: 1237, icon: "icon-trash", view: section + "/trash/view/", children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menu: getMenuItems() }
+                          { name: "My website", id: 1234, childNodesUrl:url, icon: "icon-home", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menu: getMenuItems() },
+                          { name: "Components", id: 1235, childNodesUrl:url, icon: "icon-cogs", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menu: getMenuItems() },
+                          { name: "Archieve", id: 1236, childNodesUrl:url, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menu: getMenuItems() },
+                          { name: "Recycle Bin", id: 1237, childNodesUrl:url, icon: "icon-trash", view: section + "/trash/view/", children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menu: getMenuItems() }
                   ];
                   break;
 
               case "developer":
                   t = [
-                      { name: "Data types", id: 1234, icon: "icon-folder-close", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
-                      { name: "Macros", id: 1235, icon: "icon-folder-close", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
-                      { name: "Pacakges", id: 1236, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
-                      { name: "XSLT Files", id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
-                      { name: "Razor Files", id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() }
+                      { name: "Data types", childNodesUrl:url, id: 1234, icon: "icon-folder-close", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
+                      { name: "Macros", childNodesUrl:url, id: 1235, icon: "icon-folder-close", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
+                      { name: "Pacakges", childNodesUrl:url, id: 1236, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
+                      { name: "XSLT Files", childNodesUrl:url, id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
+                      { name: "Razor Files", childNodesUrl:url, id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() }
                   ];
                   break;
               case "settings":
                   t = [
-                      { name: "Stylesheets", id: 1234, icon: "icon-folder-close", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
-                      { name: "Templates", id: 1235, icon: "icon-folder-close", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
-                      { name: "Dictionary", id: 1236, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
-                      { name: "Media types", id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
-                      { name: "Document types", id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() }
+                      { name: "Stylesheets", childNodesUrl:url, id: 1234, icon: "icon-folder-close", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
+                      { name: "Templates", childNodesUrl:url, id: 1235, icon: "icon-folder-close", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
+                      { name: "Dictionary", childNodesUrl:url, id: 1236, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
+                      { name: "Media types", childNodesUrl:url, id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
+                      { name: "Document types", childNodesUrl:url, id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() }
                   ];
                   break;
               default:
                   t = [
-                      { name: "random-name-" + section, id: 1234, icon: "icon-home", defaultAction: "create", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
-                      { name: "random-name-" + section, id: 1235, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
-                      { name: "random-name-" + section, id: 1236, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
-                      { name: "random-name-" + section, id: 1237, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() }
+                      { name: "random-name-" + section, childNodesUrl:url, id: 1234, icon: "icon-home", defaultAction: "create", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
+                      { name: "random-name-" + section, childNodesUrl:url, id: 1235, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
+                      { name: "random-name-" + section, childNodesUrl:url, id: 1236, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() },
+                      { name: "random-name-" + section, childNodesUrl:url, id: 1237, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menu: getMenuItems() }
                   ];
                   break;
           }
@@ -103,6 +103,9 @@ angular.module('umbraco.mocks').
                  .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoTrees/ApplicationTreeApi/GetApplicationTrees'))
                  .respond(returnApplicationTrees);
 
+              $httpBackend
+                 .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoTrees/ApplicationTreeApi/GetChildren'))
+                 .respond(returnChildren);    
                 
           }
       };

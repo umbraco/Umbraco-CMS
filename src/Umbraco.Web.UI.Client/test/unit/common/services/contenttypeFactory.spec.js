@@ -16,6 +16,7 @@ describe('content type factory tests', function () {
 
 
     describe('global content type factory crud', function () {
+        /*
         it('should return a content type object, given an id', function () {
             
             var ct1;
@@ -23,14 +24,15 @@ describe('content type factory tests', function () {
               ct1 = result;
             });
 
-            $rootScope.$digest();
-            $rootScope.$apply();
+           $rootScope.$digest();
+           $rootScope.$digest();
             
             console.log("ct1:", ct1);
             
             expect(ct1).toNotBe(undefined);
             expect(ct1.id).toBe(1234);
         });
+*/
 
         it('should return a allowed content type collection given a document id', function(){
 
@@ -41,9 +43,6 @@ describe('content type factory tests', function () {
                 collection = result;
             });
 
-
-            $rootScope.$digest();
-            $rootScope.$apply();
             expect(collection.length).toBe(3);
         });      
   });
