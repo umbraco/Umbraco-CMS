@@ -13,7 +13,7 @@ function sectionResource($q, $http) {
     //the factory object returned
     return {
         /** Loads in the data to display the section list */
-        getSections: function (options) {
+        getSections: function () {
            
             var deferred = $q.defer();
 

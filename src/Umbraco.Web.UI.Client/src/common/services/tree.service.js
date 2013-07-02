@@ -9,7 +9,7 @@
 
  * @param myParam {object} Enter param description here
  */
-function treeService($q, treeResource, treeIconHelper) {
+function treeService($q, treeResource, iconHelper) {
     //implement this in local storage
     var treeArray = [];
     var currentSection = "content";
@@ -70,7 +70,7 @@ function treeService($q, treeResource, treeIconHelper) {
 
             //need to convert the icons to new ones
             for (var i = 0; i < treeItem.node.menu.length; i++) {
-                treeItem.node.menu[i].cssclass = treeIconHelper.convertFromLegacyIcon(treeItem.node.menu[i].cssclass);
+                treeItem.node.menu[i].cssclass = iconHelper.convertFromLegacyIcon(treeItem.node.menu[i].cssclass);
             }
             return treeItem.node.menu;            
         },	

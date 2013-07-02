@@ -9,7 +9,7 @@
  * 
  * @param navigationService {navigationService} A reference to the navigationService
  */
-function NavigationController($scope, navigationService) {
+function NavigationController($scope, navigationService, sectionResource) {
     //load navigation service handlers
     $scope.changeSection = navigationService.changeSection;
     $scope.showTree = navigationService.showTree;
@@ -21,7 +21,14 @@ function NavigationController($scope, navigationService) {
     $scope.ui = navigationService.ui;
 
     $scope.selectedId = navigationService.currentId;
-    $scope.sections = navigationService.sections();
+
+    sectionResource.getSections()
+        .then(function(result) {
+            $scope.sections = result;
+        }, function (reason) {
+            //TODO: handle error properly
+            alert(reason);
+        });
 
     //events
     $scope.$on("treeOptionsClick", function (ev, args) {

@@ -11,7 +11,7 @@
                    ng-click="changeSection(section.alias)"
                    ng-mouseenter="showTree(section.alias)"
                    prevent-default>
-                    <i class="{{section.cssclass}}"></i><span>{{section.name}}</span>
+                    <i class="{{section.cssclass | sectionIcon}}"></i><span>{{section.name}}</span>
                 </a>
             </li>
 
