@@ -60,18 +60,8 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             var sql = GetBaseQuery(false);
-            var foundUserTypes = new Dictionary<short, IUserType>();
-            return Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql)
-                           .Select(dto =>
-                           {
-                               //first we need to get the user type
-                               var userType = foundUserTypes.ContainsKey(dto.Type)
-                                                  ? foundUserTypes[dto.Type]
-                                                  : _userTypeRepository.Get(dto.Type);
 
-                               var userFactory = new UserFactory(userType);
-                               return userFactory.BuildEntity(dto);
-                           });
+            return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql));
         }
 
         private IEnumerable<IUser> PerformGetAllOnIds(params int[] ids)
@@ -110,13 +100,21 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                sql.Select("*")
-                   .From<UserDto>()
-                   .LeftJoin<User2AppDto>()
-                   .On<UserDto, User2AppDto>(left => left.Id, right => right.UserId);
+                return GetBaseQuery("*");
             }
             return sql;
         }
+
+        private static Sql GetBaseQuery(string columns)
+        {
+            var sql = new Sql();
+            sql.Select(columns)
+                      .From<UserDto>()
+                      .LeftJoin<User2AppDto>()
+                      .On<UserDto, User2AppDto>(left => left.Id, right => right.UserId);
+            return sql;
+        }
+
 
         protected override string GetBaseWhereClause()
         {
@@ -198,44 +196,53 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         #region Implementation of IUserRepository
-
-        public IProfile GetProfileById(int id)
-        {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-
-            var dto = Database.FirstOrDefault<UserDto>(sql);
-
-            if (dto == null)
-                return null;
-
-            return new Profile(dto.Id, dto.UserName);
-        }
-
-        public IProfile GetProfileByUserName(string username)
-        {
-            var sql = GetBaseQuery(false);
-            sql.Where("umbracoUser.userLogin = @Username", new { Username = username });
-
-            var dto = Database.FirstOrDefault<UserDto>(sql);
-
-            if (dto == null)
-                return null;
-
-            return new Profile(dto.Id, dto.UserName);
-        }
-
-        public IUser GetUserByUserName(string username)
-        {
-            var query = Query<IUser>.Builder.Where(x => x.Username == username);
-            return GetByQuery(query).FirstOrDefault();
-        }
         
-        public void DeleteSectionFromAllUsers(string sectionAlias)
+        public IEnumerable<IUser> GetUsersAssignedToSection(string sectionAlias)
         {
-            throw new NotImplementedException();
+            //Here we're building up a query that looks like this, a sub query is required because the resulting structure
+            // needs to still contain all of the section rows per user.
+
+            //SELECT *
+            //FROM [umbracoUser]
+            //LEFT JOIN [umbracoUser2app]
+            //ON [umbracoUser].[id] = [umbracoUser2app].[user]
+            //WHERE umbracoUser.id IN (SELECT umbracoUser.id
+            //    FROM [umbracoUser]
+            //    LEFT JOIN [umbracoUser2app]
+            //    ON [umbracoUser].[id] = [umbracoUser2app].[user]
+            //    WHERE umbracoUser2app.app = 'content')
+
+            var sql = GetBaseQuery(false);
+            var innerSql = GetBaseQuery("umbracoUser.id");
+            innerSql.Where("umbracoUser2app.app = " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedValue(sectionAlias));
+            sql.Where(string.Format("umbracoUser.id IN ({0})", innerSql.SQL));
+
+            return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql));
         }
 
         #endregion
+
+        private IEnumerable<IUser> ConvertFromDtos(IEnumerable<UserDto> dtos)
+        {
+            var foundUserTypes = new Dictionary<short, IUserType>();
+            return dtos.Select(dto =>
+                {
+                    //first we need to get the user type
+                    IUserType userType;
+                    if (foundUserTypes.ContainsKey(dto.Type))
+                    {
+                        userType = foundUserTypes[dto.Type];
+                    }
+                    else
+                    {
+                        userType = _userTypeRepository.Get(dto.Type);
+                        //put it in the local cache
+                        foundUserTypes.Add(dto.Type, userType);
+                    }
+
+                    var userFactory = new UserFactory(userType);
+                    return userFactory.BuildEntity(dto);
+                });
+        } 
     }
 }

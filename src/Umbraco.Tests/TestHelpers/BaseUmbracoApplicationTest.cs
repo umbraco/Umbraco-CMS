@@ -18,6 +18,11 @@ namespace Umbraco.Tests.TestHelpers
         {
             TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
+
+            SettingsForTests.UseLegacyXmlSchema = false;
+            SettingsForTests.ForceSafeAliases = true;
+            SettingsForTests.UmbracoLibraryCacheDuration = 1800;
+            
             SetupPluginManager();
 
             FreezeResolution();

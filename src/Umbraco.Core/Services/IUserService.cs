@@ -32,16 +32,17 @@ namespace Umbraco.Core.Services
         /// <param name="name">Name of the UserType to retrieve</param>
         /// <returns><see cref="IUserType"/></returns>
         IUserType GetUserTypeByName(string name);
-    }
 
-    /// <summary>
-    /// Defines part of the UserService, which is specific to methods used by the membership provider.
-    /// </summary>
-    /// <remarks>
-    /// Idea is to have this is an isolated interface so that it can be easily 'replaced' in the membership provider impl.
-    /// </remarks>
-    internal interface IMembershipUserService : IService
-    {
-        IMembershipUser CreateUser(string name, string login, string password, IUserType userType, string email = "");
+        /// <summary>
+        /// Saves changes to the user object
+        /// </summary>
+        /// <param name="user"></param>
+        void SaveUser(IUser user);
+
+        /// <summary>
+        /// This is useful when an entire section is removed from config
+        /// </summary>
+        /// <param name="sectionAlias"></param>
+        void DeleteSectionFromAllUsers(string sectionAlias);
     }
 }

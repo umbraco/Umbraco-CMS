@@ -373,70 +373,32 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.IsTrue(result.AllowedSections.Contains("settings"));
             Assert.IsTrue(result.AllowedSections.Contains("media"));
         }
+        
 
         [Test]
-        public void Get_By_Profile_Id()
+        public void Get_Users_Assigned_To_Section()
         {
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             var repository = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
-            var user = MockedUser.CreateUser(CreateAndCommitUserType());
-            repository.AddOrUpdate(user);
+            var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1", "test", "media");
+            var user2 = MockedUser.CreateUser(CreateAndCommitUserType(), "2", "media", "settings");
+            var user3 = MockedUser.CreateUser(CreateAndCommitUserType(), "3", "test", "settings");
+            repository.AddOrUpdate(user1);
+            repository.AddOrUpdate(user2);
+            repository.AddOrUpdate(user3);
             unitOfWork.Commit();
 
             // Act
 
-            var profile = repository.GetProfileById((int)user.Id);
-            unitOfWork.Commit();
+            var users = repository.GetUsersAssignedToSection("test");
 
-            // Assert
-            Assert.IsNotNull(profile);
-            Assert.AreEqual(user.Username, profile.Name);
-            Assert.AreEqual(user.Id, profile.Id);
-        }
-
-        [Test]
-        public void Get_By_Profile_Username()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
-            var user = MockedUser.CreateUser(CreateAndCommitUserType());
-            repository.AddOrUpdate(user);
-            unitOfWork.Commit();
-
-            // Act
-
-            var profile = repository.GetProfileByUserName(user.Username);
-            unitOfWork.Commit();
-
-            // Assert
-            Assert.IsNotNull(profile);
-            Assert.AreEqual(user.Username, profile.Name);
-            Assert.AreEqual(user.Id, profile.Id);
-        }
-
-        [Test]
-        public void Get_User_By_Username()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
-            var user = MockedUser.CreateUser(CreateAndCommitUserType());
-            repository.AddOrUpdate(user);
-            unitOfWork.Commit();
-
-            // Act
-
-            var userByUsername = repository.GetUserByUserName(user.Username);
-            unitOfWork.Commit();
-
-            // Assert
-            Assert.IsNotNull(userByUsername);
-            AssertPropertyValues(userByUsername, user);
+            // Assert            
+            Assert.AreEqual(2, users.Count());
+            var names = users.Select(x => x.Username).ToArray();
+            Assert.IsTrue(names.Contains("TestUser1"));
+            Assert.IsTrue(names.Contains("TestUser3"));
         }
 
         private void AssertPropertyValues(IUser updatedItem, IUser originalUser)

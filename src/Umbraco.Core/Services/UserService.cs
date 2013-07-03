@@ -1,6 +1,8 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using Umbraco.Core.Events;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -40,25 +42,22 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IProfile"/></returns>
         public IProfile GetProfileById(int id)
         {
-            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
-            {
-                return repository.GetProfileById(id);
-            }
+            var user = GetUserById(id);
+            return new Profile(user.Id, user.Username);
         }
 
         public IProfile GetProfileByUserName(string username)
         {
-            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
-            {
-                return repository.GetProfileByUserName(username);
-            }
+            var user = GetUserByUserName(username);
+            return new Profile(user.Id, user.Username);
         }
 
         public IUser GetUserByUserName(string username)
         {
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
             {
-                return repository.GetUserByUserName(username);
+                var query = Query<IUser>.Builder.Where(x => x.Username == username);
+                return repository.GetByQuery(query).FirstOrDefault();
             }
         }
 
@@ -102,6 +101,45 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Savers changes to a user to the database
+        /// </summary>
+        /// <param name="user"></param>
+        public void SaveUser(IUser user)
+        {
+            if (UserSaving.IsRaisedEventCancelled(new SaveEventArgs<IUser>(user), this))
+                return;
+
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateUserRepository(uow))
+            {
+                repository.AddOrUpdate(user);
+                uow.Commit();
+            }
+
+            UserSaved.RaiseEvent(new SaveEventArgs<IUser>(user, false), this);
+        }
+
+        /// <summary>
+        /// This is useful for when a section is removed from config
+        /// </summary>
+        /// <param name="sectionAlias"></param>
+        public void DeleteSectionFromAllUsers(string sectionAlias)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateUserRepository(uow))
+            {
+                var assignedUsers = repository.GetUsersAssignedToSection(sectionAlias);
+                foreach (var user in assignedUsers)
+                {
+                    //now remove the section for each user and commit
+                    user.RemoveAllowedSection(sectionAlias);
+                    repository.AddOrUpdate(user);
+                }
+                uow.Commit();
+            }
+        }
+
+        /// <summary>
         /// Creates a new user for logging into the umbraco backoffice
         /// </summary>
         /// <param name="name"></param>
@@ -110,7 +148,7 @@ namespace Umbraco.Core.Services
         /// <param name="userType"></param>
         /// <param name="email"></param>
         /// <returns></returns>
-        public IMembershipUser CreateUser(string name, string login, string password, IUserType userType, string email = "")
+        public IMembershipUser CreateMembershipUser(string name, string login, string password, IUserType userType, string email = "")
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateUserRepository(uow))
@@ -142,5 +180,15 @@ namespace Umbraco.Core.Services
         }
 
         #endregion
+
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        public static event TypedEventHandler<IUserService, SaveEventArgs<IUser>> UserSaving;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        public static event TypedEventHandler<IUserService, SaveEventArgs<IUser>> UserSaved;
     }
 }
