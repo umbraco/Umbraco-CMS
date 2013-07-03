@@ -42,25 +42,22 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IProfile"/></returns>
         public IProfile GetProfileById(int id)
         {
-            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
-            {
-                return repository.GetProfileById(id);
-            }
+            var user = GetUserById(id);
+            return new Profile(user.Id, user.Username);
         }
 
         public IProfile GetProfileByUserName(string username)
         {
-            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
-            {
-                return repository.GetProfileByUserName(username);
-            }
+            var user = GetUserByUserName(username);
+            return new Profile(user.Id, user.Username);
         }
 
         public IUser GetUserByUserName(string username)
         {
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
             {
-                return repository.GetUserByUserName(username);
+                var query = Query<IUser>.Builder.Where(x => x.Username == username);
+                return repository.GetByQuery(query).FirstOrDefault();
             }
         }
 

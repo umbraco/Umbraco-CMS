@@ -90,5 +90,67 @@ namespace Umbraco.Tests.Services
             Assert.IsFalse(result2.AllowedSections.Contains("test"));
 
         }
+
+        [Test]
+        public void Get_By_Profile_Username()
+        {
+            // Arrange
+            var userType = ServiceContext.UserService.GetUserTypeByAlias("admin");
+            var user = (IUser)ServiceContext.UserService.CreateMembershipUser("test1", "test1", "test1", userType, "test1@test.com");
+
+            // Act
+
+            var profile = ServiceContext.UserService.GetProfileByUserName(user.Username);
+
+            // Assert
+            Assert.IsNotNull(profile);
+            Assert.AreEqual(user.Username, profile.Name);
+            Assert.AreEqual(user.Id, profile.Id);
+        }
+
+        [Test]
+        public void Get_By_Profile_Id()
+        {
+            // Arrange
+            var userType = ServiceContext.UserService.GetUserTypeByAlias("admin");
+            var user = (IUser)ServiceContext.UserService.CreateMembershipUser("test1", "test1", "test1", userType, "test1@test.com");
+
+            // Act
+
+            var profile = ServiceContext.UserService.GetProfileById((int)user.Id);
+
+            // Assert
+            Assert.IsNotNull(profile);
+            Assert.AreEqual(user.Username, profile.Name);
+            Assert.AreEqual(user.Id, profile.Id);
+        }
+
+        [Test]
+        public void Get_User_By_Username()
+        {
+            // Arrange
+            var userType = ServiceContext.UserService.GetUserTypeByAlias("admin");
+            var originalUser = (IUser)ServiceContext.UserService.CreateMembershipUser("test1", "test1", "test1", userType, "test1@test.com");
+
+            // Act
+
+            var updatedItem = ServiceContext.UserService.GetUserByUserName(originalUser.Username);
+
+            // Assert
+            Assert.IsNotNull(updatedItem);
+            Assert.That(updatedItem.Id, Is.EqualTo(originalUser.Id));
+            Assert.That(updatedItem.Name, Is.EqualTo(originalUser.Name));
+            Assert.That(updatedItem.Permissions, Is.EqualTo(originalUser.Permissions));
+            Assert.That(updatedItem.Language, Is.EqualTo(originalUser.Language));
+            Assert.That(updatedItem.IsApproved, Is.EqualTo(originalUser.IsApproved));
+            Assert.That(updatedItem.Password, Is.EqualTo(originalUser.Password));
+            Assert.That(updatedItem.NoConsole, Is.EqualTo(originalUser.NoConsole));
+            Assert.That(updatedItem.StartContentId, Is.EqualTo(originalUser.StartContentId));
+            Assert.That(updatedItem.StartMediaId, Is.EqualTo(originalUser.StartMediaId));
+            Assert.That(updatedItem.DefaultToLiveEditing, Is.EqualTo(originalUser.DefaultToLiveEditing));
+            Assert.That(updatedItem.Email, Is.EqualTo(originalUser.Email));
+            Assert.That(updatedItem.Username, Is.EqualTo(originalUser.Username));
+            Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(0));
+        }
     }
 }

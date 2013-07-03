@@ -196,39 +196,7 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         #region Implementation of IUserRepository
-
-        public IProfile GetProfileById(int id)
-        {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-
-            var dto = Database.FirstOrDefault<UserDto>(sql);
-
-            if (dto == null)
-                return null;
-
-            return new Profile(dto.Id, dto.UserName);
-        }
-
-        public IProfile GetProfileByUserName(string username)
-        {
-            var sql = GetBaseQuery(false);
-            sql.Where("umbracoUser.userLogin = @Username", new { Username = username });
-
-            var dto = Database.FirstOrDefault<UserDto>(sql);
-
-            if (dto == null)
-                return null;
-
-            return new Profile(dto.Id, dto.UserName);
-        }
-
-        public IUser GetUserByUserName(string username)
-        {
-            var query = Query<IUser>.Builder.Where(x => x.Username == username);
-            return GetByQuery(query).FirstOrDefault();
-        }
-
+        
         public IEnumerable<IUser> GetUsersAssignedToSection(string sectionAlias)
         {
             //Here we're building up a query that looks like this, a sub query is required because the resulting structure

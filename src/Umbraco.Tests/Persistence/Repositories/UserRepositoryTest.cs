@@ -373,71 +373,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.IsTrue(result.AllowedSections.Contains("settings"));
             Assert.IsTrue(result.AllowedSections.Contains("media"));
         }
-
-        [Test]
-        public void Get_By_Profile_Id()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
-            var user = MockedUser.CreateUser(CreateAndCommitUserType());
-            repository.AddOrUpdate(user);
-            unitOfWork.Commit();
-
-            // Act
-
-            var profile = repository.GetProfileById((int)user.Id);
-            unitOfWork.Commit();
-
-            // Assert
-            Assert.IsNotNull(profile);
-            Assert.AreEqual(user.Username, profile.Name);
-            Assert.AreEqual(user.Id, profile.Id);
-        }
-
-        [Test]
-        public void Get_By_Profile_Username()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
-            var user = MockedUser.CreateUser(CreateAndCommitUserType());
-            repository.AddOrUpdate(user);
-            unitOfWork.Commit();
-
-            // Act
-
-            var profile = repository.GetProfileByUserName(user.Username);
-            unitOfWork.Commit();
-
-            // Assert
-            Assert.IsNotNull(profile);
-            Assert.AreEqual(user.Username, profile.Name);
-            Assert.AreEqual(user.Id, profile.Id);
-        }
-
-        [Test]
-        public void Get_User_By_Username()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
-            var user = MockedUser.CreateUser(CreateAndCommitUserType());
-            repository.AddOrUpdate(user);
-            unitOfWork.Commit();
-
-            // Act
-
-            var userByUsername = repository.GetUserByUserName(user.Username);
-            unitOfWork.Commit();
-
-            // Assert
-            Assert.IsNotNull(userByUsername);
-            AssertPropertyValues(userByUsername, user);
-        }
+        
 
         [Test]
         public void Get_Users_Assigned_To_Section()
