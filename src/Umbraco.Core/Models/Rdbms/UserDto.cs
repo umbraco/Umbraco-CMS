@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence;
+﻿using System.Collections.Generic;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
@@ -59,5 +60,8 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("defaultToLiveEditing")]
         [Constraint(Default = "0")]
         public bool DefaultToLiveEditing { get; set; }
+
+        [ResultColumn]
+        public List<User2AppDto> User2AppDtos { get; set; }
     }
 }

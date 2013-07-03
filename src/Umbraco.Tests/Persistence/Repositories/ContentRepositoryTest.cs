@@ -15,7 +15,7 @@ using umbraco.interfaces;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-	[TestFixture]
+    [TestFixture]
     public class ContentRepositoryTest : BaseDatabaseFactoryTest
     {
         [SetUp]

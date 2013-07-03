@@ -8,6 +8,8 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Relators;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -38,8 +40,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var dto = Database.FirstOrDefault<UserDto>(sql);
-
+            var dto = Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql).FirstOrDefault();
+            
             if (dto == null)
                 return null;
 
@@ -54,18 +56,30 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (ids.Any())
             {
-                foreach (var id in ids)
-                {
-                    yield return Get(id);
-                }
+                return PerformGetAllOnIds(ids);
             }
-            else
+
+            var sql = GetBaseQuery(false);
+            var foundUserTypes = new Dictionary<short, IUserType>();
+            return Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql)
+                           .Select(dto =>
+                               {
+                                   //first we need to get the user type
+                                   var userType = foundUserTypes.ContainsKey(dto.Type)
+                                                      ? foundUserTypes[dto.Type]
+                                                      : _userTypeRepository.Get(dto.Type);
+
+                                   var userFactory = new UserFactory(userType);
+                                   return userFactory.BuildEntity(dto);
+                               });
+        }
+
+        private IEnumerable<IUser> PerformGetAllOnIds(params int[] ids)
+        {
+            if (ids.Any() == false) yield break;
+            foreach (var id in ids)
             {
-                var userDtos = Database.Fetch<UserDto>("WHERE id >= 0");
-                foreach (var userDto in userDtos)
-                {
-                    yield return Get(userDto.Id);
-                }
+                yield return Get(id);
             }
         }
 
@@ -75,24 +89,33 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IUser>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.Fetch<UserDto>(sql);
+            var dtos = Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql);
 
             foreach (var dto in dtos.DistinctBy(x => x.Id))
             {
                 yield return Get(dto.Id);
             }
         }
-
+        
         #endregion
 
         #region Overrides of PetaPocoRepositoryBase<int,IUser>
-
+        
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<UserDto>();
-            return sql;
+            if (isCount)
+            {
+                sql.Select("COUNT(*)").From<UserDto>();                   
+            }
+            else
+            {                
+                sql.Select("*")
+                   .From<UserDto>()
+                   .LeftJoin<User2AppDto>()
+                   .On<UserDto, User2AppDto>(left => left.Id, right => right.UserId);               
+            }
+            return sql;   
         }
 
         protected override string GetBaseWhereClause()
@@ -104,6 +127,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                            {
+                               "DELETE FROM umbracoUser2app WHERE " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("user") + "=@Id",
                                "DELETE FROM umbracoUser WHERE id = @Id"
                            };
             return list;
@@ -113,7 +137,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { throw new NotImplementedException(); }
         }
-
+        
         protected override void PersistNewItem(IUser entity)
         {
             var userFactory = new UserFactory(entity.UserType);
@@ -122,12 +146,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var id = Convert.ToInt32(Database.Insert(userDto));
             entity.Id = id;
 
-            var sectionFactory = new UserSectionFactory(entity);
-            var sectionDtos = sectionFactory.BuildDto(entity.AllowedSections);
-            foreach (var sectionDto in sectionDtos)
+            foreach (var sectionDto in userDto.User2AppDtos)
             {
-                //just insert the record, we don't need to return a primary key since we already 
-                //know what it is since it is a composite key (and not an identity)
+                //need to set the id explicitly here
+                sectionDto.UserId = id; 
                 Database.Insert(sectionDto);
             }
 
@@ -140,6 +162,37 @@ namespace Umbraco.Core.Persistence.Repositories
             var userDto = userFactory.BuildDto(entity);
 
             Database.Update(userDto);
+
+            //update the sections if they've changed
+            var user = (User) entity;
+            if (user.IsPropertyDirty("AllowedSections"))
+            {
+                //for any that exist on the object, we need to determine if we need to update or insert
+                foreach (var sectionDto in userDto.User2AppDtos)
+                {
+                    if (user.AddedSections.Contains(sectionDto.AppAlias))
+                    {
+                        //we need to insert since this was added  
+                        Database.Insert(sectionDto);
+                    }
+                    else
+                    {
+                        //we need to manually update this record because it has a composite key
+                        Database.Update<User2AppDto>("SET app=@Section WHERE app=@Section AND " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("user") + "=@UserId",
+                                                     new { Section = sectionDto.AppAlias, UserId = sectionDto.UserId });    
+                    }                    
+                }    
+
+                //now we need to delete any applications that have been removed
+                foreach (var section in user.RemovedSections)
+                {
+                    //we need to manually delete thsi record because it has a composite key
+                    Database.Delete<User2AppDto>("WHERE app=@Section AND " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("user") + "=@UserId",
+                        new { Section = section, UserId = (int) user.Id });    
+                }
+            }
+
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
         #endregion
