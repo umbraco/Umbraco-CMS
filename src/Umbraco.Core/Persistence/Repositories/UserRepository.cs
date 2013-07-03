@@ -176,7 +176,9 @@ namespace Umbraco.Core.Persistence.Repositories
                     }
                     else
                     {
-                        //we need to manually update this record because it has a composite key
+                        //we need to manually update this record because it has a composite key, HOWEVER currently we don't really expose
+                        // a way to update the value so this will never be hit. If a section needs to be 'updated' then the developer needs
+                        // to remove and then add a different one.
                         Database.Update<User2AppDto>("SET app=@Section WHERE app=@Section AND " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("user") + "=@UserId",
                                                      new { Section = sectionDto.AppAlias, UserId = sectionDto.UserId });    
                     }                    

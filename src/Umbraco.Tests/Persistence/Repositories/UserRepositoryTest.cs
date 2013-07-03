@@ -364,6 +364,30 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.IsTrue(result[1].AllowedSections.Contains("media"));
         }
 
+        [Test]
+        public void Can_Update_Section_For_User()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
+            var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
+
+            // Act
+
+            users[0].RemoveAllowedSection("content");
+            users[0].AddAllowedSection("settings");
+
+            repository.AddOrUpdate(users[0]);
+            unitOfWork.Commit();
+
+            // Assert
+            var result = repository.Get((int)users[0].Id);
+            Assert.AreEqual(2, result.AllowedSections.Count());
+            Assert.IsTrue(result.AllowedSections.Contains("settings"));
+            Assert.IsTrue(result.AllowedSections.Contains("media"));
+        }
+
         private IUser[] CreateAndCommitMultipleUsers(IUserRepository repository, IUnitOfWork unitOfWork)
         {
             var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1");
