@@ -22,7 +22,7 @@ namespace Umbraco.Core.Models.Membership
 
         public User(IUserType userType)
         {
-            Groups = new List<object> {userType};
+            Groups = new List<object> { userType };
         }
 
         #region Implementation of IEntity
@@ -92,6 +92,7 @@ namespace Umbraco.Core.Models.Membership
         public string Language { get; set; }
         [DataMember]
         public string Permissions { get; set; }
+
         [DataMember]
         public bool DefaultToLiveEditing { get; set; }
         [DataMember]
@@ -100,8 +101,8 @@ namespace Umbraco.Core.Models.Membership
         [IgnoreDataMember]
         public IUserType UserType
         {
-            get 
-            { 
+            get
+            {
                 var type = Groups.FirstOrDefault();
                 return type as IUserType;
             }
