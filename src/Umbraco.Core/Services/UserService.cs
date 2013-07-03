@@ -14,19 +14,21 @@ namespace Umbraco.Core.Services
     /// </summary>
     internal class UserService : IUserService
     {
-	    private readonly RepositoryFactory _repositoryFactory;
+        private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 
-        public UserService(RepositoryFactory repositoryFactory) : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
-        {}
+        public UserService(RepositoryFactory repositoryFactory)
+            : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
+        { }
 
-        public UserService(IDatabaseUnitOfWorkProvider provider) : this(provider, new RepositoryFactory())
-        {}
+        public UserService(IDatabaseUnitOfWorkProvider provider)
+            : this(provider, new RepositoryFactory())
+        { }
 
         public UserService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
         {
-			_repositoryFactory = repositoryFactory;
-			_uowProvider = provider;
+            _repositoryFactory = repositoryFactory;
+            _uowProvider = provider;
         }
 
         #region Implementation of IUserService
@@ -43,6 +45,31 @@ namespace Umbraco.Core.Services
                 return repository.GetProfileById(id);
             }
         }
+
+        public IProfile GetProfileByUserName(string username)
+        {
+            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetProfileByUserName(username);
+            }
+        }
+
+        public IUser GetUserByUserName(string username)
+        {
+            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetUserByUserName(username);
+            }
+        }
+
+        public IUser GetUserById(int id)
+        {
+            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetUserById(id);
+            }
+        }
+
 
         /// <summary>
         /// Gets an IUserType by its Alias
@@ -93,19 +120,19 @@ namespace Umbraco.Core.Services
                     throw new ArgumentException("Login already exists");
 
                 var user = new User(userType)
-                               {
-                                   DefaultToLiveEditing = false,
-                                   Email = email,
-                                   Language = Umbraco.Core.Configuration.GlobalSettings.DefaultUILanguage,
-                                   Name = name,
-                                   Password = password,
-                                   Permissions = userType.Permissions,
-                                   Username = login,
-                                   StartContentId = -1,
-                                   StartMediaId = -1,
-                                   NoConsole = false,
-                                   IsApproved = true
-                               };
+                {
+                    DefaultToLiveEditing = false,
+                    Email = email,
+                    Language = Umbraco.Core.Configuration.GlobalSettings.DefaultUILanguage,
+                    Name = name,
+                    Password = password,
+                    Permissions = userType.Permissions,
+                    Username = login,
+                    StartContentId = -1,
+                    StartMediaId = -1,
+                    NoConsole = false,
+                    IsApproved = true
+                };
 
                 repository.AddOrUpdate(user);
                 uow.Commit();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
@@ -20,13 +21,13 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IUserTypeRepository _userTypeRepository;
 
-		public UserRepository(IDatabaseUnitOfWork work, IUserTypeRepository userTypeRepository)
+        public UserRepository(IDatabaseUnitOfWork work, IUserTypeRepository userTypeRepository)
             : base(work)
         {
             _userTypeRepository = userTypeRepository;
         }
 
-		public UserRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IUserTypeRepository userTypeRepository)
+        public UserRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IUserTypeRepository userTypeRepository)
             : base(work, cache)
         {
             _userTypeRepository = userTypeRepository;
@@ -40,7 +41,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
             var dto = Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql).FirstOrDefault();
-            
+
             if (dto == null)
                 return null;
 
@@ -62,15 +63,15 @@ namespace Umbraco.Core.Persistence.Repositories
             var foundUserTypes = new Dictionary<short, IUserType>();
             return Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql)
                            .Select(dto =>
-                               {
-                                   //first we need to get the user type
-                                   var userType = foundUserTypes.ContainsKey(dto.Type)
-                                                      ? foundUserTypes[dto.Type]
-                                                      : _userTypeRepository.Get(dto.Type);
+                           {
+                               //first we need to get the user type
+                               var userType = foundUserTypes.ContainsKey(dto.Type)
+                                                  ? foundUserTypes[dto.Type]
+                                                  : _userTypeRepository.Get(dto.Type);
 
-                                   var userFactory = new UserFactory(userType);
-                                   return userFactory.BuildEntity(dto);
-                               });
+                               var userFactory = new UserFactory(userType);
+                               return userFactory.BuildEntity(dto);
+                           });
         }
 
         private IEnumerable<IUser> PerformGetAllOnIds(params int[] ids)
@@ -95,26 +96,26 @@ namespace Umbraco.Core.Persistence.Repositories
                 yield return Get(dto.Id);
             }
         }
-        
+
         #endregion
 
         #region Overrides of PetaPocoRepositoryBase<int,IUser>
-        
+
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
             if (isCount)
             {
-                sql.Select("COUNT(*)").From<UserDto>();                   
+                sql.Select("COUNT(*)").From<UserDto>();
             }
             else
-            {                
+            {
                 sql.Select("*")
                    .From<UserDto>()
                    .LeftJoin<User2AppDto>()
-                   .On<UserDto, User2AppDto>(left => left.Id, right => right.UserId);               
+                   .On<UserDto, User2AppDto>(left => left.Id, right => right.UserId);
             }
-            return sql;   
+            return sql;
         }
 
         protected override string GetBaseWhereClause()
@@ -136,7 +137,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { throw new NotImplementedException(); }
         }
-        
+
         protected override void PersistNewItem(IUser entity)
         {
             var userFactory = new UserFactory(entity.UserType);
@@ -148,7 +149,7 @@ namespace Umbraco.Core.Persistence.Repositories
             foreach (var sectionDto in userDto.User2AppDtos)
             {
                 //need to set the id explicitly here
-                sectionDto.UserId = id; 
+                sectionDto.UserId = id;
                 Database.Insert(sectionDto);
             }
 
@@ -163,7 +164,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Update(userDto);
 
             //update the sections if they've changed
-            var user = (User) entity;
+            var user = (User)entity;
             if (user.IsPropertyDirty("AllowedSections"))
             {
                 //for any that exist on the object, we need to determine if we need to update or insert
@@ -176,20 +177,18 @@ namespace Umbraco.Core.Persistence.Repositories
                     }
                     else
                     {
-                        //we need to manually update this record because it has a composite key, HOWEVER currently we don't really expose
-                        // a way to update the value so this will never be hit. If a section needs to be 'updated' then the developer needs
-                        // to remove and then add a different one.
+                        //we need to manually update this record because it has a composite key
                         Database.Update<User2AppDto>("SET app=@Section WHERE app=@Section AND " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("user") + "=@UserId",
-                                                     new { Section = sectionDto.AppAlias, UserId = sectionDto.UserId });    
-                    }                    
-                }    
+                                                     new { Section = sectionDto.AppAlias, UserId = sectionDto.UserId });
+                    }
+                }
 
                 //now we need to delete any applications that have been removed
                 foreach (var section in user.RemovedSections)
                 {
                     //we need to manually delete thsi record because it has a composite key
                     Database.Delete<User2AppDto>("WHERE app=@Section AND " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("user") + "=@UserId",
-                        new { Section = section, UserId = (int) user.Id });    
+                        new { Section = section, UserId = (int)user.Id });
                 }
             }
 
@@ -211,6 +210,63 @@ namespace Umbraco.Core.Persistence.Repositories
                 return null;
 
             return new Profile(dto.Id, dto.UserName);
+        }
+
+        public IProfile GetProfileByUserName(string username)
+        {
+            var sql = GetBaseQuery(false);
+            sql.Where("umbracoUser.userLogin = @Username", new { Username = username });
+
+            var dto = Database.FirstOrDefault<UserDto>(sql);
+
+            if (dto == null)
+                return null;
+
+            return new Profile(dto.Id, dto.UserName);
+        }
+
+        public IUser GetUserByUserName(string username)
+        {
+            var sql = GetBaseQuery(false);
+            sql.Where("umbracoUser.userLogin = @Username", new { Username = username });
+
+            var dto = Database.FirstOrDefault<UserDto>(sql);
+
+            if (dto == null)
+                return null;
+
+            return new User(_userTypeRepository.Get(dto.Type))
+            {
+                Id = dto.Id,
+                Email = dto.Email,
+                Language = dto.UserLanguage,
+                Name = dto.UserName,
+                NoConsole = dto.NoConsole,
+                IsLockedOut = dto.Disabled
+            };
+
+        }
+
+        public IUser GetUserById(int id)
+        {
+            var sql = GetBaseQuery(false);
+            sql.Where(GetBaseWhereClause(), new { Id = id });
+
+            var dto = Database.FirstOrDefault<UserDto>(sql);
+
+            if (dto == null)
+                return null;
+
+            return new User(_userTypeRepository.Get(dto.Type))
+            {
+                Id = dto.Id,
+                Email = dto.Email,
+                Language = dto.UserLanguage,
+                Name = dto.UserName,
+                NoConsole = dto.NoConsole,
+                IsLockedOut = dto.Disabled
+            };
+
         }
 
         #endregion
