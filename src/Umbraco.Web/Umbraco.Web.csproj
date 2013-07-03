@@ -420,9 +420,9 @@
     <Compile Include="umbraco.presentation\umbraco\settings\modals\ShowUmbracoTags.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx.cs">
-       <SubType>ASPXCodeBehind</SubType>
-     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -698,11 +698,7 @@
     <Compile Include="umbraco.presentation\umbraco\controls\ContentPicker.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControl.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\Images\ImageViewer.ascx.cs">
-      <DependentUpon>ImageViewer.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\Images\ImageViewer.ascx.designer.cs">
-      <DependentUpon>ImageViewer.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\Images\ImageViewerUpdater.asmx.cs">
       <DependentUpon>ImageViewerUpdater.asmx</DependentUpon>
@@ -1866,7 +1862,6 @@
     <Content Include="umbraco.presentation\umbraco\create\DLRScripting.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\controls\Images\ImageViewer.ascx" />
     <Content Include="umbraco.presentation\umbraco\controls\Images\ImageViewerUpdater.asmx" />
     <Content Include="umbraco.presentation\umbraco\controls\Images\UploadMediaImage.ascx">
       <SubType>ASPXCodeBehind</SubType>
@@ -1941,7 +1936,7 @@
     <Content Include="umbraco.presentation\install\steps\welcome.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\cacheBrowser.aspx" />    
+    <Content Include="umbraco.presentation\umbraco\cacheBrowser.aspx" />
     <Content Include="umbraco.presentation\umbraco\members\ViewMembers.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertImage.aspx">
       <SubType>ASPXCodeBehind</SubType>

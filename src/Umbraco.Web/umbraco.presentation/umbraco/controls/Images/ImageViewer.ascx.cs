@@ -1,21 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.media;
-using umbraco.cms.businesslogic;
 
 namespace umbraco.controls.Images
 {
-	public partial class ImageViewer : System.Web.UI.UserControl
+	public partial class ImageViewer : UserControl
 	{
 
 		public ImageViewer()
 		{
 			MediaItemPath = "#";
-            MediaItemThumbnailPath = umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/images/blank.png";
+            MediaItemThumbnailPath = IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/images/blank.png";
 			AltText = "No Image";
 			ImageFound = false;
             ViewerStyle = Style.Basic;
@@ -53,9 +50,9 @@ namespace umbraco.controls.Images
 		protected bool ImageFound { get; private set; }
 		
 
-		private int m_FileWidth = 0;
-		private int m_FileHeight = 0;
-		private bool m_IsBound = false;
+		private int m_FileWidth;
+		private int m_FileHeight;
+		private bool m_IsBound;
 
 		/// <summary>
 		/// automatically bind if it's not explicitly called.
@@ -64,7 +61,11 @@ namespace umbraco.controls.Images
 		protected override void OnPreRender(EventArgs e)
 		{
 			base.OnPreRender(e);
-			if (!m_IsBound)
+
+		    View view = FindControl(ViewerStyle.ToString()) as View;
+            MultiView.SetActiveView(view);
+
+			if (m_IsBound == false)
 			{
 				DataBind();
 			}          
@@ -94,7 +95,7 @@ namespace umbraco.controls.Images
                 }
 
                 MediaItemPath = pFile.Value != null && !string.IsNullOrEmpty(pFile.Value.ToString())
-                    ? umbraco.IO.IOHelper.ResolveUrl(pFile.Value.ToString())
+                    ? IOHelper.ResolveUrl(pFile.Value.ToString())
                     : "#";
                 AltText = MediaItemPath != "#" ? m.Text : ui.GetText("no") + " " + ui.GetText("media");
 
@@ -116,6 +117,55 @@ namespace umbraco.controls.Images
             {
                 ImageFound = false;
             }
-		}
-	}
+        }
+
+        #region Controls
+
+        /// <summary>
+        /// JsInclude1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude1;
+
+        /// <summary>
+        /// MultiView control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.MultiView MultiView;
+
+        /// <summary>
+        /// Basic control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.View Basic;
+
+        /// <summary>
+        /// ImageLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.View ImageLink;
+
+        /// <summary>
+        /// ThumbnailPreview control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.View ThumbnailPreview;
+
+        #endregion
+    }
 }
