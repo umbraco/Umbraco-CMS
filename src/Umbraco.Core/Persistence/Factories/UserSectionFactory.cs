@@ -27,11 +27,11 @@ namespace Umbraco.Core.Persistence.Factories
         internal static void ConfigureMappings(IConfiguration config)
         {
             config.CreateMap<User2AppDto, UserSection>()
-                  .ForMember(section => section.Id, expression => expression.MapFrom(dto => dto.UserId))
+                  .ForMember(section => section.UserId, expression => expression.MapFrom(dto => dto.UserId))
                   .ForMember(section => section.SectionAlias, expression => expression.MapFrom(dto => dto.AppAlias));
 
             config.CreateMap<UserSection, User2AppDto>()
-                  .ForMember(dto => dto.UserId, expression => expression.MapFrom(section => section.Id))
+                  .ForMember(dto => dto.UserId, expression => expression.MapFrom(section => section.UserId))
                   .ForMember(dto => dto.AppAlias, expression => expression.MapFrom(section => section.SectionAlias));
         }
     }

@@ -132,10 +132,12 @@ namespace Umbraco.Core.Services
             var allApps = GetSections();
             var apps = new List<Section>();
 
-            using (var repository = _repositoryFactory.CreateUserSectionRepository(_uowProvider.GetUnitOfWork()))
-            {
-                return repository.Get(id);
-            }
+            //TODO: Sort this out
+
+            //using (var repository = _repositoryFactory.CreateUserSectionRepository(_uowProvider.GetUnitOfWork()))
+            //{
+            //    return repository.Get(id);
+            //}
 
             //using (IRecordsReader appIcons = SqlHelper.ExecuteReader("select app from umbracoUser2app where [user] = @userID", SqlHelper.CreateParameter("@userID", this.Id)))
             //{

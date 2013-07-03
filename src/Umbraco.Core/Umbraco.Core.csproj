@@ -507,7 +507,6 @@
     <Compile Include="Persistence\Repositories\Interfaces\IStylesheetRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IUserRepository.cs" />
-    <Compile Include="Persistence\Repositories\Interfaces\IUserSectionRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IUserTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\LanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\MediaRepository.cs" />
@@ -521,7 +520,6 @@
     <Compile Include="Persistence\Repositories\StylesheetRepository.cs" />
     <Compile Include="Persistence\Repositories\TemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\UserRepository.cs" />
-    <Compile Include="Persistence\Repositories\UserSectionRepository.cs" />
     <Compile Include="Persistence\Repositories\UserTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\VersionableRepositoryBase.cs" />
     <Compile Include="Persistence\RepositoryFactory.cs" />
@@ -697,7 +695,6 @@
     <Compile Include="Publishing\PublishStatusType.cs" />
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="Models\Section.cs" />
-    <Compile Include="Services\SectionService.cs" />
     <Compile Include="Serialization\AbstractSerializationService.cs" />
     <Compile Include="Serialization\Formatter.cs" />
     <Compile Include="Serialization\IFormatter.cs" />
@@ -727,6 +724,7 @@
     <Compile Include="Services\MediaService.cs" />
     <Compile Include="Services\MemberService.cs" />
     <Compile Include="Services\RelationService.cs" />
+    <Compile Include="Services\SectionService.cs" />
     <Compile Include="Services\ServerRegistrationService.cs" />
     <Compile Include="Services\PackagingService.cs" />
     <Compile Include="Services\ServiceContext.cs" />

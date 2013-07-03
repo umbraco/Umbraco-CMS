@@ -69,14 +69,6 @@ namespace Umbraco.Core.Persistence
                 CreateLanguageRepository(uow));
         }
 
-        internal virtual IUserSectionRepository CreateUserSectionRepository(IDatabaseUnitOfWork uow)
-        {
-            return new UserSectionRepository(
-                uow,
-                //Null cache here? I dunno?
-                NullCacheProvider.Current);
-        }
-
         public virtual ILanguageRepository CreateLanguageRepository(IDatabaseUnitOfWork uow)
         {
             return new LanguageRepository(

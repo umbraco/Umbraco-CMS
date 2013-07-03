@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence.Mappers
 
         internal override void BuildMap()
         {
-            CacheMap<UserSection, User2AppDto>(src => src.Id, dto => dto.UserId);
+            CacheMap<UserSection, User2AppDto>(src => src.UserId, dto => dto.UserId);
             CacheMap<UserSection, User2AppDto>(src => src.SectionAlias, dto => dto.AppAlias);
         }
 

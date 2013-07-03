@@ -19,5 +19,9 @@ namespace Umbraco.Core.Models.Membership
         bool NoConsole { get; set; }
         IUserType UserType { get; }
         string Permissions { get; set; }
+
+        IEnumerable<UserSection> UserSections { get; }
+        void RemoveUserSection(string sectionAlias);
+        void AddUserSection(string sectionAlias);
     }
 }

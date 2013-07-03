@@ -8,6 +8,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
+
     /// <summary>
     /// Represent an abstract Repository, which is the base of the Repository implementations
     /// </summary>

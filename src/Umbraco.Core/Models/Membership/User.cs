@@ -19,10 +19,12 @@ namespace Umbraco.Core.Models.Membership
     internal class User : UserProfile, IUser
     {
         private bool _hasIdentity;
+        private readonly UserSectionCollection _sectionCollection;
 
         public User(IUserType userType)
         {
             Groups = new List<object> {userType};
+            _sectionCollection = new UserSectionCollection();
         }
 
         #region Implementation of IEntity
@@ -92,6 +94,23 @@ namespace Umbraco.Core.Models.Membership
         public string Language { get; set; }
         [DataMember]
         public string Permissions { get; set; }
+
+        public IEnumerable<UserSection> UserSections
+        {
+            get { return _sectionCollection; }
+        }
+
+        public void RemoveUserSection(string sectionAlias)
+        {
+            //NOTE: we're casting to int here but might have to change that in the future.
+            _sectionCollection.Remove(new Tuple<object, string>((int) Id, sectionAlias));
+        }
+
+        public void AddUserSection(string sectionAlias)
+        {
+             _sectionCollection.Add(new UserSection(this, sectionAlias));
+        }
+
         [DataMember]
         public bool DefaultToLiveEditing { get; set; }
         [DataMember]
