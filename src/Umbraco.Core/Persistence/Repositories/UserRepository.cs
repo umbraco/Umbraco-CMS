@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
@@ -120,6 +122,16 @@ namespace Umbraco.Core.Persistence.Repositories
             var id = Convert.ToInt32(Database.Insert(userDto));
             entity.Id = id;
 
+            var sectionFactory = new UserSectionFactory(entity);
+            var sectionDtos = sectionFactory.BuildDto(entity.AllowedSections);
+            foreach (var sectionDto in sectionDtos)
+            {
+                //just insert the record, we don't need to return a primary key since we already 
+                //know what it is since it is a composite key (and not an identity)
+                Database.Insert(sectionDto);
+            }
+
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IUser entity)

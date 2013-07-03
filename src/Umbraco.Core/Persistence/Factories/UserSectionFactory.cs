@@ -1,38 +1,35 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using System.Linq;
+using AutoMapper;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class UserSectionFactory : IEntityFactory<UserSection, User2AppDto>
+    internal class UserSectionFactory : IEntityFactory<IEnumerable<string>, IEnumerable<User2AppDto>>
     {
-        #region Implementation of IEntityFactory<Language,LanguageDto>
+        private readonly IUser _user;
 
-        public UserSection BuildEntity(User2AppDto dto)
+        public UserSectionFactory(IUser user)
         {
-            return Mapper.Map<User2AppDto, UserSection>(dto);
+            _user = user;
         }
 
-        public User2AppDto BuildDto(UserSection entity)
+        public IEnumerable<string> BuildEntity(IEnumerable<User2AppDto> dto)
         {
-            return Mapper.Map<UserSection, User2AppDto>(entity);
+            return dto.Select(x => x.AppAlias);
         }
 
-        #endregion
-
-        /// <summary>
-        /// Sets up the automapper mappings
-        /// </summary>
-        /// <param name="config"></param>
-        internal static void ConfigureMappings(IConfiguration config)
+        public IEnumerable<User2AppDto> BuildDto(IEnumerable<string> entity)
         {
-            config.CreateMap<User2AppDto, UserSection>()
-                  .ForMember(section => section.UserId, expression => expression.MapFrom(dto => dto.UserId))
-                  .ForMember(section => section.SectionAlias, expression => expression.MapFrom(dto => dto.AppAlias));
-
-            config.CreateMap<UserSection, User2AppDto>()
-                  .ForMember(dto => dto.UserId, expression => expression.MapFrom(section => section.UserId))
-                  .ForMember(dto => dto.AppAlias, expression => expression.MapFrom(section => section.SectionAlias));
+            return entity.Select(x => new User2AppDto
+                {
+                    //NOTE: We're force casting to int here! this might not work in the future
+                    UserId = (int)_user.Id,
+                    AppAlias = x
+                });
         }
+
     }
 }

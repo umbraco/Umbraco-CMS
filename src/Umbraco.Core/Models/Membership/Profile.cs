@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models.Membership
 {
@@ -8,7 +10,7 @@ namespace Umbraco.Core.Models.Membership
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class Profile : IProfile
+    internal class Profile : TracksChangesEntityBase, IProfile, IRememberBeingDirty
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Profile"/> class.
@@ -25,11 +27,47 @@ namespace Umbraco.Core.Models.Membership
             Name = name;
         }
 
-        [DataMember]
-        public object Id { get; set; }
+        private object _id;
+        private string _name;
+        private Type _userTypeKey;
+
+        private static readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<Profile, object>(x => x.Id);
+        private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<Profile, string>(x => x.Name);
+        private static readonly PropertyInfo UserTypeKeySelector = ExpressionHelper.GetPropertyInfo<Profile, Type>(x => x.ProviderUserKeyType);
 
         [DataMember]
-        public string Name { get; set; }
+        public object Id
+        {
+            get
+            {
+                return _id;
+            }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _id = value;
+                    return _id;
+                }, _id, IdSelector);
+            }
+        }
+
+        [DataMember]
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _name = value;
+                    return _name;
+                }, _name, NameSelector);
+            }
+        }
 
         [IgnoreDataMember]
         public virtual object ProviderUserKey
@@ -45,7 +83,21 @@ namespace Umbraco.Core.Models.Membership
         /// The type of the provider user key.
         /// </value>
         [IgnoreDataMember]
-        internal Type ProviderUserKeyType { get; private set; }
+        internal Type ProviderUserKeyType
+        {
+            get
+            {
+                return _userTypeKey;
+            }
+            private set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _userTypeKey = value;
+                    return _userTypeKey;
+                }, _userTypeKey, UserTypeKeySelector);
+            }
+        }
 
         /// <summary>
         /// Sets the type of the provider user key.

@@ -251,7 +251,6 @@
     <Compile Include="Models\UmbracoEntity.cs" />
     <Compile Include="Models\UmbracoObjectTypes.cs" />
     <Compile Include="Models\UmbracoObjectTypesExtensions.cs" />
-    <Compile Include="Models\UserSection.cs" />
     <Compile Include="ObjectResolution\ApplicationEventsResolver.cs" />
     <Compile Include="ObjectResolution\ResolverCollection.cs" />
     <Compile Include="Persistence\Caching\InMemoryCacheProvider.cs" />
