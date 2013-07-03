@@ -561,6 +561,11 @@ namespace Umbraco.Core.Models
             return ApplicationContext.Current.Services.PackagingService.Export(media);
         }
 
+        internal static XElement ToDeepXml(this IMedia media)
+        {
+            return ApplicationContext.Current.Services.PackagingService.Export(media, true);
+        }
+
         /// <summary>
         /// Creates the xml representation for the <see cref="IContent"/> object
         /// </summary>

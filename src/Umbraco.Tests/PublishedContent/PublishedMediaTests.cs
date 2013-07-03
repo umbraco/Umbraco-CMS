@@ -38,10 +38,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Initialize();
             UmbracoExamineSearcher.DisableInitializationCheck = true;
-            BaseUmbracoIndexer.DisableInitializationCheck = true;
-            UmbracoSettings.ForceSafeAliases = true;
-            UmbracoSettings.UmbracoLibraryCacheDuration = 1800;
-            UmbracoSettings.ForceSafeAliases = true;
+            BaseUmbracoIndexer.DisableInitializationCheck = true;            
         }
 
         public override void TearDown()

@@ -11,6 +11,12 @@ namespace Umbraco.Tests.TestHelpers
     {
         // umbracoSettings
 
+        public static int UmbracoLibraryCacheDuration
+        {
+            get { return UmbracoSettings.UmbracoLibraryCacheDuration; }
+            set { UmbracoSettings.UmbracoLibraryCacheDuration = value; }
+        }
+
         public static bool UseLegacyXmlSchema
         {
             get { return UmbracoSettings.UseLegacyXmlSchema; }
@@ -33,6 +39,12 @@ namespace Umbraco.Tests.TestHelpers
         {
             get { return UmbracoSettings.SettingsFilePath; }
             set { UmbracoSettings.SettingsFilePath = value; }
+        }
+
+        public static bool ForceSafeAliases
+        {
+            get { return UmbracoSettings.ForceSafeAliases; }
+            set { UmbracoSettings.ForceSafeAliases = value; }
         }
 
         // from appSettings

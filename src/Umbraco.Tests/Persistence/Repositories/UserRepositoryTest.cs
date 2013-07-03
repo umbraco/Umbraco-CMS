@@ -188,21 +188,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var updatedItem = repository.Get((int)user.Id);
 
             // Assert
-            Assert.That(updatedItem.Id, Is.EqualTo(user.Id));
-            Assert.That(updatedItem.Name, Is.EqualTo(user.Name));
-            Assert.That(updatedItem.Permissions, Is.EqualTo(user.Permissions));
-            Assert.That(updatedItem.Language, Is.EqualTo(user.Language));
-            Assert.That(updatedItem.IsApproved, Is.EqualTo(user.IsApproved));
-            Assert.That(updatedItem.Password, Is.EqualTo(user.Password));
-            Assert.That(updatedItem.NoConsole, Is.EqualTo(user.NoConsole));
-            Assert.That(updatedItem.StartContentId, Is.EqualTo(user.StartContentId));
-            Assert.That(updatedItem.StartMediaId, Is.EqualTo(user.StartMediaId));
-            Assert.That(updatedItem.DefaultToLiveEditing, Is.EqualTo(user.DefaultToLiveEditing));
-            Assert.That(updatedItem.Email, Is.EqualTo(user.Email));
-            Assert.That(updatedItem.Username, Is.EqualTo(user.Username));
-            Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(2));
-            Assert.IsTrue(updatedItem.AllowedSections.Contains("media"));
-            Assert.IsTrue(updatedItem.AllowedSections.Contains("content"));
+            AssertPropertyValues(updatedItem, user);
         }
 
         [Test]
@@ -362,6 +348,76 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.AreEqual(2, result[2].AllowedSections.Count());
             Assert.IsTrue(result[1].AllowedSections.Contains("content"));
             Assert.IsTrue(result[1].AllowedSections.Contains("media"));
+        }
+
+        [Test]
+        public void Can_Update_Section_For_User()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
+            var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
+
+            // Act
+
+            users[0].RemoveAllowedSection("content");
+            users[0].AddAllowedSection("settings");
+
+            repository.AddOrUpdate(users[0]);
+            unitOfWork.Commit();
+
+            // Assert
+            var result = repository.Get((int)users[0].Id);
+            Assert.AreEqual(2, result.AllowedSections.Count());
+            Assert.IsTrue(result.AllowedSections.Contains("settings"));
+            Assert.IsTrue(result.AllowedSections.Contains("media"));
+        }
+        
+
+        [Test]
+        public void Get_Users_Assigned_To_Section()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
+            var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1", "test", "media");
+            var user2 = MockedUser.CreateUser(CreateAndCommitUserType(), "2", "media", "settings");
+            var user3 = MockedUser.CreateUser(CreateAndCommitUserType(), "3", "test", "settings");
+            repository.AddOrUpdate(user1);
+            repository.AddOrUpdate(user2);
+            repository.AddOrUpdate(user3);
+            unitOfWork.Commit();
+
+            // Act
+
+            var users = repository.GetUsersAssignedToSection("test");
+
+            // Assert            
+            Assert.AreEqual(2, users.Count());
+            var names = users.Select(x => x.Username).ToArray();
+            Assert.IsTrue(names.Contains("TestUser1"));
+            Assert.IsTrue(names.Contains("TestUser3"));
+        }
+
+        private void AssertPropertyValues(IUser updatedItem, IUser originalUser)
+        {
+            Assert.That(updatedItem.Id, Is.EqualTo(originalUser.Id));
+            Assert.That(updatedItem.Name, Is.EqualTo(originalUser.Name));
+            Assert.That(updatedItem.Permissions, Is.EqualTo(originalUser.Permissions));
+            Assert.That(updatedItem.Language, Is.EqualTo(originalUser.Language));
+            Assert.That(updatedItem.IsApproved, Is.EqualTo(originalUser.IsApproved));
+            Assert.That(updatedItem.Password, Is.EqualTo(originalUser.Password));
+            Assert.That(updatedItem.NoConsole, Is.EqualTo(originalUser.NoConsole));
+            Assert.That(updatedItem.StartContentId, Is.EqualTo(originalUser.StartContentId));
+            Assert.That(updatedItem.StartMediaId, Is.EqualTo(originalUser.StartMediaId));
+            Assert.That(updatedItem.DefaultToLiveEditing, Is.EqualTo(originalUser.DefaultToLiveEditing));
+            Assert.That(updatedItem.Email, Is.EqualTo(originalUser.Email));
+            Assert.That(updatedItem.Username, Is.EqualTo(originalUser.Username));
+            Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(2));
+            Assert.IsTrue(updatedItem.AllowedSections.Contains("media"));
+            Assert.IsTrue(updatedItem.AllowedSections.Contains("content"));
         }
 
         private IUser[] CreateAndCommitMultipleUsers(IUserRepository repository, IUnitOfWork unitOfWork)

@@ -1,10 +1,11 @@
-﻿using Umbraco.Core.Models.Membership;
+﻿using System.Linq;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Tests.TestHelpers.Entities
 {
     public class MockedUser
     {
-        internal static User CreateUser(IUserType userType = null, string suffix = "")
+        internal static User CreateUser(IUserType userType = null, string suffix = "", params string[] allowedSections)
         {
             if (userType == null)
             {
@@ -26,8 +27,18 @@ namespace Umbraco.Tests.TestHelpers.Entities
                     Username = "TestUser" + suffix
                 };
 
-            user.AddAllowedSection("content");
-            user.AddAllowedSection("media");
+            if (allowedSections.Any())
+            {
+                foreach (var s in allowedSections)
+                {
+                    user.AddAllowedSection(s);
+                }
+            }
+            else
+            {
+                user.AddAllowedSection("content");
+                user.AddAllowedSection("media");    
+            }
 
             return user;
         }

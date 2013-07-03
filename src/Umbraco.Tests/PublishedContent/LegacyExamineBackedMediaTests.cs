@@ -5,6 +5,7 @@ using Lucene.Net.Documents;
 using Lucene.Net.Store;
 using NUnit.Framework;
 using Umbraco.Core.Configuration;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.UmbracoExamine;
 using umbraco.MacroEngines;
 
@@ -15,13 +16,13 @@ namespace Umbraco.Tests.PublishedContent
         public override void TestSetup()
         {
             base.TestSetup();
-            UmbracoSettings.ForceSafeAliases = true;
-            UmbracoSettings.UmbracoLibraryCacheDuration = 1800;
-            UmbracoSettings.ForceSafeAliases = true;
+            SettingsForTests.ForceSafeAliases = true;
+            SettingsForTests.UmbracoLibraryCacheDuration = 1800;
         }
 
         public override void TestTearDown()
         {
+            SettingsForTests.Reset();
             base.TestTearDown();
         }
 
