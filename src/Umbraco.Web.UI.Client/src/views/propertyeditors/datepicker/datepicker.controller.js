@@ -2,8 +2,8 @@ angular.module("umbraco").controller("Umbraco.Editors.DatepickerController",
     function ($scope, notificationsService, scriptLoader) {
     
     scriptLoader.load([
-            'views/propertyeditors/umbraco/datepicker/bootstrap.datepicker.js',
-            'css!/belle/views/propertyeditors/umbraco/datepicker/bootstrap.datepicker.css'
+            'views/propertyeditors/datepicker/bootstrap.datepicker.js',
+            'css!/belle/views/propertyeditors/datepicker/bootstrap.datepicker.css'
         ]).then(
         function () {
             //The Datepicker js and css files are available and all components are ready to use.

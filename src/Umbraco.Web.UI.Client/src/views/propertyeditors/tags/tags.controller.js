@@ -4,8 +4,8 @@ angular.module("umbraco")
 		
 		scriptLoader.load(
 			[
-			'views/propertyeditors/umbraco/tags/bootstrap-tags.custom.js',
-			'css!views/propertyeditors/umbraco/tags/bootstrap-tags.custom.css'
+			'views/propertyeditors/tags/bootstrap-tags.custom.js',
+			'css!views/propertyeditors/tags/bootstrap-tags.custom.css'
 			]).then(function(){
 
 			// Get data from tagsFactory

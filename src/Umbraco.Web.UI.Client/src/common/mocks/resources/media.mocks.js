@@ -1,29 +1,10 @@
 angular.module('umbraco.mocks').
-  factory('contentMocks', ['$httpBackend', 'mocksUtills', function ($httpBackend, mocksUtills) {
+  factory('mediaMocks', ['$httpBackend', 'mocksUtills', function ($httpBackend, mocksUtills) {
       'use strict';
       
-      function returnEmptyNode(status, data, headers) {
-          var response = returnNodebyId(200, "", null);
-          var node = response[1];
-          var parentId = mocksUtills.getParameterByName(data, "parentId") || 1234;
-
-          node.name = "";
-          node.id = 0;
-          node.parentId = parentId;
-
-          $(node.tabs).each(function(i,tab){
-              $(tab.properties).each(function(i, property){
-                  property.value = "";
-              });
-          });
-
-          return response;
-      }
-
       function returnNodebyId(status, data, headers) {
-          var id = mocksUtills.getParameterByName(data, "id") || "1234";
-          id = parseInt(id, 10);
-
+          var id = mocksUtills.getParameterByName(data, "id") || 1234;
+          
           var node = {
               name: "My content with id: " + id,
               updateDate: new Date(),
@@ -100,17 +81,9 @@ angular.module('umbraco.mocks').
       return {
           register: function() {
             $httpBackend
-		          .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoApi/Content/GetById'))
+	            .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoApi/Content/GetById'))
 		          .respond(returnNodebyId);
-
-            $httpBackend
-              .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoApi/Content/GetEmpty'))
-              .respond(returnEmptyNode);
-
-              
           },
-
-
           expectGetById: function() {
             $httpBackend
               .expectGET(mocksUtills.urlRegex('/umbraco/UmbracoApi/Content/GetById'));
