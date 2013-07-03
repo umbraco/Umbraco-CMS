@@ -81,12 +81,12 @@ namespace umbraco.uicontrols {
         {
             ErrorHeaderControl.Text = ErrorHeader;
            
+            var activeClass = string.Empty;
 
-            var activeClass = "active";
-            if (!Active)
-                activeClass = "";
+            if (this.ID == parent.ActiveTabId)
+                activeClass = "active";
 
-            writer.WriteLine("<div id='" + this.ID + "' class='umb-tab-pane tab-pane form-horizontal " + activeClass + " " + CssClass + "'>");
+            writer.WriteLine("<div id='" + this.ID + "' class='umb-tab-pane tab-pane form-horizontal " + activeClass + " " + parent.ActiveTabId + "'>");
             writer.WriteLine("<div class='umb-tab-pane-inner' id='" + this.ClientID + "_contentlayer'>");
 
             this.RenderChildren(writer);

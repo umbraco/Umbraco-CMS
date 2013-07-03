@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <createUI>
   <nodeType alias="nodeTypes">
     <header>Nodetype</header>
@@ -253,36 +253,34 @@
       <delete assembly="umbraco" type="cacheTasks" />
     </tasks>
   </nodeType>
-    <nodeType alias="initpython">
-        <header>Scripting file</header>
-        <usercontrol>/create/DLRScripting.ascx</usercontrol>
-        <tasks>
-            <create assembly="umbraco" type="PythonTasks" />
-        </tasks>
-    </nodeType>
-    <nodeType alias="python">
-        <header>Macro</header>
-        <usercontrol>/create/DLRScripting.ascx</usercontrol>
-        <tasks>
-            <delete assembly="umbraco" type="PythonTasks" />
-        </tasks>
-    </nodeType>
-
-    <nodeType alias="initdlrscripting">
-        <header>Scripting file</header>
-        <usercontrol>/create/DLRScripting.ascx</usercontrol>
-        <tasks>
-            <create assembly="umbraco" type="DLRScriptingTasks" />
-        </tasks>
-    </nodeType>
-
-    <nodeType alias="dlrscripting">
-        <header>Macro</header>
-        <usercontrol>/create/DLRScripting.ascx</usercontrol>
-        <tasks>
-            <delete assembly="umbraco" type="DLRScriptingTasks" />
-        </tasks>
-    </nodeType>
+  <nodeType alias="initpython">
+    <header>Scripting file</header>
+    <usercontrol>/create/DLRScripting.ascx</usercontrol>
+    <tasks>
+      <create assembly="umbraco" type="PythonTasks" />
+    </tasks>
+  </nodeType>
+  <nodeType alias="python">
+    <header>Macro</header>
+    <usercontrol>/create/DLRScripting.ascx</usercontrol>
+    <tasks>
+      <delete assembly="umbraco" type="PythonTasks" />
+    </tasks>
+  </nodeType>
+  <nodeType alias="initdlrscripting">
+    <header>Scripting file</header>
+    <usercontrol>/create/DLRScripting.ascx</usercontrol>
+    <tasks>
+      <create assembly="umbraco" type="DLRScriptingTasks" />
+    </tasks>
+  </nodeType>
+  <nodeType alias="dlrscripting">
+    <header>Macro</header>
+    <usercontrol>/create/DLRScripting.ascx</usercontrol>
+    <tasks>
+      <delete assembly="umbraco" type="DLRScriptingTasks" />
+    </tasks>
+  </nodeType>
   <nodeType alias="initscripts">
     <header>Script file</header>
     <usercontrol>/create/script.ascx</usercontrol>
@@ -305,7 +303,6 @@
       <delete assembly="umbraco" type="ScriptTasks" />
     </tasks>
   </nodeType>
-    
   <nodeType alias="initpackager">
     <header>Package</header>
     <usercontrol>/create/simple.ascx</usercontrol>
@@ -342,22 +339,107 @@
       <delete assembly="umbraco" type="cms.presentation.user.UserTypeTasks" />
     </tasks>
   </nodeType>
-
-	<nodeType alias="partialViews">
-		<header>Macro</header>
-		<usercontrol>/create/simple.ascx</usercontrol>
-		<tasks>
-			<create assembly="umbraco" type="PartialViewTasks" />
-			<delete assembly="umbraco" type="PartialViewTasks" />
-		</tasks>
-	</nodeType>
-	<nodeType alias="partialViewMacros">
-		<header>Macro</header>
-		<usercontrol>/Create/PartialViewMacro.ascx</usercontrol>
-		<tasks>
-			<create assembly="umbraco" type="MacroPartialViewTasks" />
-			<delete assembly="umbraco" type="MacroPartialViewTasks" />
-		</tasks>
-	</nodeType>
-	
+  <nodeType alias="partialViews">
+    <header>Macro</header>
+    <usercontrol>/create/simple.ascx</usercontrol>
+    <tasks>
+      <create assembly="umbraco" type="PartialViewTasks" />
+      <delete assembly="umbraco" type="PartialViewTasks" />
+    </tasks>
+  </nodeType>
+  <nodeType alias="partialViewMacros">
+    <header>Macro</header>
+    <usercontrol>/Create/PartialViewMacro.ascx</usercontrol>
+    <tasks>
+      <create assembly="umbraco" type="MacroPartialViewTasks" />
+      <delete assembly="umbraco" type="MacroPartialViewTasks" />
+    </tasks>
+  </nodeType>
+  <nodeType alias="tea-commerce-store-tree-stores" teaCommerce="">
+    <header>TeaCommerce</header>
+    <usercontrol>/plugins/tea-commerce/Views/Stores/CreateStore.ascx</usercontrol>
+  </nodeType>
+  <nodeType alias="tea-commerce-store-tree-store" teaCommerce="">
+    <header>TeaCommerce</header>
+    <tasks>
+      <delete assembly="TeaCommerce.Umbraco.Application" type="Trees.Tasks.StoreTask"></delete>
+    </tasks>
+  </nodeType>
+  <nodeType alias="tea-commerce-store-tree-settings-shipping-methods" teaCommerce="">
+    <header>TeaCommerce</header>
+    <usercontrol>/plugins/tea-commerce/Views/ShippingMethods/CreateShippingMethod.ascx</usercontrol>
+  </nodeType>
+  <nodeType alias="tea-commerce-store-tree-settings-shipping-method" teaCommerce="">
+    <header>TeaCommerce</header>
+    <tasks>
+      <delete assembly="TeaCommerce.Umbraco.Application" type="Trees.Tasks.ShippingMethodTask"></delete>
+    </tasks>
+  </nodeType>
+  <nodeType alias="tea-commerce-store-tree-settings-payment-methods" teaCommerce="">
+    <header>TeaCommerce</header>
+    <usercontrol>/plugins/tea-commerce/Views/PaymentMethods/CreatePaymentMethod.ascx</usercontrol>
+  </nodeType>
+  <nodeType alias="tea-commerce-store-tree-settings-payment-method" teaCommerce="">
+    <header>TeaCommerce</header>
+    <tasks>
+      <delete assembly="TeaCommerce.Umbraco.Application" type="Trees.Tasks.PaymentMethodTask"></delete>
+    </tasks>
+  </nodeType>
+  <nodeType alias="tea-commerce-store-tree-settings-countries" teaCommerce="">
+    <header>TeaCommerce</header>
+    <usercontrol>/plugins/tea-commerce/Views/Countries/CreateCountry.ascx</usercontrol>
+  </nodeType>
+  <nodeType alias="tea-commerce-store-tree-settings-country" teaCommerce="">
+    <header>TeaCommerce</header>
+    <usercontrol>/plugins/tea-commerce/Views/CountryRegions/CreateCountryRegion.ascx</usercontrol>
+    <tasks>
+      <delete assembly="TeaCommerce.Umbraco.Application" type="Trees.Tasks.CountryTask"></delete>
+    </tasks>
+  </nodeType>
+  <nodeType alias="tea-commerce-store-tree-settings-country-region" teaCommerce="">
+    <header>TeaCommerce</header>
+    <tasks>
+      <delete assembly="TeaCommerce.Umbraco.Application" type="Trees.Tasks.CountryRegionTask"></delete>
+    </tasks>
+  </nodeType>
+  <nodeType alias="tea-commerce-store-tree-settings-currencies" teaCommerce="">
+    <header>TeaCommerce</header>
+    <usercontrol>/plugins/tea-commerce/Views/Currencies/CreateCurrency.ascx</usercontrol>
+  </nodeType>
+  <nodeType alias="tea-commerce-store-tree-settings-currency" teaCommerce="">
+    <header>TeaCommerce</header>
+    <tasks>
+      <delete assembly="TeaCommerce.Umbraco.Application" type="Trees.Tasks.CurrencyTask"></delete>
+    </tasks>
+  </nodeType>
+  <nodeType alias="tea-commerce-store-tree-settings-order-statuses" teaCommerce="">
+    <header>TeaCommerce</header>
+    <usercontrol>/plugins/tea-commerce/Views/OrderStatuses/CreateOrderStatus.ascx</usercontrol>
+  </nodeType>
+  <nodeType alias="tea-commerce-store-tree-settings-order-status" teaCommerce="">
+    <header>TeaCommerce</header>
+    <tasks>
+      <delete assembly="TeaCommerce.Umbraco.Application" type="Trees.Tasks.OrderStatusTask"></delete>
+    </tasks>
+  </nodeType>
+  <nodeType alias="tea-commerce-store-tree-settings-vat-groups" teaCommerce="">
+    <header>TeaCommerce</header>
+    <usercontrol>/plugins/tea-commerce/Views/VatGroups/CreateVatGroup.ascx</usercontrol>
+  </nodeType>
+  <nodeType alias="tea-commerce-store-tree-settings-vat-group" teaCommerce="">
+    <header>TeaCommerce</header>
+    <tasks>
+      <delete assembly="TeaCommerce.Umbraco.Application" type="Trees.Tasks.VATGroupTask"></delete>
+    </tasks>
+  </nodeType>
+  <nodeType alias="tea-commerce-store-tree-settings-email-templates" teaCommerce="">
+    <header>TeaCommerce</header>
+    <usercontrol>/plugins/tea-commerce/Views/EmailTemplates/CreateEmailTemplate.ascx</usercontrol>
+  </nodeType>
+  <nodeType alias="tea-commerce-store-tree-settings-email-template" teaCommerce="">
+    <header>TeaCommerce</header>
+    <tasks>
+      <delete assembly="TeaCommerce.Umbraco.Application" type="Trees.Tasks.EmailTemplateTask"></delete>
+    </tasks>
+  </nodeType>
 </createUI>

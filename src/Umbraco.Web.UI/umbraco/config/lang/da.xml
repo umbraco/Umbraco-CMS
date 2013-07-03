@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="da" intName="Danish" localName="dansk" lcid="6" culture="da-DK">
   <creator>
     <name>The umbraco community</name>
@@ -35,6 +35,7 @@
     <key alias="toPublish">Send til udgivelse</key>
     <key alias="translate">Oversæt</key>
     <key alias="update">Opdatér</key>
+    <key alias="teaCommerceSort">Sortér</key>
   </area>
   <area alias="assignDomain">
     <key alias="addNew">Tilføj nyt domæne</key>
@@ -539,6 +540,7 @@ Mange hilsner fra umbraco robotten
     <key alias="statistics">Statistik</key>
     <key alias="translation">Oversættelse</key>
     <key alias="users">Brugere</key>
+    <key alias="teacommerce">Tea Commerce</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standard skabelon</key>
@@ -698,7 +700,7 @@ Mange hilsner fra umbraco robotten
     <key alias="memberType">Medlemstype</key>
     <key alias="nodeTypes">Dokumenttyper</key>
     <key alias="packager">Pakker</key>
-	<key alias="packages">Pakker</key>
+    <key alias="packages">Pakker</key>
     <key alias="python">Python</key>
     <key alias="repositories">Installer fra "repository"</key>
     <key alias="runway">Installer Runway</key>
@@ -736,8 +738,8 @@ Mange hilsner fra umbraco robotten
     <key alias="passwordChanged">Dit kodeord er blevet ændret!</key>
     <key alias="passwordConfirm">Bekræft venligst dit nye kodeord</key>
     <key alias="passwordEnterNew">Indtast dit nye kodeord</key>
-	<key alias="passwordCurrent">Nuværende kodeord</key>
-	<key alias="passwordInvalid">ugyldig nuværende kodeord</key>
+    <key alias="passwordCurrent">Nuværende kodeord</key>
+    <key alias="passwordInvalid">ugyldig nuværende kodeord</key>
     <key alias="passwordIsBlank">Dit nye kodeord må ikke være tomt!</key>
     <key alias="passwordIsDifferent">Dit nye kodeord og dit bekræftede kodeord var ikke ens, forsøg venligst igen!</key>
     <key alias="passwordMismatch">Det bekræftede kodeord matcher ikke det nye kodeord</key>

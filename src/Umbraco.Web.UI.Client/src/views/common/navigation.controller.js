@@ -21,7 +21,7 @@ function NavigationController($scope, navigationService) {
     $scope.ui = navigationService.ui;
 
     $scope.selectedId = navigationService.currentId;
-    $scope.sections = navigationService.sections();
+    $scope.sections = navigationService.sections;
 
     //events
     $scope.$on("treeOptionsClick", function (ev, args) {

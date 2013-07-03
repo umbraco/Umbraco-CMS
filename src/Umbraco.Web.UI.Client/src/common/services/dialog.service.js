@@ -2,7 +2,7 @@ angular.module('umbraco.services')
 .factory('dialogService', ['$rootScope', '$compile', '$http', '$timeout', '$q', '$templateCache', 
 	function($rootScope, $compile, $http, $timeout, $q, $templateCache) {
 	
-	function _open(options){	
+   function _open(options){	
 		if(!options){
 			options = {};
 		}
@@ -13,83 +13,105 @@ angular.module('umbraco.services')
 			templateUrl = options.template || "views/common/notfound.html";
 
 		var callback = options.callback;
-		return $q.when($templateCache.get(templateUrl) || $http.get(templateUrl, {cache: true}).then(function(res) { return res.data; }))
-		.then(function onSuccess(template) {
+	    var $modal = $('<div class="modal umb-modal hide" data-backdrop="false" tabindex="-1"></div>');
+	    var id = templateUrl.replace('.html', '').replace(/[\/|\.|:]/g, "-") + '-' + scope.$id;
 
-					// Build modal object
-					var id = templateUrl.replace('.html', '').replace(/[\/|\.|:]/g, "-") + '-' + scope.$id;
-					var $modal = $('<div class="modal umb-modal hide" data-backdrop="false" tabindex="-1"></div>')
-									.attr('id', id)
-									.addClass(animationClass)
-									.addClass(modalClass)
-									.html(template);
+	    $modal
+	        .attr('id', id)
+	        .addClass(animationClass)
+	        .addClass(modalClass);
 
-					
-							
-					$('body').append($modal);
+	    $rootScope.$on("closeDialogs", function () {
+	        $modal.modal("hide");
+	    });
 
-					// Compile modal content
-					$timeout(function() {
-						$compile($modal)(scope);
-					});
+        if(options.iframe) {
+            var html = $("<iframe src='" + templateUrl + "' style='width: 100%; height: 100%;'></iframe>");
+            $modal.html(html);
+            $('body').append($modal);
+            
+            //Autoshow	
+            if (options.show) {
+                $modal.modal('show');
+            }
 
-					//Scope to handle data from the modal form
-					scope.dialogData = {};
-					scope.dialogData.selection = [];
+            return $modal;
+        } else {
+            return $q.when($templateCache.get(templateUrl) || $http.get(templateUrl, { cache: true }).then(function (res) { return res.data; }))
+		        .then(function onSuccess(template) {
 
-					// Provide scope display functions
-					scope.$modal = function(name) {
-						$modal.modal(name);
-					};
-					
-					scope.hide = function() {
-					    $modal.modal('hide');
-					    $('body').remove($modal);
-					};
+		            // Build modal object
+		            $modal
+                        .html(template);
 
-					scope.show = function() {
-						$modal.modal('show');
-					};
 
-					scope.submit = function(data){
-					    $modal.modal('hide');
-					    $('body').remove($modal);
+		            $('body').append($modal);
 
-					    callback(data);
-					};
+		            // Compile modal content
+		            $timeout(function () {
+		                $compile($modal)(scope);
+		            });
 
-					scope.select = function(item){
-						if(scope.dialogData.selection.indexOf(item) < 0){
-							scope.dialogData.selection.push(item);	
-						}	
-					};
+		            //Scope to handle data from the modal form
+		            scope.dialogData = {};
+		            scope.dialogData.selection = [];
 
-					scope.dismiss = scope.hide;
+		            // Provide scope display functions
+		            scope.$modal = function (name) {
+		                $modal.modal(name);
+		            };
 
-					// Emit modal events
-					angular.forEach(['show', 'shown', 'hide', 'hidden'], function(name) {
-						$modal.on(name, function(ev) {
-							scope.$emit('modal-' + name, ev);
-						});
-					});
+		            scope.hide = function () {
+		                $modal.modal('hide');
+		                $('body').remove($modal);
+		            };
 
-					// Support autofocus attribute
-					$modal.on('shown', function(event) {
-						$('input[autofocus]', $modal).first().trigger('focus');
-					});
+		            scope.show = function () {
+		                $modal.modal('show');
+		            };
 
-					//Autoshow	
-					if(options.show) {
-						$modal.modal('show');
-					}
+		            scope.submit = function (data) {
+		                $modal.modal('hide');
+		                $('body').remove($modal);
 
-					$rootScope.$on("closeDialogs", function(){
-						$modal.modal("hide");
-					});
-					
-					//Return the modal object	
-					return $modal;
-				});	
+		                callback(data);
+		            };
+
+		            scope.select = function (item) {
+		                if (scope.dialogData.selection.indexOf(item) < 0) {
+		                    scope.dialogData.selection.push(item);
+		                }
+		            };
+
+		            scope.dismiss = scope.hide;
+
+		            // Emit modal events
+		            angular.forEach(['show', 'shown', 'hide', 'hidden'], function (name) {
+		                $modal.on(name, function (ev) {
+		                    scope.$emit('modal-' + name, ev);
+		                });
+		            });
+
+		            // Support autofocus attribute
+		            $modal.on('shown', function (event) {
+		                $('input[autofocus]', $modal).first().trigger('focus');
+		            });
+
+		            //Autoshow	
+		            if (options.show) {
+		                $modal.modal('show');
+		            }
+
+		            $rootScope.$on("closeDialogs", function () {
+		                $modal.modal("hide");
+		            });
+
+		            //Return the modal object	
+		            return $modal;
+		        });
+        }
+
+		
 }
 
 return{

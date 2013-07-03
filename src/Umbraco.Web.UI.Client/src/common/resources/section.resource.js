@@ -14,19 +14,14 @@ function sectionResource($q, $http) {
     return {
         /** Loads in the data to display the section list */
         getSections: function (options) {
-           
-            var deferred = $q.defer();
-
             //go and get the tree data
-            $http.get(getSectionsUrl()).
-                success(function (data, status, headers, config) {
-                    deferred.resolve(data);
-                }).
-                error(function (data, status, headers, config) {
-                    deferred.reject('Failed to retreive data for sections');
+            
+            return $http.get(getSectionsUrl())
+                .then(function (response) {
+                    return response.data;
+                }, function (response) {
+                    throw new Error('Failed to retreive data for content id ' + id);
                 });
-
-            return deferred.promise;
         }
     };
 }

@@ -131,7 +131,14 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 
                 if (!strLocation || strLocation == "") {
                     //SD: NOTE: We used to return the content iframe object but now I'm not sure we should do that ?!
-                    return;
+
+                    if (typeof top.right != "undefined") {
+                        return top.right;
+                    }
+                    else {
+                        return top; //return the current window if the content frame doesn't exist in the current context
+                    }
+                    //return;
                 }
 
                 this._debug("contentFrame: " + strLocation);
@@ -196,7 +203,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
             },
             closeModalWindow: function(rVal) {
                 
-                throw "Not implemented!";
+                getRootScope().$emit("closeDialogs");
 
                 //if (this._modal != null && this._modal.length > 0) {
                 //    this._modal.pop().close(rVal);

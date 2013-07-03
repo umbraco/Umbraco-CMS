@@ -46,6 +46,11 @@ namespace umbraco.uicontrols {
             for (int i = 0; i < Tabs.Count; i++)
             {
                 var tabPage = TabPages.ElementAt(i).Value;
+                tabPage.Active = false;
+
+                if (tabPage.ID == ActiveTabId)
+                    tabPage.Active = true;
+
                 _tabsHolder.Controls.Add(tabPage);
             }
         }
@@ -120,42 +125,15 @@ namespace umbraco.uicontrols {
 	        set { _autoResize = value; }
 	    }
 
-        private string ActiveTabId
+        public string ActiveTabId
         {
             get
             {
-                if (this.Parent.Page.IsPostBack)
-                {
-                    return this.Parent.Page.Request.Form[this.ClientID + "_activetab"];
-                }
+                if (TabPages.Count > 0)
+                    return TabPages.ElementAt(0).Value.ID;
+
                 return "tab01";
             }
         }
-        
-        /*
-	    protected override void Render(HtmlTextWriter writer)
-	    {
-	        writer.WriteLine("<div id='" + this.ClientID + "' style='height:" + this.Height.Value + "px;width:" + this.Width.Value + "px;'>");
-	        writer.WriteLine("  <div class='header'>");
-	        writer.WriteLine("      <ul>");
-	        for (int i = 0; i <= _tabs.Count - 1; i++)
-	        {
-	            string TabPageCaption = (string) _tabs[i];
-	            string TabId = this.ClientID + "_tab0" + (i + 1);
-	            writer.WriteLine("          <li id='" + TabId + "' class='tabOff'>");
-	            writer.WriteLine("              <a id='" + TabId + "a' href='#' onclick=\"setActiveTab('" + this.ClientID + "','" + TabId + "'," + this.ClientID + "_tabs); return false;\">");
-	            writer.WriteLine("                  <span><nobr>" + TabPageCaption + "</nobr></span>");
-	            writer.WriteLine("              </a>");
-	            writer.WriteLine("          </li>");
-	        }
-	        writer.WriteLine("      </ul>");
-	        writer.WriteLine("  </div>");
-	        writer.WriteLine("  <div id='' class='tabpagecontainer'>");
-	        this.RenderChildren(writer);
-	        writer.WriteLine("\t</div>");
-	        writer.WriteLine("\t<div class='footer'><div class='status'><h2>" + this._status + "</h2></div></div>");
-	        writer.WriteLine("</div>");
-	        writer.WriteLine("<input type='hidden' name='" + this.ClientID + "_activetab' id='" + this.ClientID + "_activetab' value='" + this.ActiveTabId + "'/>");
-	    }*/
-	}
+    }
 }

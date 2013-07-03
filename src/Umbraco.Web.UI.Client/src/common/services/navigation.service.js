@@ -1,10 +1,12 @@
 angular.module('umbraco.services')
-.factory('navigationService', function ($rootScope, $routeParams, $log, $location, dialogService, treeService) {
+.factory('navigationService', function ($rootScope, $routeParams, $log, $location, dialogService, treeService, sectionResource) {
 
 	var currentSection = $routeParams.section;
 	var currentId = $routeParams.id;
 	var currentNode;
 	var ui = {};
+
+    var _sections = sectionResource.getSections();
 
 	function setMode(mode){
 		switch(mode)
@@ -50,16 +52,7 @@ angular.module('umbraco.services')
 		currentNode: currentNode,
 		mode: "default",
 		ui: ui,
-
-		sections: function(){
-			return [
-				{ name: "Content", cssclass: "content", alias: "content" },
-				{ name: "Media", cssclass: "media", alias: "media" },
-				{ name: "Settings", cssclass: "settings",  alias: "settings" },
-				{ name: "Developer", cssclass: "developer", alias: "developer" },
-				{ name: "Users", cssclass: "user", alias: "users" }
-				];		
-		},
+		sections: _sections,
 
 	    /**
          * @ngdoc function

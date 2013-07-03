@@ -32,7 +32,8 @@ angular.module('umbraco.security.service', [
 
     loginDialog = dialogService.open({
                       template: 'views/common/dialogs/login.html', 
-                      modalClass: "login-overlay", 
+                      modalClass: "login-overlay",
+                      animation: "slide",
                       show: true, 
                       callback: onLoginDialogClose});
   }

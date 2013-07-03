@@ -6,12 +6,14 @@
                 <umb-avatar name="{{user.name}}" email="{{user.email}}" hash="{{user.emailHash}}"></umb-avatar>
             </li>
 
-            <li ng-repeat="section in sections">
+            <li ng-repeat="section in sections" ng-class="{current: section.alias == ui.currentSection}">
                 <a href="#/{{section.alias}}"
                    ng-click="changeSection(section.alias)"
                    ng-mouseenter="showTree(section.alias)"
                    prevent-default>
-                    <i class="{{section.cssclass}}"></i><span>{{section.name}}</span>
+                  
+                    <section-icon icon="{{section.cssclass}}"></section-icon>  
+                    <span>{{section.name}}</span>
                 </a>
             </li>
 
