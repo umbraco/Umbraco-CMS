@@ -66,7 +66,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
             {
-                return repository.GetUserById(id);
+                return repository.Get(id);
             }
         }
 

@@ -227,46 +227,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IUser GetUserByUserName(string username)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where("umbracoUser.userLogin = @Username", new { Username = username });
-
-            var dto = Database.FirstOrDefault<UserDto>(sql);
-
-            if (dto == null)
-                return null;
-
-            return new User(_userTypeRepository.Get(dto.Type))
-            {
-                Id = dto.Id,
-                Email = dto.Email,
-                Language = dto.UserLanguage,
-                Name = dto.UserName,
-                NoConsole = dto.NoConsole,
-                IsLockedOut = dto.Disabled
-            };
-
+            var query = Query<IUser>.Builder.Where(x => x.Username == username);
+            return GetByQuery(query).FirstOrDefault();
         }
-
-        public IUser GetUserById(int id)
+        
+        public void DeleteSectionFromAllUsers(string sectionAlias)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-
-            var dto = Database.FirstOrDefault<UserDto>(sql);
-
-            if (dto == null)
-                return null;
-
-            return new User(_userTypeRepository.Get(dto.Type))
-            {
-                Id = dto.Id,
-                Email = dto.Email,
-                Language = dto.UserLanguage,
-                Name = dto.UserName,
-                NoConsole = dto.NoConsole,
-                IsLockedOut = dto.Disabled
-            };
-
+            throw new NotImplementedException();
         }
 
         #endregion
