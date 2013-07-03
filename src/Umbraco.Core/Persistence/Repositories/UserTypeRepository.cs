@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var dto = Database.Query<UserTypeDto>(sql).FirstOrDefault();
+            var dto = Database.FirstOrDefault<UserTypeDto>(sql);
 
             if (dto == null)
                 return null;

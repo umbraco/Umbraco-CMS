@@ -1188,6 +1188,7 @@ namespace Umbraco.Core.Services
             {
                 content.WriterId = userId;
                 content.CreatorId = userId;
+                content.ChangePublishedState(PublishedState.Unpublished);
 
                 repository.AddOrUpdate(content);
                 uow.Commit();
@@ -1467,11 +1468,10 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentRepository(uow))
                 {
-                    //Only loop through content that was successfully published, was not already published and where the Published property has been updated
+                    //NOTE The Publish with subpages-dialog was used more as a republish-type-thing, so we'll have to include PublishStatusType.SuccessAlreadyPublished
+                    //in the updated-list, so the Published event is triggered with the expected set of pages and the xml is updated.
                     foreach (var item in publishedOutcome.Where(
-                        x => x.Success
-                             && x.Result.StatusType != PublishStatusType.SuccessAlreadyPublished
-                             && ((ICanBeDirty)x.Result.ContentItem).IsPropertyDirty("Published")))
+                        x => x.Success || x.Result.StatusType == PublishStatusType.SuccessAlreadyPublished))
                     {
                         item.Result.ContentItem.WriterId = userId;
                         repository.AddOrUpdate(item.Result.ContentItem);

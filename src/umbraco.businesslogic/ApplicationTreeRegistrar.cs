@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using umbraco.businesslogic;
 using umbraco.interfaces;
 
@@ -23,7 +24,7 @@ namespace umbraco.BusinessLogic
 
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
-            ScanTrees();
+            ScanTrees(applicationContext);
         }
 
         /// <summary>
@@ -31,14 +32,14 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public void ConfigureMappings(IConfiguration config)
         {
-            config.CreateMap<Umbraco.Core.Trees.ApplicationTree, ApplicationTree>()
+            config.CreateMap<Umbraco.Core.Models.ApplicationTree, ApplicationTree>()
                   .ReverseMap(); //two way
         }
 
         /// <summary>
         /// Scans for all attributed trees and ensures they exist in the tree xml
         /// </summary>
-        private static void ScanTrees()
+        private static void ScanTrees(ApplicationContext applicationContext)
         {
             // Load all Trees by attribute and add them to the XML config
             var types = PluginManager.Current.ResolveAttributedTrees();
@@ -46,9 +47,9 @@ namespace umbraco.BusinessLogic
             var items = types
                 .Select(x =>
                         new Tuple<Type, TreeAttribute>(x, x.GetCustomAttributes<TreeAttribute>(false).Single()))
-                .Where(x => Umbraco.Core.Trees.ApplicationTreeCollection.GetByAlias(x.Item2.Alias) == null);
+                .Where(x => applicationContext.Services.ApplicationTreeService.GetByAlias(x.Item2.Alias) == null);
 
-            Umbraco.Core.Trees.ApplicationTreeCollection.LoadXml(doc =>
+            applicationContext.Services.ApplicationTreeService.LoadXml(doc =>
                 {
                     foreach (var tuple in items)
                     {

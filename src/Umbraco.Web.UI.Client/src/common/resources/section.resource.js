@@ -14,15 +14,13 @@ function sectionResource($q, $http) {
     return {
         /** Loads in the data to display the section list */
         getSections: function (options) {
-            //go and get the tree data
-            
             return $http.get(getSectionsUrl())
                 .then(function (response) {
                     return response.data;
                 }, function (response) {
                     throw new Error('Failed to retreive data for content id ' + id);
                 });
-        }
+		}
     };
 }
 

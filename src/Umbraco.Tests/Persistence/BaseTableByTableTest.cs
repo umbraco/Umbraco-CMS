@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.ObjectResolution;
@@ -27,14 +28,16 @@ namespace Umbraco.Tests.Persistence
 
             RepositoryResolver.Current = new RepositoryResolver(
                 new RepositoryFactory());
-            
+
+            //disable cache
+            var cacheHelper = new CacheHelper(new NullCacheProvider(), false);
+
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
                 new DatabaseContext(new DefaultDatabaseFactory()),
                 //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy()),
-                //disable cache
-                false)
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),                
+                cacheHelper)
                 {
                     IsReady = true
                 };

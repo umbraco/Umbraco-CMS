@@ -3,10 +3,10 @@
     * @name umbraco.filters:umbTreeIconImage
     * @description This will properly render the tree icon image based on the tree icon set on the server
     **/
-function treeIconStyleFilter(treeIconHelper) {
+function treeIconStyleFilter(iconHelper) {
     return function (treeNode) {
         if (treeNode.iconIsClass) {
-            var converted = treeIconHelper.convertFromLegacyTreeNodeIcon(treeNode);
+            var converted = iconHelper.convertFromLegacyTreeNodeIcon(treeNode);
             if (converted.startsWith('.')) {
                 //its legacy so add some width/height
                 return "height:16px;width:16px;";

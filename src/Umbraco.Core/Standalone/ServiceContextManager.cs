@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Reflection;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -24,10 +23,19 @@ namespace Umbraco.Core.Standalone
             Trace.WriteLine("ServiceContextManager-Current AppDomain: " + AppDomain.CurrentDomain.FriendlyName);
             Trace.WriteLine("ServiceContextManager-Current AppDomain: " + AppDomain.CurrentDomain.BaseDirectory);
 
-            var examineEventHandlerToRemove = Type.GetType("Umbraco.Web.Search.ExamineEvents, Umbraco.Web");
+            //var webAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.FullName.StartsWith("umbraco"));
+            //if (webAssembly != null && examineEventHandlerToRemove == null)
+            //{
+            //    var examineEventType = webAssembly.GetType("Umbraco.Web.Search.ExamineEvents");
+            //    examineEventHandlerToRemove = examineEventType;
+            //}
 
             _application = StandaloneCoreApplication.GetApplication(baseDirectory);
-            _application.WithoutApplicationEventHandler(examineEventHandlerToRemove);
+
+            var examineEventHandlerToRemove = Type.GetType("Umbraco.Web.Search.ExamineEvents, umbraco");
+            if (examineEventHandlerToRemove != null)
+                _application.WithoutApplicationEventHandler(examineEventHandlerToRemove);
+
             _application.Start();
         }
 
@@ -43,7 +51,8 @@ namespace Umbraco.Core.Standalone
                     _serviceContext = new ServiceContext(
                         new PetaPocoUnitOfWorkProvider(dbFactory),
                         new FileUnitOfWorkProvider(),
-                        new PublishingStrategy());
+                        new PublishingStrategy(),
+                        new CacheHelper(new System.Web.Caching.Cache(), true));
 
                     //initialize the DatabaseContext
                     dbContext.Initialize(_providerName);

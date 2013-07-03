@@ -54,6 +54,7 @@ angular.module('umbraco.services')
 		ui: ui,
 		sections: _sections,
 
+        
 	    /**
          * @ngdoc function
          * @name loadLegacyIFrame

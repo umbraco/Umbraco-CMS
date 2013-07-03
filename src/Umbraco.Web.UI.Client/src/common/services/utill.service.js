@@ -345,10 +345,10 @@ angular.module('umbraco.services').factory('umbDataFormatter', umbDataFormatter)
 
 /**
 * @ngdoc factory
-* @name umbraco.services.tree:treeIconHelper
-* @description A helper service for dealing with tree icons, mostly dealing with legacy tree icons
+* @name umbraco.services.tree:iconHelper
+* @description A helper service for dealing with icons, mostly dealing with legacy tree icons
 **/
-function treeIconHelper() {
+function iconHelper() {
 
     var converter = [
         { oldIcon: ".sprNew", newIcon: "plus" },
@@ -371,7 +371,16 @@ function treeIconHelper() {
         { oldIcon: ".sprTreeFolder_o", newIcon: "icon-folder-open" },
         { oldIcon: ".sprTreeMediaFile", newIcon: "icon-music" },
         { oldIcon: ".sprTreeMediaMovie", newIcon: "icon-movie" },
-        { oldIcon: ".sprTreeMediaPhoto", newIcon: "icon-picture" }
+        { oldIcon: ".sprTreeMediaPhoto", newIcon: "icon-picture" },
+        
+        //tray icons
+        { oldIcon: ".traycontent", newIcon: "content" },
+        { oldIcon: ".traymedia", newIcon: "media" },
+        { oldIcon: ".traysettings", newIcon: "settings" },
+        { oldIcon: ".traydeveloper", newIcon: "developer" },
+        { oldIcon: ".trayusers", newIcon: "user" },
+        { oldIcon: ".traymember", newIcon: "member" },
+        { oldIcon: ".traytranslation", newIcon: "translation" }
     ];
 
     return {
@@ -409,4 +418,4 @@ function treeIconHelper() {
         }
     };
 }
-angular.module('umbraco.services').factory('treeIconHelper', treeIconHelper);
+angular.module('umbraco.services').factory('iconHelper', iconHelper);

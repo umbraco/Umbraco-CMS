@@ -8,6 +8,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
+
     /// <summary>
     /// Represent an abstract Repository, which is the base of the Repository implementations
     /// </summary>
@@ -102,7 +103,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
-                Entity asEntity = entity as Entity;
+                TracksChangesEntityBase asEntity = entity as TracksChangesEntityBase;
                 if (asEntity != null)
                 {
                     asEntity.ResetDirtyProperties(false);

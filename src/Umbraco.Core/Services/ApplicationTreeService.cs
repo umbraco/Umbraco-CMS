@@ -6,11 +6,20 @@ using System.Xml.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
+using File = System.IO.File;
 
-namespace Umbraco.Core.Trees
+namespace Umbraco.Core.Services
 {
-    internal class ApplicationTreeCollection
+    internal class ApplicationTreeService
     {
+        private readonly CacheHelper _cache;
+
+        public ApplicationTreeService(CacheHelper cache)
+        {
+            _cache = cache;
+        }
+
         internal const string TreeConfigFileName = "trees.config";
         private static string _treeConfig;
         private static readonly object Locker = new object();
@@ -37,37 +46,34 @@ namespace Umbraco.Core.Trees
         /// <summary>
         /// The cache storage for all application trees
         /// </summary>
-        private static List<ApplicationTree> AppTrees
+        private List<ApplicationTree> GetAppTrees()
         {
-            get
-            {
-                return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                    CacheKeys.ApplicationTreeCacheKey,
-                    () =>
-                        {
-                            var list = new List<ApplicationTree>();
+            return _cache.GetCacheItem(
+                CacheKeys.ApplicationTreeCacheKey,
+                () =>
+                    {
+                        var list = new List<ApplicationTree>();
 
-                            LoadXml(doc =>
+                        LoadXml(doc =>
                             {
                                 foreach (var addElement in doc.Root.Elements("add").OrderBy(x =>
+                                    {
+                                        var sortOrderAttr = x.Attribute("sortOrder");
+                                        return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
+                                    }))
                                 {
-                                    var sortOrderAttr = x.Attribute("sortOrder");
-                                    return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
-                                }))
-                                {
-
-                                    var applicationAlias = (string)addElement.Attribute("application");
-                                    var type = (string)addElement.Attribute("type");
-                                    var assembly = (string)addElement.Attribute("assembly");
+                                    var applicationAlias = (string) addElement.Attribute("application");
+                                    var type = (string) addElement.Attribute("type");
+                                    var assembly = (string) addElement.Attribute("assembly");
 
                                     //check if the tree definition (applicationAlias + type + assembly) is already in the list
 
                                     if (list.Any(tree => tree.ApplicationAlias.InvariantEquals(applicationAlias)
                                                          && tree.Type.InvariantEquals(type)) == false)
                                     {
-                                        list.Add(new ApplicationTree(                                                     
+                                        list.Add(new ApplicationTree(
                                                      addElement.Attribute("initialize") == null || Convert.ToBoolean(addElement.Attribute("initialize").Value),
-                                                     addElement.Attribute("sortOrder") != null ? Convert.ToByte(addElement.Attribute("sortOrder").Value) : (byte)0,
+                                                     addElement.Attribute("sortOrder") != null ? Convert.ToByte(addElement.Attribute("sortOrder").Value) : (byte) 0,
                                                      addElement.Attribute("application").Value,
                                                      addElement.Attribute("alias").Value,
                                                      addElement.Attribute("title").Value,
@@ -75,16 +81,12 @@ namespace Umbraco.Core.Trees
                                                      addElement.Attribute("iconOpen").Value,
                                                      addElement.Attribute("type").Value));
                                     }
-
-
                                 }
                             }, false);
 
-                            return list;
-                        });
-            }            
+                        return list;
+                    });
         }
-
 
         /// <summary>
         /// Creates a new application tree.
@@ -97,7 +99,7 @@ namespace Umbraco.Core.Trees
         /// <param name="iconClosed">The icon closed.</param>
         /// <param name="iconOpened">The icon opened.</param>
         /// <param name="type">The type.</param>
-        public static void MakeNew(bool initialize, byte sortOrder, string applicationAlias, string alias, string title, string iconClosed, string iconOpened, string type)
+        public void MakeNew(bool initialize, byte sortOrder, string applicationAlias, string alias, string title, string iconClosed, string iconOpened, string type)
         {
             LoadXml(doc =>
             {
@@ -123,7 +125,7 @@ namespace Umbraco.Core.Trees
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        public static void SaveTree(ApplicationTree tree)
+        public void SaveTree(ApplicationTree tree)
         {
             LoadXml(doc =>
             {
@@ -151,7 +153,7 @@ namespace Umbraco.Core.Trees
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        public static void DeleteTree(ApplicationTree tree)
+        public void DeleteTree(ApplicationTree tree)
         {            
             LoadXml(doc =>
             {
@@ -167,9 +169,9 @@ namespace Umbraco.Core.Trees
         /// </summary>
         /// <param name="treeAlias">The tree alias.</param>
         /// <returns>An ApplicationTree instance</returns>
-        public static ApplicationTree GetByAlias(string treeAlias)
+        public ApplicationTree GetByAlias(string treeAlias)
         {
-            return AppTrees.Find(t => (t.Alias == treeAlias));
+            return GetAppTrees().Find(t => (t.Alias == treeAlias));
 
         }
 
@@ -177,9 +179,9 @@ namespace Umbraco.Core.Trees
         /// Gets all applicationTrees registered in umbraco from the umbracoAppTree table..
         /// </summary>
         /// <returns>Returns a ApplicationTree Array</returns>
-        public static IEnumerable<ApplicationTree> GetAll()
+        public IEnumerable<ApplicationTree> GetAll()
         {
-            return AppTrees.OrderBy(x => x.SortOrder);
+            return GetAppTrees().OrderBy(x => x.SortOrder);
         }
 
         /// <summary>
@@ -187,9 +189,9 @@ namespace Umbraco.Core.Trees
         /// </summary>
         /// <param name="applicationAlias">The application alias.</param>
         /// <returns>Returns a ApplicationTree Array</returns>
-        public static IEnumerable<ApplicationTree> GetApplicationTree(string applicationAlias)
+        public IEnumerable<ApplicationTree> GetApplicationTrees(string applicationAlias)
         {
-            return GetApplicationTree(applicationAlias, false);
+            return GetApplicationTrees(applicationAlias, false);
         }
 
         /// <summary>
@@ -198,9 +200,9 @@ namespace Umbraco.Core.Trees
         /// <param name="applicationAlias">The application alias.</param>
         /// <param name="onlyInitializedApplications"></param>
         /// <returns>Returns a ApplicationTree Array</returns>
-        public static IEnumerable<ApplicationTree> GetApplicationTree(string applicationAlias, bool onlyInitializedApplications)
+        public IEnumerable<ApplicationTree> GetApplicationTrees(string applicationAlias, bool onlyInitializedApplications)
         {
-            var list = AppTrees.FindAll(
+            var list = GetAppTrees().FindAll(
                 t =>
                     {
                         if (onlyInitializedApplications)
@@ -212,7 +214,7 @@ namespace Umbraco.Core.Trees
             return list.OrderBy(x => x.SortOrder).ToArray();
         }
 
-        internal static void LoadXml(Action<XDocument> callback, bool saveAfterCallback)
+        internal void LoadXml(Action<XDocument> callback, bool saveAfterCallback)
         {
             lock (Locker)
             {
@@ -231,7 +233,7 @@ namespace Umbraco.Core.Trees
 
                         //remove the cache now that it has changed  SD: I'm leaving this here even though it
                         // is taken care of by events as well, I think unit tests may rely on it being cleared here.
-                        ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.ApplicationTreeCacheKey);
+                        _cache.ClearCacheItem(CacheKeys.ApplicationTreeCacheKey);
                     }
                 }
             }

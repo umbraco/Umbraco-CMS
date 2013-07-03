@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(IContentType))]
     public sealed class ContentTypeMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache = new ConcurrentDictionary<string, DtoMapModel>();
+        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
 
         //NOTE: its an internal class but the ctor must be public since we're using Activator.CreateInstance to create it
         // otherwise that would fail because there is no public constructor.
@@ -24,6 +24,11 @@ namespace Umbraco.Core.Persistence.Mappers
         }
 
         #region Overrides of BaseMapper
+
+        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
+        {
+            get { return PropertyInfoCacheInstance; }
+        }
 
         internal override void BuildMap()
         {
@@ -46,22 +51,6 @@ namespace Umbraco.Core.Persistence.Mappers
                 CacheMap<ContentType, ContentTypeDto>(src => src.IsContainer, dto => dto.IsContainer);
                 CacheMap<ContentType, ContentTypeDto>(src => src.Thumbnail, dto => dto.Thumbnail);
             }
-        }
-
-        internal override string Map(string propertyName)
-        {
-            if (!PropertyInfoCache.ContainsKey(propertyName))
-                return string.Empty;
-
-            var dtoTypeProperty = PropertyInfoCache[propertyName];
-
-            return base.GetColumnName(dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo);
-        }
-
-        internal override void CacheMap<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
-        {
-            var property = base.ResolveMapping(sourceMember, destinationMember);
-            PropertyInfoCache.AddOrUpdate(property.SourcePropertyName, property, (x, y) => property);
         }
 
         #endregion

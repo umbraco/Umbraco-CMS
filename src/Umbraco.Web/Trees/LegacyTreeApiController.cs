@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
-using Umbraco.Core.Trees;
+using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -28,7 +28,7 @@ namespace Umbraco.Web.Trees
             //need to ensure we have a tree type
             var treeType = queryStrings.GetRequiredString("treeType");
             //now we'll look up that tree
-            var tree = ApplicationTreeCollection.GetByAlias(treeType);
+            var tree = Services.ApplicationTreeService.GetByAlias(treeType);
             if (tree == null)
                 throw new InvalidOperationException("No tree found with alias " + treeType);
 

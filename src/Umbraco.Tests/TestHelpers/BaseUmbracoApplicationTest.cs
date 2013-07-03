@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.ObjectResolution;
@@ -24,6 +25,11 @@ namespace Umbraco.Tests.TestHelpers
         {
             TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
+
+            SettingsForTests.UseLegacyXmlSchema = false;
+            SettingsForTests.ForceSafeAliases = true;
+            SettingsForTests.UmbracoLibraryCacheDuration = 1800;
+            
             SetupPluginManager();            
             SetupApplicationContext();
             InitializeMappers();
@@ -81,13 +87,15 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void SetupApplicationContext()
         {
+            //disable cache
+            var cacheHelper = new CacheHelper(new NullCacheProvider(), false);
+
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
                 new DatabaseContext(new DefaultDatabaseFactory()),
                 //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy()),
-                //disable cache
-                false)
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),
+                cacheHelper)
             {
                 IsReady = true
             };

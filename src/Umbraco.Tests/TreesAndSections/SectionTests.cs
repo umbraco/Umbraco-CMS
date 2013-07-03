@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using Umbraco.Core.Sections;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using umbraco.BusinessLogic;
 using System;
@@ -23,15 +23,15 @@ namespace Umbraco.Tests.TreesAndSections
         public void Application_Make_New()
         {
             var name = Guid.NewGuid().ToString("N");
-            SectionCollection.MakeNew(name, name, "icon.jpg");
+            ApplicationContext.Current.Services.SectionService.MakeNew(name, name, "icon.jpg");
             
             //check if it exists
-            var app = SectionCollection.GetByAlias(name);
+            var app = ApplicationContext.Current.Services.SectionService.GetByAlias(name);
             Assert.IsNotNull(app);
 
             //now remove it
-            SectionCollection.DeleteSection(app);
-            Assert.IsNull(SectionCollection.GetByAlias(name));
+            ApplicationContext.Current.Services.SectionService.DeleteSection(app);
+            Assert.IsNull(ApplicationContext.Current.Services.SectionService.GetByAlias(name));
         }
 
         /// <summary>
@@ -74,10 +74,10 @@ namespace Umbraco.Tests.TreesAndSections
             var ut = UserType.GetAllUserTypes().First();
             var user = User.MakeNew(name, name, name, ut);
 
-            SectionCollection.MakeNew(name, name, "icon.jpg");
+            ApplicationContext.Current.Services.SectionService.MakeNew(name, name, "icon.jpg");
 
             //check if it exists
-            var app = SectionCollection.GetByAlias(name);
+            var app = ApplicationContext.Current.Services.SectionService.GetByAlias(name);
             Assert.IsNotNull(app);
 
             //assign the app
@@ -86,7 +86,7 @@ namespace Umbraco.Tests.TreesAndSections
             Assert.AreEqual(1, user.Applications.Count(x => x.alias == app.Alias));
 
             //delete the app
-            SectionCollection.DeleteSection(app);
+            ApplicationContext.Current.Services.SectionService.DeleteSection(app);
 
             //make sure the assigned applications are gone
             Assert.AreEqual(0, user.Applications.Count(x => x.alias == name));

@@ -141,6 +141,14 @@ namespace Umbraco.Web
         }
 
         /// <summary>
+        /// Creates the application cache based on the HttpRuntime cache
+        /// </summary>
+        protected override void CreateApplicationCache()
+        {
+            ApplicationCache = new CacheHelper(HttpRuntime.Cache, true);
+        }
+
+        /// <summary>
         /// Creates the routes
         /// </summary>
         protected internal void CreateRoutes()

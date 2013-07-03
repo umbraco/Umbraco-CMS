@@ -8,7 +8,7 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config)
         {
-            config.CreateMap<Section, Umbraco.Core.Sections.Section>()
+            config.CreateMap<Section, Core.Models.Section>()
                   .ReverseMap(); //backwards too!
         }
     }

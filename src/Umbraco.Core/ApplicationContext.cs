@@ -20,41 +20,26 @@ namespace Umbraco.Core
     /// </remarks>
     public class ApplicationContext : IDisposable
     {
-    	/// <summary>
-        /// Constructor
-        /// </summary>        
-        internal ApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
-            : this(dbContext, serviceContext, true)
-    	{
-    			
-    	}
-
+        
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="dbContext"></param>
         /// <param name="serviceContext"></param>
-        /// <param name="enableCache"></param>
-        internal ApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext, bool enableCache)
-            : this(enableCache)
+        /// <param name="cache"></param>
+        internal ApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext, CacheHelper cache)
         {
             if (dbContext == null) throw new ArgumentNullException("dbContext");
             if (serviceContext == null) throw new ArgumentNullException("serviceContext");
+            if (cache == null) throw new ArgumentNullException("cache");
 
             _databaseContext = dbContext;
-            _services = serviceContext;		
+            _services = serviceContext;
+            ApplicationCache = cache;
         }
 
-		/// <summary>
-		/// Empty constructor normally reserved for unit tests when a DatabaseContext or a ServiceContext is not
-		/// necessarily required or needs to be set after construction.
-		/// </summary>
-		internal ApplicationContext() : this(true)
-		{			
-		}
-
         /// <summary>
-        /// Constructor used to specify if we will enable application cache or not
+        /// Constructor used to specify if we will enable application cache or not, used for unit tests
         /// </summary>
         /// <param name="enableCache"></param>
         internal ApplicationContext(bool enableCache)
