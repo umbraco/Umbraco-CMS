@@ -20,6 +20,10 @@ namespace Umbraco.Core.Models
         {
             Mandate.ParameterNotNull(propertyType, "propertyType");
             var dataType = ApplicationContext.Current.Services.DataTypeService.GetDataTypeById(propertyType.DataTypeId);
+            if (dataType == null)
+            {
+                return null;
+            }
             dataType.DataTypeDefinitionId = propertyType.DataTypeDefinitionId;
             dataType.Data.PropertyId = propertyId;
             return dataType;
