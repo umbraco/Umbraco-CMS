@@ -439,6 +439,32 @@ namespace Umbraco.Tests.Persistence.Repositories
             AssertPropertyValues(userByUsername, user);
         }
 
+        [Test]
+        public void Get_Users_Assigned_To_Section()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
+            var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1", "test", "media");
+            var user2 = MockedUser.CreateUser(CreateAndCommitUserType(), "2", "media", "settings");
+            var user3 = MockedUser.CreateUser(CreateAndCommitUserType(), "3", "test", "settings");
+            repository.AddOrUpdate(user1);
+            repository.AddOrUpdate(user2);
+            repository.AddOrUpdate(user3);
+            unitOfWork.Commit();
+
+            // Act
+
+            var users = repository.GetUsersAssignedToSection("test");
+
+            // Assert            
+            Assert.AreEqual(2, users.Count());
+            var names = users.Select(x => x.Username).ToArray();
+            Assert.IsTrue(names.Contains("TestUser1"));
+            Assert.IsTrue(names.Contains("TestUser3"));
+        }
+
         private void AssertPropertyValues(IUser updatedItem, IUser originalUser)
         {
             Assert.That(updatedItem.Id, Is.EqualTo(originalUser.Id));
