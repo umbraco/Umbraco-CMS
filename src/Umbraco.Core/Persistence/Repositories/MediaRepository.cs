@@ -256,7 +256,7 @@ namespace Umbraco.Core.Persistence.Repositories
             ((Models.Media)entity).UpdatingEntity();
 
             //Ensure unique name on the same level
-            entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
+            entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
 
             //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
             if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
