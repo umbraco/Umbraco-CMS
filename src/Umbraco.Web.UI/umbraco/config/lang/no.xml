@@ -35,7 +35,6 @@
     <key alias="toPublish">Send til publisering</key>
     <key alias="translate">Oversett</key>
     <key alias="update">Oppdater</key>
-    <key alias="teaCommerceSort">Sorter</key>
   </area>
   <area alias="assignDomain">
     <key alias="addNew">Legg til domene</key>
@@ -574,7 +573,6 @@ Vennlig hilsen umbraco roboten
     <key alias="statistics">Statistikk</key>
     <key alias="translation">Oversettelse</key>
     <key alias="users">Brukere</key>
-    <key alias="teacommerce">Tea Commerce</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standard mal</key>
