@@ -61,6 +61,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoExamine.Azure", "Umb
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoExamine.PDF.Azure", "UmbracoExamine.PDF.Azure\UmbracoExamine.PDF.Azure.csproj", "{B555AAE6-0F56-442F-AC9F-EF497DB38DE7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuSpecs", "NuSpecs", "{227C3B55-80E5-4E7E-A802-BE16C5128B9D}"
+	ProjectSection(SolutionItems) = preProject
+		..\build\NuSpecs\UmbracoCms.Core.nuspec = ..\build\NuSpecs\UmbracoCms.Core.nuspec
+		..\build\NuSpecs\UmbracoCms.nuspec = ..\build\NuSpecs\UmbracoCms.nuspec
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -107,10 +113,6 @@ Global
 		{6EDD2061-82F2-461B-BB6E-879245A832DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6EDD2061-82F2-461B-BB6E-879245A832DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6EDD2061-82F2-461B-BB6E-879245A832DE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CBDB56AC-FF02-4421-9FD4-ED82E339D8E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CBDB56AC-FF02-4421-9FD4-ED82E339D8E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CBDB56AC-FF02-4421-9FD4-ED82E339D8E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CBDB56AC-FF02-4421-9FD4-ED82E339D8E2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5BA5425F-27A7-4677-865E-82246498AA2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5BA5425F-27A7-4677-865E-82246498AA2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BA5425F-27A7-4677-865E-82246498AA2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -148,6 +150,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{227C3B55-80E5-4E7E-A802-BE16C5128B9D} = {2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}
 		{5D3B8245-ADA6-453F-A008-50ED04BFE770} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{07FBC26B-2927-4A22-8D96-D644C667FECC} = {DD32977B-EF54-475B-9A1B-B97A502C6E58}
 		{F30DDDB8-3994-4673-82AE-057123C6E1A8} = {DD32977B-EF54-475B-9A1B-B97A502C6E58}
