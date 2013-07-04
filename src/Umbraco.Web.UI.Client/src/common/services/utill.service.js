@@ -374,16 +374,24 @@ function iconHelper() {
         { oldIcon: ".sprTreeMediaPhoto", newIcon: "icon-picture" },
         
         //tray icons
-        { oldIcon: ".traycontent", newIcon: "content" },
-        { oldIcon: ".traymedia", newIcon: "media" },
-        { oldIcon: ".traysettings", newIcon: "settings" },
-        { oldIcon: ".traydeveloper", newIcon: "developer" },
-        { oldIcon: ".trayusers", newIcon: "user" },
-        { oldIcon: ".traymember", newIcon: "member" },
-        { oldIcon: ".traytranslation", newIcon: "translation" }
+        { oldIcon: ".traycontent", newIcon: "traycontent" },
+        { oldIcon: ".traymedia", newIcon: "traymedia" },
+        { oldIcon: ".traysettings", newIcon: "traysettings" },
+        { oldIcon: ".traydeveloper", newIcon: "traydeveloper" },
+        { oldIcon: ".trayusers", newIcon: "trayusers" },
+        { oldIcon: ".traymember", newIcon: "traymember" },
+        { oldIcon: ".traytranslation", newIcon: "traytranslation" }
     ];
 
     return {
+        /** If the icon is file based (i.e. it has a file path) */
+        isFileBasedIcon: function (icon) {
+            //if it doesn't start with a '.' but contains one then we'll assume it's file based
+            if (!icon.startsWith('.') && icon.indexOf('.') > 1) {
+                return true;
+            }
+            return false;
+        },
         /** If the icon is legacy */
         isLegacyIcon: function (icon) {
             if (icon.startsWith('.')) {

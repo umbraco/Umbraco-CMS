@@ -8,16 +8,16 @@ function sectionMocks($httpBackend, mocksUtills) {
     /** internal method to mock the sections to be returned */
     function getSections() {
         var sections = [
-            { name: "Content", cssclass: "content", alias: "content" },
-            { name: "Media", cssclass: "media", alias: "media" },
-            { name: "Settings", cssclass: "settings", alias: "settings" },
-            { name: "Developer", cssclass: "developer", alias: "developer" },
-            { name: "Users", cssclass: "user", alias: "users" }
+            { name: "Content", cssclass: "traycontent", alias: "content" },
+            { name: "Media", cssclass: "traymedia", alias: "media" },
+            { name: "Settings", cssclass: "traysettings", alias: "settings" },
+            { name: "Developer", cssclass: "traydeveloper", alias: "developer" },
+            { name: "Users", cssclass: "trayuser", alias: "users" }
         ];
         
         return [200, sections, null];
     }
-   
+    
     return {
         register: function () {
             $httpBackend
