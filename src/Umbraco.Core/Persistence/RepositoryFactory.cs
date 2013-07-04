@@ -81,7 +81,7 @@ namespace Umbraco.Core.Persistence
             return new MediaRepository(
                 uow,
                 RuntimeCacheProvider.Current,
-                CreateMediaTypeRepository(uow));
+                CreateMediaTypeRepository(uow)) { EnsureUniqueNaming = Umbraco.Core.Configuration.UmbracoSettings.EnsureUniqueNaming };
         }
 
         public virtual IMediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork uow)
