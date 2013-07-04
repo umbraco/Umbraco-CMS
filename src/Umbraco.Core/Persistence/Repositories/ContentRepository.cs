@@ -510,7 +510,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
             sql.Select("*")
                .From<NodeDto>()
-               .Where<NodeDto>(x => x.ParentId == parentId && x.Text.StartsWith(nodeName));
+               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.ParentId == parentId && x.Text.StartsWith(nodeName));
 
             int uniqueNumber = 1;
             var currentName = nodeName;
