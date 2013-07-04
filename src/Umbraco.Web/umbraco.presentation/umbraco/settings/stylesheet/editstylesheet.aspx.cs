@@ -17,7 +17,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
     {
         private StyleSheet stylesheet;
 
-        protected MenuIconI SaveButton;
+        protected MenuButton SaveButton;
 
         public editstylesheet()
         {
@@ -28,9 +28,18 @@ namespace umbraco.cms.presentation.settings.stylesheet
         {
             base.OnInit(e);
 
-            SaveButton = Panel1.Menu.NewIcon();
-            SaveButton.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
-            SaveButton.AltText = "Save stylesheet";
+
+            var editor = Panel1.NewTabPage(ui.Text("stylesheet"));
+            editor.Controls.Add(Pane7);
+
+            var props = Panel1.NewTabPage(ui.Text("properties"));
+            props.Controls.Add(Pane8);
+
+
+            SaveButton = Panel1.Menu.NewButton();
+            SaveButton.Icon = "save";
+            SaveButton.Text = ui.Text("save");
+            SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
         }
 
@@ -74,7 +83,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.UmbracoPanel Panel1;
+        protected global::umbraco.uicontrols.TabView Panel1;
 
         /// <summary>
         /// Pane7 control.
@@ -84,6 +93,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::umbraco.uicontrols.Pane Pane7;
+        protected global::umbraco.uicontrols.Pane Pane8;
 
         /// <summary>
         /// pp_name control.

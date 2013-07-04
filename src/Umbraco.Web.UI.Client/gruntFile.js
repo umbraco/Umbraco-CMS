@@ -114,7 +114,10 @@ module.exports = function (grunt) {
       },
 
       vs: {
-        files: [{ dest: '<%= vsdir %>', src : '**', expand: true, cwd: '<%= distdir %>' }]
+        files: [{ dest: '<%= vsdir %>/js', src : '**', expand: true, cwd: '<%= distdir %>/js/' }]
+      },
+      packages: {
+        files: [{ dest: '<%= vsdir %>/../App_Plugins', src : '**', expand: true, cwd: 'src/packages/' }]
       }
     },
 

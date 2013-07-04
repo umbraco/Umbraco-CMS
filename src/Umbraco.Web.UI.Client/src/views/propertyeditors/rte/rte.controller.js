@@ -33,10 +33,7 @@ angular.module("umbraco")
                                     var imagePropVal = umbImageHelper.getImagePropertyVaue({imageModel: img, scope: $scope});
 
                                     var data = {
-                                        src: (imagePropVal != null && imagePropVal != "")
-                                            ? imagePropVal
-                                            : "nothing.jpg",
-                                        style: 'width: 100px; height: 100px',
+                                        src: (imagePropVal != null && imagePropVal != "") ? imagePropVal: "nothing.jpg",
                                         id: '__mcenew'
                                     };
                                         

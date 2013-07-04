@@ -6,7 +6,7 @@ using Umbraco.Core.IO;
 
 namespace umbraco.uicontrols
 {
-    internal class MenuButton : System.Web.UI.WebControls.LinkButton
+    public class MenuButton : System.Web.UI.WebControls.LinkButton
     {
         public MenuButtonType ButtonType { get; set; }
         internal DataAttributes Data { get; private set; }
