@@ -94,7 +94,7 @@ namespace Umbraco.Core.Services
                 _treeService = new Lazy<ApplicationTreeService>(() => new ApplicationTreeService(cache));
 
             if (_sectionService == null)
-                _sectionService = new Lazy<SectionService>(() => new SectionService(provider, repositoryFactory.Value, _entityService.Value, _treeService.Value, cache));
+                _sectionService = new Lazy<SectionService>(() => new SectionService(_userService.Value, _treeService.Value, cache));
         }
 
         /// <summary>

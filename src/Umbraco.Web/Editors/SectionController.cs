@@ -16,7 +16,8 @@ namespace Umbraco.Web.Editors
     {
         public IEnumerable<Section> GetSections()
         {
-            return Services.SectionService.GetSections().Select(Mapper.Map<Core.Models.Section, Section>);
+            return Services.SectionService.GetAllowedSections(UmbracoUser.Id)
+                .Select(Mapper.Map<Core.Models.Section, Section>);
         } 
     }
 }

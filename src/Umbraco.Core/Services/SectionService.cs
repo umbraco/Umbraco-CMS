@@ -16,24 +16,19 @@ namespace Umbraco.Core.Services
 {
     internal class SectionService
     {
-        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
-        private readonly RepositoryFactory _repositoryFactory;
-        private readonly EntityService _entityService;
+        private readonly IUserService _userService;
         private readonly ApplicationTreeService _applicationTreeService;
         private readonly CacheHelper _cache;
 
         public SectionService(
-            IDatabaseUnitOfWorkProvider uowProvider, 
-            RepositoryFactory repositoryFactory,
-            EntityService entityService, 
+            IUserService userService,             
             ApplicationTreeService applicationTreeService, 
             CacheHelper cache)
         {
             if (applicationTreeService == null) throw new ArgumentNullException("applicationTreeService");
             if (cache == null) throw new ArgumentNullException("cache");
-            _uowProvider = uowProvider;
-            _repositoryFactory = repositoryFactory;
-            _entityService = entityService;
+
+            _userService = userService;
             _applicationTreeService = applicationTreeService;
             _cache = cache;
         }
@@ -129,27 +124,14 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<Section> GetAllowedSections(int userId)
         {
-            var allApps = GetSections();
-            var apps = new List<Section>();
+            
+            var user = _userService.GetUserById(userId);
+            if (user == null)
+            {
+                throw new InvalidOperationException("No user found with id " + userId);
+            }
 
-            //TODO: Sort this out
-
-            //using (var repository = _repositoryFactory.CreateUserSectionRepository(_uowProvider.GetUnitOfWork()))
-            //{
-            //    return repository.Get(id);
-            //}
-
-            //using (IRecordsReader appIcons = SqlHelper.ExecuteReader("select app from umbracoUser2app where [user] = @userID", SqlHelper.CreateParameter("@userID", this.Id)))
-            //{
-            //    while (appIcons.Read())
-            //    {
-            //        var app = allApps.SingleOrDefault(x => x.alias == appIcons.GetString("app"));
-            //        if (app != null)
-            //            apps.Add(app);
-            //    }
-            //}
-
-            return apps;
+            return GetSections().Where(x => user.AllowedSections.Contains(x.Alias));
         }
 
         /// <summary>
