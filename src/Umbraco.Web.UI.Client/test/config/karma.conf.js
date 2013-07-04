@@ -11,6 +11,7 @@ module.exports = function(karma) {
         'lib/angular/angular.min.js',
         'lib/underscore/underscore.js',
         'test/lib/angular/angular-mocks.js',
+        'lib/umbraco/Extensions.js',
         'src/app_dev.js',
         'src/common/directives/*.js',
         'src/common/filters/*.js',
