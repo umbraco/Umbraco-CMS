@@ -103,11 +103,10 @@ angular.module('umbraco.mocks').
 		          .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoApi/Content/GetById'))
 		          .respond(returnNodebyId);
 
+
             $httpBackend
               .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoApi/Content/GetEmpty'))
               .respond(returnEmptyNode);
-
-              
           },
 
 
