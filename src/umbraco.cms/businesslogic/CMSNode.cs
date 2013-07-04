@@ -1114,7 +1114,7 @@ order by level,sortOrder";
             _isTrashed = dr.GetBoolean("trashed");
         }
 
-        internal protected void PopulateCMSNodeFromContentBase(IContentBase content, Guid objectType)
+        internal protected void PopulateCMSNodeFromUmbracoEntity(IUmbracoEntity content, Guid objectType)
         {
             _uniqueID = content.Key;
             _nodeObjectType = objectType;
@@ -1127,21 +1127,6 @@ order by level,sortOrder";
             _createDate = content.CreateDate;
             _isTrashed = content.Trashed;
             _entity = content;
-        }
-
-        internal protected void PopulateCMSNodeFromContentTypeBase(IContentTypeBase contentType, Guid objectType)
-        {
-            _uniqueID = contentType.Key;
-            _nodeObjectType = objectType;
-            _level = contentType.Level;
-            _path = contentType.Path;
-            _parentid = contentType.ParentId;
-            _text = contentType.Name;
-            _sortOrder = contentType.SortOrder;
-            _userId = contentType.CreatorId;
-            _createDate = contentType.CreateDate;
-            _isTrashed = false;
-            _entity = contentType;
         }
 
         #endregion
