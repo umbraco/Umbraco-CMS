@@ -8,7 +8,7 @@
  * @description
  * Some angular helper/extension methods
  */
-function angularHelper() {
+function angularHelper($log) {
     return {
         
         /**
@@ -39,33 +39,39 @@ function angularHelper() {
          * Returns the current form object applied to the scope or null if one is not found
          */
         getCurrentForm: function (scope) {
+
             //NOTE: There isn't a way in angular to get a reference to the current form object since the form object
             // is just defined as a property of the scope when it is named but you'll always need to know the name which
             // isn't very convenient. If we want to watch for validation changes we need to get a form reference.
             // The way that we detect the form object is a bit hackerific in that we detect all of the required properties 
             // that exist on a form object.
+            //
+            //The other way to do it in a directive is to require "^form", but in a controller the only other way to do it
+            // is to inject the $element object and use: $element.inheritedData('$formController');
 
             var form = null;
-            var requiredFormProps = ["$error", "$name", "$dirty", "$pristine", "$valid", "$invalid", "$addControl", "$removeControl", "$setValidity", "$setDirty"];
+            //var requiredFormProps = ["$error", "$name", "$dirty", "$pristine", "$valid", "$invalid", "$addControl", "$removeControl", "$setValidity", "$setDirty"];
+            var requiredFormProps = ["$addControl", "$removeControl", "$setValidity", "$setDirty", "$setPristine"];
 
             // a method to check that the collection of object prop names contains the property name expected
-            var propertyExists = function (objectPropNames) {
+            function propertyExists(objectPropNames) {
                 //ensure that every required property name exists on the current scope property
                 return _.every(requiredFormProps, function (item) {
+                    
                     return _.contains(objectPropNames, item);
                 });
-            };
+            }
 
             for (var p in scope) {
 
-                if (_.isObject(scope[p]) && p.substr(0, 1) !== "$") {
+                if (_.isObject(scope[p]) && p !== "this" && p.substr(0, 1) !== "$") {
                     //get the keys of the property names for the current property
                     var props = _.keys(scope[p]);
                     //if the length isn't correct, try the next prop
                     if (props.length < requiredFormProps.length) {
                         continue;
                     }
-                    
+
                     //ensure that every required property name exists on the current scope property
                     var containProperty = propertyExists(props);
 
@@ -95,6 +101,31 @@ function angularHelper() {
                 throw "The current scope requires a current form object (or ng-form) with a name assigned to it";
             }
             return currentForm;
+        },
+        
+        /**
+         * @ngdoc function
+         * @name getNullForm
+         * @methodOf angularHelper
+         * @function
+         *
+         * @description
+         * Returns a null angular FormController, mostly for use in unit tests
+         *      NOTE: This is actually the same construct as angular uses internally for creating a null form but they don't expose
+         *          any of this publicly to us, so we need to create our own.
+         *
+         * @param formName {string} The form name to assign
+         */
+        getNullForm: function(formName) {
+            return {
+                $addControl: angular.noop,
+                $removeControl: angular.noop,
+                $setValidity: angular.noop,
+                $setDirty: angular.noop,
+                $setPristine: angular.noop,
+                $name: formName
+                //NOTE: we don't include the 'properties', just the methods.
+            };
         }
     };
 }
