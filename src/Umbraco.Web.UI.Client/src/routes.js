@@ -1,7 +1,10 @@
 app.config(function ($routeProvider) {
         $routeProvider
         .when('/:section', {
-            templateUrl: "views/common/dashboard.html"
+            templateUrl: function (rp) {
+                rp.url = "dashboard.aspx?app=" + rp.section;
+                return 'views/common/legacy.html';
+            }
         })
         .when('/framed/:url', {
             //This occurs when we need to launch some content in an iframe
