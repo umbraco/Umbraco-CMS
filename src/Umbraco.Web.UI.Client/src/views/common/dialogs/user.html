@@ -15,11 +15,11 @@
 			<h5>Your profile</h5>
 			
 			<p>
-				<a href="#" class="btn btn-primary">Edit your profile</a>
+				<a href="#/framed/umbraco/users/edituser.asp?id={{user.id}}" class="btn btn-primary">Edit your profile</a>
 			</p>
 
 			<hr />
-			
+
 			<h5>Your recent history</h5>
 			<ul class="umb-tree">
 					<li ng-repeat="item in history | orderBy:'time'">
