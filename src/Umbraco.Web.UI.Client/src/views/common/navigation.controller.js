@@ -20,9 +20,12 @@ function NavigationController($scope, $location, navigationService, historyServi
     $scope.hideDialog = navigationService.hideDialog;
     $scope.hideNavigation = navigationService.hideNavigation;
     $scope.ui = navigationService.ui;
+    //tree event handler everyone can subscribe to
+    $scope.ui.tree = $({});
 
     $scope.selectedId = navigationService.currentId;
     $scope.sections = navigationService.sections;
+    
 
     sectionResource.getSections()
         .then(function(result) {
@@ -32,19 +35,17 @@ function NavigationController($scope, $location, navigationService, historyServi
             alert(reason);
         });
 
-    //events
     
     //this reacts to the options item in the tree
-    $scope.$on("treeOptionsClick", function (ev, args) {
+    $scope.ui.tree.bind("treeOptionsClick", function (ev, args) {
         $scope.currentNode = args.node;
         args.scope = $scope;
         navigationService.showMenu(ev, args);
     });
 
-
     //this reacts to tree items themselves being clicked
     //the tree directive should not contain any handling, simply just bubble events
-    $scope.$on("treeNodeSelect", function (ev, args) {
+    $scope.ui.tree.bind("treeNodeSelect", function(ev, args){
 
         var n = args.node;
 
