@@ -38,34 +38,6 @@ angular.module("umbraco.directives")
          * @param n {object} The tree node object associated with the click
          */
         scope.select = function(e,n,ev){
-
-            //here we need to check for some legacy tree code
-            if (n.jsClickCallback && n.jsClickCallback !== "") {
-                //this is a legacy tree node!                
-                var jsPrefix = "javascript:";
-                var js;
-                if (n.jsClickCallback.startsWith(jsPrefix)) {
-                    js = n.jsClickCallback.substr(jsPrefix.length);
-                }
-                else {
-                    js = n.jsClickCallback;
-                }
-                try {
-                    var func = eval(js);
-                    //this is normally not necessary since the eval above should execute the method and will return nothing.
-                    if (func != null && (typeof func === "function")) {
-                        func.call();
-                    }
-                }
-                catch(ex) {
-                    $log.error("Error evaluating js callback from legacy tree node: " + ex);
-                }
-            }
-            else {
-                //not legacy, lets just set the route value
-                $location.path(n.view);
-            }
-
             scope.$emit("treeNodeSelect", { element: e, node: n, event: ev });
         };
 
