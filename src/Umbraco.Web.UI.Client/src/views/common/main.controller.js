@@ -1,4 +1,4 @@
-﻿
+
 /**
  * @ngdoc controller
  * @name MainController
@@ -25,7 +25,11 @@ function MainController($scope, $routeParams, $rootScope, $timeout, notification
     };
 
     $scope.closeDialogs = function (event) {
-        $rootScope.$emit("closeDialogs");
+        //only close dialogs if non-lin and non-buttons are clicked
+        if(event.target.nodeName != "A" && event.target.nodeName != "BUTTON"){
+            $rootScope.$emit("closeDialogs");
+        }
+
         if (navigationService.ui.stickyNavigation && $(event.target).parents(".umb-modalcolumn").size() == 0) {
             navigationService.hideNavigation();
         }

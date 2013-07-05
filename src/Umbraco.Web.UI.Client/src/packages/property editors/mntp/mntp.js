@@ -3,11 +3,10 @@
 angular.module('umbraco')
 .controller("uComponents.Editors.MNTPController",
 	function($scope, dialogService){
-
-		alert("node!");
 		
     $scope.openContentPicker =function(value){
             var d = dialogService.contentPicker({scope: $scope, callback: populate});
+            var s = d;
     };
 
     function populate(data){
