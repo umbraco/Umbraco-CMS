@@ -137,12 +137,9 @@ namespace Umbraco.Web.Templates
 					requestContext.RouteData.Values.Add("controller", routeDef.ControllerName);
 					//add the rest of the required route data
 					routeHandler.SetupRouteDataForRequest(renderModel, requestContext, contentRequest);
-					//create and assign the controller context
-					routeDef.Controller.ControllerContext = new ControllerContext(requestContext, routeDef.Controller);
-					//render as string
-					var stringOutput = routeDef.Controller.RenderViewToString(
-						routeDef.ActionName,
-						renderModel);
+
+                    var stringOutput = RenderUmbracoRequestToString(requestContext);
+                    
 					sw.Write(stringOutput);
 					break;
 				case RenderingEngine.WebForms:
@@ -156,6 +153,33 @@ namespace Umbraco.Web.Templates
 			}	
 			
 		}
+
+        /// <summary>
+        /// This will execute the UmbracoMvcHandler for the request specified and get the string output.
+        /// </summary>
+        /// <param name="requestContext">
+        /// Assumes the RequestContext is setup specifically to render an Umbraco view.
+        /// </param>
+        /// <returns></returns>
+        /// <remarks>
+        /// To acheive this we temporarily change the output text writer of the current HttpResponse, then
+        ///   execute the controller via the handler which innevitably writes the result to the text writer
+        ///   that has been assigned to the response. Then we change the response textwriter back to the original
+        ///   before continuing .
+        /// </remarks>
+        private string RenderUmbracoRequestToString(RequestContext requestContext)
+        {
+            var currentWriter = requestContext.HttpContext.Response.Output;
+            var newWriter = new StringWriter();
+            requestContext.HttpContext.Response.Output = newWriter;
+
+            var handler = new UmbracoMvcHandler(requestContext);
+            handler.ExecuteUmbracoRequest();
+
+            //reset it
+            requestContext.HttpContext.Response.Output = currentWriter;
+            return newWriter.ToString();
+        }
 
 		private void SetNewItemsOnContextObjects(PublishedContentRequest contentRequest)
 		{
