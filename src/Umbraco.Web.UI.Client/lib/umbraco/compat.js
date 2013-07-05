@@ -17,6 +17,7 @@ jQuery(document).ready(function () {
 });
 
 
+
 function scaleScrollables(selector){
 	jQuery(".umb-scrollable").each(function () {
             var el = jQuery(this);

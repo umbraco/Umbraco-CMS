@@ -79,7 +79,7 @@ function ContentEditController($scope, $routeParams, contentResource, notificati
     }
     else {
         contentResource.getById($routeParams.id)
-            .then(function(data) {
+            .then(function (data) {
                 $scope.content = data;
             });
     }
