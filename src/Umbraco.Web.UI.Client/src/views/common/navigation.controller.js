@@ -16,6 +16,7 @@ function NavigationController($scope, navigationService, sectionResource) {
     $scope.hideTree = navigationService.hideTree;
     $scope.hideMenu = navigationService.hideMenu;
     $scope.showMenu = navigationService.showMenu;
+    $scope.showUserDialog = navigationService.showUserDialog;
     $scope.hideDialog = navigationService.hideDialog;
     $scope.hideNavigation = navigationService.hideNavigation;
     $scope.ui = navigationService.ui;

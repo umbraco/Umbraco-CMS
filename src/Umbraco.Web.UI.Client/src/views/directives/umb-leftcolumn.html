@@ -3,7 +3,9 @@
         <ul class="sections">
             
             <li class="avatar">
-                <umb-avatar name="{{user.name}}" email="{{user.email}}" hash="{{user.emailHash}}"></umb-avatar>
+                <a href="#" ng-click="showUserDialog()" title="{{user.name}}">
+                    <img ng-src="{{user.avatar}}" />
+                </a>
             </li>
 
             <li ng-repeat="section in sections" ng-class="{current: section.alias == ui.currentSection}">

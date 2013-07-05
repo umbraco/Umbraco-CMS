@@ -9,11 +9,11 @@ angular.module('umbraco.services')
 
 		var scope = options.scope || $rootScope.$new(),
 			animationClass = options.animation || "fade",
-			modalClass = options.modalClass || "umb-modalcolumn",
+			modalClass = options.modalClass || "umb-modal",
 			templateUrl = options.template || "views/common/notfound.html";
 
 		var callback = options.callback;
-		var $modal = $('<div class="modal umb-modal hide" data-backdrop="false" tabindex="-1"></div>');
+		var $modal = $('<div class="modal hide" data-backdrop="false" tabindex="-1"></div>');
 		var id = templateUrl.replace('.html', '').replace(/[\/|\.|:]/g, "-") + '-' + scope.$id;
 
 		$modal

@@ -1,0 +1,19 @@
+<div class="umb-panel" ng-controller="Umbraco.Dialogs.UserController">
+	<div class="umb-panel-header">
+		<h1>{{user.name}}</h1>
+
+		<div class="umb-el-wrap umb-panel-buttons">
+	        <div class="btn-toolbar umb-btn-toolbar">
+	         	<input type="button" ng-click="logout()" class="btn btn-warning" value="Log out" />
+	        </div>
+		</div>
+	</div>
+	
+	<div class="umb-panel-body umb-scrollable" auto-scale="1">
+		<div class="tab-content umb-control-group">
+			<ul>
+					<li>Your recent items</li>
+			</ul>	
+		</div>
+	</div>
+</div>

@@ -1,5 +1,5 @@
-// Modals
-// -------------------------
+/* Modals
+// -------------------------*/
 
 .umb-modalcolumn {
 	background: #fff;
@@ -53,8 +53,7 @@
 	border-top: #efefef 1px solid
 }
 
-.umb-modal{border: none; border-radius: none;}
-
+.modal.fade.in{border: none !important; border-radius: none !important;}
 .umb-modal.fade {
 	top: 0 !important;
 	left: -100% !important;
@@ -74,8 +73,28 @@
 	display: block;
 }
 
-/* MEDIA PICKER */
+.umb-modal-left.fade {
+	top: 0 !important;
+	left: -100% !important;
+	width: 0px !important;
+	-webkit-transition: left 0.3s linear, left 0.3s ease-out;
+	-moz-transition: opacity 0.3s linear, top 0.3s ease-out;
+	-o-transition: opacity 0.3s linear, top 0.3s ease-out;
+	transition: opacity 0.3s linear, top 0.3s ease-out;
+	height: 100% !important;
+}
+.umb-modal-left.fade.in {
+	top: 0 !important;
+	left: 0 !important;
+	margin-left: 80px;
+	width: 440px !important;
+	height: 100% !important;
+	display: block;
+}
 
+
+
+/* MEDIA PICKER */
 .umb-modal .umb-btn-toolbar {
 	margin: 10px 0 0 0
 }

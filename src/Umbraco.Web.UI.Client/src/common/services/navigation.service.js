@@ -127,6 +127,15 @@ angular.module('umbraco.services')
 			setMode("tree");
 		},
 
+		showUserDialog: function(){
+			var d = dialogService.open(
+							{
+								template: "views/common/dialogs/user.html", 
+								modalClass: "umb-modal-left", 
+								show: true
+							});
+
+		},
 		showDialog: function (args) {
 			setMode("dialog");
 
