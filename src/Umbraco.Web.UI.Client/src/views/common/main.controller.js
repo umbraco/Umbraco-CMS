@@ -26,7 +26,10 @@ function MainController($scope, $routeParams, $rootScope, $timeout, notification
 
     $scope.closeDialogs = function (event) {
         //only close dialogs if non-lin and non-buttons are clicked
-        if(event.target.nodeName != "A" && event.target.nodeName != "BUTTON"){
+        var el = event.target.nodeName;
+        var pEl = event.target.parentElement.nodeName;
+
+        if(el != "A" && el != "BUTTON" && pEl != "A" && pEl != "BUTTON"){
             $rootScope.$emit("closeDialogs");
         }
 

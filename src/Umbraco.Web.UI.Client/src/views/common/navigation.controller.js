@@ -9,7 +9,7 @@
  * 
  * @param navigationService {navigationService} A reference to the navigationService
  */
-function NavigationController($scope, $location, navigationService, sectionResource) {
+function NavigationController($scope, $location, navigationService, historyService, sectionResource) {
     //load navigation service handlers
     $scope.changeSection = navigationService.changeSection;
     $scope.showTree = navigationService.showTree;
@@ -71,6 +71,8 @@ function NavigationController($scope, $location, navigationService, sectionResou
             }
         }
         else {
+            //add action to the history service
+            historyService.add({name: n.name, link: n.view, icon: n.icon});
             //not legacy, lets just set the route value
             $location.path(n.view);
         }

@@ -6,6 +6,7 @@ angular.module('umbraco.services')
    $rootScope.$on("closeDialogs", function () {
 		for (var i = 0; i < _dialogs.length; i++) {
 			var dialog = _dialogs[i];
+			
 			dialog.modal("hide");
 			dialog.remove();
 			$("#" + dialog.attr("id")).remove();
