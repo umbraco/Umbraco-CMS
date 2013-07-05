@@ -1,8 +1,9 @@
 //used for the media picker dialog
-angular.module("umbraco").controller("Umbraco.Dialogs.ContentPickerController", 
+angular.module("umbraco").controller("Umbraco.Dialogs.ContentPickerController",
 	function ($scope) {	
-	
-	$scope.$on("treeNodeSelect", function(event, args){
+	$scope.treeCallback = $({});
+
+	$scope.treeCallback.bind("treeNodeSelect", function(event, args){
 		args.event.preventDefault();
 		args.event.stopPropagation();
 			
