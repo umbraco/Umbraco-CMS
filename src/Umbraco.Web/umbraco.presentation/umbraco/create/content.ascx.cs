@@ -3,12 +3,12 @@ using System.Linq;
 using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.create;
 using Content=umbraco.cms.businesslogic.Content;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
-using umbraco.IO;
 
 namespace umbraco.cms.presentation.create.controls
 {
@@ -19,48 +19,48 @@ namespace umbraco.cms.presentation.create.controls
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack)
+            if (IsPostBack == false)
             {
                 sbmt.Text = ui.Text("create");
-                int NodeId = int.Parse(Request["nodeID"]);
+                var nodeId = int.Parse(Request["nodeID"]);
 
-                int[] allowedIds = new int[0];
-                if (NodeId > 0)
+                var allowedIds = new int[0];
+                if (nodeId > 0)
                 {
-                    Content c = new Document(NodeId);
+                    var c = new Document(nodeId);
                     allowedIds = c.ContentType.AllowedChildContentTypeIDs;
                 }
 
                 nodeType.Attributes.Add("onChange", "document.getElementById('typeDescription').innerHTML = typeInfo[this.selectedIndex];");
 
-                int counter = 0;
-                bool typeInited = false;
-                StringBuilder js = new StringBuilder();
+                var counter = 0;
+                var typeInited = false;
+                var js = new StringBuilder();
                 var documentTypeList = DocumentType.GetAllAsList().ToList();
-                foreach (DocumentType dt in documentTypeList)
+                foreach (var dt in documentTypeList)
                 {
                     string docDescription = "<em>No description available...</em>";
-                    if (dt.Description != null && dt.Description != "")
+                    if (string.IsNullOrEmpty(dt.Description) == false)
                         docDescription = dt.Description;
                     docDescription = "<strong>" + dt.Text + "</strong><br/>" + docDescription.Replace(Environment.NewLine, "<br />");
                     docDescription = docDescription.Replace("'", "\\'");
 
-                    string docImage = (dt.Thumbnail != "") ? dt.Thumbnail : "../nada.gif";
+                    var docImage = (dt.Thumbnail != "") ? dt.Thumbnail : "../nada.gif";
                     docImage = IOHelper.ResolveUrl( SystemDirectories.Umbraco ) + "/images/thumbnails/" + docImage;
 
-                    ListItem li = new ListItem();
+                    var li = new ListItem();
                     li.Text = dt.Text;
                     li.Value = dt.Id.ToString();
 
-                    if (NodeId > 0)
+                    if (nodeId > 0)
                     {
-                        foreach (int i in allowedIds) if (i == dt.Id)
+                        foreach (var i in allowedIds) if (i == dt.Id)
                         {
                             nodeType.Items.Add(li);
                             js.Append("typeInfo[" + counter + "] = '<img src=\"" + docImage + "\"><p>" +
                                       docDescription + "</p>'\n");
 
-                            if (!typeInited)
+                            if (typeInited == false)
                             {
                                 descr.Text = "<img src=\"" + docImage + "\"><p>" +
                                              docDescription + "</p>";
@@ -76,7 +76,7 @@ namespace umbraco.cms.presentation.create.controls
                         nodeType.Items.Add(li);
                         js.Append("typeInfo[" + counter + "] = '<img src=\"" + docImage + "\"><p>" +
                                   docDescription + "</p>'\n");
-                        if (!typeInited)
+                        if (typeInited == false)
                         {
                             descr.Text = "<img src=\"" + docImage + "\"><p>" +
                                          docDescription + "</p>'";
@@ -94,34 +94,14 @@ namespace umbraco.cms.presentation.create.controls
             }
         }
 
-        #region Web Form Designer generated code
-
-        protected override void OnInit(EventArgs e)
-        {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
-            base.OnInit(e);
-        }
-
-        /// <summary>
-        ///		Required method for Designer support - do not modify
-        ///		the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-        }
-
-        #endregion
-
+        
         protected void sbmt_Click(object sender, EventArgs e)
         {
-            doCreation();
+            DoCreation();
         }
 
 
-        private void doCreation()
+        private void DoCreation()
         {
             if (Page.IsValid)
             {

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -38,6 +40,15 @@ namespace Umbraco.Web.Mvc
             routeDef.Controller = controller;
         }
 
+        /// <summary>
+        /// This is used internally purely to render an Umbraco MVC template to string and shouldn't be used for anything else.
+        /// </summary>
+        internal void ExecuteUmbracoRequest()
+        {
+            StoreControllerInRouteDefinition();
+            base.ProcessRequest(RequestContext.HttpContext);
+        }
+
         protected override void ProcessRequest(HttpContextBase httpContext)
         {
             StoreControllerInRouteDefinition();
@@ -54,4 +65,6 @@ namespace Umbraco.Web.Mvc
             return base.BeginProcessRequest(httpContext, callback, state);
         }
     }
+
+
 }
