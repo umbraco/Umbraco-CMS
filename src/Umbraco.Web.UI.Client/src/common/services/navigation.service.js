@@ -75,6 +75,8 @@ angular.module('umbraco.services')
 				this.ui.currentSection = selectedSection;
 				this.showTree(selectedSection);
 			}
+
+			$location.path(sectionAlias);
 		},
 
 		showTree: function(sectionAlias){
