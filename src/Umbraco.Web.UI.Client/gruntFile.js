@@ -112,9 +112,8 @@ module.exports = function (grunt) {
       mocks: {
         files: [{ dest: '<%= distdir %>/js', src : '*.js', expand: true, cwd: 'src/common/mocks/' }]
       },
-
       vs: {
-        files: [{ dest: '<%= vsdir %>/js', src : '**', expand: true, cwd: '<%= distdir %>/js/' }]
+        files: [{ dest: '<%= vsdir %>/', src : '**', expand: true, cwd: '<%= distdir %>/' }]
       },
       packages: {
         files: [{ dest: '<%= vsdir %>/../App_Plugins', src : '**', expand: true, cwd: 'src/packages/' }]
