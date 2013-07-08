@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Factories
                            Language = dto.UserLanguage,
                            DefaultToLiveEditing = dto.DefaultToLiveEditing,
                            NoConsole = dto.NoConsole,
-                           Permissions = dto.DefaultPermissions
+                           DefaultPermissions = dto.DefaultPermissions
                        };
 
             foreach (var app in dto.User2AppDtos)
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Persistence.Factories
                               UserLanguage = entity.Language,
                               UserName = entity.Name,
                               Type = short.Parse(entity.UserType.Id.ToString()),
-                              DefaultPermissions = entity.Permissions,
+                              DefaultPermissions = entity.DefaultPermissions,
                               User2AppDtos = new List<User2AppDto>()
                           };
 

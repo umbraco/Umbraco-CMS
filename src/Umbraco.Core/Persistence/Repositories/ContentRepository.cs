@@ -206,7 +206,7 @@ namespace Umbraco.Core.Persistence.Repositories
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
             nodeDto.SortOrder = sortOrder;
             var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
-
+        
             //Update with new correct path
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
             Database.Update(nodeDto);
@@ -216,6 +216,21 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.Path = nodeDto.Path;
             entity.SortOrder = sortOrder;
             entity.Level = level;
+
+
+            //Assign the same permissions to it as the parent node
+            // http://issues.umbraco.org/issue/U4-2161            
+            var parentPermissions = GetPermissionsForEntity(entity.ParentId).ToArray();
+            //if there are parent permissions then assign them, otherwise leave null and permissions will become the
+            // user's default permissions.
+            if (parentPermissions.Any())
+            {
+                //group by the unique permission and assign then for the users of that permission set.
+                foreach (var assignedPermission in parentPermissions.GroupBy(x => x.Permission))
+                {
+                    AssignEntityPermissions(entity, assignedPermission.Key, assignedPermission.Select(x => (object)x.UserId));
+                }
+            }
 
             //Create the Content specific data - cmsContent
             var contentDto = dto.ContentVersionDto.ContentDto;

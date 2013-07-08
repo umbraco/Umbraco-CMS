@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Linq;
 using StackExchange.Profiling;
 using Umbraco.Core.Logging;
 
@@ -46,8 +48,7 @@ namespace Umbraco.Core.Persistence
             // wrap the connection with a profiling connection that tracks timings 
             return new StackExchange.Profiling.Data.ProfiledDbConnection(connection as DbConnection, MiniProfiler.Current);
         }
-
-
+        
         public override void OnException(Exception x)
         {
             LogHelper.Info<UmbracoDatabase>(x.StackTrace);

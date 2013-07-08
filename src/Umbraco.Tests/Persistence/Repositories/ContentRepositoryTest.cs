@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
@@ -30,6 +32,42 @@ namespace Umbraco.Tests.Persistence.Repositories
         public override void TearDown()
         {
             base.TearDown();
+        }
+
+        [Test]
+        public void Ensures_Permissions_Are_Set_If_Parent_Entity_Permissions_Exist()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var contentTypeRepository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
+            var repository = (ContentRepository)RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+            contentType.AllowedContentTypes = new List<ContentTypeSort>
+                {
+                    new ContentTypeSort
+                        {
+                            Alias = contentType.Alias,
+                            Id = new Lazy<int>(() => contentType.Id),
+                            SortOrder = 0
+                        }
+                };
+            var parentPage = MockedContent.CreateSimpleContent(contentType);                        
+            contentTypeRepository.AddOrUpdate(contentType);
+            repository.AddOrUpdate(parentPage);
+            unitOfWork.Commit();
+
+            // Act
+            repository.AssignEntityPermissions(parentPage, "ABCD", new object[] {0});
+            var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
+            repository.AddOrUpdate(childPage);
+            unitOfWork.Commit();
+
+            // Assert
+            var permissions = repository.GetPermissionsForEntity(childPage.Id);
+            Assert.AreEqual(1, permissions.Count());
+            Assert.AreEqual("ABCD", permissions.Single().Permission);
         }
 
         [Test]

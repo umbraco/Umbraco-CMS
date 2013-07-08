@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using umbraco.DataLayer;
 using System.Collections.Generic;
@@ -667,7 +668,7 @@ namespace umbraco.BusinessLogic
         {
             if (!_isInitialized)
                 setupUser(_id);
-            string cruds = UserType.DefaultPermissions;
+            string defaultPermissions = UserType.DefaultPermissions;
 
             if (!_crudsInitialized)
                 initCruds();
@@ -681,16 +682,16 @@ namespace umbraco.BusinessLogic
             }
 
             // exception to everything. If default cruds is empty and we're on root node; allow browse of root node
-            if (String.IsNullOrEmpty(cruds) && Path == "-1")
-                cruds = "F";
+            if (String.IsNullOrEmpty(defaultPermissions) && Path == "-1")
+                defaultPermissions = "F";
 
             // else return default user type cruds
-            return cruds;
+            return defaultPermissions;
         }
 
         /// <summary>
         /// Initializes the user node permissions
-        /// </summary>
+        /// </summary>        
         public void initCruds()
         {
             if (!_isInitialized)
@@ -904,7 +905,7 @@ namespace umbraco.BusinessLogic
         public void FlushFromCache()
         {
             OnFlushingFromCache(EventArgs.Empty);
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(string.Format("UmbracoUser{0}", Id.ToString()));            
+            ApplicationContext.Current.ApplicationCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.UserCacheKey, Id.ToString()));            
         }
 
         /// <summary>
@@ -915,7 +916,7 @@ namespace umbraco.BusinessLogic
         public static User GetUser(int id)
         {
             return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                string.Format("UmbracoUser{0}", id.ToString()), () =>
+                string.Format("{0}{1}", CacheKeys.UserCacheKey, id.ToString()), () =>
                     {
                         try
                         {

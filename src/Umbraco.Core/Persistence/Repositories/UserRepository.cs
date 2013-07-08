@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents the UserRepository for doing CRUD operations for <see cref="IUser"/>
     /// </summary>
-    internal class UserRepository : PetaPocoRepositoryBase<int, IUser>, IUserRepository
+    internal class UserRepository : PermissionRepository<int, IUser>, IUserRepository
     {
         private readonly IUserTypeRepository _userTypeRepository;
 
@@ -122,9 +122,12 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
-        {
+        {            
             var list = new List<string>
                            {
+                               "DELETE FROM umbracoUser2NodePermission WHERE userId = @Id",
+                               "DELETE FROM umbracoUser2NodeNotify WHERE userId = @Id",
+                               "DELETE FROM umbracoUserLogins WHERE userId = @Id",
                                "DELETE FROM umbracoUser2app WHERE " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("user") + "=@Id",
                                "DELETE FROM umbracoUser WHERE id = @Id"
                            };

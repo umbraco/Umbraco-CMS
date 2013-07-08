@@ -491,6 +491,7 @@
     <Compile Include="Persistence\Repositories\LanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\MediaRepository.cs" />
     <Compile Include="Persistence\Repositories\MediaTypeRepository.cs" />
+    <Compile Include="Persistence\Repositories\PermissionRepository.cs" />
     <Compile Include="Persistence\Repositories\PetaPocoRepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\RelationRepository.cs" />
     <Compile Include="Persistence\Repositories\RelationTypeRepository.cs" />
