@@ -572,7 +572,7 @@ To manage your website, simply open the umbraco back office and start adding con
       <![CDATA[<p>Hi %0%</p>
 
 		  <p>This is an automated mail to inform you that the task <strong>'%1%'</strong> 
-		  has been performed on the page <a href="%7%"><strong>'%2%'</strong></a>
+		  has been performed on the page <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a>
 		  by the user <strong>'%3%'</strong>
 	  </p>
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
