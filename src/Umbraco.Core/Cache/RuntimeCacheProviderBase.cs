@@ -8,7 +8,7 @@ namespace Umbraco.Core.Cache
     /// An abstract class for implementing a runtime cache provider
     /// </summary>
     /// <remarks>
-    /// THIS MUST REMAIN INTERNAL UNTIL WE STREAMLINE HOW ALL CACHE IS HANDLED, WE NEED TO SUPPORT HTTP RUNTIME CACHE, IN MEMORY CACHE, ETC...
+    /// THIS MUST REMAIN INTERNAL UNTIL WE STREAMLINE HOW ALL CACHE IS HANDLED, WE NEED TO SUPPORT HTTP RUNTIME CACHE, IN MEMORY CACHE, REQUEST CACHE, ETC...
     /// </remarks>
     internal abstract class RuntimeCacheProviderBase : CacheProviderBase
     {
