@@ -32,7 +32,7 @@ jQuery(document).ready(function () {
 			If you installed a starter kit you can start by configuring your new site, just click &quot;Preview your new website&quot; and follow the instructions. Or to start adding content right away click &quot;Set up your new website&quot; </p>
 		<ul class="btn-web">
 			<li class="btn-preview-web" id="customizeSite" runat="server"><a href="<%= umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/canvas.aspx?redir=<%= this.ResolveUrl("~/")  %>&umbSkinning=true&umbSkinningConfigurator=true" target="_blank"><span>Set up your new website</span></a></li>
-			<li class="btn-set"><a href="<%= umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/umbraco.aspx"><span>Launch umbraco</span></a></li>
+			<li class="btn-set"><a href="<%= umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/default"><span>Launch umbraco</span></a></li>
 		</ul>
 	</div>
 	<div class="threcol">
