@@ -247,7 +247,22 @@ namespace umbraco.dialogs
                 // Check on contenttypes
                 if (parentContentType == null)
                 {
-                    nodeAllowed = true;
+                    //check if this is allowed at root
+                    IContentTypeBase currContentType;
+                    if (CurrentApp == "content")
+                    {
+                        currContentType = Services.ContentTypeService.GetContentType(currContent.ContentTypeId);
+                    }
+                    else
+                    {
+                        currContentType = Services.ContentTypeService.GetMediaType(currContent.ContentTypeId);
+                    }
+                    nodeAllowed = currContentType.AllowedAsRoot;
+                    if (!nodeAllowed)
+                    {
+                        feedback.Text = ui.Text("moveOrCopy", "notAllowedAtRoot", UmbracoUser);
+                        feedback.type = uicontrols.Feedback.feedbacktype.error;
+                    }
                 }
                 else
                 {

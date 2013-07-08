@@ -548,6 +548,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="noNodeSelected">No node selected yet, please select a node in the list above before clicking 'ok'</key>
     <key alias="notAllowedByContentType">The current node is not allowed under the chosen node because of its type</key>
     <key alias="notAllowedByPath">The current node cannot be moved to one of its subpages</key>
+    <key alias="notAllowedAtRoot">The current node cannot exist at the root</key>
     <key alias="notValid">The action isn't allowed since you have insufficient permissions on 1 or more child documents.</key>
     <key alias="relateToOriginal">Relate copied items to original</key>
   </area>
