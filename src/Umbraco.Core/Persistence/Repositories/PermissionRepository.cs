@@ -59,6 +59,25 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
+        /// Assigns permissions to an entity for multiple users/permission entries
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="userPermissions">
+        /// A key/value pair list containing a userId and a permission to assign
+        /// </param>
+        protected internal void AssignEntityPermissions(TEntity entity, IEnumerable<KeyValuePair<object, string>> userPermissions)
+        {
+            var actions = userPermissions.Select(p => new User2NodePermissionDto
+            {
+                NodeId = entity.Id,
+                Permission = p.Value,
+                UserId = (int)p.Key
+            });
+
+            Database.BulkInsertRecords(actions);
+        }
+
+        /// <summary>
         /// Replace permissions for an entity for multiple users
         /// </summary>
         /// <param name="entity"></param>

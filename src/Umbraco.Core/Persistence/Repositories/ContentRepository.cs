@@ -225,11 +225,9 @@ namespace Umbraco.Core.Persistence.Repositories
             // user's default permissions.
             if (parentPermissions.Any())
             {
-                //group by the unique permission and assign then for the users of that permission set.
-                foreach (var assignedPermission in parentPermissions.GroupBy(x => x.Permission))
-                {
-                    AssignEntityPermissions(entity, assignedPermission.Key, assignedPermission.Select(x => (object)x.UserId));
-                }
+                var userPermissions = parentPermissions.ToDictionary(
+                    permissionDto => (object) permissionDto.UserId, permissionDto => permissionDto.Permission);
+                AssignEntityPermissions(entity, userPermissions);
             }
 
             //Create the Content specific data - cmsContent
