@@ -166,8 +166,15 @@
 				});
 			}
 			else {
-				setMode("menu");
-				ui.actions = treeService.getActions({node: args.node, section: this.ui.currentTree});
+			    setMode("menu");
+
+			    treeService.getActions({ node: args.node, section: this.ui.currentTree })
+			        .then(function(data) {
+			            ui.actions = data;
+			        }, function (err) {
+			            //display the error
+			            notificationsService.error(err.errorMsg);
+			        });
 				
 
 				this.ui.currentNode = args.node;

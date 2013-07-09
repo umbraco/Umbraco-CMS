@@ -38,11 +38,11 @@ angular.module('umbraco.security.service', [
                       callback: onLoginDialogClose});
   }
       
-  function closeLoginDialog(success) {
-    if (loginDialog) {
-        loginDialog = null;
-    }
-  }
+  //function closeLoginDialog(success) {
+  //  if (loginDialog) {
+  //      loginDialog = null;
+  //  }
+  //}
 
   function onLoginDialogClose(success) {
     loginDialog = null;
@@ -55,44 +55,46 @@ angular.module('umbraco.security.service', [
     }
   }
 
+      //TODO: Clean this class up since most of this doesn't do anything!
+
 
   // The public API of the service
   var service = {
 
-    // Get the first reason for needing a login
-    getLoginReason: function() {
-      return queue.retryReason();
-    },
+    //// Get the first reason for needing a login
+    //getLoginReason: function() {
+    //  return queue.retryReason();
+    //},
 
     // Show the modal login dialog
     showLogin: function() {
       openLoginDialog();
-    },
+    },      
+    
+    //// Attempt to authenticate a user by the given email and password
+    //login: function(email, password) {
+    //  var request = $http.post('/login', {email: email, password: password});
+    //  return request.then(function(response) {
+    //    service.currentUser = response.data.user;
+    //    if ( service.isAuthenticated() ) {
+    //      closeLoginDialog(true);
+    //    }
+    //  });
+    //},
 
-    // Attempt to authenticate a user by the given email and password
-    login: function(email, password) {
-      var request = $http.post('/login', {email: email, password: password});
-      return request.then(function(response) {
-        service.currentUser = response.data.user;
-        if ( service.isAuthenticated() ) {
-          closeLoginDialog(true);
-        }
-      });
-    },
+    //// Give up trying to login and clear the retry queue
+    //cancelLogin: function() {
+    //  closeLoginDialog(false);
+    //  redirect();
+    //},
 
-    // Give up trying to login and clear the retry queue
-    cancelLogin: function() {
-      closeLoginDialog(false);
-      redirect();
-    },
-
-    // Logout the current user and redirect
-    logout: function(redirectTo) {
-      $http.post('/logout').then(function() {
-        service.currentUser = null;
-        redirect(redirectTo);
-      });
-    },
+    //// Logout the current user and redirect
+    //logout: function(redirectTo) {
+    //  $http.post('/logout').then(function() {
+    //    service.currentUser = null;
+    //    redirect(redirectTo);
+    //  });
+    //},
 
     // Ask the backend to see if a user is already authenticated - this may be from a previous session.
     requestCurrentUser: function() {

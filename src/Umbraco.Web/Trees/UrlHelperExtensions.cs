@@ -17,5 +17,15 @@ namespace Umbraco.Web.Trees
             return actionUrl;
         }
 
+        public static string GetMenuUrl(this UrlHelper urlHelper, Type treeType, string nodeId, FormDataCollection queryStrings)
+        {
+            var actionUrl = urlHelper.GetUmbracoApiService("GetMenu", treeType)
+                .EnsureEndsWith('?');
+
+            //now we need to append the query strings
+            actionUrl += "id=" + nodeId.EnsureEndsWith('&') + queryStrings.ToQueryString("id");
+            return actionUrl;
+        }
+
     }
 }

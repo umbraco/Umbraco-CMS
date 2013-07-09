@@ -45,22 +45,20 @@ angular.module("umbraco.directives")
 
         return function (scope, element, attrs, controller) {
 
-            function loadTree(){
-              if(scope.section){
+            function loadTree() {
+                if (scope.section) {
 
-                  $q.when(treeService.getTree({ section: scope.section, cachekey: scope.cachekey }))
-                      .then(function (data) {
-                          //set the data once we have it
-                          scope.tree = data;
-                      }, function (reason) {
+                    //use $q.when because a promise OR raw data might be returned.
 
-                          notificationsService.error("Tree Error", reason);
-                          return;
-                      });   
-
-               //   scope.tree = treeService.getTree({section:scope.section, cachekey: scope.cachekey});
-              }
-            } 
+                    $q.when(treeService.getTree({ section: scope.section, cachekey: scope.cachekey }))
+                        .then(function(data) {
+                            //set the data once we have it
+                            scope.tree = data;
+                        }, function(reason) {
+                            notificationsService.error("Tree Error", reason);
+                        });
+                }
+            }
 
 
             //watch for section changes

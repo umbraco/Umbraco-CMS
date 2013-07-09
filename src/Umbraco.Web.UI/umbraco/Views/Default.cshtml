@@ -11,7 +11,6 @@
 
 <html lang="en">
 <head>
-    @*<base href="@GlobalSettings.Path.EnsureEndsWith('/')" />*@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -19,32 +18,6 @@
     <link rel="stylesheet" href="assets/css/umbraco.css" />
     <link rel="stylesheet" href="../umbraco_client/tree/treeicons.css" />
 
-    @*<style type="text/css">
-        .validation-message
-        {
-            color: #FA787E;
-        }
-
-        .property-validation
-        {
-            color: #FA787E; 
-            float: right;
-        }
-
-        .validation-summary
-        {
-            padding: 5px;
-            background-color: #EEEEEE;
-            border: #FA787E solid 2px;
-            margin: 5px;
-            color: #fa787e;
-        }
-
-        .validation-summary span
-        {
-            font-style: italic;
-        }
-    </style>*@
 </head>
 <body ng-controller="MainController" id="umbracoMainPageBody">
     <div ng-cloak id="Div1" class="clearfix" ng-click="closeDialogs($event)">
@@ -64,9 +37,6 @@
     
     @*Currently this needs to be loaded before anything*@
     <script src="@Url.Action("ServerVariables", "BackOffice")" type="text/javascript"></script>
-
-    @*Now we need to load in some legacy stuff*@
-    <script src="@Url.Action("LegacyTreeJs", "BackOffice")" type="text/javascript"></script>    
     
     @*And finally we can load in our angular app*@
     <script type="text/javascript" src="lib/yepnope/yepnope.min.js"></script>

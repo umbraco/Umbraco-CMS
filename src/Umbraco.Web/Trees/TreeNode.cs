@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using Umbraco.Core;
 using Umbraco.Core.IO;
-using umbraco.interfaces;
 
 namespace Umbraco.Web.Trees
 {
@@ -13,15 +11,16 @@ namespace Umbraco.Web.Trees
     [DataContract(Name = "node", Namespace = "")]
     public class TreeNode
     {
-        private readonly List<MenuItem> _menuItems = new List<MenuItem>();
+        //private readonly List<MenuItem> _menuItems = new List<MenuItem>();
 
-        public TreeNode(string nodeId, string getChildNodesUrl)
+        public TreeNode(string nodeId, string getChildNodesUrl, string menuUrl)
         {
             //_menuItems = menuItems;
             //Style = new NodeStyle();
             NodeId = nodeId;
             AdditionalData = new Dictionary<string, object>();
             ChildNodesUrl = getChildNodesUrl;
+            MenuUrl = menuUrl;
         }
 
         /// <summary>
@@ -118,6 +117,12 @@ namespace Umbraco.Web.Trees
         [DataMember(Name = "childNodesUrl")]
         public string ChildNodesUrl { get; set; }
 
+        /// <summary>
+        /// The JSON url to load the menu from
+        /// </summary>
+        [DataMember(Name = "menuUrl")]
+        public string MenuUrl { get; set; }
+
         ///// <summary>
         ///// The UI style to give the model
         ///// </summary>
@@ -129,81 +134,6 @@ namespace Umbraco.Web.Trees
         /// </summary>
         [DataMember(Name = "metaData")]
         public Dictionary<string, object> AdditionalData { get; private set; }
-
-        /// <summary>
-        /// A collection of context menu actions to apply for the model
-        /// </summary>
-        [DataMember(Name = "menu")]
-        public IEnumerable<MenuItem> Menu
-        {
-            get { return _menuItems; }
-        }
-
-        /// <summary>
-        /// Adds a menu item
-        /// </summary>
-        public void AddMenuItem(IAction action)
-        {
-            _menuItems.Add(new MenuItem(action));
-        }
-
-        /// <summary>
-        /// Adds a menu item
-        /// </summary>
-        public void AddMenuItem(MenuItem item)
-        {
-            _menuItems.Add(item);
-        }
-
-        //TODO: Implement more overloads for MenuItem with dictionary vals
-
-        /// <summary>
-        /// Adds a menu item
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        public void AddMenuItem<T>()
-           where T : IAction
-        {
-            AddMenuItem<T>(null);
-        }
-
-        /// <summary>
-        /// Adds a menu item with a key value pair which is merged to the AdditionalData bag
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        public void AddMenuItem<T>(string key, string value)
-           where T : IAction
-        {
-            AddMenuItem<T>(new Dictionary<string, object> { { key, value } });
-        }
-
-        /// <summary>
-        /// Adds a menu item with a dictionary which is merged to the AdditionalData bag
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="additionalData"></param>
-        public void AddMenuItem<T>(IDictionary<string, object> additionalData)
-           where T : IAction
-        {
-            var item = ActionsResolver.Current.GetAction<T>();
-            if (item != null)
-            {
-                _menuItems.Add(new MenuItem(item));
-                if (additionalData != null)
-                {
-                    //merge the additional data!
-                    AdditionalData = AdditionalData.MergeLeft(additionalData);
-                }
-
-                //TODO: Once we implement 'real' menu items, not just IActions we can implement this since
-                // people may need to pass specific data to their menu items
-                
-                ////validate the data in the meta data bag
-                //item.ValidateRequiredData(AdditionalData);
-            }
-        }
 
     }
 }

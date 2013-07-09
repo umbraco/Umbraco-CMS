@@ -28,6 +28,33 @@ namespace Umbraco.Core
         [UmbracoWillObsolete("Do not use this constants. See IShortStringHelper.CleanStringForSafeAliasJavaScriptCode.")]
         public const string UmbracoInvalidFirstCharacters = "01234567890";
 
+        /// <summary>
+        /// This will append the query string to the URL
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This methods ensures that the resulting URL is structured correctly, that there's only one '?' and that things are
+        /// delimited properly with '&' 
+        /// </remarks>
+        internal static string AppendQueryStringToUrl(this string url, params string[] queryStrings)
+        {
+            //remove any prefixed '&' or '?'
+            for (var i = 0; i < queryStrings.Length; i++)
+            {
+                queryStrings[i] = queryStrings[i].TrimStart('?', '&').TrimEnd('&');            
+            }
+
+            var nonEmpty = queryStrings.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
+
+            if (url.Contains("?"))
+            {
+                return url + string.Join("&", nonEmpty).EnsureStartsWith('&');
+            }
+            return url + string.Join("&", nonEmpty).EnsureStartsWith('?');
+        }
+        
 		/// <summary>
 		/// Encrypt the string using the MachineKey in medium trust
 		/// </summary>

@@ -1,5 +1,27 @@
 /*Contains multiple services for various helper tasks */
 
+
+/**
+ * @ngdoc function
+ * @name umbraco.services.angularHelper
+ * @function
+ *
+ * @description
+ * Some angular helper/extension methods
+ */
+function legacyJsLoader(scriptLoader) {
+    return {
+        
+        /** Called to load in the legacy tree js which is required on startup if a user is logged in or 
+         after login, but cannot be called until they are authenticated which is why it needs to be lazy loaded. */
+        loadLegacyTreeJs: function(scope) {
+            return scriptLoader.load([Umbraco.Sys.ServerVariables.legacyTreeJs], scope);
+        }  
+    };
+}
+
+angular.module('umbraco.services').factory('legacyJsLoader', legacyJsLoader);
+
 /**
  * @ngdoc service
  * @name umbraco.services.angularHelper
@@ -8,9 +30,34 @@
  * @description
  * Some angular helper/extension methods
  */
-function angularHelper($log) {
+function angularHelper($log, $q) {
     return {
         
+        resourcePromise: function (httpPromise, errorMsg) {
+            var deferred = $q.defer();
+            
+            httpPromise.success(function (data, status, headers, config) {
+
+                //when it's successful, just return the data
+                deferred.resolve(data);
+                
+            }).error(function(data, status, headers, config) {
+                
+                //when there's an erorr...
+                // TODO: Deal with the error in a global way
+                
+                //return an error object including the error message for UI
+                deferred.reject({
+                    errorMsg: errorMsg,
+                    data: data
+                });
+
+            });
+
+            return deferred.promise;
+
+        },
+
         /**
          * @ngdoc function
          * @name safeApply

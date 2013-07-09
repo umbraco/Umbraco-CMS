@@ -15,7 +15,7 @@ angular.module('umbraco.services')
                     currentUser.avatar = 'http://www.gravatar.com/avatar/' + data.emailHash + '?s=40';
                     
                     //note, this can return null if they are not authenticated
-                    deferred.resolve({ user: data, authenticated: data == null ? false : true });
+                    deferred.resolve({ user: data, authenticated: true });
                 },
                     function(reason) {
                         deferred.reject(reason);

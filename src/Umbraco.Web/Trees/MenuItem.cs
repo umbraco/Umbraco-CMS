@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using umbraco.interfaces;
+using System.Collections.Generic;
 
 namespace Umbraco.Web.Trees
 {
@@ -9,7 +10,7 @@ namespace Umbraco.Web.Trees
     {
         public MenuItem()
         {
-            
+            AdditionalData = new Dictionary<string, object>();
         }
 
         public MenuItem(IAction legacyMenu)
@@ -19,6 +20,13 @@ namespace Umbraco.Web.Trees
             Seperator = false;
             Icon = legacyMenu.Icon;
         }
+
+        /// <summary>
+        /// A dictionary to support any additional meta data that should be rendered for the node which is 
+        /// useful for custom action commands such as 'create', 'copy', etc...
+        /// </summary>
+        [DataMember(Name = "metaData")]
+        public Dictionary<string, object> AdditionalData { get; private set; }
 
         [DataMember(Name = "name", IsRequired = true)]
         [Required]

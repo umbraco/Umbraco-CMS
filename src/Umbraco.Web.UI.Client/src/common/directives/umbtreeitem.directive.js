@@ -115,7 +115,6 @@ angular.module("umbraco.directives")
 
                     //tell notications about the error
                     notificationsService.error(reason);
-                    return;
                 });
             }   
         };
