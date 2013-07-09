@@ -7,6 +7,7 @@ angular.module("umbraco.directives")
     scope: {
       section: '@',
       cachekey: '@',
+      callback: '=',
       node:'='
     },
 
@@ -21,9 +22,16 @@ angular.module("umbraco.directives")
         '</li>',
 
     link: function (scope, element, attrs) {
-      
+        
+        function emitEvent(eventName, args){
+
+          if(scope.callback){
+            $(scope.callback).trigger(eventName,args);
+          }
+        }
+
         scope.options = function(e, n, ev){ 
-          scope.$emit("treeOptionsClick", {element: e, node: n, event: ev});
+          emitEvent("treeOptionsClick", {element: e, node: n, event: ev});
         };
 
         /**
@@ -38,56 +46,37 @@ angular.module("umbraco.directives")
          * @param n {object} The tree node object associated with the click
          */
         scope.select = function(e,n,ev){
-
-            //here we need to check for some legacy tree code
-            if (n.jsClickCallback && n.jsClickCallback !== "") {
-                //this is a legacy tree node!                
-                var jsPrefix = "javascript:";
-                var js;
-                if (n.jsClickCallback.startsWith(jsPrefix)) {
-                    js = n.jsClickCallback.substr(jsPrefix.length);
-                }
-                else {
-                    js = n.jsClickCallback;
-                }
-                try {
-                    var func = eval(js);
-                    //this is normally not necessary since the eval above should execute the method and will return nothing.
-                    if (func != null && (typeof func === "function")) {
-                        func.call();
-                    }
-                }
-                catch(ex) {
-                    $log.error("Error evaluating js callback from legacy tree node: " + ex);
-                }
-            }
-            else {
-                //not legacy, lets just set the route value
-                $location.path(n.view);
-            }
-
-            scope.$emit("treeNodeSelect", { element: e, node: n, event: ev });
+            emitEvent("treeNodeSelect", { element: e, node: n, event: ev });
         };
 
         scope.load = function (arrow, node) {
 
           if (node.expanded){
+            emitEvent("treeNodeCollapsing", { element: arrow, node: node});
+
             node.expanded = false;
             node.children = [];
-            
           }else {
             
+            emitEvent("treeNodeExpanding", { element: arrow, node: node});
+
             node.loading = true;
 
             treeService.getChildren( { node: node, section: scope.section } )
                 .then(function (data) {
+
+                    emitEvent("treeNodeLoaded", { element: arrow, node: node, children: data});
+
                     node.loading = false;
-                   // $(arrow).parent().remove(loader);
-                    
                     node.children = data;
                     node.expanded = true;
+
+                    emitEvent("treeNodeExpanded", { element: arrow, node: node, children: data});
+
                 }, function (reason) {
-                  //  $(arrow).parent().remove(loader);
+
+                    emitEvent("treeNodeLoadError", { element: arrow, node: node, error: reason});
+
                     node.loading = false;
                     notificationsService.error(reason);
                 });
@@ -98,7 +87,7 @@ angular.module("umbraco.directives")
           return { 'padding-left': (node.level * 20) + "px" };
         };
 
-        var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item ng-repeat="child in node.children" node="child" section="{{section}}"></umb-tree-item></ul>';
+        var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item ng-repeat="child in node.children" callback="callback" node="child" section="{{section}}"></umb-tree-item></ul>';
         var newElement = angular.element(template);
         $compile(newElement)(scope);
         element.append(newElement);

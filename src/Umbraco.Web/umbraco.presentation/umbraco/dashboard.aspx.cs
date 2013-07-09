@@ -22,6 +22,8 @@ namespace umbraco.cms.presentation
     /// <summary>
     /// Summary description for dashboard.
     /// </summary>
+    /// 
+    
     public partial class dashboard : BasePages.UmbracoEnsuredPage
     {
 
@@ -31,7 +33,7 @@ namespace umbraco.cms.presentation
         protected void Page_Load(object sender, System.EventArgs e)
         {
             // Put user code to initialize the page here
-            Panel2.Text = ui.Text("dashboard", "welcome", base.getUser()) + " " + this.getUser().Name;
+            Panel2.Text = ui.Text("dashboard", "welcome", UmbracoUser) + " " + UmbracoUser.Name;
         }
 
         private Control CreateDashBoardWrapperControl(Control control)

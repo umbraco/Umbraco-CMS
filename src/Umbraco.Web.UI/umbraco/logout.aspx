@@ -12,10 +12,7 @@
   <body MS_POSITIONING="GridLayout">
 	
     <form id="Form1" method="post" runat="server">
-		<script>
-			window.top.location.href='login.aspx?redir=<%=Server.UrlEncode(Request["redir"]) %>';
-		</script>
-     </form>
+	</form>
 	
   </body>
 </html>

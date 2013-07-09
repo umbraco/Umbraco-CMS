@@ -1,0 +1,29 @@
+﻿<div class="searchPreview" ng-controller="Umbraco.Editors.SimpleEditorController">
+
+
+<h3><a href="#">{{content.name}}</a></h3>
+<a href="#">http://localhost/{{content.name}}</a>
+<p>{{tab.properties[1].value}}</p>
+</div>
+
+<style>
+	.searchPreview h3{
+		font-size: 16px !Important;
+		line-height: 16px !Important;
+		padding: 0px; margin: 0px;
+	}
+
+	.searchPreview h3 a{
+		color: #12c; text-decoration: underline;}
+
+	.searchPreview a{
+		color: #009933;
+		font-size: 14px;
+
+	}	
+
+	.searchPreview p{
+		color: #444;
+		font-size: 13px;
+	}
+</style>

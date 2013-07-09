@@ -1,7 +1,15 @@
 app.config(function ($routeProvider) {
-        $routeProvider
-        .when('/:section', {
-            templateUrl: "views/common/dashboard.html"
+    $routeProvider
+    .when('/:section', {
+        templateUrl: function (rp) {
+                if (rp.section === "default")
+                {
+                    rp.section = "content";
+                }
+
+                rp.url = "dashboard.aspx?app=" + rp.section;
+                return 'views/common/legacy.html';
+            }
         })
         .when('/framed/:url', {
             //This occurs when we need to launch some content in an iframe
@@ -30,9 +38,12 @@ app.config(function ($routeProvider) {
         })        
         .otherwise({ redirectTo: '/content' });
     }).config(function ($locationProvider) {
-    //$locationProvider.html5Mode(false).hashPrefix('!'); //turn html5 mode off
-    // $locationProvider.html5Mode(true);         //turn html5 mode on
+
+        //$locationProvider.html5Mode(false).hashPrefix('!'); //turn html5 mode off
+        // $locationProvider.html5Mode(true);         //turn html5 mode on
+
     });
+
 
 app.run(['security', function (security) {
     // Get the current user when the application starts

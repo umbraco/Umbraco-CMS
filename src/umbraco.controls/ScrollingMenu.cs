@@ -43,7 +43,7 @@ namespace umbraco.uicontrols
             return menu;
         }
 
-        internal MenuButton NewButton(int index = -1)
+        public MenuButton NewButton(int index = -1)
         {
             MenuButton btn = new MenuButton();
 

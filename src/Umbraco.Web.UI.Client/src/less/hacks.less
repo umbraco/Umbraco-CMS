@@ -3,6 +3,9 @@
 
 /* CONTAINS ALL HACKS AND OTHER QUICK-FIXES THAT WE MUST HANDLE BEFORE A RELEASE */
 
+/*ensures dialogs doesnt have side-by-side labels */
+.umbracoDialog .controls-row{margin-left: 0px !important;}
+
 .controls-row img {
 	max-width: none;
 }
@@ -15,8 +18,8 @@
   max-width: none !important;
 }
 
-/* loading animation for iframes */
-iframe {
+/* loading animation for iframes and content pages */
+iframe, .content-column-body {
     background: center center url(../img/loader.gif) no-repeat;
 }
 

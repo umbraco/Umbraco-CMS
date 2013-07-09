@@ -27,9 +27,10 @@ namespace umbraco.cms.presentation.settings.scripts
 
         }
         protected System.Web.UI.HtmlControls.HtmlForm Form1;
-        protected uicontrols.UmbracoPanel Panel1;
+        protected uicontrols.TabView Panel1;
         protected System.Web.UI.WebControls.TextBox NameTxt;
         protected uicontrols.Pane Pane7;
+        protected uicontrols.Pane Pane8;
 
         protected System.Web.UI.WebControls.Literal lttPath;
         protected System.Web.UI.WebControls.Literal editorJs;
@@ -37,7 +38,7 @@ namespace umbraco.cms.presentation.settings.scripts
         protected umbraco.uicontrols.PropertyPanel pp_name;
         protected umbraco.uicontrols.PropertyPanel pp_path;
 
-        protected MenuIconI SaveButton;
+        protected MenuButton SaveButton;
 
         private string file;
 
@@ -106,9 +107,18 @@ namespace umbraco.cms.presentation.settings.scripts
             else if (file.EndsWith("master"))
                 editorSource.CodeBase = uicontrols.CodeArea.EditorType.HTML;
 
-            SaveButton = Panel1.Menu.NewIcon();
-            SaveButton.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
-            SaveButton.AltText = "Save File";
+
+            var editor = Panel1.NewTabPage(ui.Text("script"));
+            editor.Controls.Add(Pane7);
+
+            var props = Panel1.NewTabPage(ui.Text("properties"));
+            props.Controls.Add(Pane8);
+
+
+            SaveButton = Panel1.Menu.NewButton();
+            SaveButton.Icon = "save";
+            SaveButton.Text = ui.Text("save");
+            SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
 
             if (editorSource.CodeBase == uicontrols.CodeArea.EditorType.HTML)

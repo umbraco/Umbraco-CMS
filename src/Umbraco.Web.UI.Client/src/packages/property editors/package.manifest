@@ -1,0 +1,15 @@
+{    	
+	propertyEditors: [		
+		{
+			id: "7e062c13-7c41-4ad9-b389-41d88aeef87c",
+			name: "Multinode treepicker",
+			editor: {
+				view: "~/App_Plugins/property editors/mntp/mntp.html"
+			}
+		}
+	]
+	,
+	javascript: [
+	    '~/App_Plugins/property editors/mntp/mntp.js'
+	]
+}

@@ -1,0 +1,14 @@
+{    	
+	propertyEditors: [		
+		{
+			id: "0BA0F832-D759-4526-9B3E-95BBFC98F82E",
+			name: "My Simple Editor",
+			editor: {
+				view: "~/App_Plugins/SimpleEditor/PropertyEditors/Views/simpleeditor.html"
+			}
+		}
+	],
+	javascript: [
+	    '~/App_Plugins/SimpleEditor/PropertyEditors/Js/SimpleEditor.js'
+	]
+}

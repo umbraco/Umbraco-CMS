@@ -21,7 +21,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 	public partial class EditView : global::umbraco.BasePages.UmbracoEnsuredPage
 	{
 		private Template _template;
-		protected MenuIconI SaveButton;
+		public MenuButton SaveButton;
 
 		public EditView()
 		{
@@ -151,11 +151,20 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			}
 			
 			Panel1.hasMenu = true;
+            var editor = Panel1.NewTabPage(ui.Text("template"));
+            editor.Controls.Add(Pane8);
 
-			SaveButton = Panel1.Menu.NewIcon();
-			SaveButton.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
-			SaveButton.AltText = ui.Text("save");
-			SaveButton.ID = "save";
+            var props = Panel1.NewTabPage(ui.Text("properties"));
+            props.Controls.Add(Pane7);
+
+
+            SaveButton = Panel1.Menu.NewButton();
+            SaveButton.Icon = "save";
+            SaveButton.OnClientClick = "doSubmit()";
+            SaveButton.Text = ui.Text("save");
+            SaveButton.ButtonType = MenuButtonType.Primary;
+            SaveButton.ID = "save";
+
 
 			Panel1.Text = ui.Text("edittemplate");
 			pp_name.Text = ui.Text("name", base.getUser());
@@ -163,8 +172,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			pp_masterTemplate.Text = ui.Text("mastertemplate", base.getUser());
 
 			// Editing buttons
-			Panel1.Menu.InsertSplitter();
-			MenuIconI umbField = Panel1.Menu.NewIcon();
+            MenuIconI umbField = editorSource.Menu.NewIcon();
 			umbField.ImageURL = UmbracoPath + "/images/editor/insField.gif";
 			umbField.OnClickCommand =
 				ClientTools.Scripts.OpenModalWindow(
@@ -174,7 +182,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 
 
 			// TODO: Update icon
-			MenuIconI umbDictionary = Panel1.Menu.NewIcon();
+            MenuIconI umbDictionary = editorSource.Menu.NewIcon();
 			umbDictionary.ImageURL = GlobalSettings.Path + "/images/editor/dictionaryItem.gif";
 			umbDictionary.OnClickCommand =
 				ClientTools.Scripts.OpenModalWindow(
@@ -188,7 +196,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 					ClientCallbackInsertMacroMarkup = "function(alias) {editViewEditor.insertMacroMarkup(alias);}",
 					ClientCallbackOpenMacroModel = "function(alias) {editViewEditor.openMacroModal(alias);}"
 				};
-			Panel1.Menu.InsertNewControl(macroSplitButton, 40);
+            editorSource.Menu.InsertNewControl(macroSplitButton, 40);
 			
 			if (_template == null)
 			{

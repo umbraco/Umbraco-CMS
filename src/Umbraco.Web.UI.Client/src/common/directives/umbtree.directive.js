@@ -10,14 +10,17 @@ angular.module("umbraco.directives")
         section: '@',
         showoptions: '@',
         showheader: '@',
-        cachekey: '@'
+        cachekey: '@',
+        callback: '='
       },
 
       compile: function (element, attrs) {
          //config
          var hideheader = (attrs.showheader === 'false') ? true : false;
          var hideoptions = (attrs.showoptions === 'false') ? "hide-options" : "";
+        
          
+
          var template = '<ul class="umb-tree ' + hideoptions + '">' + 
          '<li class="root">';
 
@@ -27,7 +30,7 @@ angular.module("umbraco.directives")
            '</div>';
          }
          template += '<ul>' +
-                  '<umb-tree-item ng-repeat="child in tree.children" node="child" section="{{section}}"></umb-tree-item>' +
+                  '<umb-tree-item ng-repeat="child in tree.children" node="child" callback="callback" section="{{section}}"></umb-tree-item>' +
                   '</ul>' +
                 '</li>' +
                '</ul>';

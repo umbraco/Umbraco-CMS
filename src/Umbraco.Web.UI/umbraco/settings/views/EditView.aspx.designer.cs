@@ -28,7 +28,34 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.UmbracoPanel Panel1;
+        protected global::umbraco.uicontrols.TabView Panel1;
+        
+        /// <summary>
+        /// Pane8 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane8;
+        
+        /// <summary>
+        /// pp_source control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_source;
+        
+        /// <summary>
+        /// editorSource control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.CodeArea editorSource;
         
         /// <summary>
         /// Pane7 control.
@@ -92,23 +119,5 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList MasterTemplate;
-        
-        /// <summary>
-        /// pp_source control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_source;
-        
-        /// <summary>
-        /// editorSource control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::umbraco.uicontrols.CodeArea editorSource;
     }
 }

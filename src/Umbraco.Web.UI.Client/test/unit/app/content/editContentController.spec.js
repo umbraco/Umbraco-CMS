@@ -4,10 +4,15 @@ describe('edit content controller tests', function () {
 
     beforeEach(module('umbraco'));
 
-    beforeEach(inject(function ($rootScope, $controller, angularHelper, $httpBackend) {
+    //inject the contentMocks service
+    beforeEach(inject(function ($rootScope, $controller, angularHelper, $httpBackend, contentMocks) {
         httpBackend = $httpBackend;
         scope = $rootScope.$new();
         
+        //have the contentMocks register its expect urls on the httpbackend
+        //see /mocks/content.mocks.js for how its setup
+        contentMocks.register();
+
         //this controller requires an angular form controller applied to it
         scope.contentForm = angularHelper.getNullForm("contentForm");
         
@@ -15,6 +20,15 @@ describe('edit content controller tests', function () {
             $scope: scope,
             $routeParams: routeParams
         });
+
+        //For controller tests its easiest to have the digest and flush happen here
+        //since its intially always the same $http calls made
+
+        //scope.$digest resolves the promise against the httpbackend
+        scope.$digest();
+        //httpbackend.flush() resolves all request against the httpbackend
+        //to fake a async response, (which is what happens on a real setup)
+        httpBackend.flush();
     }));
 
     describe('content edit controller save and publish', function () {
@@ -35,52 +49,45 @@ describe('edit content controller tests', function () {
             expect(scope.files[0].file).toBe("testFile2");
         });
 
-        //it('it should have an content object', function() {
+        it('it should have an content object', function() {
 
-        /* 
-        NOTE: I cannot figure out how to make this work... I've followed along with a few sources like:
-          http://stackoverflow.com/questions/15833462/angularjs-need-help-to-unit-test-a-factory-with-promise
-          http://www.benlesh.com/2013/05/angularjs-unit-testing-controllers.html
+            //controller should have a content object
+            expect(scope.content).toNotBe(undefined);
 
-          But it tells me that there is no pending request to flush, so dunno what is going on there?
-        */
+            //if should be the same as the routeParams defined one
+            expect(scope.content.id).toBe(1234);
+        });
 
-        //    httpBackend.flush();
+        it('it should have a tabs collection', function () {
+          expect(scope.content.tabs.length).toBe(5);
+        });
 
-        //    rootScope.$apply();
+        it('it should have a properties collection on each tab', function () {
+              $(scope.content.tabs).each(function(i, tab){
+                  expect(tab.properties.length).toBeGreaterThan(0);
+              });
+        });
 
-        //    expect(scope.content).toNotBe(undefined);
-        //    //expect(scope.content.id).toBe(1234);
-        //});
+        it('it should change updateDate on save', function () {
+          var currentUpdateDate = scope.content.updateDate;
 
-        //it('it should have a tabs collection', function () {
-        //  expect(scope.content.tabs.length).toBe(5);
-        //});
+          setTimeout(function(){
+              scope.save(scope.content);
+              expect(scope.content.updateDate).toBeGreaterThan(currentUpdateDate);
+              }, 1000);
+        });
 
-        //it('it should have a properties collection on each tab', function () {
-        //      $(scope.content.tabs).each(function(i, tab){
-        //          expect(tab.properties.length).toBeGreaterThan(0);
-        //      });
-        //});
+        it('it should change publishDate on publish', function () {
+          var currentPublishDate = scope.content.publishDate;
 
-        //it('it should change updateDate on save', function () {
-        //  var currentUpdateDate = scope.content.updateDate;
-
-        //  setTimeout(function(){
-        //      scope.save(scope.content);
-        //      expect(scope.content.updateDate).toBeGreaterThan(currentUpdateDate);
-        //      }, 1000);
-        // });
-
-        //it('it should change publishDate on publish', function () {
-        //  var currentPublishDate = scope.content.publishDate;
-
-        //  //wait a sec before you publish
-        //  setTimeout(function(){
-        //      scope.saveAndPublish(scope.content);
-        //      expect(scope.content.publishDate).toBeGreaterThan(currentPublishDate);
-        //      }, 1000);
-        //});
+          //wait a sec before you publish
+          setTimeout(function(){
+              scope.saveAndPublish(scope.content);
+              
+              expect(scope.content.publishDate).toBeGreaterThan(currentPublishDate);
+              
+              }, 1000);
+        });
 
 
     });

@@ -74,12 +74,14 @@ function ContentEditController($scope, $routeParams, contentResource, notificati
     if ($routeParams.create) {
         contentResource.getScaffold($routeParams.id, $routeParams.doctype)
             .then(function(data) {
+                $scope.contentLoaded = true;
                 $scope.content = data;
             });
     }
     else {
         contentResource.getById($routeParams.id)
             .then(function(data) {
+                $scope.contentLoaded = true;
                 $scope.content = data;
             });
     }

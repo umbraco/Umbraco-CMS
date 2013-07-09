@@ -48,11 +48,12 @@
 </head>
 <body ng-controller="MainController" id="umbracoMainPageBody">
     <div ng-cloak id="Div1" class="clearfix" ng-click="closeDialogs($event)">
-        <umb-left-column></umb-left-column>
+
+        <umb-navigation></umb-navigation>
 
         <section id="contentwrapper">
             <div id="contentcolumn">
-                <div ng-view></div>
+                <div class="content-column-body" ng-view></div>
             </div>
         </section>
 

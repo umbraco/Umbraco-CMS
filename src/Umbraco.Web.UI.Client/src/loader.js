@@ -10,7 +10,7 @@ yepnope({
 		'lib/umbraco/Extensions.js',
 		
 		'js/umbraco.servervariables.js',		
-		'js/app_dev.js',
+		'js/app.dev.js',
 		'js/umbraco.httpbackend.js',
         'js/umbraco.testing.js',
 

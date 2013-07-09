@@ -75,6 +75,8 @@ angular.module('umbraco.services')
 				this.ui.currentSection = selectedSection;
 				this.showTree(selectedSection);
 			}
+
+			$location.path(sectionAlias);
 		},
 
 		showTree: function(sectionAlias){
@@ -134,6 +136,15 @@ angular.module('umbraco.services')
 			setMode("tree");
 		},
 
+		showUserDialog: function(){
+			var d = dialogService.open(
+							{
+								template: "views/common/dialogs/user.html", 
+								modalClass: "umb-modal-left", 
+								show: true
+							});
+
+		},
 		showDialog: function (args) {
 			setMode("dialog");
 

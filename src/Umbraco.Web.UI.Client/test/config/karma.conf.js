@@ -12,13 +12,16 @@ module.exports = function(karma) {
         'lib/underscore/underscore.js',
         'test/lib/angular/angular-mocks.js',
         'lib/umbraco/Extensions.js',
-        'src/app_dev.js',
+        
+        'test/config/app.unit.js',
+        'src/common/mocks/umbraco.servervariables.js',
+
         'src/common/directives/*.js',
         'src/common/filters/*.js',
         'src/common/services/*.js',
         'src/common/security/*.js',
         'src/common/resources/*.js',
-        'src/common/mocks/**/*.js',
+        'src/common/mocks/resources/*.js',
         'src/views/**/*.controller.js',
         'test/unit/**/*.spec.js'
     ],
