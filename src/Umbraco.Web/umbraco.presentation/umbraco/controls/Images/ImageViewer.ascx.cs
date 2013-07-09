@@ -95,7 +95,7 @@ namespace umbraco.controls.Images
                 }
 
                 MediaItemPath = pFile.Value != null && !string.IsNullOrEmpty(pFile.Value.ToString())
-                    ? umbraco.IO.IOHelper.ResolveUrl(pFile.Value.ToString())
+                    ? Umbraco.Core.IO.IOHelper.AbsoluteUrl(pFile.Value.ToString())
                     : "#";
                 AltText = MediaItemPath != "#" ? m.Text : ui.GetText("no") + " " + ui.GetText("media");
 
