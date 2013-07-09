@@ -72,6 +72,7 @@ namespace Umbraco.Web.Editors
         /// Returns the JavaScript blocks for any legacy trees declared
         /// </summary>
         /// <returns></returns>
+        [UmbracoAuthorize]
         public JavaScriptResult LegacyTreeJs()
         {            
             var javascript = new StringBuilder();

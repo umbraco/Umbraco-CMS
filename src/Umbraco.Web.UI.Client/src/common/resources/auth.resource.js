@@ -49,10 +49,8 @@ function authResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     deferred.resolve(data);
                 }).
                 error(function (data, status, headers, config) {
-
-                    //Change this to 200 ! we're just checking auth.
-                    
-                    if (status === 401) {
+                    //204 - means the current user is not-authorized, the result was empty.
+                    if (status === 204) {
                         //if it's unauthorized it just means we are not authenticated so we'll just return null
                         deferred.resolve(null);
                     }
