@@ -56,6 +56,7 @@ namespace Umbraco.Web.Editors
             var d = new Dictionary<string, object>
                 {
                     {"umbracoPath", GlobalSettings.Path},
+                    {"legacyTreeJs", Url.Action("LegacyTreeJs", "BackOffice")},
                     {"contentApiBaseUrl", Url.GetUmbracoApiService<ContentController>("PostSave").TrimEnd("PostSave")},
                     {"mediaApiBaseUrl", Url.GetUmbracoApiService<MediaController>("GetRootMedia").TrimEnd("GetRootMedia")},
                     {"sectionApiBaseUrl", Url.GetUmbracoApiService<SectionController>("GetSections").TrimEnd("GetSections")},

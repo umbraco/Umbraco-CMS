@@ -8,7 +8,7 @@
  * The main application controller
  * 
  */
-function MainController($scope, $routeParams, $rootScope, $timeout, notificationsService, userService, navigationService) {
+function MainController($scope, $routeParams, $rootScope, $timeout, notificationsService, userService, navigationService, legacyJsLoader) {
     //set default properties
     $scope.authenticated = null; //the null is important because we do an explicit bool check on this in the view    
     
@@ -41,8 +41,16 @@ function MainController($scope, $routeParams, $rootScope, $timeout, notification
     //fetch the authorized status         
     userService.isAuthenticated()
         .then(function (data) {
+            
+            //We need to load in the legacy tree js.
+            legacyJsLoader.loadLegacyTreeJs($scope).then(
+                function (result) {
+                    //TODO: We could wait for this to load before running the UI ?
+                });
+            
             $scope.authenticated = data.authenticated;
             $scope.user = data.user;
+            
         }, function (reason) {
             notificationsService.error("An error occurred checking authentication.");
             $scope.authenticated = false;

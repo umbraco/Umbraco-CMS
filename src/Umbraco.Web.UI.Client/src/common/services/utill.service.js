@@ -1,5 +1,27 @@
 /*Contains multiple services for various helper tasks */
 
+
+/**
+ * @ngdoc function
+ * @name umbraco.services.angularHelper
+ * @function
+ *
+ * @description
+ * Some angular helper/extension methods
+ */
+function legacyJsLoader(scriptLoader) {
+    return {
+        
+        /** Called to load in the legacy tree js which is required on startup if a user is logged in or 
+         after login, but cannot be called until they are authenticated which is why it needs to be lazy loaded. */
+        loadLegacyTreeJs: function(scope) {
+            return scriptLoader.load([Umbraco.Sys.ServerVariables.legacyTreeJs], scope);
+        }  
+    };
+}
+
+angular.module('umbraco.services').factory('legacyJsLoader', legacyJsLoader);
+
 /**
  * @ngdoc function
  * @name umbraco.services.angularHelper
