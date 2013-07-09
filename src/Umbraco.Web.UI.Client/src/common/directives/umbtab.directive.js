@@ -1,3 +1,8 @@
+/**
+* @ngdoc directive 
+* @name umbraco.directive:umbTab 
+* @restrict E
+**/
 angular.module("umbraco.directives")
 .directive('umbTab', function(){
 	return {

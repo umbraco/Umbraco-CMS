@@ -6,7 +6,6 @@
  * @description
  * A controller to control the legacy iframe injection
  * 
- * @param myParam {object} Enter param description here
 */
 function LegacyController($scope, $routeParams, $element) {
     //set the legacy path

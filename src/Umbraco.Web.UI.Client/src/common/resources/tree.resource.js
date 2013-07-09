@@ -1,5 +1,5 @@
 ﻿/**
-    * @ngdoc factory 
+    * @ngdoc service 
     * @name umbraco.resources.treeResource     
     * @description Loads in data for trees
     **/

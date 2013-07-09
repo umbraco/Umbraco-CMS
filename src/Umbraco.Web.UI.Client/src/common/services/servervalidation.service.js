@@ -1,6 +1,6 @@
 /**
- * @ngdoc factory
- * @name serverValidationService
+ * @ngdoc service
+ * @name umbraco.services.serverValidationService
  * @function
  *
  * @description
@@ -14,7 +14,7 @@ function serverValidationService() {
         /**
          * @ngdoc function
          * @name subscribe
-         * @methodOf serverValidationService
+         * methodOf umbrac.services.serverValidationService
          * @function
          *
          * @description
@@ -52,7 +52,7 @@ function serverValidationService() {
         /**
          * @ngdoc function
          * @name getCallbacks
-         * @methodOf serverValidationService
+         * methodOf umbraco.services.serverValidationService
          * @function
          *
          * @description
@@ -71,7 +71,7 @@ function serverValidationService() {
         /**
          * @ngdoc function
          * @name addError
-         * @methodOf serverValidationService
+         * methodOf umbraco.services.serverValidationService
          * @function
          *
          * @description
@@ -109,7 +109,7 @@ function serverValidationService() {
         /**
          * @ngdoc function
          * @name removeError
-         * @methodOf serverValidationService
+         * methodOf umbraco.services.serverValidationService
          * @function
          *
          * @description
@@ -129,7 +129,7 @@ function serverValidationService() {
         /**
          * @ngdoc function
          * @name reset
-         * @methodOf serverValidationService
+         * methodOf umbraco.services.serverValidationService
          * @function
          *
          * @description
@@ -148,7 +148,7 @@ function serverValidationService() {
         /**
          * @ngdoc function
          * @name getError
-         * @methodOf serverValidationService
+         * methodOf umbraco.services.serverValidationService
          * @function
          *
          * @description
@@ -166,7 +166,7 @@ function serverValidationService() {
         /**
          * @ngdoc function
          * @name hasError
-         * @methodOf serverValidationService
+         * methodOf umbraco.services.serverValidationService
          * @function
          *
          * @description

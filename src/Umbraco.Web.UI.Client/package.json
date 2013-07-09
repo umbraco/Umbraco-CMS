@@ -42,6 +42,9 @@
     "karma-requirejs": "0.0.1",
     "karma-coffee-preprocessor": "0.0.1",
     "karma": "~0.9",
-    "karma-phantomjs-launcher": "0.0.2"
+    "karma-phantomjs-launcher": "0.0.2",
+    "grunt-ngdocs": "~0.1.2",
+    "shelljs": "~0.1.4",
+    "grunt-jsdoc": "~0.4.0"
   }
 }

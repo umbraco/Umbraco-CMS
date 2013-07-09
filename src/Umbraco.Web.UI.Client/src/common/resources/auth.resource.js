@@ -1,5 +1,5 @@
 /**
-    * @ngdoc factory 
+    * @ngdoc service 
     * @name umbraco.resources.authResource     
     * @description Loads in data for authentication
     **/

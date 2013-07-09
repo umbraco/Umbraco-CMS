@@ -1,5 +1,5 @@
 /**
-    * @ngdoc factory 
+    * @ngdoc service 
     * @name umbraco.resources.contentResource
     * @description Loads/saves in data for content
     **/

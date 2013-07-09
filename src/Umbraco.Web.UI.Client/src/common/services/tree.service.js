@@ -1,13 +1,11 @@
 
 /**
- * @ngdoc factory
+ * @ngdoc service
  * @name treeService
  * @function
  *
  * @description
  * The tree service factory
-
- * @param myParam {object} Enter param description here
  */
 function treeService($q, treeResource, iconHelper) {
     //implement this in local storage

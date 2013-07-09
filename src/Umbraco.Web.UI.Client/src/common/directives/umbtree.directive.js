@@ -1,3 +1,8 @@
+/**
+* @ngdoc directive 
+* @name umbraco.directive:umbTree 
+* @restrict E
+**/
 angular.module("umbraco.directives")
   .directive('umbTree', function ($compile, $log, $q, treeService, notificationsService) {
     

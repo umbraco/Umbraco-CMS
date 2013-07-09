@@ -1,3 +1,8 @@
+/**
+* @ngdoc directive 
+* @name umbraco.directive:umbPanel 
+* @restrict E
+**/
 angular.module("umbraco.directives")
 	.directive('umbPanel', function(){
 		return {

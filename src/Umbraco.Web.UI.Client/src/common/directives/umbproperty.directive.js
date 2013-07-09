@@ -1,4 +1,8 @@
-
+/**
+* @ngdoc directive 
+* @name umbraco.directive:umbProperty 
+* @restrict E
+**/
 angular.module("umbraco.directives")
     .directive('umbProperty', function (umbPropEditorHelper) {
         return {

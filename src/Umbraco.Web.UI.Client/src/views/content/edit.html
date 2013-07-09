@@ -1,4 +1,4 @@
-﻿<ng-form name="contentForm" ng-show="contentLoaded">
+<ng-form name="contentForm" ng-show="contentLoaded">
     <umb-panel ng-controller="Umbraco.Editors.ContentEditController" val-show-validation>
         <umb-header tabs="content.tabs">
                 <div class="span4">
@@ -33,6 +33,12 @@
             <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" 
                 ng-repeat="tab in content.tabs">
                 <umb-property ng-repeat="model in tab.properties"></umb-property>
+            </umb-tab>
+
+            <umb-tab id="tabproperties" rel="tabproperties">
+                <umb-property>
+
+                </umb-property>
             </umb-tab>
         </umb-tab-view>
     </umb-panel>

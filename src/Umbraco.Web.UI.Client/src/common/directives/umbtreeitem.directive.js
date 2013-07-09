@@ -1,3 +1,22 @@
+/**
+ * @ngdoc directive
+ * @name umbraco.directives:umbTreeItem
+ * @element li
+ * @function
+ *
+ * @description
+ * Renders a list item, representing a single node in the tree.
+ * Includes element to toggle children, and a menu toggling button
+ *
+ * **note:** This directive is only used internally in the umbTree directive
+ *
+ * @example
+   <example module="umbraco.directives">
+    <file name="index.html">
+         <umb-tree-item ng-repeat="child in tree.children" node="child" callback="callback" section="content"></umb-tree-item>
+    </file>
+   </example>
+ */
 angular.module("umbraco.directives")
 .directive('umbTreeItem', function($compile, $http, $templateCache, $interpolate, $log, $location, treeService, notificationsService) {
   return {
@@ -23,6 +42,7 @@ angular.module("umbraco.directives")
 
     link: function (scope, element, attrs) {
         
+        /*Helper function to emit tree events */
         function emitEvent(eventName, args){
 
           if(scope.callback){
@@ -30,25 +50,31 @@ angular.module("umbraco.directives")
           }
         }
 
+        /*
+          Method called when the options button next to a node is called
+          In the main tree this opens the menu, but internally the tree doesnt
+          know about this, so it simply raises an event to tell the parent controller
+          about it.
+        */
         scope.options = function(e, n, ev){ 
           emitEvent("treeOptionsClick", {element: e, node: n, event: ev});
         };
 
-        /**
-         * @ngdoc function
-         * @name select
-         * @methodOf umbraco.directives.umbTreeItem
-         * @function
-         *
-         * @description
-         * Handles the click event of a tree node
-
-         * @param n {object} The tree node object associated with the click
-         */
+        /*
+          Method called when an item is clicked in the tree, this passes the 
+          DOM element, the tree node object and the original click
+          and emits it as a treeNodeSelect element if there is a callback object
+          defined on the tree
+        */
         scope.select = function(e,n,ev){
             emitEvent("treeNodeSelect", { element: e, node: n, event: ev });
         };
 
+        /*
+          Method called when a node in the tree is expanded, when clicking the arrow
+          takes the arrow DOM element and node data as parameters
+          emits treeNodeCollapsing event if already expanded and treeNodeExpanding if collapsed
+        */
         scope.load = function (arrow, node) {
 
           if (node.expanded){
@@ -58,32 +84,47 @@ angular.module("umbraco.directives")
             node.children = [];
           }else {
             
+            //emit treeNodeExpanding event, if a callback object is set on the tree
             emitEvent("treeNodeExpanding", { element: arrow, node: node});
 
+            //set element state to loading
             node.loading = true;
 
+            //get the children from the tree service
             treeService.getChildren( { node: node, section: scope.section } )
                 .then(function (data) {
 
+                    //emit event
                     emitEvent("treeNodeLoaded", { element: arrow, node: node, children: data});
 
+                    //set state to done and expand
                     node.loading = false;
                     node.children = data;
                     node.expanded = true;
 
+                    //emit expanded event
                     emitEvent("treeNodeExpanded", { element: arrow, node: node, children: data});
 
                 }, function (reason) {
 
+                    //in case of error, emit event
                     emitEvent("treeNodeLoadError", { element: arrow, node: node, error: reason});
 
+                    //stop show the loading indicator  
                     node.loading = false;
+
+                    //tell notications about the error
                     notificationsService.error(reason);
                     return;
                 });
             }   
         };
 
+        /*
+          Helper method for setting correct element padding on tree DOM elements
+          Since elements are not children of eachother, we need this indenting done
+          manually
+        */
         scope.setTreePadding = function(node) {
           return { 'padding-left': (node.level * 20) + "px" };
         };

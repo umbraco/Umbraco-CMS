@@ -7,7 +7,7 @@
  * @description
  * Handles the section area of the app
  * 
- * @param navigationService {navigationService} A reference to the navigationService
+ * @param {navigationService} navigationService A reference to the navigationService
  */
 function NavigationController($scope, $location, navigationService, historyService, sectionResource) {
     //load navigation service handlers

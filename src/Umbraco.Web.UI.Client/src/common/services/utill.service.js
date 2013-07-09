@@ -1,7 +1,7 @@
 /*Contains multiple services for various helper tasks */
 
 /**
- * @ngdoc function
+ * @ngdoc service
  * @name umbraco.services.angularHelper
  * @function
  *
@@ -14,7 +14,7 @@ function angularHelper($log) {
         /**
          * @ngdoc function
          * @name safeApply
-         * @methodOf angularHelper
+         * methodOf umbraco.services.angularHelper
          * @function
          *
          * @description
@@ -32,7 +32,7 @@ function angularHelper($log) {
         /**
          * @ngdoc function
          * @name getCurrentForm
-         * @methodOf angularHelper
+         * methodOf umbraco.services.angularHelper
          * @function
          *
          * @description
@@ -88,7 +88,7 @@ function angularHelper($log) {
         /**
          * @ngdoc function
          * @name validateHasForm
-         * @methodOf angularHelper
+         * methodOf umbraco.services.angularHelper
          * @function
          *
          * @description
@@ -106,7 +106,7 @@ function angularHelper($log) {
         /**
          * @ngdoc function
          * @name getNullForm
-         * @methodOf angularHelper
+         * methodOf umbraco.services.angularHelper
          * @function
          *
          * @description
@@ -114,7 +114,7 @@ function angularHelper($log) {
          *      NOTE: This is actually the same construct as angular uses internally for creating a null form but they don't expose
          *          any of this publicly to us, so we need to create our own.
          *
-         * @param formName {string} The form name to assign
+         * @param {string} formName The form name to assign
          */
         getNullForm: function(formName) {
             return {
@@ -132,8 +132,8 @@ function angularHelper($log) {
 angular.module('umbraco.services').factory('angularHelper', angularHelper);
 
 /**
-* @ngdoc factory
-* @name umbraco.services:umbPropertyEditorHelper
+* @ngdoc service
+* @name umbraco.services.umbPropertyEditorHelper
 * @description A helper object used for property editors
 **/
 function umbPropEditorHelper() {
@@ -141,13 +141,13 @@ function umbPropEditorHelper() {
         /**
      * @ngdoc function
      * @name getImagePropertyValue
-     * @methodOf umbPropEditorHelper
+     * methodOf umbraco.services.umbPropertyEditorHelper
      * @function    
      *
      * @description
      * Returns the correct view path for a property editor, it will detect if it is a full virtual path but if not then default to the internal umbraco one
      * 
-     * @param input {string} the view path currently stored for the property editor
+     * @param {string} input the view path currently stored for the property editor
      */
         getViewPath: function (input) {
             var path = String(input);
@@ -165,8 +165,8 @@ function umbPropEditorHelper() {
 angular.module('umbraco.services').factory('umbPropEditorHelper', umbPropEditorHelper);
 
 /**
-* @ngdoc factory
-* @name umbraco.services:umbImageHelper
+* @ngdoc service
+* @name umbraco.services.umbImageHelper
 * @description A helper object used for parsing image paths
 **/
 function umbImageHelper() {
@@ -225,7 +225,7 @@ function umbImageHelper() {
 angular.module('umbraco.services').factory('umbImageHelper', umbImageHelper);
 
 /**
-* @ngdoc factory
+* @ngdoc service
 * @name umbraco.services:umbRequestHelper
 * @description A helper object used for sending requests to the server
 **/
@@ -339,7 +339,7 @@ function umbRequestHelper($http, $q, umbDataFormatter) {
 angular.module('umbraco.services').factory('umbRequestHelper', umbRequestHelper);
 
 /**
-* @ngdoc factory
+* @ngdoc service
 * @name umbraco.services:umbDataFormatter
 * @description A helper object used to format/transform JSON Umbraco data, mostly used for persisting data to the server
 **/
@@ -375,7 +375,7 @@ function umbDataFormatter() {
 angular.module('umbraco.services').factory('umbDataFormatter', umbDataFormatter);
 
 /**
-* @ngdoc factory
+* @ngdoc service
 * @name umbraco.services.tree:iconHelper
 * @description A helper service for dealing with icons, mostly dealing with legacy tree icons
 **/

@@ -1,24 +1,10 @@
-/**
-    * @ngdoc directive 
-    * @name umbraco.directive:valToggleMsg
-    * @restrict A
-    * @description This directive will show/hide an error based on: is the value + the given validator invalid? AND, has the form been submitted ?
-    **/
 function valToggleMsg() {
     return {
         require: "^form",
         restrict: "A",
 
         /**
-         * @ngdoc function
-         * @name link
-         * @methodOf valServer
-         * @function
-         *
-         * @description
-         * The linking function for the directive
-         *
-         * @param formCtrl {FormController} Our directive requries a reference to a form controller which gets passed in to this parameter
+            Our directive requries a reference to a form controller which gets passed in to this parameter
          */
         link: function (scope, element, attr, formCtrl) {
 
@@ -62,4 +48,13 @@ function valToggleMsg() {
         }
     };
 }
+
+/**
+* @ngdoc directive 
+* @name umbraco.directives.directive:valToggleMsg
+* @restrict A
+* @element input
+* @requires formController
+* @description This directive will show/hide an error based on: is the value + the given validator invalid? AND, has the form been submitted ?
+**/
 angular.module('umbraco.directives').directive("valToggleMsg", valToggleMsg);

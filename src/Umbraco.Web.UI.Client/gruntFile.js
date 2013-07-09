@@ -1,19 +1,5 @@
 module.exports = function (grunt) {
 
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-recess');
-
-  grunt.loadNpmTasks('grunt-karma');
-  
-  grunt.loadNpmTasks('grunt-open');
-  grunt.loadNpmTasks('grunt-markdown');
-  grunt.loadNpmTasks('grunt-contrib-connect');
-
   // Default task.
   grunt.registerTask('default', ['jshint:dev','build','karma:unit']);
   grunt.registerTask('dev', ['jshint:dev', 'build', 'webserver', 'open:dev', 'watch']);
@@ -25,7 +11,7 @@ module.exports = function (grunt) {
   grunt.registerTask('build', ['clean','concat','recess:build','copy']);
 
   //utillity tasks
-  grunt.registerTask('docs', ['markdown']);
+  grunt.registerTask('docs', ['markdown', 'ngdocs']);
   grunt.registerTask('webserver', ['connect:devserver']);
 
   // Print a timestamp (useful for when watching)
@@ -219,6 +205,17 @@ module.exports = function (grunt) {
         }
     },
 
+    ngdocs: {
+      options: {
+        dest: 'docs/api',
+        startPage: '/api',
+        title: "My Awesome Docs"
+      },
+      api: {
+        src: ['src/common/services/*.js'],
+        title: 'API Documentation'
+      }
+    },
 
     jshint:{
       dev:{
@@ -266,5 +263,22 @@ module.exports = function (grunt) {
       }
     }
   });
+  
 
+  
+  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-recess');
+
+  grunt.loadNpmTasks('grunt-karma');
+  
+  grunt.loadNpmTasks('grunt-open');
+  grunt.loadNpmTasks('grunt-contrib-connect');
+
+  grunt.loadNpmTasks('grunt-markdown');
+  grunt.loadNpmTasks('grunt-ngdocs');
 };

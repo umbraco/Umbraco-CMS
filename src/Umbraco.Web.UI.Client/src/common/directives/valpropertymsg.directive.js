@@ -1,11 +1,13 @@
 /**
-    * @ngdoc directive 
-    * @name umbraco.directives:valPropertyMsg
-    * @restrict A
-    * @description This directive is used to control the display of the property level validation message.
-    *    We will listen for server side validation changes
-    *    and when an error is detected for this property we'll show the error message
-    **/
+* @ngdoc directive 
+* @name umbraco.directives:valPropertyMsg
+* @restrict A
+* @element textarea
+* @requires formController
+* @description This directive is used to control the display of the property level validation message.
+*    We will listen for server side validation changes
+*    and when an error is detected for this property we'll show the error message
+**/
 function valPropertyMsg(serverValidationService) {
     return {
         scope: {
@@ -17,15 +19,8 @@ function valPropertyMsg(serverValidationService) {
         template: "<div ng-show=\"errorMsg != ''\" class='alert alert-error property-error' >{{errorMsg}}</div>",
         
         /**
-         * @ngdoc function
-         * @name link
-         * @methodOf valPropertyMsg
-         * @function
-         *
-         * @description
-         * The linking function for the directive
-         *
-         * @param formCtrl {FormController} Our directive requries a reference to a form controller which gets passed in to this parameter
+            Our directive requries a reference to a form controller 
+            which gets passed in to this parameter
          */
         link: function (scope, element, attrs, formCtrl) {
 
