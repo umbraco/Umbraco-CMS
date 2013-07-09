@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Web.Caching;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -27,9 +28,6 @@ namespace umbraco.BusinessLogic
         private bool _userNoConsole;
         private bool _userDisabled;
         private bool _defaultToLiveEditing;
-
-        private Hashtable _cruds = new Hashtable();
-        private bool _crudsInitialized = false;
 
         private Hashtable _notifications = new Hashtable();
         private bool _notificationsInitialized = false;
@@ -670,19 +668,42 @@ namespace umbraco.BusinessLogic
                 setupUser(_id);
             string defaultPermissions = UserType.DefaultPermissions;
 
-            if (!_crudsInitialized)
-                initCruds();
+            //get the cached permissions for the user
+            var cachedPermissions = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                string.Format("{0}{1}", CacheKeys.UserPermissionsCacheKey, _id),
+                //Since this cache can be quite large (http://issues.umbraco.org/issue/U4-2161) we will make this priority below average
+                CacheItemPriority.BelowNormal, 
+                null,
+                //Since this cache can be quite large (http://issues.umbraco.org/issue/U4-2161) we will only have this exist in cache for 20 minutes, 
+                // then it will refresh from the database.
+                new TimeSpan(0, 20, 0),
+                () =>
+                    {
+                        var cruds = new Hashtable();
+                        using (var dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodePermission where userId = @userId order by nodeId", SqlHelper.CreateParameter("@userId", this.Id)))
+                        {
+                            while (dr.Read())
+                            {
+                                if (!cruds.ContainsKey(dr.GetInt("nodeId")))
+                                {
+                                    cruds.Add(dr.GetInt("nodeId"), string.Empty);
+                                }
+                                cruds[dr.GetInt("nodeId")] += dr.GetString("permission");
+                            }
+                        }
+                        return cruds;
+                    });
 
             // NH 4.7.1 changing default permission behavior to default to User Type permissions IF no specific permissions has been
             // set for the current node
-            int nodeId = Path.Contains(",") ? int.Parse(Path.Substring(Path.LastIndexOf(",")+1)) : int.Parse(Path);
-            if (_cruds.ContainsKey(nodeId))
+            var nodeId = Path.Contains(",") ? int.Parse(Path.Substring(Path.LastIndexOf(",", StringComparison.Ordinal)+1)) : int.Parse(Path);
+            if (cachedPermissions.ContainsKey(nodeId))
             {
-                return _cruds[int.Parse(Path.Substring(Path.LastIndexOf(",")+1))].ToString();
+                return cachedPermissions[int.Parse(Path.Substring(Path.LastIndexOf(",", StringComparison.Ordinal) + 1))].ToString();
             }
 
             // exception to everything. If default cruds is empty and we're on root node; allow browse of root node
-            if (String.IsNullOrEmpty(defaultPermissions) && Path == "-1")
+            if (string.IsNullOrEmpty(defaultPermissions) && Path == "-1")
                 defaultPermissions = "F";
 
             // else return default user type cruds
@@ -691,29 +712,10 @@ namespace umbraco.BusinessLogic
 
         /// <summary>
         /// Initializes the user node permissions
-        /// </summary>        
+        /// </summary>
+        [Obsolete("This method doesn't do anything whatsoever and will be removed in future versions")]
         public void initCruds()
-        {
-            if (!_isInitialized)
-                setupUser(_id);
-
-            // clear cruds
-            System.Web.HttpContext.Current.Application.Lock();
-            _cruds.Clear();
-            System.Web.HttpContext.Current.Application.UnLock();
-
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodePermission where userId = @userId order by nodeId", SqlHelper.CreateParameter("@userId", this.Id)))
-            {
-                //	int currentId = -1;
-                while (dr.Read())
-                {
-                    if (!_cruds.ContainsKey(dr.GetInt("nodeId")))
-                        _cruds.Add(dr.GetInt("nodeId"), String.Empty);
-
-                    _cruds[dr.GetInt("nodeId")] += dr.GetString("permission");
-                }
-            }
-            _crudsInitialized = true;
+        {            
         }
 
         /// <summary>

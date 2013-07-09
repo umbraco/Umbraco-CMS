@@ -225,9 +225,14 @@ namespace Umbraco.Core.Persistence.Repositories
             // user's default permissions.
             if (parentPermissions.Any())
             {
-                var userPermissions = parentPermissions.ToDictionary(
-                    permissionDto => (object) permissionDto.UserId, permissionDto => permissionDto.Permission);
+                var userPermissions = parentPermissions.Select(
+                    permissionDto => new KeyValuePair<object, string>(
+                                         permissionDto.UserId,
+                                         permissionDto.Permission));                
                 AssignEntityPermissions(entity, userPermissions);
+                //flag the entity's permissions changed flag so we can track those changes.
+                //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.
+                ((Content) entity).PermissionsChanged = true;
             }
 
             //Create the Content specific data - cmsContent
@@ -296,6 +301,10 @@ namespace Umbraco.Core.Persistence.Repositories
                         "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
                         new {ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId});
                 entity.SortOrder = maxSortOrder + 1;
+
+                //Question: If we move a node, should we update permissions to inherit from the new parent if the parent has permissions assigned?
+                // if we do that, then we'd need to propogate permissions all the way downward which might not be ideal for many people.
+                // Gonna just leave it as is for now, and not re-propogate permissions.
             }
 
             var factory = new ContentFactory(NodeObjectTypeId, entity.Id);
