@@ -35,44 +35,40 @@ function treeService($q, treeResource, iconHelper) {
             var cacheKey = options.cachekey || '';
             cacheKey += "_" + section;	
 
-            var deferred = $q.defer();
-
             //return the cache if it exists
             if (treeArray[cacheKey] !== undefined){
                 return treeArray[cacheKey];
             }
-
-            treeResource.loadApplication(options)
-            .then(function (data) {
-                //this will be called once the tree app data has loaded
-                var result = {
-                    name: section,
-                    alias: section,
-                    children: data
-                };
-                //ensure the view is added to each tree node
-                ensureLevelAndView(result.children, section);
-                //cache this result
-                //TODO: We'll need to un-cache this in many circumstances
-                treeArray[cacheKey] = result;
-                //return the data result as promised
-                deferred.resolve(treeArray[cacheKey]);
-            }, function (reason) {
-                //bubble up the rejection
-                deferred.reject(reason);
-                return;
-            });
-
-            return deferred.promise;
+             
+            return treeResource.loadApplication(options)
+                .then(function(data) {
+                    //this will be called once the tree app data has loaded
+                    var result = {
+                        name: section,
+                        alias: section,
+                        children: data
+                    };
+                    //ensure the view is added to each tree node
+                    ensureLevelAndView(result.children, section);
+                    //cache this result
+                    //TODO: We'll need to un-cache this in many circumstances
+                    treeArray[cacheKey] = result;
+                    //return the data result as promised
+                    //deferred.resolve(treeArray[cacheKey]);
+                    return treeArray[cacheKey];
+                });
         },
 
         getActions: function(treeItem, section) {
 
-            //need to convert the icons to new ones
-            for (var i = 0; i < treeItem.node.menu.length; i++) {
-                treeItem.node.menu[i].cssclass = iconHelper.convertFromLegacyIcon(treeItem.node.menu[i].cssclass);
-            }
-            return treeItem.node.menu;            
+            return treeResource.loadMenu(treeItem.node)
+                .then(function(data) {
+                    //need to convert the icons to new ones
+                    for (var i = 0; i < data.length; i++) {
+                        data[i].cssclass = iconHelper.convertFromLegacyIcon(data[i].cssclass);
+                    }
+                    return data;
+                });
         },	
         
         getChildren: function (options) {
@@ -97,20 +93,12 @@ function treeService($q, treeResource, iconHelper) {
                 throw "No node defined";
             }
 
-            var deferred = $q.defer();
-	
-            treeResource.loadNodes( {section: section, node:treeItem} )
-            .then(function (data) {
-                //now that we have the data, we need to add the level property to each item and the view
-                ensureLevelAndView(data, section, treeItem.level + 1);
-                deferred.resolve(data);
-            }, function (reason) {
-                //bubble up the rejection
-                deferred.reject(reason);
-                return;
-            });
-
-            return deferred.promise;
+            return treeResource.loadNodes({ section: section, node: treeItem })
+                .then(function(data) {
+                    //now that we have the data, we need to add the level property to each item and the view
+                    ensureLevelAndView(data, section, treeItem.level + 1);
+                    return data;
+                });
         }
     };
 }

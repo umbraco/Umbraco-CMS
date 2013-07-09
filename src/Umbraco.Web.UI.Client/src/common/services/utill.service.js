@@ -8,9 +8,34 @@
  * @description
  * Some angular helper/extension methods
  */
-function angularHelper($log) {
+function angularHelper($log, $q) {
     return {
         
+        resourcePromise: function (httpPromise, errorMsg) {
+            var deferred = $q.defer();
+            
+            httpPromise.success(function (data, status, headers, config) {
+
+                //when it's successful, just return the data
+                deferred.resolve(data);
+                
+            }).error(function(data, status, headers, config) {
+                
+                //when there's an erorr...
+                // TODO: Deal with the error in a global way
+                
+                //return an error object including the error message for UI
+                deferred.reject({
+                    errorMsg: errorMsg,
+                    data: data
+                });
+
+            });
+
+            return deferred.promise;
+
+        },
+
         /**
          * @ngdoc function
          * @name safeApply

@@ -90,9 +90,6 @@ angular.module("umbraco.directives")
                   //  $(arrow).parent().remove(loader);
                     node.loading = false;
                     notificationsService.error(reason);
-                    
-                    //alert(reason);
-                    return;
                 });
             }   
         };

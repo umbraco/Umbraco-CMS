@@ -59,6 +59,14 @@ namespace Umbraco.Web.Trees
         /// </remarks>
         protected abstract TreeNodeCollection GetTreeData(string id, FormDataCollection queryStrings);
 
+        /// <summary>
+        /// Returns the menu structure for the node
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        protected abstract MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings);
+
         ///// <summary>
         ///// Returns the root node for the tree
         ///// </summary>
@@ -92,19 +100,44 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
+        /// The action called to render the menu for a tree node
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        [HttpQueryStringFilter("queryStrings")]
+        public MenuItemCollection GetMenu(string id, FormDataCollection queryStrings)
+        {
+            if (queryStrings == null) queryStrings = new FormDataCollection("");
+
+            return GetMenuForNode(id, queryStrings);
+        }
+
+        /// <summary>
         /// Helper method to create a root model for a tree
         /// </summary>
         /// <returns></returns>
         protected virtual TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
+            var rootNodeAsString = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
+
             var getChildNodesUrl = Url.GetTreeUrl(
-                GetType(), 
-                Constants.System.Root.ToString(CultureInfo.InvariantCulture), 
+                GetType(),
+                rootNodeAsString, 
+                queryStrings);
+
+            var getMenuUrl = Url.GetTreeUrl(
+                GetType(),
+                rootNodeAsString,
                 queryStrings);
 
             var isDialog = queryStrings.GetValue<bool>(TreeQueryStringParameters.DialogMode);
+
             //var node = new TreeNode(RootNodeId, BackOfficeRequestContext.RegisteredComponents.MenuItems, jsonUrl)
-            var node = new TreeNode(Constants.System.Root.ToString(CultureInfo.InvariantCulture), getChildNodesUrl)
+            var node = new TreeNode(
+                rootNodeAsString, 
+                getChildNodesUrl,
+                getMenuUrl)
                 {
                     HasChildren = true,
 
