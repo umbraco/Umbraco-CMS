@@ -9,7 +9,7 @@
  * 
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope,$rootScope, $location, navigationService, dialogService, historyService, sectionResource) {
+function NavigationController($scope,$rootScope, $location, navigationService, dialogService, historyService, sectionResource, angularHelper) {
 
     var actionDialog = null;
 
@@ -42,7 +42,7 @@ function NavigationController($scope,$rootScope, $location, navigationService, d
     $rootScope.$on("closeDialogs", function (event) {
         if (navigationService.ui.stickyNavigation && (!event.target || $(event.target).parents(".umb-modalcolumn").size() == 0)) {
            navigationService.hideNavigation();
-           $scope.$apply();
+            angularHelper.safeApply($scope);
         }
     });
     

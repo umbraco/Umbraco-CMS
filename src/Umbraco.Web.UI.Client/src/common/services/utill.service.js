@@ -117,10 +117,17 @@ function angularHelper($log, $q) {
          */
         safeApply: function (scope, fn) {
             if (scope.$$phase || scope.$root.$$phase) {
-                fn();
+                if (angular.isFunction(fn)) {
+                    fn();
+                }
             }
             else {
-                scope.$apply(fn);
+                if (angular.isFunction(fn)) {
+                    scope.$apply(fn);
+                }
+                else {
+                    scope.$apply();
+                }
             }
         },
         
