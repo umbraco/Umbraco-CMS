@@ -1,7 +1,8 @@
 describe('content type factory tests', function () {
     var $rootScope, $httpBackend, contentTypeResource, m;
 
-   // beforeEach(module('ngMockE2E'));
+    // beforeEach(module('ngMockE2E'));
+    beforeEach(module('umbraco.services'));
     beforeEach(module('umbraco.resources'));
     beforeEach(module('umbraco.mocks'));
     

@@ -12,6 +12,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "id")]
         public int Id { get; set; }
 
+        [DataMember(Name = "active")]
+        public bool IsActive { get; set; }
+
         [DataMember(Name = "label")]
         public string Label { get; set; }
 

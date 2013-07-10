@@ -3,7 +3,7 @@
     * @name umbraco.resources.contentResource
     * @description Loads/saves in data for content
     **/
-function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
+function contentResource($q, $http, umbDataFormatter, umbRequestHelper, angularHelper) {
 
     /** internal method to get the api url */
     function getContentUrl(contentId) {
@@ -32,89 +32,28 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     return {
         getById: function (id) {
-
-            return  $http.get(getContentUrl(id))  
-                .then(function(response) {
-
-                    _.each(response.data.tabs, function (item) {
-                        item.active = false;
-                    });
-                    if (response.data.tabs.length > 0){
-                        response.data.tabs[0].active = true;
-                    }    
-
-                    return response.data;
-                },function(response) {
-                    throw new Error('Failed to retreive data for content id ' + id);
-                });    
-
-               /* 
-
-            var deferred = $q.defer();
-
-            
-            //go and get the data
-            $http.get(getContentUrl(id)).
-                success(function (data, status, headers, config) {
-                    //set the first tab to active
-                    _.each(data.tabs, function (item) {
-                        item.active = false;
-                    });
-                    if (data.tabs.length > 0){
-                        data.tabs[0].active = true;
-                    }
-
-                    deferred.resolve(data);
-                }).
-                error(function (data, status, headers, config) {
-                    deferred.reject('Failed to retreive data for content id ' + id);
-                });
-
-            return deferred.promise;*/
+            return angularHelper.resourcePromise(
+                $http.get(getContentUrl(id)),
+                'Failed to retreive data for content id ' + id);
         },
         
         getByIds: function (ids) {
-            var deferred = $q.defer();
-
-            //go and get the data
-            $http.get(getByIdsUrl(ids)).
-                success(function (data, status, headers, config) {                    
-                    deferred.resolve(data);
-                }).
-                error(function (data, status, headers, config) {
-                    deferred.reject('Failed to retreive data for content ids ' + ids);
-                });
-
-            return deferred.promise;
+            return angularHelper.resourcePromise(
+                $http.get(getByIdsUrl(ids)),
+                'Failed to retreive data for content ids ' + ids);
         },
 
         /** returns an empty content object which can be persistent on the content service
             requires the parent id and the alias of the content type to base the scaffold on */
         getScaffold: function (parentId, alias) {
-
-            var deferred = $q.defer();
-
-            //go and get the data
-            $http.get(getEmptyContentUrl(alias, parentId)).
-                success(function (data, status, headers, config) {
-                    //set the first tab to active
-                    _.each(data.tabs, function (item) {
-                        item.active = false;
-                    });
-                    if (data.tabs.length > 0){
-                        data.tabs[0].active = true;
-                    }
-
-                    deferred.resolve(data);
-                }).
-                error(function (data, status, headers, config) {
-                    deferred.reject('Failed to retreive data for empty content item type ' + alias);
-                });
-
-            return deferred.promise;
+            return angularHelper.resourcePromise(
+                $http.get(getEmptyContentUrl(alias, parentId)),
+                'Failed to retreive data for empty content item type ' + alias);
         },
 
         getChildren: function (parentId, options) {
+
+            //TODO: Make this real
 
             if (options === undefined) {
                 options = {

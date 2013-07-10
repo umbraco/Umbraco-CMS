@@ -324,10 +324,11 @@ angular.module('umbraco.services').factory('umbImageHelper', umbImageHelper);
 * @name umbraco.services:umbRequestHelper
 * @description A helper object used for sending requests to the server
 **/
-function umbRequestHelper($http, $q, umbDataFormatter) {
+function umbRequestHelper($http, $q, umbDataFormatter, angularHelper) {
     return {
         
         postSaveContent: function (restApiUrl, content, action, files) {
+            
             var deferred = $q.defer();
 
             //save the active tab id so we can set it when the data is returned.

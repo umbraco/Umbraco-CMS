@@ -58,7 +58,8 @@ namespace Umbraco.Web.Models.Mapping
                             Id = propertyGroup.Id,
                             Alias = propertyGroup.Name,
                             Label = propertyGroup.Name,
-                            Properties = displayProperties
+                            Properties = displayProperties,
+                            IsActive = false
                         };
                 }).ToList();
 
@@ -73,6 +74,9 @@ namespace Umbraco.Web.Models.Mapping
                     Alias = "Generic properties",
                     Properties = orphanProperties.Select(ToContentPropertyDisplay).ToArray()
                 });
+
+            //set the first tab to active
+            tabs.First().IsActive = true;
 
             return tabs;
         }

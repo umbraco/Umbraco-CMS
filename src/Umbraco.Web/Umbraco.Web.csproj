@@ -1915,7 +1915,9 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\empty.htm" />
     <Content Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\insertMasterpagePlaceholder.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\republish.aspx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\republish.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\search.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx" />
     <Content Include="umbraco.presentation\umbraco\create\script.ascx">
