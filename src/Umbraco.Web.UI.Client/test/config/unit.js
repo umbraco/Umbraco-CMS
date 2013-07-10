@@ -8,6 +8,7 @@ files = [
 
   'lib/jquery/jquery-1.8.2.min.js',
   'lib/angular/angular.min.js',
+    'lib/angular/angular-cookies.min.js',
   'test/lib/angular/angular-mocks.js',
   'lib/umbraco/Extensions.js',
   'src/app_dev.js', 

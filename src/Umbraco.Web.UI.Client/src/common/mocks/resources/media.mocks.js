@@ -3,6 +3,11 @@ angular.module('umbraco.mocks').
       'use strict';
       
       function returnNodebyId(status, data, headers) {
+
+          if (!mocksUtills.checkAuth()) {
+              return [401, null, null];
+          }
+
           var id = mocksUtills.getParameterByName(data, "id") || 1234;
           
           var node = {
@@ -81,12 +86,12 @@ angular.module('umbraco.mocks').
       return {
           register: function() {
             $httpBackend
-	            .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoApi/Content/GetById'))
+	            .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoApi/Media/GetById'))
 		          .respond(returnNodebyId);
           },
           expectGetById: function() {
             $httpBackend
-              .expectGET(mocksUtills.urlRegex('/umbraco/UmbracoApi/Content/GetById'));
+              .expectGET(mocksUtills.urlRegex('/umbraco/UmbracoApi/Media/GetById'));
           }
       };
   }]);

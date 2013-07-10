@@ -33,19 +33,7 @@ function authResource($q, $http, angularHelper) {
             
             return angularHelper.resourcePromise(
                 $http.get(getIsAuthUrl()),
-                {
-                    success: function (data, status, headers, config) {
-                        //204 - means the current user is not-authorized, the result was empty.
-                        if (status === 204) {
-                            //if it's unauthorized it just means we are not authenticated so we'll just return null
-                            return null;
-                        }
-                        else {
-                            return data;
-                        }
-                    },
-                    errorMsg: 'Server call failed for checking authorization'
-                });
+                'Server call failed for checking authorization');
         }
     };
 }

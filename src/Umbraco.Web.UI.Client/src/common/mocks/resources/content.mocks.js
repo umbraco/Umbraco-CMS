@@ -3,6 +3,11 @@ angular.module('umbraco.mocks').
       'use strict';
       
       function returnEmptyNode(status, data, headers) {
+
+          if (!mocksUtills.checkAuth()) {
+              return [401, null, null];
+          }
+
           var response = returnNodebyId(200, "", null);
           var node = response[1];
           var parentId = mocksUtills.getParameterByName(data, "parentId") || 1234;
@@ -21,6 +26,11 @@ angular.module('umbraco.mocks').
       }
 
       function returnNodebyId(status, data, headers) {
+
+          if (!mocksUtills.checkAuth()) {
+              return [401, null, null];
+          }
+
           var id = mocksUtills.getParameterByName(data, "id") || "1234";
           id = parseInt(id, 10);
 

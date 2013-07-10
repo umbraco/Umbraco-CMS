@@ -4,6 +4,10 @@ angular.module('umbraco.mocks').
       
       function getMenuItems() {
 
+          if (!mocksUtills.checkAuth()) {
+              return [401, null, null];
+          }
+
           var menu = [
               { name: "Create", cssclass: "plus", alias: "create" },
 
@@ -30,6 +34,10 @@ angular.module('umbraco.mocks').
 
       function returnChildren(status, data, headers) {
           
+          if (!mocksUtills.checkAuth()) {
+              return [401, null, null];
+          }
+
           var id = mocksUtills.getParameterByName(data, "id");
           var section = mocksUtills.getParameterByName(data, "treeType");
           var level = mocksUtills.getParameterByName(data, "level")+1;
@@ -54,6 +62,11 @@ angular.module('umbraco.mocks').
       }
 
       function returnApplicationTrees(status, data, headers) {
+
+          if (!mocksUtills.checkAuth()) {
+              return [401, null, null];
+          }
+
           var section = mocksUtills.getParameterByName(data, "application");
           var url = "/umbraco/UmbracoTrees/ApplicationTreeApi/GetChildren?treeType=" + section + "&id=1234&level=1";
           var menuUrl = "/umbraco/UmbracoTrees/ApplicationTreeApi/GetMenu?treeType=" + section + "&id=1234&parentId=456";

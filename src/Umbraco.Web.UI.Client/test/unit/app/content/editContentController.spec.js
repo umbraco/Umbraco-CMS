@@ -5,7 +5,11 @@ describe('edit content controller tests', function () {
     beforeEach(module('umbraco'));
 
     //inject the contentMocks service
-    beforeEach(inject(function ($rootScope, $controller, angularHelper, $httpBackend, contentMocks) {
+    beforeEach(inject(function ($rootScope, $controller, angularHelper, $httpBackend, contentMocks, mocksUtills) {
+
+        //for these tests we don't want any authorization to occur
+        mocksUtills.disableAuth();
+
         httpBackend = $httpBackend;
         scope = $rootScope.$new();
         

@@ -1,7 +1,7 @@
 ﻿[
     'lib/jquery/jquery-1.8.2.min.js',
-    'lib/jquery/jquery.cookie.js',
     'lib/angular/angular.min.js',
+    'lib/angular/angular-cookies.min.js',
     'lib/bootstrap/js/bootstrap.js',
     'lib/underscore/underscore.js',
     'lib/umbraco/Extensions.js',

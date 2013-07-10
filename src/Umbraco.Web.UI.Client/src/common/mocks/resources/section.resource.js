@@ -7,6 +7,11 @@ function sectionMocks($httpBackend, mocksUtills) {
 
     /** internal method to mock the sections to be returned */
     function getSections() {
+        
+        if (!mocksUtills.checkAuth()) {
+            return [401, null, null];
+        }
+
         var sections = [
             { name: "Content", cssclass: "traycontent", alias: "content" },
             { name: "Media", cssclass: "traymedia", alias: "media" },

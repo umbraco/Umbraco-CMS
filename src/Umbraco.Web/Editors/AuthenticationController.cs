@@ -43,11 +43,9 @@ namespace Umbraco.Web.Editors
                     Services.UserService.GetUserById(
                         UmbracoContext.Security.GetUserId(UmbracoContext.Security.UmbracoUserContextId));
                 return _userModelMapper.ToUserDetail(user);
-            }            
+            }
 
-            //don't return not-authorized because this method is here to check if the current user is authorized.
-            // if they are not, then we just return no content.
-            throw new HttpResponseException(HttpStatusCode.NoContent);
+            throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
 
         public UserDetail PostLogin(string username, string password)

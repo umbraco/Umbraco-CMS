@@ -1,1 +1,1 @@
-﻿angular.module("umbraco.mocks", []);
+﻿angular.module("umbraco.mocks", ['ngCookies']);

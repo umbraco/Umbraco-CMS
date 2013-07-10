@@ -24,8 +24,6 @@ angular.module('umbraco.services')
     var currentNode;
     var ui = {};
 
-    var _sections = sectionResource.getSections();
-
     function setMode(mode) {
         switch (mode) {
             case 'tree':
@@ -69,8 +67,7 @@ angular.module('umbraco.services')
         currentNode: currentNode,
         mode: "default",
         ui: ui,
-        sections: _sections,
-
+        
         /**
          * @ngdoc method
          * @name umbraco.services.navigationService#load
