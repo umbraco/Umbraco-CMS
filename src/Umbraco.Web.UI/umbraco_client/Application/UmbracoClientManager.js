@@ -102,7 +102,9 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     self.mainWindow().UmbClientMgr.contentFrame(rightFrameUrl);
                 }, 200);
             },
-            contentFrame: function(strLocation) {
+            contentFrame: function (strLocation) {
+
+                alert(strLocation);
                 /// <summary>
                 /// This will return the reference to the right content frame if strLocation is null or empty,
                 /// or set the right content frames location to the one specified by strLocation.

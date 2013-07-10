@@ -32,11 +32,7 @@ function MainController($scope, $routeParams, $rootScope, $timeout, notification
         var pEl = event.target.parentElement.nodeName;
 
         if(el != "I" && el != "A" && el != "BUTTON" && pEl != "A" && pEl != "BUTTON"){
-            $rootScope.$emit("closeDialogs");
-        }
-
-        if (navigationService.ui.stickyNavigation && $(event.target).parents(".umb-modalcolumn").size() == 0) {
-            navigationService.hideNavigation();
+            $rootScope.$emit("closeDialogs", event);
         }
     };
 

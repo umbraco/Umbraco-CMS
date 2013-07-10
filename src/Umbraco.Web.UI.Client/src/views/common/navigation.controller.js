@@ -9,7 +9,7 @@
  * 
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope, $location, navigationService, historyService, sectionResource) {
+function NavigationController($scope,$rootScope, $location, navigationService, historyService, sectionResource) {
     //load navigation service handlers
     $scope.changeSection = navigationService.changeSection;
     $scope.showTree = navigationService.showTree;
@@ -35,6 +35,13 @@ function NavigationController($scope, $location, navigationService, historyServi
             alert(reason);
         });
 
+    //This reacts to clicks passed to the body element which emits a global call to close all dialogs
+    $rootScope.$on("closeDialogs", function (event) {
+        if (navigationService.ui.stickyNavigation && (!event.target || $(event.target).parents(".umb-modalcolumn").size() == 0)) {
+           navigationService.hideNavigation();
+           $scope.$apply();
+        }
+    });
     
     //this reacts to the options item in the tree
     $scope.ui.tree.bind("treeOptionsClick", function (ev, args) {

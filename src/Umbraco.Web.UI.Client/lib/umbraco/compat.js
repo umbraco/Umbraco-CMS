@@ -14,7 +14,7 @@
             var el = event.target.nodeName;
             var pEl = event.target.parentElement.nodeName;
 
-            if (el != "A" && el != "BUTTON" && pEl != "A" && pEl != "BUTTON") {
+            if (el != "INPUT" && el != "A" && el != "BUTTON" && pEl != "A" && pEl != "BUTTON") {
                 UmbClientMgr.closeModalWindow(undefined);
             }
         });

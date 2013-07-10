@@ -46,7 +46,7 @@ namespace umbraco.BasePages
 			public static string RefreshAdmin { get { return "setTimeout('" + GetMainWindow + ".location.reload()', {0});"; } }
 			public static string ShowSpeechBubble { get { return GetMainWindow + ".UmbSpeechBubble.ShowMessage('{0}','{1}', '{2}');"; } }
 			public static string ChangeContentFrameUrl(string url) {
-				return string.Format(ClientMgrScript + ".contentFrame('{0}');", url);
+				return string.Format("alert('sdsd'); " + ClientMgrScript + ".contentFrame('{0}');", url);
 			}
 			public static string ChildNodeCreated = GetMainTree + ".childNodeCreated();";
 			public static string SyncTree { get { return GetMainTree + ".syncTree('{0}', {1});"; } }
@@ -180,7 +180,7 @@ namespace umbraco.BasePages
 		/// <returns></returns>
 		public ClientTools ChildNodeCreated()
 		{
-			RegisterClientScript(Scripts.ChildNodeCreated);
+			//RegisterClientScript(Scripts.ChildNodeCreated);
 			return this;
 		}		
 
@@ -214,7 +214,7 @@ namespace umbraco.BasePages
 		/// </example>
 		public ClientTools SyncTree(string path, bool forceReload)
 		{
-			RegisterClientScript(string.Format(Scripts.SyncTree, path, forceReload.ToString().ToLower()));
+			//RegisterClientScript(string.Format(Scripts.SyncTree, path, forceReload.ToString().ToLower()));
 			return this;
 		}
 

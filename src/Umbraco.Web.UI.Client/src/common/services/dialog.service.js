@@ -34,13 +34,19 @@ angular.module('umbraco.services')
        $rootScope.$on("closeDialogs", function () {
            for (var i = 0; i < _dialogs.length; i++) {
                var dialog = _dialogs[i];
-
-               dialog.modal("hide");
-               dialog.remove();
-               $("#" + dialog.attr("id")).remove();
+               removeDialog(dialog);
                _dialogs.splice(i, 1);
            }
        });
+
+       function removeDialog(dialog) {
+           dialog.modal("hide");
+
+           $timeout(function () {
+               dialog.remove();
+               //$("#" + dialog.attr("id")).remove();
+           }, 250);
+       }
 
        //internal method that handles opening all dialogs
        function _open(options) {
@@ -52,20 +58,23 @@ angular.module('umbraco.services')
                container = options.container || $("body"),
                animationClass = options.animation || "fade",
                modalClass = options.modalClass || "umb-modal",
+               width = options.width || "100%";
                templateUrl = options.template || "views/common/notfound.html";
 
            //if a callback is available
            var callback = options.callback;
 
            //Modal dom obj and unique id
-           var $modal = $('<div class="hide" data-backdrop="false"></div>');
-           var id = templateUrl.replace('.html', '').replace(/[\/|\.|:]/g, "-") + '-' + scope.$id;
+           var $modal = $('<div data-backdrop="false"></div>');
+           var id = templateUrl.replace('.html', '').replace('.aspx', '').replace(/[\/|\.|:\&\?\=]/g, "-") + '-' + scope.$id;
+
 
            if(options.inline){
               animationClass = "";
               modalClass = "";
            }else{
-            $modal.addClass("modal");
+               $modal.addClass("modal");
+               $modal.addClass("hide");
            }
 
            //set the id and add classes
@@ -73,8 +82,6 @@ angular.module('umbraco.services')
                .attr('id', id)
                .addClass(animationClass)
                .addClass(modalClass);
-
-           
 
            //push the modal into the global modal collection
            _dialogs.push($modal);
@@ -86,6 +93,11 @@ angular.module('umbraco.services')
                $modal.html(html);
                //append to body or whatever element is passed in as options.containerElement
                container.append($modal);
+
+               // Compile modal content
+               $timeout(function () {
+                   $compile($modal)(scope);
+               });
 
                if (width) {
                    $modal.css("width", width);
