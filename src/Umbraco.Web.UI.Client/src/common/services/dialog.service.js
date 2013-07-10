@@ -58,14 +58,23 @@ angular.module('umbraco.services')
            var callback = options.callback;
 
            //Modal dom obj and unique id
-           var $modal = $('<div class="modal hide" data-backdrop="false" tabindex="-1"></div>');
+           var $modal = $('<div class="hide" data-backdrop="false"></div>');
            var id = templateUrl.replace('.html', '').replace(/[\/|\.|:]/g, "-") + '-' + scope.$id;
+
+           if(options.inline){
+              animationClass = "";
+              modalClass = "";
+           }else{
+            $modal.addClass("modal");
+           }
 
            //set the id and add classes
            $modal
                .attr('id', id)
                .addClass(animationClass)
                .addClass(modalClass);
+
+           
 
            //push the modal into the global modal collection
            _dialogs.push($modal);

@@ -239,6 +239,8 @@ angular.module('umbraco.services')
 			{
 			    container: $("#dialog div.umb-panel-body"),
 			    scope: scope,
+                inline: true,
+                show: true,
 			    template: templateUrl
 			});
         },

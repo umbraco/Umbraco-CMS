@@ -38,6 +38,9 @@ function NavigationController($scope, $location, navigationService, historyServi
     
     //this reacts to the options item in the tree
     $scope.ui.tree.bind("treeOptionsClick", function (ev, args) {
+        ev.stopPropagation();
+        ev.preventDefault();
+        
         $scope.currentNode = args.node;
         args.scope = $scope;
         navigationService.showMenu(ev, args);
