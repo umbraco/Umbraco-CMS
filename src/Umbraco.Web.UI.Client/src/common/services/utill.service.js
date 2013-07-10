@@ -62,27 +62,26 @@ function angularHelper($log, $q) {
                 //when it's successful, just return the data
                 return data;
             }
-            
+
             /** The default error callback used if one is not supplied in the opts */
             function defaultError(data, status, headers, config) {
                 return {
-                    errorMsg: (opts.errorMsg ? opts.errorMsg : 'An error occurred!'),
+                    //NOTE: the default error message here should never be used based on the above docs!
+                    errorMsg: (angular.isString(opts) ? opts : 'An error occurred!'),
                     data: data
                 };
             }
 
-            //set the callbacks to the defaults if there aren't any
-            if (!opts.success) {
-                opts.success = defaultSuccess;
-            }
-            if (!opts.error) {
-                opts.error = defaultError;
-            }
-
+            //create the callbacs based on whats been passed in.
+            var callbacks = {                
+                success: (!opts.success ? defaultSuccess : opts.success),
+                error: (!opts.error ? defaultError : opts.error)
+            };
+            
             httpPromise.success(function (data, status, headers, config) {
 
                 //invoke the callback 
-                var result = opts.success.apply(this, [data, status, headers, config]);
+                var result = callbacks.success.apply(this, [data, status, headers, config]);
 
                 //when it's successful, just return the data
                 deferred.resolve(result);
@@ -90,7 +89,7 @@ function angularHelper($log, $q) {
             }).error(function(data, status, headers, config) {
                 
                 //invoke the callback
-                var result = opts.error.apply(this, [data, status, headers, config]);
+                var result = callbacks.error.apply(this, [data, status, headers, config]);
 
                 //when there's an erorr...
                 // TODO: Deal with the error in a global way
