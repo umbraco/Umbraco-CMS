@@ -3,7 +3,7 @@
     * @name umbraco.resources.section     
     * @description Loads in data for section
     **/
-function sectionResource($q, $http) {
+function sectionResource($q, $http, angularHelper) {
 
     /** internal method to get the tree app url */
     function getSectionsUrl(section) {
@@ -13,13 +13,11 @@ function sectionResource($q, $http) {
     //the factory object returned
     return {
         /** Loads in the data to display the section list */
-        getSections: function (options) {
-            return $http.get(getSectionsUrl())
-                .then(function (response) {
-                    return response.data;
-                }, function (response) {
-                    throw new Error('Failed to retreive data for content id ' + id);
-                });
+        getSections: function () {
+            
+            return angularHelper.resourcePromise(
+                $http.get(getSectionsUrl()),
+                'Failed to retreive data for sections');
 		}
     };
 }
