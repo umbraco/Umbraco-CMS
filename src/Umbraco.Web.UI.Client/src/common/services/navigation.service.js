@@ -235,12 +235,21 @@ angular.module('umbraco.services')
             this.ui.dialogTitle = args.action.name;
 
             var templateUrl = "views/" + this.ui.currentTree + "/" + args.action.alias + ".html";
+            var iframe = false;
+
+            ///TODO: fix hardcoded hack, this is to support legacy create dialogs
+            if(args.action.alias === "create" && this.ui.currentTree !== "content" && this.ui.currentTree !== "media"){
+                templateUrl = "create.aspx?nodeId=" + args.node.id + "&nodeType=" + args.node.nodetype + "&nodeName=" + args.node.name + "&rnd=73.8&rndo=75.1";
+                iframe = true;
+            }
+
             var d = dialogService.open(
 			{
 			    container: $("#dialog div.umb-panel-body"),
 			    scope: scope,
                 inline: true,
                 show: true,
+                iframe: iframe,
 			    template: templateUrl
 			});
         },

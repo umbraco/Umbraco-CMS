@@ -22,10 +22,9 @@
                 legacyJsLoader.loadLegacyTreeJs($scope).then(
                     function(result) {
                         //TODO: We could wait for this to load before running the UI ?
-                    });
-                
-                $scope.submit(data);
 
+                        $scope.submit(data);
+                    });
             }, function (reason) {
                 alert(reason);
             });
