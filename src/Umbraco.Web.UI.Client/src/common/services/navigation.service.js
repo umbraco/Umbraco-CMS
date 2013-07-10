@@ -17,7 +17,7 @@
  */
 
 angular.module('umbraco.services')
-.factory('navigationService', function ($rootScope, $routeParams, $log, $location, dialogService, treeService, sectionResource) {
+.factory('navigationService', function ($rootScope, $routeParams, $log, $location, $q, dialogService, treeService, sectionResource) {
 
     var currentSection = $routeParams.section;
     var currentId = $routeParams.id;
@@ -203,7 +203,7 @@ angular.module('umbraco.services')
          * template is located in views/common/dialogs/user.html
          */
         showUserDialog: function () {
-            var d = dialogService.open(
+            return dialogService.open(
                 {
                     template: "views/common/dialogs/user.html",
                     modalClass: "umb-modal-left",
@@ -243,15 +243,15 @@ angular.module('umbraco.services')
                 iframe = true;
             }
 
-            var d = dialogService.open(
-			{
-			    container: $("#dialog div.umb-panel-body"),
-			    scope: scope,
-                inline: true,
-                show: true,
-                iframe: iframe,
-			    template: templateUrl
-			});
+            return dialogService.open(
+                {
+                    container: $("#dialog div.umb-panel-body"),
+                    scope: scope,
+                    inline: true,
+                    show: true,
+                    iframe: iframe,
+                    template: templateUrl
+                });
         },
 
         /**

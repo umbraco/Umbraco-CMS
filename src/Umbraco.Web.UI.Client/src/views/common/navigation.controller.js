@@ -9,7 +9,10 @@
  * 
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope,$rootScope, $location, navigationService, historyService, sectionResource) {
+function NavigationController($scope,$rootScope, $location, navigationService, dialogService, historyService, sectionResource) {
+
+    var actionDialog = null;
+
     //load navigation service handlers
     $scope.changeSection = navigationService.changeSection;
     $scope.showTree = navigationService.showTree;
@@ -90,7 +93,13 @@ function NavigationController($scope,$rootScope, $location, navigationService, h
     });
 
     $scope.openDialog = function (currentNode, action, currentSection) {
-        navigationService.showDialog({
+
+        //ensure the actionDialog is cleared before opening another!
+        if (actionDialog) {
+            dialogService.close(actionDialog);
+        }
+
+        actionDialog = navigationService.showDialog({
             scope: $scope,
             node: currentNode,
             action: action,
