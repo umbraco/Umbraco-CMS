@@ -64,6 +64,13 @@ namespace Umbraco.Web.Trees
         public string Icon { get; set; }
 
         /// <summary>
+        /// The tree nodetype which refers to the type of node rendered in the tree
+        /// </summary>
+        [DataMember(Name = "nodetype")]
+        public string NodeType { get; set; }
+
+
+        /// <summary>
         /// Returns true if the icon represents a CSS class instead of a file path
         /// </summary>
         [DataMember(Name = "iconIsClass")]

@@ -101,7 +101,9 @@ namespace Umbraco.Web.Trees
             {
                 HasChildren = xmlTreeNode.HasChildren,
                 Icon = xmlTreeNode.Icon,
-                Title = xmlTreeNode.Text                
+                Title = xmlTreeNode.Text,
+                NodeType = xmlTreeNode.NodeType
+                
             };
 
             //This is a special case scenario, we know that content/media works based on the normal Belle routing/editing so we'll ensure we don't
