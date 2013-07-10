@@ -1,15 +1,13 @@
 /* contains random bits and pieces we neede to make the U6 UI behave */
 
-Umbraco.Sys.registerNamespace("Umbraco.Application.LegacyHelper");
-
 (function ($) {
     
 
     $(document).ready(function () {
-        Umbraco.Application.LegacyHelper.scaleScrollables("body");
+        scaleScrollables("body");
 
         $(window).bind("resize", function () {
-            Umbraco.Application.LegacyHelper.scaleScrollables("body");
+            scaleScrollables("body");
         });
 
         $("body").click(function (event) {
@@ -22,21 +20,17 @@ Umbraco.Sys.registerNamespace("Umbraco.Application.LegacyHelper");
         });
     });     
 
-    /** Static helper class  */
-    Umbraco.Application.LegacyHelper = {
+    function scaleScrollables(selector) {
+        $(".umb-scrollable").each(function() {
+            var el = jQuery(this);
+            var totalOffset = 0;
+            var offsety = el.data("offset-y");
 
-        scaleScrollables: function (selector) {
-            $(".umb-scrollable").each(function() {
-                var el = jQuery(this);
-                var totalOffset = 0;
-                var offsety = el.data("offset-y");
+            if (offsety != undefined)
+                totalOffset += offsety;
 
-                if (offsety != undefined)
-                    totalOffset += offsety;
-
-                el.height($(window).height() - (el.offset().top + totalOffset));
-            });
-        }
-    };
+            el.height($(window).height() - (el.offset().top + totalOffset));
+        });
+    }
     
 })(jQuery);

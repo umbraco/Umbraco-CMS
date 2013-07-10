@@ -3,11 +3,11 @@
 
 /**
  * @ngdoc function
- * @name umbraco.services.angularHelper
+ * @name umbraco.services.legacyJsLoader
  * @function
  *
  * @description
- * Some angular helper/extension methods
+ * Used to lazy load in any JS dependencies that need to be manually loaded in
  */
 function legacyJsLoader(scriptLoader) {
     return {
@@ -33,23 +33,72 @@ angular.module('umbraco.services').factory('legacyJsLoader', legacyJsLoader);
 function angularHelper($log, $q) {
     return {
         
-        resourcePromise: function (httpPromise, errorMsg) {
+        /**
+         * @ngdoc function
+         * @name resourcePromise
+         * methodOf umbraco.services.angularHelper
+         * @function
+         *
+         * @description
+         * This returns a promise with an underlying http call, it is a helper method to reduce
+         *  the amount of duplicate code needed to query http resources and automatically handle any 
+         *  Http errors. See /docs/source/using-promises-resources.md
+         *
+         * @param {object} opts A mixed object which can either be a string representing the error message to be
+         *   returned OR an object containing either:
+         *     { success: successCallback, errorMsg: errorMessage }
+         *          OR
+         *     { success: successCallback, error: errorCallback }
+         *   In both of the above, the successCallback must accept these parameters: data, status, headers, config
+         *   If using the errorCallback it must accept these parameters: data, status, headers, config
+         *   The success callback must return the data which will be resolved by the deferred object.
+         *   The error callback must return an object containing: {errorMsg: errorMessage, data: originalData }
+         */
+        resourcePromise: function (httpPromise, opts) {
             var deferred = $q.defer();
             
+            /** The default success callback used if one is not supplied in the opts */
+            function defaultSuccess(data, status, headers, config) {
+                //when it's successful, just return the data
+                return data;
+            }
+            
+            /** The default error callback used if one is not supplied in the opts */
+            function defaultError(data, status, headers, config) {
+                return {
+                    errorMsg: (opts.errorMsg ? opts.errorMsg : 'An error occurred!'),
+                    data: data
+                };
+            }
+
+            //set the callbacks to the defaults if there aren't any
+            if (!opts.success) {
+                opts.success = defaultSuccess;
+            }
+            if (!opts.error) {
+                opts.error = defaultError;
+            }
+
             httpPromise.success(function (data, status, headers, config) {
 
+                //invoke the callback 
+                var result = opts.success.apply(this, [data, status, headers, config]);
+
                 //when it's successful, just return the data
-                deferred.resolve(data);
+                deferred.resolve(result);
                 
             }).error(function(data, status, headers, config) {
                 
+                //invoke the callback
+                var result = opts.error.apply(this, [data, status, headers, config]);
+
                 //when there's an erorr...
                 // TODO: Deal with the error in a global way
                 
                 //return an error object including the error message for UI
                 deferred.reject({
-                    errorMsg: errorMsg,
-                    data: data
+                    errorMsg: result.errorMsg,
+                    data: result.data
                 });
 
             });
