@@ -5,7 +5,7 @@ namespace Umbraco.Core.Profiling
     /// <summary>
     /// A resolver exposing the current profiler
     /// </summary>
-    internal class ProfilerResolver : SingleObjectResolverBase<ProfilerResolver, IProfiler>
+    public class ProfilerResolver : SingleObjectResolverBase<ProfilerResolver, IProfiler>
     {
         /// <summary>
         /// Constructor
