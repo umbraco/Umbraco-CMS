@@ -30,8 +30,7 @@
         </umb-header>
 
         <umb-tab-view>
-            <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" 
-                ng-repeat="tab in content.tabs">
+            <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
                 <umb-property ng-repeat="model in tab.properties"></umb-property>
             </umb-tab>
 

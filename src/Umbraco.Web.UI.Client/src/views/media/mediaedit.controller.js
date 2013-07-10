@@ -4,12 +4,14 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
 
         mediaResource.getScaffold($routeParams.id, $routeParams.doctype)
             .then(function (data) {
+                $scope.contentLoaded = true;
                 $scope.content = data;
             });
     }
     else {
         mediaResource.getById($routeParams.id)
             .then(function (data) {
+                $scope.contentLoaded = true;
                 $scope.content = data;
             });
     }
