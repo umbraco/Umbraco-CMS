@@ -126,31 +126,59 @@ module.exports = function (grunt) {
       },
       controllers: {
         src:['src/views/**/*.controller.js'],
-        dest: '<%= distdir %>/js/umbraco.controllers.js'
+        dest: '<%= distdir %>/js/umbraco.controllers.js',
+        options: {
+            banner: "<%= banner %>\n(function() { \n\n",
+            footer: "\n\n})();"
+        }
       },
       services: {
         src:['src/common/services/*.js'],
-        dest: '<%= distdir %>/js/umbraco.services.js'
+        dest: '<%= distdir %>/js/umbraco.services.js',
+        options: {
+            banner: "<%= banner %>\n(function() { \n\n",
+            footer: "\n\n})();"
+        }
       },
       security: {
         src:['src/common/security/*.js'],
-        dest: '<%= distdir %>/js/umbraco.security.js'
+        dest: '<%= distdir %>/js/umbraco.security.js',
+        options: {
+            banner: "<%= banner %>\n(function() { \n\n",
+            footer: "\n\n})();"
+        }
       },
       resources: {
         src:['src/common/resources/*.js'],
-        dest: '<%= distdir %>/js/umbraco.resources.js'
+        dest: '<%= distdir %>/js/umbraco.resources.js',
+        options: {
+            banner: "<%= banner %>\n(function() { \n\n",
+            footer: "\n\n})();"
+        }
       },
       testing: {
         src:['src/common/mocks/resources/*.js'],
-        dest: '<%= distdir %>/js/umbraco.testing.js'
+        dest: '<%= distdir %>/js/umbraco.testing.js',
+        options: {
+            banner: "<%= banner %>\n(function() { \n\n",
+            footer: "\n\n})();"
+        }
       },
       directives: {
         src:['src/common/directives/*.js'],
-        dest: '<%= distdir %>/js/umbraco.directives.js'
+        dest: '<%= distdir %>/js/umbraco.directives.js',
+        options: {
+            banner: "<%= banner %>\n(function() { \n\n",
+            footer: "\n\n})();"
+        }
       },
       filters: {
         src:['src/common/filters/*.js'],
-        dest: '<%= distdir %>/js/umbraco.filters.js'
+        dest: '<%= distdir %>/js/umbraco.filters.js',
+        options: {
+            banner: "<%= banner %>\n(function() { \n\n",
+            footer: "\n\n})();"
+        }
       }
     },
 

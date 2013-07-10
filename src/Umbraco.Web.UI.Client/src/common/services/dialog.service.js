@@ -28,216 +28,220 @@
  */
 
 angular.module('umbraco.services')
-.factory('dialogService', ['$rootScope', '$compile', '$http', '$timeout', '$q', '$templateCache', 
-   function($rootScope, $compile, $http, $timeout, $q, $templateCache) {
-   var _dialogs = [];
-   $rootScope.$on("closeDialogs", function () {
-		for (var i = 0; i < _dialogs.length; i++) {
-			var dialog = _dialogs[i];
-			
-			dialog.modal("hide");
-			dialog.remove();
-			$("#" + dialog.attr("id")).remove();
-			_dialogs.splice(i,1);
-		}
-	});
+.factory('dialogService', ['$rootScope', '$compile', '$http', '$timeout', '$q', '$templateCache',
+   function ($rootScope, $compile, $http, $timeout, $q, $templateCache) {
+       var _dialogs = [];
+       $rootScope.$on("closeDialogs", function () {
+           for (var i = 0; i < _dialogs.length; i++) {
+               var dialog = _dialogs[i];
 
-   //internal method that handles opening all dialogs
-   function _open(options){
-		if(!options){
-			options = {};
-		}
-		//configation and defaults
-		var scope = options.scope || $rootScope.$new(),
-			container = options.container || $("body"),
-			animationClass = options.animation || "fade",
-			modalClass = options.modalClass || "umb-modal",
-			templateUrl = options.template || "views/common/notfound.html";
+               dialog.modal("hide");
+               dialog.remove();
+               $("#" + dialog.attr("id")).remove();
+               _dialogs.splice(i, 1);
+           }
+       });
 
-		//if a callback is available 	
-		var callback = options.callback;
+       //internal method that handles opening all dialogs
+       function _open(options) {
+           if (!options) {
+               options = {};
+           }
+           //configation and defaults
+           var scope = options.scope || $rootScope.$new(),
+               container = options.container || $("body"),
+               animationClass = options.animation || "fade",
+               modalClass = options.modalClass || "umb-modal",
+               templateUrl = options.template || "views/common/notfound.html";
 
-		//Modal dom obj and unique id
-		var $modal = $('<div class="modal hide" data-backdrop="false" tabindex="-1"></div>');
-		var id = templateUrl.replace('.html', '').replace(/[\/|\.|:]/g, "-") + '-' + scope.$id;
+           //if a callback is available
+           var callback = options.callback;
 
-		//set the id and add classes
-		$modal
-			.attr('id', id)
-			.addClass(animationClass)
-			.addClass(modalClass);
+           //Modal dom obj and unique id
+           var $modal = $('<div class="modal hide" data-backdrop="false" tabindex="-1"></div>');
+           var id = templateUrl.replace('.html', '').replace(/[\/|\.|:]/g, "-") + '-' + scope.$id;
 
-		//push the modal into the global modal collection
-		_dialogs.push($modal);	
+           //set the id and add classes
+           $modal
+               .attr('id', id)
+               .addClass(animationClass)
+               .addClass(modalClass);
 
-		//if iframe is enabled, inject that instead of a template
-        if(options.iframe) {
-            var html = $("<iframe auto-scale='0' src='" + templateUrl + "' style='width: 100%; height: 100%;'></iframe>");
-            
-            $modal.html(html);
-            //append to body or whatever element is passed in as options.containerElement
-            container.append($modal);
+           //push the modal into the global modal collection
+           _dialogs.push($modal);
 
-			if(width){
-				$modal.css("width", width);
-			}
+           //if iframe is enabled, inject that instead of a template
+           if (options.iframe) {
+               var html = $("<iframe auto-scale='0' src='" + templateUrl + "' style='width: 100%; height: 100%;'></iframe>");
 
-            //Autoshow	
-            if (options.show) {
-                $modal.modal('show');
-            }
+               $modal.html(html);
+               //append to body or whatever element is passed in as options.containerElement
+               container.append($modal);
 
-            return $modal;
-        } else {
-            return $q.when($templateCache.get(templateUrl) || $http.get(templateUrl, { cache: true }).then(function (res) { return res.data; }))
-					.then(function onSuccess(template) {
+               if (width) {
+                   $modal.css("width", width);
+               }
 
-					// Build modal object
-					$modal
-					    .html(template);
+               //Autoshow	
+               if (options.show) {
+                   $modal.modal('show');
+               }
 
-					//append to body or other container element	
-					container.append($modal);
+               return $modal;
+           } else {
+               return $q.when($templateCache.get(templateUrl) || $http.get(templateUrl, { cache: true }).then(function (res) { return res.data; }))
+                       .then(function onSuccess(template) {
 
-					// Compile modal content
-					$timeout(function () {
-					    $compile($modal)(scope);
-					});
+                           // Build modal object
+                           $modal
+                               .html(template);
 
-					//Scope to handle data from the modal form
-					scope.dialogData = {};
-					scope.dialogData.selection = [];
+                           //append to body or other container element	
+                           container.append($modal);
 
-					// Provide scope display functions
-					//this passes the modal to the current scope
-					scope.$modal = function (name) {
-					    $modal.modal(name);
-					};
+                           // Compile modal content
+                           $timeout(function () {
+                               $compile($modal)(scope);
+                           });
 
-					scope.hide = function () {
-					    $modal.modal('hide');
-					    
-					    $modal.remove();
-					    $("#" + $modal.attr("id")).remove();
-					};
+                           //Scope to handle data from the modal form
+                           scope.dialogData = {};
+                           scope.dialogData.selection = [];
 
-					scope.show = function () {
-						$modal.modal('show');
-					};
+                           // Provide scope display functions
+                           //this passes the modal to the current scope
+                           scope.$modal = function (name) {
+                               $modal.modal(name);
+                           };
 
-					scope.submit = function (data) {
-						if(callback){
-						callback(data);
-						}
+                           scope.hide = function () {
+                               $modal.modal('hide');
 
-						$modal.modal('hide');
+                               $modal.remove();
+                               $("#" + $modal.attr("id")).remove();
+                           };
 
-						$modal.remove();
-						$("#" + $modal.attr("id")).remove();
-					};
+                           scope.show = function () {
+                               $modal.modal('show');
+                           };
 
-					scope.select = function (item) {
-					    if (scope.dialogData.selection.indexOf(item) < 0) {
-					        scope.dialogData.selection.push(item);
-					    }
-					};
+                           scope.submit = function (data) {
+                               if (callback) {
+                                   callback(data);
+                               }
 
-					scope.dismiss = scope.hide;
+                               $modal.modal('hide');
 
-					// Emit modal events
-					angular.forEach(['show', 'shown', 'hide', 'hidden'], function (name) {
-					    $modal.on(name, function (ev) {
-					        scope.$emit('modal-' + name, ev);
-					    });
-					});
+                               $modal.remove();
+                               $("#" + $modal.attr("id")).remove();
+                           };
 
-					// Support autofocus attribute
-					$modal.on('shown', function (event) {
-					    $('input[autofocus]', $modal).first().trigger('focus');
-					});
+                           scope.select = function (item) {
+                               if (scope.dialogData.selection.indexOf(item) < 0) {
+                                   scope.dialogData.selection.push(item);
+                               }
+                           };
 
-		            //Autoshow	
-		            if (options.show) {
-		                $modal.modal('show');
-		            }
+                           scope.dismiss = scope.hide;
 
-		            //Return the modal object	
-		            return $modal;
-		        });
-        }
+                           // Emit modal events
+                           angular.forEach(['show', 'shown', 'hide', 'hidden'], function (name) {
+                               $modal.on(name, function (ev) {
+                                   scope.$emit('modal-' + name, ev);
+                               });
+                           });
 
-		
-}
+                           // Support autofocus attribute
+                           $modal.on('shown', function (event) {
+                               $('input[autofocus]', $modal).first().trigger('focus');
+                           });
 
-return{
-    /**
-     * @ngdoc method
-     * @name umbraco.services.dialogService#open
-     * @methodOf umbraco.services.dialogService
-     *
-     * @description
-     * Opens a modal rendering a given template url
-     * @param {Object} options rendering options
-     * @param {DomElement} options.container the DOM element to inject the modal into, by default set to body
-     * @param {Function} options.callback function called when the modal is submitted
-     * @param {String} options.template the url of the template
-     * @param {Bool} options.show show the modal instantly
-     * @param {Object} options.scope scope to attach the modal to, by default rootScope.new()
-     * @param {Bool} options.iframe load template in an iframe, only needed for serverside templates
-     * @param {Int} options.width set a width on the modal, only needed for iframes
-     */
-	open: function(options){
-		return _open(options);
-	},
-	mediaPicker: function(options){
-		return _open({
-			scope: options.scope, 
-			callback: options.callback, 
-			template: 'views/common/dialogs/mediaPicker.html', 
-			show: true});
-	},
-	contentPicker: function(options){
-		return _open({
-			scope: options.scope, 
-			callback: options.callback, 
-			template: 'views/common/dialogs/contentPicker.html', 
-			show: true});
-	},
-	macroPicker: function(options){
-		return _open({
-			scope: options.scope, 
-			callback: options.callback, 
-			template: 'views/common/dialogs/macroPicker.html', 
-			show: true});
-	},
-	propertyDialog: function(options){
-		return _open({
-			scope: options.scope, 
-			callback: options.callback, 
-			template: 'views/common/dialogs/property.html', 
-			show: true});
-	},
+                           //Autoshow	
+                           if (options.show) {
+                               $modal.modal('show');
+                           }
 
-	//deprecated
-	append : function(options){
+                           //Return the modal object	
+                           return $modal;
+                       });
+           }
 
-		return _open(options); 
 
-		/*
-		var scope = options.scope || $rootScope.$new(), 
-		templateUrl = options.template;
+       }
 
-		return $q.when($templateCache.get(templateUrl) || $http.get(templateUrl, {cache: true}).then(function(res) { return res.data; }))
-		.then(function onSuccess(template) {
+       return {
+           /**
+            * @ngdoc method
+            * @name umbraco.services.dialogService#open
+            * @methodOf umbraco.services.dialogService
+            *
+            * @description
+            * Opens a modal rendering a given template url
+            * @param {Object} options rendering options
+            * @param {DomElement} options.container the DOM element to inject the modal into, by default set to body
+            * @param {Function} options.callback function called when the modal is submitted
+            * @param {String} options.template the url of the template
+            * @param {Bool} options.show show the modal instantly
+            * @param {Object} options.scope scope to attach the modal to, by default rootScope.new()
+            * @param {Bool} options.iframe load template in an iframe, only needed for serverside templates
+            * @param {Int} options.width set a width on the modal, only needed for iframes
+            */
+           open: function (options) {
+               return _open(options);
+           },
+           mediaPicker: function (options) {
+               return _open({
+                   scope: options.scope,
+                   callback: options.callback,
+                   template: 'views/common/dialogs/mediaPicker.html',
+                   show: true
+               });
+           },
+           contentPicker: function (options) {
+               return _open({
+                   scope: options.scope,
+                   callback: options.callback,
+                   template: 'views/common/dialogs/contentPicker.html',
+                   show: true
+               });
+           },
+           macroPicker: function (options) {
+               return _open({
+                   scope: options.scope,
+                   callback: options.callback,
+                   template: 'views/common/dialogs/macroPicker.html',
+                   show: true
+               });
+           },
+           propertyDialog: function (options) {
+               return _open({
+                   scope: options.scope,
+                   callback: options.callback,
+                   template: 'views/common/dialogs/property.html',
+                   show: true
+               });
+           },
 
-						// Compile modal content
-						$timeout(function() {
-							options.container.html(template);
-							$compile(options.container)(scope);
-						});
+           //deprecated
+           append: function (options) {
 
-						return template;
-					});*/
-	}  
-};
-}]);	
+               return _open(options);
+
+               /*
+               var scope = options.scope || $rootScope.$new(), 
+               templateUrl = options.template;
+       
+               return $q.when($templateCache.get(templateUrl) || $http.get(templateUrl, {cache: true}).then(function(res) { return res.data; }))
+               .then(function onSuccess(template) {
+       
+                               // Compile modal content
+                               $timeout(function() {
+                                   options.container.html(template);
+                                   $compile(options.container)(scope);
+                               });
+       
+                               return template;
+                           });*/
+           }
+       };
+   }]);
