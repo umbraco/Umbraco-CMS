@@ -19,9 +19,11 @@ namespace Umbraco.Web.Trees
         /// <summary>
         /// Adds a menu item
         /// </summary>
-        public void AddMenuItem(IAction action)
+        internal MenuItem AddMenuItem(IAction action)
         {
-            _menuItems.Add(new MenuItem(action));
+            var item = new MenuItem(action);
+            _menuItems.Add(item);
+            return item;
         }
 
         /// <summary>

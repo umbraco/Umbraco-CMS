@@ -28,7 +28,7 @@ namespace Umbraco.Web.Trees
         public TreeNodeCollection GetNodes(string id, FormDataCollection queryStrings)
         {
             var tree = GetTree(queryStrings);
-            var attempt = tree.TryLoadFromLegacyTree(id, queryStrings, Url);
+            var attempt = tree.TryLoadFromLegacyTree(id, queryStrings, Url, tree.ApplicationAlias);
             if (attempt.Success == false)
             {
                 var msg = "Could not render tree " + queryStrings.GetRequiredString("treeType") + " for node id " + id;

@@ -84,7 +84,8 @@ namespace Umbraco.Web.Trees
             {
                 return byControllerAttempt.Result;
             }
-            var legacyAttempt = configTree.TryGetRootNodeFromLegacyTree(queryStrings, Url);
+
+            var legacyAttempt = configTree.TryGetRootNodeFromLegacyTree(queryStrings, Url, configTree.ApplicationAlias);
             if (legacyAttempt.Success)
             {
                 return legacyAttempt.Result;
@@ -108,7 +109,7 @@ namespace Umbraco.Web.Trees
             {
                 return byControllerAttempt.Result;
             }
-            var legacyAttempt = configTree.TryLoadFromLegacyTree(id, queryStrings, Url);
+            var legacyAttempt = configTree.TryLoadFromLegacyTree(id, queryStrings, Url, configTree.ApplicationAlias);
             if (legacyAttempt.Success)
             {
                 return legacyAttempt.Result;

@@ -10,9 +10,7 @@ namespace umbraco.BusinessLogic.Actions
 	public class ActionNew : IAction
 	{
 		//create singleton
-#pragma warning disable 612,618
-		private static readonly ActionNew m_instance = new ActionNew();
-#pragma warning restore 612,618
+		private static readonly ActionNew InternalInstance = new ActionNew();
 
 		/// <summary>
 		/// A public constructor exists ONLY for backwards compatibility in regards to 3rd party add-ons.
@@ -24,7 +22,7 @@ namespace umbraco.BusinessLogic.Actions
 
 		public static ActionNew Instance
 		{
-			get { return m_instance; }
+			get { return InternalInstance; }
 		}
 
 		#region IAction Members

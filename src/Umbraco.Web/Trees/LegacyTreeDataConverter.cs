@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http.Routing;
 using Umbraco.Core;
+using umbraco;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.helpers;
 using umbraco.cms.presentation.Trees;
@@ -16,14 +17,14 @@ namespace Umbraco.Web.Trees
     /// </summary>
     internal class LegacyTreeDataConverter
     {
-
         /// <summary>
         /// Gets the menu item collection from a legacy tree node based on it's parent node's child collection
         /// </summary>
         /// <param name="nodeId">The node id</param>
         /// <param name="xmlTree">The node collection that contains the node id</param>
+        /// <param name="currentSection"></param>
         /// <returns></returns>
-        internal static MenuItemCollection ConvertFromLegacyMenu(string nodeId, XmlTree xmlTree)
+        internal static MenuItemCollection ConvertFromLegacyMenu(string nodeId, XmlTree xmlTree, string currentSection)
         {
             var xmlTreeNode = xmlTree.treeCollection.FirstOrDefault(x => x.NodeID == nodeId);
             if (xmlTreeNode == null)
@@ -31,15 +32,16 @@ namespace Umbraco.Web.Trees
                 return null;
             }
 
-            return ConvertFromLegacyMenu(xmlTreeNode);
+            return ConvertFromLegacyMenu(xmlTreeNode, currentSection);
         }
 
         /// <summary>
         /// Gets the menu item collection from a legacy tree node
         /// </summary>
         /// <param name="xmlTreeNode"></param>
+        /// <param name="currentSection"></param>
         /// <returns></returns>
-        internal static MenuItemCollection ConvertFromLegacyMenu(XmlTreeNode xmlTreeNode)
+        internal static MenuItemCollection ConvertFromLegacyMenu(XmlTreeNode xmlTreeNode, string currentSection)
         {
             var collection = new MenuItemCollection();
 
@@ -55,7 +57,15 @@ namespace Umbraco.Web.Trees
                 }
                 else
                 {
-                    collection.AddMenuItem(t);
+                    var menuItem = collection.AddMenuItem(t);
+
+                    //Now we need to figure out how to deal with the legacy menu actions t.JsSource
+                    var tryGetLegacyUrl = GetUrlAndTitleFromLegacyAction(t, xmlTreeNode, currentSection);
+                    if (tryGetLegacyUrl.Success)
+                    {
+                        menuItem.SetActionUrl(tryGetLegacyUrl.Result.Url, tryGetLegacyUrl.Result.ActionMethod);
+                        menuItem.SetDialogTitle(tryGetLegacyUrl.Result.DialogTitle);
+                    }
                     numAdded++;
                 }
             }
@@ -71,7 +81,141 @@ namespace Umbraco.Web.Trees
             return collection;
         }
 
-        internal static TreeNode ConvertFromLegacy(string parentId, XmlTreeNode xmlTreeNode, UrlHelper urlHelper, bool isRoot = false)
+        /// <summary>
+        /// This will look at a legacy IAction's JsFunctionName and convert it to a URL if possible.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="actionNode"></param>
+        /// <param name="currentSection"></param>
+        internal static Attempt<LegacyUrlAction> GetUrlAndTitleFromLegacyAction(IAction action, XmlTreeNode actionNode, string currentSection)
+        {
+            if (action.JsFunctionName.IsNullOrWhiteSpace())
+            {
+                return Attempt<LegacyUrlAction>.False;
+            }
+
+            switch (action.JsFunctionName)
+            {
+                case "UmbClientMgr.appActions().actionNew()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "create.aspx?nodeId=" + actionNode.NodeID + "&nodeType=" + actionNode.NodeType + "&nodeName=" + actionNode.Text + "&rnd=" + DateTime.UtcNow.Ticks,
+                            ui.GetText("actions", "create")));
+                case "UmbClientMgr.appActions().actionNewFolder()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "createFolder.aspx?nodeId=" + actionNode.NodeID + "&nodeType=" + actionNode.NodeType + "&nodeName=" + actionNode.Text + "&rnd=" + DateTime.UtcNow.Ticks,
+                            ui.GetText("actions", "create")));
+                case "UmbClientMgr.appActions().actionSort()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "dialogs/sort.aspx?id=" + actionNode.NodeID + "&nodeType=" + actionNode.NodeType + "&app=" + currentSection + "&rnd=" + DateTime.UtcNow.Ticks,
+                            ui.GetText("actions", "sort")));
+                case "UmbClientMgr.appActions().actionRights()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "dialogs/cruds.aspx?id=" + actionNode.NodeID + "&rnd=" + DateTime.UtcNow.Ticks,
+                            ui.GetText("actions", "rights")));
+                case "UmbClientMgr.appActions().actionProtect()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "dialogs/protectPage.aspx?mode=cut&nodeId=" + actionNode.NodeID + "&rnd=" + DateTime.UtcNow.Ticks,
+                            ui.GetText("actions", "protect")));
+                case "UmbClientMgr.appActions().actionRollback()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "dialogs/rollback.aspx?nodeId=" + actionNode.NodeID + "&rnd=" + DateTime.UtcNow.Ticks,
+                            ui.GetText("actions", "rollback")));
+                case "UmbClientMgr.appActions().actionNotify()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "dialogs/notifications.aspx?id=" + actionNode.NodeID + "&rnd=" + DateTime.UtcNow.Ticks,
+                            ui.GetText("actions", "notify")));
+                case "UmbClientMgr.appActions().actionPublish()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "dialogs/publish.aspx?id=" + actionNode.NodeID + "&rnd=" + DateTime.UtcNow.Ticks,
+                            ui.GetText("actions", "publish")));
+                case "UmbClientMgr.appActions().actionToPublish()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "dialogs/SendPublish.aspx?id=" + actionNode.NodeID + "&rnd=" + DateTime.UtcNow.Ticks,
+                            ui.GetText("actions", "sendtopublish")));
+                case "UmbClientMgr.appActions().actionRePublish()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "dialogs/republish.aspx?rnd=" + actionNode.NodeID + "&rnd=" + DateTime.UtcNow.Ticks,
+                            "Republishing entire site"));
+                case "UmbClientMgr.appActions().actionAssignDomain()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "dialogs/assignDomain2.aspx?id=" + actionNode.NodeID + "&rnd=" + DateTime.UtcNow.Ticks,
+                            ui.GetText("actions", "assignDomain")));
+                case "UmbClientMgr.appActions().actionLiveEdit()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "canvas.aspx?redir=/" + actionNode.NodeID + ".aspx",
+                            "",
+                            ActionUrlMethod.BlankWindow));
+                case "UmbClientMgr.appActions().actionSendToTranslate()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "dialogs/sendToTranslation.aspx?id=" + actionNode.NodeID + "&rnd=" + DateTime.UtcNow.Ticks,
+                            ui.GetText("actions", "sendToTranslate")));
+                case "UmbClientMgr.appActions().actionEmptyTranscan()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "dialogs/emptyTrashcan.aspx?type=" + currentSection,
+                            ui.GetText("actions", "emptyTrashcan")));
+                case "UmbClientMgr.appActions().actionImport()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "dialogs/importDocumentType.aspx",
+                            ui.GetText("actions", "importDocumentType")));
+                case "UmbClientMgr.appActions().actionExport()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "dialogs/exportDocumentType.aspx?nodeId=" + actionNode.NodeID + "&rnd=" + DateTime.UtcNow.Ticks,
+                            ""));
+                case "UmbClientMgr.appActions().actionAudit()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "dialogs/viewAuditTrail.aspx?nodeId=" + actionNode.NodeID + "&rnd=" + DateTime.UtcNow.Ticks,
+                            ui.GetText("actions", "auditTrail")));
+                case "UmbClientMgr.appActions().actionMove()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "dialogs/moveOrCopy.aspx?app=" + currentSection + "&mode=cut&id=" + actionNode.NodeID + "&rnd=" + DateTime.UtcNow.Ticks,
+                            ui.GetText("actions", "move")));
+                case "UmbClientMgr.appActions().actionCopy()":
+                    return new Attempt<LegacyUrlAction>(
+                        true,
+                        new LegacyUrlAction(
+                            "dialogs/moveOrCopy.aspx?app=" + currentSection + "&mode=copy&id=" + actionNode.NodeID + "&rnd=" + DateTime.UtcNow.Ticks,
+                            ui.GetText("actions", "copy")));
+            }
+            return Attempt<LegacyUrlAction>.False;            
+        }
+
+        internal static TreeNode ConvertFromLegacy(string parentId, XmlTreeNode xmlTreeNode, UrlHelper urlHelper, string currentSection, bool isRoot = false)
         {
             //  /umbraco/tree.aspx?rnd=d0d0ff11a1c347dabfaa0fc75effcc2a&id=1046&treeType=content&contextMenu=false&isDialog=false
 
@@ -92,7 +236,8 @@ namespace Umbraco.Web.Trees
                 {
                     "id=" + (isRoot ? "-1" : xmlTreeNode.NodeID),
                     "treeType=" + xmlTreeNode.TreeType,
-                    "parentId=" + (isRoot ? "-1" : parentId)
+                    "parentId=" + (isRoot ? "-1" : parentId),
+                    "section=" + currentSection
                 });
 
             //TODO: Might need to add stuff to additional attributes
@@ -117,7 +262,7 @@ namespace Umbraco.Web.Trees
             return node;
         }
 
-        internal static TreeNodeCollection ConvertFromLegacy(string parentId, XmlTree xmlTree, UrlHelper urlHelper)
+        internal static TreeNodeCollection ConvertFromLegacy(string parentId, XmlTree xmlTree, UrlHelper urlHelper, string currentSection)
         {
             //TODO: Once we get the editor URL stuff working we'll need to figure out how to convert 
             // that over to use the old school ui.xml stuff for these old trees and however the old menu items worked.
@@ -125,9 +270,29 @@ namespace Umbraco.Web.Trees
             var collection = new TreeNodeCollection();
             foreach (var x in xmlTree.treeCollection)
             {
-                collection.Add(ConvertFromLegacy(parentId, x, urlHelper));
+                collection.Add(ConvertFromLegacy(parentId, x, urlHelper, currentSection));
             }
             return collection;
+        }
+
+        internal class LegacyUrlAction
+        {
+            public LegacyUrlAction(string url, string dialogTitle)
+                : this(url, dialogTitle, ActionUrlMethod.Dialog)
+            {
+                
+            }
+
+            public LegacyUrlAction(string url, string dialogTitle, ActionUrlMethod actionMethod)
+            {
+                Url = url;
+                ActionMethod = actionMethod;
+                DialogTitle = dialogTitle;
+            }
+
+            public string Url { get; private set; }
+            public ActionUrlMethod ActionMethod { get; private set; }
+            public string DialogTitle { get; private set; }
         }
 
     }

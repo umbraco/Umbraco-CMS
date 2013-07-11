@@ -30,6 +30,7 @@ namespace umbraco.BusinessLogic.Actions
     /// which is enabling thirdparty developers to extend the core functionality of
     /// umbraco without changing the codebase.
     /// </summary>
+    [Obsolete("Actions and ActionHandlers are obsolete and should no longer be used")]
     public class Action
     {
         private static readonly List<IActionHandler> ActionHandlers = new List<IActionHandler>();
@@ -48,7 +49,7 @@ namespace umbraco.BusinessLogic.Actions
 		/// </summary>
 		/// <remarks>
 		/// TODO: this shouldn't be needed... we should restart the app pool when a package is installed!
-		/// </remarks>
+		/// </remarks>		
 		public static void ReRegisterActionsAndHandlers()
 		{
 			lock (Lock)

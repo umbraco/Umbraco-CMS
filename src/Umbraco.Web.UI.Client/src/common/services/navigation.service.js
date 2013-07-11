@@ -21,7 +21,7 @@ angular.module('umbraco.services')
 
     var currentSection = $routeParams.section;
     var currentId = $routeParams.id;
-    var currentNode;
+
     var ui = {};
 
     function setMode(mode) {
@@ -64,7 +64,6 @@ angular.module('umbraco.services')
     }
 
     return {
-        currentNode: currentNode,
         mode: "default",
         ui: ui,
         
@@ -231,22 +230,47 @@ angular.module('umbraco.services')
          * @param {Object} args.action the clicked action containing `name` and `alias`
          */
         showDialog: function (args) {
+
+            if (!args) {
+                throw "showDialog is missing the args parameter";
+            }
+            if (!args.action) {
+                throw "The args parameter must have an 'action' property as the clicked menu action object";
+            }
+
             setMode("dialog");
 
             var scope = args.scope || $rootScope.$new();
             scope.currentNode = args.node;
 
-            //this.currentNode = item;
-            this.ui.dialogTitle = args.action.name;
+            //the title might be in the meta data, check there first
+            if (args.action.metaData["dialogTitle"]) {
+                this.ui.dialogTitle = args.action.metaData["dialogTitle"];
+            }
+            else {
+                this.ui.dialogTitle = args.action.name;
+            }
 
-            var templateUrl = "views/" + this.ui.currentTree + "/" + args.action.alias + ".html";
-            var iframe = false;
+            var templateUrl;
+            var iframe;
+            
+            //TODO: fix hardcoded hack for content/media... once these trees are converted over to 
+            // new c# trees we won't need to do this any longer.
+            var isCreateForContent = args.action.alias === "create" && (this.ui.currentTree === "content" && this.ui.currentTree === "media");
 
-            ///TODO: fix hardcoded hack, this is to support legacy create dialogs
-            if(args.action.alias === "create" && this.ui.currentTree !== "content" && this.ui.currentTree !== "media"){
-                templateUrl = "create.aspx?nodeId=" + args.node.id + "&nodeType=" + args.node.nodetype + "&nodeName=" + args.node.name + "&rnd=73.8&rndo=75.1";
+            if (args.action.metaData["actionUrl"] && !isCreateForContent) {
+                templateUrl = args.action.metaData["actionUrl"];
                 iframe = true;
             }
+            else {
+                templateUrl = "views/" + this.ui.currentTree + "/" + args.action.alias + ".html";
+                iframe = false;
+            }
+            
+            //TODO: some action's want to launch a new window like live editing, we support this in the menu item's metadata with
+            // a key called: "actionUrlMethod" which can be set to either: Dialog, BlankWindow. Normally this is always set to Dialog 
+            // if a URL is specified in the "actionUrl" metadata. For now I'm not going to implement launching in a blank window, 
+            // though would be v-easy, just not sure we want to ever support that?
 
             return dialogService.open(
                 {
