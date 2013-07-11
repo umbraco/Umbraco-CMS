@@ -9,9 +9,9 @@ angular.module('umbraco.mocks').
           }
 
           var types = [
-                { name: "News Article", description: "Standard news article", alias: "newsArticle", id: 1234, cssClass: "file" },
-                { name: "News Area", description: "Area to hold all news articles, there should be only one", alias: "newsArea", id: 1234, cssClass: "suitcase" },
-                { name: "Employee", description: "Employee profile information page", alias: "employee", id: 1234, cssClass: "user" }
+                { name: "News Article", description: "Standard news article", alias: "newsArticle", id: 1234, icon: "file" },
+                { name: "News Area", description: "Area to hold all news articles, there should be only one", alias: "newsArea", id: 1234, icon: "suitcase" },
+                { name: "Employee", description: "Employee profile information page", alias: "employee", id: 1234, icon: "user" }
           ];
           return [200, types, null];
       }

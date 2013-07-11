@@ -9,24 +9,24 @@ angular.module('umbraco.mocks').
           }
 
           var menu = [
-              { name: "Create", cssclass: "plus", alias: "create" },
+              { name: "Create", cssclass: "plus", alias: "create", metaData: {} },
 
-              { seperator: true, name: "Delete", cssclass: "remove", alias: "delete" },
-              { name: "Move", cssclass: "move", alias: "move" },
-              { name: "Copy", cssclass: "copy", alias: "copy" },
-              { name: "Sort", cssclass: "sort", alias: "sort" },
+              { seperator: true, name: "Delete", cssclass: "remove", alias: "delete", metaData: {} },
+              { name: "Move", cssclass: "move", alias: "move", metaData: {} },
+              { name: "Copy", cssclass: "copy", alias: "copy", metaData: {} },
+              { name: "Sort", cssclass: "sort", alias: "sort", metaData: {} },
 
-              { seperator: true, name: "Publish", cssclass: "globe", alias: "publish" },
-              { name: "Rollback", cssclass: "undo", alias: "rollback" },
+              { seperator: true, name: "Publish", cssclass: "globe", alias: "publish", metaData: {} },
+              { name: "Rollback", cssclass: "undo", alias: "rollback", metaData: {} },
 
-              { seperator: true, name: "Permissions", cssclass: "lock", alias: "permissions" },
-              { name: "Audit Trail", cssclass: "time", alias: "audittrail" },
-              { name: "Notifications", cssclass: "envelope", alias: "notifications" },
+              { seperator: true, name: "Permissions", cssclass: "lock", alias: "permissions", metaData: {} },
+              { name: "Audit Trail", cssclass: "time", alias: "audittrail", metaData: {} },
+              { name: "Notifications", cssclass: "envelope", alias: "notifications", metaData: {} },
 
-              { seperator: true, name: "Hostnames", cssclass: "home", alias: "hostnames" },
-              { name: "Public Access", cssclass: "group", alias: "publicaccess" },
+              { seperator: true, name: "Hostnames", cssclass: "home", alias: "hostnames", metaData: {} },
+              { name: "Public Access", cssclass: "group", alias: "publicaccess", metaData: {} },
 
-              { seperator: true, name: "Reload", cssclass: "refresh", alias: "users" }
+              { seperator: true, name: "Reload", cssclass: "refresh", alias: "users", metaData: {} }
           ];
 
           return [200, menu, null];

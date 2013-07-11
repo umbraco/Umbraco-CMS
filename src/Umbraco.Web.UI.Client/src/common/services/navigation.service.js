@@ -66,7 +66,7 @@ angular.module('umbraco.services')
     return {
         mode: "default",
         ui: ui,
-        
+
         /**
          * @ngdoc method
          * @name umbraco.services.navigationService#load
@@ -140,46 +140,54 @@ angular.module('umbraco.services')
          * @methodOf umbraco.services.navigationService
          *
          * @description
-         * Hides the tree by hiding the containing dom element
+         * Hides the tree by hiding the containing dom element. 
+         * This always returns a promise!
+         *
          * @param {Event} event the click event triggering the method, passed from the DOM element
          */
         showMenu: function (event, args) {
-            if (args.event !== undefined && args.node.defaultAction && !args.event.altKey) {
-                //hack for now, it needs the complete action object to, so either include in tree item json
-                //or lookup in service...
-                var act = {
-                    alias: args.node.defaultAction,
-                    name: args.node.defaultAction
-                };
 
-                this.ui.currentNode = args.node;
-                
-                //return the dialog this is opening.
-                return this.showDialog({
-                    scope: args.scope,
-                    node: args.node,
-                    action: act,
-                    section: this.ui.currentTree
-                });
+            var deferred = $q.defer();
+            var self = this;
+
+            if (args.event !== undefined && args.node.defaultAction && !args.event.altKey) {
+
+                treeService.getMenuItemByAlias({ treeNode: args.node, menuItemAlias: args.node.defaultAction })
+                    .then(function(result) {
+
+                        if (!result) {
+                            throw "No menu item found with alias " + args.node.defaultAction;
+                        }
+
+                        self.ui.currentNode = args.node;
+                        
+                        var dialog = self.showDialog({
+                            scope: args.scope,
+                            node: args.node,
+                            action: result,
+                            section: self.ui.currentTree
+                        });
+
+                        //return the dialog this is opening.
+                        deferred.resolve(dialog);
+                    });
             }
             else {
                 setMode("menu");
 
-                treeService.getActions({ node: args.node, section: this.ui.currentTree })
-			        .then(function (data) {
-			            ui.actions = data;
-			        }, function (err) {
-			            //display the error
-			            notificationsService.error(err.errorMsg);
-			        });
-
+                treeService.getMenu({ treeNode: args.node })
+                    .then(function(data) {
+                        ui.actions = data;
+                    });
 
                 this.ui.currentNode = args.node;
                 this.ui.dialogTitle = args.node.name;
 
                 //we're not opening a dialog, return null.
-                return null;
+                deferred.resolve(null);
             }
+
+            return deferred.promise;
         },
 
         /**
@@ -253,10 +261,10 @@ angular.module('umbraco.services')
 
             var templateUrl;
             var iframe;
-            
+
             //TODO: fix hardcoded hack for content/media... once these trees are converted over to 
             // new c# trees we won't need to do this any longer.
-            var isCreateForContent = args.action.alias === "create" && (this.ui.currentTree === "content" && this.ui.currentTree === "media");
+            var isCreateForContent = args.action.alias === "create" && (this.ui.currentTree === "content" || this.ui.currentTree === "media");
 
             if (args.action.metaData["actionUrl"] && !isCreateForContent) {
                 templateUrl = args.action.metaData["actionUrl"];
@@ -266,7 +274,7 @@ angular.module('umbraco.services')
                 templateUrl = "views/" + this.ui.currentTree + "/" + args.action.alias + ".html";
                 iframe = false;
             }
-            
+
             //TODO: some action's want to launch a new window like live editing, we support this in the menu item's metadata with
             // a key called: "actionUrlMethod" which can be set to either: Dialog, BlankWindow. Normally this is always set to Dialog 
             // if a URL is specified in the "actionUrl" metadata. For now I'm not going to implement launching in a blank window, 

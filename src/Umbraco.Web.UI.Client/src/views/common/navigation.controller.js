@@ -59,7 +59,10 @@ function NavigationController($scope,$rootScope, $location, navigationService, d
         if (menuDialog) {
             dialogService.close(menuDialog);
         }
-        menuDialog = navigationService.showMenu(ev, args);
+        navigationService.showMenu(ev, args)
+            .then(function(result) {
+                menuDialog = result;
+            });
     });
 
     //this reacts to tree items themselves being clicked

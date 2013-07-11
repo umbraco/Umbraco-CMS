@@ -57,9 +57,16 @@ function treeService($q, treeResource, iconHelper) {
                 });
         },
 
-        getActions: function(treeItem, section) {
+        getMenu: function (args) {
 
-            return treeResource.loadMenu(treeItem.node)
+            if (!args) {
+                throw "args cannot be null";
+            }
+            if (!args.treeNode) {
+                throw "args.treeNode cannot be null";
+            }
+
+            return treeResource.loadMenu(args.treeNode)
                 .then(function(data) {
                     //need to convert the icons to new ones
                     for (var i = 0; i < data.length; i++) {
@@ -67,7 +74,41 @@ function treeService($q, treeResource, iconHelper) {
                     }
                     return data;
                 });
-        },	
+        },
+        
+        /**
+         * @ngdoc method
+         * @name umbraco.services.treeService#getMenuItemByAlias
+         * @methodOf umbraco.services.treeService
+         * @function
+         *
+         * @description
+         * Attempts to return a tree node's menu item based on the alias supplied, otherwise returns null.
+
+         * @param {object} args An arguments object
+         * @param {object} args.treeNode The tree node to get the menu item for
+         * @param {object} args.menuItemAlias The menu item alias to attempt to find
+         */
+        getMenuItemByAlias: function (args) {
+
+            if (!args) {
+                throw "args cannot be null";
+            }
+            if (!args.treeNode) {
+                throw "args.treeNode cannot be null";                
+            }
+            if (!args.menuItemAlias) {
+                throw "args.menuItemAlias cannot be null";
+            }
+
+            return this.getMenu(args)
+                .then(function (menuItems) {
+                    //try to find the node with the alias
+                    return _.find(menuItems, function(item) {
+                        return item.alias === args.menuItemAlias;
+                    });
+                });
+        },
         
         getChildren: function (options) {
 
