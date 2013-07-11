@@ -24,6 +24,8 @@ function NavigationController($scope,$rootScope, $location, navigationService, d
     $scope.hideDialog = navigationService.hideDialog;
     $scope.hideNavigation = navigationService.hideNavigation;
     $scope.ui = navigationService.ui;
+    //track the currently opened dialog
+    $scope.ui.currentDialog = null;
     //tree event handler everyone can subscribe to
     $scope.ui.tree = $({});
 
@@ -56,12 +58,12 @@ function NavigationController($scope,$rootScope, $location, navigationService, d
         args.scope = $scope;
         
         //ensure the menuDialog is cleared before opening another!
-        if (menuDialog) {
-            dialogService.close(menuDialog);
+        if ($scope.ui.currentDialog) {
+            dialogService.close($scope.ui.currentDialog);
         }
         navigationService.showMenu(ev, args)
             .then(function(result) {
-                menuDialog = result;
+                $scope.ui.currentDialog = result;
             });
     });
 
@@ -103,12 +105,14 @@ function NavigationController($scope,$rootScope, $location, navigationService, d
 
     $scope.openDialog = function (currentNode, action, currentSection) {
 
+        $scope.currentAction = action;
+
         //ensure the actionDialog is cleared before opening another!
-        if (actionDialog) {
-            dialogService.close(actionDialog);
+        if ($scope.ui.currentDialog) {
+            dialogService.close($scope.ui.currentDialog);
         }
 
-        actionDialog = navigationService.showDialog({
+        $scope.ui.currentDialog = navigationService.showDialog({
             scope: $scope,
             node: currentNode,
             action: action,

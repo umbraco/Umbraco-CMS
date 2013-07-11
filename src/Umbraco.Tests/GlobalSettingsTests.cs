@@ -8,7 +8,7 @@ using System.Web.Mvc;
 
 namespace Umbraco.Tests
 {
-	[TestFixture]
+    [TestFixture]
 	public class GlobalSettingsTests : BaseWebTest
 	{
         protected override DatabaseBehavior DatabaseTestBehavior

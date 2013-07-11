@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using System.Web.Http.Routing;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.helpers;
@@ -59,13 +61,20 @@ namespace Umbraco.Web.Trees
                 {
                     var menuItem = collection.AddMenuItem(t);
 
-                    //Now we need to figure out how to deal with the legacy menu actions t.JsSource
-                    var tryGetLegacyUrl = GetUrlAndTitleFromLegacyAction(t, xmlTreeNode, currentSection);
-                    if (tryGetLegacyUrl.Success)
-                    {
-                        menuItem.SetActionUrl(tryGetLegacyUrl.Result.Url, tryGetLegacyUrl.Result.ActionMethod);
-                        menuItem.SetDialogTitle(tryGetLegacyUrl.Result.DialogTitle);
-                    }
+                    var currentAction = t;
+
+                    //First try to get a URL/title from the legacy action,
+                    // if that doesn't work, try to get the legacy confirm view
+                    Attempt<LegacyUrlAction>.Try(GetUrlAndTitleFromLegacyAction(currentAction, xmlTreeNode, currentSection), action =>
+                        {
+                            menuItem.SetActionUrl(action.Url, action.ActionMethod);
+                            menuItem.SetDialogTitle(action.DialogTitle);
+                        })
+                        .IfFailed(() => GetLegacyConfirmView(currentAction, xmlTreeNode, currentSection), view =>
+                            {
+                                menuItem.View = view;
+                            });
+                    
                     numAdded++;
                 }
             }
@@ -79,6 +88,31 @@ namespace Umbraco.Web.Trees
             }
 
             return collection;
+        }
+
+        /// <summary>
+        /// This will look at the legacy IAction's JsFunctionName and convert it to a confirmation dialog view if possible
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="actionNode"></param>
+        /// <param name="currentSection"></param>
+        /// <returns></returns>
+        internal static Attempt<string> GetLegacyConfirmView(IAction action, XmlTreeNode actionNode, string currentSection)
+        {
+            if (action.JsFunctionName.IsNullOrWhiteSpace())
+            {
+                return Attempt<string>.False;
+            }
+
+            switch (action.JsFunctionName)
+            {
+                case "UmbClientMgr.appActions().actionDelete()":
+                    return new Attempt<string>(
+                        true,
+                        Core.Configuration.GlobalSettings.Path.EnsureEndsWith('/') + "views/common/dialogs/legacydelete.html");
+            }
+
+            return Attempt<string>.False;
         }
 
         /// <summary>
@@ -212,7 +246,7 @@ namespace Umbraco.Web.Trees
                             "dialogs/moveOrCopy.aspx?app=" + currentSection + "&mode=copy&id=" + actionNode.NodeID + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "copy")));
             }
-            return Attempt<LegacyUrlAction>.False;            
+            return Attempt<LegacyUrlAction>.False;
         }
 
         internal static TreeNode ConvertFromLegacy(string parentId, XmlTreeNode xmlTreeNode, UrlHelper urlHelper, string currentSection, bool isRoot = false)
@@ -225,7 +259,7 @@ namespace Umbraco.Web.Trees
             var childQuery = (xmlTreeNode.Source.IsNullOrWhiteSpace() || xmlTreeNode.Source.IndexOf('?') == -1)
                 ? ""
                 : xmlTreeNode.Source.Substring(xmlTreeNode.Source.IndexOf('?'));
-            
+
             //append the query strings
             childNodesSource = childNodesSource.AppendQueryStringToUrl(childQuery);
 
@@ -248,13 +282,13 @@ namespace Umbraco.Web.Trees
                 Icon = xmlTreeNode.Icon,
                 Title = xmlTreeNode.Text,
                 NodeType = xmlTreeNode.NodeType
-                
+
             };
 
             //This is a special case scenario, we know that content/media works based on the normal Belle routing/editing so we'll ensure we don't
             // pass in the legacy JS handler so we do it the new way, for all other trees (Currently, this is a WIP), we'll render
             // the legacy js callback,.
-            var knownNonLegacyNodeTypes = new[] {"content", "contentRecycleBin", "mediaRecyleBin", "media"};
+            var knownNonLegacyNodeTypes = new[] { "content", "contentRecycleBin", "mediaRecyleBin", "media" };
             if (knownNonLegacyNodeTypes.InvariantContains(xmlTreeNode.NodeType) == false)
             {
                 node.OnClickCallback = xmlTreeNode.Action;
@@ -280,7 +314,7 @@ namespace Umbraco.Web.Trees
             public LegacyUrlAction(string url, string dialogTitle)
                 : this(url, dialogTitle, ActionUrlMethod.Dialog)
             {
-                
+
             }
 
             public LegacyUrlAction(string url, string dialogTitle, ActionUrlMethod actionMethod)

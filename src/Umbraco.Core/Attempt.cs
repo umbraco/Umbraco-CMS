@@ -2,6 +2,55 @@ using System;
 
 namespace Umbraco.Core
 {
+    public struct AttemptOutcome
+    {
+        private readonly bool _success;
+
+        public AttemptOutcome(bool success)
+        {
+            _success = success;
+        }
+
+        public AttemptOutcome IfFailed<T>(Func<Attempt<T>> nextAttempt, Action<T> onSuccess, Action<Exception> onFail = null)
+        {
+            if (_success == false)
+            {
+                return ExecuteNextAttempt(nextAttempt, onSuccess, onFail);
+            }
+            
+            //return a successful outcome since the last one was successful, this allows the next AttemptOutcome chained to 
+            // continue properly.
+            return new AttemptOutcome(true);
+        }
+
+        public AttemptOutcome IfSuccessful<T>(Func<Attempt<T>> nextAttempt, Action<T> onSuccess, Action<Exception> onFail = null)
+        {
+            if (_success)
+            {
+                return ExecuteNextAttempt(nextAttempt, onSuccess, onFail);
+            }
+            //return a failed outcome since the last one was not successful, this allows the next AttemptOutcome chained to 
+            // continue properly.
+            return new AttemptOutcome(false);
+        }
+
+        private AttemptOutcome ExecuteNextAttempt<T>(Func<Attempt<T>> nextAttempt, Action<T> onSuccess, Action<Exception> onFail = null)
+        {
+            var attempt = nextAttempt();
+            if (attempt.Success)
+            {
+                onSuccess(attempt.Result);
+                return new AttemptOutcome(true);
+            }
+
+            if (onFail != null)
+            {
+                onFail(attempt.Error);
+            }
+            return new AttemptOutcome(false);
+        }
+    }
+
 	/// <summary>
 	/// Represents the result of an operation attempt
 	/// </summary>
@@ -37,6 +86,27 @@ namespace Umbraco.Core
 		{
 			get { return _result; }
 		}
+
+        /// <summary>
+        /// Perform the attempt with callbacks
+        /// </summary>
+        /// <param name="attempt"></param>
+        /// <param name="onSuccess"></param>
+        /// <param name="onFail"></param>
+        public static AttemptOutcome Try(Attempt<T> attempt, Action<T> onSuccess, Action<Exception> onFail = null)
+        {
+            if (attempt.Success)
+            {
+                onSuccess(attempt.Result);
+                return new AttemptOutcome(true);
+            }
+
+            if (onFail != null)
+            {
+                onFail(attempt.Error);    
+            }
+            return new AttemptOutcome(false);
+        }
 
 		/// <summary>
 		/// Represents an unsuccessful parse operation

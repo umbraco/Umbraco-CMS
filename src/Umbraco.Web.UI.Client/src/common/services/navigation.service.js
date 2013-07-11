@@ -270,6 +270,10 @@ angular.module('umbraco.services')
                 templateUrl = args.action.metaData["actionUrl"];
                 iframe = true;
             }
+            else if (args.action.view) {
+                templateUrl = args.action.view;
+                iframe = false;
+            }
             else {
                 templateUrl = "views/" + this.ui.currentTree + "/" + args.action.alias + ".html";
                 iframe = false;
