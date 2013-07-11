@@ -16,7 +16,7 @@ To view more examples please visit [http://umbraco.com/why-umbraco/#caseStudies]
 
 ## Downloading ##
 
-The downloadable Umbraco releases live at [http://our.umbraco.org/contribute/releases](http://our.umbraco.org/contribute/releases).
+The downloadable Umbraco releases live at [http://our.umbraco.org/download](http://our.umbraco.org/download).
 
 ## Forums ##
 
