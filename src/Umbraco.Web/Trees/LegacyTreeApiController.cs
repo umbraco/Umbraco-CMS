@@ -56,8 +56,15 @@ namespace Umbraco.Web.Trees
             var parentId = queryStrings.GetRequiredString("parentId");
             var tree = GetTree(queryStrings);
 
+            var rootIds = new[]
+            {
+                Core.Constants.System.Root.ToString(CultureInfo.InvariantCulture),
+                Core.Constants.System.RecycleBinContent.ToString(CultureInfo.InvariantCulture),
+                Core.Constants.System.RecycleBinMedia.ToString(CultureInfo.InvariantCulture)
+            };
+
             //if the id and the parentId are both -1 then we need to get the menu for the root node
-            if (id == "-1" && parentId == "-1")
+            if (rootIds.Contains(id) && parentId == "-1")
             {
                 var attempt = tree.TryGetMenuFromLegacyTreeRootNode(queryStrings, Url);
                 if (attempt.Success == false)

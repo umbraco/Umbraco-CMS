@@ -48,10 +48,10 @@ namespace Umbraco.Web.Trees
         public string Icon { get; set; }
 
         /// <summary>
-        /// The action to execute when the menu item is clicked. This is generally a route path.
+        /// The view to render when the menu item is clicked. This is generally a route path.
         /// </summary>
-        [DataMember(Name = "action")]
-        public string Action { get; set; }
+        [DataMember(Name = "view")]
+        public string View { get; set; }
 
         
     }
