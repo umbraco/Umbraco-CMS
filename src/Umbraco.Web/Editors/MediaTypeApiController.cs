@@ -1,37 +1,37 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.WebApi;
-using System.Linq;
 
 namespace Umbraco.Web.Editors
 {
     /// <summary>
     /// An API controller used for dealing with content types
     /// </summary>
-    public class ContentTypeController : UmbracoAuthorizedApiController
+    public class MediaTypeApiController : UmbracoAuthorizedApiController
     {
-        private readonly ContentTypeModelMapper _contentTypeModelMapper;
+        private readonly MediaTypeModelMapper _mediaTypeModelMapper;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public ContentTypeController()
-            : this(UmbracoContext.Current, new ContentTypeModelMapper(UmbracoContext.Current.Application))
-        {            
+        public MediaTypeApiController()
+            : this(UmbracoContext.Current, new MediaTypeModelMapper(UmbracoContext.Current.Application))
+        {
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="umbracoContext"></param>
-        /// <param name="contentModelMapper"></param>
-        internal ContentTypeController(UmbracoContext umbracoContext, ContentTypeModelMapper contentModelMapper)
+        /// <param name="mediaModelMapper"></param>
+        internal MediaTypeApiController(UmbracoContext umbracoContext, MediaTypeModelMapper mediaModelMapper)
             : base(umbracoContext)
         {
-            _contentTypeModelMapper = contentModelMapper;
+            _mediaTypeModelMapper = mediaModelMapper;
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Editors
         /// <param name="contentId"></param>
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
-            var contentItem = Services.ContentService.GetById(contentId);
+            var contentItem = Services.MediaService.GetById(contentId);
             if (contentItem == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -48,9 +48,9 @@ namespace Umbraco.Web.Editors
 
 
             return contentItem.ContentType.AllowedContentTypes
-                .Select(x => Services.ContentTypeService.GetContentType(x.Id.Value))
-                .Select(x => _contentTypeModelMapper.ToContentTypeBasic(x));
-            
+                              .Select(x => Services.ContentTypeService.GetMediaType((int) x.Id.Value))
+                              .Select(x => _mediaTypeModelMapper.ToMediaTypeBasic(x));
+
         }
     }
 }

@@ -501,11 +501,50 @@ function iconHelper() {
         
         { oldIcon: ".sprTreeSettingDomain", newIcon: "icon-home" },
         { oldIcon: ".sprTreeDoc", newIcon: "icon-file-alt" },
+        { oldIcon: ".sprTreeDoc2", newIcon: "icon-file" },
+        { oldIcon: ".sprTreeDoc3", newIcon: "icon-file-text" },
+        { oldIcon: ".sprTreeDoc4", newIcon: "icon-file-text-alt" },
+        { oldIcon: ".sprTreeDoc5", newIcon: "icon-book" },        
+        { oldIcon: ".sprTreeDocPic", newIcon: "icon-picture" },        
         { oldIcon: ".sprTreeFolder", newIcon: "icon-folder-close" },
         { oldIcon: ".sprTreeFolder_o", newIcon: "icon-folder-open" },
         { oldIcon: ".sprTreeMediaFile", newIcon: "icon-music" },
         { oldIcon: ".sprTreeMediaMovie", newIcon: "icon-movie" },
         { oldIcon: ".sprTreeMediaPhoto", newIcon: "icon-picture" },
+        
+        { oldIcon: ".sprTreeMember", newIcon: "icon-mail" },
+        { oldIcon: ".sprTreeMemberGroup", newIcon: "icon-group" },
+        { oldIcon: ".sprTreeMemberType", newIcon: "icon-group" },
+        
+        { oldIcon: ".sprTreeNewsletter", newIcon: "icon-file-text-alt" },
+        { oldIcon: ".sprTreePackage", newIcon: "icon-dropbox" },
+        { oldIcon: ".sprTreeRepository", newIcon: "icon-github" },
+        
+        //TODO:
+        /*
+        { oldIcon: ".sprTreeSettingAgent", newIcon: "" },
+        { oldIcon: ".sprTreeSettingCss", newIcon: "" },
+        { oldIcon: ".sprTreeSettingCssItem", newIcon: "" },
+        { oldIcon: ".sprTreeSettingDataType", newIcon: "" },
+        { oldIcon: ".sprTreeSettingDataTypeChild", newIcon: "" },
+        { oldIcon: ".sprTreeSettingDomain", newIcon: "" },
+        { oldIcon: ".sprTreeSettingLanguage", newIcon: "" },
+        { oldIcon: ".sprTreeSettingScript", newIcon: "" },
+        { oldIcon: ".sprTreeSettingTemplate", newIcon: "" },
+        { oldIcon: ".sprTreeSettingXml", newIcon: "" },
+        { oldIcon: ".sprTreeStatistik", newIcon: "" },
+        { oldIcon: ".sprTreeUser", newIcon: "" },
+        { oldIcon: ".sprTreeUserGroup", newIcon: "" },
+        { oldIcon: ".sprTreeUserType", newIcon: "" },
+        */
+
+
+        { oldIcon: ".sprTreeDeveloperCacheItem", newIcon: "icon-box" },
+        { oldIcon: ".sprTreeDeveloperCacheTypes", newIcon: "icon-box" },
+        { oldIcon: ".sprTreeDeveloperMacro", newIcon: "icon-cogs" },
+        { oldIcon: ".sprTreeDeveloperRegistry", newIcon: "icon-windows" },
+        { oldIcon: ".sprTreeDeveloperPython", newIcon: "icon-linux" },
+        
         
         //tray icons
         { oldIcon: ".traycontent", newIcon: "traycontent" },

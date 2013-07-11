@@ -298,6 +298,7 @@
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Editors\ContentController.cs" />
     <Compile Include="Editors\ContentTypeController.cs" />
+    <Compile Include="Editors\MediaTypeApiController.cs" />
     <Compile Include="Editors\SectionController.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
     <Compile Include="Models\ContentEditing\ContentSaveAction.cs" />
