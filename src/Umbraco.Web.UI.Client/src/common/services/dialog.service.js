@@ -23,6 +23,7 @@
  *		var dialog = dialogService.open({template: 'path/to/page.html', show: true, callback: done});
  *		functon done(data){
  *			//The dialog has been submitted	
+ *      // data contains whatever the dialog has selected / attached
  *		}			
  * </pre> 
  */
@@ -211,10 +212,14 @@ angular.module('umbraco.services')
             * @param {DomElement} options.container the DOM element to inject the modal into, by default set to body
             * @param {Function} options.callback function called when the modal is submitted
             * @param {String} options.template the url of the template
+            * @param {String} options.animation animation csss class, by default set to "fade"
+            * @param {String} options.modalClass modal css class, by default "umb-modal"
             * @param {Bool} options.show show the modal instantly
             * @param {Object} options.scope scope to attach the modal to, by default rootScope.new()
             * @param {Bool} options.iframe load template in an iframe, only needed for serverside templates
             * @param {Int} options.width set a width on the modal, only needed for iframes
+            * @param {Bool} options.inline strips the modal from any animation and wrappers, used when you want to inject a dialog into an existing container
+            * @returns {Object} modal object
             */
            open: function (options) {
                return openDialog(options);
@@ -233,6 +238,18 @@ angular.module('umbraco.services')
                removeDialog(dialog);
            },
 
+           /**
+            * @ngdoc method
+            * @name umbraco.services.dialogService#mediaPicker
+            * @methodOf umbraco.services.dialogService
+            *
+            * @description
+            * Opens a media picker in a modal, the callback returns an array of selected media items
+            * @param {Object} options mediapicker dialog options object
+            * @param {$scope} options.scope dialog scope
+            * @param {Function} options.callback callback function
+            * @returns {Object} modal object
+            */
            mediaPicker: function (options) {
                return openDialog({
                    scope: options.scope,
@@ -241,6 +258,19 @@ angular.module('umbraco.services')
                    show: true
                });
            },
+
+           /**
+            * @ngdoc method
+            * @name umbraco.services.dialogService#contentPicker
+            * @methodOf umbraco.services.dialogService
+            *
+            * @description
+            * Opens a content picker tree in a modal, the callback returns an array of selected documents
+            * @param {Object} options content picker dialog options object
+            * @param {$scope} options.scope dialog scope
+            * @param {Function} options.callback callback function
+            * @returns {Object} modal object
+            */
            contentPicker: function (options) {
                return openDialog({
                    scope: options.scope,
@@ -249,6 +279,19 @@ angular.module('umbraco.services')
                    show: true
                });
            },
+
+           /**
+            * @ngdoc method
+            * @name umbraco.services.dialogService#macroPicker
+            * @methodOf umbraco.services.dialogService
+            *
+            * @description
+            * Opens a mcaro picker in a modal, the callback returns a object representing the macro and it's parameters
+            * @param {Object} options mediapicker dialog options object
+            * @param {$scope} options.scope dialog scope
+            * @param {Function} options.callback callback function
+            * @returns {Object} modal object
+            */
            macroPicker: function (options) {
                return openDialog({
                    scope: options.scope,
@@ -257,6 +300,21 @@ angular.module('umbraco.services')
                    show: true
                });
            },
+
+           /**
+            * @ngdoc method
+            * @name umbraco.services.dialogService#propertyDialog
+            * @methodOf umbraco.services.dialogService
+            *
+            * @description
+            * Opens a dialog with a chosen property editor in, a value can be passed to the modal, and this value is returned in the callback
+            * @param {Object} options mediapicker dialog options object
+            * @param {$scope} options.scope dialog scope
+            * @param {Function} options.callback callback function
+            * @param {String} editor editor to use to edit a given value and return on callback
+            * @param {Object} value value sent to the property editor
+            * @returns {Object} modal object
+            */
            propertyDialog: function (options) {
                return openDialog({
                    scope: options.scope,
@@ -264,28 +322,6 @@ angular.module('umbraco.services')
                    template: 'views/common/dialogs/property.html',
                    show: true
                });
-           },
-
-           //deprecated
-           append: function (options) {
-
-               return openDialog(options);
-
-               /*
-               var scope = options.scope || $rootScope.$new(), 
-               templateUrl = options.template;
-       
-               return $q.when($templateCache.get(templateUrl) || $http.get(templateUrl, {cache: true}).then(function(res) { return res.data; }))
-               .then(function onSuccess(template) {
-       
-                               // Compile modal content
-                               $timeout(function() {
-                                   options.container.html(template);
-                                   $compile(options.container)(scope);
-                               });
-       
-                               return template;
-                           });*/
            }
        };
    }]);
