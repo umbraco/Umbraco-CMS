@@ -19,7 +19,6 @@ function legacyJsLoader(scriptLoader) {
         }  
     };
 }
-
 angular.module('umbraco.services').factory('legacyJsLoader', legacyJsLoader);
 
 /**
@@ -36,7 +35,7 @@ function angularHelper($log, $q) {
         /**
          * @ngdoc function
          * @name resourcePromise
-         * methodOf umbraco.services.angularHelper
+         * @methodOf umbraco.services.angularHelper
          * @function
          *
          * @description
@@ -109,7 +108,7 @@ function angularHelper($log, $q) {
         /**
          * @ngdoc function
          * @name safeApply
-         * methodOf umbraco.services.angularHelper
+         * @methodOf umbraco.services.angularHelper
          * @function
          *
          * @description
@@ -134,7 +133,7 @@ function angularHelper($log, $q) {
         /**
          * @ngdoc function
          * @name getCurrentForm
-         * methodOf umbraco.services.angularHelper
+         * @methodOf umbraco.services.angularHelper
          * @function
          *
          * @description
@@ -190,7 +189,7 @@ function angularHelper($log, $q) {
         /**
          * @ngdoc function
          * @name validateHasForm
-         * methodOf umbraco.services.angularHelper
+         * @methodOf umbraco.services.angularHelper
          * @function
          *
          * @description
@@ -208,7 +207,7 @@ function angularHelper($log, $q) {
         /**
          * @ngdoc function
          * @name getNullForm
-         * methodOf umbraco.services.angularHelper
+         * @methodOf umbraco.services.angularHelper
          * @function
          *
          * @description
@@ -243,7 +242,7 @@ function umbPropEditorHelper() {
         /**
      * @ngdoc function
      * @name getImagePropertyValue
-     * methodOf umbraco.services.umbPropertyEditorHelper
+     * @methodOf umbraco.services.umbPropertyEditorHelper
      * @function    
      *
      * @description
@@ -328,7 +327,7 @@ angular.module('umbraco.services').factory('umbImageHelper', umbImageHelper);
 
 /**
 * @ngdoc service
-* @name umbraco.services:umbRequestHelper
+* @name umbraco.services.umbRequestHelper
 * @description A helper object used for sending requests to the server
 **/
 function umbRequestHelper($http, $q, umbDataFormatter, angularHelper) {
@@ -443,7 +442,7 @@ angular.module('umbraco.services').factory('umbRequestHelper', umbRequestHelper)
 
 /**
 * @ngdoc service
-* @name umbraco.services:umbDataFormatter
+* @name umbraco.services.umbDataFormatter
 * @description A helper object used to format/transform JSON Umbraco data, mostly used for persisting data to the server
 **/
 function umbDataFormatter() {
@@ -479,7 +478,7 @@ angular.module('umbraco.services').factory('umbDataFormatter', umbDataFormatter)
 
 /**
 * @ngdoc service
-* @name umbraco.services.tree:iconHelper
+* @name umbraco.services.iconHelper
 * @description A helper service for dealing with icons, mostly dealing with legacy tree icons
 **/
 function iconHelper() {

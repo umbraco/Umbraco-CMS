@@ -1,7 +1,9 @@
 /**
-* @ngdoc directive 
-* @name umbraco.directive:umbFileUpload
-* @description A directive applied to a file input box so that outer scopes can listen for when a file is selected
+* @ngdoc object
+* @name umbraco.directives.directive:umbFileUpload
+* @restrict AE 
+* @element ANY
+* @scope
 **/
 function umbFileUpload() {
     return {

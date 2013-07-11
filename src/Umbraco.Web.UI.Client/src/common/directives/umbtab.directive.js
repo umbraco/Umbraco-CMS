@@ -1,5 +1,5 @@
 /**
-* @ngdoc directive 
+* @ngdoc object 
 * @name umbraco.directive:umbTab 
 * @restrict E
 **/

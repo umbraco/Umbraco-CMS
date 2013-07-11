@@ -1,0 +1,96 @@
+<h1><code ng:non-bindable="">navigationService</code>
+<span class="hint">(service in module <code ng:non-bindable="">umbraco.services</code>
+)</span>
+</h1>
+<div><h2 id="Description">Description</h2>
+<div class="description"><p>Service to handle the main application navigation. Responsible for invoking the tree
+Section navigation and search, and maintain their state for the entire application lifetime</p></div>
+<h2 id="Dependencies">Dependencies</h2>
+<ul class="dependencies"><li><code ng:non-bindable=""><a href="api/$rootScope">$rootScope</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="api/$routeParams">$routeParams</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="api/$log">$log</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="api/$location">$location</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="api/dialogService">dialogService</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="api/treeService">treeService</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="api/sectionResource">sectionResource</a></code>
+</li>
+</ul>
+<div class="member method"><h2 id="Methods">Methods</h2>
+<ul class="methods"><li><h3 id="changeSection">changeSection(sectionAlias)</h3>
+<div class="changesection"><p>Changes the active section to a given section alias
+If the navigation is 'sticky' this will load the associated tree
+and load the dashboard related to the section</p><h4 id="Parameters">Parameters</h4>
+<ul class="parameters"><li><code ng:non-bindable="">sectionAlias  {string}  </code>
+<p>The alias of the section</p></li>
+</ul>
+</div>
+</li>
+<li><h3 id="hideDialog">hideDialog()</h3>
+<div class="hidedialog"><p>hides the currently open dialog</p></div>
+</li>
+<li><h3 id="hideMenu">hideMenu()</h3>
+<div class="hidemenu"><p>Hides the menu by hiding the containing dom element</p></div>
+</li>
+<li><h3 id="hideNavigation">hideNavigation()</h3>
+<div class="hidenavigation"><p>hides any open navigation panes and resets the tree, actions and the currently selected node</p></div>
+</li>
+<li><h3 id="hideSearch">hideSearch()</h3>
+<div class="hidesearch"><p>hides the search pane</p></div>
+</li>
+<li><h3 id="hideTree">hideTree()</h3>
+<div class="hidetree"><p>Hides the tree by hiding the containing dom element</p></div>
+</li>
+<li><h3 id="load">load(source)</h3>
+<div class="load"><p>Shows the legacy iframe and loads in the content based on the source url</p><h4 id="Parameters">Parameters</h4>
+<ul class="parameters"><li><code ng:non-bindable="">source  {String}  </code>
+<p>The URL to load into the iframe</p></li>
+</ul>
+</div>
+</li>
+<li><h3 id="showDialog">showDialog(args)</h3>
+<div class="showdialog"><p>Opens a dialog, for a given action on a given tree node
+uses the dialogServicet to inject the selected action dialog
+into #dialog div.umb-panel-body
+the path to the dialog view is determined by: 
+"views/" + current tree + "/" + action alias + ".html"</p><h4 id="Parameters">Parameters</h4>
+<ul class="parameters"><li><code ng:non-bindable="">args  {Object}  </code>
+<p>arguments passed to the function</p></li>
+<li><code ng:non-bindable="">args.scope  {Scope}  </code>
+<p>current scope passed to the dialog</p></li>
+<li><code ng:non-bindable="">args.action  {Object}  </code>
+<p>the clicked action containing <code>name</code> and <code>alias</code></p></li>
+</ul>
+</div>
+</li>
+<li><h3 id="showMenu">showMenu(event)</h3>
+<div class="showmenu"><p>Hides the tree by hiding the containing dom element. 
+This always returns a promise!</p><h4 id="Parameters">Parameters</h4>
+<ul class="parameters"><li><code ng:non-bindable="">event  {Event}  </code>
+<p>the click event triggering the method, passed from the DOM element</p></li>
+</ul>
+</div>
+</li>
+<li><h3 id="showSearch">showSearch()</h3>
+<div class="showsearch"><p>shows the search pane</p></div>
+</li>
+<li><h3 id="showTree">showTree(sectionAlias)</h3>
+<div class="showtree"><p>Shows the tree for a given tree alias but turning on the containing dom element
+only changes if the section is different from the current one</p><h4 id="Parameters">Parameters</h4>
+<ul class="parameters"><li><code ng:non-bindable="">sectionAlias  {string}  </code>
+<p>The alias of the section the tree should load data from</p></li>
+</ul>
+</div>
+</li>
+<li><h3 id="showUserDialog">showUserDialog()</h3>
+<div class="showuserdialog"><p>Opens the user dialog, next to the sections navigation
+template is located in views/common/dialogs/user.html</p></div>
+</li>
+</ul>
+</div>
+</div>

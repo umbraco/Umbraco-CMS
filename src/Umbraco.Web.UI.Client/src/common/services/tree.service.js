@@ -1,11 +1,11 @@
 
 /**
  * @ngdoc service
- * @name treeService
+ * @name umbraco.services.treeService
  * @function
  *
  * @description
- * The tree service factory
+ * The tree service factory, used internally by the umbTree and umbTreeItem directives
  */
 function treeService($q, treeResource, iconHelper) {
     //implement this in local storage

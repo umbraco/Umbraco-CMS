@@ -1,5 +1,5 @@
 /**
-    * @ngdoc directive 
+    * @ngdoc object 
     * @name umbraco.directive:valServer
     * @restrict A
     * @description This directive is used to associate a field with a server-side validation response

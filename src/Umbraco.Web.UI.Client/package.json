@@ -1,19 +1,19 @@
 {
-  "author": "Per Ploug, Anders Stenteberg & Shannon Deminick",
-  "name": "umbraco",
-  "homepage": "http://umbraco.github.io/Belle",
-  "version": "0.0.1-SNAPSHOT",
+  "author": "Umbraco HQ",
+  "name": "umbraco 7",
+  "homepage": "https://github.com/umbraco/umbraco-cms/tree/7.0.0",
+  "version": "0.0.1-TechnicalPReview",
   "repository": {
     "type": "git",
-    "url": "git@github.com:umbraco/Belle.git"
+    "url": "git@github.com:umbraco/umbraco-cms.git"
   },
   "bugs": {
-    "url": "https://github.com/umbraco/Belle/issues"
+    "url": "https://issues.umbraco.org"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://raw.github.com/umbraco/belle/master/LICENSE"
+      "url": "https://github.com/umbraco/Umbraco-CMS/blob/7.0.0/docs/License.txt"
     }
   ],
   "engines": {
@@ -43,8 +43,6 @@
     "karma-coffee-preprocessor": "0.0.1",
     "karma": "~0.9",
     "karma-phantomjs-launcher": "0.0.2",
-    "grunt-ngdocs": "~0.1.2",
-    "shelljs": "~0.1.4",
-    "grunt-jsdoc": "~0.4.0"
+    "grunt-ngdocs": "~0.1.2"
   }
 }

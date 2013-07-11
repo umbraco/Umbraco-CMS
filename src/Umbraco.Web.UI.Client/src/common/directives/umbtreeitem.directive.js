@@ -1,5 +1,5 @@
 /**
- * @ngdoc directive
+ * @ngdoc object
  * @name umbraco.directives:umbTreeItem
  * @element li
  * @function

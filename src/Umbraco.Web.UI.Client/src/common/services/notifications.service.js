@@ -137,7 +137,7 @@ angular.module('umbraco.services')
 		 * @description
 		 * Returns an array of current notifications to display
 		 *
-		 * @returns []
+		 * @returns {string} returns an array
 		 */
 		current: nArray,
 

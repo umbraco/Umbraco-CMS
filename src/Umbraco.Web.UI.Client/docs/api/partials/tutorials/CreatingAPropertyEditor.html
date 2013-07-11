@@ -1,0 +1,89 @@
+<h1><code ng:non-bindable=""></code>
+<span class="hint"></span>
+</h1>
+<div><h2 id="overview">Overview</h3>
+
+<p>This guide explains how to setup a simple property editor, how to hook it into Umbraco's datatypes
+how to hook it into angulars modules and its injector, and finally how you can test your property editor.</p>
+
+<p>So all the steps we will go through:</p>
+
+<ul>
+<li>Setting up a plugin</li>
+<li>Write some basic hello world html + js</li>
+<li>Register the data type in Umbraco</li>
+<li>Add external dependencies</li>
+<li>Complete the markdown editor</li>
+</ul>
+
+<h2 id="prerequisites">Prerequisites</h3>
+
+<p>This is about how to use AngularJS with umbraco, so it does not cover AngularJS itself, as there are tons of resources on that already here: </p>
+
+<ul>
+<li><a href="egghead.io">http://www.egghead.io/</a></li>
+<li><a href="angularjs.org/tutorial">http://docs.angularjs.org/tutorial</a></li>
+<li><a href="Tekpub">http://tekpub.com/products/angular</a></li>
+</ul>
+
+<h2 id="theendresult">The end result</h3>
+
+<p>By the end of this guide, we will have a simple markdown editor running inside of Umbraco
+registered as a data type in the backoffice, assigned to a document type, and the editor can 
+create and modify data.</p>
+
+<h2 id="settingupaplugin">Setting up a plugin</h3>
+
+<p>The first thing we must do is create a new folder inside <code>/app_plugins</code> folder. We will call it
+<code>MarkDownEditor</code></p>
+
+<p>Next We will create a simple manifest file to describe what this plugin does. This manifest will tell Umbraco about our new property editor and allows us to inject any needed files into the application, so we create the file <code>/app_plugins/MarkDownEditor/package.manifest</code> </p>
+
+<p>Inside this package manifest we add a bit of json to describe the property editor, have a look at the inline comments in the json below for details on each bit:</p>
+
+<pre><code>{   
+    //you can define multiple editors   
+    propertyEditors: [      
+        {
+            //this must be a unique guid    
+            id: "7e062c13-7c41-4ad9-b389-41d88aeef87c",
+            //the name
+            name: "Markdown editor",
+            //the html file we will load for the editor
+            editor: {
+                view: "~/App_Plugins/MarkDownEditor/markdowneditor.html"
+            }
+        }
+    ]
+    ,
+    //array of files we want to inject into the application on app_start
+    javascript: [
+        '~/App_Plugins/MarkDownEditor/markdowneditor.controller.js'
+    ]
+}
+</code></pre>
+
+<h2 id="writingsomebasichtmljs">Writing some basic html + js</h3>
+
+<p>Then we add 2 files to the /app_plugins/markdowneditor/ folder:
+- ´markdowneditor.html<code>
+-</code>markdowneditor.controller.js`    </p>
+
+<p>These will be our main files for the editor, with the .html file handling the view and the .js 
+part handling the functionality. </p>
+
+<p>In the .js file I will add a basic angularJS controller declaration</p>
+
+<pre><code>angular.module("umbraco")
+    .controller("My.MarkdownEditorController",
+    function () {
+        alert("The controller has landed");   
+    });
+</code></pre>
+
+<p>And in the .html file I'll add: </p>
+
+<pre><code>&lt;div ng-controller="My.MarkdownEditorController"&gt;
+    &lt;textarea ng-bind="model.value"&gt;&lt;/textarea&gt;
+&lt;/div&gt;
+</code></pre></div>

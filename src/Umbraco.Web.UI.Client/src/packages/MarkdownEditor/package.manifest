@@ -1,0 +1,20 @@
+{   
+	//you can define multiple editors 	
+	propertyEditors: [		
+		{
+			//this must be a unique guid	
+			id: "7e062c13-7c41-4ad9-b389-41d99aeef87c",
+			//the name
+			name: "Markdown editor",
+			//the html file we will load for the editor
+			editor: {
+				view: "~/App_Plugins/MarkDownEditor/markdowneditor.html"
+			}
+		}
+	]
+	,
+	//array of files we want to inject into the application on app_start
+	javascript: [
+	    '~/App_Plugins/MarkDownEditor/markdowneditor.controller.js'
+	]
+}

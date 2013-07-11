@@ -1,5 +1,5 @@
 /**
-* @ngdoc directive 
+* @ngdoc object 
 * @name umbraco.directives:valPropertyMsg
 * @restrict A
 * @element textarea

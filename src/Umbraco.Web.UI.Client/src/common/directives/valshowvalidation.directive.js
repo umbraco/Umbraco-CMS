@@ -1,6 +1,6 @@
 
 /**
-* @ngdoc directive 
+* @ngdoc object 
 * @name umbraco.directive:valShowValidation
 * @restrict A
 * @description Used to toggle the show-validation class on the element containing the form elements to validate.

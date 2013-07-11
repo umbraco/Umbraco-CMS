@@ -1,0 +1,37 @@
+<h1><code ng:non-bindable="">serverValidationService</code>
+<span class="hint">(service in module <code ng:non-bindable="">umbraco.services</code>
+)</span>
+</h1>
+<div><h2 id="Description">Description</h2>
+<div class="description"><p>used to handle server side validation and wires up the UI with the messages</p></div>
+<div class="member method"><h2 id="Methods">Methods</h2>
+<ul class="methods"><li><h3 id="addError">addError()</h3>
+<div class="adderror"><p>Adds an error message for the content property</p></div>
+</li>
+<li><h3 id="getCallbacks">getCallbacks()</h3>
+<div class="getcallbacks"><p>Gets all callbacks that has been registered using the subscribe method for the contentProperty + fieldName combo.
+This will always return any callbacks registered for just the property (i.e. field name is empty) and for ones with an 
+explicit field name set.</p></div>
+</li>
+<li><h3 id="getError">getError()</h3>
+<div class="geterror"><p>Gets the error message for the content property</p></div>
+</li>
+<li><h3 id="hasError">hasError()</h3>
+<div class="haserror"><p>Checks if the content property + field name combo has an error</p></div>
+</li>
+<li><h3 id="removeError">removeError()</h3>
+<div class="removeerror"><p>Removes an error message for the content property</p></div>
+</li>
+<li><h3 id="reset">reset()</h3>
+<div class="reset"><p>Clears all errors and notifies all callbacks that all server errros are now valid - used when submitting a form</p></div>
+</li>
+<li><h3 id="subscribe">subscribe()</h3>
+<div class="subscribe"><p>Adds a callback method that is executed whenever validation changes for the field name + property specified.
+This is generally used for server side validation in order to match up a server side validation error with 
+a particular field, otherwise we can only pinpoint that there is an error for a content property, not the 
+property's specific field. This is used with the val-server directive in which the directive specifies the 
+field alias to listen for.</p></div>
+</li>
+</ul>
+</div>
+</div>
