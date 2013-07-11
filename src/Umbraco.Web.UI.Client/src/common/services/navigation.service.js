@@ -17,7 +17,7 @@
  */
 
 angular.module('umbraco.services')
-.factory('navigationService', function ($rootScope, $routeParams, $log, $location, $q, dialogService, treeService, sectionResource) {
+.factory('navigationService', function ($rootScope, $routeParams, $log, $location, $q, dialogService, treeService, notificationsService) {
 
     var currentSection = $routeParams.section;
     var currentId = $routeParams.id;
@@ -95,8 +95,8 @@ angular.module('umbraco.services')
         changeSection: function (sectionAlias) {
             if (this.ui.stickyNavigation) {
                 setMode("default-opensection");
-                this.ui.currentSection = selectedSection;
-                this.showTree(selectedSection);
+                this.ui.currentSection = sectionAlias;
+                this.showTree(sectionAlias);
             }
 
             $location.path(sectionAlias);
