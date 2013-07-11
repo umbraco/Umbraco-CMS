@@ -154,7 +154,9 @@ angular.module('umbraco.services')
                 };
 
                 this.ui.currentNode = args.node;
-                this.showDialog({
+                
+                //return the dialog this is opening.
+                return this.showDialog({
                     scope: args.scope,
                     node: args.node,
                     action: act,
@@ -175,6 +177,9 @@ angular.module('umbraco.services')
 
                 this.ui.currentNode = args.node;
                 this.ui.dialogTitle = args.node.name;
+
+                //we're not opening a dialog, return null.
+                return null;
             }
         },
 

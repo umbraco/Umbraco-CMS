@@ -12,6 +12,7 @@
 function NavigationController($scope,$rootScope, $location, navigationService, dialogService, historyService, sectionResource, angularHelper) {
 
     var actionDialog = null;
+    var menuDialog = null;
 
     //load navigation service handlers
     $scope.changeSection = navigationService.changeSection;
@@ -53,7 +54,12 @@ function NavigationController($scope,$rootScope, $location, navigationService, d
         
         $scope.currentNode = args.node;
         args.scope = $scope;
-        navigationService.showMenu(ev, args);
+        
+        //ensure the menuDialog is cleared before opening another!
+        if (menuDialog) {
+            dialogService.close(menuDialog);
+        }
+        menuDialog = navigationService.showMenu(ev, args);
     });
 
     //this reacts to tree items themselves being clicked
