@@ -86,3 +86,4 @@ build/_BuildOutput/
 src/Umbraco.Web.UI.Client/src/[Ll]ess/*.css
 tools/NDepend/
 
+src/Umbraco.Web.UI/App_Plugins/*
