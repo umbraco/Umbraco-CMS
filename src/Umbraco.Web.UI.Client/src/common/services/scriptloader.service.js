@@ -22,7 +22,7 @@
  * </pre> 
  */
 angular.module('umbraco.services')
-.factory('scriptLoader', function ($q, angularHelper) {
+.factory('scriptLoader', function ($q, $log, angularHelper) {
 
     return {
         load: function (pathArray, scope) {
@@ -34,6 +34,8 @@ angular.module('umbraco.services')
 
             //don't load anything if there's nothing to load
             if (nonEmpty.length > 0) {
+
+                $log.log("loading");
                 yepnope({
                     load: pathArray,
                     complete: function() {
@@ -62,6 +64,7 @@ angular.module('umbraco.services')
                     });
                 }
             }
+
             return deferred.promise;
         }
     };
