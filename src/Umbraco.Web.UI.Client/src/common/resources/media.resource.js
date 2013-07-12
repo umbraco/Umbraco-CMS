@@ -35,7 +35,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "mediaApiBaseUrl",
                        "GetEmpty",
-                       [{ contentTypeAlias: contentTypeAlias }, { parentId: parentId }])),
+                       [{ contentTypeAlias: alias }, { parentId: parentId }])),
                'Failed to retreive data for empty media item type ' + alias);
 
         },

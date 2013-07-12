@@ -39,8 +39,10 @@ namespace Umbraco.Web.Editors
         /// has functionality included in the ui.xml structure.
         /// </summary>
         /// <returns></returns>
-        public HttpResponseMessage DeleteLegacyItem(string nodeId, string nodeType, string nodeText)
+        public HttpResponseMessage DeleteLegacyItem(string nodeId, string nodeType)
         {
+            //TODO: Detect recycle bin node ids and delete permanently!
+
             //In order to process this request we MUST have an HttpContext available
             var httpContextAttempt = TryGetHttpContext();
             if (httpContextAttempt.Success)
@@ -48,7 +50,7 @@ namespace Umbraco.Web.Editors
                 int id;
                 if (int.TryParse(nodeId, out id))
                 {
-                    LegacyDialogHandler.Delete(httpContextAttempt.Result, UmbracoUser, nodeType, id, nodeText);
+                    LegacyDialogHandler.Delete(httpContextAttempt.Result, UmbracoUser, nodeType, id, "");
                     return new HttpResponseMessage(HttpStatusCode.OK);
                 }
                 //We must have an integer id for this to work

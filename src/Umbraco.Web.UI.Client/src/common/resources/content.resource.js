@@ -50,7 +50,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "contentApiBaseUrl",
                        "GetEmpty",
-                       [{ contentTypeAlias: contentTypeAlias }, { parentId: parentId }])),
+                       [{ contentTypeAlias: alias }, { parentId: parentId }])),
                'Failed to retreive data for empty content item type ' + alias);
         },
 

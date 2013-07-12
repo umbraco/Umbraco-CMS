@@ -9,7 +9,7 @@
  * 
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope,$rootScope, $location, navigationService, dialogService, historyService, sectionResource, angularHelper) {
+function NavigationController($scope,$rootScope, $location, $log, navigationService, dialogService, historyService, sectionResource, angularHelper) {
 
     //load navigation service handlers
     $scope.changeSection = navigationService.changeSection;

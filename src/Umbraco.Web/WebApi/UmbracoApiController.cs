@@ -31,10 +31,10 @@ namespace Umbraco.Web.WebApi
             object context;
             if (Request.Properties.TryGetValue("MS_HttpContext", out context))
             {
-                var httpContext = context as HttpContext;
+                var httpContext = context as HttpContextBase;
                 if (httpContext != null)
                 {
-                    return new Attempt<HttpContextBase>(true, new HttpContextWrapper(httpContext));
+                    return new Attempt<HttpContextBase>(true, httpContext);
                 }
             }
             return Attempt<HttpContextBase>.False;

@@ -59,7 +59,8 @@ namespace Umbraco.Web.Editors
                                 {"treeApplicationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>("GetApplicationTrees")},
                                 {"contentTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentTypeController>("GetAllowedChildren")},
                                 {"mediaTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MediaTypeApiController>("GetAllowedChildren")},
-                                {"authenticationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>("PostLogin")}
+                                {"authenticationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>("PostLogin")},
+                                {"legacyApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<LegacyController>("DeleteLegacyItem")}
                             }
                     },
                     {
