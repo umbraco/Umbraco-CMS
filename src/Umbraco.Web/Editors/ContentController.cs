@@ -24,7 +24,7 @@ namespace Umbraco.Web.Editors
     /// </summary>
     [PluginController("UmbracoApi")]
     [ValidationFilter]
-    public class ContentController : UmbracoAuthorizedApiController
+    public class ContentController : UmbracoAuthorizedJsonController
     {
         private readonly ContentModelMapper _contentModelMapper;
 
@@ -45,16 +45,6 @@ namespace Umbraco.Web.Editors
             : base(umbracoContext)
         {
             _contentModelMapper = contentModelMapper;
-        }
-
-        /// <summary>
-        /// Remove the xml formatter... only support JSON!
-        /// </summary>
-        /// <param name="controllerContext"></param>
-        protected override void Initialize(global::System.Web.Http.Controllers.HttpControllerContext controllerContext)
-        {
-            base.Initialize(controllerContext);
-            controllerContext.Configuration.Formatters.Remove(controllerContext.Configuration.Formatters.XmlFormatter);
         }
 
         public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)

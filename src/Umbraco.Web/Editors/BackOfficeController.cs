@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Web.Mvc;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
-using umbraco.cms.presentation.Trees;
-using umbraco.controls.Tree;
-using umbraco.interfaces;
-using Action = umbraco.BusinessLogic.Actions.Action;
 
 namespace Umbraco.Web.Editors
 {
