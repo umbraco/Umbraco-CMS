@@ -38,6 +38,19 @@ namespace Umbraco.Web
         }
 
         /// <summary>
+        /// Return the Base Url (not including the action) for a Web Api service
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url"></param>
+        /// <param name="actionName"></param>
+        /// <returns></returns>
+        public static string GetUmbracoApiServiceBaseUrl<T>(this UrlHelper url, string actionName)
+            where T : UmbracoApiController
+        {
+            return url.GetUmbracoApiService<T>(actionName).TrimEnd(actionName);
+        }
+
+        /// <summary>
         /// Return the Url for a Web Api service
         /// </summary>
         /// <param name="url"></param>

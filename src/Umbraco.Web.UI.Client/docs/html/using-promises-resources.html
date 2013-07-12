@@ -113,7 +113,7 @@
     <h1>Using AngularJS Promises and Umbraco Resources</h1>
 <h2>Promises in Umbraco Resources</h2>
 <p>All Umbraco resource methods utilize a helper method:</p>
-<pre><code>angularHelper.resourcePromise</code></pre>
+<pre><code>umbRequestHelper.resourcePromise</code></pre>
 <p>This method accepts 2 arguments:</p>
 <ul>
 <li>The angular HttpPromise which is created with a call to $http.get (post, etc..)</li>
@@ -123,13 +123,13 @@
 <pre><code>/** Loads in the data to display the nodes menu */
 loadMenu: function (node) {
 
-    return angularHelper.resourcePromise(
+    return umbRequestHelper.resourcePromise(
         $http.get(getTreeMenuUrl(node)),
         &quot;Failed to retreive data for a node&#39;s menu &quot; + node.id);
 }</code></pre>
-<p>HTTP error handling is performed automatically inside of the <code>angularHelper.resourcePromise</code> and inside of Umbraco&#39;s response interceptors.</p>
+<p>HTTP error handling is performed automatically inside of the <code>umbRequestHelper.resourcePromise</code> and inside of Umbraco&#39;s response interceptors.</p>
 <h2>Consuming Umbraco resources</h2>
-<p>When consuming Umbraco resources, a normal angular promise will be returned based on the above <code>angularHelper.resourcePromise</code>. The success callback will always receive the RAW json data from the server and the error callback will always receive an object containing these properties:</p>
+<p>When consuming Umbraco resources, a normal angular promise will be returned based on the above <code>umbRequestHelper.resourcePromise</code>. The success callback will always receive the RAW json data from the server and the error callback will always receive an object containing these properties:</p>
 <ul>
 <li>erroMsg = the error message that can be used to show in the UI</li>
 <li>data = the original data object used to create the promise</li>

@@ -48,15 +48,26 @@ namespace Umbraco.Web.Editors
             //now we need to build up the variables
             var d = new Dictionary<string, object>
                 {
-                    {"umbracoPath", GlobalSettings.Path},
-                    {"legacyTreeJs", Url.Action("LegacyTreeJs", "BackOffice")},
-                    {"contentApiBaseUrl", Url.GetUmbracoApiService<ContentController>("PostSave").TrimEnd("PostSave")},
-                    {"mediaApiBaseUrl", Url.GetUmbracoApiService<MediaController>("GetRootMedia").TrimEnd("GetRootMedia")},
-                    {"sectionApiBaseUrl", Url.GetUmbracoApiService<SectionController>("GetSections").TrimEnd("GetSections")},
-                    {"treeApplicationApiBaseUrl", Url.GetUmbracoApiService<ApplicationTreeController>("GetApplicationTrees").TrimEnd("GetApplicationTrees")},
-                    {"contentTypeApiBaseUrl", Url.GetUmbracoApiService<ContentTypeController>("GetAllowedChildren").TrimEnd("GetAllowedChildren")},
-                    {"mediaTypeApiBaseUrl", Url.GetUmbracoApiService<MediaTypeApiController>("GetAllowedChildren").TrimEnd("GetAllowedChildren")},
-                    {"authenticationApiBaseUrl", Url.GetUmbracoApiService<AuthenticationController>("PostLogin").TrimEnd("PostLogin")}
+                    {
+                        "umbracoUrls", new Dictionary<string, object>
+                            {
+                                {"legacyTreeJs", Url.Action("LegacyTreeJs", "BackOffice")},                    
+                                //API URLs
+                                {"contentApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentController>("PostSave")},
+                                {"mediaApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MediaController>("GetRootMedia")},
+                                {"sectionApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<SectionController>("GetSections")},
+                                {"treeApplicationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>("GetApplicationTrees")},
+                                {"contentTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentTypeController>("GetAllowedChildren")},
+                                {"mediaTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MediaTypeApiController>("GetAllowedChildren")},
+                                {"authenticationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>("PostLogin")}
+                            }
+                    },
+                    {
+                        "umbracoSettings", new Dictionary<string, object>
+                            {
+                                {"umbracoPath", GlobalSettings.Path}
+                            }
+                    }
                 };
 
             return JavaScript(ServerVariablesParser.Parse(d));

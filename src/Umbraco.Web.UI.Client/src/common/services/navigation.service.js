@@ -162,8 +162,8 @@ angular.module('umbraco.services')
                         self.ui.currentNode = args.node;
                         
                         //ensure the current dialog is cleared before creating another!
-                        if (this.ui.currentDialog) {
-                            dialogService.close(this.ui.currentDialog);
+                        if (self.ui.currentDialog) {
+                            dialogService.close(self.ui.currentDialog);
                         }
 
                         var dialog = self.showDialog({

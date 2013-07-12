@@ -3,52 +3,55 @@
     * @name umbraco.resources.contentResource
     * @description Loads/saves in data for content
     **/
-function contentResource($q, $http, umbDataFormatter, umbRequestHelper, angularHelper) {
+function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
-    /** internal method to get the api url */
-    function getContentUrl(contentId) {
-        return Umbraco.Sys.ServerVariables.contentApiBaseUrl + "GetById?id=" + contentId;
-    }
-    /** internal method to get the api url */
-    function getByIdsUrl(ids) {
-        var idQuery = "";
-        _.each(ids, function(item) {
-            idQuery += "ids=" + item + "&";
-        });
-        return Umbraco.Sys.ServerVariables.contentApiBaseUrl + "GetById?" + idQuery;
-    }
-    /** internal method to get the api url */
-    function getEmptyContentUrl(contentTypeAlias, parentId) {
-        return Umbraco.Sys.ServerVariables.contentApiBaseUrl + "GetEmpty?contentTypeAlias=" + contentTypeAlias + "&parentId=" + parentId;
-    }
-    /** internal method to get the api url for publishing */
-    function getSaveUrl() {
-        return Umbraco.Sys.ServerVariables.contentApiBaseUrl + "PostSave";
-    }
     /** internal method process the saving of data and post processing the result */
     function saveContentItem(content, action, files) {
-        return umbRequestHelper.postSaveContent(getSaveUrl(content.id), content, action, files);
+        return umbRequestHelper.postSaveContent(
+            umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "PostSave"),
+            content, action, files);
     }
 
     return {
-        getById: function (id) {
-            return angularHelper.resourcePromise(
-                $http.get(getContentUrl(id)),
-                'Failed to retreive data for content id ' + id);
+        getById: function (id) {            
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentApiBaseUrl",
+                       "GetById",
+                       [{ id: id }])),
+               'Failed to retreive data for content id ' + id);
         },
         
         getByIds: function (ids) {
-            return angularHelper.resourcePromise(
-                $http.get(getByIdsUrl(ids)),
-                'Failed to retreive data for content ids ' + ids);
+            
+            var idQuery = "";
+            _.each(ids, function(item) {
+                idQuery += "ids=" + item + "&";
+            });
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentApiBaseUrl",
+                       "GetByIds",
+                       idQuery)),
+               'Failed to retreive data for content id ' + id);
         },
 
         /** returns an empty content object which can be persistent on the content service
             requires the parent id and the alias of the content type to base the scaffold on */
         getScaffold: function (parentId, alias) {
-            return angularHelper.resourcePromise(
-                $http.get(getEmptyContentUrl(alias, parentId)),
-                'Failed to retreive data for empty content item type ' + alias);
+            
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentApiBaseUrl",
+                       "GetEmpty",
+                       [{ contentTypeAlias: contentTypeAlias }, { parentId: parentId }])),
+               'Failed to retreive data for empty content item type ' + alias);
         },
 
         getChildren: function (parentId, options) {

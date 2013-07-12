@@ -34,79 +34,6 @@ function angularHelper($log, $q) {
         
         /**
          * @ngdoc function
-         * @name resourcePromise
-         * @methodOf umbraco.services.angularHelper
-         * @function
-         *
-         * @description
-         * This returns a promise with an underlying http call, it is a helper method to reduce
-         *  the amount of duplicate code needed to query http resources and automatically handle any 
-         *  Http errors. See /docs/source/using-promises-resources.md
-         *
-         * @param {object} opts A mixed object which can either be a string representing the error message to be
-         *   returned OR an object containing either:
-         *     { success: successCallback, errorMsg: errorMessage }
-         *          OR
-         *     { success: successCallback, error: errorCallback }
-         *   In both of the above, the successCallback must accept these parameters: data, status, headers, config
-         *   If using the errorCallback it must accept these parameters: data, status, headers, config
-         *   The success callback must return the data which will be resolved by the deferred object.
-         *   The error callback must return an object containing: {errorMsg: errorMessage, data: originalData }
-         */
-        resourcePromise: function (httpPromise, opts) {
-            var deferred = $q.defer();
-            
-            /** The default success callback used if one is not supplied in the opts */
-            function defaultSuccess(data, status, headers, config) {
-                //when it's successful, just return the data
-                return data;
-            }
-
-            /** The default error callback used if one is not supplied in the opts */
-            function defaultError(data, status, headers, config) {
-                return {
-                    //NOTE: the default error message here should never be used based on the above docs!
-                    errorMsg: (angular.isString(opts) ? opts : 'An error occurred!'),
-                    data: data
-                };
-            }
-
-            //create the callbacs based on whats been passed in.
-            var callbacks = {                
-                success: (!opts.success ? defaultSuccess : opts.success),
-                error: (!opts.error ? defaultError : opts.error)
-            };
-            
-            httpPromise.success(function (data, status, headers, config) {
-
-                //invoke the callback 
-                var result = callbacks.success.apply(this, [data, status, headers, config]);
-
-                //when it's successful, just return the data
-                deferred.resolve(result);
-                
-            }).error(function(data, status, headers, config) {
-                
-                //invoke the callback
-                var result = callbacks.error.apply(this, [data, status, headers, config]);
-
-                //when there's an erorr...
-                // TODO: Deal with the error in a global way
-                
-                //return an error object including the error message for UI
-                deferred.reject({
-                    errorMsg: result.errorMsg,
-                    data: result.data
-                });
-
-            });
-
-            return deferred.promise;
-
-        },
-
-        /**
-         * @ngdoc function
          * @name safeApply
          * @methodOf umbraco.services.angularHelper
          * @function
@@ -333,6 +260,140 @@ angular.module('umbraco.services').factory('umbImageHelper', umbImageHelper);
 function umbRequestHelper($http, $q, umbDataFormatter, angularHelper) {
     return {
         
+        /**
+         * @ngdoc method
+         * @name umbRequestHelper#dictionaryToQueryString
+         * @methodOf umbRequestHelper
+         * @function
+         *
+         * @description
+         * This will turn an array of key/value pairs into a query string
+         * 
+         * @param {Array} queryStrings An array of key/value pairs
+         */
+        dictionaryToQueryString: function(queryStrings) {
+
+            if (!angular.isArray(queryStrings)) {
+                throw "The queryString parameter is not an array of key value pairs";
+            }
+
+            return _.map(queryStrings, function (item) {            
+                var key = null;
+                var val = null;
+                for (var k in item) {
+                    key = k;
+                    val = item[k];
+                    break;
+                }
+                if (key == null || val == null) {
+                    throw "The object in the array was not formatted as a key/value pair";
+                }
+                return key + "=" + val;
+            }).join("&");
+            
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbRequestHelper#getApiUrl
+         * @methodOf umbRequestHelper
+         * @function
+         *
+         * @description
+         * This will return the webapi Url for the requested key based on the servervariables collection
+         * 
+         * @param {string} apiName The webapi name that is found in the servervariables["umbracoUrls"] dictionary
+         * @param {string} actionName The webapi action name 
+         * @param {object} queryStrings Can be either a string or an array containing key/value pairs
+         */
+        getApiUrl: function(apiName, actionName, queryStrings) {
+            if (!Umbraco || !Umbraco.Sys || !Umbraco.Sys.ServerVariables || !Umbraco.Sys.ServerVariables["umbracoUrls"]) {
+                throw "No server variables defined!";
+            }
+            
+            if (!Umbraco.Sys.ServerVariables["umbracoUrls"][apiName]) {
+                throw "No url found for api name " + apiName;
+            }
+            
+            return Umbraco.Sys.ServerVariables["umbracoUrls"][apiName] + actionName +
+                (!queryStrings ? "" : "?" + (angular.isString(queryStrings) ? queryStrings : this.dictionaryToQueryString(queryStrings)));
+
+        },
+
+        /**
+         * @ngdoc function
+         * @name resourcePromise
+         * @methodOf umbraco.services.angularHelper
+         * @function
+         *
+         * @description
+         * This returns a promise with an underlying http call, it is a helper method to reduce
+         *  the amount of duplicate code needed to query http resources and automatically handle any 
+         *  Http errors. See /docs/source/using-promises-resources.md
+         *
+         * @param {object} opts A mixed object which can either be a string representing the error message to be
+         *   returned OR an object containing either:
+         *     { success: successCallback, errorMsg: errorMessage }
+         *          OR
+         *     { success: successCallback, error: errorCallback }
+         *   In both of the above, the successCallback must accept these parameters: data, status, headers, config
+         *   If using the errorCallback it must accept these parameters: data, status, headers, config
+         *   The success callback must return the data which will be resolved by the deferred object.
+         *   The error callback must return an object containing: {errorMsg: errorMessage, data: originalData }
+         */
+        resourcePromise: function (httpPromise, opts) {
+            var deferred = $q.defer();
+
+            /** The default success callback used if one is not supplied in the opts */
+            function defaultSuccess(data, status, headers, config) {
+                //when it's successful, just return the data
+                return data;
+            }
+
+            /** The default error callback used if one is not supplied in the opts */
+            function defaultError(data, status, headers, config) {
+                return {
+                    //NOTE: the default error message here should never be used based on the above docs!
+                    errorMsg: (angular.isString(opts) ? opts : 'An error occurred!'),
+                    data: data
+                };
+            }
+
+            //create the callbacs based on whats been passed in.
+            var callbacks = {
+                success: (!opts.success ? defaultSuccess : opts.success),
+                error: (!opts.error ? defaultError : opts.error)
+            };
+
+            httpPromise.success(function (data, status, headers, config) {
+
+                //invoke the callback 
+                var result = callbacks.success.apply(this, [data, status, headers, config]);
+
+                //when it's successful, just return the data
+                deferred.resolve(result);
+
+            }).error(function (data, status, headers, config) {
+
+                //invoke the callback
+                var result = callbacks.error.apply(this, [data, status, headers, config]);
+
+                //when there's an erorr...
+                // TODO: Deal with the error in a global way
+
+                //return an error object including the error message for UI
+                deferred.reject({
+                    errorMsg: result.errorMsg,
+                    data: result.data
+                });
+
+            });
+
+            return deferred.promise;
+
+        },
+
+        /** Used for saving media/content specifically */
         postSaveContent: function (restApiUrl, content, action, files) {
             
             var deferred = $q.defer();

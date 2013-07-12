@@ -1,9 +1,9 @@
 ﻿/**
     * @ngdoc service 
-    * @name umbraco.resources.section     
+    * @name umbraco.resources.sectionResource     
     * @description Loads in data for section
     **/
-function sectionResource($q, $http, angularHelper) {
+function sectionResource($q, $http, umbRequestHelper) {
 
     /** internal method to get the tree app url */
     function getSectionsUrl(section) {
@@ -15,9 +15,13 @@ function sectionResource($q, $http, angularHelper) {
         /** Loads in the data to display the section list */
         getSections: function () {
             
-            return angularHelper.resourcePromise(
-                $http.get(getSectionsUrl()),
-                'Failed to retreive data for sections');
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "sectionApiBaseUrl",
+                       "GetSections")),
+               'Failed to retreive data for sections');
+
 		}
     };
 }

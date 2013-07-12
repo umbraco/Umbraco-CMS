@@ -3,12 +3,7 @@
     * @name umbraco.resources.contentTypeResource
     * @description Loads in data for content types
     **/
-function contentTypeResource($q, $http, $rootScope, angularHelper) {
-
-    /** internal method to get the api url */
-    function getChildContentTypesUrl(contentId) {
-        return Umbraco.Sys.ServerVariables.contentTypeApiBaseUrl + "GetAllowedChildren?contentId=" + contentId;
-    }
+function contentTypeResource($q, $http, umbRequestHelper) {
 
     return {
 
@@ -44,9 +39,13 @@ function contentTypeResource($q, $http, $rootScope, angularHelper) {
         //return all types allowed under given document
         getAllowedTypes: function (contentId) {
            
-            return angularHelper.resourcePromise(
-                $http.get(getChildContentTypesUrl(contentId)),
-                'Failed to retreive data for content id ' + contentId);
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentTypeApiBaseUrl",
+                       "GetAllowedChildren",
+                       [{ contentId: contentId }])),
+               'Failed to retreive data for content id ' + contentId);
         }
 
     };
