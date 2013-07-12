@@ -30,6 +30,8 @@ namespace umbraco
             return false;            
         }
 
+        private string _returnUrl = "";
+
         public override string ReturnUrl
         {
             get { return _returnUrl; }

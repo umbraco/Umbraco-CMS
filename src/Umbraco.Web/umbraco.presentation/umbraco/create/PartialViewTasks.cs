@@ -4,8 +4,10 @@ using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.UI;
 using umbraco.BasePages;
 using Umbraco.Core;
+using umbraco.BusinessLogic;
 
 namespace umbraco
 {
@@ -13,12 +15,9 @@ namespace umbraco
 	/// The UI 'tasks' for the create dialog and delete processes
 	/// </summary>
 	[UmbracoWillObsolete("http://issues.umbraco.org/issue/U4-1373", "This will one day be removed when we overhaul the create process")]
-	public class PartialViewTasks : interfaces.ITaskReturnUrl
+    public class PartialViewTasks : LegacyDialogTask
 	{
-		private string _alias;
-		private int _parentId;
-		private int _typeId;
-		private int _userId;
+		
 
 		protected virtual string EditViewFile
 		{
@@ -35,62 +34,39 @@ namespace umbraco
 			get { return "Partials"; }
 		}
 
-		public int UserId
-		{
-			set { _userId = value; }
-		}
-		public int TypeID
-		{
-			set { _typeId = value; }
-			get { return _typeId; }
-		}
+	    public override bool PerformSave()
+	    {
+            var fileName = Alias + ".cshtml";
+            var fullFilePath = IOHelper.MapPath(BasePath + fileName);
 
+            //return the link to edit the file if it already exists
+            if (File.Exists(fullFilePath))
+            {
+                _returnUrl = string.Format(EditViewFile + "?file={0}", HttpUtility.UrlEncode(ParentFolderName.EnsureEndsWith('/') + fileName));
+                return true;
+            }
 
-		public string Alias
-		{
-			set { _alias = value; }
-			get { return _alias; }
-		}
+            //create the file
+            using (var sw = File.CreateText(fullFilePath))
+            {
+                WriteTemplateHeader(sw);
+            }
 
-		public int ParentID
-		{
-			set { _parentId = value; }
-			get { return _parentId; }
-		}
-
-		public bool Save()
-		{
-			var fileName = _alias + ".cshtml";
-			var fullFilePath = IOHelper.MapPath(BasePath + fileName);
-			
-			//return the link to edit the file if it already exists
-			if (File.Exists(fullFilePath))
-			{
-				_returnUrl = string.Format(EditViewFile + "?file={0}", HttpUtility.UrlEncode(ParentFolderName.EnsureEndsWith('/') + fileName));
-				return true;
-			}	
-
-			//create the file
-			using (var sw = File.CreateText(fullFilePath))
-			{
-				WriteTemplateHeader(sw);
-			}
-
-			// Create macro?
-			if (ParentID == 1)
-			{
+            // Create macro?
+            if (ParentID == 1)
+            {
                 var name = fileName
                     .Substring(0, (fileName.LastIndexOf('.') + 1)).Trim('.')
                     .SplitPascalCasing().ToFirstUpperInvariant();
-			    var m = cms.businesslogic.macro.Macro.MakeNew(name);
-				m.ScriptingFile = BasePath + fileName;
-			}
-			
-			_returnUrl = string.Format(EditViewFile + "?file={0}", HttpUtility.UrlEncode(ParentFolderName.EnsureEndsWith('/') + fileName));
-			return true;
-		}
+                var m = cms.businesslogic.macro.Macro.MakeNew(name);
+                m.ScriptingFile = BasePath + fileName;
+            }
 
-		protected virtual void WriteTemplateHeader(StreamWriter sw)
+            _returnUrl = string.Format(EditViewFile + "?file={0}", HttpUtility.UrlEncode(ParentFolderName.EnsureEndsWith('/') + fileName));
+            return true;
+	    }
+
+	    protected virtual void WriteTemplateHeader(StreamWriter sw)
 		{
 			//write out the template header
 			sw.Write("@inherits ");
@@ -98,27 +74,31 @@ namespace umbraco
 			sw.Write("<dynamic>");
 		}
 
-		public bool Delete()
-		{
-			var path = IOHelper.MapPath(BasePath + _alias.TrimStart('/'));
+	    public override bool PerformDelete()
+	    {
+            var path = IOHelper.MapPath(BasePath + Alias.TrimStart('/'));
 
-			if (File.Exists(path))
-				File.Delete(path);
-			else if (Directory.Exists(path))
-				Directory.Delete(path, true);
+            if (File.Exists(path))
+                File.Delete(path);
+            else if (Directory.Exists(path))
+                Directory.Delete(path, true);
 
-			LogHelper.Info<PartialViewTasks>(string.Format("{0} Deleted by user {1}", _alias, UmbracoEnsuredPage.CurrentUser.Id));
+            LogHelper.Info<PartialViewTasks>(string.Format("{0} Deleted by user {1}", Alias, UmbracoEnsuredPage.CurrentUser.Id));
 
-			return true;
-		}
+            return true;
+	    }
 
-		#region ITaskReturnUrl Members
+	    
 		private string _returnUrl = "";
-		public string ReturnUrl
-		{
-			get { return _returnUrl; }
-		}
+        public override string ReturnUrl
+        {
+            get { return _returnUrl; }
+        }
 
-		#endregion
+	    public override string AssignedApp
+	    {
+            get { return DefaultApps.settings.ToString(); }
+	    }
+
 	}
 }

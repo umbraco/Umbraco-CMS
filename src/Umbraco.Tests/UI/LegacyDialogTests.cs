@@ -50,6 +50,7 @@ namespace Umbraco.Tests.UI
         [TestCase(typeof(DataTypeTasks), DefaultApps.developer)]
         [TestCase(typeof(CreatedPackageTasks), DefaultApps.developer)]
         [TestCase(typeof(contentTasks), DefaultApps.content)]
+        [TestCase(typeof(PartialViewTasks), DefaultApps.settings)]
         public void Check_Assigned_Apps_For_Tasks(Type taskType, DefaultApps app)
         {
             var task = (LegacyDialogTask)Activator.CreateInstance(taskType);

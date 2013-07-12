@@ -19,7 +19,7 @@ namespace umbraco
                 mediaType.Save();
             }
 
-            m_returnUrl = string.Format("settings/editMediaType.aspx?id={0}", mediaType.Id);
+            _returnUrl = string.Format("settings/editMediaType.aspx?id={0}", mediaType.Id);
             return true;
         }
 

@@ -1,15 +1,19 @@
+using System.Web;
+using System.Web.UI;
 using Umbraco.Core.Logging;
 using Umbraco.Web.UI;
-
+using Umbraco.Web;
 using System;
+using Umbraco.Web.UI.Controls;
 using umbraco.BasePages;
+using UmbracoUserControl = Umbraco.Web.UI.Controls.UmbracoUserControl;
 
 namespace umbraco.cms.presentation.create.controls
 {
     /// <summary>
 	///		Summary description for simple.
 	/// </summary>
-	public partial class simple : System.Web.UI.UserControl
+	public partial class simple : UmbracoUserControl
 	{
 
 		protected void Page_Load(object sender, System.EventArgs e)
@@ -49,8 +53,8 @@ namespace umbraco.cms.presentation.create.controls
 
                 var returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),
-                    BasePage.Current.getUser(),
-                    helper.Request("nodeType"),
+                    Security.CurrentUser,
+                    Request.GetItemAsString("nodeType"),
 					nodeId,
 					rename.Text);
 

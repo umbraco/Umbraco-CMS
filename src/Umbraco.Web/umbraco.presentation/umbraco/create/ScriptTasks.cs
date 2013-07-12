@@ -11,7 +11,7 @@ namespace umbraco
      
         public override bool PerformSave()
         {
-            string[] scriptFileAr = _alias.Split('\u00A4');
+            string[] scriptFileAr = Alias.Split('\u00A4');
             
             var relPath = scriptFileAr[0];
             var fileName = scriptFileAr[1];
@@ -48,7 +48,7 @@ namespace umbraco
             else if (System.IO.Directory.Exists(path))
                 System.IO.Directory.Delete(path, true);
 
-            LogHelper.Info<ScriptTasks>(string.Format("{0} Deleted by user {1}", _alias, UmbracoEnsuredPage.CurrentUser.Id));
+            LogHelper.Info<ScriptTasks>(string.Format("{0} Deleted by user {1}", Alias, User.Id));
 
             return true;
         }

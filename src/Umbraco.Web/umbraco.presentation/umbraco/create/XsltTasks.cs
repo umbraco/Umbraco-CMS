@@ -58,7 +58,7 @@ namespace umbraco
 				// Create macro?
 				if (ParentID == 1)
 				{
-				    var name = _alias.Substring(_alias.IndexOf("|||") + 3, _alias.Length - _alias.IndexOf("|||") - 3)
+                    var name = Alias.Substring(Alias.IndexOf("|||") + 3, Alias.Length - Alias.IndexOf("|||") - 3)
 				                     .SplitPascalCasing().ToFirstUpperInvariant();
 					cms.businesslogic.macro.Macro m =
 						cms.businesslogic.macro.Macro.MakeNew(name);

@@ -35,7 +35,7 @@ namespace umbraco
 
         public override bool PerformDelete()
         {
-			LogHelper.Debug<dictionaryTasks>(_typeID.ToString() + " " + _parentID.ToString() + " deleting " + Alias);
+			LogHelper.Debug<dictionaryTasks>(TypeID.ToString() + " " + ParentID.ToString() + " deleting " + Alias);
             new cms.businesslogic.Dictionary.DictionaryItem(ParentID).delete();
             return true;
         }

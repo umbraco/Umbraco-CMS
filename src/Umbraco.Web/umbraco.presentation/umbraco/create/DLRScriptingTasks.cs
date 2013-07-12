@@ -70,7 +70,7 @@ namespace umbraco
             }
             catch (Exception ex)
             {
-                LogHelper.Error<DLRScriptingTasks>(string.Format("Could not remove DLR file {0} - User {1}", Alias, UmbracoEnsuredPage.CurrentUser.Id), ex);
+                LogHelper.Error<DLRScriptingTasks>(string.Format("Could not remove DLR file {0} - User {1}", Alias, User.Id), ex);
             }
             return true;
         }

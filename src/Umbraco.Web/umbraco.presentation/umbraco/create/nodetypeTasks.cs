@@ -24,7 +24,7 @@ namespace umbraco
             var contentType = parentId == -1
                                   ? new ContentType(-1)
                                   : new ContentType(ApplicationContext.Current.Services.ContentTypeService.GetContentType(parentId));
-            contentType.CreatorId = _userID;
+            contentType.CreatorId = User.Id;
             contentType.Alias = Alias.Replace("'", "''");
             contentType.Name = Alias.Replace("'", "''");
             contentType.Icon = UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates
@@ -36,7 +36,7 @@ namespace umbraco
             {
                 //TODO: We are creating a legacy template first because it contains the correct logic used to save templates, the
                 // new API is not yet complete. See: http://issues.umbraco.org/issue/U4-2243, http://issues.umbraco.org/issue/U4-2277, http://issues.umbraco.org/issue/U4-2276
-                var legacyTemplate = cms.businesslogic.template.Template.MakeNew(_alias, BusinessLogic.User.GetUser(_userID));
+                var legacyTemplate = cms.businesslogic.template.Template.MakeNew(Alias, User);
 
                 var template = ApplicationContext.Current.Services.FileService.GetTemplate(legacyTemplate.Id);
                 //var template = new Template(string.Empty, _alias, _alias);
@@ -61,6 +61,12 @@ namespace umbraco
                 ApplicationContext.Current.Services.ContentTypeService.Delete(docType);
             }
             return false;
+        }
+
+        private string _returnUrl = "";
+        public override string ReturnUrl
+        {
+            get { return _returnUrl; }
         }
 
         public override string AssignedApp

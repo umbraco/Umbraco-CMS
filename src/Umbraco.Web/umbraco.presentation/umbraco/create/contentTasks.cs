@@ -27,7 +27,7 @@ namespace umbraco
         public override bool PerformSave()
         {
             var dt = new cms.businesslogic.web.DocumentType(TypeID);
-            var d = cms.businesslogic.web.Document.MakeNew(Alias, dt, User.GetUser(_userId), ParentID);
+            var d = cms.businesslogic.web.Document.MakeNew(Alias, dt, User, ParentID);
             if (d == null)
             {
                 //TODO: Slace - Fix this to use the language files
