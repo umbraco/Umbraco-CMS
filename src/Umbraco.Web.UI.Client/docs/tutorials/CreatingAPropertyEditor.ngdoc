@@ -78,7 +78,7 @@ In the .js file I will add a basic angularJS controller declaration
 And in the .html file I'll add: 
 
 	<div ng-controller="My.MarkdownEditorController">
-		<textarea ng-bind="model.value"></textarea>
+		<textarea ng-model="model.value"></textarea>
 	</div>
 
 Now our basic parts of the editor is done namely: 
@@ -88,4 +88,68 @@ Now our basic parts of the editor is done namely:
 - The controller for wiring up the editor with angular.
 
 ##Register the datatype in umbraco
+After the above edits are done, restart your application. Go to developer section, click the 3 dots next to the datatypes folder and create a new data type called "markdown". In the editor you can now select a property editor, where your newly added "markdown editor" will appear. 
+
+Save the datatype, and add it to a document type of your choice, open a document of that type, and you will be greated with an alert message saying "The controller has landed", which means all is well, and you can now edit the assigned property's value with your editor. 
+
+
+##Add external dependencies
+Lets go a bit further, and load in a markdown editor javascript library, I've chosen pagedown, but you can use whatever you want. 
+
+First of, I'll add some external files to our package folder, in /app_plugins/markdowneditor/lib folder, these files comes from the pagedown editor project found here: 
+
+[https://github.com/samwillis/pagedown-bootstrap](Pagedown-bootstrap on github.com)
+
+Then open the `markdowneditor.controller.js` file and edit it so it looks like this: 
+
+	angular.module("umbraco")
+	.controller("My.MarkdownEditorController",
+	//inject umbracos scriptLoader
+	function ($scope,scriptLoader) {
+
+	    //tell the scriptloader to load the markdown.editor libs from the markdown editors
+	    //plugin folder
+	    scriptLoader
+			.load([
+				"/app_plugins/markdowneditor/lib/markdown.converter.js",
+	            "/app_plugins/markdowneditor/lib/markdown.sanitizer.js",
+	            "/app_plugins/markdowneditor/lib/markdown.editor.js"
+	        ])
+			.then(function () {
+			    //this function will execute when all dependencies have loaded
+			    alert("editor dependencies loaded");
+			});
+
+	    //load the seperat css for the editor to avoid it blocking our js loading
+	    scriptLoader.load(["/app_plugins/markdowneditor/lib/markdown.css"]);
+	});
+
+This loads in our external dependency, but only when its needed by the editor.
+
+Now lets replace that `alert()` with some code that can instantiate the pagedown editor:
+
+	var converter2 = new Markdown.Converter();
+    var editor2 = new Markdown.Editor(converter2, "-" + $scope.model.alias);
+    editor2.run();
+
+and add that id to the text area in the html, for more info on the html structure, see the pagedown demo [https://github.com/samwillis/pagedown-bootstrap/blob/master/demo/browser/demo.html](here): 
+	
+	<div ng-controller="My.MarkdownEditorController" class="wmd-panel">
+	    <div id="wmd-button-bar-{{model.alias}}"></div>
+	        <textarea ng-model="model.value" class="wmd-input" id="wmd-input-{{model.alias}}"></textarea>
+	    </div>
+	    <div id="wmd-preview-{{model.alias}}" class="wmd-panel wmd-preview"></div>
+	</div> 
+
+Now, clear the cache, reload the document and see the pagedown editor running. 
+
+When you save or publish the value of the editor is automaticly synced to the current content object and sent to the server, all through the power of angular and the `ng-model`attribute.
+
+##Get the source
+The full source, including manifest and dependencies, can be found on the umbraco-cms project 
+[https://github.com/umbraco/Umbraco-CMS/tree/7.0.0/src/Umbraco.Web.UI.Client/src/packages/MarkdownEditor](here)
+
+Simply copy the MarkdownEditor folder to /app_plugins and restart your website, and it will be up and running.
+
+
 
