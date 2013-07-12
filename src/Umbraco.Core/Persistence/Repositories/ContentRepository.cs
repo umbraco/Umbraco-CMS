@@ -206,7 +206,7 @@ namespace Umbraco.Core.Persistence.Repositories
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
             nodeDto.SortOrder = sortOrder;
             var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
-
+        
             //Update with new correct path
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
             Database.Update(nodeDto);
@@ -216,6 +216,24 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.Path = nodeDto.Path;
             entity.SortOrder = sortOrder;
             entity.Level = level;
+
+
+            //Assign the same permissions to it as the parent node
+            // http://issues.umbraco.org/issue/U4-2161            
+            var parentPermissions = GetPermissionsForEntity(entity.ParentId).ToArray();
+            //if there are parent permissions then assign them, otherwise leave null and permissions will become the
+            // user's default permissions.
+            if (parentPermissions.Any())
+            {
+                var userPermissions = parentPermissions.Select(
+                    permissionDto => new KeyValuePair<object, string>(
+                                         permissionDto.UserId,
+                                         permissionDto.Permission));                
+                AssignEntityPermissions(entity, userPermissions);
+                //flag the entity's permissions changed flag so we can track those changes.
+                //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.
+                ((Content) entity).PermissionsChanged = true;
+            }
 
             //Create the Content specific data - cmsContent
             var contentDto = dto.ContentVersionDto.ContentDto;
@@ -283,6 +301,10 @@ namespace Umbraco.Core.Persistence.Repositories
                         "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
                         new {ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId});
                 entity.SortOrder = maxSortOrder + 1;
+
+                //Question: If we move a node, should we update permissions to inherit from the new parent if the parent has permissions assigned?
+                // if we do that, then we'd need to propogate permissions all the way downward which might not be ideal for many people.
+                // Gonna just leave it as is for now, and not re-propogate permissions.
             }
 
             var factory = new ContentFactory(NodeObjectTypeId, entity.Id);
@@ -510,7 +532,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
             sql.Select("*")
                .From<NodeDto>()
-               .Where<NodeDto>(x => x.ParentId == parentId && x.Text.StartsWith(nodeName));
+               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.ParentId == parentId && x.Text.StartsWith(nodeName));
 
             int uniqueNumber = 1;
             var currentName = nodeName;
@@ -532,46 +554,6 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             return currentName;
-        }
-
-        /// <summary>
-        /// Comparer that takes into account the duplicate index of a node name
-        /// This is needed as a normal alphabetic sort would go Page (1), Page (10), Page (2) etc.
-        /// </summary>
-        private class SimilarNodeNameComparer : IComparer<string>
-        {
-            public int Compare(string x, string y)
-            {
-                if (x.LastIndexOf(')') == x.Length - 1 && y.LastIndexOf(')') == y.Length - 1)
-                {
-                    if (x.ToLower().Substring(0, x.LastIndexOf('(')) == y.ToLower().Substring(0, y.LastIndexOf('(')))
-                    {
-                        int xDuplicateIndex = ExtractDuplicateIndex(x);
-                        int yDuplicateIndex = ExtractDuplicateIndex(y);
-
-                        if (xDuplicateIndex != 0 && yDuplicateIndex != 0)
-                        {
-                            return xDuplicateIndex.CompareTo(yDuplicateIndex);
-                        }
-                    }
-                }
-                return String.Compare(x.ToLower(), y.ToLower(), StringComparison.Ordinal);
-            }
-
-            private int ExtractDuplicateIndex(string text)
-            {
-                int index = 0;
-
-                if (text.LastIndexOf('(') != -1 && text.LastIndexOf('(') < text.Length - 2)
-                {
-                    int startPos = text.LastIndexOf('(') + 1;
-                    int length = text.Length - 1 - startPos;
-
-                    int.TryParse(text.Substring(startPos, length), out index);
-                }
-
-                return index;
-            }
         }
     }
 }

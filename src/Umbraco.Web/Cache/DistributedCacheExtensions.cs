@@ -61,6 +61,23 @@ namespace Umbraco.Web.Cache
         } 
         #endregion
 
+        #region User permissions cache
+        public static void RemoveUserPermissionsCache(this DistributedCache dc, int userId)
+        {
+            dc.Remove(new Guid(DistributedCache.UserPermissionsCacheRefresherId), userId);
+        }
+
+        public static void RefreshUserPermissionsCache(this DistributedCache dc, int userId)
+        {
+            dc.Refresh(new Guid(DistributedCache.UserPermissionsCacheRefresherId), userId);
+        }
+
+        public static void RefreshAllUserPermissionsCache(this DistributedCache dc)
+        {
+            dc.RefreshAll(new Guid(DistributedCache.UserPermissionsCacheRefresherId));
+        }
+        #endregion
+
         #region Template cache
         /// <summary>
         /// Refreshes the cache amongst servers for a template

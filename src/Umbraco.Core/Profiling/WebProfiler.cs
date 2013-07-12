@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using StackExchange.Profiling;
+using StackExchange.Profiling.SqlFormatters;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 
@@ -52,13 +53,8 @@ namespace Umbraco.Core.Profiling
         /// <param name="e"></param>
         void UmbracoApplicationEndRequest(object sender, EventArgs e)
         {
-            if (GlobalSettings.DebugMode == false) return;
-            var request = TryGetRequest(sender);
-            if (request.Success == false) return;
-            if (request.Result.Url.IsClientSideRequest()) return;
-            if (string.IsNullOrEmpty(request.Result["umbDebug"]) == false)
+            if (CanPerformProfilingAction(sender))
             {
-                //stop the profiler
                 Stop();
             }
         }
@@ -70,15 +66,26 @@ namespace Umbraco.Core.Profiling
         /// <param name="e"></param>
         void UmbracoApplicationBeginRequest(object sender, EventArgs e)
         {
-            if (GlobalSettings.DebugMode == false) return;
-            var request = TryGetRequest(sender);
-            if (request.Success == false) return;
-            if (request.Result.Url.IsClientSideRequest()) return;
-            if (string.IsNullOrEmpty(request.Result["umbDebug"]) == false)
+            if (CanPerformProfilingAction(sender))
             {
-                //start the profiler
                 Start();
             }
+        }
+
+        private bool CanPerformProfilingAction(object sender)
+        {
+            if (GlobalSettings.DebugMode == false) 
+                return false;
+            
+            //will not run in medium trust
+            if (SystemUtilities.GetCurrentTrustLevel() < AspNetHostingPermissionLevel.High) 
+                return false;
+
+            var request = TryGetRequest(sender);
+            if (request.Success == false || request.Result.Url.IsClientSideRequest() || string.IsNullOrEmpty(request.Result["umbDebug"]))
+                return false;
+            
+            return true;
         }
 
         /// <summary>
@@ -103,9 +110,7 @@ namespace Umbraco.Core.Profiling
         /// </remarks>
         public IDisposable Step(string name)
         {
-            if (GlobalSettings.DebugMode == false) return null;
-
-            return MiniProfiler.Current.Step(name);
+            return GlobalSettings.DebugMode == false ? null : MiniProfiler.Current.Step(name);
         }
 
         /// <summary>
@@ -113,10 +118,8 @@ namespace Umbraco.Core.Profiling
         /// </summary>
         public void Start()
         {
-            if (GlobalSettings.DebugMode == false) return;
-            //will not run in medium trust
-            if (SystemUtilities.GetCurrentTrustLevel() < AspNetHostingPermissionLevel.High) return;
-
+            MiniProfiler.Settings.SqlFormatter = new SqlServerFormatter();
+            MiniProfiler.Settings.StackMaxLength = 5000;
             MiniProfiler.Start();
         }
 
@@ -129,10 +132,6 @@ namespace Umbraco.Core.Profiling
         /// </remarks>
         public void Stop(bool discardResults = false)
         {
-            if (GlobalSettings.DebugMode == false) return;
-            //will not run in medium trust
-            if (SystemUtilities.GetCurrentTrustLevel() < AspNetHostingPermissionLevel.High) return;
-
             MiniProfiler.Stop(discardResults);
         }
 
@@ -156,6 +155,5 @@ namespace Umbraco.Core.Profiling
                 return new Attempt<HttpRequestBase>(ex);
             }
         }
-
     }
 }

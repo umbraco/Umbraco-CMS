@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var resolved = repository.Get((int)user.Id);
             
             resolved.Name = "New Name";
-            resolved.Permissions = "ZYX";
+            resolved.DefaultPermissions = "ZYX";
             resolved.Language = "fr";
             resolved.IsApproved = false;
             resolved.Password = "new";
@@ -134,7 +134,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Assert
             Assert.That(updatedItem.Id, Is.EqualTo(resolved.Id));
             Assert.That(updatedItem.Name, Is.EqualTo(resolved.Name));
-            Assert.That(updatedItem.Permissions, Is.EqualTo(resolved.Permissions));
+            Assert.That(updatedItem.DefaultPermissions, Is.EqualTo(resolved.DefaultPermissions));
             Assert.That(updatedItem.Language, Is.EqualTo(resolved.Language));
             Assert.That(updatedItem.IsApproved, Is.EqualTo(resolved.IsApproved));
             Assert.That(updatedItem.Password, Is.EqualTo(resolved.Password));
@@ -173,6 +173,32 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(resolved, Is.Null);
         }
 
+        //[Test]
+        //public void Can_Perform_Delete_On_UserRepository_With_Permissions_Assigned()
+        //{
+        //    // Arrange
+        //    var provider = new PetaPocoUnitOfWorkProvider();
+        //    var unitOfWork = provider.GetUnitOfWork();
+        //    var repository = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
+
+        //    var user = MockedUser.CreateUser(CreateAndCommitUserType());
+        //    //repository.AssignPermissions()
+
+        //    // Act
+        //    repository.AddOrUpdate(user);
+        //    unitOfWork.Commit();
+        //    var id = user.Id;
+
+        //    var repository2 = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
+        //    repository2.Delete(user);
+        //    unitOfWork.Commit();
+
+        //    var resolved = repository2.Get((int)id);
+
+        //    // Assert
+        //    Assert.That(resolved, Is.Null);
+        //}
+
         [Test]
         public void Can_Perform_Get_On_UserRepository()
         {
@@ -190,7 +216,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Assert
             AssertPropertyValues(updatedItem, user);
         }
-
+        
         [Test]
         public void Can_Perform_GetByQuery_On_UserRepository()
         {
@@ -405,7 +431,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             Assert.That(updatedItem.Id, Is.EqualTo(originalUser.Id));
             Assert.That(updatedItem.Name, Is.EqualTo(originalUser.Name));
-            Assert.That(updatedItem.Permissions, Is.EqualTo(originalUser.Permissions));
+            Assert.That(updatedItem.DefaultPermissions, Is.EqualTo(originalUser.DefaultPermissions));
             Assert.That(updatedItem.Language, Is.EqualTo(originalUser.Language));
             Assert.That(updatedItem.IsApproved, Is.EqualTo(originalUser.IsApproved));
             Assert.That(updatedItem.Password, Is.EqualTo(originalUser.Password));

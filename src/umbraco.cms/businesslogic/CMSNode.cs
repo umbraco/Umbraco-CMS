@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Xml;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Caching;
@@ -55,12 +57,13 @@ namespace umbraco.cms.businesslogic
 
         #region Private static
 
-        private static readonly string m_DefaultIconCssFile = IOHelper.MapPath(SystemDirectories.Umbraco_client + "/Tree/treeIcons.css");
-        private static List<string> m_DefaultIconClasses = new List<string>();
+        private static readonly string DefaultIconCssFile = IOHelper.MapPath(SystemDirectories.Umbraco_client + "/Tree/treeIcons.css");
+        private static readonly List<string> InternalDefaultIconClasses = new List<string>();
+        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
 
-        private static void initializeIconClasses()
+        private static void InitializeIconClasses()
         {
-            StreamReader re = File.OpenText(m_DefaultIconCssFile);
+            StreamReader re = File.OpenText(DefaultIconCssFile);
             string content = string.Empty;
             string input = null;
             while ((input = re.ReadLine()) != null)
@@ -70,20 +73,20 @@ namespace umbraco.cms.businesslogic
             re.Close();
 
             // parse the classes
-            MatchCollection m = Regex.Matches(content, "([^{]*){([^}]*)}", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+            var m = Regex.Matches(content, "([^{]*){([^}]*)}", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
             foreach (Match match in m)
             {
-                GroupCollection groups = match.Groups;
-                string cssClass = groups[1].Value.Replace("\n", "").Replace("\r", "").Trim().Trim(Environment.NewLine.ToCharArray());
-                if (!String.IsNullOrEmpty(cssClass))
+                var groups = match.Groups;
+                var cssClass = groups[1].Value.Replace("\n", "").Replace("\r", "").Trim().Trim(Environment.NewLine.ToCharArray());
+                if (string.IsNullOrEmpty(cssClass) == false)
                 {
-                    m_DefaultIconClasses.Add(cssClass);
+                    InternalDefaultIconClasses.Add(cssClass);
                 }
             }
         }
-        private const string m_SQLSingle = "SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE id = @id";
-        private const string m_SQLDescendants = @"
+        private const string SqlSingle = "SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE id = @id";
+        private const string SqlDescendants = @"
             SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text 
             FROM umbracoNode 
             WHERE path LIKE '%,{0},%'";
@@ -137,10 +140,16 @@ namespace umbraco.cms.businesslogic
         {
             get
             {
-                if (m_DefaultIconClasses.Count == 0)
-                    initializeIconClasses();
+                using (var l = new UpgradeableReadLock(Locker))
+                {
+                    if (InternalDefaultIconClasses.Count == 0)
+                    {
+                        l.UpgradeToWriteLock();
+                        InitializeIconClasses();
+                    }
+                    return InternalDefaultIconClasses;
+                }
 
-                return m_DefaultIconClasses;
             }
         }
 
@@ -309,7 +318,7 @@ namespace umbraco.cms.businesslogic
 
             return sortOrder;
         }
-        
+
         /// <summary>
         /// Retrieve a list of the id's of all CMSNodes given the objecttype and the first letter of the name.
         /// </summary>
@@ -519,9 +528,9 @@ order by level,sortOrder";
                         SqlHelper.CreateParameter("@parentId", newParent.Id));
 
                     this.Parent = newParent;
-                    this.sortOrder = maxSortOrder + 1;                    
+                    this.sortOrder = maxSortOrder + 1;
                 }
-                
+
                 //detect if we have moved, then update the level and path
                 // issue: http://issues.umbraco.org/issue/U4-1579
                 if (this.Path != newParent.Path + "," + this.Id.ToString())
@@ -556,7 +565,7 @@ order by level,sortOrder";
                     //regenerate the xml for the newParent node
                     var parentDocument = new Document(newParent.Id);
                     parentDocument.XmlGenerate(new XmlDocument());
-                    
+
                 }
                 else if (!IsTrashed && newParent.nodeObjectType == Media._objectType)
                 {
@@ -661,7 +670,7 @@ order by level,sortOrder";
         public virtual IEnumerable GetDescendants()
         {
             var descendants = new List<CMSNode>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(m_SQLDescendants, Id)))
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(SqlDescendants, Id)))
             {
                 while (dr.Read())
                 {
@@ -998,7 +1007,7 @@ order by level,sortOrder";
         /// </summary>
         protected virtual void setupNode()
         {
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(m_SQLSingle,
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(SqlSingle,
                     SqlHelper.CreateParameter("@id", this.Id)))
             {
                 if (dr.Read())
@@ -1187,7 +1196,7 @@ order by level,sortOrder";
         }
 
         /// <summary>
-        /// Occurs after a node is saved.
+        /// Occurs after a node is saved. 
         /// </summary>
         public static event EventHandler<SaveEventArgs> AfterSave;
 

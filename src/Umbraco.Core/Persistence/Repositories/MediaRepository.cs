@@ -25,13 +25,19 @@ namespace Umbraco.Core.Persistence.Repositories
             : base(work)
         {
             _mediaTypeRepository = mediaTypeRepository;
+
+            EnsureUniqueNaming = true;
         }
 
 		public MediaRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMediaTypeRepository mediaTypeRepository)
             : base(work, cache)
         {
             _mediaTypeRepository = mediaTypeRepository;
+
+            EnsureUniqueNaming = true;
         }
+
+        public bool EnsureUniqueNaming { get; set; }
 
         #region Overrides of RepositoryBase<int,IMedia>
 
@@ -182,6 +188,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((Models.Media)entity).AddingEntity();
 
+            //Ensure unique name on the same level
+            entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
+
             var factory = new MediaFactory(NodeObjectTypeId, entity.Id);
             var dto = factory.BuildDto(entity);
 
@@ -245,6 +254,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //Updates Modified date
             ((Models.Media)entity).UpdatingEntity();
+
+            //Ensure unique name on the same level
+            entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
 
             //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
             if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
@@ -369,6 +381,38 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             return new PropertyCollection(properties);
+        }
+
+        private string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
+        {
+            if (EnsureUniqueNaming == false)
+                return nodeName;
+
+            var sql = new Sql();
+            sql.Select("*")
+               .From<NodeDto>()
+               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.ParentId == parentId && x.Text.StartsWith(nodeName));
+
+            int uniqueNumber = 1;
+            var currentName = nodeName;
+
+            var dtos = Database.Fetch<NodeDto>(sql);
+            if (dtos.Any())
+            {
+                var results = dtos.OrderBy(x => x.Text, new SimilarNodeNameComparer());
+                foreach (var dto in results)
+                {
+                    if (id != 0 && id == dto.NodeId) continue;
+
+                    if (dto.Text.ToLowerInvariant().Equals(currentName.ToLowerInvariant()))
+                    {
+                        currentName = nodeName + string.Format(" ({0})", uniqueNumber);
+                        uniqueNumber++;
+                    }
+                }
+            }
+
+            return currentName;
         }
     }
 }

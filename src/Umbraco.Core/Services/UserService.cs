@@ -164,7 +164,7 @@ namespace Umbraco.Core.Services
                     Language = Umbraco.Core.Configuration.GlobalSettings.DefaultUILanguage,
                     Name = name,
                     Password = password,
-                    Permissions = userType.Permissions,
+                    DefaultPermissions = userType.Permissions,
                     Username = login,
                     StartContentId = -1,
                     StartMediaId = -1,
