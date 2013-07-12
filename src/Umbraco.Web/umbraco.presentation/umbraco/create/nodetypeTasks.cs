@@ -4,6 +4,7 @@ using System.Data;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -12,38 +13,10 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
-    public class nodetypeTasks : interfaces.ITaskReturnUrl
+    public class nodetypeTasks : LegacyDialogTask
     {
-
-        private string _alias;
-        private int _parentID;
-        private int _typeID;
-        private int _userID;
-
-        public int UserId
-        {
-            set { _userID = value; }
-        }
-        public int TypeID
-        {
-            set { _typeID = value; }
-            get { return _typeID; }
-        }
-
-
-        public string Alias
-        {
-            set { _alias = value; }
-            get { return _alias; }
-        }
-
-        public int ParentID
-        {
-            set { _parentID = value; }
-            get { return _parentID; }
-        }
-
-        public bool Save()
+       
+        public override bool PerformSave()
         {
             //NOTE: TypeID is the parent id!
             //NOTE: ParentID is aparently a flag to determine if we are to create a template! Hack much ?! :P
@@ -74,12 +47,13 @@ namespace umbraco
             }
             ApplicationContext.Current.Services.ContentTypeService.Save(contentType);
 
-            m_returnUrl = "settings/editNodeTypeNew.aspx?id=" + contentType.Id.ToString();
+            _returnUrl = "settings/editNodeTypeNew.aspx?id=" + contentType.Id.ToString();
+
 
             return true;
         }
 
-        public bool Delete()
+        public override bool PerformDelete()
         {
             var docType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(ParentID);
             if (docType != null)
@@ -89,13 +63,9 @@ namespace umbraco
             return false;
         }
 
-        #region ITaskReturnUrl Members
-        private string m_returnUrl = "";
-        public string ReturnUrl
+        public override string AssignedApp
         {
-            get { return m_returnUrl; }
+            get { return DefaultApps.settings.ToString(); }
         }
-
-        #endregion
     }
 }

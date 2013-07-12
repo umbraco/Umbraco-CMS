@@ -1,3 +1,6 @@
+using Umbraco.Core.Logging;
+using Umbraco.Web.UI;
+
 using System;
 using umbraco.BasePages;
 
@@ -43,14 +46,13 @@ namespace umbraco.cms.presentation.create.controls
 			    if (int.TryParse(Request.QueryString["nodeId"], out nodeId) == false)
 			        nodeId = -1;
 
-				if (umbraco.helper.Request("nodeId") != "init")
-					nodeId = int.Parse(umbraco.helper.Request("nodeId"));
 
-				string returnUrl = umbraco.presentation.create.dialogHandler_temp.Create(
-					umbraco.helper.Request("nodeType"),
+                var returnUrl = LegacyDialogHandler.Create(
+                    new HttpContextWrapper(Context),
+                    BasePage.Current.getUser(),
+                    helper.Request("nodeType"),
 					nodeId,
 					rename.Text);
-
 
 				BasePage.Current.ClientTools
 					.ChangeContentFrameUrl(returnUrl)

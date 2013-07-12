@@ -1,4 +1,5 @@
 using System.Linq;
+using Umbraco.Web.UI;
 
 namespace umbraco.cms.presentation.create.controls
 {
@@ -66,11 +67,13 @@ namespace umbraco.cms.presentation.create.controls
         {
             if (Page.IsValid)
             {
-                string returnUrl = umbraco.presentation.create.dialogHandler_temp.Create(
-                    umbraco.helper.Request("nodeType"),
-                    int.Parse(nodeType.SelectedValue),
-                    int.Parse(Request["nodeID"]),
+			    var returnUrl = LegacyDialogHandler.Create(
+			        new HttpContextWrapper(Context),
+			        BasePage.Current.getUser(),
+			        helper.Request("nodeType"),
+			        int.Parse(Request["nodeID"]),                    
                     rename.Text);
+                    int.Parse(nodeType.SelectedValue));
 
                 BasePage.Current.ClientTools
                     .ChangeContentFrameUrl(returnUrl)

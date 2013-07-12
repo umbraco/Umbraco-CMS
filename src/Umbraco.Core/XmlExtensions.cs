@@ -13,6 +13,12 @@ namespace Umbraco.Core
 	/// </summary>
 	internal static class XmlExtensions
 	{
+
+        public static bool HasAttribute(this XmlAttributeCollection attributes, string attributeName)
+        {
+            return attributes.Cast<XmlAttribute>().Any(x => x.Name == attributeName);
+        }	
+		
         /// <summary>
         /// Selects a list of XmlNode matching an XPath expression.
         /// </summary>

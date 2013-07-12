@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Web.Security;
 using Umbraco.Core.Logging;
+using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -10,46 +11,9 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
-    public class dictionaryTasks : interfaces.ITaskReturnUrl
+    public class dictionaryTasks : LegacyDialogTask
     {
-
-        private string _alias;
-        private int _parentID;
-        private int _typeID;
-        private int _userID;
-
-        public int UserId
-        {
-            set { _userID = value; }
-        }
-
-        public int TypeID
-        {
-            set { _typeID = value; }
-            get { return _typeID; }
-        }
-
-        public string Alias
-        {
-            set { _alias = value; }
-            get { return _alias; }
-        }
-
-        public int ParentID
-        {
-            set
-            {
-                _parentID = value;
-                // NASTY HACK ON NASTY HACK§!!
-                // if (_parentID == 1) _parentID = -1;
-            }
-            get
-            {
-                return _parentID;
-            }
-        }
-
-        public bool Save()
+        public override bool PerformSave()
         {
             //check to see if key is already there
             if (cms.businesslogic.Dictionary.DictionaryItem.hasKey(Alias))
@@ -58,44 +22,34 @@ namespace umbraco
             // Create new dictionary item if name no already exist
             if (ParentID > 0)
             {
-                int id = cms.businesslogic.Dictionary.DictionaryItem.addKey(Alias, "", new cms.businesslogic.Dictionary.DictionaryItem(ParentID).key);
-                m_returnUrl = string.Format("settings/editDictionaryItem.aspx?id={0}", id);
+                var id = cms.businesslogic.Dictionary.DictionaryItem.addKey(Alias, "", new cms.businesslogic.Dictionary.DictionaryItem(ParentID).key);
+                _returnUrl = string.Format("settings/editDictionaryItem.aspx?id={0}", id);
             }
             else
             {
-                int id = cms.businesslogic.Dictionary.DictionaryItem.addKey(Alias, "");
-                m_returnUrl = string.Format("settings/editDictionaryItem.aspx?id={0}", id);
+                var id = cms.businesslogic.Dictionary.DictionaryItem.addKey(Alias, "");
+                _returnUrl = string.Format("settings/editDictionaryItem.aspx?id={0}", id);
             }
             return true;
         }
 
-        public bool Delete()
+        public override bool PerformDelete()
         {
 			LogHelper.Debug<dictionaryTasks>(_typeID.ToString() + " " + _parentID.ToString() + " deleting " + Alias);
-
             new cms.businesslogic.Dictionary.DictionaryItem(ParentID).delete();
             return true;
         }
 
-        public bool Sort()
+        private string _returnUrl = "";
+
+        public override string ReturnUrl
         {
-            return false;
+            get { return _returnUrl; }
         }
 
-        public dictionaryTasks()
+        public override string AssignedApp
         {
-            //
-            // TODO: Add constructor logic here
-            //
+            get { return DefaultApps.settings.ToString(); }
         }
-
-        #region ITaskReturnUrl Members
-        private string m_returnUrl = "";
-        public string ReturnUrl
-        {
-            get { return m_returnUrl; }
-        }
-
-        #endregion
     }
 }

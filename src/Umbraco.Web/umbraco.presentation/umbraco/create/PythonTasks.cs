@@ -9,5 +9,6 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
+    [Obsolete("Use DLRScriptingTasks instead")]
     public class PythonTasks : DLRScriptingTasks { }
 }

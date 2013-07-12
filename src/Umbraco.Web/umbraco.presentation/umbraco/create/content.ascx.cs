@@ -1,9 +1,11 @@
 using System;
 using System.Linq;
 using System.Text;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core.IO;
+using Umbraco.Web.UI;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.create;
 using Content=umbraco.cms.businesslogic.Content;
@@ -100,16 +102,17 @@ namespace umbraco.cms.presentation.create.controls
             DoCreation();
         }
 
-
         private void DoCreation()
         {
             if (Page.IsValid)
             {
-                string returnUrl = dialogHandler_temp.Create(
+                var returnUrl = LegacyDialogHandler.Create(
+                    new HttpContextWrapper(Context),
+                    BasePage.Current.getUser(),
                     helper.Request("nodeType"),
-                    int.Parse(nodeType.SelectedValue),
                     int.Parse(Request["nodeID"]),
-                    rename.Text);
+                    rename.Text,
+                    int.Parse(nodeType.SelectedValue));
 
 				BasePage.Current.ClientTools
 					.ChangeContentFrameUrl(returnUrl)

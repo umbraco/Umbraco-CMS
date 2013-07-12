@@ -535,6 +535,7 @@
     <Compile Include="Routing\UrlProviderResolver.cs" />
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
     <Compile Include="Routing\EnsureRoutableOutcome.cs" />
+    <Compile Include="Security\LegacyDefaultAppMapping.cs" />
     <Compile Include="Routing\PublishedContentRequestEngine.cs" />
     <Compile Include="Routing\UrlProvider.cs" />
     <Compile Include="Routing\WebServicesRouteConstraint.cs" />
@@ -551,6 +552,9 @@
     <Compile Include="Trees\PartialViewMacrosTree.cs" />
     <Compile Include="Trees\PartialViewsTree.cs" />
     <Compile Include="UI\Controls\InsertMacroSplitButton.cs" />
+    <Compile Include="UI\IAssignedApp.cs" />
+    <Compile Include="UI\LegacyDialogHandler.cs" />
+    <Compile Include="UI\LegacyDialogTask.cs" />
     <Compile Include="UI\Controls\ProgressBar.cs" />
     <Compile Include="UI\Controls\UmbracoControl.cs" />
     <Compile Include="UI\Controls\UmbracoUserControl.cs">
@@ -2011,7 +2015,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\create\media.ascx" />
-    <Content Include="umbraco.presentation\umbraco\create\member.ascx" />
+    <Content Include="umbraco.presentation\umbraco\create\member.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\create\nodeType.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

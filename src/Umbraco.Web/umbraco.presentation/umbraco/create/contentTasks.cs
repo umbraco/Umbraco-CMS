@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -9,50 +10,21 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
-    public class contentTasks : interfaces.ITaskReturnUrl
+    public class contentTasks : LegacyDialogTask
     {
-
-        private string _alias;
-        private int _parentId;
-        private int _typeId;
-        private int _userId;
         private string _returnUrl = "";
 
-        public int UserId
-        {
-            set { _userId = value; }
-        }
-
-        public string ReturnUrl
+        public override string ReturnUrl
         {
             get { return _returnUrl; }
         }
 
-        public int TypeID
+        public override string AssignedApp
         {
-            set { _typeId = value; }
-            get { return _typeId; }
+            get { return DefaultApps.content.ToString(); }
         }
 
-        public string Alias
-        {
-            set { _alias = value; }
-            get { return _alias; }
-        }
-
-        public int ParentID
-        {
-            set
-            {
-                _parentId = value;
-            }
-            get
-            {
-                return _parentId;
-            }
-        }
-
-        public bool Save()
+        public override bool PerformSave()
         {
             var dt = new cms.businesslogic.web.DocumentType(TypeID);
             var d = cms.businesslogic.web.Document.MakeNew(Alias, dt, User.GetUser(_userId), ParentID);
@@ -69,7 +41,7 @@ namespace umbraco
             }
         }
 
-        public bool Delete()
+        public override bool PerformDelete()
         {
             var d = new cms.businesslogic.web.Document(ParentID);
 
@@ -82,16 +54,5 @@ namespace umbraco
 
         }
 
-        public bool Sort()
-        {
-            return false;
-        }
-
-        public contentTasks()
-        {
-            //
-            // TODO: Add constructor logic here
-            //
-        }
     }
 }

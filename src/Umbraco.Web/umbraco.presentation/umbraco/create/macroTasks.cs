@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -9,76 +10,40 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
-    public class macroTasks : interfaces.ITaskReturnUrl
+    public class macroTasks : LegacyDialogTask
     {
-
-        private string _alias;
-        private int _parentID;
-        private int _typeID;
-        private int _userID;
-
+        
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
         }
-
-        public int UserId
+        
+        public override bool PerformSave()
         {
-            set { _userID = value; }
-        }
-
-
-        public int TypeID
-        {
-            set { _typeID = value; }
-            get { return _typeID; }
-        }
-
-
-        public string Alias
-        {
-            set { _alias = value; }
-            get { return _alias; }
-        }
-
-        public int ParentID
-        {
-            set { _parentID = value; }
-            get { return _parentID; }
-        }
-
-        public bool Save()
-        {
-            int id = -1;
-            umbraco.cms.businesslogic.macro.Macro checkingMacro =umbraco.cms.businesslogic.macro.Macro.GetByAlias(_alias);
-            if (checkingMacro!=null)
-                id =checkingMacro.Id;
-            else      
-            id = umbraco.cms.businesslogic.macro.Macro.MakeNew(_alias).Id;
-            m_returnUrl = string.Format("developer/Macros/editMacro.aspx?macroID={0}", id);
+            var checkingMacro =cms.businesslogic.macro.Macro.GetByAlias(Alias);
+            var id = checkingMacro != null
+                         ? checkingMacro.Id
+                         : cms.businesslogic.macro.Macro.MakeNew(Alias).Id;
+            _returnUrl = string.Format("developer/Macros/editMacro.aspx?macroID={0}", id);
             return true;
         }
 
-        public bool Delete()
+        public override bool PerformDelete()
         {
             new cms.businesslogic.macro.Macro(ParentID).Delete();
             return true;
         }
 
-        public macroTasks()
+        private string _returnUrl = "";
+
+        public override string ReturnUrl
         {
-            //
-            // TODO: Add constructor logic here
-            //
+            get { return _returnUrl; }
         }
 
-        #region ITaskReturnUrl Members
-        private string m_returnUrl = "";
-        public string ReturnUrl
+        public override string AssignedApp
         {
-            get { return m_returnUrl; }
+            get { return DefaultApps.developer.ToString(); }
         }
-
-        #endregion
     }
 }

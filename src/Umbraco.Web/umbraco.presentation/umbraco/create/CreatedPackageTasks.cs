@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Web.Security;
 using Umbraco.Core.Logging;
+using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -10,37 +11,10 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
-    public class CreatedPackageTasks : interfaces.ITaskReturnUrl
+    public class CreatedPackageTasks : LegacyDialogTask
     {
-        private string _alias;
-        private int _parentID;
-        private int _typeID;
-        private int _userID;
-
-        public int UserId
-        {
-            set { _userID = value; }
-        }
-        public int TypeID
-        {
-            set { _typeID = value; }
-            get { return _typeID; }
-        }
-
-
-        public string Alias
-        {
-            set { _alias = value; }
-            get { return _alias; }
-        }
-
-        public int ParentID
-        {
-            set { _parentID = value; }
-            get { return _parentID; }
-        }
-
-        public bool Save()
+        
+        public override bool PerformSave()
         {
             LogHelper.Info<CreatedPackageTasks>("Xml save started");
             int id = cms.businesslogic.packager.CreatedPackage.MakeNew(Alias).Data.Id;
@@ -48,7 +22,7 @@ namespace umbraco
             return true;
         }
 
-        public bool Delete()
+        public override bool PerformDelete()
         {
             // we need to grab the id from the alias as the new tree needs to prefix the NodeID with "package_"
             if (ParentID == 0)
@@ -59,13 +33,16 @@ namespace umbraco
             return true;
         }
 
-        #region ITaskReturnUrl Members
-        private string m_returnUrl = "";
-        public string ReturnUrl
+        private string _returnUrl = "";
+
+        public override string ReturnUrl
         {
-            get { return m_returnUrl; }
+            get { return _returnUrl; }
         }
 
-        #endregion
+        public override string AssignedApp
+        {
+            get { return DefaultApps.developer.ToString(); }
+        }
     }
 }

@@ -1,3 +1,5 @@
+using Umbraco.Web.UI;
+
 namespace umbraco.cms.presentation.create.controls
 {
     using System;
@@ -85,13 +87,15 @@ namespace umbraco.cms.presentation.create.controls
         {
             if (Page.IsValid)
             {
-                int memberType = memberChooser.Visible ? int.Parse(nodeType.SelectedValue) : -1;
-                string emailAppend = String.IsNullOrEmpty(Email.Text) ? "" : String.Format("|{0}|{1}|{2}", Email.Text, Password.Text,Login.Text);
-                string returnUrl = umbraco.presentation.create.dialogHandler_temp.Create(
-                    umbraco.helper.Request("nodeType"),
-                    memberType,
-                    -1,
-                    rename.Text + emailAppend);
+                var memberType = memberChooser.Visible ? int.Parse(nodeType.SelectedValue) : -1;
+                var emailAppend = String.IsNullOrEmpty(Email.Text) ? "" : String.Format("|{0}|{1}|{2}", Email.Text, Password.Text,Login.Text);
+                var returnUrl = LegacyDialogHandler.Create(
+                    new HttpContextWrapper(Context),
+                    BasePage.Current.getUser(),
+                    helper.Request("nodeType"),
+                    -1,                    
+                    rename.Text + emailAppend,
+                    memberType);
 
 				BasePage.Current.ClientTools
 					.ChangeContentFrameUrl(returnUrl)

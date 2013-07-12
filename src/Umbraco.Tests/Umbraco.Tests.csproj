@@ -373,6 +373,7 @@
     </Compile>
     <Compile Include="UmbracoExamine\TestIndexField.cs" />
     <Compile Include="UmbracoExamine\TestLogService.cs" />
+    <Compile Include="UI\LegacyDialogTests.cs" />
     <Compile Include="UmbracoExamine\TestMediaService.cs" />
     <Compile Include="UmbracoExamine\TestContentService.cs" />
     <Compile Include="UriExtensionsTests.cs" />
