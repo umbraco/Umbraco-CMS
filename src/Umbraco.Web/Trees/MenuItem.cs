@@ -28,7 +28,7 @@ namespace Umbraco.Web.Trees
         /// </summary>
         /// <remarks>
         /// We will also use the meta data collection for dealing with legacy menu items (i.e. for loading custom URLs or
-        /// executing custom JS)
+        /// executing custom JS).
         /// </remarks>
         [DataMember(Name = "metaData")]
         public Dictionary<string, object> AdditionalData { get; private set; }
@@ -47,12 +47,5 @@ namespace Umbraco.Web.Trees
         [DataMember(Name = "cssclass")]
         public string Icon { get; set; }
 
-        /// <summary>
-        /// The view to render when the menu item is clicked. This is generally a route path.
-        /// </summary>
-        [DataMember(Name = "view")]
-        public string View { get; set; }
-
-        
     }
 }

@@ -8,9 +8,9 @@
  */
 function LegacyDeleteController($scope) {
 
-    $scope.caption = "Are you sure you want to delete the node '" + $scope.currentNode.name + "' ?";
-
     $scope.performDelete = function() {
+
+
         alert("Deleted!");
     };
 
