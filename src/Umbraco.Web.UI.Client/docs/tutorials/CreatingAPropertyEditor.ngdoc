@@ -18,9 +18,9 @@ So all the steps we will go through:
 ##Prerequisites
 This is about how to use AngularJS with umbraco, so it does not cover AngularJS itself, as there are tons of resources on that already here: 
 
-- [http://www.egghead.io/](egghead.io)
-- [http://docs.angularjs.org/tutorial](angularjs.org/tutorial)
-- [http://tekpub.com/products/angular](Tekpub)
+- [egghead.io](http://www.egghead.io/)
+- [angularjs.org/tutorial](http://docs.angularjs.org/tutorial)
+- [Tekpub](http://tekpub.com/products/angular)
 
 ##The end result
 
@@ -98,7 +98,7 @@ Lets go a bit further, and load in a markdown editor javascript library, I've ch
 
 First of, I'll add some external files to our package folder, in /app_plugins/markdowneditor/lib folder, these files comes from the pagedown editor project found here: 
 
-[https://github.com/samwillis/pagedown-bootstrap](Pagedown-bootstrap on github.com)
+[Pagedown-bootstrap on github.com](https://github.com/samwillis/pagedown-bootstrap)
 
 Then open the `markdowneditor.controller.js` file and edit it so it looks like this: 
 
@@ -132,13 +132,16 @@ Now lets replace that `alert()` with some code that can instantiate the pagedown
     var editor2 = new Markdown.Editor(converter2, "-" + $scope.model.alias);
     editor2.run();
 
-and add that id to the text area in the html, for more info on the html structure, see the pagedown demo [https://github.com/samwillis/pagedown-bootstrap/blob/master/demo/browser/demo.html](here): 
+and add that id to the text area in the html, for more info on the html structure, see the pagedown demo [here](https://github.com/samwillis/pagedown-bootstrap/blob/master/demo/browser/demo.html): 
 	
 	<div ng-controller="My.MarkdownEditorController" class="wmd-panel">
-	    <div id="wmd-button-bar-{{model.alias}}"></div>
-	        <textarea ng-model="model.value" class="wmd-input" id="wmd-input-{{model.alias}}"></textarea>
-	    </div>
-	    <div id="wmd-preview-{{model.alias}}" class="wmd-panel wmd-preview"></div>
+		<div id="wmd-button-bar-{{model.alias}}"></div>
+
+			<textarea ng-model="model.value" class="wmd-input" id="wmd-input-{{model.alias}}">
+				your content
+			</textarea>
+
+		<div id="wmd-preview-{{model.alias}}" class="wmd-panel wmd-preview"></div>
 	</div> 
 
 Now, clear the cache, reload the document and see the pagedown editor running. 
@@ -147,7 +150,7 @@ When you save or publish the value of the editor is automaticly synced to the cu
 
 ##Get the source
 The full source, including manifest and dependencies, can be found on the umbraco-cms project 
-[https://github.com/umbraco/Umbraco-CMS/tree/7.0.0/src/Umbraco.Web.UI.Client/src/packages/MarkdownEditor](here)
+[here](https://github.com/umbraco/Umbraco-CMS/tree/7.0.0/src/Umbraco.Web.UI.Client/src/packages/MarkdownEditor)
 
 Simply copy the MarkdownEditor folder to /app_plugins and restart your website, and it will be up and running.
 
