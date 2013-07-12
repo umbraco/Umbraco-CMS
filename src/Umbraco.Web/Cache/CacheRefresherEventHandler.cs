@@ -10,6 +10,7 @@ using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.member;
 using System.Linq;
 using umbraco.cms.businesslogic.web;
+using Content = Umbraco.Core.Models.Content;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
 using Template = umbraco.cms.businesslogic.template.Template;
@@ -124,7 +125,45 @@ namespace Umbraco.Web.Cache
             MediaService.Deleting += MediaServiceDeleting;
             MediaService.Moving += MediaServiceMoving;
             MediaService.Trashing += MediaServiceTrashing;
+
+            ContentService.Created += ContentServiceCreated;
+            ContentService.Copied += ContentServiceCopied;
         }
+
+        #region Content service event handlers
+
+        /// <summary>
+        /// When an entity is copied new permissions may be assigned to it based on it's parent, if that is the 
+        /// case then we need to clear all user permissions cache.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<IContent> e)
+        {
+            //check if permissions have changed
+            var permissionsChanged = ((Content)e.Copy).WasPropertyDirty("PermissionsChanged");
+            if (permissionsChanged)
+            {
+                DistributedCache.Instance.RefreshAllUserPermissionsCache();
+            }
+        }
+
+        /// <summary>
+        /// When an entity is created new permissions may be assigned to it based on it's parent, if that is the 
+        /// case then we need to clear all user permissions cache.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void ContentServiceCreated(IContentService sender, Core.Events.NewEventArgs<IContent> e)
+        {
+            //check if permissions have changed
+            var permissionsChanged = ((Content)e.Entity).WasPropertyDirty("PermissionsChanged");
+            if (permissionsChanged)
+            {
+                DistributedCache.Instance.RefreshAllUserPermissionsCache();
+            }
+        } 
+        #endregion
 
         #region ApplicationTree event handlers
         static void ApplicationTreeNew(ApplicationTree sender, System.EventArgs e)
@@ -397,15 +436,15 @@ namespace Umbraco.Web.Cache
         {
             if (sender.User != null)
             {
-                DistributedCache.Instance.RefreshUserCache(sender.User.Id);
+                DistributedCache.Instance.RefreshUserPermissionsCache(sender.User.Id);
             }
-            if (sender.UserId > -1)
+            else if (sender.UserId > -1)
             {
-                DistributedCache.Instance.RefreshUserCache(sender.UserId);
+                DistributedCache.Instance.RefreshUserPermissionsCache(sender.UserId);
             }
-            if (sender.NodeIds.Any())
+            else if (sender.NodeIds.Any())
             {
-                DistributedCache.Instance.RefreshAllUserCache();
+                DistributedCache.Instance.RefreshAllUserPermissionsCache();
             }
         }
 

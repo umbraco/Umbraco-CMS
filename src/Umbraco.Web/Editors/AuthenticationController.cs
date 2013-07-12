@@ -31,6 +31,16 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Remove the xml formatter... only support JSON!
+        /// </summary>
+        /// <param name="controllerContext"></param>
+        protected override void Initialize(global::System.Web.Http.Controllers.HttpControllerContext controllerContext)
+        {
+            base.Initialize(controllerContext);
+            controllerContext.Configuration.Formatters.Remove(controllerContext.Configuration.Formatters.XmlFormatter);
+        }
+
+        /// <summary>
         /// Simply checks if the current user's cookie is valid and if so returns the user object associated
         /// </summary>
         /// <returns></returns>

@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Web.Mvc;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
-using umbraco.cms.presentation.Trees;
-using umbraco.controls.Tree;
-using umbraco.interfaces;
-using Action = umbraco.BusinessLogic.Actions.Action;
 
 namespace Umbraco.Web.Editors
 {
@@ -55,15 +48,27 @@ namespace Umbraco.Web.Editors
             //now we need to build up the variables
             var d = new Dictionary<string, object>
                 {
-                    {"umbracoPath", GlobalSettings.Path},
-                    {"legacyTreeJs", Url.Action("LegacyTreeJs", "BackOffice")},
-                    {"contentApiBaseUrl", Url.GetUmbracoApiService<ContentController>("PostSave").TrimEnd("PostSave")},
-                    {"mediaApiBaseUrl", Url.GetUmbracoApiService<MediaController>("GetRootMedia").TrimEnd("GetRootMedia")},
-                    {"sectionApiBaseUrl", Url.GetUmbracoApiService<SectionController>("GetSections").TrimEnd("GetSections")},
-                    {"treeApplicationApiBaseUrl", Url.GetUmbracoApiService<ApplicationTreeController>("GetApplicationTrees").TrimEnd("GetApplicationTrees")},
-                    {"contentTypeApiBaseUrl", Url.GetUmbracoApiService<ContentTypeController>("GetAllowedChildren").TrimEnd("GetAllowedChildren")},
-                    {"mediaTypeApiBaseUrl", Url.GetUmbracoApiService<MediaTypeApiController>("GetAllowedChildren").TrimEnd("GetAllowedChildren")},
-                    {"authenticationApiBaseUrl", Url.GetUmbracoApiService<AuthenticationController>("PostLogin").TrimEnd("PostLogin")}
+                    {
+                        "umbracoUrls", new Dictionary<string, object>
+                            {
+                                {"legacyTreeJs", Url.Action("LegacyTreeJs", "BackOffice")},                    
+                                //API URLs
+                                {"contentApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentController>("PostSave")},
+                                {"mediaApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MediaController>("GetRootMedia")},
+                                {"sectionApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<SectionController>("GetSections")},
+                                {"treeApplicationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>("GetApplicationTrees")},
+                                {"contentTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentTypeController>("GetAllowedChildren")},
+                                {"mediaTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MediaTypeApiController>("GetAllowedChildren")},
+                                {"authenticationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>("PostLogin")},
+                                {"legacyApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<LegacyController>("DeleteLegacyItem")}
+                            }
+                    },
+                    {
+                        "umbracoSettings", new Dictionary<string, object>
+                            {
+                                {"umbracoPath", GlobalSettings.Path}
+                            }
+                    }
                 };
 
             return JavaScript(ServerVariablesParser.Parse(d));

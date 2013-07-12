@@ -1,4 +1,10 @@
 using System.Linq;
+using System.Web;
+using System.Web.UI;
+using Umbraco.Web.UI;
+using Umbraco.Web.UI.Controls;
+using Umbraco.Web;
+using UmbracoUserControl = Umbraco.Web.UI.Controls.UmbracoUserControl;
 
 namespace umbraco.cms.presentation.create.controls
 {
@@ -9,7 +15,7 @@ namespace umbraco.cms.presentation.create.controls
     /// <summary>
     ///		Summary description for media.
     /// </summary>
-    public partial class media : System.Web.UI.UserControl
+    public partial class media : UmbracoUserControl
     {
 
 
@@ -66,11 +72,13 @@ namespace umbraco.cms.presentation.create.controls
         {
             if (Page.IsValid)
             {
-                string returnUrl = umbraco.presentation.create.dialogHandler_temp.Create(
-                    umbraco.helper.Request("nodeType"),
-                    int.Parse(nodeType.SelectedValue),
+                var returnUrl = LegacyDialogHandler.Create(
+                    new HttpContextWrapper(Context),
+                    Security.CurrentUser,
+                    Request.GetItemAsString("nodeType"),
                     int.Parse(Request["nodeID"]),
-                    rename.Text);
+                    rename.Text,
+                    int.Parse(nodeType.SelectedValue));
 
                 BasePage.Current.ClientTools
                     .ChangeContentFrameUrl(returnUrl)

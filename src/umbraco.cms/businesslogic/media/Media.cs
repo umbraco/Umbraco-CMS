@@ -92,12 +92,11 @@ namespace umbraco.cms.businesslogic.media
                 return null;
             }
 
-            var media = ApplicationContext.Current.Services.MediaService.CreateMedia(Name, ParentId, dct.Alias, u.Id);
+            var media = ApplicationContext.Current.Services.MediaService.CreateMediaWithIdentity(Name, ParentId, dct.Alias, u.Id);
             //The media object will only have the 'WasCancelled' flag set to 'True' if the 'Creating' event has been cancelled
             if (((Entity)media).WasCancelled)
                 return null;
 
-            ApplicationContext.Current.Services.MediaService.Save(media);
             var tmp = new Media(media);
 
             tmp.OnNew(e);

@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -9,70 +10,38 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
-    public class contentItemTasks : interfaces.ITask
+    //This was only referenced from the tree : loadMember which is trying to load this node type alias
+    // to show pages that are owned by members but this tree is also trying to show an editor that doesn't exist
+    // and I've never even heard of this functionality and think it was an idea that never got completed.
+    // I'm nearly positive this is not used and should be un-referenced.
+    [Obsolete("This class is no longer used and will be removed from the codebase in future versions")]
+    public class contentItemTasks : LegacyDialogTask
     {
-
-        private string _alias;
-        private int _parentID;
-        private int _typeID;
-        private int _userID;
-
-        public int UserId
-        {
-            set { _userID = value; }
-        }
-
-        public int TypeID
-        {
-            set { _typeID = value; }
-            get { return _typeID; }
-        }
-
-        public string Alias
-        {
-            set { _alias = value; }
-            get { return _alias; }
-        }
-
-        public int ParentID
-        {
-            set
-            {
-                _parentID = value;
-            }
-            get
-            {
-                return _parentID;
-            }
-        }
-
-        public bool Save()
+        
+        public override bool PerformSave()
         {
             // TODO : fix it!!
             return true;
         }
 
-        public bool Delete()
+        public override bool PerformDelete()
         {
-            cms.businesslogic.contentitem.ContentItem d = new cms.businesslogic.contentitem.ContentItem(ParentID);
+            var d = new cms.businesslogic.contentitem.ContentItem(ParentID);
 
             // Version3.0 - moving to recycle bin instead of deletion
             //d.delete();
             d.Move(-20);
             return true;
-
         }
 
-        public bool Sort()
+        public override string ReturnUrl
         {
-            return false;
+            get { return string.Empty; }
         }
 
-        public contentItemTasks()
+        public override string AssignedApp
         {
-            //
-            // TODO: Add constructor logic here
-            //
+            get { return DefaultApps.member.ToString(); }
         }
     }
 }

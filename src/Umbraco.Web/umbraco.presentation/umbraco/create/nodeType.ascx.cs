@@ -1,4 +1,5 @@
 using Umbraco.Core;
+using Umbraco.Web.UI;
 
 namespace umbraco.cms.presentation.create.controls
 {
@@ -60,18 +61,20 @@ namespace umbraco.cms.presentation.create.controls
 		{
 			if (Page.IsValid) 
 			{
-				int createTemplateVal = 0;
+				var createTemplateVal = 0;
 			    if (createTemplate.Checked)
 					createTemplateVal = 1;
 
                 // check master type
-                string masterTypeVal = String.IsNullOrEmpty(umbraco.helper.Request("nodeId")) || umbraco.helper.Request("nodeId") == "init" ? masterType.SelectedValue : umbraco.helper.Request("nodeId");
+                var masterTypeVal = String.IsNullOrEmpty(umbraco.helper.Request("nodeId")) || umbraco.helper.Request("nodeId") == "init" ? masterType.SelectedValue : umbraco.helper.Request("nodeId");
 
-				string returnUrl = umbraco.presentation.create.dialogHandler_temp.Create(
-					umbraco.helper.Request("nodeType"),
-                    int.Parse(masterTypeVal),
-					createTemplateVal,
-					rename.Text);
+                var returnUrl = LegacyDialogHandler.Create(
+                    new HttpContextWrapper(Context),
+                    BasePage.Current.getUser(),
+                    helper.Request("nodeType"),
+                    createTemplateVal,
+					rename.Text,
+                    int.Parse(masterTypeVal));
 
 				BasePage.Current.ClientTools
 					.ChangeContentFrameUrl(returnUrl)

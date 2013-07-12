@@ -384,7 +384,7 @@ namespace Umbraco.Core.Persistence
 		}
 
 		// Add a parameter to a DB command
-		void AddParam(IDbCommand cmd, object item, string ParameterPrefix)
+		internal void AddParam(IDbCommand cmd, object item, string ParameterPrefix)
 		{
 			// Convert value to from poco type to db type
 			if (Database.Mapper != null && item!=null)

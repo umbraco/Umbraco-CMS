@@ -10,6 +10,8 @@ using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.Strategies.Publishing
 {
+    //TODO: I think we should move this logic into the CacheRefresherEventHandler since all other handlers are registered there for invalidating cache.
+
     /// <summary>
     /// Represents the UpdateCacheAfterUnPublish class, which subscribes to the UnPublished event
     /// of the <see cref="PublishingStrategy"/> class and is responsible for doing the actual

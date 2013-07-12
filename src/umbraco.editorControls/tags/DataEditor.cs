@@ -62,7 +62,6 @@ namespace umbraco.editorControls.tags
             base.OnInit(e);
 
             // register all dependencies - only registered once
-            ClientDependencyLoader.Instance.RegisterDependency("ui/ui-lightness/jquery-ui.custom.css", "UmbracoClient", ClientDependencyType.Css);
             ClientDependencyLoader.Instance.RegisterDependency("css/umbracoGui.css", "UmbracoRoot", ClientDependencyType.Css);
             ClientDependencyLoader.Instance.RegisterDependency("tags/css/jquery.tagsinput.css", "UmbracoClient", ClientDependencyType.Css);
             ClientDependencyLoader.Instance.RegisterDependency("tags/js/jquery.tagsinput.min.js", "UmbracoClient", ClientDependencyType.Javascript);

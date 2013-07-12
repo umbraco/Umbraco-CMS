@@ -11,7 +11,7 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// An API controller used for dealing with content types
     /// </summary>
-    public class ContentTypeController : UmbracoAuthorizedApiController
+    public class ContentTypeController : UmbracoAuthorizedJsonController
     {
         private readonly ContentTypeModelMapper _contentTypeModelMapper;
 

@@ -31,6 +31,7 @@ namespace Umbraco.Core.Cache
         public const string UserContextCacheKey = "UmbracoUserContext";
         public const string UserContextTimeoutCacheKey = "UmbracoUserContextTimeout";
         public const string UserCacheKey = "UmbracoUser";
+        public const string UserPermissionsCacheKey = "UmbracoUserPermissions";
 
         public const string ContentTypeCacheKey = "UmbracoContentType";
 

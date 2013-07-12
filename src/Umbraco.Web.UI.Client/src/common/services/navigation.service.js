@@ -161,6 +161,11 @@ angular.module('umbraco.services')
 
                         self.ui.currentNode = args.node;
                         
+                        //ensure the current dialog is cleared before creating another!
+                        if (self.ui.currentDialog) {
+                            dialogService.close(self.ui.currentDialog);
+                        }
+
                         var dialog = self.showDialog({
                             scope: args.scope,
                             node: args.node,
@@ -229,10 +234,16 @@ angular.module('umbraco.services')
          *
          * @description
          * Opens a dialog, for a given action on a given tree node
-         * uses the dialogServicet to inject the selected action dialog
+         * uses the dialogService to inject the selected action dialog
          * into #dialog div.umb-panel-body
          * the path to the dialog view is determined by: 
          * "views/" + current tree + "/" + action alias + ".html"
+         * The dialog controller will get passed a scope object that is created here. This scope
+         * object may be injected as part of the args object, if one is not found then a new scope
+         * is created. Regardless of whether a scope is created or re-used, a few properties and methods 
+         * will be added to it so that they can be used in any dialog controller:
+         *  scope.currentNode = the selected tree node
+         *  scope.currentAction = the selected menu item
          * @param {Object} args arguments passed to the function
          * @param {Scope} args.scope current scope passed to the dialog
          * @param {Object} args.action the clicked action containing `name` and `alias`
@@ -246,10 +257,17 @@ angular.module('umbraco.services')
                 throw "The args parameter must have an 'action' property as the clicked menu action object";
             }
 
+            //ensure the current dialog is cleared before creating another!
+            if (this.ui.currentDialog) {
+                dialogService.close(this.ui.currentDialog);
+            }
+
             setMode("dialog");
 
+            //set up the scope object and assign properties
             var scope = args.scope || $rootScope.$new();
             scope.currentNode = args.node;
+            scope.currentAction = args.action;
 
             //the title might be in the meta data, check there first
             if (args.action.metaData["dialogTitle"]) {
@@ -270,8 +288,8 @@ angular.module('umbraco.services')
                 templateUrl = args.action.metaData["actionUrl"];
                 iframe = true;
             }
-            else if (args.action.view) {
-                templateUrl = args.action.view;
+            else if (args.action.metaData["actionView"]) {
+                templateUrl = args.action.metaData["actionView"];
                 iframe = false;
             }
             else {
@@ -284,7 +302,7 @@ angular.module('umbraco.services')
             // if a URL is specified in the "actionUrl" metadata. For now I'm not going to implement launching in a blank window, 
             // though would be v-easy, just not sure we want to ever support that?
 
-            return dialogService.open(
+            var dialog = dialogService.open(
                 {
                     container: $("#dialog div.umb-panel-body"),
                     scope: scope,
@@ -293,6 +311,11 @@ angular.module('umbraco.services')
                     iframe: iframe,
                     template: templateUrl
                 });
+
+            //save the currently assigned dialog so it can be removed before a new one is created
+            this.ui.currentDialog = dialog;
+
+            return dialog;
         },
 
         /**

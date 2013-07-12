@@ -5,5 +5,10 @@
       AddUmbracoFilesToOutput;
       $(CopyAllFilesToSingleFolderForPackageDependsOn);
     </CopyAllFilesToSingleFolderForPackageDependsOn>
+	
+	<CopyAllFilesToSingleFolderForMsdeployDependsOn>
+      AddUmbracoFilesToOutput;
+      $(CopyAllFilesToSingleFolderForPackageDependsOn);
+    </CopyAllFilesToSingleFolderForMsdeployDependsOn>
   </PropertyGroup>
 </Project>

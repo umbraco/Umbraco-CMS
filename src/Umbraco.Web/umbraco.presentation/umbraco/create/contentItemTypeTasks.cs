@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -9,55 +10,32 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
-    public class contentItemTypeTasks : interfaces.ITask
+    //This was only referenced from the obsolete tree that is not used: loadcontentItemType which is trying to load
+    // pages that don't even exist so I'm nearly positive this isn't used and should be removed.
+    [Obsolete("This class is no longer used and will be removed from the codebase in future versions")]
+    public class contentItemTypeTasks : LegacyDialogTask
     {
-
-        private string _alias;
-        private int _parentID;
-        private int _typeID;
-        private int _userID;
-
-        public int UserId
-        {
-            set { _userID = value; }
-        }
-        public int TypeID
-        {
-            set { _typeID = value; }
-            get { return _typeID; }
-        }
-
-
-        public string Alias
-        {
-            set { _alias = value; }
-            get { return _alias; }
-        }
-
-        public int ParentID
-        {
-            set { _parentID = value; }
-            get { return _parentID; }
-        }
-
-        public bool Save()
+        public override bool PerformSave()
         {
 
-            cms.businesslogic.contentitem.ContentItemType.MakeNew(BusinessLogic.User.GetUser(_userID), Alias);
+            cms.businesslogic.contentitem.ContentItemType.MakeNew(User, Alias);
             return true;
         }
 
-        public bool Delete()
+        public override bool PerformDelete()
         {
-            new cms.businesslogic.contentitem.ContentItemType(_parentID).delete();
+            new cms.businesslogic.contentitem.ContentItemType(ParentID).delete();
             return true;
         }
 
-        public contentItemTypeTasks()
+        public override string ReturnUrl
         {
-            //
-            // TODO: Add constructor logic here
-            //
+            get { return string.Empty; }
+        }
+
+        public override string AssignedApp
+        {
+            get { return DefaultApps.member.ToString(); }
         }
     }
 }

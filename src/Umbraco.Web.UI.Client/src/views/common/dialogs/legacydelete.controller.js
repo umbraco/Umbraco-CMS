@@ -6,12 +6,19 @@
  * @description
  * The controller for deleting content
  */
-function LegacyDeleteController($scope) {
-
-    $scope.caption = "Are you sure you want to delete the node '" + $scope.currentNode.name + "' ?";
+function LegacyDeleteController($scope, legacyResource) {
 
     $scope.performDelete = function() {
-        alert("Deleted!");
+
+        legacyResource.deleteItem({
+            nodeId: $scope.currentNode.id,
+            nodeType: $scope.currentNode.nodetype
+        }).then(function () {
+            //TODO: Need to sync tree, etc...
+            alert("Deleted!");
+            $scope.hideMenu();            
+        });
+
     };
 
     $scope.cancel = function() {

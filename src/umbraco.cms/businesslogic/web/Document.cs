@@ -306,13 +306,10 @@ namespace umbraco.cms.businesslogic.web
             }
 
             //Create a new IContent object based on the passed in DocumentType's alias, set the name and save it
-            IContent content = ApplicationContext.Current.Services.ContentService.CreateContent(Name, ParentId, dct.Alias, u.Id);
+            IContent content = ApplicationContext.Current.Services.ContentService.CreateContentWithIdentity(Name, ParentId, dct.Alias, u.Id);
             //The content object will only have the 'WasCancelled' flag set to 'True' if the 'Creating' event has been cancelled, so we return null.
             if (((Entity)content).WasCancelled)
                 return null;
-
-            //don't raise events here (false), they will get raised with the d.Save() call.
-            ApplicationContext.Current.Services.ContentService.Save(content, u.Id, false); 
 
             //read the whole object from the db
             Document d = new Document(content);

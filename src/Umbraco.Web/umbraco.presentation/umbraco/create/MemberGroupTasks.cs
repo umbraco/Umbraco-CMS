@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -9,73 +10,36 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
-    public class MemberGroupTasks : interfaces.ITaskReturnUrl
+    public class MemberGroupTasks : LegacyDialogTask
     {
-
-        private string _alias;
-        private int _parentID;
-        private int _typeID;
-        private int _userID;
-
-        public int UserId
+        public override bool PerformSave()
         {
-            set { _userID = value; }
-        }
-        public int TypeID
-        {
-            set { _typeID = value; }
-            get { return _typeID; }
-        }
-
-
-        public string Alias
-        {
-            set { _alias = value; }
-            get { return _alias; }
-        }
-
-        public int ParentID
-        {
-            set { _parentID = value; }
-            get { return _parentID; }
-        }
-
-        public bool Save()
-        {
-            System.Web.Security.Roles.CreateRole(Alias);
-            //			int id = cms.businesslogic.member.MemberGroup.MakeNew(Alias, BusinessLogic.User.GetUser(_userID)).Id;
-            m_returnUrl = string.Format("members/EditMemberGroup.aspx?id={0}", System.Web.HttpContext.Current.Server.UrlEncode(Alias));
+            Roles.CreateRole(Alias);
+            _returnUrl = string.Format("members/EditMemberGroup.aspx?id={0}", System.Web.HttpContext.Current.Server.UrlEncode(Alias));
             return true;
         }
 
-        public bool Delete()
+        public override bool PerformDelete()
         {
             // only build-in roles can be deleted
-            if (cms.businesslogic.member.Member.IsUsingUmbracoRoles())
+            if (Member.IsUsingUmbracoRoles())
             {
-                cms.businesslogic.member.MemberGroup.GetByName(Alias).delete();
+                MemberGroup.GetByName(Alias).delete();
                 return true;
             }
-            else
-            {
-                return false;
-            }
+            return false;            
         }
 
-        public MemberGroupTasks()
+        private string _returnUrl = "";
+
+        public override string ReturnUrl
         {
-            //
-            // TODO: Add constructor logic here
-            //
+            get { return _returnUrl; }
         }
 
-        #region ITaskReturnUrl Members
-        private string m_returnUrl = "";
-        public string ReturnUrl
+        public override string AssignedApp
         {
-            get { return m_returnUrl; }
+            get { return DefaultApps.member.ToString(); }
         }
-
-        #endregion
     }
 }

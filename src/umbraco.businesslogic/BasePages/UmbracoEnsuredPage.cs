@@ -15,6 +15,13 @@ namespace umbraco.BasePages
     [Obsolete("This class has been superceded by Umbraco.Web.UI.Pages.UmbracoEnsuredPage")]
     public class UmbracoEnsuredPage : BasePage
     {
+
+        /// <summary>
+        /// Gets/sets the app for which this page belongs to so that we can validate the current user's security against it
+        /// </summary>
+        /// <remarks>
+        /// If no app is specified then all logged in users will have access to the page
+        /// </remarks>
         public string CurrentApp { get; set; }
 
         /// <summary>

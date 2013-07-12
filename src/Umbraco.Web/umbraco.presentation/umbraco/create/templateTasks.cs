@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -10,79 +11,47 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
-    public class templateTasks : interfaces.ITaskReturnUrl
+    public class templateTasks : LegacyDialogTask
     {
-
-        private string _alias;
-        private int _parentID;
-        private int _typeID;
-        private int _userID;
-
-        public int UserId
+       
+        public override bool PerformSave()
         {
-            set { _userID = value; }
-        }
-        public int TypeID
-        {
-            set { _typeID = value; }
-            get { return _typeID; }
-        }
-
-
-        public string Alias
-        {
-            set { _alias = value; }
-            get { return _alias; }
-        }
-
-        public int ParentID
-        {
-            set { _parentID = value; }
-            get { return _parentID; }
-        }
-
-        public bool Save()
-        {
-            int masterId = ParentID;
-
+            var masterId = ParentID;
+            
             var editor = "settings/editTemplate.aspx";
             if(Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
                 editor = "settings/views/editView.aspx";
 
             if (masterId > 0)
             {
-                int id = cms.businesslogic.template.Template.MakeNew(Alias, BusinessLogic.User.GetUser(_userID), new cms.businesslogic.template.Template(masterId)).Id;
-                m_returnUrl = string.Format("{1}?templateID={0}", id, editor);
+                var id = cms.businesslogic.template.Template.MakeNew(Alias, User, new cms.businesslogic.template.Template(masterId)).Id;
+                _returnUrl = string.Format("{1}?templateID={0}", id, editor);
             }
             else
             {
-                int id = cms.businesslogic.template.Template.MakeNew(Alias, BusinessLogic.User.GetUser(_userID)).Id;
-                m_returnUrl = string.Format("{1}?templateID={0}", id, editor);
+                var id = cms.businesslogic.template.Template.MakeNew(Alias, User).Id;
+                _returnUrl = string.Format("{1}?templateID={0}", id, editor);
 
             }
             return true;
         }
 
-        public bool Delete()
+        public override bool PerformDelete()
         {
-            new cms.businesslogic.template.Template(_parentID).delete();
+            new cms.businesslogic.template.Template(ParentID).delete();
             return false;
         }
 
-        public templateTasks()
+        private string _returnUrl = "";
+        
+        public override string ReturnUrl
         {
-            //
-            // TODO: Add constructor logic here
-            //
+            get { return _returnUrl; }
         }
 
-        #region ITaskReturnUrl Members
-        private string m_returnUrl = "";
-        public string ReturnUrl
+        public override string AssignedApp
         {
-            get { return m_returnUrl; }
+            get { return DefaultApps.settings.ToString(); }
         }
-
-        #endregion
     }
 }

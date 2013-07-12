@@ -9,10 +9,7 @@
  * 
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope,$rootScope, $location, navigationService, dialogService, historyService, sectionResource, angularHelper) {
-
-    var actionDialog = null;
-    var menuDialog = null;
+function NavigationController($scope,$rootScope, $location, $log, navigationService, dialogService, historyService, sectionResource, angularHelper) {
 
     //load navigation service handlers
     $scope.changeSection = navigationService.changeSection;
@@ -24,8 +21,6 @@ function NavigationController($scope,$rootScope, $location, navigationService, d
     $scope.hideDialog = navigationService.hideDialog;
     $scope.hideNavigation = navigationService.hideNavigation;
     $scope.ui = navigationService.ui;
-    //track the currently opened dialog
-    $scope.ui.currentDialog = null;
     //tree event handler everyone can subscribe to
     $scope.ui.tree = $({});
 
@@ -56,15 +51,8 @@ function NavigationController($scope,$rootScope, $location, navigationService, d
         
         $scope.currentNode = args.node;
         args.scope = $scope;
-        
-        //ensure the menuDialog is cleared before opening another!
-        if ($scope.ui.currentDialog) {
-            dialogService.close($scope.ui.currentDialog);
-        }
-        navigationService.showMenu(ev, args)
-            .then(function(result) {
-                $scope.ui.currentDialog = result;
-            });
+
+        navigationService.showMenu(ev, args);
     });
 
     //this reacts to tree items themselves being clicked
@@ -104,15 +92,8 @@ function NavigationController($scope,$rootScope, $location, navigationService, d
     });
 
     $scope.openDialog = function (currentNode, action, currentSection) {
-
-        $scope.currentAction = action;
-
-        //ensure the actionDialog is cleared before opening another!
-        if ($scope.ui.currentDialog) {
-            dialogService.close($scope.ui.currentDialog);
-        }
-
-        $scope.ui.currentDialog = navigationService.showDialog({
+        
+        navigationService.showDialog({
             scope: $scope,
             node: currentNode,
             action: action,

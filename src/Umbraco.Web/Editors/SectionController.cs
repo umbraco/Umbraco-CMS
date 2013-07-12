@@ -12,7 +12,7 @@ namespace Umbraco.Web.Editors
     /// The API controller used for using the list of sections
     /// </summary>
     [PluginController("UmbracoApi")]
-    public class SectionController : UmbracoAuthorizedApiController
+    public class SectionController : UmbracoAuthorizedJsonController
     {
         public IEnumerable<Section> GetSections()
         {

@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -9,53 +10,24 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
-    public class contentTasks : interfaces.ITaskReturnUrl
+    public class contentTasks : LegacyDialogTask
     {
-
-        private string _alias;
-        private int _parentID;
-        private int _typeID;
-        private int _userID;
         private string _returnUrl = "";
 
-        public int UserId
-        {
-            set { _userID = value; }
-        }
-
-        public string ReturnUrl
+        public override string ReturnUrl
         {
             get { return _returnUrl; }
         }
 
-        public int TypeID
+        public override string AssignedApp
         {
-            set { _typeID = value; }
-            get { return _typeID; }
+            get { return DefaultApps.content.ToString(); }
         }
 
-        public string Alias
+        public override bool PerformSave()
         {
-            set { _alias = value; }
-            get { return _alias; }
-        }
-
-        public int ParentID
-        {
-            set
-            {
-                _parentID = value;
-            }
-            get
-            {
-                return _parentID;
-            }
-        }
-
-        public bool Save()
-        {
-            cms.businesslogic.web.DocumentType dt = new cms.businesslogic.web.DocumentType(TypeID);
-            cms.businesslogic.web.Document d = cms.businesslogic.web.Document.MakeNew(Alias, dt, BusinessLogic.User.GetUser(_userID), ParentID);
+            var dt = new cms.businesslogic.web.DocumentType(TypeID);
+            var d = cms.businesslogic.web.Document.MakeNew(Alias, dt, User, ParentID);
             if (d == null)
             {
                 //TODO: Slace - Fix this to use the language files
@@ -69,29 +41,18 @@ namespace umbraco
             }
         }
 
-        public bool Delete()
+        public override bool PerformDelete()
         {
-            cms.businesslogic.web.Document d = new cms.businesslogic.web.Document(ParentID);
-
-            // Log
-            BusinessLogic.Log.Add(BusinessLogic.LogTypes.Delete, User.GetCurrent(), d.Id, "");
+            var d = new cms.businesslogic.web.Document(ParentID);
 
             d.delete();
+
+            // Log
+            Log.Add(LogTypes.Delete, User.GetCurrent(), d.Id, "");
 
             return true;
 
         }
 
-        public bool Sort()
-        {
-            return false;
-        }
-
-        public contentTasks()
-        {
-            //
-            // TODO: Add constructor logic here
-            //
-        }
     }
 }

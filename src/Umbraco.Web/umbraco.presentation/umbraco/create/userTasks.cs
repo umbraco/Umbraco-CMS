@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Web.Security;
 using Umbraco.Core.Logging;
+using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -10,28 +11,21 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
-    public class userTasks : interfaces.ITaskReturnUrl
+    public class userTasks : LegacyDialogTask
     {
         private string _returnUrl = "";
 
-        public int UserId
-        {
-            set { }
-        }
-
-        public int TypeID { get; set; }
-
-
-        public string Alias { get; set; }
-
-        public int ParentID { get; set; }
-
-        public string ReturnUrl
+        public override string ReturnUrl
         {
             get { return _returnUrl; }
         }
 
-        public bool Save()
+        public override string AssignedApp
+        {
+            get { return DefaultApps.users.ToString(); }
+        }
+
+        public override bool PerformSave()
         {
             // Hot damn HACK > user is allways UserType with id  = 1  = administrator ???
             // temp password deleted by NH
@@ -48,7 +42,7 @@ namespace umbraco
                     Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].MinRequiredNonAlphanumericCharacters),
                     "", "", "", true, null, out status);
 
-                _returnUrl = string.Format("users/EditUser.aspx?id={0}", u.ProviderUserKey.ToString());
+                _returnUrl = string.Format("users/EditUser.aspx?id={0}", u.ProviderUserKey);
 
                 return status == MembershipCreateStatus.Success;
             }
@@ -59,7 +53,7 @@ namespace umbraco
             }
         }
 
-        public bool Delete()
+        public override bool PerformDelete()
         {
             var u = User.GetUser(ParentID);
             u.disable();

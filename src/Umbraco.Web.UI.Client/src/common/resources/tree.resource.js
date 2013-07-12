@@ -3,12 +3,7 @@
     * @name umbraco.resources.treeResource     
     * @description Loads in data for trees
     **/
-function treeResource($q, $http, angularHelper) {
-
-    /** internal method to get the tree app url */
-    function getTreeAppUrl(section) {
-        return Umbraco.Sys.ServerVariables.treeApplicationApiBaseUrl + "GetApplicationTrees?application=" + section;
-    }
+function treeResource($q, $http, umbRequestHelper) {
 
     /** internal method to get the tree node's children url */
     function getTreeNodesUrl(node) {
@@ -31,8 +26,8 @@ function treeResource($q, $http, angularHelper) {
         
         /** Loads in the data to display the nodes menu */
         loadMenu: function (node) {
-            
-            return angularHelper.resourcePromise(
+              
+            return umbRequestHelper.resourcePromise(
                 $http.get(getTreeMenuUrl(node)),
                 "Failed to retreive data for a node's menu " + node.id);
         },
@@ -44,8 +39,12 @@ function treeResource($q, $http, angularHelper) {
                 throw "The object specified for does not contain a 'section' property";
             }
 
-            return angularHelper.resourcePromise(
-                $http.get(getTreeAppUrl(options.section)),
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "treeApplicationApiBaseUrl",
+                        "GetApplicationTrees",
+                        [{ application: options.section }])),
                 'Failed to retreive data for application tree ' + options.section);
         },
         
@@ -56,7 +55,7 @@ function treeResource($q, $http, angularHelper) {
                 throw "The options parameter object does not contain the required properties: 'node' and 'section'";
             }
 
-            return angularHelper.resourcePromise(
+            return umbRequestHelper.resourcePromise(
                 $http.get(getTreeNodesUrl(options.node)),
                 'Failed to retreive data for child nodes ' + options.node.nodeId);
         }

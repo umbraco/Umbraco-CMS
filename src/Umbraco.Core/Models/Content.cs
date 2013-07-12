@@ -22,7 +22,7 @@ namespace Umbraco.Core.Models
         private DateTime? _expireDate;
         private int _writer;
         private string _nodeName;//NOTE Once localization is introduced this will be the non-localized Node Name.
-
+        private bool _permissionsChanged;
         /// <summary>
         /// Constructor for creating a Content object
         /// </summary>
@@ -82,6 +82,7 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
         private static readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.WriterId);
         private static readonly PropertyInfo NodeNameSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.NodeName);
+        private static readonly PropertyInfo PermissionsChangedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.PermissionsChanged);
 
         /// <summary>
         /// Gets or sets the template used by the Content.
@@ -240,6 +241,22 @@ namespace Umbraco.Core.Models
                     _nodeName = value;
                     return _nodeName;
                 }, _nodeName, NodeNameSelector);
+            }
+        }
+
+        /// <summary>
+        /// Used internally to track if permissions have been changed during the saving process for this entity
+        /// </summary>
+        internal bool PermissionsChanged
+        {
+            get { return _permissionsChanged; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _permissionsChanged = value;
+                    return _permissionsChanged;
+                }, _permissionsChanged, PermissionsChangedSelector);
             }
         }
 

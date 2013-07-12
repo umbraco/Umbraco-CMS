@@ -30,7 +30,7 @@ namespace Umbraco.Web.Editors
     //}
 
     [PluginController("UmbracoApi")]
-    public class MediaController : UmbracoAuthorizedApiController
+    public class MediaController : UmbracoAuthorizedJsonController
     {
         private readonly MediaModelMapper _mediaModelMapper;
 

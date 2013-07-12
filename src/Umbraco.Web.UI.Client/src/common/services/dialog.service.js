@@ -34,13 +34,14 @@ angular.module('umbraco.services')
 
        var dialogs = [];
        
-       $rootScope.$on("closeDialogs", function () {
+       /** Internal method that removes all dialogs */
+       function removeAllDialogs() {
            for (var i = 0; i < dialogs.length; i++) {
                var dialog = dialogs[i];
                removeDialog(dialog);
                dialogs.splice(i, 1);
            }
-       });
+       }
 
        /** Internal method that handles closing a specific dialog */
        function removeDialog(dialog) {
@@ -199,6 +200,11 @@ angular.module('umbraco.services')
 
        }
 
+       /** Handles the closeDialogs event */
+       $rootScope.$on("closeDialogs", function () {
+           removeAllDialogs();
+       });
+
        return {
            /**
             * @ngdoc method
@@ -221,7 +227,7 @@ angular.module('umbraco.services')
             * @param {Bool} options.inline strips the modal from any animation and wrappers, used when you want to inject a dialog into an existing container
             * @returns {Object} modal object
             */
-           open: function (options) {
+           open: function (options) {               
                return openDialog(options);
            },
            
@@ -234,8 +240,20 @@ angular.module('umbraco.services')
             * Closes a specific dialog
             * @param {Object} dialog the dialog object to close
             */
-           close: function(dialog) {
+           close: function (dialog) {
                removeDialog(dialog);
+           },
+           
+           /**
+            * @ngdoc method
+            * @name umbraco.services.dialogService#closeAll
+            * @methodOf umbraco.services.dialogService
+            *
+            * @description
+            * Closes all dialogs
+            */
+           closeAll: function() {
+               removeAllDialogs();
            },
 
            /**

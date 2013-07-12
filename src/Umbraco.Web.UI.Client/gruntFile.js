@@ -260,7 +260,9 @@ module.exports = function (grunt) {
            newcap:true,
            noarg:true,
            sub:true,
-           boss:true,
+           boss: true,
+             //NOTE: This is required so it doesn't barf on reserved words like delete when doing $http.delete
+           es5: true,
            eqnull: true,
              //NOTE: we need to use eval sometimes so ignore it
            evil: true,
@@ -281,7 +283,9 @@ module.exports = function (grunt) {
            newcap:true,
            noarg:true,
            sub:true,
-           boss:true,
+           boss: true,
+            //NOTE: This is required so it doesn't barf on reserved words like delete when doing $http.delete
+           es5: true,
            eqnull: true,
              //NOTE: we need to use eval sometimes so ignore it
            evil: true,

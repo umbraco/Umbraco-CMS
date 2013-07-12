@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Services
             Assert.That(membershipUser.HasIdentity, Is.True);
             IUser user = membershipUser as User;
             Assert.That(user, Is.Not.Null);
-            Assert.That(user.Permissions, Is.EqualTo(userType.Permissions));
+            Assert.That(user.DefaultPermissions, Is.EqualTo(userType.Permissions));
         }
 
         [Test]
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Services
             Assert.That(membershipUser.Password, Is.EqualTo(encodedPassword));
             IUser user = membershipUser as User;
             Assert.That(user, Is.Not.Null);
-            Assert.That(user.Permissions, Is.EqualTo(userType.Permissions));
+            Assert.That(user.DefaultPermissions, Is.EqualTo(userType.Permissions));
         }
 
         [Test]
@@ -140,7 +140,7 @@ namespace Umbraco.Tests.Services
             Assert.IsNotNull(updatedItem);
             Assert.That(updatedItem.Id, Is.EqualTo(originalUser.Id));
             Assert.That(updatedItem.Name, Is.EqualTo(originalUser.Name));
-            Assert.That(updatedItem.Permissions, Is.EqualTo(originalUser.Permissions));
+            Assert.That(updatedItem.DefaultPermissions, Is.EqualTo(originalUser.DefaultPermissions));
             Assert.That(updatedItem.Language, Is.EqualTo(originalUser.Language));
             Assert.That(updatedItem.IsApproved, Is.EqualTo(originalUser.IsApproved));
             Assert.That(updatedItem.Password, Is.EqualTo(originalUser.Password));

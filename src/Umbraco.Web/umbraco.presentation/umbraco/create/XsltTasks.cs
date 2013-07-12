@@ -4,6 +4,7 @@ using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -16,71 +17,40 @@ namespace umbraco
     /// </summary>
     ///
 
-    public class XsltTasks : interfaces.ITaskReturnUrl
+    public class XsltTasks : LegacyDialogTask
     {
 
-        private string _alias;
-        private int _parentId;
-        private int _typeId;
-        private int _userId;
-
-        public int UserId
+        public override bool PerformSave()
         {
-            set { _userId = value; }
-        }
-
-
-        public int TypeID
-        {
-            set { _typeId = value; }
-            get { return _typeId; }
-        }
-
-
-        public string Alias
-        {
-            set { _alias = value; }
-            get { return _alias; }
-        }
-
-        public int ParentID
-        {
-            set { _parentId = value; }
-            get { return _parentId; }
-        }
-
-        public bool Save()
-        {
-            string template = _alias.Substring(0, _alias.IndexOf("|||"));
-            string fileName = _alias.Substring(_alias.IndexOf("|||") + 3, _alias.Length - _alias.IndexOf("|||") - 3).Replace(" ", "");
-            string xsltTemplateSource = IOHelper.MapPath(SystemDirectories.Umbraco + "/xslt/templates/" + template);
-            string xsltNewFilename = IOHelper.MapPath(SystemDirectories.Xslt + "/" + fileName + ".xslt");
-
-
+            var template = Alias.Substring(0, Alias.IndexOf("|||"));
+            var fileName = Alias.Substring(Alias.IndexOf("|||") + 3, Alias.Length - Alias.IndexOf("|||") - 3).Replace(" ", "");
+            var xsltTemplateSource = IOHelper.MapPath(SystemDirectories.Umbraco + "/xslt/templates/" + template);
+            var xsltNewFilename = IOHelper.MapPath(SystemDirectories.Xslt + "/" + fileName + ".xslt");
+            
 			if (!System.IO.File.Exists(xsltNewFilename))
 			{
 				if (fileName.Contains("/")) //if there's a / create the folder structure for it
 				{
-					string[] folders = fileName.Split("/".ToCharArray());
-					string xsltBasePath = IOHelper.MapPath(SystemDirectories.Xslt);
-					for (int i = 0; i < folders.Length - 1; i++)
+					var folders = fileName.Split("/".ToCharArray());
+					var xsltBasePath = IOHelper.MapPath(SystemDirectories.Xslt);
+					for (var i = 0; i < folders.Length - 1; i++)
 					{
 						xsltBasePath = System.IO.Path.Combine(xsltBasePath, folders[i]);
 						System.IO.Directory.CreateDirectory(xsltBasePath);
 					}
 				}
 
-				//            System.IO.File.Copy(xsltTemplateSource, xsltNewFilename, false);
-
 				// update with xslt references
-				string xslt = "";
-				System.IO.StreamReader xsltFile = System.IO.File.OpenText(xsltTemplateSource);
-				xslt = xsltFile.ReadToEnd();
-				xsltFile.Close();
+				var xslt = "";
+				using (var xsltFile = System.IO.File.OpenText(xsltTemplateSource))
+				{
+                    xslt = xsltFile.ReadToEnd();
+                    xsltFile.Close();    
+				}
 
 				// prepare support for XSLT extensions
 				xslt = macro.AddXsltExtensionsToHeader(xslt);
-				System.IO.StreamWriter xsltWriter = System.IO.File.CreateText(xsltNewFilename);
+				var xsltWriter = System.IO.File.CreateText(xsltNewFilename);
 				xsltWriter.Write(xslt);
 				xsltWriter.Flush();
 				xsltWriter.Close();
@@ -88,7 +58,7 @@ namespace umbraco
 				// Create macro?
 				if (ParentID == 1)
 				{
-				    var name = _alias.Substring(_alias.IndexOf("|||") + 3, _alias.Length - _alias.IndexOf("|||") - 3)
+                    var name = Alias.Substring(Alias.IndexOf("|||") + 3, Alias.Length - Alias.IndexOf("|||") - 3)
 				                     .SplitPascalCasing().ToFirstUpperInvariant();
 					cms.businesslogic.macro.Macro m =
 						cms.businesslogic.macro.Macro.MakeNew(name);
@@ -101,11 +71,9 @@ namespace umbraco
             return true;
         }
 
-        public bool Delete()
+        public override bool PerformDelete()
         {
-            string path = IOHelper.MapPath(SystemDirectories.Xslt + "/" + Alias.TrimStart('/'));
-
-            System.Web.HttpContext.Current.Trace.Warn("", "*" + path + "*");
+            var path = IOHelper.MapPath(SystemDirectories.Xslt + "/" + Alias.TrimStart('/'));
 
             try
             {
@@ -121,21 +89,16 @@ namespace umbraco
             return true;
         }
 
-        public XsltTasks()
-        {
-            //
-            // TODO: Add constructor logic here
-            //
-        }
-
-        #region ITaskReturnUrl Members
         private string _returnUrl = "";
-        public string ReturnUrl
+        
+        public override string ReturnUrl
         {
             get { return _returnUrl; }
         }
 
-        #endregion
-
+        public override string AssignedApp
+        {
+            get { return DefaultApps.developer.ToString(); }
+        }
     }
 }

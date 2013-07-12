@@ -217,25 +217,52 @@ namespace umbraco.dialogs
                 var nodeAllowed = false;
 
                 IContentBase currContent;
-                IContentBase parentContent;
-                IContentTypeBase parentContentType;
+                IContentBase parentContent = null;
+                IContentTypeBase parentContentType = null;
                 if (CurrentApp == "content")
                 {
                     currContent = Services.ContentService.GetById(Request.GetItemAs<int>("id"));
-                    parentContent = Services.ContentService.GetById(Request.GetItemAs<int>("copyTo"));
-                    parentContentType = Services.ContentTypeService.GetContentType(parentContent.ContentTypeId);
+                    if (Request.GetItemAs<int>("copyTo") != -1)
+                    {
+                        parentContent = Services.ContentService.GetById(Request.GetItemAs<int>("copyTo"));
+                        if (parentContent != null)
+                        {
+                            parentContentType = Services.ContentTypeService.GetContentType(parentContent.ContentTypeId);
+                        }   
+                    }    
                 }
                 else
                 {
                     currContent = Services.MediaService.GetById(Request.GetItemAs<int>("id"));
-                    parentContent = Services.MediaService.GetById(Request.GetItemAs<int>("copyTo"));
-                    parentContentType = Services.ContentTypeService.GetMediaType(parentContent.ContentTypeId);
+                    if (Request.GetItemAs<int>("copyTo") != -1)
+                    {
+                        parentContent = Services.MediaService.GetById(Request.GetItemAs<int>("copyTo"));
+                        if (parentContent != null)
+                        {
+                            parentContentType = Services.ContentTypeService.GetMediaType(parentContent.ContentTypeId);
+                        }
+                    }                    
                 }
 
                 // Check on contenttypes
-                if (Request.GetItemAs<int>("copyTo") == -1)
+                if (parentContentType == null)
                 {
-                    nodeAllowed = true;
+                    //check if this is allowed at root
+                    IContentTypeBase currContentType;
+                    if (CurrentApp == "content")
+                    {
+                        currContentType = Services.ContentTypeService.GetContentType(currContent.ContentTypeId);
+                    }
+                    else
+                    {
+                        currContentType = Services.ContentTypeService.GetMediaType(currContent.ContentTypeId);
+                    }
+                    nodeAllowed = currContentType.AllowedAsRoot;
+                    if (!nodeAllowed)
+                    {
+                        feedback.Text = ui.Text("moveOrCopy", "notAllowedAtRoot", UmbracoUser);
+                        feedback.type = uicontrols.Feedback.feedbacktype.error;
+                    }
                 }
                 else
                 {
@@ -268,7 +295,7 @@ namespace umbraco.dialogs
                     pane_form_notice.Visible = false;
                     panel_buttons.Visible = false;
 
-                    var newNodeCaption = Request.GetItemAs<int>("copyTo") == -1 
+                    var newNodeCaption = parentContent == null 
                         ? ui.Text(CurrentApp) 
                         : parentContent.Name;
 
@@ -290,19 +317,19 @@ namespace umbraco.dialogs
                         feedback.type = uicontrols.Feedback.feedbacktype.success;
 
                         // refresh tree
-                        ClientTools.MoveNode(currContent.Id.ToString(), parentContent.Path);
+                        ClientTools.MoveNode(currContent.Id.ToString(), currContent.Path);
                     }
                     else
                     {
                         //NOTE: We ONLY support Copy on content not media for some reason.
 
-                        Services.ContentService.Copy((IContent)currContent, Request.GetItemAs<int>("copyTo"), RelateDocuments.Checked, getUser().Id);
+                        var newContent = Services.ContentService.Copy((IContent)currContent, Request.GetItemAs<int>("copyTo"), RelateDocuments.Checked, getUser().Id);
                         
                         feedback.Text = ui.Text("moveOrCopy", "copyDone", nodes, getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
                         feedback.type = uicontrols.Feedback.feedbacktype.success;
 
                         // refresh tree
-                        ClientTools.CopyNode(currContent.Id.ToString(), parentContent.Path);
+                        ClientTools.CopyNode(currContent.Id.ToString(), newContent.Path);
                     }
                 }
             }

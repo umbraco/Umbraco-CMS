@@ -4,7 +4,7 @@
 
 All Umbraco resource methods utilize a helper method:
 
-	angularHelper.resourcePromise
+	umbRequestHelper.resourcePromise
 
 This method accepts 2 arguments:
 
@@ -16,16 +16,16 @@ Here's an example of the usage in an Umbraco resource. This example is the metho
 	/** Loads in the data to display the nodes menu */
     loadMenu: function (node) {
         
-        return angularHelper.resourcePromise(
+        return umbRequestHelper.resourcePromise(
             $http.get(getTreeMenuUrl(node)),
             "Failed to retreive data for a node's menu " + node.id);
     }
 
-HTTP error handling is performed automatically inside of the `angularHelper.resourcePromise` and inside of Umbraco's response interceptors.
+HTTP error handling is performed automatically inside of the `umbRequestHelper.resourcePromise` and inside of Umbraco's response interceptors.
 
 ##Consuming Umbraco resources
 
-When consuming Umbraco resources, a normal angular promise will be returned based on the above `angularHelper.resourcePromise`. The success callback will always receive the RAW json data from the server and the error callback will always receive an object containing these properties:
+When consuming Umbraco resources, a normal angular promise will be returned based on the above `umbRequestHelper.resourcePromise`. The success callback will always receive the RAW json data from the server and the error callback will always receive an object containing these properties:
 
 * erroMsg = the error message that can be used to show in the UI
 * data = the original data object used to create the promise

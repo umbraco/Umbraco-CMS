@@ -19,7 +19,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                     Name = "TestUser" + suffix,
                     Password = "testing",
                     NoConsole = false,
-                    Permissions = "ABC",
+                    DefaultPermissions = "ABC",
                     StartContentId = -1,
                     StartMediaId = -1,
                     DefaultToLiveEditing = false,

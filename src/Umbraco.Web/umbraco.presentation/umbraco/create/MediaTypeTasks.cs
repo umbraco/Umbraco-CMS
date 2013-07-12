@@ -1,49 +1,16 @@
-using System;
-using System.Data;
-using System.Web.Security;
+using Umbraco.Web.UI;
 using Umbraco.Core;
 using umbraco.BusinessLogic;
-using umbraco.DataLayer;
-using umbraco.BasePages;
-using umbraco.IO;
-using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
-    public class MediaTypeTasks : interfaces.ITaskReturnUrl
+    public class MediaTypeTasks : LegacyDialogTask
     {
-
-        private string _alias;
-        private int _parentID;
-        private int _typeID;
-        private int _userID;
-
-        public int UserId
-        {
-            set { _userID = value; }
-        }
-        public int TypeID
-        {
-            set { _typeID = value; }
-            get { return _typeID; }
-        }
-
-
-        public string Alias
-        {
-            set { _alias = value; }
-            get { return _alias; }
-        }
-
-        public int ParentID
-        {
-            set { _parentID = value; }
-            get { return _parentID; }
-        }
-
-        public bool Save()
+       
+        public override bool PerformSave()
         { 
-            var mediaType = cms.businesslogic.media.MediaType.MakeNew(User.GetUser(_userID), Alias.Replace("'", "''"));
+
+            var mediaType = cms.businesslogic.media.MediaType.MakeNew(User, Alias.Replace("'", "''"));
             mediaType.IconUrl = UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates ? ".sprTreeFolder" : "folder.gif";
            
             if (ParentID != -1)
@@ -52,11 +19,11 @@ namespace umbraco
                 mediaType.Save();
             }
 
-            m_returnUrl = string.Format("settings/editMediaType.aspx?id={0}", mediaType.Id);
+            _returnUrl = string.Format("settings/editMediaType.aspx?id={0}", mediaType.Id);
             return true;
         }
 
-        public bool Delete()
+        public override bool PerformDelete()
         {
             var mediaType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(ParentID);
             if (mediaType != null)
@@ -65,22 +32,17 @@ namespace umbraco
             }
             return false;
         }
+        
+        private string _returnUrl = "";
 
-        public MediaTypeTasks()
+        public override string ReturnUrl
         {
-            //
-            // TODO: Add constructor logic here
-            //
+            get { return _returnUrl; }
         }
 
-        #region ITaskReturnUrl Members
-        private string m_returnUrl = "";
-        public string ReturnUrl
+        public override string AssignedApp
         {
-            get { return m_returnUrl; }
+            get { return DefaultApps.settings.ToString(); }
         }
-
-        #endregion
-
     }
 }
