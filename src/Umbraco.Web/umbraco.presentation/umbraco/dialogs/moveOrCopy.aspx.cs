@@ -89,6 +89,10 @@ namespace umbraco.dialogs
                         currContent = Services.MediaService.GetById(Request.GetItemAs<int>("id"));
                     }
 
+                    // Preselect the parent of the seslected item.
+                    if(cmsNode.ParentId > 0)
+                        JTree.SelectedNodePath = cmsNode.Parent.Path;
+
                     var validAction = true;
                     if (CurrentApp == Constants.Applications.Content && Umbraco.Core.Models.ContentExtensions.HasChildren(currContent, Services))
                     {

@@ -62,6 +62,7 @@ namespace umbraco.controls.Tree
         private TreeMode m_TreeType = TreeMode.Standard;
         private bool m_IsInit = false;
         private TreeService m_TreeService = new TreeService();
+        private string m_SelectedNodePath;
 
         #region Public Properties
 
@@ -97,6 +98,15 @@ namespace umbraco.controls.Tree
             set
             {
                 m_TreeService.StartNodeID = value;
+            }
+        }
+
+        public string SelectedNodePath
+        {
+            get { return m_SelectedNodePath; }
+            set
+            {
+                m_SelectedNodePath = value;
             }
         }
 
