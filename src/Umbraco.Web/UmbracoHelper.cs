@@ -314,7 +314,7 @@ namespace Umbraco.Web
 
 
 
-		    var item = new Item()
+            var item = new Item(currentPage)
 		                   {		        
 		                       Field = fieldAlias,
 		                       TextIfEmpty = altText,
