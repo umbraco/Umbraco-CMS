@@ -48,7 +48,7 @@ namespace Umbraco.Web
                 //set the area to the plugin area
                 area = metaData.AreaName;
             }
-            return url.GetUmbracoApiService(actionName, ControllerExtensions.GetControllerName(apiControllerType), area);
+            return url.GetUmbracoApiService(actionName, ControllerExtensions.GetControllerName(apiControllerType), area, id);
         }
 
         /// <summary>

@@ -50,10 +50,10 @@ function treeService($q, treeResource, iconHelper) {
                     var result = {
                         name: section,
                         alias: section,
-                        children: data
+                        root: data
                     };
                     //ensure the view is added to each tree node
-                    ensureParentLevelAndView(null, result.children, section);
+                    ensureParentLevelAndView(result.root, result.root.children, section);
                     //cache this result
                     //TODO: We'll need to un-cache this in many circumstances
                     treeArray[cacheKey] = result;

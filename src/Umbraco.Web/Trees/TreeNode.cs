@@ -2,6 +2,7 @@
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Umbraco.Core.IO;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Trees
 {
@@ -11,8 +12,7 @@ namespace Umbraco.Web.Trees
     [DataContract(Name = "node", Namespace = "")]
     public class TreeNode
     {
-        //private readonly List<MenuItem> _menuItems = new List<MenuItem>();
-
+        
         public TreeNode(string nodeId, string getChildNodesUrl, string menuUrl)
         {
             //_menuItems = menuItems;
@@ -22,15 +22,6 @@ namespace Umbraco.Web.Trees
             ChildNodesUrl = getChildNodesUrl;
             MenuUrl = menuUrl;
         }
-
-        /// <summary>
-        /// Internal child array to be able to add nested levels of content
-        /// </summary>
-        /// <remarks>
-        /// Currently this is ONLY supported for rendering the root node for an application
-        /// tree when there are multiple trees for an application
-        /// </remarks>
-        internal IEnumerable<TreeNode> Children { get; set; }
 
         /// <summary>
         /// The unique identifier for the node
@@ -78,6 +69,10 @@ namespace Umbraco.Web.Trees
         {
             get
             {
+                if (Icon.IsNullOrWhiteSpace())
+                {
+                    return true;
+                }
                 //if it starts with a '.' or doesn't contain a '.' at all then it is a class
                 return Icon.StartsWith(".") || Icon.Contains(".") == false;
             }

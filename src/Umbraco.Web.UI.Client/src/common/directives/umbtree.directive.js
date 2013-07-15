@@ -24,18 +24,17 @@ angular.module("umbraco.directives")
          var hideheader = (attrs.showheader === 'false') ? true : false;
          var hideoptions = (attrs.showoptions === 'false') ? "hide-options" : "";
         
-         
-
          var template = '<ul class="umb-tree ' + hideoptions + '">' + 
          '<li class="root">';
 
          if(!hideheader){ 
            template +='<div>' + 
-           '<h5><a class="root-link">{{tree.name}}</a><i class="umb-options"><i></i><i></i><i></i></i></h5>' + 
+           '<h5><a class="root-link">{{tree.name}}</a></h5>' +
+               '<i class="umb-options" ng-hide="tree.root.isContainer" ng-click="options(this, tree.root, $event)"><i></i><i></i><i></i></i>' +
            '</div>';
          }
          template += '<ul>' +
-                  '<umb-tree-item ng-repeat="child in tree.children" node="child" callback="callback" section="{{section}}"></umb-tree-item>' +
+                  '<umb-tree-item ng-repeat="child in tree.root.children" node="child" callback="callback" section="{{section}}"></umb-tree-item>' +
                   '</ul>' +
                 '</li>' +
                '</ul>';
@@ -44,6 +43,22 @@ angular.module("umbraco.directives")
         element.replaceWith(template);
 
         return function (scope, element, attrs, controller) {
+
+            /** Helper function to emit tree events */
+            function emitEvent(eventName, args) {
+                if (scope.callback) {
+                    $(scope.callback).trigger(eventName, args);
+                }
+            }
+
+            /**
+              Method called when the options button next to the root node is called.
+              The tree doesnt know about this, so it raises an event to tell the parent controller
+              about it.
+            */
+            scope.options = function (e, n, ev) {
+                emitEvent("treeOptionsClick", { element: e, node: n, event: ev });
+            };
 
             function loadTree() {
                 if (scope.section) {

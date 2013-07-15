@@ -336,6 +336,7 @@
     <Compile Include="Trees\MenuItemCollection.cs" />
     <Compile Include="Trees\MenuItemExtensions.cs" />
     <Compile Include="Trees\SearchResultItem.cs" />
+    <Compile Include="Trees\SectionRootNode.cs" />
     <Compile Include="Trees\TreeApiController.cs" />
     <Compile Include="Trees\ApplicationTreeExtensions.cs" />
     <Compile Include="Trees\TreeNode.cs" />

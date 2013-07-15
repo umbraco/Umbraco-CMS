@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Management.Instrumentation;
 using System.Net.Http.Formatting;
@@ -34,16 +35,25 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         /// <returns></returns>
         [HttpQueryStringFilter("queryStrings")]
-        public TreeNodeCollection GetApplicationTrees(string application, FormDataCollection queryStrings)
+        public SectionRootNode GetApplicationTrees(string application, FormDataCollection queryStrings)
         {
             if (application == null) throw new ArgumentNullException("application");
+
+            var rootId = Core.Constants.System.Root.ToString(CultureInfo.InvariantCulture);
 
             //find all tree definitions that have the current application alias
             var appTrees = ApplicationContext.Current.Services.ApplicationTreeService.GetApplicationTrees(application).Where(x => x.Initialize).ToArray();
             if (appTrees.Count() == 1)
-            {
-                //return the nodes for the one tree assigned
-                return GetNodeCollection(appTrees.Single(), "-1", queryStrings);
+            {   
+                return new SectionRootNode(
+                    rootId,
+                    Url.GetUmbracoApiService<LegacyTreeApiController>("GetMenu", rootId) 
+                        + "&parentId=" + rootId 
+                        + "&treeType=" + application
+                        + "&section=" + application)
+                    {
+                        Children = GetNodeCollection(appTrees.Single(), "-1", queryStrings)
+                    };                
             }
 
             var collection = new TreeNodeCollection();
@@ -53,7 +63,12 @@ namespace Umbraco.Web.Trees
                 var rootNode = GetRoot(tree, queryStrings);                
                 collection.Add(rootNode); 
             }
-            return collection;
+
+            return new SectionRootNode(rootId, "")
+                {
+                    Children = collection,
+                    IsContainer = true
+                };
         }
 
         ///// <summary>

@@ -74,39 +74,76 @@ angular.module('umbraco.mocks').
           switch (section) {
 
               case "content":
-                  t = [
+                  t = {
+                      name: "content",
+                      id: -1,
+                      children: [
                           { name: "My website", id: 1234, childNodesUrl: url, icon: "icon-home", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl },
                           { name: "Components", id: 1235, childNodesUrl: url, icon: "icon-cogs", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl },
                           { name: "Archieve", id: 1236, childNodesUrl: url, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl },
                           { name: "Recycle Bin", id: 1237, childNodesUrl: url, icon: "icon-trash", view: section + "/trash/view/", children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl }
-                  ];
+                      ],
+                      expanded: true,
+                      hasChildren: true,
+                      level: 0,
+                      menuUrl: menuUrl
+                  };
+
                   break;
 
               case "developer":
-                  t = [
-                      { name: "Data types", childNodesUrl: url, id: 1234, icon: "icon-folder-close", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                      { name: "Macros", childNodesUrl: url, id: 1235, icon: "icon-folder-close", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                      { name: "Pacakges", childNodesUrl: url, id: 1236, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                      { name: "XSLT Files", childNodesUrl: url, id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                      { name: "Razor Files", childNodesUrl: url, id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
-                  ];
+                  t = {
+                      name: "developer",
+                      id: -1,
+                      children: [
+                          { name: "Data types", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "Macros", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "Pacakges", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "XSLT Files", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "Razor Files", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
+                      ],
+                      expanded: true,
+                      hasChildren: true,
+                      level: 0,
+                      isContainer: true
+                  };
+
                   break;
               case "settings":
-                  t = [
-                      { name: "Stylesheets", childNodesUrl: url, id: 1234, icon: "icon-folder-close", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                      { name: "Templates", childNodesUrl: url, id: 1235, icon: "icon-folder-close", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                      { name: "Dictionary", childNodesUrl: url, id: 1236, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                      { name: "Media types", childNodesUrl: url, id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                      { name: "Document types", childNodesUrl: url, id: 1237, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
-                  ];
+                  t = {
+                      name: "settings",
+                      id: -1,
+                      children: [
+                          { name: "Stylesheets", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "Templates", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "Dictionary", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "Media types", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "Document types", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
+                      ],
+                      expanded: true,
+                      hasChildren: true,
+                      level: 0,
+                      isContainer: true
+                  };
+                  
                   break;
               default:
-                  t = [
-                      { name: "random-name-" + section, childNodesUrl: url, id: 1234, icon: "icon-home", defaultAction: "create", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                      { name: "random-name-" + section, childNodesUrl: url, id: 1235, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                      { name: "random-name-" + section, childNodesUrl: url, id: 1236, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                      { name: "random-name-" + section, childNodesUrl: url, id: 1237, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
-                  ];
+                  
+                  t = {
+                      name: "randomTree",
+                      id: -1,
+                      children: [
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1234, icon: "icon-home", defaultAction: "create", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1235, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1236, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1237, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
+                      ],
+                      expanded: true,
+                      hasChildren: true,
+                      level: 0,
+                      menuUrl: menuUrl
+                  };
+
                   break;
           }
 
