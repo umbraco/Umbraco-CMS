@@ -32,15 +32,19 @@ namespace Umbraco.Core.Sync
         {
             get
             {
-                if (_addresses == null)
+                if (_addresses == null && _xmlServers != null)
                 {
                     _addresses = new List<IServerAddress>();
                     var nodes = _xmlServers.SelectNodes("./server");
-                    foreach (XmlNode n in nodes)
-                     {
-                         _addresses.Add(new ConfigServerAddress(n));
-                     }
+                    if (nodes != null)
+                    {
+                        foreach (XmlNode n in nodes)
+                        {
+                            _addresses.Add(new ConfigServerAddress(n));
+                        }
+                    }
                 }
+
                 return _addresses;
             }
         }
