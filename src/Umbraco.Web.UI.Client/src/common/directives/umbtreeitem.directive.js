@@ -42,7 +42,10 @@ angular.module("umbraco.directives")
 
     link: function (scope, element, attrs) {
         
-        /*Helper function to emit tree events */
+        //flag to enable/disable delete animations
+        var enableDeleteAnimations = false;
+
+        /** Helper function to emit tree events */
         function emitEvent(eventName, args){
 
           if(scope.callback){
@@ -50,7 +53,7 @@ angular.module("umbraco.directives")
           }
         }
 
-        /*
+        /**
           Method called when the options button next to a node is called
           In the main tree this opens the menu, but internally the tree doesnt
           know about this, so it simply raises an event to tell the parent controller
@@ -60,7 +63,7 @@ angular.module("umbraco.directives")
           emitEvent("treeOptionsClick", {element: e, node: n, event: ev});
         };
 
-        /*
+        /**
           Method called when an item is clicked in the tree, this passes the 
           DOM element, the tree node object and the original click
           and emits it as a treeNodeSelect element if there is a callback object
@@ -70,56 +73,73 @@ angular.module("umbraco.directives")
             emitEvent("treeNodeSelect", { element: e, node: n, event: ev });
         };
 
-        /*
+        /** method to set the current animation for the node. 
+        *  This changes dynamically based on if we are changing sections or just loading normal tree data. 
+        *  When changing sections we don't want all of the tree-ndoes to do their 'leave' animations.
+        */
+        scope.animation = function () {
+            if (enableDeleteAnimations) {
+                return { leave: 'tree-node-delete-leave' };
+            }
+            else {
+                return {};
+            }
+        };
+
+        /**
           Method called when a node in the tree is expanded, when clicking the arrow
           takes the arrow DOM element and node data as parameters
           emits treeNodeCollapsing event if already expanded and treeNodeExpanding if collapsed
         */
-        scope.load = function (arrow, node) {
+        scope.load = function(arrow, node) {
 
-          if (node.expanded){
-            emitEvent("treeNodeCollapsing", { element: arrow, node: node});
+            if (node.expanded) {
+                enableDeleteAnimations = false;
+                emitEvent("treeNodeCollapsing", { element: arrow, node: node });
 
-            node.expanded = false;
-            node.children = [];
-          }else {
-            
-            //emit treeNodeExpanding event, if a callback object is set on the tree
-            emitEvent("treeNodeExpanding", { element: arrow, node: node});
+                node.expanded = false;
+                node.children = [];
+            }
+            else {
 
-            //set element state to loading
-            node.loading = true;
+                //emit treeNodeExpanding event, if a callback object is set on the tree
+                emitEvent("treeNodeExpanding", { element: arrow, node: node });
 
-            //get the children from the tree service
-            treeService.getChildren( { node: node, section: scope.section } )
-                .then(function (data) {
+                //set element state to loading
+                node.loading = true;
 
-                    //emit event
-                    emitEvent("treeNodeLoaded", { element: arrow, node: node, children: data});
+                //get the children from the tree service
+                treeService.getChildren({ node: node, section: scope.section })
+                    .then(function(data) {
 
-                    //set state to done and expand
-                    node.loading = false;
-                    node.children = data;
-                    node.expanded = true;
+                        //emit event
+                        emitEvent("treeNodeLoaded", { element: arrow, node: node, children: data });
 
-                    //emit expanded event
-                    emitEvent("treeNodeExpanded", { element: arrow, node: node, children: data});
+                        //set state to done and expand
+                        node.loading = false;
+                        node.children = data;
+                        node.expanded = true;
 
-                }, function (reason) {
+                        //emit expanded event
+                        emitEvent("treeNodeExpanded", { element: arrow, node: node, children: data });
 
-                    //in case of error, emit event
-                    emitEvent("treeNodeLoadError", { element: arrow, node: node, error: reason});
+                    }, function(reason) {
 
-                    //stop show the loading indicator  
-                    node.loading = false;
+                        //in case of error, emit event
+                        emitEvent("treeNodeLoadError", { element: arrow, node: node, error: reason });
 
-                    //tell notications about the error
-                    notificationsService.error(reason);
-                });
-            }   
+                        //stop show the loading indicator  
+                        node.loading = false;
+
+                        //tell notications about the error
+                        notificationsService.error(reason);
+                    });
+                
+                enableDeleteAnimations = true;
+            }            
         };
 
-        /*
+        /**
           Helper method for setting correct element padding on tree DOM elements
           Since elements are not children of eachother, we need this indenting done
           manually
@@ -128,7 +148,7 @@ angular.module("umbraco.directives")
           return { 'padding-left': (node.level * 20) + "px" };
         };
         
-        var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item ng-repeat="child in node.children" callback="callback" node="child" section="{{section}}" ng-animate="{leave: \'tree-node-delete-leave\'}"></umb-tree-item></ul>';
+        var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item ng-repeat="child in node.children" callback="callback" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
         var newElement = angular.element(template);
         $compile(newElement)(scope);
         element.append(newElement);

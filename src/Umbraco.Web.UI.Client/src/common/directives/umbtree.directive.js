@@ -39,7 +39,6 @@ angular.module("umbraco.directives")
                 '</li>' +
                '</ul>';
 
-        var newElem = $(template);
         element.replaceWith(template);
 
         return function (scope, element, attrs, controller) {
