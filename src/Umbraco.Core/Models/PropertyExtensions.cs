@@ -42,9 +42,11 @@ namespace Umbraco.Core.Models
             {
                 switch (property.PropertyType.DataTypeDatabaseType)
                 {                    
-                    case DataTypeDatabaseType.Nvarchar:                        
-                    case DataTypeDatabaseType.Integer:
+                    case DataTypeDatabaseType.Nvarchar:          
                         xmlNode.AppendChild(xd.CreateTextNode(property.Value.ToXmlString<string>()));
+                        break;
+                    case DataTypeDatabaseType.Integer:
+                        xmlNode.AppendChild(xd.CreateTextNode(property.Value.ToXmlString(property.Value.GetType())));    
                         break;
                     case DataTypeDatabaseType.Ntext:
                         //put text in cdata
