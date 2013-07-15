@@ -112,8 +112,8 @@ angular.module('umbraco.services')
 		 * @param {string} sectionAlias The alias of the section the tree should load data from
 		 */
         showTree: function (sectionAlias) {
-            if (!this.ui.stickyNavigation && sectionAlias !== this.ui.currentTree) {
-                this.ui.currentTree = sectionAlias;
+            if (!this.ui.stickyNavigation && sectionAlias !== this.ui.currentSection) {
+                this.ui.currentSection = sectionAlias;
                 setMode("tree");
             }
         },
@@ -129,7 +129,7 @@ angular.module('umbraco.services')
         hideTree: function () {
             if (!this.ui.stickyNavigation) {
                 $log.log("hide tree");
-                this.ui.currentTree = "";
+                this.ui.currentSection = "";
                 setMode("default-hidesectiontree");
             }
         },
@@ -170,7 +170,7 @@ angular.module('umbraco.services')
                             scope: args.scope,
                             node: args.node,
                             action: result,
-                            section: self.ui.currentTree
+                            section: self.ui.currentSection
                         });
 
                         //return the dialog this is opening.
@@ -282,7 +282,7 @@ angular.module('umbraco.services')
 
             //TODO: fix hardcoded hack for content/media... once these trees are converted over to 
             // new c# trees we won't need to do this any longer.
-            var isCreateForContent = args.action.alias === "create" && (this.ui.currentTree === "content" || this.ui.currentTree === "media");
+            var isCreateForContent = args.action.alias === "create" && (this.ui.currentSection === "content" || this.ui.currentSection === "media");
 
             if (args.action.metaData["actionUrl"] && !isCreateForContent) {
                 templateUrl = args.action.metaData["actionUrl"];
@@ -293,7 +293,7 @@ angular.module('umbraco.services')
                 iframe = false;
             }
             else {
-                templateUrl = "views/" + this.ui.currentTree + "/" + args.action.alias + ".html";
+                templateUrl = "views/" + this.ui.currentSection + "/" + args.action.alias + ".html";
                 iframe = false;
             }
 
@@ -360,7 +360,7 @@ angular.module('umbraco.services')
           * hides any open navigation panes and resets the tree, actions and the currently selected node
           */
         hideNavigation: function () {
-            this.ui.currentTree = "";
+            this.ui.currentSection = "";
             this.ui.actions = [];
             this.ui.currentNode = undefined;
 

@@ -4,7 +4,7 @@
 * @restrict E
 **/
 angular.module("umbraco.directives")
-  .directive('umbTree', function ($compile, $log, $q, treeService, notificationsService) {
+  .directive('umbTree', function ($compile, $log, $q, treeService, notificationsService, $timeout) {
     
     return {
       restrict: 'E',
@@ -34,7 +34,7 @@ angular.module("umbraco.directives")
            '</div>';
          }
          template += '<ul>' +
-                  '<umb-tree-item ng-repeat="child in tree.root.children" node="child" callback="callback" section="{{section}}" ng-animate="{leave: \'tree-node-delete-leave\'}"></umb-tree-item>' +
+                  '<umb-tree-item ng-repeat="child in tree.root.children" node="child" callback="callback" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
                   '</ul>' +
                 '</li>' +
                '</ul>';
@@ -44,12 +44,53 @@ angular.module("umbraco.directives")
 
         return function (scope, element, attrs, controller) {
 
+            //flag to enable/disable delete animations
+            var enableDeleteAnimations = false;
+
             /** Helper function to emit tree events */
             function emitEvent(eventName, args) {
                 if (scope.callback) {
                     $(scope.callback).trigger(eventName, args);
                 }
             }
+
+            /** Method to load in the tree data */
+            function loadTree() {                
+                if (scope.section) {
+
+                    //anytime we want to load the tree we need to disable the delete animations
+                    enableDeleteAnimations = false;
+
+                    //use $q.when because a promise OR raw data might be returned.
+                    $q.when(treeService.getTree({ section: scope.section, cachekey: scope.cachekey }))
+                        .then(function (data) {
+                            //set the data once we have it
+                            scope.tree = data;
+
+                            //do timeout so that it re-enables them after this digest
+                            $timeout(function() {
+                                //enable delete animations
+                                enableDeleteAnimations = true;
+                            });
+
+                        }, function (reason) {
+                            notificationsService.error("Tree Error", reason);
+                        });
+                }
+            }
+
+            /** method to set the current animation for the node. 
+             *  This changes dynamically based on if we are changing sections or just loading normal tree data. 
+             *  When changing sections we don't want all of the tree-ndoes to do their 'leave' animations.
+             */
+            scope.animation = function () {
+                if (enableDeleteAnimations) {
+                    return { leave: 'tree-node-delete-leave' };
+                }
+                else {
+                    return {};
+                }
+            };
 
             /**
               Method called when the options button next to the root node is called.
@@ -59,30 +100,15 @@ angular.module("umbraco.directives")
             scope.options = function (e, n, ev) {
                 emitEvent("treeOptionsClick", { element: e, node: n, event: ev });
             };
-
-            function loadTree() {
-                if (scope.section) {
-
-                    //use $q.when because a promise OR raw data might be returned.
-
-                    $q.when(treeService.getTree({ section: scope.section, cachekey: scope.cachekey }))
-                        .then(function(data) {
-                            //set the data once we have it
-                            scope.tree = data;
-                        }, function(reason) {
-                            notificationsService.error("Tree Error", reason);
-                        });
-                }
-            }
-
-
+            
             //watch for section changes
             if(scope.node === undefined){
                 scope.$watch("section",function (newVal, oldVal) {
                   if(!newVal){
                     scope.tree = undefined;
                     scope.node = undefined;
-                  }else if(newVal !== oldVal){
+                  }
+                  else if (newVal !== oldVal) {
                     loadTree();
                   }
               });

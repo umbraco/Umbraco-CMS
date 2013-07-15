@@ -11,12 +11,13 @@ function LegacyDeleteController($scope, legacyResource, treeService) {
     $scope.performDelete = function() {
 
         //mark it for deletion (used in the UI)
-        $scope.currentNode.isDeleting = true;
+        $scope.currentNode.loading = true;
 
         legacyResource.deleteItem({            
             nodeId: $scope.currentNode.id,
             nodeType: $scope.currentNode.nodetype
         }).then(function () {
+            $scope.currentNode.loading = false;
             //TODO: Need to sync tree, etc...
             treeService.removeNode($scope.currentNode);
             $scope.hideMenu();            
