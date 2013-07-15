@@ -3,6 +3,7 @@ using System.Net;
 using System.Web.Http;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using System.Linq;
 
@@ -11,6 +12,7 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// An API controller used for dealing with content types
     /// </summary>
+    [PluginController("UmbracoApi")]
     public class ContentTypeController : UmbracoAuthorizedJsonController
     {
         private readonly ContentTypeModelMapper _contentTypeModelMapper;
@@ -40,6 +42,13 @@ namespace Umbraco.Web.Editors
         /// <param name="contentId"></param>
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
+            if (contentId == Core.Constants.System.Root)
+            {
+                return Services.ContentTypeService.GetAllContentTypes()
+                    .Where(x => x.AllowedAsRoot)
+                    .Select(x => _contentTypeModelMapper.ToContentTypeBasic(x));
+            }
+
             var contentItem = Services.ContentService.GetById(contentId);
             if (contentItem == null)
             {

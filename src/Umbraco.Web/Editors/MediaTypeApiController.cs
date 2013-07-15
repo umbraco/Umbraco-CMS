@@ -4,6 +4,7 @@ using System.Net;
 using System.Web.Http;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors
@@ -11,6 +12,7 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// An API controller used for dealing with content types
     /// </summary>
+    [PluginController("UmbracoApi")]
     public class MediaTypeApiController : UmbracoAuthorizedJsonController
     {
         private readonly MediaTypeModelMapper _mediaTypeModelMapper;
@@ -40,6 +42,14 @@ namespace Umbraco.Web.Editors
         /// <param name="contentId"></param>
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
+
+            if (contentId == Core.Constants.System.Root)
+            {
+                return Services.ContentTypeService.GetAllMediaTypes()
+                    .Where(x => x.AllowedAsRoot)
+                    .Select(x => _mediaTypeModelMapper.ToMediaTypeBasic(x));
+            }
+
             var contentItem = Services.MediaService.GetById(contentId);
             if (contentItem == null)
             {
