@@ -13,16 +13,22 @@ function treeService($q, treeResource, iconHelper) {
     var currentSection = "content";
 
     /** ensures there's a view and level property on each tree node */
-    function ensureLevelAndView(treeNodes, section, level) {
+    function ensureParentLevelAndView(parentNode, treeNodes, section, level) {
         //if no level is set, then we make it 1   
         var childLevel = (level ? level : 1);
         for (var i = 0; i < treeNodes.length; i++) {
             treeNodes[i].level = childLevel;
             treeNodes[i].view = section + "/edit/" + treeNodes[i].id;
+            treeNodes[i].parent = parentNode;
         }
     }
 
     return {
+        
+        removeNode: function(treeNode) {
+            var asdf = treeNode;
+        },
+
         getTree: function (options) {
 
             if(options === undefined){
@@ -47,7 +53,7 @@ function treeService($q, treeResource, iconHelper) {
                         children: data
                     };
                     //ensure the view is added to each tree node
-                    ensureLevelAndView(result.children, section);
+                    ensureParentLevelAndView(null, result.children, section);
                     //cache this result
                     //TODO: We'll need to un-cache this in many circumstances
                     treeArray[cacheKey] = result;
@@ -135,7 +141,7 @@ function treeService($q, treeResource, iconHelper) {
             return treeResource.loadNodes({ section: section, node: treeItem })
                 .then(function(data) {
                     //now that we have the data, we need to add the level property to each item and the view
-                    ensureLevelAndView(data, section, treeItem.level + 1);
+                    ensureParentLevelAndView(treeItem, data, section, treeItem.level + 1);
                     return data;
                 });
         }
