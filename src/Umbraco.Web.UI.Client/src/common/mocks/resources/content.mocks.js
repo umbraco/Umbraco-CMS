@@ -2,6 +2,14 @@ angular.module('umbraco.mocks').
   factory('contentMocks', ['$httpBackend', 'mocksUtills', function ($httpBackend, mocksUtills) {
       'use strict';
       
+      function returnDeletedNode(status, data, headers) {
+          if (!mocksUtills.checkAuth()) {
+              return [401, null, null];
+          }
+          
+          return [200, null, null];
+      }
+
       function returnEmptyNode(status, data, headers) {
 
           if (!mocksUtills.checkAuth()) {
@@ -117,6 +125,10 @@ angular.module('umbraco.mocks').
             $httpBackend
               .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoApi/Content/GetEmpty'))
               .respond(returnEmptyNode);
+
+              $httpBackend
+                  .whenDELETE(mocksUtills.urlRegex('/umbraco/UmbracoApi/Content/DeleteById'))
+                  .respond(returnDeletedNode);
           },
 
 

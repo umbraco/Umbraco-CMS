@@ -1,6 +1,6 @@
 /**
  * @ngdoc controller
- * @name LegacyDeleteController
+ * @name Umbraco.Dialogs.LegacyDeleteController
  * @function
  * 
  * @description

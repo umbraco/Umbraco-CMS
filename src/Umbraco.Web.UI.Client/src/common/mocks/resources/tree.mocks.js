@@ -129,7 +129,7 @@ angular.module('umbraco.mocks').
               $httpBackend
                  .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoTrees/ApplicationTreeApi/GetMenu'))
                  .respond(getMenuItems);
-                
+              
           }
       };
   }]);

@@ -15,6 +15,17 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
     }
 
     return {
+        
+        deleteById: function(id) {
+            return umbRequestHelper.resourcePromise(
+                $http.delete(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "DeleteById",
+                        [{ id: id }])),
+                'Failed to delete item ' + id);
+        },
+
         getById: function (id) {            
             return umbRequestHelper.resourcePromise(
                $http.get(
