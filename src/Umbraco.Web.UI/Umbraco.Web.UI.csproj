@@ -552,6 +552,14 @@
     </Compile>
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
+    <Content Include="Umbraco\Images\PinnedIcons\task_content.ico" />
+    <Content Include="Umbraco\Images\PinnedIcons\task_default.ico" />
+    <Content Include="Umbraco\Images\PinnedIcons\task_developer.ico" />
+    <Content Include="Umbraco\Images\PinnedIcons\task_media.ico" />
+    <Content Include="Umbraco\Images\PinnedIcons\task_member.ico" />
+    <Content Include="Umbraco\Images\PinnedIcons\task_settings.ico" />
+    <Content Include="Umbraco\Images\PinnedIcons\task_users.ico" />
+    <Content Include="Umbraco\Images\PinnedIcons\umb.ico" />
     <Content Include="Umbraco\Xslt\Web.config">
       <SubType>
       </SubType>
