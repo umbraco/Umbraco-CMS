@@ -34,7 +34,7 @@ angular.module("umbraco.directives")
            '</div>';
          }
          template += '<ul>' +
-                  '<umb-tree-item ng-repeat="child in tree.root.children" node="child" callback="callback" section="{{section}}"></umb-tree-item>' +
+                  '<umb-tree-item ng-repeat="child in tree.root.children" node="child" callback="callback" section="{{section}}" ng-animate="{leave: \'tree-node-delete-leave\'}"></umb-tree-item>' +
                   '</ul>' +
                 '</li>' +
                '</ul>';

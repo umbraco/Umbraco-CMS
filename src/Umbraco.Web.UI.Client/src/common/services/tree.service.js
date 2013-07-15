@@ -26,7 +26,11 @@ function treeService($q, treeResource, iconHelper) {
     return {
         
         removeNode: function(treeNode) {
-            var asdf = treeNode;
+            if (treeNode.parent == null) {
+                throw "Cannot remove a node that doesn't have a parent";
+            }
+            //remove the current item from it's siblings
+            treeNode.parent.children.splice(treeNode.parent.children.indexOf(treeNode), 1);
         },
 
         getTree: function (options) {
