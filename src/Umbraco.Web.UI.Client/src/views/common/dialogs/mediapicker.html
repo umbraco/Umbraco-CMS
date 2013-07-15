@@ -20,11 +20,11 @@
                         <form class="form-search" ng-controller="SearchController">
                             <i class="icon-search"></i>
                             <input type="text" 
-                                   ng-model="ui.searchTerm" 
+                                   ng-model="nav.ui.searchTerm" 
                                    class="umb-search-field search-query" 
                                    placeholder="{{localization.app.search.typeToSearch}}"
                                    on-blur="deActivateSearch()" 
-                                   on-keyup="performSearch(ui.searchTerm)">
+                                   on-keyup="performSearch(nav.ui.searchTerm)">
                         </form>
                 </div>
 				</ul>

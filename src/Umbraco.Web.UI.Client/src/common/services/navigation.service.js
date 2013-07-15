@@ -22,7 +22,11 @@ angular.module('umbraco.services')
     var currentSection = $routeParams.section;
     var currentId = $routeParams.id;
 
-    var ui = {};
+    //TODO: would be nicer to set all of the options here first instead of implicitly below!
+    var ui = {
+        //tree event handler everyone can subscribe to (TODO: but why not use angular events instead of jquery ?)
+        tree: $({})
+    };
 
     function setMode(mode) {
         switch (mode) {

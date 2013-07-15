@@ -1,17 +1,17 @@
-<div id="leftcolumn" ng-controller="NavigationController" ng-mouseleave="hideTree()">
-    <div id="applications" ng-class="{faded:ui.stickyNavigation}">
+<div id="leftcolumn" ng-controller="NavigationController" ng-mouseleave="nav.hideTree()">
+    <div id="applications" ng-class="{faded:nav.ui.stickyNavigation}">
         <ul class="sections">
             
             <li class="avatar">
-                <a href="#" ng-click="showUserDialog()" title="{{user.name}}" prevent-default>
+                <a href="#" ng-click="nav.showUserDialog()" title="{{user.name}}" prevent-default>
                     <img ng-src="{{user.avatar}}" />
                 </a>
             </li>
 
-            <li ng-repeat="section in sections" ng-class="{current: section.alias == ui.currentSection}">
+            <li ng-repeat="section in sections" ng-class="{current: section.alias == nav.ui.currentSection}">
                 <a href="#/{{section.alias}}"
-                   ng-click="changeSection(section.alias)"
-                   ng-mouseenter="showTree(section.alias)"
+                   ng-click="nav.changeSection(section.alias)"
+                   ng-mouseenter="nav.showTree(section.alias)"
                    prevent-default>
                     <section-icon icon="{{section.cssclass}}"></section-icon>  
                     <span>{{section.name}}</span>
@@ -29,7 +29,7 @@
 
     <!-- navigation container -->
     <div id="navigation" class="fill shadow umb-panel umb-modalcolumn"
-            ng-show="ui.showNavigation" 
+            ng-show="nav.ui.showNavigation" 
             ng-animate="'slide'">
         <!-- the search -->
         <div id="search-form" ng-animate="'slide'">
@@ -37,35 +37,35 @@
                 <form class="form-search" ng-controller="SearchController" novalidate>
                     <i class="icon-search"></i>
                     <input type="text"
-                        ng-model="ui.searchTerm"
+                        ng-model="nav.ui.searchTerm"
                         class="umb-search-field search-query"
                         placeholder="{{localization.app.search.typeToSearch}}"
                         on-blur="deActivateSearch()"
-                        on-keyup="performSearch(ui.searchTerm)">
+                        on-keyup="performSearch(nav.ui.searchTerm)">
                 </form>
             </div>
         </div>
 
         <!-- Search results -->
         <div id="search-results" class="umb-scrollable umb-panel" auto-scale="0"
-            ng-show="ui.showSearchResults" ng-animate="'slide'">
+            ng-show="nav.ui.showSearchResults" ng-animate="'slide'">
 
             <h5>Search results</h5>
 
-            <ul class="searchResults" ng-repeat="resultGroup in ui.searchResults">
-                <li class="umb-icon-item" ng-class="{selected:$index==ui.selectedSearchResult}" ng-repeat="result in resultGroup.matches">
+            <ul class="searchResults" ng-repeat="resultGroup in nav.ui.searchResults">
+                <li class="umb-icon-item" ng-class="{selected:$index==nav.ui.selectedSearchResult}" ng-repeat="result in resultGroup.matches">
                     <i class="icon umb-tree-icon sprTree {{result.icon}}" ng-show="$first"></i>
                     <a ng-href="#{{result.view}}">{{result.name}}
                                 <small>{{result.path}}</small>
                     </a>
-                    <i class="umb-options" ng-click="showMenu(result, $event)"><i></i><i></i><i></i></i>
+                    <i class="umb-options" ng-click="nav.showMenu(result, $event)"><i></i><i></i><i></i></i>
                 </li>
             </ul>
         </div>
 
         <!-- the tree -->
         <div id="tree" class="span5 umb-scrollable umb-panel" auto-scale="0" ng-animate="'slide'">
-            <umb-tree callback="ui.tree" section="{{ui.currentSection}}" ></umb-tree>
+            <umb-tree callback="nav.ui.tree" section="{{nav.ui.currentSection}}" ></umb-tree>
         </div>        
 
         <!-- The context menu -->
@@ -73,9 +73,9 @@
         
         <!-- Tree dialogs -->
         <div id="dialog" class='umb-modalcolumn fill shadow umb-panel'
-            ng-show="ui.showContextMenuDialog" ng-animate="'slide'">
+            ng-show="nav.ui.showContextMenuDialog" ng-animate="'slide'">
             <div class='umb-panel-header'>
-                <h1>{{ui.dialogTitle}}</h1>
+                <h1>{{nav.ui.dialogTitle}}</h1>
             </div>
             <div class='umb-panel-body'>
             </div>

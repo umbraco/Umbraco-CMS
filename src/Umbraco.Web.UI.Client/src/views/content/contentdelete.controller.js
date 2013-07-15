@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting content
  */
-function ContentDeleteController($scope, contentResource, treeService) {
+function ContentDeleteController($scope, contentResource, treeService, navigationService) {
 
     $scope.performDelete = function() {
 
@@ -17,13 +17,13 @@ function ContentDeleteController($scope, contentResource, treeService) {
             $scope.currentNode.loading = false;
             //TODO: Need to sync tree, etc...
             treeService.removeNode($scope.currentNode);
-            $scope.hideMenu();            
+            navigationService.hideMenu();
         });
 
     };
 
     $scope.cancel = function() {
-        $scope.hideDialog();
+        navigationService.hideDialog();
     };
 }
 

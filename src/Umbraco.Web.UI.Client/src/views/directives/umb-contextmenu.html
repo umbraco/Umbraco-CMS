@@ -1,13 +1,13 @@
 <div id='contextMenu' class="umb-modalcolumn fill shadow umb-panel"
-    ng-show="ui.showContextMenu" ng-animate="'slide'">
+    ng-show="nav.ui.showContextMenu" ng-animate="'slide'">
 
     <div class='umb-panel-header'>
-        <h1>{{ui.dialogTitle}}</h1>
+        <h1>{{nav.ui.dialogTitle}}</h1>
     </div>
 
     <div class='umb-panel-body'>
         <ul class="umb-actions">
-            <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in ui.actions">
+            <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in nav.ui.actions">
                 <a prevent-default
                     ng-click="openDialog(currentNode,action,currentSection)">
                     <i class="icon icon-{{action.cssclass}}"></i>

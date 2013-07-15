@@ -7,7 +7,7 @@
 				<ul class="umb-actions-child">
 
 					<li ng-repeat="docType in allowedTypes">
-					    <a href="#content/edit/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="hideNavigation()">
+					    <a href="#content/edit/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
 					        <i class="icon-large {{docType.icon}}"></i>
 					        <span class="menu-label">
 					            {{docType.name}}
@@ -19,7 +19,7 @@
 					</li>
 
 					<li class="add">
-						<a href="#settings/documenttype/create/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="hideNavigation()"><i class="icon-large icon-plus"></i>
+						<a href="#settings/documenttype/create/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()"><i class="icon-large icon-plus"></i>
 						    <span class="menu-label">
 						    	Create a new document type
 						    	<small>
@@ -34,6 +34,6 @@
 	</div>
 	
 	<div class="btn-toolbar umb-btn-toolbar">
-		<button class="btn" ng-click="hideDialog()">Do something else</button>
+		<button class="btn" ng-click="nav.hideDialog()">Do something else</button>
 	</div>
 </div>

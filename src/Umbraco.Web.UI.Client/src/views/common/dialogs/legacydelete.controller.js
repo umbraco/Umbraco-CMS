@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting content
  */
-function LegacyDeleteController($scope, legacyResource, treeService) {
+function LegacyDeleteController($scope, legacyResource, treeService, navigationService) {
 
     $scope.performDelete = function() {
 
@@ -20,13 +20,13 @@ function LegacyDeleteController($scope, legacyResource, treeService) {
             $scope.currentNode.loading = false;
             //TODO: Need to sync tree, etc...
             treeService.removeNode($scope.currentNode);
-            $scope.hideMenu();            
+            navigationService.hideMenu();
         });
 
     };
 
     $scope.cancel = function() {
-        $scope.hideDialog();
+        navigationService.hideDialog();
     };
 }
 

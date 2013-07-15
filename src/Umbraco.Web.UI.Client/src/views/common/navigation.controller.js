@@ -11,29 +11,17 @@
  */
 function NavigationController($scope,$rootScope, $location, $log, navigationService, dialogService, historyService, sectionResource, angularHelper) {
 
-    //load navigation service handlers
-    $scope.changeSection = navigationService.changeSection;
-    $scope.showTree = navigationService.showTree;
-    $scope.hideTree = navigationService.hideTree;
-    $scope.hideMenu = navigationService.hideMenu;
-    $scope.showMenu = navigationService.showMenu;
-    $scope.showUserDialog = navigationService.showUserDialog;
-    $scope.hideDialog = navigationService.hideDialog;
-    $scope.hideNavigation = navigationService.hideNavigation;
-    $scope.ui = navigationService.ui;
-    //tree event handler everyone can subscribe to
-    $scope.ui.tree = $({});
+    //Put the navigation service on this scope so we can use it's methods/properties in the view.
+    // IMPORTANT: all properties assigned to this scope are generally available on the scope object on dialogs since
+    //   when we create a dialog we pass in this scope to be used for the dialog's scope instead of creating a new one.
+    $scope.nav = navigationService;
 
     $scope.selectedId = navigationService.currentId;
     $scope.sections = navigationService.sections;
     
-
     sectionResource.getSections()
         .then(function(result) {
             $scope.sections = result;
-        }, function (reason) {
-            //TODO: handle error properly
-            alert(reason);
         });
 
     //This reacts to clicks passed to the body element which emits a global call to close all dialogs
@@ -45,7 +33,7 @@ function NavigationController($scope,$rootScope, $location, $log, navigationServ
     });
     
     //this reacts to the options item in the tree
-    $scope.ui.tree.bind("treeOptionsClick", function (ev, args) {
+    navigationService.ui.tree.bind("treeOptionsClick", function (ev, args) {
         ev.stopPropagation();
         ev.preventDefault();
         
@@ -57,7 +45,7 @@ function NavigationController($scope,$rootScope, $location, $log, navigationServ
 
     //this reacts to tree items themselves being clicked
     //the tree directive should not contain any handling, simply just bubble events
-    $scope.ui.tree.bind("treeNodeSelect", function(ev, args){
+    navigationService.ui.tree.bind("treeNodeSelect", function (ev, args) {
 
         var n = args.node;
 
@@ -91,6 +79,7 @@ function NavigationController($scope,$rootScope, $location, $log, navigationServ
         }
     });
 
+    /** Opens a dialog but passes in this scope instance to be used for the dialog */
     $scope.openDialog = function (currentNode, action, currentSection) {
         
         navigationService.showDialog({

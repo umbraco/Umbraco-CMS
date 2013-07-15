@@ -16,12 +16,12 @@ function SearchController($scope, searchService, $log, navigationService) {
     $scope.performSearch = function (term) {
         if (term != undefined && term != currentTerm) {
             if (term.length > 3) {
-                $scope.ui.selectedSearchResult = -1;
+                navigationService.ui.selectedSearchResult = -1;
                 navigationService.showSearch();
                 currentTerm = term;
-                $scope.ui.searchResults = searchService.search(term, $scope.currentSection);
+                navigationService.ui.searchResults = searchService.search(term, navigationService.currentSection);
             } else {
-                $scope.ui.searchResults = [];
+                navigationService.ui.searchResults = [];
             }
         }
     };
@@ -29,14 +29,14 @@ function SearchController($scope, searchService, $log, navigationService) {
     $scope.hideSearch = navigationService.hideSearch;
 
     $scope.iterateResults = function (direction) {
-        if (direction == "up" && $scope.ui.selectedSearchResult < $scope.ui.searchResults.length)
-            $scope.ui.selectedSearchResult++;
-        else if ($scope.ui.selectedSearchResult > 0)
-            $scope.ui.selectedSearchResult--;
+        if (direction == "up" && navigationService.ui.selectedSearchResult < navigationService.ui.searchResults.length)
+            navigationService.ui.selectedSearchResult++;
+        else if (navigationService.ui.selectedSearchResult > 0)
+            navigationService.ui.selectedSearchResult--;
     };
 
     $scope.selectResult = function () {
-        navigationService.showMenu($scope.ui.searchResults[$scope.ui.selectedSearchResult], undefined);
+        navigationService.showMenu(navigationService.ui.searchResults[navigationService.ui.selectedSearchResult], undefined);
     };
 }
 //register it
