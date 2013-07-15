@@ -42,8 +42,8 @@ angular.module("umbraco.directives")
 
     link: function (scope, element, attrs) {
         
-        //flag to enable/disable delete animations
-        var enableDeleteAnimations = false;
+        //flag to enable/disable delete animations, default for an item is tru
+        var enableDeleteAnimations = true;
 
         /** Helper function to emit tree events */
         function emitEvent(eventName, args){
