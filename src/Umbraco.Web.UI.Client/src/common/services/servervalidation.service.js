@@ -38,7 +38,7 @@ function serverValidationService() {
                     return item.propertyAlias === null && item.fieldName === fieldName;
                 });
                 if (!exists1) {
-                    callbacks.push({ propertyAlias: contentProperty.alias, fieldName: fieldName, callback: callback });
+                    callbacks.push({ propertyAlias: null, fieldName: fieldName, callback: callback });
                 }
             }
             else if (contentProperty !== undefined) {
@@ -104,7 +104,7 @@ function serverValidationService() {
          * @description
          * Gets all callbacks that has been registered using the subscribe method for the field.         
          */
-        getFieldCallbacks: function (contentProperty, fieldName) {
+        getFieldCallbacks: function (fieldName) {
             var found = _.filter(callbacks, function (item) {
                 //returns any callback that have been registered directly against the field
                 return (item.propertyAlias === null && item.fieldName === fieldName);

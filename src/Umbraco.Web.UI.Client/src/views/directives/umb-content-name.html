@@ -1,6 +1,10 @@
-<ng-form name="contentNameForm">
-    <div class="span4 control-group" ng-class="{error: contentNameForm.name.$invalid}">
-        <input name="name" type="text" placeholder="{{placeholder}}" headline ng-model="model"  />
+<div class="span4 control-group" ng-class="{error: contentNameForm.name.$invalid}">
+    <ng-form name="contentNameForm">        
+        <input name="name" type="text" placeholder="{{placeholder}}" headline ng-model="model" 
+            required   
+            val-server-field="Name" />
+
         <span class="help-inline" val-msg-for="name" val-toggle-msg="required">Required</span>
-    </div>
-</ng-form>
+        <span class="help-inline" val-msg-for="name" val-toggle-msg="valServerField">{{contentNameForm.name.errorMsg}}</span>
+    </ng-form>
+</div> 

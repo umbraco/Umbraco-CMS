@@ -32,7 +32,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public int Id { get; set; }
 
         [DataMember(Name = "name", IsRequired = true)]
-        [Required(AllowEmptyStrings = false)]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Required")]
         public string Name { get; set; }
 
         [DataMember(Name = "properties")]

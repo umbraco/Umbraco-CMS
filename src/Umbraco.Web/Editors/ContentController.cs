@@ -87,7 +87,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = new Content("Empty", parentId, contentType);
+            var emptyContent = new Content("", parentId, contentType);
             return _contentModelMapper.ToContentItemDisplay(emptyContent);
         }
 
