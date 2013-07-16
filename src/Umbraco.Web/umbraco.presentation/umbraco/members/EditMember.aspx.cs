@@ -142,8 +142,8 @@ namespace umbraco.cms.presentation.members
 
         void MemberEmailExistCheck_ServerValidate(object source, ServerValidateEventArgs args)
         {
-            var oldEmail = MemberEmail.Text.ToLower();
-            var newEmail = _document.Email.ToLower();
+            var oldEmail = _document.Email.ToLower();
+            var newEmail = MemberEmail.Text.ToLower();
             var requireUniqueEmail = Membership.Providers[Member.UmbracoMemberProviderName].RequiresUniqueEmail;
             var howManyMembersWithEmail = Member.GetMembersFromEmail(newEmail).Length;
             if (((oldEmail == newEmail && howManyMembersWithEmail > 1) ||
