@@ -1,6 +1,7 @@
 angular.module("umbraco")
 .controller("Umbraco.Editors.TagsController",
-	function($rootScope, $scope, $log, tagsResource, scriptLoader) {	
+	//function($rootScope, $scope, $log, tagsResource, scriptLoader) {	
+    function ($rootScope, $scope, $log, scriptLoader) {
 		
 		scriptLoader.load(
 			[
@@ -8,8 +9,9 @@ angular.module("umbraco")
 			'css!views/propertyeditors/tags/bootstrap-tags.custom.css'
 			]).then(function(){
 
-			// Get data from tagsFactory
-			$scope.tags = tagsResource.getTags("group");
+			//// Get data from tagsFactory
+			//$scope.tags = tagsResource.getTags("group");
+			$scope.tags = [];
 
 			// Initialize bootstrap-tags.js script
 			var tags = $('#' + $scope.model.alias + "_tags").tags({
