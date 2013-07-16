@@ -10,8 +10,8 @@
         <projectUrl>http://umbraco.com/</projectUrl>
         <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Installs Umbraco Cms in your Visual Studio ASP.NET Webforms project</description>
-        <summary>Installs Umbraco Cms in your Visual Studio ASP.NET Webforms project</summary>
+        <description>Installs Umbraco Cms in your Visual Studio ASP.NET project</description>
+        <summary>Installs Umbraco Cms in your Visual Studio ASP.NET project</summary>
         <language>en-US</language>
         <tags>umbraco</tags>
         <dependencies>
