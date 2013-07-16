@@ -111,8 +111,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Saves content
         /// </summary>
-        /// <returns></returns>
-        [ContentItemValidationFilter(typeof(ContentItemValidationHelper<IMedia>))]
+        /// <returns></returns>        
         [FileUploadCleanupFilter]
         public MediaItemDisplay PostSave(
             [ModelBinder(typeof(MediaItemBinder))]

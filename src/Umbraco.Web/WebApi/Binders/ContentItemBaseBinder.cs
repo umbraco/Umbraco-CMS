@@ -1,16 +1,29 @@
-﻿using System.IO;
+﻿using System;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Formatting;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Controllers;
-using System.Web.Http.ModelBinding;
+using System.Web.Http.ModelBinding.Binders;
+using System.Web.Http.Validation;
+using System.Web.ModelBinding;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.WebApi.Filters;
+using IModelBinder = System.Web.Http.ModelBinding.IModelBinder;
+using ModelBindingContext = System.Web.Http.ModelBinding.ModelBindingContext;
+using ModelMetadata = System.Web.Http.Metadata.ModelMetadata;
+using ModelMetadataProvider = System.Web.Http.Metadata.ModelMetadataProvider;
+using MutableObjectModelBinder = System.Web.Http.ModelBinding.Binders.MutableObjectModelBinder;
 using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Web.WebApi.Binders
@@ -45,13 +58,18 @@ namespace Umbraco.Web.WebApi.Binders
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
 
-            var task = Task.Run(() => GetModel(actionContext.Request, provider))
+            var task = Task.Run(() => GetModel(actionContext, bindingContext, provider))
                            .ContinueWith(x =>
                                {
                                    if (x.IsFaulted && x.Exception != null)
                                    {
                                        throw x.Exception;
                                    }
+
+                                   //now that everything is binded, validate the properties
+                                   var contentItemValidator = new ContentItemValidationHelper<TPersisted>(ApplicationContext);
+                                   contentItemValidator.ValidateItem(actionContext, x.Result);
+
                                    bindingContext.Model = x.Result;
                                });
 
@@ -63,11 +81,14 @@ namespace Umbraco.Web.WebApi.Binders
         /// <summary>
         /// Builds the model from the request contents
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="actionContext"></param>
+        /// <param name="bindingContext"></param>
         /// <param name="provider"></param>
         /// <returns></returns>
-        private async Task<ContentItemSave<TPersisted>> GetModel(HttpRequestMessage request, MultipartFormDataStreamProvider provider)
+        private async Task<ContentItemSave<TPersisted>> GetModel(HttpActionContext actionContext, ModelBindingContext bindingContext, MultipartFormDataStreamProvider provider)
         {
+            var request = actionContext.Request;
+
             //IMPORTANT!!! We need to ensure the umbraco context here because this is running in an async thread
             UmbracoContext.EnsureContext(request.Properties["MS_HttpContext"] as HttpContextBase, ApplicationContext.Current);
 
@@ -87,8 +108,14 @@ namespace Umbraco.Web.WebApi.Binders
             //get the string json from the request
             var contentItem = result.FormData["contentItem"];
 
-            //transform the json into an object
+            //deserialize into our model
             var model = JsonConvert.DeserializeObject<ContentItemSave<TPersisted>>(contentItem);
+            
+            //get the default body validator and validate the object
+            var bodyValidator = actionContext.ControllerContext.Configuration.Services.GetBodyModelValidator();
+            var metadataProvider = actionContext.ControllerContext.Configuration.Services.GetModelMetadataProvider();
+            //all validation errors will not contain a prefix
+            bodyValidator.Validate(model, typeof (ContentItemSave<TPersisted>), metadataProvider, actionContext, "");
 
             //get the files
             foreach (var file in result.FileData)
@@ -150,7 +177,7 @@ namespace Umbraco.Web.WebApi.Binders
         /// <param name="saveModel"></param>
         /// <param name="dto"></param>
         private static void MapPropertyValuesFromSaved(ContentItemSave<TPersisted> saveModel, ContentItemDto<TPersisted> dto)
-        {          
+        {
             foreach (var p in saveModel.Properties)
             {
                 dto.Properties.Single(x => x.Alias == p.Alias).Value = p.Value;

@@ -53,7 +53,7 @@ function valPropertyMsg(serverValidationService) {
                         hasError = true;
                         //update the validation message if we don't already have one assigned.
                         if (showValidation && scope.errorMsg === "") {                            
-                            scope.errorMsg = serverValidationService.getError(scope.currentProperty, "");
+                            scope.errorMsg = serverValidationService.getPropertyError(scope.currentProperty, "");
                         }
                     }
                     else {
@@ -71,7 +71,7 @@ function valPropertyMsg(serverValidationService) {
             scope.$on("saving", function (ev, args) {
                 showValidation = true;
                 if (hasError && scope.errorMsg === "") {
-                    scope.errorMsg = serverValidationService.getError(scope.currentProperty, "");
+                    scope.errorMsg = serverValidationService.getPropertyError(scope.currentProperty, "");
                 }
                 else if (!hasError) {
                     scope.errorMsg = "";
@@ -111,7 +111,7 @@ function valPropertyMsg(serverValidationService) {
                     //error collection... it is a 'one-time' usage so that when the field is invalidated 
                     //again, the message we display is the client side message.
                     //NOTE: 'this' in the subscribe callback context is the validation manager object.
-                    this.removeError(scope.currentProperty);
+                    this.removePropertyError(scope.currentProperty);
                     //flag that the current validator is invalid
                     formCtrl.$setValidity('valPropertyMsg', false);
                 }

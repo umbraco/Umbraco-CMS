@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Umbraco.Core.Models;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Models.ContentEditing
 {

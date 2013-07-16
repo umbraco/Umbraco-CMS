@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 
@@ -45,6 +47,21 @@ namespace Umbraco.Web
 		//{
 		//    state.AddModelError("DataValidation", errorMessage);
 		//}
+
+        public static IDictionary<string, object> ToErrorDictionary(this System.Web.Http.ModelBinding.ModelStateDictionary modelState)
+        {
+            var modelStateError = new Dictionary<string, object>();
+            foreach (var keyModelStatePair in modelState)
+            {
+                var key = keyModelStatePair.Key;
+                var errors = keyModelStatePair.Value.Errors;
+                if (errors != null && errors.Count > 0)
+                {
+                    modelStateError.Add(key, errors.Select(error => error.ErrorMessage));
+                }
+            }
+            return modelStateError;
+        }
 
 		/// <summary>
 		/// Serializes the ModelState to JSON for JavaScript to interrogate the errors

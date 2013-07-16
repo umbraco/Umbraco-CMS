@@ -8,6 +8,61 @@
  */
 function ContentEditController($scope, $routeParams, contentResource, notificationsService, angularHelper, serverValidationService) {
 
+
+    /**
+     * @ngdoc function
+     * @name handleValidationErrors
+     * @methodOf ContentEditController
+     * @function
+     *
+     * @description
+     * A function to handle the validation (ModelState) errors collection which will happen on a 403 error indicating validation errors
+     */
+    function handleValidationErrors(modelState) {
+        //get a list of properties since they are contained in tabs
+        var allProps = [];
+        for (var i = 0; i < $scope.content.tabs.length; i++) {
+            for (var p = 0; p < $scope.content.tabs[i].properties.length; p++) {
+                allProps.push($scope.content.tabs[i].properties[p]);
+            }
+        }
+
+        for (var e in modelState) {
+            //the alias in model state can be in dot notation which indicates
+            // * the first part is the content property alias
+            // * the second part is the field to which the valiation msg is associated with
+            //There will always be at least 2 parts since all model errors for properties are prefixed with "Properties"
+            var parts = e.split(".");
+            if (parts.length > 1) {
+                var propertyAlias = parts[1];
+
+                //find the content property for the current error
+                var contentProperty = _.find(allProps, function(item) {
+                    return (item.alias === propertyAlias);
+                });
+
+                if (contentProperty) {
+                    //if it contains 2 '.' then we will wire it up to a property's field
+                    if (parts.length > 2) {
+                        //add an error with a reference to the field for which the validation belongs too
+                        serverValidationService.addPropertyError(contentProperty, parts[2], modelState[e][0]);
+                    }
+                    else {
+                        //add a generic error for the property, no reference to a specific field
+                        serverValidationService.addPropertyError(contentProperty, "", modelState[e][0]);
+                    }
+                }
+            }
+            else {
+                //the parts are only 1, this means its not a property but a native content property
+                serverValidationService.addFieldError(parts[0], modelState[e][0]);
+            }
+            
+            //add to notifications
+            notificationsService.error("Validation", modelState[e][0]);
+        }
+    }
+
     /**
      * @ngdoc function
      * @name handleSaveError
@@ -17,55 +72,19 @@ function ContentEditController($scope, $routeParams, contentResource, notificati
      * @description
      * A function to handle what happens when we have validation issues from the server side
      */
-
     function handleSaveError(err) {
         //When the status is a 403 status, we have validation errors.
         //Otherwise the error is probably due to invalid data (i.e. someone mucking around with the ids or something).
         //Or, some strange server error
         if (err.status == 403) {
             //now we need to look through all the validation errors
-            if (err.data && err.data.ModelState) {
-
-                //get a list of properties since they are contained in tabs
-                var allProps = [];
-                for (var i = 0; i < $scope.content.tabs.length; i++) {
-                    for (var p = 0; p < $scope.content.tabs[i].properties.length; p++) {
-                        allProps.push($scope.content.tabs[i].properties[p]);
-                    }
-                }
-
-                for (var e in err.data.ModelState) {
-                    //the alias in model state can be in dot notation which indicates
-                    // * the first part is the content property alias
-                    // * the second part is the field to which the valiation msg is associated with
-                    var parts = e.split(".");
-                    var propertyAlias = parts[0];
-
-                    //find the content property for the current error
-                    var contentProperty = _.find(allProps, function (item) {
-                        return (item.alias === propertyAlias);
-                    });
-                    if (contentProperty) {
-                        //if it contains a '.' then we will wire it up to a property's field
-                        if (parts.length > 1) {
-                            //add an error with a reference to the field for which the validation belongs too
-                            serverValidationService.addError(contentProperty, parts[1], err.data.ModelState[e][0]);
-                        }
-                        else {
-                            //add a generic error for the property, no reference to a specific field
-                            serverValidationService.addError(contentProperty, "", err.data.ModelState[e][0]);
-                        }
-
-                        //add to notifications
-                        notificationsService.error("Validation", err.data.ModelState[e][0]);
-                    }
-                }
-
+            if (err.data && (err.data.ModelState)) {
+                
+                handleValidationErrors(err.data.ModelState);
             }
         }
         else {
             //TODO: Implement an overlay showing the full YSOD like we had in v5
-            //alert("failed!");
             notificationsService.error("Validation failed", err);
         }
     }

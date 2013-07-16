@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -23,7 +24,6 @@ namespace Umbraco.Web.Editors
     /// The API controller used for editing content
     /// </summary>
     [PluginController("UmbracoApi")]
-    [ValidationFilter]
     public class ContentController : UmbracoAuthorizedJsonController
     {
         private readonly ContentModelMapper _contentModelMapper;
@@ -95,7 +95,6 @@ namespace Umbraco.Web.Editors
         /// Saves content
         /// </summary>
         /// <returns></returns>
-        [ContentItemValidationFilter(typeof(ContentItemValidationHelper<IContent>))]
         [FileUploadCleanupFilter]
         public ContentItemDisplay PostSave(
             [ModelBinder(typeof(ContentItemBinder))]
@@ -107,9 +106,43 @@ namespace Umbraco.Web.Editors
             // * any file attachments have been saved to their temporary location for us to use
             // * we have a reference to the DTO object and the persisted object
 
+            //We need to manually check the validation results here because:
+            // * We still need to save the entity even if there are validation value errors
+            // * Depending on if the entity is new, and if there are non property validation errors (i.e. the name is null)
+            //      then we cannot continue saving, we can only display errors
+            // * If there are validation errors and they were attempting to publish, we can only save, NOT publish and display 
+            //      a message indicating this
+            // TODO: WE need to implement the above points!
+
+            if (!ModelState.IsValid)
+            {
+                if (ModelState["Name"] != null && ModelState["Name"].Errors.Any()
+                    && (contentItem.Action == ContentSaveAction.SaveNew || contentItem.Action == ContentSaveAction.PublishNew))
+                {
+                    //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
+                    throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.Forbidden, ModelState));
+                }
+
+                //if the model state is not valid we cannot publish so change it to save
+                switch (contentItem.Action)
+                {
+                    case ContentSaveAction.Publish:
+                        contentItem.Action = ContentSaveAction.Save;
+                        break;
+                    case ContentSaveAction.PublishNew:
+                        contentItem.Action = ContentSaveAction.SaveNew;
+                        break;
+                }
+            }
+
             //Now, we just need to save the data
 
-            contentItem.PersistedContent.Name = contentItem.Name;
+            //Don't update the name if it is empty
+            if (!contentItem.Name.IsNullOrWhiteSpace())
+            {
+                contentItem.PersistedContent.Name = contentItem.Name;    
+            }
+            
             //TODO: We'll need to save the new template, publishat, etc... values here
 
             //Save the property values
@@ -152,7 +185,15 @@ namespace Umbraco.Web.Editors
             
 
             //return the updated model
-            return _contentModelMapper.ToContentItemDisplay(contentItem.PersistedContent);
+            var display = _contentModelMapper.ToContentItemDisplay(contentItem.PersistedContent);
+            //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
+            if (!ModelState.IsValid)
+            {
+                display.Errors = ModelState.ToErrorDictionary();
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Forbidden, display));
+            }
+
+            return display;
         }
 
     }

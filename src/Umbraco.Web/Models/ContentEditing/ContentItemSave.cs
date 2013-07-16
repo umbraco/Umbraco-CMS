@@ -6,14 +6,10 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-    public interface IHaveUploadedFiles
-    {
-        List<ContentItemFile> UploadedFiles { get; }
-    }
-
     /// <summary>
     /// A model representing a content item to be saved
     /// </summary>
+    [DataContract(Name = "content", Namespace = "")]
     public class ContentItemSave<TPersisted> : ContentItemBasic<ContentPropertyBasic, TPersisted>, IHaveUploadedFiles 
         where TPersisted : IContentBase
     {

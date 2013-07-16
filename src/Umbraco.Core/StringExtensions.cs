@@ -29,6 +29,21 @@ namespace Umbraco.Core
         public const string UmbracoInvalidFirstCharacters = "01234567890";
 
         /// <summary>
+        /// Returns a stream from a string
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        internal static Stream GenerateStreamFromString(this string s)
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+            writer.Write(s);
+            writer.Flush();
+            stream.Position = 0;
+            return stream;
+        }
+
+        /// <summary>
         /// This will append the query string to the URL
         /// </summary>
         /// <param name="url"></param>

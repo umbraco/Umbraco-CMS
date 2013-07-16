@@ -306,6 +306,7 @@
     <Compile Include="HttpCookieExtensions.cs" />
     <Compile Include="Models\ContentEditing\ContentSaveAction.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeBasic.cs" />
+    <Compile Include="Models\ContentEditing\IHaveUploadedFiles.cs" />
     <Compile Include="Models\ContentEditing\MediaItemDisplay.cs" />
     <Compile Include="Models\ContentEditing\Section.cs" />
     <Compile Include="Models\ContentEditing\Tab.cs" />
@@ -466,6 +467,7 @@
     <Compile Include="WebApi\Binders\ContentItemBinder.cs" />
     <Compile Include="WebApi\Binders\MediaItemBinder.cs" />
     <Compile Include="WebApi\Filters\ContentItemValidationFilterAttribute.cs" />
+    <Compile Include="WebApi\Filters\ContentItemValidationHelper.cs" />
     <Compile Include="WebApi\Filters\FileUploadCleanupFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\HttpQueryStringFilterAttribute.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
