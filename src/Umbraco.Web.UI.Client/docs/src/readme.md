@@ -5,14 +5,16 @@ _The super fast introduction to getting belle running on your local machine, bot
 ##Running the prebuilt site
 
 ###Windows
-Right-click the `/build` folder and choose "open in webmatrix", run the website in webmatrix and browse to `localhost:xxxx/Belle/`, this should display the Belle login screen
+Right-click the `/build` folder and choose "open in webmatrix", run the website in webmatrix and browse to `localhost:9999/Belle/`, this should display the Belle login screen
+
+*Port 9999 should be used because that is the target site that the grunt build command mentioned below will launch*
 
 ###OSX
 Open a terminal inside the "/build" folder and run the command:
 
-	python -m SimpleHTTPServer 8080
+	python -m SimpleHTTPServer 9999
 
-This will start a local webserver, hosting the site on `localhost:8080` browse to localhost:8080/Belle/ which should display the belle login screen.
+This will start a local webserver, hosting the site on `localhost:9999` browse to localhost:9999/Belle/ which should display the belle login screen.
 
 ##Uing the dev environment
 _The dev environment is tad more tricky to get running, since it depends on a number of unit tests and automated tools, to produce the contents of the /build folder_
@@ -48,14 +50,13 @@ So run the command:
 
 Now that you have node and grunt installed, you can open `/Umbraco.Belle.Client` in either `cmd.exe` or terminal and run: 
 
-	grunt
+	grunt dev
 
-This will build the site, merge less files, run tests and create the /Build folder.
+This will build the site, merge less files, run tests and create the /Build folder, launch the web browser and monitor changes.
 
 ###Automated builds and tests
-If you prefer to do test-driven developement, or just dont want to manually run `grunt` on every change, you can simply tell grunt to watch for any changes made in the project, by running:
 
-	grunt watch
+grunt dev will continue to run in the background monitoring changes to files. When changes are detected it will rebuild the JS and also run the unit tests.
 
 
 
