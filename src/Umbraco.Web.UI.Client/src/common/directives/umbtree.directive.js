@@ -43,6 +43,14 @@ angular.module("umbraco.directives")
 
         return function (scope, element, attrs, controller) {
 
+            //flag to track the last loaded section when the tree 'un-loads'. We use this to determine if we should
+            // re-load the tree again. For example, if we hover over 'content' the content tree is shown. Then we hover
+            // outside of the tree and the tree 'un-loads'. When we re-hover over 'content', we don't want to re-load the 
+            // entire tree again since we already still have it in memory. Of course if the section is different we will
+            // reload it. This saves a lot on processing if someone is navigating in and out of the same section many times
+            // since it saves on data retreival and DOM processing.
+            var lastSection = "";
+
             //flag to enable/disable delete animations
             var enableDeleteAnimations = false;
 
@@ -101,17 +109,20 @@ angular.module("umbraco.directives")
             };
             
             //watch for section changes
-            if(scope.node === undefined){
-                scope.$watch("section",function (newVal, oldVal) {
-                  if(!newVal){
-                    scope.tree = undefined;
-                    scope.node = undefined;
-                  }
-                  else if (newVal !== oldVal) {
+            scope.$watch("section", function (newVal, oldVal) {
+                if (!newVal) {
+                    //store the last section loaded
+                    lastSection = oldVal;
+                }                
+                else if (newVal !== oldVal && newVal !== lastSection) {
+                    //only reload the tree data and Dom if the newval is different from the old one
+                    // and if the last section loaded is different from the requested one.
                     loadTree();
-                  }
-              });
-            }
+                    
+                    //store the new section to be loaded as the last section
+                    lastSection = newVal;
+                }
+            });
 
             //initial change
             loadTree();
