@@ -3,12 +3,12 @@
     * @name umbraco.mocks.sectionMocks     
     * @description Mocks data retreival for the sections
     **/
-function sectionMocks($httpBackend, mocksUtills) {
+function sectionMocks($httpBackend, mocksUtils) {
 
     /** internal method to mock the sections to be returned */
     function getSections() {
         
-        if (!mocksUtills.checkAuth()) {
+        if (!mocksUtils.checkAuth()) {
             return [401, null, null];
         }
 
@@ -26,10 +26,10 @@ function sectionMocks($httpBackend, mocksUtills) {
     return {
         register: function () {
             $httpBackend
-              .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoApi/Section/GetSections'))
+              .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Section/GetSections'))
               .respond(getSections);
         }
     };
 }
 
-angular.module('umbraco.mocks').factory('sectionMocks', ['$httpBackend', 'mocksUtills', sectionMocks]);
+angular.module('umbraco.mocks').factory('sectionMocks', ['$httpBackend', 'mocksUtils', sectionMocks]);

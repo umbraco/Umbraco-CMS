@@ -5,10 +5,10 @@ describe('edit content controller tests', function () {
     beforeEach(module('umbraco'));
 
     //inject the contentMocks service
-    beforeEach(inject(function ($rootScope, $controller, angularHelper, $httpBackend, contentMocks, mocksUtills) {
+    beforeEach(inject(function ($rootScope, $controller, angularHelper, $httpBackend, contentMocks, mocksUtils) {
 
         //for these tests we don't want any authorization to occur
-        mocksUtills.disableAuth();
+        mocksUtils.disableAuth();
 
         httpBackend = $httpBackend;
         scope = $rootScope.$new();
@@ -43,7 +43,7 @@ describe('edit content controller tests', function () {
         
         it('adding a file adds to the collection', function () {
             scope.addFiles(123, ["testFile"]);
-            expect(scope.files.length).toBe(1);
+            expect(scope.files.length).toBe(1); 
         });
         
         it('adding a file with the same property id replaces the existing one', function () {

@@ -5,10 +5,10 @@ describe('content factory tests', function () {
     beforeEach(module('umbraco.resources'));
     beforeEach(module('umbraco.mocks'));
 
-    beforeEach(inject(function ($injector, mocksUtills) {
+    beforeEach(inject(function ($injector, mocksUtils) {
         
         //for these tests we don't want any authorization to occur
-        mocksUtills.disableAuth();
+        mocksUtils.disableAuth();
 
         $rootScope = $injector.get('$rootScope');
         $httpBackend = $injector.get('$httpBackend');

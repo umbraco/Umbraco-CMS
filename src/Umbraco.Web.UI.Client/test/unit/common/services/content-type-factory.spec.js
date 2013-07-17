@@ -1,18 +1,18 @@
 describe('content type factory tests', function () {
-    var $rootScope, $httpBackend, contentTypeResource, m;
+    var $rootScope, $httpBackend, contentTypeResource, mocks;
 
     // beforeEach(module('ngMockE2E'));
     beforeEach(module('umbraco.services'));
     beforeEach(module('umbraco.resources'));
     beforeEach(module('umbraco.mocks'));
     
-    beforeEach(inject(function ($injector, mocksUtills) {
+    beforeEach(inject(function ($injector, mocksUtils) {
         
         //for these tests we don't want any authorization to occur
-        mocksUtills.disableAuth();
+        mocksUtils.disableAuth();
 
         $rootScope = $injector.get('$rootScope');
-        $httpBackend = $injector.get('$httpBackend');
+        $httpBackend = $injector.get('$httpBackend'); 
         mocks = $injector.get("contentTypeMocks");
         mocks.register();
         contentTypeResource = $injector.get('contentTypeResource');

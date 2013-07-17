@@ -1,10 +1,10 @@
 angular.module('umbraco.mocks').
-  factory('treeMocks', ['$httpBackend', 'mocksUtills', function ($httpBackend, mocksUtills) {
+  factory('treeMocks', ['$httpBackend', 'mocksUtils', function ($httpBackend, mocksUtils) {
       'use strict';
       
       function getMenuItems() {
 
-          if (!mocksUtills.checkAuth()) {
+          if (!mocksUtils.checkAuth()) {
               return [401, null, null];
           }
 
@@ -34,13 +34,13 @@ angular.module('umbraco.mocks').
 
       function returnChildren(status, data, headers) {
           
-          if (!mocksUtills.checkAuth()) {
+          if (!mocksUtils.checkAuth()) {
               return [401, null, null];
           }
 
-          var id = mocksUtills.getParameterByName(data, "id");
-          var section = mocksUtills.getParameterByName(data, "treeType");
-          var level = mocksUtills.getParameterByName(data, "level")+1;
+          var id = mocksUtils.getParameterByName(data, "id");
+          var section = mocksUtils.getParameterByName(data, "treeType");
+          var level = mocksUtils.getParameterByName(data, "level")+1;
 
           var url = "/umbraco/UmbracoTrees/ApplicationTreeApi/GetChildren?treeType=" + section + "&id=1234&level=" + level;
           var menuUrl = "/umbraco/UmbracoTrees/ApplicationTreeApi/GetMenu?treeType=" + section + "&id=1234&parentId=456";
@@ -63,11 +63,11 @@ angular.module('umbraco.mocks').
 
       function returnApplicationTrees(status, data, headers) {
 
-          if (!mocksUtills.checkAuth()) {
+          if (!mocksUtils.checkAuth()) {
               return [401, null, null];
           }
 
-          var section = mocksUtills.getParameterByName(data, "application");
+          var section = mocksUtils.getParameterByName(data, "application");
           var url = "/umbraco/UmbracoTrees/ApplicationTreeApi/GetChildren?treeType=" + section + "&id=1234&level=1";
           var menuUrl = "/umbraco/UmbracoTrees/ApplicationTreeApi/GetMenu?treeType=" + section + "&id=1234&parentId=456";
           var t;
@@ -156,15 +156,15 @@ angular.module('umbraco.mocks').
           register: function() {
               
               $httpBackend
-                 .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoTrees/ApplicationTreeApi/GetApplicationTrees'))
+                 .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoTrees/ApplicationTreeApi/GetApplicationTrees'))
                  .respond(returnApplicationTrees);
 
               $httpBackend
-                 .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoTrees/ApplicationTreeApi/GetChildren'))
+                 .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoTrees/ApplicationTreeApi/GetChildren'))
                  .respond(returnChildren);
               
               $httpBackend
-                 .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoTrees/ApplicationTreeApi/GetMenu'))
+                 .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoTrees/ApplicationTreeApi/GetMenu'))
                  .respond(getMenuItems);
               
           }

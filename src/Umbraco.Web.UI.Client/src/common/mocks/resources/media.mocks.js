@@ -1,14 +1,14 @@
 angular.module('umbraco.mocks').
-  factory('mediaMocks', ['$httpBackend', 'mocksUtills', function ($httpBackend, mocksUtills) {
+  factory('mediaMocks', ['$httpBackend', 'mocksUtils', function ($httpBackend, mocksUtils) {
       'use strict';
       
       function returnNodebyId(status, data, headers) {
 
-          if (!mocksUtills.checkAuth()) {
+          if (!mocksUtils.checkAuth()) {
               return [401, null, null];
           }
 
-          var id = mocksUtills.getParameterByName(data, "id") || 1234;
+          var id = mocksUtils.getParameterByName(data, "id") || 1234;
           
           var node = {
               name: "My content with id: " + id,
@@ -86,12 +86,12 @@ angular.module('umbraco.mocks').
       return {
           register: function() {
             $httpBackend
-	            .whenGET(mocksUtills.urlRegex('/umbraco/UmbracoApi/Media/GetById'))
+	            .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Media/GetById'))
 		          .respond(returnNodebyId);
           },
           expectGetById: function() {
             $httpBackend
-              .expectGET(mocksUtills.urlRegex('/umbraco/UmbracoApi/Media/GetById'));
+              .expectGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Media/GetById'));
           }
       };
   }]);

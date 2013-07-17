@@ -1,5 +1,5 @@
 angular.module('umbraco.mocks').
-  factory('userMocks', ['$httpBackend', 'mocksUtills', function ($httpBackend, mocksUtills) {
+  factory('userMocks', ['$httpBackend', 'mocksUtils', function ($httpBackend, mocksUtils) {
       'use strict';
       
       var mocked = {
@@ -12,7 +12,7 @@ angular.module('umbraco.mocks').
 
       function getCurrentUser(status, data, headers) {
           //check for existence of a cookie so we can do login/logout in the belle app (ignore for tests).
-          if (!mocksUtills.checkAuth()) {
+          if (!mocksUtils.checkAuth()) {
               //return a 204 with a null value
               //return [204, null, null];
               
@@ -26,7 +26,7 @@ angular.module('umbraco.mocks').
       function returnUser(status, data, headers) {
 
           //set the cookie for loging
-          mocksUtills.setAuth();
+          mocksUtils.setAuth();
 
           return [200, mocked, null];
       }
@@ -35,7 +35,7 @@ angular.module('umbraco.mocks').
           register: function() {
               
               $httpBackend
-			    .whenPOST(mocksUtills.urlRegex('/umbraco/UmbracoApi/Authentication/PostLogin'))
+			    .whenPOST(mocksUtils.urlRegex('/umbraco/UmbracoApi/Authentication/PostLogin'))
 			    .respond(returnUser);
 
 

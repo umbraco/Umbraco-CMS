@@ -1,10 +1,10 @@
 angular.module('umbraco.mocks').
-  factory('contentTypeMocks', ['$httpBackend', 'mocksUtills', function ($httpBackend, mocksUtills) {
+  factory('contentTypeMocks', ['$httpBackend', 'mocksUtils', function ($httpBackend, mocksUtils) {
       'use strict';
       
       function returnAllowedChildren(status, data, headers) {
 
-          if (!mocksUtills.checkAuth()) {
+          if (!mocksUtils.checkAuth()) {
               return [401, null, null];
           }
 
@@ -19,13 +19,13 @@ angular.module('umbraco.mocks').
       return {
           register: function() {
               $httpBackend
-                  .whenGET(mocksUtills.urlRegex('/umbraco/Api/'))
+                  .whenGET(mocksUtils.urlRegex('/umbraco/Api/'))
                   .respond(returnAllowedChildren);
                 
           },
           expectAllowedChildren: function(){
             console.log("expecting get");
-            $httpBackend.expectGET(mocksUtills.urlRegex('/umbraco/Api/'));
+            $httpBackend.expectGET(mocksUtils.urlRegex('/umbraco/Api/'));
           }
       };
   }]);
