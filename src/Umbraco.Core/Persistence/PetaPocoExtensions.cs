@@ -74,7 +74,11 @@ namespace Umbraco.Core.Persistence
             //get all columns but not the primary key if it is auto-incremental
             var cols = string.Join(", ", (
                 from c in pd.Columns
-                where c.Value.ResultColumn == false 
+                where 
+                    //don't return ResultColumns
+                    !c.Value.ResultColumn
+                    //if the table is auto-incremental, don't return the primary key
+                    && (pd.TableInfo.AutoIncrement && c.Key != pd.TableInfo.PrimaryKey)
                 select tableName + "." + db.EscapeSqlIdentifier(c.Key))
                 .ToArray());
 
@@ -87,10 +91,10 @@ namespace Umbraco.Core.Persistence
                 var values = new List<string>();
                 foreach (var i in pd.Columns)
                 {
-                    //if (pd.TableInfo.AutoIncrement && i.Key == pd.TableInfo.PrimaryKey)
-                    //{
-                    //    continue;
-                    //}
+                    if (pd.TableInfo.AutoIncrement && i.Key == pd.TableInfo.PrimaryKey)
+                    {
+                        continue;
+                    }
                     values.Add(string.Format("{0}{1}", "@", index++));
                     db.AddParam(cmd, i.Value.GetValue(poco), "@");
                 }
