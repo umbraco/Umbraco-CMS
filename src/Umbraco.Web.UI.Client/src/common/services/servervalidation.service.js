@@ -37,6 +37,18 @@ function serverValidationService($timeout) {
 
     return {
         
+        /**
+         * @ngdoc function
+         * @name subscribe
+         * @methodOf umbraco.services.executeAndClearAllSubscriptions
+         * @function
+         *
+         * @description
+         *  This is primarily used for scenarios where the error collection needs to be persisted over a route change. Generally this 
+         *   is when a content item (or any item) is created. The controller should call this method once the data is bound to the scope
+         *   so that any persisted validation errors are re-bound to their controls. Once they are re-binded this then clears the validation
+         *   colleciton so that if another route change occurs, the previously persisted validation errors are not re-bound to the new item.
+         */
         executeAndClearAllSubscriptions: function() {
 
             var self = this;
@@ -59,31 +71,9 @@ function serverValidationService($timeout) {
                         }
                     }
                 }
-
-                ////iterate all items, detect if the error is a field vs property error and then 
-                //// execute any callbacks registered for that particular error.
-                //for (var i in self.items) {
-                //    if (self.items[i].propertyAlias === null) {
-                //        //its a field error
-                //        var cbs1 = self.getFieldCallbacks(self.items[i].fieldName);
-                //        for (var cb1 in cbs1) {
-                //            executeCallback(self, self.items[i], cbs1[cb1].callback);
-                //        }
-                //    }
-                //    else {
-                //        //its a property error
-                //        var cbs2 = self.getPropertyCallbacks({ alias: self.items[i].propertyAlias }, self.items[i].fieldName);
-                //        for (var cb2 in cbs2) {
-                //            executeCallback(self, self.items[i], cbs2[cb2].callback);
-                //        }
-                //    }
-                //}
-                
                 //now that they are all executed, we're gonna clear all of the errors we have
                 self.clear();
-
             });
-            
         },
 
         /**
@@ -99,16 +89,12 @@ function serverValidationService($timeout) {
          *  property's specific field. This is used with the val-server directive in which the directive specifies the 
          *  field alias to listen for.
          *  If contentProperty is null, then this subscription is for a field property (not a user defined property).
-         *  During the call to subscribe we will check if there are any current validation errors for the subscription and
-         *   execute the specified callback.
          */
         subscribe: function (contentProperty, fieldName, callback) {
             if (!callback) {
                 return;
             }
             
-            var self = this;
-
             if (contentProperty === null) {
                 //don't add it if it already exists
                 var exists1 = _.find(callbacks, function (item) {
@@ -116,17 +102,6 @@ function serverValidationService($timeout) {
                 });
                 if (!exists1) {
                     callbacks.push({ propertyAlias: null, fieldName: fieldName, callback: callback });
-
-                    ////TODO: Figure out how the heck to clear the validation collection!!!!!!!!!!!!!!!!!!
-
-                    ////find errors for this callback and execute the callback after this current digest                    
-                    //$timeout(function() {                        
-                    //    var fieldErrors = getFieldErrors(self, fieldName);
-                    //    if (fieldErrors.length > 0) {
-                    //        executeCallback(self, fieldErrors, callback);
-                    //    }
-                    //});
-                    
                 }
             }
             else if (contentProperty !== undefined) {
@@ -135,15 +110,7 @@ function serverValidationService($timeout) {
                     return item.propertyAlias === contentProperty.alias && item.fieldName === fieldName;
                 });
                 if (!exists2) {
-                    callbacks.push({ propertyAlias: contentProperty.alias, fieldName: fieldName, callback: callback });
-                    
-                    ////find errors for this callback and execute the callback after this current digest
-                    //$timeout(function() {
-                    //    var propErrors = getPropertyErrors(self, contentProperty, fieldName);
-                    //    if (propErrors.length > 0) {
-                    //        executeCallback(self, propErrors, callback);
-                    //    }
-                    //});
+                    callbacks.push({ propertyAlias: contentProperty.alias, fieldName: fieldName, callback: callback });                    
                 }
             }
         },

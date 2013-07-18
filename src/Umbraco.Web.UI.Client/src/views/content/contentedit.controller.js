@@ -7,12 +7,7 @@
  * The controller for the content editor
  */
 function ContentEditController($scope, $routeParams, $location, contentResource, notificationsService, angularHelper, serverValidationService, contentEditingHelper) {
-    
-    //This is important with our routing: 
-    // * When we create something the id will be 'create' and a 'parentId' query string will be supplied so we know where to create it
-    // * After it is create there might be validation errors but the item has still be saved to the server, we cannot just change the route
-    //      to the normal editing route for the new ID because our server validation errors will no long exists
-    
+        
     if ($routeParams.create) {
         //we are creating so get an empty content item
         contentResource.getScaffold($routeParams.id, $routeParams.doctype)
