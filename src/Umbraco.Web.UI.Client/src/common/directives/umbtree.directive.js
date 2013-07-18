@@ -4,7 +4,7 @@
 * @restrict E
 **/
 angular.module("umbraco.directives")
-  .directive('umbTree', function ($compile, $log, $q, treeService, notificationsService, $timeout) {
+  .directive('umbTree', function ($compile, $log, $q, $rootScope, treeService, notificationsService, $timeout) {
     
     return {
       restrict: 'E',
@@ -15,8 +15,7 @@ angular.module("umbraco.directives")
         section: '@',
         showoptions: '@',
         showheader: '@',
-        cachekey: '@',
-        callback: '='
+        cachekey: '@'
       },
 
       compile: function (element, attrs) {
@@ -34,7 +33,7 @@ angular.module("umbraco.directives")
            '</div>';
          }
          template += '<ul>' +
-                  '<umb-tree-item ng-repeat="child in tree.root.children" node="child" callback="callback" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
+                  '<umb-tree-item ng-repeat="child in tree.root.children" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
                   '</ul>' +
                 '</li>' +
                '</ul>';
@@ -56,9 +55,7 @@ angular.module("umbraco.directives")
 
             /** Helper function to emit tree events */
             function emitEvent(eventName, args) {
-                if (scope.callback) {
-                    $(scope.callback).trigger(eventName, args);
-                }
+                $rootScope.$broadcast(eventName, args);
             }
 
             /** Method to load in the tree data */

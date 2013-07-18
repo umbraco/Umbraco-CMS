@@ -149,7 +149,7 @@ namespace Umbraco.Web.Editors
             //      a message indicating this
             if (!ModelState.IsValid)
             {
-                if (ModelState["Name"] != null && ModelState["Name"].Errors.Any()
+                if (ValidationHelper.ModelHasRequiredForPersistenceErrors(contentItem)
                     && (contentItem.Action == ContentSaveAction.SaveNew || contentItem.Action == ContentSaveAction.PublishNew))
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
@@ -157,6 +157,7 @@ namespace Umbraco.Web.Editors
                     var forDisplay = _contentModelMapper.ToContentItemDisplay(contentItem.PersistedContent);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Forbidden, forDisplay));
+                    
                 }
 
                 //if the model state is not valid we cannot publish so change it to save

@@ -20,10 +20,7 @@ angular.module('umbraco.services')
 .factory('navigationService', function ($rootScope, $routeParams, $log, $location, $q, dialogService, treeService, notificationsService) {
 
     //TODO: would be nicer to set all of the options here first instead of implicitly below!
-    var ui = {
-        //tree event handler everyone can subscribe to (TODO: but why not use angular events instead of jquery ?)
-        tree: $({})
-    };
+    var ui = {};
 
     function setMode(mode) {
         switch (mode) {

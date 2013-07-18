@@ -33,20 +33,16 @@ function NavigationController($scope,$rootScope, $location, $log, navigationServ
     });
     
     //this reacts to the options item in the tree
-    navigationService.ui.tree.bind("treeOptionsClick", function (ev, args) {
-        ev.stopPropagation();
-        ev.preventDefault();
-        
+    $scope.$on("treeOptionsClick", function (ev, args) {        
         $scope.currentNode = args.node;
         args.scope = $scope;
-
         navigationService.showMenu(ev, args);
     });
 
     //this reacts to tree items themselves being clicked
     //the tree directive should not contain any handling, simply just bubble events
-    navigationService.ui.tree.bind("treeNodeSelect", function (ev, args) {
-
+    $scope.$on("treeNodeSelect", function (ev, args) {
+        
         var n = args.node;
 
         //here we need to check for some legacy tree code

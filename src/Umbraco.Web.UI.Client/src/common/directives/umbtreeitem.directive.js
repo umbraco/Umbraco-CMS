@@ -18,7 +18,7 @@
    </example>
  */
 angular.module("umbraco.directives")
-.directive('umbTreeItem', function($compile, $http, $templateCache, $interpolate, $log, $location, treeService, notificationsService) {
+.directive('umbTreeItem', function ($compile, $http, $templateCache, $interpolate, $log, $location, $rootScope, treeService, notificationsService) {
   return {
     restrict: 'E',
     replace: true,
@@ -46,11 +46,9 @@ angular.module("umbraco.directives")
         var enableDeleteAnimations = true;
 
         /** Helper function to emit tree events */
-        function emitEvent(eventName, args){
 
-          if(scope.callback){
-            $(scope.callback).trigger(eventName,args);
-          }
+        function emitEvent(eventName, args) {
+            $rootScope.$broadcast(eventName, args);
         }
 
         /**

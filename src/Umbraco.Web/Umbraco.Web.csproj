@@ -303,6 +303,7 @@
     <Compile Include="Editors\MediaTypeApiController.cs" />
     <Compile Include="Editors\SectionController.cs" />
     <Compile Include="Editors\UmbracoAuthorizedJsonController.cs" />
+    <Compile Include="Editors\ValidationHelper.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
     <Compile Include="Models\ContentEditing\ContentSaveAction.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeBasic.cs" />
@@ -442,25 +443,16 @@
     <Compile Include="UI\CdfLogger.cs" />
     <Compile Include="umbraco.presentation\LegacyClasses.cs" />
     <Compile Include="umbraco.presentation\umbraco\ActionHandlers\SimilarNodeNameComparer.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx.cs" />
     <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.cs">
       <DependentUpon>AssignDomain2.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.designer.cs">
       <DependentUpon>AssignDomain2.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="Editors\MediaController.cs" />
     <Compile Include="WebApi\Binders\ContentItemBaseBinder.cs" />
@@ -485,9 +477,7 @@
     <Compile Include="PublishedCache\IPublishedMediaCache.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="ExamineExtensions.cs" />
-    <Compile Include="FormlessPage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="FormlessPage.cs" />
     <Compile Include="HtmlHelperRenderExtensions.cs" />
     <Compile Include="LegacyScheduledTasks.cs" />
     <Compile Include="Media\EmbedProviders\AbstractOEmbedProvider.cs" />
@@ -560,138 +550,56 @@
     <Compile Include="UI\LegacyDialogTask.cs" />
     <Compile Include="UI\Controls\ProgressBar.cs" />
     <Compile Include="UI\Controls\UmbracoControl.cs" />
-    <Compile Include="UI\Controls\UmbracoUserControl.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Pages\BasePage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="UI\Controls\UmbracoUserControl.cs" />
+    <Compile Include="UI\Pages\BasePage.cs" />
     <Compile Include="UI\Pages\ClientTools.cs" />
-    <Compile Include="UI\Pages\UmbracoEnsuredPage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="UI\Pages\UmbracoEnsuredPage.cs" />
     <Compile Include="UI\SpeechBubbleIcon.cs" />
     <Compile Include="umbraco.presentation\AttributeCollectionAdapter.cs" />
-    <Compile Include="umbraco.presentation\Default.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\LegacyClasses.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\LegacyClasses.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\Skinning\LegacyClasses.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\Default.aspx.cs" />
+    <Compile Include="umbraco.presentation\install\steps\LegacyClasses.cs" />
+    <Compile Include="umbraco.presentation\install\LegacyClasses.cs" />
+    <Compile Include="umbraco.presentation\install\steps\Skinning\LegacyClasses.cs" />
     <Compile Include="umbraco.presentation\MacroCacheContent.cs" />
     <Compile Include="umbraco.presentation\ScriptingMacroResult.cs" />
-    <Compile Include="umbraco.presentation\umbraco\cacheBrowser.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\channels\wlwmanifest.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\channels\rsd.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\canvas.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\moveOrCopy.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\sort.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\Create.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\publish.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\editContent.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\editMedia.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\endPreview.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\helpRedirect.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\cacheBrowser.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\channels\wlwmanifest.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\channels\rsd.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\canvas.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\dialogs\moveOrCopy.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\dialogs\sort.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\Create.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\dashboard.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\dialogs\publish.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\editContent.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\editMedia.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\endPreview.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\helpRedirect.aspx.cs" />
     <Compile Include="umbraco.presentation\umbraco\Help.cs" />
-    <Compile Include="umbraco.presentation\umbraco\login.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\logout.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\macroResultWrapper.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\masterpages\default.Master.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\publishStatus.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\Default.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\tree.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\ping.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\login.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\logout.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\macroResultWrapper.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\masterpages\default.Master.cs" />
+    <Compile Include="umbraco.presentation\umbraco\publishStatus.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\Default.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\tree.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\ping.aspx.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\MacroPartialViewTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\PartialViewTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\StarterKits.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Xslt\editXslt.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\editMacro.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\umbracoField.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\treePicker.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\masterpages\umbracoPage.master.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\masterpages\umbracoDialog.master.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\developer\Packages\StarterKits.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\developer\Xslt\editXslt.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\dialogs\editMacro.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\dialogs\umbracoField.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\dialogs\treePicker.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\masterpages\umbracoPage.master.cs" />
+    <Compile Include="umbraco.presentation\umbraco\masterpages\umbracoDialog.master.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProviderAccessUpdate.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Search\QuickSearch.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\editTemplate.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\modals\ShowUmbracoTags.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\Search\QuickSearch.ascx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\settings\editTemplate.aspx.cs" />
+    <Compile Include="umbraco.presentation\umbraco\settings\modals\ShowUmbracoTags.aspx.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\Image.cs" />
     <Compile Include="umbraco.presentation\umbraco\uQuery\IGetProperty.cs" />
     <Compile Include="umbraco.presentation\XsltExtensionAttribute.cs" />
@@ -720,9 +628,7 @@
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\Nodes.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\Property.cs" />
     <Compile Include="Routing\UmbracoRequestEventArgs.cs" />
-    <Compile Include="UmbracoUserControl.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="UmbracoUserControl.cs" />
     <Compile Include="WebApi\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoAuthorizedApiController.cs" />
     <Compile Include="WebApi\ValidationFilterAttribute.cs" />
@@ -748,12 +654,8 @@
     <Compile Include="Routing\IContentFinder.cs" />
     <Compile Include="Routing\RoutingContext.cs" />
     <Compile Include="umbraco.presentation\EnsureSystemPathsApplicationStartupHandler.cs" />
-    <Compile Include="umbraco.presentation\install\steps\Definitions\LegacyClasses.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\utills\LegacyClasses.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\install\steps\Definitions\LegacyClasses.cs" />
+    <Compile Include="umbraco.presentation\install\utills\LegacyClasses.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -805,9 +707,7 @@
     <Compile Include="umbraco.presentation\umbracobase\baseLibrary.cs" />
     <Compile Include="umbraco.presentation\umbracobase\restExtension.cs" />
     <Compile Include="umbraco.presentation\UmbracoContext.cs" />
-    <Compile Include="umbraco.presentation\UmbracoPage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\UmbracoPage.cs" />
     <Compile Include="umbraco.presentation\umbracoPageHolder.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -823,28 +723,24 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\actions\delete.aspx.cs">
       <DependentUpon>delete.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\actions\delete.aspx.designer.cs">
       <DependentUpon>delete.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\actions\editContent.aspx.cs">
       <DependentUpon>editContent.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\actions\editContent.aspx.designer.cs">
       <DependentUpon>editContent.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\actions\preview.aspx.cs">
       <DependentUpon>preview.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\actions\preview.aspx.designer.cs">
       <DependentUpon>preview.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\actions\publish.aspx.cs">
       <DependentUpon>publish.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\actions\publish.aspx.designer.cs">
       <DependentUpon>publish.aspx</DependentUpon>
@@ -865,18 +761,15 @@
     <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControl.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\Images\ImageViewer.ascx.cs">
       <DependentUpon>ImageViewer.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\Images\ImageViewer.ascx.designer.cs">
       <DependentUpon>ImageViewer.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\Images\ImageViewerUpdater.asmx.cs">
       <DependentUpon>ImageViewerUpdater.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\Images\UploadMediaImage.ascx.cs">
       <DependentUpon>UploadMediaImage.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\Images\UploadMediaImage.ascx.designer.cs">
       <DependentUpon>UploadMediaImage.ascx</DependentUpon>
@@ -884,7 +777,6 @@
     <Compile Include="umbraco.presentation\umbraco\controls\dualSelectBox.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx.cs">
       <DependentUpon>GenericProperty.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx.designer.cs">
       <DependentUpon>GenericProperty.ascx</DependentUpon>
@@ -895,25 +787,19 @@
     <Compile Include="umbraco.presentation\umbraco\controls\macroParameterControl.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\passwordChanger.ascx.cs">
       <DependentUpon>passwordChanger.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\passwordChanger.ascx.designer.cs">
       <DependentUpon>passwordChanger.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
       <DependentUpon>ProgressBar.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx.designer.cs">
       <DependentUpon>ProgressBar.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\SaveClickEventArgs.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\Tree\CustomTreeControl.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\Tree\CustomTreeService.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\controls\Tree\CustomTreeControl.cs" />
+    <Compile Include="umbraco.presentation\umbraco\controls\Tree\CustomTreeService.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\Tree\JTreeContextMenu.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\Tree\JTreeContextMenuItem.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\Tree\NodeInfo.cs">
@@ -921,7 +807,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx.cs">
       <DependentUpon>TreeControl.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx.designer.cs">
       <DependentUpon>TreeControl.ascx</DependentUpon>
@@ -934,7 +819,6 @@
     <Compile Include="umbraco.presentation\umbraco\create\dictionaryTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\DLRScripting.ascx.cs">
       <DependentUpon>DLRScripting.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\DLRScripting.ascx.designer.cs">
       <DependentUpon>DLRScripting.ascx</DependentUpon>
@@ -957,14 +841,12 @@
     <Compile Include="umbraco.presentation\umbraco\create\XsltTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\dashboard\ChangePassword.ascx.cs">
       <DependentUpon>ChangePassword.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\ChangePassword.ascx.designer.cs">
       <DependentUpon>ChangePassword.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\DesktopMediaUploader.ascx.cs">
       <DependentUpon>DesktopMediaUploader.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\DesktopMediaUploader.ascx.designer.cs">
       <DependentUpon>DesktopMediaUploader.ascx</DependentUpon>
@@ -977,7 +859,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.designer.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
@@ -1002,7 +883,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\Settings\Applyskin.ascx.cs">
       <DependentUpon>Applyskin.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\Settings\Applyskin.ascx.designer.cs">
       <DependentUpon>Applyskin.ascx</DependentUpon>
@@ -1018,14 +898,12 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx.cs">
       <DependentUpon>EditRelationType.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx.designer.cs">
       <DependentUpon>EditRelationType.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx.cs">
       <DependentUpon>NewRelationType.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx.designer.cs">
       <DependentUpon>NewRelationType.aspx</DependentUpon>
@@ -1033,20 +911,17 @@
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\ReadOnlyRelation.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\RelationTypesWebService.asmx.cs">
       <DependentUpon>RelationTypesWebService.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\TreeMenu\ActionDeleteRelationType.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\TreeMenu\ActionNewRelationType.cs" />
     <Compile Include="umbraco.presentation\umbraco\dialogs\Preview.aspx.cs">
       <DependentUpon>Preview.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\Preview.aspx.designer.cs">
       <DependentUpon>Preview.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\TemplateSkinning.aspx.cs">
       <DependentUpon>TemplateSkinning.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\TemplateSkinning.aspx.designer.cs">
       <DependentUpon>TemplateSkinning.aspx</DependentUpon>
@@ -1056,49 +931,42 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\CssParser.aspx.cs">
       <DependentUpon>CssParser.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\CssParser.aspx.designer.cs">
       <DependentUpon>CssParser.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ImageUploader.aspx.cs">
       <DependentUpon>ImageUploader.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ImageUploader.aspx.designer.cs">
       <DependentUpon>ImageUploader.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInjectionMacroRenderer.aspx.cs">
       <DependentUpon>ModuleInjectionMacroRenderer.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInjectionMacroRenderer.aspx.designer.cs">
       <DependentUpon>ModuleInjectionMacroRenderer.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInjector.aspx.cs">
       <DependentUpon>ModuleInjector.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInjector.aspx.designer.cs">
       <DependentUpon>ModuleInjector.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInstaller.aspx.cs">
       <DependentUpon>ModuleInstaller.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInstaller.aspx.designer.cs">
       <DependentUpon>ModuleInstaller.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx.cs">
       <DependentUpon>ModuleSelector.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx.designer.cs">
       <DependentUpon>ModuleSelector.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx.cs">
       <DependentUpon>SkinCustomizer.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx.designer.cs">
       <DependentUpon>SkinCustomizer.ascx</DependentUpon>
@@ -1106,7 +974,6 @@
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\SkinModule.cs" />
     <Compile Include="umbraco.presentation\umbraco\members\MemberSearch.ascx.cs">
       <DependentUpon>MemberSearch.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\MemberSearch.ascx.designer.cs">
       <DependentUpon>MemberSearch.ascx</DependentUpon>
@@ -1116,56 +983,48 @@
     <Compile Include="umbraco.presentation\umbraco\Search\ExamineEvents.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx.cs">
       <DependentUpon>xsltVisualize.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx.designer.cs">
       <DependentUpon>xsltVisualize.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx.cs">
       <DependentUpon>insertMasterpageContent.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx.designer.cs">
       <DependentUpon>insertMasterpageContent.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\insertMasterpagePlaceholder.aspx.cs">
       <DependentUpon>insertMasterpagePlaceholder.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\insertMasterpagePlaceholder.aspx.designer.cs">
       <DependentUpon>insertMasterpagePlaceholder.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\mediaPicker.aspx.cs">
       <DependentUpon>mediaPicker.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\mediaPicker.aspx.designer.cs">
       <DependentUpon>mediaPicker.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\republish.aspx.cs">
       <DependentUpon>republish.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\republish.aspx.designer.cs">
       <DependentUpon>republish.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\search.aspx.cs">
       <DependentUpon>search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\search.aspx.designer.cs">
       <DependentUpon>search.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx.cs">
       <DependentUpon>SendPublish.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx.designer.cs">
       <DependentUpon>SendPublish.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\content.ascx.cs">
       <DependentUpon>content.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\content.ascx.designer.cs">
       <DependentUpon>content.ascx</DependentUpon>
@@ -1175,42 +1034,36 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\language.ascx.cs">
       <DependentUpon>language.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\language.ascx.designer.cs">
       <DependentUpon>language.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\media.ascx.cs">
       <DependentUpon>media.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\media.ascx.designer.cs">
       <DependentUpon>media.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\member.ascx.cs">
       <DependentUpon>member.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\member.ascx.designer.cs">
       <DependentUpon>member.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\nodeType.ascx.cs">
       <DependentUpon>nodeType.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\nodeType.ascx.designer.cs">
       <DependentUpon>nodeType.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\script.ascx.cs">
       <DependentUpon>script.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\script.ascx.designer.cs">
       <DependentUpon>script.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\simple.ascx.cs">
       <DependentUpon>simple.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\simple.ascx.designer.cs">
       <DependentUpon>simple.ascx</DependentUpon>
@@ -1220,222 +1073,189 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.cs">
       <DependentUpon>xslt.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.designer.cs">
       <DependentUpon>xslt.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\LatestEdits.ascx.cs">
       <DependentUpon>LatestEdits.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\LatestEdits.ascx.designer.cs">
       <DependentUpon>LatestEdits.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Macros\assemblyBrowser.aspx.cs">
       <DependentUpon>assemblyBrowser.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Macros\assemblyBrowser.aspx.designer.cs">
       <DependentUpon>assemblyBrowser.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\autoDoc.aspx.cs">
       <DependentUpon>autoDoc.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\autoDoc.aspx.designer.cs">
       <DependentUpon>autoDoc.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\DataTypes\editDatatype.aspx.cs">
       <DependentUpon>editDatatype.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\DataTypes\editDatatype.aspx.designer.cs">
       <DependentUpon>editDatatype.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\BrowseRepository.aspx.cs">
       <DependentUpon>BrowseRepository.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\BrowseRepository.aspx.designer.cs">
       <DependentUpon>BrowseRepository.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx.cs">
       <DependentUpon>editPackage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx.designer.cs">
       <DependentUpon>editPackage.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\installedPackage.aspx.cs">
       <DependentUpon>installedPackage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\installedPackage.aspx.designer.cs">
       <DependentUpon>installedPackage.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\LoadNitros.ascx.cs">
       <DependentUpon>LoadNitros.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\LoadNitros.ascx.designer.cs">
       <DependentUpon>LoadNitros.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\SubmitPackage.aspx.cs">
       <DependentUpon>SubmitPackage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\SubmitPackage.aspx.designer.cs">
       <DependentUpon>SubmitPackage.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\getXsltStatus.asmx.cs">
       <DependentUpon>getXsltStatus.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Cache\viewCacheItem.aspx.cs">
       <DependentUpon>viewCacheItem.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Cache\viewCacheItem.aspx.designer.cs">
       <DependentUpon>viewCacheItem.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx.cs">
       <DependentUpon>xsltChooseExtension.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx.designer.cs">
       <DependentUpon>xsltChooseExtension.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\xsltInsertValueOf.aspx.cs">
       <DependentUpon>xsltInsertValueOf.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\xsltInsertValueOf.aspx.designer.cs">
       <DependentUpon>xsltInsertValueOf.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\about.aspx.cs">
       <DependentUpon>about.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\about.aspx.designer.cs">
       <DependentUpon>about.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain.aspx.cs">
       <DependentUpon>AssignDomain.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain.aspx.designer.cs">
       <DependentUpon>AssignDomain.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\create.aspx.cs">
       <DependentUpon>create.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\create.aspx.designer.cs">
       <DependentUpon>create.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\cruds.aspx.cs">
       <DependentUpon>cruds.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\cruds.aspx.designer.cs">
       <DependentUpon>cruds.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\emptyTrashcan.aspx.cs">
       <DependentUpon>emptyTrashcan.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\emptyTrashcan.aspx.designer.cs">
       <DependentUpon>emptyTrashcan.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\exportDocumenttype.aspx.cs">
       <DependentUpon>exportDocumenttype.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\imageViewer.aspx.cs">
       <DependentUpon>imageViewer.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\imageViewer.aspx.designer.cs">
       <DependentUpon>imageViewer.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\importDocumenttype.aspx.cs">
       <DependentUpon>importDocumenttype.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\insertMacro.aspx.cs">
       <DependentUpon>insertMacro.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\insertMacro.aspx.designer.cs">
       <DependentUpon>insertMacro.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\insertTable.aspx.cs">
       <DependentUpon>insertTable.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\insertTable.aspx.designer.cs">
       <DependentUpon>insertTable.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\notifications.aspx.cs">
       <DependentUpon>notifications.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\notifications.aspx.designer.cs">
       <DependentUpon>notifications.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx.cs">
       <DependentUpon>installer.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx.designer.cs">
       <DependentUpon>installer.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\protectPage.aspx.cs">
       <DependentUpon>protectPage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\protectPage.aspx.designer.cs">
       <DependentUpon>protectPage.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\RegexWs.aspx.cs">
       <DependentUpon>RegexWs.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\RegexWs.aspx.designer.cs">
       <DependentUpon>RegexWs.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx.cs">
       <DependentUpon>rollBack.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx.designer.cs">
       <DependentUpon>rollBack.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx.cs">
       <DependentUpon>sendToTranslation.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx.designer.cs">
       <DependentUpon>sendToTranslation.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\uploadImage.aspx.cs">
       <DependentUpon>uploadImage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\uploadImage.aspx.designer.cs">
       <DependentUpon>uploadImage.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx.cs">
       <DependentUpon>viewAuditTrail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx.designer.cs">
       <DependentUpon>viewAuditTrail.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\js\language.aspx.cs">
       <DependentUpon>language.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\js\language.aspx.designer.cs">
       <DependentUpon>language.aspx</DependentUpon>
@@ -1464,35 +1284,30 @@
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Utility.cs" />
     <Compile Include="umbraco.presentation\umbraco\members\EditMember.aspx.cs">
       <DependentUpon>EditMember.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\EditMember.aspx.designer.cs">
       <DependentUpon>EditMember.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx.cs">
       <DependentUpon>EditMemberGroup.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx.designer.cs">
       <DependentUpon>EditMemberGroup.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\EditMemberType.aspx.cs">
       <DependentUpon>EditMemberType.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\EditMemberType.aspx.designer.cs">
       <DependentUpon>EditMemberType.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\search.aspx.cs">
       <DependentUpon>search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\search.aspx.designer.cs">
       <DependentUpon>search.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\ViewMembers.aspx.cs">
       <DependentUpon>ViewMembers.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\ViewMembers.aspx.designer.cs">
       <DependentUpon>ViewMembers.aspx</DependentUpon>
@@ -1506,35 +1321,30 @@
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\IModule.cs" />
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\InsertAnchor.aspx.cs">
       <DependentUpon>InsertAnchor.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\InsertAnchor.aspx.designer.cs">
       <DependentUpon>InsertAnchor.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\insertChar.aspx.cs">
       <DependentUpon>insertChar.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\insertChar.aspx.designer.cs">
       <DependentUpon>insertChar.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\insertImage.aspx.cs">
       <DependentUpon>insertImage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\insertImage.aspx.designer.cs">
       <DependentUpon>insertImage.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\insertLink.aspx.cs">
       <DependentUpon>insertLink.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\insertLink.aspx.designer.cs">
       <DependentUpon>insertLink.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\insertMacro.aspx.cs">
       <DependentUpon>insertMacro.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\insertMacro.aspx.designer.cs">
       <DependentUpon>insertMacro.aspx</DependentUpon>
@@ -1544,7 +1354,6 @@
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\JSONWriter.cs" />
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx.cs">
       <DependentUpon>tinymce3tinymceCompress.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx.designer.cs">
       <DependentUpon>tinymce3tinymceCompress.aspx</DependentUpon>
@@ -1554,35 +1363,30 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx.cs">
       <DependentUpon>DictionaryItemList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx.designer.cs">
       <DependentUpon>DictionaryItemList.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx.cs">
       <DependentUpon>EditDictionaryItem.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx.designer.cs">
       <DependentUpon>EditDictionaryItem.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\editLanguage.aspx.cs">
       <DependentUpon>editLanguage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\editLanguage.aspx.designer.cs">
       <DependentUpon>editLanguage.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\EditMediaType.aspx.cs">
       <DependentUpon>EditMediaType.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\EditMediaType.aspx.designer.cs">
       <DependentUpon>EditMediaType.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\scripts\editScript.aspx.cs">
       <DependentUpon>editScript.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\templateControls\Script.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\BaseMediaTree.cs" />
@@ -1606,7 +1410,6 @@
     <Compile Include="umbraco.presentation\umbraco\uQuery\UmbracoObjectTypeExtensions.cs" />
     <Compile Include="umbraco.presentation\umbraco\webservices\MacroContainerService.asmx.cs">
       <DependentUpon>MacroContainerService.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\MediaUploader.ashx.cs">
       <DependentUpon>MediaUploader.ashx</DependentUpon>
@@ -1616,7 +1419,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\TreeClientService.asmx.cs">
       <DependentUpon>TreeClientService.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\templateControls\DisableEventValidation.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\Item.cs" />
@@ -1633,35 +1435,29 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\translation\default.aspx.cs">
       <DependentUpon>default.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\translation\default.aspx.designer.cs">
       <DependentUpon>default.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\translation\details.aspx.cs">
       <DependentUpon>details.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\translation\details.aspx.designer.cs">
       <DependentUpon>details.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\translation\preview.aspx.cs">
       <DependentUpon>preview.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\translation\preview.aspx.designer.cs">
       <DependentUpon>preview.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\translation\xml.aspx.cs">
       <DependentUpon>xml.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\translation\xml.aspx.designer.cs">
       <DependentUpon>xml.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\treeInit.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\treeInit.aspx.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\BaseContentTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\BaseTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\ContentRecycleBin.cs" />
@@ -1702,107 +1498,85 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\XmlTree.cs">
       <DependentUpon>XmlTree.xsd</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\umbraco.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\umbraco.aspx.cs" />
     <Compile Include="umbraco.presentation\umbraco\umbWindow.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\urlRewriter\UrlRewriterFormWriter.cs" />
     <Compile Include="umbraco.presentation\umbraco\users\EditUser.aspx.cs">
       <DependentUpon>EditUser.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\EditUser.aspx.designer.cs">
       <DependentUpon>EditUser.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\EditUserType.aspx.cs">
       <DependentUpon>EditUserType.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\EditUserType.aspx.designer.cs">
       <DependentUpon>EditUserType.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\NodePermissions.ascx.cs">
       <DependentUpon>NodePermissions.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\NodePermissions.ascx.designer.cs">
       <DependentUpon>NodePermissions.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx.cs">
       <DependentUpon>PermissionEditor.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx.designer.cs">
       <DependentUpon>PermissionEditor.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\PermissionsHandler.asmx.cs">
       <DependentUpon>PermissionsHandler.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\UserPermissions.cs" />
     <Compile Include="umbraco.presentation\umbraco\users\UserTypeTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\webService.asmx.cs">
       <DependentUpon>webService.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\ajaxHelpers.cs" />
     <Compile Include="umbraco.presentation\umbraco\webservices\CacheRefresher.asmx.cs">
       <DependentUpon>CacheRefresher.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\CheckForUpgrade.asmx.cs">
       <DependentUpon>CheckForUpgrade.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\CMSNode.asmx.cs">
       <DependentUpon>CMSNode.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\codeEditorSave.asmx.cs">
       <DependentUpon>codeEditorSave.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\Developer.asmx.cs">
       <DependentUpon>Developer.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\legacyAjaxCalls.asmx.cs">
       <DependentUpon>legacyAjaxCalls.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\nodeSorter.asmx.cs">
       <DependentUpon>nodeSorter.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\progressStatus.asmx.cs">
       <DependentUpon>progressStatus.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\publication.asmx.cs">
       <DependentUpon>publication.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\RegexComWebservice.cs" />
     <Compile Include="umbraco.presentation\umbraco\webservices\Settings.asmx.cs">
       <DependentUpon>Settings.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\templates.asmx.cs">
       <DependentUpon>templates.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\trashcan.asmx.cs">
       <DependentUpon>trashcan.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\UltimatePickerAutoCompleteHandler.ashx.cs">
       <DependentUpon>UltimatePickerAutoCompleteHandler.ashx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\Web\UI\ContentPage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\Web\UI\ContentPage.cs" />
     <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltCommon.cs" />
     <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltDatesAndTimes.cs" />
     <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltMath.cs" />
@@ -1860,13 +1634,9 @@
     <Compile Include="WebServices\FolderBrowserService.cs" />
     <Compile Include="WebServices\UmbracoAuthorizedHttpHandler.cs" />
     <Compile Include="WebServices\SaveFileController.cs" />
-    <Compile Include="WebServices\UmbracoAuthorizedWebService.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="WebServices\UmbracoAuthorizedWebService.cs" />
     <Compile Include="WebServices\UmbracoHttpHandler.cs" />
-    <Compile Include="WebServices\UmbracoWebService.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="WebServices\UmbracoWebService.cs" />
     <EmbeddedResource Include="UI\JavaScript\Main.js" />
     <EmbeddedResource Include="UI\JavaScript\JsInitialize.js" />
     <EmbeddedResource Include="UI\JavaScript\ServerVariables.js" />

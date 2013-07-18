@@ -71,6 +71,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <IntermediateOutputPath>C:\Users\Shannon\AppData\Local\Temp\vs24C6.tmp\Debug\</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\</OutputPath>
@@ -96,6 +97,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <IntermediateOutputPath>C:\Users\Shannon\AppData\Local\Temp\vs24C6.tmp\Release\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\UmbracoExamine\UmbracoExamine.csproj">
