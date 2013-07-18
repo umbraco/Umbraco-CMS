@@ -55,10 +55,16 @@ and load the dashboard related to the section</p><h4 id="Parameters">Parameters<
 </li>
 <li><h3 id="showDialog">showDialog(args)</h3>
 <div class="showdialog"><p>Opens a dialog, for a given action on a given tree node
-uses the dialogServicet to inject the selected action dialog
+uses the dialogService to inject the selected action dialog
 into #dialog div.umb-panel-body
 the path to the dialog view is determined by: 
-"views/" + current tree + "/" + action alias + ".html"</p><h4 id="Parameters">Parameters</h4>
+"views/" + current tree + "/" + action alias + ".html"
+The dialog controller will get passed a scope object that is created here. This scope
+object may be injected as part of the args object, if one is not found then a new scope
+is created. Regardless of whether a scope is created or re-used, a few properties and methods 
+will be added to it so that they can be used in any dialog controller:
+ scope.currentNode = the selected tree node
+ scope.currentAction = the selected menu item</p><h4 id="Parameters">Parameters</h4>
 <ul class="parameters"><li><code ng:non-bindable="">args  {Object}  </code>
 <p>arguments passed to the function</p></li>
 <li><code ng:non-bindable="">args.scope  {Scope}  </code>

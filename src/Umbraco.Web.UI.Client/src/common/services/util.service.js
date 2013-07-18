@@ -262,8 +262,8 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper) {
         
         /**
          * @ngdoc method
-         * @name umbRequestHelper#dictionaryToQueryString
-         * @methodOf umbRequestHelper
+         * @name umbraco.services.umbRequestHelper#dictionaryToQueryString
+         * @methodOf umbraco.services.umbRequestHelper
          * @function
          *
          * @description
@@ -295,8 +295,8 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper) {
 
         /**
          * @ngdoc method
-         * @name umbRequestHelper#getApiUrl
-         * @methodOf umbRequestHelper
+         * @name umbraco.services.umbRequestHelper#getApiUrl
+         * @methodOf umbraco.services.umbRequestHelper
          * @function
          *
          * @description
@@ -322,8 +322,8 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper) {
 
         /**
          * @ngdoc function
-         * @name resourcePromise
-         * @methodOf umbraco.services.angularHelper
+         * @name umbraco.services.umbRequestHelper#resourcePromise
+         * @methodOf umbraco.services.umbRequestHelper
          * @function
          *
          * @description
