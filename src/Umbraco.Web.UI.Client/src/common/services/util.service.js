@@ -729,7 +729,6 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
 
                 //add to notifications
                 notificationsService.error("Validation", modelState[e][0]);
-
             }
         },
 
@@ -749,9 +748,15 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
             if (err.status === 403) {
                 //now we need to look through all the validation errors
                 if (err.data && (err.data.ModelState)) {
+                    
                     this.handleValidationErrors(err.data, err.data.ModelState);
 
-                    this.redirectToCreatedContent(err.data.id, err.data.ModelState);
+                    if (!this.redirectToCreatedContent(err.data.id, err.data.ModelState)) {
+                        //we are not redirecting because this is not new content, it is existing content. In this case
+                        // we need to clear the server validation items. When we are creating new content we cannot clear
+                        // the server validation items because we redirect and they need to persist until the validation is re-bound.
+                        serverValidationService.clear();
+                    }
 
                     //indicates we've handled the server result
                     return true;                    
@@ -795,6 +800,8 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
                 $location.search(null);
                 //change to new path
                 $location.path("/" + $routeParams.section + "/" + $routeParams.method + "/" + id);
+                //don't add a browser history for this
+                $location.replace();
                 return true;
             }
             return false;

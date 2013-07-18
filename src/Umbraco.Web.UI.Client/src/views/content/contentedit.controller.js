@@ -8,8 +8,13 @@
  */
 function ContentEditController($scope, $routeParams, $location, contentResource, notificationsService, angularHelper, serverValidationService, contentEditingHelper) {
     
-    //get the data to show, scaffold for new or get existing
+    //This is important with our routing: 
+    // * When we create something the id will be 'create' and a 'parentId' query string will be supplied so we know where to create it
+    // * After it is create there might be validation errors but the item has still be saved to the server, we cannot just change the route
+    //      to the normal editing route for the new ID because our server validation errors will no long exists
+    
     if ($routeParams.create) {
+        //we are creating so get an empty content item
         contentResource.getScaffold($routeParams.id, $routeParams.doctype)
             .then(function(data) {
                 $scope.contentLoaded = true;
@@ -17,10 +22,18 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
             });
     }
     else {
+        //we are editing so get the content item from the server
         contentResource.getById($routeParams.id)
             .then(function(data) {
                 $scope.contentLoaded = true;
                 $scope.content = data;
+                
+                //in one particular special case, after we've created a new item we redirect back to the edit
+                // route but there might be server validation errors in the collection which we need to display
+                // after the redirect, so we will bind all subscriptions which will show the server validation errors
+                // if there are any and then clear them so the collection no longer persists them.
+                serverValidationService.executeAndClearAllSubscriptions();
+
             });
     }
 
@@ -58,11 +71,10 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
                 notificationsService.success("Published", "Content has been saved and published");                
                 $scope.$broadcast("saved", { scope: $scope });
 
-                contentEditingHelper.redirectToCreatedContent(data.id);
+                contentEditingHelper.redirectToCreatedContent($scope.content.id);
             }, function (err) {
-                $location.search(null);
                 //TODO: only update the content that has changed!
-                $scope.content = err.data;
+                //$scope.content = err.data;
                 contentEditingHelper.handleSaveError(err);
             });	        
     };
@@ -78,12 +90,16 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
 
         contentResource.saveContent(cnt, $routeParams.create, $scope.files)
             .then(function (data) {
+                //TODO: only update the content that has changed!
                 $scope.content = data;
+                
                 notificationsService.success("Saved", "Content has been saved");                
                 $scope.$broadcast("saved", { scope: $scope });
+                
+                contentEditingHelper.redirectToCreatedContent($scope.content.id);
             }, function (err) {
                 //TODO: only update the content that has changed!
-                $scope.content = err.data;
+                //$scope.content = err.data;
                 contentEditingHelper.handleSaveError(err);
             });
 	        

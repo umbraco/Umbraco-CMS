@@ -25,10 +25,10 @@ function valPropertyMsg(serverValidationService) {
         link: function (scope, element, attrs, formCtrl) {
 
             //assign the form control to our isolated scope so we can watch it's values
-            scope.formCtrl = formCtrl;
+            scope.formCtrl = formCtrl; 
 
-            //flags for use in the below closures
-            var showValidation = false;
+            //if there's any remaining errors in the server validation service then we should show them.
+            var showValidation = serverValidationService.items.length > 0;
             var hasError = false;
 
             //create properties on our custom scope so we can use it in our template
@@ -53,7 +53,7 @@ function valPropertyMsg(serverValidationService) {
                         hasError = true;
                         //update the validation message if we don't already have one assigned.
                         if (showValidation && scope.errorMsg === "") {                            
-                            scope.errorMsg = serverValidationService.getPropertyError(scope.currentProperty, "");
+                            scope.errorMsg = serverValidationService.getPropertyError(scope.currentProperty, "").errorMsg;
                         }
                     }
                     else {
@@ -71,7 +71,7 @@ function valPropertyMsg(serverValidationService) {
             scope.$on("saving", function (ev, args) {
                 showValidation = true;
                 if (hasError && scope.errorMsg === "") {
-                    scope.errorMsg = serverValidationService.getPropertyError(scope.currentProperty, "");
+                    scope.errorMsg = serverValidationService.getPropertyError(scope.currentProperty, "").errorMsg;
                 }
                 else if (!hasError) {
                     scope.errorMsg = "";
@@ -94,7 +94,7 @@ function valPropertyMsg(serverValidationService) {
             scope.$watch("currentProperty.value", function(newValue) {
                 if (formCtrl.$invalid) {
                     scope.errorMsg = "";
-                    formCtrl.$setValidity('valPropertyMsg', true);                    
+                    formCtrl.$setValidity('valPropertyMsg', true);
                 }
             });
             
@@ -102,16 +102,14 @@ function valPropertyMsg(serverValidationService) {
             // NOTE: we pass in "" in order to listen for all validation changes to the content property, not for
             // validation changes to fields in the property this is because some server side validators may not
             // return the field name for which the error belongs too, just the property for which it belongs.
+            // It's important to note that we need to subscribe to server validation changes here because we always must
+            // indicate that a content property is invalid at the property level since developers may not actually implement
+            // the correct field validation in their property editors.
             serverValidationService.subscribe(scope.currentProperty, "", function (isValid, propertyErrors, allErrors) {
                 hasError = !isValid;
                 if (hasError) {
                     //set the error message to the server message
-                    scope.errorMsg = propertyErrors[0].errorMsg;                                     
-                    //now that we've used the server validation message, we need to remove it from the 
-                    //error collection... it is a 'one-time' usage so that when the field is invalidated 
-                    //again, the message we display is the client side message.
-                    //NOTE: 'this' in the subscribe callback context is the validation manager object.
-                    this.removePropertyError(scope.currentProperty);
+                    scope.errorMsg = propertyErrors[0].errorMsg;                                                         
                     //flag that the current validator is invalid
                     formCtrl.$setValidity('valPropertyMsg', false);
                 }

@@ -1,4 +1,4 @@
-function valToggleMsg() {
+function valToggleMsg(serverValidationService) {
     return {
         require: "^form",
         restrict: "A",
@@ -15,8 +15,8 @@ function valToggleMsg() {
                 throw "valToggleMsg requires that the attribute valMsgFor exists on the element";
             }
 
-            //create a flag for us to be able to reference in the below closures for watching.
-            var showValidation = false;
+            //if there's any remaining errors in the server validation service then we should show them.
+            var showValidation = serverValidationService.items.length > 0;
             var hasError = false;
 
             //add a watch to the validator for the value (i.e. myForm.value.$error.required )
@@ -29,7 +29,7 @@ function valToggleMsg() {
                     element.hide();
                 }
             });
-
+            
             scope.$on("saving", function(ev, args) {
                 showValidation = true;
                 if (hasError) {
