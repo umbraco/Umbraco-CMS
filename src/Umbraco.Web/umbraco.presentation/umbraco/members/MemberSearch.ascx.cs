@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 using Examine.LuceneEngine.SearchCriteria;
+using Examine.SearchCriteria;
 using umbraco.cms.businesslogic.member;
 using System.Web.Security;
 
 namespace umbraco.presentation.umbraco.members
 {
-    public partial class MemberSearch : System.Web.UI.UserControl
+    public partial class MemberSearch : UserControl
     {
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -19,46 +18,30 @@ namespace umbraco.presentation.umbraco.members
                 ButtonSearch.Text = ui.Text("search");
         }
 
-        protected void ButtonSearch_Click(object sender, System.EventArgs e)
+        protected void ButtonSearch_Click(object sender, EventArgs e)
         {
             resultsPane.Visible = true;
 
-            if (!Member.InUmbracoMemberMode())
+            if (Member.InUmbracoMemberMode())
             {
-
-                IEnumerable<MemberSearchResult> results;
-                if (searchQuery.Text.Contains("@"))
-                {
-                    results = from MembershipUser x in Membership.FindUsersByEmail(searchQuery.Text)
-                              select new MemberSearchResult() { Id = x.UserName, Email = x.Email, LoginName = x.UserName, Name = x.UserName };
-                }
-                else
-                {
-                    results = from MembershipUser x in Membership.FindUsersByName(searchQuery.Text + "%")
-                              select new MemberSearchResult() { Id = x.UserName, Email = x.Email, LoginName = x.UserName, Name = x.UserName };
-                }
-
-                rp_members.DataSource = results;
-                rp_members.DataBind();
-            }
-            else
-            {
-
-                string query = searchQuery.Text.ToLower();
+                var query = searchQuery.Text.ToLower();
                 var internalSearcher = UmbracoContext.Current.InternalMemberSearchProvider;
 
-                IEnumerable<MemberSearchResult> results;
-                if (!String.IsNullOrEmpty(query))
+                if (String.IsNullOrEmpty(query) == false)
                 {
-                    var criteria = internalSearcher.CreateSearchCriteria("member", Examine.SearchCriteria.BooleanOperation.And);
-                    var operation = criteria.Field("__nodeName", query.MultipleCharacterWildcard());
-                    results = internalSearcher.Search(operation.Compile()).Select(x => new MemberSearchResult()
-                    {
-                        Id = x["id"],
-                        Name = x["nodeName"],
-                        Email = x["email"],
-                        LoginName = x["loginName"]
-                    });
+                    var criteria = internalSearcher.CreateSearchCriteria("member", BooleanOperation.Or);
+                    var fields = new[] {"id", "__nodeName", "email"};
+                    var term = new[] {query.ToLower().Escape()};
+                    var operation = criteria.GroupedOr(fields, term).Compile();
+
+                    var results = internalSearcher.Search(operation)
+                        .Select(x => new MemberSearchResult
+                                     {
+                                         Id = x["id"],
+                                         Name = x["nodeName"],
+                                         Email = x["email"],
+                                         LoginName = x["loginName"]
+                                     });
                     rp_members.DataSource = results;
                     rp_members.DataBind();
                 }
@@ -67,7 +50,39 @@ namespace umbraco.presentation.umbraco.members
                     resultsPane.Visible = false;
                 }
             }
+            else
+            {
+                IEnumerable<MemberSearchResult> results;
+                if (searchQuery.Text.Contains("@"))
+                {
+                    results = from MembershipUser x in Membership.FindUsersByEmail(searchQuery.Text)
+                        select
+                            new MemberSearchResult()
+                            {
+                                Id = x.UserName,
+                                Email = x.Email,
+                                LoginName = x.UserName,
+                                Name = x.UserName
+                            };
+                }
+                else
+                {
+                    results = from MembershipUser x in Membership.FindUsersByName(searchQuery.Text + "%")
+                        select
+                            new MemberSearchResult()
+                            {
+                                Id = x.UserName,
+                                Email = x.Email,
+                                LoginName = x.UserName,
+                                Name = x.UserName
+                            };
+                }
+
+                rp_members.DataSource = results;
+                rp_members.DataBind();
+            }
         }
+
         public class MemberSearchResult
         {
             public string Id { get; set; }
