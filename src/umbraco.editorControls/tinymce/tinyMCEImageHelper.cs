@@ -31,7 +31,7 @@ namespace umbraco.editorControls.tinymce
                     // gather all attributes
                     // TODO: This should be replaced with a general helper method - but for now we'll wanna leave umbraco.dll alone for this patch
                     var ht = new Hashtable();
-                    var matches = Regex.Matches(tag.Value.Replace(">", " >"), "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"|(?<attributeName>\\S*)=(?<attributeValue>[^\"|\\s]*)\\s", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+                    var matches = Regex.Matches(tag.Value.Replace(">", " >"), "(?<attributeName>\\S*?)=\"(?<attributeValue>[^\"]*)\"|(?<attributeName>\\S*?)=(?<attributeValue>[^\"|\\s]*)\\s", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
                     foreach (Match attributeSet in matches)
                     {
                         ht.Add(attributeSet.Groups["attributeName"].Value.ToLower(),
