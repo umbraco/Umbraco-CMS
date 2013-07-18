@@ -1,6 +1,6 @@
 /**
  * @ngdoc service
- * @name umbraco.services.serverValidationService
+ * @name umbraco.services.serverValidationManager
  * @function
  *
  * @description
@@ -8,7 +8,7 @@
  * is for user defined properties (called Properties) and the other is for field properties which are attached to the native 
  * model objects (not user defined). The methods below are named according to these rules: Properties vs Fields.
  */
-function serverValidationService($timeout) {
+function serverValidationManager($timeout) {
 
     var callbacks = [];
     
@@ -30,8 +30,8 @@ function serverValidationService($timeout) {
     
     function getPropertyErrors(self, contentProperty, fieldName) {
         //find all errors for this property
-        return _.filter(self.items, function (item) {
-            return (item.propertyAlias === contentProperty.alias && item.fieldName === fieldName);
+        return _.filter(self.items, function (item) {            
+            return (item.propertyAlias === contentProperty.alias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
         });
     }
 
@@ -79,7 +79,7 @@ function serverValidationService($timeout) {
         /**
          * @ngdoc function
          * @name subscribe
-         * @methodOf umbraco.services.serverValidationService
+         * @methodOf umbraco.services.serverValidationManager
          * @function
          *
          * @description
@@ -142,7 +142,7 @@ function serverValidationService($timeout) {
         /**
          * @ngdoc function
          * @name getPropertyCallbacks
-         * @methodOf umbraco.services.serverValidationService
+         * @methodOf umbraco.services.serverValidationManager
          * @function
          *
          * @description
@@ -161,7 +161,7 @@ function serverValidationService($timeout) {
         /**
          * @ngdoc function
          * @name getFieldCallbacks
-         * @methodOf umbraco.services.serverValidationService
+         * @methodOf umbraco.services.serverValidationManager
          * @function
          *
          * @description
@@ -178,7 +178,7 @@ function serverValidationService($timeout) {
         /**
          * @ngdoc function
          * @name addFieldError
-         * @methodOf umbraco.services.serverValidationService
+         * @methodOf umbraco.services.serverValidationManager
          * @function
          *
          * @description
@@ -211,7 +211,7 @@ function serverValidationService($timeout) {
         /**
          * @ngdoc function
          * @name addPropertyError
-         * @methodOf umbraco.services.serverValidationService
+         * @methodOf umbraco.services.serverValidationManager
          * @function
          *
          * @description
@@ -244,7 +244,7 @@ function serverValidationService($timeout) {
         /**
          * @ngdoc function
          * @name removePropertyError
-         * @methodOf umbraco.services.serverValidationService
+         * @methodOf umbraco.services.serverValidationManager
          * @function
          *
          * @description
@@ -264,7 +264,7 @@ function serverValidationService($timeout) {
         /**
          * @ngdoc function
          * @name reset
-         * @methodOf umbraco.services.serverValidationService
+         * @methodOf umbraco.services.serverValidationManager
          * @function
          *
          * @description
@@ -283,7 +283,7 @@ function serverValidationService($timeout) {
         /**
          * @ngdoc function
          * @name clear
-         * @methodOf umbraco.services.serverValidationService
+         * @methodOf umbraco.services.serverValidationManager
          * @function
          *
          * @description
@@ -296,7 +296,7 @@ function serverValidationService($timeout) {
         /**
          * @ngdoc function
          * @name getPropertyError
-         * @methodOf umbraco.services.serverValidationService
+         * @methodOf umbraco.services.serverValidationManager
          * @function
          *
          * @description
@@ -307,14 +307,13 @@ function serverValidationService($timeout) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
                 return (item.propertyAlias === contentProperty.alias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
             });
-            //return generic property error message if the error doesn't exist
-            return err ? err : { errorMsg: "Property has errors" };
+            return err;
         },
         
         /**
          * @ngdoc function
          * @name getFieldError
-         * @methodOf umbraco.services.serverValidationService
+         * @methodOf umbraco.services.serverValidationManager
          * @function
          *
          * @description
@@ -325,14 +324,13 @@ function serverValidationService($timeout) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
                 return (item.propertyAlias === null && item.fieldName === fieldName);
             });
-            //return generic property error message if the error doesn't exist
-            return err ? err : { errorMsg: "Field has errors" };
+            return err;
         },
         
         /**
          * @ngdoc function
          * @name hasPropertyError
-         * @methodOf umbraco.services.serverValidationService
+         * @methodOf umbraco.services.serverValidationManager
          * @function
          *
          * @description
@@ -349,7 +347,7 @@ function serverValidationService($timeout) {
         /**
          * @ngdoc function
          * @name hasFieldError
-         * @methodOf umbraco.services.serverValidationService
+         * @methodOf umbraco.services.serverValidationManager
          * @function
          *
          * @description
@@ -368,4 +366,4 @@ function serverValidationService($timeout) {
     };
 }
 
-angular.module('umbraco.services').factory('serverValidationService', serverValidationService);
+angular.module('umbraco.services').factory('serverValidationManager', serverValidationManager);

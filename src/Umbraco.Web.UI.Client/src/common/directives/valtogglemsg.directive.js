@@ -1,4 +1,4 @@
-function valToggleMsg(serverValidationService) {
+function valToggleMsg(serverValidationManager) {
     return {
         require: "^form",
         restrict: "A",
@@ -16,7 +16,7 @@ function valToggleMsg(serverValidationService) {
             }
 
             //if there's any remaining errors in the server validation service then we should show them.
-            var showValidation = serverValidationService.items.length > 0;
+            var showValidation = serverValidationManager.items.length > 0;
             var hasError = false;
 
             //add a watch to the validator for the value (i.e. myForm.value.$error.required )

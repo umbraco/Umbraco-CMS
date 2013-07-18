@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $location, contentResource, notificationsService, angularHelper, serverValidationService, contentEditingHelper) {
+function ContentEditController($scope, $routeParams, $location, contentResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper) {
         
     if ($routeParams.create) {
         //we are creating so get an empty content item
@@ -27,7 +27,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
                 // route but there might be server validation errors in the collection which we need to display
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors
                 // if there are any and then clear them so the collection no longer persists them.
-                serverValidationService.executeAndClearAllSubscriptions();
+                serverValidationManager.executeAndClearAllSubscriptions();
 
             });
     }
@@ -56,7 +56,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
         //don't continue if the form is invalid
         if (currentForm.$invalid) return;
 
-        serverValidationService.reset();
+        serverValidationManager.reset();
         
         contentResource.publishContent(cnt, $routeParams.create, $scope.files)
             .then(function (data) {
@@ -81,7 +81,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
         //don't continue if the form is invalid
         if (currentForm.$invalid) return;
 
-        serverValidationService.reset();
+        serverValidationManager.reset();
 
         contentResource.saveContent(cnt, $routeParams.create, $scope.files)
             .then(function (data) {

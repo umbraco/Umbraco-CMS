@@ -18,7 +18,7 @@
    </example>
  */
 angular.module("umbraco.directives")
-.directive('umbTreeItem', function ($compile, $http, $templateCache, $interpolate, $log, $location, $rootScope, treeService, notificationsService) {
+.directive('umbTreeItem', function ($compile, $http, $templateCache, $interpolate, $log, $location, $rootScope, $window, treeService, notificationsService) {
   return {
     restrict: 'E',
     replace: true,
@@ -34,7 +34,7 @@ angular.module("umbraco.directives")
         '<ins ng-hide="node.hasChildren" style="background:none;width:18px;"></ins>' +        
         '<ins ng-show="node.hasChildren" ng-class="{\'icon-caret-right\': !node.expanded, \'icon-caret-down\': node.expanded}" ng-click="load(this, node)"></ins>' +
         '<i class="{{node | umbTreeIconClass:\'icon umb-tree-icon sprTree\'}}" style="{{node | umbTreeIconStyle}}"></i>' +
-        '<a ng-click="select(this, node, $event)" >{{node.name}}</a>' +
+        '<a href="" ng-click="select(this, node, $event)" >{{node.name}}</a>' +
         '<i class="umb-options" ng-click="options(this, node, $event)"><i></i><i></i><i></i></i>' +
         '<div ng-show="node.loading" class="l"><div></div></div>' +
         '</div>' +

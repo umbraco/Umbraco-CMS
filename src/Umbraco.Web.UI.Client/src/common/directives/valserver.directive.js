@@ -5,7 +5,7 @@
     * @description This directive is used to associate a content property with a server-side validation response
     *               so that the validators in angular are updated based on server-side feedback.
     **/
-function valServer(serverValidationService) {
+function valServer(serverValidationManager) {
     return {
         require: 'ngModel',
         restrict: "A",
@@ -36,7 +36,7 @@ function valServer(serverValidationService) {
             });
             
             //subscribe to the server validation changes
-            serverValidationService.subscribe(currentProperty, fieldName, function (isValid, propertyErrors, allErrors) {
+            serverValidationManager.subscribe(currentProperty, fieldName, function (isValid, propertyErrors, allErrors) {
                 if (!isValid) {
                     ctrl.$setValidity('valServer', false);
                     //assign an error msg property to the current validator
@@ -53,7 +53,7 @@ function valServer(serverValidationService) {
             // NOTE: this is very important otherwise when this controller re-binds the previous subscriptsion will remain
             // but they are a different callback instance than the above.
             element.bind('$destroy', function () {
-                serverValidationService.unsubscribe(currentProperty, fieldName);
+                serverValidationManager.unsubscribe(currentProperty, fieldName);
             });
         }
     };

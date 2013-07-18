@@ -5,7 +5,7 @@
     * @description This directive is used to associate a content field (not user defined) with a server-side validation response
     *               so that the validators in angular are updated based on server-side feedback.
     **/
-function valServerField(serverValidationService) {
+function valServerField(serverValidationManager) {
     return {
         require: 'ngModel',
         restrict: "A",
@@ -31,7 +31,7 @@ function valServerField(serverValidationService) {
             });
             
             //subscribe to the server validation changes
-            serverValidationService.subscribe(null, fieldName, function (isValid, fieldErrors, allErrors) {
+            serverValidationManager.subscribe(null, fieldName, function (isValid, fieldErrors, allErrors) {
                 if (!isValid) {
                     ctrl.$setValidity('valServerField', false);
                     //assign an error msg property to the current validator
@@ -48,7 +48,7 @@ function valServerField(serverValidationService) {
             // NOTE: this is very important otherwise when this controller re-binds the previous subscriptsion will remain
             // but they are a different callback instance than the above.
             element.bind('$destroy', function () {
-                serverValidationService.unsubscribe(null, fieldName);
+                serverValidationManager.unsubscribe(null, fieldName);
             });
         }
     };

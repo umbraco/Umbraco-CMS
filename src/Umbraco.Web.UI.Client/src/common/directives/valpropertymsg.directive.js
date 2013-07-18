@@ -8,7 +8,7 @@
 *    We will listen for server side validation changes
 *    and when an error is detected for this property we'll show the error message
 **/
-function valPropertyMsg(serverValidationService) {
+function valPropertyMsg(serverValidationManager) {
     return {
         scope: {
             currentProperty: "=property"  
@@ -28,7 +28,7 @@ function valPropertyMsg(serverValidationService) {
             scope.formCtrl = formCtrl; 
 
             //if there's any remaining errors in the server validation service then we should show them.
-            var showValidation = serverValidationService.items.length > 0;
+            var showValidation = serverValidationManager.items.length > 0;
             var hasError = false;
 
             //create properties on our custom scope so we can use it in our template
@@ -45,15 +45,16 @@ function valPropertyMsg(serverValidationService) {
                     //first we need to check if the valPropertyMsg validity is invalid
                     if (formCtrl.$error.valPropertyMsg && formCtrl.$error.valPropertyMsg.length > 0) {
                         //since we already have an error we'll just return since this means we've already set the 
-                        // hasError and errorMsg properties which occurs below in the serverValidationService.subscribe
+                        // hasError and errorMsg properties which occurs below in the serverValidationManager.subscribe
                         return;
                     }                    
                     else if (element.closest(".umb-control-group").find(".ng-invalid").length > 0) {
                         //check if it's one of the properties that is invalid in the current content property
                         hasError = true;
                         //update the validation message if we don't already have one assigned.
-                        if (showValidation && scope.errorMsg === "") {                            
-                            scope.errorMsg = serverValidationService.getPropertyError(scope.currentProperty, "").errorMsg;
+                        if (showValidation && scope.errorMsg === "") {
+                            var err = serverValidationManager.getPropertyError(scope.currentProperty, "");
+                            scope.errorMsg = err ? err.errorMsg : "Property has errors";
                         }
                     }
                     else {
@@ -71,7 +72,8 @@ function valPropertyMsg(serverValidationService) {
             scope.$on("saving", function (ev, args) {
                 showValidation = true;
                 if (hasError && scope.errorMsg === "") {
-                    scope.errorMsg = serverValidationService.getPropertyError(scope.currentProperty, "").errorMsg;
+                    var err = serverValidationManager.getPropertyError(scope.currentProperty, "");
+                    scope.errorMsg = err ? err.errorMsg : "Property has errors";                    
                 }
                 else if (!hasError) {
                     scope.errorMsg = "";
@@ -105,7 +107,7 @@ function valPropertyMsg(serverValidationService) {
             // It's important to note that we need to subscribe to server validation changes here because we always must
             // indicate that a content property is invalid at the property level since developers may not actually implement
             // the correct field validation in their property editors.
-            serverValidationService.subscribe(scope.currentProperty, "", function (isValid, propertyErrors, allErrors) {
+            serverValidationManager.subscribe(scope.currentProperty, "", function (isValid, propertyErrors, allErrors) {
                 hasError = !isValid;
                 if (hasError) {
                     //set the error message to the server message
@@ -124,7 +126,7 @@ function valPropertyMsg(serverValidationService) {
             // NOTE: this is very important otherwise when this controller re-binds the previous subscriptsion will remain
             // but they are a different callback instance than the above.
             element.bind('$destroy', function () {
-                serverValidationService.unsubscribe(scope.currentProperty, "");
+                serverValidationManager.unsubscribe(scope.currentProperty, "");
             });
         }
     };

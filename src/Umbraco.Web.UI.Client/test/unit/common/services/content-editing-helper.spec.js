@@ -1,5 +1,5 @@
 describe('contentEditingHelper tests', function () {
-    var contentEditingHelper, $routeParams, serverValidationService, mocksUtils, notificationsService;
+    var contentEditingHelper, $routeParams, serverValidationManager, mocksUtils, notificationsService;
 
     beforeEach(module('umbraco.services'));
     beforeEach(module('umbraco.mocks'));
@@ -7,7 +7,7 @@ describe('contentEditingHelper tests', function () {
     beforeEach(inject(function ($injector) {
         contentEditingHelper = $injector.get('contentEditingHelper');
         $routeParams = $injector.get('$routeParams');
-        serverValidationService = $injector.get('serverValidationService');
+        serverValidationManager = $injector.get('serverValidationManager');
         mocksUtils = $injector.get('mocksUtils');
         notificationsService = $injector.get('notificationsService');
     }));
@@ -74,10 +74,10 @@ describe('contentEditingHelper tests', function () {
             contentEditingHelper.handleValidationErrors(content, { Name: ["Required"] });
 
             //assert
-            expect(serverValidationService.items.length).toBe(1);
-            expect(serverValidationService.items[0].fieldName).toBe("Name");
-            expect(serverValidationService.items[0].errorMsg).toBe("Required"); 
-            expect(serverValidationService.items[0].propertyAlias).toBe(null);
+            expect(serverValidationManager.items.length).toBe(1);
+            expect(serverValidationManager.items[0].fieldName).toBe("Name");
+            expect(serverValidationManager.items[0].errorMsg).toBe("Required"); 
+            expect(serverValidationManager.items[0].propertyAlias).toBe(null);
         });
 
         it('adds a property level server validation error when a property is invalid', function () {
@@ -89,10 +89,10 @@ describe('contentEditingHelper tests', function () {
             contentEditingHelper.handleValidationErrors(content, { "Property.bodyText": ["Required"] });
 
             //assert
-            expect(serverValidationService.items.length).toBe(1);
-            expect(serverValidationService.items[0].fieldName).toBe("");
-            expect(serverValidationService.items[0].errorMsg).toBe("Required");
-            expect(serverValidationService.items[0].propertyAlias).toBe("bodyText");
+            expect(serverValidationManager.items.length).toBe(1);
+            expect(serverValidationManager.items[0].fieldName).toBe("");
+            expect(serverValidationManager.items[0].errorMsg).toBe("Required");
+            expect(serverValidationManager.items[0].propertyAlias).toBe("bodyText");
         });
         
         it('adds a property level server validation error with a specific field when a property is invalid', function () {
@@ -104,10 +104,10 @@ describe('contentEditingHelper tests', function () {
             contentEditingHelper.handleValidationErrors(content, { "Property.bodyText.value": ["Required"] });
 
             //assert
-            expect(serverValidationService.items.length).toBe(1);
-            expect(serverValidationService.items[0].fieldName).toBe("value");
-            expect(serverValidationService.items[0].errorMsg).toBe("Required");
-            expect(serverValidationService.items[0].propertyAlias).toBe("bodyText");
+            expect(serverValidationManager.items.length).toBe(1);
+            expect(serverValidationManager.items[0].fieldName).toBe("value");
+            expect(serverValidationManager.items[0].errorMsg).toBe("Required");
+            expect(serverValidationManager.items[0].propertyAlias).toBe("bodyText");
         });
         
         it('adds a multiple property and field level server validation errors when they are invalid', function () {
@@ -126,19 +126,19 @@ describe('contentEditingHelper tests', function () {
                 });
 
             //assert
-            expect(serverValidationService.items.length).toBe(4);
-            expect(serverValidationService.items[0].fieldName).toBe("Name");
-            expect(serverValidationService.items[0].errorMsg).toBe("Required");
-            expect(serverValidationService.items[0].propertyAlias).toBe(null);
-            expect(serverValidationService.items[1].fieldName).toBe("UpdateDate");
-            expect(serverValidationService.items[1].errorMsg).toBe("Invalid date");
-            expect(serverValidationService.items[1].propertyAlias).toBe(null);
-            expect(serverValidationService.items[2].fieldName).toBe("value");
-            expect(serverValidationService.items[2].errorMsg).toBe("Required field");
-            expect(serverValidationService.items[2].propertyAlias).toBe("bodyText");
-            expect(serverValidationService.items[3].fieldName).toBe("");
-            expect(serverValidationService.items[3].errorMsg).toBe("Invalid format");
-            expect(serverValidationService.items[3].propertyAlias).toBe("textarea");
+            expect(serverValidationManager.items.length).toBe(4);
+            expect(serverValidationManager.items[0].fieldName).toBe("Name");
+            expect(serverValidationManager.items[0].errorMsg).toBe("Required");
+            expect(serverValidationManager.items[0].propertyAlias).toBe(null);
+            expect(serverValidationManager.items[1].fieldName).toBe("UpdateDate");
+            expect(serverValidationManager.items[1].errorMsg).toBe("Invalid date");
+            expect(serverValidationManager.items[1].propertyAlias).toBe(null);
+            expect(serverValidationManager.items[2].fieldName).toBe("value");
+            expect(serverValidationManager.items[2].errorMsg).toBe("Required field");
+            expect(serverValidationManager.items[2].propertyAlias).toBe("bodyText");
+            expect(serverValidationManager.items[3].fieldName).toBe("");
+            expect(serverValidationManager.items[3].errorMsg).toBe("Invalid format");
+            expect(serverValidationManager.items[3].propertyAlias).toBe("textarea");
         });
 
     });

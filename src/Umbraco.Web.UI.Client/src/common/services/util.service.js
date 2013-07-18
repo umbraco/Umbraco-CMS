@@ -666,7 +666,7 @@ angular.module('umbraco.services').factory('iconHelper', iconHelper);
 * @name umbraco.services.contentEditingHelper
 * @description A helper service for content controllers when editing/creating/saving content.
 **/
-function contentEditingHelper($location, $routeParams, notificationsService, serverValidationService) {
+function contentEditingHelper($location, $routeParams, notificationsService, serverValidationManager) {
 
     return {
         
@@ -714,17 +714,17 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
                         //if it contains 2 '.' then we will wire it up to a property's field
                         if (parts.length > 2) {
                             //add an error with a reference to the field for which the validation belongs too
-                            serverValidationService.addPropertyError(contentProperty, parts[2], modelState[e][0]);
+                            serverValidationManager.addPropertyError(contentProperty, parts[2], modelState[e][0]);
                         }
                         else {
                             //add a generic error for the property, no reference to a specific field
-                            serverValidationService.addPropertyError(contentProperty, "", modelState[e][0]);
+                            serverValidationManager.addPropertyError(contentProperty, "", modelState[e][0]);
                         }
                     }
                 }
                 else {
                     //the parts are only 1, this means its not a property but a native content property
-                    serverValidationService.addFieldError(parts[0], modelState[e][0]);
+                    serverValidationManager.addFieldError(parts[0], modelState[e][0]);
                 }
 
                 //add to notifications
@@ -755,7 +755,7 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
                         //we are not redirecting because this is not new content, it is existing content. In this case
                         // we need to clear the server validation items. When we are creating new content we cannot clear
                         // the server validation items because we redirect and they need to persist until the validation is re-bound.
-                        serverValidationService.clear();
+                        serverValidationManager.clear();
                     }
 
                     //indicates we've handled the server result

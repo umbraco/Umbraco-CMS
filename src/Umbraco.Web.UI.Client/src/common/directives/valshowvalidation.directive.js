@@ -7,14 +7,14 @@
 *   This is used because we don't want to show validation messages until after the form is submitted and then reset
 *   the process when the form is successful. We do this by listening to the current controller's saving and saved events.
 **/
-function valShowValidation(serverValidationService) {
+function valShowValidation(serverValidationManager) {
     return {
         require: "ngController",
         restrict: "A",
         link: function (scope, element, attr, ctrl) {
 
             //we should show validation if there are any msgs in the server validation collection
-            if (serverValidationService.items.length > 0) {
+            if (serverValidationManager.items.length > 0) {
                 element.addClass("show-validation");
             }
 
