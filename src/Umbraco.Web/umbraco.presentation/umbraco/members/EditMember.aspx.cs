@@ -1,5 +1,6 @@
 using System;
 using System.Web.UI;
+using System.Web.UI.Design.WebControls;
 using System.Web.UI.WebControls;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.member;
@@ -144,8 +145,14 @@ namespace umbraco.cms.presentation.members
         {
             var oldEmail = _document.Email.ToLower();
             var newEmail = MemberEmail.Text.ToLower();
+
             var requireUniqueEmail = Membership.Providers[Member.UmbracoMemberProviderName].RequiresUniqueEmail;
-            var howManyMembersWithEmail = Member.GetMembersFromEmail(newEmail).Length;
+
+            var howManyMembersWithEmail = 0;
+            var membersWithEmail = Member.GetMembersFromEmail(newEmail);
+            if (membersWithEmail != null)
+                howManyMembersWithEmail = membersWithEmail.Length;
+
             if (((oldEmail == newEmail && howManyMembersWithEmail > 1) ||
                 (oldEmail != newEmail && howManyMembersWithEmail > 0))
                 && requireUniqueEmail)
