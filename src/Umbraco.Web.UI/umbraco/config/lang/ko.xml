@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿h<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="ko" intName="Korean" localName="한국어" lcid="18" culture="ko-KR">
   <creator>
     <name>The Umbraco community</name>
@@ -54,7 +54,7 @@
     <key alias="deindent">단락 들여쓰기 취소</key>
     <key alias="formFieldInsert">폼 필드 삽입</key>
     <key alias="graphicHeadline">그래픽 헤드라인 삽입</key>
-    <key alias="htmlEdit">Html 편집</key>
+    <key alias="hmailEdit">Html 편집</key>
     <key alias="indent">단락 들여쓰기</key>
     <key alias="italic">기울임꼴</key>
     <key alias="justifyCenter">가운데 맞춤</key>
@@ -483,7 +483,7 @@
     <key alias="mailBodyHtml"><![CDATA[<p>안녕하세요 %0%</p>
 
 	  <p>사용자 <strong>'%3%'</strong> 가  작업 <strong>'%1%'</strong> 를 
-       페이지 <a href="%7%"> 에서
+       페이지 <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a> 에서
        진행했음을 알리는 자동 발송 메일입니다.
   </p>
 	  <div style="margin: 8px 0; padding: 8px; display: block;">

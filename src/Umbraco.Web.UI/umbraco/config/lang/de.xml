@@ -471,7 +471,7 @@ Ihr freundlicher Umbraco-Robot
     <key alias="mailBodyHtml"><![CDATA[
 <p>Hallo %0%,</p>
 
-<p>die Aufgabe <strong>'%1%'</strong> (von Benutzer '%3%') an der Seite <a href="%7%"><strong>'%2%'</strong></a> wurde ausgeführt.</p>
+<p>die Aufgabe <strong>'%1%'</strong> (von Benutzer '%3%') an der Seite <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a> wurde ausgeführt.</p>
 <div style="margin: 8px 0; padding: 8px; display: block;">
 	<br />
 	<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;VERÖFFENTLICHEN&nbsp;&nbsp;</a> &nbsp; 

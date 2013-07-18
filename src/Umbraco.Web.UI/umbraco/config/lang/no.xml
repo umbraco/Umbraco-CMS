@@ -442,7 +442,7 @@ Vennlig hilsen umbraco roboten
     <key alias="mailBodyHtml"><![CDATA[<p>Hei %0%</p>
 
 		  <p>Dette er en automatisk mail for å informere om at handlingen '%1%'
-        er blitt utført på siden <a href="%7%"><strong>'%2%'</strong></a>
+        er blitt utført på siden <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a>
         av brukeren <strong>'%3%'</strong>
 	    </p>
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
