@@ -1,4 +1,4 @@
-﻿<%@ Control Language="c#" AutoEventWireup="True" CodeBehind="database.ascx.cs" Inherits="Umbraco.Web.UI.Install.Steps.Database"
+﻿<%@ Control Language="c#" AutoEventWireup="True" CodeBehind="database.ascx.cs" Inherits="Umbraco.Web.UI.Install.Steps.Database" %>
 <%@ Import Namespace="Umbraco.Core.Configuration" %>
 
 <asp:PlaceHolder ID="settings" runat="server" Visible="true">
