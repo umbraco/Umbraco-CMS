@@ -201,6 +201,7 @@ namespace umbraco.cms.businesslogic.web
 			bool hasChange = false;
 			if (oldRolename != newRolename)
 			{
+                oldRolename = oldRolename.Replace("'", "&apos;");
 				foreach (XmlNode x in AccessXml.SelectNodes("//group [@id = '" + oldRolename + "']"))
 				{
 					x.Attributes["id"].Value = newRolename;
