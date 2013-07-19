@@ -182,10 +182,18 @@ namespace Umbraco.Web
 					// within Razor since it will never be inserted into the page pipeline (which may even not exist at all
 					// if we're running MVC).
 					//
+                    // I'm sure there's more things that will get lost with this context changing but I guess we'll figure 
+                    // those out as we go along. One thing we lose is the content type response output.
+                    // http://issues.umbraco.org/issue/U4-1599 if it is setup during the macro execution. So 
+                    // here we'll save the content type response and reset it after execute is called.
+
+				    var contentType = _umbracoContext.HttpContext.Response.ContentType;
 					var traceIsEnabled = containerPage.Trace.IsEnabled;
 					containerPage.Trace.IsEnabled = false;
 					_umbracoContext.HttpContext.Server.Execute(containerPage, output, false);
 					containerPage.Trace.IsEnabled = traceIsEnabled;
+                    //reset the content type
+				    _umbracoContext.HttpContext.Response.ContentType = contentType;
 
 					//Now, we need to ensure that local links are parsed
 					html = TemplateUtilities.ParseInternalLinks(output.ToString());
