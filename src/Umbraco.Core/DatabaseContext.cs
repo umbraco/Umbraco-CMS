@@ -169,6 +169,20 @@ namespace Umbraco.Core
             Initialize(providerName);
         }
 
+        /// <summary>
+        /// Configures a ConnectionString for the Umbraco database that uses Microsoft SQL Server integrated security.
+        /// </summary>
+        /// <param name="server">Name or address of the database server</param>
+        /// <param name="databaseName">Name of the database</param>
+        public void ConfigureIntegratedSecurityDatabaseConnection(string server, string databaseName)
+        {
+            const string providerName = "System.Data.SqlClient";
+            string connectionString = String.Format("Server={0};Database={1};Integrated Security=true", server, databaseName);
+
+            SaveConnectionString(connectionString, providerName);
+            Initialize(providerName);
+        }
+
         internal string BuildAzureConnectionString(string server, string databaseName, string user, string password)
         {
             if (server.Contains(".") && ServerStartsWithTcp(server) == false)

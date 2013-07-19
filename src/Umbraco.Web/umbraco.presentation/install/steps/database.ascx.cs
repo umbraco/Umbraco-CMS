@@ -194,19 +194,31 @@ namespace umbraco.presentation.install.steps
         {
             try
             {
+                var dbContext = ApplicationContext.Current.DatabaseContext;
+
                 if (string.IsNullOrEmpty(ConnectionString.Text) == false)
                 {
-                    ApplicationContext.Current.DatabaseContext.ConfigureDatabaseConnection(ConnectionString.Text);
+                    dbContext.ConfigureDatabaseConnection(ConnectionString.Text);
                 }
                 else if (IsEmbeddedDatabase)
                 {
-                    ApplicationContext.Current.DatabaseContext.ConfigureEmbeddedDatabaseConnection();
+                    dbContext.ConfigureEmbeddedDatabaseConnection();
                 }
                 else
                 {
-                    ApplicationContext.Current.DatabaseContext.ConfigureDatabaseConnection(DatabaseServer.Text, DatabaseName.Text,
-                                                                        DatabaseUsername.Text, DatabasePassword.Text,
-                                                                        DatabaseType.SelectedValue);
+                    var server = DatabaseServer.Text;
+                    var databaseName = DatabaseName.Text;
+                    
+                    if (DatabaseType.SelectedValue == "SqlServer" && DatabaseIntegratedSecurity.Checked == true)
+                    {
+                        dbContext.ConfigureIntegratedSecurityDatabaseConnection(server, databaseName);
+                    }
+                    else
+                    {
+                        dbContext.ConfigureDatabaseConnection(server, databaseName,
+                            DatabaseUsername.Text, DatabasePassword.Text, DatabaseType.SelectedValue
+                        );
+                    }
                 }
             }
             catch (Exception ex)
