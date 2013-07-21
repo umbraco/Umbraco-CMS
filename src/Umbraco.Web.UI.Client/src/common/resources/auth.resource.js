@@ -1,8 +1,8 @@
 /**
-    * @ngdoc service 
-    * @name umbraco.resources.authResource     
-    * @description Loads in data for authentication
-    **/
+* @ngdoc service 
+* @name umbraco.resources.authResource     
+* @description Loads in data for authentication
+**/
 function authResource($q, $http, umbRequestHelper) {
 
     return {

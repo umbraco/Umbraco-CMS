@@ -3,8 +3,6 @@ angular.module('umbraco.security.retryQueue', [])
 // This is a generic retry queue for security failures.  Each item is expected to expose two functions: retry and cancel.
 .factory('securityRetryQueue', ['$q', '$log', function ($q, $log) {
 
-    $log.log("loaded queue");
-    
   var retryQueue = [];
   var service = {
     // The security service puts its own handler in here!

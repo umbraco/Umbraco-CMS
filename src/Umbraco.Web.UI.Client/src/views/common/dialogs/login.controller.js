@@ -17,13 +17,10 @@
         
         userService.authenticate(login, password)
             .then(function (data) {
-
                 //We need to load in the legacy tree js.
                 legacyJsLoader.loadLegacyTreeJs($scope).then(
                     function(result) {
-                        //TODO: We could wait for this to load before running the UI ?
-
-                        $scope.submit(data);
+                        $scope.submit(true);
                     });
             }, function (reason) {
                 alert(reason);

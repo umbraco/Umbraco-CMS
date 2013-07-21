@@ -3,6 +3,5 @@ var app = angular.module('umbraco', [
 	'umbraco.directives',
 	'umbraco.resources',
 	'umbraco.services',
-	'umbraco.security',
     'ngCookies'
 ]);
