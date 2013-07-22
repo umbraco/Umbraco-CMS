@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
@@ -80,16 +81,19 @@ namespace Umbraco.Web.WebApi.Filters
         /// <returns></returns>
         private bool ValidateProperties(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, HttpActionContext actionContext)
         {
+            //ensure the property actually exists in our server side properties
+            //var propertyAliases = postedItem.ContentDto.Properties.Select(x => x.Alias).ToArray();
+
             foreach (var p in postedItem.Properties)
             {
-                //ensure the property actually exists in our server side properties
-                if (postedItem.ContentDto.Properties.Contains(p) == false)
+                //if (propertyAliases.Contains(p.Alias) == false)
+                if (postedItem.PersistedContent.Properties[p.Alias] == null)
                 {
                     //TODO: Do we return errors here ? If someone deletes a property whilst their editing then should we just
                     //save the property data that remains? Or inform them they need to reload... not sure. This problem exists currently too i think.
 
-                    var message = string.Format("property with id: {0} was not found", p.Id);
-                    actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
+                    var message = string.Format("property with alias: {0} was not found", p.Alias);
+                    actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, new InvalidOperationException(message));
                     return false;
                 }
             }

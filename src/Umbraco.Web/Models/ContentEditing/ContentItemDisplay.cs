@@ -32,7 +32,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// still save the item but it cannot be published. So we need a way of returning validation errors as well as the
         /// updated model.
         /// </remarks>
-        [DataMember(Name = "ModelState")]
+        [DataMember(Name = "modelState")]
         public IDictionary<string, object> Errors { get; set; }
 
         /// <summary>

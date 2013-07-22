@@ -10,22 +10,22 @@ namespace Umbraco.Web.UI
         /// <summary>
         /// Save icon
         /// </summary>
-        Save,
+        Save = 0,
         /// <summary>
         /// Info icon
         /// </summary>
-        Info,
+        Info = 1,
         /// <summary>
         /// Error icon
         /// </summary>
-        Error,
+        Error = 2,
         /// <summary>
         /// Success icon
         /// </summary>
-        Success,
+        Success = 3,
         /// <summary>
         /// Warning icon
         /// </summary>
-        Warning
+        Warning = 4
     }
 }

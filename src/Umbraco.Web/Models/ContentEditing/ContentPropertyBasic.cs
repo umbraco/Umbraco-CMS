@@ -20,22 +20,5 @@ namespace Umbraco.Web.Models.ContentEditing
         [Required(AllowEmptyStrings = false)]
         public string Alias { get; set; }
 
-        protected bool Equals(ContentPropertyBasic other)
-        {
-            return Id == other.Id;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            var other = obj as ContentPropertyBasic;
-            return other != null && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Id;
-        }
     }
 }

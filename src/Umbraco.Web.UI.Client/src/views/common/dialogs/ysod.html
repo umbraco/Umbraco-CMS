@@ -4,7 +4,7 @@
 
     <h1>{{error.errorMsg}}</h1>
     <hr />
-    <h2>{{error.data.ExceptionMessage}}</h2>
+    <h2>{{error.data.ExceptionMessage || error.data.Message}}</h2>
     <div>
         <b>Description: </b>An unhandled exception occurred during the execution of the current web request. Please review the stack trace for more information about the error and where it originated in the code.
         <br />

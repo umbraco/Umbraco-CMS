@@ -184,7 +184,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                //publish the item
+                //publish the item and check if it worked, if not we will show a diff msg below
                 isPublishSuccess = Services.ContentService.SaveAndPublish(contentItem.PersistedContent);
             }
             

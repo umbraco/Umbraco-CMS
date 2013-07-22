@@ -42,7 +42,55 @@ angular.module('umbraco.services')
 	}
 
 	return {
-		/**
+
+	    /**
+		 * @ngdoc method
+		 * @name umbraco.services.notificationsService#showNotification
+		 * @methodOf umbraco.services.notificationsService
+		 *
+		 * @description
+		 * Shows a notification based on the object passed in, normally used to render notifications sent back from the server
+		 *		 
+		 * @returns {Object} args notification object
+		 */
+        showNotification: function(args) {
+            if (!args) {
+                throw "args cannot be null";
+            }
+            if (!args.type) {
+                throw "args.type cannot be null";
+            }
+            if (!args.header) {
+                throw "args.header cannot be null";
+            }
+            if (!args.message) {
+                throw "args.message cannot be null";
+            }
+            switch(args.type) {
+                case 0:
+                    //save
+                    this.success(args.header, args.message);
+                    break;
+                case 1:
+                    //info
+                    this.success(args.header, args.message);
+                    break;
+                case 2:
+                    //error
+                    this.error(args.header, args.message);
+                    break;
+                case 3:
+                    //success
+                    this.success(args.header, args.message);
+                    break;
+                case 4:
+                    //warning
+                    this.warning(args.header, args.message);
+                    break;
+            }
+        },
+
+	    /**
 		 * @ngdoc method
 		 * @name umbraco.services.notificationsService#success
 		 * @methodOf umbraco.services.notificationsService

@@ -22,7 +22,7 @@ describe('contentEditingHelper tests', function () {
                 data: content,
                 status: 403
             };
-            err.data.ModelState = {};
+            err.data.modelState = {};
 
             //act
             var handled = contentEditingHelper.handleSaveError(err, {content: content});

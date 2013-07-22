@@ -441,12 +441,24 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                 function (data, status, headers, config) {
                     //failure callback
 
-                    deferred.reject({
-                        data: data,
-                        status: status,
-                        headers: headers,
-                        config: config
-                    });
+                    //when there's a 500 (unhandled) error show a YSOD overlay if debugging is enabled.
+                    if (status >= 500 && status < 600 && Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
+
+                        dialogService.ysodDialog({
+                            errorMsg: 'An error occurred',
+                            data: data
+                        });
+                    }
+                    else {
+
+                        //return an error object including the error message for UI
+                        deferred.reject({
+                            errorMsg: 'An error occurred',
+                            data: data,
+                            status: status
+                        });
+                    }
+
                 });
 
             return deferred.promise;
@@ -675,7 +687,7 @@ angular.module('umbraco.services').factory('iconHelper', iconHelper);
 * @name umbraco.services.contentEditingHelper
 * @description A helper service for content controllers when editing/creating/saving content.
 **/
-function contentEditingHelper($location, $routeParams, notificationsService, serverValidationManager) {
+function contentEditingHelper($location, $routeParams, notificationsService, serverValidationManager, dialogService) {
 
     return {
     
@@ -742,7 +754,7 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
          * @function
          *
          * @description
-         * A function to handle the validation (ModelState) errors collection which will happen on a 403 error indicating validation errors
+         * A function to handle the validation (modelState) errors collection which will happen on a 403 error indicating validation errors
          *  It's worth noting that when a 403 occurs, the data is still saved just never published, though this depends on if the entity is a new
          *  entity and whether or not the data fulfils the absolute basic requirements like having a mandatory Name.
          */
@@ -806,11 +818,11 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
             //Or, some strange server error
             if (err.status === 403) {
                 //now we need to look through all the validation errors
-                if (err.data && (err.data.ModelState)) {
+                if (err.data && (err.data.modelState)) {
                     
-                    this.handleValidationErrors(err.data, err.data.ModelState);
+                    this.handleValidationErrors(err.data, err.data.modelState);
 
-                    if (!this.redirectToCreatedContent(err.data.id, err.data.ModelState)) {
+                    if (!this.redirectToCreatedContent(err.data.id, err.data.modelState)) {
                         //we are not redirecting because this is not new content, it is existing content. In this case
                         // we need to detect what properties have changed and re-bind them with the server data. Then we need
                         // to re-bind any server validation errors after the digest takes place.
@@ -821,14 +833,12 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
                     //indicates we've handled the server result
                     return true;                    
                 }
-                else {
-                    //TODO: Implement an overlay showing the full YSOD like we had in v5
-                    notificationsService.error("Server error", err);                    
+                else {                    
+                    dialogService.ysodDialog(err);
                 }
             }
             else {
-                //TODO: Implement an overlay showing the full YSOD like we had in v5
-                notificationsService.error("Validation failed", err);
+                dialogService.ysodDialog(err);
             }
             
             return false;
@@ -859,14 +869,11 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
             if (!args.newContent) {
                 throw "args.newContent cannot be null";
             }
-            if (!args.notifyHeader) {
-                throw "args.notifyHeader cannot be null";
-            }
-            if (!args.notifyMsg) {
-                throw "args.notifyMsg cannot be null";
+            
+            for (var i = 0; i < args.newContent.notifications.length;i++) {
+                notificationsService.showNotification(args.newContent.notifications[i]);
             }
             
-            notificationsService.success(args.notifyHeader, args.notifyMsg);
             args.scope.$broadcast("saved", { scope: args.scope });
             if (!this.redirectToCreatedContent(args.scope.content.id)) {
                 //we are not redirecting because this is not new content, it is existing content. In this case
