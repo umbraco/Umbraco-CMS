@@ -26,19 +26,30 @@ angular.module('umbraco.services')
 
 	var nArray = [];
 
-	function add(item) {
-		var index = nArray.length;
-		nArray.push(item);
+	function add(item) {	    
+	    angularHelper.safeApply($rootScope, function () {
+	        
+	        //we need to ID the item, going by index isn't good enough because people can remove at different indexes 
+	        // whenever they want. Plus once we remove one, then the next index will be different. The only way to 
+	        // effectively remove an item is by an Id.
+	        item.id = String.CreateGuid();
+	        
+	        nArray.push(item);
+            
+	        $timeout(function () {
 
+	            var found = _.find(nArray, function(i) {
+	                return i.id === item.id;
+	            });
+                if (found) {
+                    var index = nArray.indexOf(found);
+                    nArray.splice(index, 1);
+                }
+	            
+	        }, 7000);
 
-		$timeout(function () {
-		    angularHelper.safeApply($rootScope, function () {
-				nArray.splice(index, 1);
-			});
-			
-		}, 7000);
-
-		return nArray[index];
+	        return item;
+	    });
 	}
 
 	return {
@@ -104,9 +115,8 @@ angular.module('umbraco.services')
 		 * @returns {Object} notification object
 		 */
 	    success: function (headline, message) {
-	        angularHelper.safeApply($rootScope, function () {
-	            return add({ headline: headline, message: message, type: 'success', time: new Date() });
-	        });
+	        return add({ headline: headline, message: message, type: 'success', time: new Date() });
+	        
 		},
 		/**
 		 * @ngdoc method
@@ -122,9 +132,7 @@ angular.module('umbraco.services')
 		 * @returns {Object} notification object
 		 */
 	    error: function (headline, message) {
-	        angularHelper.safeApply($rootScope, function() {
-	            return add({ headline: headline, message: message, type: 'error', time: new Date() });
-	        });			
+	        return add({ headline: headline, message: message, type: 'error', time: new Date() });
 		},
 
 		/**
@@ -142,9 +150,7 @@ angular.module('umbraco.services')
 		 * @returns {Object} notification object
 		 */
 	    warning: function (headline, message) {
-	        angularHelper.safeApply($rootScope, function() {
-	            return add({ headline: headline, message: message, type: 'warning', time: new Date() });
-	        });
+	        return add({ headline: headline, message: message, type: 'warning', time: new Date() });
 		},
 
 		/**

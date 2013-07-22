@@ -82,9 +82,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
             .then(function (data) {
                 contentEditingHelper.handleSuccessfulSave({
                     scope: $scope,
-                    newContent: data,
-                    notifyHeader: "Saved",
-                    notifyMsg: "Content has been saved"
+                    newContent: data
                 });
             }, function (err) {
                 contentEditingHelper.handleSaveError(err, $scope);
