@@ -68,7 +68,8 @@ namespace Umbraco.Web.Editors
                             {
                                 {"umbracoPath", GlobalSettings.Path}
                             }
-                    }
+                    },
+                    { "isDebuggingEnabled", HttpContext.IsDebuggingEnabled }
                 };
 
             return JavaScript(ServerVariablesParser.Parse(d));

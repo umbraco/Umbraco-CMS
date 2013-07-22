@@ -340,6 +340,27 @@ angular.module('umbraco.services')
                    template: 'views/common/dialogs/property.html',
                    show: true
                });
+           },
+           
+           /**
+           * @ngdoc method
+           * @name umbraco.services.dialogService#ysodDialog
+           * @methodOf umbraco.services.dialogService
+           *
+           * @description
+           * Opens a dialog to show a custom YSOD
+           */
+           ysodDialog: function (ysodError) {
+
+               var newScope = $rootScope.$new();
+               newScope.error = ysodError;
+               return openDialog({
+                   modalClass: "umb-modal wide",
+                   scope: newScope,
+                   //callback: options.callback,
+                   template: 'views/common/dialogs/ysod.html',
+                   show: true
+               });
            }
        };
    }]);

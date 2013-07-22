@@ -16,5 +16,6 @@ Umbraco.Sys.ServerVariables = {
     },
     umbracoSettings: {
         "umbracoPath": "/umbraco"    
-    }
+    },
+    isDebuggingEnabled: true
 };

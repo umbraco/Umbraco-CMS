@@ -257,7 +257,7 @@ angular.module('umbraco.services').factory('umbImageHelper', umbImageHelper);
 * @name umbraco.services.umbRequestHelper
 * @description A helper object used for sending requests to the server
 **/
-function umbRequestHelper($http, $q, umbDataFormatter, angularHelper) {
+function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogService) {
     return {
         
         /**
@@ -319,7 +319,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper) {
                 (!queryStrings ? "" : "?" + (angular.isString(queryStrings) ? queryStrings : this.dictionaryToQueryString(queryStrings)));
 
         },
-
+        
         /**
          * @ngdoc function
          * @name umbraco.services.umbRequestHelper#resourcePromise
@@ -378,14 +378,23 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper) {
                 //invoke the callback
                 var result = callbacks.error.apply(this, [data, status, headers, config]);
 
-                //when there's an erorr...
-                // TODO: Deal with the error in a global way
+                //when there's a 500 (unhandled) error show a YSOD overlay if debugging is enabled.
+                if (status >= 500 && status < 600 && Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
 
-                //return an error object including the error message for UI
-                deferred.reject({
-                    errorMsg: result.errorMsg,
-                    data: result.data
-                });
+                    dialogService.ysodDialog({
+                        errorMsg: result.errorMsg,
+                        data: result.data
+                    });
+                }
+                else {
+
+                    //return an error object including the error message for UI
+                    deferred.reject({
+                        errorMsg: result.errorMsg,
+                        data: result.data
+                    });
+                    
+                }
 
             });
 
