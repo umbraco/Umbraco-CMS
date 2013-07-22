@@ -18,6 +18,7 @@ using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
+using umbraco;
 
 namespace Umbraco.Web.Editors
 {
@@ -113,6 +114,8 @@ namespace Umbraco.Web.Editors
                 contentItem.PersistedContent.Name = contentItem.Name;    
             }
             
+            //TODO: We need to support 'send to publish'
+
             //TODO: We'll need to save the new template, publishat, etc... values here
 
             //Map the property values
@@ -173,6 +176,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
+            bool isPublishSuccess = false;
             if (contentItem.Action == ContentSaveAction.Save || contentItem.Action == ContentSaveAction.SaveNew)
             {
                 //save the item
@@ -181,7 +185,7 @@ namespace Umbraco.Web.Editors
             else
             {
                 //publish the item
-                Services.ContentService.SaveAndPublish(contentItem.PersistedContent);
+                isPublishSuccess = Services.ContentService.SaveAndPublish(contentItem.PersistedContent);
             }
             
 
@@ -192,6 +196,37 @@ namespace Umbraco.Web.Editors
             {
                 display.Errors = ModelState.ToErrorDictionary();
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Forbidden, display));
+            }
+
+            //put the correct msgs in 
+            switch (contentItem.Action)
+            {
+                case ContentSaveAction.Save:
+                case ContentSaveAction.SaveNew:
+                    display.AddSuccessNotification(ui.Text("speechBubbles", "editContentSavedHeader"), ui.Text("speechBubbles", "editContentSavedText"));
+                    break;
+                case ContentSaveAction.Publish:
+                case ContentSaveAction.PublishNew:
+
+                    //If the document is at a level deeper than the root but it's ancestor's path is not published, 
+                    //it means that we cannot actually publish this document because one of it's parent's is not published.
+                    //So, we still need to save the document but we'll show a different notification.
+                    if (contentItem.PersistedContent.Level > 1 && !Services.ContentService.IsPublishable(contentItem.PersistedContent))
+                    {
+                        display.AddWarningNotification(ui.Text("publish"), ui.Text("speechBubbles", "editContentPublishedFailedByParent"));
+                    }
+                    else
+                    {
+                        if (isPublishSuccess)
+                        {
+                            display.AddSuccessNotification(ui.Text("speechBubbles", "editContentPublishedHeader"), ui.Text("speechBubbles", "editContentPublishedText"));
+                        }
+                        else
+                        {
+                            display.AddWarningNotification(ui.Text("publish"), ui.Text("speechBubbles", "contentPublishedFailedByEvent"));
+                        }
+                    }
+                    break;
             }
 
             return display;

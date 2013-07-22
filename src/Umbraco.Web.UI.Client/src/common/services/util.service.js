@@ -678,11 +678,67 @@ angular.module('umbraco.services').factory('iconHelper', iconHelper);
 function contentEditingHelper($location, $routeParams, notificationsService, serverValidationManager) {
 
     return {
-        
+    
+        /**
+         * @ngdoc function
+         * @name getAllProps
+         * @methodOf contentEditingHelper
+         * @function
+         *
+         * @description
+         * Returns all propertes contained for the content item (since the normal model has properties contained inside of tabs)
+         */
+        getAllProps: function(content) {
+            var allProps = [];
+
+            for (var i = 0; i < content.tabs.length; i++) {
+                for (var p = 0; p < content.tabs[i].properties.length; p++) {
+                    allProps.push(content.tabs[i].properties[p]);
+                }
+            }
+
+            return allProps;
+        },
+
+        /**
+         * @ngdoc function
+         * @name reBindChangedProperties
+         * @methodOf contentEditingHelper
+         * @function
+         *
+         * @description
+         * re-binds all changed property values to the origContent object from the newContent object and returns an array of changed properties.
+         */
+        reBindChangedProperties: function(origContent, newContent) {
+
+            var changed = [];
+
+            //get a list of properties since they are contained in tabs
+            var allOrigProps = this.getAllProps(origContent);
+            var allNewProps = this.getAllProps(newContent);
+
+            function getNewProp(alias) {
+                return _.find(allNewProps, function(item) {
+                    return item.alias === alias;
+                });
+            }
+            
+            for (var p in allOrigProps) {
+                var newProp = getNewProp(allOrigProps[p].alias);
+                if (!_.isEqual(allOrigProps[p].value, newProp.value)) {
+                    //they have changed so set the origContent prop's value to the new value
+                    allOrigProps[p].value = newProp.value;
+                    changed.push(allOrigProps[p]);
+                }
+            }
+
+            return changed;
+        },
+
         /**
          * @ngdoc function
          * @name handleValidationErrors
-         * @methodOf ContentEditController
+         * @methodOf contentEditingHelper
          * @function
          *
          * @description
@@ -692,13 +748,7 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
          */
         handleValidationErrors: function (content, modelState) {
             //get a list of properties since they are contained in tabs
-            var allProps = [];
-
-            for (var i = 0; i < content.tabs.length; i++) {
-                for (var p = 0; p < content.tabs[i].properties.length; p++) {
-                    allProps.push(content.tabs[i].properties[p]);
-                }
-            }
+            var allProps = this.getAllProps(content);
 
             //find the content property for the current error, for use in the loop below
             function findContentProp(props, propAlias) {                
@@ -744,13 +794,13 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
         /**
          * @ngdoc function
          * @name handleSaveError
-         * @methodOf ContentEditController
+         * @methodOf contentEditingHelper
          * @function
          *
          * @description
          * A function to handle what happens when we have validation issues from the server side
          */
-        handleSaveError: function (err) {
+        handleSaveError: function (err, scope) {
             //When the status is a 403 status, we have validation errors.
             //Otherwise the error is probably due to invalid data (i.e. someone mucking around with the ids or something).
             //Or, some strange server error
@@ -762,9 +812,10 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
 
                     if (!this.redirectToCreatedContent(err.data.id, err.data.ModelState)) {
                         //we are not redirecting because this is not new content, it is existing content. In this case
-                        // we need to clear the server validation items. When we are creating new content we cannot clear
-                        // the server validation items because we redirect and they need to persist until the validation is re-bound.
-                        serverValidationManager.clear();
+                        // we need to detect what properties have changed and re-bind them with the server data. Then we need
+                        // to re-bind any server validation errors after the digest takes place.
+                        this.reBindChangedProperties(scope.content, err.data);
+                        serverValidationManager.executeAndClearAllSubscriptions();
                     }
 
                     //indicates we've handled the server result
@@ -785,8 +836,49 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
 
         /**
          * @ngdoc function
+         * @name handleSaveError
+         * @methodOf handleSuccessfulSave
+         * @function
+         *
+         * @description
+         * A function to handle when saving a content item is successful. This will rebind the values of the model that have changed
+         * ensure the notifications are displayed and that the appropriate events are fired. This will also check if we need to redirect
+         * when we're creating new content.
+         */
+        handleSuccessfulSave: function (args) {
+            
+            if (!args) {
+                throw "args cannot be null";
+            }
+            if (!args.scope) {
+                throw "args.scope cannot be null";
+            }
+            if (!args.scope.content) {
+                throw "args.scope.content cannot be null";
+            }
+            if (!args.newContent) {
+                throw "args.newContent cannot be null";
+            }
+            if (!args.notifyHeader) {
+                throw "args.notifyHeader cannot be null";
+            }
+            if (!args.notifyMsg) {
+                throw "args.notifyMsg cannot be null";
+            }
+            
+            notificationsService.success(args.notifyHeader, args.notifyMsg);
+            args.scope.$broadcast("saved", { scope: args.scope });
+            if (!this.redirectToCreatedContent(args.scope.content.id)) {
+                //we are not redirecting because this is not new content, it is existing content. In this case
+                // we need to detect what properties have changed and re-bind them with the server data
+                this.reBindChangedProperties(args.scope.content, args.newContent);
+            }
+        },
+
+        /**
+         * @ngdoc function
          * @name redirectToCreatedContent
-         * @methodOf ContentEditController
+         * @methodOf contentEditingHelper
          * @function
          *
          * @description

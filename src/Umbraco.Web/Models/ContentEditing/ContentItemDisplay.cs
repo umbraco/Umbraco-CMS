@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
@@ -12,8 +13,13 @@ namespace Umbraco.Web.Models.ContentEditing
     /// A model representing a content item to be displayed in the back office
     /// </summary>    
     [DataContract(Name = "content", Namespace = "")]
-    public class ContentItemDisplay : TabbedContentItem<ContentPropertyDisplay, IContent>
+    public class ContentItemDisplay : TabbedContentItem<ContentPropertyDisplay, IContent>, INotificationModel
     {
+        public ContentItemDisplay()
+        {
+            Notifications = new List<Notification>();
+        }
+
         
         [DataMember(Name = "publishDate")]
         public DateTime? PublishDate { get; set; }
@@ -28,6 +34,12 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </remarks>
         [DataMember(Name = "ModelState")]
         public IDictionary<string, object> Errors { get; set; }
+
+        /// <summary>
+        /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
+        /// </summary>
+        [DataMember(Name = "notifications")]
+        public List<Notification> Notifications { get; private set; }
 
     }
 }

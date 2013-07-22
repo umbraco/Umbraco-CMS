@@ -60,17 +60,14 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
         
         contentResource.publishContent(cnt, $routeParams.create, $scope.files)
             .then(function (data) {
-                //TODO: only update the content that has changed!
-                $scope.content = data;
-                
-                notificationsService.success("Published", "Content has been saved and published");                
-                $scope.$broadcast("saved", { scope: $scope });
-
-                contentEditingHelper.redirectToCreatedContent($scope.content.id);
-            }, function (err) {
-                //TODO: only update the content that has changed!
-                //$scope.content = err.data;
-                contentEditingHelper.handleSaveError(err);
+                contentEditingHelper.handleSuccessfulSave({
+                    scope: $scope,
+                    newContent: data,
+                    notifyHeader: "Published",
+                    notifyMsg: "Content has been saved and published"
+                });
+            }, function (err) {                
+                contentEditingHelper.handleSaveError(err, $scope);
             });	        
     };
 
@@ -85,17 +82,14 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
 
         contentResource.saveContent(cnt, $routeParams.create, $scope.files)
             .then(function (data) {
-                //TODO: only update the content that has changed!
-                $scope.content = data;
-                
-                notificationsService.success("Saved", "Content has been saved");                
-                $scope.$broadcast("saved", { scope: $scope });
-                
-                contentEditingHelper.redirectToCreatedContent($scope.content.id);
+                contentEditingHelper.handleSuccessfulSave({
+                    scope: $scope,
+                    newContent: data,
+                    notifyHeader: "Saved",
+                    notifyMsg: "Content has been saved"
+                });
             }, function (err) {
-                //TODO: only update the content that has changed!
-                //$scope.content = err.data;
-                contentEditingHelper.handleSaveError(err);
+                contentEditingHelper.handleSaveError(err, $scope);
             });
 	        
     };
