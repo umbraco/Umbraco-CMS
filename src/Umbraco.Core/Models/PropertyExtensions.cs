@@ -1,7 +1,15 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.XPath;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Services;
+using umbraco.interfaces;
 
 namespace Umbraco.Core.Models
 {
@@ -32,9 +40,16 @@ namespace Umbraco.Core.Models
             var dt = property.PropertyType.DataType(property.Id);
             if (dt != null && dt.Data != null)
             {
-                xmlNode.AppendChild(dt.Data.ToXMl(xd));    
+                if (dt.Id == new Guid(Constants.PropertyEditors.CheckBoxList))
+                {
+                    xmlNode.AppendChild(xd.CreateCDataSection(dt.Data.Value.ToString()));
+                }
+                else
+                {
+                    xmlNode.AppendChild(dt.Data.ToXMl(xd));
+                }
             }
-            
+
             var element = xmlNode.GetXElement();
             return element;
         }
