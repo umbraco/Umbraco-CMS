@@ -488,7 +488,7 @@ Ihr freundlicher Umbraco-Robot
     <key alias="mailBodyHtml">
 &lt;p&gt;Hallo %0%,&lt;/p&gt;
 
-&lt;p&gt;die Aufgabe &lt;strong&gt;'%1%'&lt;/strong&gt; (von Benutzer '%3%') an der Seite &lt;a href="%7%"&gt;&lt;strong&gt;'%2%'&lt;/strong&gt;&lt;/a&gt; wurde ausgeführt.&lt;/p&gt;
+&lt;p&gt;die Aufgabe &lt;strong&gt;'%1%'&lt;/strong&gt; (von Benutzer '%3%') an der Seite &lt;a href="http://%4%/actions/preview.aspx?id=%5%"&gt;&lt;strong&gt;'%2%'&lt;/strong&gt;&lt;/a&gt; wurde ausgeführt.&lt;/p&gt;
 &lt;div style="margin: 8px 0; padding: 8px; display: block;"&gt;
 	&lt;br /&gt;
 	&lt;a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/umbraco/actions/publish.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;VERÖFFENTLICHEN&amp;nbsp;&amp;nbsp;&lt;/a&gt; &amp;nbsp; 

@@ -454,7 +454,7 @@ Vennlig hilsen umbraco roboten
     <key alias="mailBodyHtml">&lt;p&gt;Hei %0%&lt;/p&gt;
 
 		  &lt;p&gt;Dette er en automatisk mail for å informere om at handlingen '%1%'
-        er blitt utført på siden &lt;a href="%7%"&gt;&lt;strong&gt;'%2%'&lt;/strong&gt;&lt;/a&gt;
+        er blitt utført på siden &lt;a href="http://%4%/actions/preview.aspx?id=%5%"&gt;&lt;strong&gt;'%2%'&lt;/strong&gt;&lt;/a&gt;
         av brukeren &lt;strong&gt;'%3%'&lt;/strong&gt;
 	    &lt;/p&gt;
 		  &lt;div style="margin: 8px 0; padding: 8px; display: block;"&gt;

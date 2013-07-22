@@ -447,7 +447,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="mailBodyHtml"><![CDATA[<p>Hi %0%</p>
 
 		  <p>Dit is een geautomatiseerde mail om u op de hoogte te brengen dat de taak <strong>'%1%'</strong> 
-		  is uitgevoerd op pagina <strong>'%2%'</strong> 
+		  is uitgevoerd op pagina <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a> 
 		  door gebruiker <strong>'%3%'</strong>
 	  </p>
 		  <div class="buttons">

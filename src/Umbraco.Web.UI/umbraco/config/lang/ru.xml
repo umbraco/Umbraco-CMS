@@ -524,7 +524,7 @@
     <key alias="mailBodyHtml"><![CDATA[<p>Здравствуйте, %0%</p>
 
 		<p>Это автоматически сгенерированное уведомление. Операция <strong>'%1%'</strong>
-		была произведена на странице <a href="%7%"><strong>'%2%'</strong></a>
+		была произведена на странице <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a>
 		пользователем <strong>'%3%'</strong>.</p>
 
 		<div style="margin: 8px 0; padding: 8px; display: block;">
