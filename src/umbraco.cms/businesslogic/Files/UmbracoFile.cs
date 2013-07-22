@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -8,18 +7,11 @@ using System.Linq;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Encoder = System.Text.Encoder;
 
 namespace umbraco.cms.businesslogic.Files
 {
     public class UmbracoFile : IFile
     {
-        private readonly string _path;
-        private string _fileName;
-        private string _extension;
-        private string _url;
-        private long _length;
-
         private readonly MediaFileSystem _fs;
 
         #region Constructors
@@ -33,11 +25,11 @@ namespace umbraco.cms.businesslogic.Files
         {
             _fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
-            _path = path;
+            Path = path;
 
             Initialize();
         }
-        
+
         #endregion
 
         #region Static Methods
@@ -84,26 +76,19 @@ namespace umbraco.cms.businesslogic.Files
 
         private void Initialize()
         {
-            _fileName = _fs.GetFileName(_path);
-            _length = _fs.GetSize(_path);
-            _extension = _fs.GetExtension(_path) != null
-                ? _fs.GetExtension(_path).Substring(1).ToLowerInvariant()
+            Filename = _fs.GetFileName(Path);
+            Length = _fs.GetSize(Path);
+            Extension = _fs.GetExtension(Path) != null
+                ? _fs.GetExtension(Path).Substring(1).ToLowerInvariant()
                 : "";
-            _url = _fs.GetUrl(_path);
+            Url = _fs.GetUrl(Path);
         }
 
         #region IFile Members
 
-        public string Filename
-        {
-            get { return _fileName; }
-        }
+        public string Filename { get; private set; }
 
-        public string Extension
-        {
-
-            get { return _extension; }
-        }
+        public string Extension { get; private set; }
 
         [Obsolete("LocalName is obsolete, please use Url instead", false)]
         public string LocalName
@@ -111,43 +96,30 @@ namespace umbraco.cms.businesslogic.Files
             get { return Url; }
         }
 
-        public string Path
-        {
-            get { return _path; }
-        }
+        public string Path { get; private set; }
 
-        public string Url
-        {
-            get { return _url; }
-        }
+        public string Url { get; private set; }
 
-        public long Length
-        {
-            get { return _length; }
-        }
+        public long Length { get; private set; }
 
         public bool SupportsResizing
         {
             get
             {
-                if (("," + UmbracoSettings.ImageFileTypes + ",").Contains(string.Format(",{0},", _extension)))
-                {
-                    return true;
-                }
-                return false;
+                return ("," + UmbracoSettings.ImageFileTypes + ",").Contains(string.Format(",{0},", Extension));
             }
         }
 
         public string GetFriendlyName()
         {
-            return _fileName.SplitPascalCasing().ToFirstUpperInvariant();
+            return Filename.SplitPascalCasing().ToFirstUpperInvariant();
         }
 
         public System.Tuple<int, int> GetDimensions()
         {
-            throwNotAnImageException();
+            EnsureFileSupportsResizing();
 
-            var fs = _fs.OpenFile(_path);
+            var fs = _fs.OpenFile(Path);
             var image = Image.FromStream(fs);
             var fileWidth = image.Width;
             var fileHeight = image.Height;
@@ -159,16 +131,16 @@ namespace umbraco.cms.businesslogic.Files
 
         public string Resize(int width, int height)
         {
-            throwNotAnImageException();
+            EnsureFileSupportsResizing();
 
-            var fileNameThumb = DoResize(width, height, 0, String.Empty);
+            var fileNameThumb = DoResize(width, height, 0, string.Empty);
 
             return _fs.GetUrl(fileNameThumb);
         }
 
         public string Resize(int maxWidthHeight, string fileNameAddition)
         {
-            throwNotAnImageException();
+            EnsureFileSupportsResizing();
 
             var fileNameThumb = DoResize(GetDimensions().Item1, GetDimensions().Item2, maxWidthHeight, fileNameAddition);
 
@@ -177,53 +149,44 @@ namespace umbraco.cms.businesslogic.Files
 
         private string DoResize(int width, int height, int maxWidthHeight, string fileNameAddition)
         {
-            var fs = _fs.OpenFile(_path);
-            var image = Image.FromStream(fs);
-            fs.Close();
+            using (var fs = _fs.OpenFile(Path))
+            {
+                using (var image = Image.FromStream(fs))
+                {
+                    var fileNameThumb = string.IsNullOrWhiteSpace(fileNameAddition)
+                        ? string.Format("{0}_UMBRACOSYSTHUMBNAIL.jpg", Path.Substring(0, Path.LastIndexOf(".", StringComparison.Ordinal)))
+                        : string.Format("{0}_{1}.jpg", Path.Substring(0, Path.LastIndexOf(".", StringComparison.Ordinal)), fileNameAddition);
 
-            string fileNameThumb = String.IsNullOrEmpty(fileNameAddition) ?
-                string.Format("{0}_UMBRACOSYSTHUMBNAIL.jpg", _path.Substring(0, _path.LastIndexOf("."))) :
-                string.Format("{0}_{1}.jpg", _path.Substring(0, _path.LastIndexOf(".")), fileNameAddition);
-
-            fileNameThumb = generateThumbnail(
-                image,
-                maxWidthHeight,
-                width,
-                height,
-                _path,
-                _extension,
-                fileNameThumb,
-                maxWidthHeight == 0
-                ).FileName;
-
-            image.Dispose();
-            
-            return fileNameThumb;
+                    var thumbnail = GenerateThumbnail(image, maxWidthHeight, width, height, fileNameThumb, maxWidthHeight == 0);
+                    
+                    return thumbnail.FileName;
+                }
+            }
         }
 
         #endregion
 
-        private void throwNotAnImageException()
+        private void EnsureFileSupportsResizing()
         {
-            if (!SupportsResizing)
-                throw new NotAnImageException(string.Format("The file {0} is not an image, so can't get dimensions", _fileName));
+            if (SupportsResizing == false)
+                throw new NotAnImageException(string.Format("The file {0} is not an image, so can't get dimensions", Filename));
         }
 
-
-        private ResizedImage generateThumbnail(System.Drawing.Image image, int maxWidthHeight, int fileWidth, int fileHeight, string fullFilePath, string ext, string thumbnailFileName, bool useFixedDimensions)
+        private ResizedImage GenerateThumbnail(Image image, int maxWidthHeight, int fileWidth, int fileHeight, string thumbnailFileName, bool useFixedDimensions)
         {
             // Generate thumbnail
             float f = 1;
-            if (!useFixedDimensions)
+            if (useFixedDimensions == false)
             {
                 var fx = (float)image.Size.Width / (float)maxWidthHeight;
                 var fy = (float)image.Size.Height / (float)maxWidthHeight;
 
                 // must fit in thumbnail size
-                f = Math.Max(fx, fy); //if (f < 1) f = 1;
+                f = Math.Max(fx, fy);
             }
 
-            var widthTh = (int)Math.Round((float)fileWidth / f); int heightTh = (int)Math.Round((float)fileHeight / f);
+            var widthTh = (int)Math.Round((float)fileWidth / f);
+            var heightTh = (int)Math.Round((float)fileHeight / f);
 
             // fixes for empty width or height
             if (widthTh == 0)
@@ -232,55 +195,50 @@ namespace umbraco.cms.businesslogic.Files
                 heightTh = 1;
 
             // Create new image with best quality settings
-            var bp = new Bitmap(widthTh, heightTh);
-            var g = Graphics.FromImage(bp);
-            g.SmoothingMode = SmoothingMode.HighQuality;
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            g.CompositingQuality = CompositingQuality.HighQuality;
+            using (var bp = new Bitmap(widthTh, heightTh))
+            {
+                using (var g = Graphics.FromImage(bp))
+                {
+                    g.SmoothingMode = SmoothingMode.HighQuality;
+                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                    g.CompositingQuality = CompositingQuality.HighQuality;
 
-            // Copy the old image to the new and resized
-            var rect = new Rectangle(0, 0, widthTh, heightTh);
-            g.DrawImage(image, rect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
+                    // Copy the old image to the new and resized
+                    var rect = new Rectangle(0, 0, widthTh, heightTh);
+                    g.DrawImage(image, rect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
 
-            // Copy metadata
-            var imageEncoders = ImageCodecInfo.GetImageEncoders();
-            ImageCodecInfo codec = null;
-            if (Extension.ToLower() == "png" || Extension.ToLower() == "gif")
-                codec = imageEncoders.Single(t => t.MimeType.Equals("image/png"));
-            else
-                codec = imageEncoders.Single(t => t.MimeType.Equals("image/jpeg"));
+                    // Copy metadata
+                    var imageEncoders = ImageCodecInfo.GetImageEncoders();
 
+                    var codec = Extension.ToLower() == "png" || Extension.ToLower() == "gif"
+                        ? imageEncoders.Single(t => t.MimeType.Equals("image/png"))
+                        : imageEncoders.Single(t => t.MimeType.Equals("image/jpeg"));
 
-            // Set compresion ratio to 90%
-            var ep = new EncoderParameters();
-            ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 90L);
+                    // Set compresion ratio to 90%
+                    var ep = new EncoderParameters();
+                    ep.Param[0] = new EncoderParameter(Encoder.Quality, 90L);
 
-            // Save the new image using the dimensions of the image
-            string newFileName = thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL",
-                                                           string.Format("{0}x{1}", widthTh, heightTh));
-            var ms = new MemoryStream();
-            bp.Save(ms, codec, ep);
-            ms.Seek(0, 0);
+                    // Save the new image using the dimensions of the image
+                    var newFileName = thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL", string.Format("{0}x{1}", widthTh, heightTh));
+                    using (var ms = new MemoryStream())
+                    {
+                        bp.Save(ms, codec, ep);
+                        ms.Seek(0, 0);
 
-            _fs.AddFile(newFileName, ms);
-            
-            ms.Close();
-            bp.Dispose();
-            g.Dispose();
+                        _fs.AddFile(newFileName, ms);
+                    }
 
-            return new ResizedImage(widthTh, heightTh, newFileName);
-
+                    return new ResizedImage(widthTh, heightTh, newFileName);
+                }
+            }
         }
-
-
     }
 
     internal class ResizedImage
     {
         public ResizedImage()
         {
-            
         }
 
         public ResizedImage(int width, int height, string fileName)
