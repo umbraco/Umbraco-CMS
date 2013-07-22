@@ -5,9 +5,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.Files;
-using umbraco.IO;
 
 namespace umbraco.editorControls.tinymce
 {
@@ -134,7 +132,21 @@ namespace umbraco.editorControls.tinymce
                 if (fs.FileExists(orgPath))
                 {
                     var uf = new UmbracoFile(orgPath);
-                    newSrc = uf.Resize(newWidth, newHeight);
+
+                    try
+                    {
+                        newSrc = uf.Resize(newWidth, newHeight);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogHelper.Error<tinyMCEImageHelper>(string.Format("The file {0} could not be resized, reverting the image src attribute to the original source: {1}", orgPath, orgSrc), ex);
+                        newSrc = orgSrc;
+                    }
+                }
+                else
+                {
+                    LogHelper.Warn<tinyMCEImageHelper>(string.Format("The file {0} does not exist, reverting the image src attribute to the original source: {1}", orgPath, orgSrc));
+                    newSrc = orgSrc;
                 }
             }
 
