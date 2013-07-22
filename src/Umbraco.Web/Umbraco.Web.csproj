@@ -778,11 +778,7 @@
     <Compile Include="umbraco.presentation\umbraco\controls\ContentPicker.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControl.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\Images\ImageViewer.ascx.cs">
-      <DependentUpon>ImageViewer.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\Images\ImageViewer.ascx.designer.cs">
-      <DependentUpon>ImageViewer.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\Images\ImageViewerUpdater.asmx.cs">
       <DependentUpon>ImageViewerUpdater.asmx</DependentUpon>
@@ -1822,7 +1818,6 @@
     <Content Include="umbraco.presentation\umbraco\create\DLRScripting.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\controls\Images\ImageViewer.ascx" />
     <Content Include="umbraco.presentation\umbraco\controls\Images\ImageViewerUpdater.asmx" />
     <Content Include="umbraco.presentation\umbraco\controls\Images\UploadMediaImage.ascx">
       <SubType>ASPXCodeBehind</SubType>

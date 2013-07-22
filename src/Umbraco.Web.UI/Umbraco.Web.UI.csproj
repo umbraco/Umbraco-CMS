@@ -398,6 +398,13 @@
     <Compile Include="Umbraco\controls\ContentTypeControlNew.ascx.designer.cs">
       <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\controls\Images\ImageViewer.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+      <DependentUpon>ImageViewer.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Umbraco\controls\Images\ImageViewer.ascx.designer.cs">
+      <DependentUpon>ImageViewer.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Create.aspx.cs">
       <DependentUpon>create.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

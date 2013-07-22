@@ -1,20 +1,13 @@
 using System;
 using System.Web.UI;
-
+using Umbraco.Core.IO;
 using umbraco.cms.presentation.Trees;
-using ClientDependency.Core;
-using umbraco.presentation;
-using ClientDependency.Core.Controls;
 using umbraco.interfaces;
-using umbraco.IO;
-using umbraco.BasePages;
 using umbraco.controls.Images;
-using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
-using System.Resources;
 using umbraco.editorControls.mediapicker;
-using umbraco.uicontrols.TreePicker;
 using umbraco.cms.businesslogic;
+
 namespace umbraco.editorControls
 {
 	/// <summary>
@@ -23,8 +16,8 @@ namespace umbraco.editorControls
 	[ValidationProperty("Value")]
     public class mediaChooser : BaseTreePickerEditor
 	{
-		bool _showpreview;
-		bool _showadvanced;
+	    readonly bool _showpreview;
+	    readonly bool _showadvanced;
 		protected ImageViewer ImgViewer;		
 		protected HtmlGenericControl PreviewContainer;
 
@@ -51,7 +44,7 @@ namespace umbraco.editorControls
         {
             get
             {
-                return _showadvanced ? umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/mediaPicker.aspx" : TreeService.GetPickerUrl(Umbraco.Core.Constants.Applications.Media, "media");
+                return _showadvanced ? IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/mediaPicker.aspx" : TreeService.GetPickerUrl(Umbraco.Core.Constants.Applications.Media, "media");
             }
         }
 
@@ -87,7 +80,7 @@ namespace umbraco.editorControls
                     TreePickerUrl,
                     ModalWidth.ToString(),
                     ModalHeight.ToString(),
-                    umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco).TrimEnd('/')
+                    IOHelper.ResolveUrl(SystemDirectories.Umbraco).TrimEnd('/')
                  });
             }           
         }
@@ -119,14 +112,14 @@ namespace umbraco.editorControls
                 //create the preview wrapper
                 PreviewContainer = new HtmlGenericControl("div");
                 PreviewContainer.ID = "preview";
-                this.Controls.Add(PreviewContainer);
+                Controls.Add(PreviewContainer);
 
-                ImgViewer = (ImageViewer)Page.LoadControl(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/controls/Images/ImageViewer.ascx");
+                ImgViewer = (ImageViewer)Page.LoadControl(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/controls/Images/ImageViewer.ascx");
 				ImgViewer.ID = "ImgViewer";
-				ImgViewer.ViewerStyle = ImageViewer.Style.ImageLink;				
+				ImgViewer.ViewerStyle = ImageViewer.Style.ImageLink;	
 				
 				PreviewContainer.Style.Add(HtmlTextWriterStyle.MarginTop, "5px");
-				PreviewContainer.Controls.Add(ImgViewer);				
+				PreviewContainer.Controls.Add(ImgViewer);
 			}			
 		}
 
@@ -159,23 +152,6 @@ namespace umbraco.editorControls
                     ImgViewer.MediaId = int.Parse(ItemIdValue.Value);
                 }
             }
-
-            //if (ScriptManager.GetCurrent(Page).IsInAsyncPostBack)
-            //{
-            //    //renders the media picker JS class
-            //    ScriptManager.RegisterStartupScript(this, this.GetType(), "MediaChooser", MediaChooserScripts.MediaPicker, true);
-            //    ScriptManager.RegisterStartupScript(this, this.GetType(), this.ClientID + "MediaPicker", strScript, true);
-
-            //}
-            //else
-            //{
-            //    //renders the media picker JS class
-            //    Page.ClientScript.RegisterClientScriptBlock(typeof(mediaChooser), "MediaChooser", MediaChooserScripts.MediaPicker, true);
-            //    Page.ClientScript.RegisterStartupScript(this.GetType(), this.ClientID + "MediaPicker", strScript, true);
-
-            //}
-           
         }
-
 	}
 }
