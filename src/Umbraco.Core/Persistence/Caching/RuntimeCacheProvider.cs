@@ -25,6 +25,10 @@ namespace Umbraco.Core.Persistence.Caching
     /// NOTE: These changes are all temporary until we finalize the ApplicationCache implementation which will support static cache, runtime cache
     /// and request based cache which will all live in one central location so it is easily managed. 
     /// 
+    /// Also note that we don't always keep checking if HttpContext.Current == null and instead check for _memoryCache != null. This is because
+    /// when there are async requests being made even in the context of a web request, the HttpContext.Current will be null but the HttpRuntime.Cache will
+    /// always be available.
+    /// 
     /// </remarks>
     internal sealed class RuntimeCacheProvider : IRepositoryCacheProvider
     {
@@ -52,7 +56,7 @@ namespace Umbraco.Core.Persistence.Caching
         public IEntity GetById(Type type, Guid id)
         {
             var key = GetCompositeId(type, id);
-            var item = HttpContext.Current == null 
+            var item = _memoryCache != null 
                 ? _memoryCache.Get(key) 
                 : HttpRuntime.Cache.Get(key);
             return item as IEntity;
@@ -62,7 +66,7 @@ namespace Umbraco.Core.Persistence.Caching
         {
             foreach (var guid in ids)
             {
-                var item = HttpContext.Current == null
+                var item = _memoryCache != null
                                ? _memoryCache.Get(GetCompositeId(type, guid))
                                : HttpRuntime.Cache.Get(GetCompositeId(type, guid));
 
@@ -76,7 +80,7 @@ namespace Umbraco.Core.Persistence.Caching
             {
                 if (key.StartsWith(type.Name))
                 {
-                    var item = HttpContext.Current == null
+                    var item = _memoryCache != null
                                ? _memoryCache.Get(key)
                                : HttpRuntime.Cache.Get(key);
 
@@ -94,7 +98,7 @@ namespace Umbraco.Core.Persistence.Caching
             //NOTE: Before we were checking if it already exists but the MemoryCache.Set handles this implicitly and does 
             // an add or update, same goes for HttpRuntime.Cache.Insert.
 
-            if (HttpContext.Current == null)
+            if (_memoryCache != null)
             {
                 _memoryCache.Set(key, entity, new CacheItemPolicy { SlidingExpiration = TimeSpan.FromMinutes(5) });
             }
@@ -107,7 +111,7 @@ namespace Umbraco.Core.Persistence.Caching
         public void Delete(Type type, IEntity entity)
         {
             var key = GetCompositeId(type, entity.Id);
-            if (HttpContext.Current == null)
+            if (_memoryCache != null)
             {
                 _memoryCache.Remove(key);
             }
@@ -137,7 +141,7 @@ namespace Umbraco.Core.Persistence.Caching
                 }
                 foreach (var key in keysToRemove)
                 {
-                    if (HttpContext.Current == null)
+                    if (_memoryCache != null)
                     {
                         _memoryCache.Remove(key);
                     }
@@ -155,7 +159,7 @@ namespace Umbraco.Core.Persistence.Caching
             {
                 _keyTracker.Clear();
 
-                if (HttpContext.Current == null)
+                if (_memoryCache != null)
                 {
                     _memoryCache.DisposeIfDisposable();
                     _memoryCache = new MemoryCache("in-memory");
