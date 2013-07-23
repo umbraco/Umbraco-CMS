@@ -107,7 +107,7 @@ namespace Umbraco.Web.PropertyEditors
 
                         using (var fileStream = File.OpenRead(file.TempFilePath))
                         {
-                            var umbracoFile = UmbracoFile.Save(fileStream, fileName);
+                            var umbracoFile = UmbracoMediaFile.Save(fileStream, fileName);
 
                             if (umbracoFile.SupportsResizing)
                             {
