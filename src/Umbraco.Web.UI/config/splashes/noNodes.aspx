@@ -9,7 +9,7 @@
     <meta charset="utf-8">
 
     <title>Umbraco - no pages found</title>
-    <link rel="icon" type="image/png" href="<%=umbraco.GlobalSettings.Path + "/images/pinnedIcons/umb.ico" %>" />
+    <link rel="icon" type="image/png" href="<%=umbraco.GlobalSettings.Path + "/Images/PinnedIcons/umb.ico" %>" />
 
     <link media="all" rel="stylesheet" href="../../umbraco_client/installer/css/jquery-ui-1.8.6.custom.css" />
 

@@ -475,7 +475,7 @@ Vá até http://%4%/actions/editContent.aspx?id=%5% para editar.
     <key alias="mailBodyHtml"><![CDATA[<p>Olá %0%</p>
 
 		  <p>Esta é uma mensagem automatizada para informar que a tarefa <strong>'%1%'</strong> 
-		  foi completada na página <a href="%7%"><strong>'%2%'</strong></a>
+		  foi completada na página <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a>
 		  pelo usuário <strong>'%3%'</strong>
 	  </p>
 		  <div style="margin: 8px 0; padding: 8px; display: block;">

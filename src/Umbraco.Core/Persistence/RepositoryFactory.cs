@@ -118,7 +118,7 @@ namespace Umbraco.Core.Persistence
 
         public virtual ITemplateRepository CreateTemplateRepository(IDatabaseUnitOfWork uow)
         {
-            return new TemplateRepository(uow, NullCacheProvider.Current);
+            return new TemplateRepository(uow, RuntimeCacheProvider.Current);
         }
     }
 }
