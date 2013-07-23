@@ -2,11 +2,8 @@
     
     <div ng-hide="clearFiles">
         <div class="file-uploader">
-            <input type="file" umb-file-upload multiple />
-        </div>
-        <ul ng-show="files.length > 0">
-            <li ng-repeat="file in files">{{file.file.name}}</li>
-        </ul>
+            <input type="file" umb-file-upload />
+        </div>        
     </div>
 
     <div ng-show="persistedFiles.length > 0">
