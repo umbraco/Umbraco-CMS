@@ -1122,6 +1122,9 @@ namespace Umbraco.Core.Services
 
                 Audit.Add(AuditTypes.Copy, "Copy Content performed by user", content.WriterId, content.Id);
 
+
+                //TODO: Don't think we need this here because cache should be cleared by the event listeners
+                // and the correct ICacheRefreshers!?
                 RuntimeCacheProvider.Current.Clear();
 
                 return copy;
