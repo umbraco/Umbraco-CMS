@@ -67,10 +67,16 @@ namespace umbraco.presentation.webservices
             int intNodeId;
             if (nodeType == "memberGroup")
             {
-                presentation.create.dialogHandler_temp.Delete(nodeType, 0, alias);
+                 LegacyDialogHandler.Delete(
+                    new HttpContextWrapper(HttpContext.Current),
+                    UmbracoUser,
+                    nodeType, 0, nodeId);
             }
-            else if (int.TryParse(nodeId, out intNodeID) && nodeType != "member") // Fix for #26965 - numeric member login gets parsed as nodeId
+            else if (int.TryParse(nodeId, out intNodeId) && nodeType != "member") // Fix for #26965 - numeric member login gets parsed as nodeId
             {
+                LegacyDialogHandler.Delete(
+                    new HttpContextWrapper(HttpContext.Current),
+                    UmbracoUser,
                     nodeType, intNodeId, alias);
             }
             else
