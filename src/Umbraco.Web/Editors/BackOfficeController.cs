@@ -66,7 +66,8 @@ namespace Umbraco.Web.Editors
                     {
                         "umbracoSettings", new Dictionary<string, object>
                             {
-                                {"umbracoPath", GlobalSettings.Path}
+                                {"umbracoPath", GlobalSettings.Path},
+                                {"imageFileTypes", UmbracoSettings.ImageFileTypes},
                             }
                     },
                     { "isDebuggingEnabled", HttpContext.IsDebuggingEnabled }

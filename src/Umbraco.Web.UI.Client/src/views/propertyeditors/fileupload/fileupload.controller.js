@@ -20,28 +20,24 @@ function fileUploadController($scope, $element, $compile, umbImageHelper) {
 
     //clear the current files
     $scope.files = [];
+
     //create the property to show the list of files currently saved
     if ($scope.model.value != "") {
 
-        //for legacy data, this will not be an array, just a string so convert to an array
-        if (!$scope.model.value.startsWith('[')) {
-
-            //check if it ends with a common image extensions
-            var isImage = umbImageHelper.detectIfImageByExtension($scope.model.value);
-            $scope.model.value = "[{\"file\": \"" + $scope.model.value + "\",\"isImage\":" + isImage + "}]";
-        }
-
-        $scope.persistedFiles = angular.fromJson($scope.model.value);
+        var images = $scope.model.value.split(",");
+        
+        $scope.persistedFiles = _.map(images, function (item) {
+            return { file: item, isImage: umbImageHelper.detectIfImageByExtension(item) };
+        });
     }
     else {
         $scope.persistedFiles = [];
     }
-
+    
     _.each($scope.persistedFiles, function (file) {
         file.thumbnail = umbImageHelper.getThumbnailFromPath(file.file);
     });
-
-
+    
     $scope.clearFiles = false;
 
     //listen for clear files changes to set our model to be sent up to the server

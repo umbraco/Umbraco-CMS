@@ -15,7 +15,8 @@ Umbraco.Sys.ServerVariables = {
         "legacyTreeJs": "/belle/lib/yepnope/empty.js",
     },
     umbracoSettings: {
-        "umbracoPath": "/umbraco"    
+        "umbracoPath": "/umbraco",
+        "imageFileTypes": "jpeg,jpg,gif,bmp,png,tiff,tif"
     },
     isDebuggingEnabled: true
 };

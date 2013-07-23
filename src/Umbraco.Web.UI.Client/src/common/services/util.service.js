@@ -208,15 +208,16 @@ function umbImageHelper() {
                     return item.alias === 'umbracoFile';
                 });
                 var imageVal;
-                //Legacy images will be saved as a string, not an array so we will convert the legacy values
-                // to our required structure.
-                if (imageProp.value.startsWith('[')) {
-                    imageVal = options.scope.$eval(imageProp.value);
-                }
-                else {
-                    imageVal = [{ file: imageProp.value, isImage: this.detectIfImageByExtension(imageProp.value) }];
-                }
 
+                //our default images might store one or many images (as csv)
+                var split = imageProp.value.split(',');
+                var self = this;
+                imageVal = _.map(split, function(item) {
+                    return { file: item, isImage: self.detectIfImageByExtension(item) };
+                });
+                
+                //for now we'll just return the first image in the collection.
+                //TODO: we should enable returning many to be displayed in the picker if the uploader supports many.
                 if (imageVal.length && imageVal.length > 0 && imageVal[0].isImage) {
                     return imageVal[0].file;
                 }
@@ -242,10 +243,8 @@ function umbImageHelper() {
         },
         detectIfImageByExtension: function(imagePath) {
             var lowered = imagePath;
-            if (lowered.endsWith(".jpg") || lowered.endsWith(".gif") || lowered.endsWith(".jpeg") || lowered.endsWith(".png")) {
-                return true;
-            }
-            return false;
+            var ext = lowered.substr(lowered.lastIndexOf(".") + 1);
+            return ("," + Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes + ",").indexOf("," + ext + ",") !== -1;
         }
     };
 }
