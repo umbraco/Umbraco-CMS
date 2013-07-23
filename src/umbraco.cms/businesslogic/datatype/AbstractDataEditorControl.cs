@@ -10,6 +10,7 @@ namespace umbraco.cms.businesslogic.datatype
     /// Base class that defines the methods, properties and events for all datatype controls.
     /// </summary>
     [ValidationProperty("Value")]
+    [Obsolete("This class is no longer used and will be removed from the codebase in the future.")]
     public class AbstractDataEditorControl : WebControl, INamingContainer, IDataEditor
     {
         /// <summary>

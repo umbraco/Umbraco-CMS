@@ -14,6 +14,7 @@ namespace umbraco.cms.businesslogic.datatype
     /// <summary>
     /// Any data type in umbraco can have PreValues, which is a simple Key/Value collection of items attached to a specific instance of the data type.
     /// </summary>
+    [Obsolete("This class is no longer used and will be removed from the codebase in the future.")]
     public class PreValues
     {
         private static ISqlHelper SqlHelper

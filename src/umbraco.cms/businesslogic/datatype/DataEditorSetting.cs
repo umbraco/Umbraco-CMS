@@ -6,6 +6,7 @@ using System.Reflection;
 
 namespace umbraco.cms.businesslogic.datatype
 {
+    [Obsolete("This class is no longer used and will be removed from the codebase in the future.")]
     [System.AttributeUsage(System.AttributeTargets.Property, AllowMultiple = false)]
     public class DataEditorSetting: System.Attribute
     {

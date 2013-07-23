@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace umbraco.cms.businesslogic.datatype
 {
+    [Obsolete("This class is no longer used and will be removed from the codebase in the future.")]
     public abstract class DataEditorSettingType : ProviderBase, IDataEditorSettingType
     {
         public virtual string Value { get; set; }

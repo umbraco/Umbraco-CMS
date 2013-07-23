@@ -14,6 +14,7 @@ namespace umbraco.cms.businesslogic.datatype
     /// A simple class for storing predefined values on a datatype.
     /// A prevalue contains a value, a unique key and sort order.
     /// </summary>
+    [Obsolete("This class is no longer used and will be removed from the codebase in the future.")]
     public class PreValue
     {
         private static ISqlHelper SqlHelper
