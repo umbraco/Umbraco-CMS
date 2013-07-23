@@ -305,8 +305,10 @@
     <Compile Include="Editors\UmbracoAuthorizedJsonController.cs" />
     <Compile Include="Editors\ValidationHelper.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
+    <Compile Include="Models\ContentEditing\ContentItemDisplayBase.cs" />
     <Compile Include="Models\ContentEditing\ContentSaveAction.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeBasic.cs" />
+    <Compile Include="Models\ContentEditing\IErrorModel.cs" />
     <Compile Include="Models\ContentEditing\IHaveUploadedFiles.cs" />
     <Compile Include="Models\ContentEditing\INotificationModel.cs" />
     <Compile Include="Models\ContentEditing\MediaItemDisplay.cs" />

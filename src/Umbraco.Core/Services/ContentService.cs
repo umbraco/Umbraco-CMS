@@ -1055,6 +1055,7 @@ namespace Umbraco.Core.Services
                     uow.Commit();
 
                     //Special case for the Upload DataType
+                    //TODO: Should we handle this with events?
                     var uploadDataTypeId = new Guid(Constants.PropertyEditors.UploadField);
                     if (content.Properties.Any(x => x.PropertyType.DataTypeId == uploadDataTypeId))
                     {

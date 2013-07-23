@@ -22,11 +22,94 @@ using umbraco;
 
 namespace Umbraco.Web.Editors
 {
+    public abstract class ContentControllerBase : UmbracoAuthorizedJsonController
+    {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        protected ContentControllerBase()
+            : this(UmbracoContext.Current)
+        {            
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        protected ContentControllerBase(UmbracoContext umbracoContext)
+            : base(umbracoContext)
+        {
+        }
+
+        protected void HandleContentNotFound(int id)
+        {
+            ModelState.AddModelError("id", string.Format("content with id: {0} was not found", id));
+            var errorResponse = Request.CreateErrorResponse(
+                HttpStatusCode.NotFound,
+                ModelState);
+            throw new HttpResponseException(errorResponse);
+        }
+
+        protected void UpdateName<TPersisted>(ContentItemSave<TPersisted> contentItem) 
+            where TPersisted : IContentBase
+        {
+            //Don't update the name if it is empty
+            if (!contentItem.Name.IsNullOrWhiteSpace())
+            {
+                contentItem.PersistedContent.Name = contentItem.Name;
+            }
+        }
+
+        protected void MapPropertyValues<TPersisted>(ContentItemSave<TPersisted> contentItem)
+            where TPersisted : IContentBase
+        {
+            //Map the property values
+            foreach (var p in contentItem.ContentDto.Properties)
+            {
+                //get the dbo property
+                var dboProperty = contentItem.PersistedContent.Properties[p.Alias];
+
+                //create the property data to send to the property editor
+                var d = new Dictionary<string, object>();
+                //add the files if any
+                var files = contentItem.UploadedFiles.Where(x => x.PropertyId == p.Id).ToArray();
+                if (files.Any())
+                {
+                    d.Add("files", files);
+                }
+                var data = new ContentPropertyData(p.Value, d);
+
+                //get the deserialized value from the property editor
+                if (p.PropertyEditor == null)
+                {
+                    LogHelper.Warn<ContentController>("No property editor found for property " + p.Alias);
+                }
+                else
+                {
+                    dboProperty.Value = p.PropertyEditor.ValueEditor.DeserializeValue(data, dboProperty.Value);
+                }
+            }
+        }
+
+        protected void HandleInvalidModelState<T, TPersisted>(ContentItemDisplayBase<T, TPersisted> display) 
+            where TPersisted : IContentBase 
+            where T : ContentPropertyBasic
+        {
+            //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
+            if (!ModelState.IsValid)
+            {
+                display.Errors = ModelState.ToErrorDictionary();
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Forbidden, display));
+            }
+        }
+
+    }
+
     /// <summary>
     /// The API controller used for editing content
     /// </summary>
     [PluginController("UmbracoApi")]
-    public class ContentController : UmbracoAuthorizedJsonController
+    public class ContentController : ContentControllerBase
     {
         private readonly ContentModelMapper _contentModelMapper;
 
@@ -66,11 +149,7 @@ namespace Umbraco.Web.Editors
             var foundContent = Services.ContentService.GetById(id);
             if (foundContent == null)
             {
-                ModelState.AddModelError("id", string.Format("content with id: {0} was not found", id));
-                var errorResponse = Request.CreateErrorResponse(
-                    HttpStatusCode.NotFound,
-                    ModelState);
-                throw new HttpResponseException(errorResponse);
+                HandleContentNotFound(id);
             }
             return _contentModelMapper.ToContentItemDisplay(foundContent);
         }
@@ -107,43 +186,14 @@ namespace Umbraco.Web.Editors
             // * and validated
             // * any file attachments have been saved to their temporary location for us to use
             // * we have a reference to the DTO object and the persisted object
-            
-            //Don't update the name if it is empty
-            if (!contentItem.Name.IsNullOrWhiteSpace())
-            {
-                contentItem.PersistedContent.Name = contentItem.Name;    
-            }
+
+            UpdateName(contentItem);
             
             //TODO: We need to support 'send to publish'
 
             //TODO: We'll need to save the new template, publishat, etc... values here
 
-            //Map the property values
-            foreach (var p in contentItem.ContentDto.Properties)
-            {
-                //get the dbo property
-                var dboProperty = contentItem.PersistedContent.Properties[p.Alias];
-
-                //create the property data to send to the property editor
-                var d = new Dictionary<string, object>();
-                //add the files if any
-                var files = contentItem.UploadedFiles.Where(x => x.PropertyId == p.Id).ToArray();
-                if (files.Any())
-                {
-                    d.Add("files", files);
-                }
-                var data = new ContentPropertyData(p.Value, d);
-                
-                //get the deserialized value from the property editor
-                if (p.PropertyEditor == null)
-                {
-                    LogHelper.Warn<ContentController>("No property editor found for property " + p.Alias);
-                }
-                else
-                {
-                    dboProperty.Value = p.PropertyEditor.ValueEditor.DeserializeValue(data, dboProperty.Value);                    
-                }
-            }
+            MapPropertyValues(contentItem);
 
             //We need to manually check the validation results here because:
             // * We still need to save the entity even if there are validation value errors
@@ -191,12 +241,9 @@ namespace Umbraco.Web.Editors
 
             //return the updated model
             var display = _contentModelMapper.ToContentItemDisplay(contentItem.PersistedContent);
+
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
-            if (!ModelState.IsValid)
-            {
-                display.Errors = ModelState.ToErrorDictionary();
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Forbidden, display));
-            }
+            HandleInvalidModelState(display);
 
             //put the correct msgs in 
             switch (contentItem.Action)

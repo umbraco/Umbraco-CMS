@@ -8,7 +8,8 @@ using Umbraco.Core.Models;
 namespace Umbraco.Web.Models.ContentEditing
 {
     public abstract class TabbedContentItem<T, TPersisted> : ContentItemBasic<T, TPersisted> 
-        where T : ContentPropertyBasic where TPersisted : IContentBase
+        where T : ContentPropertyBasic 
+        where TPersisted : IContentBase
     {
         protected TabbedContentItem()
         {

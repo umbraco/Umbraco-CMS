@@ -763,7 +763,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="editContentSendToPublish">Sent For Approval</key>
     <key alias="editContentSendToPublishText">Changes have been sent for approval</key>
     <key alias="editMediaSaved">Media saved</key>
-    <key alias="editMediaSavedText"></key>
+    <key alias="editMediaSavedText">Media saved without any errors</key>
     <key alias="editMemberSaved">Member saved</key>
     <key alias="editStylesheetPropertySaved">Stylesheet Property Saved</key>
     <key alias="editStylesheetSaved">Stylesheet saved</key>

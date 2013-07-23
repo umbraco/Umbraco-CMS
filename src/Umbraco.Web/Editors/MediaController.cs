@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -14,6 +15,7 @@ using Umbraco.Web.WebApi;
 using System.Linq;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
+using umbraco;
 
 namespace Umbraco.Web.Editors
 {
@@ -30,7 +32,7 @@ namespace Umbraco.Web.Editors
     //}
 
     [PluginController("UmbracoApi")]
-    public class MediaController : UmbracoAuthorizedJsonController
+    public class MediaController : ContentControllerBase
     {
         private readonly MediaModelMapper _mediaModelMapper;
 
@@ -67,7 +69,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = new Umbraco.Core.Models.Media("Empty", parentId, contentType);
+            var emptyContent = new Core.Models.Media("Empty", parentId, contentType);
             return _mediaModelMapper.ToMediaItemDisplay(emptyContent);
         }
 
@@ -81,11 +83,7 @@ namespace Umbraco.Web.Editors
             var foundContent = Services.MediaService.GetById(id);
             if (foundContent == null)
             {
-                ModelState.AddModelError("id", string.Format("media with id: {0} was not found", id));
-                var errorResponse = Request.CreateErrorResponse(
-                    HttpStatusCode.NotFound,
-                    ModelState);
-                throw new HttpResponseException(errorResponse);
+                HandleContentNotFound(id);
             }
             return _mediaModelMapper.ToMediaItemDisplay(foundContent);
         }
@@ -123,35 +121,26 @@ namespace Umbraco.Web.Editors
             // * any file attachments have been saved to their temporary location for us to use
             // * we have a reference to the DTO object and the persisted object
 
-            //Now, we just need to save the data
+            UpdateName(contentItem);
 
-            contentItem.PersistedContent.Name = contentItem.Name;
-            //TODO: We'll need to save the new template, publishat, etc... values here
+            MapPropertyValues(contentItem);
 
-            //Save the property values (for properties that have a valid editor ... not legacy)
-            foreach (var p in contentItem.ContentDto.Properties.Where(x => x.PropertyEditor != null))
+            //We need to manually check the validation results here because:
+            // * We still need to save the entity even if there are validation value errors
+            // * Depending on if the entity is new, and if there are non property validation errors (i.e. the name is null)
+            //      then we cannot continue saving, we can only display errors
+            // * If there are validation errors and they were attempting to publish, we can only save, NOT publish and display 
+            //      a message indicating this
+            if (!ModelState.IsValid)
             {
-                //get the dbo property
-                var dboProperty = contentItem.PersistedContent.Properties[p.Alias];
-
-                //create the property data to send to the property editor
-                var d = new Dictionary<string, object>();
-                //add the files if any
-                var files = contentItem.UploadedFiles.Where(x => x.PropertyId == p.Id).ToArray();
-                if (files.Any())
+                if (ValidationHelper.ModelHasRequiredForPersistenceErrors(contentItem)
+                    && (contentItem.Action == ContentSaveAction.SaveNew))
                 {
-                    d.Add("files", files);
-                }
-                var data = new ContentPropertyData(p.Value, d);
-
-                //get the deserialized value from the property editor
-                if (p.PropertyEditor == null)
-                {
-                    LogHelper.Warn<MediaController>("No property editor found for property " + p.Alias);
-                }
-                else
-                {
-                    dboProperty.Value = p.PropertyEditor.ValueEditor.DeserializeValue(data, dboProperty.Value);
+                    //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
+                    // add the modelstate to the outgoing object and throw a 403
+                    var forDisplay = _mediaModelMapper.ToMediaItemDisplay(contentItem.PersistedContent);
+                    forDisplay.Errors = ModelState.ToErrorDictionary();
+                    throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Forbidden, forDisplay));
                 }
             }
 
@@ -159,7 +148,21 @@ namespace Umbraco.Web.Editors
             Services.MediaService.Save(contentItem.PersistedContent);
 
             //return the updated model
-            return _mediaModelMapper.ToMediaItemDisplay(contentItem.PersistedContent);
+            var display = _mediaModelMapper.ToMediaItemDisplay(contentItem.PersistedContent);
+            
+            //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
+            HandleInvalidModelState(display);
+
+            //put the correct msgs in 
+            switch (contentItem.Action)
+            {
+                case ContentSaveAction.Save:
+                case ContentSaveAction.SaveNew:
+                    display.AddSuccessNotification(ui.Text("speechBubbles", "editMediaSaved"), ui.Text("speechBubbles", "editMediaSavedText"));
+                    break;                
+            }
+
+            return display;
         }
     }
 }

@@ -1,4 +1,4 @@
-function mediaEditController($scope, $routeParams, mediaResource, notificationsService) {
+function mediaEditController($scope, $routeParams, mediaResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper) {
 
     if ($routeParams.create) {
 
@@ -13,6 +13,13 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
             .then(function (data) {
                 $scope.contentLoaded = true;
                 $scope.content = data;
+                
+                //in one particular special case, after we've created a new item we redirect back to the edit
+                // route but there might be server validation errors in the collection which we need to display
+                // after the redirect, so we will bind all subscriptions which will show the server validation errors
+                // if there are any and then clear them so the collection no longer persists them.
+                serverValidationManager.executeAndClearAllSubscriptions();
+
             });
     }
 
@@ -28,22 +35,27 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
         }
     };
     
-    //TODO: Clean this up and share this code with the content editor
-    $scope.saveAndPublish = function (cnt) {        
-        mediaResource.saveMedia(cnt, $routeParams.create, $scope.files)
-            .then(function (data) {
-                $scope.content = data;
-                notificationsService.success("Published", "Media has been saved and published");
-            });
-    };
+    //ensure there is a form object assigned.
+    var currentForm = angularHelper.getRequiredCurrentForm($scope);
+   
+    $scope.save = function (cnt) {
+        
+        $scope.$broadcast("saving", { scope: $scope });
 
-    //TODO: Clean this up and share this code with the content editor
-    $scope.save = function (cnt) {        
+        //don't continue if the form is invalid
+        if (currentForm.$invalid) return;
+        
+        serverValidationManager.reset();
+
         mediaResource.saveMedia(cnt, $routeParams.create, $scope.files)
             .then(function (data) {
-                $scope.content = data;
-                notificationsService.success("Saved", "Media has been saved");
-            });        
+                contentEditingHelper.handleSuccessfulSave({
+                    scope: $scope,
+                    newContent: data
+                });
+            }, function (err) {
+                contentEditingHelper.handleSaveError(err, $scope);
+            });
     };
 }
 
