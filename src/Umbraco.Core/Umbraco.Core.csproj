@@ -173,6 +173,8 @@
     <Compile Include="Events\SaveEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
+    <Compile Include="IO\ResizedImage.cs" />
+    <Compile Include="IO\UmbracoMediaFile.cs" />
     <Compile Include="Manifest\ManifestBuilder.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\PackageManifest.cs" />
