@@ -1,4 +1,6 @@
-﻿using System.Xml;
+﻿using System;
+using System.Linq;
+using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -66,8 +68,13 @@ namespace Umbraco.Web.PropertyEditors
 
                     if (uploadFieldConfigNode != null && p.Value != null && p.Value is string && ((string)p.Value).IsNullOrWhiteSpace() == false)
                     {
-                        var umbracoFile = new UmbracoMediaFile(IOHelper.MapPath((string)p.Value));
-                        FillProperties(uploadFieldConfigNode, model, umbracoFile);
+                        //there might be multiple, we can only process the first one!
+                        var split = ((string) p.Value).Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+                        if (split.Any())
+                        {
+                            var umbracoFile = new UmbracoMediaFile(IOHelper.MapPath(split[0]));
+                            FillProperties(uploadFieldConfigNode, model, umbracoFile);    
+                        }
                     }
                 }
             }
