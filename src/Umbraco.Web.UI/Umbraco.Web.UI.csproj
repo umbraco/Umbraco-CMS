@@ -337,6 +337,13 @@
     <Compile Include="Umbraco\Developer\Python\EditPython.aspx.designer.cs">
       <DependentUpon>editPython.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.cs">
+      <DependentUpon>ChangeDocType.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.designer.cs">
+      <DependentUpon>ChangeDocType.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Dialogs\EditMacro.aspx.cs">
       <DependentUpon>EditMacro.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -510,6 +517,9 @@
     <Content Include="Umbraco\Developer\RelationTypes\RelationTypesWebService.asmx" />
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionDeleteRelationType.js" />
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionNewRelationType.js" />
+    <Content Include="Umbraco\Dialogs\ChangeDocType.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Umbraco\Dialogs\EditMacro.aspx" />
     <Content Include="Umbraco\Images\delete.gif" />
     <Content Include="Umbraco\Images\delete.png" />
