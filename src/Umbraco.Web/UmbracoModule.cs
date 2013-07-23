@@ -63,6 +63,14 @@ namespace Umbraco.Web
 		/// Processses the Umbraco Request
 		/// </summary>
 		/// <param name="httpContext"></param>
+		/// <remarks>
+		/// 
+		/// This will check if we are trying to route to the default back office page (i.e. ~/Umbraco/ or ~/Umbraco or ~/Umbraco/Default )
+		/// and ensure that the MVC handler executes for that. This is required because the route for /Umbraco will never execute because 
+        /// files/folders exist there and we cannot set the RouteCollection.RouteExistingFiles = true since that will muck a lot of other things up.
+        /// So we handle it here and explicitly execute the MVC controller.
+		/// 
+		/// </remarks>
 		void ProcessRequest(HttpContextBase httpContext)
 		{
 			// do not process if client-side request
@@ -75,6 +83,13 @@ namespace Umbraco.Web
 				throw new InvalidOperationException("The UmbracoContext.RoutingContext has not been assigned, ProcessRequest cannot proceed unless there is a RoutingContext assigned to the UmbracoContext");
 
 			var umbracoContext = UmbracoContext.Current;		
+
+            //re-write for the default back office path
+            if (httpContext.Request.Url.IsDefaultBackOfficeRequest())
+            {
+                RewriteToBackOfficeHandler(httpContext);
+                return;
+            }
 
 			// do not process but remap to handler if it is a base rest request
 			if (BaseRest.BaseRestHandler.IsBaseRestRequest(umbracoContext.OriginalRequestUrl))
@@ -344,6 +359,30 @@ namespace Umbraco.Web
 		}
 
 		#endregion
+
+        /// <summary>
+        /// Rewrites to the default back office page.
+        /// </summary>
+        /// <param name="context"></param>
+        private void RewriteToBackOfficeHandler(HttpContextBase context)
+        {
+            // GlobalSettings.Path has already been through IOHelper.ResolveUrl() so it begins with / and vdir (if any)
+            var rewritePath = GlobalSettings.Path.TrimEnd(new[] { '/' }) + "/Default";
+            // rewrite the path to the path of the handler (i.e. /umbraco/RenderMvc)
+            context.RewritePath(rewritePath, "", "", false);
+
+            //if it is MVC we need to do something special, we are not using TransferRequest as this will 
+            //require us to rewrite the path with query strings and then reparse the query strings, this would 
+            //also mean that we need to handle IIS 7 vs pre-IIS 7 differently. Instead we are just going to create
+            //an instance of the UrlRoutingModule and call it's PostResolveRequestCache method. This does:
+            // * Looks up the route based on the new rewritten URL
+            // * Creates the RequestContext with all route parameters and then executes the correct handler that matches the route
+            //we also cannot re-create this functionality because the setter for the HttpContext.Request.RequestContext is internal
+            //so really, this is pretty much the only way without using Server.TransferRequest and if we did that, we'd have to rethink
+            //a bunch of things!
+            var urlRouting = new UrlRoutingModule();
+            urlRouting.PostResolveRequestCache(context);
+        }
 
 		/// <summary>
 		/// Rewrites to the correct Umbraco handler, either WebForms or Mvc

@@ -21,7 +21,6 @@ namespace Umbraco.Web.Mvc
         /// </remarks>
         public override void RegisterArea(AreaRegistrationContext context)
         {
-            //Default back office route
             context.MapRoute(
                 "Umbraco_back_office",
                 GlobalSettings.UmbracoMvcArea + "/{action}/{id}",

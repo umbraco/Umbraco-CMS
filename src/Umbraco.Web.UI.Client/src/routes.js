@@ -1,7 +1,7 @@
 app.config(function ($routeProvider) {
     $routeProvider
-    .when('/:section', {
-        templateUrl: function (rp) {
+    .when('/:section', { 
+        templateUrl: function (rp) { 
                 if (rp.section === "default")
                 {
                     rp.section = "content";

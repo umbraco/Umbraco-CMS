@@ -99,7 +99,14 @@ module.exports = function (grunt) {
         files: [{ dest: '<%= distdir %>/js', src : '*.js', expand: true, cwd: 'src/common/mocks/' }]
       },
       vs: {
-        files: [{ dest: '<%= vsdir %>/', src : '**', expand: true, cwd: '<%= distdir %>/' }]
+          files: [
+              //everything except the index.html root file!
+              //then we need to figure out how to not copy all the test stuff either!?
+              { dest: '<%= vsdir %>/assets', src: '**', expand: true, cwd: '<%= distdir %>/assets' },
+              { dest: '<%= vsdir %>/js', src: '**', expand: true, cwd: '<%= distdir %>/js' },
+              { dest: '<%= vsdir %>/lib', src: '**', expand: true, cwd: '<%= distdir %>/lib' },
+              { dest: '<%= vsdir %>/views', src: '**', expand: true, cwd: '<%= distdir %>/views' }
+          ]
       },
       packages: {
         files: [{ dest: '<%= vsdir %>/../App_Plugins', src : '**', expand: true, cwd: 'src/packages/' }]

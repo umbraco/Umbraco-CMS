@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Web;
+using System.Web.Mvc;
 using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -18,8 +19,10 @@ namespace umbraco
     {
         protected void Page_Load(object sender, System.EventArgs e)
         {
-
-            Server.Transfer("umbraco.aspx");
+            //var mvcHandler = new MvcHandler()
+            //Server.TransferRequest();
+            //Server.Transfer("~/Umbraco/Default");
+            //Server.Transfer("umbraco.aspx");
             // Put user code to initialize the page here
         }
 

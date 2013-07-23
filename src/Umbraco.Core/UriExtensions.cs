@@ -2,6 +2,8 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Web;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core
 {
@@ -10,6 +12,23 @@ namespace Umbraco.Core
     /// </summary>
     public static class UriExtensions
     {
+        /// <summary>
+        /// Checks if the uri is a request for the default back office page
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        internal static bool IsDefaultBackOfficeRequest(this Uri url)
+        {
+            if (url.AbsolutePath.InvariantEquals(GlobalSettings.Path.TrimEnd("/"))
+                || url.AbsolutePath.InvariantEquals(GlobalSettings.Path.EnsureEndsWith('/'))
+                || url.AbsolutePath.InvariantEquals(GlobalSettings.Path.EnsureEndsWith('/') + "Default")
+                || url.AbsolutePath.InvariantEquals(GlobalSettings.Path.EnsureEndsWith('/') + "Default/"))
+            {
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// This is a performance tweak to check if this is a .css, .js or .ico, .jpg, .jpeg, .png, .gif file request since
         /// .Net will pass these requests through to the module when in integrated mode.
