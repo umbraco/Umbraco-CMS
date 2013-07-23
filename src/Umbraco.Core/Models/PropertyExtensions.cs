@@ -39,15 +39,8 @@ namespace Umbraco.Core.Models
             //SD: With the new null checks below, this shouldn't fail anymore.
             var dt = property.PropertyType.DataType(property.Id);
             if (dt != null && dt.Data != null)
-            {
-                if (dt.Id == new Guid(Constants.PropertyEditors.CheckBoxList))
-                {
-                    xmlNode.AppendChild(xd.CreateCDataSection(dt.Data.Value.ToString()));
-                }
-                else
-                {
-                    xmlNode.AppendChild(dt.Data.ToXMl(xd));
-                }
+            {                
+                xmlNode.AppendChild(dt.Data.ToXMl(xd));
             }
 
             var element = xmlNode.GetXElement();
