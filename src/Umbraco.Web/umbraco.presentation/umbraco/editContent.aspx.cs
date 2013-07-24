@@ -4,6 +4,7 @@ using System.Web.UI.WebControls;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.IO;
+using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic.Actions;
 using umbraco.uicontrols.DatePicker;
@@ -290,63 +291,71 @@ namespace umbraco.cms.presentation
         {
             //update UI and set document properties
             PerformSaveLogic();
+            
+            //the business logic here will check to see if the doc can actually be published and will return the 
+            // appropriate result so we can display the correct error messages (or success).
+            var savePublishResult = _document.SaveAndPublishWithResult(UmbracoUser);
 
-            //the page is not valid, we'll still need to save the document and persist it
-            if (!Page.IsValid)
-            {                
-                ClientTools.ShowSpeechBubble(
-                    speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSavedHeader", null),
-                    ui.Text("speechBubbles", "editContentSavedText", null));
-                _document.Save();
-                return;
-            }
+            ShowMessageForStatus(savePublishResult.Result);
 
-            //If the document is at a level deeper than the root but it's ancestor's path is not published, 
-            //it means that we cannot actually publish this document because one of it's parent's is not published.
-            //So, we still need to save the document but we'll show a different notification.
-            if (_document.Level > 1 && !Services.ContentService.IsPublishable(_document.Content))
+            if (savePublishResult.Success)
             {
-                ClientTools.ShowSpeechBubble(
-                    speechBubbleIcon.warning, ui.Text("publish"), 
-                    ui.Text("speechBubbles", "editContentPublishedFailedByParent"));
-                _document.Save();
-                return;
-            }
-                    
-            if (_document.SaveAndPublish(UmbracoUser))
-            {
-                //library.UpdateDocumentCache(_document.Id);
-
-                ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));
-
                 _littPublishStatus.Text = string.Format("{0}: {1}<br/>", ui.Text("content", "lastPublished", UmbracoUser), _document.VersionDate.ToString());
 
                 if (UmbracoUser.GetPermissions(_document.Path).IndexOf("U") > -1)
+                {
                     _unPublish.Visible = true;
+                }
 
                 _documentHasPublishedVersion = _document.Content.HasPublishedVersion();
-
-                //if (previouslyPublished == false)
-                //{
-                //    var descendants = ((ContentService)ApplicationContext.Current.Services.ContentService)
-                //        .GetPublishedDescendants(_document.Content).ToList();
-
-                //    if (descendants.Any())
-                //    {
-                //        foreach (var descendant in descendants)
-                //        {
-                //            library.UpdateDocumentCache(descendant.Id);
-                //        }
-                //        library.RefreshContent();
-                //    }
-                //}
             }
-            else
-            {
-                ClientTools.ShowSpeechBubble(speechBubbleIcon.warning, ui.Text("publish"), ui.Text("speechBubbles", "contentPublishedFailedByEvent"));
-            }
-
+            
             ClientTools.SyncTree(_document.Path, true);
+        }
+
+        private void ShowMessageForStatus(PublishStatus status)
+        {
+            switch (status.StatusType)
+            {
+                case PublishStatusType.Success:
+                case PublishStatusType.SuccessAlreadyPublished:
+                    ClientTools.ShowSpeechBubble(
+                        speechBubbleIcon.save, 
+                        ui.Text("speechBubbles", "editContentPublishedHeader", UmbracoUser), 
+                        ui.Text("speechBubbles", "editContentPublishedText", UmbracoUser));
+                    break;
+                case PublishStatusType.FailedPathNotPublished:
+                    ClientTools.ShowSpeechBubble(
+                        speechBubbleIcon.warning,
+                        ui.Text("publish"),
+                        ui.Text("publish", "contentPublishedFailedByParent",
+                                string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
+                                UmbracoUser).Trim());
+                    break;
+                case PublishStatusType.FailedCancelledByEvent:
+                    ClientTools.ShowSpeechBubble(
+                        speechBubbleIcon.warning,
+                        ui.Text("publish"),
+                        ui.Text("speechBubbles", "contentPublishedFailedByEvent"));
+                    break;
+                case PublishStatusType.FailedHasExpired:
+                case PublishStatusType.FailedAwaitingRelease:
+                case PublishStatusType.FailedIsTrashed:
+                case PublishStatusType.FailedContentInvalid:
+                    ClientTools.ShowSpeechBubble(
+                        speechBubbleIcon.warning,
+                        ui.Text("publish"),
+                        ui.Text("publish", "contentPublishedFailedInvalid",
+                                new[]
+                                    {
+                                        string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
+                                        string.Join(",", status.InvalidProperties.Select(x => x.Alias))
+                                    },
+                                UmbracoUser).Trim());
+                    break;
+                default:
+                    throw new IndexOutOfRangeException();
+            }
         }
 
         protected void UnPublishDo(object sender, EventArgs e)

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Publishing
@@ -9,6 +10,11 @@ namespace Umbraco.Core.Publishing
     {
         public IContent ContentItem { get; private set; }
         public PublishStatusType StatusType { get; internal set; }
+
+        /// <summary>
+        /// Gets sets the invalid properties if the status failed due to validation.
+        /// </summary>
+        public IEnumerable<Property> InvalidProperties { get; set; }
 
         public PublishStatus(IContent content, PublishStatusType statusType)
         {
@@ -24,6 +30,5 @@ namespace Umbraco.Core.Publishing
         {            
         }
 
-        
     }
 }
