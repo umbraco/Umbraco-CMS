@@ -20,7 +20,6 @@ namespace Umbraco.Core.Models
         private int _level;
         private int _sortOrder;
         private int _parentId;
-        private string _nodePath;
         private int _masterTemplateId;
         private string _masterTemplateAlias;
 
@@ -28,7 +27,6 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.Level);
         private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.SortOrder);
         private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.ParentId);
-        private static readonly PropertyInfo NodePathSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.NodePath);
         //private static readonly PropertyInfo MasterTemplateIdSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.MasterTemplateId);
         private static readonly PropertyInfo MasterTemplateAliasSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.MasterTemplateAlias);
         
@@ -104,21 +102,7 @@ namespace Umbraco.Core.Models
                 }, _parentId, ParentIdSelector);    
             }
         }
-
-        [DataMember]
-        internal string NodePath
-        {
-            get { return _nodePath; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _nodePath = value;
-                    return _nodePath;
-                }, _nodePath, NodePathSelector);    
-            }
-        }
-
+        
         [DataMember]
         internal Lazy<int> MasterTemplateId { get; set; }
 
