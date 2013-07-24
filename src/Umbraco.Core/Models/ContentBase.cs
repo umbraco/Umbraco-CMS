@@ -27,6 +27,7 @@ namespace Umbraco.Core.Models
         private bool _trashed;
         private int _contentTypeId;
         private PropertyCollection _properties;
+        private readonly List<Property> _lastInvalidProperties = new List<Property>();
 
         /// <summary>
         /// Protected constructor for ContentBase (Base for Content and Media)
@@ -421,7 +422,17 @@ namespace Umbraco.Core.Models
         /// <returns>True if content is valid otherwise false</returns>
         public virtual bool IsValid()
         {
-            return Properties.Any(property => !property.IsValid()) == false;
+            _lastInvalidProperties.Clear();
+            _lastInvalidProperties.AddRange(Properties.Where(property => property.IsValid() == false));
+            return _lastInvalidProperties.Any() == false;
+        }
+
+        /// <summary>
+        /// Returns a collection of the result of the last validation process, this collection contains all invalid properties.
+        /// </summary>
+        internal IEnumerable<Property> LastInvalidProperties
+        {
+            get { return _lastInvalidProperties; }
         }
 
         public abstract void ChangeTrashedState(bool isTrashed, int parentId = -20);

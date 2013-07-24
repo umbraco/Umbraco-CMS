@@ -1566,6 +1566,8 @@ namespace Umbraco.Core.Services
                 publishStatus.StatusType = CheckAndLogIsPublishable(content);
                 //Content contains invalid property values and can therefore not be published - fire event?
                 publishStatus.StatusType = CheckAndLogIsValid(content);
+                //set the invalid properties (if there are any)
+                publishStatus.InvalidProperties = ((ContentBase) content).LastInvalidProperties;
 
                 //if we're still successful, then publish using the strategy
                 if (publishStatus.StatusType == PublishStatusType.Success)

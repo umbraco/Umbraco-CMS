@@ -78,7 +78,7 @@ namespace Umbraco.Core.Persistence.Caching
         {
             foreach (var key in _keyTracker)
             {
-                if (key.StartsWith(type.Name))
+                if (key.StartsWith(string.Format("{0}{1}-", CacheItemPrefix, type.Name)))
                 {
                     var item = _memoryCache != null
                                ? _memoryCache.Get(key)

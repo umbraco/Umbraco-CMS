@@ -1027,11 +1027,12 @@ namespace umbraco.cms.businesslogic.web
         }
 
         /// <summary>
-        /// Saves and publishes a document
+        /// Do not use! only used internally in order to get the published status until we upgrade everything to use the new API
         /// </summary>
-        /// <param name="u">The usercontext under which the action are performed</param>
+        /// <param name="u"></param>
         /// <returns></returns>
-        public bool SaveAndPublish(User u)
+        [Obsolete("Do not use! only used internally in order to get the published status until we upgrade everything to use the new API")]
+        internal Attempt<PublishStatus> SaveAndPublishWithResult(User u)
         {
             foreach (var property in GenericProperties)
             {
@@ -1065,13 +1066,24 @@ namespace umbraco.cms.businesslogic.web
                     //Now we need to fire the After publish event
                     FireAfterPublish(publishArgs);
 
-                    return result.Success;
+                    return result;
                 }
-                
-                return false;
+
+                return Attempt<PublishStatus>.False;
             }
 
-            return false;
+            return Attempt<PublishStatus>.False;
+        }
+
+        /// <summary>
+        /// Saves and publishes a document
+        /// </summary>
+        /// <param name="u">The usercontext under which the action are performed</param>
+        /// <returns></returns>
+        public bool SaveAndPublish(User u)
+        {
+            var result = SaveAndPublishWithResult(u);
+            return result.Success;
         }
 
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.HasPublishedVersion()", false)]

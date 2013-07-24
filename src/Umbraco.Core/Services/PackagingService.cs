@@ -9,6 +9,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -286,7 +287,7 @@ namespace Umbraco.Core.Services
             var properties = from property in element.Elements()
                              where property.Attribute("isDoc") == null
                              select property;
-
+            
             IContent content = parent == null
                                    ? new Content(nodeName, parentId, contentType)
                                    {
@@ -303,11 +304,32 @@ namespace Umbraco.Core.Services
             {
                 string propertyTypeAlias = isLegacySchema ? property.Attribute("alias").Value : property.Name.LocalName;
                 if (content.HasProperty(propertyTypeAlias))
-                    content.SetValue(propertyTypeAlias, property.Value);
+                {
+                    var propertyValue = property.Value;
+
+                    var propertyType = contentType.PropertyTypes.FirstOrDefault(pt => pt.Alias == propertyTypeAlias);
+                    if (propertyType != null && propertyType.DataTypeId == new Guid(Constants.PropertyEditors.CheckBoxList))
+                    {
+                        var database = ApplicationContext.Current.DatabaseContext.Database;
+                        var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNo" + "deId = @Id", new { Id = propertyType.DataTypeDefinitionId });
+
+                        var propertyValueList = new List<string>();
+                        foreach (var preValue in propertyValue.Split(','))
+                        {
+                            propertyValueList.Add(dtos.Single(x => x.Value == preValue).Id.ToString(CultureInfo.InvariantCulture));
+                        }
+                        
+                        propertyValue = string.Join(",", propertyValueList.ToArray());
+                    }
+
+                    content.SetValue(propertyTypeAlias, propertyValue);
+                }
             }
 
             return content;
         }
+
+
 
         #endregion
 

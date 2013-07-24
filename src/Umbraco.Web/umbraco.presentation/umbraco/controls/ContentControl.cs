@@ -545,16 +545,19 @@ namespace umbraco.controls
             {
                 try
                 {
-                    RequiredFieldValidator rq = new RequiredFieldValidator();
-                    rq.ControlToValidate = dt.DataEditor.Editor.ID;
-                    Control component = dt.DataEditor.Editor; // holder.FindControl(rq.ControlToValidate);
-                    ValidationPropertyAttribute attribute =
-                        (ValidationPropertyAttribute)
-                        TypeDescriptor.GetAttributes(component)[typeof(ValidationPropertyAttribute)];
+                    var rq = new RequiredFieldValidator
+                        {
+                            ControlToValidate = dt.DataEditor.Editor.ID,
+                            CssClass = "error"
+                        };
+                    rq.Style.Add(HtmlTextWriterStyle.Display, "block");
+                    rq.Style.Add(HtmlTextWriterStyle.Padding, "2px");
+                    var component = dt.DataEditor.Editor; // holder.FindControl(rq.ControlToValidate);
+                    var attribute = (ValidationPropertyAttribute)TypeDescriptor.GetAttributes(component)[typeof(ValidationPropertyAttribute)];
                     PropertyDescriptor pd = null;
                     if (attribute != null)
                     {
-                        pd = TypeDescriptor.GetProperties(component, (Attribute[])null)[attribute.Name];
+                        pd = TypeDescriptor.GetProperties(component, null)[attribute.Name];
                     }
                     if (pd != null)
                     {
@@ -578,17 +581,19 @@ namespace umbraco.controls
             {
                 try
                 {
-                    RegularExpressionValidator rv = new RegularExpressionValidator();
-                    rv.ControlToValidate = dt.DataEditor.Editor.ID;
-
-                    Control component = dt.DataEditor.Editor; // holder.FindControl(rq.ControlToValidate);
-                    ValidationPropertyAttribute attribute =
-                        (ValidationPropertyAttribute)
-                        TypeDescriptor.GetAttributes(component)[typeof(ValidationPropertyAttribute)];
+                    var rv = new RegularExpressionValidator
+                        {
+                            ControlToValidate = dt.DataEditor.Editor.ID,
+                            CssClass = "error"
+                        };
+                    rv.Style.Add(HtmlTextWriterStyle.Display, "block");
+                    rv.Style.Add(HtmlTextWriterStyle.Padding, "2px");
+                    var component = dt.DataEditor.Editor; // holder.FindControl(rq.ControlToValidate);
+                    var attribute = (ValidationPropertyAttribute)TypeDescriptor.GetAttributes(component)[typeof(ValidationPropertyAttribute)];
                     PropertyDescriptor pd = null;
                     if (attribute != null)
                     {
-                        pd = TypeDescriptor.GetProperties(component, (Attribute[])null)[attribute.Name];
+                        pd = TypeDescriptor.GetProperties(component, null)[attribute.Name];
                     }
                     if (pd != null)
                     {
