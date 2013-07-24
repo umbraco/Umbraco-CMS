@@ -670,7 +670,7 @@ To manage your website, simply open the umbraco back office and start adding con
   <area alias="publish">
     <key alias="contentPublishedFailedInvalid">
       <![CDATA[
-      %0% could not be published because these properties %1% did not pass validation rules.
+      %0% could not be published because these properties:  %1%  did not pass validation rules.
     ]]>
     </key>
     <key alias="contentPublishedFailedByEvent">
