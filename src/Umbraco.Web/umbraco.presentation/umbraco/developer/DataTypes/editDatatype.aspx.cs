@@ -52,6 +52,12 @@ namespace umbraco.cms.presentation.developer
                     li.Text = ide.Key.ToString().Substring(0, ide.Key.ToString().IndexOf("|"));
                     li.Value = ide.Value.ToString();
 
+                    //SJ Fixes U4-2488 Edit datatype: Media Picker appears incorrectly
+                    //Apparently in some installs the media picker rendercontrol is installed twice with 
+                    //the exact same ID so we need to check for duplicates
+                    if (ddlRenderControl.Items.Contains(li))
+                        continue;
+
                     if (!String.IsNullOrEmpty(datatTypeId) && li.Value.ToString() == datatTypeId) li.Selected = true;
                     ddlRenderControl.Items.Add(li);
                 }
