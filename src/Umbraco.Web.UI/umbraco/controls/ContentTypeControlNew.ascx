@@ -79,9 +79,8 @@
 
 <asp:Panel ID="pnlStructure" runat="server">
     <cc2:Pane ID="Pane6" runat="server">
-        <cc2:PropertyPanel ID="pp_Root" runat="server" Text="Allow at root">
-            <asp:CheckBox runat="server" ID="allowAtRoot" Text="Yes" /><br />
-            Only Content Types with this checked can be created at the root level of Content and Media trees
+        <cc2:PropertyPanel ID="pp_Root" runat="server" Text="Allow at root <br/><small>Only Content Types with this checked can be created at the root level of Content and Media trees</small>">
+            <asp:CheckBox runat="server" ID="allowAtRoot" Text="Yes" /><br />            
         </cc2:PropertyPanel>     
     </cc2:Pane>
   <cc2:Pane ID="Pane5" runat="server">
