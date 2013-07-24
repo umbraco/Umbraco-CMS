@@ -1,0 +1,99 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
+using Umbraco.Web.Models.ContentEditing;
+
+namespace Umbraco.Web.Editors
+{
+    /// <summary>
+    /// An abstract base controller used for media/content (and probably members) to try to reduce code replication.
+    /// </summary>
+    public abstract class ContentControllerBase : UmbracoAuthorizedJsonController
+    {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        protected ContentControllerBase()
+            : this(UmbracoContext.Current)
+        {            
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        protected ContentControllerBase(UmbracoContext umbracoContext)
+            : base(umbracoContext)
+        {
+        }
+
+        protected void HandleContentNotFound(int id)
+        {
+            ModelState.AddModelError("id", string.Format("content with id: {0} was not found", id));
+            var errorResponse = Request.CreateErrorResponse(
+                HttpStatusCode.NotFound,
+                ModelState);
+            throw new HttpResponseException(errorResponse);
+        }
+
+        protected void UpdateName<TPersisted>(ContentItemSave<TPersisted> contentItem) 
+            where TPersisted : IContentBase
+        {
+            //Don't update the name if it is empty
+            if (!contentItem.Name.IsNullOrWhiteSpace())
+            {
+                contentItem.PersistedContent.Name = contentItem.Name;
+            }
+        }
+
+        protected void MapPropertyValues<TPersisted>(ContentItemSave<TPersisted> contentItem)
+            where TPersisted : IContentBase
+        {
+            //Map the property values
+            foreach (var p in contentItem.ContentDto.Properties)
+            {
+                //get the dbo property
+                var dboProperty = contentItem.PersistedContent.Properties[p.Alias];
+
+                //create the property data to send to the property editor
+                var d = new Dictionary<string, object>();
+                //add the files if any
+                var files = contentItem.UploadedFiles.Where(x => x.PropertyId == p.Id).ToArray();
+                if (files.Any())
+                {
+                    d.Add("files", files);
+                }
+                var data = new ContentPropertyData(p.Value, d);
+
+                //get the deserialized value from the property editor
+                if (p.PropertyEditor == null)
+                {
+                    LogHelper.Warn<ContentController>("No property editor found for property " + p.Alias);
+                }
+                else
+                {
+                    dboProperty.Value = p.PropertyEditor.ValueEditor.DeserializeValue(data, dboProperty.Value);
+                }
+            }
+        }
+
+        protected void HandleInvalidModelState<T, TPersisted>(ContentItemDisplayBase<T, TPersisted> display) 
+            where TPersisted : IContentBase 
+            where T : ContentPropertyBasic
+        {
+            //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
+            if (!ModelState.IsValid)
+            {
+                display.Errors = ModelState.ToErrorDictionary();
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Forbidden, display));
+            }
+        }
+
+    }
+}

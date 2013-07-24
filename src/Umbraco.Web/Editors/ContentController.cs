@@ -6,10 +6,9 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
@@ -22,89 +21,6 @@ using umbraco;
 
 namespace Umbraco.Web.Editors
 {
-    public abstract class ContentControllerBase : UmbracoAuthorizedJsonController
-    {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        protected ContentControllerBase()
-            : this(UmbracoContext.Current)
-        {            
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        protected ContentControllerBase(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {
-        }
-
-        protected void HandleContentNotFound(int id)
-        {
-            ModelState.AddModelError("id", string.Format("content with id: {0} was not found", id));
-            var errorResponse = Request.CreateErrorResponse(
-                HttpStatusCode.NotFound,
-                ModelState);
-            throw new HttpResponseException(errorResponse);
-        }
-
-        protected void UpdateName<TPersisted>(ContentItemSave<TPersisted> contentItem) 
-            where TPersisted : IContentBase
-        {
-            //Don't update the name if it is empty
-            if (!contentItem.Name.IsNullOrWhiteSpace())
-            {
-                contentItem.PersistedContent.Name = contentItem.Name;
-            }
-        }
-
-        protected void MapPropertyValues<TPersisted>(ContentItemSave<TPersisted> contentItem)
-            where TPersisted : IContentBase
-        {
-            //Map the property values
-            foreach (var p in contentItem.ContentDto.Properties)
-            {
-                //get the dbo property
-                var dboProperty = contentItem.PersistedContent.Properties[p.Alias];
-
-                //create the property data to send to the property editor
-                var d = new Dictionary<string, object>();
-                //add the files if any
-                var files = contentItem.UploadedFiles.Where(x => x.PropertyId == p.Id).ToArray();
-                if (files.Any())
-                {
-                    d.Add("files", files);
-                }
-                var data = new ContentPropertyData(p.Value, d);
-
-                //get the deserialized value from the property editor
-                if (p.PropertyEditor == null)
-                {
-                    LogHelper.Warn<ContentController>("No property editor found for property " + p.Alias);
-                }
-                else
-                {
-                    dboProperty.Value = p.PropertyEditor.ValueEditor.DeserializeValue(data, dboProperty.Value);
-                }
-            }
-        }
-
-        protected void HandleInvalidModelState<T, TPersisted>(ContentItemDisplayBase<T, TPersisted> display) 
-            where TPersisted : IContentBase 
-            where T : ContentPropertyBasic
-        {
-            //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
-            if (!ModelState.IsValid)
-            {
-                display.Errors = ModelState.ToErrorDictionary();
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Forbidden, display));
-            }
-        }
-
-    }
-
     /// <summary>
     /// The API controller used for editing content
     /// </summary>
@@ -226,7 +142,9 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            bool isPublishSuccess = false;
+            //initialize this to successful
+            var publishStatus = new Attempt<PublishStatus>(true, null);
+
             if (contentItem.Action == ContentSaveAction.Save || contentItem.Action == ContentSaveAction.SaveNew)
             {
                 //save the item
@@ -235,7 +153,7 @@ namespace Umbraco.Web.Editors
             else
             {
                 //publish the item and check if it worked, if not we will show a diff msg below
-                isPublishSuccess = Services.ContentService.SaveAndPublish(contentItem.PersistedContent);
+                publishStatus = ((ContentService)Services.ContentService).SaveAndPublishInternal(contentItem.PersistedContent);
             }
             
 
@@ -254,29 +172,52 @@ namespace Umbraco.Web.Editors
                     break;
                 case ContentSaveAction.Publish:
                 case ContentSaveAction.PublishNew:
-
-                    //If the document is at a level deeper than the root but it's ancestor's path is not published, 
-                    //it means that we cannot actually publish this document because one of it's parent's is not published.
-                    //So, we still need to save the document but we'll show a different notification.
-                    if (contentItem.PersistedContent.Level > 1 && !Services.ContentService.IsPublishable(contentItem.PersistedContent))
-                    {
-                        display.AddWarningNotification(ui.Text("publish"), ui.Text("speechBubbles", "editContentPublishedFailedByParent"));
-                    }
-                    else
-                    {
-                        if (isPublishSuccess)
-                        {
-                            display.AddSuccessNotification(ui.Text("speechBubbles", "editContentPublishedHeader"), ui.Text("speechBubbles", "editContentPublishedText"));
-                        }
-                        else
-                        {
-                            display.AddWarningNotification(ui.Text("publish"), ui.Text("speechBubbles", "contentPublishedFailedByEvent"));
-                        }
-                    }
+                    ShowMessageForStatus(publishStatus.Result, display);
                     break;
             }
 
             return display;
+        }
+
+        private void ShowMessageForStatus(PublishStatus status, ContentItemDisplay display)
+        {
+            switch (status.StatusType)
+            {
+                case PublishStatusType.Success:
+                case PublishStatusType.SuccessAlreadyPublished:
+                    display.AddSuccessNotification(
+                        ui.Text("speechBubbles", "editContentPublishedHeader", UmbracoUser),
+                        ui.Text("speechBubbles", "editContentPublishedText", UmbracoUser));
+                    break;
+                case PublishStatusType.FailedPathNotPublished:
+                    display.AddWarningNotification(
+                        ui.Text("publish"),
+                        ui.Text("publish", "contentPublishedFailedByParent",
+                                string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
+                                UmbracoUser).Trim());
+                    break;
+                case PublishStatusType.FailedCancelledByEvent:
+                    display.AddWarningNotification(
+                        ui.Text("publish"),
+                        ui.Text("speechBubbles", "contentPublishedFailedByEvent"));
+                    break;
+                case PublishStatusType.FailedHasExpired:
+                case PublishStatusType.FailedAwaitingRelease:
+                case PublishStatusType.FailedIsTrashed:
+                case PublishStatusType.FailedContentInvalid:
+                    display.AddWarningNotification(
+                        ui.Text("publish"),
+                        ui.Text("publish", "contentPublishedFailedInvalid",
+                                new[]
+                                    {
+                                        string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
+                                        string.Join(",", status.InvalidProperties.Select(x => x.Alias))
+                                    },
+                                UmbracoUser).Trim());
+                    break;
+                default:
+                    throw new IndexOutOfRangeException();
+            }
         }
 
     }
