@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -52,7 +53,7 @@ namespace Umbraco.Web.Editors
         {
             var foundContent = ((ContentService) Services.ContentService).GetByIds(ids);
 
-            return foundContent.Select(x => _contentModelMapper.ToContentItemDisplay(x));
+            return foundContent.Select(Mapper.Map<IContent, ContentItemDisplay>);
         }
 
         /// <summary>
@@ -67,7 +68,7 @@ namespace Umbraco.Web.Editors
             {
                 HandleContentNotFound(id);
             }
-            return _contentModelMapper.ToContentItemDisplay(foundContent);
+            return Mapper.Map<IContent, ContentItemDisplay>(foundContent);
         }
 
         /// <summary>
@@ -85,7 +86,7 @@ namespace Umbraco.Web.Editors
             }
 
             var emptyContent = new Content("", parentId, contentType);
-            return _contentModelMapper.ToContentItemDisplay(emptyContent);
+            return Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
         }
 
         /// <summary>
@@ -124,7 +125,7 @@ namespace Umbraco.Web.Editors
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the modelstate to the outgoing object and throw a 403
-                    var forDisplay = _contentModelMapper.ToContentItemDisplay(contentItem.PersistedContent);
+                    var forDisplay = Mapper.Map<IContent, ContentItemDisplay>(contentItem.PersistedContent);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Forbidden, forDisplay));
                     
@@ -158,7 +159,7 @@ namespace Umbraco.Web.Editors
             
 
             //return the updated model
-            var display = _contentModelMapper.ToContentItemDisplay(contentItem.PersistedContent);
+            var display = Mapper.Map<IContent, ContentItemDisplay>(contentItem.PersistedContent);
 
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);

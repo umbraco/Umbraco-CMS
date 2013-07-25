@@ -56,7 +56,7 @@ namespace Umbraco.Tests.TestHelpers
                 var mappers = PluginManager.Current.FindAndCreateInstances<IMapperConfiguration>();
                 foreach (var mapper in mappers)
                 {
-                    mapper.ConfigureMappings(configuration);
+                    mapper.ConfigureMappings(configuration, ApplicationContext);
                 }
             });
         }

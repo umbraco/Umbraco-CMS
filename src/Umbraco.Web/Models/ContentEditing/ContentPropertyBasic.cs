@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -19,6 +20,12 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "alias", IsRequired = true)]
         [Required(AllowEmptyStrings = false)]
         public string Alias { get; set; }
+
+        /// <summary>
+        /// Used internally during model mapping
+        /// </summary>
+        [IgnoreDataMember]
+        internal PropertyEditor PropertyEditor { get; set; }
 
     }
 }

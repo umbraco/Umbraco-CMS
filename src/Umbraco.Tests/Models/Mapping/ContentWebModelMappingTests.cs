@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 
 namespace Umbraco.Tests.Models.Mapping
@@ -22,6 +24,11 @@ namespace Umbraco.Tests.Models.Mapping
             
         }
 
+        protected override DatabaseBehavior DatabaseTestBehavior
+        {
+            get { return DatabaseBehavior.NewSchemaPerFixture; }
+        }
+
         protected override void FreezeResolution()
         {
             PropertyEditorResolver.Current = new PropertyEditorResolver(
@@ -31,6 +38,113 @@ namespace Umbraco.Tests.Models.Mapping
         }
 
         [Test]
+        public void To_Media_Item_Simple()
+        {
+            var contentType = MockedContentTypes.CreateImageMediaType();
+            var content = MockedMedia.CreateMediaImage(contentType, -1);
+
+            var result = Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>(content);
+
+            AssertBasics(result, content);
+
+            foreach (var p in content.Properties)
+            {
+                AssertBasicProperty(result, p);
+            }
+        }
+
+        [Test]
+        public void To_Content_Item_Simple()
+        {
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+            var content = MockedContent.CreateSimpleContent(contentType);
+
+            var result = Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>(content);
+
+            AssertBasics(result, content);
+
+            foreach (var p in content.Properties)
+            {
+                AssertBasicProperty(result, p);
+            }
+        }
+
+        [Test]
+        public void To_Content_Item_Dto()
+        {
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+            var content = MockedContent.CreateSimpleContent(contentType);
+
+            var result = Mapper.Map<IContent, ContentItemDto<IContent>>(content);
+
+            AssertContentItem(result, content);    
+        }
+
+        [Test]
+        public void To_Media_Item_Dto()
+        {
+            var contentType = MockedContentTypes.CreateImageMediaType();
+            var content = MockedMedia.CreateMediaImage(contentType, -1);
+
+            var result = Mapper.Map<IMedia, ContentItemDto<IMedia>>(content);
+
+            AssertContentItem(result, content);
+        }
+
+        #region Assertions
+        private void AssertBasics<T, TPersisted>(ContentItemBasic<T, TPersisted> result, TPersisted content)
+            where T : ContentPropertyBasic
+            where TPersisted : IContentBase
+        {
+            Assert.AreEqual(content.Id, result.Id);
+            Assert.AreEqual(0, result.Owner.UserId);
+            Assert.AreEqual("admin", result.Owner.Name);
+            Assert.AreEqual(content.ParentId, result.ParentId);
+            Assert.AreEqual(content.UpdateDate, result.UpdateDate);
+            Assert.AreEqual(content.CreateDate, result.CreateDate);
+            Assert.AreEqual(content.Name, result.Name);
+            Assert.AreEqual(content.Properties.Count(), result.Properties.Count());
+        }
+
+        private void AssertBasicProperty<T, TPersisted>(ContentItemBasic<T, TPersisted> result, Property p)
+            where T : ContentPropertyBasic
+            where TPersisted : IContentBase
+        {
+            var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
+            Assert.IsNotNull(pDto);
+            Assert.AreEqual(p.Alias, pDto.Alias);
+            Assert.AreEqual(p.Id, pDto.Id);
+            Assert.AreEqual(p.Value, pDto.Value);
+        }
+
+        private void AssertProperty<TPersisted>(ContentItemBasic<ContentPropertyDto, TPersisted> result, Property p)
+            where TPersisted : IContentBase
+        {
+            AssertBasicProperty(result, p);
+
+            var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
+            Assert.IsNotNull(pDto);
+            Assert.AreEqual(p.PropertyType.Mandatory, pDto.IsRequired);
+            Assert.AreEqual(p.PropertyType.ValidationRegExp, pDto.ValidationRegExp);
+            Assert.AreEqual(p.PropertyType.Description, pDto.Description);
+            Assert.AreEqual(p.PropertyType.Name, pDto.Label);
+            Assert.AreEqual(ApplicationContext.Services.DataTypeService.GetDataTypeDefinitionById(p.PropertyType.DataTypeDefinitionId), pDto.DataType);
+            Assert.AreEqual(PropertyEditorResolver.Current.GetById(p.PropertyType.DataTypeId), pDto.PropertyEditor);
+        }
+
+        private void AssertContentItem<T>(ContentItemBasic<ContentPropertyDto, T> result, T content)
+            where T : IContentBase
+        {
+            AssertBasics(result, content);
+
+            foreach (var p in content.Properties)
+            {
+                AssertProperty(result, p);
+            }
+        } 
+        #endregion
+
+        [Test]
         public void To_Display_Model()
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
@@ -38,7 +152,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             var mapper = new ContentModelMapper(ApplicationContext, new UserModelMapper());
 
-            var result = mapper.ToContentItemDisplay(content);
+            var result = Mapper.Map<IContent, ContentItemDisplay>(content);
 
             Assert.AreEqual(content.Name, result.Name);
             Assert.AreEqual(content.Id, result.Id);
@@ -77,7 +191,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             var mapper = new ContentModelMapper(ApplicationContext, new UserModelMapper());
 
-            var result = mapper.ToContentItemDisplay(content);
+            var result = Mapper.Map<IContent, ContentItemDisplay>(content);
 
             Assert.AreEqual(content.Name, result.Name);
             Assert.AreEqual(content.Id, result.Id);

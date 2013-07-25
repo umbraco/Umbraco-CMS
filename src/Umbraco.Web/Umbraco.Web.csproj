@@ -325,6 +325,8 @@
     <Compile Include="FormDataCollectionExtensions.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMapper.cs" />
     <Compile Include="Models\Mapping\MediaModelMapper.cs" />
+    <Compile Include="Models\Mapping\MediaTypeModelMapper.cs" />
+    <Compile Include="Models\Mapping\NewContentMapper.cs" />
     <Compile Include="Models\Mapping\SectionModelMapper.cs" />
     <Compile Include="Models\Mapping\UserModelMapper.cs" />
     <Compile Include="PropertyEditors\ContentPickerPropertyEditor.cs" />

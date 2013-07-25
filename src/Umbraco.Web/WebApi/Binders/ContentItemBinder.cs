@@ -1,4 +1,5 @@
 ﻿using System;
+using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -8,19 +9,17 @@ namespace Umbraco.Web.WebApi.Binders
 {
     internal class ContentItemBinder : ContentItemBaseBinder<IContent>
     {
-        private readonly ContentModelMapper _contentModelMapper;
 
-        public ContentItemBinder(ApplicationContext applicationContext, ContentModelMapper contentModelMapper) 
+        public ContentItemBinder(ApplicationContext applicationContext) 
             : base(applicationContext)
-        {
-            _contentModelMapper = contentModelMapper;
+        {     
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
         public ContentItemBinder()
-            : this(ApplicationContext.Current, new ContentModelMapper(ApplicationContext.Current, new UserModelMapper()))
+            : this(ApplicationContext.Current)
         {            
         }
 
@@ -41,7 +40,7 @@ namespace Umbraco.Web.WebApi.Binders
 
         protected override ContentItemDto<IContent> MapFromPersisted(ContentItemSave<IContent> model)
         {
-            return _contentModelMapper.ToContentItemDto(model.PersistedContent);
+            return Mapper.Map<IContent, ContentItemDto<IContent>>(model.PersistedContent);
         }
     }
 }

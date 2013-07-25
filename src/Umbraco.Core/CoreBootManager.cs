@@ -126,7 +126,7 @@ namespace Umbraco.Core
                 {
                     foreach (var m in ApplicationEventsResolver.Current.ApplicationEventHandlers.OfType<IMapperConfiguration>())
                     {
-                        m.ConfigureMappings(configuration);
+                        m.ConfigureMappings(configuration, ApplicationContext);
                     }
                 });
         }

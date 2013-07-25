@@ -17,6 +17,6 @@ namespace Umbraco.Core.Models.Mapping
     /// </remarks>
     internal interface IMapperConfiguration : IApplicationEventHandler
     {
-        void ConfigureMappings(IConfiguration config);
+        void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext);
     }
 }

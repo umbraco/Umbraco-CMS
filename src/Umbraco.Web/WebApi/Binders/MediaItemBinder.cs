@@ -1,4 +1,5 @@
 ﻿using System;
+using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -41,7 +42,7 @@ namespace Umbraco.Web.WebApi.Binders
 
         protected override ContentItemDto<IMedia> MapFromPersisted(ContentItemSave<IMedia> model)
         {
-            return _mediaModelMapper.ToMediaItemDto(model.PersistedContent);
+            return Mapper.Map<IMedia, ContentItemDto<IMedia>>(model.PersistedContent);
         }
     }
 }

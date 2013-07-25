@@ -11,7 +11,7 @@ namespace Umbraco.Web.Models.Mapping
     {
 
         #region Mapper config
-        public override void ConfigureMappings(IConfiguration config)
+        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<IUser, UserDetail>()
                   .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))
