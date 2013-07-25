@@ -168,6 +168,7 @@
     <Reference Include="System.Net.Http.WebRequest, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.WebRequest.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -289,6 +290,8 @@
     <Compile Include="Cache\UserPermissionsCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />
+    <Compile Include="Editors\MediaController.cs" />
+    <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
     <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
     <Compile Include="Security\Providers\UsersMembershipProvider.cs" />
     <Compile Include="Standalone\ServiceContextManager.cs" />

@@ -2,6 +2,7 @@
 using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.WebApi
 {
@@ -59,5 +60,13 @@ namespace Umbraco.Web.WebApi
         /// Useful for debugging
         /// </summary>
         internal Guid InstanceId { get; private set; }
+
+        /// <summary>
+        /// Returns the WebSecurity instance
+        /// </summary>
+        public WebSecurity Security
+        {
+            get { return UmbracoContext.Security; }
+        }
     }
 }
