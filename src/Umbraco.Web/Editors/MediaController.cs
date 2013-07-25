@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -34,13 +35,11 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class MediaController : ContentControllerBase
     {
-        private readonly MediaModelMapper _mediaModelMapper;
-
         /// <summary>
         /// Constructor
         /// </summary>
         public MediaController()
-            : this(UmbracoContext.Current, new MediaModelMapper(UmbracoContext.Current.Application, new UserModelMapper()))
+            : this(UmbracoContext.Current)
         {            
         }
 
@@ -48,11 +47,9 @@ namespace Umbraco.Web.Editors
         /// Constructor
         /// </summary>
         /// <param name="umbracoContext"></param>
-        /// <param name="mediaModelMapper"></param>
-        internal MediaController(UmbracoContext umbracoContext, MediaModelMapper mediaModelMapper)
+        internal MediaController(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
-            _mediaModelMapper = mediaModelMapper;
         }
 
         /// <summary>
@@ -70,7 +67,7 @@ namespace Umbraco.Web.Editors
             }
 
             var emptyContent = new Core.Models.Media("Empty", parentId, contentType);
-            return _mediaModelMapper.ToMediaItemDisplay(emptyContent);
+            return Mapper.Map<IMedia, MediaItemDisplay>(emptyContent);
         }
 
         /// <summary>
@@ -85,7 +82,7 @@ namespace Umbraco.Web.Editors
             {
                 HandleContentNotFound(id);
             }
-            return _mediaModelMapper.ToMediaItemDisplay(foundContent);
+            return Mapper.Map<IMedia, MediaItemDisplay>(foundContent);
         }
 
         /// <summary>
@@ -94,7 +91,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>> GetRootMedia()
         {
             return Services.MediaService.GetRootMedia()
-                           .Select(x => _mediaModelMapper.ToMediaItemSimple(x));
+                           .Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
         }
 
         /// <summary>
@@ -103,7 +100,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(int parentId)
         {
             return Services.MediaService.GetChildren(parentId)
-                           .Select(x => _mediaModelMapper.ToMediaItemSimple(x));
+                           .Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
         }
 
         /// <summary>
@@ -138,7 +135,7 @@ namespace Umbraco.Web.Editors
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the modelstate to the outgoing object and throw a 403
-                    var forDisplay = _mediaModelMapper.ToMediaItemDisplay(contentItem.PersistedContent);
+                    var forDisplay = Mapper.Map<IMedia, MediaItemDisplay>(contentItem.PersistedContent);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Forbidden, forDisplay));
                 }
@@ -148,7 +145,7 @@ namespace Umbraco.Web.Editors
             Services.MediaService.Save(contentItem.PersistedContent);
 
             //return the updated model
-            var display = _mediaModelMapper.ToMediaItemDisplay(contentItem.PersistedContent);
+            var display = Mapper.Map<IMedia, MediaItemDisplay>(contentItem.PersistedContent);
             
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);

@@ -27,14 +27,12 @@ namespace Umbraco.Web.Editors
     /// </summary>
     [PluginController("UmbracoApi")]
     public class ContentController : ContentControllerBase
-    {
-        private readonly ContentModelMapper _contentModelMapper;
-
+    {        
         /// <summary>
         /// Constructor
         /// </summary>
         public ContentController()
-            : this(UmbracoContext.Current, new ContentModelMapper(UmbracoContext.Current.Application, new UserModelMapper()))
+            : this(UmbracoContext.Current)
         {            
         }
 
@@ -42,11 +40,9 @@ namespace Umbraco.Web.Editors
         /// Constructor
         /// </summary>
         /// <param name="umbracoContext"></param>
-        /// <param name="contentModelMapper"></param>
-        internal ContentController(UmbracoContext umbracoContext, ContentModelMapper contentModelMapper)
+        internal ContentController(UmbracoContext umbracoContext)
             : base(umbracoContext)
-        {
-            _contentModelMapper = contentModelMapper;
+        {            
         }
 
         public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)

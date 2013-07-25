@@ -91,72 +91,19 @@ namespace Umbraco.Tests.Models.Mapping
             AssertContentItem(result, content);
         }
 
-        #region Assertions
-        private void AssertBasics<T, TPersisted>(ContentItemBasic<T, TPersisted> result, TPersisted content)
-            where T : ContentPropertyBasic
-            where TPersisted : IContentBase
-        {
-            Assert.AreEqual(content.Id, result.Id);
-            Assert.AreEqual(0, result.Owner.UserId);
-            Assert.AreEqual("admin", result.Owner.Name);
-            Assert.AreEqual(content.ParentId, result.ParentId);
-            Assert.AreEqual(content.UpdateDate, result.UpdateDate);
-            Assert.AreEqual(content.CreateDate, result.CreateDate);
-            Assert.AreEqual(content.Name, result.Name);
-            Assert.AreEqual(content.Properties.Count(), result.Properties.Count());
-        }
-
-        private void AssertBasicProperty<T, TPersisted>(ContentItemBasic<T, TPersisted> result, Property p)
-            where T : ContentPropertyBasic
-            where TPersisted : IContentBase
-        {
-            var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
-            Assert.IsNotNull(pDto);
-            Assert.AreEqual(p.Alias, pDto.Alias);
-            Assert.AreEqual(p.Id, pDto.Id);
-            Assert.AreEqual(p.Value, pDto.Value);
-        }
-
-        private void AssertProperty<TPersisted>(ContentItemBasic<ContentPropertyDto, TPersisted> result, Property p)
-            where TPersisted : IContentBase
-        {
-            AssertBasicProperty(result, p);
-
-            var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
-            Assert.IsNotNull(pDto);
-            Assert.AreEqual(p.PropertyType.Mandatory, pDto.IsRequired);
-            Assert.AreEqual(p.PropertyType.ValidationRegExp, pDto.ValidationRegExp);
-            Assert.AreEqual(p.PropertyType.Description, pDto.Description);
-            Assert.AreEqual(p.PropertyType.Name, pDto.Label);
-            Assert.AreEqual(ApplicationContext.Services.DataTypeService.GetDataTypeDefinitionById(p.PropertyType.DataTypeDefinitionId), pDto.DataType);
-            Assert.AreEqual(PropertyEditorResolver.Current.GetById(p.PropertyType.DataTypeId), pDto.PropertyEditor);
-        }
-
-        private void AssertContentItem<T>(ContentItemBasic<ContentPropertyDto, T> result, T content)
-            where T : IContentBase
-        {
-            AssertBasics(result, content);
-
-            foreach (var p in content.Properties)
-            {
-                AssertProperty(result, p);
-            }
-        } 
-        #endregion
-
         [Test]
         public void To_Display_Model()
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             var content = MockedContent.CreateSimpleContent(contentType);
 
-            var mapper = new ContentModelMapper(ApplicationContext, new UserModelMapper());
-
             var result = Mapper.Map<IContent, ContentItemDisplay>(content);
 
-            Assert.AreEqual(content.Name, result.Name);
-            Assert.AreEqual(content.Id, result.Id);
-            Assert.AreEqual(content.Properties.Count(), result.Properties.Count());
+            AssertBasics(result, content);
+            foreach (var p in content.Properties)
+            {
+                AssertDisplayProperty(result, p, ApplicationContext);
+            }            
             Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count() - 1);
             Assert.IsTrue(result.Tabs.Any(x => x.Label == "Generic properties"));
             Assert.IsTrue(result.Tabs.First().IsActive);
@@ -189,16 +136,86 @@ namespace Umbraco.Tests.Models.Mapping
             //ensure that nothing is marked as dirty
             content.ResetDirtyProperties(false);
 
-            var mapper = new ContentModelMapper(ApplicationContext, new UserModelMapper());
-
             var result = Mapper.Map<IContent, ContentItemDisplay>(content);
 
-            Assert.AreEqual(content.Name, result.Name);
-            Assert.AreEqual(content.Id, result.Id);
-            Assert.AreEqual(content.Properties.Count(), result.Properties.Count());
+            AssertBasics(result, content);
+            foreach (var p in content.Properties)
+            {
+                AssertDisplayProperty(result, p, ApplicationContext);
+            }
             Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count() - 1);
             Assert.IsTrue(result.Tabs.Any(x => x.Label == "Generic properties"));
             Assert.AreEqual(2, result.Tabs.Where(x => x.Label == "Generic properties").SelectMany(x => x.Properties).Count());
         }
+
+        #region Assertions
+
+        private void AssertDisplayProperty<T, TPersisted>(ContentItemBasic<T, TPersisted> result, Property p, ApplicationContext applicationContext)
+            where T : ContentPropertyDisplay
+            where TPersisted : IContentBase
+        {
+            AssertBasicProperty(result, p);
+            
+            var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
+            Assert.IsNotNull(pDto);
+            pDto.Alias = p.Alias;
+            pDto.Description = p.PropertyType.Description;
+            pDto.Label = p.PropertyType.Name;
+            pDto.Config = applicationContext.Services.DataTypeService.GetPreValuesByDataTypeId(p.PropertyType.DataTypeDefinitionId);
+
+        }
+
+        private void AssertBasics<T, TPersisted>(ContentItemBasic<T, TPersisted> result, TPersisted content)
+            where T : ContentPropertyBasic
+            where TPersisted : IContentBase
+        {
+            Assert.AreEqual(content.Id, result.Id);
+            Assert.AreEqual(0, result.Owner.UserId);
+            Assert.AreEqual("admin", result.Owner.Name);
+            Assert.AreEqual(content.ParentId, result.ParentId);
+            Assert.AreEqual(content.UpdateDate, result.UpdateDate);
+            Assert.AreEqual(content.CreateDate, result.CreateDate);
+            Assert.AreEqual(content.Name, result.Name);
+            Assert.AreEqual(content.Properties.Count(), result.Properties.Count());
+        }
+
+        private void AssertBasicProperty<T, TPersisted>(ContentItemBasic<T, TPersisted> result, Property p)
+            where T : ContentPropertyBasic
+            where TPersisted : IContentBase
+        {
+            var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
+            Assert.IsNotNull(pDto);
+            Assert.AreEqual(p.Alias, pDto.Alias);
+            Assert.AreEqual(p.Id, pDto.Id);
+
+            Assert.IsTrue(p.Value == null ? pDto.Value == string.Empty : pDto.Value == p.Value);
+        }
+
+        private void AssertProperty<TPersisted>(ContentItemBasic<ContentPropertyDto, TPersisted> result, Property p)
+            where TPersisted : IContentBase
+        {
+            AssertBasicProperty(result, p);
+
+            var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
+            Assert.IsNotNull(pDto);
+            Assert.AreEqual(p.PropertyType.Mandatory, pDto.IsRequired);
+            Assert.AreEqual(p.PropertyType.ValidationRegExp, pDto.ValidationRegExp);
+            Assert.AreEqual(p.PropertyType.Description, pDto.Description);
+            Assert.AreEqual(p.PropertyType.Name, pDto.Label);
+            Assert.AreEqual(ApplicationContext.Services.DataTypeService.GetDataTypeDefinitionById(p.PropertyType.DataTypeDefinitionId), pDto.DataType);
+            Assert.AreEqual(PropertyEditorResolver.Current.GetById(p.PropertyType.DataTypeId), pDto.PropertyEditor);
+        }
+
+        private void AssertContentItem<T>(ContentItemBasic<ContentPropertyDto, T> result, T content)
+            where T : IContentBase
+        {
+            AssertBasics(result, content);
+
+            foreach (var p in content.Properties)
+            {
+                AssertProperty(result, p);
+            }
+        }
+        #endregion
     }
 }

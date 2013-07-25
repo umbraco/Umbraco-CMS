@@ -3,45 +3,53 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class MediaModelMapper : BaseContentModelMapper
+    /// <summary>
+    /// Declares model mappings for media.
+    /// </summary>
+    internal class NewMediaModelMapper : MapperConfiguration
     {
-        public MediaModelMapper(ApplicationContext applicationContext, UserModelMapper userMapper)
-            : base(applicationContext, userMapper)
+        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
-        }
+            //FROM IMedia TO MediaItemDisplay
+            config.CreateMap<IMedia, MediaItemDisplay>()
+                  .ForMember(
+                      dto => dto.Owner,
+                      expression => expression.ResolveUsing<OwnerResolver<IMedia>>())
+                  .ForMember(
+                      dto => dto.Icon,
+                      expression => expression.MapFrom(content => content.ContentType.Icon))
+                  .ForMember(
+                      dto => dto.ContentTypeAlias,
+                      expression => expression.MapFrom(content => content.ContentType.Alias))                  
+                  .ForMember(display => display.Properties, expression => expression.Ignore())
+                  .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>());
 
-        public ContentItemBasic<ContentPropertyBasic, IMedia> ToMediaItemSimple(IMedia content)
-        {
-            var result = base.ToContentItemSimpleBase<IMedia>(content);
-            result.ContentTypeAlias = content.ContentType.Alias;
-            result.Icon = content.ContentType.Icon;
-            return result;
-        } 
+            //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
+            config.CreateMap<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>()
+                  .ForMember(
+                      dto => dto.Owner,
+                      expression => expression.ResolveUsing<OwnerResolver<IMedia>>())
+                  .ForMember(
+                      dto => dto.Icon,
+                      expression => expression.MapFrom(content => content.ContentType.Icon))
+                  .ForMember(
+                      dto => dto.ContentTypeAlias,
+                      expression => expression.MapFrom(content => content.ContentType.Alias));
 
-        public MediaItemDisplay ToMediaItemDisplay(IMedia media)
-        {
-            //create the list of tabs for properties assigned to tabs.
-            var tabs = GetTabs(media);
-
-            var result = CreateContent<MediaItemDisplay, ContentPropertyDisplay, IMedia>(media, (display, originalContent) =>
-            {
-                //fill in the rest
-                display.ContentTypeAlias = media.ContentType.Alias;
-                display.Icon = media.ContentType.Icon;
-
-                //set display props after the normal properties are alraedy mapped
-                display.Name = originalContent.Name;
-                display.Tabs = tabs;
-            }, null, false);
-
-            return result;
+            //FROM IMedia TO ContentItemDto<IMedia>
+            config.CreateMap<IMedia, ContentItemDto<IMedia>>()
+                  .ForMember(
+                      dto => dto.Owner,
+                      expression => expression.ResolveUsing<OwnerResolver<IMedia>>());
         }
 
     }

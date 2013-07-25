@@ -8,20 +8,17 @@ using Umbraco.Web.Models.Mapping;
 namespace Umbraco.Web.WebApi.Binders
 {
     internal class MediaItemBinder : ContentItemBaseBinder<IMedia>
-    {
-        private readonly MediaModelMapper _mediaModelMapper;
-
-        public MediaItemBinder(ApplicationContext applicationContext, MediaModelMapper mediaModelMapper)
+    {        
+        public MediaItemBinder(ApplicationContext applicationContext)
             : base(applicationContext)
         {
-            _mediaModelMapper = mediaModelMapper;
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
         public MediaItemBinder()
-            : this(ApplicationContext.Current, new MediaModelMapper(ApplicationContext.Current, new UserModelMapper()))
+            : this(ApplicationContext.Current)
         {
         }
 
