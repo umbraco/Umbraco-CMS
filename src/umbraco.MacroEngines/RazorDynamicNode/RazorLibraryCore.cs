@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Web.Mvc;
-using Umbraco.Core.Dynamics;
-using Umbraco.Core.Models;
 using Umbraco.Web;
-using Umbraco.Web.Models;
 using umbraco.interfaces;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Web;
-using System.IO;
-using HtmlAgilityPack;
 
 namespace umbraco.MacroEngines.Library
 {
