@@ -23,6 +23,7 @@
 			<dependency id="Lucene.Net" version="[2.9.4.1]" />
 			<dependency id="SharpZipLib" version="0.86.0" />
 			<dependency id="MySql.Data" version="[6.6.5]" />
+			<dependency id="xmlrpcnet" version="2.5.0" />
 			<dependency id="ClientDependency" version="[1.7.0,1.7.1)" />
 			<dependency id="ClientDependency-Mvc" version="[1.7.0,1.7.1)" />
         </dependencies>
