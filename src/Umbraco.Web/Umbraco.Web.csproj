@@ -1935,7 +1935,9 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Macros\assemblyBrowser.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\autoDoc.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\DataTypes\editDatatype.aspx" />
+    <Content Include="umbraco.presentation\umbraco\developer\DataTypes\editDatatype.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\getXsltStatus.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\Cache\viewCacheItem.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx" />
