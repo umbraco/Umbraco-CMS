@@ -1374,6 +1374,8 @@ namespace Umbraco.Core.Services
                     {
                         foreach (var id in contentTypeIds)
                         {
+                            
+
                             //first we'll clear out the data from the cmsContentXml table for this type
                             uow.Database.Execute(@"delete from cmsContentXml where nodeId in 
 (select cmsDocument.nodeId from cmsDocument 

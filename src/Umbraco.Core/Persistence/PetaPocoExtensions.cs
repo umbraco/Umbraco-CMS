@@ -6,6 +6,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Initial;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
@@ -48,11 +49,15 @@ namespace Umbraco.Core.Persistence
                     }
                     else
                     {
-                        string sql;
-                        using (var cmd = db.GenerateBulkInsertCommand(collection, db.Connection, out sql))
+                        string[] sqlStatements;
+                        var cmds = db.GenerateBulkInsertCommand(collection, db.Connection, out sqlStatements);
+                        for (var i = 0; i < sqlStatements.Length; i++)
                         {
-                            cmd.CommandText = sql;
-                            cmd.ExecuteNonQuery();
+                            using (var cmd = cmds[i])
+                            {
+                                cmd.CommandText = sqlStatements[i];
+                                cmd.ExecuteNonQuery();
+                            }
                         }
                     }
 
@@ -66,42 +71,92 @@ namespace Umbraco.Core.Persistence
             }
         }
 
-        internal static IDbCommand GenerateBulkInsertCommand<T>(this Database db, IEnumerable<T> collection, IDbConnection connection, out string sql)
+        /// <summary>
+        /// Creates a bulk insert command
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="db"></param>
+        /// <param name="collection"></param>
+        /// <param name="connection"></param>        
+        /// <param name="sql"></param>
+        /// <returns>Sql commands with populated command parameters required to execute the sql statement</returns>
+        /// <remarks>
+        /// The limits for number of parameters are 2100 (in sql server, I think there's many more allowed in mysql). So 
+        /// we need to detect that many params and split somehow. 
+        /// For some reason the 2100 limit is not actually allowed even though the exception from sql server mentions 2100 as a max, perhaps it is 2099 
+        /// that is max. I've reduced it to 2000 anyways.
+        /// </remarks>
+        internal static IDbCommand[] GenerateBulkInsertCommand<T>(
+            this Database db, 
+            IEnumerable<T> collection, 
+            IDbConnection connection,             
+            out string[] sql)
         {
+            //A filter used below a few times to get all columns except result cols and not the primary key if it is auto-incremental
+            Func<Database.PocoData, KeyValuePair<string, Database.PocoColumn>, bool> includeColumn = (data, column) =>
+                {
+                    if (column.Value.ResultColumn) return false;
+                    if (data.TableInfo.AutoIncrement && column.Key == data.TableInfo.PrimaryKey) return false;
+                    return true;
+                };
+
             var pd = Database.PocoData.ForType(typeof(T));
             var tableName = db.EscapeTableName(pd.TableInfo.TableName);
 
-            //get all columns but not the primary key if it is auto-incremental
-            var cols = string.Join(", ", (
-                from c in pd.Columns
-                where 
-                    //don't return ResultColumns
-                    !c.Value.ResultColumn
-                    //if the table is auto-incremental, don't return the primary key
-                    && (pd.TableInfo.AutoIncrement && c.Key != pd.TableInfo.PrimaryKey)
-                select tableName + "." + db.EscapeSqlIdentifier(c.Key))
-                .ToArray());
+            //get all columns to include and format for sql
+            var cols = string.Join(", ", 
+                pd.Columns
+                .Where(c => includeColumn(pd, c))
+                .Select(c => tableName + "." + db.EscapeSqlIdentifier(c.Key)).ToArray());
 
-            var cmd = db.CreateCommand(connection, "");
+            var itemArray = collection.ToArray();
 
-            var pocoValues = new List<string>();
-            var index = 0;
-            foreach (var poco in collection)
+            //calculate number of parameters per item
+            var paramsPerItem = pd.Columns.Count(i => includeColumn(pd, i));
+            
+            //Example calc:
+            // Given: we have 4168 items in the itemArray, each item contains 8 command parameters (values to be inserterted)                
+            // 2100 / 8 = 262.5
+            // Math.Floor(2100 / 8) = 262 items per trans
+            // 4168 / 262 = 15.908... = there will be 16 trans in total
+
+            //all items will be included if we have disabled db parameters
+            var itemsPerTrans = Math.Floor(2000.00 / paramsPerItem);
+            //there will only be one transaction if we have disabled db parameters
+            var numTrans = Math.Ceiling(itemArray.Length / itemsPerTrans);
+
+            var sqlQueries = new List<string>();
+            var commands = new List<IDbCommand>();
+
+            for (var tIndex = 0; tIndex < numTrans; tIndex++)
             {
-                var values = new List<string>();
-                foreach (var i in pd.Columns)
+                var itemsForTrans = itemArray
+                    .Skip(tIndex * (int)itemsPerTrans)
+                    .Take((int)itemsPerTrans);
+
+                var cmd = db.CreateCommand(connection, "");
+                var pocoValues = new List<string>();
+                var index = 0;
+                foreach (var poco in itemsForTrans)
                 {
-                    if (pd.TableInfo.AutoIncrement && i.Key == pd.TableInfo.PrimaryKey)
+                    var values = new List<string>();
+                    //get all columns except result cols and not the primary key if it is auto-incremental
+                    foreach (var i in pd.Columns.Where(x => includeColumn(pd, x)))
                     {
-                        continue;
+                        db.AddParam(cmd, i.Value.GetValue(poco), "@");
+                        values.Add(string.Format("{0}{1}", "@", index++));
                     }
-                    values.Add(string.Format("{0}{1}", "@", index++));
-                    db.AddParam(cmd, i.Value.GetValue(poco), "@");
+                    pocoValues.Add("(" + string.Join(",", values.ToArray()) + ")");
                 }
-                pocoValues.Add("(" + string.Join(",", values.ToArray()) + ")");
+
+                var sqlResult = string.Format("INSERT INTO {0} ({1}) VALUES {2}", tableName, cols, string.Join(", ", pocoValues)); 
+                sqlQueries.Add(sqlResult);
+                commands.Add(cmd);
             }
-            sql = string.Format("INSERT INTO {0} ({1}) VALUES {2}", tableName, cols, string.Join(", ", pocoValues));
-            return cmd;
+
+            sql = sqlQueries.ToArray();
+
+            return commands.ToArray();    
         }
 
         public static void CreateTable(this Database db, bool overwrite, Type modelType)
