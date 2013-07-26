@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using umbraco.presentation.LiveEditing.Modules;
 using ClientDependency.Core;
 using System.Web.UI.WebControls;
@@ -13,9 +10,6 @@ using ClientDependency.Core.Controls;
 using umbraco.presentation.umbraco.controls;
 using HtmlAgilityPack;
 using umbraco.cms.businesslogic.template;
-using System.Text;
-using System.IO;
-using System.Collections;
 
 namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 {
