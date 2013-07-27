@@ -1,4 +1,5 @@
 ﻿using System;
+using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -7,20 +8,17 @@ using Umbraco.Web.Models.Mapping;
 namespace Umbraco.Web.WebApi.Binders
 {
     internal class MediaItemBinder : ContentItemBaseBinder<IMedia>
-    {
-        private readonly MediaModelMapper _mediaModelMapper;
-
-        public MediaItemBinder(ApplicationContext applicationContext, MediaModelMapper mediaModelMapper)
+    {        
+        public MediaItemBinder(ApplicationContext applicationContext)
             : base(applicationContext)
         {
-            _mediaModelMapper = mediaModelMapper;
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
         public MediaItemBinder()
-            : this(ApplicationContext.Current, new MediaModelMapper(ApplicationContext.Current, new UserModelMapper()))
+            : this(ApplicationContext.Current)
         {
         }
 
@@ -41,7 +39,7 @@ namespace Umbraco.Web.WebApi.Binders
 
         protected override ContentItemDto<IMedia> MapFromPersisted(ContentItemSave<IMedia> model)
         {
-            return _mediaModelMapper.ToMediaItemDto(model.PersistedContent);
+            return Mapper.Map<IMedia, ContentItemDto<IMedia>>(model.PersistedContent);
         }
     }
 }

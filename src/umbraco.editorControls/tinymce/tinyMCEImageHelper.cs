@@ -5,9 +5,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.Files;
-using umbraco.IO;
 
 namespace umbraco.editorControls.tinymce
 {
@@ -31,7 +29,7 @@ namespace umbraco.editorControls.tinymce
                     // gather all attributes
                     // TODO: This should be replaced with a general helper method - but for now we'll wanna leave umbraco.dll alone for this patch
                     var ht = new Hashtable();
-                    var matches = Regex.Matches(tag.Value.Replace(">", " >"), "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"|(?<attributeName>\\S*)=(?<attributeValue>[^\"|\\s]*)\\s", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+                    var matches = Regex.Matches(tag.Value.Replace(">", " >"), "(?<attributeName>\\S*?)=\"(?<attributeValue>[^\"]*)\"|(?<attributeName>\\S*?)=(?<attributeValue>[^\"|\\s]*)\\s", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
                     foreach (Match attributeSet in matches)
                     {
                         ht.Add(attributeSet.Groups["attributeName"].Value.ToLower(),
@@ -134,7 +132,21 @@ namespace umbraco.editorControls.tinymce
                 if (fs.FileExists(orgPath))
                 {
                     var uf = new UmbracoFile(orgPath);
-                    newSrc = uf.Resize(newWidth, newHeight);
+
+                    try
+                    {
+                        newSrc = uf.Resize(newWidth, newHeight);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogHelper.Error<tinyMCEImageHelper>(string.Format("The file {0} could not be resized, reverting the image src attribute to the original source: {1}", orgPath, orgSrc), ex);
+                        newSrc = orgSrc;
+                    }
+                }
+                else
+                {
+                    LogHelper.Warn<tinyMCEImageHelper>(string.Format("The file {0} does not exist, reverting the image src attribute to the original source: {1}", orgPath, orgSrc));
+                    newSrc = orgSrc;
                 }
             }
 

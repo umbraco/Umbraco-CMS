@@ -545,7 +545,7 @@ Pour gerer votre site, accéder simplement au back office et commencez à contri
 	<![CDATA[<p>Bonjour %0%</p>
 
 		  <p>Ceci est un email automatique pour vous informer que la tâche <strong>'%1%'</strong> 
-		  a été activée sur la page <strong>'%2%'</strong> 
+		  a été activée sur la page <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a> 
 		  par l'utilisateur <strong>'%3%'</strong>
 	  </p>
 		  <div class="buttons">

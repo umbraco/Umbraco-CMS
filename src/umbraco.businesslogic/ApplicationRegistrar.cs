@@ -45,7 +45,7 @@ namespace umbraco.BusinessLogic
             }, true);
         }
 
-        public void ConfigureMappings(IConfiguration config)
+        public void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<Section, Application>()
                   .ForMember(x => x.alias, expression => expression.MapFrom(x => x.Alias))

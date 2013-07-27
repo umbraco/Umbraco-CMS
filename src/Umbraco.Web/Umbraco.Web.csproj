@@ -98,9 +98,9 @@
     <Reference Include="AutoMapper">
       <HintPath>..\packages\AutoMapper.2.2.1\lib\net40\AutoMapper.dll</HintPath>
     </Reference>
-    <Reference Include="ClientDependency.Core, Version=1.7.0.3, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ClientDependency.Core, Version=1.7.0.4, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ClientDependency.1.7.0.3\lib\ClientDependency.Core.dll</HintPath>
+      <HintPath>..\packages\ClientDependency.1.7.0.4\lib\ClientDependency.Core.dll</HintPath>
     </Reference>
     <Reference Include="CookComputing.XmlRpcV2, Version=2.5.0.0, Culture=neutral, PublicKeyToken=a7d6e17aa302004d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -298,6 +298,7 @@
     <Compile Include="Configuration\WebRouting.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Editors\ContentController.cs" />
+    <Compile Include="Editors\ContentControllerBase.cs" />
     <Compile Include="Editors\ContentTypeController.cs" />
     <Compile Include="Editors\LegacyController.cs" />
     <Compile Include="Editors\MediaTypeApiController.cs" />
@@ -305,21 +306,34 @@
     <Compile Include="Editors\UmbracoAuthorizedJsonController.cs" />
     <Compile Include="Editors\ValidationHelper.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
+    <Compile Include="Models\ContentEditing\ContentItemDisplayBase.cs" />
     <Compile Include="Models\ContentEditing\ContentSaveAction.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeBasic.cs" />
+    <Compile Include="Models\ContentEditing\IErrorModel.cs" />
     <Compile Include="Models\ContentEditing\IHaveUploadedFiles.cs" />
+    <Compile Include="Models\ContentEditing\INotificationModel.cs" />
     <Compile Include="Models\ContentEditing\MediaItemDisplay.cs" />
+    <Compile Include="Models\ContentEditing\MessagesExtensions.cs" />
+    <Compile Include="Models\ContentEditing\Notification.cs" />
     <Compile Include="Models\ContentEditing\Section.cs" />
     <Compile Include="Models\ContentEditing\Tab.cs" />
     <Compile Include="Models\ContentEditing\TabbedContentItem.cs" />
     <Compile Include="Models\ContentEditing\UserBasic.cs" />
     <Compile Include="Models\ContentEditing\UserDetail.cs" />
     <Compile Include="Models\Mapping\BaseContentModelMapper.cs" />
-    <Compile Include="Models\Mapping\ContentModelMapper.cs" />
     <Compile Include="FormDataCollectionExtensions.cs" />
+    <Compile Include="Models\Mapping\ContentPropertyBasicConverter.cs" />
+    <Compile Include="Models\Mapping\ContentPropertyDisplayConverter.cs" />
+    <Compile Include="Models\Mapping\ContentPropertyDtoConverter.cs" />
+    <Compile Include="Models\Mapping\ContentPropertyModelMapper.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMapper.cs" />
+    <Compile Include="Models\Mapping\CreatorResolver.cs" />
     <Compile Include="Models\Mapping\MediaModelMapper.cs" />
+    <Compile Include="Models\Mapping\MediaTypeModelMapper.cs" />
+    <Compile Include="Models\Mapping\ContentModelMapper.cs" />
+    <Compile Include="Models\Mapping\OwnerResolver.cs" />
     <Compile Include="Models\Mapping\SectionModelMapper.cs" />
+    <Compile Include="Models\Mapping\TabsAndPropertiesResolver.cs" />
     <Compile Include="Models\Mapping\UserModelMapper.cs" />
     <Compile Include="PropertyEditors\ContentPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\FileUploadPropertyEditor.cs" />
@@ -865,11 +879,7 @@
     <Compile Include="umbraco.presentation\umbraco\controls\ContentPicker.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControl.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\Images\ImageViewer.ascx.cs">
-      <DependentUpon>ImageViewer.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\Images\ImageViewer.ascx.designer.cs">
-      <DependentUpon>ImageViewer.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\Images\ImageViewerUpdater.asmx.cs">
       <DependentUpon>ImageViewerUpdater.asmx</DependentUpon>
@@ -1912,7 +1922,6 @@
     <Content Include="umbraco.presentation\umbraco\create\DLRScripting.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\controls\Images\ImageViewer.ascx" />
     <Content Include="umbraco.presentation\umbraco\controls\Images\ImageViewerUpdater.asmx" />
     <Content Include="umbraco.presentation\umbraco\controls\Images\UploadMediaImage.ascx">
       <SubType>ASPXCodeBehind</SubType>
@@ -1923,7 +1932,9 @@
     <Content Include="umbraco.presentation\umbraco\actions\delete.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\editContent.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\preview.aspx" />
-    <Content Include="umbraco.presentation\umbraco\actions\publish.aspx" />
+    <Content Include="umbraco.presentation\umbraco\actions\publish.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\mediaPicker.aspx" />
     <Content Include="umbraco.presentation\umbraco\webservices\MacroContainerService.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx" />

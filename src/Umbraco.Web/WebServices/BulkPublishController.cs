@@ -93,7 +93,11 @@ namespace Umbraco.Web.WebServices
                                    string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id), UmbracoUser);
                 case PublishStatusType.FailedContentInvalid:
                     return ui.Text("publish", "contentPublishedFailedInvalid",
-                                   string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id), UmbracoUser);  
+                                   new []{
+                                       string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id), 
+                                       string.Join(",", status.InvalidProperties.Select(x => x.Alias))
+                                   }, 
+                                   UmbracoUser);  
                 default:
                     return status.StatusType.ToString();
             }

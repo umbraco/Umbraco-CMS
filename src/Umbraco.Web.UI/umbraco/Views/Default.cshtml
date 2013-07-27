@@ -11,6 +11,7 @@
 
 <html lang="en">
 <head>
+    <base href="@GlobalSettings.Path.EnsureEndsWith('/')" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -33,15 +34,15 @@
     </div>
 
     <umb-notifications></umb-notifications>
-    
-    
+
+
     @*Currently this needs to be loaded before anything*@
     <script src="@Url.Action("ServerVariables", "BackOffice")" type="text/javascript"></script>
-    
+
     @*And finally we can load in our angular app*@
     <script type="text/javascript" src="lib/yepnope/yepnope.min.js"></script>
     <script type="text/javascript" src="@Url.Action("Application", "BackOffice")"></script>
-    
+
 </body>
 </html>
 

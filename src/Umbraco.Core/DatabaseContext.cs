@@ -169,6 +169,20 @@ namespace Umbraco.Core
             Initialize(providerName);
         }
 
+        /// <summary>
+        /// Configures a ConnectionString for the Umbraco database that uses Microsoft SQL Server integrated security.
+        /// </summary>
+        /// <param name="server">Name or address of the database server</param>
+        /// <param name="databaseName">Name of the database</param>
+        public void ConfigureIntegratedSecurityDatabaseConnection(string server, string databaseName)
+        {
+            const string providerName = "System.Data.SqlClient";
+            string connectionString = String.Format("Server={0};Database={1};Integrated Security=true", server, databaseName);
+
+            SaveConnectionString(connectionString, providerName);
+            Initialize(providerName);
+        }
+
         internal string BuildAzureConnectionString(string server, string databaseName, string user, string password)
         {
             if (server.Contains(".") && ServerStartsWithTcp(server) == false)
@@ -393,8 +407,8 @@ namespace Umbraco.Core
                 if (supportsCaseInsensitiveQueries  == false)
                 {
                     message = "<p>&nbsp;</p><p>The database you're trying to use does not support case insensitive queries. <br />We currently do not support these types of databases.</p>" +
-                              "<p>You can fix this by changing the following two settings in your my.ini file in your MySQL installation directory:</p>" +
-                              "<pre>lower_case_table_names=1\nlower_case_file_system=1</pre><br />" +
+                              "<p>You can fix this by changing the following setting in your my.ini file in your MySQL installation directory:</p>" +
+                              "<pre>lower_case_table_names=1</pre><br />" +
                               "<p>Note: Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
                               "<p>For more technical information on case sensitivity in MySQL, have a look at " +
                               "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
@@ -404,8 +418,8 @@ namespace Umbraco.Core
                 else if (supportsCaseInsensitiveQueries == null)
                 {
                     message = "<p>&nbsp;</p><p>Warning! Could not check if your database type supports case insensitive queries. <br />We currently do not support these databases that do not support case insensitive queries.</p>" +
-                              "<p>You can check this by looking for the following two settings in your my.ini file in your MySQL installation directory:</p>" +
-                              "<pre>lower_case_table_names=1\nlower_case_file_system=1</pre><br />" +
+                              "<p>You can check this by looking for the following setting in your my.ini file in your MySQL installation directory:</p>" +
+                              "<pre>lower_case_table_names=1</pre><br />" +
                               "<p>Note: Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
                               "<p>For more technical information on case sensitivity in MySQL, have a look at " +
                               "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
@@ -418,8 +432,8 @@ namespace Umbraco.Core
                                   "<p>Note: You're using MySQL and the database instance you're connecting to seems to support case insensitive queries.</p>" +
                                   "<p>However, your hosting provider may not support this option. Umbraco does not currently support MySQL installs that do not support case insensitive queries</p>" +
                                   "<p>Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
-                                  "<p>They can check this by looking for the following two settings in the my.ini file in their MySQL installation directory:</p>" +
-                                  "<pre>lower_case_table_names=1\nlower_case_file_system=1</pre><br />" +
+                                  "<p>They can check this by looking for the following setting in the my.ini file in their MySQL installation directory:</p>" +
+                                  "<pre>lower_case_table_names=1</pre><br />" +
                                   "<p>For more technical information on case sensitivity in MySQL, have a look at " +
                                   "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
                     }

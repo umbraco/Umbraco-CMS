@@ -61,8 +61,12 @@
 		</div>
 </li>
 <script type="text/javascript">
-    $(function() {
+    $(function () {
         checkAlias('<%=tbAlias.ClientID%>');
-        duplicatePropertyNameAsSafeAlias('<%=tbName.ClientID%>', '<%=tbAlias.ClientID%>')
+        var textbox = $('#<%=tbAlias.ClientID%>');
+        var ul = textbox.closest('ul');
+        if (ul.hasClass('addNewProperty')) {
+            duplicatePropertyNameAsSafeAlias('<%=tbName.ClientID%>', '<%=tbAlias.ClientID%>');
+        }
     });
 </script>

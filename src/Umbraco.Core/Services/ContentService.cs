@@ -1055,6 +1055,7 @@ namespace Umbraco.Core.Services
                     uow.Commit();
 
                     //Special case for the Upload DataType
+                    //TODO: Should we handle this with events?
                     var uploadDataTypeId = new Guid(Constants.PropertyEditors.UploadField);
                     if (content.Properties.Any(x => x.PropertyType.DataTypeId == uploadDataTypeId))
                     {
@@ -1135,6 +1136,9 @@ namespace Umbraco.Core.Services
 
                 Audit.Add(AuditTypes.Copy, "Copy Content performed by user", content.WriterId, content.Id);
 
+
+                //TODO: Don't think we need this here because cache should be cleared by the event listeners
+                // and the correct ICacheRefreshers!?
                 RuntimeCacheProvider.Current.Clear();
 
                 return copy;
@@ -1562,6 +1566,8 @@ namespace Umbraco.Core.Services
                 publishStatus.StatusType = CheckAndLogIsPublishable(content);
                 //Content contains invalid property values and can therefore not be published - fire event?
                 publishStatus.StatusType = CheckAndLogIsValid(content);
+                //set the invalid properties (if there are any)
+                publishStatus.InvalidProperties = ((ContentBase) content).LastInvalidProperties;
 
                 //if we're still successful, then publish using the strategy
                 if (publishStatus.StatusType == PublishStatusType.Success)

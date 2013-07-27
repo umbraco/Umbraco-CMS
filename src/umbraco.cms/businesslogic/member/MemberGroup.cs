@@ -157,16 +157,16 @@ namespace umbraco.cms.businesslogic.member
 		/// <summary>
 		/// Get a membergroup by it's name
 		/// </summary>
-		/// <param name="Name">Name of the membergroup</param>
+		/// <param name="name">Name of the membergroup</param>
 		/// <returns>If a MemberGroup with the given name exists, it will return this, else: null</returns>
-        public static MemberGroup GetByName(string Name) 
+        public static MemberGroup GetByName(string name) 
 		{
 			try 
 			{
 				return
 					new MemberGroup(SqlHelper.ExecuteScalar<int>(
 								    "select id from umbracoNode where Text = @text and nodeObjectType = @objectType",
-								    SqlHelper.CreateParameter("@text", Name),
+								    SqlHelper.CreateParameter("@text", name),
 								    SqlHelper.CreateParameter("@objectType", _objectType)));
 			} 
 			catch 

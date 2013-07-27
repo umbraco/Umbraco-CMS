@@ -104,13 +104,13 @@
       <Project>{07fbc26b-2927-4a22-8d96-d644c667fecc}</Project>
       <Name>UmbracoExamine</Name>
     </ProjectReference>
-    <Reference Include="ClientDependency.Core, Version=1.7.0.3, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ClientDependency.Core, Version=1.7.0.4, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ClientDependency.1.7.0.3\lib\ClientDependency.Core.dll</HintPath>
+      <HintPath>..\packages\ClientDependency.1.7.0.4\lib\ClientDependency.Core.dll</HintPath>
     </Reference>
-    <Reference Include="ClientDependency.Core.Mvc, Version=1.7.0.3, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ClientDependency.Core.Mvc, Version=1.7.0.4, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ClientDependency-Mvc.1.7.0.3\lib\ClientDependency.Core.Mvc.dll</HintPath>
+      <HintPath>..\packages\ClientDependency-Mvc.1.7.0.4\lib\ClientDependency.Core.Mvc.dll</HintPath>
     </Reference>
     <Reference Include="Examine, Version=0.1.51.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -409,6 +409,13 @@
     <Compile Include="Umbraco\Controls\ContentTypeControlNew.ascx.designer.cs">
       <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\controls\Images\ImageViewer.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+      <DependentUpon>ImageViewer.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Umbraco\controls\Images\ImageViewer.ascx.designer.cs">
+      <DependentUpon>ImageViewer.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Create.aspx.cs">
       <DependentUpon>create.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -570,6 +577,14 @@
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\RegexEditor.html" />
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
+    <Content Include="Umbraco\Images\PinnedIcons\task_content.ico" />
+    <Content Include="Umbraco\Images\PinnedIcons\task_default.ico" />
+    <Content Include="Umbraco\Images\PinnedIcons\task_developer.ico" />
+    <Content Include="Umbraco\Images\PinnedIcons\task_media.ico" />
+    <Content Include="Umbraco\Images\PinnedIcons\task_member.ico" />
+    <Content Include="Umbraco\Images\PinnedIcons\task_settings.ico" />
+    <Content Include="Umbraco\Images\PinnedIcons\task_users.ico" />
+    <Content Include="Umbraco\Images\PinnedIcons\umb.ico" />
     <Content Include="Umbraco\Xslt\Web.config">
       <SubType>
       </SubType>
@@ -2175,7 +2190,6 @@
     <Content Include="Umbraco\Css\umbracoGui.css" />
     <Content Include="Umbraco\dashboard.aspx" />
     <Content Include="Umbraco\Dashboard\LatestEdits.ascx" />
-    <Content Include="Umbraco\Default.aspx" />
     <Content Include="Umbraco\Developer\Macros\assemblyBrowser.aspx" />
     <Content Include="Umbraco\Developer\autoDoc.aspx" />
     <Content Include="Umbraco\Developer\DataTypes\editDatatype.aspx" />
@@ -2585,7 +2599,7 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>6130</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:6130</IISUrl>
+          <IISUrl>http://localhost:6230</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

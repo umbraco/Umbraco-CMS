@@ -8,6 +8,7 @@ using System.Collections.Generic;
 
 namespace umbraco.cms.businesslogic.datatype
 {
+    [Obsolete("This class is no longer used and will be removed from the codebase in the future.")]
 	public abstract class BaseDataType
 	{
 		private int _datatypedefinitionid;

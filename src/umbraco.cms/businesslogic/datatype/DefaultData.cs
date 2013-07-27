@@ -14,6 +14,7 @@ namespace umbraco.cms.businesslogic.datatype
     /// <summary>
     /// Default implementation of the <c>IData</c> interface that stores data inside the Umbraco database.
     /// </summary>
+    [Obsolete("This class is no longer used and will be removed from the codebase in the future.")]
     public class DefaultData : IData, IDataWithPreview
 	{
 		private int _propertyId;

@@ -13,6 +13,22 @@ namespace Umbraco.Tests.Persistence.Querying
     public class QueryBuilderTests : BaseUsingSqlCeSyntax
     {
         [Test]
+        public void Dates_Formatted_Properly()
+        {
+            var sql = new Sql();
+            sql.Select("*").From<DocumentDto>();
+
+            var dt = new DateTime(2013, 11, 21, 13, 25, 55);
+
+            var query = Query<IContent>.Builder.Where(x => x.ExpireDate <= dt);
+            var translator = new SqlTranslator<IContent>(sql, query);
+
+            var result = translator.Translate();
+
+            Assert.IsTrue(result.SQL.Contains("[expireDate] <= '2013-11-21 13:25:55'"));
+        }
+
+        [Test]
         public void Can_Build_StartsWith_Query_For_IContent()
         {
             // Arrange

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -20,22 +21,11 @@ namespace Umbraco.Web.Models.ContentEditing
         [Required(AllowEmptyStrings = false)]
         public string Alias { get; set; }
 
-        protected bool Equals(ContentPropertyBasic other)
-        {
-            return Id == other.Id;
-        }
+        /// <summary>
+        /// Used internally during model mapping
+        /// </summary>
+        [IgnoreDataMember]
+        internal PropertyEditor PropertyEditor { get; set; }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            var other = obj as ContentPropertyBasic;
-            return other != null && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Id;
-        }
     }
 }

@@ -12,6 +12,7 @@
     /// <remarks>
     /// Made by NH in flight SK 925 on his way to MIX09
     /// </remarks>
+    [Obsolete("This class is no longer used and will be removed from the codebase in the future.")]
     public abstract class AbstractDataEditor : BaseDataType, IDataType
     {
         /// <summary>

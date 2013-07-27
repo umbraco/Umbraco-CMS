@@ -2,12 +2,14 @@ using System;
 using System.Data;
 using System.Configuration;
 using System.Collections;
+using System.Linq;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core.Publishing;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
 
@@ -39,9 +41,45 @@ namespace umbraco.presentation.actions
             deleteMessage.Text = ui.Text("editContentPublishedHeader");
 
             confirm.Visible = false;
-            d.SaveAndPublish(UmbracoUser);
+
+            var result = d.SaveAndPublishWithResult(UmbracoUser);
+            if (result.Success)
+            {
+                deleted.Text = ui.Text("editContentPublishedHeader") + " ('" + d.Text + "') " + ui.Text("editContentPublishedText") + "</p><p><a href=\"" + library.NiceUrl(d.Id) + "\"> " + ui.Text("view") + " " + d.Text + "</a>";
+            }
+            else
+            {
+                deleted.Text = "<div class='error' style='padding:10px'>" + GetMessageForStatus(result.Result) +  "</div>";
+            }
             
-            deleted.Text = ui.Text("editContentPublishedHeader") + " ('" + d.Text + "') " + ui.Text("editContentPublishedText") + "</p><p><a href=\"" + library.NiceUrl(d.Id) + "\"> " + ui.Text("view") + " " + d.Text + "</a>";
+        }
+
+        private string GetMessageForStatus(PublishStatus status)
+        {
+            switch (status.StatusType)
+            {
+                case PublishStatusType.Success:
+                case PublishStatusType.SuccessAlreadyPublished:
+                    return ui.Text("speechBubbles", "editContentPublishedText", UmbracoUser);
+                case PublishStatusType.FailedPathNotPublished:
+                    return ui.Text("publish", "contentPublishedFailedByParent",
+                                   string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
+                                   UmbracoUser).Trim();
+                case PublishStatusType.FailedCancelledByEvent:
+                    return ui.Text("speechBubbles", "contentPublishedFailedByEvent");
+                case PublishStatusType.FailedHasExpired:
+                case PublishStatusType.FailedAwaitingRelease:
+                case PublishStatusType.FailedIsTrashed:
+                case PublishStatusType.FailedContentInvalid:
+                    return ui.Text("publish", "contentPublishedFailedInvalid",
+                                   new[]
+                                       {
+                                           string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
+                                           string.Join(",", status.InvalidProperties.Select(x => x.Alias))
+                                       }, UmbracoUser);
+                default:
+                    throw new IndexOutOfRangeException();
+            }
         }
     }
 }

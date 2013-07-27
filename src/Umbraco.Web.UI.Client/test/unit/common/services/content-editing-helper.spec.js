@@ -22,10 +22,10 @@ describe('contentEditingHelper tests', function () {
                 data: content,
                 status: 403
             };
-            err.data.ModelState = {};
+            err.data.modelState = {};
 
             //act
-            var handled = contentEditingHelper.handleSaveError(err);
+            var handled = contentEditingHelper.handleSaveError(err, {content: content});
 
             //assert
             expect(handled).toBe(true);
@@ -39,7 +39,7 @@ describe('contentEditingHelper tests', function () {
             };
             
             //act
-            var handled = contentEditingHelper.handleSaveError(err);
+            var handled = contentEditingHelper.handleSaveError(err, null);
 
             //assert
             expect(handled).toBe(false);
@@ -55,7 +55,7 @@ describe('contentEditingHelper tests', function () {
             };
 
             //act
-            var handled = contentEditingHelper.handleSaveError(err);
+            var handled = contentEditingHelper.handleSaveError(err, { content: content });
 
             //assert
             expect(handled).toBe(false);
@@ -180,6 +180,34 @@ describe('contentEditingHelper tests', function () {
             //assert
             expect(result).toBe(false);
             
+        });
+
+    });
+    
+    describe('wires up property values after saving', function () {
+
+        it('does not update un-changed values', function () {
+
+            //arrange
+            var origContent = mocksUtils.getMockContent(1234);
+            origContent.tabs[0].properties[0].value = { complex1: "origValue1a", complex2: "origValue1b" };
+            origContent.tabs[1].properties[0].value = "origValue2";
+            origContent.tabs[1].properties[1].value = "origValue3";
+            origContent.tabs[1].properties[2].value = "origValue4";
+
+            var newContent = mocksUtils.getMockContent(1234);
+            newContent.tabs[0].properties[0].value = { complex1: "origValue1a", complex2: "newValue1b" };
+            newContent.tabs[1].properties[0].value = "origValue2";
+            newContent.tabs[1].properties[1].value = "newValue3";
+            newContent.tabs[1].properties[2].value = "origValue4";
+
+            //act
+            var changed = contentEditingHelper.reBindChangedProperties(origContent, newContent);
+
+            //assert
+            expect(changed.length).toBe(2);
+            expect(changed[0].alias).toBe("list");
+            expect(changed[1].alias).toBe("textarea");
         });
 
     });

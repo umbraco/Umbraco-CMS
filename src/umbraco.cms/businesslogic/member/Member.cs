@@ -551,14 +551,19 @@ namespace umbraco.cms.businesslogic.member
                        SqlHelper.CreateParameter("@id", Id));
                 }
 
-                return m_Email.ToLower();
+                return string.IsNullOrWhiteSpace(m_Email) ? m_Email : m_Email.ToLower();
             }
             set
             {
                 var oldEmail = Email;
-                var newEmail = value.ToLower();
+                var newEmail = string.IsNullOrWhiteSpace(value) ? value : value.ToLower();
                 var requireUniqueEmail = Membership.Providers[UmbracoMemberProviderName].RequiresUniqueEmail;
-                var howManyMembersWithEmail = Member.GetMembersFromEmail(newEmail).Length;
+
+                var howManyMembersWithEmail = 0;
+                var membersWithEmail = GetMembersFromEmail(newEmail);
+                if (membersWithEmail != null)
+                    howManyMembersWithEmail = membersWithEmail.Length;
+
                 if (((oldEmail == newEmail && howManyMembersWithEmail > 1) ||
                     (oldEmail != newEmail && howManyMembersWithEmail > 0))
                     && requireUniqueEmail)

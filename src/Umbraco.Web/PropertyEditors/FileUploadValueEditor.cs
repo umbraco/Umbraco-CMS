@@ -6,6 +6,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
@@ -46,31 +47,29 @@ namespace Umbraco.Web.PropertyEditors
             var clear = false;
             if (editorValue.Value.IsNullOrWhiteSpace() == false)
             {
-                var parsed = JObject.Parse(editorValue.Value);
-                clear = parsed["clearFiles"].Value<bool>();
-            }
-
-            //parse the current value
-            var currentPersistedValues = new JArray();
-            if (currentValue != null)
-            {
                 try
                 {
-                    currentPersistedValues = JArray.Parse(currentValue.ToString());
+                    var parsed = JObject.Parse(editorValue.Value);
+                    clear = parsed["clearFiles"].Value<bool>();
                 }
                 catch (JsonReaderException)
                 {
-                    //if we cannot parse, we'll ignore the error and start again, there must be a bad value stored for some reason                            
+                    clear = false;
                 }
             }
 
-            var newValue = new JArray();
+            var currentPersistedValues = new string[] {};
+            if (currentValue != null)
+            {
+                currentPersistedValues = currentValue.ToString().Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+            }
+
+            var newValue = new List<string>();
 
             if (clear)
             {
                 //TODO: Need to delete our old files!
-
-                return newValue.ToString(Formatting.None);
+                return "";
             }
             
             //check for any files
@@ -87,8 +86,8 @@ namespace Umbraco.Web.PropertyEditors
                     {
                         var file = filesAsArray[i];
 
-                        var currentPersistedFile = currentPersistedValues.Count >= (i + 1)
-                                                       ? currentPersistedValues[i]["file"].ToString()
+                        var currentPersistedFile = currentPersistedValues.Length >= (i + 1)
+                                                       ? currentPersistedValues[i]
                                                        : "";
 
                         var name = IOHelper.SafeFileName(file.FileName.Substring(file.FileName.LastIndexOf(IOHelper.DirSepChar) + 1, file.FileName.Length - file.FileName.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
@@ -108,20 +107,10 @@ namespace Umbraco.Web.PropertyEditors
 
                         using (var fileStream = File.OpenRead(file.TempFilePath))
                         {
-                            var umbracoFile = UmbracoFile.Save(fileStream, fileName);
-
-                            //create json to be saved
-                            var forPersisting = JObject.FromObject(new
-                                {
-                                    file = umbracoFile.Url,
-                                    isImage = false
-                                });
-
+                            var umbracoFile = UmbracoMediaFile.Save(fileStream, fileName);
 
                             if (umbracoFile.SupportsResizing)
                             {
-                                forPersisting["isImage"] = true;
-
                                 // make default thumbnail
                                 umbracoFile.Resize(100, "thumb");
 
@@ -137,23 +126,22 @@ namespace Umbraco.Web.PropertyEditors
                                     }
                                 }
                             }
-                            
-                            //add this to the persisted values
-                            newValue.Add(forPersisting);
+                            newValue.Add(umbracoFile.Url);
                         }
                         //now remove the temp file
-                        File.Delete(file.TempFilePath);
+                        File.Delete(file.TempFilePath);    
                     }
-
+                    
                     //TODO: We need to remove any files that were previously persisted but are no longer persisted. FOr example, if we
                     // uploaded 5 files before and then only uploaded 3, then the last two should be deleted.
 
-                    return newValue.ToString(Formatting.None);
+                    return string.Join(",", newValue);
                 }
             }
 
             //if we've made it here, we had no files to save and we were not clearing anything so just persist the same value we had before
             return currentValue;
         }
+
     }
 }

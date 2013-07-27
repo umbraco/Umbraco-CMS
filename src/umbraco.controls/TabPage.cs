@@ -18,6 +18,7 @@ namespace umbraco.uicontrols {
         private bool _hasMenu = true;
         private readonly ScrollingMenu _menu = new ScrollingMenu();
         protected LiteralControl ErrorHeaderControl = new LiteralControl();
+        private LiteralControl _closeButtonControl = new LiteralControl();
         private readonly ValidationSummary _vs = new ValidationSummary();
         private readonly Control _tempErr = new Control();
         internal TabView parent;
@@ -57,7 +58,7 @@ namespace umbraco.uicontrols {
             // Add error pane
             _tempErr.Visible = false;
             _tempErr.ID = String.Format("{0}_errorPaneContainer", this.ID);
-            _tempErr.Controls.Add(new LiteralControl("<div id=\"errorPane_" + this.ClientID + "\" style='margin: 10px 0px 10px 0px; text-align: left;' class=\"error\"><div style=\"float: right; padding: 5px;\"><a href=\"#\" onClick=\"javascript:document.getElementById('errorPane_" + this.ClientID + "').style.display = 'none'; return false;\">" + CloseCaption + "</a></div><h3>"));
+            _tempErr.Controls.Add(_closeButtonControl);
             _tempErr.Controls.Add(ErrorHeaderControl);
             _tempErr.Controls.Add(new LiteralControl("</h3><p>"));
             _tempErr.Controls.Add(_vs);
@@ -79,6 +80,7 @@ namespace umbraco.uicontrols {
 
         protected override void Render(System.Web.UI.HtmlTextWriter writer)
         {
+            _closeButtonControl.Text = "<div id=\"errorPane_" + this.ClientID + "\" style='margin: 10px 0px 10px 0px; text-align: left;' class=\"error\"><div style=\"float: right; padding: 5px;\"><a href=\"#\" onClick=\"javascript:document.getElementById('errorPane_" + this.ClientID + "').style.display = 'none'; return false;\">" + CloseCaption + "</a></div><h3>";
             ErrorHeaderControl.Text = ErrorHeader;
            
             var activeClass = string.Empty;

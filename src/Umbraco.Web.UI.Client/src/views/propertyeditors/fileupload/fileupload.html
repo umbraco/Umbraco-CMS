@@ -6,11 +6,10 @@
         </div>
         <ul ng-show="files.length > 0">
             <li ng-repeat="file in files">{{file.file.name}}</li>
-        </ul>
+        </ul> 
     </div>
 
-    <div ng-show="persistedFiles.length > 0">
-        <p>Current files</p>
+    <div ng-show="persistedFiles.length > 0">        
         <ul class="thumbnails">
             <li class="thumbnail" ng-repeat="file in persistedFiles">
                 <div ng-switch on="file.isImage" >

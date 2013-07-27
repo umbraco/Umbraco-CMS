@@ -30,7 +30,7 @@ namespace umbraco.BusinessLogic
         /// <summary>
         /// Configures automapper model mappings
         /// </summary>
-        public void ConfigureMappings(IConfiguration config)
+        public void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<Umbraco.Core.Models.ApplicationTree, ApplicationTree>()
                   .ReverseMap(); //two way

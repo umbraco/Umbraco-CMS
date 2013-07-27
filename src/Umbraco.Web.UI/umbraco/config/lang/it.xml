@@ -468,7 +468,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
         <![CDATA[<p>Salve %0%</p>
 
 		  <p>Questa è un'email automatica per informare che l'azione <strong>'%1%'</strong> 
-		  è stata eseguita sulla pagina <a href="%7%"><strong>'%2%'</strong></a>
+		  è stata eseguita sulla pagina <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a>
 		  dall'utente <strong>'%3%'</strong>
 	  </p>
 		  <div style="margin: 8px 0; padding: 8px; display: block;">

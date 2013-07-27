@@ -92,6 +92,9 @@ namespace umbraco.presentation.webservices
 
             if (isMedia)
                 SortMedia(ids);
+
+            if (isContent == false && isMedia == false)
+                SortStylesheetProperties(ids);
         }
 
         private void SortMedia(string[] ids)
@@ -113,6 +116,22 @@ namespace umbraco.presentation.webservices
             catch (Exception ex)
             {
                 LogHelper.Error<nodeSorter>("Could not update media sort order", ex);
+            }
+        }
+
+        private void SortStylesheetProperties(string[] ids)
+        {
+            try
+            {
+                for (var i = 0; i < ids.Length; i++)
+                {
+                    var id = int.Parse(ids[i]);
+                    new cms.businesslogic.CMSNode(id).sortOrder = i;
+                }   
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<nodeSorter>("Could not update stylesheet property sort order", ex);
             }
         }
 

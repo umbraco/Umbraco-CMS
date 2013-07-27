@@ -108,7 +108,7 @@ namespace Umbraco.Web.UI.Umbraco
                 <meta name='msapplication-tooltip' content='Umbraco CMS - {1}' />
                 <meta name='msapplication-navbutton-color' content='#f36f21' />
                 <meta name='msapplication-starturl' content='./umbraco.aspx' />",
-    IOHelper.ResolveUrl(SystemDirectories.Umbraco + "/images/pinnedIcons/umb.ico"),
+    IOHelper.ResolveUrl(SystemDirectories.Umbraco + "/Images/PinnedIcons/umb.ico"),
     HttpContext.Current.Request.Url.Host.ToLower().Replace("www.", ""));
 
                 var user = UmbracoUser;
@@ -123,9 +123,9 @@ namespace Umbraco.Web.UI.Umbraco
                             File.Exists(
                                 IOHelper.MapPath(
                                     IOHelper.ResolveUrl(
-                                        string.Format("{0}/images/pinnedIcons/task_{1}.ico", SystemDirectories.Umbraco, app.alias))))
-                                ? "/umbraco/images/pinnedIcons/task_" + app.alias + ".ico"
-                                : "/umbraco/images/pinnedIcons/task_default.ico");
+                                        string.Format("{0}/Images/PinnedIcons/task_{1}.ico", SystemDirectories.Umbraco, app.alias))))
+                                ? "/umbraco/Images/PinnedIcons/task_" + app.alias + ".ico"
+                                : "/umbraco/Images/PinnedIcons/task_default.ico");
                     }
                 }
 

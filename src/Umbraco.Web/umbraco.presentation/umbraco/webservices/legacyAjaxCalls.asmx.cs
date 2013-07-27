@@ -65,8 +65,14 @@ namespace umbraco.presentation.webservices
             
             //check which parameters to pass depending on the types passed in
             int intNodeId;
-            // Fix for #26965 - numeric member login gets parsed as nodeId
-            if (int.TryParse(nodeId, out intNodeId) && nodeType != "member")
+            if (nodeType == "memberGroup")
+            {
+                 LegacyDialogHandler.Delete(
+                    new HttpContextWrapper(HttpContext.Current),
+                    UmbracoUser,
+                    nodeType, 0, nodeId);
+            }
+            else if (int.TryParse(nodeId, out intNodeId) && nodeType != "member") // Fix for #26965 - numeric member login gets parsed as nodeId
             {
                 LegacyDialogHandler.Delete(
                     new HttpContextWrapper(HttpContext.Current),

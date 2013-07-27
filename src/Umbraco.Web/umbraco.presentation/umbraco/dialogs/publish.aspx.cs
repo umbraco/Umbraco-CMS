@@ -14,6 +14,7 @@ namespace umbraco.dialogs
 	/// <summary>
 	/// Summary description for publish.
 	/// </summary>
+	[Obsolete("This is no longer used whatsoever and will be removed from the codebase")]
 	public partial class publish : UmbracoEnsuredPage
 	{
 		protected Literal total;

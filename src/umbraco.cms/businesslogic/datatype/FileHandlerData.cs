@@ -10,6 +10,7 @@ using umbraco.cms.businesslogic.Files;
 
 namespace umbraco.cms.businesslogic.datatype
 {
+    [Obsolete("This class is no longer used and will be removed from the codebase in the future.")]
     public class FileHandlerData : DefaultData
     {
         private readonly string _thumbnailSizes;
@@ -169,12 +170,12 @@ namespace umbraco.cms.businesslogic.datatype
                                            object propertyValue)
         {
             XmlNode propertyNode = uploadFieldConfigNode.SelectSingleNode(propertyAlias);
-            if (propertyNode != null && !String.IsNullOrEmpty(propertyNode.FirstChild.Value))
+            if (propertyNode != null && !string.IsNullOrEmpty(propertyNode.FirstChild.Value))
             {
-                if (content.getProperty(propertyNode.FirstChild.Value) != null)
+                var prop = content.getProperty(propertyNode.FirstChild.Value);
+                if (prop != null)
                 {
-                    content.getProperty(propertyNode.FirstChild.Value)
-                        .Value = propertyValue;
+                    prop.Value = propertyValue;
                 }
             }
         }

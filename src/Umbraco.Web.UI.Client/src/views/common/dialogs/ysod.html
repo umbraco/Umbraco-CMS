@@ -1,0 +1,28 @@
+﻿<div class="umb-modalcolumn ysod" ng-controller="Umbraco.Dialogs.YsodController">
+    
+    <a href="" ng-click="closeDialog()" class="btn">Close</a>
+
+    <h1>{{error.errorMsg}}</h1>
+    <hr />
+    <h2>{{error.data.ExceptionMessage || error.data.Message}}</h2>
+    <div>
+        <b>Description: </b>An unhandled exception occurred during the execution of the current web request. Please review the stack trace for more information about the error and where it originated in the code.
+        <br />
+        <br />
+        <b>Exception Details: </b>{{error.data.ExceptionType}}: {{error.data.ExceptionMessage}}      
+        <br />
+        <br />
+        <b>Stack Trace:</b>
+        <br />
+        <br />
+
+        <table>
+            <tr>
+                <td>
+                    <pre>{{error.data.StackTrace}}</pre>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+</div>
