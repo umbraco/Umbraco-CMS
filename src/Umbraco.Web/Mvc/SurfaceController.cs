@@ -16,23 +16,6 @@ namespace Umbraco.Web.Mvc
     {
 
         /// <summary>
-        /// Default constructor
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        protected SurfaceController(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {
-        }
-
-        /// <summary>
-        /// Empty constructor, uses Singleton to resolve the UmbracoContext
-        /// </summary>
-        protected SurfaceController()
-            : base(UmbracoContext.Current)
-        {
-        }
-
-        /// <summary>
         /// Redirects to the Umbraco page with the given id
         /// </summary>
         /// <param name="pageId"></param>
