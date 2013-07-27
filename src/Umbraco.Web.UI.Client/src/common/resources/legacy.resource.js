@@ -1,10 +1,9 @@
 ﻿/**
-    * @ngdoc service 
+    * @ngdoc service
     * @name umbraco.resources.legacyResource     
     * @description Handles legacy dialog requests
     **/
 function legacyResource($q, $http, umbRequestHelper) {
-
    
     //the factory object returned
     return {

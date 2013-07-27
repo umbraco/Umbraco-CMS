@@ -1,6 +1,6 @@
 /**
- * @ngdoc object
- * @name umbraco.directives:umbTreeItem
+ * @ngdoc directive
+ * @name umbraco.directives.directive:umbTreeItem
  * @element li
  * @function
  *
@@ -11,7 +11,7 @@
  * **note:** This directive is only used internally in the umbTree directive
  *
  * @example
-   <example module="umbraco.directives">
+   <example module="umbraco">
     <file name="index.html">
          <umb-tree-item ng-repeat="child in tree.children" node="child" callback="callback" section="content"></umb-tree-item>
     </file>

@@ -671,9 +671,9 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
     return {
         
         /**
-         * @ngdoc function
-         * @name handleValidationErrors
-         * @methodOf ContentEditController
+         * @ngdoc method
+         * @name umbraco.services.contentEditingHelper#handleValidationErrors
+         * @methodOf umbraco.services.contentEditingHelper
          * @function
          *
          * @description
@@ -734,8 +734,8 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
 
         /**
          * @ngdoc function
-         * @name handleSaveError
-         * @methodOf ContentEditController
+         * @name umbraco.services.contentEditingHelper#handleSaveError
+         * @methodOf umbraco.services.contentEditingHelper
          * @function
          *
          * @description
@@ -776,8 +776,8 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
 
         /**
          * @ngdoc function
-         * @name redirectToCreatedContent
-         * @methodOf ContentEditController
+         * @name umbraco.services.contentEditingHelper#redirectToCreatedContent
+         * @methodOf umbraco.services.contentEditingHelper
          * @function
          *
          * @description

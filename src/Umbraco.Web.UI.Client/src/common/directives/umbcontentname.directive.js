@@ -1,7 +1,8 @@
 /**
-* @ngdoc object 
-* @name umbraco.directive:umbContentName 
+* @ngdoc directive
+* @name umbraco.directives.directive:umbContentName 
 * @restrict E
+* @function
 * @description 
 * Used by editors that require naming an entity. Shows a textbox/headline with a required validator within it's own form.
 **/

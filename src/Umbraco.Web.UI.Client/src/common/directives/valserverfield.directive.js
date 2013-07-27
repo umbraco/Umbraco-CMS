@@ -1,6 +1,6 @@
 /**
-    * @ngdoc object 
-    * @name umbraco.directive:valServerField
+    * @ngdoc directive
+    * @name umbraco.directives.directive:valServerField
     * @restrict A
     * @description This directive is used to associate a content field (not user defined) with a server-side validation response
     *               so that the validators in angular are updated based on server-side feedback.

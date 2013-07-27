@@ -1,7 +1,7 @@
 
 /**
-* @ngdoc object 
-* @name umbraco.directive:valTab
+* @ngdoc directive
+* @name umbraco.directives.directive:valTab
 * @restrict A
 * @description Used to show validation warnings for a tab to indicate that the tab content has validations errors in its data.
 **/

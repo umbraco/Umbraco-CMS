@@ -1,6 +1,6 @@
 /**
-* @ngdoc object 
-* @name umbraco.directives:valPropertyMsg
+* @ngdoc directive
+* @name umbraco.directives.directive:valPropertyMsg
 * @restrict A
 * @element textarea
 * @requires formController

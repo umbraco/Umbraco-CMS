@@ -1,8 +1,9 @@
 ﻿/**
-    * @ngdoc service 
-    * @name umbraco.mocks.sectionMocks     
-    * @description Mocks data retreival for the sections
-    **/
+* @ngdoc service
+* @name umbraco.mocks.sectionMocks     
+* @description 
+* Mocks data retrival for the sections
+**/
 function sectionMocks($httpBackend, mocksUtils) {
 
     /** internal method to mock the sections to be returned */

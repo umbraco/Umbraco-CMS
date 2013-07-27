@@ -1,6 +1,8 @@
 ﻿/**
-* @ngdoc object 
-* @name umbraco.directive:login 
+* @ngdoc directive
+* @name umbraco.directives.directive:login
+* @function
+* @element ANY
 * @restrict E
 **/
 function loginDirective() {

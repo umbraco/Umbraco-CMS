@@ -13,6 +13,7 @@
                     name: "My content with id: " + id,
                     updateDate: new Date(),
                     publishDate: new Date(),
+                    createDate: new Date(),
                     id: id,
                     parentId: 1234,
                     icon: "icon-file-alt",

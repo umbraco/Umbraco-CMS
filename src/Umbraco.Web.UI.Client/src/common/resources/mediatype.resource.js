@@ -1,5 +1,5 @@
 /**
-    * @ngdoc service 
+    * @ngdoc service
     * @name umbraco.resources.mediaTypeResource
     * @description Loads in data for media types
     **/

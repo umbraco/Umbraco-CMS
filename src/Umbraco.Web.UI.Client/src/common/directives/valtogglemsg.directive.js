@@ -50,7 +50,7 @@ function valToggleMsg(serverValidationManager) {
 }
 
 /**
-* @ngdoc object 
+* @ngdoc directive
 * @name umbraco.directives.directive:valToggleMsg
 * @restrict A
 * @element input

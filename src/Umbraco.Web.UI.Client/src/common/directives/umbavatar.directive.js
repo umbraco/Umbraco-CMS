@@ -1,6 +1,6 @@
 ﻿/**
-* @ngdoc object 
-* @name umbraco.directives.directive:login 
+* @ngdoc directive
+* @name umbraco.directives.directive:umbAvatar
 * @restrict E
 **/
 function avatarDirective() {

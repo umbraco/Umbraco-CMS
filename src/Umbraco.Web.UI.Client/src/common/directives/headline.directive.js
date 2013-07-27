@@ -1,3 +1,7 @@
+/**
+* @ngdoc directive
+* @name umbraco.directives.directive:headline
+**/
 angular.module("umbraco.directives")
   .directive('headline', function ($window) {
       return function (scope, el, attrs) {

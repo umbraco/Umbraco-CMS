@@ -1,6 +1,7 @@
 /**
-* @ngdoc object
+* @ngdoc directive
 * @name umbraco.directives.directive:umbFileUpload
+* @function
 * @restrict AE 
 * @element ANY
 * @scope
