@@ -39,39 +39,47 @@ namespace Umbraco.Core.Persistence
 
             using (var tr = db.GetTransaction())
             {
-                try
+                db.BulkInsertRecords(collection, tr);
+            }
+        }
+
+        public static void BulkInsertRecords<T>(this Database db, IEnumerable<T> collection, Transaction tr)
+        {
+            //don't do anything if there are no records.
+            if (collection.Any() == false)
+                return;
+
+            try
+            {
+                if (SqlSyntaxContext.SqlSyntaxProvider is SqlCeSyntaxProvider)
                 {
-                    if (SqlSyntaxContext.SqlSyntaxProvider is SqlCeSyntaxProvider)
+                    //SqlCe doesn't support bulk insert statements!
+
+                    foreach (var poco in collection)
                     {
-                        //SqlCe doesn't support bulk insert statements!
-
-                        foreach (var poco in collection)
-                        {
-                            db.Insert(poco);
-                        }
-
+                        db.Insert(poco);
                     }
-                    else
-                    {
-                        string[] sqlStatements;
-                        var cmds = db.GenerateBulkInsertCommand(collection, db.Connection, out sqlStatements);
-                        for (var i = 0; i < sqlStatements.Length; i++)
-                        {
-                            using (var cmd = cmds[i])
-                            {
-                                cmd.CommandText = sqlStatements[i];
-                                cmd.ExecuteNonQuery();
-                            }
-                        }
-                    }
-
-                    tr.Complete();
                 }
-                catch
+                else
                 {
-                    tr.Dispose();
-                    throw;
+                    string[] sqlStatements;
+                    var cmds = db.GenerateBulkInsertCommand(collection, db.Connection, out sqlStatements);
+                    for (var i = 0; i < sqlStatements.Length; i++)
+                    {
+                        using (var cmd = cmds[i])
+                        {
+                            cmd.CommandText = sqlStatements[i];
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
                 }
+
+                tr.Complete();
+            }
+            catch
+            {
+                tr.Dispose();
+                throw;
             }
         }
 

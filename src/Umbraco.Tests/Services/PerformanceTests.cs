@@ -211,6 +211,27 @@ namespace Umbraco.Tests.Services
                 }
             }
 
+            //now, test truncating but then do bulk insertion of records
+            using (DisposableTimer.DebugDuration<PerformanceTests>("Starting truncate + bulk insert test in one transaction"))
+            {
+                //do this 10x!
+                for (var i = 0; i < 10; i++)
+                {
+                    //now we insert each record for the ones we've deleted like we do in the content service.
+                    var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = UpdatedXmlStructure }).ToList();
+
+                    using (var tr = DatabaseContext.Database.GetTransaction())
+                    {
+                        //clear all the xml entries
+                        DatabaseContext.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+                                                    INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
+
+
+                        DatabaseContext.Database.BulkInsertRecords(xmlItems, tr);
+                    }
+                }
+            }
             
 
         }
