@@ -160,13 +160,6 @@ namespace umbraco.presentation.webservices
                 if (parentNode != null)
                     content.SortNodes(ref parentNode);
 
-                // Load balancing - then refresh entire cache
-                // NOTE: SD: This seems a bit excessive to do simply for sorting! I'm going to leave this here for now but 
-                //  the sort order should be updated in distributed calls when an item is Published (and it most likely is)
-                //  but I guess this was put here for a reason at some point.
-                if (UmbracoSettings.UseDistributedCalls)
-                    library.RefreshContent();
-
                 // fire actionhandler, check for content
                 BusinessLogic.Actions.Action.RunActionHandlers(new Document(parentId), ActionSort.Instance);
             }

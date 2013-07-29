@@ -296,16 +296,13 @@ namespace Umbraco.Core
             if (databaseSettings != null && string.IsNullOrWhiteSpace(databaseSettings.ConnectionString) == false && string.IsNullOrWhiteSpace(databaseSettings.ProviderName) == false)
             {
                 var providerName = "System.Data.SqlClient";
+                string connString = null;
                 if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName))
                 {
                     providerName = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName;
-
-                    _connectionString =
-                        ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ConnectionString;
-
+                    connString = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ConnectionString;
                 }
-
-                Initialize(providerName);
+                Initialize(providerName, connString);
             }
             else if (ConfigurationManager.AppSettings.ContainsKey(GlobalSettings.UmbracoConnectionName) && string.IsNullOrEmpty(ConfigurationManager.AppSettings[GlobalSettings.UmbracoConnectionName]) == false)
             {
@@ -367,6 +364,12 @@ namespace Umbraco.Core
                 LogHelper.Info<DatabaseContext>("Initialization of the DatabaseContext failed with following error: " + e.Message);
                 LogHelper.Info<DatabaseContext>(e.StackTrace);
             }
+        }
+
+        internal void Initialize(string providerName, string connectionString)
+        {
+            _connectionString = connectionString;
+            Initialize(providerName);
         }
 
         internal DatabaseSchemaResult ValidateDatabaseSchema()
