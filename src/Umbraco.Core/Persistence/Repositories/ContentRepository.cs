@@ -449,8 +449,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
             foreach (var dto in dtos)
             {
+                //Check in the cache first. If it exists there AND it is published
+                // then we can use that entity. Otherwise if it is not published (which can be the case
+                // because we only store the 'latest' entries in the cache which might not be the published
+                // version)
                 var fromCache = TryGetFromCache(dto.NodeId);
-                if (fromCache.Success)
+                if (fromCache.Success && fromCache.Result.Published)
                 {
                     yield return fromCache.Result;
                 }
