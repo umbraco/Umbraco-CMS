@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories
         IContent GetByLanguage(int id, string language);
 
         /// <summary>
-        /// Gets all published Content byh the specified query
+        /// Gets all published Content by the specified query
         /// </summary>
         /// <param name="query">Query to execute against published versions</param>
         /// <returns>An enumerable list of <see cref="IContent"/></returns>
