@@ -449,7 +449,15 @@ namespace Umbraco.Core.Persistence.Repositories
 
             foreach (var dto in dtos)
             {
-                yield return CreateContentFromDto(dto, dto.VersionId);
+                var fromCache = TryGetFromCache(dto.NodeId);
+                if (fromCache.Success)
+                {
+                    yield return fromCache.Result;
+                }
+                else
+                {
+                    yield return CreateContentFromDto(dto, dto.VersionId);    
+                }
             }
         }
 

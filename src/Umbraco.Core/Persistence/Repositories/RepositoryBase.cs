@@ -85,11 +85,10 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public TEntity Get(TId id)
         {
-            Guid key = id is int ? ConvertIdToGuid(id) : ConvertStringIdToGuid(id.ToString());
-            var rEntity = _cache.GetById(typeof(TEntity), key);
-            if (rEntity != null)
+            var fromCache = TryGetFromCache(id);
+            if (fromCache.Success)
             {
-                return (TEntity)rEntity;
+                return fromCache.Result;
             }
 
             var entity = PerformGet(id);
@@ -111,6 +110,17 @@ namespace Umbraco.Core.Persistence.Repositories
             
             return entity;
         }
+
+        protected Attempt<TEntity> TryGetFromCache(TId id)
+        {
+            Guid key = id is int ? ConvertIdToGuid(id) : ConvertStringIdToGuid(id.ToString());
+            var rEntity = _cache.GetById(typeof(TEntity), key);
+            if (rEntity != null)
+            {
+                return new Attempt<TEntity>(true, (TEntity) rEntity);
+            }
+            return Attempt<TEntity>.False;
+        } 
 
         protected abstract IEnumerable<TEntity> PerformGetAll(params TId[] ids);
         /// <summary>
@@ -173,14 +183,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public bool Exists(TId id)
         {
-            Guid key = id is int ? ConvertIdToGuid(id) : ConvertStringIdToGuid(id.ToString());
-            var rEntity = _cache.GetById(typeof(TEntity), key);
-            if (rEntity != null)
+            var fromCache = TryGetFromCache(id);
+            if (fromCache.Success)
             {
                 return true;
             }
-
-            return PerformExists(id);
+            return PerformExists(id);            
         }
 
         protected abstract int PerformCount(IQuery<TEntity> query);

@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -65,6 +66,90 @@ namespace Umbraco.Tests.Services
 		{   
       		base.TearDown();
 		}
+
+        [Test]
+        public void Get_All_Published_Content()
+        {
+            var result = PrimeDbWithLotsOfContent();
+            var contentSvc = (ContentService) ServiceContext.ContentService;
+
+            var countOfPublished = result.Count(x => x.Published);
+            var contentTypeId = result.First().ContentTypeId;
+
+            using (DisposableTimer.DebugDuration<PerformanceTests>("Getting published content normally"))
+            {
+                //do this 10x!
+                for (var i = 0; i < 10; i++)
+                {
+                    //clear the cache to make this test valid
+                    RuntimeCacheProvider.Current.Clear();
+
+                    var published = new List<IContent>();
+                    //get all content items that are published
+                    var rootContent = contentSvc.GetRootContent();
+                    foreach (var content in rootContent.Where(content => content.Published))
+                    {
+                        published.Add(content);
+                        published.AddRange(contentSvc.GetPublishedDescendants(content));
+                    }
+                    Assert.AreEqual(countOfPublished, published.Count(x => x.ContentTypeId == contentTypeId));
+                }
+                
+            }
+
+            using (DisposableTimer.DebugDuration<PerformanceTests>("Getting published content optimized"))
+            {
+
+                //do this 10x!
+                for (var i = 0; i < 10; i++)
+                {
+                    //clear the cache to make this test valid
+                    RuntimeCacheProvider.Current.Clear();
+
+                    //get all content items that are published
+                    var published = contentSvc.GetAllPublished();
+
+                    Assert.AreEqual(countOfPublished, published.Count(x => x.ContentTypeId == contentTypeId));
+                }
+            }
+        }
+
+        [Test]
+        public void Get_All_Published_Content_Of_Type()
+        {
+            var result = PrimeDbWithLotsOfContent();
+            var contentSvc = (ContentService)ServiceContext.ContentService;
+
+            var countOfPublished = result.Count(x => x.Published);
+            var contentTypeId = result.First().ContentTypeId;
+
+            using (DisposableTimer.DebugDuration<PerformanceTests>("Getting published content of type normally"))
+            {
+                //do this 10x!
+                for (var i = 0; i < 10; i++)
+                {
+                    //clear the cache to make this test valid
+                    RuntimeCacheProvider.Current.Clear();
+                    //get all content items that are published of this type
+                    var published = contentSvc.GetContentOfContentType(contentTypeId).Where(content => content.Published);
+                    Assert.AreEqual(countOfPublished, published.Count(x => x.ContentTypeId == contentTypeId));
+                }
+            }
+
+            using (DisposableTimer.DebugDuration<PerformanceTests>("Getting published content of type optimized"))
+            {
+
+                //do this 10x!
+                for (var i = 0; i < 10; i++)
+                {
+                    //clear the cache to make this test valid
+                    RuntimeCacheProvider.Current.Clear();
+                    //get all content items that are published of this type
+                    var published = contentSvc.GetPublishedContentOfContentType(contentTypeId);
+                    Assert.AreEqual(countOfPublished, published.Count(x => x.ContentTypeId == contentTypeId));
+                }
+            }
+        }
 
         [Test]
         public void Truncate_Insert_Vs_Update_Insert()
@@ -129,6 +214,51 @@ namespace Umbraco.Tests.Services
             
 
         }
+
+        private IEnumerable<IContent> PrimeDbWithLotsOfContent()
+        {
+            var contentType1 = MockedContentTypes.CreateSimpleContentType();
+            contentType1.AllowedAsRoot = true;            
+            ServiceContext.ContentTypeService.Save(contentType1);
+            contentType1.AllowedContentTypes = new List<ContentTypeSort>
+                {
+                    new ContentTypeSort
+                        {
+                            Alias = contentType1.Alias,
+                            Id = new Lazy<int>(() => contentType1.Id),
+                            SortOrder = 0
+                        }
+                };
+            var result = new List<IContent>();
+            ServiceContext.ContentTypeService.Save(contentType1);            
+            IContent lastParent = MockedContent.CreateSimpleContent(contentType1);
+            ServiceContext.ContentService.SaveAndPublish(lastParent);
+            result.Add(lastParent);
+            //create 20 deep
+            for (var i = 0; i < 20; i++)
+            {
+                //for each level, create 20
+                IContent content = null;
+                for (var j = 1; j <= 10; j++)
+                {
+                    content = MockedContent.CreateSimpleContent(contentType1, "Name" + j, lastParent);
+                    //only publish evens
+                    if (j % 2 == 0)
+                    {
+                        ServiceContext.ContentService.SaveAndPublish(content);        
+                    }
+                    else
+                    {
+                        ServiceContext.ContentService.Save(content);
+                    }
+                    result.Add(content);
+                }
+                
+                //assign the last one as the next parent
+                lastParent = content;
+            }
+            return result;
+        } 
 
         private IEnumerable<NodeDto> PrimeDbWithLotsOfContentXmlRecords(Guid customObjectType)
         {

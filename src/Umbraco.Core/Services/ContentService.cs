@@ -13,6 +13,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 
@@ -250,6 +251,17 @@ namespace Umbraco.Core.Services
             }
         }
 
+        internal IEnumerable<IContent> GetPublishedContentOfContentType(int id)
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == id);
+                var contents = repository.GetByPublishedVersion(query);
+
+                return contents;
+            }
+        }
+
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by Level
         /// </summary>
@@ -428,6 +440,19 @@ namespace Umbraco.Core.Services
                 var contents = repository.GetByQuery(query);
 
                 return contents;
+            }
+        }
+
+        /// <summary>
+        /// Gets all published content items
+        /// </summary>
+        /// <returns></returns>
+        internal IEnumerable<IContent> GetAllPublished()
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IContent>.Builder.Where(x => x.Trashed == false);
+                return repository.GetByPublishedVersion(query);
             }
         }
 
@@ -1359,23 +1384,13 @@ namespace Umbraco.Core.Services
                         uow.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
                                                 (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
                                                     INNER JOIN cmsDocument ON cmsContentXml.nodeId = cmsDocument.nodeId)");
-                        
-                        //get all content items that are published
-                        //  Consider creating a Path query instead of recursive method:
-                        //  var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith("-1"));
-                        var rootContent = GetRootContent();
-                        foreach (var content in rootContent.Where(content => content.Published))
-                        {
-                            list.Add(content);
-                            list.AddRange(GetPublishedDescendants(content));
-                        }                        
+
+                        list.AddRange(GetAllPublished());
                     }
                     else
                     {
                         foreach (var id in contentTypeIds)
                         {
-                            
-
                             //first we'll clear out the data from the cmsContentXml table for this type
                             uow.Database.Execute(@"delete from cmsContentXml where nodeId in 
 (select cmsDocument.nodeId from cmsDocument 
@@ -1383,7 +1398,7 @@ namespace Umbraco.Core.Services
 	where published = 1 and contentType = @contentTypeId)", new {contentTypeId = id});
 
                             //now get all published content objects of this type and add to the list
-                            list.AddRange(GetContentOfContentType(id).Where(content => content.Published));
+                            list.AddRange(GetPublishedContentOfContentType(id));
                         }
                     }
 
