@@ -27,6 +27,7 @@ namespace umbraco.cms.presentation
             if (Request.GetItemAsString("xml") != "")
             {
                 Server.ScriptTimeout = 100000;
+                Services.ContentService.RePublishAll();
                 umbraco.cms.businesslogic.web.Document.RePublishAll();
             }
             else if (Request.GetItemAsString("previews") != "")
