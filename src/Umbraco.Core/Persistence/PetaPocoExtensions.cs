@@ -33,6 +33,10 @@ namespace Umbraco.Core.Persistence
 
         public static void BulkInsertRecords<T>(this Database db, IEnumerable<T> collection)
         {
+            //don't do anything if there are no records.
+            if (collection.Any() == false)
+                return;
+
             using (var tr = db.GetTransaction())
             {
                 try

@@ -109,7 +109,7 @@ namespace Umbraco.Tests.Services
                 }
             }
 
-            //now, isntead of truncating, we'll attempt to update and if it doesn't work then we insert
+            //now, test truncating but then do bulk insertion of records
             using (DisposableTimer.DebugDuration<PerformanceTests>("Starting truncate + bulk insert test"))
             {
                 //do this 10x!
