@@ -26,20 +26,20 @@ namespace Umbraco.Web.Trees
         }
 
         protected TreeApiController()
-        {           
+        {
             //Locate the tree attribute
             var treeAttributes = GetType()
-                .GetCustomAttributes(typeof (TreeAttribute), false)
+                .GetCustomAttributes(typeof(TreeAttribute), false)
                 .OfType<TreeAttribute>()
                 .ToArray();
-            
+
             if (treeAttributes.Any() == false)
             {
                 throw new InvalidOperationException("The Tree controller is missing the " + typeof(TreeAttribute).FullName + " attribute");
             }
 
             //assign the properties of this object to those of the metadata attribute
-            _attribute = treeAttributes.First();            
+            _attribute = treeAttributes.First();
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         /// <returns></returns>
         protected abstract MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings);
-        
+
         /// <summary>
         /// The name to display on the root node
         /// </summary>
@@ -80,7 +80,22 @@ namespace Umbraco.Web.Trees
         public TreeNode GetRootNode(FormDataCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = new FormDataCollection("");
-            return CreateRootNode(queryStrings);
+            var node = CreateRootNode(queryStrings);
+
+            //add the tree type to the root
+            node.AdditionalData.Add("treeType", GetType().FullName);
+
+            AddQueryStringsToAdditionalData(node, queryStrings);
+
+            //check if the tree is searchable and add that to the meta data as well
+            if (this is ISearchableTree)
+            {
+                node.AdditionalData.Add("searchable", "true");
+            }
+
+            OnRootNodeRendering(this, new TreeNodeRenderingEventArgs(node, queryStrings));
+
+            return node;
         }
 
         /// <summary>
@@ -99,7 +114,17 @@ namespace Umbraco.Web.Trees
         public TreeNodeCollection GetNodes(string id, FormDataCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = new FormDataCollection("");
-            return GetTreeData(id, queryStrings);
+            var nodes = GetTreeData(id, queryStrings);
+
+            foreach (var node in nodes)
+            {
+                AddQueryStringsToAdditionalData(node, queryStrings);
+            }
+
+            //raise the event
+            OnTreeNodesRendering(this, new TreeNodesRenderingEventArgs(nodes, queryStrings));
+
+            return nodes;
         }
 
         /// <summary>
@@ -125,7 +150,7 @@ namespace Umbraco.Web.Trees
 
             var getChildNodesUrl = Url.GetTreeUrl(
                 GetType(),
-                rootNodeAsString, 
+                rootNodeAsString,
                 queryStrings);
 
             var getMenuUrl = Url.GetMenuUrl(
@@ -137,7 +162,7 @@ namespace Umbraco.Web.Trees
 
             //var node = new TreeNode(RootNodeId, BackOfficeRequestContext.RegisteredComponents.MenuItems, jsonUrl)
             var node = new TreeNode(
-                rootNodeAsString, 
+                rootNodeAsString,
                 getChildNodesUrl,
                 getMenuUrl)
                 {
@@ -153,22 +178,7 @@ namespace Umbraco.Web.Trees
                     Title = RootNodeDisplayName
                 };
 
-            //add the tree type to the root
-            node.AdditionalData.Add("treeType", GetType().FullName);
-            
-            ////add the tree-root css class
-            //node.Style.AddCustom("tree-root");
 
-            //node.AdditionalData.Add("id", node.HiveId.ToString());
-            //node.AdditionalData.Add("title", node.Title);
-
-            AddQueryStringsToAdditionalData(node, queryStrings);
-
-            //check if the tree is searchable and add that to the meta data as well
-            if (this is ISearchableTree)
-            {
-                node.AdditionalData.Add("searchable", "true");
-            }
 
             return node;
         }
@@ -179,7 +189,7 @@ namespace Umbraco.Web.Trees
         /// </summary>
         /// <param name="node"></param>
         /// <param name="queryStrings"></param>
-        protected virtual void AddQueryStringsToAdditionalData(TreeNode node, FormDataCollection queryStrings)
+        protected void AddQueryStringsToAdditionalData(TreeNode node, FormDataCollection queryStrings)
         {
             // Add additional data, ensure treeId isn't added as we've already done that
             foreach (var q in queryStrings
@@ -188,7 +198,7 @@ namespace Umbraco.Web.Trees
                 node.AdditionalData.Add(q.Key, q.Value);
             }
         }
-        
+
         #region Create TreeNode methods
 
         /// <summary>
@@ -221,7 +231,7 @@ namespace Umbraco.Web.Trees
             var node = new TreeNode(id, jsonUrl, menuUrl) { Title = title, Icon = icon };
             return node;
         }
-        
+
         /// <summary>
         /// Helper method to create tree nodes
         /// </summary>
@@ -234,7 +244,7 @@ namespace Umbraco.Web.Trees
         public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string icon, string routePath)
         {
             var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
-            var menuUrl = Url.GetMenuUrl(GetType(), id, queryStrings);            
+            var menuUrl = Url.GetMenuUrl(GetType(), id, queryStrings);
             var node = new TreeNode(id, jsonUrl, menuUrl) { Title = title, RoutePath = routePath, Icon = icon };
             return node;
         }
@@ -275,18 +285,32 @@ namespace Umbraco.Web.Trees
 
         #endregion
 
-        /// <summary>
-        /// The tree name based on the controller type so that everything is based on naming conventions
-        /// </summary>
-        public string TreeType
+        ///// <summary>
+        ///// The tree name based on the controller type so that everything is based on naming conventions
+        ///// </summary>
+        //public string TreeType
+        //{
+        //    get
+        //    {
+        //        var name = GetType().Name;
+        //        return name.Substring(0, name.LastIndexOf("TreeController", StringComparison.Ordinal));
+        //    }
+        //}
+
+        public static event EventHandler<TreeNodesRenderingEventArgs> TreeNodesRendering;
+
+        private static void OnTreeNodesRendering(TreeApiController instance, TreeNodesRenderingEventArgs e)
         {
-            get
-            {
-                var name = GetType().Name;
-                return name.Substring(0, name.LastIndexOf("TreeController", StringComparison.Ordinal));
-            }
+            var handler = TreeNodesRendering;
+            if (handler != null) handler(instance, e);
         }
-       
-        
+
+        public static event EventHandler<TreeNodeRenderingEventArgs> RootNodeRendering;
+
+        private static void OnRootNodeRendering(TreeApiController instance, TreeNodeRenderingEventArgs e)
+        {
+            var handler = RootNodeRendering;
+            if (handler != null) handler(instance, e);
+        }
     }
 }
