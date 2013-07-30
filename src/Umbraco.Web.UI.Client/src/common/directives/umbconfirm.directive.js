@@ -1,7 +1,7 @@
 ﻿/**
- * @ngdoc object
- * @name umbraco.directives:umbConfirm
- *
+ * @ngdoc directive
+ * @name umbraco.directives.directive:umbConfirm
+ * @function
  * @description
  * A confirmation dialog
  * 

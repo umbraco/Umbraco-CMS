@@ -17,9 +17,16 @@ angular.module("umbraco.directives")
             }        
             //var hasProcessed = false;
 
+            scope.collectedTabs = [];
+
             //when the tabs change, we need to hack the planet a bit and force the first tab content to be active,
             //unfortunately twitter bootstrap tabs is not playing perfectly with angular.
             scope.$watch("tabs", function (newValue, oldValue) {
+
+                $(newValue).each(function(i, val){
+                    scope.collectedTabs.push({id: val.id, label: val.label});
+                });
+                //scope.collectedTabs = newValue;
 
                 //don't process if we cannot or have already done so
                 if (!newValue) {return;}
@@ -39,11 +46,20 @@ angular.module("umbraco.directives")
                 $timeout(function () {
                     $panes.find('.tab-pane').each(function (index) {
                         var $this = angular.element(this);
+                        var id = $this.attr("rel");
+                        var label = $this.attr("data-label");
+
                         if ($this.attr("rel") === String(activeTab.id)) {
                             $this.addClass('active');
                         }
                         else {
                             $this.removeClass('active');
+                        }
+
+                        //this is sorta hacky since we add a tab object to the tabs collection
+                        //based on a dom element, there is most likely a better way...    
+                        if (label) {
+                            scope.collectedTabs.push({id: id, label: label});
                         }
                     });
                 });

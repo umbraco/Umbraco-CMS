@@ -2,7 +2,6 @@ angular.module('umbraco.services')
 .factory('searchService', function () {
 	return {
 		search: function(term, section){
-
 			return [
 			{
 				section: "settings",
@@ -14,6 +13,7 @@ angular.module('umbraco.services')
 				
 				]	
 			},
+			
 			{
 				section: "content",
 				tree: "content",
@@ -33,7 +33,7 @@ angular.module('umbraco.services')
 				{ name: "Something else", path:"/Macros/Navigation.xslt",id: 1234, icon: "icon-cogs", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1 }
 				]	
 			}
-			];	
+			];
 		},
 		
 		setCurrent: function(sectionAlias){

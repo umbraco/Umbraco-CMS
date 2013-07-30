@@ -1,8 +1,8 @@
 ﻿/**
-    * @ngdoc filter 
-    * @name umbraco.filters:umbTreeIconImage
-    * @description This will properly render the tree icon image based on the tree icon set on the server
-    **/
+* @ngdoc filter
+* @name umbraco.filters.filter:umbTreeIconImage
+* @description This will properly render the tree icon image based on the tree icon set on the server
+**/
 function treeIconStyleFilter(iconHelper) {
     return function (treeNode) {
         if (treeNode.iconIsClass) {

@@ -1,6 +1,6 @@
 ﻿/**
-* @ngdoc object 
-* @name umbraco.directive:umbNavigation
+* @ngdoc directive
+* @name umbraco.directives.directive:umbNavigation
 * @restrict E
 **/
 function leftColumnDirective() {

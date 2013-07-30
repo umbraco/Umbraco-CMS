@@ -1,7 +1,44 @@
 angular.module('umbraco.services')
-.factory('userService', function (authResource, $q) {
+.factory('userService', function ($rootScope, $q, $location, $log, securityRetryQueue, authResource, dialogService) {
 
     var currentUser = null;
+    var loginDialog = null;
+
+    // Redirect to the given url (defaults to '/')
+    function redirect(url) {
+        url = url || '/';
+        $location.path(url);
+    }
+
+    function openLoginDialog() {
+        if (!loginDialog) {
+            loginDialog = dialogService.open({
+                template: 'views/common/dialogs/login.html',
+                modalClass: "login-overlay",
+                animation: "slide",
+                show: true,
+                callback: onLoginDialogClose
+            });
+        }
+    }
+
+    function onLoginDialogClose(success) {
+        loginDialog = null;
+
+        if (success) {
+            securityRetryQueue.retryAll();
+        } else {
+            securityRetryQueue.cancelAll();
+            redirect();
+        }
+    }
+
+    // Register a handler for when an item is added to the retry queue
+    securityRetryQueue.onItemAddedCallbacks.push(function (retryItem) {
+        if (securityRetryQueue.hasMore()) {
+            openLoginDialog();
+        }
+    });
 
     return {
 
@@ -35,9 +72,8 @@ angular.module('umbraco.services')
         },
 
         logout: function () {
-            $rootScope.$apply(function () {
+                //TODO, clear cookie, or call authResource to notify server about logout
                 currentUser = undefined;
-            });
         },
 
         /** Returns the current user object, if null then calls to authenticated or authenticate must be called  */

@@ -1,6 +1,6 @@
 /**
-* @ngdoc object 
-* @name umbraco.directive:umbPanel 
+* @ngdoc directive
+* @name umbraco.directives.directive:umbPanel 
 * @restrict E
 **/
 angular.module("umbraco.directives")

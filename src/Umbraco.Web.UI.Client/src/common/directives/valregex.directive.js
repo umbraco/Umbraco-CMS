@@ -1,6 +1,6 @@
 /**
-    * @ngdoc object 
-    * @name umbraco.directive:valRegex
+    * @ngdoc directive
+    * @name umbraco.directives.directive:valRegex
     * @restrict A
     * @description A custom directive to allow for matching a value against a regex string.
     *               NOTE: there's already an ng-pattern but this requires that a regex expression is set, not a regex string

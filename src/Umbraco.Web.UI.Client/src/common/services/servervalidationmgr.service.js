@@ -39,8 +39,8 @@ function serverValidationManager($timeout) {
         
         /**
          * @ngdoc function
-         * @name subscribe
-         * @methodOf umbraco.services.executeAndClearAllSubscriptions
+         * @name umbraco.services.serverValidationManager#subscribe
+         * @methodOf umbraco.services.serverValidationManager
          * @function
          *
          * @description
@@ -78,7 +78,7 @@ function serverValidationManager($timeout) {
 
         /**
          * @ngdoc function
-         * @name subscribe
+         * @name umbraco.services.serverValidationManager#subscribe
          * @methodOf umbraco.services.serverValidationManager
          * @function
          *

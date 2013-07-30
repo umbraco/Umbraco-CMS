@@ -3,7 +3,6 @@ angular.module("umbraco").controller("Umbraco.Editors.DatepickerController",
     
     scriptLoader.load([
             'views/propertyeditors/datepicker/bootstrap.datepicker.js',
-            'css!/belle/views/propertyeditors/datepicker/bootstrap.datepicker.css'
         ]).then(
         function () {
             //The Datepicker js and css files are available and all components are ready to use.
@@ -20,4 +19,9 @@ angular.module("umbraco").controller("Umbraco.Editors.DatepickerController",
                 $scope.model.value = e.date.toISOString();
             });
         });
+
+
+    scriptLoader.load([
+            'css!/belle/views/propertyeditors/datepicker/bootstrap.datepicker.css'
+        ]);    
 });

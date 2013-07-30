@@ -1,8 +1,8 @@
 /**
-    * @ngdoc service 
+    * @ngdoc service
     * @name umbraco.resources.contentResource
     * @description Loads/saves in data for content
-    **/
+**/
 function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     /** internal method process the saving of data and post processing the result */

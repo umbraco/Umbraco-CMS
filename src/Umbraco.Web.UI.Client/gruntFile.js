@@ -247,7 +247,7 @@ module.exports = function (grunt) {
         title: "Umbraco 7"
       },
       api: {
-        src: ['src/common/services/**/*.js'],
+        src: ['src/common/**/*.js'],
         title: 'API Documentation'
       },
       tutorials: {

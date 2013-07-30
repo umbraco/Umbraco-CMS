@@ -1,7 +1,6 @@
-
 /**
-* @ngdoc object 
-* @name umbraco.directive:valShowValidation
+* @ngdoc directive
+* @name umbraco.directives.directive:valShowValidation
 * @restrict A
 * @description Used to toggle the show-validation class on the element containing the form elements to validate.
 *   This is used because we don't want to show validation messages until after the form is submitted and then reset

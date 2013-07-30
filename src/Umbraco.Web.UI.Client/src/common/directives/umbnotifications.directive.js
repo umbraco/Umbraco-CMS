@@ -1,8 +1,7 @@
 ﻿/**
-* @ngdoc object 
-* @name umbraco.directive:notifications 
-* @restrict E
-**/
+ * @ngdoc directive
+ * @name umbraco.directives.directive:umbNotifications
+ */
 function notificationDirective() {
     return {
         restrict: "E",    // restrict to an element

@@ -1,6 +1,6 @@
 /**
-* @ngdoc object 
-* @name umbraco.directive:umbTabView 
+* @ngdoc directive
+* @name umbraco.directives.directive:umbTabView 
 * @restrict E
 **/
 angular.module("umbraco.directives")

@@ -1,7 +1,7 @@
 app.config(function ($routeProvider) {
     $routeProvider
-    .when('/:section', { 
-        templateUrl: function (rp) { 
+        .when('/:section', {
+            templateUrl: function (rp) {
                 if (rp.section === "default")
                 {
                     rp.section = "content";
@@ -41,12 +41,11 @@ app.config(function ($routeProvider) {
 
         //$locationProvider.html5Mode(false).hashPrefix('!'); //turn html5 mode off
         // $locationProvider.html5Mode(true);         //turn html5 mode on
+});
 
-    });
 
-
-app.run(['security', function (security) {
+app.run(['userService', function (userService) {
     // Get the current user when the application starts
     // (in case they are still logged in from a previous session)
-    security.requestCurrentUser();
+    userService.isAuthenticated();
 }]);  

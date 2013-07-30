@@ -33,10 +33,23 @@
                 <umb-property ng-repeat="model in tab.properties"></umb-property>
             </umb-tab>
 
-            <umb-tab id="tabproperties" rel="tabproperties">
-                <umb-property>
 
-                </umb-property>
+            <umb-tab id="tabgeneric" rel="generic" data-label="Generic properties">
+                <umb-editor
+                    value="content.createDate" 
+                    label="Created"
+                    view="datepicker" 
+                    description="Time this document was created">
+                </umb-editor>
+
+                <umb-editor
+                    value="content.updateDate" 
+                    label="Updated"
+                    view="datepicker"
+                    description="Time this document was last updated">
+                </umb-editor>
+
+                
             </umb-tab>
         </umb-tab-view>
     </umb-panel>

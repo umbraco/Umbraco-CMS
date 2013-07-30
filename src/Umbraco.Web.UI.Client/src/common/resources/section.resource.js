@@ -1,5 +1,5 @@
 ﻿/**
-    * @ngdoc service 
+    * @ngdoc service
     * @name umbraco.resources.sectionResource     
     * @description Loads in data for section
     **/
