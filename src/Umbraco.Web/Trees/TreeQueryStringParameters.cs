@@ -6,7 +6,8 @@
     internal struct TreeQueryStringParameters
     {
         public const string DialogMode = "DialogMode";
-        public const string OnNodeClick = "OnNodeClick";
-        public const string RenderParent = "RenderParent";
+        public const string Application = "application";
+        //public const string OnNodeClick = "OnNodeClick";
+        //public const string RenderParent = "RenderParent";
     }
 }

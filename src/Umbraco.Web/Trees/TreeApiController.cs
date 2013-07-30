@@ -93,6 +93,13 @@ namespace Umbraco.Web.Trees
                 node.AdditionalData.Add("searchable", "true");
             }
 
+            //now update all data based on some of the query strings, like if we are running in dialog mode
+            var isDialog = queryStrings.GetValue<bool>(TreeQueryStringParameters.DialogMode);
+            if (isDialog)
+            {
+                node.RoutePath = "#";
+            }
+
             OnRootNodeRendering(this, new TreeNodeRenderingEventArgs(node, queryStrings));
 
             return node;
@@ -121,6 +128,16 @@ namespace Umbraco.Web.Trees
                 AddQueryStringsToAdditionalData(node, queryStrings);
             }
 
+            //now update all data based on some of the query strings, like if we are running in dialog mode
+            var isDialog = queryStrings.GetValue<bool>(TreeQueryStringParameters.DialogMode);
+            if (isDialog)
+            {
+                foreach (var node in nodes)
+                {
+                    node.RoutePath = "#";    
+                }
+            }
+
             //raise the event
             OnTreeNodesRendering(this, new TreeNodesRenderingEventArgs(nodes, queryStrings));
 
@@ -146,39 +163,18 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected virtual TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
-            var rootNodeAsString = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
+            var rootNodeAsString = Constants.System.Root.ToString(CultureInfo.InvariantCulture);           
+            var currApp = queryStrings.GetValue<string>(TreeQueryStringParameters.Application);
 
-            var getChildNodesUrl = Url.GetTreeUrl(
-                GetType(),
-                rootNodeAsString,
-                queryStrings);
-
-            var getMenuUrl = Url.GetMenuUrl(
-                GetType(),
-                rootNodeAsString,
-                queryStrings);
-
-            var isDialog = queryStrings.GetValue<bool>(TreeQueryStringParameters.DialogMode);
-
-            //var node = new TreeNode(RootNodeId, BackOfficeRequestContext.RegisteredComponents.MenuItems, jsonUrl)
             var node = new TreeNode(
                 rootNodeAsString,
-                getChildNodesUrl,
-                getMenuUrl)
+                "", //root nodes aren't expandable, no need to lookup the child nodes url
+                Url.GetMenuUrl(GetType(), rootNodeAsString, queryStrings))
                 {
                     HasChildren = true,
-
-                    ////THIS IS TEMPORARY UNTIL WE FIGURE OUT HOW WE ARE LOADING STUFF (I.E. VIEW NAMES, ACTION NAMES, DUNNO)
-                    //EditorUrl = queryStrings.HasKey(TreeQueryStringParameters.OnNodeClick) //has a node click handler?
-                    //                ? queryStrings.Get(TreeQueryStringParameters.OnNodeClick) //return node click handler
-                    //                : isDialog //is in dialog mode without a click handler ?
-                    //                      ? "#" //return empty string, otherwise, return an editor URL:
-                    //                      : "mydashboard", 
-
+                    RoutePath = currApp,
                     Title = RootNodeDisplayName
                 };
-
-
 
             return node;
         }

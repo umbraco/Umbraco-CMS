@@ -117,6 +117,7 @@ namespace Umbraco.Web.Trees
                     rootId,
                     rootNode.Result.MenuUrl)
                 {
+                    Title = rootNode.Result.Title,
                     Children = byControllerAttempt.Result
                 };
 

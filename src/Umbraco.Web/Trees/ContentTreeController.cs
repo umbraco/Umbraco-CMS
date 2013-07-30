@@ -7,18 +7,54 @@ using System.Net.Http.Formatting;
 using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
 using umbraco.interfaces;
 
 namespace Umbraco.Web.Trees
 {
+    //[Tree(Constants.Applications.Content, Constants.Trees.Content, "Content")]
+    //public class MediaTreeController : ContentTreeControllerBase
+    //{
+    //    protected override TreeNodeCollection GetTreeData(string id, FormDataCollection queryStrings)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
+
     [Tree(Constants.Applications.Content, Constants.Trees.Content, "Content")]
     public class ContentTreeController : ContentTreeControllerBase
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
-            //TODO: We need to implement security checks here and the user's start node!
+            //if the user's start node is not default, then return their start node as the root node.
+            if (UmbracoUser.StartNodeId != Constants.System.Root)
+            {
+                var currApp = queryStrings.GetValue<string>(TreeQueryStringParameters.Application);
+                var userRoot = Services.EntityService.Get(UmbracoUser.StartNodeId, UmbracoObjectTypes.Document);
+                if (userRoot == null)
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
+
+                var node = new TreeNode(
+                    userRoot.Id.ToInvariantString(),
+                    "", //root nodes aren't expandable, no need to lookup the child nodes url
+                    Url.GetMenuUrl(GetType(), userRoot.Id.ToInvariantString(), queryStrings))
+                {
+                    HasChildren = true,
+                    RoutePath = currApp,
+                    Title = userRoot.Name
+                };
+
+                return node;
+            }
 
             return base.CreateRootNode(queryStrings);
         }
@@ -32,19 +68,34 @@ namespace Umbraco.Web.Trees
             }
 
             var nodes = new TreeNodeCollection();
-            var entities = Services.EntityService.GetChildren(iid, UmbracoObjectTypes.Document).ToArray();
+            IEnumerable<IUmbracoEntity> entities;
+
+            //if a request is made for the root node data but the user's start node is not the default, then
+            // we need to return their start node data
+            if (iid == Constants.System.Root && UmbracoUser.StartNodeId != Constants.System.Root)
+            {
+                entities = Services.EntityService.GetChildren(UmbracoUser.StartNodeId, UmbracoObjectTypes.Document).ToArray();
+            }
+            else
+            {
+                entities = Services.EntityService.GetChildren(iid, UmbracoObjectTypes.Document).ToArray();                
+            }
+
             foreach (var entity in entities)
             {
-                //TODO: We need to implement security checks here!
-
                 var e = (UmbracoEntity)entity;
-                nodes.Add(
+                
+                var allowedUserOptions = GetUserMenuItemsForNode(e);
+                if (CanUserAccessNode(e, allowedUserOptions))
+                {
+                    nodes.Add(
                     CreateTreeNode(
                         e.Id.ToInvariantString(),
                         queryStrings,
                         e.Name,
                         e.ContentTypeIcon,
                         e.HasChildren));
+                }
             }
             return nodes;
         }
@@ -89,7 +140,7 @@ namespace Umbraco.Web.Trees
 
             return GetUserAllowedMenuItems(
                 CreateAllowedActions(), 
-                GetUserMenuItemsForNode((UmbracoEntity) item));
+                GetUserMenuItemsForNode(item));
         }
 
         protected IEnumerable<MenuItem> CreateAllowedActions()
