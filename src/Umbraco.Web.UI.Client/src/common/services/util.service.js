@@ -33,6 +33,25 @@ function angularHelper($log, $q) {
         
         /**
          * @ngdoc function
+         * @name umbraco.services.angularHelper#rejectedPromise
+         * @methodOf umbraco.services.angularHelper
+         * @function
+         *
+         * @description
+         * In some situations we need to return a promise as a rejection, normally based on invalid data. This
+         * is a wrapper to do that so we can save one writing a bit of code.
+         *
+         * @param {object} objReject The object to send back with the promise rejection
+         */
+        rejectedPromise: function (objReject) {
+            var deferred = $q.defer();
+            //return an error object including the error message for UI
+            deferred.reject(objReject);
+            return deferred.promise;
+        },
+
+        /**
+         * @ngdoc function
          * @name safeApply
          * @methodOf umbraco.services.angularHelper
          * @function

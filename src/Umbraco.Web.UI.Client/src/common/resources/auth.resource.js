@@ -3,13 +3,19 @@
     * @name umbraco.resources.authResource     
     * @description Loads in data for authentication
 **/
-function authResource($q, $http, umbRequestHelper) {
+function authResource($q, $http, umbRequestHelper, angularHelper) {
 
     return {
         //currentUser: currentUser,
 
         /** Logs the user in if the credentials are good */
         performLogin: function (username, password) {
+            
+            if (!username || !password) {
+                return angularHelper.rejectedPromise({
+                    errorMsg: 'Username or password cannot be empty'
+                });
+            }
 
             return umbRequestHelper.resourcePromise(
                 $http.post(

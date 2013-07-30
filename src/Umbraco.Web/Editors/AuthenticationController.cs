@@ -55,6 +55,7 @@ namespace Umbraco.Web.Editors
                 return _userModelMapper.ToUserDetail(user);
             }
 
+            //return Unauthorized (401) because the user is not authorized right now
             throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
 
@@ -67,7 +68,11 @@ namespace Umbraco.Web.Editors
                 UmbracoContext.Security.PerformLogin((int)user.Id);
                 return _userModelMapper.ToUserDetail(user);
             }
-            throw new HttpResponseException(HttpStatusCode.Unauthorized);
+
+            //return Forbidden (403), we don't want to return a 401 because that get's intercepted 
+            // by our angular helper because it thinks that we need to re-perform the request once we are
+            // authorized. A login form should not return a 401 because its the authorization process.
+            throw new HttpResponseException(HttpStatusCode.Forbidden);
         }
 
         //public HttpResponseMessage PostLogout()
