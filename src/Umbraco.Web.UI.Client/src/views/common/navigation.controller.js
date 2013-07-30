@@ -46,15 +46,15 @@ function NavigationController($scope,$rootScope, $location, $log, navigationServ
         var n = args.node;
 
         //here we need to check for some legacy tree code
-        if (n.jsClickCallback && n.jsClickCallback !== "") {
+        if (n.metaData && n.metaData["jsClickCallback"] && angular.isString(n.metaData["jsClickCallback"]) && n.metaData["jsClickCallback"] !== "") {
             //this is a legacy tree node!                
             var jsPrefix = "javascript:";
             var js;
-            if (n.jsClickCallback.startsWith(jsPrefix)) {
-                js = n.jsClickCallback.substr(jsPrefix.length);
+            if (n.metaData["jsClickCallback"].startsWith(jsPrefix)) {
+                js = n.metaData["jsClickCallback"].substr(jsPrefix.length);
             }
             else {
-                js = n.jsClickCallback;
+                js = n.metaData["jsClickCallback"];
             }
             try {
                 var func = eval(js);
@@ -69,9 +69,9 @@ function NavigationController($scope,$rootScope, $location, $log, navigationServ
         }
         else {
             //add action to the history service
-            historyService.add({name: n.name, link: n.view, icon: n.icon});
+            historyService.add({ name: n.name, link: n.routePath, icon: n.icon });
             //not legacy, lets just set the route value and clear the query string if there is one.
-            $location.path(n.view).search(null);
+            $location.path(n.routePath).search(null);
         }
     });
 

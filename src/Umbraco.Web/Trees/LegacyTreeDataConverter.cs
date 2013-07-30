@@ -81,7 +81,7 @@ namespace Umbraco.Web.Trees
             {
                 if (length >= s)
                 {
-                    collection.ElementAt(s).Seperator = true;
+                    collection.ElementAt(s).SeperatorBefore = true;
                 }
             }
 
@@ -252,7 +252,7 @@ namespace Umbraco.Web.Trees
             //  /umbraco/tree.aspx?rnd=d0d0ff11a1c347dabfaa0fc75effcc2a&id=1046&treeType=content&contextMenu=false&isDialog=false
 
             //we need to convert the node source to our legacy tree controller
-            var childNodesSource = urlHelper.GetUmbracoApiService<LegacyTreeApiController>("GetNodes");
+            var childNodesSource = urlHelper.GetUmbracoApiService<LegacyTreeController>("GetNodes");
 
             var childQuery = (xmlTreeNode.Source.IsNullOrWhiteSpace() || xmlTreeNode.Source.IndexOf('?') == -1)
                 ? ""
@@ -263,7 +263,7 @@ namespace Umbraco.Web.Trees
 
             //for the menu source we need to detect if this is a root node since we'll need to set the parentId and id to -1
             // for which we'll handle correctly on the server side.            
-            var menuSource = urlHelper.GetUmbracoApiService<LegacyTreeApiController>("GetMenu");
+            var menuSource = urlHelper.GetUmbracoApiService<LegacyTreeController>("GetMenu");
             menuSource = menuSource.AppendQueryStringToUrl(new[]
                 {
                     "id=" + (isRoot ? "-1" : xmlTreeNode.NodeID),
@@ -289,7 +289,7 @@ namespace Umbraco.Web.Trees
             var knownNonLegacyNodeTypes = new[] { "content", "contentRecycleBin", "mediaRecyleBin", "media" };
             if (knownNonLegacyNodeTypes.InvariantContains(xmlTreeNode.NodeType) == false)
             {
-                node.OnClickCallback = xmlTreeNode.Action;
+                node.AssignLegacyJsCallback(xmlTreeNode.Action);
             }
             return node;
         }

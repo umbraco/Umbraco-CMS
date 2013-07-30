@@ -50,10 +50,10 @@ namespace Umbraco.Web.Trees
             instance.ControllerContext = controllerContext;
             instance.Request = request;
             //return the root
-            var nodes = instance.GetNodes(Constants.System.Root.ToString(CultureInfo.InvariantCulture), formCollection);
-            return nodes.Any() == false 
+            var node = instance.GetRootNode(formCollection);
+            return node == null
                 ? new Attempt<TreeNode>(new InvalidOperationException("Could not return a root node for tree " + appTree.Type)) 
-                : new Attempt<TreeNode>(true, nodes.First());
+                : new Attempt<TreeNode>(true, node);
         }
 
         internal static  Attempt<TreeNodeCollection> TryLoadFromControllerTree(this ApplicationTree appTree, string id, FormDataCollection formCollection, HttpControllerContext controllerContext, HttpRequestMessage request)

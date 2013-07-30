@@ -42,5 +42,26 @@
 			/// </summary>
 			public const string Users = "users";
 		}
+
+        /// <summary>
+        /// Defines the alias identifiers for Umbraco's core trees.
+        /// </summary>
+        public static class Trees
+        {
+            /// <summary>
+            /// alias for the content tree.
+            /// </summary>
+            public const string Content = "content";
+
+            /// <summary>
+            /// alias for the media tree.
+            /// </summary>
+            public const string Media = "media";
+
+            //TODO: Fill in the rest!
+
+        }
 	}
+
+   
 }

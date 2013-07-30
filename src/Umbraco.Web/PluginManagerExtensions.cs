@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Media;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using umbraco;
 using umbraco.interfaces;
@@ -16,6 +17,18 @@ namespace Umbraco.Web
 	/// </summary>
 	public static class PluginManagerExtensions
 	{
+
+        /// <summary>
+        /// Returns all available TreeApiController's in application that are attribute with TreeAttribute
+        /// </summary>
+        /// <param name="resolver"></param>
+        /// <returns></returns>
+        internal static IEnumerable<Type> ResolveAttributedTreeControllers(this PluginManager resolver)
+        {
+            //don't cache the result of this because it is only used once during app startup, caching will just add a bit more mem overhead for no reason
+            return resolver.ResolveTypesWithAttribute<TreeApiController, TreeAttribute>(cacheResult: false);
+        }
+
 		internal static IEnumerable<Type> ResolveSurfaceControllers(this PluginManager resolver)
 		{
 			return resolver.ResolveTypes<SurfaceController>();

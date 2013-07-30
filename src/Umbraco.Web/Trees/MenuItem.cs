@@ -18,9 +18,12 @@ namespace Umbraco.Web.Trees
         {
             Name = legacyMenu.Alias;
             Alias = legacyMenu.Alias;
-            Seperator = false;
+            SeperatorBefore = false;
             Icon = legacyMenu.Icon;
+            Action = legacyMenu;
         }
+
+        internal IAction Action { get; private set; }
 
         /// <summary>
         /// A dictionary to support any additional meta data that should be rendered for the node which is 
@@ -41,8 +44,11 @@ namespace Umbraco.Web.Trees
         [Required]
         public string Alias { get; set; }
 
+        /// <summary>
+        /// Ensures a menu separator will exist before this menu item
+        /// </summary>
         [DataMember(Name = "seperator")]
-        public bool Seperator { get; set; }
+        public bool SeperatorBefore { get; set; }
 
         [DataMember(Name = "cssclass")]
         public string Icon { get; set; }

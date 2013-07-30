@@ -424,6 +424,7 @@ namespace Umbraco.Core
         private readonly HashSet<TypeList> _types = new HashSet<TypeList>();
         private IEnumerable<Assembly> _assemblies;
 
+
         /// <summary>
         /// Returns all found property editors
         /// </summary>

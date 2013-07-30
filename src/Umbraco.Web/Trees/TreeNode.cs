@@ -13,7 +13,13 @@ namespace Umbraco.Web.Trees
     public class TreeNode
     {
         
-        public TreeNode(string nodeId, string getChildNodesUrl, string menuUrl)
+        /// <summary>
+        /// Internal constructor, to create a tree node use the CreateTreeNode methods of the TreeApiController.
+        /// </summary>
+        /// <param name="nodeId"></param>
+        /// <param name="getChildNodesUrl"></param>
+        /// <param name="menuUrl"></param>
+        internal TreeNode(string nodeId, string getChildNodesUrl, string menuUrl)
         {
             //_menuItems = menuItems;
             //Style = new NodeStyle();
@@ -21,6 +27,8 @@ namespace Umbraco.Web.Trees
             AdditionalData = new Dictionary<string, object>();
             ChildNodesUrl = getChildNodesUrl;
             MenuUrl = menuUrl;
+            //default
+            Icon = "icon-folder-close";
         }
 
         /// <summary>
@@ -44,8 +52,8 @@ namespace Umbraco.Web.Trees
         /// <summary>
         /// Gets or sets the node path.
         /// </summary>
-        [DataMember(Name = "path")]
-        public string Path { get; set; }
+        [DataMember(Name = "nodePath")]
+        public string NodePath { get; set; }
 
         /// <summary>
         /// The icon to use for the node, this can be either a path to an image or a Css class. 
@@ -92,27 +100,15 @@ namespace Umbraco.Web.Trees
             }
         }
 
-        ///// <summary>
-        ///// The URL path for the editor for this model
-        ///// </summary>
-        ///// <remarks>
-        ///// If this is set then the UI will attempt to load the result of this URL into an IFrame
-        ///// for the editor.
-        ///// 
-        ///// Generally for use with Legacy trees
-        ///// </remarks>
-        //[DataMember(Name = "editorUrl")]
-        //internal string EditorUrl { get; set; }
-
         /// <summary>
-        /// A JS method/codeblock to be called when the tree node is clicked
+        /// Optional: The Route path for the editor for this node
         /// </summary>
         /// <remarks>
-        /// This should only be used for legacy trees
+        /// If this is not set, then the route path will be automatically determined by: {section}/edit/{id}
         /// </remarks>
-        [DataMember(Name = "jsClickCallback")]
-        internal string OnClickCallback { get; set; }
-
+        [DataMember(Name = "routePath")]
+        public string RoutePath { get; set; }
+        
         /// <summary>
         /// The JSON url to load the nodes children
         /// </summary>

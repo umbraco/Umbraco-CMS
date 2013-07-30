@@ -18,7 +18,10 @@ function treeService($q, treeResource, iconHelper) {
         var childLevel = (level ? level : 1);
         for (var i = 0; i < treeNodes.length; i++) {
             treeNodes[i].level = childLevel;
-            treeNodes[i].view = section + "/edit/" + treeNodes[i].id;
+            //if there is not route path specified, then set it automatically
+            if (!treeNodes[i].routePath) {
+                treeNodes[i].routePath = section + "/edit/" + treeNodes[i].id;
+            }
             treeNodes[i].parent = parentNode;
         }
     }

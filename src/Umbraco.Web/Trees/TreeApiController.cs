@@ -5,17 +5,16 @@ using System.Net.Http.Formatting;
 using Umbraco.Core;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using umbraco.businesslogic;
 
 namespace Umbraco.Web.Trees
 {
-    //NOTE: We will of course have to authorized this but changing the base class once integrated
-
     /// <summary>
     /// The base controller for all tree requests
-    /// </summary>    
+    /// </summary>
     public abstract class TreeApiController : UmbracoAuthorizedApiController
     {
+        private readonly TreeAttribute _attribute;
+
         /// <summary>
         /// Remove the xml formatter... only support JSON!
         /// </summary>
@@ -40,10 +39,7 @@ namespace Umbraco.Web.Trees
             }
 
             //assign the properties of this object to those of the metadata attribute
-            var attr = treeAttributes.First();
-            //TreeId = attr.Id;
-            RootNodeDisplayName = attr.Title;
-            NodeCollection = new TreeNodeCollection();
+            _attribute = treeAttributes.First();            
         }
 
         /// <summary>
@@ -66,17 +62,27 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         /// <returns></returns>
         protected abstract MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings);
-
-        ///// <summary>
-        ///// Returns the root node for the tree
-        ///// </summary>
-        //protected abstract string RootNodeId { get; }
         
         /// <summary>
         /// The name to display on the root node
         /// </summary>
-        public string RootNodeDisplayName { get; private set; }
-        
+        public virtual string RootNodeDisplayName
+        {
+            get { return _attribute.Title; }
+        }
+
+        /// <summary>
+        /// Returns the root node for the tree
+        /// </summary>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        [HttpQueryStringFilter("queryStrings")]
+        public TreeNode GetRootNode(FormDataCollection queryStrings)
+        {
+            if (queryStrings == null) queryStrings = new FormDataCollection("");
+            return CreateRootNode(queryStrings);
+        }
+
         /// <summary>
         /// The action called to render the contents of the tree structure
         /// </summary>
@@ -93,10 +99,7 @@ namespace Umbraco.Web.Trees
         public TreeNodeCollection GetNodes(string id, FormDataCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = new FormDataCollection("");
-            //if its the root node, render it otherwise render normal nodes
-            return AddRootNodeToCollection(id, queryStrings)
-                       ? NodeCollection
-                       : GetTreeData(id, queryStrings);
+            return GetTreeData(id, queryStrings);
         }
 
         /// <summary>
@@ -109,7 +112,6 @@ namespace Umbraco.Web.Trees
         public MenuItemCollection GetMenu(string id, FormDataCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = new FormDataCollection("");
-
             return GetMenuForNode(id, queryStrings);
         }
 
@@ -126,7 +128,7 @@ namespace Umbraco.Web.Trees
                 rootNodeAsString, 
                 queryStrings);
 
-            var getMenuUrl = Url.GetTreeUrl(
+            var getMenuUrl = Url.GetMenuUrl(
                 GetType(),
                 rootNodeAsString,
                 queryStrings);
@@ -186,156 +188,90 @@ namespace Umbraco.Web.Trees
                 node.AdditionalData.Add(q.Key, q.Value);
             }
         }
+        
+        #region Create TreeNode methods
 
         /// <summary>
-        /// Checks if the node Id is the root node and if so creates the root node and appends it to the 
-        /// NodeCollection based on the standard tree parameters
+        /// Helper method to create tree nodes
         /// </summary>
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
+        /// <param name="title"></param>
         /// <returns></returns>
-        /// <remarks>
-        /// This method ensure that all of the correct meta data is set for the root node so that the Umbraco application works
-        /// as expected. Meta data such as 'treeId' and 'searchable'
-        /// </remarks>
-        protected bool AddRootNodeToCollection(string id, FormDataCollection queryStrings)
-        {                       
-            //if its the root model
-            if (id == Constants.System.Root.ToString(CultureInfo.InvariantCulture))
-            {
-                //get the root model
-                var rootNode = CreateRootNode(queryStrings);
-             
-                NodeCollection.Add(rootNode);
-
-                return true;
-            }
-
-            return false;
+        public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title)
+        {
+            var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
+            var menuUrl = Url.GetMenuUrl(GetType(), id, queryStrings);
+            var node = new TreeNode(id, jsonUrl, menuUrl) { Title = title };
+            return node;
         }
 
-        #region Create TreeNode methods
+        /// <summary>
+        /// Helper method to create tree nodes
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings"></param>
+        /// <param name="title"></param>
+        /// <param name="icon"></param>
+        /// <returns></returns>
+        public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string icon)
+        {
+            var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
+            var menuUrl = Url.GetMenuUrl(GetType(), id, queryStrings);
+            var node = new TreeNode(id, jsonUrl, menuUrl) { Title = title, Icon = icon };
+            return node;
+        }
+        
+        /// <summary>
+        /// Helper method to create tree nodes
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings"></param>
+        /// <param name="title"></param>
+        /// <param name="routePath"></param>
+        /// <param name="icon"></param>
+        /// <returns></returns>
+        public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string icon, string routePath)
+        {
+            var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
+            var menuUrl = Url.GetMenuUrl(GetType(), id, queryStrings);            
+            var node = new TreeNode(id, jsonUrl, menuUrl) { Title = title, RoutePath = routePath, Icon = icon };
+            return node;
+        }
 
-        ///// <summary>
-        ///// Helper method to create tree nodes and automatically generate the json url
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <param name="queryStrings"></param>
-        ///// <param name="title"></param>
-        ///// <param name="editorUrl"></param>
-        ///// <returns></returns>
-        //public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl)
-        //{
-        //    var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
-        //    //var node = new TreeNode(id, BackOfficeRequestContext.RegisteredComponents.MenuItems, jsonUrl) { Title = title, EditorUrl = editorUrl };
-        //    var node = new TreeNode(id, jsonUrl) { Title = title, EditorUrl = editorUrl };
-        //    return node;
-        //}
+        /// <summary>
+        /// Helper method to create tree nodes and automatically generate the json url
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings"></param>
+        /// <param name="title"></param>
+        /// <param name="icon"></param>
+        /// <param name="hasChildren"></param>
+        /// <returns></returns>
+        public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string icon, bool hasChildren)
+        {
+            var treeNode = CreateTreeNode(id, queryStrings, title, icon);
+            treeNode.HasChildren = hasChildren;
+            return treeNode;
+        }
 
-        ///// <summary>
-        ///// Helper method to create tree nodes and automatically generate the json url
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <param name="queryStrings"></param>
-        ///// <param name="title"></param>
-        ///// <param name="editorUrl"></param>
-        ///// <param name="action"></param>
-        ///// <returns></returns>
-        //public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, string action)
-        //{
-        //    var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
-        //    //var node = new TreeNode(id, BackOfficeRequestContext.RegisteredComponents.MenuItems, jsonUrl) { Title = title, EditorUrl = editorUrl };
-        //    var node = new TreeNode(id, jsonUrl) { Title = title, EditorUrl = editorUrl };
-        //    return node;
-        //}
-
-        ///// <summary>
-        ///// Helper method to create tree nodes and automatically generate the json url
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <param name="queryStrings"></param>
-        ///// <param name="title"></param>
-        ///// <param name="editorUrl"></param>
-        ///// <param name="action"></param>
-        ///// <param name="icon"></param>
-        ///// <returns></returns>
-        //public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, string action, string icon)
-        //{
-        //    var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
-        //    //var node = new TreeNode(id, BackOfficeRequestContext.RegisteredComponents.MenuItems, jsonUrl) { Title = title, EditorUrl = editorUrl };
-        //    var node = new TreeNode(id, jsonUrl) { Title = title, EditorUrl = editorUrl };
-        //    return node;
-        //}
-
-        ///// <summary>
-        ///// Helper method to create tree nodes and automatically generate the json url
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <param name="queryStrings"></param>
-        ///// <param name="title"></param>
-        ///// <param name="editorUrl"></param>
-        ///// <param name="action"></param>
-        ///// <param name="hasChildren"></param>
-        ///// <returns></returns>
-        //public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, string action, bool hasChildren)
-        //{
-        //    var treeNode = CreateTreeNode(id, queryStrings, title, editorUrl, action);
-        //    treeNode.HasChildren = hasChildren;
-        //    return treeNode;
-        //}
-
-        ///// <summary>
-        ///// Helper method to create tree nodes and automatically generate the json url
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <param name="queryStrings"></param>
-        ///// <param name="title"></param>
-        ///// <param name="editorUrl"></param>
-        ///// <param name="action"></param>
-        ///// <param name="hasChildren"></param>
-        ///// <param name="icon"></param>
-        ///// <returns></returns>
-        //public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, string action, bool hasChildren, string icon)
-        //{
-        //    var treeNode = CreateTreeNode(id, queryStrings, title, editorUrl, action);
-        //    treeNode.HasChildren = hasChildren;
-        //    treeNode.Icon = icon;
-        //    return treeNode;
-        //}
-
-        ///// <summary>
-        ///// Helper method to create tree nodes and automatically generate the json url
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <param name="queryStrings"></param>
-        ///// <param name="title"></param>
-        ///// <param name="editorUrl"></param>
-        ///// <param name="hasChildren"></param>
-        ///// <returns></returns>
-        //public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, bool hasChildren)
-        //{
-        //    var treeNode = CreateTreeNode(id, queryStrings, title, editorUrl);
-        //    treeNode.HasChildren = hasChildren;
-        //    return treeNode;
-        //}
-
-        ///// <summary>
-        ///// Helper method to create tree nodes and automatically generate the json url
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <param name="queryStrings"></param>
-        ///// <param name="title"></param>
-        ///// <param name="editorUrl"></param>
-        ///// <param name="hasChildren"></param>
-        ///// <param name="icon"></param>
-        ///// <returns></returns>
-        //public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string editorUrl, bool hasChildren, string icon)
-        //{
-        //    var treeNode = CreateTreeNode(id, queryStrings, title, editorUrl);
-        //    treeNode.HasChildren = hasChildren;
-        //    treeNode.Icon = icon;
-        //    return treeNode;
-        //} 
+        /// <summary>
+        /// Helper method to create tree nodes and automatically generate the json url
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings"></param>
+        /// <param name="title"></param>
+        /// <param name="routePath"></param>
+        /// <param name="hasChildren"></param>
+        /// <param name="icon"></param>
+        /// <returns></returns>
+        public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string icon, bool hasChildren, string routePath)
+        {
+            var treeNode = CreateTreeNode(id, queryStrings, title, icon);
+            treeNode.HasChildren = hasChildren;
+            treeNode.RoutePath = routePath;
+            return treeNode;
+        }
 
         #endregion
 
@@ -350,11 +286,7 @@ namespace Umbraco.Web.Trees
                 return name.Substring(0, name.LastIndexOf("TreeController", StringComparison.Ordinal));
             }
         }
-        
-        /// <summary>
-        /// The model collection for trees to add nodes to
-        /// </summary>
-        protected TreeNodeCollection NodeCollection { get; private set; }
+       
         
     }
 }

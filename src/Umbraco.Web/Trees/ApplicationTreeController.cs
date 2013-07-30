@@ -10,6 +10,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
@@ -39,28 +40,24 @@ namespace Umbraco.Web.Trees
         {
             if (application == null) throw new ArgumentNullException("application");
 
-            var rootId = Core.Constants.System.Root.ToString(CultureInfo.InvariantCulture);
+            var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
 
             //find all tree definitions that have the current application alias
             var appTrees = ApplicationContext.Current.Services.ApplicationTreeService.GetApplicationTrees(application).Where(x => x.Initialize).ToArray();
             if (appTrees.Count() == 1)
-            {   
-                return new SectionRootNode(
-                    rootId,
-                    Url.GetUmbracoApiService<LegacyTreeApiController>("GetMenu", rootId) 
-                        + "&parentId=" + rootId 
-                        + "&treeType=" + application
-                        + "&section=" + application)
-                    {
-                        Children = GetNodeCollection(appTrees.Single(), "-1", queryStrings)
-                    };                
+            {
+                return GetRootForSingleAppTree(
+                    appTrees.Single(),
+                    Constants.System.Root.ToString(CultureInfo.InvariantCulture),
+                    queryStrings, 
+                    application);
             }
 
             var collection = new TreeNodeCollection();
             foreach (var tree in appTrees)
             {
                 //return the root nodes for each tree in the app
-                var rootNode = GetRoot(tree, queryStrings);                
+                var rootNode = GetRootForMultipleAppTree(tree, queryStrings);                
                 collection.Add(rootNode); 
             }
 
@@ -71,27 +68,13 @@ namespace Umbraco.Web.Trees
                 };
         }
 
-        ///// <summary>
-        ///// Returns the tree data for a specific tree for the children of the id
-        ///// </summary>
-        ///// <param name="treeType"></param>
-        ///// <param name="id"></param>
-        ///// <param name="queryStrings"></param>
-        ///// <returns></returns>
-        //[HttpQueryStringFilter("queryStrings")]
-        //public TreeNodeCollection GetTreeData(string treeType, string id, FormDataCollection queryStrings)
-        //{
-        //    if (treeType == null) throw new ArgumentNullException("treeType");
-
-        //    //get the configured tree
-        //    var foundConfigTree = ApplicationTreeCollection.GetByAlias(treeType);
-        //    if (foundConfigTree == null) 
-        //        throw new InstanceNotFoundException("Could not find tree of type " + treeType + " in the trees.config");
-
-        //    return GetNodeCollection(foundConfigTree, id, queryStrings);
-        //}
-
-        private TreeNode GetRoot(ApplicationTree configTree, FormDataCollection queryStrings)
+        /// <summary>
+        /// Get the root node for an application with multiple trees
+        /// </summary>
+        /// <param name="configTree"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        private TreeNode GetRootForMultipleAppTree(ApplicationTree configTree, FormDataCollection queryStrings)
         {
             if (configTree == null) throw new ArgumentNullException("configTree");
             var byControllerAttempt = configTree.TryGetRootNodeFromControllerTree(queryStrings, ControllerContext, Request);
@@ -110,24 +93,46 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// Get the node collection for the tree, try loading from new controllers first, then from legacy trees
+        /// Get the root node for an application with one tree
         /// </summary>
         /// <param name="configTree"></param>
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        private TreeNodeCollection GetNodeCollection(ApplicationTree configTree, string id, FormDataCollection queryStrings)
+        private SectionRootNode GetRootForSingleAppTree(ApplicationTree configTree, string id, FormDataCollection queryStrings, string application)
         {
+            var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
             if (configTree == null) throw new ArgumentNullException("configTree");
             var byControllerAttempt = configTree.TryLoadFromControllerTree(id, queryStrings, ControllerContext, Request);
             if (byControllerAttempt.Success)
             {
-                return byControllerAttempt.Result;
+                var rootNode = configTree.TryGetRootNodeFromControllerTree(queryStrings, ControllerContext, Request);
+                if (rootNode.Success == false)
+                {
+                    //This should really never happen if we've successfully got the children above.
+                    throw new InvalidOperationException("Could not create root node for tree " + configTree.Alias);
+                }
+
+                return new SectionRootNode(
+                    rootId,
+                    rootNode.Result.MenuUrl)
+                {
+                    Children = byControllerAttempt.Result
+                };
+
             }
             var legacyAttempt = configTree.TryLoadFromLegacyTree(id, queryStrings, Url, configTree.ApplicationAlias);
             if (legacyAttempt.Success)
             {
-                return legacyAttempt.Result;
+                return new SectionRootNode(
+                    rootId,
+                    Url.GetUmbracoApiService<LegacyTreeController>("GetMenu", rootId)
+                        + "&parentId=" + rootId
+                        + "&treeType=" + application
+                        + "&section=" + application)
+                {
+                    Children = legacyAttempt.Result
+                };
             }
 
             throw new ApplicationException("Could not render a tree for type " + configTree.Alias);

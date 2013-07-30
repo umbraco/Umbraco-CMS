@@ -14,6 +14,11 @@ namespace Umbraco.Web.Trees
             
         }
 
+        public MenuItemCollection(IEnumerable<MenuItem> items)
+        {
+            _menuItems = new List<MenuItem>(items);
+        }
+
         private readonly List<MenuItem> _menuItems = new List<MenuItem>();
 
         /// <summary>
@@ -40,10 +45,18 @@ namespace Umbraco.Web.Trees
         /// Adds a menu item
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        public void AddMenuItem<T>()
+        public MenuItem AddMenuItem<T>()
             where T : IAction
         {
-            AddMenuItem<T>(null);
+            return AddMenuItem<T>(null);
+        }
+
+        public MenuItem AddMenuItem<T>(bool hasSeparator)
+            where T : IAction
+        {
+            var item = AddMenuItem<T>();
+            item.SeperatorBefore = hasSeparator;
+            return item;
         }
 
         /// <summary>
@@ -52,10 +65,10 @@ namespace Umbraco.Web.Trees
         /// <typeparam name="T"></typeparam>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        public void AddMenuItem<T>(string key, string value)
+        public MenuItem AddMenuItem<T>(string key, string value)
             where T : IAction
         {
-            AddMenuItem<T>(new Dictionary<string, object> { { key, value } });
+            return AddMenuItem<T>(new Dictionary<string, object> { { key, value } });
         }
 
         /// <summary>
@@ -63,7 +76,7 @@ namespace Umbraco.Web.Trees
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="additionalData"></param>
-        public void AddMenuItem<T>(IDictionary<string, object> additionalData)
+        public MenuItem AddMenuItem<T>(IDictionary<string, object> additionalData)
             where T : IAction
         {
             var item = ActionsResolver.Current.GetAction<T>();
@@ -86,7 +99,10 @@ namespace Umbraco.Web.Trees
 
                 ////validate the data in the meta data bag
                 //item.ValidateRequiredData(AdditionalData);
+
+                return menuItem;
             }
+            return null;
         }
 
         public IEnumerator<MenuItem> GetEnumerator()

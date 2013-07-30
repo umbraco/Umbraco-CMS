@@ -49,8 +49,13 @@ namespace umbraco.businesslogic
         public string Title { get; private set; }
         public string IconClosed { get; private set; }
         public string IconOpen { get; private set; }
+
+        [Obsolete("This doesn't do anything")]
         public string Action { get; private set; }
+
+        [Obsolete("This doesn't do anything")]
         public bool Silent { get; private set; }
+
         public bool Initialize { get; private set; }
         public int SortOrder { get; private set; }
     }
