@@ -32,7 +32,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         protected bool ValidateUserContextId(string currentUmbracoUserContextId)
         {
-            return UmbracoContext.Security.ValidateUserContextId(currentUmbracoUserContextId);
+            return UmbracoContext.Security.ValidateCurrentUser();
         }
 
         /// <summary>

@@ -16,6 +16,20 @@ namespace Umbraco.Web.Install
 		private readonly ApplicationContext _applicationContext;
         private readonly UmbracoContext _umbracoContext;
 
+        private ApplicationContext GetApplicationContext()
+        {
+            return _applicationContext ?? ApplicationContext.Current;
+        }
+
+        private UmbracoContext GetUmbracoContext()
+        {
+            return _umbracoContext ?? UmbracoContext.Current;
+        }
+
+        /// <summary>
+        /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
+        /// </summary>
+        /// <param name="umbracoContext"></param>
         public UmbracoInstallAuthorizeAttribute(UmbracoContext umbracoContext)
         {
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
@@ -24,9 +38,7 @@ namespace Umbraco.Web.Install
         }
 
 		public UmbracoInstallAuthorizeAttribute()
-			: this(UmbracoContext.Current)
-		{
-			
+		{			
 		}
 
 		/// <summary>
@@ -41,13 +53,13 @@ namespace Umbraco.Web.Install
 		    try
 			{
 				//if its not configured then we can continue
-				if (!_applicationContext.IsConfigured)
+                if (!GetApplicationContext().IsConfigured)
 				{
 					return true;
 				}
 				
 				//otherwise we need to ensure that a user is logged in
-                var isLoggedIn = _umbracoContext.Security.ValidateUserContextId(_umbracoContext.Security.UmbracoUserContextId);
+                var isLoggedIn = GetUmbracoContext().Security.ValidateCurrentUser();
 				if (isLoggedIn)
 				{
 					return true;

@@ -2,6 +2,7 @@
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Mvc
 {
@@ -58,6 +59,14 @@ namespace Umbraco.Web.Mvc
         public DatabaseContext DatabaseContext
         {
             get { return ApplicationContext.DatabaseContext; }
+        }
+
+        /// <summary>
+        /// Returns the WebSecurity instance
+        /// </summary>
+        public WebSecurity Security
+        {
+            get { return UmbracoContext.Security; }
         }
     }
 }

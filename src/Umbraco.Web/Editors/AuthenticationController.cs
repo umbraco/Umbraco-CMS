@@ -50,9 +50,7 @@ namespace Umbraco.Web.Editors
             var attempt = UmbracoContext.Security.AuthorizeRequest();
             if (attempt == ValidateRequestAttempt.Success)
             {
-                var user =
-                    Services.UserService.GetUserById(
-                        UmbracoContext.Security.GetUserId(UmbracoContext.Security.UmbracoUserContextId));
+                var user = Services.UserService.GetUserById(UmbracoContext.Security.GetUserId());
                 return _userModelMapper.ToUserDetail(user);
             }
 

@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.WebApi
 {
@@ -79,6 +80,14 @@ namespace Umbraco.Web.WebApi
         /// Returns the current UmbracoContext
         /// </summary>
         public UmbracoContext UmbracoContext { get; private set; }
+
+        /// <summary>
+        /// Returns the WebSecurity instance
+        /// </summary>
+        public WebSecurity Security
+        {
+            get { return UmbracoContext.Security; }
+        }
 
         /// <summary>
         /// Useful for debugging

@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.businesslogic.Exceptions;
@@ -17,15 +19,19 @@ namespace Umbraco.Web.Security
     /// <summary>
     /// A utility class used for dealing with security in Umbraco
     /// </summary>
-    public class WebSecurity
+    public class WebSecurity : DisposableObject
     {
-        private readonly HttpContextBase _httpContext;
+        private HttpContextBase _httpContext;
 
         public WebSecurity(HttpContextBase httpContext)
         {
             _httpContext = httpContext;
+            //This ensures the dispose method is called when the request terminates, though
+            // we also ensure this happens in the Umbraco module because the UmbracoContext is added to the
+            // http context items.
+            _httpContext.DisposeOnPipelineCompleted(this);
         }
-
+        
         /// <summary>
         /// Returns true or false if the currently logged in member is authorized based on the parameters provided
         /// </summary>
@@ -90,16 +96,6 @@ namespace Umbraco.Web.Security
             return allowAction;
         }
 
-        /// <summary>
-        /// Gets the SQL helper.
-        /// </summary>
-        /// <value>The SQL helper.</value>
-        private ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
-
-        private const long TicksPrMinute = 600000000;
         private static readonly int UmbracoTimeOutInMinutes = GlobalSettings.TimeOutInMinutes;
 
         private User _currentUser;
@@ -117,7 +113,17 @@ namespace Umbraco.Web.Security
             get
             {
                 //only load it once per instance!
-                return _currentUser ?? (_currentUser = User.GetCurrent());
+                if (_currentUser == null)
+                {
+                    var id = GetUserId();
+                    if (id == -1)
+                    {
+                        return null;
+                    }
+                    _currentUser = User.GetUser(id);
+                }
+
+                return _currentUser;
             }
         }
 
@@ -127,16 +133,25 @@ namespace Umbraco.Web.Security
         /// <param name="userId">The user Id</param>
         public void PerformLogin(int userId)
         {
-            var retVal = Guid.NewGuid();
-            SqlHelper.ExecuteNonQuery(
-                                      "insert into umbracoUserLogins (contextID, userID, timeout) values (@contextId,'" + userId + "','" +
-                                      (DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)) +
-                                      "') ",
-                                      SqlHelper.CreateParameter("@contextId", retVal));
-            UmbracoUserContextId = retVal.ToString();
+            var user = User.GetUser(userId);
+            PerformLogin(user);
+        }
 
-            LogHelper.Info<WebSecurity>("User Id: {0} logged in", () => userId);
+        internal void PerformLogin(User user)
+        {
+            _httpContext.CreateUmbracoAuthTicket(new UserData
+            {
+                Id = user.Id,
+                AllowedApplications = user.GetApplications().Select(x => x.alias).ToArray(),
+                RealName = user.Name,
+                //currently we only have one user type!
+                Roles = new[] { user.UserType.Alias },
+                StartContentNode = user.StartNodeId,
+                StartMediaNode = user.StartMediaId,
+                Username = user.LoginName
+            });
 
+            LogHelper.Info<WebSecurity>("User Id: {0} logged in", () => user.Id);
         }
 
         /// <summary>
@@ -144,30 +159,12 @@ namespace Umbraco.Web.Security
         /// </summary>
         public void ClearCurrentLogin()
         {
-            // Added try-catch in case login doesn't exist in the database
-            // Either due to old cookie or running multiple sessions on localhost with different port number
-            try
-            {
-                SqlHelper.ExecuteNonQuery(
-                "DELETE FROM umbracoUserLogins WHERE contextId = @contextId",
-                SqlHelper.CreateParameter("@contextId", UmbracoUserContextId));
-            }
-            catch (Exception ex)
-            {
-                LogHelper.Error<WebSecurity>(string.Format("Login with contextId {0} didn't exist in the database", UmbracoUserContextId), ex);
-            }
-
-            //this clears the cookie
-            UmbracoUserContextId = "";
+            _httpContext.UmbracoLogout();
         }
 
         public void RenewLoginTimeout()
         {
-            // only call update if more than 1/10 of the timeout has passed
-            SqlHelper.ExecuteNonQuery(
-                "UPDATE umbracoUserLogins SET timeout = @timeout WHERE contextId = @contextId",
-                SqlHelper.CreateParameter("@timeout", DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)),
-                SqlHelper.CreateParameter("@contextId", UmbracoUserContextId));
+            _httpContext.RenewUmbracoAuthTicket(UmbracoTimeOutInMinutes);
         }
 
         /// <summary>
@@ -215,82 +212,65 @@ namespace Umbraco.Web.Security
             return CurrentUser.Applications.Any(uApp => uApp.alias == app);
         }
 
-        internal void UpdateLogin(long timeout)
+        internal void UpdateLogin()
         {
-            // only call update if more than 1/10 of the timeout has passed
-            if (timeout - (((TicksPrMinute * UmbracoTimeOutInMinutes) * 0.8)) < DateTime.Now.Ticks)
-                SqlHelper.ExecuteNonQuery(
-                    "UPDATE umbracoUserLogins SET timeout = @timeout WHERE contextId = @contextId",
-                    SqlHelper.CreateParameter("@timeout", DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)),
-                    SqlHelper.CreateParameter("@contextId", UmbracoUserContextId));
+            _httpContext.RenewUmbracoAuthTicket(UmbracoTimeOutInMinutes);
         }
 
-        internal long GetTimeout(string umbracoUserContextId)
+        internal long GetTimeout()
         {
-            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                CacheKeys.UserContextTimeoutCacheKey + umbracoUserContextId,
-                new TimeSpan(0, UmbracoTimeOutInMinutes / 10, 0),
-                () => GetTimeout(true));
+            var ticket = _httpContext.GetUmbracoAuthTicket();
+            var ticks = ticket.Expiration.Ticks - DateTime.Now.Ticks;
+            return ticks;
         }
-
-        internal long GetTimeout(bool byPassCache)
-        {
-            if (UmbracoSettings.KeepUserLoggedIn)
-                RenewLoginTimeout();
-
-            if (byPassCache)
-            {
-                return SqlHelper.ExecuteScalar<long>("select timeout from umbracoUserLogins where contextId=@contextId",
-                                                          SqlHelper.CreateParameter("@contextId", new Guid(UmbracoUserContextId))
-                                        );
-            }
-
-            return GetTimeout(UmbracoUserContextId);
-        }
-
+        
         /// <summary>
         /// Gets the user id.
         /// </summary>
-        /// <param name="umbracoUserContextId">The umbraco user context ID.</param>
+        /// <param name="umbracoUserContextId">This is not used</param>
         /// <returns></returns>
+        [Obsolete("This method is no longer used, use the GetUserId() method without parameters instead")]
         public int GetUserId(string umbracoUserContextId)
-        {
-            //need to parse to guid
-            Guid guid;
-            if (Guid.TryParse(umbracoUserContextId, out guid) == false)
-            {
-                return -1;
-            }
+        {           
+            return GetUserId();
+        }
 
-            var id = ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                CacheKeys.UserContextCacheKey + umbracoUserContextId,
-                new TimeSpan(0, UmbracoTimeOutInMinutes / 10, 0),
-                () => SqlHelper.ExecuteScalar<int?>(
-                    "select userID from umbracoUserLogins where contextID = @contextId",
-                    SqlHelper.CreateParameter("@contextId", guid)));
-            if (id == null)
+        /// <summary>
+        /// Gets the currnet user's id.
+        /// </summary>
+        /// <returns></returns>
+        public int GetUserId()
+        {
+            var identity = _httpContext.GetCurrentIdentity();
+            if (identity == null)
                 return -1;
-            return id.Value;
+            return identity.Id;
         }
 
         /// <summary>
         /// Validates the user context ID.
         /// </summary>
-        /// <param name="currentUmbracoUserContextId">The umbraco user context ID.</param>
+        /// <param name="currentUmbracoUserContextId">This doesn't do anything</param>
         /// <returns></returns>
+        [Obsolete("This method is no longer used, use the ValidateCurrentUser() method instead")]
         public bool ValidateUserContextId(string currentUmbracoUserContextId)
         {
-            if ((currentUmbracoUserContextId != ""))
-            {
-                int uid = GetUserId(currentUmbracoUserContextId);
-                long timeout = GetTimeout(currentUmbracoUserContextId);
+            return ValidateCurrentUser();
+        }
 
-                if (timeout > DateTime.Now.Ticks)
+        /// <summary>
+        /// Validates the currently logged in user and ensures they are not timed out
+        /// </summary>
+        /// <returns></returns>
+        public bool ValidateCurrentUser()
+        {
+            var ticket = _httpContext.GetUmbracoAuthTicket();
+            if (ticket != null)
+            {
+                if (ticket.Expired == false)
                 {
                     return true;
                 }
-                var user = User.GetUser(uid);
-                LogHelper.Info(typeof(WebSecurity), "User {0} (Id:{1}) logged out", () => user.Name, () => user.Id);
             }
             return false;
         }
@@ -300,16 +280,15 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="throwExceptions">set to true if you want exceptions to be thrown if failed</param>
         /// <returns></returns>
-        internal ValidateRequestAttempt ValidateCurrentUser(bool throwExceptions = false)
+        internal ValidateRequestAttempt ValidateCurrentUser(bool throwExceptions)
         {
-            if (UmbracoUserContextId != "")
-            {
-                var uid = GetUserId(UmbracoUserContextId);
-                var timeout = GetTimeout(UmbracoUserContextId);
+            var ticket = _httpContext.GetUmbracoAuthTicket();
 
-                if (timeout > DateTime.Now.Ticks)
+            if (ticket != null)
+            {
+                if (ticket.Expired == false)
                 {
-                    var user = User.GetUser(uid);
+                    var user = User.GetUser(GetUserId());
 
                     // Check for console access
                     if (user.Disabled || (user.NoConsole && GlobalSettings.RequestIsInUmbracoApplication(_httpContext) && GlobalSettings.RequestIsLiveEditRedirector(_httpContext) == false))
@@ -317,12 +296,13 @@ namespace Umbraco.Web.Security
                         if (throwExceptions) throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
                         return ValidateRequestAttempt.FailedNoPrivileges;
                     }
-                    UpdateLogin(timeout);
+                    UpdateLogin();
                     return ValidateRequestAttempt.Success;
                 }
                 if (throwExceptions) throw new ArgumentException("User has timed out!!");
                 return ValidateRequestAttempt.FailedTimedOut;
             }
+
             if (throwExceptions) throw new InvalidOperationException("The user has no umbraco contextid - try logging in");
             return ValidateRequestAttempt.FailedNoContextId;
         }
@@ -369,62 +349,21 @@ namespace Umbraco.Web.Security
             return UserHasAppAccess(app, usr);
         }
 
-        /// <summary>
-        /// Gets or sets the umbraco user context ID.
-        /// </summary>
-        /// <value>The umbraco user context ID.</value>
+        [Obsolete("This is no longer used at all, it will always return a new GUID though if a user is logged in")]
         public string UmbracoUserContextId
-        {            
+        {
             get
             {
-                if (StateHelper.Cookies.HasCookies && StateHelper.Cookies.UserContext.HasValue)
-                {
-                    try
-                    {
-                        var encTicket = StateHelper.Cookies.UserContext.GetValue();
-                        if (string.IsNullOrEmpty(encTicket) == false)
-                        {
-                            return encTicket.DecryptWithMachineKey();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        if (ex is ArgumentException || ex is FormatException || ex is HttpException)
-                        {
-                            StateHelper.Cookies.UserContext.Clear();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-                }
-                return "";
+                return _httpContext.GetUmbracoAuthTicket() == null ? "" : Guid.NewGuid().ToString();
             }
             set
             {
-                // zb-00004 #29956 : refactor cookies names & handling
-                if (StateHelper.Cookies.HasCookies)
-                {
-                    // Clearing all old cookies before setting a new one.
-                    if (StateHelper.Cookies.UserContext.HasValue)
-                        StateHelper.Cookies.ClearAll();
-
-                    if (string.IsNullOrEmpty(value) == false)
-                    {
-                        // Encrypt the value
-                        var encTicket = value.EncryptWithMachineKey();
-
-                        // Create new cookie.
-                        StateHelper.Cookies.UserContext.SetValue(encTicket, 1);
-                    }
-                    else
-                    {
-                        StateHelper.Cookies.UserContext.Clear();
-                    }
-                }
             }
         }
 
+        protected override void DisposeResources()
+        {
+            _httpContext = null;
+        }
     }
 }

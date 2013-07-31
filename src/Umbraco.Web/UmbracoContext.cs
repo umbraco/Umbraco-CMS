@@ -26,7 +26,7 @@ namespace Umbraco.Web
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
-    public class UmbracoContext
+    public class UmbracoContext : DisposableObject
     {
         private const string HttpContextItemName = "Umbraco.Web.UmbracoContext";
         private static readonly object Locker = new object();
@@ -37,6 +37,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Used if not running in a web application (no real HttpContext)
         /// </summary>
+        [ThreadStatic]
         private static UmbracoContext _umbracoContext;
 
         /// <summary>
@@ -127,6 +128,11 @@ namespace Umbraco.Web
             IPublishedCaches publishedCaches,
             bool? preview = null)
         {
+            //This ensures the dispose method is called when the request terminates, though
+            // we also ensure this happens in the Umbraco module because the UmbracoContext is added to the
+            // http context items.
+            httpContext.DisposeOnPipelineCompleted(this);
+
             if (httpContext == null) throw new ArgumentNullException("httpContext");
             if (applicationContext == null) throw new ArgumentNullException("applicationContext");
 
@@ -366,5 +372,15 @@ namespace Umbraco.Web
         }
 
 
+        protected override void DisposeResources()
+        {
+            Security.Dispose();
+            Security = null;
+            _previewContent = null;
+            _umbracoContext = null;
+            Application = null;
+            ContentCache = null;
+            MediaCache = null;            
+        }
     }
 }
