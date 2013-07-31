@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core
