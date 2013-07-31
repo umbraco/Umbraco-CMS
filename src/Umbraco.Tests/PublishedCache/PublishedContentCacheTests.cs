@@ -10,6 +10,7 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
 
 namespace Umbraco.Tests.PublishedCache
@@ -92,7 +93,8 @@ namespace Umbraco.Tests.PublishedCache
 		    _umbracoContext = new UmbracoContext(
                 _httpContextFactory.HttpContext,
                 ApplicationContext.Current,
-                new PublishedCaches(cache, new PublishedMediaCache()));
+                new PublishedCaches(cache, new PublishedMediaCache()),
+                new WebSecurity(_httpContextFactory.HttpContext, ApplicationContext.Current));
 
 		    _cache = _umbracoContext.ContentCache;
 		}

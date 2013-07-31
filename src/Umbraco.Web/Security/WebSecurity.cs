@@ -6,13 +6,16 @@ using System.Web.Security;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
-using umbraco.BusinessLogic;
+using umbraco;
 using umbraco.DataLayer;
 using umbraco.businesslogic.Exceptions;
-using umbraco.cms.businesslogic.member;
+using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
+using Member = umbraco.cms.businesslogic.member.Member;
+using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
+using User = umbraco.BusinessLogic.User;
 
 namespace Umbraco.Web.Security
 {
@@ -22,10 +25,12 @@ namespace Umbraco.Web.Security
     public class WebSecurity : DisposableObject
     {
         private HttpContextBase _httpContext;
+        private ApplicationContext _applicationContext;
 
-        public WebSecurity(HttpContextBase httpContext)
+        public WebSecurity(HttpContextBase httpContext, ApplicationContext applicationContext)
         {
             _httpContext = httpContext;
+            _applicationContext = applicationContext;
             //This ensures the dispose method is called when the request terminates, though
             // we also ensure this happens in the Umbraco module because the UmbracoContext is added to the
             // http context items.
@@ -133,24 +138,25 @@ namespace Umbraco.Web.Security
         /// <param name="userId">The user Id</param>
         public void PerformLogin(int userId)
         {
-            var user = User.GetUser(userId);
+            var user = _applicationContext.Services.UserService.GetUserById(userId);
             PerformLogin(user);
         }
 
-        internal void PerformLogin(User user)
+        internal void PerformLogin(IUser user)
         {
             _httpContext.CreateUmbracoAuthTicket(new UserData
             {
                 Id = user.Id,
-                AllowedApplications = user.GetApplications().Select(x => x.alias).ToArray(),
+                AllowedApplications = user.AllowedSections.ToArray(),
                 RealName = user.Name,
                 //currently we only have one user type!
                 Roles = new[] { user.UserType.Alias },
-                StartContentNode = user.StartNodeId,
+                StartContentNode = user.StartContentId,
                 StartMediaNode = user.StartMediaId,
-                Username = user.LoginName
+                Username = user.Username,
+                Culture = ui.Culture(user.Language)
             });
-
+            
             LogHelper.Info<WebSecurity>("User Id: {0} logged in", () => user.Id);
         }
 
@@ -244,7 +250,7 @@ namespace Umbraco.Web.Security
             var identity = _httpContext.GetCurrentIdentity();
             if (identity == null)
                 return -1;
-            return identity.Id;
+            return (int)identity.Id;
         }
 
         /// <summary>
@@ -364,6 +370,7 @@ namespace Umbraco.Web.Security
         protected override void DisposeResources()
         {
             _httpContext = null;
+            _applicationContext = null;
         }
     }
 }

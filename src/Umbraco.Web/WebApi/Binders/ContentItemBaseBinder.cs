@@ -18,6 +18,7 @@ using Newtonsoft.Json.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 using IModelBinder = System.Web.Http.ModelBinding.IModelBinder;
 using ModelBindingContext = System.Web.Http.ModelBinding.ModelBindingContext;
@@ -90,7 +91,11 @@ namespace Umbraco.Web.WebApi.Binders
             var request = actionContext.Request;
 
             //IMPORTANT!!! We need to ensure the umbraco context here because this is running in an async thread
-            UmbracoContext.EnsureContext(request.Properties["MS_HttpContext"] as HttpContextBase, ApplicationContext.Current);
+            var httpContext = (HttpContextBase) request.Properties["MS_HttpContext"];
+            UmbracoContext.EnsureContext(
+                httpContext, 
+                ApplicationContext.Current,
+                new WebSecurity(httpContext, ApplicationContext.Current));
 
             var content = request.Content;
 

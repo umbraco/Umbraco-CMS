@@ -28,7 +28,12 @@ namespace umbraco
         /// <returns></returns>
         public static string Culture(User u)
         {
-            var langFile = getLanguageFile(u.Language);
+            return Culture(u.Language);
+        }
+
+        internal static string Culture(string userLanguage)
+        {
+            var langFile = getLanguageFile(userLanguage);
             try
             {
                 return langFile.SelectSingleNode("/language").Attributes.GetNamedItem("culture").Value;

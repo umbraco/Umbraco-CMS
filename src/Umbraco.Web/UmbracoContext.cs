@@ -46,6 +46,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="httpContext"></param>
         /// <param name="applicationContext"></param>
+        /// <param name="webSecurity"></param>
         /// <returns>
         /// The Singleton context object
         /// </returns>
@@ -55,9 +56,34 @@ namespace Umbraco.Web
         /// during the startup process as well.
         /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
         /// </remarks>
-        public static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext)
+        public static UmbracoContext EnsureContext(
+            HttpContextBase httpContext, 
+            ApplicationContext applicationContext,
+            WebSecurity webSecurity)
         {
-            return EnsureContext(httpContext, applicationContext, false);
+            return EnsureContext(httpContext, applicationContext, webSecurity, false);
+        }
+
+        /// <summary>
+        /// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
+        /// context is created and assigned.
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <param name="applicationContext"></param>
+        /// <returns>
+        /// The Singleton context object
+        /// </returns>
+        /// <remarks>
+        /// This is created in order to standardize the creation of the singleton. Normally it is created during a request
+        /// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
+        /// during the startup process as well.
+        /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
+        /// </remarks>
+        public static UmbracoContext EnsureContext(
+            HttpContextBase httpContext,
+            ApplicationContext applicationContext)
+        {
+            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), false);
         }
 
         /// <summary>
@@ -80,7 +106,40 @@ namespace Umbraco.Web
         /// during the startup process as well.
         /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
         /// </remarks>
-        public static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext, bool replaceContext)
+        public static UmbracoContext EnsureContext(
+            HttpContextBase httpContext,
+            ApplicationContext applicationContext,
+            bool replaceContext)
+        {
+            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), replaceContext);
+        }
+
+        /// <summary>
+        /// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
+        /// context is created and assigned.
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <param name="applicationContext"></param>
+        /// <param name="webSecurity"></param>
+        /// <param name="replaceContext">
+        /// if set to true will replace the current singleton with a new one, this is generally only ever used because
+        /// during application startup the base url domain will not be available so after app startup we'll replace the current
+        /// context with a new one in which we can access the httpcontext.Request object.
+        /// </param>
+        /// <returns>
+        /// The Singleton context object
+        /// </returns>
+        /// <remarks>
+        /// This is created in order to standardize the creation of the singleton. Normally it is created during a request
+        /// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
+        /// during the startup process as well.
+        /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
+        /// </remarks>
+        public static UmbracoContext EnsureContext(
+            HttpContextBase httpContext, 
+            ApplicationContext applicationContext,
+            WebSecurity webSecurity,
+            bool replaceContext)
         {
             if (UmbracoContext.Current != null)
             {
@@ -92,7 +151,8 @@ namespace Umbraco.Web
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 applicationContext,
-                PublishedCachesResolver.Current.Caches);
+                PublishedCachesResolver.Current.Caches,
+                webSecurity);
 
             // create the nice urls provider
             // there's one per request because there are some behavior parameters that can be changed
@@ -121,11 +181,13 @@ namespace Umbraco.Web
         /// <param name="httpContext"></param>
         /// <param name="applicationContext"> </param>
         /// <param name="publishedCaches">The published caches.</param>
+        /// <param name="webSecurity"></param>
         /// <param name="preview">An optional value overriding detection of preview mode.</param>
         internal UmbracoContext(
 			HttpContextBase httpContext, 
 			ApplicationContext applicationContext,
             IPublishedCaches publishedCaches,
+            WebSecurity webSecurity,
             bool? preview = null)
         {
             //This ensures the dispose method is called when the request terminates, though
@@ -141,7 +203,7 @@ namespace Umbraco.Web
 
             HttpContext = httpContext;            
             Application = applicationContext;
-            Security = new WebSecurity(HttpContext);
+            Security = webSecurity;
 
             ContentCache = publishedCaches.CreateContextualContentCache(this);
             MediaCache = publishedCaches.CreateContextualMediaCache(this);
@@ -374,10 +436,11 @@ namespace Umbraco.Web
 
         protected override void DisposeResources()
         {
-            Security.Dispose();
+            Security.DisposeIfDisposable();
             Security = null;
             _previewContent = null;
             _umbracoContext = null;
+            //ensure not to dispose this!
             Application = null;
             ContentCache = null;
             MediaCache = null;            

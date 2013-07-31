@@ -15,7 +15,7 @@ namespace Umbraco.Core.Security
         }
 
         [DataMember(Name = "id")]
-        public int Id { get; set; }
+        public object Id { get; set; }
         
         [DataMember(Name = "roles")]
         public string[] Roles { get; set; }
@@ -36,5 +36,8 @@ namespace Umbraco.Core.Security
 
         [DataMember(Name = "allowedApps")]
         public string[] AllowedApplications { get; set; }
+
+        [DataMember(Name = "culture")]
+        public string Culture { get; set; }
     }
 }

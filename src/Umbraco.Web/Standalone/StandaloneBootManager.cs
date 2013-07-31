@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 using umbraco.interfaces;
 
 namespace Umbraco.Web.Standalone
@@ -79,7 +80,10 @@ namespace Umbraco.Web.Standalone
             base.FreezeResolution();
 
             var httpContext = new StandaloneHttpContext();
-            UmbracoContext.EnsureContext(httpContext, ApplicationContext.Current);
+            UmbracoContext.EnsureContext(
+                httpContext, 
+                ApplicationContext.Current,
+                new WebSecurity(httpContext, ApplicationContext.Current));
         }
     }
 }

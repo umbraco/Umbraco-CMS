@@ -61,7 +61,11 @@ namespace Umbraco.Web
 
             // create the UmbracoContext singleton, one per request, and assign
             // NOTE: we assign 'true' to ensure the context is replaced if it is already set (i.e. during app startup)            
-            UmbracoContext.EnsureContext(httpContext, ApplicationContext.Current, true);    
+            UmbracoContext.EnsureContext(
+                httpContext, 
+                ApplicationContext.Current, 
+                new WebSecurity(httpContext, ApplicationContext.Current), 
+                true);    
 		}
 
 		/// <summary>
@@ -173,6 +177,11 @@ namespace Umbraco.Web
                     }
                     app.Context.User = principal;
                     Thread.CurrentPrincipal = principal;
+
+                    //This is a back office request, we will also set the culture/ui culture
+                    Thread.CurrentThread.CurrentCulture =
+                        Thread.CurrentThread.CurrentUICulture =
+                        new System.Globalization.CultureInfo(identity.Culture);
                 }
             }
 

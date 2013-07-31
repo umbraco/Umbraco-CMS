@@ -44,6 +44,11 @@ namespace Umbraco.Web.WebApi
                     return new Attempt<HttpContextBase>(true, httpContext);
                 }
             }
+            if (HttpContext.Current != null)
+            {
+                return new Attempt<HttpContextBase>(true, new HttpContextWrapper(HttpContext.Current));
+            }
+
             return Attempt<HttpContextBase>.False;
         }
 

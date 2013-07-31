@@ -24,6 +24,7 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
 
 namespace Umbraco.Tests.TestHelpers
@@ -284,10 +285,12 @@ namespace Umbraco.Tests.TestHelpers
 
             PublishedContentCache.UnitTesting = true;
 
+            var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
             var ctx = new UmbracoContext(
-                GetHttpContextFactory(url, routeData).HttpContext,
+                httpContext,
                 ApplicationContext,
-                new PublishedCaches(cache, new PublishedMediaCache()));
+                new PublishedCaches(cache, new PublishedMediaCache()),
+                new WebSecurity(httpContext, ApplicationContext));
 
             if (setSingleton)
             {

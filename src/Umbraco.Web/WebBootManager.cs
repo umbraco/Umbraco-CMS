@@ -25,6 +25,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic;
@@ -98,7 +99,11 @@ namespace Umbraco.Web
 
             //before we do anything, we'll ensure the umbraco context
             //see: http://issues.umbraco.org/issue/U4-1717
-            UmbracoContext.EnsureContext(new HttpContextWrapper(UmbracoApplication.Context), ApplicationContext);
+            var httpContext = new HttpContextWrapper(UmbracoApplication.Context);
+            UmbracoContext.EnsureContext(
+                httpContext, 
+                ApplicationContext,
+                new WebSecurity(httpContext, ApplicationContext));
         }
 
         /// <summary>

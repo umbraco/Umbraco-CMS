@@ -47,7 +47,7 @@ namespace Umbraco.Core.Security
             }
         }
         
-        public int Id
+        public object Id
         {
             get
             {
@@ -62,6 +62,15 @@ namespace Umbraco.Core.Security
             {
                 EnsureDeserialized();
                 return DeserializedData.RealName;
+            }
+        }
+
+        public string Culture
+        {
+            get
+            {
+                EnsureDeserialized();
+                return DeserializedData.Culture;
             }
         }
 
