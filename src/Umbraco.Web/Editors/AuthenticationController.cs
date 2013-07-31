@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 using Umbraco.Web.Models.ContentEditing;
@@ -59,6 +60,12 @@ namespace Umbraco.Web.Editors
             throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
 
+        /// <summary>
+        /// Logs a user in
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
         public UserDetail PostLogin(string username, string password)
         {
             if (UmbracoContext.Security.ValidateBackOfficeCredentials(username, password))
@@ -75,9 +82,14 @@ namespace Umbraco.Web.Editors
             throw new HttpResponseException(HttpStatusCode.Forbidden);
         }
 
-        //public HttpResponseMessage PostLogout()
-        //{
-
-        //}
+        /// <summary>
+        /// Logs the current user out
+        /// </summary>
+        /// <returns></returns>
+        public HttpResponseMessage PostLogout()
+        {
+            UmbracoContext.Security.ClearCurrentLogin();
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
     }
 }
