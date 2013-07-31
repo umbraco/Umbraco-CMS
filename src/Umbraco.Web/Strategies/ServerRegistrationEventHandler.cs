@@ -77,13 +77,8 @@ namespace Umbraco.Web.Strategies
             //if it is not a document request, we'll check if it is a back end request
             if (e.Outcome == EnsureRoutableOutcome.NotDocumentRequest)
             {
-                var authority = e.HttpContext.Request.Url.GetLeftPart(UriPartial.Authority);
-                var afterAuthority = e.HttpContext.Request.Url.GetLeftPart(UriPartial.Query)
-                                      .TrimStart(authority)
-                                      .TrimStart("/");
-
                 //check if this is in the umbraco back office
-                if (afterAuthority.InvariantStartsWith(GlobalSettings.Path.TrimStart("/")))
+                if (e.HttpContext.Request.Url.IsBackOfficeRequest())
                 {
                     //yup it's a back office request!
                     using (var lck = new UpgradeableReadLock(Locker))

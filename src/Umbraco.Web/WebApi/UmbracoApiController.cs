@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Services;
@@ -20,6 +21,29 @@ namespace Umbraco.Web.WebApi
             UmbracoContext = umbracoContext;
             InstanceId = Guid.NewGuid();
             Umbraco = new UmbracoHelper(umbracoContext);
+        }
+
+        /// <summary>
+        /// Tries to retreive the current HttpContext if one exists.
+        /// </summary>
+        /// <returns></returns>
+        protected Attempt<HttpContextBase> TryGetHttpContext()
+        {
+            object context;
+            if (Request.Properties.TryGetValue("MS_HttpContext", out context))
+            {
+                var httpContext = context as HttpContextBase;
+                if (httpContext != null)
+                {
+                    return new Attempt<HttpContextBase>(true, httpContext);
+                }
+            }
+            if (HttpContext.Current != null)
+            {
+                return new Attempt<HttpContextBase>(true, new HttpContextWrapper(HttpContext.Current));
+            }
+
+            return Attempt<HttpContextBase>.False;
         }
 
         /// <summary>

@@ -15,6 +15,20 @@ namespace Umbraco.Web.Mvc
         private readonly ApplicationContext _applicationContext;
         private readonly UmbracoContext _umbracoContext;
 
+        private ApplicationContext GetApplicationContext()
+        {
+            return _applicationContext ?? ApplicationContext.Current;
+        }
+
+        private UmbracoContext GetUmbracoContext()
+        {
+            return _umbracoContext ?? UmbracoContext.Current;
+        }
+
+        /// <summary>
+        /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
+        /// </summary>
+        /// <param name="umbracoContext"></param>
         public UmbracoAuthorizeAttribute(UmbracoContext umbracoContext)
         {
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
@@ -22,11 +36,9 @@ namespace Umbraco.Web.Mvc
             _applicationContext = _umbracoContext.Application;
         }
 
-		public UmbracoAuthorizeAttribute()
-            : this(UmbracoContext.Current)
-		{
-
-		}
+        public UmbracoAuthorizeAttribute()
+        {
+        }
 
 		/// <summary>
 		/// Ensures that the user must be in the Administrator or the Install role
@@ -40,9 +52,10 @@ namespace Umbraco.Web.Mvc
 		    try
 			{						
 				//we need to that the app is configured and that a user is logged in
-				if (!_applicationContext.IsConfigured)
+                if (!GetApplicationContext().IsConfigured)
 					return false;
-                var isLoggedIn = _umbracoContext.Security.ValidateUserContextId(_umbracoContext.Security.UmbracoUserContextId);
+			    var umbCtx = GetUmbracoContext();
+                var isLoggedIn = umbCtx.Security.ValidateUserContextId(umbCtx.Security.UmbracoUserContextId);
 				return isLoggedIn;
 			}
 			catch (Exception)

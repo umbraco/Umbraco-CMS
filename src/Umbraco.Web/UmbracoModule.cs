@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -165,23 +166,6 @@ namespace Umbraco.Web
 
             return end;
         }
-
-		/// <summary>
-		/// Checks if the xml cache file needs to be updated/persisted
-		/// </summary>
-		/// <param name="httpContext"></param>
-		/// <remarks>
-		/// TODO: This needs an overhaul, see the error report created here:
-		///   https://docs.google.com/document/d/1neGE3q3grB4lVJfgID1keWY2v9JYqf-pw75sxUUJiyo/edit		
-		/// </remarks>
-		void PersistXmlCache(HttpContextBase httpContext)
-		{
-			if (content.Instance.IsXmlQueuedForPersistenceToFile)
-			{
-				content.Instance.RemoveXmlFilePersistenceQueue();
-				content.Instance.PersistXmlToFile();
-			}
-		}
 
 		#endregion
 
@@ -350,7 +334,7 @@ namespace Umbraco.Web
 		/// </summary>		
 		/// <param name="context"></param>
         /// <param name="pcr"> </param>
-		private void RewriteToUmbracoHandler(HttpContextBase context, PublishedContentRequest pcr)
+		private static void RewriteToUmbracoHandler(HttpContextBase context, PublishedContentRequest pcr)
 		{
 			// NOTE: we do not want to use TransferRequest even though many docs say it is better with IIS7, turns out this is
 			// not what we need. The purpose of TransferRequest is to ensure that .net processes all of the rules for the newly
@@ -401,6 +385,36 @@ namespace Umbraco.Web
                     throw new Exception("Invalid RenderingEngine.");
             }
 		}
+
+        /// <summary>
+        /// Checks if the xml cache file needs to be updated/persisted
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <remarks>
+        /// TODO: This needs an overhaul, see the error report created here:
+        ///   https://docs.google.com/document/d/1neGE3q3grB4lVJfgID1keWY2v9JYqf-pw75sxUUJiyo/edit		
+        /// </remarks>
+        static void PersistXmlCache(HttpContextBase httpContext)
+        {
+            if (content.Instance.IsXmlQueuedForPersistenceToFile)
+            {
+                content.Instance.RemoveXmlFilePersistenceQueue();
+                content.Instance.PersistXmlToFile();
+            }
+        }
+
+        /// <summary>
+        /// Any object that is in the HttpContext.Items collection that is IDisposable will get disposed on the end of the request
+        /// </summary>
+        /// <param name="http"></param>
+        private static void DisposeHttpContextItems(HttpContext http)
+        {
+            foreach (DictionaryEntry i in http.Items)
+            {
+                i.Value.DisposeIfDisposable();
+                i.Key.DisposeIfDisposable();
+            }
+        }
 
 		#region IHttpModule
 
@@ -468,18 +482,6 @@ namespace Umbraco.Web
 		}
 
 		#endregion
-
-		/// <summary>
-		/// Any object that is in the HttpContext.Items collection that is IDisposable will get disposed on the end of the request
-		/// </summary>
-		/// <param name="http"></param>
-		private static void DisposeHttpContextItems(HttpContext http)
-		{
-			foreach(var i in http.Items)
-			{
-				i.DisposeIfDisposable();
-			}
-		}
 
         #region Events
         internal static event EventHandler<RoutableAttemptEventArgs> RouteAttempt;

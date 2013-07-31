@@ -24,7 +24,7 @@ namespace Umbraco.Web
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
-    public class UmbracoContext
+    public class UmbracoContext : DisposableObject
     {
         private const string HttpContextItemName = "Umbraco.Web.UmbracoContext";
         private static readonly object Locker = new object();
@@ -361,7 +361,17 @@ namespace Umbraco.Web
                 return null;
             }
         }
-
-
+        
+        protected override void DisposeResources()
+        {
+            Security.DisposeIfDisposable();
+            Security = null;
+            _previewContent = null;
+            _umbracoContext = null;
+            //ensure not to dispose this!
+            Application = null;
+            ContentCache = null;
+            MediaCache = null;     
+        }
     }
 }
