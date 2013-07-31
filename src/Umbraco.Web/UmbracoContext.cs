@@ -40,6 +40,7 @@ namespace Umbraco.Web
         [ThreadStatic]
         private static UmbracoContext _umbracoContext;
 
+        #region EnsureContext methods
         /// <summary>
         /// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
         /// context is created and assigned.
@@ -57,7 +58,7 @@ namespace Umbraco.Web
         /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
         /// </remarks>
         public static UmbracoContext EnsureContext(
-            HttpContextBase httpContext, 
+            HttpContextBase httpContext,
             ApplicationContext applicationContext,
             WebSecurity webSecurity)
         {
@@ -136,7 +137,7 @@ namespace Umbraco.Web
         /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
         /// </remarks>
         public static UmbracoContext EnsureContext(
-            HttpContextBase httpContext, 
+            HttpContextBase httpContext,
             ApplicationContext applicationContext,
             WebSecurity webSecurity,
             bool replaceContext)
@@ -184,8 +185,8 @@ namespace Umbraco.Web
         /// <param name="webSecurity"></param>
         /// <param name="preview">An optional value overriding detection of preview mode.</param>
         internal UmbracoContext(
-			HttpContextBase httpContext, 
-			ApplicationContext applicationContext,
+            HttpContextBase httpContext,
+            ApplicationContext applicationContext,
             IPublishedCaches publishedCaches,
             WebSecurity webSecurity,
             bool? preview = null)
@@ -198,10 +199,10 @@ namespace Umbraco.Web
             if (httpContext == null) throw new ArgumentNullException("httpContext");
             if (applicationContext == null) throw new ArgumentNullException("applicationContext");
 
-    		ObjectCreated = DateTime.Now;
-	        UmbracoRequestId = Guid.NewGuid();
+            ObjectCreated = DateTime.Now;
+            UmbracoRequestId = Guid.NewGuid();
 
-            HttpContext = httpContext;            
+            HttpContext = httpContext;
             Application = applicationContext;
             Security = webSecurity;
 
@@ -209,8 +210,8 @@ namespace Umbraco.Web
             MediaCache = publishedCaches.CreateContextualMediaCache(this);
             InPreviewMode = preview ?? DetectInPreviewModeFromRequest();
 
-			// set the urls...
-			//original request url
+            // set the urls...
+            //original request url
             //NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
             // is a work around to being able to access the UmbracoContext during application startup and this will also ensure that people
             // 'could' still generate URLs during startup BUT any domain driven URL generation will not work because it is NOT possible to get
@@ -224,10 +225,11 @@ namespace Umbraco.Web
                 requestUrl = request.Url;
             }
             this.OriginalRequestUrl = requestUrl;
-			//cleaned request url
-			this.CleanedUmbracoUrl = UriUtility.UriToUmbraco(this.OriginalRequestUrl);
-			
-        }
+            //cleaned request url
+            this.CleanedUmbracoUrl = UriUtility.UriToUmbraco(this.OriginalRequestUrl);
+
+        } 
+        #endregion
 
         /// <summary>
         /// Gets the current Umbraco Context.
