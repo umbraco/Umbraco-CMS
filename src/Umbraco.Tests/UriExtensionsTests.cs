@@ -10,6 +10,38 @@ namespace Umbraco.Tests
     [TestFixture]
     public class UriExtensionsTests
     {
+        [TestCase("http://www.domain.com/umbraco", true)]
+        [TestCase("http://www.domain.com/Umbraco/", true)]
+        [TestCase("http://www.domain.com/umbraco/default.aspx", true)]
+        [TestCase("http://www.domain.com/umbraco/test/test", true)]
+        [TestCase("http://www.domain.com/Umbraco/test/test.aspx", true)]
+        [TestCase("http://www.domain.com/umbraco/test/test.js", true)]
+        [TestCase("http://www.domain.com/umbrac", false)]
+        [TestCase("http://www.domain.com/test", false)]
+        [TestCase("http://www.domain.com/test/umbraco", false)]
+        [TestCase("http://www.domain.com/test/umbraco.aspx", false)]
+        public void Is_Back_Office_Request(string input, bool expected)
+        {
+            var source = new Uri(input);            
+            Assert.AreEqual(expected, source.IsBackOfficeRequest());
+        }
+
+        [TestCase("http://www.domain.com/install", true)]
+        [TestCase("http://www.domain.com/Install/", true)]
+        [TestCase("http://www.domain.com/install/default.aspx", true)]
+        [TestCase("http://www.domain.com/install/test/test", true)]
+        [TestCase("http://www.domain.com/Install/test/test.aspx", true)]
+        [TestCase("http://www.domain.com/install/test/test.js", true)]
+        [TestCase("http://www.domain.com/instal", false)]
+        [TestCase("http://www.domain.com/umbraco", false)]
+        [TestCase("http://www.domain.com/umbraco/umbraco", false)]
+        [TestCase("http://www.domain.com/test/umbraco.aspx", false)]
+        public void Is_Installer_Request(string input, bool expected)
+        {
+            var source = new Uri(input);
+            Assert.AreEqual(expected, source.IsInstallerRequest());
+        }
+
         [TestCase("http://www.domain.com/foo/bar", "/", "http://www.domain.com/")]
         [TestCase("http://www.domain.com/foo/bar#hop", "/", "http://www.domain.com/")]
         [TestCase("http://www.domain.com/foo/bar?q=2#hop", "/", "http://www.domain.com/?q=2")]
