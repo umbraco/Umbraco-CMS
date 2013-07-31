@@ -10,6 +10,7 @@ using System.Xml;
 using NUnit.Framework;
 using SQLCE4Umbraco;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
@@ -41,6 +42,7 @@ namespace Umbraco.Tests.TestHelpers
         private static volatile bool _firstRunInTestSession = true;
         private static readonly object Locker = new object();
         private bool _firstTestInFixture = true;
+        private DefaultDatabaseFactory _dbFactory;
 
         //Used to flag if its the first test in the current session
         private bool _isFirstRunInTestSession = false;
@@ -52,26 +54,16 @@ namespace Umbraco.Tests.TestHelpers
         {
             InitializeFirstRunFlags();
 
+            _dbFactory = new DefaultDatabaseFactory(
+                GetDbConnectionString(),
+                GetDbProviderName());
+
             base.Initialize();
 
             var path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            var dbFactory = new DefaultDatabaseFactory(
-                GetDbConnectionString(),
-                GetDbProviderName());
-            ApplicationContext.Current = new ApplicationContext(
-				//assign the db context
-                new DatabaseContext(dbFactory),
-				//assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy()),
-                //disable cache
-                false)
-                {
-                    IsReady = true
-                };
-
-            DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
+            DatabaseContext.Initialize(_dbFactory.ProviderName, _dbFactory.ConnectionString);
 
             CreateSqlCeDatabase();
 
@@ -80,7 +72,23 @@ namespace Umbraco.Tests.TestHelpers
             //ensure the configuration matches the current version for tests
             SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
         }
-        
+
+        protected override void SetupApplicationContext()
+        {
+            //disable cache
+            var cacheHelper = new CacheHelper(new NullCacheProvider(), false);
+
+            ApplicationContext.Current = new ApplicationContext(
+                //assign the db context
+                new DatabaseContext(_dbFactory),
+                //assign the service context
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),
+                cacheHelper)
+            {
+                IsReady = true
+            };
+        }
+
         /// <summary>
         /// The database behavior to use for the test/fixture
         /// </summary>

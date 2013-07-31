@@ -99,12 +99,5 @@ namespace Umbraco.Web.WebApi
         /// </summary>
         internal Guid InstanceId { get; private set; }
 
-        /// <summary>
-        /// Returns the WebSecurity instance
-        /// </summary>
-        public WebSecurity Security
-        {
-            get { return UmbracoContext.Security; }
-        }
     }
 }

@@ -57,8 +57,8 @@ namespace Umbraco.Web.Mvc
 				//we need to that the app is configured and that a user is logged in
                 if (!appContext.IsConfigured)
 					return false;
+
                 var isLoggedIn = umbContext.Security.ValidateCurrentUser();
-                var isLoggedIn = umbCtx.Security.ValidateUserContextId(umbCtx.Security.UmbracoUserContextId);
 				return isLoggedIn;
 			}
 			catch (Exception)
