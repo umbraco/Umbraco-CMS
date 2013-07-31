@@ -107,8 +107,8 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
 
             //create the callbacs based on whats been passed in.
             var callbacks = {
-                success: (!opts.success ? defaultSuccess : opts.success),
-                error: (!opts.error ? defaultError : opts.error)
+                success: ((!opts || !opts.success) ? defaultSuccess : opts.success),
+                error: ((!opts || !opts.error) ? defaultError : opts.error)
             };
 
             httpPromise.success(function (data, status, headers, config) {

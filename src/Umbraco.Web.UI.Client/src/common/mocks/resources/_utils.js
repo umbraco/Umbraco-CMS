@@ -112,6 +112,11 @@
                 //set the cookie for loging
                 $cookieStore.put("mockAuthCookie", "Logged in!");
             },
+            
+            /** removes the auth cookie  */
+            clearAuth: function() {
+                $cookieStore.remove("mockAuthCookie");
+            },
 
             urlRegex: function(url) {
                 url = url.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");

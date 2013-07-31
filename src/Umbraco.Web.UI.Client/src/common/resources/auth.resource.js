@@ -26,6 +26,14 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                 'Login failed for user ' + username);
         },
         
+        performLogout: function() {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "authenticationApiBaseUrl",
+                        "PostLogout")));
+        },
+        
         /** Sends a request to the server to check if the current cookie value is valid for the user */
         isAuthenticated: function () {
             

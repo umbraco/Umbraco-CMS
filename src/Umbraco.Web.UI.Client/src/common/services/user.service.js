@@ -45,7 +45,7 @@ angular.module('umbraco.services')
         /** Returns a promise, sends a request to the server to check if the current cookie is authorized  */
         isAuthenticated: function () {
             
-            return $q.when(authResource.isAuthenticated())
+            return authResource.isAuthenticated()
                 .then(function(data) {
 
                     //note, this can return null if they are not authenticated
@@ -63,7 +63,7 @@ angular.module('umbraco.services')
         /** Returns a promise, sends a request to the server to validate the credentials  */
         authenticate: function (login, password) {
 
-            return $q.when(authResource.performLogin(login, password))
+            return authResource.performLogin(login, password)
                 .then(function (data) {
                     //when it's successful, return the user data
                     currentUser = data;
@@ -72,8 +72,13 @@ angular.module('umbraco.services')
         },
 
         logout: function () {
-                //TODO, clear cookie, or call authResource to notify server about logout
-                currentUser = undefined;
+            
+            return authResource.performLogout()
+                .then(function (data) {                   
+                    currentUser = null;
+                    openLoginDialog();
+                    return null;
+                });
         },
 
         /** Returns the current user object, if null then calls to authenticated or authenticate must be called  */

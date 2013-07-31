@@ -27,6 +27,14 @@ angular.module('umbraco.mocks').
 
           return [200, mocked, null];
       }
+      
+      function logout() {
+          
+          mocksUtils.clearAuth();
+
+          return [200, null, null];
+
+      }
 
       return {
           register: function() {
@@ -34,6 +42,10 @@ angular.module('umbraco.mocks').
               $httpBackend
                   .whenPOST(mocksUtils.urlRegex('/umbraco/UmbracoApi/Authentication/PostLogin'))
                   .respond(returnUser);
+              
+              $httpBackend
+                  .whenPOST(mocksUtils.urlRegex('/umbraco/UmbracoApi/Authentication/PostLogout'))
+                  .respond(logout);
 
 
               $httpBackend
