@@ -128,7 +128,7 @@ namespace Umbraco.Web.Security
                                       SqlHelper.CreateParameter("@contextId", retVal));
             UmbracoUserContextId = retVal.ToString();
 
-            LogHelper.Info(typeof(WebSecurity), "User Id: {0} logged in", () => userId);
+            LogHelper.Info<WebSecurity>("User Id: {0} logged in", () => userId);
 
         }
 
@@ -147,8 +147,11 @@ namespace Umbraco.Web.Security
             }
             catch (Exception ex)
             {
-                LogHelper.Error(typeof(WebSecurity), string.Format("Login with contextId {0} didn't exist in the database", UmbracoUserContextId), ex);
+                LogHelper.Error<WebSecurity>(string.Format("Login with contextId {0} didn't exist in the database", UmbracoUserContextId), ex);
             }
+
+            //this clears the cookie
+            UmbracoUserContextId = "";
         }
 
         public void RenewLoginTimeout()
