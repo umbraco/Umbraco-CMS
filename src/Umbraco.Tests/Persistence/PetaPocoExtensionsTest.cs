@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models.Rdbms;
@@ -73,13 +74,47 @@ namespace Umbraco.Tests.Persistence
             db.OpenSharedConnection();
 
             // Act
-            string sql;
+            string[] sql;
             db.GenerateBulkInsertCommand(servers, db.Connection, out sql);
             db.CloseSharedConnection();
 
             // Assert
-            Assert.That(sql,
+            Assert.That(sql[0],
                         Is.EqualTo("INSERT INTO [umbracoServer] ([umbracoServer].[address], [umbracoServer].[computerName], [umbracoServer].[registeredDate], [umbracoServer].[lastNotifiedDate], [umbracoServer].[isActive]) VALUES (@0,@1,@2,@3,@4), (@5,@6,@7,@8,@9)"));
+        }
+
+
+        [Test]
+        public void Generate_Bulk_Import_Sql_Exceeding_Max_Params()
+        {
+            // Arrange
+            var db = DatabaseContext.Database;
+
+            var servers = new List<ServerRegistrationDto>();
+            for (var i = 0; i < 1500; i++)
+            {
+                servers.Add(new ServerRegistrationDto
+                {
+                    Address = "address" + i,
+                    ComputerName = "computer" + i,
+                    DateRegistered = DateTime.Now,
+                    IsActive = true,
+                    LastNotified = DateTime.Now
+                });
+            }
+            db.OpenSharedConnection();
+
+            // Act
+            string[] sql;
+            db.GenerateBulkInsertCommand(servers, db.Connection, out sql);
+            db.CloseSharedConnection();
+
+            // Assert
+            Assert.That(sql.Length, Is.EqualTo(4));
+            foreach (var s in sql)
+            {
+                Assert.LessOrEqual(Regex.Matches(s, "@\\d+").Count, 2000);
+            }
         }
     }
 }

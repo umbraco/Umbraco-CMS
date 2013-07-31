@@ -296,8 +296,7 @@
     <Compile Include="Cache\UserPermissionsCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />
-    <Compile Include="Editors\AuthenticationController.cs" />
-    <Compile Include="Editors\ContentController.cs" />
+    <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
     <Compile Include="Editors\ContentControllerBase.cs" />
     <Compile Include="Editors\ContentTypeController.cs" />
     <Compile Include="Editors\LegacyController.cs" />

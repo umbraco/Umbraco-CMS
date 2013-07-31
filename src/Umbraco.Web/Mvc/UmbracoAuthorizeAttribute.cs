@@ -36,9 +36,9 @@ namespace Umbraco.Web.Mvc
             _applicationContext = _umbracoContext.Application;
         }
 
-		public UmbracoAuthorizeAttribute()
-		{
-		}
+        public UmbracoAuthorizeAttribute()
+        {
+        }
 
 		/// <summary>
 		/// Ensures that the user must be in the Administrator or the Install role
@@ -58,6 +58,7 @@ namespace Umbraco.Web.Mvc
                 if (!appContext.IsConfigured)
 					return false;
                 var isLoggedIn = umbContext.Security.ValidateCurrentUser();
+                var isLoggedIn = umbCtx.Security.ValidateUserContextId(umbCtx.Security.UmbracoUserContextId);
 				return isLoggedIn;
 			}
 			catch (Exception)

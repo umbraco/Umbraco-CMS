@@ -1,14 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using umbraco.interfaces.skinning;
-using System.Text.RegularExpressions;
-using System.IO;
-using System.Web;
 using umbraco.IO;
-using umbraco.cms.businesslogic.packager.standardPackageActions;
-using System.Xml;
 using HtmlAgilityPack;
 
 namespace umbraco.cms.businesslogic.skinning.tasks

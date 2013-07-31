@@ -33,6 +33,8 @@ namespace Umbraco.Web.WebApi
                 if (!_userisValidated)
                 {
                     Security.ValidateCurrentUser(true);
+                        throw new InvalidOperationException("To get a current user, this method must occur in a web request");
+                    Security.ValidateCurrentUser(ctx.Result, true);
                     _userisValidated = true;
                 }
 

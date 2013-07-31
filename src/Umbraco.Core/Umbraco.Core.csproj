@@ -483,6 +483,7 @@
     <Compile Include="Persistence\Querying\IQuery.cs" />
     <Compile Include="Persistence\Querying\ModelToSqlExpressionHelper.cs" />
     <Compile Include="Persistence\Querying\Query.cs" />
+    <Compile Include="Persistence\Querying\QueryHelper.cs" />
     <Compile Include="Persistence\Querying\SqlTranslator.cs" />
     <Compile Include="Persistence\Relators\DictionaryLanguageTextRelator.cs" />
     <Compile Include="Persistence\Relators\UserSectionRelator.cs" />

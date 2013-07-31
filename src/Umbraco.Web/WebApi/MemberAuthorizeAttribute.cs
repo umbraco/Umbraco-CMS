@@ -33,9 +33,9 @@ namespace Umbraco.Web.WebApi
         }
 
         public MemberAuthorizeAttribute()
-		{
+        {
 
-		}
+        }
 
         /// <summary>
         /// Flag for whether to allow all site visitors or just authenticated members

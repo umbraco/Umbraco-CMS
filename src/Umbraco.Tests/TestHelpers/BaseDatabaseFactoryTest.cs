@@ -57,9 +57,23 @@ namespace Umbraco.Tests.TestHelpers
             var path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            DatabaseContext.Initialize();
+            var dbFactory = new DefaultDatabaseFactory(
+                GetDbConnectionString(),
+                GetDbProviderName());
+            ApplicationContext.Current = new ApplicationContext(
+				//assign the db context
+                new DatabaseContext(dbFactory),
+				//assign the service context
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy()),
+                //disable cache
+                false)
+                {
+                    IsReady = true
+                };
 
-            CreateDatabase();
+            DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
+
+            CreateSqlCeDatabase();
 
             InitializeDatabase();
 
@@ -75,10 +89,23 @@ namespace Umbraco.Tests.TestHelpers
             get { return DatabaseBehavior.NewSchemaPerTest; }
         }
 
+        protected virtual string GetDbProviderName()
+        {
+            return "System.Data.SqlServerCe.4.0";
+        }
+
+        /// <summary>
+        /// Get the db conn string
+        /// </summary>
+        protected virtual string GetDbConnectionString()
+        {
+            return @"Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf";            
+        }
+
         /// <summary>
         /// Creates the SqlCe database if required
         /// </summary>
-        protected virtual void CreateDatabase()
+        protected virtual void CreateSqlCeDatabase()
         {
             if (DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture)
                 return;
@@ -87,7 +114,9 @@ namespace Umbraco.Tests.TestHelpers
             
             //Get the connectionstring settings from config
             var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
-            ConfigurationManager.AppSettings.Set(Core.Configuration.GlobalSettings.UmbracoConnectionName, @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf");
+            ConfigurationManager.AppSettings.Set(
+                Core.Configuration.GlobalSettings.UmbracoConnectionName, 
+                GetDbConnectionString());
 
             string dbFilePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
 

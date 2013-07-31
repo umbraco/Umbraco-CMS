@@ -306,12 +306,13 @@ namespace Umbraco.Tests.Services
         public void Can_RePublish_All_Content()
         {
             // Arrange
-            var contentService = ServiceContext.ContentService;
+            var contentService = (ContentService)ServiceContext.ContentService;
             var rootContent = contentService.GetRootContent();
             foreach (var c in rootContent)
             {
                 contentService.PublishWithChildren(c);
             }
+            var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants()));
             //for testing we need to clear out the contentXml table so we can see if it worked
             var provider = new PetaPocoUnitOfWorkProvider();
             var uow =  provider.GetUnitOfWork();
@@ -319,13 +320,49 @@ namespace Umbraco.Tests.Services
             {
                 uow.Database.TruncateTable("cmsContentXml");
             }
-
+            //for this test we are also going to save a revision for a content item that is not published, this is to ensure
+            //that it's published version still makes it into the cmsContentXml table!
+            contentService.Save(allContent.Last());
+            
             // Act
             var published = contentService.RePublishAll(0);
 
             // Assert
             Assert.IsTrue(published);
+            uow = provider.GetUnitOfWork();
+            using (var repo = RepositoryResolver.Current.ResolveByType<IContentRepository>(uow))
+            {
+                Assert.AreEqual(allContent.Count(), uow.Database.ExecuteScalar<int>("select count(*) from cmsContentXml"));
+            }
+        }
+
+        [Test]
+        public void Can_RePublish_All_Content_Of_Type()
+        {
+            // Arrange
+            var contentService = (ContentService)ServiceContext.ContentService;
+            var rootContent = contentService.GetRootContent();
+            foreach (var c in rootContent)
+            {
+                contentService.PublishWithChildren(c);
+            }
             var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants()));
+            //for testing we need to clear out the contentXml table so we can see if it worked
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var uow = provider.GetUnitOfWork();
+            using (RepositoryResolver.Current.ResolveByType<IContentRepository>(uow))
+            {
+                uow.Database.TruncateTable("cmsContentXml");
+            }
+            //for this test we are also going to save a revision for a content item that is not published, this is to ensure
+            //that it's published version still makes it into the cmsContentXml table!
+            contentService.Save(allContent.Last());
+
+
+            // Act
+            contentService.RePublishAll(new int[]{allContent.Last().ContentTypeId});
+
+            // Assert            
             uow = provider.GetUnitOfWork();
             using (var repo = RepositoryResolver.Current.ResolveByType<IContentRepository>(uow))
             {

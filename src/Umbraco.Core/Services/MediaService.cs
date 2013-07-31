@@ -11,10 +11,11 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Publishing;
 
 namespace Umbraco.Core.Services
 {
-	/// <summary>
+    /// <summary>
 	/// Represents the Media Service, which is an easy access to operations involving <see cref="IMedia"/>
 	/// </summary>
 	public class MediaService : IMediaService
@@ -875,15 +876,16 @@ namespace Umbraco.Core.Services
                         }
                     }
 
+                    var xmlItems = new List<ContentXmlDto>();
                     foreach (var c in list)
                     {
                         //generate the xml
                         var xml = c.ToXml();
                         //create the dto to insert
-                        var poco = new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) };
-                        //insert it into the database
-                        uow.Database.Insert(poco);
+                        xmlItems.Add(new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) });
                     }
+                    //bulk insert it into the database
+                    uow.Database.BulkInsertRecords(xmlItems);
                 }
                 Audit.Add(AuditTypes.Publish, "RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
             }

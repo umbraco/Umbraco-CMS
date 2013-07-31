@@ -13,7 +13,7 @@ namespace Umbraco.Web.Install
 	/// </summary>
 	internal class UmbracoInstallAuthorizeAttribute : AuthorizeAttribute
 	{
-		private readonly ApplicationContext _applicationContext;
+        private readonly ApplicationContext _applicationContext;
         private readonly UmbracoContext _umbracoContext;
 
         private ApplicationContext GetApplicationContext()
@@ -37,9 +37,9 @@ namespace Umbraco.Web.Install
             _applicationContext = _umbracoContext.Application;
         }
 
-		public UmbracoInstallAuthorizeAttribute()
+        public UmbracoInstallAuthorizeAttribute()
 		{			
-		}
+        }
 
 		/// <summary>
 		/// Ensures that the user must be logged in or that the application is not configured just yet.
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Install
 				{
 					return true;
 				}
-				
+			    var umbCtx = GetUmbracoContext();
 				//otherwise we need to ensure that a user is logged in
                 var isLoggedIn = GetUmbracoContext().Security.ValidateCurrentUser();
 				if (isLoggedIn)
