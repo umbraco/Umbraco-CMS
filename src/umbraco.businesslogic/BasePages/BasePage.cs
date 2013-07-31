@@ -184,7 +184,7 @@ namespace umbraco.BasePages
             var identity = HttpContext.Current.GetCurrentIdentity();
             if (identity == null)
                 return -1;
-            return (int)identity.Id;
+            return Convert.ToInt32(identity.Id);
         }
 
         // Added by NH to use with webservices authentications
