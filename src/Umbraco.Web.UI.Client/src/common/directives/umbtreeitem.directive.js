@@ -76,7 +76,7 @@ angular.module("umbraco.directives")
         *  When changing sections we don't want all of the tree-ndoes to do their 'leave' animations.
         */
         scope.animation = function () {
-            if (enableDeleteAnimations) {
+            if (enableDeleteAnimations && scope.node.expanded) {
                 return { leave: 'tree-node-delete-leave' };
             }
             else {
@@ -94,46 +94,27 @@ angular.module("umbraco.directives")
             if (node.expanded) {
                 enableDeleteAnimations = false;
                 emitEvent("treeNodeCollapsing", { element: arrow, node: node });
-
-                node.expanded = false;
-                node.children = [];
+                node.expanded = false;                
             }
             else {
 
                 //emit treeNodeExpanding event, if a callback object is set on the tree
                 emitEvent("treeNodeExpanding", { element: arrow, node: node });
-
-                //set element state to loading
-                node.loading = true;
-
-                //get the children from the tree service
-                treeService.getChildren({ node: node, section: scope.section })
-                    .then(function(data) {
-
-                        //emit event
-                        emitEvent("treeNodeLoaded", { element: arrow, node: node, children: data });
-
-                        //set state to done and expand
-                        node.loading = false;
-                        node.children = data;
-                        node.expanded = true;
-
-                        //emit expanded event
-                        emitEvent("treeNodeExpanded", { element: arrow, node: node, children: data });
-
-                    }, function(reason) {
-
-                        //in case of error, emit event
-                        emitEvent("treeNodeLoadError", { element: arrow, node: node, error: reason });
-
-                        //stop show the loading indicator  
-                        node.loading = false;
-
-                        //tell notications about the error
-                        notificationsService.error(reason);
-                    });
                 
-                enableDeleteAnimations = true;
+                if (!node.children || (angular.isArray(node.children) && node.children.length === 0)) {
+                    //get the children from the tree service
+                    treeService.loadNodeChildren({ node: node, section: scope.section })
+                        .then(function(data) {
+                            //emit expanded event
+                            emitEvent("treeNodeExpanded", { element: arrow, node: node, children: data });
+                            enableDeleteAnimations = true;
+                        });
+                }
+                else {
+                    emitEvent("treeNodeExpanded", { element: arrow, node: node, children: node.children });
+                    node.expanded = true;
+                    enableDeleteAnimations = true;
+                }
             }            
         };
 

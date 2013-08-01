@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Trees
+﻿namespace Umbraco.Web.Trees.Menu
 {
     public static class MenuItemExtensions
     {

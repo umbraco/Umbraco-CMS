@@ -4,8 +4,9 @@ using System.Runtime.Serialization;
 using Umbraco.Core;
 using umbraco.interfaces;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.Trees.Menu
 {
+
     [CollectionDataContract(Name = "menuItems", Namespace = "")]
     public class MenuItemCollection : IEnumerable<MenuItem>
     {
@@ -41,6 +42,27 @@ namespace Umbraco.Web.Trees
 
         //TODO: Implement more overloads for MenuItem with dictionary vals
 
+        public TMenuItem AddMenuItem<TMenuItem, TAction>(bool hasSeparator = false, IDictionary<string, object> additionalData = null)
+            where TAction : IAction
+            where TMenuItem : MenuItem, new()
+        {
+            var item = CreateMenuItem<TAction>(hasSeparator, additionalData);
+            if (item == null) return null;
+
+            var customMenuItem = new TMenuItem
+                {
+                    Name = item.Alias,
+                    Alias = item.Alias,
+                    SeperatorBefore = hasSeparator,
+                    Icon = item.Icon,
+                    Action = item.Action
+                };
+
+            _menuItems.Add(customMenuItem);
+
+            return customMenuItem;
+        }
+
         /// <summary>
         /// Adds a menu item
         /// </summary>
@@ -48,15 +70,7 @@ namespace Umbraco.Web.Trees
         public MenuItem AddMenuItem<T>()
             where T : IAction
         {
-            return AddMenuItem<T>(null);
-        }
-
-        public MenuItem AddMenuItem<T>(bool hasSeparator)
-            where T : IAction
-        {
-            var item = AddMenuItem<T>();
-            item.SeperatorBefore = hasSeparator;
-            return item;
+            return AddMenuItem<T>(false, null);
         }
 
         /// <summary>
@@ -65,25 +79,24 @@ namespace Umbraco.Web.Trees
         /// <typeparam name="T"></typeparam>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        public MenuItem AddMenuItem<T>(string key, string value)
+        /// <param name="hasSeparator"></param>
+        public MenuItem AddMenuItem<T>(string key, string value, bool hasSeparator = false)
             where T : IAction
         {
-            return AddMenuItem<T>(new Dictionary<string, object> { { key, value } });
+            return AddMenuItem<T>(hasSeparator, new Dictionary<string, object> { { key, value } });
         }
 
-        /// <summary>
-        /// Adds a menu item with a dictionary which is merged to the AdditionalData bag
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="additionalData"></param>
-        public MenuItem AddMenuItem<T>(IDictionary<string, object> additionalData)
+        internal MenuItem CreateMenuItem<T>(bool hasSeparator = false, IDictionary<string, object> additionalData = null)
             where T : IAction
         {
             var item = ActionsResolver.Current.GetAction<T>();
             if (item != null)
             {
-                var menuItem = new MenuItem(item);
-                
+                var menuItem = new MenuItem(item)
+                    {
+                        SeperatorBefore = hasSeparator
+                    };
+
                 if (additionalData != null)
                 {
                     foreach (var i in additionalData)
@@ -92,8 +105,6 @@ namespace Umbraco.Web.Trees
                     }
                 }
 
-                _menuItems.Add(menuItem);
-
                 //TODO: Once we implement 'real' menu items, not just IActions we can implement this since
                 // people may need to pass specific data to their menu items
 
@@ -101,6 +112,24 @@ namespace Umbraco.Web.Trees
                 //item.ValidateRequiredData(AdditionalData);
 
                 return menuItem;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Adds a menu item with a dictionary which is merged to the AdditionalData bag
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="hasSeparator"></param>
+        /// <param name="additionalData"></param>
+        public MenuItem AddMenuItem<T>(bool hasSeparator = false, IDictionary<string, object> additionalData = null)
+            where T : IAction
+        {
+            var item = CreateMenuItem<T>(hasSeparator, additionalData);
+            if (item != null) 
+            {
+                _menuItems.Add(item);
+                return item;
             }
             return null;
         }

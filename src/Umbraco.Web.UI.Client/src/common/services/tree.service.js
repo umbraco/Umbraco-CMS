@@ -7,7 +7,7 @@
  * @description
  * The tree service factory, used internally by the umbTree and umbTreeItem directives
  */
-function treeService($q, treeResource, iconHelper) {
+function treeService($q, treeResource, iconHelper, notificationsService, $rootScope) {
     //implement this in local storage
     var treeArray = [];
     var currentSection = "content";
@@ -28,6 +28,58 @@ function treeService($q, treeResource, iconHelper) {
 
     return {
         
+        /**
+         * @ngdoc method
+         * @name umbraco.services.treeService#getMenuItemByAlias
+         * @methodOf umbraco.services.treeService
+         * @function
+         *
+         * @description
+         * Clears all node children, gets it's up-to-date children from the server and re-assigns them and then
+         * returns them in a promise.
+         * @param {object} args An arguments object
+         * @param {object} args.node The tree node
+         * @param {object} args.section The current section
+         */
+        loadNodeChildren: function(args) {
+            if (!args) {
+                throw "No args object defined for getChildren";
+            }
+            if (!args.node) {
+                throw "No node defined on args object for getChildren";
+            }
+            
+            this.removeChildNodes(args.node);
+            args.node.loading = true;
+
+            return this.getChildren(args)
+                .then(function(data) {
+
+                    //set state to done and expand
+                    args.node.loading = false;
+                    args.node.children = data;
+                    args.node.expanded = true;
+                    args.node.hasChildren = true;
+
+                    return data;
+
+                }, function(reason) {
+
+                    //in case of error, emit event
+                    $rootScope.$broadcast("treeNodeLoadError", { element: arrow, node: node, error: reason });
+
+                    //stop show the loading indicator  
+                    node.loading = false;
+
+                    //tell notications about the error
+                    notificationsService.error(reason);
+
+                    return reason;
+                });
+
+        },
+
+        /** Removes a given tree node from the tree */
         removeNode: function(treeNode) {
             if (treeNode.parent == null) {
                 throw "Cannot remove a node that doesn't have a parent";
@@ -36,7 +88,9 @@ function treeService($q, treeResource, iconHelper) {
             treeNode.parent.children.splice(treeNode.parent.children.indexOf(treeNode), 1);            
         },
         
+        /** Removes all child nodes from a given tree node */
         removeChildNodes : function(treeNode) {
+            treeNode.expanded = false;
             treeNode.children = [];
             treeNode.hasChildren = false;
         },
@@ -59,7 +113,7 @@ function treeService($q, treeResource, iconHelper) {
            
             //check each child of this node
             for (var i = 0; i < treeNode.children.length; i++) {
-                if (treeNode.children[i].hasChildren) {
+                if (treeNode.children[i].children && angular.isArray(treeNode.children[i].children) && treeNode.children[i].children.length > 0) {
                     //recurse
                     found = this.getDescendantNode(treeNode.children[i], id);
                     if (found) {
@@ -89,14 +143,14 @@ function treeService($q, treeResource, iconHelper) {
             return root;
         },
 
-        getTree: function (options) {
+        getTree: function (args) {
 
-            if(options === undefined){
-                options = {};
+            if (args === undefined) {
+                args = {};
             }
 
-            var section = options.section || 'content';
-            var cacheKey = options.cachekey || '';
+            var section = args.section || 'content';
+            var cacheKey = args.cachekey || '';
             cacheKey += "_" + section;	
 
             //return the cache if it exists
@@ -104,7 +158,7 @@ function treeService($q, treeResource, iconHelper) {
                 return treeArray[cacheKey];
             }
              
-            return treeResource.loadApplication(options)
+            return treeResource.loadApplication(args)
                 .then(function(data) {
                     //this will be called once the tree app data has loaded
                     var result = {
@@ -175,28 +229,25 @@ function treeService($q, treeResource, iconHelper) {
                 });
         },
         
-        getChildren: function (options) {
+        /** Gets the children from the server for a given node */
+        getChildren: function (args) {
 
-            if(options === undefined){
-                throw "No options object defined for getChildren";
+            if (!args) {
+                throw "No args object defined for getChildren";
             }
-            if (options.node === undefined) {
-                throw "No node defined on options object for getChildren";
+            if (!args.node) {
+                throw "No node defined on args object for getChildren";
             }
 
-            var section = options.section || 'content';
-            var treeItem = options.node;
+            var section = args.section || 'content';
+            var treeItem = args.node;
 
             //hack to have create as default content action
             var action;
             if(section === "content"){
                 action = "create";
             }
-
-            if (!options.node) {
-                throw "No node defined";
-            }
-
+            
             return treeResource.loadNodes({ section: section, node: treeItem })
                 .then(function(data) {
                     //now that we have the data, we need to add the level property to each item and the view

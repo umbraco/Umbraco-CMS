@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Http.Routing;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Web.Trees.Menu;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.helpers;

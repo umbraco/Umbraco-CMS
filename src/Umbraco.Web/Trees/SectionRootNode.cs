@@ -20,7 +20,7 @@ namespace Umbraco.Web.Trees
             //default to false
             IsContainer = false;
         }
-
+        
         [DataMember(Name = "isContainer")]
         public bool IsContainer { get; set; }
 

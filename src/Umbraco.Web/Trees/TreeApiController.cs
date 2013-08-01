@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
+using Umbraco.Web.Trees.Menu;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 

@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
+using Umbraco.Web.Trees.Menu;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
@@ -134,7 +135,7 @@ namespace Umbraco.Web.Trees
 
                 // default actions for all users
                 allowedMenu.AddMenuItem<ActionRePublish>();
-                allowedMenu.AddMenuItem<ActionRefresh>(true);
+                menu.AddMenuItem<RefreshNodeMenuItem, ActionRefresh>(true);
                 return allowedMenu;
             }
 
@@ -172,7 +173,9 @@ namespace Umbraco.Web.Trees
             menu.AddMenuItem<ActionUnPublish>(true);
             menu.AddMenuItem<ActionNotify>(true);
             menu.AddMenuItem<ActionSendToTranslate>();
-            menu.AddMenuItem<ActionRefresh>(true);
+
+            menu.AddMenuItem<RefreshNodeMenuItem, ActionRefresh>(true);
+
             return menu;
         }
 

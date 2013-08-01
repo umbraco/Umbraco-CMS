@@ -113,19 +113,24 @@ namespace Umbraco.Web.Trees
                     throw new InvalidOperationException("Could not create root node for tree " + configTree.Alias);
                 }
 
-                return new SectionRootNode(
+                var sectionRoot = new SectionRootNode(
                     rootId,
                     rootNode.Result.MenuUrl)
                 {
                     Title = rootNode.Result.Title,
                     Children = byControllerAttempt.Result
                 };
+                foreach (var d in rootNode.Result.AdditionalData)
+                {
+                    sectionRoot.AdditionalData[d.Key] = d.Value;
+                }
+                return sectionRoot;
 
             }
             var legacyAttempt = configTree.TryLoadFromLegacyTree(id, queryStrings, Url, configTree.ApplicationAlias);
             if (legacyAttempt.Success)
             {
-                return new SectionRootNode(
+                var sectionRoot = new SectionRootNode(
                     rootId,
                     Url.GetUmbracoApiService<LegacyTreeController>("GetMenu", rootId)
                         + "&parentId=" + rootId
@@ -134,6 +139,8 @@ namespace Umbraco.Web.Trees
                 {
                     Children = legacyAttempt.Result
                 };
+                sectionRoot.AdditionalData.Add("treeType", Type.GetType(configTree.Type).FullName);
+                return sectionRoot;
             }
 
             throw new ApplicationException("Could not render a tree for type " + configTree.Alias);

@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Umbraco.Core.IO;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using Umbraco.Core;
 
 namespace Umbraco.Web.Trees
@@ -9,10 +11,12 @@ namespace Umbraco.Web.Trees
     /// <summary>
     /// Represents a model in the tree
     /// </summary>
+    /// <remarks>
+    /// TreeNode is sealed to prevent developers from adding additional json data to the response
+    /// </remarks>
     [DataContract(Name = "node", Namespace = "")]
-    public class TreeNode
+    public class TreeNode 
     {
-        
         /// <summary>
         /// Internal constructor, to create a tree node use the CreateTreeNode methods of the TreeApiController.
         /// </summary>
@@ -68,7 +72,6 @@ namespace Umbraco.Web.Trees
         [DataMember(Name = "nodetype")]
         public string NodeType { get; set; }
 
-
         /// <summary>
         /// Returns true if the icon represents a CSS class instead of a file path
         /// </summary>
@@ -108,7 +111,7 @@ namespace Umbraco.Web.Trees
         /// </remarks>
         [DataMember(Name = "routePath")]
         public string RoutePath { get; set; }
-        
+
         /// <summary>
         /// The JSON url to load the nodes children
         /// </summary>
@@ -121,17 +124,16 @@ namespace Umbraco.Web.Trees
         [DataMember(Name = "menuUrl")]
         public string MenuUrl { get; set; }
 
-        ///// <summary>
-        ///// The UI style to give the model
-        ///// </summary>
-        //public NodeStyle Style { get; private set; }
-
         /// <summary>
         /// A dictionary to support any additional meta data that should be rendered for the node which is 
         /// useful for custom action commands such as 'create', 'copy', etc...
         /// </summary>
         [DataMember(Name = "metaData")]
         public Dictionary<string, object> AdditionalData { get; private set; }
-
+        
+        ///// <summary>
+        ///// The UI style to give the model
+        ///// </summary>
+        //public NodeStyle Style { get; private set; }
     }
 }

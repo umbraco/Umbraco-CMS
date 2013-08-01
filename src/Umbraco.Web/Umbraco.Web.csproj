@@ -343,6 +343,8 @@
     <Compile Include="PropertyEditors\TextAreaPropertyEditor.cs" />
     <Compile Include="PropertyEditors\TextStringPropertyEditor.cs" />
     <Compile Include="PropertyEditors\TrueFalsePropertyEditor.cs" />
+    <Compile Include="Trees\Menu\ActionMenuItem.cs" />
+    <Compile Include="Trees\Menu\ActionMenuItemAttribute.cs" />
     <Compile Include="Trees\ActionUrlMethod.cs" />
     <Compile Include="Trees\ApplicationTreeRegistrar.cs" />
     <Compile Include="Trees\ContentTreeControllerBase.cs" />
@@ -351,9 +353,10 @@
     <Compile Include="Trees\LegacyTreeDataConverter.cs" />
     <Compile Include="Trees\LegacyTreeJavascript.cs" />
     <Compile Include="Trees\LegacyTreeParams.cs" />
-    <Compile Include="Trees\MenuItem.cs" />
-    <Compile Include="Trees\MenuItemCollection.cs" />
-    <Compile Include="Trees\MenuItemExtensions.cs" />
+    <Compile Include="Trees\Menu\MenuItem.cs" />
+    <Compile Include="Trees\Menu\MenuItemCollection.cs" />
+    <Compile Include="Trees\Menu\MenuItemExtensions.cs" />
+    <Compile Include="Trees\Menu\RefreshNodeMenuItem.cs" />
     <Compile Include="Trees\SearchResultItem.cs" />
     <Compile Include="Trees\SectionRootNode.cs" />
     <Compile Include="Trees\TreeApiController.cs" />

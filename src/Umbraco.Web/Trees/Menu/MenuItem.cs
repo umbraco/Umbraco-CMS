@@ -3,8 +3,11 @@ using System.Runtime.Serialization;
 using umbraco.interfaces;
 using System.Collections.Generic;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.Trees.Menu
 {
+    /// <summary>
+    /// A context menu item
+    /// </summary>
     [DataContract(Name = "menuItem", Namespace = "")]
     public class MenuItem
     {
@@ -23,7 +26,7 @@ namespace Umbraco.Web.Trees
             Action = legacyMenu;
         }
 
-        internal IAction Action { get; private set; }
+        internal IAction Action { get; set; }
 
         /// <summary>
         /// A dictionary to support any additional meta data that should be rendered for the node which is 
