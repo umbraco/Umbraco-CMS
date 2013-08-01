@@ -70,7 +70,7 @@ namespace umbraco.cms.businesslogic
             _alias = alias;
             _iconurl = icon;
             _thumbnail = thumbnail;
-            
+
             if (masterContentType.HasValue)
                 MasterContentType = masterContentType.Value;
 
@@ -92,7 +92,7 @@ namespace umbraco.cms.businesslogic
                 allowAtRoot, isContainer, Alias,icon,thumbnail,description 
             FROM umbracoNode INNER JOIN cmsContentType ON umbracoNode.id = cmsContentType.nodeId
             WHERE nodeObjectType = @nodeObjectType";
-        
+
         #endregion
 
         #region Static Methods
@@ -113,12 +113,12 @@ namespace umbraco.cms.businesslogic
         /// </remarks>
         internal static IDictionary<string, string> GetAliasesAndNames(string contentTypeAlias)
         {
-		    return AliasToNames.GetOrAdd(contentTypeAlias, s =>
-		        {
-		            var ct = GetByAlias(contentTypeAlias);
-		            var userFields = ct.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
-		            return userFields;
-		        });
+            return AliasToNames.GetOrAdd(contentTypeAlias, s =>
+                {
+                    var ct = GetByAlias(contentTypeAlias);
+                    var userFields = ct.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
+                    return userFields;
+                });
         }
 
         /// <summary>
@@ -150,21 +150,21 @@ namespace umbraco.cms.businesslogic
             //propertyTypeAlias needs to be invariant, so we will store uppercase
             var key = new System.Tuple<string, string>(contentTypeAlias, propertyTypeAlias.ToUpper());
 
-            
+
             return PropertyTypeCache.GetOrAdd(
                 key,
                 tuple =>
-                    {                       
-                        // With 4.10 we can't do this via direct SQL as we have content type mixins
-                        var controlId = Guid.Empty;
-                        var ct = GetByAlias(contentTypeAlias);
+                {
+                    // With 4.10 we can't do this via direct SQL as we have content type mixins
+                    var controlId = Guid.Empty;
+                    var ct = GetByAlias(contentTypeAlias);
                     var pt = ct.getPropertyType(propertyTypeAlias);
                     if (pt != null)
                     {
                         controlId = pt.DataTypeDefinition.DataType.Id;
                     }
-                        return controlId;     
-                });  
+                    return controlId;
+                });
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace umbraco.cms.businesslogic
         private bool _isContainerContentType;
         private List<int> _allowedChildContentTypeIDs;
         private List<TabI> _virtualTabs;
-        
+
         protected internal IContentTypeComposition ContentTypeItem;
 
         #endregion
@@ -264,7 +264,7 @@ namespace umbraco.cms.businesslogic
             foreach (var i in GetContentIdsForContentType())
             {
                 RebuildXmlStructureForContentItem(i);
-            }            
+            }
         }
 
         /// <summary>
@@ -292,7 +292,7 @@ namespace umbraco.cms.businesslogic
                 dr.Close();
             }
             return ids;
-        } 
+        }
 
         /// <summary>
         /// Rebuilds the xml structure for the content item by id
@@ -325,7 +325,7 @@ namespace umbraco.cms.businesslogic
                                             INNER JOIN cmsContentType ON cmsContent.contentType = cmsContentType.nodeId 
                                             WHERE cmsContentType.nodeId = @nodeId)",
                                       SqlHelper.CreateParameter("@nodeId", this.Id));
-        } 
+        }
 
         #endregion
 
@@ -443,7 +443,7 @@ namespace umbraco.cms.businesslogic
                 }
             }
         }
-        
+
         /// <summary>
         /// Gets or sets the description.
         /// </summary>
@@ -580,41 +580,41 @@ namespace umbraco.cms.businesslogic
                     cacheKey,
                     TimeSpan.FromMinutes(15),
                     () =>
+                    {
+                        //MCH NOTE: For the timing being I have changed this to a dictionary to ensure that property types
+                        //aren't added multiple times through the MasterContentType structure, because each level loads
+                        //its own + inherited property types, which is wrong. Once we are able to fully switch to the new api
+                        //this should no longer be a problem as the composition always contains a correct list of property types.
+                        var result = new Dictionary<int, PropertyType>();
+                        using (IRecordsReader dr =
+                            SqlHelper.ExecuteReader(
+                                "select id from cmsPropertyType where contentTypeId = @ctId order by sortOrder",
+                                SqlHelper.CreateParameter("@ctId", Id)))
                         {
-                            //MCH NOTE: For the timing being I have changed this to a dictionary to ensure that property types
-                            //aren't added multiple times through the MasterContentType structure, because each level loads
-                            //its own + inherited property types, which is wrong. Once we are able to fully switch to the new api
-                            //this should no longer be a problem as the composition always contains a correct list of property types.
-                            var result = new Dictionary<int, PropertyType>();
-                            using (IRecordsReader dr =
-                                SqlHelper.ExecuteReader(
-                                    "select id from cmsPropertyType where contentTypeId = @ctId order by sortOrder",
-                                    SqlHelper.CreateParameter("@ctId", Id)))
+                            while (dr.Read())
                             {
-                                while (dr.Read())
+                                int id = dr.GetInt("id");
+                                PropertyType pt = PropertyType.GetPropertyType(id);
+                                if (pt != null)
+                                    result.Add(pt.Id, pt);
+                            }
+                        }
+
+                        // Get Property Types from the master content type
+                        if (MasterContentTypes.Count > 0)
+                        {
+                            foreach (var mct in MasterContentTypes)
+                            {
+                                var pts = GetContentType(mct).PropertyTypes;
+                                foreach (var pt in pts)
                                 {
-                                    int id = dr.GetInt("id");
-                                    PropertyType pt = PropertyType.GetPropertyType(id);
-                                    if (pt != null)
+                                    if (result.ContainsKey(pt.Id) == false)
                                         result.Add(pt.Id, pt);
                                 }
                             }
-
-                            // Get Property Types from the master content type
-                            if (MasterContentTypes.Count > 0)
-                            {
-                                foreach (var mct in MasterContentTypes)
-                                {
-                                    var pts = GetContentType(mct).PropertyTypes;
-                                    foreach (var pt in pts)
-                                    {
-                                        if (result.ContainsKey(pt.Id) == false)
-                                            result.Add(pt.Id, pt);
-                                    }
-                                }
-                            }
-                            return result.Select(x => x.Value).ToList();
-                        });
+                        }
+                        return result.Select(x => x.Value).ToList();
+                    });
             }
         }
 
@@ -850,7 +850,7 @@ namespace umbraco.cms.businesslogic
                     foreach (var i in value)
                     {
                         int id = i;
-                        list.Add(new ContentTypeSort{Id = new Lazy<int>(() => id), SortOrder = sort});
+                        list.Add(new ContentTypeSort { Id = new Lazy<int>(() => id), SortOrder = sort });
                         sort++;
                     }
 
@@ -963,7 +963,7 @@ namespace umbraco.cms.businesslogic
             {
                 ContentTypeItem.RemovePropertyType(pt.Alias);
             }
-            
+
             // Remove from cache
             FlushFromCache(Id);
         }
@@ -1163,7 +1163,7 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         /// <param name="id">The id.</param>
         public static void FlushFromCache(int id)
-        {   
+        {
             //Ensure that MediaTypes are reloaded from db by clearing cache
             InMemoryCacheProvider.Current.Clear();
 
@@ -1428,12 +1428,12 @@ namespace umbraco.cms.businesslogic
             public List<PropertyType> GetAllPropertyTypes()
             {
                 var db = ApplicationContext.Current.DatabaseContext.Database;
-                var propertyTypeDtos = db.Fetch<PropertyTypeDto>("WHERE propertyTypeGroupId = @Id", new {Id = _id});
+                var propertyTypeDtos = db.Fetch<PropertyTypeDto>("WHERE propertyTypeGroupId = @Id", new { Id = _id });
                 var tmp = propertyTypeDtos
                             .Select(propertyTypeDto => PropertyType.GetPropertyType(propertyTypeDto.Id))
                             .ToList();
 
-                var propertyTypeGroupDtos = db.Fetch<PropertyTypeGroupDto>("WHERE parentGroupId = @Id", new {Id = _id});
+                var propertyTypeGroupDtos = db.Fetch<PropertyTypeGroupDto>("WHERE parentGroupId = @Id", new { Id = _id });
                 foreach (var propertyTypeGroupDto in propertyTypeGroupDtos)
                 {
                     var inheritedPropertyTypeDtos = db.Fetch<PropertyTypeDto>("WHERE propertyTypeGroupId = @Id", new { Id = propertyTypeGroupDto.Id });
@@ -1497,6 +1497,24 @@ namespace umbraco.cms.businesslogic
                         return new Dictionary.DictionaryItem(tempCaption.Substring(1, tempCaption.Length - 1)).Value(lang.id);
                     }
                     return "[" + tempCaption + "]";
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+
+            /// <summary>
+            /// Gets the tab caption by id.
+            /// </summary>
+            /// <param name="id">The id.</param>
+            /// <returns></returns>
+            internal static string GetRawCaptionById(int id)
+            {
+                try
+                {
+                    var tempCaption = SqlHelper.ExecuteScalar<string>("Select text from cmsPropertyTypeGroup where id = " + id);
+                    return tempCaption;
                 }
                 catch
                 {
@@ -1629,7 +1647,7 @@ namespace umbraco.cms.businesslogic
                 {
                     if (!_caption.StartsWith("#"))
                         return _caption;
-                    
+
                     var lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
                     if (lang != null)
                     {
@@ -1645,6 +1663,5 @@ namespace umbraco.cms.businesslogic
             }
         }
         #endregion
-
     }
 }
