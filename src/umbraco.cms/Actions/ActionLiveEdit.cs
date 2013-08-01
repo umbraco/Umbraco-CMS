@@ -33,7 +33,7 @@ namespace umbraco.BusinessLogic.Actions
 
 		public string Icon
 		{
-			get { return ".sprLiveEdit"; }
+			get { return "edit"; }
 		}
 
 		public string Alias

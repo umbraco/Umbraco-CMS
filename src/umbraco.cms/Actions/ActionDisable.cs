@@ -67,7 +67,7 @@ namespace umbraco.BusinessLogic.Actions
 			get
 			{
 
-				return ".sprDelete";
+                return "remove";
 			}
 		}
 

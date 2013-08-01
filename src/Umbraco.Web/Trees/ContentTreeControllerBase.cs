@@ -1,13 +1,73 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Formatting;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using umbraco;
 using umbraco.BusinessLogic.Actions;
 
 namespace Umbraco.Web.Trees
 {
     public abstract class ContentTreeControllerBase : TreeApiController
     {
+        /// <summary>
+        /// Returns the 
+        /// </summary>
+        protected abstract int RecycleBinId { get; }
+
+        /// <summary>
+        /// Returns true if the recycle bin has items in it
+        /// </summary>
+        protected abstract bool RecycleBinSmells { get; }
+
+        protected abstract TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings);
+        
+        protected abstract MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings);
+
+        /// <summary>
+        /// This will automatically check if the recycle bin needs to be rendered (i.e. its the first level)
+        /// and will automatically append it to the result of GetChildNodes.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        protected sealed override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
+        {
+            if (id == Constants.System.Root.ToInvariantString())
+            {
+                //we need to append the recycle bin to the end 
+                var nodes = PerformGetTreeNodes(id, queryStrings);
+                nodes.Add(CreateTreeNode(
+                    Constants.System.RecycleBinContent.ToInvariantString(),
+                    queryStrings,
+                    ui.GetText("general", "recycleBin"),
+                    "icon-trash",
+                    RecycleBinSmells));
+                return nodes;
+            }
+
+            return PerformGetTreeNodes(id, queryStrings);
+        }
+
+        /// <summary>
+        /// Checks if the menu requested is for the recycle bin and renders that, otherwise renders the result of PerformGetMenuForNode
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        protected sealed override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        {
+            if (RecycleBinId.ToInvariantString() == id)
+            {
+                var menu = new MenuItemCollection();
+                menu.AddMenuItem<ActionEmptyTranscan>();
+                menu.AddMenuItem<ActionRefresh>(true);
+                return menu;
+            }
+            return PerformGetMenuForNode(id, queryStrings);
+        }
+
         /// <summary>
         /// Based on the allowed actions, this will filter the ones that the current user is allowed
         /// </summary>

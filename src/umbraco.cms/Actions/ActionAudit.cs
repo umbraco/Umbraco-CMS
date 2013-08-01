@@ -65,7 +65,7 @@ namespace umbraco.BusinessLogic.Actions
 		{
 			get
 			{
-				return ".sprAudit";
+                return "time";
 			}
 		}
 

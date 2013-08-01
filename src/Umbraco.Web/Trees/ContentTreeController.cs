@@ -8,6 +8,8 @@ using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Services;
+using umbraco;
 using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
 using umbraco.interfaces;
@@ -59,7 +61,17 @@ namespace Umbraco.Web.Trees
             return base.CreateRootNode(queryStrings);
         }
 
-        protected override TreeNodeCollection GetTreeData(string id, FormDataCollection queryStrings)
+        protected override int RecycleBinId
+        {
+            get { return Constants.System.RecycleBinContent; }
+        }
+
+        protected override bool RecycleBinSmells
+        {
+            get { return Services.ContentService.RecycleBinSmells(); }
+        }
+
+        protected override TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings)
         {
             int iid;
             if (int.TryParse(id, out iid) == false)
@@ -100,7 +112,7 @@ namespace Umbraco.Web.Trees
             return nodes;
         }
 
-        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        protected override MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
 
@@ -163,5 +175,7 @@ namespace Umbraco.Web.Trees
             menu.AddMenuItem<ActionRefresh>(true);
             return menu;
         }
+
+        
     }
 }

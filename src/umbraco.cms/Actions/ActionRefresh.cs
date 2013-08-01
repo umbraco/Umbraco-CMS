@@ -71,7 +71,7 @@ namespace umbraco.BusinessLogic.Actions
 			get
 			{
 
-				return ".sprRefresh";
+                return "refresh";
 			}
 		}
 

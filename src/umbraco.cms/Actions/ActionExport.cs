@@ -65,7 +65,7 @@ namespace umbraco.BusinessLogic.Actions
 		{
 			get
 			{
-				return ".sprExportDocumentType";
+                return "download-alt";
 			}
 		}
 

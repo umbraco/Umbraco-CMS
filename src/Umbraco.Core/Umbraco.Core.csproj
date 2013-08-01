@@ -717,6 +717,7 @@
     <Compile Include="Serialization\SerializationService.cs" />
     <Compile Include="Serialization\StreamedResult.cs" />
     <Compile Include="Services\ContentService.cs" />
+    <Compile Include="Services\ContentServiceExtensions.cs" />
     <Compile Include="Services\ContentTypeService.cs" />
     <Compile Include="Services\DataTypeService.cs" />
     <Compile Include="Services\EntityService.cs" />

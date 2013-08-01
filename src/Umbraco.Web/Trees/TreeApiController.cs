@@ -53,7 +53,7 @@ namespace Umbraco.Web.Trees
         /// We are allowing an arbitrary number of query strings to be pased in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
-        protected abstract TreeNodeCollection GetTreeData(string id, FormDataCollection queryStrings);
+        protected abstract TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings);
 
         /// <summary>
         /// Returns the menu structure for the node
@@ -121,7 +121,7 @@ namespace Umbraco.Web.Trees
         public TreeNodeCollection GetNodes(string id, FormDataCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = new FormDataCollection("");
-            var nodes = GetTreeData(id, queryStrings);
+            var nodes = GetTreeNodes(id, queryStrings);
 
             foreach (var node in nodes)
             {

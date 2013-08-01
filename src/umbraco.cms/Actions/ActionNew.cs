@@ -63,7 +63,7 @@ namespace umbraco.BusinessLogic.Actions
 		{
 			get
 			{
-				return ".sprNew";
+                return "plus";
 			}
 		}
 
