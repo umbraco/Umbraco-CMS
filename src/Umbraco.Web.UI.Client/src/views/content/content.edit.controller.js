@@ -91,4 +91,4 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
     };
 }
 
-angular.module("umbraco").controller("Umbraco.Editors.ContentEditController", ContentEditController);
+angular.module("umbraco").controller("Umbraco.Editors.Content.EditController", ContentEditController);

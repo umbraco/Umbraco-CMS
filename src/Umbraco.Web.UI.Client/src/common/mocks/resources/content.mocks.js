@@ -51,24 +51,26 @@ angular.module('umbraco.mocks').
 
       return {
           register: function() {
-            $httpBackend
-		          .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Content/GetById'))
-		          .respond(returnNodebyId);
+              $httpBackend
+                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Content/GetById'))
+                  .respond(returnNodebyId);
 
-
-            $httpBackend
-              .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Content/GetEmpty'))
-              .respond(returnEmptyNode);
+              $httpBackend
+                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Content/GetEmpty'))
+                  .respond(returnEmptyNode);
 
               $httpBackend
                   .whenDELETE(mocksUtils.urlRegex('/umbraco/UmbracoApi/Content/DeleteById'))
                   .respond(returnDeletedNode);
+              
+              $httpBackend
+                  .whenDELETE(mocksUtils.urlRegex('/umbraco/UmbracoApi/Content/EmptyRecycleBin'))
+                  .respond(returnDeletedNode);
           },
 
-
           expectGetById: function() {
-            $httpBackend
-              .expectGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Content/GetById'));
+              $httpBackend
+                  .expectGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Content/GetById'));
           }
       };
   }]);

@@ -17,6 +17,12 @@ function ContentDeleteController($scope, contentResource, treeService, navigatio
             $scope.currentNode.loading = false;
             //TODO: Need to sync tree, etc...
             treeService.removeNode($scope.currentNode);
+
+            //ensure the recycle bin has child nodes now
+            var rootNode = treeService.getTreeRoot($scope.currentNode);
+            var recycleBin = treeService.getDescendantNode(rootNode, -20);
+            recycleBin.hasChildren = true;
+
             navigationService.hideMenu();
         });
 
@@ -27,4 +33,4 @@ function ContentDeleteController($scope, contentResource, treeService, navigatio
     };
 }
 
-angular.module("umbraco").controller("Umbraco.Editors.ContentDeleteController", ContentDeleteController);
+angular.module("umbraco").controller("Umbraco.Editors.Content.DeleteController", ContentDeleteController);

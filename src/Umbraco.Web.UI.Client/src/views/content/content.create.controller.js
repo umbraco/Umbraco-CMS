@@ -1,5 +1,5 @@
 angular.module('umbraco')
-.controller("Umbraco.Editors.ContentCreateController",
+.controller("Umbraco.Editors.Content.CreateController",
 	function ($scope, $routeParams, contentTypeResource, iconHelper) {
 
 	    contentTypeResource.getAllowedTypes($scope.currentNode.id)

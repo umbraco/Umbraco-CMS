@@ -16,6 +16,15 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     return {
         
+        emptyRecycleBin: function() {
+            return umbRequestHelper.resourcePromise(
+                $http.delete(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "EmptyRecycleBin")),
+                'Failed to empty the recycle bin');
+        },
+
         deleteById: function(id) {
             return umbRequestHelper.resourcePromise(
                 $http.delete(

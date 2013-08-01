@@ -20,7 +20,7 @@ describe('edit content controller tests', function () {
         //this controller requires an angular form controller applied to it
         scope.contentForm = angularHelper.getNullForm("contentForm");
         
-        controller = $controller('Umbraco.Editors.ContentEditController', {
+        controller = $controller('Umbraco.Editors.Content.EditController', {
             $scope: scope,
             $routeParams: routeParams
         });

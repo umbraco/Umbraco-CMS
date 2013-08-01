@@ -43,7 +43,8 @@ namespace Umbraco.Web.Trees
                     queryStrings,
                     ui.GetText("general", "recycleBin"),
                     "icon-trash",
-                    RecycleBinSmells));
+                    RecycleBinSmells,
+                    queryStrings.GetValue<string>("application") + "/recyclebin"));
                 return nodes;
             }
 

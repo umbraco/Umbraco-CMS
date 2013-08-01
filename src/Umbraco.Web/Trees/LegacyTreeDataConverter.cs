@@ -280,8 +280,11 @@ namespace Umbraco.Web.Trees
                 Icon = xmlTreeNode.Icon,
                 Title = xmlTreeNode.Text,
                 NodeType = xmlTreeNode.NodeType
-
             };
+            if (isRoot)
+            {
+                node.AdditionalData.Add("treeType", xmlTreeNode.TreeType);    
+            }
 
             //This is a special case scenario, we know that content/media works based on the normal Belle routing/editing so we'll ensure we don't
             // pass in the legacy JS handler so we do it the new way, for all other trees (Currently, this is a WIP), we'll render

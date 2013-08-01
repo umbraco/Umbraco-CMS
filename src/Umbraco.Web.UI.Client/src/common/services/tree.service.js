@@ -12,7 +12,7 @@ function treeService($q, treeResource, iconHelper) {
     var treeArray = [];
     var currentSection = "content";
 
-    /** ensures there's a view and level property on each tree node */
+    /** ensures there's a routePath, parent and level property on each tree node */
     function ensureParentLevelAndView(parentNode, treeNodes, section, level) {
         //if no level is set, then we make it 1   
         var childLevel = (level ? level : 1);
@@ -33,7 +33,60 @@ function treeService($q, treeResource, iconHelper) {
                 throw "Cannot remove a node that doesn't have a parent";
             }
             //remove the current item from it's siblings
-            treeNode.parent.children.splice(treeNode.parent.children.indexOf(treeNode), 1);
+            treeNode.parent.children.splice(treeNode.parent.children.indexOf(treeNode), 1);            
+        },
+        
+        removeChildNodes : function(treeNode) {
+            treeNode.children = [];
+            treeNode.hasChildren = false;
+        },
+
+        /** Gets a child node by id */
+        getChildNode: function(treeNode, id) {
+            var found = _.find(treeNode.children, function (child) {
+                return child.id === id;
+            });
+            return found === undefined ? null : found;
+        },
+
+        /** Gets a descendant node by id */
+        getDescendantNode: function(treeNode, id) {
+            //check the first level
+            var found = this.getChildNode(treeNode, id);
+            if (found) {
+                return found;
+            }
+           
+            //check each child of this node
+            for (var i = 0; i < treeNode.children.length; i++) {
+                if (treeNode.children[i].hasChildren) {
+                    //recurse
+                    found = this.getDescendantNode(treeNode.children[i], id);
+                    if (found) {
+                        return found;
+                    }
+                }
+            }
+            
+            //not found
+            return found === undefined ? null : found;
+        },
+
+        /** Gets the root node of the current tree type for a given tree node */
+        getTreeRoot: function(treeNode) {
+            //all root nodes have metadata key 'treeType'
+            var root = null;
+            var current = treeNode;            
+            while (root === null && current !== undefined) {
+                
+                if (current.metaData && current.metaData["treeType"]) {
+                    root = current;
+                }
+                else { 
+                    current = current.parent;
+                }
+            }
+            return root;
         },
 
         getTree: function (options) {
@@ -97,7 +150,6 @@ function treeService($q, treeResource, iconHelper) {
          *
          * @description
          * Attempts to return a tree node's menu item based on the alias supplied, otherwise returns null.
-
          * @param {object} args An arguments object
          * @param {object} args.treeNode The tree node to get the menu item for
          * @param {object} args.menuItemAlias The menu item alias to attempt to find

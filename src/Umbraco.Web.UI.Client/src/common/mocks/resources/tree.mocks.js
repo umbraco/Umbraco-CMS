@@ -26,7 +26,9 @@ angular.module('umbraco.mocks').
               { seperator: true, name: "Hostnames", cssclass: "home", alias: "hostnames", metaData: {} },
               { name: "Public Access", cssclass: "group", alias: "publicaccess", metaData: {} },
 
-              { seperator: true, name: "Reload", cssclass: "refresh", alias: "users", metaData: {} }
+              { seperator: true, name: "Reload", cssclass: "refresh", alias: "users", metaData: {} },
+          
+                { seperator: true, name: "Empty Recycle Bin", cssclass: "trash", alias: "emptyrecyclebin", metaData: {} }
           ];
 
           return [200, menu, null];
@@ -52,10 +54,10 @@ angular.module('umbraco.mocks').
           }
 
           var children = [
-              { name: "child-of-" + section, childNodesUrl: url, id: level + "" + 1234, icon: "icon-file-alt", view: section + "/edit/" + level + "" + 1234, children: [], expanded: false, hasChildren: true, level: level, defaultAction: action, menuUrl: menuUrl },
-              { name: "random-name-" + section, childNodesUrl: url, id: level + "" + 1235, icon: "icon-file-alt", view: section + "/edit/" + level + "" + 1235, children: [], expanded: false, hasChildren: true, level: level, defaultAction: action, menuUrl: menuUrl },
-              { name: "random-name-" + section, childNodesUrl: url, id: level + "" + 1236, icon: "icon-file-alt", view: section + "/edit/" + level + "" + 1236, children: [], expanded: false, hasChildren: true, level: level, defaultAction: action, menuUrl: menuUrl },
-              { name: "random-name-" + section, childNodesUrl: url, id: level + "" + 1237, icon: "icon-file-alt", view: "common/legacy/1237?p=" + encodeURI("developer/contentType.aspx?idequal1234"), children: [], expanded: false, hasChildren: true, level: level, defaultAction: action, menuUrl: menuUrl }
+              { name: "child-of-" + section, childNodesUrl: url, id: level + "" + 1234, icon: "icon-file-alt", children: [], expanded: false, hasChildren: true, level: level, defaultAction: action, menuUrl: menuUrl },
+              { name: "random-name-" + section, childNodesUrl: url, id: level + "" + 1235, icon: "icon-file-alt", children: [], expanded: false, hasChildren: true, level: level, defaultAction: action, menuUrl: menuUrl },
+              { name: "random-name-" + section, childNodesUrl: url, id: level + "" + 1236, icon: "icon-file-alt", children: [], expanded: false, hasChildren: true, level: level, defaultAction: action, menuUrl: menuUrl },
+              { name: "random-name-" + section, childNodesUrl: url, id: level + "" + 1237, icon: "icon-file-alt", routePath: "common/legacy/1237?p=" + encodeURI("developer/contentType.aspx?idequal1234"), children: [], expanded: false, hasChildren: true, level: level, defaultAction: action, menuUrl: menuUrl }
           ];
 
           return [200, children, null];
@@ -78,15 +80,16 @@ angular.module('umbraco.mocks').
                       name: "content",
                       id: -1,
                       children: [
-                          { name: "My website", id: 1234, childNodesUrl: url, icon: "icon-home", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl },
-                          { name: "Components", id: 1235, childNodesUrl: url, icon: "icon-cogs", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl },
-                          { name: "Archieve", id: 1236, childNodesUrl: url, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl },
-                          { name: "Recycle Bin", id: 1237, childNodesUrl: url, icon: "icon-trash", view: section + "/trash/view/", children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl }
+                          { name: "My website", id: 1234, childNodesUrl: url, icon: "icon-home", children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl },
+                          { name: "Components", id: 1235, childNodesUrl: url, icon: "icon-cogs", children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl },
+                          { name: "Archieve", id: 1236, childNodesUrl: url, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl },
+                          { name: "Recycle Bin", id: -20, childNodesUrl: url, icon: "icon-trash", routePath: section + "/recyclebin", children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl }
                       ],
                       expanded: true,
                       hasChildren: true,
                       level: 0,
-                      menuUrl: menuUrl
+                      menuUrl: menuUrl,
+                      metaData: { treeType: "Umbraco.Web.Trees.ContentTreeController" }
                   };
 
                   break;
@@ -96,16 +99,16 @@ angular.module('umbraco.mocks').
                       name: "developer",
                       id: -1,
                       children: [
-                          { name: "Data types", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                          { name: "Macros", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                          { name: "Pacakges", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                          { name: "XSLT Files", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                          { name: "Razor Files", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
+                          { name: "Data types", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.DataTypeTreeController" } },
+                          { name: "Macros", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.MacrosTreeController" } },
+                          { name: "Pacakges", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.PackagesTreeController" } },
+                          { name: "XSLT Files", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.XsltTreeController" } },
+                          { name: "Razor Files", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.RazorTreeController" } }
                       ],
                       expanded: true,
                       hasChildren: true,
                       level: 0,
-                      isContainer: true
+                      isContainer: true                      
                   };
 
                   break;
@@ -114,11 +117,11 @@ angular.module('umbraco.mocks').
                       name: "settings",
                       id: -1,
                       children: [
-                          { name: "Stylesheets", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                          { name: "Templates", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                          { name: "Dictionary", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                          { name: "Media types", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                          { name: "Document types", childNodesUrl: url, id: -1, icon: "icon-folder-close", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
+                          { name: "Stylesheets", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.StylesheetTreeController" } },
+                          { name: "Templates", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.TemplatesTreeController" } },
+                          { name: "Dictionary", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.DictionaryTreeController" } },
+                          { name: "Media types", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.MediaTypesTreeController" } },
+                          { name: "Document types", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.ContentTypesTreeController" } }
                       ],
                       expanded: true,
                       hasChildren: true,
@@ -133,15 +136,16 @@ angular.module('umbraco.mocks').
                       name: "randomTree",
                       id: -1,
                       children: [
-                          { name: "random-name-" + section, childNodesUrl: url, id: 1234, icon: "icon-home", defaultAction: "create", view: section + "/edit/" + 1234, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                          { name: "random-name-" + section, childNodesUrl: url, id: 1235, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1235, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                          { name: "random-name-" + section, childNodesUrl: url, id: 1236, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1236, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                          { name: "random-name-" + section, childNodesUrl: url, id: 1237, icon: "icon-folder-close", defaultAction: "create", view: section + "/edit/" + 1237, children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1234, icon: "icon-home", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1235, icon: "icon-folder-close", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1236, icon: "icon-folder-close", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1237, icon: "icon-folder-close", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
                       ],
                       expanded: true,
                       hasChildren: true,
                       level: 0,
-                      menuUrl: menuUrl
+                      menuUrl: menuUrl,
+                      metaData: { treeType: "Umbraco.Web.Trees.RandomTreeController" }
                   };
 
                   break;

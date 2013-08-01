@@ -203,7 +203,6 @@
     <Compile Include="Actions\ActionSort.cs" />
     <Compile Include="Actions\ActionToPublish.cs" />
     <Compile Include="Actions\ActionTranslate.cs" />
-    <Compile Include="Actions\ActionTreeEditMode.cs" />
     <Compile Include="Actions\ActionUpdate.cs" />
     <Compile Include="Actions\ContextMenuSeperator.cs" />
     <Compile Include="Actions\ActionUnPublish.cs">

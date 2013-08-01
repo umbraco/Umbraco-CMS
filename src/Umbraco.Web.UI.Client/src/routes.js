@@ -33,6 +33,11 @@ app.config(function ($routeProvider) {
                 if (!rp.method)
                     return "views/common/dashboard.html";
 
+                ////here we detect recycle bins, all recycle bins start with -2* (i.e. -20, -21)
+                //if (rp.id.startsWith("-2")) {
+                //    return 'views/' + rp.section + '/recyclebin.html';
+                //}
+
                 return 'views/' + rp.section + '/' + rp.method + '.html';
             }
         })        

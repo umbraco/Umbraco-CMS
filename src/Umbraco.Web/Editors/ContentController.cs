@@ -176,6 +176,33 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
+        /// <summary>
+        /// Deletes an item
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public HttpResponseMessage DeleteById(int id)
+        {
+            var foundContent = Services.ContentService.GetById(id);
+            if (foundContent == null)
+            {
+                HandleContentNotFound(id);
+            }
+            Services.ContentService.Delete(foundContent, UmbracoUser.Id);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        /// <summary>
+        /// Empties the recycle bin
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete]
+        public HttpResponseMessage EmptyRecycleBin()
+        {            
+            Services.ContentService.EmptyRecycleBin();
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
         private void ShowMessageForStatus(PublishStatus status, ContentItemDisplay display)
         {
             switch (status.StatusType)
