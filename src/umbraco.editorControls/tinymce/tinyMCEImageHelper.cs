@@ -55,7 +55,7 @@ namespace umbraco.editorControls.tinymce
                             }
                             catch (Exception err)
                             {
-                                cleanTag += " src=\"" + helper.FindAttribute(ht, "src") + "\"";
+                                //cleanTag += " src=\"" + helper.FindAttribute(ht, "src") + "\"";
                                 if (helper.FindAttribute(ht, "width") != "")
                                 {
                                     cleanTag += " width=\"" + helper.FindAttribute(ht, "width") + "\"";
