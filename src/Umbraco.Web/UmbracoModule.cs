@@ -2,13 +2,17 @@
 using System.Collections;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 using Umbraco.Web.Routing;
 using umbraco;
+using umbraco.BasePages;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Web.Configuration;
@@ -29,7 +33,7 @@ namespace Umbraco.Web
 		/// Begins to process a request.
 		/// </summary>
 		/// <param name="httpContext"></param>
-		void BeginRequest(HttpContextBase httpContext)
+		static void BeginRequest(HttpContextBase httpContext)
 		{
             //we need to set the initial url in our ApplicationContext, this is so our keep alive service works and this must
             //exist on a global context because the keep alive service doesn't run in a web context.
@@ -118,6 +122,58 @@ namespace Umbraco.Web
 			else
 				RewriteToUmbracoHandler(httpContext, pcr);
 		}
+
+        /// <summary>
+        /// Checks if the request is authenticated, if it is it sets the thread culture to the currently logged in user
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void AuthenticateRequest(object sender, EventArgs e)
+        {
+            var app = (HttpApplication)sender;
+            var http = new HttpContextWrapper(app.Context);
+
+            // do not process if client-side request
+            if (http.Request.Url.IsClientSideRequest())
+                return;
+
+            if (app.Request.Url.IsBackOfficeRequest() || app.Request.Url.IsInstallerRequest())
+            {
+                var ticket = http.GetUmbracoAuthTicket();
+                if (ticket != null)
+                {                   
+                    //create the Umbraco user identity 
+                    var identity = ticket.CreateUmbracoIdentity();
+                    if (identity != null)
+                    {
+
+                        //We'll leave setting custom identies/principals for 6.2, for now we'll just ensure that the cultures, etc.. are set
+                        ////set the principal object
+                        ////now we need to see if their session is still valid
+                        //var timeout = BasePage.GetTimeout(identity.UserContextId);
+                        //if (timeout > DateTime.Now.Ticks)
+                        //{                            
+                            //var principal = new GenericPrincipal(identity, identity.Roles);
+                            ////It is actually not good enough to set this on the current app Context and the thread, it also needs
+                            //// to be set explicitly on the HttpContext.Current !! This is a strange web api thing that is actually 
+                            //// an underlying fault of asp.net not propogating the User correctly.
+                            //if (HttpContext.Current != null)
+                            //{
+                            //    HttpContext.Current.User = principal;
+                            //}
+                            //app.Context.User = principal;
+                            //Thread.CurrentPrincipal = principal;
+                        //}
+
+                        //This is a back office/installer request, we will also set the culture/ui culture
+                        Thread.CurrentThread.CurrentCulture =
+                            Thread.CurrentThread.CurrentUICulture =
+                            new System.Globalization.CultureInfo(identity.Culture);
+
+                    }
+                }
+            }
+        }
 
         // returns a value indicating whether redirection took place and the request has
         // been completed - because we don't want to Response.End() here to terminate
@@ -432,6 +488,8 @@ namespace Umbraco.Web
 				    LogHelper.Debug<UmbracoModule>("Begin request: {0}.", () => httpContext.Request.Url);
                     BeginRequest(new HttpContextWrapper(httpContext));
 				};
+
+            app.AuthenticateRequest += AuthenticateRequest;
 
             app.PostResolveRequestCache += (sender, e) =>
 				{

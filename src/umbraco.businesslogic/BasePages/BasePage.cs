@@ -14,6 +14,7 @@ using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using Umbraco.Core;
+using Umbraco.Core.Security;
 
 namespace umbraco.BasePages
 {
@@ -223,10 +224,10 @@ namespace umbraco.BasePages
             return false;
         }
 
-        private static long GetTimeout(string umbracoUserContextID)
+        internal static long GetTimeout(string umbracoUserContextId)
         {
             return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                CacheKeys.UserContextTimeoutCacheKey + umbracoUserContextID,
+                CacheKeys.UserContextTimeoutCacheKey + umbracoUserContextId,
                 new TimeSpan(0, UmbracoTimeOutInMinutes / 10, 0),
                 () => GetTimeout(true));
         }
@@ -257,50 +258,48 @@ namespace umbraco.BasePages
         {
             get
             {
-                if (StateHelper.Cookies.HasCookies && StateHelper.Cookies.UserContext.HasValue)
+                var authTicket = HttpContext.Current.GetUmbracoAuthTicket();
+                if (authTicket == null)
                 {
-                    try
-                    {
-                        var encTicket = StateHelper.Cookies.UserContext.GetValue();
-                        if (string.IsNullOrEmpty(encTicket) == false)
-                        {
-                            return encTicket.DecryptWithMachineKey();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        if (ex is ArgumentException || ex is FormatException || ex is HttpException)
-                        {
-                            StateHelper.Cookies.UserContext.Clear();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
+                    return "";
                 }
-                return "";
+                var identity = authTicket.CreateUmbracoIdentity();
+                if (identity == null)
+                {
+                    HttpContext.Current.UmbracoLogout();
+                    return "";
+                }
+                return identity.UserContextId;
             }
             set
             {
-                // zb-00004 #29956 : refactor cookies names & handling
-                if (StateHelper.Cookies.HasCookies)
+                if (value.IsNullOrWhiteSpace())
                 {
-                    // Clearing all old cookies before setting a new one.
-                    if (StateHelper.Cookies.UserContext.HasValue)
-                        StateHelper.Cookies.ClearAll();
-
-                    if (string.IsNullOrEmpty(value) == false)
-                    {                        
-                        // Encrypt the value
-                        var encTicket = value.EncryptWithMachineKey();
-
-                        // Create new cookie.
-                        StateHelper.Cookies.UserContext.SetValue(encTicket, 1);
+                    HttpContext.Current.UmbracoLogout();
+                }
+                else
+                {
+                    var uid = GetUserId(value);
+                    if (uid == -1)
+                    {
+                        HttpContext.Current.UmbracoLogout();
                     }
                     else
                     {
-                        StateHelper.Cookies.UserContext.Clear();
+                        var user = BusinessLogic.User.GetUser(uid);
+                        HttpContext.Current.CreateUmbracoAuthTicket(
+                            new UserData
+                                {
+                                    Id = uid,
+                                    AllowedApplications = user.Applications.Select(x => x.alias).ToArray(),
+                                    Culture = ui.Culture(user),
+                                    RealName = user.Name,
+                                    Roles = new string[] {user.UserType.Alias},
+                                    StartContentNode = user.StartNodeId,
+                                    StartMediaNode = user.StartMediaId,
+                                    UserContextId = value,
+                                    Username = user.LoginName
+                                });
                     }
                 }
             }

@@ -5,12 +5,15 @@ using System.Web;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
+using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.businesslogic.Exceptions;
 using umbraco.cms.businesslogic.member;
+using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
+using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.Security
 {
@@ -369,53 +372,51 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <value>The umbraco user context ID.</value>
         public string UmbracoUserContextId
-        {            
+        {
             get
             {
-                if (StateHelper.Cookies.HasCookies && StateHelper.Cookies.UserContext.HasValue)
+                var authTicket = HttpContext.Current.GetUmbracoAuthTicket();
+                if (authTicket == null)
                 {
-                    try
-                    {
-                        var encTicket = StateHelper.Cookies.UserContext.GetValue();
-                        if (string.IsNullOrEmpty(encTicket) == false)
-                        {
-                            return encTicket.DecryptWithMachineKey();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        if (ex is ArgumentException || ex is FormatException || ex is HttpException)
-                        {
-                            StateHelper.Cookies.UserContext.Clear();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
+                    return "";
                 }
-                return "";
+                var identity = authTicket.CreateUmbracoIdentity();
+                if (identity == null)
+                {
+                    HttpContext.Current.UmbracoLogout();
+                    return "";
+                }
+                return identity.UserContextId;
             }
             set
             {
-                // zb-00004 #29956 : refactor cookies names & handling
-                if (StateHelper.Cookies.HasCookies)
+                if (value.IsNullOrWhiteSpace())
                 {
-                    // Clearing all old cookies before setting a new one.
-                    if (StateHelper.Cookies.UserContext.HasValue)
-                        StateHelper.Cookies.ClearAll();
-
-                    if (string.IsNullOrEmpty(value) == false)
+                    HttpContext.Current.UmbracoLogout();
+                }
+                else
+                {
+                    var uid = GetUserId(value);
+                    if (uid == -1)
                     {
-                        // Encrypt the value
-                        var encTicket = value.EncryptWithMachineKey();
-
-                        // Create new cookie.
-                        StateHelper.Cookies.UserContext.SetValue(encTicket, 1);
+                        HttpContext.Current.UmbracoLogout();
                     }
                     else
                     {
-                        StateHelper.Cookies.UserContext.Clear();
+                        var user = User.GetUser(uid);
+                        HttpContext.Current.CreateUmbracoAuthTicket(
+                            new UserData
+                            {
+                                Id = uid,
+                                AllowedApplications = user.Applications.Select(x => x.alias).ToArray(),
+                                Culture = ui.Culture(user),
+                                RealName = user.Name,
+                                Roles = new string[] { user.UserType.Alias },
+                                StartContentNode = user.StartNodeId,
+                                StartMediaNode = user.StartMediaId,
+                                UserContextId = value,
+                                Username = user.LoginName
+                            });
                     }
                 }
             }

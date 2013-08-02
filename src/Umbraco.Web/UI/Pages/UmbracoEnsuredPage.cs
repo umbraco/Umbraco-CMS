@@ -51,14 +51,6 @@ namespace Umbraco.Web.UI.Pages
                     Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl), true);
             }
         }
-       
-        protected override void OnInit(EventArgs e)
-        {
-            base.OnInit(e);
-
-            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(ui.Culture(Security.CurrentUser));
-            System.Threading.Thread.CurrentThread.CurrentUICulture = System.Threading.Thread.CurrentThread.CurrentCulture;
-        }
 
         /// <summary>
         /// Gets/sets the app that this page is assigned to

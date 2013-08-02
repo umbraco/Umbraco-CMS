@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using System.Web.Caching;
+using System.Web.Security;
 using System.Xml;
 using System.Configuration;
 
@@ -296,6 +297,32 @@ namespace Umbraco.Core.Configuration
                 if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out result))
                     return result;
                 return true;
+            }
+        }
+
+        internal static string AuthCookieName
+        {
+            get
+            {
+                var value = GetKey("/settings/security/authCookieName");
+                if (string.IsNullOrEmpty(value) == false)
+                {
+                    return value;
+                }
+                return "UMB_UCONTEXT";
+            }
+        }
+
+        internal static string AuthCookieDomain
+        {
+            get
+            {
+                var value = GetKey("/settings/security/authCookieDomain");
+                if (string.IsNullOrEmpty(value) == false)
+                {
+                    return value;
+                }
+                return FormsAuthentication.CookieDomain;
             }
         }
 
