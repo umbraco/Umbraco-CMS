@@ -148,6 +148,12 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        /// <remarks>
+        /// We will set the identity, culture, etc... for any request that is:
+        /// * A back office request
+        /// * An installer request
+        /// * A /base request (since these can be back office web service requests)
+        /// </remarks>
         static void AuthenticateRequest(object sender, EventArgs e)
         {
             var app = (HttpApplication)sender;
@@ -157,7 +163,9 @@ namespace Umbraco.Web
             if (http.Request.Url.IsClientSideRequest())
                 return;
 
-            if (app.Request.Url.IsBackOfficeRequest() || app.Request.Url.IsInstallerRequest())
+            if (app.Request.Url.IsBackOfficeRequest() 
+                || app.Request.Url.IsInstallerRequest() 
+                || BaseRest.BaseRestHandler.IsBaseRestRequest(UmbracoContext.Current.OriginalRequestUrl))
             {
                 var ticket = http.GetUmbracoAuthTicket();
                 if (ticket != null && !ticket.Expired && http.RenewUmbracoAuthTicket())
