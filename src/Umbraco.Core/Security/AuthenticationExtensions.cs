@@ -58,7 +58,16 @@ namespace Umbraco.Core.Security
         public static void CreateUmbracoAuthTicket(this HttpContextBase http, UserData userdata)
         {
             var userDataString = JsonConvert.SerializeObject(userdata);
-            CreateAuthTicket(http, userdata.Username, userDataString, GlobalSettings.TimeOutInMinutes, GlobalSettings.TimeOutInMinutes, "/", UmbracoSettings.AuthCookieName, UmbracoSettings.AuthCookieDomain);
+            CreateAuthTicket(
+                http, 
+                userdata.Username, 
+                userDataString, 
+                GlobalSettings.TimeOutInMinutes, 
+                //Umbraco has always persisted it's original cookie for 1 day so we'll keep it that way
+                1440, 
+                "/", 
+                UmbracoSettings.AuthCookieName, 
+                UmbracoSettings.AuthCookieDomain);
         }
 
         internal static void CreateUmbracoAuthTicket(this HttpContext http, UserData userdata)
@@ -143,17 +152,22 @@ namespace Umbraco.Core.Security
             {
                 return false;
             }
+
+            //get the request cookie to get it's expiry date, 
+            //NOTE: this will never be null becaues we already do this
+            // check in teh GetAuthTicket.
+            var formsCookie = http.Request.Cookies[cookieName];
+            
             //encrypt it
             var hash = FormsAuthentication.Encrypt(renewed);
             //write it to the response
             var cookie = new HttpCookie(cookieName, hash)
                 {
-                    Expires = DateTime.Now.AddMinutes(minutesPersisted),
+                    Expires = formsCookie.Expires,
                     Domain = cookieDomain
                 };
             //rewrite the cooke
-            http.Response.Cookies.Remove(cookieName);
-            http.Response.Cookies.Add(cookie);
+            http.Response.Cookies.Set(cookie);
             return true;
         }
 
@@ -187,7 +201,7 @@ namespace Umbraco.Core.Security
                 userData,
                 cookiePath
                 );
-
+	
             // Encrypt the cookie using the machine key for secure transport
             var hash = FormsAuthentication.Encrypt(ticket);
             var cookie = new HttpCookie(
@@ -198,6 +212,12 @@ namespace Umbraco.Core.Security
                     Domain = cookieDomain
                 };
 
+			if (GlobalSettings.UseSSL)
+                cookie.Secure = true;
+
+            //ensure http only, this should only be able to be accessed via the server
+            cookie.HttpOnly = true;
+				
             http.Response.Cookies.Set(cookie);
         }
     }
