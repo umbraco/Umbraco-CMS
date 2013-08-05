@@ -1,13 +1,10 @@
 angular.module("umbraco")
 .controller("Umbraco.Editors.TagsController",
-	//function($rootScope, $scope, $log, tagsResource, scriptLoader) {	
-    function ($rootScope, $scope, $log, scriptLoader) {
+    function ($rootScope, $scope, $log, assetsService) {
 		
-		scriptLoader.load(
-			[
-			'views/propertyeditors/tags/bootstrap-tags.custom.js',
-			'css!views/propertyeditors/tags/bootstrap-tags.custom.css'
-			]).then(function(){
+		assetsService.loadJs(
+			'views/propertyeditors/tags/bootstrap-tags.custom.js'
+			).then(function(){
 
 			//// Get data from tagsFactory
 			//$scope.tags = tagsResource.getTags("group");
@@ -22,5 +19,7 @@ angular.module("umbraco")
 				tags.addTag(tag.label);
 			});
 		});
+
+		assetsService.loadCss('views/propertyeditors/tags/bootstrap-tags.custom.css');
 	}
 );

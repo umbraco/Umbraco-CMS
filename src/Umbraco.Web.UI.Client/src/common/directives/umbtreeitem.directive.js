@@ -26,7 +26,7 @@ angular.module("umbraco.directives")
     scope: {
       section: '@',
       cachekey: '@',
-      callback: '=',
+      eventhandler: '=',
       node:'='
     },
 
@@ -46,9 +46,12 @@ angular.module("umbraco.directives")
         var enableDeleteAnimations = true;
 
         /** Helper function to emit tree events */
-
         function emitEvent(eventName, args) {
-            $rootScope.$broadcast(eventName, args);
+
+          if(scope.eventhandler){
+            $(scope.eventhandler).trigger(eventName,args);
+          }
+          //$rootScope.$broadcast(eventName, args);
         }
 
         /**
@@ -127,7 +130,7 @@ angular.module("umbraco.directives")
           return { 'padding-left': (node.level * 20) + "px" };
         };
         
-        var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item ng-repeat="child in node.children" callback="callback" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
+        var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item ng-repeat="child in node.children" eventhandler="eventhandler" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
         var newElement = angular.element(template);
         $compile(newElement)(scope);
         element.append(newElement);

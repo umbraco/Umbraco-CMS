@@ -1,10 +1,10 @@
 angular.module("umbraco")
     .controller("Umbraco.Editors.RTEController",
-    function($rootScope, $scope, dialogService, $log, umbImageHelper, scriptLoader){
+    function($rootScope, $scope, dialogService, $log, umbImageHelper, assetsService){
 
-    scriptLoader.load(["lib/tinymce/tinymce.min.js"]).then(function(){
-        
+    assetsService.loadJs("lib/tinymce/tinymce.min.js", $scope).then(function(){
         tinymce.DOM.events.domLoaded = true;
+
         tinymce.init({
             selector: "#" + $scope.model.alias + "_rte",
             skin: "umbraco",
@@ -55,7 +55,7 @@ angular.module("umbraco")
         };
 
         function populate(data){
-            $scope.model.value = data.selection;    
+            $scope.model.value = data.selection;   
         }
 
     });

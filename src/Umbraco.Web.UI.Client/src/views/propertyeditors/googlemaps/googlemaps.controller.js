@@ -1,8 +1,8 @@
 angular.module("umbraco")
 .controller("Umbraco.Editors.GoogleMapsController",
-    function ($rootScope, $scope, notificationsService, dialogService, scriptLoader, $log, $timeout) {
+    function ($rootScope, $scope, notificationsService, dialogService, assetsService, $log, $timeout) {
     
-    scriptLoader.load(['http://www.google.com/jsapi'])
+    assetsService.loadJs('http://www.google.com/jsapi')
         .then(function(){
             google.load("maps", "3",
                         {

@@ -8,13 +8,13 @@
  * @description
  * Used to lazy load in any JS dependencies that need to be manually loaded in
  */
-function legacyJsLoader(scriptLoader, umbRequestHelper) {
+function legacyJsLoader(assetsService, umbRequestHelper) {
     return {
         
         /** Called to load in the legacy tree js which is required on startup if a user is logged in or 
          after login, but cannot be called until they are authenticated which is why it needs to be lazy loaded. */
         loadLegacyTreeJs: function(scope) {
-            return scriptLoader.load([umbRequestHelper.getApiUrl("legacyTreeJs", "", "")], scope);
+            return assetsService.loadJs(umbRequestHelper.getApiUrl("legacyTreeJs", "", ""), scope);
         }  
     };
 }

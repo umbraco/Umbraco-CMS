@@ -16,6 +16,9 @@ function NavigationController($scope,$rootScope, $location, $log, navigationServ
     //   when we create a dialog we pass in this scope to be used for the dialog's scope instead of creating a new one.
     $scope.nav = navigationService;
 
+    //the tree event handler i used to subscribe to the main tree click events
+    $scope.treeEventHandler = $({});
+
     $scope.selectedId = navigationService.currentId;
     $scope.sections = navigationService.sections;
     
@@ -31,18 +34,21 @@ function NavigationController($scope,$rootScope, $location, $log, navigationServ
             angularHelper.safeApply($scope);
         }
     });
-    
+        
     //this reacts to the options item in the tree
-    $scope.$on("treeOptionsClick", function (ev, args) {        
+    $scope.treeEventHandler.bind("treeOptionsClick", function (ev, args) {
+        ev.stopPropagation();
+        ev.preventDefault();
+        
         $scope.currentNode = args.node;
         args.scope = $scope;
+
         navigationService.showMenu(ev, args);
     });
 
     //this reacts to tree items themselves being clicked
     //the tree directive should not contain any handling, simply just bubble events
-    $scope.$on("treeNodeSelect", function (ev, args) {
-        
+    $scope.treeEventHandler.bind("treeNodeSelect", function (ev, args) {
         var n = args.node;
 
         //here we need to check for some legacy tree code

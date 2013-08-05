@@ -15,7 +15,8 @@ angular.module("umbraco.directives")
         section: '@',
         showoptions: '@',
         showheader: '@',
-        cachekey: '@'
+        cachekey: '@',
+        eventhandler: '='
       },
 
       compile: function (element, attrs) {
@@ -33,7 +34,7 @@ angular.module("umbraco.directives")
            '</div>';
          }
          template += '<ul>' +
-                  '<umb-tree-item ng-repeat="child in tree.root.children" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
+                  '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
                   '</ul>' +
                 '</li>' +
                '</ul>';
@@ -55,7 +56,11 @@ angular.module("umbraco.directives")
 
             /** Helper function to emit tree events */
             function emitEvent(eventName, args) {
-                $rootScope.$broadcast(eventName, args);
+
+              if (scope.eventhandler) {
+                $(scope.eventhandler).trigger(eventName, args);
+              }
+             //   $rootScope.$broadcast(eventName, args);
             }
 
             /** Method to load in the tree data */

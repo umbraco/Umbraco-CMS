@@ -104,12 +104,12 @@ Then open the `markdowneditor.controller.js` file and edit it so it looks like t
 
 	angular.module("umbraco")
 	.controller("My.MarkdownEditorController",
-	//inject umbracos scriptLoader
-	function ($scope,scriptLoader) {
+	//inject umbracos assetsService
+	function ($scope,assetsService) {
 
-	    //tell the scriptloader to load the markdown.editor libs from the markdown editors
+	    //tell the assetsService to load the markdown.editor libs from the markdown editors
 	    //plugin folder
-	    scriptLoader
+	    assetsService
 			.load([
 				"/app_plugins/markdowneditor/lib/markdown.converter.js",
 	            "/app_plugins/markdowneditor/lib/markdown.sanitizer.js",
@@ -121,7 +121,7 @@ Then open the `markdowneditor.controller.js` file and edit it so it looks like t
 			});
 
 	    //load the seperat css for the editor to avoid it blocking our js loading
-	    scriptLoader.load(["/app_plugins/markdowneditor/lib/markdown.css"]);
+	    assetsService.loadCss("/app_plugins/markdowneditor/lib/markdown.css");
 	});
 
 This loads in our external dependency, but only when its needed by the editor.
