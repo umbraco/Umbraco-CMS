@@ -4,17 +4,16 @@ using umbraco.BasePages;
 
 namespace umbraco.BusinessLogic.Actions
 {
-	/// <summary>
+    /// <summary>
 	/// This action is invoked when a node reloads its children
 	/// Concerns only the tree itself and thus you should not handle
 	/// this action from without umbraco.
 	/// </summary>
+    [LegacyActionMenuItem("umbracoMenuActions", "RefreshNodeMenuItem")]
 	public class ActionRefresh : IAction
 	{
 		//create singleton
-#pragma warning disable 612,618
-		private static readonly ActionRefresh m_instance = new ActionRefresh();
-#pragma warning restore 612,618
+		private static readonly ActionRefresh InnerInstance = new ActionRefresh();
 
 		/// <summary>
 		/// A public constructor exists ONLY for backwards compatibility in regards to 3rd party add-ons.
@@ -26,7 +25,7 @@ namespace umbraco.BusinessLogic.Actions
 
 		public static ActionRefresh Instance
 		{
-			get { return m_instance; }
+			get { return InnerInstance; }
 		}
 
 		#region IAction Members

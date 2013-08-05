@@ -1,20 +1,24 @@
-﻿using System;
+using System;
 using Umbraco.Core;
 
-namespace Umbraco.Web.Trees.Menu
+namespace umbraco.BusinessLogic.Actions
 {
     /// <summary>
-    /// The attribute to assign to any ActionMenuItem objects.
+    /// The attribute to assign to any IAction objects.
     /// </summary>
+    /// <remarks>
+    /// This is purely used for compatibility reasons for old IActions used in v7 that haven't been upgraded to 
+    /// the new format.
+    /// </remarks>
     [AttributeUsage(AttributeTargets.Class)]
-    public sealed class ActionMenuItemAttribute : Attribute
+    internal sealed class LegacyActionMenuItemAttribute : Attribute
     {
         /// <summary>
         /// This constructor defines both the angular service and method name to use
         /// </summary>
         /// <param name="serviceName"></param>
         /// <param name="methodName"></param>
-        public ActionMenuItemAttribute(string serviceName, string methodName)
+        public LegacyActionMenuItemAttribute(string serviceName, string methodName)
         {
             Mandate.ParameterNotNullOrEmpty(serviceName, "serviceName");
             Mandate.ParameterNotNullOrEmpty(methodName, "methodName");
@@ -26,7 +30,7 @@ namespace Umbraco.Web.Trees.Menu
         /// This constructor will assume that the method name equals the type name of the action menu class
         /// </summary>
         /// <param name="serviceName"></param>
-        public ActionMenuItemAttribute(string serviceName)
+        public LegacyActionMenuItemAttribute(string serviceName)
         {
             Mandate.ParameterNotNullOrEmpty(serviceName, "serviceName");
             MethodName = "";

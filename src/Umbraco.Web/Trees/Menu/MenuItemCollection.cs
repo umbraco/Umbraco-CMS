@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Umbraco.Core;
+using umbraco.BusinessLogic.Actions;
 using umbraco.interfaces;
 
 namespace Umbraco.Web.Trees.Menu
@@ -28,6 +30,9 @@ namespace Umbraco.Web.Trees.Menu
         internal MenuItem AddMenuItem(IAction action)
         {
             var item = new MenuItem(action);
+
+            DetectLegacyActionMenu(action.GetType(), item);
+
             _menuItems.Add(item);
             return item;
         }
@@ -105,6 +110,8 @@ namespace Umbraco.Web.Trees.Menu
                     }
                 }
 
+                DetectLegacyActionMenu(typeof (T), menuItem);
+
                 //TODO: Once we implement 'real' menu items, not just IActions we can implement this since
                 // people may need to pass specific data to their menu items
 
@@ -132,6 +139,32 @@ namespace Umbraco.Web.Trees.Menu
                 return item;
             }
             return null;
+        }
+
+        /// <summary>
+        /// Checks if the IAction type passed in is attributed with LegacyActionMenuItemAttribute and if so 
+        /// ensures that the correct action metadata is added.
+        /// </summary>
+        /// <param name="actionType"></param>
+        /// <param name="menuItem"></param>
+        private void DetectLegacyActionMenu(Type actionType, MenuItem menuItem)
+        {
+            //This checks for legacy IActions that have the LegacyActionMenuItemAttribute which is a legacy hack
+            // to make old IAction actions work in v7 by mapping to the JS used by the new menu items
+            var attribute = actionType.GetCustomAttribute<LegacyActionMenuItemAttribute>(false);
+            if (attribute != null)
+            {
+                //add the current type to the metadata
+                if (attribute.MethodName.IsNullOrWhiteSpace())
+                {
+                    //if no method name is supplied we will assume that the menu action is the type name of the current menu class
+                    menuItem.AdditionalData.Add("jsAction", string.Format("{0}.{1}", attribute.ServiceName, this.GetType().Name));
+                }
+                else
+                {
+                    menuItem.AdditionalData.Add("jsAction", string.Format("{0}.{1}", attribute.ServiceName, attribute.MethodName));
+                }
+            }
         }
 
         public IEnumerator<MenuItem> GetEnumerator()

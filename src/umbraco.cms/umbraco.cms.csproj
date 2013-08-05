@@ -209,6 +209,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Actions\IActionHandler.cs" />
+    <Compile Include="Actions\LegacyActionMenuItemAttribute.cs" />
     <Compile Include="businesslogic\CMSPreviewNode.cs" />
     <Compile Include="businesslogic\datatype\AbstractDataEditorControl.cs" />
     <Compile Include="businesslogic\datatype\ClientDependencyAttribute.cs" />

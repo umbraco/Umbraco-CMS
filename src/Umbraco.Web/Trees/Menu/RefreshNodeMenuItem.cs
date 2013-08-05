@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents the refresh node menu item
     /// </summary>
-    [ActionMenuItem("umbracoMenuActions", "refresh")]
+    [ActionMenuItem("umbracoMenuActions")]
     public sealed class RefreshNodeMenuItem : ActionMenuItem
     {        
     }
