@@ -1,28 +1,20 @@
-﻿using Umbraco.Core;
+﻿using AutoMapper;
+using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Mapping;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class MediaTypeModelMapper
-    {
-        private readonly ApplicationContext _applicationContext;
-
-        public MediaTypeModelMapper(ApplicationContext applicationContext)
+    /// <summary>
+    /// Defines mappings for content/media (and i'm sure one day member) type mappings
+    /// </summary>
+    internal class ContentTypeModelMapper : MapperConfiguration
+    {    
+        public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
-            _applicationContext = applicationContext;
-        }
-
-        public ContentTypeBasic ToMediaTypeBasic(IMediaType contentType)
-        {
-            return new ContentTypeBasic
-                {
-                    Alias = contentType.Alias,
-                    Id = contentType.Id,
-                    Description = contentType.Description,
-                    Icon = contentType.Icon,
-                    Name = contentType.Name
-                };
+            config.CreateMap<IMediaType, ContentTypeBasic>();
+            config.CreateMap<IContentType, ContentTypeBasic>();
         }
     }
 }

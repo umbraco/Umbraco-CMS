@@ -41,7 +41,7 @@ namespace Umbraco.Web.Editors
         /// Constructor
         /// </summary>
         /// <param name="umbracoContext"></param>
-        internal ContentController(UmbracoContext umbracoContext)
+        public ContentController(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {            
         }

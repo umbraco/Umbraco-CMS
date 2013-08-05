@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using AutoMapper;
+using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
@@ -13,15 +15,13 @@ namespace Umbraco.Web.Editors
     /// An API controller used for dealing with content types
     /// </summary>
     [PluginController("UmbracoApi")]
-    public class MediaTypeApiController : UmbracoAuthorizedJsonController
+    public class MediaTypeController : UmbracoAuthorizedJsonController
     {
-        private readonly MediaTypeModelMapper _mediaTypeModelMapper;
-
         /// <summary>
         /// Constructor
         /// </summary>
-        public MediaTypeApiController()
-            : this(UmbracoContext.Current, new MediaTypeModelMapper(UmbracoContext.Current.Application))
+        public MediaTypeController()
+            : this(UmbracoContext.Current)
         {
         }
 
@@ -29,11 +29,9 @@ namespace Umbraco.Web.Editors
         /// Constructor
         /// </summary>
         /// <param name="umbracoContext"></param>
-        /// <param name="mediaModelMapper"></param>
-        internal MediaTypeApiController(UmbracoContext umbracoContext, MediaTypeModelMapper mediaModelMapper)
+        public MediaTypeController(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
-            _mediaTypeModelMapper = mediaModelMapper;
         }
 
         /// <summary>
@@ -47,7 +45,7 @@ namespace Umbraco.Web.Editors
             {
                 return Services.ContentTypeService.GetAllMediaTypes()
                     .Where(x => x.AllowedAsRoot)
-                    .Select(x => _mediaTypeModelMapper.ToMediaTypeBasic(x));
+                    .Select(Mapper.Map<IMediaType, ContentTypeBasic>);
             }
 
             var contentItem = Services.MediaService.GetById(contentId);
@@ -59,7 +57,7 @@ namespace Umbraco.Web.Editors
 
             return contentItem.ContentType.AllowedContentTypes
                               .Select(x => Services.ContentTypeService.GetMediaType((int) x.Id.Value))
-                              .Select(x => _mediaTypeModelMapper.ToMediaTypeBasic(x));
+                              .Select(Mapper.Map<IMediaType, ContentTypeBasic>);
 
         }
     }

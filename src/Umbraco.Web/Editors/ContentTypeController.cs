@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
+using AutoMapper;
+using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
@@ -15,13 +17,11 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class ContentTypeController : UmbracoAuthorizedJsonController
     {
-        private readonly ContentTypeModelMapper _contentTypeModelMapper;
-
         /// <summary>
         /// Constructor
         /// </summary>
         public ContentTypeController()
-            : this(UmbracoContext.Current, new ContentTypeModelMapper(UmbracoContext.Current.Application))
+            : this(UmbracoContext.Current)
         {            
         }
 
@@ -29,11 +29,9 @@ namespace Umbraco.Web.Editors
         /// Constructor
         /// </summary>
         /// <param name="umbracoContext"></param>
-        /// <param name="contentModelMapper"></param>
-        internal ContentTypeController(UmbracoContext umbracoContext, ContentTypeModelMapper contentModelMapper)
+        public ContentTypeController(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
-            _contentTypeModelMapper = contentModelMapper;
         }
 
         /// <summary>
@@ -46,7 +44,7 @@ namespace Umbraco.Web.Editors
             {
                 return Services.ContentTypeService.GetAllContentTypes()
                     .Where(x => x.AllowedAsRoot)
-                    .Select(x => _contentTypeModelMapper.ToContentTypeBasic(x));
+                    .Select(Mapper.Map<IContentType, ContentTypeBasic>);
             }
 
             var contentItem = Services.ContentService.GetById(contentId);
@@ -58,7 +56,7 @@ namespace Umbraco.Web.Editors
 
             return contentItem.ContentType.AllowedContentTypes
                 .Select(x => Services.ContentTypeService.GetContentType(x.Id.Value))
-                .Select(x => _contentTypeModelMapper.ToContentTypeBasic(x));
+                .Select(Mapper.Map<IContentType, ContentTypeBasic>);
             
         }
     }

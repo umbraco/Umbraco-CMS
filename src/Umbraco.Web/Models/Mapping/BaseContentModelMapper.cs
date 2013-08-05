@@ -20,21 +20,6 @@ namespace Umbraco.Web.Models.Mapping
             UserMapper = userMapper;
         }
 
-        //protected ContentItemDto<TPersisted> ToContentItemDtoBase<TPersisted>(IContentBase content) 
-        //    where TPersisted : IContentBase
-        //{
-        //    return CreateContent<ContentItemDto<TPersisted>, ContentPropertyDto, TPersisted>(content, null, (propertyDto, originalProperty, propEditor) =>
-        //        {
-        //            propertyDto.IsRequired = originalProperty.PropertyType.Mandatory;
-        //            propertyDto.ValidationRegExp = originalProperty.PropertyType.ValidationRegExp;
-        //            propertyDto.Alias = originalProperty.Alias;
-        //            propertyDto.Description = originalProperty.PropertyType.Description;
-        //            propertyDto.Label = originalProperty.PropertyType.Name;
-        //            propertyDto.DataType = ApplicationContext.Services.DataTypeService.GetDataTypeDefinitionById(originalProperty.PropertyType.DataTypeDefinitionId);
-        //            propertyDto.PropertyEditor = PropertyEditorResolver.Current.GetById(originalProperty.PropertyType.DataTypeId);
-        //        });
-        //}
-
         protected ContentItemBasic<ContentPropertyBasic, TPersisted> ToContentItemSimpleBase<TPersisted>(IContentBase content) 
             where TPersisted : IContentBase
         {

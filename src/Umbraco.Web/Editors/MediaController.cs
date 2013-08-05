@@ -47,7 +47,7 @@ namespace Umbraco.Web.Editors
         /// Constructor
         /// </summary>
         /// <param name="umbracoContext"></param>
-        internal MediaController(UmbracoContext umbracoContext)
+        public MediaController(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
         }
