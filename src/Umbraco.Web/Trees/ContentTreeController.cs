@@ -17,20 +17,6 @@ using umbraco.interfaces;
 
 namespace Umbraco.Web.Trees
 {
-    //[Tree(Constants.Applications.Content, Constants.Trees.Content, "Content")]
-    //public class MediaTreeController : ContentTreeControllerBase
-    //{
-    //    protected override TreeNodeCollection GetTreeData(string id, FormDataCollection queryStrings)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
-
     [Tree(Constants.Applications.Content, Constants.Trees.Content, "Content")]
     public class ContentTreeController : ContentTreeControllerBase
     {
@@ -74,26 +60,10 @@ namespace Umbraco.Web.Trees
 
         protected override TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings)
         {
-            int iid;
-            if (int.TryParse(id, out iid) == false)
-            {
-                throw new InvalidCastException("The id for the content tree must be an integer");
-            }
+            var entities = GetChildEntities(id);
 
             var nodes = new TreeNodeCollection();
-            IEnumerable<IUmbracoEntity> entities;
-
-            //if a request is made for the root node data but the user's start node is not the default, then
-            // we need to return their start node data
-            if (iid == Constants.System.Root && UmbracoUser.StartNodeId != Constants.System.Root)
-            {
-                entities = Services.EntityService.GetChildren(UmbracoUser.StartNodeId, UmbracoObjectTypes.Document).ToArray();
-            }
-            else
-            {
-                entities = Services.EntityService.GetChildren(iid, UmbracoObjectTypes.Document).ToArray();                
-            }
-
+            
             foreach (var entity in entities)
             {
                 var e = (UmbracoEntity)entity;
@@ -124,8 +94,11 @@ namespace Umbraco.Web.Trees
                     UmbracoUser.GetPermissions(Constants.System.Root.ToInvariantString()))
                                         .Select(x => new MenuItem(x));
 
+                //these two are the standard items
                 menu.AddMenuItem<ActionNew>();
                 menu.AddMenuItem<ActionSort>();
+
+                //filter the standard items
                 var allowedMenu = GetUserAllowedMenuItems(menu, nodeActions);
 
                 if (allowedMenu.Any())
@@ -133,9 +106,9 @@ namespace Umbraco.Web.Trees
                     allowedMenu.Last().SeperatorBefore = true;
                 }
 
-                // default actions for all users
+                // add default actions for *all* users
                 allowedMenu.AddMenuItem<ActionRePublish>();
-                menu.AddMenuItem<RefreshNodeMenuItem, ActionRefresh>(true);
+                allowedMenu.AddMenuItem<RefreshNodeMenuItem, ActionRefresh>(true);
                 return allowedMenu;
             }
 
@@ -154,6 +127,11 @@ namespace Umbraco.Web.Trees
             return GetUserAllowedMenuItems(
                 CreateAllowedActions(), 
                 GetUserMenuItemsForNode(item));
+        }
+
+        protected override UmbracoObjectTypes UmbracoObjectType
+        {
+            get { return UmbracoObjectTypes.Document; }
         }
 
         protected IEnumerable<MenuItem> CreateAllowedActions()

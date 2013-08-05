@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
@@ -25,6 +26,26 @@ namespace Umbraco.Web.Trees
         protected abstract TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings);
         
         protected abstract MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings);
+
+        protected abstract UmbracoObjectTypes UmbracoObjectType { get; }
+
+        protected IEnumerable<IUmbracoEntity> GetChildEntities(string id)
+        {
+            int iid;
+            if (int.TryParse(id, out iid) == false)
+            {
+                throw new InvalidCastException("The id for the media tree must be an integer");
+            }
+
+            //if a request is made for the root node data but the user's start node is not the default, then
+            // we need to return their start node data
+            if (iid == Constants.System.Root && UmbracoUser.StartNodeId != Constants.System.Root)
+            {
+                return Services.EntityService.GetChildren(UmbracoUser.StartNodeId, UmbracoObjectType).ToArray();
+            }
+
+            return Services.EntityService.GetChildren(iid, UmbracoObjectType).ToArray();
+        }
 
         /// <summary>
         /// This will automatically check if the recycle bin needs to be rendered (i.e. its the first level)

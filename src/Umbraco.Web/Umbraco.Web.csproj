@@ -343,6 +343,7 @@
     <Compile Include="PropertyEditors\TextAreaPropertyEditor.cs" />
     <Compile Include="PropertyEditors\TextStringPropertyEditor.cs" />
     <Compile Include="PropertyEditors\TrueFalsePropertyEditor.cs" />
+    <Compile Include="Trees\MediaTreeController.cs" />
     <Compile Include="Trees\Menu\ActionMenuItem.cs" />
     <Compile Include="Trees\Menu\ActionMenuItemAttribute.cs" />
     <Compile Include="Trees\ActionUrlMethod.cs" />
