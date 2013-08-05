@@ -98,7 +98,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
         /** Gets a child node by id */
         getChildNode: function(treeNode, id) {
             var found = _.find(treeNode.children, function (child) {
-                return child.id === id;
+                return String(child.id) === String(id);
             });
             return found === undefined ? null : found;
         },

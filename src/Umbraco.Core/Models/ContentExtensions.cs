@@ -106,6 +106,22 @@ namespace Umbraco.Core.Models
         }
         #endregion
 
+        internal static bool IsInRecycleBin(this IContent content)
+        {
+            return IsInRecycleBin(content, Constants.System.RecycleBinContent);
+        }
+
+        internal static bool IsInRecycleBin(this IMedia media)
+        {
+            return IsInRecycleBin(media, Constants.System.RecycleBinMedia);
+        }
+
+        internal static bool IsInRecycleBin(this IContentBase content, int recycleBinId)
+        {
+            return content.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                          .Contains(recycleBinId.ToInvariantString());
+        }
+
         /// <summary>
         /// Checks if the IContentBase has children
         /// </summary>

@@ -19,6 +19,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Editors
 {
@@ -177,7 +178,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Deletes an item
+        /// Moves an item to the recycle bin, if it is already there then it will permanently delete it
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -186,9 +187,19 @@ namespace Umbraco.Web.Editors
             var foundContent = Services.ContentService.GetById(id);
             if (foundContent == null)
             {
-                HandleContentNotFound(id);
+                return HandleContentNotFound(id, false);
             }
-            Services.ContentService.Delete(foundContent, UmbracoUser.Id);
+
+            //if the current item is in the recycle bin
+            if (foundContent.IsInRecycleBin() == false)
+            {
+                Services.ContentService.MoveToRecycleBin(foundContent, UmbracoUser.Id);                
+            }
+            else
+            {
+                Services.ContentService.Delete(foundContent, UmbracoUser.Id);
+            }
+
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 

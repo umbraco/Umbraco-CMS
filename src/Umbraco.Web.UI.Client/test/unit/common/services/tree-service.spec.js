@@ -53,9 +53,20 @@ describe('tree service tests', function () {
 
     beforeEach(inject(function ($injector) {
         treeService = $injector.get('treeService');
-    }));
+    })); 
 
     describe('query existing node structure of the tree', function () {
+
+        it('can get a descendant node with string id', function () {
+
+            var tree = getContentTree();
+            var found = treeService.getDescendantNode(tree, "13");
+
+            expect(found).toBeDefined();
+            expect(found).not.toBeNull();
+            expect(found.id).toBe(13);
+            expect(found.name).toBe("random-name-3");
+        });
 
         it('can get a descendant node', function() {
 
