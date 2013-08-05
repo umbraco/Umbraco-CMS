@@ -25,6 +25,8 @@ namespace Umbraco.Tests.TestHelpers
             
             SetupPluginManager();
 
+            SetupApplicationContext();
+
             FreezeResolution();
         }
 
@@ -40,7 +42,7 @@ namespace Umbraco.Tests.TestHelpers
             ApplicationContext.Current = null;
             ResetPluginManager();
         }
-
+        
         /// <summary>
         /// By default this returns false which means the plugin manager will not be reset so it doesn't need to re-scan 
         /// all of the assemblies. Inheritors can override this if plugin manager resetting is required, generally needs

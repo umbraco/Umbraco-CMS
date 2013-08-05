@@ -67,6 +67,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuSpecs", "NuSpecs", "{227C
 		..\build\NuSpecs\UmbracoCms.nuspec = ..\build\NuSpecs\UmbracoCms.nuspec
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{99794542-89EC-43BA-88BE-E31A9D61423B}"
+	ProjectSection(SolutionItems) = preProject
+		Performance1.psess = Performance1.psess
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -156,5 +161,8 @@ Global
 		{F30DDDB8-3994-4673-82AE-057123C6E1A8} = {DD32977B-EF54-475B-9A1B-B97A502C6E58}
 		{73529637-28F5-419C-A6BB-D094E39DE614} = {DD32977B-EF54-475B-9A1B-B97A502C6E58}
 		{B555AAE6-0F56-442F-AC9F-EF497DB38DE7} = {DD32977B-EF54-475B-9A1B-B97A502C6E58}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

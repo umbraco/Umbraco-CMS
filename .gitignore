@@ -79,3 +79,5 @@ src/Umbraco.Web.UI.Client/[Bb]uild/[Bb]elle/
 src/Umbraco.Web.UI/[Uu]ser[Cc]ontrols/
 build/_BuildOutput/
 tools/NDepend/
+src/*.vspx
+src/*.psess
