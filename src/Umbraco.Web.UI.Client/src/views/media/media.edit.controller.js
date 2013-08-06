@@ -1,3 +1,11 @@
+/**
+ * @ngdoc controller
+ * @name Umbraco.Editors.Media.EditController
+ * @function
+ * 
+ * @description
+ * The controller for the media editor
+ */
 function mediaEditController($scope, $routeParams, mediaResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper) {
 
     if ($routeParams.create) {

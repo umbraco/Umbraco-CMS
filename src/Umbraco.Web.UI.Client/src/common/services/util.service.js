@@ -397,6 +397,22 @@ function iconHelper() {
     ];
 
     return {
+        
+        /** Used by the create dialogs for content/media types to format the data so that the thumbnails are styled properly */
+        formatContentTypeThumbnails: function (contentTypes) {
+            for (var i = 0; i < contentTypes.length; i++) {
+                if (contentTypes[i].thumbnailIsClass === undefined || contentTypes[i].thumbnailIsClass) {
+                    contentTypes[i].cssClass = this.convertFromLegacyIcon(contentTypes[i].thumbnail);
+                }
+                else {
+                    contentTypes[i].style = "background-image: url('" + contentTypes[i].thumbnailFilePath + "');height:36px; background-position:4px 0px; background-repeat: no-repeat;background-size: 35px 35px;";
+                    //we need an 'icon-' class in there for certain styles to work so if it is image based we'll add this
+                    contentTypes[i].cssClass = "custom-file";
+                }
+            }
+            return contentTypes;
+        },
+
         /** If the icon is file based (i.e. it has a file path) */
         isFileBasedIcon: function (icon) {
             //if it doesn't start with a '.' but contains one then we'll assume it's file based

@@ -1,6 +1,6 @@
 /**
  * @ngdoc controller
- * @name ContentEditController
+ * @name Umbraco.Editors.Content.EditController
  * @function
  * 
  * @description

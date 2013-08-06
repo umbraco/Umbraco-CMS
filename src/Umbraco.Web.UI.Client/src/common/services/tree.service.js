@@ -26,7 +26,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             treeNodes[i].parent = parentNode;
 
             //now, format the icon data
-            if (treeNodes[i].iconIsClass) {
+            if (treeNodes[i].iconIsClass === undefined || treeNodes[i].iconIsClass) {
                 var converted = iconHelper.convertFromLegacyTreeNodeIcon(treeNodes[i]);
                 treeNodes[i].cssClass = standardCssClass + " " + converted;
                 if (converted.startsWith('.')) {

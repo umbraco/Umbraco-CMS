@@ -8,7 +8,7 @@
 
 					<li ng-repeat="docType in allowedTypes">
 					    <a href="#content/edit/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
-					        <i class="icon-large {{docType.icon}}"></i>
+					        <i class="icon-large {{docType.cssClass}}" style="{{docType.style}}"></i>
 					        <span class="menu-label">
 					            {{docType.name}}
 					            <small>
@@ -19,14 +19,15 @@
 					</li>
 
 					<li class="add">
-						<a href="#settings/documenttype/create/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()"><i class="icon-large icon-plus"></i>
-						    <span class="menu-label">
-						    	Create a new document type
-						    	<small>
-						    		Design and configure a new document type
-						    	</small>
-						    </span>
-						</a>
+					    <a href="#settings/documenttype/create/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
+					        <i class="icon-large icon-plus"></i>
+					        <span class="menu-label">
+					            Create a new document type
+					            <small>
+					                Design and configure a new document type
+					            </small>
+					        </span>
+					    </a>
 					</li>	
 				</ul>
 			</li>
