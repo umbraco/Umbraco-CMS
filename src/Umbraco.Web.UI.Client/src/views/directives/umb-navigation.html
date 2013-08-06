@@ -1,4 +1,4 @@
-<div id="leftcolumn" ng-controller="NavigationController" ng-mouseleave="nav.hideTree()">
+<div id="leftcolumn" ng-controller="Umbraco.NavigationController" ng-mouseleave="nav.hideTree()">
     <div id="applications" ng-class="{faded:nav.ui.stickyNavigation}">
         <ul class="sections">
             
@@ -34,7 +34,7 @@
         <!-- the search -->
         <div id="search-form" ng-animate="'slide'">
             <div class="umb-panel-header">
-                <form class="form-search" ng-controller="SearchController" novalidate>
+                <form class="form-search" ng-controller="Umbraco.SearchController" novalidate>
                     <i class="icon-search"></i>
                     <input type="text"
                         ng-model="nav.ui.searchTerm"

@@ -1,6 +1,6 @@
 ﻿/**
  * @ngdoc controller
- * @name SearchController
+ * @name Umbraco.SearchController
  * @function
  * 
  * @description
@@ -40,4 +40,4 @@ function SearchController($scope, searchService, $log, navigationService) {
     };
 }
 //register it
-angular.module('umbraco').controller("SearchController", SearchController);
+angular.module('umbraco').controller("Umbraco.SearchController", SearchController);

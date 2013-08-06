@@ -1,6 +1,6 @@
 /**
  * @ngdoc controller
- * @name DashboardController
+ * @name Umbraco.DashboardController
  * @function
  * 
  * @description
@@ -11,4 +11,4 @@ function DashboardController($scope, $routeParams) {
     $scope.name = $routeParams.section;
 }
 //register it
-angular.module('umbraco').controller("DashboardController", DashboardController);
+angular.module('umbraco').controller("Umbraco.DashboardController", DashboardController);

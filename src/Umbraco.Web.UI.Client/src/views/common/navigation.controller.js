@@ -1,7 +1,7 @@
 ﻿
 /**
  * @ngdoc controller
- * @name NavigationController
+ * @name Umbraco.NavigationController
  * @function
  * 
  * @description
@@ -94,4 +94,4 @@ function NavigationController($scope,$rootScope, $location, $log, navigationServ
 }
 
 //register it
-angular.module('umbraco').controller("NavigationController", NavigationController);
+angular.module('umbraco').controller("Umbraco.NavigationController", NavigationController);

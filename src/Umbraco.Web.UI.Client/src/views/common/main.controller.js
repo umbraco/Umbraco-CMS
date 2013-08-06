@@ -1,7 +1,7 @@
 
 /**
  * @ngdoc controller
- * @name MainController
+ * @name Umbraco.MainController
  * @function
  * 
  * @description
@@ -57,4 +57,4 @@ function MainController($scope, $routeParams, $rootScope, $timeout, notification
 }
 
 //register it
-angular.module('umbraco').controller("MainController", MainController);
+angular.module('umbraco').controller("Umbraco.MainController", MainController);

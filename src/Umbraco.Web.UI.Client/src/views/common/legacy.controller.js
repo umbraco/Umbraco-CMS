@@ -1,6 +1,6 @@
 /**
  * @ngdoc controller
- * @name LegacyController
+ * @name Umbraco.LegacyController
  * @function
  * 
  * @description
@@ -15,4 +15,4 @@ function LegacyController($scope, $routeParams, $element) {
     //    var asdf = $element;
     //});
 }
-angular.module("umbraco").controller('LegacyController', LegacyController);
+angular.module("umbraco").controller('Umbraco.LegacyController', LegacyController);
