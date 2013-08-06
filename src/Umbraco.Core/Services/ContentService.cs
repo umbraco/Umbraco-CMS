@@ -521,11 +521,16 @@ namespace Umbraco.Core.Services
         /// <returns>True if the content has any children otherwise False</returns>
         public bool HasChildren(int id)
         {
+            return CountChildren(id) > 0;
+        }
+
+        internal int CountChildren(int id)
+        {
             using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
             {
                 var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
-                int count = repository.Count(query);
-                return count > 0;
+                var count = repository.Count(query);
+                return count;
             }
         }
 

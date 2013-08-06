@@ -41,17 +41,26 @@ describe('content factory tests', function () {
         });
 
 
-        it('should return a content children collection given an id', function () {
-            var collection = contentFactory.getChildren(1234, undefined);
-            $rootScope.$digest();
-            $httpBackend.flush();
-            expect(collection.resultSet.length).toBe(10);
+        it('should return a all children collection given an id', function () {
 
-            collection = contentFactory.getChildren(1234,{take: 5, offset: 1, filter: ""});
+            var collection;
+            contentFactory.getChildren(1234, undefined).then(function (data) {
+                collection = data;
+            });            
+            $rootScope.$digest();
+            $httpBackend.flush();            
+            expect(collection.items.length).toBe(56);
+        });
+        
+        it('should return paged children collection given an id', function () {
+
+            var collection;
+            contentFactory.getChildren(1234, { pageSize: 5, pageNumber: 1, filter: "" }).then(function (data) {
+                collection = data;
+            });
             $rootScope.$digest();
             $httpBackend.flush();
-            
-            expect(collection.resultSet.length).toBe(5);
-        });    
+            expect(collection.items.length).toBe(5);
+        });
   });
 });

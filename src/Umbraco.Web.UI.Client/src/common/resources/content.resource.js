@@ -76,42 +76,42 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         getChildren: function (parentId, options) {
 
-            //TODO: Make this real
-
+            var defaults = {
+                pageSize: 0,
+                pageNumber: 0,
+                filter: '',
+                orderDirection: "Ascending",
+                orderBy: "SortOrder"
+            };
             if (options === undefined) {
-                options = {
-                    take: 10,
-                    offset: 0,
-                    filter: ''
-                };
+                options = {}; 
+            }
+            //overwrite the defaults if there are any specified
+            angular.extend(defaults, options);
+            //now copy back to the options we will use
+            options = defaults;
+            //change asc/desct
+            if (options.orderDirection === "asc") {
+                options.orderDirection = "Ascending";
+            }
+            else {
+                options.orderDirection = "Descending";
             }
 
-            var collection = { take: 10, total: 68, pages: 7, currentPage: options.offset, filter: options.filter };
-            collection.total = 56 - (options.filter.length);
-            collection.pages = Math.round(collection.total / collection.take);
-            collection.resultSet = [];
-
-            if (collection.total < options.take) {
-                collection.take = collection.total;
-            } else {
-                collection.take = options.take;
-            }
-
-
-            var _id = 0;
-            for (var i = 0; i < collection.take; i++) {
-                _id = (parentId + i) * options.offset;
-                var cnt = this.getById(_id);
-
-                //here we fake filtering
-                if (options.filter !== '') {
-                    cnt.name = options.filter + cnt.name;
-                }
-
-                collection.resultSet.push(cnt);
-            }
-
-            return collection;
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentApiBaseUrl",
+                       "GetChildren",
+                       [
+                           { id: parentId },
+                           { pageNumber: options.pageNumber },
+                           { pageSize: options.pageSize },
+                           { orderBy: options.orderBy },
+                           { orderDirection: options.orderDirection },
+                           { filter: options.filter }
+                       ])),
+               'Failed to retreive children for content item ' + parentId);
         },
 
         /** saves or updates a content object */

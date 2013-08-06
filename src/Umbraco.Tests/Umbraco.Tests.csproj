@@ -195,6 +195,7 @@
     <Compile Include="CodeFirst\TopologicalSorter.cs" />
     <Compile Include="CodeFirst\TypeInheritanceTest.cs" />
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
+    <Compile Include="Controllers\WebApiEditors\ContentControllerTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
     <Compile Include="Integration\CreateContent.cs" />
     <Compile Include="Persistence\PetaPocoExtensionsTest.cs" />

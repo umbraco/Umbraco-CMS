@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
+using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
@@ -20,6 +23,7 @@ using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using Umbraco.Core.Models;
+using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Web.Editors
 {
@@ -85,8 +89,59 @@ namespace Umbraco.Web.Editors
             var emptyContent = new Content("", parentId, contentType);
             return Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
         }
-
+        
         /// <summary>
+        /// Gets the children for the content id passed in
+        /// </summary>
+        /// <returns></returns>
+        [OutgoingDateTimeFormat]
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>> GetChildren(
+            int id, 
+            int pageNumber = 0, 
+            int pageSize = 0, 
+            string orderBy = "SortOrder", 
+            Direction orderDirection = Direction.Ascending, 
+            string filter = "")
+        {
+            //TODO: Not sure how to handle 'filter' just yet!
+
+            //TODO: This will be horribly inefficient for paging! This is because our datasource/repository 
+            // doesn't support paging at the SQL level... and it'll be pretty interesting to try to make that work.
+
+            var foundContent = Services.ContentService.GetById(id);
+            if (foundContent == null)
+            {
+                HandleContentNotFound(id);
+            }
+            
+            var totalChildren = ((ContentService) Services.ContentService).CountChildren(id);
+            var result = foundContent.Children()
+                                     .Select(Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>)
+                                     .AsQueryable();
+
+            var orderedResult = orderDirection == Direction.Ascending 
+                ? result.OrderBy(orderBy) 
+                : result.OrderByDescending(orderBy);
+            
+            var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(
+               totalChildren,
+               pageNumber,
+               pageSize);
+
+            if (pageNumber > 0 && pageSize > 0)
+            {
+                pagedResult.Items = orderedResult
+                    .Skip(pagedResult.SkipSize)
+                    .Take(pageSize);
+            }
+            else
+            {
+                pagedResult.Items = orderedResult;
+            }
+
+            return pagedResult;
+        }
+            /// <summary>
         /// Saves content
         /// </summary>
         /// <returns></returns>

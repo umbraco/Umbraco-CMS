@@ -63,6 +63,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [Required(AllowEmptyStrings = false)]
         public string ContentTypeAlias { get; set; }
 
+        [DataMember(Name = "sortOrder")]
+        public int SortOrder { get; set; }
+
         /// <summary>
         /// The real persisted content object
         /// </summary>

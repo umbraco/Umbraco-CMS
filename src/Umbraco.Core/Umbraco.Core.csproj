@@ -700,6 +700,7 @@
     <Compile Include="Publishing\PublishingStrategy.cs" />
     <Compile Include="Publishing\PublishStatus.cs" />
     <Compile Include="Publishing\PublishStatusType.cs" />
+    <Compile Include="Dynamics\QueryableExtensions.cs" />
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="Models\Section.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
