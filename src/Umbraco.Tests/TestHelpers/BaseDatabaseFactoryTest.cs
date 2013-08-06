@@ -52,9 +52,7 @@ namespace Umbraco.Tests.TestHelpers
         public override void Initialize()
         {
             InitializeFirstRunFlags();
-
-            base.Initialize();
-
+            
             var path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
@@ -71,6 +69,8 @@ namespace Umbraco.Tests.TestHelpers
                 {
                     IsReady = true
                 };
+
+            base.Initialize();
 
             DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
 
