@@ -33,7 +33,7 @@ angular.module("umbraco.directives")
     template: '<li><div ng-style="setTreePadding(node)" ng-class="{\'loading\': node.loading}">' +
         '<ins ng-hide="node.hasChildren" style="background:none;width:18px;"></ins>' +        
         '<ins ng-show="node.hasChildren" ng-class="{\'icon-caret-right\': !node.expanded, \'icon-caret-down\': node.expanded}" ng-click="load(this, node)"></ins>' +
-        '<i class="{{node | umbTreeIconClass:\'icon umb-tree-icon sprTree\'}}" style="{{node | umbTreeIconStyle}}"></i>' +
+        '<i class="{{node.cssClass}}" style="{{node.style}}"></i>' +
         '<a href="" ng-click="select(this, node, $event)" >{{node.name}}</a>' +
         '<i class="umb-options" ng-hide="!node.menuUrl" ng-click="options(this, node, $event)"><i></i><i></i><i></i></i>' +
         '<div ng-show="node.loading" class="l"><div></div></div>' +

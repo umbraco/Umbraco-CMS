@@ -10,10 +10,11 @@
 function treeService($q, treeResource, iconHelper, notificationsService, $rootScope) {
     //implement this in local storage
     var treeArray = [];
-    var currentSection = "content";
+    var standardCssClass = 'icon umb-tree-icon sprTree';
 
-    /** ensures there's a routePath, parent and level property on each tree node */
-    function ensureParentLevelAndView(parentNode, treeNodes, section, level) {
+    /** ensures there's a routePath, parent and level property on each tree node and 
+        adds some icon specific properties so that the nodes display properly */
+    function formatNodeDataForUseInUI(parentNode, treeNodes, section, level) {
         //if no level is set, then we make it 1   
         var childLevel = (level ? level : 1);
         for (var i = 0; i < treeNodes.length; i++) {
@@ -23,6 +24,24 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                 treeNodes[i].routePath = section + "/edit/" + treeNodes[i].id;
             }
             treeNodes[i].parent = parentNode;
+
+            //now, format the icon data
+            if (treeNodes[i].iconIsClass) {
+                var converted = iconHelper.convertFromLegacyTreeNodeIcon(treeNodes[i]);
+                treeNodes[i].cssClass = standardCssClass + " " + converted;
+                if (converted.startsWith('.')) {
+                    //its legacy so add some width/height
+                    treeNodes[i].style = "height:16px;width:16px;";
+                }
+                else {
+                    treeNodes[i].style = "";
+                }                
+            }
+            else {
+                treeNodes[i].style = "background-image: url('" + treeNodes[i].iconFilePath + "');height:16px; background-position:2px 0px; background-repeat: no-repeat";
+                //we need an 'icon-' class in there for certain styles to work so if it is image based we'll add this
+                treeNodes[i].cssClass = standardCssClass + " icon-custom-file";
+            }            
         }
     }
 
@@ -166,8 +185,8 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                         alias: section,
                         root: data
                     };
-                    //ensure the view is added to each tree node
-                    ensureParentLevelAndView(result.root, result.root.children, section);
+                    //we need to format/modify some of the node data to be used in our app.
+                    formatNodeDataForUseInUI(result.root, result.root.children, section);
                     //cache this result
                     //TODO: We'll need to un-cache this in many circumstances
                     treeArray[cacheKey] = result;
@@ -251,7 +270,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             return treeResource.loadNodes({ section: section, node: treeItem })
                 .then(function(data) {
                     //now that we have the data, we need to add the level property to each item and the view
-                    ensureParentLevelAndView(treeItem, data, section, treeItem.level + 1);
+                    formatNodeDataForUseInUI(treeItem, data, section, treeItem.level + 1);
                     return data;
                 });
         }
