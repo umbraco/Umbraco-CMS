@@ -1,4 +1,6 @@
-﻿using System.Web.Security;
+﻿using System;
+using System.Web;
+using System.Web.Security;
 using Newtonsoft.Json;
 
 namespace Umbraco.Core.Security
@@ -15,6 +17,7 @@ namespace Umbraco.Core.Security
             : base(ticket)
         {
             UserData = ticket.UserData;
+            EnsureDeserialized();
         }
         
         protected readonly string UserData;
@@ -24,54 +27,33 @@ namespace Umbraco.Core.Security
         {
             get
             {
-                EnsureDeserialized();
                 return DeserializedData.StartContentNode;
             }
         }
 
         public int StartMediaNode
         {
-            get
-            {
-                EnsureDeserialized();
-                return DeserializedData.StartMediaNode;
-            }
+            get { return DeserializedData.StartMediaNode; }
         }
 
         public string[] AllowedApplications
         {
-            get
-            {
-                EnsureDeserialized();
-                return DeserializedData.AllowedApplications;
-            }
+            get { return DeserializedData.AllowedApplications; }
         }
         
         public object Id
         {
-            get
-            {
-                EnsureDeserialized();
-                return DeserializedData.Id;
-            }
+            get { return DeserializedData.Id; }
         }
 
         public string RealName
         {
-            get
-            {
-                EnsureDeserialized();
-                return DeserializedData.RealName;
-            }
+            get { return DeserializedData.RealName; }
         }
 
         public string Culture
         {
-            get
-            {
-                EnsureDeserialized();
-                return DeserializedData.Culture;
-            }
+            get { return DeserializedData.Culture; }
         }
 
         //public int SessionTimeout
@@ -85,24 +67,42 @@ namespace Umbraco.Core.Security
 
         public string[] Roles
         {
-            get
-            {
-                EnsureDeserialized();
-                return DeserializedData.Roles;                
-            }
+            get { return DeserializedData.Roles; }
         }
 
+        /// <summary>
+        /// This will ensure we only deserialize once
+        /// </summary>
+        /// <remarks>
+        /// For performance reasons, we'll also check if there's an http context available,
+        /// if so, we'll chuck our instance in there so that we only deserialize once per request.
+        /// </remarks>
         protected void EnsureDeserialized()
         {
             if (DeserializedData != null)
                 return;
-            
+
+            if (HttpContext.Current != null)
+            {
+                //check if we've already done this in this request
+                var data = HttpContext.Current.Items[typeof(UmbracoBackOfficeIdentity)] as UserData;
+                if (data != null)
+                {
+                    DeserializedData = data;
+                    return;
+                }
+            }
+
             if (string.IsNullOrEmpty(UserData))
             {
-                DeserializedData = new UserData();
-                return;
+                throw new NullReferenceException("The " + typeof(UserData) + " found in the ticket cannot be empty");
             }
-            DeserializedData = JsonConvert.DeserializeObject<UserData>(UserData);            
+            DeserializedData = JsonConvert.DeserializeObject<UserData>(UserData);
+            
+            if (HttpContext.Current != null)
+            {
+                HttpContext.Current.Items[typeof (UmbracoBackOfficeIdentity)] = DeserializedData;
+            }
         }
     }
 }

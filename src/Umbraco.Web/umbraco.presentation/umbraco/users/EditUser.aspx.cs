@@ -348,16 +348,12 @@ namespace umbraco.cms.presentation.user
                 }
             }
         }
-
-        #region Web Form Designer generated code
-
+        
         protected override void OnInit(EventArgs e)
         {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
-            base.OnInit(e);
+            //lapps.SelectionMode = ListSelectionMode.Multiple;
+            lapps.RepeatLayout = RepeatLayout.Flow;
+            lapps.RepeatDirection = RepeatDirection.Vertical;
         }
 
         protected override void OnPreRender(EventArgs e)
@@ -366,22 +362,8 @@ namespace umbraco.cms.presentation.user
 
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/CMSNode.asmx"));
             //      ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
-
-
+            
         }
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-            //lapps.SelectionMode = ListSelectionMode.Multiple;
-            lapps.RepeatLayout = RepeatLayout.Flow;
-            lapps.RepeatDirection = RepeatDirection.Vertical;
-        }
-
-        #endregion
 
         /// <summary>
         /// Handles the Click event of the saveUser control.
