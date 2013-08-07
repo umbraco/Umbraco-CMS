@@ -1,14 +1,39 @@
 ﻿(function () {
 
-    //extensions to base classes such as String and extension methods for jquery.
-    //NOTE: jquery must be loaded before this file.
-
-    
+    //JavaScript extension methods on the core JavaScript objects (like String, Date, etc...)
+    if (!Date.prototype.toIsoDateTimeString) {
+        /** Converts a Date object to a globally acceptable ISO string, NOTE: This is different from the built in 
+            JavaScript toISOString method which returns date/time like "2013-08-07T02:04:11.487Z" but we want "yyyy-MM-dd HH:mm:ss" */
+        Date.prototype.toIsoDateTimeString = function (str) {
+            var month = this.getMonth();
+            if (month.length === 1) {
+                month = "0" + month;
+            }
+            var day = this.getDate();
+            if (day.length === 1) {
+                day = "0" + day;
+            }
+            var hour = this.getHours();
+            if (hour.length === 1) {
+                hour = "0" + hour;
+            }
+            var mins = this.getMinutes();
+            if (mins.length === 1) {
+                mins = "0" + mins;
+            }
+            var secs = this.getSeconds();
+            if (secs.length === 1) {
+                secs = "0" + secs;
+            }
+            return this.getFullYear() + "-" + month + "-" + day + " " + hour + ":" + mins + ":" + secs;
+        };
+    }
 
     //create guid method on the String
     if (String.CreateGuid == null) {
-        String.CreateGuid = function () {
-            ///<summary>generates a new Guid</summary>
+        
+        /** generates a new Guid */
+        String.CreateGuid = function () {            
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                 var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
@@ -17,9 +42,9 @@
     }
 
     if (!window.__debug__) {
+        
+        /** global method to send debug statements to console that is cross browser (or at least checks if its possible)*/
         window.__debug__ = function (msg, category, isErr) {
-            ///<summary>global method to send debug statements to console that is cross browser (or at least checks if its possible)</summary>        
-
             if (((typeof console) != "undefined") && console.log && console.error) {
                 if (isErr) console.error(category + ": " + msg);
                 else console.log(category + ": " + msg);
@@ -28,24 +53,24 @@
     }
 
     if (!String.prototype.startsWith) {
-        String.prototype.startsWith = function (str) {
-            ///<summary>startsWith extension method for string</summary>
-
+        /** startsWith extension method for string */
+        String.prototype.startsWith = function (str) {            
             return this.substr(0, str.length) === str;
         };
     }
 
     if (!String.prototype.endsWith) {
-        String.prototype.endsWith = function (str) {
-            ///<summary>endsWith extension method for string</summary>
-
+        
+        /** endsWith extension method for string*/
+        String.prototype.endsWith = function (str) {            
             return this.substr(this.length - str.length) === str;
         };
     }
     
     if (!String.prototype.trimStart) {
+        
+        /** trims the start of the string*/
         String.prototype.trimStart = function (str) {
-            ///<summary>trims the start of the string</summary>
             if (this.startsWith(str)) {
                 return this.substring(str.length);
             }
@@ -54,9 +79,9 @@
     }
 
     if (!String.prototype.utf8Encode) {
-        String.prototype.utf8Encode = function () {
-            ///<summary>UTF8 encoder for string</summary>
 
+        /** UTF8 encoder for string*/
+        String.prototype.utf8Encode = function () {
             var str = this.replace(/\r\n/g, "\n");
             var utftext = "";
             for (var n = 0; n < str.length; n++) {
@@ -79,6 +104,8 @@
     }
 
     if (!String.prototype.utf8Decode) {
+        
+        /** UTF8 decoder for string*/
         String.prototype.utf8Decode = function () {
             var utftext = this;
             var string = "";
@@ -112,9 +139,9 @@
     }
 
     if (!String.prototype.base64Encode) {
+        
+        /** Base64 encoder for string*/
         String.prototype.base64Encode = function () {
-            ///<summary>Base64 encoder for string</summary>
-
             var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
             var output = "";
             var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
@@ -150,8 +177,9 @@
     }
 
     if (!String.prototype.base64Decode) {
+        
+        /** Base64 decoder for string*/
         String.prototype.base64Decode = function () {
-            ///<summary>Base64 decoder for string</summary>
 
             var input = this;
             var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
@@ -191,16 +219,17 @@
 
 
     if (!Math.randomRange) {
+        
+        /** randomRange extension for math*/
         Math.randomRange = function (from, to) {
-            ///<summary>randomRange extension for math</summary>
-
             return Math.floor(Math.random() * (to - from + 1) + from);
         };
     }
 
     if (!String.prototype.toCamelCase) {
+        
+        /** toCamelCase extension method for string*/
         String.prototype.toCamelCase = function () {
-            ///<summary>toCamelCase extension method for string</summary>
 
             var s = this.toPascalCase();
             if ($.trim(s) == "")
@@ -220,9 +249,10 @@
     }
 
     if (!String.prototype.toPascalCase) {
+        
+        /** toPascalCase extension method for string*/
         String.prototype.toPascalCase = function () {
-            ///<summary>toPascalCase extension method for string</summary>
-
+            
             var s = "";
             $.each($.trim(this).split(/[\s\.-]+/g), function (idx, val) {
                 if ($.trim(val) == "")
@@ -237,15 +267,18 @@
     }
 
     if (!String.prototype.toUmbracoAlias) {
+        
+        /** toUmbracoAlias extension method for string*/
         String.prototype.toUmbracoAlias = function () {
-            ///<summary>///<summary>toUmbracoAlias extension method for string</summary></summary>
-
+            
             var s = this.replace(/[^a-zA-Z0-9\s\.-]+/g, ''); // Strip none alphanumeric chars
             return s.toCamelCase(); // Convert to camelCase
         };
     }
 
     if (!String.prototype.toFunction) {
+        
+        /** Converts a string into a function if it is found */
         String.prototype.toFunction = function () {
             var arr = this.split(".");
             var fn = (window || this);
