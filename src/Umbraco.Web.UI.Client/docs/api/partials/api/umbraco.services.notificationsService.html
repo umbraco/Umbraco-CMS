@@ -1,0 +1,98 @@
+<h1><code ng:non-bindable="">notificationsService</code>
+<span class="hint">(service in module <code ng:non-bindable="">umbraco.services</code>
+)</span>
+</h1>
+<div><h2 id="Description">Description</h2>
+<div class="description"><p>Application-wide service for handling notifications, the umbraco application 
+maintains a single collection of notications, which the UI watches for changes.
+By default when a notication is added, it is automaticly removed 7 seconds after
+This can be changed on add()</p>
+
+<h2 id="usage">usage</h4>
+
+<p>To use, simply inject the notificationsService into any controller that needs it, and make
+sure the umbraco.services module is accesible - which it should be by default.</p>
+
+<pre class="prettyprint linenums">
+	notificationsService.success("Document Published", "hooraaaay for you!");
+     notificationsService.error("Document Failed", "booooh");
+</pre> </p></div>
+<h2 id="Dependencies">Dependencies</h2>
+<ul class="dependencies"><li><code ng:non-bindable=""><a href="api/$rootScope">$rootScope</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="api/$timeout">$timeout</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="api/angularHelper">angularHelper</a></code>
+</li>
+</ul>
+<div class="member method"><h2 id="Methods">Methods</h2>
+<ul class="methods"><li><h3 id="error">error(headline, message)</h3>
+<div class="error"><p>Adds a red error notication to the notications collection
+This should be used when an operations <em>fails</em> and could not complete</p><h4 id="Parameters">Parameters</h4>
+<ul class="parameters"><li><code ng:non-bindable="">headline  {String}  </code>
+<p>Headline of the notification</p></li>
+<li><code ng:non-bindable="">message  {String}  </code>
+<p>longer text for the notication, trimmed after 200 characters, which can then be exanded</p></li>
+</ul>
+<h4 id="Returns">Returns</h4>
+<div class="returns"><code ng:non-bindable="">{Object}</code>
+– <p>notification object</p></div>
+</div>
+</li>
+<li><h3 id="getCurrent">getCurrent()</h3>
+<div class="getcurrent"><p>Method to return all notifications from the notifcations collection </p></div>
+</li>
+<li><h3 id="remove">remove(index)</h3>
+<div class="remove"><p>Removes a notification from the notifcations collection at a given index </p><h4 id="Parameters">Parameters</h4>
+<ul class="parameters"><li><code ng:non-bindable="">index  {Int}  </code>
+<p>index where the notication should be removed from</p></li>
+</ul>
+</div>
+</li>
+<li><h3 id="removeAll">removeAll()</h3>
+<div class="removeall"><p>Removes all notifications from the notifcations collection </p></div>
+</li>
+<li><h3 id="showNotification">showNotification()</h3>
+<div class="shownotification"><p>Shows a notification based on the object passed in, normally used to render notifications sent back from the server</p><h4 id="Returns">Returns</h4>
+<div class="returns"><code ng:non-bindable="">{Object}</code>
+– <p>args notification object</p></div>
+</div>
+</li>
+<li><h3 id="success">success(headline, message)</h3>
+<div class="success"><p>Adds a green success notication to the notications collection
+This should be used when an operations <em>completes</em> without errors</p><h4 id="Parameters">Parameters</h4>
+<ul class="parameters"><li><code ng:non-bindable="">headline  {String}  </code>
+<p>Headline of the notification</p></li>
+<li><code ng:non-bindable="">message  {String}  </code>
+<p>longer text for the notication, trimmed after 200 characters, which can then be exanded</p></li>
+</ul>
+<h4 id="Returns">Returns</h4>
+<div class="returns"><code ng:non-bindable="">{Object}</code>
+– <p>notification object</p></div>
+</div>
+</li>
+<li><h3 id="warning">warning(headline, message)</h3>
+<div class="warning"><p>Adds a yellow warning notication to the notications collection
+This should be used when an operations <em>completes</em> but something was not as expected</p><h4 id="Parameters">Parameters</h4>
+<ul class="parameters"><li><code ng:non-bindable="">headline  {String}  </code>
+<p>Headline of the notification</p></li>
+<li><code ng:non-bindable="">message  {String}  </code>
+<p>longer text for the notication, trimmed after 200 characters, which can then be exanded</p></li>
+</ul>
+<h4 id="Returns">Returns</h4>
+<div class="returns"><code ng:non-bindable="">{Object}</code>
+– <p>notification object</p></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="member property"><h2 id="Properties">Properties</h2>
+<ul class="properties"><li><h3 id="current">current</h3>
+<div class="current"><p>Returns an array of current notifications to display</p><h4 id="Returns">Returns</h4>
+<div class="returns"><code ng:non-bindable="">{string}</code>
+– <p>returns an array</p></div>
+</div>
+</li>
+</ul>
+</div>
+</div>

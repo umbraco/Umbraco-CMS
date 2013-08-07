@@ -1,6 +1,7 @@
 angular.module("umbraco")
     .controller("Umbraco.Editors.ListViewController", 
-        function ($rootScope, $scope, contentResource, contentTypeResource) {
+        function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource) {
+        
         $scope.options = {
             pageSize: 10,
             pageNumber: 1,
@@ -9,8 +10,6 @@ angular.module("umbraco")
             orderDirection: "desc"
         };
 
-        $scope.pagination = [];
-        $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($scope.content.id);
         
         $scope.next = function(){
             if ($scope.options.pageNumber < $scope.listViewResultSet.totalPages) {
@@ -31,7 +30,7 @@ angular.module("umbraco")
                 if($scope.options.order === "desc"){
                     $scope.options.order = "asc";
                 }else{
-                    $scope.options.order = "desc";    
+                    $scope.options.order = "desc";
                 }
             }
             $scope.reloadView();
@@ -40,7 +39,6 @@ angular.module("umbraco")
         $scope.prev = function(){
             if ($scope.options.pageNumber > 1) {
                 $scope.options.pageNumber--;
-                
                 $scope.reloadView();
             }
         };
@@ -48,24 +46,29 @@ angular.module("umbraco")
         /*Loads the search results, based on parameters set in prev,next,sort and so on*/
         /*Pagination is done by an array of objects, due angularJS's funky way of monitoring state
         with simple values */
-        $scope.reloadView = function() {
-
-            contentResource.getChildren($scope.content.id, $scope.options).then(function(data) {
-
+                
+        $scope.reloadView = function(id) {
+            contentResource.getChildren(id, $scope.options).then(function(data) {
+                
                 $scope.listViewResultSet = data;
-
                 $scope.pagination = [];
+
                 for (var i = $scope.listViewResultSet.totalPages - 1; i >= 0; i--) {
                     $scope.pagination[i] = { index: i, name: i + 1 };
-                };
+                }
 
                 if ($scope.options.pageNumber > $scope.listViewResultSet.totalPages) {
                     $scope.options.pageNumber = $scope.listViewResultSet.totalPages;
                 }
 
             });
-            
         };
 
-        $scope.reloadView();
+
+        if($routeParams.id){
+            $scope.pagination = new Array(100);
+            $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
+            $scope.reloadView($routeParams.id);
+        }
+        
 });

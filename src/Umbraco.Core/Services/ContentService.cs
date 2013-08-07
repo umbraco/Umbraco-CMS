@@ -1479,7 +1479,12 @@ namespace Umbraco.Core.Services
                     LogHelper.Info<ContentService>(
                         string.Format("Content '{0}' with Id '{1}' could not be published because of invalid properties.",
                                       content.Name, content.Id));
-                    result.Add(new Attempt<PublishStatus>(false, new PublishStatus(content, PublishStatusType.FailedContentInvalid)));
+                    result.Add(
+                        new Attempt<PublishStatus>(false, 
+                            new PublishStatus(content, PublishStatusType.FailedContentInvalid)
+                                {
+                                    InvalidProperties = ((ContentBase) content).LastInvalidProperties
+                                }));
                     return result;
                 }
 

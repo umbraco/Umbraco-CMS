@@ -8,6 +8,6 @@ angular.module('umbraco')
     };
 
     function populate(data){
-        $scope.model.value = data.selection;
+        $scope.value = data.selection;
     }
 });

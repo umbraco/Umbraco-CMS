@@ -13,13 +13,13 @@ angular.module("umbraco")
 
     function initMap(){
         //Google maps is available and all components are ready to use.
-        var valueArray = $scope.model.value.split(',');
+        var valueArray = $scope.value.split(',');
         var latLng = new google.maps.LatLng(valueArray[0], valueArray[1]);      
-        var mapDiv = document.getElementById($scope.model.alias + '_map');
+        var mapDiv = document.getElementById($scope.alias + '_map');
         var mapOptions = {
-            zoom: $scope.model.config.zoom,
+            zoom: $scope.config.zoom,
             center: latLng,
-            mapTypeId: google.maps.MapTypeId[$scope.model.config.mapType]
+            mapTypeId: google.maps.MapTypeId[$scope.config.mapType]
         };
         var geocoder = new google.maps.Geocoder();
         var map = new google.maps.Map(mapDiv, mapOptions);
@@ -50,7 +50,7 @@ angular.module("umbraco")
                     codeLatLng(marker.getPosition(), geocoder);
 
                     //set the model value
-                    $scope.model.value = newLat + "," + newLng;
+                    $scope.value = newLat + "," + newLng;
 
                 });
 

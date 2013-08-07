@@ -17,22 +17,17 @@ using System.Linq;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
 
-    //internal interface IUmbracoApiService<T>
-    //{
-    //    T Get(int id);
-    //    IEnumerable<T> GetChildren(int id);
-    //    HttpResponseMessage Delete(int id);
-    //    //copy
-    //    //move
-    //    //update
-    //    //create
-    //}
-
+    /// <remarks>
+    /// This controller is decorated with the UmbracoApplicationAuthorizeAttribute which means that any user requesting
+    /// access to ALL of the methods on this controller will need access to the media application.
+    /// </remarks>
     [PluginController("UmbracoApi")]
+    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Media)]
     public class MediaController : ContentControllerBase
     {
         /// <summary>
@@ -75,6 +70,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [EnsureUserPermissionForContent("id")]
         public MediaItemDisplay GetById(int id)
         {
             var foundContent = Services.MediaService.GetById(id);
@@ -179,12 +175,7 @@ namespace Umbraco.Web.Editors
             {
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
-
-            if (!Security.UserHasAppAccess(global::Umbraco.Core.Constants.Applications.Media, UmbracoUser))
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "User has no access to this application");
-            }
-
+            
             var mediaService = base.ApplicationContext.Services.MediaService;
             var sortedMedia = new List<IMedia>();
             try

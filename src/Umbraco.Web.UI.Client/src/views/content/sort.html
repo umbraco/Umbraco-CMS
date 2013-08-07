@@ -1,5 +1,8 @@
-<div class="umb-dialog" style="width: 500px" ng-controller="Umbraco.Editors.Content.SortController">
-    <ng-form name="sortForm" ng-submit="performSort()">
+<div class="umb-dialog" style="width: 500px"
+     ng-controller="Umbraco.Editors.Content.SortController"
+     ng-switch on="complete">
+    
+    <form name="sortForm" ng-submit="performSort()" ng-switch-when="false">
         <div class="umb-dialog-body" auto-scale="90">
             <p class="umb-abstract">Sort children of {{nav.ui.currentNode.name}}</p>
 
@@ -10,19 +13,28 @@
                     <td>Last Update</td>
                     <td>Index</td>
                 </thead>
-                <tbody>
+                <tbody ui-sortable="sortableOptions" ng-model="itemsToSort">
                     <tr ng-repeat="model in itemsToSort">
                         <td>{{model.name}}</td>
                         <td>{{model.updateDate}}</td>
                         <td>{{model.sortOrder}}</td>
-                    </tr>                    
+                    </tr>
                 </tbody>
             </table>
 
         </div>
         <div class="btn-toolbar umb-btn-toolbar">
             <button class="btn" ng-click="nav.hideDialog()">Cancel</button>
-            <button class="btn btn-primary">Sort</button>
+            <button type="submit" class="btn btn-primary">Sort</button>
         </div>
-    </ng-form>
+    </form>
+    <div ng-switch-when="true">
+        <div class="alert alert-success">
+            Sorting successful    
+        </div>
+        
+        <div class="btn-toolbar umb-btn-toolbar">
+            <button class="btn" ng-click="nav.hideDialog()">Ok</button>
+        </div>
+    </div>
 </div>

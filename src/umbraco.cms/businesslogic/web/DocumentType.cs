@@ -527,7 +527,7 @@ namespace umbraco.cms.businesslogic.web
                     //Datatype definition guid was added in v4 to enable datatype imports
                     ptx.AppendChild(XmlHelper.AddTextNode(xd, "Definition", pt.DataTypeDefinition.UniqueId.ToString()));
 
-                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Tab", Tab.GetCaptionById(pt.TabId)));
+                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Tab", Tab.GetRawCaptionById(pt.TabId)));
                     ptx.AppendChild(XmlHelper.AddTextNode(xd, "Mandatory", pt.Mandatory.ToString()));
                     ptx.AppendChild(XmlHelper.AddTextNode(xd, "Validation", pt.ValidationRegExp));
                     ptx.AppendChild(XmlHelper.AddCDataNode(xd, "Description", pt.GetRawDescription()));

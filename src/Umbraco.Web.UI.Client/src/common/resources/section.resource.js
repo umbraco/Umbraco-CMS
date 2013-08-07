@@ -1,6 +1,6 @@
 ﻿/**
     * @ngdoc service
-    * @name umbraco.resources.sectionResource     
+    * @name umbraco.resources.sectionResource
     * @description Loads in data for section
     **/
 function sectionResource($q, $http, umbRequestHelper) {

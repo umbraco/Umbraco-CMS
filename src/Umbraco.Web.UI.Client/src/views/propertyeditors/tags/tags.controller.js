@@ -11,7 +11,7 @@ angular.module("umbraco")
 			$scope.tags = [];
 
 			// Initialize bootstrap-tags.js script
-			var tags = $('#' + $scope.model.alias + "_tags").tags({
+			var tags = $('#' + $scope.alias + "_tags").tags({
 				tagClass: 'label-inverse'
 			});
 

@@ -16,6 +16,26 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     return {
         
+        sort: function (args) {
+            if (!args) {
+                throw "args cannot be null";
+            }
+            if (!args.parentId) {
+                throw "args.parentId cannot be null";
+            }
+            if (!args.sortedIds) {
+                throw "args.sortedIds cannot be null";
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostSort"),
+                    {
+                        parentId: args.parentId,
+                        idSortOrder: args.sortedIds
+                    }),
+                'Failed to sort content');
+        },
+
         emptyRecycleBin: function() {
             return umbRequestHelper.resourcePromise(
                 $http.delete(
@@ -94,7 +114,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             if (options.orderDirection === "asc") {
                 options.orderDirection = "Ascending";
             }
-            else {
+            else if (options.orderDirection === "desc") {
                 options.orderDirection = "Descending";
             }
 

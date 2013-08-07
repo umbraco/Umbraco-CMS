@@ -13,18 +13,8 @@ namespace Umbraco.Web.Models.ContentEditing
     /// A model representing a basic content item
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
-    public class ContentItemBasic<T, TPersisted>
-        where T: ContentPropertyBasic
-        where TPersisted : IContentBase
+    public class ContentItemBasic
     {
-        public ContentItemBasic()
-        {
-            //ensure its not null
-            _properties = new List<T>();
-        }
-
-        private IEnumerable<T> _properties;
-
         [DataMember(Name = "icon")]
         public string Icon { get; set; }
 
@@ -35,13 +25,6 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "name", IsRequired = true)]
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
         public string Name { get; set; }
-
-        [DataMember(Name = "properties")]
-        public virtual IEnumerable<T> Properties
-        {
-            get { return _properties; }
-            set { _properties = value; }
-        }
 
         [DataMember(Name = "updateDate")]
         public DateTime UpdateDate { get; set; }
@@ -55,7 +38,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "owner")]
         public UserBasic Owner { get; set; }
-        
+
         [DataMember(Name = "updator")]
         public UserBasic Updator { get; set; }
 
@@ -65,6 +48,48 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "sortOrder")]
         public int SortOrder { get; set; }
+
+        protected bool Equals(ContentItemBasic other)
+        {
+            return Id == other.Id;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            var other = obj as ContentItemBasic;
+            return other != null && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id;
+        }
+    }
+
+    /// <summary>
+    /// A model representing a basic content item with properties
+    /// </summary>
+    [DataContract(Name = "content", Namespace = "")]
+    public class ContentItemBasic<T, TPersisted> : ContentItemBasic
+        where T : ContentPropertyBasic
+        where TPersisted : IContentBase
+    {
+        public ContentItemBasic()
+        {
+            //ensure its not null
+            _properties = new List<T>();
+        }
+
+        private IEnumerable<T> _properties;
+
+        [DataMember(Name = "properties")]
+        public virtual IEnumerable<T> Properties
+        {
+            get { return _properties; }
+            set { _properties = value; }
+        }
 
         /// <summary>
         /// The real persisted content object
@@ -82,22 +107,6 @@ namespace Umbraco.Web.Models.ContentEditing
         [JsonIgnore]
         internal ContentItemDto<TPersisted> ContentDto { get; set; }
 
-        protected bool Equals(ContentItemBasic<T, TPersisted> other)
-        {
-            return Id == other.Id;
-        }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            var other = obj as ContentItemBasic<T, TPersisted>;
-            return other != null && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Id;
-        }
     }
 }

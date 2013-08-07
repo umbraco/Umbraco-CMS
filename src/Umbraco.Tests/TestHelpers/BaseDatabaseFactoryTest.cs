@@ -42,28 +42,42 @@ namespace Umbraco.Tests.TestHelpers
         private static volatile bool _firstRunInTestSession = true;
         private static readonly object Locker = new object();
         private bool _firstTestInFixture = true;
-        private DefaultDatabaseFactory _dbFactory;
 
         //Used to flag if its the first test in the current session
         private bool _isFirstRunInTestSession = false;
         //Used to flag if its the first test in the current fixture
         private bool _isFirstTestInFixture = false;
 
+        private ApplicationContext _appContext;
+
         [SetUp]
         public override void Initialize()
         {
             InitializeFirstRunFlags();
+            
+            var path = TestHelper.CurrentAssemblyDirectory;
+            AppDomain.CurrentDomain.SetData("DataDirectory", path);
+            
+            //disable cache
+            var cacheHelper = new CacheHelper(new NullCacheProvider(), false);
 
-            _dbFactory = new DefaultDatabaseFactory(
+            var dbFactory = new DefaultDatabaseFactory(
                 GetDbConnectionString(),
                 GetDbProviderName());
 
+            _appContext = new ApplicationContext(
+				//assign the db context
+                new DatabaseContext(dbFactory),
+				//assign the service context
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),
+                cacheHelper)
+                {
+                    IsReady = true
+                };
+
             base.Initialize();
 
-            var path = TestHelper.CurrentAssemblyDirectory;
-            AppDomain.CurrentDomain.SetData("DataDirectory", path);
-
-            DatabaseContext.Initialize(_dbFactory.ProviderName, _dbFactory.ConnectionString);
+            DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
 
             CreateSqlCeDatabase();
 
@@ -75,18 +89,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected override void SetupApplicationContext()
         {
-            //disable cache
-            var cacheHelper = new CacheHelper(new NullCacheProvider(), false);
-
-            ApplicationContext.Current = new ApplicationContext(
-                //assign the db context
-                new DatabaseContext(_dbFactory),
-                //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),
-                cacheHelper)
-            {
-                IsReady = true
-            };
+            ApplicationContext.Current = _appContext;
         }
 
         /// <summary>

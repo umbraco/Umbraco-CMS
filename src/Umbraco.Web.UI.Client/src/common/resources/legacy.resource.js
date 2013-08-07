@@ -1,6 +1,6 @@
 ﻿/**
     * @ngdoc service
-    * @name umbraco.resources.legacyResource     
+    * @name umbraco.resources.legacyResource
     * @description Handles legacy dialog requests
     **/
 function legacyResource($q, $http, umbRequestHelper) {

@@ -7,13 +7,15 @@ angular.module('umbraco.mocks').
               return [401, null, null];
           }
 
-          var pageNumber = mocksUtils.getParameterByName(data, "pageNumber");
-
+          var pageNumber = Number(mocksUtils.getParameterByName(data, "pageNumber"));
           var filter = mocksUtils.getParameterByName(data, "filter");
-          var pageSize = mocksUtils.getParameterByName(data, "pageSize");
-          var parentId = mocksUtils.getParameterByName(data, "id");
+          var pageSize = Number(mocksUtils.getParameterByName(data, "pageSize"));
+          var parentId = Number(mocksUtils.getParameterByName(data, "id"));
 
-          var collection = { pageSize: 10, totalItems: 68, totalPages: 7, pageNumber: pageNumber, filter: filter };
+          if (pageNumber === 0) {
+              pageNumber = 1;
+          }
+          var collection = { pageSize: pageSize, totalItems: 68, totalPages: 7, pageNumber: pageNumber, filter: filter };
           collection.totalItems = 56 - (filter.length);
           if (pageSize > 0) {
               collection.totalPages = Math.round(collection.totalItems / collection.pageSize);
@@ -38,6 +40,9 @@ angular.module('umbraco.mocks').
               if (filter !== '') {
                   cnt.name = filter + cnt.name;
               }
+
+              //set a fake sortOrder
+              cnt.sortOrder = i + 1;
 
               collection.items.push(cnt);
           }
@@ -90,10 +95,20 @@ angular.module('umbraco.mocks').
           return [200, node, null];
       }
       
-
+      function returnSort(status, data, headers) {
+          if (!mocksUtils.checkAuth()) {
+              return [401, null, null];
+          }
+          
+          return [200, null, null];
+      }
 
       return {
           register: function () {
+              $httpBackend
+                  .whenPOST(mocksUtils.urlRegex('/umbraco/UmbracoApi/Content/PostSort'))
+                  .respond(returnSort);
+
               $httpBackend
                   .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Content/GetChildren'))
                   .respond(returnChildren);

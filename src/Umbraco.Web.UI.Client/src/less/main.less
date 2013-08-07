@@ -244,3 +244,31 @@ label {
 table thead a {
   color: #333
 }
+
+/* UI interactions */
+
+.umb-table tbody.ui-sortable tr
+{
+    cursor:pointer;
+}
+
+.umb-table tbody.ui-sortable tr.ui-sortable-helper {
+  background-color: @sortableHelperBg;
+  border: none; 
+}
+.umb-table tbody.ui-sortable tr.ui-sortable-helper td 
+ {
+    border:none;
+}
+
+.umb-table tbody.ui-sortable tr.ui-sortable-placeholder {
+  background-color: @sortablePlaceholderBg;
+  border:none;   
+}
+
+.umb-table tbody.ui-sortable tr.ui-sortable-placeholder td
+{
+    height:5px;
+    padding:0px;
+    line-height:0px;
+}

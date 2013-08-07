@@ -249,7 +249,7 @@ namespace umbraco.cms.presentation
 
             //update UI and set document properties
             PerformSaveLogic();
-            
+
             //persist the document
             _document.Save();
 
@@ -257,7 +257,7 @@ namespace umbraco.cms.presentation
             BusinessLogic.Actions.Action.RunActionHandlers(_document, ActionUpdate.Instance);
 
             ClientTools.ShowSpeechBubble(
-                speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSavedHeader", null), 
+                speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSavedHeader", null),
                 ui.Text("speechBubbles", "editContentSavedText", null));
 
             ClientTools.SyncTree(_document.Path, true);
@@ -291,7 +291,7 @@ namespace umbraco.cms.presentation
         {
             //update UI and set document properties
             PerformSaveLogic();
-            
+
             //the business logic here will check to see if the doc can actually be published and will return the 
             // appropriate result so we can display the correct error messages (or success).
             var savePublishResult = _document.SaveAndPublishWithResult(UmbracoUser);
@@ -309,7 +309,7 @@ namespace umbraco.cms.presentation
 
                 _documentHasPublishedVersion = _document.Content.HasPublishedVersion();
             }
-            
+
             ClientTools.SyncTree(_document.Path, true);
         }
 
@@ -320,8 +320,8 @@ namespace umbraco.cms.presentation
                 case PublishStatusType.Success:
                 case PublishStatusType.SuccessAlreadyPublished:
                     ClientTools.ShowSpeechBubble(
-                        speechBubbleIcon.save, 
-                        ui.Text("speechBubbles", "editContentPublishedHeader", UmbracoUser), 
+                        speechBubbleIcon.save,
+                        ui.Text("speechBubbles", "editContentPublishedHeader", UmbracoUser),
                         ui.Text("speechBubbles", "editContentPublishedText", UmbracoUser));
                     break;
                 case PublishStatusType.FailedPathNotPublished:
@@ -550,21 +550,38 @@ namespace umbraco.cms.presentation
             }
 
             menuItem.ImageURL = SystemDirectories.Umbraco + "/images/editor/vis.gif";
-            // Fix for U4-682, if there's no template, disable the preview button
-            if (_document.Template != -1)
+
+            if (EnablePreviewButton())
             {
                 menuItem.AltText = ui.Text("buttons", "showPage", UmbracoUser);
                 menuItem.OnClickCommand = "window.open('dialogs/preview.aspx?id=" + id + "','umbPreview')";
             }
             else
             {
-                string showPageDisabledText = ui.Text("buttons", "showPageDisabled", UmbracoUser);
+                var showPageDisabledText = ui.Text("buttons", "showPageDisabled", UmbracoUser);
                 if (showPageDisabledText.StartsWith("["))
-                    showPageDisabledText = ui.GetText("buttons", "showPageDisabled", null, "en"); ;
+                    showPageDisabledText = ui.GetText("buttons", "showPageDisabled", null, "en");
 
                 menuItem.AltText = showPageDisabledText;
-                ((Image)menuItem).Attributes.Add("style", "opacity: 0.5");
+                ((Image) menuItem).Attributes.Add("style", "opacity: 0.5");
             }
+        }
+
+        private bool EnablePreviewButton()
+        {
+            // Fix for U4-862, if there's no template, disable the preview button
+            // Fixed again for U4-2587, apparently at some point "no template" changed from -1 to 0? -SJ
+            // Now also catches when template doesn't exist any more or is not allowed any more
+            // Don't think there's a better way to check if the template exists besides trying to instantiate it..
+            try
+            {
+                var template = new businesslogic.template.Template(_document.Template);
+                // If template is found check if it's in the list of allowed templates for this document
+                return _document.Content.ContentType.AllowedTemplates.ToList().Any(t => t.Id == template.Id);
+            }
+            catch (Exception) { }
+            
+            return false;
         }
 
         /// <summary>

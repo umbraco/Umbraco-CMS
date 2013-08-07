@@ -1,6 +1,6 @@
 /**
     * @ngdoc service
-    * @name umbraco.resources.mediaResource     
+    * @name umbraco.resources.mediaResource
     * @description Loads in data for media
     **/
 function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {

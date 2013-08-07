@@ -1,4 +1,7 @@
-angular.module("umbraco").controller("Umbraco.Editors.CodeMirrorController", function ($scope, $rootScope) {
+angular.module("umbraco").controller("Umbraco.Editors.CodeMirrorController", 
+    function ($scope, $rootScope, assetsService) {
+    
+    /*   
     require(
         [
             'css!../lib/codemirror/js/lib/codemirror.css',
@@ -8,7 +11,7 @@ angular.module("umbraco").controller("Umbraco.Editors.CodeMirrorController", fun
         function () {
 
             var editor = CodeMirror.fromTextArea(
-                                    document.getElementById($scope.model.alias), 
+                                    document.getElementById($scope.alias), 
                                     {
                                         mode: CodeMirror.modes.htmlmixed, 
                                         tabMode: "indent"
@@ -16,9 +19,9 @@ angular.module("umbraco").controller("Umbraco.Editors.CodeMirrorController", fun
 
             editor.on("change", function(cm) {
                 $rootScope.$apply(function(){
-                    $scope.model.value = cm.getValue();   
+                    $scope.value = cm.getValue();   
                 });
             });
 
-        });
+        });*/
 });

@@ -1,0 +1,67 @@
+<h1><code ng:non-bindable=""></code>
+<span class="hint"></span>
+</h1>
+<div><h1 id="belle">Belle</h2>
+
+<p>Umbraco 7 UI, codename "Belle" Built on AngularJS, YepNope and Twitter Bootstrap</p>
+
+<h2 id="introduction">Introduction</h3>
+
+<p>Slides from the initial demonstration of Belle done at the Umbraco DK Fest can be found here: </p>
+
+<p>http://rawgithub.com/umbraco/Belle/master/Presentation/index.html</p>
+
+<h2 id="runningthesitewithmockeddata">Running the site with mocked data</h3>
+
+<p>This won't require any database or setup, as everything is running through node. All you have to do is install 
+node and grunt on either windows or OSX and the entire setup is ready for you.</p>
+
+<h3 id="installnodejs">Install node.js</h4>
+
+<p>We need node to run tests and automated less compiling and other automated tasks. go to http://nodejs.org. Node.js is a powerfull javascript engine, which allows us to run all our tests and tasks written in javascript locally.</p>
+
+<p><em>note:</em> On windows you might need to restart explorer.exe to register node.</p>
+
+<h3 id="installdependencies">Install dependencies</h4>
+
+<p>Next we need to install all the required packages. This is done with the package tool, included with node.js, open /Umbraco.Belle.Client in cmd.exe or osx terminal and run the command:</p>
+
+<pre><code>npm install
+</code></pre>
+
+<p>this will fetch all needed packages to your local machine.</p>
+
+<h3 id="installgruntglobally">Install grunt globally</h4>
+
+<p>Grunt is a task runner for node.js, and we use it for all automated tasks in the build process. For convenience we need to install it globally on your machine, so it can be used directly in cmd.exe or the terminal.</p>
+
+<p>So run the command:</p>
+
+<pre><code>npm install grunt-cli -g
+</code></pre>
+
+<p><em>note:</em> On windows you might need to restart explorer.exe to register the grunt cmd.</p>
+
+<p><em>note:</em> On OSX you might need to run:</p>
+
+<pre><code>sudo npm install grunt-cli -g
+</code></pre>
+
+<p>Now that you have node and grunt installed, you can open <code>/Umbraco.Belle.Client</code> in either <code>cmd.exe</code> or terminal and run: </p>
+
+<pre><code>grunt dev
+</code></pre>
+
+<p>This will build the site, merge less files, run tests and create the /Build folder, and finally open the site in your
+browser.</p>
+
+<h2 id="gettingstarted">Getting started</h3>
+
+<p>The current app is built, following conventions from angularJs and bootstrap. To get started with the applicaton you will need to atleast know the basics of these frameworks </p>
+
+<h3 id="angularjs">AngularJS</h4>
+
+<ul>
+<li>Excellent introduction videos on http://www.egghead.io/</li>
+<li>Official guide at: http://docs.angularjs.org/guide/</li>
+</ul></div>

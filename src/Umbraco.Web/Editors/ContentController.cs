@@ -8,6 +8,7 @@ using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -24,13 +25,20 @@ using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using Umbraco.Core.Models;
 using Umbraco.Core.Dynamics;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
+ 
     /// <summary>
     /// The API controller used for editing content
     /// </summary>
+    /// <remarks>
+    /// This controller is decorated with the UmbracoApplicationAuthorizeAttribute which means that any user requesting
+    /// access to ALL of the methods on this controller will need access to the content application.
+    /// </remarks>
     [PluginController("UmbracoApi")]
+    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
     public class ContentController : ContentControllerBase
     {        
         /// <summary>
@@ -50,10 +58,15 @@ namespace Umbraco.Web.Editors
         {            
         }
 
+        /// <summary>
+        /// Return content for the specified ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [FilterAllowedOutgoingContent]
         public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)
         {
             var foundContent = ((ContentService) Services.ContentService).GetByIds(ids);
-
             return foundContent.Select(Mapper.Map<IContent, ContentItemDisplay>);
         }
 
@@ -62,6 +75,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [EnsureUserPermissionForContent("id")]
         public ContentItemDisplay GetById(int id)
         {
             var foundContent = Services.ContentService.GetById(id);
@@ -69,6 +83,7 @@ namespace Umbraco.Web.Editors
             {
                 HandleContentNotFound(id);
             }
+            
             return Mapper.Map<IContent, ContentItemDisplay>(foundContent);
         }
 
@@ -95,6 +110,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [OutgoingDateTimeFormat]
+        [FilterAllowedOutgoingContent("Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>> GetChildren(
             int id, 
             int pageNumber = 0, 
@@ -161,6 +177,8 @@ namespace Umbraco.Web.Editors
             //TODO: We need to support 'send to publish'
 
             //TODO: We'll need to save the new template, publishat, etc... values here
+
+            //TODO: We need to check the user's permissions to see if they are allowed to do this!
 
             MapPropertyValues(contentItem);
 
@@ -237,8 +255,15 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// The CanAccessContentAuthorize attribute will deny access to this method if the current user
+        /// does not have Delete access to this node.
+        /// </remarks>
+        [EnsureUserPermissionForContent("id", 'D')]
         public HttpResponseMessage DeleteById(int id)
         {
+            //TODO: We need to check if the user is allowed to do this!
+
             var foundContent = Services.ContentService.GetById(id);
             if (foundContent == null)
             {
@@ -262,11 +287,63 @@ namespace Umbraco.Web.Editors
         /// Empties the recycle bin
         /// </summary>
         /// <returns></returns>
+        /// <remarks>
+        /// attributed with EnsureUserPermissionForContent to verify the user has access to the recycle bin
+        /// </remarks>
         [HttpDelete]
+        [EnsureUserPermissionForContent(true)]
         public HttpResponseMessage EmptyRecycleBin()
         {            
+            //TODO: We need to check if the user is allowed access to the recycle bin!
+
             Services.ContentService.EmptyRecycleBin();
             return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        /// <summary>
+        /// Change the sort order for media
+        /// </summary>
+        /// <param name="sorted"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PostSort(ContentSortOrder sorted)
+        {
+            //TODO: We need to check if the user is allowed to sort here!
+
+            if (sorted == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+
+            //if there's nothing to sort just return ok
+            if (sorted.IdSortOrder.Length == 0)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+
+            if (Security.UserHasAppAccess(Constants.Applications.Content, UmbracoUser) == false)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "User has no access to this application");
+            }            
+
+            var contentService = Services.ContentService;
+            var sortedContent = new List<IContent>();
+            try
+            {
+                sortedContent.AddRange(((ContentService) Services.ContentService).GetByIds(sorted.IdSortOrder));
+
+                // Save content with new sort order and update content xml in db accordingly
+                if (contentService.Sort(sortedContent) == false)
+                {
+                    LogHelper.Warn<MediaController>("Content sorting failed, this was probably caused by an event being cancelled");
+                    return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Content sorting failed, this was probably caused by an event being cancelled");
+                }
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<MediaController>("Could not update content sort order", ex);
+                throw;
+            }
         }
 
         private void ShowMessageForStatus(PublishStatus status, ContentItemDisplay display)
