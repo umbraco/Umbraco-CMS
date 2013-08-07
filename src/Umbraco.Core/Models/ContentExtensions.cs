@@ -12,6 +12,7 @@ using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Persistence;
@@ -23,6 +24,48 @@ namespace Umbraco.Core.Models
     public static class ContentExtensions
     {
         #region IContent
+
+        /// <summary>
+        /// Determines if a new version should be created
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// A new version needs to be created when:
+        /// * Any property value is changed (to enable a rollback)
+        /// * The publish status is changed
+        /// * The language is changed
+        /// </remarks>
+        internal static bool ShouldCreateNewVersion(this IContent entity)
+        {
+            var publishedState = ((Content)entity).PublishedState;
+            return ShouldCreateNewVersion(entity, publishedState);
+        }
+
+        /// <summary>
+        /// Determines if a new version should be created
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="publishedState"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// A new version needs to be created when:
+        /// * Any property value is changed (to enable a rollback)
+        /// * The publish status is changed
+        /// * The language is changed
+        /// </remarks>
+        internal static bool ShouldCreateNewVersion(this IContent entity, PublishedState publishedState)
+        {
+            var dirtyEntity = (ICanBeDirty)entity;
+            var contentChanged =
+                (dirtyEntity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished)
+                || dirtyEntity.IsPropertyDirty("Language");
+
+            var propertyValueChanged = entity.Properties.Any(x => ((ICanBeDirty)x).IsDirty());
+
+            return contentChanged || propertyValueChanged;
+        }
+
         /// <summary>
         /// Returns a list of the current contents ancestors, not including the content itself.
         /// </summary>
