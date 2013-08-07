@@ -198,6 +198,7 @@
     <Compile Include="Controllers\WebApiEditors\ContentControllerTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
     <Compile Include="Integration\CreateContent.cs" />
+    <Compile Include="Models\ContentExtensionsTests.cs" />
     <Compile Include="Models\DataValueSetterTests.cs" />
     <Compile Include="Persistence\PetaPocoExtensionsTest.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
