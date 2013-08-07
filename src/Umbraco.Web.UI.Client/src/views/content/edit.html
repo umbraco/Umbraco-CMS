@@ -1,91 +1,97 @@
 <ng-form name="contentForm" ng-show="contentLoaded">
-    <umb-panel ng-controller="Umbraco.Editors.Content.EditController" val-show-validation>
-        <umb-header tabs="content.tabs">
-            
-            <umb-content-name ng-model="content.name" placeholder="Enter a page title"></umb-content-name>
+<umb-panel ng-controller="Umbraco.Editors.Content.EditController" val-show-validation>
 
-            <div class="span8">
-                <div class="btn-toolbar pull-right umb-btn-toolbar">
-                    <div class="btn-group">
-                        <a class="btn" ng-click="preview(content)" 
-                           data-shortcut="ctrl+s">Preview page</a>
-                    </div>
+<umb-header tabs="content.tabs">
 
-                    <div class="btn-group">
-                        <a class="btn btn-success" href="#" ng-click="saveAndPublish(content)"
-                           prevent-default data-shortcut="ctrl+p">Publish</a>
+<umb-content-name 
+    ng-model="content.name" 
+    placeholder="Enter a page title">
+</umb-content-name>
 
-                        <a class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                            <span class="caret"></span>
-                        </a>
+<div class="span8">
+    <div class="btn-toolbar pull-right umb-btn-toolbar">
+        <div class="btn-group">
+            <a class="btn" ng-click="preview(content)" 
+            data-shortcut="ctrl+s">Preview page</a>
+        </div>
 
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                            <li><a href="#" ng-click="save(content)"
-                                   prevent-default data-shortcut="ctrl+s">Save draft</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </umb-header>
+        <div class="btn-group">
+            <a class="btn btn-success" href="#" ng-click="saveAndPublish(content)"
+            prevent-default data-shortcut="ctrl+p">Publish</a>
 
-        <umb-tab-view>
-            <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs |  filter:exludeLastTab">
-                <umb-property 
-                    label="{{property.label}}" 
-                    description="{{property.description}}"
-                    alias="{{property.alias}}" 
-                    hidelabel="{{property.hideLabel}}"
-                    ng-repeat="property in tab.properties">
-                        
-                        <umb-editor 
-                            config="{{property.config}}"
-                            value="property.value" 
-                            view="{{property.view}}" 
-                            alias="{{property.alias}}">
-                        </umb-editor>
+            <a class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                <span class="caret"></span>
+            </a>
 
-                </umb-property>
-            </umb-tab>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                <li><a href="#" ng-click="save(content)"
+                 prevent-default data-shortcut="ctrl+s">Save draft</a></li>
+             </ul>
+         </div>
+     </div>
+ </div>
+</umb-header>
 
-            <umb-tab id="tab0" rel="0" data-label="Generic properties">
-                
-               <umb-property 
-                   label="Created" description="Time this document was created">
-                   <umb-editor
-                       value="content.createDate"
-                       view="readonlyvalue"
-                       config="{{ {filter: 'date', format: 'medium'} }}" 
-                       alias="createdate">
-                   </umb-editor>
-               </umb-property>   
-               
-               <umb-property 
-                   label="Updated" description="Time this document was last updated">
-                   <umb-editor
-                       value="content.updateDate" 
-                       view="readonlyvalue"
-                       config="{{ {filter: 'date', format: 'medium'} }}"
-                       alias="createdate">
-                   </umb-editor>
-               </umb-property>   
-                
+<umb-tab-view>
+<umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs |  filter:exludeLastTab">
+    <umb-property 
+        label="{{property.label}}" 
+        description="{{property.description}}"
+        alias="{{property.alias}}" 
+        hidelabel="{{property.hideLabel}}"
+        ng-repeat="property in tab.properties">
 
-                <umb-property 
-                    label="{{property.label}}" 
-                    description="{{property.description}}"
-                    alias="{{property.alias}}" 
-                    hidelabel="{{property.hideLabel}}"
-                    ng-repeat="property in genericPropertiesTab.properties">
-                        
-                    <umb-editor 
-                        config="{{property.config}}"
-                        value="property.value" 
-                        view="{{property.view}}" 
-                        alias="{{property.alias}}">
-                    </umb-editor>
-                </umb-property>
-                
-            </umb-tab>
-        </umb-tab-view>
-    </umb-panel>
+        <umb-editor 
+            config="{{property.config}}"
+            value="property.value" 
+            view="{{property.view}}" 
+            alias="{{property.alias}}">
+        </umb-editor>
+
+    </umb-property>
+</umb-tab>
+
+<umb-tab id="tab0" rel="0" data-label="Generic properties">
+
+    <umb-property 
+        label="Created" description="Time this document was created">
+        <umb-editor
+            value="content.createDate"
+            view="readonlyvalue"
+            config="{{ {filter: 'date', format: 'medium'} }}" 
+            alias="createdate">
+        </umb-editor>
+    </umb-property>   
+
+    <umb-property 
+        label="Updated" description="Time this document was last updated">
+        <umb-editor
+            value="content.updateDate" 
+            view="readonlyvalue"
+            config="{{ {filter: 'date', format: 'medium'} }}"
+            alias="createdate">
+        </umb-editor>
+    </umb-property>   
+
+
+    <umb-property 
+        label="{{property.label}}" 
+        description="{{property.description}}"
+        alias="{{property.alias}}" 
+        hidelabel="{{property.hideLabel}}"
+        ng-repeat="property in genericPropertiesTab.properties">
+
+        <umb-editor 
+            config="{{property.config}}"
+            value="property.value" 
+            view="{{property.view}}" 
+            alias="{{property.alias}}">
+        </umb-editor>
+
+    </umb-property>
+
+</umb-tab>
+</umb-tab-view>
+
+</umb-panel>
 </ng-form>

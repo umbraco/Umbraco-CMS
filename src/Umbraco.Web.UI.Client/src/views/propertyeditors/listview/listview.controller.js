@@ -48,26 +48,27 @@ angular.module("umbraco")
         with simple values */
                 
         $scope.reloadView = function(id) {
-        	contentResource.getChildren(id, $scope.options).then(function(data) {
-				$scope.listViewResultSet = data;
+            contentResource.getChildren(id, $scope.options).then(function(data) {
                 
+                $scope.listViewResultSet = data;
                 $scope.pagination = [];
+
                 for (var i = $scope.listViewResultSet.totalPages - 1; i >= 0; i--) {
                     $scope.pagination[i] = { index: i, name: i + 1 };
-                };
-               
+                }
+
                 if ($scope.options.pageNumber > $scope.listViewResultSet.totalPages) {
                     $scope.options.pageNumber = $scope.listViewResultSet.totalPages;
                 }
+
             });
-            
         };
 
 
         if($routeParams.id){
             $scope.pagination = new Array(100);
             $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
-            $scope.reloadView($routeParams.id);  
+            $scope.reloadView($routeParams.id);
         }
         
 });
