@@ -3,6 +3,8 @@ using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
+using umbraco.interfaces;
 
 namespace Umbraco.Core.Models
 {
@@ -39,19 +41,6 @@ namespace Umbraco.Core.Models
             //      XML construct from the value returned from the Property Editor.
             // More details discussed here: https://groups.google.com/forum/?fromgroups=#!topic/umbraco-dev/fieWZzHj7oY
 
-            //var dataType = ApplicationContext.Current.Services.DataTypeService.GetDataTypeDefinitionById(property.PropertyType.DataTypeDefinitionId);
-            //if (dataType == null) throw new InvalidOperationException("No data type definition found with id " + property.PropertyType.DataTypeDefinitionId);
-
-                //We've already got the value for the property so we're going to give it to the 
-                // data type's data property so it doesn't go re-look up the value from the db again.
-                var defaultData = dt.Data as IDataValueSetter;
-                if (defaultData != null)
-                {
-                    defaultData.SetValue(property.Value, property.PropertyType.DataTypeDatabaseType.ToString());
-                }
-
-                xmlNode.AppendChild(dt.Data.ToXMl(xd));            
-            
             var propertyEditor = PropertyEditorResolver.Current.GetById(property.PropertyType.DataTypeId);
             if (propertyEditor != null)
             {
@@ -86,7 +75,15 @@ namespace Umbraco.Core.Models
             else
             {
                 //NOTE: An exception will be thrown if this doesn't exist
-                var legacyDataType = property.PropertyType.DataType(property.Id);
+                var legacyDataType = property.PropertyType.DataType(property.Id, ApplicationContext.Current.Services.DataTypeService);
+
+                //We've already got the value for the property so we're going to give it to the 
+                // data type's data property so it doesn't go re-look up the value from the db again.
+                var defaultData = legacyDataType.Data as IDataValueSetter;
+                if (defaultData != null)
+                {
+                    defaultData.SetValue(property.Value, property.PropertyType.DataTypeDatabaseType.ToString());
+                }
                 xmlNode.AppendChild(legacyDataType.Data.ToXMl(xd));
             }
 

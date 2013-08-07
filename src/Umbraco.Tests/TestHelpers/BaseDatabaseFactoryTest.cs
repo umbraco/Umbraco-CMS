@@ -57,17 +57,20 @@ namespace Umbraco.Tests.TestHelpers
             
             var path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
+            
+            //disable cache
+            var cacheHelper = new CacheHelper(new NullCacheProvider(), false);
 
             var dbFactory = new DefaultDatabaseFactory(
                 GetDbConnectionString(),
                 GetDbProviderName());
+
             _appContext = new ApplicationContext(
 				//assign the db context
                 new DatabaseContext(dbFactory),
 				//assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy()),
-                //disable cache
-                false)
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),
+                cacheHelper)
                 {
                     IsReady = true
                 };
