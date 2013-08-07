@@ -10,7 +10,7 @@
                     <td>Last Update</td>
                     <td>Index</td>
                 </thead>
-                <tbody>
+                <tbody ui-sortable="sortableOptions" ng-model="itemsToSort">
                     <tr ng-repeat="model in itemsToSort">
                         <td>{{model.name}}</td>
                         <td>{{model.updateDate}}</td>

@@ -6,7 +6,17 @@
  * @description
  * The controller for deleting content
  */
-function ContentSortController($scope, contentResource, treeService, navigationService) {
+function ContentSortController($scope, $element, contentResource, treeService, navigationService) {
+
+    //defines the options for the jquery sortable
+    $scope.sortableOptions = {
+        axis: 'y',
+        cursor: "move",
+        placeholder: "ui-sortable-placeholder",
+        update: function (ev, ui) {
+            $(ui.item).effect("highlight", { color: "#049cdb" }, 500);
+        }
+    };
 
     contentResource.getChildren($scope.currentNode.id).then(function(data) {
         $scope.itemsToSort = data.items;

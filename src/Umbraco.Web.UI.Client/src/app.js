@@ -3,5 +3,6 @@ var app = angular.module('umbraco', [
 	'umbraco.directives',
 	'umbraco.resources',
 	'umbraco.services',
-    'ngCookies'
+    'ngCookies',
+    'ui.sortable'
 ]);
