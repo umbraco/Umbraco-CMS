@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Security;
+using System.Security.Principal;
 using System.Text;
 using System.Web;
 using System.Web.Routing;
@@ -87,6 +88,9 @@ namespace Umbraco.Tests.TestHelpers
 			var server = MockRepository.GenerateStub<HttpServerUtilityBase>();
 			server.Stub(x => x.MapPath(Arg<string>.Is.Anything)).Return(Environment.CurrentDirectory);
 
+            //User
+            var user = MockRepository.GenerateStub<IPrincipal>();
+
 			//HTTP Context
 
 			HttpContext = MockRepository.GenerateMock<HttpContextBase>();
@@ -95,6 +99,7 @@ namespace Umbraco.Tests.TestHelpers
 			HttpContext.Stub(x => x.Request).Return(request);
 			HttpContext.Stub(x => x.Server).Return(server);
 			HttpContext.Stub(x => x.Response).Return(response);
+            HttpContext.Stub(x => x.User).Return(user);
 
 			RequestContext.Stub(x => x.HttpContext).Return(HttpContext);
 

@@ -11,9 +11,9 @@
             getMockContent: function(id) {
                 var node = {
                     name: "My content with id: " + id,
-                    updateDate: new Date(),
-                    publishDate: new Date(),
-                    createDate: new Date(),
+                    updateDate: new Date().toIsoDateTimeString(),
+                    publishDate: new Date().toIsoDateTimeString(),
+                    createDate: new Date().toIsoDateTimeString(),
                     id: id,
                     parentId: 1234,
                     icon: "icon-file-alt",

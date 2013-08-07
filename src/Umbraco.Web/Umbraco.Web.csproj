@@ -298,6 +298,9 @@
     <Compile Include="Configuration\WebRouting.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Editors\ContentController.cs" />
+    <Compile Include="Models\PagedResult.cs" />
+    <Compile Include="WebApi\ControllerContextExtensions.cs" />
+    <Compile Include="WebApi\CustomDateTimeConvertor.cs" />
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
     <Compile Include="Editors\ContentControllerBase.cs" />
     <Compile Include="Editors\ContentTypeController.cs" />
@@ -321,7 +324,6 @@
     <Compile Include="Models\ContentEditing\TabbedContentItem.cs" />
     <Compile Include="Models\ContentEditing\UserBasic.cs" />
     <Compile Include="Models\ContentEditing\UserDetail.cs" />
-    <Compile Include="Models\Mapping\BaseContentModelMapper.cs" />
     <Compile Include="FormDataCollectionExtensions.cs" />
     <Compile Include="Models\Mapping\ContentPropertyBasicConverter.cs" />
     <Compile Include="Models\Mapping\ContentPropertyDisplayConverter.cs" />
@@ -492,10 +494,13 @@
     <Compile Include="WebApi\Binders\ContentItemBaseBinder.cs" />
     <Compile Include="WebApi\Binders\ContentItemBinder.cs" />
     <Compile Include="WebApi\Binders\MediaItemBinder.cs" />
-    <Compile Include="WebApi\Filters\ContentItemValidationFilterAttribute.cs" />
+    <Compile Include="WebApi\Filters\EnsureUserPermissionForContentAttribute.cs" />
     <Compile Include="WebApi\Filters\ContentItemValidationHelper.cs" />
     <Compile Include="WebApi\Filters\FileUploadCleanupFilterAttribute.cs" />
+    <Compile Include="WebApi\Filters\FilterAllowedOutgoingContentAttribute.cs" />
     <Compile Include="WebApi\Filters\HttpQueryStringFilterAttribute.cs" />
+    <Compile Include="WebApi\Filters\OutgoingDateTimeFormatAttribute.cs" />
+    <Compile Include="WebApi\Filters\UmbracoApplicationAuthorizeAttribute.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerResolver.cs" />
@@ -751,7 +756,7 @@
     </Compile>
     <Compile Include="WebApi\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoAuthorizedApiController.cs" />
-    <Compile Include="WebApi\ValidationFilterAttribute.cs" />
+    <Compile Include="WebApi\Filters\ValidationFilterAttribute.cs" />
     <Compile Include="WebBootManager.cs" />
     <Compile Include="Routing\LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />

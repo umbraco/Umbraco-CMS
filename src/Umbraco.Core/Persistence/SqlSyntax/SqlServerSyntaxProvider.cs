@@ -14,6 +14,20 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     }
 
     /// <summary>
+    /// Represents the version name of SQL server (i.e. the year 2008, 2005, etc...)
+    /// </summary>
+    internal enum SqlServerVersionName
+    {
+        Invalid = -1,
+        V7 = 0,
+        V2000 = 1,
+        V2005 = 2,
+        V2008 = 3,
+        V2012 = 4,
+        Other = 5
+    }
+
+    /// <summary>
     /// Represents an SqlSyntaxProvider for Sql Server
     /// </summary>
     [SqlSyntaxProviderAttribute("System.Data.SqlClient")]
@@ -35,6 +49,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
             InitColumnTypeMap();
         }
+
+        /// <summary>
+        /// Gets/sets the version of the current SQL server instance
+        /// </summary>
+        internal Lazy<SqlServerVersionName> VersionName { get; set; }
 
         public override string GetQuotedTableName(string tableName)
         {

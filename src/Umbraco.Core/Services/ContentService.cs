@@ -521,11 +521,16 @@ namespace Umbraco.Core.Services
         /// <returns>True if the content has any children otherwise False</returns>
         public bool HasChildren(int id)
         {
+            return CountChildren(id) > 0;
+        }
+
+        internal int CountChildren(int id)
+        {
             using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
             {
                 var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
-                int count = repository.Count(query);
-                return count > 0;
+                var count = repository.Count(query);
+                return count;
             }
         }
 
@@ -1474,7 +1479,12 @@ namespace Umbraco.Core.Services
                     LogHelper.Info<ContentService>(
                         string.Format("Content '{0}' with Id '{1}' could not be published because of invalid properties.",
                                       content.Name, content.Id));
-                    result.Add(new Attempt<PublishStatus>(false, new PublishStatus(content, PublishStatusType.FailedContentInvalid)));
+                    result.Add(
+                        new Attempt<PublishStatus>(false, 
+                            new PublishStatus(content, PublishStatusType.FailedContentInvalid)
+                                {
+                                    InvalidProperties = ((ContentBase) content).LastInvalidProperties
+                                }));
                     return result;
                 }
 

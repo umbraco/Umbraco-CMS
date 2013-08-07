@@ -58,6 +58,21 @@ namespace Umbraco.Tests.Models
         }
 
         [Test]
+        public void All_Dirty_Properties_Get_Reset()
+        {
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+
+            content.ResetDirtyProperties(false);
+
+            Assert.IsFalse(content.IsDirty());
+            foreach (var prop in content.Properties)
+            {
+                Assert.IsFalse(prop.IsDirty());
+            }
+        }
+
+        [Test]
         public void Can_Verify_Mocked_Content()
         {
             // Arrange

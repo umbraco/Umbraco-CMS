@@ -33,6 +33,7 @@ namespace Umbraco.Tests.TestHelpers
             SetupPluginManager();            
             SetupApplicationContext();
             InitializeMappers();
+
             FreezeResolution();
         }
 
@@ -48,7 +49,7 @@ namespace Umbraco.Tests.TestHelpers
             ApplicationContext.Current = null;
             ResetPluginManager();
         }
-
+        
         private void InitializeMappers()
         {
             Mapper.Initialize(configuration =>

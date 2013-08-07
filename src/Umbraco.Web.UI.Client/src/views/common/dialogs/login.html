@@ -9,7 +9,7 @@
                 <input type="password" ng-model="password" name="password" class="input-xlarge" placeholder="Enter your password" />
             </div>
 
-            <input type="submit" class="btn" value="Login" ng-disabled="loginForm.$invalid" />
+            <button type="submit" class="btn" ng-disabled="loginForm.$invalid">Login</button>
             
             <div class="control-group" ng-show="loginForm.$invalid">
                 <div class="alert alert-error">{{errorMsg}}</div>

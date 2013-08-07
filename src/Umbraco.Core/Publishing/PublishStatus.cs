@@ -8,15 +8,14 @@ namespace Umbraco.Core.Publishing
     /// </summary>
     internal class PublishStatus
     {
-        public IContent ContentItem { get; private set; }
-        public PublishStatusType StatusType { get; internal set; }
-
-        /// <summary>
-        /// Gets sets the invalid properties if the status failed due to validation.
-        /// </summary>
-        public IEnumerable<Property> InvalidProperties { get; set; }
+        public PublishStatus()
+        {
+            //initialize
+            InvalidProperties = new List<Property>();
+        }
 
         public PublishStatus(IContent content, PublishStatusType statusType)
+            : this()
         {
             ContentItem = content;
             StatusType = statusType;
@@ -29,6 +28,13 @@ namespace Umbraco.Core.Publishing
             : this(content, PublishStatusType.Success)
         {            
         }
+        
+        public IContent ContentItem { get; private set; }
+        public PublishStatusType StatusType { get; internal set; }
 
+        /// <summary>
+        /// Gets sets the invalid properties if the status failed due to validation.
+        /// </summary>
+        public IEnumerable<Property> InvalidProperties { get; set; }
     }
 }

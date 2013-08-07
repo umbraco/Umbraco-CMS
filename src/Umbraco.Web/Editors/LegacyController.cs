@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.UI;
 using Umbraco.Web.WebApi;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {

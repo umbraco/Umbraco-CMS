@@ -10,6 +10,9 @@ using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Dynamics
 {
+    //SD: I wish all of this wasn't hacked and was just the original dynamic linq from MS... sigh. Just
+    // means we can't really use it for anything other than dynamic node (i think)
+
 	internal class ExpressionParser<T>
 	{
 		struct Token

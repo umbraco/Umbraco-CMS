@@ -13,6 +13,7 @@ namespace Umbraco.Core
     /// </summary>
     public static class UriExtensions
     {
+        
         /// <summary>
         /// Checks if the current uri is a back office request
         /// </summary>
@@ -20,10 +21,13 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal static bool IsBackOfficeRequest(this Uri url)
         {
+        
             var authority = url.GetLeftPart(UriPartial.Authority);
             var afterAuthority = url.GetLeftPart(UriPartial.Query)
                                     .TrimStart(authority)
                                     .TrimStart("/");
+
+            
 
             //check if this is in the umbraco back office
             return afterAuthority.InvariantStartsWith(GlobalSettings.Path.TrimStart("/"));
