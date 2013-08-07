@@ -56,6 +56,22 @@ namespace Umbraco.Web.Editors
             }
         }
 
+        protected HttpResponseMessage PerformSort(ContentSortOrder sorted)
+        {
+            if (sorted == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+
+            //if there's nothing to sort just return ok
+            if (sorted.IdSortOrder.Length == 0)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+
+            return null;
+        }
+
         protected void MapPropertyValues<TPersisted>(ContentItemSave<TPersisted> contentItem)
             where TPersisted : IContentBase
         {

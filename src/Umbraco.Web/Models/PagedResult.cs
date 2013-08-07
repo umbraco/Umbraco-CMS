@@ -29,12 +29,16 @@ namespace Umbraco.Web.Models
 
         [DataMember(Name = "pageNumber")]
         public long PageNumber { get; private set; }
+
         [DataMember(Name = "pageSize")]
         public long PageSize { get; private set; }
+
         [DataMember(Name = "totalPages")]
         public long TotalPages { get; private set; }
+
         [DataMember(Name = "totalItems")]
         public long TotalItems { get; private set; }
+
         [DataMember(Name = "items")]
         public IEnumerable<T> Items { get; set; }
 

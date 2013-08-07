@@ -29,12 +29,16 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
-    //TODO: For each of these requests the user will need to have access to the content app! 
-
+ 
     /// <summary>
     /// The API controller used for editing content
     /// </summary>
+    /// <remarks>
+    /// This controller is decorated with the UmbracoApplicationAuthorizeAttribute which means that any user requesting
+    /// access to ALL of the methods on this controller will need access to the content application.
+    /// </remarks>
     [PluginController("UmbracoApi")]
+    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
     public class ContentController : ContentControllerBase
     {        
         /// <summary>
@@ -54,12 +58,15 @@ namespace Umbraco.Web.Editors
         {            
         }
 
+        /// <summary>
+        /// Return content for the specified ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [FilterAllowedOutgoingContent]
         public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)
         {
             var foundContent = ((ContentService) Services.ContentService).GetByIds(ids);
-
-            //TODO: We need to check if the current user is allowed to see each node!
-
             return foundContent.Select(Mapper.Map<IContent, ContentItemDisplay>);
         }
 
@@ -68,6 +75,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [EnsureUserPermissionForContent("id")]
         public ContentItemDisplay GetById(int id)
         {
             var foundContent = Services.ContentService.GetById(id);
@@ -75,9 +83,7 @@ namespace Umbraco.Web.Editors
             {
                 HandleContentNotFound(id);
             }
-
-            //TODO: We need to check if the current user is allowed to see this node!
-
+            
             return Mapper.Map<IContent, ContentItemDisplay>(foundContent);
         }
 
@@ -104,6 +110,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [OutgoingDateTimeFormat]
+        [FilterAllowedOutgoingContent("Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>> GetChildren(
             int id, 
             int pageNumber = 0, 
@@ -116,8 +123,6 @@ namespace Umbraco.Web.Editors
 
             //TODO: This will be horribly inefficient for paging! This is because our datasource/repository 
             // doesn't support paging at the SQL level... and it'll be pretty interesting to try to make that work.
-
-            //TODO: We need to check the nodes returned to see if the current user is allowed to see each of them!
 
             var foundContent = Services.ContentService.GetById(id);
             if (foundContent == null)
@@ -250,15 +255,20 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// The CanAccessContentAuthorize attribute will deny access to this method if the current user
+        /// does not have Delete access to this node.
+        /// </remarks>
+        [EnsureUserPermissionForContent("id", 'D')]
         public HttpResponseMessage DeleteById(int id)
         {
+            //TODO: We need to check if the user is allowed to do this!
+
             var foundContent = Services.ContentService.GetById(id);
             if (foundContent == null)
             {
                 return HandleContentNotFound(id, false);
             }
-
-            //TODO: We need to check if the user is allowed to do this!
 
             //if the current item is in the recycle bin
             if (foundContent.IsInRecycleBin() == false)
@@ -277,7 +287,11 @@ namespace Umbraco.Web.Editors
         /// Empties the recycle bin
         /// </summary>
         /// <returns></returns>
+        /// <remarks>
+        /// attributed with EnsureUserPermissionForContent to verify the user has access to the recycle bin
+        /// </remarks>
         [HttpDelete]
+        [EnsureUserPermissionForContent(true)]
         public HttpResponseMessage EmptyRecycleBin()
         {            
             //TODO: We need to check if the user is allowed access to the recycle bin!
@@ -293,6 +307,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public HttpResponseMessage PostSort(ContentSortOrder sorted)
         {
+            //TODO: We need to check if the user is allowed to sort here!
+
             if (sorted == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -307,15 +323,13 @@ namespace Umbraco.Web.Editors
             if (Security.UserHasAppAccess(Constants.Applications.Content, UmbracoUser) == false)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "User has no access to this application");
-            }
-
-            //TODO: We need to check if the user is allowed to sort here!
+            }            
 
             var contentService = Services.ContentService;
             var sortedContent = new List<IContent>();
             try
             {
-                sortedContent.AddRange(sorted.IdSortOrder.Select(contentService.GetById));
+                sortedContent.AddRange(((ContentService) Services.ContentService).GetByIds(sorted.IdSortOrder));
 
                 // Save content with new sort order and update content xml in db accordingly
                 if (contentService.Sort(sortedContent) == false)

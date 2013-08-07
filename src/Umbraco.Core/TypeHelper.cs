@@ -15,7 +15,7 @@ namespace Umbraco.Core
 		
 		private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache = new ConcurrentDictionary<Type, FieldInfo[]>();
 		private static readonly ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]> GetPropertiesCache = new ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]>();
-
+        
         /// <summary>
         /// Find all assembly references that are referencing the assignTypeFrom Type's assembly found in the assemblyList
         /// </summary>

@@ -13,7 +13,7 @@ namespace Umbraco.Web.WebApi.Filters
     /// Just like you can POST an arbitrary number of parameters to an Action, you can't GET an arbitrary number
     /// but this will allow you to do it
     /// </remarks>
-    public class HttpQueryStringFilterAttribute : ActionFilterAttribute
+    public sealed class HttpQueryStringFilterAttribute : ActionFilterAttribute
     {
         public string ParameterName { get; private set; }
 

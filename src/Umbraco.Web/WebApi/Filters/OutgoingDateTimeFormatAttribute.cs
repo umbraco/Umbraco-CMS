@@ -6,7 +6,7 @@ namespace Umbraco.Web.WebApi.Filters
     /// <summary>
     /// Sets the json outgoing/serialized datetime format
     /// </summary>
-    internal class OutgoingDateTimeFormatAttribute : ActionFilterAttribute
+    internal sealed class OutgoingDateTimeFormatAttribute : ActionFilterAttribute
     {
         private readonly string _format;
 

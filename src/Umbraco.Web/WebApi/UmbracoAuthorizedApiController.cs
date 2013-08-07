@@ -3,6 +3,7 @@ using System.Web;
 using System.Web.Http;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Security;
+using Umbraco.Web.WebApi.Filters;
 using umbraco.BusinessLogic;
 
 namespace Umbraco.Web.WebApi

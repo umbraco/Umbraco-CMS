@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Web.Http;
 using Umbraco.Core;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.WebApi
 {
@@ -10,6 +9,11 @@ namespace Umbraco.Web.WebApi
     /// </summary>
     public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
     {
+        /// <summary>
+        /// Can be used by unit tests to enable/disable this filter
+        /// </summary>
+        internal static bool Enable = true;
+
         private readonly ApplicationContext _applicationContext;
         private readonly UmbracoContext _umbracoContext;
 
@@ -40,6 +44,11 @@ namespace Umbraco.Web.WebApi
 
         protected override bool IsAuthorized(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
+            if (Enable == false)
+            {
+                return true;
+            }
+
             try
             {
                 var appContext = GetApplicationContext();

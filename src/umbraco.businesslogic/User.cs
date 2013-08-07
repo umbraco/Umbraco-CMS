@@ -666,44 +666,56 @@ namespace umbraco.BusinessLogic
         {
             if (!_isInitialized)
                 setupUser(_id);
+            
+            // NH 4.7.1 changing default permission behavior to default to User Type permissions IF no specific permissions has been
+            // set for the current node
+            var nodeId = Path.Contains(",") ? int.Parse(Path.Substring(Path.LastIndexOf(",", StringComparison.Ordinal)+1)) : int.Parse(Path);
+            return GetPermissions(nodeId);
+        }
+
+        [Obsolete("Do not use this, implement something in the service layer!! And make sure we can mock/test it")]
+        internal string GetPermissions(int nodeId)
+        {
+            if (!_isInitialized)
+                setupUser(_id);
+
             string defaultPermissions = UserType.DefaultPermissions;
 
             //get the cached permissions for the user
             var cachedPermissions = ApplicationContext.Current.ApplicationCache.GetCacheItem(
                 string.Format("{0}{1}", CacheKeys.UserPermissionsCacheKey, _id),
                 //Since this cache can be quite large (http://issues.umbraco.org/issue/U4-2161) we will make this priority below average
-                CacheItemPriority.BelowNormal, 
+                CacheItemPriority.BelowNormal,
                 null,
                 //Since this cache can be quite large (http://issues.umbraco.org/issue/U4-2161) we will only have this exist in cache for 20 minutes, 
                 // then it will refresh from the database.
                 new TimeSpan(0, 20, 0),
                 () =>
+                {
+                    var cruds = new Hashtable();
+                    using (var dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodePermission where userId = @userId order by nodeId", SqlHelper.CreateParameter("@userId", this.Id)))
                     {
-                        var cruds = new Hashtable();
-                        using (var dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodePermission where userId = @userId order by nodeId", SqlHelper.CreateParameter("@userId", this.Id)))
+                        while (dr.Read())
                         {
-                            while (dr.Read())
+                            if (!cruds.ContainsKey(dr.GetInt("nodeId")))
                             {
-                                if (!cruds.ContainsKey(dr.GetInt("nodeId")))
-                                {
-                                    cruds.Add(dr.GetInt("nodeId"), string.Empty);
-                                }
-                                cruds[dr.GetInt("nodeId")] += dr.GetString("permission");
+                                cruds.Add(dr.GetInt("nodeId"), string.Empty);
                             }
+                            cruds[dr.GetInt("nodeId")] += dr.GetString("permission");
                         }
-                        return cruds;
-                    });
+                    }
+                    return cruds;
+                });
 
             // NH 4.7.1 changing default permission behavior to default to User Type permissions IF no specific permissions has been
             // set for the current node
-            var nodeId = Path.Contains(",") ? int.Parse(Path.Substring(Path.LastIndexOf(",", StringComparison.Ordinal)+1)) : int.Parse(Path);
             if (cachedPermissions.ContainsKey(nodeId))
             {
-                return cachedPermissions[int.Parse(Path.Substring(Path.LastIndexOf(",", StringComparison.Ordinal) + 1))].ToString();
+                return cachedPermissions[nodeId].ToString();
             }
 
             // exception to everything. If default cruds is empty and we're on root node; allow browse of root node
-            if (string.IsNullOrEmpty(defaultPermissions) && Path == "-1")
+            if (string.IsNullOrEmpty(defaultPermissions) && nodeId == -1)
                 defaultPermissions = "F";
 
             // else return default user type cruds

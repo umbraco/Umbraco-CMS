@@ -114,7 +114,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             if (options.orderDirection === "asc") {
                 options.orderDirection = "Ascending";
             }
-            else {
+            else if (options.orderDirection === "desc") {
                 options.orderDirection = "Descending";
             }
 

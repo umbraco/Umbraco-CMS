@@ -9,7 +9,7 @@ namespace Umbraco.Web.WebApi.Filters
     /// <summary>
     /// Checks if the parameter is ContentItemSave and then deletes any temporary saved files from file uploads associated with the request
     /// </summary>
-    internal class FileUploadCleanupFilterAttribute : ActionFilterAttribute
+    internal sealed class FileUploadCleanupFilterAttribute : ActionFilterAttribute
     {
         /// <summary>
         /// Returns true so that other filters can execute along with this one
