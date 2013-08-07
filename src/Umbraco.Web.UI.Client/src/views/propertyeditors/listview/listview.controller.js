@@ -1,6 +1,7 @@
 angular.module("umbraco")
     .controller("Umbraco.Editors.ListViewController", 
-        function ($rootScope, $scope, contentResource, contentTypeResource) {
+        function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource) {
+        
         $scope.options = {
             take: 10,
             offset: 0,
@@ -9,8 +10,6 @@ angular.module("umbraco")
             order: "desc"
         };
 
-        $scope.pagination = new Array(100);
-        $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($scope.content.id);
         
         $scope.next = function(){
             if($scope.options.offset < $scope.listViewResultSet.pages){
@@ -31,7 +30,7 @@ angular.module("umbraco")
                 if($scope.options.order === "desc"){
                     $scope.options.order = "asc";
                 }else{
-                    $scope.options.order = "desc";    
+                    $scope.options.order = "desc";
                 }
             }
             $scope.reloadView();
@@ -39,8 +38,7 @@ angular.module("umbraco")
 
         $scope.prev = function(){
             if($scope.options.offset > 0){
-                $scope.options.offset--;    
-                
+                $scope.options.offset--;                
                 $scope.reloadView();
             }
         };
@@ -48,8 +46,8 @@ angular.module("umbraco")
         /*Loads the search results, based on parameters set in prev,next,sort and so on*/
         /*Pagination is done by an array of objects, due angularJS's funky way of monitoring state
         with simple values */
-        $scope.reloadView = function(){
-                $scope.listViewResultSet = contentResource.getChildren($scope.content.id, $scope.options);
+        $scope.reloadView = function(id){
+                $scope.listViewResultSet = contentResource.getChildren(id, $scope.options);
                 
                 $scope.pagination = [];
                 for (var i = $scope.listViewResultSet.pages - 1; i >= 0; i--) {
@@ -58,8 +56,14 @@ angular.module("umbraco")
                 
                 if($scope.options.offset > $scope.listViewResultSet.pages){
                     $scope.options.offset = $scope.listViewResultSet.pages;
-                }        
+                }       
         };
 
-        $scope.reloadView();
+
+        if($routeParams.id){
+            $scope.pagination = new Array(100);
+            $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
+            $scope.reloadView($routeParams.id);  
+        }
+        
 });

@@ -14,6 +14,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
             .then(function(data) {
                 $scope.contentLoaded = true;
                 $scope.content = data;
+                $scope.genericPropertiesTab = $.grep($scope.content.tabs, function(e){ return e.id === 0; })[0];
             });
     }
     else {
@@ -22,13 +23,12 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
             .then(function(data) {
                 $scope.contentLoaded = true;
                 $scope.content = data;
-                
+                $scope.genericPropertiesTab = $.grep($scope.content.tabs, function(e){ return e.id === 0; })[0];
                 //in one particular special case, after we've created a new item we redirect back to the edit
                 // route but there might be server validation errors in the collection which we need to display
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
-
             });
     }
 
@@ -50,7 +50,6 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
     //TODO: Need to figure out a way to share the saving and event broadcasting with all editors!
 
     $scope.saveAndPublish = function (cnt) {
-
         $scope.$broadcast("saving", { scope: $scope });
 
         //don't continue if the form is invalid
@@ -70,7 +69,6 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
     };
 
     $scope.save = function (cnt) {
-	        
         $scope.$broadcast("saving", { scope: $scope });
             
         //don't continue if the form is invalid
@@ -86,8 +84,12 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
                 });
             }, function (err) {
                 contentEditingHelper.handleSaveError(err, $scope);
-            });
-	        
+        });
+    };
+
+    
+    $scope.exludeLastTab = function(item) {
+        return item.id !== 0;
     };
 }
 

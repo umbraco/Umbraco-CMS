@@ -1,0 +1,91 @@
+<h1><code ng:non-bindable=""></code>
+<span class="hint"></span>
+</h1>
+<div><h2 id="overview">Overview</h3>
+
+<p>This document is loosely connected notes and thoughts on naming conventions on all application components for the Umbraco 7 UI.</p>
+
+<h2 id="moduleshandlenamespacing">modules handle namespacing,</h3>
+
+<p>Naming: last one wins
+but to do this automaticly, we would need
+to auto-register all modules needed on app-start.
+This gives us a couple of complications for handling 3rd party applications. 
+As it would be a pain to scan every file for modules to load on app start.</p>
+
+<p>Proposed structure:
+http://briantford.com/blog/huuuuuge-angular-apps.html</p>
+
+<p>Register all modules in app.js
+Root module: Umbraco
+    - contains the core services: notifications,dialogs,etc
+    - contains the core resources: content,media etc
+    - contains the core directives</p>
+
+<p>1 module pr file princible</p>
+
+<p>1st level modules:
+    Umbraco (for misc system-level stuff, dialogs, notifications, etc)
+    Umbraco.PropertyEditors (for all editors, as they are shared between all modules)
+        - how would a 3rd party property editor access a 3rd party service in the Ucommerce module, when its loaded in the content editor? (which is inside the the content module?)
+    Umbraco.Content (registers that it needs umbraco module, for access to core services )
+    Umbraco.Media
+    Umbraco.Settings
+    Ucommerce
+    TeaCommerce
+    Etc</p>
+
+<p>Should all (core + 3rd party) services, filters and directives just be dependencies in the global umbraco module?</p>
+
+<p>Each section namespace knows what modules to initially have loaded: 
+Umbraco.Content
+    - EditController
+    - SortController</p>
+
+<p>Inside the EditController module, it references the needed services:
+    - DialogService
+    - ContentFactory
+    - Etc</p>
+
+<p>So things are only loaded when needed, due to the modules, and our application, really only needs to know about the root modules, Content,Media,Settings, Ucommerce etc.</p>
+
+<h2 id="directives">Directives</h3>
+
+<p>If more directives have the same name, they will all be run</p>
+
+<h2 id="controllers">Controllers</h3>
+
+<p>Last one wins, so you can override core controllers
+Can be namedspaced, but shouldnt, the module is the namespace?
+Module: Umbraco.Section.Area.Page
+Name: PageNameController</p>
+
+<p>Filename: /umbraco/section/area/pagename.controller.js
+Ex: /umbraco/content/document/edit.controller.js
+Ex: /umbraco/settings/documenttype/edit.controller.js</p>
+
+<p>There is a need to have an extra level in the content tree urls due to all
+other sections have this as well, and we dont want to confuse the routing.</p>
+
+<p>The ctrl acronym is horrible and should not be used IMO.</p>
+
+<h2 id="services">Services</h3>
+
+<p>typeService ? - cant be namespaced
+Module: Umbraco.Services.Type
+Name: TypeService?</p>
+
+<p>Ex: Umbraco.Services.Notifications.NotificationsService
+Filename: /umbraco/common/services/notifcations.service.js</p>
+
+<h2 id="resources">Resources</h3>
+
+<ul>
+<li>Content, media, etc, cant be namespaced:
+Module: Umbraco.Resources.Type
+Name: TypeFactory?</li>
+</ul>
+
+<p>Ex: Umbraco.Resources.Content.ContentFactory?
+filename: /umbraco/common/resources/content.resources.js ? or
+/umbraco/common/resoures/content.factory.js ?</p></div>

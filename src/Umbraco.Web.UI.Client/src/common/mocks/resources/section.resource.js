@@ -1,6 +1,6 @@
 ﻿/**
 * @ngdoc service
-* @name umbraco.mocks.sectionMocks     
+* @name umbraco.mocks.sectionMocks
 * @description 
 * Mocks data retrival for the sections
 **/

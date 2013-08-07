@@ -1,4 +1,9 @@
-#Naming conventions
+@ngdoc overview
+@name Naming conventions
+@description
+
+##Overview
+This document is loosely connected notes and thoughts on naming conventions on all application components for the Umbraco 7 UI.
 
 ##modules handle namespacing, 
 Naming: last one wins

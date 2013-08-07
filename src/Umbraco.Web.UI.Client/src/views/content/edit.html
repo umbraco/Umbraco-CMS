@@ -29,26 +29,61 @@
         </umb-header>
 
         <umb-tab-view>
-            <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
-                <umb-property ng-repeat="model in tab.properties"></umb-property>
+            <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs |  filter:exludeLastTab">
+                <umb-property 
+                    label="{{property.label}}" 
+                    description="{{property.description}}"
+                    alias="{{property.alias}}" 
+                    hidelabel="{{property.hideLabel}}"
+                    ng-repeat="property in tab.properties">
+                        
+                        <umb-editor 
+                            config="{{property.config}}"
+                            value="property.value" 
+                            view="{{property.view}}" 
+                            alias="{{property.alias}}">
+                        </umb-editor>
+
+                </umb-property>
             </umb-tab>
 
+            <umb-tab id="tab0" rel="0" data-label="Generic properties">
+                
+               <umb-property 
+                   label="Created" description="Time this document was created">
+                   <umb-editor
+                       value="content.createDate"
+                       view="readonlyvalue"
+                       config="{{ {filter: 'date', format: 'medium'} }}" 
+                       alias="createdate">
+                   </umb-editor>
+               </umb-property>   
+               
+               <umb-property 
+                   label="Updated" description="Time this document was last updated">
+                   <umb-editor
+                       value="content.updateDate" 
+                       view="readonlyvalue"
+                       config="{{ {filter: 'date', format: 'medium'} }}"
+                       alias="createdate">
+                   </umb-editor>
+               </umb-property>   
+                
 
-            <umb-tab id="tabgeneric" rel="generic" data-label="Generic properties">
-                <umb-editor
-                    value="content.createDate" 
-                    label="Created"
-                    view="datepicker" 
-                    description="Time this document was created">
-                </umb-editor>
-
-                <umb-editor
-                    value="content.updateDate" 
-                    label="Updated"
-                    view="datepicker"
-                    description="Time this document was last updated">
-                </umb-editor>
-
+                <umb-property 
+                    label="{{property.label}}" 
+                    description="{{property.description}}"
+                    alias="{{property.alias}}" 
+                    hidelabel="{{property.hideLabel}}"
+                    ng-repeat="property in genericPropertiesTab.properties">
+                        
+                    <umb-editor 
+                        config="{{property.config}}"
+                        value="property.value" 
+                        view="{{property.view}}" 
+                        alias="{{property.alias}}">
+                    </umb-editor>
+                </umb-property>
                 
             </umb-tab>
         </umb-tab-view>

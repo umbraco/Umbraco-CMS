@@ -1,4 +1,8 @@
-#Test-driven developement flow for Umbraco 7
+@ngdoc overview
+@name Test-driven developement flow
+@description
+
+##Overview
 
 _This document tries to outline what is required to have a test-driven setup for
 angular developement in Umbraco 7. It goes through the setup process as well as how
@@ -28,7 +32,6 @@ This ensures 3 things:
 - we test our controllers
 - we test our services
 - we always have mocked data available, if you want to run the client without IIS
-
 
 
 ###Example: 

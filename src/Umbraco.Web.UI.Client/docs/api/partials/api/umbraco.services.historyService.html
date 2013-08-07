@@ -1,0 +1,75 @@
+<h1><code ng:non-bindable="">historyService</code>
+<span class="hint">(service in module <code ng:non-bindable="">umbraco.services</code>
+)</span>
+</h1>
+<div><h2 id="Description">Description</h2>
+<div class="description"><p>Service to handle the main application navigation history. Responsible for keeping track
+of where a user navigates to, stores an icon, url and name in a collection, to make it easy
+for the user to go back to a previous editor / action</p>
+
+<p><strong>Note:</strong> only works with new angular-based editors, not legacy ones</p>
+
+<h2 id="usage">usage</h4>
+
+<p>To use, simply inject the historyService into any controller that needs it, and make
+sure the umbraco.services module is accesible - which it should be by default.</p>
+
+<pre class="prettyprint linenums">
+     angular.module("umbraco").controller("my.controller". function(historyService){
+        historyService.add({
+							icon: "icon-class",
+							name: "Editing 'articles',
+							link: "/content/edit/1234"}
+						);
+     }); 
+</pre> </p></div>
+<h2 id="Dependencies">Dependencies</h2>
+<ul class="dependencies"><li><code ng:non-bindable=""><a href="api/$rootScope">$rootScope</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="api/$timeout">$timeout</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="api/angularHelper">angularHelper</a></code>
+</li>
+</ul>
+<div class="member method"><h2 id="Methods">Methods</h2>
+<ul class="methods"><li><h3 id="add">add(item)</h3>
+<div class="add"><p>Adds a given history item to the users history collection.</p><h4 id="Parameters">Parameters</h4>
+<ul class="parameters"><li><code ng:non-bindable="">item  {Object}  </code>
+<p>the history item</p></li>
+<li><code ng:non-bindable="">item.icon  {String}  </code>
+<p>icon css class for the list, ex: "icon-image", "icon-doc"</p></li>
+<li><code ng:non-bindable="">item.link  {String}  </code>
+<p>route to the editor, ex: "/content/edit/1234"</p></li>
+<li><code ng:non-bindable="">item.name  {String}  </code>
+<p>friendly name for the history listing</p></li>
+</ul>
+<h4 id="Returns">Returns</h4>
+<div class="returns"><code ng:non-bindable="">{Object}</code>
+– <p>history item object</p></div>
+</div>
+</li>
+<li><h3 id="getCurrent">getCurrent()</h3>
+<div class="getcurrent"><p>Method to return the current history collection.</p></div>
+</li>
+<li><h3 id="remove">remove(index)</h3>
+<div class="remove"><p>Removes a history item from the users history collection, given an index to remove from.</p><h4 id="Parameters">Parameters</h4>
+<ul class="parameters"><li><code ng:non-bindable="">index  {Int}  </code>
+<p>index to remove item from</p></li>
+</ul>
+</div>
+</li>
+<li><h3 id="removeAll">removeAll()</h3>
+<div class="removeall"><p>Removes all history items from the users history collection</p></div>
+</li>
+</ul>
+</div>
+<div class="member property"><h2 id="Properties">Properties</h2>
+<ul class="properties"><li><h3 id="current">current</h3>
+<div class="current"><h4 id="Returns">Returns</h4>
+<div class="returns"><code ng:non-bindable="">{Array}</code>
+– <p>Array of history entries for the current user, newest items first</p></div>
+</div>
+</li>
+</ul>
+</div>
+</div>

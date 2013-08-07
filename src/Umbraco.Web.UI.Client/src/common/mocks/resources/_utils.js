@@ -23,8 +23,7 @@
                     tabs: [
                     {
                         label: "Child documents",
-                        alias: "tab00",
-                        id: 0,
+                        id: 1,
                         active: true,
                         properties: [
                         { alias: "list", label: "List", view: "listview", value: "", hideLabel: true }
@@ -32,8 +31,7 @@
                     },
                     {
                         label: "Content",
-                        alias: "tab01",
-                        id: 1,
+                        id: 2,
                         properties: [
                             { alias: "bodyText", label: "Body Text", description: "Here you enter the primary article contents", view: "rte", value: "<p>askjdkasj lasjd</p>" },
                             { alias: "textarea", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
@@ -44,8 +42,7 @@
                     },
                     {
                         label: "Sample Editor",
-                        alias: "tab02",
-                        id: 2,
+                        id: 3,
                         properties: [
                             { alias: "datepicker", label: "Datepicker", view: "datepicker", config: { rows: 7 } },
                             { alias: "tags", label: "Tags", view: "tags", value: "" }
@@ -53,15 +50,13 @@
                     },
                     {
                         label: "Grid",
-                        alias: "tab03",
-                        id: 3,
+                        id: 4,
                         properties: [
                         { alias: "grid", label: "Grid", view: "grid", controller: "umbraco.grid", value: "test", hideLabel: true }
                         ]
                     }, {
-                        label: "WIP",
-                        alias: "tab04",
-                        id: 4,
+                        label: "Generic Properties",
+                        id: 0,
                         properties: [
                             {
                                 alias: "tes", label: "Stuff", view: "test", controller: "umbraco.embeddedcontent", value: "",

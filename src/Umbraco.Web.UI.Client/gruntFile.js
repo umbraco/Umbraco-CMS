@@ -244,14 +244,15 @@ module.exports = function (grunt) {
       options: {
         dest: 'docs/api',
         startPage: '/api',
-        title: "Umbraco 7"
+        title: "Umbraco 7",
+        html5Mode: false,
       },
       api: {
-        src: ['src/common/**/*.js'],
+        src: ['src/common/**/*.js', 'docs/src/api/**/*.ngdoc'],
         title: 'API Documentation'
       },
       tutorials: {
-        src: ['docs/tutorials/**/*.ngdoc'],
+        src: ['docs/src/tutorials/**/*.ngdoc'],
         title: 'Tutorials'
       }
     },

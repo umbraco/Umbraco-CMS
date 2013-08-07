@@ -1,6 +1,6 @@
 ﻿/**
     * @ngdoc service
-    * @name umbraco.resources.treeResource     
+    * @name umbraco.resources.treeResource
     * @description Loads in data for trees
     **/
 function treeResource($q, $http, umbRequestHelper) {

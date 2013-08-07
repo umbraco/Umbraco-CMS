@@ -72,6 +72,10 @@ describe('edit content controller tests', function () {
               });
         });
 
+        it('it should have a generic properties tab', function () {
+            expect(scope.genericPropertiesTab).toNotBe(undefined);
+        });
+
         it('it should change updateDate on save', function () {
           var currentUpdateDate = scope.content.updateDate;
 

@@ -1,4 +1,9 @@
-#Using AngularJS Promises and Umbraco Resources
+@ngdoc overview
+@name Using AngularJS Promises and Umbraco Resources
+@description
+
+##Overview
+Document to outline the way we work with data from the Umbraco rest API which is always returned as a promise, so we in an async way can resolve our data.  
 
 ##Promises in Umbraco Resources
 
