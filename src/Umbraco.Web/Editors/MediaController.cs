@@ -17,6 +17,7 @@ using System.Linq;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -180,7 +181,7 @@ namespace Umbraco.Web.Editors
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
 
-            if (!Security.UserHasAppAccess(global::Umbraco.Core.Constants.Applications.Media, UmbracoUser))
+            if (Security.UserHasAppAccess(Constants.Applications.Media, UmbracoUser) == false)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "User has no access to this application");
             }

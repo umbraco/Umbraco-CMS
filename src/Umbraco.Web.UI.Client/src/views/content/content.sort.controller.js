@@ -6,7 +6,9 @@
  * @description
  * The controller for deleting content
  */
-function ContentSortController($scope, $element, contentResource, treeService, navigationService) {
+function ContentSortController($scope, contentResource, angularHelper) {
+
+    $scope.complete = false;
 
     //defines the options for the jquery sortable
     $scope.sortableOptions = {
@@ -14,7 +16,18 @@ function ContentSortController($scope, $element, contentResource, treeService, n
         cursor: "move",
         placeholder: "ui-sortable-placeholder",
         update: function (ev, ui) {
+            //highlight the item when the position is changed
             $(ui.item).effect("highlight", { color: "#049cdb" }, 500);
+        },
+        stop: function (ev, ui) {
+            //the ui-sortable directive already ensures that our list is re-sorted, so now we just
+            // need to update the sortOrder to the index of each item
+            angularHelper.safeApply($scope, function () {                
+                angular.forEach($scope.itemsToSort, function (val, index) {
+                    val.sortOrder = index + 1;
+                });
+
+            });
         }
     };
 
@@ -24,21 +37,14 @@ function ContentSortController($scope, $element, contentResource, treeService, n
     
     $scope.performSort = function() {
 
-        //contentResource.sort($scope.currentNode.id).then(function () {
-        //    $scope.currentNode.loading = false;
-
-        //    //get the root node before we remove it
-        //    var rootNode = treeService.getTreeRoot($scope.currentNode);
-
-        //    //TODO: Need to sync tree, etc...
-        //    treeService.removeNode($scope.currentNode);
-
-        //    //ensure the recycle bin has child nodes now            
-        //    var recycleBin = treeService.getDescendantNode(rootNode, -20);
-        //    recycleBin.hasChildren = true;
-
-        //    navigationService.hideMenu();
-        //});
+        var sortedIds = [];
+        for (var i = 0; i < $scope.itemsToSort.length; i++) {
+            sortedIds.push($scope.itemsToSort[i].id);
+        }
+        contentResource.sort({ parentId: $scope.currentNode.id, sortedIds: sortedIds })
+            .then(function() {
+                $scope.complete = true;
+            });
 
     };
 

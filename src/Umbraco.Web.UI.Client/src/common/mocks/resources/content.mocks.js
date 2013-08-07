@@ -95,10 +95,20 @@ angular.module('umbraco.mocks').
           return [200, node, null];
       }
       
-
+      function returnSort(status, data, headers) {
+          if (!mocksUtils.checkAuth()) {
+              return [401, null, null];
+          }
+          
+          return [200, null, null];
+      }
 
       return {
           register: function () {
+              $httpBackend
+                  .whenPOST(mocksUtils.urlRegex('/umbraco/UmbracoApi/Content/PostSort'))
+                  .respond(returnSort);
+
               $httpBackend
                   .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Content/GetChildren'))
                   .respond(returnChildren);

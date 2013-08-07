@@ -31,7 +31,13 @@ function MainController($scope, $routeParams, $rootScope, $timeout, notification
         var el = event.target.nodeName;
         var pEl = event.target.parentElement.nodeName;
 
-        if(el != "I" && el != "A" && el != "BUTTON" && pEl != "A" && pEl != "BUTTON"){
+        //SD: I've updated this so that we don't close the dialog when clicking inside of the dialog
+        if ($(event.target).closest("#dialog").length === 1) {
+            return;
+        }
+
+        //SD: I've added a check for INPUT elements too
+        if(el != "I" && el != "A" && el != "BUTTON" && pEl != "A" && pEl != "BUTTON" && el != "INPUT" && pEl != "INPUT"){
             $rootScope.$emit("closeDialogs", event);
         }
     };

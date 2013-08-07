@@ -8,6 +8,7 @@ using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -24,9 +25,12 @@ using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using Umbraco.Core.Models;
 using Umbraco.Core.Dynamics;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
+    //TODO: For each of these requests the user will need to have access to the content app! 
+
     /// <summary>
     /// The API controller used for editing content
     /// </summary>
@@ -54,6 +58,8 @@ namespace Umbraco.Web.Editors
         {
             var foundContent = ((ContentService) Services.ContentService).GetByIds(ids);
 
+            //TODO: We need to check if the current user is allowed to see each node!
+
             return foundContent.Select(Mapper.Map<IContent, ContentItemDisplay>);
         }
 
@@ -69,6 +75,9 @@ namespace Umbraco.Web.Editors
             {
                 HandleContentNotFound(id);
             }
+
+            //TODO: We need to check if the current user is allowed to see this node!
+
             return Mapper.Map<IContent, ContentItemDisplay>(foundContent);
         }
 
@@ -107,6 +116,8 @@ namespace Umbraco.Web.Editors
 
             //TODO: This will be horribly inefficient for paging! This is because our datasource/repository 
             // doesn't support paging at the SQL level... and it'll be pretty interesting to try to make that work.
+
+            //TODO: We need to check the nodes returned to see if the current user is allowed to see each of them!
 
             var foundContent = Services.ContentService.GetById(id);
             if (foundContent == null)
@@ -161,6 +172,8 @@ namespace Umbraco.Web.Editors
             //TODO: We need to support 'send to publish'
 
             //TODO: We'll need to save the new template, publishat, etc... values here
+
+            //TODO: We need to check the user's permissions to see if they are allowed to do this!
 
             MapPropertyValues(contentItem);
 
@@ -245,6 +258,8 @@ namespace Umbraco.Web.Editors
                 return HandleContentNotFound(id, false);
             }
 
+            //TODO: We need to check if the user is allowed to do this!
+
             //if the current item is in the recycle bin
             if (foundContent.IsInRecycleBin() == false)
             {
@@ -265,8 +280,56 @@ namespace Umbraco.Web.Editors
         [HttpDelete]
         public HttpResponseMessage EmptyRecycleBin()
         {            
+            //TODO: We need to check if the user is allowed access to the recycle bin!
+
             Services.ContentService.EmptyRecycleBin();
             return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        /// <summary>
+        /// Change the sort order for media
+        /// </summary>
+        /// <param name="sorted"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PostSort(ContentSortOrder sorted)
+        {
+            if (sorted == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+
+            //if there's nothing to sort just return ok
+            if (sorted.IdSortOrder.Length == 0)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+
+            if (Security.UserHasAppAccess(Constants.Applications.Content, UmbracoUser) == false)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "User has no access to this application");
+            }
+
+            //TODO: We need to check if the user is allowed to sort here!
+
+            var contentService = Services.ContentService;
+            var sortedContent = new List<IContent>();
+            try
+            {
+                sortedContent.AddRange(sorted.IdSortOrder.Select(contentService.GetById));
+
+                // Save content with new sort order and update content xml in db accordingly
+                if (contentService.Sort(sortedContent) == false)
+                {
+                    LogHelper.Warn<MediaController>("Content sorting failed, this was probably caused by an event being cancelled");
+                    return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Content sorting failed, this was probably caused by an event being cancelled");
+                }
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<MediaController>("Could not update content sort order", ex);
+                throw;
+            }
         }
 
         private void ShowMessageForStatus(PublishStatus status, ContentItemDisplay display)
