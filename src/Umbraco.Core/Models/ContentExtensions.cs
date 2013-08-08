@@ -12,6 +12,7 @@ using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Persistence;
@@ -23,6 +24,60 @@ namespace Umbraco.Core.Models
     public static class ContentExtensions
     {
         #region IContent
+
+        /// <summary>
+        /// Determines if a new version should be created
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// A new version needs to be created when:
+        /// * The publish status is changed
+        /// * The language is changed
+        /// * The item is already published and is being published again and any property value is changed (to enable a rollback)
+        /// </remarks>
+        internal static bool ShouldCreateNewVersion(this IContent entity)
+        {
+            var publishedState = ((Content)entity).PublishedState;
+            return ShouldCreateNewVersion(entity, publishedState);
+        }
+
+        /// <summary>
+        /// Determines if a new version should be created
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="publishedState"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// A new version needs to be created when:
+        /// * The publish status is changed
+        /// * The language is changed
+        /// * The item is already published and is being published again and any property value is changed (to enable a rollback)
+        /// </remarks>
+        internal static bool ShouldCreateNewVersion(this IContent entity, PublishedState publishedState)
+        {
+            var dirtyEntity = (ICanBeDirty)entity;
+            
+            //check if the published state has changed or the language
+            var contentChanged =
+                (dirtyEntity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished)
+                || dirtyEntity.IsPropertyDirty("Language");
+
+            //return true if published or language has changed
+            if (contentChanged)
+            {
+                return true;
+            }
+
+            //check if any user prop has changed
+            var propertyValueChanged = ((Content) entity).IsAnyUserPropertyDirty();
+            //check if any content prop has changed
+            var contentDataChanged = ((Content) entity).IsEntityDirty();
+
+            //return true if the item is published and a property has changed or if any content property has changed
+            return (propertyValueChanged && publishedState == PublishedState.Published) || contentDataChanged;
+        }
+
         /// <summary>
         /// Returns a list of the current contents ancestors, not including the content itself.
         /// </summary>
