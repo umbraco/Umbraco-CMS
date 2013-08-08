@@ -18,10 +18,12 @@ namespace Umbraco.Core
     public class CacheHelper
 	{
 	    private readonly bool _enableCache;
-        private readonly CacheProviderBase _staticCache;
-        private readonly CacheProviderBase _nullStaticCache = new NullCacheProvider();
-        private readonly RuntimeCacheProviderBase _httpCache;
-        private readonly RuntimeCacheProviderBase _nullHttpCache = new NullCacheProvider();
+	    private readonly ICacheProvider _requestCache;
+        private readonly ICacheProvider _nullRequestCache = new NullCacheProvider();
+        private readonly ICacheProvider _staticCache;
+        private readonly ICacheProvider _nullStaticCache = new NullCacheProvider();
+        private readonly IRuntimeCacheProvider _httpCache;
+        private readonly IRuntimeCacheProvider _nullHttpCache = new NullCacheProvider();
 
 		public CacheHelper(System.Web.Caching.Cache cache)
             : this(cache, true)
@@ -33,17 +35,170 @@ namespace Umbraco.Core
 	    {            
 	    }
 
-        internal CacheHelper(RuntimeCacheProviderBase httpCacheProvider, bool enableCache)
-            : this(httpCacheProvider, new StaticCacheProvider(), enableCache)
+        internal CacheHelper(IRuntimeCacheProvider httpCacheProvider, bool enableCache)
+            : this(httpCacheProvider, new StaticCacheProvider(), new HttpRequestCacheProvider(HttpContext.Current), enableCache)
         {
         }
 
-        internal CacheHelper(RuntimeCacheProviderBase httpCacheProvider, CacheProviderBase staticCacheProvider, bool enableCache)
+        internal CacheHelper(
+            IRuntimeCacheProvider httpCacheProvider, 
+            ICacheProvider staticCacheProvider, 
+            ICacheProvider requestCacheProvider, 
+            bool enableCache)
         {
             _httpCache = httpCacheProvider;
             _staticCache = staticCacheProvider;
             _enableCache = enableCache;
+            _requestCache = requestCacheProvider;
         }
+
+        #region Request cache
+
+        /// <summary>
+        /// Clears the item in umbraco's request cache
+        /// </summary>
+        internal void ClearAllRequestCache()
+        {
+            if (!_enableCache)
+            {
+                _nullRequestCache.ClearAllCache();
+            }
+            else
+            {
+                _requestCache.ClearAllCache();
+            }
+        }
+
+        /// <summary>
+        /// Clears the item in umbraco's request cache with the given key 
+        /// </summary>
+        /// <param name="key">Key</param>
+        internal void ClearRequestCacheItem(string key)
+        {
+            if (!_enableCache)
+            {
+                _nullRequestCache.ClearCacheItem(key);
+            }
+            else
+            {
+                _requestCache.ClearCacheItem(key);
+            }
+        }
+
+        /// <summary>
+        /// Clears all objects in the request cache with the System.Type name as the
+        /// input parameter. (using [object].GetType())
+        /// </summary>
+        /// <param name="typeName">The name of the System.Type which should be cleared from cache ex "System.Xml.XmlDocument"</param>
+        internal void ClearRequestCacheObjectTypes(string typeName)
+        {
+            if (!_enableCache)
+            {
+                _nullRequestCache.ClearCacheObjectTypes(typeName);
+            }
+            else
+            {
+                _requestCache.ClearCacheObjectTypes(typeName);
+            }
+        }
+
+        /// <summary>
+        /// Clears all objects in the request cache with the System.Type specified
+        /// </summary>
+        internal void ClearRequestCacheObjectTypes<T>()
+        {
+            if (!_enableCache)
+            {
+                _nullRequestCache.ClearCacheObjectTypes<T>();
+            }
+            else
+            {
+                _requestCache.ClearCacheObjectTypes<T>();
+            }
+        }
+
+        /// <summary>
+        /// Clears all request cache items that starts with the key passed.
+        /// </summary>
+        /// <param name="keyStartsWith">The start of the key</param>
+        internal void ClearRequestCacheByKeySearch(string keyStartsWith)
+        {
+            if (!_enableCache)
+            {
+                _nullRequestCache.ClearCacheByKeySearch(keyStartsWith);
+            }
+            else
+            {
+                _requestCache.ClearCacheByKeySearch(keyStartsWith);
+            }
+        }
+
+        /// <summary>
+        /// Clears all cache items that have a key that matches the regular expression
+        /// </summary>
+        /// <param name="regexString"></param>
+        internal void ClearRequestCacheByKeyExpression(string regexString)
+        {
+            if (!_enableCache)
+            {
+                _nullRequestCache.ClearCacheByKeyExpression(regexString);
+            }
+            else
+            {
+                _requestCache.ClearCacheByKeyExpression(regexString);
+            }
+        }
+
+        internal IEnumerable<T> GetRequestCacheItemsByKeySearch<T>(string keyStartsWith)
+        {
+            if (!_enableCache)
+            {
+                return _nullRequestCache.GetCacheItemsByKeySearch<T>(keyStartsWith);
+            }
+            else
+            {
+                return _requestCache.GetCacheItemsByKeySearch<T>(keyStartsWith);
+            }
+        }
+
+        /// <summary>
+        /// Returns a request cache item by key, does not update the cache if it isn't there.
+        /// </summary>
+        /// <typeparam name="TT"></typeparam>
+        /// <param name="cacheKey"></param>
+        /// <returns></returns>
+        internal TT GetRequestCacheItem<TT>(string cacheKey)
+        {
+            if (!_enableCache)
+            {
+                return _nullRequestCache.GetCacheItem<TT>(cacheKey);
+            }
+            else
+            {
+                return _requestCache.GetCacheItem<TT>(cacheKey);
+            }
+        }
+
+        /// <summary>
+        /// Gets (and adds if necessary) an item from the request cache with all of the default parameters
+        /// </summary>
+        /// <typeparam name="TT"></typeparam>
+        /// <param name="cacheKey"></param>
+        /// <param name="getCacheItem"></param>
+        /// <returns></returns>
+        internal TT GetRequestCacheItem<TT>(string cacheKey, Func<TT> getCacheItem)
+        {
+            if (!_enableCache)
+            {
+                return _nullRequestCache.GetCacheItem<TT>(cacheKey, getCacheItem);
+            }
+            else
+            {
+                return _requestCache.GetCacheItem<TT>(cacheKey, getCacheItem);
+            }
+        }
+        
+        #endregion
 
         #region Static cache
 
@@ -192,8 +347,7 @@ namespace Umbraco.Core
         }
 
         #endregion
-
-
+        
 	    #region Runtime/Http Cache
         /// <summary>
         /// Clears the item in umbraco's runtime cache

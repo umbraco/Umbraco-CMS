@@ -10,50 +10,50 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// A cache provider that statically caches everything in an in memory dictionary
     /// </summary>
-    internal class StaticCacheProvider : CacheProviderBase
+    internal class StaticCacheProvider : ICacheProvider
     {
-        private readonly ConcurrentDictionary<string, object> _staticCache = new ConcurrentDictionary<string, object>();
+        internal readonly ConcurrentDictionary<string, object> StaticCache = new ConcurrentDictionary<string, object>();
 
-        public override void ClearAllCache()
+        public virtual void ClearAllCache()
         {
-            _staticCache.Clear();
+            StaticCache.Clear();
         }
 
-        public override void ClearCacheItem(string key)
+        public virtual void ClearCacheItem(string key)
         {
             object val;
-            _staticCache.TryRemove(key, out val);
+            StaticCache.TryRemove(key, out val);
         }
 
-        public override void ClearCacheObjectTypes(string typeName)
+        public virtual void ClearCacheObjectTypes(string typeName)
         {
-            foreach (var key in _staticCache.Keys)
+            foreach (var key in StaticCache.Keys)
             {
-                if (_staticCache[key] != null
-                    && _staticCache[key].GetType().ToString().InvariantEquals(typeName))
+                if (StaticCache[key] != null
+                    && StaticCache[key].GetType().ToString().InvariantEquals(typeName))
                 {
                     object val;
-                    _staticCache.TryRemove(key, out val);
+                    StaticCache.TryRemove(key, out val);
                 }
             }
         }
 
-        public override void ClearCacheObjectTypes<T>()
+        public virtual void ClearCacheObjectTypes<T>()
         {
-            foreach (var key in _staticCache.Keys)
+            foreach (var key in StaticCache.Keys)
             {
-                if (_staticCache[key] != null
-                    && _staticCache[key].GetType() == typeof(T))
+                if (StaticCache[key] != null
+                    && StaticCache[key].GetType() == typeof(T))
                 {
                     object val;
-                    _staticCache.TryRemove(key, out val);
+                    StaticCache.TryRemove(key, out val);
                 }
             }
         }
 
-        public override void ClearCacheByKeySearch(string keyStartsWith)
+        public virtual void ClearCacheByKeySearch(string keyStartsWith)
         {
-            foreach (var key in _staticCache.Keys)
+            foreach (var key in StaticCache.Keys)
             {
                 if (key.InvariantStartsWith(keyStartsWith))
                 {
@@ -62,9 +62,9 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public override void ClearCacheByKeyExpression(string regexString)
+        public virtual void ClearCacheByKeyExpression(string regexString)
         {
-            foreach (var key in _staticCache.Keys)
+            foreach (var key in StaticCache.Keys)
             {
                 if (Regex.IsMatch(key, regexString))
                 {
@@ -73,9 +73,9 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public override IEnumerable<T> GetCacheItemsByKeySearch<T>(string keyStartsWith)
+        public virtual IEnumerable<T> GetCacheItemsByKeySearch<T>(string keyStartsWith)
         {
-            return (from KeyValuePair<string, object> c in _staticCache
+            return (from KeyValuePair<string, object> c in StaticCache
                     where c.Key.InvariantStartsWith(keyStartsWith)
                     select c.Value.TryConvertTo<T>()
                     into attempt
@@ -83,9 +83,9 @@ namespace Umbraco.Core.Cache
                     select attempt.Result).ToList();
         }
 
-        public override T GetCacheItem<T>(string cacheKey)
+        public virtual T GetCacheItem<T>(string cacheKey)
         {
-            var result = _staticCache[cacheKey];
+            var result = StaticCache[cacheKey];
             if (result == null)
             {
                 return default(T);
@@ -93,9 +93,9 @@ namespace Umbraco.Core.Cache
             return result.TryConvertTo<T>().Result;
         }
 
-        public override T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem)
+        public virtual T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem)
         {
-            return (T)_staticCache.GetOrAdd(cacheKey, getCacheItem);
+            return (T)StaticCache.GetOrAdd(cacheKey, getCacheItem());
         }
         
     }

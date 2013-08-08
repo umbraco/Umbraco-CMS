@@ -122,10 +122,15 @@
     <Compile Include="Auditing\IAuditWriteProvider.cs" />
     <Compile Include="CacheHelper.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
-    <Compile Include="Cache\CacheProviderBase.cs" />
+    <Compile Include="Cache\ICacheProvider.cs" />
     <Compile Include="Cache\CacheRefresherBase.cs" />
     <Compile Include="Cache\CacheRefresherEventArgs.cs" />
-    <Compile Include="Cache\RuntimeCacheProviderBase.cs" />
+    <Compile Include="Cache\DictionaryCacheProdiverBase.cs" />
+    <Compile Include="Cache\DictionaryCacheWrapper.cs" />
+    <Compile Include="Cache\DictionaryItemWrapper.cs" />
+    <Compile Include="Cache\HttpRequestCacheProvider.cs" />
+    <Compile Include="Cache\ObjectCacheRuntimeCacheProvider.cs" />
+    <Compile Include="Cache\IRuntimeCacheProvider.cs" />
     <Compile Include="Cache\HttpRuntimeCacheProvider.cs" />
     <Compile Include="Cache\IJsonCacheRefresher.cs" />
     <Compile Include="Cache\JsonCacheRefresherBase.cs" />

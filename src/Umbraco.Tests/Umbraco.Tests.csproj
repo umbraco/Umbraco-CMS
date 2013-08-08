@@ -108,6 +108,7 @@
     <Reference Include="System.Net.Http.WebRequest, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.WebRequest.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -160,7 +161,11 @@
     <Compile Include="Auditing\AuditTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />
     <Compile Include="BusinessLogic\DictionaryTest.cs" />
-    <Compile Include="Cache\CacheHelperTests.cs" />
+    <Compile Include="Cache\ObjectCacheProviderTests.cs" />
+    <Compile Include="Cache\CacheProviderTests.cs" />
+    <Compile Include="Cache\HttpRequestCacheProviderTests.cs" />
+    <Compile Include="Cache\HttpRuntimeCacheProviderTests.cs" />
+    <Compile Include="Cache\RuntimeCacheProviderTests.cs" />
     <Compile Include="CodeFirst\Attributes\AliasAttribute.cs" />
     <Compile Include="CodeFirst\Attributes\ContentTypeAttribute.cs" />
     <Compile Include="CodeFirst\Attributes\DescriptionAttribute.cs" />
