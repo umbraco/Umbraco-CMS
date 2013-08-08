@@ -11,6 +11,8 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
     /** adds the custom controls to the generic props tab above the user props */
     function configureGenericPropertiesTab(genericPropsTab, content) {
 
+        //NOTE: I don't really think we need these here, we should just chuck them on the mock data, then we can make
+        // sure these are just returned from the server with the correct localized strings.
         genericPropsTab.properties.splice(0, 0,
             {
                 label: 'Created',

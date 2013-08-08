@@ -11,11 +11,10 @@ function valServer(serverValidationManager) {
         restrict: "A",
         link: function (scope, element, attr, ctrl) {
             
-            if (!scope.model || !scope.model.alias){
+            if (!scope.alias){
                 throw "valServer can only be used in the scope of a content property object";
             }
-            var currentProperty = scope.model;
-
+            
             var fieldName = scope.$eval(attr.valServer);
             if (!fieldName) {
                 //eval returned nothing so just use the string
@@ -36,7 +35,7 @@ function valServer(serverValidationManager) {
             });
             
             //subscribe to the server validation changes
-            serverValidationManager.subscribe(currentProperty.alias, fieldName, function (isValid, propertyErrors, allErrors) {
+            serverValidationManager.subscribe(scope.alias, fieldName, function (isValid, propertyErrors, allErrors) {
                 if (!isValid) {
                     ctrl.$setValidity('valServer', false);
                     //assign an error msg property to the current validator
@@ -53,7 +52,7 @@ function valServer(serverValidationManager) {
             // NOTE: this is very important otherwise when this controller re-binds the previous subscriptsion will remain
             // but they are a different callback instance than the above.
             element.bind('$destroy', function () {
-                serverValidationManager.unsubscribe(currentProperty.alias, fieldName);
+                serverValidationManager.unsubscribe(scope.alias, fieldName);
             });
         }
     };
