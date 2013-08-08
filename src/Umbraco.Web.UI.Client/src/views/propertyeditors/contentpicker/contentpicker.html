@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.Editors.ContentPickerController">
 	<ul class="nav nav-stacked">	
-		<li ng-repeat="node in value">
+		<li ng-repeat="node in model.value">
 			<a href="#" prevent-default>
 				<i class="icon umb-tree-icon sprTree {{node.icon}}"></i> 
 					{{node.name}}
@@ -8,7 +8,7 @@
 		</li>
 
 		<li>
-			<a href="#" ng-click="openContentPicker(value)" prevent-default>
+			<a href="#" ng-click="openContentPicker(model.value)" prevent-default>
 				<i class="icon icon-plus"></i> Add
 			</a>
 		</li>

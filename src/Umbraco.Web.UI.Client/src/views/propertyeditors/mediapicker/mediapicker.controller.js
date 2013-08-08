@@ -7,7 +7,6 @@ angular.module('umbraco').controller("Umbraco.Editors.MediaPickerController",
     };
 
     function populate(data){
-    	$log.log(data.selection);
-        $scope.value = data.selection;    
+    	$scope.model.value = data.selection;
     }
 });
