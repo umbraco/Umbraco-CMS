@@ -36,15 +36,12 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public override T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem)
+        public override object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
             var ctx = _context();
             var ck = GetCacheKey(cacheKey);
-            if (ctx.Items[ck] == null)
-            {
-                ctx.Items[ck] = getCacheItem();
-            }
-            return (T)ctx.Items[ck];
+            return ctx.Items[ck] ?? (ctx.Items[ck] = getCacheItem());
         }
+
     }
 }

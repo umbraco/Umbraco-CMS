@@ -54,18 +54,6 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public virtual void ClearCacheObjectTypes<T>()
-        {
-            using (new WriteLock(ClearLock))
-            {
-                var keysToRemove = (from c in MemoryCache where c.Value.GetType() == typeof (T) select c.Key).ToList();
-                foreach (var k in keysToRemove)
-                {
-                    MemoryCache.Remove(k);
-                }
-            }
-        }
-
         public virtual void ClearCacheByKeySearch(string keyStartsWith)
         {
             using (new WriteLock(ClearLock))
@@ -90,27 +78,20 @@ namespace Umbraco.Core.Cache
             }     
         }
 
-        public virtual IEnumerable<T> GetCacheItemsByKeySearch<T>(string keyStartsWith)
+        public virtual IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
         {
             return (from c in MemoryCache
                     where c.Key.InvariantStartsWith(keyStartsWith)
-                    select c.Value.TryConvertTo<T>()
-                        into attempt
-                        where attempt.Success
-                        select attempt.Result).ToList();
+                    select c.Value).ToList();
         }
 
-        public virtual T GetCacheItem<T>(string cacheKey)
+        public virtual object GetCacheItem(string cacheKey)
         {
             var result = MemoryCache.Get(cacheKey);
-            if (result == null)
-            {
-                return default(T);
-            }
-            return result.TryConvertTo<T>().Result;
+            return result;
         }
 
-        public virtual T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem)
+        public virtual object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
             return GetCacheItem(cacheKey, CacheItemPriority.Normal, null, null, null, getCacheItem);
         }

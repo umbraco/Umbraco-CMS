@@ -67,28 +67,7 @@ namespace Umbraco.Core.Cache
                 }
             }
         }
-
-        /// <summary>
-        /// Clears all objects in the System.Web.Cache with the System.Type specified
-        /// </summary>
-        public virtual void ClearCacheObjectTypes<T>()
-        {            
-            lock (Locker)
-            {
-                var keysToRemove = DictionaryCache.Cast<object>()
-                                                  .Select(item => new DictionaryItemWrapper(item))
-                                                  .Where(c => DictionaryCache[c.Key.ToString()] != null && DictionaryCache[c.Key.ToString()].GetType() == typeof (T))
-                                                  .Select(c => c.Key)
-                                                  .ToList();
-
-                foreach (var k in keysToRemove)
-                {
-                    DictionaryCache.Remove(k);    
-                }
-                    
-            }
-        }
-
+        
         /// <summary>
         /// Clears all cache items that starts with the key passed.
         /// </summary>
@@ -134,35 +113,27 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public virtual IEnumerable<T> GetCacheItemsByKeySearch<T>(string keyStartsWith)
+        public virtual IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
         {
             return (from object item in DictionaryCache
                     select new DictionaryItemWrapper(item)
                     into c
                     where c.Key is string && ((string) c.Key).InvariantStartsWith(string.Format("{0}-{1}", CacheItemPrefix, keyStartsWith))
-                    select c.Value.TryConvertTo<T>()
-                    into converted
-                    where converted.Success
-                    select converted.Result).ToList();
+                    select c.Value).ToList();
         }
 
         /// <summary>
         /// Returns a cache item by key, does not update the cache if it isn't there.
         /// </summary>
-        /// <typeparam name="TT"></typeparam>
         /// <param name="cacheKey"></param>
         /// <returns></returns>
-        public virtual TT GetCacheItem<TT>(string cacheKey)
+        public virtual object GetCacheItem(string cacheKey)
         {
             var result = DictionaryCache.Get(GetCacheKey(cacheKey));
-            if (result == null)
-            {
-                return default(TT);
-            }
-            return result.TryConvertTo<TT>().Result;
+            return result;
         }
 
-        public abstract T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem);        
+        public abstract object GetCacheItem(string cacheKey, Func<object> getCacheItem);        
 
         /// <summary>
         /// We prefix all cache keys with this so that we know which ones this class has created when 

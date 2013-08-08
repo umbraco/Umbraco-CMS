@@ -14,11 +14,10 @@ namespace Umbraco.Core.Cache
         void ClearAllCache();
         void ClearCacheItem(string key);
         void ClearCacheObjectTypes(string typeName);
-        void ClearCacheObjectTypes<T>();
         void ClearCacheByKeySearch(string keyStartsWith);
         void ClearCacheByKeyExpression(string regexString);
-        IEnumerable<T> GetCacheItemsByKeySearch<T>(string keyStartsWith);
-        T GetCacheItem<T>(string cacheKey);
-        T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem);
+        IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith);
+        object GetCacheItem(string cacheKey);
+        object GetCacheItem(string cacheKey, Func<object> getCacheItem);
     }
 }

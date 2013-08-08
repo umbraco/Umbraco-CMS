@@ -36,20 +36,7 @@ namespace Umbraco.Core.Cache
                     StaticCache.TryRemove(key, out val);
                 }
             }
-        }
-
-        public virtual void ClearCacheObjectTypes<T>()
-        {
-            foreach (var key in StaticCache.Keys)
-            {
-                if (StaticCache[key] != null
-                    && StaticCache[key].GetType() == typeof(T))
-                {
-                    object val;
-                    StaticCache.TryRemove(key, out val);
-                }
-            }
-        }
+        }        
 
         public virtual void ClearCacheByKeySearch(string keyStartsWith)
         {
@@ -73,29 +60,22 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        public virtual IEnumerable<T> GetCacheItemsByKeySearch<T>(string keyStartsWith)
+        public virtual IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
         {
             return (from KeyValuePair<string, object> c in StaticCache
                     where c.Key.InvariantStartsWith(keyStartsWith)
-                    select c.Value.TryConvertTo<T>()
-                    into attempt
-                    where attempt.Success
-                    select attempt.Result).ToList();
+                    select c.Value).ToList();
         }
 
-        public virtual T GetCacheItem<T>(string cacheKey)
+        public virtual object GetCacheItem(string cacheKey)
         {
             var result = StaticCache[cacheKey];
-            if (result == null)
-            {
-                return default(T);
-            }
-            return result.TryConvertTo<T>().Result;
+            return result;
         }
 
-        public virtual T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem)
+        public virtual object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
-            return (T)StaticCache.GetOrAdd(cacheKey, getCacheItem());
+            return StaticCache.GetOrAdd(cacheKey, getCacheItem());
         }
         
     }

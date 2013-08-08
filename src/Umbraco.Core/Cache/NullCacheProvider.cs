@@ -19,10 +19,6 @@ namespace Umbraco.Core.Cache
         {
         }
 
-        public virtual void ClearCacheObjectTypes<T>()
-        {
-        }
-
         public virtual void ClearCacheByKeySearch(string keyStartsWith)
         {
         }
@@ -31,17 +27,17 @@ namespace Umbraco.Core.Cache
         {
         }
 
-        public virtual IEnumerable<T> GetCacheItemsByKeySearch<T>(string keyStartsWith)
+        public virtual IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
         {
-            return Enumerable.Empty<T>();
+            return Enumerable.Empty<object>();
         }
 
-        public virtual T GetCacheItem<T>(string cacheKey)
+        public virtual object GetCacheItem(string cacheKey)
         {
-            return default(T);
+            return default(object);
         }
 
-        public virtual T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem)
+        public virtual object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
             return getCacheItem();
         }

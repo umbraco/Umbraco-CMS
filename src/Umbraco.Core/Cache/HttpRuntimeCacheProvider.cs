@@ -29,11 +29,10 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Gets (and adds if necessary) an item from the cache with all of the default parameters
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="cacheKey"></param>
         /// <param name="getCacheItem"></param>
         /// <returns></returns>
-        public override T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem)
+        public override object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
             return GetCacheItem(cacheKey, CacheItemPriority.Normal, null, null, null, getCacheItem, Locker);
         }
