@@ -1,11 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Events;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
+    /// <summary>
+    /// Represents a repository specific to the Recycle Bins
+    /// available for Content and Media.
+    /// </summary>
     internal class RecycleBinRepository
     {
         private readonly IDatabaseUnitOfWork _unitOfWork;
@@ -59,12 +67,41 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
 
                 //Trigger (internal) event with list of files to delete - RecycleBinEmptied
+                RecycleBinEmptied.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, files), this);
 
                 return true;
             }
             catch (Exception ex)
             {
                 LogHelper.Error<RecycleBinRepository>("An error occurred while emptying the Recycle Bin: " + ex.Message, ex);
+                return false;
+            }
+        }
+
+        public bool DeleteFiles(IEnumerable<string> files)
+        {
+            try
+            {
+                var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+                Parallel.ForEach(files, file =>
+                                        {
+                                            if (UmbracoSettings.UploadAllowDirectories)
+                                            {
+                                                var relativeFilePath = fs.GetRelativePath(file);
+                                                var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);
+                                                fs.DeleteDirectory(parentDirectory, true);
+                                            }
+                                            else
+                                            {
+                                                fs.DeleteFile(file, true);
+                                            }
+                                        });
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<RecycleBinRepository>("An error occurred while deleting files attached to deleted nodes: " + ex.Message, ex);
                 return false;
             }
         }
@@ -76,5 +113,10 @@ namespace Umbraco.Core.Persistence.Repositories
                     "DELETE FROM {0} FROM {0} as TB1 INNER JOIN umbracoNode as TB2 ON TB1.{1} = TB2.id WHERE TB2.trashed = '1' AND TB2.nodeObjectType = @NodeObjectType",
                     tableName, keyName);
         }
+
+        /// <summary>
+        /// Occurs after RecycleBin was been Emptied
+        /// </summary>
+        internal static event TypedEventHandler<RecycleBinRepository, RecycleBinEventArgs> RecycleBinEmptied;
     }
 }

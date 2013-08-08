@@ -156,6 +156,7 @@
     <Compile Include="Events\EventExtensions.cs" />
     <Compile Include="Events\MigrationEventArgs.cs" />
     <Compile Include="Events\PublishEventArgs.cs" />
+    <Compile Include="Events\RecycleBinEventArgs.cs" />
     <Compile Include="Events\TypedEventHandler.cs" />
     <Compile Include="Events\MoveEventArgs.cs" />
     <Compile Include="Events\NewEventArgs.cs" />
