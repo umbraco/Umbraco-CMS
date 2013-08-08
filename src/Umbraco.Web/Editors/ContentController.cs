@@ -39,7 +39,6 @@ namespace Umbraco.Web.Editors
     /// </remarks>
     [PluginController("UmbracoApi")]
     [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
-    [OutgoingDateTimeFormat]
     public class ContentController : ContentControllerBase
     {        
         /// <summary>
@@ -79,7 +78,11 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForContent("id")]
         public ContentItemDisplay GetById(int id)
         {
-            var foundContent = Services.ContentService.GetById(id);
+            //with the filter applied we need to check if the content has already been looked up
+            var foundContent = Request.Properties["contentItem"] == null
+                                   ? Services.ContentService.GetById(id)
+                                   : (IContent) Request.Properties["contentItem"];
+            
             if (foundContent == null)
             {
                 HandleContentNotFound(id);
@@ -157,7 +160,8 @@ namespace Umbraco.Web.Editors
 
             return pagedResult;
         }
-            /// <summary>
+        
+        /// <summary>
         /// Saves content
         /// </summary>
         /// <returns></returns>

@@ -96,8 +96,7 @@ namespace Umbraco.Web.WebApi.Filters
                 //try to get the enumerable collection from a property on the result object using reflection
                 var property = objectContent.Value.GetType().GetProperty(_propertyName);
                 if (property != null)
-                {
-                    //property.SetValue(objectContent.Value, DynamicCast(newVal, property.PropertyType));                    
+                {                  
                     property.SetValue(objectContent.Value, newVal);                    
                 }
             }
@@ -127,26 +126,5 @@ namespace Umbraco.Web.WebApi.Filters
 
             return null;
         }
-
-        //private object DynamicCast(object val, Type outgoingType)
-        //{
-        //    var castMethod = GetType()
-        //        .GetMethod("Cast", BindingFlags.Static | BindingFlags.Public)
-        //        .MakeGenericMethod(outgoingType);
-
-        //    var castedObject = castMethod.Invoke(null, new object[] { val });
-        //    return castedObject;
-        //}
-
-        ///// <summary>
-        ///// Used for dynamic casting
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="o"></param>
-        ///// <returns></returns>
-        //public static T Cast<T>(object o)
-        //{
-        //    return (T)o;
-        //}
     }
 }

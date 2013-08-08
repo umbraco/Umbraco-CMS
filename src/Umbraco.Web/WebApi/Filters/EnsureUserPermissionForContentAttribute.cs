@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using umbraco.BusinessLogic.Actions;
 
@@ -48,11 +49,6 @@ namespace Umbraco.Web.WebApi.Filters
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            if (_onlyCheckStartNode)
-            {
-                //TODO: implement this as well!
-            }
-
             if (UmbracoContext.Current.UmbracoUser == null)
             {
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
@@ -64,6 +60,15 @@ namespace Umbraco.Web.WebApi.Filters
             }
 
             var nodeId = (int)actionContext.ActionArguments[_paramName];
+
+            //var contentItem = ApplicationContext.Current.Services.ContentService.GetById(nodeId);
+
+            //var hasPathAccess = (Path.Contains("-20") || ("," + Path + ",").Contains("," + getUser().StartNodeId.ToString() + ","))
+
+            if (_onlyCheckStartNode)
+            {
+                //TODO: implement this as well!
+            }           
             
             //TODO: Change these calls to a service layer call and make sure we can mock it!
             var permissions = UmbracoContext.Current.UmbracoUser.GetPermissions(nodeId);

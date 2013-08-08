@@ -8,12 +8,14 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {
     /// <summary>
     /// An abstract base controller used for media/content (and probably members) to try to reduce code replication.
     /// </summary>
+    [OutgoingDateTimeFormat]
     public abstract class ContentControllerBase : UmbracoAuthorizedJsonController
     {
         /// <summary>
