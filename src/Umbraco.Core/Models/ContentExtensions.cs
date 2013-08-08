@@ -32,9 +32,9 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         /// <remarks>
         /// A new version needs to be created when:
-        /// * Any property value is changed (to enable a rollback)
         /// * The publish status is changed
         /// * The language is changed
+        /// * The item is already published and is being published again and any property value is changed (to enable a rollback)
         /// </remarks>
         internal static bool ShouldCreateNewVersion(this IContent entity)
         {
@@ -50,20 +50,32 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         /// <remarks>
         /// A new version needs to be created when:
-        /// * Any property value is changed (to enable a rollback)
         /// * The publish status is changed
         /// * The language is changed
+        /// * The item is already published and is being published again and any property value is changed (to enable a rollback)
         /// </remarks>
         internal static bool ShouldCreateNewVersion(this IContent entity, PublishedState publishedState)
         {
             var dirtyEntity = (ICanBeDirty)entity;
+            
+            //check if the published state has changed or the language
             var contentChanged =
                 (dirtyEntity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished)
                 || dirtyEntity.IsPropertyDirty("Language");
 
-            var propertyValueChanged = entity.Properties.Any(x => ((ICanBeDirty)x).IsDirty());
+            //return true if published or language has changed
+            if (contentChanged)
+            {
+                return true;
+            }
 
-            return contentChanged || propertyValueChanged;
+            //check if any user prop has changed
+            var propertyValueChanged = ((Content) entity).IsAnyUserPropertyDirty();
+            //check if any content prop has changed
+            var contentDataChanged = ((Content) entity).IsEntityDirty();
+
+            //return true if the item is published and a property has changed or if any content property has changed
+            return (propertyValueChanged && publishedState == PublishedState.Published) || contentDataChanged;
         }
 
         /// <summary>

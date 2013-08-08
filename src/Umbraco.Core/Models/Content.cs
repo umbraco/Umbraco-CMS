@@ -139,7 +139,10 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Boolean indicating whether this Content is Published or not
         /// </summary>
-        /// <remarks>Setting Published to true/false should be private or internal</remarks>
+        /// <remarks>
+        /// Setting Published to true/false should be private or internal and should ONLY be used for wiring up the value
+        /// from the db or modifying it based on changing the published state.
+        /// </remarks>
         [DataMember]
         public bool Published
         {
@@ -372,11 +375,25 @@ namespace Umbraco.Core.Models
         /// <returns>True if entity is dirty, otherwise False</returns>
         public override bool IsDirty()
         {
-            bool dirtyEntity = base.IsDirty();
+            return IsEntityDirty() || IsAnyUserPropertyDirty();
+        }
 
-            bool dirtyProperties = Properties.Any(x => x.IsDirty());
+        /// <summary>
+        /// Returns true if only the entity properties are direty
+        /// </summary>
+        /// <returns></returns>
+        internal bool IsEntityDirty()
+        {
+            return base.IsDirty();
+        }
 
-            return dirtyEntity || dirtyProperties;
+        /// <summary>
+        /// Returns true if any of the properties are dirty
+        /// </summary>
+        /// <returns></returns>
+        internal bool IsAnyUserPropertyDirty()
+        {
+            return Properties.Any(x => x.IsDirty());
         }
 
         /// <summary>
