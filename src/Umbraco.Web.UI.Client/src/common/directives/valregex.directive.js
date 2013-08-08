@@ -11,7 +11,14 @@ function valRegex() {
         restrict: "A",
         link: function (scope, elm, attrs, ctrl) {
 
-            var regex = new RegExp(scope.$eval(attrs.valRegex));
+            var regex;
+            if (scope[attrs.valRegex]) {
+                regex = new RegExp(scope.$eval(attrs.valRegex));
+            }
+            else {
+                regex = new RegExp(attrs.valRegex);
+            }
+            
 
             var patternValidator = function (viewValue) {
                 //NOTE: we don't validate on empty values, use required validator for that

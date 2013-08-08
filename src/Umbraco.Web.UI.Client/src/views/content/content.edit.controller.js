@@ -8,13 +8,36 @@
  */
 function ContentEditController($scope, $routeParams, $location, contentResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper) {
         
+    /** adds the custom controls to the generic props tab above the user props */
+    function configureGenericPropertiesTab(genericPropsTab, content) {
+
+        genericPropsTab.properties.splice(0, 0,
+            {
+                label: 'Created',
+                description: 'Time this document was created',
+                value: content.createDate,
+                view: "readonlyvalue",
+                config: { filter: 'date', format: 'medium' },
+                alias: "umb_createdate" //can't overlap with user defined props!! important for validation.
+            },
+            {
+                label: 'Updated',
+                description: 'Time this document was last updated',
+                value: content.updateDate,
+                view: "readonlyvalue",
+                config: { filter: 'date', format: 'medium' },
+                alias: "umb_updatedate" //can't overlap with user defined props!! important for validation.
+            });
+    }
+
     if ($routeParams.create) {
         //we are creating so get an empty content item
         contentResource.getScaffold($routeParams.id, $routeParams.doctype)
             .then(function(data) {
                 $scope.contentLoaded = true;
                 $scope.content = data;
-                $scope.genericPropertiesTab = $.grep($scope.content.tabs, function(e){ return e.id === 0; })[0];
+                $scope.genericPropertiesTab = $.grep($scope.content.tabs, function (e) { return e.id === 0; })[0];
+                configureGenericPropertiesTab($scope.genericPropertiesTab, $scope.content);
             });
     }
     else {
@@ -24,6 +47,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
                 $scope.contentLoaded = true;
                 $scope.content = data;
                 $scope.genericPropertiesTab = $.grep($scope.content.tabs, function(e){ return e.id === 0; })[0];
+                configureGenericPropertiesTab($scope.genericPropertiesTab, $scope.content);
                 //in one particular special case, after we've created a new item we redirect back to the edit
                 // route but there might be server validation errors in the collection which we need to display
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors
@@ -88,7 +112,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
     };
 
     
-    $scope.exludeLastTab = function(item) {
+    $scope.exludeLastTab = function(item, args) {
         return item.id !== 0;
     };
 }

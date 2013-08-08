@@ -1,10 +1,7 @@
 angular.module('umbraco').controller("Umbraco.Editors.ReadOnlyValueController",
 	function($rootScope, $scope, $filter){
-		if($scope.config){
-			var config = angular.fromJson($scope.config);
-			if(config && config.filter){
-				$scope.displayvalue = $filter(config.filter)($scope.value, config.format);
-			}
+	    if ($scope.config && $scope.config.filter && $scope.config.format) {
+	        $scope.displayvalue = $filter($scope.config.filter)($scope.value, $scope.config.filter);
 		}else{
 			$scope.displayvalue = $scope.value;
 		}

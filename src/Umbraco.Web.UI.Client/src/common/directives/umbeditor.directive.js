@@ -10,7 +10,7 @@ angular.module("umbraco.directives")
             scope: {
                 view: "@",
                 alias: "@",
-                config: "@",
+                config: "=",
                 value: "="
             },
             restrict: 'E',

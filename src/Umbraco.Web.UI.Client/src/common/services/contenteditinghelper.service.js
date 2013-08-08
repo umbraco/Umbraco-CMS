@@ -102,11 +102,11 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
                         //if it contains 2 '.' then we will wire it up to a property's field
                         if (parts.length > 2) {
                             //add an error with a reference to the field for which the validation belongs too
-                            serverValidationManager.addPropertyError(contentProperty, parts[2], modelState[e][0]);
+                            serverValidationManager.addPropertyError(contentProperty.alias, parts[2], modelState[e][0]);
                         }
                         else {
                             //add a generic error for the property, no reference to a specific field
-                            serverValidationManager.addPropertyError(contentProperty, "", modelState[e][0]);
+                            serverValidationManager.addPropertyError(contentProperty.alias, "", modelState[e][0]);
                         }
                     }
                 }

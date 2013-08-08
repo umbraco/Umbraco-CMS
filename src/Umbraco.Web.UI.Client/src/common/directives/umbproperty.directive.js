@@ -7,17 +7,15 @@ angular.module("umbraco.directives")
     .directive('umbProperty', function (umbPropEditorHelper) {
         return {
             scope: {
-                alias: "@",
-                label: "@",
-                description: "@",
-                hidelabel: "@"
+                property: "="
             },
             transclude: true,
             restrict: 'E',
             replace: true,        
             templateUrl: 'views/directives/umb-property.html',
             link: function (scope, element, attrs, ctrl) {
-                
+
             }
+
         };
     });

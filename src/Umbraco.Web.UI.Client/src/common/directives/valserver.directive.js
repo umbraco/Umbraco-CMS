@@ -36,7 +36,7 @@ function valServer(serverValidationManager) {
             });
             
             //subscribe to the server validation changes
-            serverValidationManager.subscribe(currentProperty, fieldName, function (isValid, propertyErrors, allErrors) {
+            serverValidationManager.subscribe(currentProperty.alias, fieldName, function (isValid, propertyErrors, allErrors) {
                 if (!isValid) {
                     ctrl.$setValidity('valServer', false);
                     //assign an error msg property to the current validator
@@ -53,7 +53,7 @@ function valServer(serverValidationManager) {
             // NOTE: this is very important otherwise when this controller re-binds the previous subscriptsion will remain
             // but they are a different callback instance than the above.
             element.bind('$destroy', function () {
-                serverValidationManager.unsubscribe(currentProperty, fieldName);
+                serverValidationManager.unsubscribe(currentProperty.alias, fieldName);
             });
         }
     };

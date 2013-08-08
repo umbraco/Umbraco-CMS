@@ -60,12 +60,12 @@
         it('can retrieve property validation errors for a sub field', function () {
 
             //arrange
-            serverValidationManager.addPropertyError({ alias: "myProperty" }, "value1", "Some value 1");
-            serverValidationManager.addPropertyError({ alias: "myProperty" }, "value2", "Another value 2");
+            serverValidationManager.addPropertyError("myProperty", "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", "value2", "Another value 2");
 
             //act
-            var err1 = serverValidationManager.getPropertyError({ alias: "myProperty" }, "value1");
-            var err2 = serverValidationManager.getPropertyError({ alias: "myProperty" }, "value2");
+            var err1 = serverValidationManager.getPropertyError("myProperty", "value1");
+            var err2 = serverValidationManager.getPropertyError("myProperty", "value2");
 
             //assert            
             expect(err1).not.toBeUndefined();
@@ -82,11 +82,11 @@
         it('can add a property errors with multiple sub fields and it the first will be retreived with only the property alias', function () {
 
             //arrange
-            serverValidationManager.addPropertyError({ alias: "myProperty" }, "value1", "Some value 1");
-            serverValidationManager.addPropertyError({ alias: "myProperty" }, "value2", "Another value 2");
+            serverValidationManager.addPropertyError("myProperty", "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", "value2", "Another value 2");
 
             //act
-            var err = serverValidationManager.getPropertyError({ alias: "myProperty" });
+            var err = serverValidationManager.getPropertyError("myProperty");
 
             //assert
             expect(err).not.toBeUndefined();
@@ -98,10 +98,10 @@
         it('will return null for a non-existing property error', function () {
 
             //arrage
-            serverValidationManager.addPropertyError({ alias: "myProperty" }, "value", "Required");
+            serverValidationManager.addPropertyError("myProperty", "value", "Required");
 
             //act
-            var err = serverValidationManager.getPropertyError({ alias: "DoesntExist" }, "value");
+            var err = serverValidationManager.getPropertyError("DoesntExist", "value");
 
             //assert
             expect(err).toBeUndefined();
@@ -111,15 +111,15 @@
         it('detects if a property error exists', function () {
 
             //arrange
-            serverValidationManager.addPropertyError({ alias: "myProperty" }, "value1", "Some value 1");
-            serverValidationManager.addPropertyError({ alias: "myProperty" }, "value2", "Another value 2");
+            serverValidationManager.addPropertyError("myProperty", "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", "value2", "Another value 2");
 
             //act
-            var err1 = serverValidationManager.hasPropertyError({ alias: "myProperty" });
-            var err2 = serverValidationManager.hasPropertyError({ alias: "myProperty" }, "value1");
-            var err3 = serverValidationManager.hasPropertyError({ alias: "myProperty" }, "value2");
-            var err4 = serverValidationManager.hasPropertyError({ alias: "notFound" });
-            var err5 = serverValidationManager.hasPropertyError({ alias: "myProperty" }, "notFound");
+            var err1 = serverValidationManager.hasPropertyError("myProperty");
+            var err2 = serverValidationManager.hasPropertyError("myProperty", "value1");
+            var err3 = serverValidationManager.hasPropertyError("myProperty", "value2");
+            var err4 = serverValidationManager.hasPropertyError("notFound");
+            var err5 = serverValidationManager.hasPropertyError("myProperty", "notFound");
 
             //assert
             expect(err1).toBe(true);            
@@ -133,30 +133,30 @@
         it('can remove a property error with a sub field specified', function () {
 
             //arrage
-            serverValidationManager.addPropertyError({ alias: "myProperty" }, "value1", "Some value 1");
-            serverValidationManager.addPropertyError({ alias: "myProperty" }, "value2", "Another value 2");
+            serverValidationManager.addPropertyError("myProperty", "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", "value2", "Another value 2");
 
             //act
-            serverValidationManager.removePropertyError({ alias: "myProperty" }, "value1");
+            serverValidationManager.removePropertyError("myProperty", "value1");
 
             //assert
-            expect(serverValidationManager.hasPropertyError({ alias: "myProperty" }, "value1")).toBe(false);
-            expect(serverValidationManager.hasPropertyError({ alias: "myProperty" }, "value2")).toBe(true);
+            expect(serverValidationManager.hasPropertyError("myProperty", "value1")).toBe(false);
+            expect(serverValidationManager.hasPropertyError("myProperty", "value2")).toBe(true);
 
         });
         
         it('can remove a property error and all sub field errors by specifying only the property', function () {
 
             //arrage
-            serverValidationManager.addPropertyError({ alias: "myProperty" }, "value1", "Some value 1");
-            serverValidationManager.addPropertyError({ alias: "myProperty" }, "value2", "Another value 2");
+            serverValidationManager.addPropertyError("myProperty", "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", "value2", "Another value 2");
 
             //act
-            serverValidationManager.removePropertyError({ alias: "myProperty" });
+            serverValidationManager.removePropertyError("myProperty");
 
             //assert
-            expect(serverValidationManager.hasPropertyError({ alias: "myProperty" }, "value1")).toBe(false);
-            expect(serverValidationManager.hasPropertyError({ alias: "myProperty" }, "value2")).toBe(false);
+            expect(serverValidationManager.hasPropertyError("myProperty", "value1")).toBe(false);
+            expect(serverValidationManager.hasPropertyError("myProperty", "value2")).toBe(false);
 
         });
 
@@ -178,7 +178,7 @@
             
             //act
             serverValidationManager.addFieldError("Name", "Required");
-            serverValidationManager.addPropertyError({ alias: "myProperty" }, "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", "value1", "Some value 1");
 
             //assert
             expect(args).not.toBeUndefined();
@@ -224,7 +224,7 @@
             var numCalled = 0;
 
             //arrange
-            serverValidationManager.subscribe({ alias: "myProperty" }, "value1", function (isValid, propertyErrors, allErrors) {
+            serverValidationManager.subscribe("myProperty", "value1", function (isValid, propertyErrors, allErrors) {
                 args1 = {
                     isValid: isValid,
                     propertyErrors: propertyErrors,
@@ -232,7 +232,7 @@
                 };
             });
             
-            serverValidationManager.subscribe({ alias: "myProperty" }, "", function (isValid, propertyErrors, allErrors) {
+            serverValidationManager.subscribe("myProperty", "", function (isValid, propertyErrors, allErrors) {
                 numCalled++;
                 args2 = {
                     isValid: isValid,
@@ -242,9 +242,9 @@
             });
 
             //act
-            serverValidationManager.addPropertyError({ alias: "myProperty" }, "value1", "Some value 1");
-            serverValidationManager.addPropertyError({ alias: "myProperty" }, "value2", "Some value 2");
-            serverValidationManager.addPropertyError({ alias: "myProperty" }, "", "Some value 3");
+            serverValidationManager.addPropertyError("myProperty", "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", "value2", "Some value 2");
+            serverValidationManager.addPropertyError("myProperty", "", "Some value 3");
 
             //assert
             expect(args1).not.toBeUndefined();

@@ -28,10 +28,10 @@ function serverValidationManager($timeout) {
         });
     }
     
-    function getPropertyErrors(self, contentProperty, fieldName) {
+    function getPropertyErrors(self, propertyAlias, fieldName) {
         //find all errors for this property
         return _.filter(self.items, function (item) {            
-            return (item.propertyAlias === contentProperty.alias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+            return (item.propertyAlias === propertyAlias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
         });
     }
 
@@ -88,14 +88,14 @@ function serverValidationManager($timeout) {
          *  a particular field, otherwise we can only pinpoint that there is an error for a content property, not the 
          *  property's specific field. This is used with the val-server directive in which the directive specifies the 
          *  field alias to listen for.
-         *  If contentProperty is null, then this subscription is for a field property (not a user defined property).
+         *  If propertyAlias is null, then this subscription is for a field property (not a user defined property).
          */
-        subscribe: function (contentProperty, fieldName, callback) {
+        subscribe: function (propertyAlias, fieldName, callback) {
             if (!callback) {
                 return;
             }
             
-            if (contentProperty === null) {
+            if (propertyAlias === null) {
                 //don't add it if it already exists
                 var exists1 = _.find(callbacks, function (item) {
                     return item.propertyAlias === null && item.fieldName === fieldName;
@@ -104,20 +104,20 @@ function serverValidationManager($timeout) {
                     callbacks.push({ propertyAlias: null, fieldName: fieldName, callback: callback });
                 }
             }
-            else if (contentProperty !== undefined) {
+            else if (propertyAlias !== undefined) {
                 //don't add it if it already exists
                 var exists2 = _.find(callbacks, function (item) {
-                    return item.propertyAlias === contentProperty.alias && item.fieldName === fieldName;
+                    return item.propertyAlias === propertyAlias && item.fieldName === fieldName;
                 });
                 if (!exists2) {
-                    callbacks.push({ propertyAlias: contentProperty.alias, fieldName: fieldName, callback: callback });                    
+                    callbacks.push({ propertyAlias: propertyAlias, fieldName: fieldName, callback: callback });
                 }
             }
         },
         
-        unsubscribe: function(contentProperty, fieldName) {
+        unsubscribe: function (propertyAlias, fieldName) {
             
-            if (contentProperty === null) {
+            if (propertyAlias === null) {
 
                 //remove all callbacks for the content field
                 callbacks = _.reject(callbacks, function (item) {
@@ -125,11 +125,11 @@ function serverValidationManager($timeout) {
                 });
 
             }
-            else if (contentProperty !== undefined) {
+            else if (propertyAlias !== undefined) {
                 
                 //remove all callbacks for the content property
                 callbacks = _.reject(callbacks, function (item) {
-                    return item.propertyAlias === contentProperty.alias &&
+                    return item.propertyAlias === propertyAlias &&
                     (item.fieldName === fieldName ||
                         ((item.fieldName === undefined || item.fieldName === "") && (fieldName === undefined || fieldName === "")));
                 });
@@ -146,14 +146,14 @@ function serverValidationManager($timeout) {
          * @function
          *
          * @description
-         * Gets all callbacks that has been registered using the subscribe method for the contentProperty + fieldName combo.
+         * Gets all callbacks that has been registered using the subscribe method for the propertyAlias + fieldName combo.
          * This will always return any callbacks registered for just the property (i.e. field name is empty) and for ones with an 
          * explicit field name set.
          */
-        getPropertyCallbacks: function (contentProperty, fieldName) {            
+        getPropertyCallbacks: function (propertyAlias, fieldName) {
             var found = _.filter(callbacks, function (item) {
                 //returns any callback that have been registered directly against the field and for only the property
-                return (item.propertyAlias === contentProperty.alias && (item.fieldName === fieldName || (item.fieldName === undefined || item.fieldName === "")));
+                return (item.propertyAlias === propertyAlias && (item.fieldName === fieldName || (item.fieldName === undefined || item.fieldName === "")));
             });
             return found;
         },
@@ -217,24 +217,24 @@ function serverValidationManager($timeout) {
          * @description
          * Adds an error message for the content property
          */
-        addPropertyError: function (contentProperty, fieldName, errorMsg) {
-            if (!contentProperty) {
+        addPropertyError: function (propertyAlias, fieldName, errorMsg) {
+            if (!propertyAlias) {
                 return;
             }
             
             //only add the item if it doesn't exist                
-            if (!this.hasPropertyError(contentProperty, fieldName)) {
+            if (!this.hasPropertyError(propertyAlias, fieldName)) {
                 this.items.push({
-                    propertyAlias: contentProperty.alias,
+                    propertyAlias: propertyAlias,
                     fieldName: fieldName,
                     errorMsg: errorMsg
                 });
             }
             
             //find all errors for this item
-            var errorsForCallback = getPropertyErrors(this, contentProperty, fieldName);
+            var errorsForCallback = getPropertyErrors(this, propertyAlias, fieldName);
             //we should now call all of the call backs registered for this error
-            var cbs = this.getPropertyCallbacks(contentProperty, fieldName);
+            var cbs = this.getPropertyCallbacks(propertyAlias, fieldName);
             //call each callback for this error
             for (var cb in cbs) {
                 executeCallback(this, errorsForCallback, cbs[cb].callback);
@@ -250,14 +250,14 @@ function serverValidationManager($timeout) {
          * @description
          * Removes an error message for the content property
          */
-        removePropertyError: function (contentProperty, fieldName) {
+        removePropertyError: function (propertyAlias, fieldName) {
 
-            if (!contentProperty) {
+            if (!propertyAlias) {
                 return;
             }
             //remove the item
             this.items = _.reject(this.items, function (item) {
-                return (item.propertyAlias === contentProperty.alias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+                return (item.propertyAlias === propertyAlias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
             });
         },
         
@@ -302,10 +302,10 @@ function serverValidationManager($timeout) {
          * @description
          * Gets the error message for the content property
          */
-        getPropertyError: function (contentProperty, fieldName) {
+        getPropertyError: function (propertyAlias, fieldName) {
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === contentProperty.alias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+                return (item.propertyAlias === propertyAlias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
             });
             return err;
         },
@@ -336,10 +336,10 @@ function serverValidationManager($timeout) {
          * @description
          * Checks if the content property + field name combo has an error
          */
-        hasPropertyError: function (contentProperty, fieldName) {
+        hasPropertyError: function (propertyAlias, fieldName) {
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === contentProperty.alias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+                return (item.propertyAlias === propertyAlias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
             });
             return err ? true : false;
         },
