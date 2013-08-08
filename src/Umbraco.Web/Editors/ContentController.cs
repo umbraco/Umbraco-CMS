@@ -39,6 +39,7 @@ namespace Umbraco.Web.Editors
     /// </remarks>
     [PluginController("UmbracoApi")]
     [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
+    [OutgoingDateTimeFormat]
     public class ContentController : ContentControllerBase
     {        
         /// <summary>
@@ -108,8 +109,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Gets the children for the content id passed in
         /// </summary>
-        /// <returns></returns>
-        [OutgoingDateTimeFormat]
+        /// <returns></returns>        
         [FilterAllowedOutgoingContent("Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>> GetChildren(
             int id, 

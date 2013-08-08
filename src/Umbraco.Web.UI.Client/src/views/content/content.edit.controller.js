@@ -19,16 +19,18 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
                 description: 'Time this document was created',
                 value: content.createDate,
                 view: "readonlyvalue",
-                config: { filter: 'date', format: 'medium' },
-                alias: "umb_createdate" //can't overlap with user defined props!! important for validation.
+                //can't overlap with user defined props!! important for validation and to filter
+                // out so we don't send this up to the server
+                alias: "_umb_createdate"
             },
             {
                 label: 'Updated',
                 description: 'Time this document was last updated',
                 value: content.updateDate,
                 view: "readonlyvalue",
-                config: { filter: 'date', format: 'medium' },
-                alias: "umb_updatedate" //can't overlap with user defined props!! important for validation.
+                //can't overlap with user defined props!! important for validation and to filter
+                // out so we don't send this up to the server
+                alias: "_umb_updatedate"
             });
     }
 

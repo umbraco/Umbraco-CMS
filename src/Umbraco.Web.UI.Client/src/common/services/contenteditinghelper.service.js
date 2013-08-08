@@ -47,6 +47,9 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
             var allNewProps = this.getAllProps(newContent);
 
             function getNewProp(alias) {
+                if (alias.startsWith("_umb_")) {
+                    return null;
+                }
                 return _.find(allNewProps, function (item) {
                     return item.alias === alias;
                 });
@@ -54,7 +57,7 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
 
             for (var p in allOrigProps) {
                 var newProp = getNewProp(allOrigProps[p].alias);
-                if (!_.isEqual(allOrigProps[p].value, newProp.value)) {
+                if (newProp && !_.isEqual(allOrigProps[p].value, newProp.value)) {
                     //they have changed so set the origContent prop's value to the new value
                     allOrigProps[p].value = newProp.value;
                     changed.push(allOrigProps[p]);

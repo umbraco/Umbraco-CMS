@@ -289,13 +289,19 @@ function umbDataFormatter() {
                 //set the action on the save model
                 action: action
             };
-            _.each(displayModel.tabs, function(tab) {
+            _.each(displayModel.tabs, function (tab) {
+                
                 _.each(tab.properties, function (prop) {
-                    saveModel.properties.push({
-                        id: prop.id,
-                        alias: prop.alias,
-                        value: prop.value
-                    });
+                    
+                    //don't include the custom generic tab properties
+                    if (tab.id !== 0 && !prop.alias.startsWith("_umb_")) {
+                        saveModel.properties.push({
+                            id: prop.id,
+                            alias: prop.alias,
+                            value: prop.value
+                        });
+                    }
+                    
                 });
             });
 
