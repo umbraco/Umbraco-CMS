@@ -3,11 +3,11 @@
 angular.module('umbraco')
 .controller("Umbraco.Editors.ContentPickerController",
 	function($scope, dialogService){
-    $scope.openContentPicker =function(value){
+    $scope.openContentPicker =function(){
             var d = dialogService.contentPicker({scope: $scope, callback: populate});
     };
 
     function populate(data){
-        $scope.model.value = data.selection;
-    }
+    	$scope.model.value = data.selection;
+    }		
 });

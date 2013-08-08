@@ -33,27 +33,14 @@
         </umb-header>
 
         <umb-tab-view>
-            <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs |  filter:exludeLastTab">
+            <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
+
                 <div class="umb-pane">
                     <umb-property 
                         property="property"
                         ng-repeat="property in tab.properties">
                         
                         <umb-editor model="property"></umb-editor>
-                    </umb-property>
-                </div>
-
-            </umb-tab>
-
-            <umb-tab id="tab0" rel="{{genericPropertiesTab.id}}" data-label="{{genericPropertiesTab.label}}">
-                
-                <div class="umb-pane">
-                    <umb-property 
-                        property="property"
-                        ng-repeat="property in genericPropertiesTab.properties">
-
-                        <umb-editor model="property"></umb-editor>
-                    
                     </umb-property>
                 </div>
 

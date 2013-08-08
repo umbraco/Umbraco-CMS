@@ -13,7 +13,7 @@
                     name: "My content with id: " + id,
                     updateDate: new Date().toIsoDateTimeString(),
                     publishDate: new Date().toIsoDateTimeString(),
-                    createDate: new Date().toIsoDateTimeString(), 
+                    createDate: new Date().toIsoDateTimeString(),
                     id: id,
                     parentId: 1234,
                     icon: "icon-file-alt",
@@ -60,8 +60,48 @@
                         id: 0,
                         properties: [
                             {
-                                alias: "tes", label: "Stuff", view: "test", controller: "umbraco.embeddedcontent", value: "",
-
+                                label: 'Created by',
+                                description: 'Original author',
+                                value: 1,
+                                view: "readonlyvalue",
+                                alias: "_umb_createdby"
+                            },
+                            {
+                                label: 'Created',
+                                description: 'Time this document was created',
+                                value: new Date().toIsoDateTimeString(),
+                                view: "readonlyvalue",
+                                config: {filter: 'date', format: 'medium'},
+                                alias: "_umb_createdate"
+                            },
+                            {
+                                label: 'Updated',
+                                description: 'Time this document was last updated',
+                                value: new Date().toIsoDateTimeString(),
+                                view: "readonlyvalue",
+                                config: {filter: 'date', format: 'medium'},
+                                alias: "_umb_updatedate"
+                            },
+                            {
+                                label: 'Id',
+                                value: 1234,
+                                view: "readonlyvalue",
+                                alias: "_umb_id"
+                            },
+                            {
+                                label: 'Document Type',
+                                value: "Home page",
+                                view: "readonlyvalue",
+                                alias: "_umb_doctype"
+                            },
+                            {
+                                label: 'Template',
+                                value: "1234",
+                                view: "templatepicker",
+                                alias: "_umb_template"
+                            },
+                            {
+                                alias: "test", label: "Stuff", view: "test", controller: "umbraco.embeddedcontent", value: "",
                                 config: {
                                     fields: [
                                                 { alias: "embedded", label: "Embbeded", view: "textstring", value: "" },
