@@ -67,7 +67,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Assert
             var permissions = repository.GetPermissionsForEntity(childPage.Id);
             Assert.AreEqual(1, permissions.Count());
-            Assert.AreEqual("A", permissions.Single().Permission);
+            Assert.AreEqual("A", permissions.Single().AssignedPermissions.First());
         }
 
         [Test]

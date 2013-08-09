@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -26,5 +27,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <returns><c>True</c> if the Recycle Bin was successfully emptied and all items deleted otherwise <c>False</c></returns>
         bool EmptyRecycleBin();
+
+        void AssignEntityPermissions(IContent entity, string permission, IEnumerable<object> userIds);
+
+        IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId);
     }
 }

@@ -6,6 +6,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -488,6 +489,18 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var repo = new RecycleBinRepository(UnitOfWork);
             return repo.EmptyRecycleBin(NodeObjectTypeId);
+        }
+
+        public void AssignEntityPermissions(IContent entity, string permission, IEnumerable<object> userIds)
+        {
+            var repo = new PermissionRepository<IContent>(UnitOfWork);
+            repo.AssignEntityPermissions(entity, permission, userIds);
+        }
+
+        public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
+        {
+            var repo = new PermissionRepository<IContent>(UnitOfWork);
+            return repo.GetPermissionsForEntity(entityId);
         }
 
         #endregion
