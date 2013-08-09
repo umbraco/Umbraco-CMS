@@ -3,6 +3,7 @@ using System.IO;
 using System.Web.Caching;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Profiling;
 using umbraco;
 using umbraco.cms.businesslogic.macro;
@@ -17,7 +18,11 @@ namespace Umbraco.Tests.Macros
         public void Setup()
         {
             //we DO want cache enabled for these tests
-            ApplicationContext.Current = new ApplicationContext(true);
+            var cacheHelper = new CacheHelper(
+                new ObjectCacheRuntimeCacheProvider(),
+                new StaticCacheProvider(),
+                new NullCacheProvider());
+            ApplicationContext.Current = new ApplicationContext(cacheHelper);
             ProfilerResolver.Current = new ProfilerResolver(new LogProfiler())
                                            {
                                                CanResolveBeforeFrozen = true

@@ -38,6 +38,15 @@ namespace Umbraco.Core
             ApplicationCache = cache;
         }
 
+        /// <summary>
+        /// Creates a basic app context
+        /// </summary>
+        /// <param name="cache"></param>
+        internal ApplicationContext(CacheHelper cache)
+        {
+            ApplicationCache = cache;
+        }
+
 		/// <summary>
     	/// Singleton accessor
     	/// </summary>

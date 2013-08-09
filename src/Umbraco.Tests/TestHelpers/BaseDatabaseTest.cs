@@ -63,7 +63,7 @@ namespace Umbraco.Tests.TestHelpers
             Resolution.Freeze();
 
             //disable cache
-            var cacheHelper = new CacheHelper(new NullCacheProvider(), false);
+            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
 
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context

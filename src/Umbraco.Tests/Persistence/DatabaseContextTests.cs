@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Persistence
 			_dbContext = new DatabaseContext(new DefaultDatabaseFactory());
 
 			//unfortunately we have to set this up because the PetaPocoExtensions require singleton access
-			ApplicationContext.Current = new ApplicationContext(false)
+			ApplicationContext.Current = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper())
 				{
 					DatabaseContext = _dbContext,
 					IsReady = true

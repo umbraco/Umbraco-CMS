@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Services
 			ApplicationContext.DatabaseContext = new DatabaseContext(_dbFactory);
 
             //disable cache
-            var cacheHelper = new CacheHelper(new NullCacheProvider(), false);
+		    var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
 
 			//here we are going to override the ServiceContext because normally with our test cases we use a 
 			//global Database object but this is NOT how it should work in the web world or in any multi threaded scenario.

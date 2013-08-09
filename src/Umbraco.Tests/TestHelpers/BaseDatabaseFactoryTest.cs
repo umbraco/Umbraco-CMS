@@ -59,7 +59,7 @@ namespace Umbraco.Tests.TestHelpers
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
             
             //disable cache
-            var cacheHelper = new CacheHelper(new NullCacheProvider(), false);
+            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
 
             var dbFactory = new DefaultDatabaseFactory(
                 GetDbConnectionString(),

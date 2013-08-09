@@ -73,7 +73,7 @@ namespace Umbraco.Tests.PublishedCache
 			TestHelper.SetupLog4NetForTests();
 
             //create the app context 
-            ApplicationContext.Current = new ApplicationContext(false);
+            ApplicationContext.Current = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
 
 			_httpContextFactory = new FakeHttpContextFactory("~/Home");
 			//ensure the StateHelper is using our custom context
