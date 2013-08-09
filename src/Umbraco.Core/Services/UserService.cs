@@ -147,12 +147,21 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<string> GetUserSections(IUser user)
         {
-            //TODO: We need to cache this result, should all caching be done in the repo level ?
+            //TODO: We need to cache this result
 
             var uow = _uowProvider.GetUnitOfWork();
             var sql = new Sql();
             sql.Select("app").From<User2AppDto>().Where("[user] = @userID", new {userID = user.Id});
             return uow.Database.Fetch<string>(sql);
+        }
+
+        public IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateUserRepository(uow))
+            {
+                return repository.GetUserPermissionsForEntities(user.Id, nodeIds);
+            }
         }
 
         /// <summary>

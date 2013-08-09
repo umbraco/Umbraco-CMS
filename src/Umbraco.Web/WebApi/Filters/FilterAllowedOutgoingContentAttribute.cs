@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
@@ -48,7 +49,7 @@ namespace Umbraco.Web.WebApi.Filters
 
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {
-            var user = UmbracoContext.Current.UmbracoUser;
+            var user = UmbracoContext.Current.Security.CurrentUser;
             if (user == null)
             {
                 base.OnActionExecuted(actionExecutedContext);
@@ -64,13 +65,23 @@ namespace Umbraco.Web.WebApi.Filters
                 {
                     var items = Enumerable.ToList(collection);
                     var length = items.Count;
+                    var ids = new List<int>();                    
                     for (var i = 0; i < length; i++)
                     {
-                        var permissions = user.GetPermissions(items[i].Id);
-                        if (Enumerable.Contains(permissions.ToCharArray(), _permissionToCheck) == false)
+                        ids.Add(items[i].Id);
+                    }
+                    //get all the permissions for these nodes in one call
+                    var permissions = ApplicationContext.Current.Services.UserService.GetPermissions(user, ids.ToArray()).ToArray();
+                    for (var i = 0; i < length; i++)
+                    {
+                        var nodePermission = permissions.Where(x => x.EntityId == items[i].Id).ToArray();
+                        foreach (var n in nodePermission)
                         {
-                            items.RemoveAt(i);
-                            length--;
+                            if (n.AssignedPermissions.Contains(_permissionToCheck.ToString(CultureInfo.InvariantCulture)) == false)
+                            {
+                                items.RemoveAt(i);
+                                length--;
+                            }
                         }
                     }
 

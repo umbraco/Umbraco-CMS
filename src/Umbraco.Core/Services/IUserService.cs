@@ -51,5 +51,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <returns></returns>
         IEnumerable<string> GetUserSections(IUser user);
+
+        IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds);
     }
 }

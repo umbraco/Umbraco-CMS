@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents the UserRepository for doing CRUD operations for <see cref="IUser"/>
     /// </summary>
-    internal class UserRepository : PermissionRepository<int, IUser>, IUserRepository
+    internal class UserRepository : PetaPocoRepositoryBase<int, IUser>, IUserRepository
     {
         private readonly IUserTypeRepository _userTypeRepository;
 
@@ -221,6 +221,12 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(string.Format("umbracoUser.id IN ({0})", innerSql.SQL));
 
             return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql));
+        }
+
+        public IEnumerable<EntityPermission> GetUserPermissionsForEntities(object userId, params int[] entityIds)
+        {
+            var repo = new PermissionRepository<IContent>(UnitOfWork);
+            return repo.GetUserPermissionsForEntities(userId, entityIds);
         }
 
         public IProfile GetProfileByUserName(string username)
