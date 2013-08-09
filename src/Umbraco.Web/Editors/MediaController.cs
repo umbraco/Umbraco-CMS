@@ -70,7 +70,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [EnsureUserPermissionForContent("id")]
+        [EnsureUserPermissionForMedia("id")]
         public MediaItemDisplay GetById(int id)
         {
             var foundContent = Services.MediaService.GetById(id);

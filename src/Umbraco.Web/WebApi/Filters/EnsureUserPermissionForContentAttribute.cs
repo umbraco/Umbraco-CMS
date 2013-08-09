@@ -19,7 +19,6 @@ namespace Umbraco.Web.WebApi.Filters
     /// <remarks>
     /// 
     /// This first checks if the user can access this based on their start node, and then checks node permissions
-    /// TODO: Implement start node check!!!
     /// 
     /// By default the permission that is checked is browse but this can be specified in the ctor.
     /// NOTE: This cannot be an auth filter because that happens too soon and we don't have access to the action params.
