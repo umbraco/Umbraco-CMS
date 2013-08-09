@@ -24,9 +24,7 @@ angular.module("umbraco.directives")
             scope.$watch("tabs", function (newValue, oldValue) {
 
                 $(newValue).each(function(i, val){
-                    if(val.id > 0){
                         scope.collectedTabs.push({id: val.id, label: val.label});
-                    }
                 });
                 //scope.collectedTabs = newValue;
 

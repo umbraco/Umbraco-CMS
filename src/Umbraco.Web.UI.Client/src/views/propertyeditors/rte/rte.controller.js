@@ -6,7 +6,7 @@ angular.module("umbraco")
         tinymce.DOM.events.domLoaded = true;
 
         tinymce.init({
-            selector: "#" + $scope.alias + "_rte",
+            selector: "#" + $scope.model.alias + "_rte",
             skin: "umbraco",
             menubar : false,
             statusbar: false,
@@ -17,7 +17,7 @@ angular.module("umbraco")
                     editor.on('blur', function(e) {
                         $scope.$apply(function() {
                             //$scope.model.value = e.getBody().innerHTML;
-                            $scope.value = editor.getContent();
+                            $scope.model.value = editor.getContent();
                         });
                     });
 
@@ -55,7 +55,7 @@ angular.module("umbraco")
         };
 
         function populate(data){
-            $scope.value = data.selection;   
+            $scope.model.value = data.selection;   
         }
 
     });

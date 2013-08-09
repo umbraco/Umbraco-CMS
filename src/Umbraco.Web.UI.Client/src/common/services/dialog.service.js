@@ -29,8 +29,7 @@
  */
 
 angular.module('umbraco.services')
-.factory('dialogService', ['$rootScope', '$compile', '$http', '$timeout', '$q', '$templateCache',
-   function ($rootScope, $compile, $http, $timeout, $q, $templateCache) {
+.factory('dialogService', function ($rootScope, $compile, $http, $timeout, $q, $templateCache, $log) {
 
        var dialogs = [];
        
@@ -49,12 +48,13 @@ angular.module('umbraco.services')
 
            $timeout(function () {
                dialog.remove();
-               //$("#" + dialog.attr("id")).remove();
            }, 250);
        }
 
        /** Internal method that handles opening all dialogs */
        function openDialog(options) {
+
+     
            if (!options) {
                options = {};
            }
@@ -89,8 +89,11 @@ angular.module('umbraco.services')
                .addClass(modalClass);
 
            //push the modal into the global modal collection
-           dialogs.push($modal);
-
+           //we halt the .push because a link click will trigger a closeAll right away
+           $timeout(function () {
+               dialogs.push($modal);
+           }, 250);
+           
            //if iframe is enabled, inject that instead of a template
            if (options.iframe) {
                var html = $("<iframe auto-scale='0' src='" + templateUrl + "' style='width: 100%; height: 100%;'></iframe>");
@@ -190,14 +193,11 @@ angular.module('umbraco.services')
                        if (options.show) {
                            $modal.modal('show');
                        }
-
                    });
                
                //Return the modal object outside of the promise!
                return $modal;
            }
-
-
        }
 
        /** Handles the closeDialogs event */
@@ -363,4 +363,4 @@ angular.module('umbraco.services')
                });
            }
        };
-   }]);
+   });

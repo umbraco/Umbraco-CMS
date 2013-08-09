@@ -16,6 +16,5 @@ angular.module("umbraco.directives")
             link: function (scope, element, attrs, ctrl) {
 
             }
-
         };
     });

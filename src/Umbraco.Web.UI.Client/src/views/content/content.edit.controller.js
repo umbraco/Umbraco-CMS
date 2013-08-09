@@ -13,7 +13,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
 
         //NOTE: I don't really think we need these here, we should just chuck them on the mock data, then we can make
         // sure these are just returned from the server with the correct localized strings.
-        genericPropsTab.properties.splice(0, 0,
+        /*genericPropsTab.properties.splice(0, 0,
             {
                 label: 'Created',
                 description: 'Time this document was created',
@@ -31,7 +31,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
                 //can't overlap with user defined props!! important for validation and to filter
                 // out so we don't send this up to the server
                 alias: "_umb_updatedate"
-            });
+            });*/
     }
 
     if ($routeParams.create) {
@@ -40,8 +40,6 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
             .then(function(data) {
                 $scope.contentLoaded = true;
                 $scope.content = data;
-                $scope.genericPropertiesTab = $.grep($scope.content.tabs, function (e) { return e.id === 0; })[0];
-                configureGenericPropertiesTab($scope.genericPropertiesTab, $scope.content);
             });
     }
     else {
@@ -50,8 +48,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
             .then(function(data) {
                 $scope.contentLoaded = true;
                 $scope.content = data;
-                $scope.genericPropertiesTab = $.grep($scope.content.tabs, function(e){ return e.id === 0; })[0];
-                configureGenericPropertiesTab($scope.genericPropertiesTab, $scope.content);
+                
                 //in one particular special case, after we've created a new item we redirect back to the edit
                 // route but there might be server validation errors in the collection which we need to display
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors
@@ -115,10 +112,6 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
         });
     };
 
-    
-    $scope.exludeLastTab = function(item, args) {
-        return item.id !== 0;
-    };
 }
 
 angular.module("umbraco").controller("Umbraco.Editors.Content.EditController", ContentEditController);

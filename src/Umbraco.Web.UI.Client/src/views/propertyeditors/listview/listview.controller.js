@@ -14,7 +14,7 @@ angular.module("umbraco")
         $scope.next = function(){
             if ($scope.options.pageNumber < $scope.listViewResultSet.totalPages) {
                 $scope.options.pageNumber++;
-                $scope.reloadView();    
+                $scope.reloadView();   
             }
         };
 

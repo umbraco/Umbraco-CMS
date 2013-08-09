@@ -79,7 +79,8 @@ namespace Umbraco.Web.Editors
         public ContentItemDisplay GetById(int id)
         {
             //with the filter applied we need to check if the content has already been looked up
-            var foundContent = Request.Properties["contentItem"] == null
+            
+            var foundContent = !Request.Properties.ContainsKey("contentItem")
                                    ? Services.ContentService.GetById(id)
                                    : (IContent) Request.Properties["contentItem"];
             

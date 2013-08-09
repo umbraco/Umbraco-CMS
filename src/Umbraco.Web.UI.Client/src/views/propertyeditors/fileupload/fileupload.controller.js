@@ -22,9 +22,9 @@ function fileUploadController($scope, $element, $compile, umbImageHelper) {
     $scope.files = [];
 
     //create the property to show the list of files currently saved
-    if ($scope.value != "") {
+    if ($scope.model.value != "") {
 
-        var images = $scope.value.split(",");
+        var images = $scope.model.value.split(",");
         
         $scope.persistedFiles = _.map(images, function (item) {
             return { file: item, isImage: umbImageHelper.detectIfImageByExtension(item) };
@@ -43,11 +43,11 @@ function fileUploadController($scope, $element, $compile, umbImageHelper) {
     //listen for clear files changes to set our model to be sent up to the server
     $scope.$watch("clearFiles", function (isCleared) {
         if (isCleared == true) {
-            $scope.value = "{clearFiles: true}";
+            $scope.model.value = "{clearFiles: true}";
             clearFiles();
         }
         else {
-            $scope.value = "";
+            $scope.model.value = "";
         }
     });
 
@@ -55,12 +55,12 @@ function fileUploadController($scope, $element, $compile, umbImageHelper) {
     $scope.$on("filesSelected", function (event, args) {
         $scope.$apply(function () {
             //set the parent files collection
-            $scope.$parent.addFiles($scope.id, args.files);
+            $scope.$parent.addFiles($scope.model.id, args.files);
             //clear the current files
             $scope.files = [];
             for (var i = 0; i < args.files.length; i++) {
                 //save the file object to the scope's files collection
-                $scope.files.push({ id: $scope.id, file: args.files[i] });
+                $scope.files.push({ id: $scope.model.id, file: args.files[i] });
             }
             //set clear files to false, this will reset the model too
             $scope.clearFiles = false;
