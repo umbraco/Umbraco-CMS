@@ -542,7 +542,7 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 			{
-				var query = Query<IMedia>.Builder.Where(x => x.Trashed == true);
+				/*var query = Query<IMedia>.Builder.Where(x => x.Trashed == true);
 				var contents = repository.GetByQuery(query).OrderByDescending(x => x.Level);
 
 				foreach (var content in contents)
@@ -553,7 +553,8 @@ namespace Umbraco.Core.Services
 					repository.Delete(content);
 
 					Deleted.RaiseEvent(new DeleteEventArgs<IMedia>(content, false), this);
-				}
+				}*/
+                repository.EmptyRecycleBin();
 				uow.Commit();
 			}
 
