@@ -334,11 +334,6 @@ namespace Umbraco.Web.Editors
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
 
-            if (Security.UserHasAppAccess(Constants.Applications.Content, UmbracoUser) == false)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "User has no access to this application");
-            }            
-
             var contentService = Services.ContentService;
             var sortedContent = new List<IContent>();
             try

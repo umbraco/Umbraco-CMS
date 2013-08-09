@@ -9,6 +9,8 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
@@ -17,6 +19,7 @@ using System.Linq;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
+using umbraco.BusinessLogic.Actions;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -86,6 +89,8 @@ namespace Umbraco.Web.Editors
         /// </summary>
         public IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>> GetRootMedia()
         {
+            //TODO: Add permissions check!
+
             return Services.MediaService.GetRootMedia()
                            .Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
         }
@@ -95,6 +100,9 @@ namespace Umbraco.Web.Editors
         /// </summary>
         public IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(int parentId)
         {
+            //TODO: Change this to be like content with paged params
+            //TODO: filter results based on permissions!
+
             return Services.MediaService.GetChildren(parentId)
                            .Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
         }
@@ -108,6 +116,17 @@ namespace Umbraco.Web.Editors
             [ModelBinder(typeof(MediaItemBinder))]
                 ContentItemSave<IMedia> contentItem)
         {
+            //We now need to validate that the user is allowed to be doing what they are doing
+            if (CheckPermissions(
+                Request.Properties,
+                Security.CurrentUser,
+                Services.MediaService,
+                contentItem.Id,
+                contentItem.PersistedContent) == false)
+            {
+                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+            }
+
             //If we've reached here it means:
             // * Our model has been bound
             // * and validated
@@ -163,6 +182,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="sorted"></param>
         /// <returns></returns>
+        [EnsureUserPermissionForContent("sorted.ParentId", 'S')]
         public HttpResponseMessage PostSort(ContentSortOrder sorted)
         {
             if (sorted == null)
@@ -183,7 +203,7 @@ namespace Umbraco.Web.Editors
                 sortedMedia.AddRange(sorted.IdSortOrder.Select(mediaService.GetById));
 
                 // Save Media with new sort order and update content xml in db accordingly
-                if (!mediaService.Sort(sortedMedia))
+                if (mediaService.Sort(sortedMedia) == false)
                 {
                     LogHelper.Warn<MediaController>("Media sorting failed, this was probably caused by an event being cancelled");
                     return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Media sorting failed, this was probably caused by an event being cancelled");
@@ -197,5 +217,31 @@ namespace Umbraco.Web.Editors
             }
         }
 
+        /// <summary>
+        /// Performs a permissions check for the user to check if it has access to the node based on 
+        /// start node and/or permissions for the node
+        /// </summary>
+        /// <param name="storage">The storage to add the content item to so it can be reused</param>
+        /// <param name="user"></param>
+        /// <param name="mediaService"></param>
+        /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
+        /// <param name="media">Specifies the already resolved content item to check against, setting this ignores the nodeId</param>
+        /// <returns></returns>
+        internal static bool CheckPermissions(IDictionary<string, object> storage, IUser user, IMediaService mediaService, int nodeId, IMedia media = null)
+        {
+            var contentItem = mediaService.GetById(nodeId);
+            if (contentItem == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            //put the content item into storage so it can be retreived 
+            // in the controller (saves a lookup)
+            storage.Add(typeof(IMedia).ToString(), contentItem);
+
+            var hasPathAccess = user.HasPathAccess(contentItem);
+
+            return hasPathAccess;
+        }
     }
 }

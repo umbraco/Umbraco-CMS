@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Web.Editors;
 using umbraco.BusinessLogic.Actions;
 
 namespace Umbraco.Web.WebApi.Filters
@@ -51,19 +52,35 @@ namespace Umbraco.Web.WebApi.Filters
             int nodeId;
             if (_nodeId.HasValue == false)
             {
-                if (actionContext.ActionArguments[_paramName] == null)
+                var parts = _paramName.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (actionContext.ActionArguments[parts[0]] == null)
                 {
                     throw new InvalidOperationException("No argument found for the current action with the name: " + _paramName);
                 }
 
-                nodeId = (int) actionContext.ActionArguments[_paramName];
+                if (parts.Length == 1)
+                {
+                    nodeId = (int)actionContext.ActionArguments[parts[0]];
+                }
+                else
+                {
+                    //now we need to see if we can get the property of whatever object it is
+                    var pType = actionContext.ActionArguments[parts[0]].GetType();
+                    var prop = pType.GetProperty(parts[1]);
+                    if (prop == null)
+                    {
+                        throw new InvalidOperationException("No argument found for the current action with the name: " + _paramName);
+                    }
+                    nodeId = (int)prop.GetValue(actionContext.ActionArguments[parts[0]]);
+                }
             }
             else
             {
                 nodeId = _nodeId.Value;
             }
 
-            if (CheckPermissions(
+            if (MediaController.CheckPermissions(
                 actionContext.Request.Properties,
                 UmbracoContext.Current.Security.CurrentUser, 
                 ApplicationContext.Current.Services.MediaService, nodeId))
@@ -77,22 +94,7 @@ namespace Umbraco.Web.WebApi.Filters
             
         }
 
-        internal bool CheckPermissions(IDictionary<string, object> storage , IUser user, IMediaService mediaService, int nodeId)
-        {
-            var contentItem = mediaService.GetById(nodeId);
-            if (contentItem == null)
-            {
-                throw new HttpResponseException(System.Net.HttpStatusCode.NotFound);
-            }
-
-            //put the content item into storage so it can be retreived 
-            // in the controller (saves a lookup)
-            storage.Add(typeof(IMedia).ToString(), contentItem);
-
-            var hasPathAccess = user.HasPathAccess(contentItem);
-
-            return hasPathAccess;
-        }
+        
 
     }
 }
