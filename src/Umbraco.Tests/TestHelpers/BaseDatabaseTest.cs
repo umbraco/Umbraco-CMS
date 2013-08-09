@@ -57,7 +57,7 @@ namespace Umbraco.Tests.TestHelpers
                 new RepositoryFactory());
 
             SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
-                new List<Type> { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) }) { CanResolveBeforeFrozen = true };
+                new List<Type> { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqliteSyntaxProvider), typeof(SqlServerSyntaxProvider) }) { CanResolveBeforeFrozen = true };
 
             Resolution.Freeze();
             ApplicationContext.Current = new ApplicationContext(
