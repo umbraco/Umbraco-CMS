@@ -25,26 +25,24 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public bool EmptyRecycleBin(Guid nodeObjectType)
         {
-            try
-            {
-                var db = _unitOfWork.Database;
+            var db = _unitOfWork.Database;
 
-                //Issue query to get all trashed content or media that has the Upload field as a property
-                //The value for each field is stored in a list: FilesToDelete<string>()
-                //Alias: Constants.Conventions.Media.File and ControlId: Constants.PropertyEditors.UploadField
-                var sql = new Sql();
-                sql.Select("DISTINCT(dataNvarchar)")
-                    .From<PropertyDataDto>()
-                    .InnerJoin<NodeDto>().On<PropertyDataDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                    .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
-                    .Where("umbracoNode.trashed = '1' AND umbracoNode.nodeObjectType = @NodeObjectType AND dataNvarchar IS NOT NULL AND (cmsPropertyType.Alias = @FileAlias OR cmsDataType.controlId = @ControlId)",
-                        new { FileAlias = Constants.Conventions.Media.File, NodeObjectType = nodeObjectType, ControlId = Constants.PropertyEditors.UploadField });
+            //Issue query to get all trashed content or media that has the Upload field as a property
+            //The value for each field is stored in a list: FilesToDelete<string>()
+            //Alias: Constants.Conventions.Media.File and ControlId: Constants.PropertyEditors.UploadField
+            var sql = new Sql();
+            sql.Select("DISTINCT(dataNvarchar)")
+                .From<PropertyDataDto>()
+                .InnerJoin<NodeDto>().On<PropertyDataDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .Where("umbracoNode.trashed = '1' AND umbracoNode.nodeObjectType = @NodeObjectType AND dataNvarchar IS NOT NULL AND (cmsPropertyType.Alias = @FileAlias OR cmsDataType.controlId = @ControlId)",
+                    new { FileAlias = Constants.Conventions.Media.File, NodeObjectType = nodeObjectType, ControlId = Constants.PropertyEditors.UploadField });
 
-                var files = db.Fetch<string>(sql);
+            var files = db.Fetch<string>(sql);
 
-                //Construct and execute delete statements for all trashed items by 'nodeObjectType'
-                var deletes = new List<string>
+            //Construct and execute delete statements for all trashed items by 'nodeObjectType'
+            var deletes = new List<string>
                           {
                               FormatDeleteStatement("umbracoUser2NodeNotify", "nodeId"),
                               FormatDeleteStatement("umbracoUser2NodePermission", "nodeId"),
@@ -61,20 +59,30 @@ namespace Umbraco.Core.Persistence.Repositories
                               "DELETE FROM umbracoNode WHERE trashed = '1' AND nodeObjectType = @NodeObjectType"
                           };
 
-                foreach (var delete in deletes)
-                {
-                    db.Execute(delete, new { NodeObjectType = nodeObjectType });
-                }
-
-                //Trigger (internal) event with list of files to delete - RecycleBinEmptied
-                RecycleBinEmptied.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, files), this);
-
-                return true;
-            }
-            catch (Exception ex)
+            //Wraps in transaction - this improves performance and also ensures
+            // that if any of the deletions fails that the whole thing is rolled back.
+            using (var trans = db.GetTransaction())
             {
-                LogHelper.Error<RecycleBinRepository>("An error occurred while emptying the Recycle Bin: " + ex.Message, ex);
-                return false;
+                try
+                {
+                    foreach (var delete in deletes)
+                    {
+                        db.Execute(delete, new { NodeObjectType = nodeObjectType });
+                    }
+
+                    trans.Complete();
+
+                    //Trigger (internal) event with list of files to delete - RecycleBinEmptied
+                    RecycleBinEmptied.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, files), this);
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    trans.Dispose();
+                    LogHelper.Error<RecycleBinRepository>("An error occurred while emptying the Recycle Bin: " + ex.Message, ex);
+                    return false;
+                }
             }
         }
 
