@@ -9,11 +9,15 @@
  * 
  */
 function MainController($scope, $routeParams, $rootScope, $timeout, notificationsService, userService, navigationService, legacyJsLoader) {
+    //debugmode so I can easily turn on/off json output of property models:
+    //TODO: find a better way
+    $scope.$umbdebugmode = true;
+
     //set default properties
     
     //the null is important because we do an explicit bool check on this in the view    
-    $scope.authenticated = null; 
-    
+    $scope.authenticated = null;
+
     //subscribes to notifications in the notification service
     $scope.notifications = notificationsService.current;
     $scope.$watch('notificationsService.current', function (newVal, oldVal, scope) {
