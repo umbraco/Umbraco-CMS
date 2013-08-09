@@ -228,9 +228,9 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public static IEnumerable<Property> GetNonGroupedProperties(this IContentBase content)
         {
-            var propertyIdsInTabs = content.PropertyGroups.SelectMany(pg => pg.PropertyTypes).Select(pt => pt.Id);
+            var propertyIdsInTabs = content.PropertyGroups.SelectMany(pg => pg.PropertyTypes);
             return content.Properties
-                          .Where(property => propertyIdsInTabs.Contains(property.PropertyTypeId) == false)
+                          .Where(property => propertyIdsInTabs.Contains(property.PropertyType) == false)
                           .OrderBy(x => x.PropertyType.SortOrder);
         }
 

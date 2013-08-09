@@ -18,6 +18,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Stubs;
@@ -172,6 +173,9 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected override void FreezeResolution()
         {
+            PropertyEditorResolver.Current = new PropertyEditorResolver(
+                () => PluginManager.Current.ResolvePropertyEditors());
+
             DataTypesResolver.Current = new DataTypesResolver(
                 () => PluginManager.Current.ResolveDataTypes());
 

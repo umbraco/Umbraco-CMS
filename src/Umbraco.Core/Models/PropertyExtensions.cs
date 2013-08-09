@@ -75,7 +75,7 @@ namespace Umbraco.Core.Models
             else
             {
                 //NOTE: An exception will be thrown if this doesn't exist
-                var legacyDataType = property.PropertyType.DataType(property.Id, ApplicationContext.Current.Services.DataTypeService);
+                var legacyDataType = property.PropertyType.DataType(property.Id, dataTypeService);
 
                 //We've already got the value for the property so we're going to give it to the 
                 // data type's data property so it doesn't go re-look up the value from the db again.

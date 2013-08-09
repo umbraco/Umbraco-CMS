@@ -46,10 +46,13 @@ namespace Umbraco.Tests.Models
             //add non-grouped properties
             contentType.AddPropertyType(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) {Alias = "nonGrouped1", Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88});
             contentType.AddPropertyType(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "nonGrouped2", Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
 
+
             var content = MockedContent.CreateSimpleContent(contentType);
+            //need to id the p
 
             var nonGrouped = content.GetNonGroupedProperties();
 

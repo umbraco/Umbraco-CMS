@@ -4,7 +4,9 @@ using System.Xml;
 using NUnit.Framework;
 using Rhino.Mocks;
 using Rhino.Mocks.Interfaces;
+using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
@@ -19,6 +21,8 @@ namespace Umbraco.Tests.Models
         protected override void FreezeResolution()
         {
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(new DefaultShortStringHelper());
+            PropertyEditorResolver.Current = new PropertyEditorResolver(
+                () => PluginManager.Current.ResolvePropertyEditors());
             base.FreezeResolution();
         }
 

@@ -42,7 +42,7 @@ namespace Umbraco.Tests
 		public void Get_All_Instances()
 		{			
 			var factory = new umbraco.presentation.cache.Factory();
-			Assert.AreEqual(2, factory.GetAll().Count());
+			Assert.AreEqual(3, factory.GetAll().Count());
 		}
 
 		#region Classes for tests
