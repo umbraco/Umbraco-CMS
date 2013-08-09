@@ -39,13 +39,13 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
             var ctx = new HttpActionContext();
             ctx.ActionArguments.Add("id", 1234);
-            var attribute = new EnsureUserPermissionForContentAttribute(user, userService, contentService, 1234, 'F');
+            var attribute = new EnsureUserPermissionForContentAttribute(1234);
 
             //act
-            attribute.OnActionExecuting(ctx);
+            var result = attribute.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
 
             //assert
-            Assert.Pass();
+            Assert.IsTrue(result);
         }
 
         [Test]
@@ -63,10 +63,10 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             var permissions = new List<EntityPermission>();
             userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
             var ctx = new HttpActionContext();
-            var attribute = new EnsureUserPermissionForContentAttribute(user, userService, contentService, 1234, 'F');
-
+            var attribute = new EnsureUserPermissionForContentAttribute(1234);
+            
             //act/assert
-            Assert.Throws<HttpResponseException>(() => attribute.OnActionExecuting(ctx));
+            Assert.Throws<HttpResponseException>(() => attribute.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F'));
         }
 
         [Test]
@@ -84,10 +84,13 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             var permissions = new List<EntityPermission>();
             userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
             var ctx = new HttpActionContext();
-            var attribute = new EnsureUserPermissionForContentAttribute(user, userService, contentService, 1234, 'F');
+            var attribute = new EnsureUserPermissionForContentAttribute(1234);
 
-            //act/assert
-            Assert.Throws<HttpResponseException>(() => attribute.OnActionExecuting(ctx));
+            //act
+            var result = attribute.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
+
+            //assert
+            Assert.IsFalse(result);
         }
 
         [Test]
@@ -108,10 +111,14 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
                 };
             userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
             var ctx = new HttpActionContext();
-            var attribute = new EnsureUserPermissionForContentAttribute(user, userService, contentService, 1234, 'F');
+            var attribute = new EnsureUserPermissionForContentAttribute(1234);
 
-            //act/assert
-            Assert.Throws<HttpResponseException>(() => attribute.OnActionExecuting(ctx));
+
+            //act
+            var result = attribute.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
+
+            //assert
+            Assert.IsFalse(result);
         }
 
         [Test]
@@ -133,13 +140,13 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
             var ctx = new HttpActionContext();
             ctx.ActionArguments.Add("id", 1234);
-            var attribute = new EnsureUserPermissionForContentAttribute(user, userService, contentService, 1234, 'F');
+            var attribute = new EnsureUserPermissionForContentAttribute(1234);
 
             //act
-            attribute.OnActionExecuting(ctx);
+            var result = attribute.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
 
             //assert
-            Assert.Pass();
+            Assert.IsTrue(result);
         }
 
         [Test]
@@ -158,13 +165,13 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
             var ctx = new HttpActionContext();
             ctx.ActionArguments.Add("id", 1234);
-            var attribute = new EnsureUserPermissionForContentAttribute(user, userService, contentService, 1234, 'F');
+            var attribute = new EnsureUserPermissionForContentAttribute(1234);
 
             //act
-            attribute.OnActionExecuting(ctx);
+            var result = attribute.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
 
             //assert
-            Assert.Pass();
+            Assert.IsTrue(result);
         }
 
     }

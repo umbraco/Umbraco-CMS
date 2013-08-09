@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
@@ -6,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using umbraco.BusinessLogic.Actions;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -17,32 +19,8 @@ namespace Umbraco.Web.WebApi.Filters
     /// </remarks>
     internal sealed class EnsureUserPermissionForMediaAttribute : ActionFilterAttribute
     {
-        private int? _nodeId;
-        private readonly IUser _user;
-        private readonly IMediaService _mediaService;
-        private IMediaService MediaService
-        {
-            get { return _mediaService ?? ApplicationContext.Current.Services.MediaService; }
-        }
-        private IUser User
-        {
-            get { return _user ?? UmbracoContext.Current.Security.CurrentUser; }
-        }
-
+        private readonly int? _nodeId;
         private readonly string _paramName;
-
-        /// <summary>
-        /// used for unit testing
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="mediaService"></param>
-        /// <param name="nodeId"></param>
-        internal EnsureUserPermissionForMediaAttribute(IUser user, IMediaService mediaService, int nodeId)
-        {
-            _user = user;
-            _mediaService = mediaService;
-            _nodeId = nodeId;
-        }
 
         /// <summary>
         /// This constructor will only be able to test the start node access
@@ -54,9 +32,10 @@ namespace Umbraco.Web.WebApi.Filters
 
         public EnsureUserPermissionForMediaAttribute(string paramName)
         {
-            _paramName = paramName;         
-        }        
-
+            Mandate.ParameterNotNullOrEmpty(paramName, "paramName");
+            _paramName = paramName;            
+        }
+       
         public override bool AllowMultiple
         {
             get { return true; }
@@ -64,11 +43,12 @@ namespace Umbraco.Web.WebApi.Filters
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            if (User == null)
+            if (UmbracoContext.Current.Security.CurrentUser == null)
             {
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
             }
 
+            int nodeId;
             if (_nodeId.HasValue == false)
             {
                 if (actionContext.ActionArguments[_paramName] == null)
@@ -76,23 +56,42 @@ namespace Umbraco.Web.WebApi.Filters
                     throw new InvalidOperationException("No argument found for the current action with the name: " + _paramName);
                 }
 
-                _nodeId = (int)actionContext.ActionArguments[_paramName];
+                nodeId = (int) actionContext.ActionArguments[_paramName];
+            }
+            else
+            {
+                nodeId = _nodeId.Value;
             }
 
-            var mediaItem = MediaService.GetById(_nodeId.Value);
-            if (mediaItem == null)
+            if (CheckPermissions(
+                actionContext.Request.Properties,
+                UmbracoContext.Current.Security.CurrentUser, 
+                ApplicationContext.Current.Services.MediaService, nodeId))
+            {
+                base.OnActionExecuting(actionContext);
+            }
+            else
+            {
+                throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
+            }
+            
+        }
+
+        internal bool CheckPermissions(IDictionary<string, object> storage , IUser user, IMediaService mediaService, int nodeId)
+        {
+            var contentItem = mediaService.GetById(nodeId);
+            if (contentItem == null)
             {
                 throw new HttpResponseException(System.Net.HttpStatusCode.NotFound);
             }
 
-            var hasPathAccess = User.HasPathAccess(mediaItem);
+            //put the content item into storage so it can be retreived 
+            // in the controller (saves a lookup)
+            storage.Add(typeof(IMedia).ToString(), contentItem);
 
-            if (hasPathAccess == false)
-            {
-                throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
-            }
+            var hasPathAccess = user.HasPathAccess(contentItem);
 
-            base.OnActionExecuting(actionContext);
+            return hasPathAccess;
         }
 
     }

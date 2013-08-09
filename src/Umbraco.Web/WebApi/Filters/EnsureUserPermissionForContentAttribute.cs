@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Web.Http;
@@ -25,42 +26,9 @@ namespace Umbraco.Web.WebApi.Filters
     /// </remarks>
     internal sealed class EnsureUserPermissionForContentAttribute : ActionFilterAttribute
     {
-        private int? _nodeId;
-        private readonly IUser _user;
-        private readonly IUserService _userService;
-        private readonly IContentService _contentService;
-        private IContentService ContentService
-        {
-            get { return _contentService ?? ApplicationContext.Current.Services.ContentService; }
-        }
-        private IUserService UserService
-        {
-            get { return _userService ?? ApplicationContext.Current.Services.UserService; }
-        }
-        private IUser User
-        {
-            get { return _user ?? UmbracoContext.Current.Security.CurrentUser; }
-        }
-
+        private readonly int? _nodeId;
         private readonly string _paramName;
         private readonly char _permissionToCheck;
-
-        /// <summary>
-        /// used for unit testing
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="userService"></param>
-        /// <param name="contentService"></param>
-        /// <param name="nodeId"></param>
-        /// <param name="permissionToCheck"></param>
-        internal EnsureUserPermissionForContentAttribute(IUser user, IUserService userService, IContentService contentService, int nodeId, char permissionToCheck)
-        {
-            _user = user;
-            _userService = userService;
-            _contentService = contentService;
-            _nodeId = nodeId;
-            _permissionToCheck = permissionToCheck;
-        }
 
         /// <summary>
         /// This constructor will only be able to test the start node access
@@ -72,12 +40,13 @@ namespace Umbraco.Web.WebApi.Filters
 
         public EnsureUserPermissionForContentAttribute(string paramName)
         {
+            Mandate.ParameterNotNullOrEmpty(paramName, "paramName");
             _paramName = paramName;
             _permissionToCheck = ActionBrowse.Instance.Letter;
         }
         public EnsureUserPermissionForContentAttribute(string paramName, char permissionToCheck)
+            : this(paramName)
         {
-            _paramName = paramName;
             _permissionToCheck = permissionToCheck;
         }
         
@@ -88,11 +57,12 @@ namespace Umbraco.Web.WebApi.Filters
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            if (User == null)
+            if (UmbracoContext.Current.Security.CurrentUser == null)
             {
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
             }
-            
+
+            int nodeId;
             if (_nodeId.HasValue == false)
             {
                 if (actionContext.ActionArguments[_paramName] == null)
@@ -100,30 +70,55 @@ namespace Umbraco.Web.WebApi.Filters
                     throw new InvalidOperationException("No argument found for the current action with the name: " + _paramName);
                 }
 
-                _nodeId = (int)actionContext.ActionArguments[_paramName];    
+                nodeId = (int) actionContext.ActionArguments[_paramName];
             }
-            
-            var contentItem = ContentService.GetById(_nodeId.Value);
-            if (contentItem == null)
+            else
             {
-                throw new HttpResponseException(System.Net.HttpStatusCode.NotFound);
+                nodeId = _nodeId.Value;
             }
 
-            var hasPathAccess = User.HasPathAccess(contentItem);
-
-            if (hasPathAccess == false)
-            {
-                throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
-            }
-
-            var permission = UserService.GetPermissions(User, _nodeId.Value).FirstOrDefault();
-            if (permission == null || permission.AssignedPermissions.Contains(_permissionToCheck.ToString(CultureInfo.InvariantCulture)))
+            if (CheckPermissions(
+                actionContext.Request.Properties,
+                UmbracoContext.Current.Security.CurrentUser,
+                ApplicationContext.Current.Services.UserService,
+                ApplicationContext.Current.Services.ContentService, nodeId, _permissionToCheck))
             {
                 base.OnActionExecuting(actionContext);
             }
             else
             {
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
+            }
+            
+        }
+
+        internal bool CheckPermissions(IDictionary<string, object> storage, IUser user, IUserService userService, IContentService contentService, int nodeId, char permissionToCheck)
+        {
+            var contentItem = contentService.GetById(nodeId);
+            if (contentItem == null)
+            {
+                throw new HttpResponseException(System.Net.HttpStatusCode.NotFound);
+            }
+
+            //put the content item into storage so it can be retreived 
+            // in the controller (saves a lookup)
+            storage.Add(typeof(IContent).ToString(), contentItem);
+
+            var hasPathAccess = user.HasPathAccess(contentItem);
+
+            if (hasPathAccess == false)
+            {
+                return false;
+            }
+
+            var permission = userService.GetPermissions(user, nodeId).FirstOrDefault();
+            if (permission == null || permission.AssignedPermissions.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
