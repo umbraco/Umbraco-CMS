@@ -71,7 +71,9 @@
                                 description: 'Time this document was created',
                                 value: new Date().toIsoDateTimeString(),
                                 view: "readonlyvalue",
-                                config: {filter: 'date', format: 'medium'},
+                                //NOTE: No need for filters because the date is a formatted string already because
+                                // that is how it comes from the server as a pre-formatted json string
+                                //config: {filter: 'date', format: 'medium'},
                                 alias: "_umb_createdate"
                             },
                             {
@@ -79,7 +81,6 @@
                                 description: 'Time this document was last updated',
                                 value: new Date().toIsoDateTimeString(),
                                 view: "readonlyvalue",
-                                config: {filter: 'date', format: 'medium'},
                                 alias: "_umb_updatedate"
                             },
                             {

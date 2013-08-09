@@ -7,33 +7,7 @@
  * The controller for the content editor
  */
 function ContentEditController($scope, $routeParams, $location, contentResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper) {
-        
-    /** adds the custom controls to the generic props tab above the user props */
-    function configureGenericPropertiesTab(genericPropsTab, content) {
-
-        //NOTE: I don't really think we need these here, we should just chuck them on the mock data, then we can make
-        // sure these are just returned from the server with the correct localized strings.
-        /*genericPropsTab.properties.splice(0, 0,
-            {
-                label: 'Created',
-                description: 'Time this document was created',
-                value: content.createDate,
-                view: "readonlyvalue",
-                //can't overlap with user defined props!! important for validation and to filter
-                // out so we don't send this up to the server
-                alias: "_umb_createdate"
-            },
-            {
-                label: 'Updated',
-                description: 'Time this document was last updated',
-                value: content.updateDate,
-                view: "readonlyvalue",
-                //can't overlap with user defined props!! important for validation and to filter
-                // out so we don't send this up to the server
-                alias: "_umb_updatedate"
-            });*/
-    }
-
+       
     if ($routeParams.create) {
         //we are creating so get an empty content item
         contentResource.getScaffold($routeParams.id, $routeParams.doctype)
