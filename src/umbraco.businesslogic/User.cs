@@ -4,6 +4,7 @@ using System.Web.Caching;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Membership;
 using umbraco.DataLayer;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +36,23 @@ namespace umbraco.BusinessLogic
         private static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
+        }
+
+        internal User(IUser user)
+        {
+            _userNoConsole = user.NoConsole;
+            _userDisabled = user.IsLockedOut;
+            _name = user.Name;
+            _loginname = user.Username;
+            _email = user.Email;
+            _language = user.Language;
+            _startnodeid = user.StartContentId;
+            _startmediaid = user.StartMediaId;
+            //this is cached, so should be 'ok'
+            _usertype = UserType.GetUserType(user.UserType.Id);
+            _defaultToLiveEditing = user.DefaultToLiveEditing;
+
+            _isInitialized = true;
         }
 
         /// <summary>

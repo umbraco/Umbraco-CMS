@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Events;
@@ -137,6 +138,21 @@ namespace Umbraco.Core.Services
                 }
                 uow.Commit();
             }
+        }
+
+        /// <summary>
+        /// Returns the user's applications that they are allowed to access
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public IEnumerable<string> GetUserSections(IUser user)
+        {
+            //TODO: We need to cache this result, should all caching be done in the repo level ?
+
+            var uow = _uowProvider.GetUnitOfWork();
+            var sql = new Sql();
+            sql.Select("app").From<User2AppDto>().Where("[user] = @userID", new {userID = user.Id});
+            return uow.Database.Fetch<string>(sql);
         }
 
         /// <summary>
