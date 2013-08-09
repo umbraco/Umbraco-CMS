@@ -3,8 +3,9 @@ using System.Web.UI;
 using System.Web.UI.Design.WebControls;
 using System.Web.UI.WebControls;
 using Umbraco.Core.IO;
-using umbraco.cms.businesslogic.member;
+using Umbraco.Core.Models.Membership;
 using System.Web.Security;
+using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace umbraco.cms.presentation.members
 {
@@ -63,7 +64,7 @@ namespace umbraco.cms.presentation.members
                 ph.Controls.Add(MemberLoginNameVal);
                 MemberLoginNameVal.ControlToValidate = MemberLoginNameTxt.ID;
                 string[] errorVars = { ui.Text("login") };
-                MemberLoginNameVal.ErrorMessage = " " + ui.Text("errorHandling", "errorMandatoryWithoutTab", errorVars, null);
+                MemberLoginNameVal.ErrorMessage = " " + ui.Text("errorHandling", "errorMandatoryWithoutTab", errorVars);
                 MemberLoginNameVal.EnableClientScript = false;
                 MemberLoginNameVal.Display = ValidatorDisplay.Dynamic;
 
@@ -276,7 +277,7 @@ namespace umbraco.cms.presentation.members
 		        menuSave.ID = m_MemberShipPanel.ID + "_save";
 		        menuSave.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
 		        menuSave.Click += new ImageClickEventHandler(MenuSaveClick);
-		        menuSave.AltText = ui.Text("buttons", "save", null);
+		        menuSave.AltText = ui.Text("buttons", "save");
 		    }
 		    base.OnInit(e);
         }

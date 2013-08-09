@@ -33,6 +33,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected internal IEnumerable<User2NodePermissionDto> GetPermissionsForEntity(int entityId)
         {
+            //TODO: Did we cache this result in the legacy implementation?
+
             var sql = new Sql();
             sql.Select("*")
                 .From<User2NodePermissionDto>()

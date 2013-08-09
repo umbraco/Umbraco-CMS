@@ -65,6 +65,7 @@ namespace Umbraco.Web.UI.Pages
         /// <summary>
         /// Returns the current user
         /// </summary>
+        [Obsolete("This should no longer be used since it returns the legacy user object, use The Security.CurrentUser instead to return the proper user object")]
         protected User UmbracoUser
         {
             get
@@ -76,7 +77,7 @@ namespace Umbraco.Web.UI.Pages
                     _hasValidated = true;
                 }
                 
-                return Security.CurrentUser;
+                return new User(Security.CurrentUser);
             }
         }
         

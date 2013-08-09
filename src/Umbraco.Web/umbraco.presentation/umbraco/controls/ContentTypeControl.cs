@@ -150,7 +150,7 @@ namespace umbraco.controls
 			if (TabTxt.Text.Trim() != "") 
 			{
 				docType.AddVirtualTab(TabTxt.Text);
-				xtra = ui.Text("speechBubbles", "contentTypeTabCreated", null);
+				xtra = ui.Text("speechBubbles", "contentTypeTabCreated");
 				populateTabDDLs();
 				TabsPane.Controls.Clear();
 				LoadExistingTabsOnTabsPane();
@@ -161,7 +161,7 @@ namespace umbraco.controls
 			SaveAllowedChildTypes();
 
 			NodeTypeEditorCtrl.Save();
-			prnt.ClientTools.ShowSpeechBubble( BasePages.BasePage.speechBubbleIcon.save, ui.Text("speechBubbles", "contentTypeSavedHeader", null),"" + xtra);
+			prnt.ClientTools.ShowSpeechBubble( BasePages.BasePage.speechBubbleIcon.save, ui.Text("speechBubbles", "contentTypeSavedHeader"),"" + xtra);
 		}
 
 		private void SaveAllowedChildTypes() {
@@ -284,7 +284,7 @@ namespace umbraco.controls
 			LoadExistingTabsOnTabsPane();
 			
 			populateTabDDLs();
-            prnt.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.info, ui.Text("speechBubbles", "contentTypeTabDeleted", null), ui.Text("speechBubbles", "contentTypeTabDeletedText", b.ID, null));
+            prnt.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.info, ui.Text("speechBubbles", "contentTypeTabDeleted"), ui.Text("speechBubbles", "contentTypeTabDeletedText", b.ID));
 		}
 
 
@@ -411,7 +411,7 @@ namespace umbraco.controls
 				if (NameTxt.Text.Trim() != "" && AliasTxt.Text.Trim() != "") 
 				{
 					string[] info = {NameTxt.Text, DataTypeDDL.SelectedItem.Value};
-                    ctctrl.prnt.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.info, ui.Text("speechBubbles", "contentTypePropertyTypeCreated", null), ui.Text("speechBubbles", "contentTypePropertyTypeCreatedText", info, null));
+                    ctctrl.prnt.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.info, ui.Text("speechBubbles", "contentTypePropertyTypeCreated"), ui.Text("speechBubbles", "contentTypePropertyTypeCreatedText", info));
 					_dt.AddPropertyType(cms.businesslogic.datatype.DataTypeDefinition.GetDataTypeDefinition(int.Parse(DataTypeDDL.SelectedValue)),AliasTxt.Text,NameTxt.Text);
 					
 					if (int.Parse(TabDDL.SelectedValue) != 0) 
@@ -428,7 +428,7 @@ namespace umbraco.controls
 				else
 				{
 					
-                    ctctrl.prnt.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.error, ui.Text("error"), ui.Text("errors", "contentTypeAliasAndNameNotNull", null));
+                    ctctrl.prnt.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.error, ui.Text("error"), ui.Text("errors", "contentTypeAliasAndNameNotNull"));
 				}
 			}
 		}
@@ -552,7 +552,7 @@ namespace umbraco.controls
 					ent.loadGenericPropertyTypesOnPane();
 
 					BasePages.BasePage bp = (BasePages.BasePage) this.Page;
-                    bp.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.info, ui.Text("speechBubbles", "contentTypePropertyTypeDeleted", null), "");
+                    bp.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.info, ui.Text("speechBubbles", "contentTypePropertyTypeDeleted"), "");
 					ent.OnPropertyTypeDelete(this, new System.EventArgs());
 				}
 

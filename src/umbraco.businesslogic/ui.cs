@@ -7,11 +7,17 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Membership;
 using umbraco.BasePages;
-using umbraco.BusinessLogic;
+using User = umbraco.BusinessLogic.User;
 
 namespace umbraco
 {
+
+    //TODO: Make the User overloads obsolete, then publicize the IUser object
+
+    //TODO: Convert all of this over to Niels K's localization framework and put into Core proj.
+
     /// <summary>
     /// The ui class handles the multilingual text in the umbraco back-end.
     /// Provides access to language settings and language files used in the umbraco back-end.
@@ -27,6 +33,11 @@ namespace umbraco
         /// <param name="u">The user.</param>
         /// <returns></returns>
         public static string Culture(User u)
+        {
+            return Culture(u.Language);
+        }
+        
+        internal static string Culture(IUser u)
         {
             return Culture(u.Language);
         }
@@ -52,19 +63,33 @@ namespace umbraco
         /// <returns></returns>
         private static string GetLanguage()
         {
-            return GetLanguage(UmbracoEnsuredPage.CurrentUser);
+            var user = UmbracoEnsuredPage.CurrentUser;
+            return GetLanguage(user);
         }
 
-        /// <summary>
-        /// Check if th user is logged in, if they are, return their language specified in the database.
-        /// If they aren't logged in, check the current thread culture and return it, however if that is
-        /// null, then return the default Umbraco culture.
-        /// </summary>
         private static string GetLanguage(User u)
         {
             if (u != null)
             {
                 return u.Language;
+            }
+            return GetLanguage("");
+        }
+
+        private static string GetLanguage(IUser u)
+        {
+            if (u != null)
+            {
+                return u.Language;
+            }
+            return GetLanguage("");
+        }
+
+        private static string GetLanguage(string userLanguage)
+        {
+            if (userLanguage.IsNullOrWhiteSpace() == false)
+            {
+                return userLanguage;
             }
             var language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
             if (string.IsNullOrEmpty(language))
@@ -81,6 +106,11 @@ namespace umbraco
         public static string Text(string Key, User u)
         {
             return GetText(string.Empty, Key, null, GetLanguage(u));
+        }
+
+        internal static string Text(string key, IUser u)
+        {
+            return GetText(string.Empty, key, null, GetLanguage(u));
         }
 
         /// <summary>
@@ -103,6 +133,11 @@ namespace umbraco
         public static string Text(string Area, string Key, User u)
         {
             return GetText(Area, Key, null, GetLanguage(u));
+        }
+
+        internal static string Text(string area, string key, IUser u)
+        {
+            return GetText(area, key, null, GetLanguage(u));
         }
 
         /// <summary>
@@ -129,6 +164,16 @@ namespace umbraco
             return GetText(Area, Key, Variables, GetLanguage(u));
         }
 
+        internal static string Text(string area, string key, string[] variables)
+        {
+            return GetText(area, key, variables, GetLanguage((IUser)null));
+        }
+
+        internal static string Text(string area, string key, string[] variables, IUser u)
+        {
+            return GetText(area, key, variables, GetLanguage(u));
+        }
+
         /// <summary>
         /// Returns translated UI text with a specific key and area based on the specified users language settings and single variable passed to the method
         /// </summary>
@@ -140,6 +185,16 @@ namespace umbraco
         public static string Text(string Area, string Key, string Variable, User u)
         {
             return GetText(Area, Key, new[] { Variable }, GetLanguage(u));
+        }
+
+        internal static string Text(string area, string key, string variable)
+        {
+            return GetText(area, key, new[] { variable }, GetLanguage((IUser)null));
+        }
+
+        internal static string Text(string area, string key, string variable, IUser u)
+        {
+            return GetText(area, key, new[] { variable }, GetLanguage(u));
         }
 
         /// <summary>

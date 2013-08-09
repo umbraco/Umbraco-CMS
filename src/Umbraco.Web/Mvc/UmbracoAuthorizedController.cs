@@ -26,6 +26,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Returns the currently logged in Umbraco User
         /// </summary>
+        [Obsolete("This should no longer be used since it returns the legacy user object, use The Security.CurrentUser instead to return the proper user object")]
         protected User UmbracoUser
         {
             get
@@ -35,7 +36,7 @@ namespace Umbraco.Web.Mvc
                     Security.ValidateCurrentUser();
                     _userisValidated = true;
                 }
-                return Security.CurrentUser;
+                return new User(Security.CurrentUser);
             }
         }
 

@@ -257,8 +257,8 @@ namespace umbraco.cms.presentation
             BusinessLogic.Actions.Action.RunActionHandlers(_document, ActionUpdate.Instance);
 
             ClientTools.ShowSpeechBubble(
-                speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSavedHeader", null),
-                ui.Text("speechBubbles", "editContentSavedText", null));
+                speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSavedHeader"),
+                ui.Text("speechBubbles", "editContentSavedText"));
 
             ClientTools.SyncTree(_document.Path, true);
         }

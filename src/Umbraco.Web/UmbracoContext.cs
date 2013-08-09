@@ -394,11 +394,12 @@ namespace Umbraco.Web
         /// Gets the current logged in Umbraco user (editor).
         /// </summary>
         /// <value>The Umbraco user object or null</value>
+        [Obsolete("This should no longer be used since it returns the legacy user object, use The Security.CurrentUser instead to return the proper user object")]
         public User UmbracoUser
         {
             get
             {
-                return Security.CurrentUser;
+                return new User(Security.CurrentUser);
             }
 
         }

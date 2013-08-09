@@ -6,6 +6,7 @@ using Umbraco.Web;
 using System;
 using Umbraco.Web.UI.Controls;
 using umbraco.BasePages;
+using umbraco.BusinessLogic;
 using UmbracoUserControl = Umbraco.Web.UI.Controls.UmbracoUserControl;
 
 namespace umbraco.cms.presentation.create.controls
@@ -53,7 +54,7 @@ namespace umbraco.cms.presentation.create.controls
 
                 var returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),
-                    Security.CurrentUser,
+                    new User(Security.CurrentUser),
                     Request.GetItemAsString("nodeType"),
 					nodeId,
 					rename.Text);

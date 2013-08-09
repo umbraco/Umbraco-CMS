@@ -170,7 +170,7 @@ namespace umbraco.controls
             }
 
             // Add property pane
-            tpProp = NewTabPage(ui.Text("general", "properties", null));
+            tpProp = NewTabPage(ui.Text("general", "properties"));
             AddSaveAndPublishButtons(ref tpProp);
             tpProp.Controls.Add(
                 new LiteralControl("<div id=\"errorPane_" + tpProp.ClientID +
@@ -181,7 +181,7 @@ namespace umbraco.controls
             foreach (Property p in props)
             {
                 if (inTab[p.PropertyType.Id.ToString()] == null)
-                    AddControlNew(p, tpProp, ui.Text("general", "properties", null));
+                    AddControlNew(p, tpProp, ui.Text("general", "properties"));
             }
 
         }
@@ -279,7 +279,7 @@ namespace umbraco.controls
                 NameTxtValidator.ControlToValidate = NameTxt.ID;
                 _nameTxtCustomValidator.ControlToValidate = NameTxt.ID;
                 string[] errorVars = { ui.Text("name") };
-                NameTxtValidator.ErrorMessage = " " + ui.Text("errorHandling", "errorMandatoryWithoutTab", errorVars, null) + "<br/>";
+                NameTxtValidator.ErrorMessage = " " + ui.Text("errorHandling", "errorMandatoryWithoutTab", errorVars) + "<br/>";
                 NameTxtValidator.EnableClientScript = false;
                 NameTxtValidator.Display = ValidatorDisplay.Dynamic;                
                 _nameTxtCustomValidator.EnableClientScript = false;
@@ -290,15 +290,15 @@ namespace umbraco.controls
                 NameTxtHolder.Controls.Add(NameTxt);
                 NameTxtHolder.Controls.Add(NameTxtValidator);
                 NameTxtHolder.Controls.Add(_nameTxtCustomValidator);
-                PropertiesPane.addProperty(ui.Text("general", "name", null), NameTxtHolder);
+                PropertiesPane.addProperty(ui.Text("general", "name"), NameTxtHolder);
 
                 Literal ltt = new Literal();
                 ltt.Text = _content.User.Name;
-                PropertiesPane.addProperty(ui.Text("content", "createBy", null), ltt);
+                PropertiesPane.addProperty(ui.Text("content", "createBy"), ltt);
 
                 ltt = new Literal();
                 ltt.Text = _content.CreateDateTime.ToString();
-                PropertiesPane.addProperty(ui.Text("content", "createDate", null), ltt);
+                PropertiesPane.addProperty(ui.Text("content", "createDate"), ltt);
 
                 ltt = new Literal();
                 ltt.Text = _content.Id.ToString();
@@ -411,7 +411,7 @@ namespace umbraco.controls
             menuSave.ImageUrl = UmbracoPath + "/images/editor/save.gif";
             menuSave.Click += new ImageClickEventHandler(SaveClick);
             menuSave.OnClickCommand = "invokeSaveHandlers();";
-            menuSave.AltText = ui.Text("buttons", "save", null);
+            menuSave.AltText = ui.Text("buttons", "save");
             if (_canPublish == publishModes.Publish)
             {
                 MenuImageButton menuPublish = tp.Menu.NewImageButton();
@@ -419,7 +419,7 @@ namespace umbraco.controls
                 menuPublish.ImageUrl = UmbracoPath + "/images/editor/saveAndPublish.gif";
                 menuPublish.OnClickCommand = "invokeSaveHandlers();";
                 menuPublish.Click += new ImageClickEventHandler(DoSaveAndPublish);
-                menuPublish.AltText = ui.Text("buttons", "saveAndPublish", null);
+                menuPublish.AltText = ui.Text("buttons", "saveAndPublish");
             }
             else if (_canPublish == publishModes.SendToPublish)
             {
@@ -428,7 +428,7 @@ namespace umbraco.controls
                 menuToPublish.ImageUrl = UmbracoPath + "/images/editor/saveToPublish.gif";
                 menuToPublish.OnClickCommand = "invokeSaveHandlers();";
                 menuToPublish.Click += new ImageClickEventHandler(DoSaveToPublish);
-                menuToPublish.AltText = ui.Text("buttons", "saveToPublish", null);
+                menuToPublish.AltText = ui.Text("buttons", "saveToPublish");
             }
         }
 
@@ -488,7 +488,7 @@ namespace umbraco.controls
                         DropDownList ddl = tp.Menu.NewDropDownList();
 
                         ddl.Style.Add("margin-bottom", "5px");
-                        ddl.Items.Add(ui.Text("buttons", "styleChoose", null));
+                        ddl.Items.Add(ui.Text("buttons", "styleChoose"));
                         ddl.ID = tp.ID + "_editorStyle";
                         if (StyleSheet.GetAll().Length > 0)
                         {
@@ -564,7 +564,7 @@ namespace umbraco.controls
                         rq.EnableClientScript = false;
                         rq.Display = ValidatorDisplay.Dynamic;
                         string[] errorVars = { p.PropertyType.Name, cap };
-                        rq.ErrorMessage = ui.Text("errorHandling", "errorMandatory", errorVars, null) + "<br/>";
+                        rq.ErrorMessage = ui.Text("errorHandling", "errorMandatory", errorVars) + "<br/>";
                         holder.Controls.AddAt(0, rq);
                     }
                 }
@@ -601,7 +601,7 @@ namespace umbraco.controls
                         rv.EnableClientScript = false;
                         rv.Display = ValidatorDisplay.Dynamic;
                         string[] errorVars = { p.PropertyType.Name, cap };
-                        rv.ErrorMessage = ui.Text("errorHandling", "errorRegExp", errorVars, null) + "<br/>";
+                        rv.ErrorMessage = ui.Text("errorHandling", "errorRegExp", errorVars) + "<br/>";
                         holder.Controls.AddAt(0, rv);
                     }
                 }

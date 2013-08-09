@@ -3,6 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Security;
 using System.Web;
 using System.Web.SessionState;
@@ -10,13 +11,14 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using Umbraco.Core.Logging;
-using umbraco.BusinessLogic;
+using Umbraco.Core.Models.Membership;
 using System.Web.Security;
 using umbraco.businesslogic.Exceptions;
 using umbraco.IO;
 using umbraco.cms.businesslogic.web;
 using System.Linq;
 using Umbraco.Core;
+using User = umbraco.BusinessLogic.User;
 
 namespace umbraco.cms.presentation
 {
@@ -55,7 +57,7 @@ namespace umbraco.cms.presentation
             TopText.Text = ui.Text("login", "topText");
 
 
-            BottomText.Text = ui.Text("login", "bottomText", DateTime.Now.Year.ToString(), null);
+            BottomText.Text = ui.Text("login", "bottomText", DateTime.Now.Year.ToString(CultureInfo.InvariantCulture));
 
             //added this little hack to remove unessary formatting, without breaking all current language files.
             if (BottomText.Text.Contains("</p>"))

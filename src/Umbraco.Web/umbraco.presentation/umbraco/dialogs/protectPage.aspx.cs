@@ -236,7 +236,7 @@ namespace umbraco.presentation.umbraco.dialogs
                             cms.businesslogic.web.Access.RemoveMembershipRoleFromDocument(pageId, li.Value);
                 }
 
-                feedback.Text = ui.Text("publicAccess", "paIsProtected", new cms.businesslogic.CMSNode(pageId).Text, null) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+                feedback.Text = ui.Text("publicAccess", "paIsProtected", new cms.businesslogic.CMSNode(pageId).Text) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
 
                 ClientTools.ReloadActionNode(true, false);
 
@@ -254,7 +254,7 @@ namespace umbraco.presentation.umbraco.dialogs
 
             Access.RemoveProtection(pageId);
 
-            feedback.Text = ui.Text("publicAccess", "paIsRemoved", new cms.businesslogic.CMSNode(pageId).Text, null) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+            feedback.Text = ui.Text("publicAccess", "paIsRemoved", new cms.businesslogic.CMSNode(pageId).Text) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
 
             ClientTools.ReloadActionNode(true, false);
 

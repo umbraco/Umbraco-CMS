@@ -103,17 +103,13 @@ namespace Umbraco.Web.Security
 
         private static readonly int UmbracoTimeOutInMinutes = GlobalSettings.TimeOutInMinutes;
 
-        private User _currentUser;
+        private IUser _currentUser;
 
         /// <summary>
         /// Gets the current user.
         /// </summary>
         /// <value>The current user.</value>
-        /// <remarks>
-        /// This is internal because we don't want to expose the legacy User object on this class, instead we'll wait until IUser
-        /// is public. If people want to reference the current user, they can reference it from the UmbracoContext.
-        /// </remarks>
-        internal User CurrentUser
+        internal IUser CurrentUser
         {
             get
             {
@@ -125,7 +121,7 @@ namespace Umbraco.Web.Security
                     {
                         return null;
                     }
-                    _currentUser = User.GetUser(id);
+                    _currentUser = _applicationContext.Services.UserService.GetUserById(id);
                 }
 
                 return _currentUser;
@@ -215,7 +211,8 @@ namespace Umbraco.Web.Security
             {
                 return true;
             }
-            return CurrentUser.Applications.Any(uApp => uApp.alias == app);
+            var userApps = _applicationContext.Services.UserService.GetUserSections(CurrentUser);
+            return userApps.Any(uApp => uApp.InvariantEquals(app));
         }
 
         internal void UpdateLogin()
