@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
@@ -70,26 +69,10 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override void PersistDeletedItem(TEntity entity)
         {
             var deletes = GetDeleteClauses();
-
-            //wrap in a transaction in case any of the delete processes fail so they'll get rolled back!
-            using (var trans = Database.GetTransaction())
+            foreach (var delete in deletes)
             {
-                try
-                {
-                    foreach (var delete in deletes)
-                    {
-                        Database.Execute(delete, new { Id = entity.Id });
-                    }
-                    trans.Complete();
-                }
-                catch (Exception ex)
-                {
-                    trans.Dispose();
-                    LogHelper.Error(GetType(), "Deletion process failed, transaction rolled back", ex);
-                    throw;
-                }
+                Database.Execute(delete, new {Id = entity.Id});
             }
-            
         }
     }
 }
