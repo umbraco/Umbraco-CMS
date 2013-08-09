@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Caching;
 
 namespace Umbraco.Core.Cache
 {
@@ -9,10 +10,30 @@ namespace Umbraco.Core.Cache
     /// </summary>
     internal static class CacheProviderExtensions
     {
-        //T GetCacheItem<T>(string cacheKey, TimeSpan? timeout, Func<T> getCacheItem);
-        //T GetCacheItem<T>(string cacheKey, CacheItemRemovedCallback refreshAction, TimeSpan? timeout, Func<T> getCacheItem);
-        //T GetCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheItemRemovedCallback refreshAction, TimeSpan? timeout, Func<T> getCacheItem);
-        //T GetCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheItemRemovedCallback refreshAction, CacheDependency cacheDependency, TimeSpan? timeout, Func<T> getCacheItem);
+        public static T GetCacheItem<T>(this IRuntimeCacheProvider provider,
+            string cacheKey,
+            Func<T> getCacheItem,
+            TimeSpan? timeout,
+            bool isSliding = false,
+            CacheItemPriority priority = CacheItemPriority.Normal,
+            CacheItemRemovedCallback removedCallback = null,
+            string[] dependentFiles = null)
+        {
+            var result = provider.GetCacheItem(cacheKey, () => getCacheItem(), timeout, isSliding, priority, removedCallback, dependentFiles);
+            return result == null ? default(T) : result.TryConvertTo<T>().Result;
+        }
+
+        public static void InsertCacheItem<T>(this IRuntimeCacheProvider provider,
+            string cacheKey,
+            Func<T> getCacheItem,
+            TimeSpan? timeout = null,
+            bool isSliding = false,
+            CacheItemPriority priority = CacheItemPriority.Normal,
+            CacheItemRemovedCallback removedCallback = null,
+            string[] dependentFiles = null)
+        {
+            provider.InsertCacheItem(cacheKey, () => getCacheItem(), timeout, isSliding, priority, removedCallback, dependentFiles);
+        }
 
         public static void ClearCacheObjectTypes<T>(this ICacheProvider provider)
         {
@@ -22,7 +43,7 @@ namespace Umbraco.Core.Cache
         public static IEnumerable<T> GetCacheItemsByKeySearch<T>(this ICacheProvider provider, string keyStartsWith)
         {
             var result = provider.GetCacheItemsByKeySearch(keyStartsWith);
-            return result.Select(x => ObjectExtensions.TryConvertTo<T>(x).Result);
+            return result.Select(x => x.TryConvertTo<T>().Result);
         }
 
         public static T GetCacheItem<T>(this ICacheProvider provider, string cacheKey)

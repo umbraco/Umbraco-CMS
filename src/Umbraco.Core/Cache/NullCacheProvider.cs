@@ -42,40 +42,14 @@ namespace Umbraco.Core.Cache
             return getCacheItem();
         }
 
-        public virtual T GetCacheItem<T>(string cacheKey, TimeSpan? timeout, Func<T> getCacheItem)
+        public object GetCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
             return getCacheItem();
         }
 
-        public virtual T GetCacheItem<T>(string cacheKey, CacheItemRemovedCallback refreshAction, TimeSpan? timeout, Func<T> getCacheItem)
+        public void InsertCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
-            return getCacheItem();
-        }
-
-        public virtual T GetCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheItemRemovedCallback refreshAction, TimeSpan? timeout, Func<T> getCacheItem)
-        {
-            return getCacheItem();
-        }
-
-        public virtual T GetCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheItemRemovedCallback refreshAction, CacheDependency cacheDependency, TimeSpan? timeout, Func<T> getCacheItem)
-        {
-            return getCacheItem();
-        }
-
-        public virtual void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, Func<T> getCacheItem)
-        {
-        }
-
-        public virtual void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, TimeSpan? timeout, Func<T> getCacheItem)
-        {
-        }
-
-        public virtual void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheDependency cacheDependency, TimeSpan? timeout, Func<T> getCacheItem)
-        {
-        }
-
-        public virtual void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheItemRemovedCallback refreshAction, CacheDependency cacheDependency, TimeSpan? timeout, Func<T> getCacheItem)
-        {
+            
         }
     }
 }
