@@ -95,8 +95,6 @@ namespace Umbraco.Web.WebApi.Filters
 
         private void SetValueForResponse(ObjectContent objectContent, dynamic newVal)
         {
-            var t = objectContent.Value.GetType();
-            
             if (objectContent.Value is IEnumerable<ContentItemBasic>)
             {
                 //objectContent.Value = DynamicCast(newVal, t);

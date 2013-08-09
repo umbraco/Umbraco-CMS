@@ -203,11 +203,12 @@
     <Compile Include="CodeFirst\TopologicalSorter.cs" />
     <Compile Include="CodeFirst\TypeInheritanceTest.cs" />
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
-    <Compile Include="Controllers\WebApiEditors\ContentControllerHostedTests.cs" />
+    <Compile Include="Controllers\WebApiEditors\EnsureUserPermissionForContentAttributeTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
     <Compile Include="Integration\CreateContent.cs" />
     <Compile Include="Models\ContentExtensionsTests.cs" />
     <Compile Include="Models\DataValueSetterTests.cs" />
+    <Compile Include="Models\UserExtensionsTests.cs" />
     <Compile Include="Persistence\PetaPocoExtensionsTest.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserTypeRepositoryTest.cs" />
