@@ -291,10 +291,10 @@ namespace Umbraco.Web.Security
             {
                 if (ticket.Expired == false)
                 {
-                    var user = User.GetUser(GetUserId());
+                    var user = CurrentUser;
 
                     // Check for console access
-                    if (user.Disabled || (user.NoConsole && GlobalSettings.RequestIsInUmbracoApplication(_httpContext) && GlobalSettings.RequestIsLiveEditRedirector(_httpContext) == false))
+                    if (user.IsLockedOut || (user.NoConsole && GlobalSettings.RequestIsInUmbracoApplication(_httpContext) && GlobalSettings.RequestIsLiveEditRedirector(_httpContext) == false))
                     {
                         if (throwExceptions) throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
                         return ValidateRequestAttempt.FailedNoPrivileges;
@@ -332,6 +332,13 @@ namespace Umbraco.Web.Security
         /// <param name="app"></param>
         /// <param name="user"></param>
         /// <returns></returns>
+        internal bool UserHasAppAccess(string app, IUser user)
+        {
+            var apps = _applicationContext.Services.UserService.GetUserSections(user);
+            return apps.Any(uApp => uApp.InvariantEquals(app));
+        }
+
+        [Obsolete("Do not use this method if you don't have to, use the overload with IUser instead")]
         internal bool UserHasAppAccess(string app, User user)
         {
             return user.Applications.Any(uApp => uApp.alias == app);
@@ -345,11 +352,12 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         internal bool UserHasAppAccess(string app, string username)
         {
-            var uid = User.getUserId(username);
-            if (uid < 0) return false;
-            var usr = User.GetUser(uid);
-            if (usr == null) return false;
-            return UserHasAppAccess(app, usr);
+            var user = _applicationContext.Services.UserService.GetUserByUserName(username);
+            if (user == null)
+            {
+                return false;
+            }
+            return UserHasAppAccess(app, user);
         }
 
         [Obsolete("This is no longer used at all, it will always return a new GUID though if a user is logged in")]
