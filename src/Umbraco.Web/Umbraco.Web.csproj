@@ -298,6 +298,7 @@
     <Compile Include="Configuration\WebRouting.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Editors\ContentController.cs" />
+    <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Models\PagedResult.cs" />
     <Compile Include="WebApi\ControllerContextExtensions.cs" />
     <Compile Include="WebApi\CustomDateTimeConvertor.cs" />
