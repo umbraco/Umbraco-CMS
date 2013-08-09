@@ -15,7 +15,6 @@ namespace Umbraco.Core.Cache
     {
         private readonly System.Web.Caching.Cache _cache;
         private readonly DictionaryCacheWrapper _wrapper;
-        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
         
         public HttpRuntimeCacheProvider(System.Web.Caching.Cache cache)
         {

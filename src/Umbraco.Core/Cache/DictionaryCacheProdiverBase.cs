@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Umbraco.Core.Cache
 {
     internal abstract class DictionaryCacheProdiverBase : ICacheProvider
     {
-        private static readonly object Locker = new object();
+        protected static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         protected abstract DictionaryCacheWrapper DictionaryCache { get; }
 
         /// <summary>
@@ -18,7 +19,7 @@ namespace Umbraco.Core.Cache
         /// </remarks>
         public virtual void ClearAllCache()
         {
-            lock (Locker)
+            using (new WriteLock(Locker))
             {
                 var keysToRemove = DictionaryCache.Cast<object>()
                                                   .Select(item => new DictionaryItemWrapper(item))
@@ -39,7 +40,7 @@ namespace Umbraco.Core.Cache
         /// <param name="key">Key</param>
         public virtual void ClearCacheItem(string key)
         {
-            lock (Locker)
+            using (new WriteLock(Locker))
             {
                 if (DictionaryCache[GetCacheKey(key)] == null) return;
                 DictionaryCache.Remove(GetCacheKey(key)); ;
@@ -53,7 +54,7 @@ namespace Umbraco.Core.Cache
         /// <param name="typeName">The name of the System.Type which should be cleared from cache ex "System.Xml.XmlDocument"</param>
         public virtual void ClearCacheObjectTypes(string typeName)
         {
-            lock (Locker)
+            using (new WriteLock(Locker))
             {
                 var keysToRemove = DictionaryCache.Cast<object>()
                                                   .Select(item => new DictionaryItemWrapper(item))
