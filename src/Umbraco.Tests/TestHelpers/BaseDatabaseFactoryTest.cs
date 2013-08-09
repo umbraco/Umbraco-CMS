@@ -59,6 +59,7 @@ namespace Umbraco.Tests.TestHelpers
             var dbFactory = new DefaultDatabaseFactory(
                 GetDbConnectionString(),
                 GetDbProviderName());
+            Database.Mapper = new PetaPocoMapper();
             _appContext = new ApplicationContext(
 				//assign the db context
                 new DatabaseContext(dbFactory),

@@ -22,6 +22,20 @@ namespace Umbraco.Core.Persistence.Mappers
 
         public Func<object, object> GetFromDbConverter(PropertyInfo pi, Type sourceType)
         {
+            if (SqlSyntaxContext.SqlSyntaxProvider is SqliteSyntaxProvider)
+            {
+                return src =>
+                       {
+                           var propertyType = pi.PropertyType;
+                           var t = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+
+                           if (src is string && t == typeof (Guid))
+                               return TypeDescriptor.GetConverter(t).ConvertFromInvariantString(src.ToString());
+
+                           return Convert.ChangeType(src, t, null);
+                       };
+            }
+
             return null;
         }
 
