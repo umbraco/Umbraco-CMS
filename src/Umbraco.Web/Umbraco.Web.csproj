@@ -498,6 +498,7 @@
     <Compile Include="WebApi\Binders\MediaItemBinder.cs" />
     <Compile Include="WebApi\Filters\EnsureUserPermissionForContentAttribute.cs" />
     <Compile Include="WebApi\Filters\ContentItemValidationHelper.cs" />
+    <Compile Include="WebApi\Filters\EnsureUserPermissionForMediaAttribute.cs" />
     <Compile Include="WebApi\Filters\FileUploadCleanupFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterAllowedOutgoingContentAttribute.cs" />
     <Compile Include="WebApi\Filters\HttpQueryStringFilterAttribute.cs" />

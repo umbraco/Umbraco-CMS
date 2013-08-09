@@ -8,21 +8,21 @@
         /// <summary>
         /// Saves the content item, no publish
         /// </summary>
-        Save,
-
-        /// <summary>
-        /// Saves and publishes the content item
-        /// </summary>
-        Publish,
+        Save = 0,
 
         /// <summary>
         /// Saves a new content item
         /// </summary>
-        SaveNew,
+        SaveNew = 1,
+
+        /// <summary>
+        /// Saves and publishes the content item
+        /// </summary>
+        Publish = 2,
 
         /// <summary>
         /// Saves an publishes a new content item
         /// </summary>
-        PublishNew
+        PublishNew = 3
     }
 }

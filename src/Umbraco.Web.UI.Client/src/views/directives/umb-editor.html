@@ -1,7 +1,7 @@
 <div>    
     <ng-include src="propertyEditorView"></ng-include>
 
-<div ng-show="{$umbdebugmode}" style="clear: both">
+<div ng-show="$umbdebugmode" style="clear: both">
 <pre>
 {{model | json}}
 </pre>

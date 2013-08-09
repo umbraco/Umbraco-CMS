@@ -38,7 +38,7 @@
                             { alias: "textarea", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
                             { alias: "map", label: "Map", view: "googlemaps", value: "37.4419,-122.1419", config: { mapType: "ROADMAP", zoom: 4 } },
                             { alias: "media", label: "Media picker", view: "mediapicker", value: "" },
-                            { alias: "content", label: "Content picker", view: "contentpicker", value: "" }
+                            { alias: "content", label: "Content picker", view: "contentpicker", value: "1234,23242,23232,23231" }
                         ]
                     },
                     {
@@ -120,6 +120,10 @@
                 return node;
             },
 
+            getMockEntity : function(id){
+                return {name: "hello", id: id, icon: "icon-file"};
+            },
+
             /** generally used for unit tests, calling this will disable the auth check and always return true */
             disableAuth: function() {
                 doAuth = false;
@@ -162,9 +166,25 @@
 
             getParameterByName: function(url, name) {
                 name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+
                 var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
                     results = regex.exec(url);
-                return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+
+                return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+            },
+
+            getParametersByName: function(url, name) {
+                name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+
+                var regex = new RegExp(name + "=([^&#]*)", "mg"), results = [];
+                var match;
+
+                while ( ( match = regex.exec(url) ) !== null )
+                {
+                    results.push(decodeURIComponent(match[1].replace(/\+/g, " ")));
+                }
+
+                return results;
             }
         };
     }]);

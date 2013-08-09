@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
@@ -11,47 +8,35 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
-using Umbraco.Web.Models.ContentEditing;
 using umbraco.BusinessLogic.Actions;
 
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// Auth filter to check if the current user has access to the content item (by id). 
+    /// Auth filter to check if the current user has access to the content item
     /// </summary>
     /// <remarks>
-    /// 
-    /// This first checks if the user can access this based on their start node, and then checks node permissions
-    /// 
-    /// By default the permission that is checked is browse but this can be specified in the ctor.
-    /// NOTE: This cannot be an auth filter because that happens too soon and we don't have access to the action params.
+    /// Since media doesn't have permissions, this simply checks start node access    
     /// </remarks>
-    internal sealed class EnsureUserPermissionForContentAttribute : ActionFilterAttribute
+    internal sealed class EnsureUserPermissionForMediaAttribute : ActionFilterAttribute
     {
         private readonly int? _nodeId;
         private readonly string _paramName;
-        private readonly char _permissionToCheck;
 
         /// <summary>
         /// This constructor will only be able to test the start node access
         /// </summary>
-        public EnsureUserPermissionForContentAttribute(int nodeId)
+        public EnsureUserPermissionForMediaAttribute(int nodeId)
         {
             _nodeId = nodeId;
         }
 
-        public EnsureUserPermissionForContentAttribute(string paramName)
+        public EnsureUserPermissionForMediaAttribute(string paramName)
         {
             Mandate.ParameterNotNullOrEmpty(paramName, "paramName");
-            _paramName = paramName;
-            _permissionToCheck = ActionBrowse.Instance.Letter;
+            _paramName = paramName;            
         }
-        public EnsureUserPermissionForContentAttribute(string paramName, char permissionToCheck)
-            : this(paramName)
-        {
-            _permissionToCheck = permissionToCheck;
-        }
-        
+       
         public override bool AllowMultiple
         {
             get { return true; }
@@ -67,7 +52,7 @@ namespace Umbraco.Web.WebApi.Filters
             int nodeId;
             if (_nodeId.HasValue == false)
             {
-                var parts = _paramName.Split(new char[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
+                var parts = _paramName.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
 
                 if (actionContext.ActionArguments[parts[0]] == null)
                 {
@@ -87,7 +72,7 @@ namespace Umbraco.Web.WebApi.Filters
                     {
                         throw new InvalidOperationException("No argument found for the current action with the name: " + _paramName);
                     }
-                    nodeId = (int)prop.GetValue(actionContext.ActionArguments[parts[0]]);                    
+                    nodeId = (int)prop.GetValue(actionContext.ActionArguments[parts[0]]);
                 }
             }
             else
@@ -95,11 +80,10 @@ namespace Umbraco.Web.WebApi.Filters
                 nodeId = _nodeId.Value;
             }
 
-            if (ContentController.CheckPermissions(
+            if (MediaController.CheckPermissions(
                 actionContext.Request.Properties,
-                UmbracoContext.Current.Security.CurrentUser,
-                ApplicationContext.Current.Services.UserService,
-                ApplicationContext.Current.Services.ContentService, nodeId, _permissionToCheck))
+                UmbracoContext.Current.Security.CurrentUser, 
+                ApplicationContext.Current.Services.MediaService, nodeId))
             {
                 base.OnActionExecuting(actionContext);
             }

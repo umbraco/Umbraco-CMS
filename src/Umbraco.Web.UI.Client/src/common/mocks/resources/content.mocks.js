@@ -95,6 +95,23 @@ angular.module('umbraco.mocks').
           return [200, node, null];
       }
       
+      function returnNodebyIds(status, data, headers) {
+
+          if (!mocksUtils.checkAuth()) {
+              return [401, null, null];
+          }
+
+          var ids = mocksUtils.getParameterByName(data, "ids") || [1234,23324,2323,23424];
+          var nodes = [];
+
+          $(ids).each(function(i, id){
+            var _id = parseInt(id, 10);
+            nodes.push(mocksUtils.getMockContent(_id)); 
+          });
+          
+          return [200, nodes, null];
+      }
+
       function returnSort(status, data, headers) {
           if (!mocksUtils.checkAuth()) {
               return [401, null, null];
@@ -114,7 +131,11 @@ angular.module('umbraco.mocks').
                   .respond(returnChildren);
 
               $httpBackend
-                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Content/GetById'))
+                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Content/GetByIds'))
+                  .respond(returnNodebyIds);
+
+              $httpBackend
+                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Content/GetById?'))
                   .respond(returnNodebyId);
 
               $httpBackend

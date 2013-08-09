@@ -14,6 +14,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.Editors;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using umbraco.presentation.channels.businesslogic;
@@ -21,7 +22,7 @@ using umbraco.presentation.channels.businesslogic;
 namespace Umbraco.Tests.Controllers.WebApiEditors
 {
     [TestFixture]
-    public class EnsureUserPermissionForContentAttributeTests
+    public class ContentControllerUnitTests
     {
         [Test]
         public void Does_Not_Throw_Exception_When_Access_Allowed_By_Path()
@@ -37,15 +38,12 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             var userService = MockRepository.GenerateStub<IUserService>();
             var permissions = new List<EntityPermission>();
             userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
-            var ctx = new HttpActionContext();
-            ctx.ActionArguments.Add("id", 1234);
-            var attribute = new EnsureUserPermissionForContentAttribute(user, userService, contentService, 1234, 'F');
 
             //act
-            attribute.OnActionExecuting(ctx);
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
 
             //assert
-            Assert.Pass();
+            Assert.IsTrue(result);
         }
 
         [Test]
@@ -62,11 +60,9 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             var userService = MockRepository.GenerateStub<IUserService>();
             var permissions = new List<EntityPermission>();
             userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
-            var ctx = new HttpActionContext();
-            var attribute = new EnsureUserPermissionForContentAttribute(user, userService, contentService, 1234, 'F');
-
+            
             //act/assert
-            Assert.Throws<HttpResponseException>(() => attribute.OnActionExecuting(ctx));
+            Assert.Throws<HttpResponseException>(() => ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F'));
         }
 
         [Test]
@@ -83,11 +79,12 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             var userService = MockRepository.GenerateStub<IUserService>();
             var permissions = new List<EntityPermission>();
             userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
-            var ctx = new HttpActionContext();
-            var attribute = new EnsureUserPermissionForContentAttribute(user, userService, contentService, 1234, 'F');
 
-            //act/assert
-            Assert.Throws<HttpResponseException>(() => attribute.OnActionExecuting(ctx));
+            //act
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
+
+            //assert
+            Assert.IsFalse(result);
         }
 
         [Test]
@@ -107,11 +104,12 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
                     new EntityPermission(9, 1234, new string[]{ "A", "B", "C" })
                 };
             userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
-            var ctx = new HttpActionContext();
-            var attribute = new EnsureUserPermissionForContentAttribute(user, userService, contentService, 1234, 'F');
 
-            //act/assert
-            Assert.Throws<HttpResponseException>(() => attribute.OnActionExecuting(ctx));
+            //act
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
+
+            //assert
+            Assert.IsFalse(result);
         }
 
         [Test]
@@ -131,15 +129,12 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
                     new EntityPermission(9, 1234, new string[]{ "A", "F", "C" })
                 };
             userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
-            var ctx = new HttpActionContext();
-            ctx.ActionArguments.Add("id", 1234);
-            var attribute = new EnsureUserPermissionForContentAttribute(user, userService, contentService, 1234, 'F');
 
             //act
-            attribute.OnActionExecuting(ctx);
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
 
             //assert
-            Assert.Pass();
+            Assert.IsTrue(result);
         }
 
         [Test]
@@ -156,15 +151,12 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             var userService = MockRepository.GenerateStub<IUserService>();
             var permissions = new List<EntityPermission>();
             userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
-            var ctx = new HttpActionContext();
-            ctx.ActionArguments.Add("id", 1234);
-            var attribute = new EnsureUserPermissionForContentAttribute(user, userService, contentService, 1234, 'F');
 
             //act
-            attribute.OnActionExecuting(ctx);
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
 
             //assert
-            Assert.Pass();
+            Assert.IsTrue(result);
         }
 
     }

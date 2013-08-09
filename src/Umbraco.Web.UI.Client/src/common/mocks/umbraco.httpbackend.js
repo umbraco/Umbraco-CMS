@@ -1,7 +1,7 @@
 var umbracoAppDev = angular.module('umbraco.httpbackend', ['umbraco', 'ngMockE2E', 'umbraco.mocks']);
 
 
-function initBackEnd($httpBackend, contentMocks, mediaMocks, treeMocks, userMocks, contentTypeMocks, sectionMocks) {
+function initBackEnd($httpBackend, contentMocks, mediaMocks, treeMocks, userMocks, contentTypeMocks, sectionMocks, entityMocks) {
 
 	console.log("httpBackend inited");
 	
@@ -15,6 +15,8 @@ function initBackEnd($httpBackend, contentMocks, mediaMocks, treeMocks, userMock
 
     contentTypeMocks.register();
     
+    entityMocks.register();
+
 	$httpBackend.whenGET(/^views\//).passThrough();
 	$httpBackend.whenGET(/^js\//).passThrough();
 	$httpBackend.whenGET(/^lib\//).passThrough();

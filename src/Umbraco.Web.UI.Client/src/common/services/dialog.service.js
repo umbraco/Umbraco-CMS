@@ -23,7 +23,7 @@
  *		var dialog = dialogService.open({template: 'path/to/page.html', show: true, callback: done});
  *		functon done(data){
  *			//The dialog has been submitted	
- *      // data contains whatever the dialog has selected / attached
+ *      //data contains whatever the dialog has selected / attached
  *		}			
  * </pre> 
  */

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -25,6 +26,7 @@ using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using Umbraco.Core.Models;
 using Umbraco.Core.Dynamics;
+using umbraco.BusinessLogic.Actions;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -78,12 +80,7 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForContent("id")]
         public ContentItemDisplay GetById(int id)
         {
-            //with the filter applied we need to check if the content has already been looked up
-            
-            var foundContent = !Request.Properties.ContainsKey("contentItem")
-                                   ? Services.ContentService.GetById(id)
-                                   : (IContent) Request.Properties["contentItem"];
-            
+            var foundContent = GetEntityFromRequest(() => Services.ContentService.GetById(id));            
             if (foundContent == null)
             {
                 HandleContentNotFound(id);
@@ -171,20 +168,31 @@ namespace Umbraco.Web.Editors
             [ModelBinder(typeof(ContentItemBinder))]
                 ContentItemSave<IContent> contentItem)
         {
+            //We now need to validate that the user is allowed to be doing what they are doing
+            if (CheckPermissions(
+                Request.Properties,
+                Security.CurrentUser,
+                Services.UserService,
+                Services.ContentService,
+                contentItem.Id,
+                (int) contentItem.Action >= 2 ? ActionPublish.Instance.Letter : ActionSave.Instance.Letter,
+                contentItem.PersistedContent) == false)
+            {
+                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+            }
+
             //If we've reached here it means:
             // * Our model has been bound
             // * and validated
             // * any file attachments have been saved to their temporary location for us to use
             // * we have a reference to the DTO object and the persisted object
-
+            
             UpdateName(contentItem);
             
             //TODO: We need to support 'send to publish'
 
             //TODO: We'll need to save the new template, publishat, etc... values here
-
-            //TODO: We need to check the user's permissions to see if they are allowed to do this!
-
+            
             MapPropertyValues(contentItem);
 
             //We need to manually check the validation results here because:
@@ -310,6 +318,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="sorted"></param>
         /// <returns></returns>
+        [EnsureUserPermissionForContent("sorted.ParentId", 'S')]
         public HttpResponseMessage PostSort(ContentSortOrder sorted)
         {
             //TODO: We need to check if the user is allowed to sort here!
@@ -324,11 +333,6 @@ namespace Umbraco.Web.Editors
             {
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
-
-            if (Security.UserHasAppAccess(Constants.Applications.Content, UmbracoUser) == false)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "User has no access to this application");
-            }            
 
             var contentService = Services.ContentService;
             var sortedContent = new List<IContent>();
@@ -389,6 +393,59 @@ namespace Umbraco.Web.Editors
                     break;
                 default:
                     throw new IndexOutOfRangeException();
+            }
+        }
+
+        /// <summary>
+        /// Performs a permissions check for the user to check if it has access to the node based on 
+        /// start node and/or permissions for the node
+        /// </summary>
+        /// <param name="storage">The storage to add the content item to so it can be reused</param>
+        /// <param name="user"></param>
+        /// <param name="userService"></param>
+        /// <param name="contentService"></param>
+        /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
+        /// <param name="permissionToCheck"></param>
+        /// <param name="contentItem">Specifies the already resolved content item to check against, setting this ignores the nodeId</param>
+        /// <returns></returns>
+        internal static bool CheckPermissions(
+            IDictionary<string, object> storage,
+            IUser user,
+            IUserService userService,
+            IContentService contentService,
+            int nodeId,
+            char permissionToCheck,
+            IContent contentItem = null)
+        {
+            if (contentItem == null)
+            {
+                contentItem = contentService.GetById(nodeId);
+            }
+
+            if (contentItem == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            //put the content item into storage so it can be retreived 
+            // in the controller (saves a lookup)
+            storage[typeof(IContent).ToString()] = contentItem;
+
+            var hasPathAccess = user.HasPathAccess(contentItem);
+
+            if (hasPathAccess == false)
+            {
+                return false;
+            }
+
+            var permission = userService.GetPermissions(user, nodeId).FirstOrDefault();
+            if (permission == null || permission.AssignedPermissions.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
