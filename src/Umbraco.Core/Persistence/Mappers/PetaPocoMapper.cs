@@ -1,5 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Reflection;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -7,7 +9,7 @@ namespace Umbraco.Core.Persistence.Mappers
     /// Represents the PetaPocoMapper, which is the implementation of the IMapper interface.
     /// This is currently only used to ensure that nullable dates are not saved to the database.
     /// </summary>
-    public class PetaPocoMapper : IMapper
+    public class PetaPocoMapper : IMapper2
     {
         public void GetTableInfo(Type t, TableInfo ti)
         {
@@ -37,6 +39,24 @@ namespace Umbraco.Core.Persistence.Mappers
 
                     return null;
                 };
+            }
+
+            return null;
+        }
+
+        public Func<object, object> GetFromDbConverter(Type DestType, Type SourceType)
+        {
+            if (SqlSyntaxContext.SqlSyntaxProvider is SqliteSyntaxProvider)
+            {
+                return src =>
+                       {
+                           var t = Nullable.GetUnderlyingType(DestType) ?? DestType;
+
+                           if (src is string && t == typeof (Guid))
+                               return TypeDescriptor.GetConverter(t).ConvertFromInvariantString(src.ToString());
+
+                           return Convert.ChangeType(src, t, null);
+                       };
             }
 
             return null;

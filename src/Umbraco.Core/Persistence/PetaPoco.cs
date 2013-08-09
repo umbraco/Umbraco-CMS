@@ -2126,15 +2126,7 @@ namespace Umbraco.Core.Persistence
 					}
 					else if (!dstType.IsAssignableFrom(srcType))
 					{
-						converter = delegate(object src)
-						            {
-						                var t = Nullable.GetUnderlyingType(dstType) ?? dstType;
-
-                                        if(src is string && t == typeof(Guid))
-                                            return TypeDescriptor.GetConverter(t).ConvertFromInvariantString(src.ToString());
-
-                                        return Convert.ChangeType(src, t, null);
-						            };
+						converter = delegate(object src) { return Convert.ChangeType(src, dstType, null); };
 					}
 				}
 				return converter;
