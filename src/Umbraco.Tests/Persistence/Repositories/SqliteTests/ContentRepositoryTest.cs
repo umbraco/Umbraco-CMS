@@ -6,15 +6,13 @@ using Umbraco.Core.Persistence;
 
 namespace Umbraco.Tests.Persistence.Repositories.SqliteTests
 {
-    [TestFixture]
+    [TestFixture, NUnit.Framework.Ignore]
     public class ContentRepositoryTest : Repositories.ContentRepositoryTest
     {
         [SetUp]
         public override void Initialize()
         {
             base.Initialize();
-
-            CreateTestData();
         }
 
         [TearDown]
@@ -30,7 +28,7 @@ namespace Umbraco.Tests.Persistence.Repositories.SqliteTests
 
         protected override string GetDbConnectionString()
         {
-            return @"Data Source=|DataDirectory|"+ GetDbFileName() +";Version=3;New=True;Compress=True;";
+            return @"Data Source=|DataDirectory|"+ GetDbFileName() +";Version=3;New=True;Compress=True";
         }
 
         protected override string GetDbFileName()
