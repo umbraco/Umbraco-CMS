@@ -23,7 +23,7 @@ model objects (not user defined). The methods below are named according to these
 <div class="getfielderror"><p>Gets the error message for a content field</p></div>
 </li>
 <li><h3 id="getPropertyCallbacks">getPropertyCallbacks()</h3>
-<div class="getpropertycallbacks"><p>Gets all callbacks that has been registered using the subscribe method for the contentProperty + fieldName combo.
+<div class="getpropertycallbacks"><p>Gets all callbacks that has been registered using the subscribe method for the propertyAlias + fieldName combo.
 This will always return any callbacks registered for just the property (i.e. field name is empty) and for ones with an 
 explicit field name set.</p></div>
 </li>
@@ -54,7 +54,7 @@ This is generally used for server side validation in order to match up a server 
 a particular field, otherwise we can only pinpoint that there is an error for a content property, not the 
 property's specific field. This is used with the val-server directive in which the directive specifies the 
 field alias to listen for.
-If contentProperty is null, then this subscription is for a field property (not a user defined property).</p></div>
+If propertyAlias is null, then this subscription is for a field property (not a user defined property).</p></div>
 </li>
 </ul>
 </div>

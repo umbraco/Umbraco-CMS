@@ -198,7 +198,7 @@ NG_DOCS={
       "id": "umbraco.resources.contentResource",
       "shortName": "contentResource",
       "type": "service",
-      "keywords": "api content contentresource data for in loads resources service umbraco"
+      "keywords": "$http $q $scope accesible again alert alias all an and angular any api application applied are args arguments array as ascending async attached base based be been below bin build by can changes children collection complete completed containing content contentarray contentresource contenttype controller create creation current data database default delete deletebyid deletes descending document editors empties empty emptyrecyclebin entities entity existing false files filter for force from getbyid getbyids getchildren gets getscaffold given gone handles has have here homepage id ids if index inject into is isnew it item items its knows made make matching method methods module must my mydoc name names needs new node node-ids nodes not number object of on only operations optional options or order orderby orderdirection page pagenumber pagesize paging param paramater parent parentid passed per place populated promise properties property provided publishcontent published publishes put query recycle resource resourcepromise resources retrieved return returns savecontent saved saves scaffold seperately service set should simply so sort sorted sortedids sortorder sorts store sure that the then they those to transactions true type umbdataformatter umbraco umbrequesthelper underneath untill update updated usage use used using var version want webapi where which will with won yet"
     },
     {
       "section": "api",
@@ -206,6 +206,13 @@ NG_DOCS={
       "shortName": "contentTypeResource",
       "type": "service",
       "keywords": "api content contenttyperesource data for in loads resources service types umbraco"
+    },
+    {
+      "section": "api",
+      "id": "umbraco.resources.entityResource",
+      "shortName": "entityResource",
+      "type": "service",
+      "keywords": "alert all an and api basic containing contains data display ent entities entity entityresource for getbyid gets given here id in is it item its lists loads method most mydoc navigation node object of only properties representation resourcepromise resources return service the then to trees umbraco usage used var what with"
     },
     {
       "section": "api",
@@ -268,7 +275,7 @@ NG_DOCS={
       "id": "umbraco.services.dialogService",
       "shortName": "dialogService",
       "type": "service",
-      "keywords": "$compile $http $log $q $rootscope $templatecache accesible all also an and animation any api application-wide array attach attached be been body but by callback called can chosen class close closeall closes container contains content contentpicker controller css csss custom data default dialog dialogs dialogservice div document documents does dom done edit editor element existing fade for from function functon given handling has html iframe iframes in incase inject injects inline instantly into is it items its load macro macropicker make mcaro media mediapicker method modal modalclass modals module needed needs new non-angular object of on only open opens options or overlays page parameters passed path picker processing property propertydialog rendering renders representing return returned returns rootscope scope selected sent serverside service services set should show simply specific strips submitted support sure template templates that the this to tree true umb-modal umbraco url usage use used value var want whatever when which width with wrappers you ysod ysoddialog"
+      "keywords": "$compile $http $log $q $rootscope $templatecache accesible all also an and animation any api application-wide array attach attached be been body but by callback called can chosen class close closeall closes container contains content contentpicker controller css csss custom default dialog dialogs dialogservice div document documents does dom done edit editor element existing fade for from function functon given handling has html iframe iframes in incase inject injects inline instantly into is it items its load macro macropicker make mcaro media mediapicker method modal modalclass modals module needed needs new non-angular object of on only open opens options or overlays page parameters passed path picker processing property propertydialog rendering renders representing return returned returns rootscope scope selected sent serverside service services set should show simply specific strips submitted support sure template templates that the this to tree true umb-modal umbraco url usage use used value var want whatever when which width with wrappers you ysod ysoddialog"
     },
     {
       "section": "api",
@@ -310,7 +317,7 @@ NG_DOCS={
       "id": "umbraco.services.serverValidationManager",
       "shortName": "serverValidationManager",
       "type": "service",
-      "keywords": "according addfielderror addpropertyerror adds alias all always an and another any api are attached be been below bound call callback callbacks can change changes checks clear clears colleciton collection combo content contentproperty controller controls created data defined directive empty error errors errros example executed explicit field fieldname fields for form function generally getfieldcallbacks getfielderror getpropertycallbacks getpropertyerror gets handle has hasfielderror haspropertyerror if in is item just listen match message messages method methods model name named native needs new not notifies now null objects occurs of once one ones only order other otherwise over particular persisted pinpoint previously primarily properties property re-binded re-bound registered removepropertyerror removes reset return route rules scenarios scope server servervalidationmanager service services set should side so specific specified specifies submitting subscribe subscription that the their then there these they this to types ui umbraco up used user using val-server valid validation vs we when whenever where which will wires with"
+      "keywords": "according addfielderror addpropertyerror adds alias all always an and another any api are attached be been below bound call callback callbacks can change changes checks clear clears colleciton collection combo content controller controls created data defined directive empty error errors errros example executed explicit field fieldname fields for form function generally getfieldcallbacks getfielderror getpropertycallbacks getpropertyerror gets handle has hasfielderror haspropertyerror if in is item just listen match message messages method methods model name named native needs new not notifies now null objects occurs of once one ones only order other otherwise over particular persisted pinpoint previously primarily properties property propertyalias re-binded re-bound registered removepropertyerror removes reset return route rules scenarios scope server servervalidationmanager service services set should side so specific specified specifies submitting subscribe subscription that the their then there these they this to types ui umbraco up used user using val-server valid validation vs we when whenever where which will wires with"
     },
     {
       "section": "api",
