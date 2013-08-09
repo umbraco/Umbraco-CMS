@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using AutoMapper;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Mapping;
@@ -110,7 +111,13 @@ namespace Umbraco.Core
         /// </summary>
         protected virtual void CreateApplicationCache()
         {
-            ApplicationCache = new CacheHelper(new System.Web.Caching.Cache(), true);
+            var cacheHelper = new CacheHelper(
+                        new ObjectCacheRuntimeCacheProvider(),
+                        new StaticCacheProvider(),
+                        //we have no request based cache when not running in web-based context
+                        new NullCacheProvider());
+
+            ApplicationCache = cacheHelper;
         }
 
         /// <summary>

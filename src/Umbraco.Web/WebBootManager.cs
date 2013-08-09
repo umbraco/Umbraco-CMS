@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using StackExchange.Profiling.MVCHelpers;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
@@ -150,7 +151,8 @@ namespace Umbraco.Web
         /// </summary>
         protected override void CreateApplicationCache()
         {
-            ApplicationCache = new CacheHelper(HttpRuntime.Cache, true);
+            //create a web-based cache helper
+            ApplicationCache = new CacheHelper();
         }
 
         /// <summary>

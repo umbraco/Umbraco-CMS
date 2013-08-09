@@ -25,31 +25,82 @@ namespace Umbraco.Core
         private readonly IRuntimeCacheProvider _httpCache;
         private readonly IRuntimeCacheProvider _nullHttpCache = new NullCacheProvider();
 
-		public CacheHelper(System.Web.Caching.Cache cache)
-            : this(cache, true)
-		{
-		}
-
-	    internal CacheHelper(System.Web.Caching.Cache cache, bool enableCache)
-            : this(new HttpRuntimeCacheProvider(cache), enableCache)
-	    {            
-	    }
-
-        internal CacheHelper(IRuntimeCacheProvider httpCacheProvider, bool enableCache)
-            : this(httpCacheProvider, new StaticCacheProvider(), new HttpRequestCacheProvider(HttpContext.Current), enableCache)
+        /// <summary>
+        /// Creates a cache helper with disabled caches
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// Good for unit testing
+        /// </remarks>
+        internal static CacheHelper CreateDisabledCacheHelper()
         {
+            return new CacheHelper(null, null, null, false);
         }
 
-        internal CacheHelper(
+	    /// <summary>
+	    /// Initializes a new instance for use in the web
+	    /// </summary>
+	    public CacheHelper()
+	        : this(
+	            new HttpRuntimeCacheProvider(HttpRuntime.Cache),
+	            new StaticCacheProvider(),
+	            new HttpRequestCacheProvider(() => new HttpContextWrapper(HttpContext.Current)))
+	    {
+	    }
+
+	    /// <summary>
+	    /// Initializes a new instance for use in the web
+	    /// </summary>
+	    /// <param name="cache"></param>
+	    public CacheHelper(System.Web.Caching.Cache cache)
+	        : this(
+	            new HttpRuntimeCacheProvider(cache),
+	            new StaticCacheProvider(),
+	            new HttpRequestCacheProvider(() => new HttpContextWrapper(HttpContext.Current)))
+	    {
+	    }
+
+	    /// <summary>
+        /// Initializes a new instance based on the provided providers
+        /// </summary>
+        /// <param name="httpCacheProvider"></param>
+        /// <param name="staticCacheProvider"></param>
+        /// <param name="requestCacheProvider"></param>
+        public CacheHelper(
             IRuntimeCacheProvider httpCacheProvider, 
             ICacheProvider staticCacheProvider, 
+            ICacheProvider requestCacheProvider)
+            : this(httpCacheProvider, staticCacheProvider, requestCacheProvider, true)
+        {            
+        }
+
+        /// <summary>
+        /// Private ctor used for creating a disabled cache helper
+        /// </summary>
+        /// <param name="httpCacheProvider"></param>
+        /// <param name="staticCacheProvider"></param>
+        /// <param name="requestCacheProvider"></param>
+        /// <param name="enableCache"></param>
+        private CacheHelper(
+            IRuntimeCacheProvider httpCacheProvider,
+            ICacheProvider staticCacheProvider,
             ICacheProvider requestCacheProvider, 
             bool enableCache)
         {
-            _httpCache = httpCacheProvider;
-            _staticCache = staticCacheProvider;
+            if (enableCache)
+            {
+                _httpCache = httpCacheProvider;
+                _staticCache = staticCacheProvider;
+                _requestCache = requestCacheProvider;
+            }
+            else
+            {
+                _httpCache = null;
+                _staticCache = null;
+                _requestCache = null;
+            }
+
             _enableCache = enableCache;
-            _requestCache = requestCacheProvider;
         }
 
         /// <summary>

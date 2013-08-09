@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -45,6 +46,12 @@ namespace Umbraco.Core.Standalone
             {
                 if (_serviceContext == null)
                 {
+                    var cacheHelper = new CacheHelper(
+                        new ObjectCacheRuntimeCacheProvider(),
+                        new StaticCacheProvider(),
+                        //we have no request based cache when running standalone
+                        new NullCacheProvider());
+
                     var dbFactory = new DefaultDatabaseFactory(_connectionString, _providerName);
                     var dbContext = new DatabaseContext(dbFactory);
                     Database.Mapper = new PetaPocoMapper();
@@ -52,7 +59,7 @@ namespace Umbraco.Core.Standalone
                         new PetaPocoUnitOfWorkProvider(dbFactory),
                         new FileUnitOfWorkProvider(),
                         new PublishingStrategy(),
-                        new CacheHelper(new System.Web.Caching.Cache(), true));
+                        cacheHelper);
 
                     //initialize the DatabaseContext
                     dbContext.Initialize(_providerName);

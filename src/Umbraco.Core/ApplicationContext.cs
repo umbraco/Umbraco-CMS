@@ -38,18 +38,6 @@ namespace Umbraco.Core
             ApplicationCache = cache;
         }
 
-        /// <summary>
-        /// Constructor used to specify if we will enable application cache or not, used for unit tests
-        /// </summary>
-        /// <param name="enableCache"></param>
-        internal ApplicationContext(bool enableCache)
-        {
-            //create a new application cache from the HttpRuntime.Cache
-            ApplicationCache = HttpRuntime.Cache == null
-                ? new CacheHelper(new System.Web.Caching.Cache(), enableCache)
-                : new CacheHelper(HttpRuntime.Cache, enableCache);
-        }
-
 		/// <summary>
     	/// Singleton accessor
     	/// </summary>
