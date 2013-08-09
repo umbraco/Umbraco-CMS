@@ -67,12 +67,28 @@ namespace Umbraco.Web.WebApi.Filters
             int nodeId;
             if (_nodeId.HasValue == false)
             {
-                if (actionContext.ActionArguments[_paramName] == null)
+                var parts = _paramName.Split(new char[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
+
+                if (actionContext.ActionArguments[parts[0]] == null)
                 {
                     throw new InvalidOperationException("No argument found for the current action with the name: " + _paramName);
                 }
 
-                nodeId = (int)actionContext.ActionArguments[_paramName];  
+                if (parts.Length == 1)
+                {
+                    nodeId = (int)actionContext.ActionArguments[parts[0]];
+                }
+                else
+                {
+                    //now we need to see if we can get the property of whatever object it is
+                    var pType = actionContext.ActionArguments[parts[0]].GetType();
+                    var prop = pType.GetProperty(parts[1]);
+                    if (prop == null)
+                    {
+                        throw new InvalidOperationException("No argument found for the current action with the name: " + _paramName);
+                    }
+                    nodeId = (int)prop.GetValue(actionContext.ActionArguments[parts[0]]);                    
+                }
             }
             else
             {
