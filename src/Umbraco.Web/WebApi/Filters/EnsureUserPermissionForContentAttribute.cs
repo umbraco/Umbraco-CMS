@@ -10,6 +10,8 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Web.Editors;
+using Umbraco.Web.Models.ContentEditing;
 using umbraco.BusinessLogic.Actions;
 
 namespace Umbraco.Web.WebApi.Filters
@@ -70,14 +72,14 @@ namespace Umbraco.Web.WebApi.Filters
                     throw new InvalidOperationException("No argument found for the current action with the name: " + _paramName);
                 }
 
-                nodeId = (int) actionContext.ActionArguments[_paramName];
+                nodeId = (int)actionContext.ActionArguments[_paramName];  
             }
             else
             {
                 nodeId = _nodeId.Value;
             }
 
-            if (CheckPermissions(
+            if (ContentController.CheckPermissions(
                 actionContext.Request.Properties,
                 UmbracoContext.Current.Security.CurrentUser,
                 ApplicationContext.Current.Services.UserService,
@@ -92,35 +94,7 @@ namespace Umbraco.Web.WebApi.Filters
             
         }
 
-        internal bool CheckPermissions(IDictionary<string, object> storage, IUser user, IUserService userService, IContentService contentService, int nodeId, char permissionToCheck)
-        {
-            var contentItem = contentService.GetById(nodeId);
-            if (contentItem == null)
-            {
-                throw new HttpResponseException(System.Net.HttpStatusCode.NotFound);
-            }
-
-            //put the content item into storage so it can be retreived 
-            // in the controller (saves a lookup)
-            storage.Add(typeof(IContent).ToString(), contentItem);
-
-            var hasPathAccess = user.HasPathAccess(contentItem);
-
-            if (hasPathAccess == false)
-            {
-                return false;
-            }
-
-            var permission = userService.GetPermissions(user, nodeId).FirstOrDefault();
-            if (permission == null || permission.AssignedPermissions.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+        
 
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -116,6 +117,25 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Forbidden, display));
             }
         }
+
+        /// <summary>
+        /// A helper method to attempt to get the instance from the request storage if it can be found there,
+        /// otherwise gets it from the callback specified
+        /// </summary>
+        /// <typeparam name="TPersisted"></typeparam>
+        /// <param name="getFromService"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is useful for when filters have alraedy looked up a persisted entity and we don't want to have
+        /// to look it up again.
+        /// </remarks>
+        protected TPersisted GetEntityFromRequest<TPersisted>(Func<TPersisted> getFromService)
+            where TPersisted : IContentBase
+        {
+            return Request.Properties.ContainsKey(typeof (TPersisted).ToString()) == false
+                       ? getFromService()
+                       : (TPersisted) Request.Properties[typeof (TPersisted).ToString()];
+        } 
 
     }
 }

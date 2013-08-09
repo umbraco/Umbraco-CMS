@@ -294,7 +294,7 @@ function umbDataFormatter() {
                 _.each(tab.properties, function (prop) {
                     
                     //don't include the custom generic tab properties
-                    if (tab.id !== 0 && !prop.alias.startsWith("_umb_")) {
+                    if (!prop.alias.startsWith("_umb_")) {
                         saveModel.properties.push({
                             id: prop.id,
                             alias: prop.alias,
