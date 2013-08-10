@@ -27,6 +27,11 @@
                 //We need to load in the legacy tree js.
                 legacyJsLoader.loadLegacyTreeJs($scope).then(
                     function(result) {
+                        var iframe = document.getElementById("right");
+                        if(iframe){
+                            iframe.contentDocument.location.reload(true);
+                        }
+                        
                         $scope.submit(true);
                     });
             }, function (reason) {
