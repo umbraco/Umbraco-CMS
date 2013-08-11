@@ -56,6 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories
                               FormatDeleteStatement("cmsContentVersion", "ContentId"),
                               FormatDeleteStatement("cmsContentXml", "nodeID"),
                               FormatDeleteStatement("cmsContent", "NodeId"),
+                              "UPDATE umbracoNode SET parentID = '-20' WHERE trashed = '1' AND nodeObjectType = @NodeObjectType",
                               "DELETE FROM umbracoNode WHERE trashed = '1' AND nodeObjectType = @NodeObjectType"
                           };
 
