@@ -79,6 +79,38 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return content;
         }
 
+        public static Content CreateAllTypesContent(IContentType contentType, string name, int parentId)
+        {
+            var content = new Content("Random Content Name", parentId, contentType) { Language = "en-US", Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
+
+            content.SetValue("isTrue", true);
+            content.SetValue("number", 42);
+            content.SetValue("bodyText", "Lorem Ipsum Body Text Test");
+            content.SetValue("singleLineText", "Single Line Text Test");
+            content.SetValue("multilineText", "Multiple lines \n in one box");
+            content.SetValue("upload", "/media/1234/koala.jpg");
+            content.SetValue("label", "Non-editable label");
+            content.SetValue("dateTime", DateTime.Now.AddDays(-20));
+            content.SetValue("colorPicker", "black");
+            content.SetValue("folderBrowser", "");
+            content.SetValue("ddlMultiple", "1234,1235");
+            content.SetValue("rbList", "random");
+            content.SetValue("date", DateTime.Now.AddDays(-10));
+            content.SetValue("ddl", "1234");
+            content.SetValue("chklist", "randomc");
+            content.SetValue("contentPicker", 1090);
+            content.SetValue("mediaPicker", 1091);
+            content.SetValue("memberPicker", 1092);
+            content.SetValue("simpleEditor", "This is simply edited");
+            content.SetValue("ultimatePicker", "1234,1235");
+            content.SetValue("relatedLinks", "<links><link title=\"google\" link=\"http://google.com\" type=\"external\" newwindow=\"0\" /></links>");
+            content.SetValue("tags", "this,is,tags");
+            content.SetValue("macroContainer", "");
+            content.SetValue("imgCropper", "");
+
+            return content;
+        }
+
         public static IEnumerable<Content> CreateTextpageContent(IContentType contentType, int parentId, int amount)
         {
             var list = new List<Content>();

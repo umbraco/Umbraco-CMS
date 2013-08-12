@@ -106,7 +106,7 @@ namespace umbraco.editorControls
         public void Save()
         {
             if (ItemIdValue.Value.Trim() != "")
-                _data.Value = ItemIdValue.Value.Trim();
+                _data.Value = int.Parse(ItemIdValue.Value.Trim());
             else
                 _data.Value = null;
         }
