@@ -103,6 +103,14 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         /// <summary>
+        /// Set this to true if the property editor is for display purposes only
+        /// </summary>
+        public virtual bool IsReadOnly
+        {
+            get { return false; }
+        }
+
+        /// <summary>
         /// Used to try to convert the string value to the correct CLR type based on the DatabaseDataType specified for this value editor
         /// </summary>
         /// <param name="value"></param>

@@ -4,10 +4,12 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi.Filters;
 
@@ -101,7 +103,13 @@ namespace Umbraco.Web.Editors
                 }
                 else
                 {
-                    dboProperty.Value = p.PropertyEditor.ValueEditor.DeserializeValue(data, dboProperty.Value);
+                    var valueEditor = p.PropertyEditor.ValueEditor;
+                    //don't persist any bound value if the editor is readonly
+                    if (valueEditor.IsReadOnly == false)
+                    {
+                        dboProperty.Value = p.PropertyEditor.ValueEditor.DeserializeValue(data, dboProperty.Value);    
+                    }
+                    
                 }
             }
         }

@@ -367,7 +367,7 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		internal static string ToXmlString(this object value, Type type)
 		{
-			if (type == typeof(string)) return ((string)value).IsNullOrWhiteSpace() ? "" : (string)value;
+			if (type == typeof(string)) return (value.ToString().IsNullOrWhiteSpace() ? "" : value.ToString());
 			if (type == typeof(bool)) return XmlConvert.ToString((bool)value);
 			if (type == typeof(byte)) return XmlConvert.ToString((byte)value);
 			if (type == typeof(char)) return XmlConvert.ToString((char)value);
