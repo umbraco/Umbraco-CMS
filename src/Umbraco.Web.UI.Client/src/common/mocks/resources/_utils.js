@@ -60,6 +60,12 @@
                         id: 0,
                         properties: [
                             {
+                                label: 'Id',
+                                value: 1234,
+                                view: "readonlyvalue",
+                                alias: "_umb_id"
+                            },
+                            {
                                 label: 'Created by',
                                 description: 'Original author',
                                 value: "Administrator",
@@ -68,35 +74,49 @@
                             },
                             {
                                 label: 'Created',
-                                description: 'Time this document was created',
+                                description: 'Date/time this document was created',
                                 value: new Date().toIsoDateTimeString(),
                                 view: "readonlyvalue",
                                 alias: "_umb_createdate"
                             },
                             {
                                 label: 'Updated',
-                                description: 'Time this document was last updated',
+                                description: 'Date/time this document was created',
                                 value: new Date().toIsoDateTimeString(),
                                 view: "readonlyvalue",
                                 alias: "_umb_updatedate"
-                            },
-                            {
-                                label: 'Id',
-                                value: 1234,
-                                view: "readonlyvalue",
-                                alias: "_umb_id"
-                            },
+                            },                            
                             {
                                 label: 'Document Type',
                                 value: "Home page",
                                 view: "readonlyvalue",
-                                alias: "_umb_doctype"
+                                alias: "_umb_doctype" 
                             },
                             {
-                                label: 'Template',
-                                value: "1234",
+                                label: 'Publish at',
+                                description: 'Date/time to publish this document',
+                                value: new Date().toIsoDateTimeString(),
+                                view: "datepicker",
+                                alias: "_umb_releasedate"
+                            },
+                            {
+                                label: 'Unpublish at',
+                                description: 'Date/time to un-publish this document',
+                                value: new Date().toIsoDateTimeString(),
+                                view: "datepicker",
+                                alias: "_umb_removedate"
+                            },
+                            {
+                                label: 'Template', 
+                                value: "1234",  
                                 view: "templatepicker",
                                 alias: "_umb_template" 
+                            },
+                            {
+                                label: 'Link to document',
+                                value: ["/testing" + id, "http://localhost/testing" + id, "http://mydomain.com/testing" + id].join(),
+                                view: "urllist",
+                                alias: "_umb_template"
                             },
                             {
                                 alias: "test", label: "Stuff", view: "test", value: "",

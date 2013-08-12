@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper;
@@ -8,6 +9,7 @@ using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -40,18 +42,53 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(
                       dto => dto.PublishDate,
                       expression => expression.MapFrom(content => GetPublishedDate(content, applicationContext)))
-                    .ForMember(
+                  .ForMember(
                       dto => dto.Template,
                       expression => expression.MapFrom(content => content.Template.Name))
+                  .ForMember(
+                      dto => dto.ReleaseDate,
+                      expression => expression.MapFrom(content => content.ReleaseDate))
+                  .ForMember(
+                      dto => dto.RemoveDate,
+                      expression => expression.MapFrom(content => content.ExpireDate))
+                  .ForMember(
+                      dto => dto.Urls,
+                      expression => expression.MapFrom(content =>
+                                                       UmbracoContext.Current == null
+                                                           ? new[] {"Cannot generate urls without a current Umbraco Context"}
+                                                           : content.GetContentUrls()))
                   .ForMember(display => display.Properties, expression => expression.Ignore())
                   .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
-                  .AfterMap((content, display) => TabsAndPropertiesResolver.MapGenericProperties(content, display, new ContentPropertyDisplay
-                      {
-                          Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                          Label = "Template", //TODO: localize this?
-                          Value = display.Template,
-                          View = "templatepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                      }));
+                  .AfterMap((content, display) => TabsAndPropertiesResolver.MapGenericProperties(
+                      content, display,
+                      new ContentPropertyDisplay
+                          {
+                              Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                              Label = ui.Text("content", "releaseDate"),
+                              Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
+                              View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                          },
+                      new ContentPropertyDisplay
+                          {
+                              Alias = string.Format("{0}removedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                              Label = ui.Text("content", "removeDate"),
+                              Value = display.RemoveDate.HasValue ? display.RemoveDate.Value.ToIsoString() : null,
+                              View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                          },
+                      new ContentPropertyDisplay
+                          {
+                              Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                              Label = "Template", //TODO: localize this?
+                              Value = display.Template,
+                              View = "templatepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                          },
+                      new ContentPropertyDisplay
+                          {
+                              Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                              Label = ui.Text("content", "urls"),
+                              Value = string.Join(",", display.Urls),
+                              View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                          }));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()

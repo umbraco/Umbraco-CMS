@@ -44,6 +44,13 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     new ContentPropertyDisplay
                         {
+                            Alias = string.Format("{0}id", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                            Label = "Id",
+                            Value = display.Id.ToInvariantString(),
+                            View = labelEditor
+                        },
+                    new ContentPropertyDisplay
+                        {
                             Alias = string.Format("{0}creator", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                             Label = ui.Text("content", "createBy"),
                             Description = "Original author", //TODO: Localize this
@@ -54,7 +61,7 @@ namespace Umbraco.Web.Models.Mapping
                         {
                             Alias = string.Format("{0}createdate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                             Label = ui.Text("content", "createDate"),
-                            Description = "Time this document was created", //TODO: Localize this
+                            Description = "Date/time this document was created", //TODO: Localize this
                             Value = display.CreateDate.ToIsoString(),
                             View = labelEditor
                         },
@@ -62,17 +69,10 @@ namespace Umbraco.Web.Models.Mapping
                         {
                             Alias = string.Format("{0}updatedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                             Label = ui.Text("content", "updateDate"),
-                            Description = "Time this document was last updated", //TODO: Localize this
+                            Description = "Date/time this document was created", //TODO: Localize this
                             Value = display.UpdateDate.ToIsoString(),
                             View = labelEditor
-                        },
-                    new ContentPropertyDisplay
-                        {
-                            Alias = string.Format("{0}id", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                            Label = "Id",
-                            Value = display.Id.ToInvariantString(),
-                            View = labelEditor
-                        },
+                        },                    
                     new ContentPropertyDisplay
                         {
                             Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),

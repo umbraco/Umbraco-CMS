@@ -1,0 +1,7 @@
+﻿<div ng-controller="Umbraco.Editors.UrlListController">
+    <ul>
+        <li ng-repeat="value in renderModel">
+            <a href="{{value.url}}" target="{{value.urlTarget}}">{{value.url}}</a>
+        </li>
+    </ul>
+</div>

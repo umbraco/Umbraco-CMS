@@ -18,8 +18,17 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "publishDate")]
         public DateTime? PublishDate { get; set; }
 
+        [DataMember(Name = "releaseDate")]
+        public DateTime? ReleaseDate { get; set; }
+
+        [DataMember(Name = "removeDate")]
+        public DateTime? RemoveDate { get; set; }
+
         [DataMember(Name = "template")]
         public string Template { get; set; }
+
+        [DataMember(Name = "urls")]
+        public string[] Urls { get; set; }
         
     }
 }

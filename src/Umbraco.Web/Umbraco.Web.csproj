@@ -301,6 +301,7 @@
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Models\PagedResult.cs" />
     <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
+    <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="WebApi\ControllerContextExtensions.cs" />
     <Compile Include="WebApi\CustomDateTimeConvertor.cs" />
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
