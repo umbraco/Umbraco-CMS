@@ -24,7 +24,7 @@
 	]
 	,
 	javascript: [
-	    '~/App_Plugins/property editors/relatedlinks/relatedlinks.js',
-	    '~/App_Plugins/property editors/mntp/mntp.js'
+	    '~/App_Plugins/propertyeditors/relatedlinks/relatedlinks.js',
+	    '~/App_Plugins/propertyeditors/mntp/mntp.js'
 	]
 }
