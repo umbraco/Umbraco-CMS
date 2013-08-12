@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
@@ -44,13 +45,12 @@ namespace Umbraco.Web.Models.Mapping
                       expression => expression.MapFrom(content => GetPublishedDate(content, applicationContext)))
                   .ForMember(
                       dto => dto.Template,
-                      expression => expression.MapFrom(content => content.Template.Name))
-                  .ForMember(
-                      dto => dto.ReleaseDate,
-                      expression => expression.MapFrom(content => content.ReleaseDate))
-                  .ForMember(
-                      dto => dto.RemoveDate,
-                      expression => expression.MapFrom(content => content.ExpireDate))
+                      expression => expression.MapFrom(content => new TemplateBasic
+                          {
+                              Alias = content.Template.Alias,
+                              Id = content.Template.Id,
+                              Name = content.Template.Name
+                          }))
                   .ForMember(
                       dto => dto.Urls,
                       expression => expression.MapFrom(content =>
@@ -70,16 +70,16 @@ namespace Umbraco.Web.Models.Mapping
                           },
                       new ContentPropertyDisplay
                           {
-                              Alias = string.Format("{0}removedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                              Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                               Label = ui.Text("content", "removeDate"),
-                              Value = display.RemoveDate.HasValue ? display.RemoveDate.Value.ToIsoString() : null,
+                              Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
                               View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                           },
                       new ContentPropertyDisplay
                           {
-                              Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                              Alias = string.Format("{0}template", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                               Label = "Template", //TODO: localize this?
-                              Value = display.Template,
+                              Value = JsonConvert.SerializeObject(display.Template),
                               View = "templatepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                           },
                       new ContentPropertyDisplay

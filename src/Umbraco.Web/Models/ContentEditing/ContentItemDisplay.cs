@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Validation;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -22,13 +23,29 @@ namespace Umbraco.Web.Models.ContentEditing
         public DateTime? ReleaseDate { get; set; }
 
         [DataMember(Name = "removeDate")]
-        public DateTime? RemoveDate { get; set; }
+        public DateTime? ExpireDate { get; set; }
 
         [DataMember(Name = "template")]
-        public string Template { get; set; }
+        public TemplateBasic Template { get; set; }
 
         [DataMember(Name = "urls")]
         public string[] Urls { get; set; }
         
+    }
+
+    [DataContract(Name = "template", Namespace = "")]
+    public class TemplateBasic
+    {
+        [DataMember(Name = "id", IsRequired = true)]
+        [Required]
+        public int Id { get; set; }
+
+        [DataMember(Name = "name", IsRequired = true)]
+        [Required(AllowEmptyStrings = false)]
+        public string Name { get; set; }
+
+        [DataMember(Name = "alias", IsRequired = true)]
+        [Required(AllowEmptyStrings = false)]
+        public string Alias { get; set; }
     }
 }

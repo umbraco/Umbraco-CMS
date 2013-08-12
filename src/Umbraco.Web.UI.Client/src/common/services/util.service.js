@@ -276,6 +276,7 @@ angular.module('umbraco.services').factory('umbImageHelper', umbImageHelper);
 **/
 function umbDataFormatter() {
     return {
+        
         /** formats the display model used to display the content to the model used to save the content */
         formatContentPostData: function (displayModel, action) {
             //NOTE: the display model inherits from the save model so we can in theory just post up the display model but 
@@ -289,6 +290,7 @@ function umbDataFormatter() {
                 //set the action on the save model
                 action: action
             };
+            
             _.each(displayModel.tabs, function (tab) {
                 
                 _.each(tab.properties, function (prop) {
@@ -300,6 +302,23 @@ function umbDataFormatter() {
                             alias: prop.alias,
                             value: prop.value
                         });
+                    }
+                    else {
+                        //here we need to map some of our internal properties to the content save item
+
+                        switch (prop.alias) {
+                            case "_umb_expiredate":
+                                saveModel.expireDate = prop.value;
+                                break;
+                            case "_umb_releasedate":
+                                saveModel.releaseDate = prop.value;
+                                break;
+                            case "_umb_template":
+                                //this will be a json string
+                                var json = angular.toJson(prop.value);
+                                saveModel.templateAlias = json.alias;
+                                break;
+                        }
                     }
                     
                 });

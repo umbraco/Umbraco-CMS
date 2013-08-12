@@ -157,7 +157,7 @@ namespace Umbraco.Web.Editors
             }
 
             //save the item
-            Services.MediaService.Save(contentItem.PersistedContent);
+            Services.MediaService.Save(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
 
             //return the updated model
             var display = Mapper.Map<IMedia, MediaItemDisplay>(contentItem.PersistedContent);

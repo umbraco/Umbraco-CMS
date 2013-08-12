@@ -104,11 +104,11 @@
                                 description: 'Date/time to un-publish this document',
                                 value: new Date().toIsoDateTimeString(),
                                 view: "datepicker",
-                                alias: "_umb_removedate"
+                                alias: "_umb_expiredate"
                             },
                             {
                                 label: 'Template', 
-                                value: "1234",  
+                                value: "{id: 1234, alias: 'myTemplate', name: 'My Template'}",
                                 view: "templatepicker",
                                 alias: "_umb_template" 
                             },
