@@ -15,7 +15,7 @@
 .umb-tree li.current > div, .umb-tree div.selected {
 	background: #2e8aea;
 }
-.umb-tree li.current > div i.umb-options i, .umb-tree div.selected i{
+.umb-tree li.current > div a.umb-options i, .umb-tree div.selected i{
 	background: #fff;
 	border-color: #2e8aea;
 }
@@ -64,10 +64,10 @@
 	background-position: 0
 }
 
-.umb-tree div > i.umb-options {
+.umb-tree div > a.umb-options {
 	visibility: hidden;
 }
-.umb-tree div:hover > i.umb-options {
+.umb-tree div:hover > a.umb-options {
 	visibility: visible;
 }
 
@@ -107,7 +107,7 @@
 	background: @grayLighter
 }
 
-i.umb-options {
+a.umb-options {
 	visibility: hidden;	
 	cursor: pointer;
 	display: inline-block;
@@ -119,7 +119,7 @@ i.umb-options {
 	top: 0px;
 }
 
-i.umb-options i {
+a.umb-options i {
 	height: 6px !important;
 	width: 6px !important;
 	border-radius: 20px;
@@ -129,11 +129,11 @@ i.umb-options i {
 	margin: 10px -2px 0 0;
 }
 
-li.root > div > i.umb-options {
+li.root > div > a.umb-options {
     top: 10px;
 }
 
-.hide-options .umb-options{display: none !important}
+.hide-options a.umb-options{display: none !important}
 .hide-header h5{display: none !important}
 
 .umb-icon-item {
@@ -167,7 +167,7 @@ li.root > div > i.umb-options {
 	font-size: 10px;
 	display: block
 }
-.umb-icon-item:hover .umb-options {
+.umb-icon-item:hover a.umb-options {
 	visibility: visible
 }
 .umb-icon-item .umb-spr {
