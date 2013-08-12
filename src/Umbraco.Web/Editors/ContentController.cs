@@ -192,7 +192,23 @@ namespace Umbraco.Web.Editors
             //TODO: We need to support 'send to publish'
 
             //TODO: We'll need to save the new template, publishat, etc... values here
-            
+            contentItem.PersistedContent.ExpireDate = contentItem.ExpireDate;
+            contentItem.PersistedContent.ReleaseDate = contentItem.ReleaseDate;
+            //only set the template if it didn't change
+            if (contentItem.PersistedContent.Template.Alias != contentItem.TemplateAlias)
+            {
+                var template = Services.FileService.GetTemplate(contentItem.TemplateAlias);
+                if (template == null)
+                {
+                    //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
+                    LogHelper.Warn<ContentController>("No template exists with the specified alias: " + contentItem.TemplateAlias);
+                }
+                else
+                {
+                    contentItem.PersistedContent.Template = template;
+                }
+            }
+
             MapPropertyValues(contentItem);
 
             //We need to manually check the validation results here because:
@@ -232,12 +248,12 @@ namespace Umbraco.Web.Editors
             if (contentItem.Action == ContentSaveAction.Save || contentItem.Action == ContentSaveAction.SaveNew)
             {
                 //save the item
-                Services.ContentService.Save(contentItem.PersistedContent);
+                Services.ContentService.Save(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
             }
             else
             {
                 //publish the item and check if it worked, if not we will show a diff msg below
-                publishStatus = ((ContentService)Services.ContentService).SaveAndPublishInternal(contentItem.PersistedContent);
+                publishStatus = ((ContentService)Services.ContentService).SaveAndPublishInternal(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
             }
             
 

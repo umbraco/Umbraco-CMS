@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
@@ -24,6 +25,18 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "action", IsRequired = true)]
         [Required]
         public ContentSaveAction Action { get; set; }
+
+        /// <summary>
+        /// The template alias to save
+        /// </summary>
+        [DataMember(Name = "templateAlias")]
+        public string TemplateAlias { get; set; }
+
+        [DataMember(Name = "releaseDate")]
+        public DateTime? ReleaseDate { get; set; }
+
+        [DataMember(Name = "expireDate")]
+        public DateTime? ExpireDate { get; set; }
 
         /// <summary>
         /// The collection of files uploaded

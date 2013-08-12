@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
+using System.Web.Http;
 using AutoMapper;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -21,13 +24,11 @@ namespace Umbraco.Web.Editors
             return Services.EntityService.Get(id);
         }
 
-        public IEnumerable<IUmbracoEntity> GetByIds(int[] ids)
+        public IEnumerable<IUmbracoEntity> GetByIds([FromUri]int[] ids)
         {
-            var list = new List<IUmbracoEntity>();
-            foreach(var id in ids)
-                list.Add(Services.EntityService.Get(id));
+            if (ids == null) throw new ArgumentNullException("ids");
 
-            return list;
+            return ids.Select(id => Services.EntityService.Get(id)).Where(entity => entity != null).ToList();
         }
 
         

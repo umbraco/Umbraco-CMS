@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
+using umbraco;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -11,6 +15,83 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class TabsAndPropertiesResolver : ValueResolver<IContentBase, IEnumerable<Tab<ContentPropertyDisplay>>>
     {
+        /// <summary>
+        /// Maps properties on to the generic properties tab
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="display"></param>
+        /// <param name="customProperties">
+        /// Any additional custom properties to assign to the generic properties tab. 
+        /// </param>
+        /// <remarks>
+        /// The generic properties tab is mapped during AfterMap and is responsible for 
+        /// setting up the properties such as Created date, udpated date, template selected, etc...
+        /// </remarks>
+        public static void MapGenericProperties<TPersisted>(
+            TPersisted content, 
+            ContentItemDisplayBase<ContentPropertyDisplay, TPersisted> display,
+            params ContentPropertyDisplay[] customProperties) 
+            where TPersisted : IContentBase
+        {
+            var genericProps = display.Tabs.Single(x => x.Id == 0);
+
+            //store the current props to append to the newly inserted ones
+            var currProps = genericProps.Properties.ToArray();
+
+            var labelEditor = PropertyEditorResolver.Current.GetById(new Guid(Constants.PropertyEditors.NoEdit)).ValueEditor.View;
+
+            var contentProps = new List<ContentPropertyDisplay>
+                {
+                    new ContentPropertyDisplay
+                        {
+                            Alias = string.Format("{0}id", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                            Label = "Id",
+                            Value = display.Id.ToInvariantString(),
+                            View = labelEditor
+                        },
+                    new ContentPropertyDisplay
+                        {
+                            Alias = string.Format("{0}creator", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                            Label = ui.Text("content", "createBy"),
+                            Description = "Original author", //TODO: Localize this
+                            Value = display.Owner.Name,
+                            View = labelEditor
+                        },
+                    new ContentPropertyDisplay
+                        {
+                            Alias = string.Format("{0}createdate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                            Label = ui.Text("content", "createDate"),
+                            Description = "Date/time this document was created", //TODO: Localize this
+                            Value = display.CreateDate.ToIsoString(),
+                            View = labelEditor
+                        },
+                     new ContentPropertyDisplay
+                        {
+                            Alias = string.Format("{0}updatedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                            Label = ui.Text("content", "updateDate"),
+                            Description = "Date/time this document was created", //TODO: Localize this
+                            Value = display.UpdateDate.ToIsoString(),
+                            View = labelEditor
+                        },                    
+                    new ContentPropertyDisplay
+                        {
+                            Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                            Label = ui.Text("content", "documentType"),
+                            Value = display.ContentTypeName,
+                            View = labelEditor
+                        }
+                };
+
+            //add the custom ones
+            contentProps.AddRange(customProperties);
+
+            //now add the user props
+            contentProps.AddRange(currProps);
+
+            //re-assign
+            genericProps.Properties = contentProps;
+        }
+
         protected override IEnumerable<Tab<ContentPropertyDisplay>> ResolveCore(IContentBase content)
         {
             var aggregateTabs = new List<Tab<ContentPropertyDisplay>>();

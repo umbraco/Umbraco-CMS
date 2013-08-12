@@ -1,0 +1,18 @@
+<div ng-controller="uComponents.Editors.MNTPController">
+	<ul class="nav nav-stacked">	
+		<li ng-repeat="node in renderModel">
+			<a href="#" prevent-default ng-click="remove($index)">
+				<i class="icon umb-tree-icon sprTree {{node.icon}}"></i> 
+					{{node.name}}
+			</a>
+		</li>
+
+		<li>
+			<a href="#" ng-click="openContentPicker()" prevent-default>
+				<i class="icon icon-plus"></i> Add
+			</a>
+		</li>
+	</ul>
+
+	<br/><br/>
+</div>

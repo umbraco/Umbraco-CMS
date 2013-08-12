@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Umbraco.Core.Configuration;
@@ -56,6 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories
                               FormatDeleteStatement("cmsContentVersion", "ContentId"),
                               FormatDeleteStatement("cmsContentXml", "nodeID"),
                               FormatDeleteStatement("cmsContent", "NodeId"),
+                              "UPDATE umbracoNode SET parentID = '-20' WHERE trashed = '1' AND nodeObjectType = @NodeObjectType",
                               "DELETE FROM umbracoNode WHERE trashed = '1' AND nodeObjectType = @NodeObjectType"
                           };
 
@@ -116,9 +117,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private string FormatDeleteStatement(string tableName, string keyName)
         {
+            //This query works with sql ce and sql server:
+            //DELETE FROM umbracoUser2NodeNotify WHERE umbracoUser2NodeNotify.nodeId IN 
+            //(SELECT nodeId FROM umbracoUser2NodeNotify as TB1 INNER JOIN umbracoNode as TB2 ON TB1.nodeId = TB2.id WHERE TB2.trashed = '1' AND TB2.nodeObjectType = 'C66BA18E-EAF3-4CFF-8A22-41B16D66A972')
             return
                 string.Format(
-                    "DELETE FROM {0} FROM {0} as TB1 INNER JOIN umbracoNode as TB2 ON TB1.{1} = TB2.id WHERE TB2.trashed = '1' AND TB2.nodeObjectType = @NodeObjectType",
+                    "DELETE FROM {0} WHERE {0}.{1} IN (SELECT TB1.{1} FROM {0} as TB1 INNER JOIN umbracoNode as TB2 ON TB1.{1} = TB2.id WHERE TB2.trashed = '1' AND TB2.nodeObjectType = @NodeObjectType)",
                     tableName, keyName);
         }
 

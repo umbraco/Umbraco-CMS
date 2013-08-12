@@ -1,4 +1,4 @@
-﻿angular.module('umbraco.mocks').
+angular.module('umbraco.mocks').
     factory('mocksUtils', ['$cookieStore', function($cookieStore) {
         'use strict';
          
@@ -53,36 +53,12 @@
                         label: "Grid",
                         id: 4,
                         properties: [
-                        { alias: "grid", label: "Grid", view: "grid", controller: "umbraco.grid", value: "test", hideLabel: true }
+                        { alias: "grid", label: "Grid", view: "grid", value: "test", hideLabel: true }
                         ]
                     }, {
                         label: "Generic Properties",
                         id: 0,
                         properties: [
-                            {
-                                label: 'Created by',
-                                description: 'Original author',
-                                value: 1,
-                                view: "readonlyvalue",
-                                alias: "_umb_createdby"
-                            },
-                            {
-                                label: 'Created',
-                                description: 'Time this document was created',
-                                value: new Date().toIsoDateTimeString(),
-                                view: "readonlyvalue",
-                                //NOTE: No need for filters because the date is a formatted string already because
-                                // that is how it comes from the server as a pre-formatted json string
-                                //config: {filter: 'date', format: 'medium'},
-                                alias: "_umb_createdate"
-                            },
-                            {
-                                label: 'Updated',
-                                description: 'Time this document was last updated',
-                                value: new Date().toIsoDateTimeString(),
-                                view: "readonlyvalue",
-                                alias: "_umb_updatedate"
-                            },
                             {
                                 label: 'Id',
                                 value: 1234,
@@ -90,19 +66,60 @@
                                 alias: "_umb_id"
                             },
                             {
+                                label: 'Created by',
+                                description: 'Original author',
+                                value: "Administrator",
+                                view: "readonlyvalue",
+                                alias: "_umb_createdby"
+                            },
+                            {
+                                label: 'Created',
+                                description: 'Date/time this document was created',
+                                value: new Date().toIsoDateTimeString(),
+                                view: "readonlyvalue",
+                                alias: "_umb_createdate"
+                            },
+                            {
+                                label: 'Updated',
+                                description: 'Date/time this document was created',
+                                value: new Date().toIsoDateTimeString(),
+                                view: "readonlyvalue",
+                                alias: "_umb_updatedate"
+                            },                            
+                            {
                                 label: 'Document Type',
                                 value: "Home page",
                                 view: "readonlyvalue",
-                                alias: "_umb_doctype"
+                                alias: "_umb_doctype" 
                             },
                             {
-                                label: 'Template',
-                                value: "1234",
+                                label: 'Publish at',
+                                description: 'Date/time to publish this document',
+                                value: new Date().toIsoDateTimeString(),
+                                view: "datepicker",
+                                alias: "_umb_releasedate"
+                            },
+                            {
+                                label: 'Unpublish at',
+                                description: 'Date/time to un-publish this document',
+                                value: new Date().toIsoDateTimeString(),
+                                view: "datepicker",
+                                alias: "_umb_expiredate"
+                            },
+                            {
+                                label: 'Template', 
+                                value: "{id: 1234, alias: 'myTemplate', name: 'My Template'}",
                                 view: "templatepicker",
+                                alias: "_umb_template" 
+                            },
+                            {
+                                label: 'Link to document',
+                                value: ["/testing" + id, "http://localhost/testing" + id, "http://mydomain.com/testing" + id].join(),
+                                view: "urllist",
                                 alias: "_umb_template"
                             },
                             {
-                                alias: "test", label: "Stuff", view: "test", controller: "umbraco.embeddedcontent", value: "",
+                                alias: "test", label: "Stuff", view: "test", value: "",
                                 config: {
                                     fields: [
                                                 { alias: "embedded", label: "Embbeded", view: "textstring", value: "" },

@@ -29,9 +29,13 @@ namespace Umbraco.Web.Models.Mapping
                       expression => expression.MapFrom(content => content.ContentType.Icon))
                   .ForMember(
                       dto => dto.ContentTypeAlias,
-                      expression => expression.MapFrom(content => content.ContentType.Alias))                  
+                      expression => expression.MapFrom(content => content.ContentType.Alias))
+                  .ForMember(
+                      dto => dto.ContentTypeName,
+                      expression => expression.MapFrom(content => content.ContentType.Name))
                   .ForMember(display => display.Properties, expression => expression.Ignore())
-                  .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>());
+                  .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
+                  .AfterMap((media, display) => TabsAndPropertiesResolver.MapGenericProperties(media, display));
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
             config.CreateMap<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>()
