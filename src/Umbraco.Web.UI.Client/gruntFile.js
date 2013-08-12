@@ -303,6 +303,7 @@ module.exports = function (grunt) {
            smarttabs: true,
            globalstrict:true,
            globals:{$:false, jQuery:false,define:false,require:false,window:false}
+
          } 
       }
     }

@@ -11,15 +11,12 @@
 <body ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
 
     <div ng-hide="!authenticated" ng-cloak ng-animate="'fade'" id="Div1" class="clearfix" ng-click="closeDialogs($event)">
-
         <umb-navigation></umb-navigation>
-
         <section id="contentwrapper">
             <div id="contentcolumn">
                 <div ng-view></div>
             </div>
         </section>
-        
     </div>
 
 

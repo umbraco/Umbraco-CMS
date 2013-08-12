@@ -66,5 +66,14 @@ function MainController($scope, $routeParams, $rootScope, $timeout, notification
         });
 }
 
+
 //register it
 angular.module('umbraco').controller("Umbraco.MainController", MainController);
+
+/*
+angular.module("umbraco").run(function(eventsService){
+    eventsService.subscribe("Umbraco.Dialogs.ContentPickerController.Select", function(a, b){
+        a.node.name = "wat";
+    });
+});
+*/
