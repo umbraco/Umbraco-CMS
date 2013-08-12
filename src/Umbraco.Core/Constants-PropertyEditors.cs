@@ -7,7 +7,12 @@
 		/// </summary>
 		public static class PropertyEditors
 		{
-			/// <summary>
+		    /// <summary>
+		    /// Used to prefix generic properties that are internal content properties
+		    /// </summary>
+		    public const string InternalGenericPropertiesPrefix = "_umb_";
+
+		    /// <summary>
 			/// Guid for the Checkbox list datatype.
 			/// </summary>
 			public const string CheckBoxList = "B4471851-82B6-4C75-AFA4-39FA9C6A75E9";

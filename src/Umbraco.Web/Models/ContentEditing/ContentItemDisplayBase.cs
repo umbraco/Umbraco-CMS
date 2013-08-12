@@ -14,6 +14,12 @@ namespace Umbraco.Web.Models.ContentEditing
         }
 
         /// <summary>
+        /// The name of the content type
+        /// </summary>
+        [DataMember(Name = "contentTypeName")]
+        public string ContentTypeName { get; set; }
+
+        /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
         /// </summary>
         [DataMember(Name = "notifications")]

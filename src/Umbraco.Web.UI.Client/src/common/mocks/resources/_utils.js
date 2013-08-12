@@ -53,7 +53,7 @@
                         label: "Grid",
                         id: 4,
                         properties: [
-                        { alias: "grid", label: "Grid", view: "grid", controller: "umbraco.grid", value: "test", hideLabel: true }
+                        { alias: "grid", label: "Grid", view: "grid", value: "test", hideLabel: true }
                         ]
                     }, {
                         label: "Generic Properties",
@@ -62,7 +62,7 @@
                             {
                                 label: 'Created by',
                                 description: 'Original author',
-                                value: 1,
+                                value: "Administrator",
                                 view: "readonlyvalue",
                                 alias: "_umb_createdby"
                             },
@@ -71,9 +71,6 @@
                                 description: 'Time this document was created',
                                 value: new Date().toIsoDateTimeString(),
                                 view: "readonlyvalue",
-                                //NOTE: No need for filters because the date is a formatted string already because
-                                // that is how it comes from the server as a pre-formatted json string
-                                //config: {filter: 'date', format: 'medium'},
                                 alias: "_umb_createdate"
                             },
                             {
@@ -99,10 +96,10 @@
                                 label: 'Template',
                                 value: "1234",
                                 view: "templatepicker",
-                                alias: "_umb_template"
+                                alias: "_umb_template" 
                             },
                             {
-                                alias: "test", label: "Stuff", view: "test", controller: "umbraco.embeddedcontent", value: "",
+                                alias: "test", label: "Stuff", view: "test", value: "",
                                 config: {
                                     fields: [
                                                 { alias: "embedded", label: "Embbeded", view: "textstring", value: "" },

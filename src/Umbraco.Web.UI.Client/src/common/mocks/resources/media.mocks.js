@@ -56,14 +56,14 @@ angular.module('umbraco.mocks').
                   alias: "tab03",
                   id: 3,
                   properties: [
-                  { alias: "grid", label: "Grid", view: "grid", controller: "umbraco.grid", value: "test", hideLabel: true }
+                  { alias: "grid", label: "Grid", view: "grid", value: "test", hideLabel: true }
                   ]
               },{
                   label: "WIP",
                   alias: "tab04",
                   id: 4,
                   properties: [
-                      { alias: "tes", label: "Stuff", view: "test", controller: "umbraco.embeddedcontent", value: "",
+                      { alias: "tes", label: "Stuff", view: "test", value: "",
                             
                           config: {
                               fields: [

@@ -8,7 +8,6 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-
     [PropertyEditor(Constants.PropertyEditors.Textbox, "Textstring", "textstring")]
     public class TextStringPropertyEditor : PropertyEditor
     {        

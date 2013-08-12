@@ -17,6 +17,9 @@ namespace Umbraco.Web.Models.ContentEditing
         
         [DataMember(Name = "publishDate")]
         public DateTime? PublishDate { get; set; }
+
+        [DataMember(Name = "template")]
+        public string Template { get; set; }
         
     }
 }

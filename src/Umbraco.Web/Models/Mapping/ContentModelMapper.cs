@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
+using umbraco;
 
 namespace Umbraco.Web.Models.Mapping
 {
+
     /// <summary>
     /// Declares how model mappings for content
     /// </summary>
@@ -15,6 +19,7 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
+            
             //FROM IContent TO ContentItemDisplay
             config.CreateMap<IContent, ContentItemDisplay>()
                   .ForMember(
@@ -30,10 +35,23 @@ namespace Umbraco.Web.Models.Mapping
                       dto => dto.ContentTypeAlias,
                       expression => expression.MapFrom(content => content.ContentType.Alias))
                   .ForMember(
+                      dto => dto.ContentTypeName,
+                      expression => expression.MapFrom(content => content.ContentType.Name))
+                  .ForMember(
                       dto => dto.PublishDate,
                       expression => expression.MapFrom(content => GetPublishedDate(content, applicationContext)))
+                    .ForMember(
+                      dto => dto.Template,
+                      expression => expression.MapFrom(content => content.Template.Name))
                   .ForMember(display => display.Properties, expression => expression.Ignore())
-                  .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>());
+                  .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
+                  .AfterMap((content, display) => TabsAndPropertiesResolver.MapGenericProperties(content, display, new ContentPropertyDisplay
+                      {
+                          Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                          Label = "Template", //TODO: localize this?
+                          Value = display.Template,
+                          View = "templatepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                      }));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
