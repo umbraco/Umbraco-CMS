@@ -54,7 +54,7 @@ namespace Umbraco.Web.Mvc
         /// Releases the specified controller.
         /// </summary>
         /// <param name="controller">The controller.</param>
-        public void ReleaseController(IController controller)
+        public virtual void ReleaseController(IController controller)
         {
             _innerFactory.ReleaseController(controller);
         }
