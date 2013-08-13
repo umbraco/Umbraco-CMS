@@ -16,7 +16,6 @@ angular.module("umbraco")
                     
                     editor.on('blur', function(e) {
                         $scope.$apply(function() {
-                            //$scope.model.value = e.getBody().innerHTML;
                             $scope.model.value = editor.getContent();
                         });
                     });
@@ -31,7 +30,6 @@ angular.module("umbraco")
                                 $(data.selection).each(function (i, img) {
 
                                     var imagePropVal = umbImageHelper.getImagePropertyVaue({imageModel: img, scope: $scope});
-
                                     var data = {
                                         src: (imagePropVal != null && imagePropVal != "") ? imagePropVal: "nothing.jpg",
                                         id: '__mcenew'

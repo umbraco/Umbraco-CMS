@@ -49,6 +49,9 @@ function NavigationController($scope,$rootScope, $location, $log, navigationServ
     //this reacts to tree items themselves being clicked
     //the tree directive should not contain any handling, simply just bubble events
     $scope.treeEventHandler.bind("treeNodeSelect", function (ev, args) {
+        ev.stopPropagation();
+        ev.preventDefault();
+        
         var n = args.node;
 
         //here we need to check for some legacy tree code

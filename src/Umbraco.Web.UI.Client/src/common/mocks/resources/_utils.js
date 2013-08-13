@@ -1,4 +1,4 @@
-﻿angular.module('umbraco.mocks').
+angular.module('umbraco.mocks').
     factory('mocksUtils', ['$cookieStore', function($cookieStore) {
         'use strict';
          

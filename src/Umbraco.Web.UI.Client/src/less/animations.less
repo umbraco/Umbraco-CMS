@@ -21,26 +21,38 @@
 }
 
 .slide-hide, .slide-show {
-	-webkit-transition: all cubic-bezier(0.770, 0.000, 0.175, 1.000) 0.3s;
-	-moz-transition: all cubic-bezier(0.770, 0.000, 0.175, 1.000) 0.3s;
-	-o-transition: all cubic-bezier(0.770, 0.000, 0.175, 1.000) 0.3s;
-	transition: all cubic-bezier(0.770, 0.000, 0.175, 1.000) 0.3s;
+	-webkit-transition: all cubic-bezier(0.770, 0.000, 0.175, 1.000) 0.5s;
+	-moz-transition: all cubic-bezier(0.770, 0.000, 0.175, 1.000) 0.5s;
+	-o-transition: all cubic-bezier(0.770, 0.000, 0.175, 1.000) 0.5s;
+	transition: all cubic-bezier(0.770, 0.000, 0.175, 1.000) 0.5s;
 }
 
 .slide-hide {
-	margin-left: 0;
+    -webkit-transform: translateX(0%);
+    -moz-transform: translateX(0%);
+    -ms-transform: translateX(0%);
+    transform: translateX(0%);
 }
 
 .slide-hide.slide-hide-active {
-	margin-left: -100%;
+    -webkit-transform: translateX(-100%);
+    -moz-transform: translateX(-100%);
+    -ms-transform: translateX(-100%);
+    transform: translateX(-100%);
 }
 
 .slide-show {
-	margin-left: -100%;
+	 -webkit-transform: translateX(-100%);
+        -moz-transform: translateX(-100%);
+        -ms-transform: translateX(-100%);
+        transform: translateX(-100%);
 }
 
 .slide-show.slide-show-active {
-	margin-left: 0;
+    -webkit-transform: translateX(0%);
+    -moz-transform: translateX(0%);
+    -ms-transform: translateX(0%);
+    transform: translateX(0%);
 }
  
 .tree-node-delete-leave { 

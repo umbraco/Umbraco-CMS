@@ -34,8 +34,8 @@ angular.module("umbraco.directives")
         '<ins ng-hide="node.hasChildren" style="background:none;width:18px;"></ins>' +        
         '<ins ng-show="node.hasChildren" ng-class="{\'icon-caret-right\': !node.expanded, \'icon-caret-down\': node.expanded}" ng-click="load(this, node)"></ins>' +
         '<i class="{{node.cssClass}}" style="{{node.style}}"></i>' +
-        '<a href="" ng-click="select(this, node, $event)" >{{node.name}}</a>' +
-        '<i class="umb-options" ng-hide="!node.menuUrl" ng-click="options(this, node, $event)"><i></i><i></i><i></i></i>' +
+        '<a href title="#{{node.routePath}}" ng-click="select(this, node, $event)" >{{node.name}}</a>' +
+        '<a href class="umb-options" ng-hide="!node.menuUrl" ng-click="options(this, node, $event)"><i></i><i></i><i></i></a>' +
         '<div ng-show="node.loading" class="l"><div></div></div>' +
         '</div>' +
         '</li>',
