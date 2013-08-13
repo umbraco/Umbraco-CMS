@@ -56,7 +56,7 @@ namespace umbraco.uicontrols {
             PropertyPanel pp = new PropertyPanel();
             pp.Controls.Add(C);
             pp.Text = Caption;
-            pp.Tooltip = tooltip;
+            pp.ToolTip = tooltip;
 
             this.Controls.Add(pp);
         }
