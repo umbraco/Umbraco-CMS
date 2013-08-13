@@ -494,5 +494,14 @@ namespace Umbraco.Core.Models
         {
             _parentId = id;
         }
+
+        /// <summary>
+        /// PropertyTypes that are not part of a PropertyGroup
+        /// </summary>
+        [IgnoreDataMember]
+        internal PropertyTypeCollection PropertyTypeCollection
+        {
+             get { return _propertyTypes; }
+        }
     }
 }

@@ -182,6 +182,38 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Creates a clone of the current entity
+        /// </summary>
+        /// <returns></returns>
+        public IContentType Clone(string alias)
+        {
+            var clone = (ContentType)this.MemberwiseClone();
+            clone.Alias = alias;
+            clone.Key = Guid.Empty;
+            var propertyGroups = this.PropertyGroups.Select(x => x.Clone()).ToList();
+            clone.PropertyGroups = new PropertyGroupCollection(propertyGroups);
+            clone.PropertyTypes = this.PropertyTypeCollection.Select(x => x.Clone()).ToList();
+            clone.ResetIdentity();
+            clone.ResetDirtyProperties(false);
+
+            foreach (var propertyGroup in clone.PropertyGroups)
+            {
+                propertyGroup.ResetIdentity();
+                foreach (var propertyType in propertyGroup.PropertyTypes)
+                {
+                    propertyType.ResetIdentity();
+                }
+            }
+
+            foreach (var propertyType in clone.PropertyTypes.Where(x => x.HasIdentity))
+            {
+                propertyType.ResetIdentity();
+            }
+
+            return clone;
+        }
+
+        /// <summary>
         /// Method to call when Entity is being saved
         /// </summary>
         /// <remarks>Created date is set and a Unique key is assigned</remarks>
