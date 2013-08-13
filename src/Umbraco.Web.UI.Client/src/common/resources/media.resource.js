@@ -15,6 +15,49 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
     }
 
     return {
+        
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaResource#sort
+         * @methodOf umbraco.resources.mediaResource
+         *
+         * @description
+         * Sorts all children below a given parent node id, based on a collection of node-ids
+         *
+         * ##usage
+         * <pre>
+         * var ids = [123,34533,2334,23434];
+         * mediaResource.sort({ sortedIds: ids })
+         *    .then(function() {
+         *        $scope.complete = true;
+         *    });
+         * </pre> 
+         * @param {Object} args arguments object
+         * @param {Int} args.parentId the ID of the parent node
+         * @param {Array} options.sortedIds array of node IDs as they should be sorted
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        sort: function (args) {
+            if (!args) {
+                throw "args cannot be null";
+            }
+            if (!args.parentId) {
+                throw "args.parentId cannot be null";
+            }
+            if (!args.sortedIds) {
+                throw "args.sortedIds cannot be null";
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostSort"),
+                    {
+                        parentId: args.parentId,
+                        idSortOrder: args.sortedIds
+                    }),
+                'Failed to sort content');
+        },
+
         getById: function (id) {
             
             return umbRequestHelper.resourcePromise(

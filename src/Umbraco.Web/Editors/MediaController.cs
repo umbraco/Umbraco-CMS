@@ -182,7 +182,6 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="sorted"></param>
         /// <returns></returns>
-        [EnsureUserPermissionForContent("sorted.ParentId", 'S')]
         public HttpResponseMessage PostSort(ContentSortOrder sorted)
         {
             if (sorted == null)

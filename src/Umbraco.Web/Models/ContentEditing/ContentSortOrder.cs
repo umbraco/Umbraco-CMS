@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -15,11 +16,9 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <summary>
         /// The parent Id of the nodes being sorted
         /// </summary>
-        /// <remarks>
-        /// This is nullable because currently we don't require this for media sorting
-        /// </remarks>
-        [DataMember(Name = "parentId")]
-        public int? ParentId { get; set; }
+        [DataMember(Name = "parentId", IsRequired = true)]
+        [Required]
+        public int ParentId { get; set; }
 
         /// <summary>
         /// An array of integer Ids representing the sort order
@@ -27,7 +26,8 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <remarks>
         /// Of course all of these Ids should be at the same level in the heirarchy!!
         /// </remarks>
-        [DataMember(Name = "idSortOrder")]
+        [DataMember(Name = "idSortOrder", IsRequired = true)]
+        [Required]
         public int[] IdSortOrder { get; set; }
 
     }
