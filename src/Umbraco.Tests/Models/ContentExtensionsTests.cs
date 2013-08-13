@@ -82,6 +82,61 @@ namespace Umbraco.Tests.Models
         }
 
 
+        [Test]
+        public void Should_Clear_Published_Flag_When_Newly_Published_Version()
+        {
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+
+            content.ResetDirtyProperties(false);
+
+            content.ChangePublishedState(PublishedState.Published);
+            Assert.IsTrue(content.ShouldClearPublishedFlagForPreviousVersions());
+        }
+
+        [Test]
+        public void Should_Not_Clear_Published_Flag_When_Saving_Version()
+        {
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+
+            content.ResetDirtyProperties(false);
+            content.ChangePublishedState(PublishedState.Published);
+            content.ResetDirtyProperties(false);
+
+            content.ChangePublishedState(PublishedState.Saved);
+            Assert.IsFalse(content.ShouldClearPublishedFlagForPreviousVersions());
+        }
+
+        [Test]
+        public void Should_Clear_Published_Flag_When_Unpublishing_From_Published()
+        {
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+
+            content.ResetDirtyProperties(false);
+            content.ChangePublishedState(PublishedState.Published);
+            content.ResetDirtyProperties(false);
+
+            content.ChangePublishedState(PublishedState.Unpublished);
+            Assert.IsTrue(content.ShouldClearPublishedFlagForPreviousVersions());
+        }
+
+        [Test]
+        public void Should_Not_Clear_Published_Flag_When_Unpublishing_From_Saved()
+        {
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+
+            content.ResetDirtyProperties(false);
+            content.ChangePublishedState(PublishedState.Saved);
+            content.ResetDirtyProperties(false);
+
+            content.ChangePublishedState(PublishedState.Unpublished);
+            Assert.IsFalse(content.ShouldClearPublishedFlagForPreviousVersions());
+        }
+
+
 
     }
 }
