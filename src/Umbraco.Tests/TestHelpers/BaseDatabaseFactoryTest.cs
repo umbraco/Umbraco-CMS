@@ -59,6 +59,7 @@ namespace Umbraco.Tests.TestHelpers
             var dbFactory = new DefaultDatabaseFactory(
                 GetDbConnectionString(),
                 GetDbProviderName());
+            Database.Mapper = new PetaPocoMapper();
             _appContext = new ApplicationContext(
 				//assign the db context
                 new DatabaseContext(dbFactory),
@@ -95,6 +96,21 @@ namespace Umbraco.Tests.TestHelpers
             get { return DatabaseBehavior.NewSchemaPerTest; }
         }
 
+        protected virtual bool FirstTestInFixture
+        {
+            get { return _firstTestInFixture; }
+        }
+
+        protected virtual bool IsFirstRunInTestSession
+        {
+            get { return _isFirstRunInTestSession; }
+        }
+
+        protected virtual bool IsFirstTestInFixture
+        {
+            get { return _isFirstTestInFixture; }
+        }
+
         protected virtual string GetDbProviderName()
         {
             return "System.Data.SqlServerCe.4.0";
@@ -105,7 +121,16 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual string GetDbConnectionString()
         {
-            return @"Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf";            
+            return @"Datasource=|DataDirectory|" + GetDbFileName();            
+        }
+
+        /// <summary>
+        /// Get the name of the file based database
+        /// </summary>
+        /// <returns></returns>
+        protected virtual string GetDbFileName()
+        {
+            return "UmbracoPetaPocoTests.sdf";
         }
 
         /// <summary>
@@ -124,7 +149,7 @@ namespace Umbraco.Tests.TestHelpers
                 Core.Configuration.GlobalSettings.UmbracoConnectionName, 
                 GetDbConnectionString());
 
-            string dbFilePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
+            string dbFilePath = string.Concat(path, "\\" + GetDbFileName());
 
             //create a new database file if
             // - is the first test in the session
@@ -174,7 +199,7 @@ namespace Umbraco.Tests.TestHelpers
                 new RepositoryFactory());
 
             SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
-                new List<Type> { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) }) { CanResolveBeforeFrozen = true };
+                new List<Type> { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqliteSyntaxProvider), typeof(SqlServerSyntaxProvider) }) { CanResolveBeforeFrozen = true };
 
             MappingResolver.Current = new MappingResolver(
                () => PluginManager.Current.ResolveAssignedMapperTypes());
@@ -273,13 +298,13 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        private void RemoveDatabaseFile(Action<Exception> onFail = null)
+        protected void RemoveDatabaseFile(Action<Exception> onFail = null)
         {
             CloseDbConnections();
             string path = TestHelper.CurrentAssemblyDirectory;
             try
             {
-                string filePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
+                string filePath = string.Concat(path, "\\" + GetDbFileName());
                 if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
