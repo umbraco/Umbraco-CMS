@@ -16,7 +16,7 @@ angular.module("umbraco").controller("Umbraco.Editors.DatepickerController",
                 autoclose: true
             }).on("changeDate", function (e) {
                 // When a date is clicked the date is stored in model.value as a ISO 8601 date
-                $scope.model.value = e.date.toISOString();
+                $scope.model.value = e.date.toIsoDateTimeString();
             });
         });
 
