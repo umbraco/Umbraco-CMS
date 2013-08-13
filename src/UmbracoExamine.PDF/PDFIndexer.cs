@@ -12,6 +12,7 @@ using iTextSharp.text.pdf;
 using System.Text;
 using Lucene.Net.Analysis;
 using UmbracoExamine.DataServices;
+using iTextSharp.text.pdf.parser;
 
 
 namespace UmbracoExamine.PDF
@@ -105,6 +106,7 @@ namespace UmbracoExamine.PDF
         /// </summary>
         /// <param name="name"></param>
         /// <param name="config"></param>
+        [SecuritySafeCritical]
         public override void Initialize(string name, NameValueCollection config)
         {
             base.Initialize(name, config);
@@ -133,7 +135,7 @@ namespace UmbracoExamine.PDF
 
             Action<Exception> onError = (e) => OnIndexingError(new IndexingErrorEventArgs("Could not read PDF", -1, e));
 
-            var txt = pdf.ParsePdfText(file.FullName, onError);
+            var txt = pdf.GetTextFromAllPages(file.FullName, onError);
             return txt;
 
         }
@@ -193,16 +195,21 @@ namespace UmbracoExamine.PDF
 
             static PDFParser()
             {
-                lock (m_Locker)
+                lock (Locker)
                 {
-                    m_UnsupportedRange = new List<int>();
-                    m_UnsupportedRange.AddRange(Enumerable.Range(0x0000, 0x001F));
-                    m_UnsupportedRange.Add(0x1F);
+                    UnsupportedRange = new HashSet<char>();
+                    foreach (var c in Enumerable.Range(0x0000, 0x001F))
+                    {
+                        UnsupportedRange.Add((char) c);
+                    }
+                    UnsupportedRange.Add((char)0x1F);
 
+                    //replace line breaks with space
+                    ReplaceWithSpace = new HashSet<char> {'\r', '\n'};
                 }
             }
 
-            private static readonly object m_Locker = new object();
+            private static readonly object Locker = new object();
 
             /// <summary>
             /// Stores the unsupported range of character
@@ -214,60 +221,67 @@ namespace UmbracoExamine.PDF
             /// http://en.wikipedia.org/wiki/Unicode
             /// http://en.wikipedia.org/wiki/Basic_Multilingual_Plane
             /// </remarks>
-            private static List<int> m_UnsupportedRange;
+            private static HashSet<char> UnsupportedRange;
 
-            /// <summary>
-            /// Return only the valid string contents of the PDF
-            /// </summary>
-            /// <param name="sourcePDF"></param>
-            /// <param name="onError"></param>
-            /// <returns></returns>
-			[SecuritySafeCritical]
-			public string ParsePdfText(string sourcePDF, Action<Exception> onError)
+            private static HashSet<char> ReplaceWithSpace;
+
+            [SecuritySafeCritical]
+            public string GetTextFromAllPages(string pdfPath, Action<Exception> onError)
             {
-                var sb = new StringBuilder();
+                var output = new StringWriter();
 
-                var reader = new PdfReader(sourcePDF);
-                PRTokeniser token = null;
-                var tknValue = String.Empty;
-
-                for (var i = 1; (i <= reader.NumberOfPages); i++)
+                try
                 {
-                    var pageBytes = reader.GetPageContent(i);
-                    if (pageBytes != null)
-                    {
-                        token = new PRTokeniser(pageBytes);
-                        try
-                        {
-                            while (token.NextToken())
-                            {
-                                var tknType = token.TokenType;
-                                tknValue = token.StringValue;
-                                if ((tknType == PRTokeniser.TokType.STRING))
-                                {
-                                    foreach (var s in tknValue)
-                                    {
-                                        //strip out unsupported characters, based on unicode tables.
-                                        if (!m_UnsupportedRange.Contains(s))
-                                        {
-                                            sb.Append(s);
-                                        }
-                                    }
+                    var reader = new PdfReader(pdfPath);
 
-                                }
-                            }   
-                        }
-                        catch (InvalidPdfException ex)
-                        {                            
-                            onError(ex);
-                        }
+                    for (int i = 1; i <= reader.NumberOfPages; i++)
+                    {
+                        var result =
+                            ExceptChars(
+                                PdfTextExtractor.GetTextFromPage(reader, i, new SimpleTextExtractionStrategy()),
+                                UnsupportedRange,
+                                ReplaceWithSpace);
+                        output.Write(result);
                     }
                 }
+                catch (Exception ex)
+                {
+                    onError(ex);
+                }
 
-                return sb.ToString();
+                return output.ToString();
             }
 
 
+        }
+
+        /// <summary>
+        /// remove all toExclude chars from string
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="toExclude"></param>
+        /// <param name="replaceWithSpace"></param>
+        /// <returns></returns>
+        private static string ExceptChars(string str, HashSet<char> toExclude, HashSet<char> replaceWithSpace)
+        {
+            var sb = new StringBuilder(str.Length);
+            for (var i = 0; i < str.Length; i++)
+            {
+                var c = str[i];
+                if (toExclude.Contains(c) == false)
+                {
+                    if (replaceWithSpace.Contains(c))
+                    {
+                        sb.Append(" ");
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+                    
+            }
+            return sb.ToString();
         }
         
         #endregion

@@ -96,6 +96,7 @@ namespace UmbracoExamine
         /// </summary>
         /// <param name="name"></param>
         /// <param name="config"></param>
+        [SecuritySafeCritical]
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {           
             if (config["dataService"] != null && !string.IsNullOrEmpty(config["dataService"]))
