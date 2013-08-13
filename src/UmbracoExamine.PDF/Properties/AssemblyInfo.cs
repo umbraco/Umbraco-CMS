@@ -28,4 +28,5 @@ using System.Security;
 [assembly: AssemblyVersion("0.6.0.*")]
 [assembly: AssemblyFileVersion("0.6.0.*")]
 
-[assembly: AllowPartiallyTrustedCallers]
+//Unfortunately itextsharp does not natively support full trust
+//[assembly: AllowPartiallyTrustedCallers]
