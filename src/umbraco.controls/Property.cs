@@ -4,49 +4,50 @@ using System.Text;
 
 namespace umbraco.uicontrols {
     public class PropertyPanel  : System.Web.UI.WebControls.Panel {
-        public PropertyPanel() {
+        public string Text { get; set; }
 
-        }
-
-        private string m_Text = string.Empty;
-        public string Text
-        {
-            get { return m_Text; }
-            set { m_Text = value; }
-        }
-                
-
-        protected override void OnLoad(System.EventArgs EventArguments) {
-        }
+        public string Tooltip { get; set; }
 
         protected override void Render(System.Web.UI.HtmlTextWriter writer) {
-
             this.CreateChildControls();
-            string styleString = "";
+            writer.AddAttribute( HtmlTextWriterAttribute.Class, "propertyItem" );
+            foreach ( string key in Style.Keys )
+            {
+                writer.AddStyleAttribute( key, Style[ key ] );
+            }
+            writer.RenderBeginTag( HtmlTextWriterTag.Div );
 
-            foreach (string key in this.Style.Keys) {
-                styleString += key + ":" + this.Style[key] + ";";
+            if ( !String.IsNullOrEmpty( Text ) )
+            {
+                writer.AddAttribute( HtmlTextWriterAttribute.Class, "propertyItemheader" );
+
+                // write the alias into the title (tooltip) if one has been supplied
+                if ( !String.IsNullOrEmpty(Alias) )
+                  writer.AddAttribute( HtmlTextWriterAttribute.Title, Tooltip );
+
+                writer.RenderBeginTag( HtmlTextWriterTag.Div );
+                if ( !String.IsNullOrEmpty(Text))
+                    writer.Write( Text );
+                writer.RenderEndTag();
+
+                writer.AddAttribute( HtmlTextWriterAttribute.Class, "propertyItemContent" );
+                writer.RenderBeginTag( HtmlTextWriterTag.Div );
             }
 
-            writer.WriteLine("<div class=\"propertyItem\" style='" + styleString + "'>");
-            if (m_Text != string.Empty) {
-                writer.WriteLine("<div class=\"propertyItemheader\">" + m_Text + "</div>");
-                writer.WriteLine("<div class=\"propertyItemContent\">");
+            try
+            {
+                this.RenderChildren( writer );
+            }
+            catch ( Exception ex )
+            {
+                writer.WriteLine( "Error creating control <br />" );
+                writer.WriteEncodedText( ex.ToString() );
             }
 
-            try {
-                this.RenderChildren(writer);
-            } catch (Exception ex) {
-                writer.WriteLine("Error creating control <br />");
-                writer.WriteLine(ex.ToString());
-            }
+            if ( !String.IsNullOrEmpty( Text ) )
+                writer.RenderEndTag();
 
-            if (m_Text != string.Empty)
-                writer.WriteLine("</div>");
-
-            writer.WriteLine("</div>");
-            
-            
+            writer.RenderEndTag();
         }
 
     }
