@@ -8,6 +8,7 @@ namespace Umbraco.Core
 	/// <summary>
 	/// A resolver to return all IDataType objects
 	/// </summary>
+    [Obsolete("IDataType is obsolete and is no longer used, it will be removed from the codebase in future versions")]
 	internal sealed class DataTypesResolver : LegacyTransientObjectsResolver<DataTypesResolver, IDataType>
 	{
 		/// <summary>

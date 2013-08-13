@@ -41,7 +41,7 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.Root.ToInvariantString())
             {
-                // default actions for all users               
+                // root actions         
                 menu.AddMenuItem<ActionNew>();
                 menu.AddMenuItem<ActionSort>(true);
                 menu.AddMenuItem<RefreshNodeMenuItem, ActionRefresh>(true);

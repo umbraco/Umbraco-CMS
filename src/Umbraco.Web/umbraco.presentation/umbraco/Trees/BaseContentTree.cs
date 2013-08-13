@@ -18,6 +18,7 @@ namespace umbraco.cms.presentation.Trees
     /// An abstract tree class for the content application.
     /// Has built in methods for handling all of the request parameters specific to the content tree.
     /// </summary>
+    [Obsolete("This is no longer used and will be removed from the codebase in the future")]
     public abstract class BaseContentTree : BaseTree
     {
 

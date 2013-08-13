@@ -31,8 +31,8 @@ namespace umbraco
 {
 	/// <summary>
 	/// Handles loading of all datatypes into the developer application tree
-	/// </summary>
-    [Tree(Constants.Applications.Developer, "datatype", "Data Types", sortOrder: 1)]
+	/// </summary>    
+    [Obsolete("This is no longer used and will be removed from the codebase in the future")]
     public class loadDataTypes : BaseTree
 	{
         public loadDataTypes(string application) : base(application) { }

@@ -10,7 +10,7 @@ using Umbraco.Core;
 
 namespace umbraco
 {
-    [Tree(Constants.Applications.Media, "media", "Media")]
+    [Obsolete("This is no longer used and will be removed from the codebase in the future")]
     public class loadMedia : BaseMediaTree
     {
 

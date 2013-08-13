@@ -290,6 +290,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="id">Id of the DataType, which corresponds to the Guid Id of the control</param>
         /// <returns><see cref="IDataType"/> object</returns>
+        [Obsolete("IDataType is obsolete and is no longer used, it will be removed from the codebase in future versions")]
         public IDataType GetDataTypeById(Guid id)
         {
             return DataTypesResolver.Current.GetById(id);
@@ -299,6 +300,7 @@ namespace Umbraco.Core.Services
         /// Gets a complete list of all registered <see cref="IDataType"/>'s
         /// </summary>
         /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
+        [Obsolete("IDataType is obsolete and is no longer used, it will be removed from the codebase in future versions")]
         public IEnumerable<IDataType> GetAllDataTypes()
         {
             return DataTypesResolver.Current.DataTypes;

@@ -15,6 +15,8 @@ using Property = umbraco.cms.businesslogic.property.Property;
 
 namespace umbraco.cms.presentation.Trees
 {
+
+    [Obsolete("This is no longer used and will be removed from the codebase in the future")]
 	public abstract class BaseMediaTree : BaseTree
 	{
         private DisposableTimer _timer;

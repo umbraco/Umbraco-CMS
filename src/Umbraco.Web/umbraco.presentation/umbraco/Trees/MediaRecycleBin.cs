@@ -30,7 +30,7 @@ using Umbraco.Core;
 
 namespace umbraco.cms.presentation.Trees
 {
-    [Tree(Constants.Applications.Media, "mediaRecycleBin", "Recycle Bin", "folder.gif", "folder_o.gif", initialize : false)]
+    [Obsolete("This is no longer used and will be removed from the codebase in the future")]
 	public class MediaRecycleBin : BaseMediaTree
 	{
 		public MediaRecycleBin(string application) : base(application) { }

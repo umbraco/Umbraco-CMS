@@ -1,17 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.presentation.Trees;
 using umbraco.interfaces;
 using Umbraco.Core;
+using Action = umbraco.BusinessLogic.Actions.Action;
 
 namespace umbraco
 {
     /// <summary>
     /// Handles loading the content tree into umbraco's application tree
     /// </summary>
-    [Tree(Constants.Applications.Content, "content", "Content", silent: true)]
+    [Obsolete("This is no longer used and will be removed from the codebase in the future")]
     public class loadContent : BaseContentTree
     {
 

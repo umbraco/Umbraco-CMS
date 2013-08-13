@@ -169,7 +169,7 @@ namespace Umbraco.Web.Trees
 
             var node = new TreeNode(
                 rootNodeAsString,
-                "", //root nodes aren't expandable, no need to lookup the child nodes url
+                Url.GetTreeUrl(GetType(), rootNodeAsString, queryStrings),
                 Url.GetMenuUrl(GetType(), rootNodeAsString, queryStrings))
                 {
                     HasChildren = true,

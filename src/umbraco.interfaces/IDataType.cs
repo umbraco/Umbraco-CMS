@@ -7,6 +7,7 @@ namespace umbraco.interfaces
     /// It consists of IdataEditor which provides the Editing UI, the IDataPrevalue which provides prevalues and th their editing UI
     /// And finally it contains IData which manages the actual data in the Data Type
 	/// </summary>
+	[Obsolete("IDataType is obsolete and is no longer used, it will be removed from the codebase in future versions")]
 	public interface IDataType 
 	{
         /// <summary>

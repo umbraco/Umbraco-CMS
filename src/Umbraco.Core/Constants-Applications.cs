@@ -58,6 +58,11 @@
             /// </summary>
             public const string Media = "media";
 
+            /// <summary>
+            /// alias for the datatype tree.
+            /// </summary>
+            public const string DataTypes = "datatype";
+
             //TODO: Fill in the rest!
 
         }

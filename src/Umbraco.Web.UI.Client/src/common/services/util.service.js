@@ -386,12 +386,14 @@ function iconHelper() {
         { oldIcon: ".sprTreePackage", newIcon: "icon-dropbox" },
         { oldIcon: ".sprTreeRepository", newIcon: "icon-github" },
         
+        { oldIcon: ".sprTreeSettingDataType", newIcon: "icon-tasks" },
+
         //TODO:
         /*
         { oldIcon: ".sprTreeSettingAgent", newIcon: "" },
         { oldIcon: ".sprTreeSettingCss", newIcon: "" },
         { oldIcon: ".sprTreeSettingCssItem", newIcon: "" },
-        { oldIcon: ".sprTreeSettingDataType", newIcon: "" },
+        
         { oldIcon: ".sprTreeSettingDataTypeChild", newIcon: "" },
         { oldIcon: ".sprTreeSettingDomain", newIcon: "" },
         { oldIcon: ".sprTreeSettingLanguage", newIcon: "" },
