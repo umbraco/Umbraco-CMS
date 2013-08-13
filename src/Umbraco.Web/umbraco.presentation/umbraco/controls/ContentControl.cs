@@ -535,7 +535,7 @@ namespace umbraco.controls
                             caption += "<br /><small>" + umbraco.library.ReplaceLineBreaks(p.PropertyType.Description) + "</small>";
                             break;
                     }
-                pp.addProperty(caption, holder);
+                pp.addProperty(caption, holder, p.PropertyType.Alias);
             }
             else
                 pp.addProperty(holder);
