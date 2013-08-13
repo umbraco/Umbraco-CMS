@@ -28,6 +28,16 @@ namespace Umbraco.Core
         [UmbracoWillObsolete("Do not use this constants. See IShortStringHelper.CleanStringForSafeAliasJavaScriptCode.")]
         public const string UmbracoInvalidFirstCharacters = "01234567890";
 
+        public static string ExceptChars(this string str, HashSet<char> toExclude)
+        {
+            var sb = new StringBuilder(str.Length);
+            foreach (var c in str.Where(c => toExclude.Contains(c) == false))
+            {
+                sb.Append(c);
+            }
+            return sb.ToString();
+        }
+
 		/// <summary>
 		/// Encrypt the string using the MachineKey in medium trust
 		/// </summary>
