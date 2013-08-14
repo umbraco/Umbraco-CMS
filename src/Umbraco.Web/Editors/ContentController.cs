@@ -195,7 +195,9 @@ namespace Umbraco.Web.Editors
             contentItem.PersistedContent.ExpireDate = contentItem.ExpireDate;
             contentItem.PersistedContent.ReleaseDate = contentItem.ReleaseDate;
             //only set the template if it didn't change
-            if (contentItem.PersistedContent.Template.Alias != contentItem.TemplateAlias)
+            var templateChanged = (contentItem.PersistedContent.Template == null && contentItem.TemplateAlias.IsNullOrWhiteSpace() == false)
+                                  || (contentItem.PersistedContent.Template != null && contentItem.PersistedContent.Template.Alias != contentItem.TemplateAlias);
+            if (templateChanged)
             {
                 var template = Services.FileService.GetTemplate(contentItem.TemplateAlias);
                 if (template == null)

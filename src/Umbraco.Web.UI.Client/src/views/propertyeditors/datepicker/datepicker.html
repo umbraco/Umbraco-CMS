@@ -1,8 +1,11 @@
 <div ng-controller="Umbraco.Editors.DatepickerController">
     <div class="input-append date datepicker" id="{{model.alias}}">        
-        <input data-format="{{$scope.model.config.format}}" type="text" value="{{model.value}}" />
+        <input  name="datepicker" data-format="{{model.config.format}}" type="text" value="{{model.value}}" 
+                ng-model="model.value"   
+                val-server="value" />
         <span class="add-on">
             <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
-        </span>
+        </span>        
     </div>
+    <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="valServer">{{propertyForm.datepicker.errorMsg}}</span>
 </div>

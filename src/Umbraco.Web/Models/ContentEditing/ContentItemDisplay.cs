@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Web.Http;
@@ -31,21 +30,5 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "urls")]
         public string[] Urls { get; set; }
         
-    }
-
-    [DataContract(Name = "template", Namespace = "")]
-    public class TemplateBasic
-    {
-        [DataMember(Name = "id", IsRequired = true)]
-        [Required]
-        public int Id { get; set; }
-
-        [DataMember(Name = "name", IsRequired = true)]
-        [Required(AllowEmptyStrings = false)]
-        public string Name { get; set; }
-
-        [DataMember(Name = "alias", IsRequired = true)]
-        [Required(AllowEmptyStrings = false)]
-        public string Alias { get; set; }
     }
 }

@@ -1,6 +1,8 @@
-﻿using Umbraco.Core;
+﻿using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -25,7 +27,13 @@ namespace Umbraco.Web.Models.Mapping
             display.Alias = originalProp.Alias;
             display.Description = originalProp.PropertyType.Description;
             display.Label = originalProp.PropertyType.Name;
-            display.Config = _applicationContext.Services.DataTypeService.GetPreValuesByDataTypeId(originalProp.PropertyType.DataTypeDefinitionId);
+            var dataTypeService = (DataTypeService) _applicationContext.Services.DataTypeService;
+
+            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(originalProp.PropertyType.DataTypeDefinitionId);
+           
+            //let the property editor format the pre-values
+            display.Config = display.PropertyEditor.FormatPreValues(display.PropertyEditor.DefaultPreValues, preVals);
+            
             if (display.PropertyEditor == null)
             {
                 //if there is no property editor it means that it is a legacy data type

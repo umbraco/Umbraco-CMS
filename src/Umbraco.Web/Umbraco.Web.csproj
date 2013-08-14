@@ -299,7 +299,11 @@
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Editors\ContentController.cs" />
     <Compile Include="Editors\EntityController.cs" />
+    <Compile Include="Models\ContentEditing\TemplateBasic.cs" />
     <Compile Include="Models\PagedResult.cs" />
+    <Compile Include="PropertyEditors\DatePropertyEditor.cs" />
+    <Compile Include="PropertyEditors\DateTimePropertyEditor.cs" />
+    <Compile Include="PropertyEditors\DateTimeValidator.cs" />
     <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
     <Compile Include="PropertyEditors\LabelValueEditor.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />

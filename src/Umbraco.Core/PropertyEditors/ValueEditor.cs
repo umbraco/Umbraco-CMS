@@ -129,10 +129,12 @@ namespace Umbraco.Core.PropertyEditors
                     valueType = typeof(string);
                     break;
                 case DataTypeDatabaseType.Integer:
-                    valueType = typeof(int);
+                    //ensure these are nullable so we can return a null if required
+                    valueType = typeof(int?);
                     break;
                 case DataTypeDatabaseType.Date:
-                    valueType = typeof(DateTime);
+                    //ensure these are nullable so we can return a null if required
+                    valueType = typeof(DateTime?);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -184,6 +186,14 @@ namespace Umbraco.Core.PropertyEditors
                     //we can just ToString() any of these types
                     return dbValue.ToString();
                 case DataTypeDatabaseType.Date:
+                    var s = dbValue as string;
+                    if (s != null)
+                    {
+                        if (s.IsNullOrWhiteSpace())
+                        {
+                            return string.Empty;
+                        }
+                    }
                     //Dates will be formatted in 'o' format (otherwise known as xml format)
                     return dbValue.ToXmlString<DateTime>();
                 default:

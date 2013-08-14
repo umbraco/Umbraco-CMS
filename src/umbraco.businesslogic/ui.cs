@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
@@ -308,27 +309,35 @@ namespace umbraco
         {
             var cacheKey = "uitext_" + language;
 
-            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                cacheKey,
-                CacheItemPriority.Default,
-                new CacheDependency(IOHelper.MapPath(UmbracoPath + "/config/lang/" + language + ".xml")),
-                () =>
-                    {
-                        using (var langReader = new XmlTextReader(IOHelper.MapPath(UmbracoPath + "/config/lang/" + language + ".xml")))
+            var file = IOHelper.MapPath(UmbracoPath + "/config/lang/" + language + ".xml");
+            if (File.Exists(file))
+            {
+                return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                    cacheKey,
+                    CacheItemPriority.Default,
+                    new CacheDependency(IOHelper.MapPath(UmbracoPath + "/config/lang/" + language + ".xml")),
+                    () =>
                         {
-                            try
+                            using (var langReader = new XmlTextReader(IOHelper.MapPath(UmbracoPath + "/config/lang/" + language + ".xml")))
                             {
-                                var langFile = new XmlDocument();
-                                langFile.Load(langReader);
-                                return langFile;
+                                try
+                                {
+                                    var langFile = new XmlDocument();
+                                    langFile.Load(langReader);
+                                    return langFile;
+                                }
+                                catch (Exception e)
+                                {
+                                    LogHelper.Error<ui>("Error reading umbraco language xml source (" + language + ")", e);
+                                    return null;
+                                }
                             }
-                            catch (Exception e)
-                            {
-                                LogHelper.Error<ui>("Error reading umbraco language xml source (" + language + ")", e);
-                                return null;
-                            }
-                        }
-                    });
+                        });
+            }
+            else
+            {
+                return null;
+            }
 
         }
 

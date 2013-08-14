@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -28,14 +29,23 @@ namespace Umbraco.Core.PropertyEditors
             {
                 Id = Guid.Parse(att.Id);
                 Name = att.Name;
-
+                
                 StaticallyDefinedValueEditor.ValueType = att.ValueType;
                 StaticallyDefinedValueEditor.View = att.EditorView;
                 StaticallyDefinedPreValueEditor.View = att.PreValueEditorView;
             }
         }
 
+        /// <summary>
+        /// These are assigned by default normally based on property editor attributes or manifest definitions,
+        /// developers have the chance to override CreateValueEditor if they don't want to use the pre-defined instance
+        /// </summary>
         internal ValueEditor StaticallyDefinedValueEditor = null;
+
+        /// <summary>
+        /// These are assigned by default normally based on property editor attributes or manifest definitions,
+        /// developers have the chance to override CreatePreValueEditor if they don't want to use the pre-defined instance
+        /// </summary>
         internal PreValueEditor StaticallyDefinedPreValueEditor = null;
 
         /// <summary>
@@ -61,6 +71,9 @@ namespace Umbraco.Core.PropertyEditors
         {
             get { return CreatePreValueEditor(); }
         }
+
+        [JsonProperty("defaultConfig")]
+        public virtual IDictionary<string, string> DefaultPreValues { get; set; }
 
         //TODO: Now we need to implement a couple of methods for saving the data for editors and pre-value editors
         // generally we can handle that automatically in this base class but people should be allowed to override 
@@ -95,6 +108,48 @@ namespace Umbraco.Core.PropertyEditors
         {
             return StaticallyDefinedPreValueEditor;
         }
+
+        /// <summary>
+        /// This can be used to re-format the currently saved pre-values that will be passed to the editor,
+        /// by default this returns the merged default and persisted pre-values.
+        /// </summary>
+        /// <param name="defaultPreVals">
+        /// The default/static pre-vals for the property editor
+        /// </param>
+        /// <param name="persistedPreVals">
+        /// The persisted pre-vals for the property editor
+        /// </param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is generally not going to be used by anything unless a property editor wants to change the merging
+        /// functionality or needs to convert some legacy persisted data, or something else ?
+        /// </remarks>
+        public virtual IDictionary<string, string> FormatPreValues(IDictionary<string, string> defaultPreVals, PreValueCollection persistedPreVals)
+        {
+            if (defaultPreVals == null)
+            {
+                defaultPreVals = new Dictionary<string, string>();
+            }
+
+            if (persistedPreVals.IsDictionaryBased)
+            {
+                //we just need to merge the dictionaries now, the persisted will replace default.
+               foreach (var item in persistedPreVals.PreValuesAsDictionary)
+               {
+                   defaultPreVals[item.Key] = item.Value;
+               }
+                return defaultPreVals;
+            }
+
+            //it's an array so need to format it 
+            var result = new Dictionary<string, string>();
+            var asArray = persistedPreVals.PreValuesAsArray.ToArray();
+            for (var i = 0; i < asArray.Length; i++)
+            {
+                result.Add(i.ToInvariantString(), asArray[i]);
+            }
+            return result;
+        } 
 
         protected bool Equals(PropertyEditor other)
         {

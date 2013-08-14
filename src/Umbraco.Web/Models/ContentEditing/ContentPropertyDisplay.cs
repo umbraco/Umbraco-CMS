@@ -22,7 +22,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public string View { get; set; }
 
         [DataMember(Name = "config")]
-        public IEnumerable<string> Config { get; set; }
+        public IDictionary<string, string> Config { get; set; }
 
         [DataMember(Name = "hideLabel")]
         public bool HideLabel { get; set; }
