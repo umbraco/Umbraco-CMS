@@ -5,7 +5,7 @@
         /** Converts a Date object to a globally acceptable ISO string, NOTE: This is different from the built in 
             JavaScript toISOString method which returns date/time like "2013-08-07T02:04:11.487Z" but we want "yyyy-MM-dd HH:mm:ss" */
         Date.prototype.toIsoDateTimeString = function (str) {
-            var month = this.getMonth().toString();
+            var month = (this.getMonth() + 1).toString();
             if (month.length === 1) {
                 month = "0" + month;
             }
