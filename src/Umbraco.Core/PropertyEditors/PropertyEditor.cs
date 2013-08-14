@@ -1,9 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
 {
+    /// <summary>
+    /// Basic definition of a property editor
+    /// </summary>
+    /// <remarks>
+    /// The Json serialization attributes are required for manifest property editors to work
+    /// </remarks>
     public class PropertyEditor
     {
         /// <summary>

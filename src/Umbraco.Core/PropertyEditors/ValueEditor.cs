@@ -10,6 +10,9 @@ namespace Umbraco.Core.PropertyEditors
     /// <summary>
     /// Represents the value editor for the property editor during content editing
     /// </summary>
+    /// <remarks>
+    /// The Json serialization attributes are required for manifest property editors to work
+    /// </remarks>
     public class ValueEditor
     {
         /// <summary>
