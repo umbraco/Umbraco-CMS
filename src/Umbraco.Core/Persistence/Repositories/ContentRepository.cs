@@ -482,12 +482,6 @@ namespace Umbraco.Core.Persistence.Repositories
             return GetByVersion(dto.ContentVersionDto.VersionId);
         }
 
-        public bool EmptyRecycleBin()
-        {
-            var repo = new RecycleBinRepository(UnitOfWork);
-            return repo.EmptyRecycleBin(NodeObjectTypeId);
-        }
-
         #endregion
         
         /// <summary>

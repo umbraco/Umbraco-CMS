@@ -356,16 +356,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        #region Implementation of IMediaRepository
-        
-        public bool EmptyRecycleBin()
-        {
-            var repo = new RecycleBinRepository(UnitOfWork);
-            return repo.EmptyRecycleBin(NodeObjectTypeId);
-        }
-
-        #endregion
-
         private PropertyCollection GetPropertyCollection(int id, Guid versionId, IMediaType contentType, DateTime createDate, DateTime updateDate)
         {
             var sql = new Sql();

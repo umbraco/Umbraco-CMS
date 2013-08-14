@@ -1011,28 +1011,29 @@ namespace Umbraco.Core.Services
         /// </summary>
         public void EmptyRecycleBin()
         {
-            //TODO: Why don't we have a base class to share between MediaService/ContentService as some of this is exacty the same?
-
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            using (new WriteLock(Locker))
             {
-                /*var query = Query<IContent>.Builder.Where(x => x.Trashed == true);
-                var contents = repository.GetByQuery(query).OrderByDescending(x => x.Level);
+                List<int> ids;
+                List<string> files;
+                bool success;
+                var nodeObjectType = new Guid(Constants.ObjectTypes.Document);
 
-                foreach (var content in contents)
+                using (var repository = _repositoryFactory.CreateRecycleBinRepository(_uowProvider.GetUnitOfWork()))
                 {
-                    if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(content), this))
-                        continue;
+                    ids = repository.GetIdsOfItemsInRecycleBin(nodeObjectType);
+                    files = repository.GetFilesInRecycleBin(nodeObjectType);
 
-                    repository.Delete(content);
+                    if (EmptyingRecycleBin.IsRaisedEventCancelled(new RecycleBinEventArgs(nodeObjectType, ids, files), this))
+                        return;
 
-                    Deleted.RaiseEvent(new DeleteEventArgs<IContent>(content, false), this);
-                }*/
-                repository.EmptyRecycleBin();
-                uow.Commit();
+                    success = repository.EmptyRecycleBin(nodeObjectType);
+                    if (success)
+                        repository.DeleteFiles(files);
+                }
+
+                EmptiedRecycleBin.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, ids, files, success), this);
             }
-
-            Audit.Add(AuditTypes.Delete, "Empty Recycle Bin performed by user", 0, -20);
+            Audit.Add(AuditTypes.Delete, "Empty Content Recycle Bin performed by user", 0, -20);
         }
 
         /// <summary>
@@ -1884,7 +1885,7 @@ namespace Umbraco.Core.Services
         /// Occurs after Create
         /// </summary>
         /// <remarks>
-        /// Please note that the Content object has been created, but not saved
+        /// Please note that the Content object has been created, but might not have been saved
         /// so it does not have an identity yet (meaning no Id has been set).
         /// </remarks>
         public static event TypedEventHandler<IContentService, NewEventArgs<IContent>> Created;
@@ -1938,6 +1939,16 @@ namespace Umbraco.Core.Services
         /// Occurs after Send to Publish
         /// </summary>
         public static event TypedEventHandler<IContentService, SendToPublishEventArgs<IContent>> SentToPublish;
+
+        /// <summary>
+        /// Occurs before the Recycle Bin is emptied
+        /// </summary>
+        public static event TypedEventHandler<IContentService, RecycleBinEventArgs> EmptyingRecycleBin;
+
+        /// <summary>
+        /// Occurs after the Recycle Bin has been Emptied
+        /// </summary>
+        public static event TypedEventHandler<IContentService, RecycleBinEventArgs> EmptiedRecycleBin;
         #endregion
     }
 }

@@ -537,28 +537,29 @@ namespace Umbraco.Core.Services
 		/// </summary>
 		public void EmptyRecycleBin()
 		{
-			//TODO: Why don't we have a base class to share between MediaService/ContentService as some of this is exacty the same?
+            using (new WriteLock(Locker))
+            {
+                List<int> ids;
+                List<string> files;
+                bool success;
+                var nodeObjectType = new Guid(Constants.ObjectTypes.Media);
 
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
-			{
-				/*var query = Query<IMedia>.Builder.Where(x => x.Trashed == true);
-				var contents = repository.GetByQuery(query).OrderByDescending(x => x.Level);
+                using (var repository = _repositoryFactory.CreateRecycleBinRepository(_uowProvider.GetUnitOfWork()))
+                {
+                    ids = repository.GetIdsOfItemsInRecycleBin(nodeObjectType);
+                    files = repository.GetFilesInRecycleBin(nodeObjectType);
 
-				foreach (var content in contents)
-				{
-					if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMedia>(content), this))
-						continue;
+                    if (EmptyingRecycleBin.IsRaisedEventCancelled(new RecycleBinEventArgs(nodeObjectType, ids, files), this))
+                        return;
 
-					repository.Delete(content);
+                    success = repository.EmptyRecycleBin(nodeObjectType);
+                    if (success)
+                        repository.DeleteFiles(files);
+                }
 
-					Deleted.RaiseEvent(new DeleteEventArgs<IMedia>(content, false), this);
-				}*/
-                repository.EmptyRecycleBin();
-				uow.Commit();
-			}
-
-            Audit.Add(AuditTypes.Delete, "Empty Recycle Bin performed by user", 0, -20);
+                EmptiedRecycleBin.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, ids, files, success), this);
+            }
+            Audit.Add(AuditTypes.Delete, "Empty Media Recycle Bin performed by user", 0, -21);
 		}
 
 	    /// <summary>
@@ -1012,6 +1013,16 @@ namespace Umbraco.Core.Services
 		/// Occurs after Move
 		/// </summary>
 		public static event TypedEventHandler<IMediaService, MoveEventArgs<IMedia>> Moved;
+
+        /// <summary>
+        /// Occurs before the Recycle Bin is emptied
+        /// </summary>
+        public static event TypedEventHandler<IMediaService, RecycleBinEventArgs> EmptyingRecycleBin;
+
+        /// <summary>
+        /// Occurs after the Recycle Bin has been Emptied
+        /// </summary>
+        public static event TypedEventHandler<IMediaService, RecycleBinEventArgs> EmptiedRecycleBin;
 		#endregion
 	}
 }
