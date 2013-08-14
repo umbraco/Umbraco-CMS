@@ -30,8 +30,6 @@ function valServer(serverValidationManager) {
             ctrl.$viewChangeListeners.push(function () {
                 if (ctrl.$invalid) {
                     ctrl.$setValidity('valServer', true);
-                    //emit the event upwards
-                    scope.$emit("serverRevalidated", { modelCtrl: ctrl });
                 }
             });
             

@@ -25,8 +25,6 @@ function valServerField(serverValidationManager) {
             ctrl.$viewChangeListeners.push(function () {
                 if (ctrl.$invalid) {
                     ctrl.$setValidity('valServerField', true);
-                    //emit the event upwards
-                    scope.$emit("serverRevalidated", { modelCtrl: ctrl });
                 }
             });
             

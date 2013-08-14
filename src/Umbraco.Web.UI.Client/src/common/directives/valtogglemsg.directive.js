@@ -15,10 +15,13 @@ function valToggleMsg(serverValidationManager) {
                 throw "valToggleMsg requires that the attribute valMsgFor exists on the element";
             }
 
+            //assign the form control to our isolated scope so we can watch it's values
+            scope.formCtrl = formCtrl;
+
             //if there's any remaining errors in the server validation service then we should show them.
             var showValidation = serverValidationManager.items.length > 0;
             var hasError = false;
-
+            
             //add a watch to the validator for the value (i.e. myForm.value.$error.required )
             scope.$watch(formCtrl.$name + "." + attr.valMsgFor + ".$error." + attr.valToggleMsg, function (isInvalid, oldValue) {
                 hasError = isInvalid;

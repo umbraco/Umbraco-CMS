@@ -1,8 +1,8 @@
 ﻿<div ng-controller="MyPackage.PropertyEditors.PostcodeEditor">
     <p>
-        Enter a postcode for country <span>{{config.country}}</span>
+        Enter a postcode for country <span>{{model.config.country}}</span>
     </p>
-    <input name="myPackage_postcode" type="text" ng-model="value"
+    <input name="myPackage_postcode" type="text" ng-model="model.value"
            val-server="value"
            val-postcode="config.country"/>
     

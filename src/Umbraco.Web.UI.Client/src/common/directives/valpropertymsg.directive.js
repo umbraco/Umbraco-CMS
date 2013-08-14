@@ -94,7 +94,9 @@ function valPropertyMsg(serverValidationManager) {
             // we need to re-validate it for the server side validator so the user can resubmit
             // the form. Of course normal client-side validators will continue to execute.          
             scope.$watch("property.value", function (newValue) {
-                if (formCtrl.$invalid) {
+                //we are explicitly checking for valServer errors here, since we shouldn't auto clear
+                // based on other errors.
+                if (formCtrl.$invalid && scope.formCtrl.$error.valServer !== undefined) {
                     scope.errorMsg = "";
                     formCtrl.$setValidity('valPropertyMsg', true);
                 }
