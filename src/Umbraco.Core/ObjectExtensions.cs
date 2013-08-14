@@ -77,7 +77,14 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		public static Attempt<object> TryConvertTo(this object input, Type destinationType)
 		{
-			if (input == null) return Attempt<object>.False;
+            //if it is null and it is nullable, then return success with null
+            if (input == null && destinationType.IsGenericType && destinationType.GetGenericTypeDefinition() == typeof (Nullable<>))
+            {
+                return new Attempt<object>(true, null);
+            }
+			
+            //if its not nullable then return false
+            if (input == null) return Attempt<object>.False;
 
 			if (destinationType == typeof(object)) return new Attempt<object>(true, input);
 

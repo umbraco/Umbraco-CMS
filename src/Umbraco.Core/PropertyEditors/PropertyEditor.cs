@@ -73,7 +73,7 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         [JsonProperty("defaultConfig")]
-        public virtual IDictionary<string, string> DefaultPreValues { get; set; }
+        public virtual IDictionary<string, object> DefaultPreValues { get; set; }
 
         //TODO: Now we need to implement a couple of methods for saving the data for editors and pre-value editors
         // generally we can handle that automatically in this base class but people should be allowed to override 
@@ -122,13 +122,13 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         /// <remarks>
         /// This is generally not going to be used by anything unless a property editor wants to change the merging
-        /// functionality or needs to convert some legacy persisted data, or something else ?
+        /// functionality or needs to convert some legacy persisted data, or convert the string values to strongly typed values in json (i.e. booleans)
         /// </remarks>
-        public virtual IDictionary<string, string> FormatPreValues(IDictionary<string, string> defaultPreVals, PreValueCollection persistedPreVals)
+        public virtual IDictionary<string, object> FormatPreValues(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
         {
             if (defaultPreVals == null)
             {
-                defaultPreVals = new Dictionary<string, string>();
+                defaultPreVals = new Dictionary<string, object>();
             }
 
             if (persistedPreVals.IsDictionaryBased)
@@ -142,7 +142,7 @@ namespace Umbraco.Core.PropertyEditors
             }
 
             //it's an array so need to format it 
-            var result = new Dictionary<string, string>();
+            var result = new Dictionary<string, object>();
             var asArray = persistedPreVals.PreValuesAsArray.ToArray();
             for (var i = 0; i < asArray.Length; i++)
             {

@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     /// </remarks>
     public class PreValueCollection
     {
-        private IDictionary<string, string> _preValuesAsDictionary;
+        private IDictionary<string, object> _preValuesAsDictionary;
         private IEnumerable<string> _preValuesAsArray;
         public IEnumerable<string> PreValuesAsArray
         {
@@ -30,7 +30,7 @@ namespace Umbraco.Core.Models
             set { _preValuesAsArray = value; }
         }
 
-        public IDictionary<string, string> PreValuesAsDictionary
+        public IDictionary<string, object> PreValuesAsDictionary
         {
             get
             {
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Models
             _preValuesAsArray = preVals;
         }
 
-        public PreValueCollection(IDictionary<string, string> preVals)
+        public PreValueCollection(IDictionary<string, object> preVals)
         {
             _preValuesAsDictionary = preVals;
         }

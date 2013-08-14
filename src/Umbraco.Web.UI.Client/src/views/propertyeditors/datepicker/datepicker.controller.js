@@ -25,7 +25,12 @@ angular.module("umbraco").controller("Umbraco.Editors.DatepickerController",
                 $("#" + pickerId).datetimepicker($scope.model.config).on("changeDate", function (e) {
                     // when a date is changed, update the model
                     if (e.localDate) {
-                        $scope.model.value = e.localDate.toIsoDateTimeString();
+                        if ($scope.model.config.format == "yyyy-MM-dd HH:mm:ss") {
+                            $scope.model.value = e.localDate.toIsoDateTimeString();
+                        }
+                        else {
+                            $scope.model.value = e.localDate.toIsoDateString();
+                        }
                     }
                     else {
                         $scope.model.value = null;

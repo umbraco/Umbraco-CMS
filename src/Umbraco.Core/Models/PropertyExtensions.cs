@@ -64,8 +64,15 @@ namespace Umbraco.Core.Models
                         }
                         else
                         {
-                            var dt = (DateTime)property.Value;
-                            xmlNode.AppendChild(xd.CreateTextNode(dt.ToXmlString<DateTime>()));
+                            var date = property.Value.TryConvertTo<DateTime?>();
+                            if (date.Success == false || date.Result == null)
+                            {
+                                xmlNode.AppendChild(xd.CreateTextNode(string.Empty));
+                            }
+                            else
+                            {
+                                xmlNode.AppendChild(xd.CreateTextNode(date.Result.ToXmlString<DateTime>()));
+                            }                                                       
                         }                        
                         break;
                     default:
