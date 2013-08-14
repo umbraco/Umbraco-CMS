@@ -5,7 +5,6 @@ app.config(function ($routeProvider) {
             templateUrl: function (rp) {
                 if (!rp.url)
                     throw "A framed resource must have a url route parameter";
-
                 return 'views/common/legacy.html';
             }
         })
@@ -54,12 +53,11 @@ app.config(function ($routeProvider) {
                 if (!rp.method)
                     return "views/common/dashboard.html";
 
-                ////here we detect recycle bins, all recycle bins start with -2* (i.e. -20, -21)
-                //if (rp.id.startsWith("-2")) {
-                //    return 'views/' + rp.section + '/recyclebin.html';
-                //}
-
-                return 'views/' + rp.section + '/' + rp.tree + '/' + rp.method + '.html';
+                if(rp.tree === "default" || rp.tree === ""){
+                    return 'views/' + rp.section + '/' + rp.method + '.html';
+                }else{
+                    return 'views/' + rp.section + '/' + rp.tree + '/' + rp.method + '.html';
+                }
             }
         })
         .otherwise({ redirectTo: '/content/document' });
