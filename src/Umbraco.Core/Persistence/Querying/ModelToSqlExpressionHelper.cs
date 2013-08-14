@@ -8,7 +8,7 @@ using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Querying
 {
-    internal class ModelToSqlExpressionHelper<T>
+    internal class ModelToSqlExpressionHelper<T> : BaseExpressionHelper
     {
         private string sep = " ";
         private BaseMapper _mapper;
@@ -246,7 +246,7 @@ namespace Umbraco.Core.Persistence.Querying
                 case "ToLower":
                     return string.Format("lower({0})", r);
                 case "StartsWith":
-                    return string.Format("upper({0}) like '{1}%'", r, RemoveQuote(args[0].ToString().ToUpper()));
+                    return string.Format("upper({0}) like '{1}%'", r, EscapeAtArgument(RemoveQuote(args[0].ToString().ToUpper())));
                 case "EndsWith":
                     return string.Format("upper({0}) like '%{1}'", r, RemoveQuote(args[0].ToString()).ToUpper());
                 case "Contains":
@@ -435,41 +435,7 @@ namespace Umbraco.Core.Persistence.Querying
 
         public virtual string GetQuotedValue(object value, Type fieldType)
         {
-            return QueryHelper.GetQuotedValue(value, fieldType, EscapeParam, ShouldQuoteValue);
-        }
-
-        public virtual string EscapeParam(object paramValue)
-        {
-            return paramValue.ToString().Replace("'", "''");
-        }
-
-        public virtual bool ShouldQuoteValue(Type fieldType)
-        {
-            return true;
-        }
-
-        protected string RemoveQuote(string exp)
-        {
-
-            if (exp.StartsWith("'") && exp.EndsWith("'"))
-            {
-                exp = exp.Remove(0, 1);
-                exp = exp.Remove(exp.Length - 1, 1);
-            }
-            return exp;
-        }
-
-        protected string RemoveQuoteFromAlias(string exp)
-        {
-
-            if ((exp.StartsWith("\"") || exp.StartsWith("`") || exp.StartsWith("'"))
-                &&
-                (exp.EndsWith("\"") || exp.EndsWith("`") || exp.EndsWith("'")))
-            {
-                exp = exp.Remove(0, 1);
-                exp = exp.Remove(exp.Length - 1, 1);
-            }
-            return exp;
+            return GetQuotedValue(value, fieldType, EscapeParam, ShouldQuoteValue);
         }
 
         private string GetTrueExpression()
