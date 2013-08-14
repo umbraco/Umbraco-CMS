@@ -172,7 +172,7 @@ module.exports = function (grunt) {
         }
       },
       directives: {
-        src:['src/common/directives/*.js'],
+        src:['src/common/directives/**/*.js'],
         dest: '<%= distdir %>/js/umbraco.directives.js',
         options: {
             banner: "<%= banner %>\n(function() { \n\n",

@@ -20,8 +20,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
         for (var i = 0; i < treeNodes.length; i++) {
             treeNodes[i].level = childLevel;
             //if there is not route path specified, then set it automatically
+            //PP: added /default/ to the path for now, as I cant find an obvious place to get the tree alias
+            //routes.js has been changed to work with this
             if (!treeNodes[i].routePath) {
-                treeNodes[i].routePath = section + "/edit/" + treeNodes[i].id;
+                treeNodes[i].routePath = section + "/default/edit/" + treeNodes[i].id;
             }
             treeNodes[i].parent = parentNode;
 

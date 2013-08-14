@@ -1,5 +1,14 @@
 app.config(function ($routeProvider) {
     $routeProvider
+        .when('/framed/:url', {
+            //This occurs when we need to launch some content in an iframe
+            templateUrl: function (rp) {
+                if (!rp.url)
+                    throw "A framed resource must have a url route parameter";
+
+                return 'views/common/legacy.html';
+            }
+        })
         .when('/:section', {
             templateUrl: function (rp) {
                 if (rp.section === "default")
@@ -11,37 +20,41 @@ app.config(function ($routeProvider) {
                 return 'views/common/legacy.html';
             }
         })
-        .when('/framed/:url', {
-            //This occurs when we need to launch some content in an iframe
+        .when('/:section/:tree', {
             templateUrl: function (rp) {
-                if (!rp.url)
-                    throw "A framed resource must have a url route parameter";
+                if (rp.section === "default")
+                {
+                    rp.section = "content";
+                }
 
+                if (rp.tree === "")
+                {
+                    rp.tree = "default";
+                }
+
+                rp.url = "dashboard.aspx?app=" + rp.section;
                 return 'views/common/legacy.html';
             }
         })
-        .when('/:section/:method', {
+        .when('/:section/:tree/:method', {
             templateUrl: function(rp) {
-                if (!rp.method)
+                if (!rp.method){
                     return "views/common/dashboard.html";
+                }
                 
-                return 'views/' + rp.section + '/' + rp.method + '.html';
+                if(rp.tree === "default" || rp.tree === ""){
+                    return 'views/' + rp.section + '/' + rp.method + '.html';
+                }else{
+                    return 'views/' + rp.section + '/' + rp.tree + '/' + rp.method + '.html';
+                }
             }
         })
-        .when('/:section/:method/:id', {
+        .when('/:section/:tree/:method/:id', {
             templateUrl: function (rp) {
-                if (!rp.method)
-                    return "views/common/dashboard.html";
-
-                ////here we detect recycle bins, all recycle bins start with -2* (i.e. -20, -21)
-                //if (rp.id.startsWith("-2")) {
-                //    return 'views/' + rp.section + '/recyclebin.html';
-                //}
-
-                return 'views/' + rp.section + '/' + rp.method + '.html';
+                return 'views/' + rp.section + '/' + rp.tree + '/' + rp.method + '.html';
             }
-        })        
-        .otherwise({ redirectTo: '/content' });
+        })
+        .otherwise({ redirectTo: '/content/document' });
     }).config(function ($locationProvider) {
 
         //$locationProvider.html5Mode(false).hashPrefix('!'); //turn html5 mode off
