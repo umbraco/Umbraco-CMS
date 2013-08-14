@@ -3,6 +3,12 @@ using Newtonsoft.Json;
 
 namespace Umbraco.Core.PropertyEditors
 {
+    /// <summary>
+    /// Defines a pre-value editor
+    /// </summary>
+    /// <remarks>
+    /// The Json serialization attributes are required for manifest property editors to work
+    /// </remarks>
     public class PreValueEditor
     {
         /// <summary>

@@ -51,6 +51,14 @@ app.config(function ($routeProvider) {
         })
         .when('/:section/:tree/:method/:id', {
             templateUrl: function (rp) {
+                if (!rp.method)
+                    return "views/common/dashboard.html";
+
+                ////here we detect recycle bins, all recycle bins start with -2* (i.e. -20, -21)
+                //if (rp.id.startsWith("-2")) {
+                //    return 'views/' + rp.section + '/recyclebin.html';
+                //}
+
                 return 'views/' + rp.section + '/' + rp.tree + '/' + rp.method + '.html';
             }
         })

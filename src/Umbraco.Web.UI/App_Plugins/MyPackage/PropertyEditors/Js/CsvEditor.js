@@ -7,8 +7,8 @@
         var values = [];
 
         //this will be comma delimited
-        if ($scope.value && (typeof $scope.value == "string")) {
-            var splitVals = $scope.value.split(",");
+        if ($scope.model.value && (typeof $scope.model.value == "string")) {
+            var splitVals = $scope.model.value.split(",");
             //set the values of our object
             for (var i = 0; i < splitVals.length; i++) {
                 values.push({
@@ -35,7 +35,7 @@
                 csv.push(newValue[v].value);
             }
             //write the csv value back to the property
-            $scope.value = csv.join();
+            $scope.model.value = csv.join();
         }, true);
     };
 

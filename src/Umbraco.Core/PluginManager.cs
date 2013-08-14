@@ -430,7 +430,9 @@ namespace Umbraco.Core
         /// </summary>
         internal IEnumerable<Type> ResolvePropertyEditors()
         {
-            return ResolveTypes<PropertyEditor>();
+            //return all proeprty editor types found except for the base property editor type
+            return ResolveTypes<PropertyEditor>()
+                .Except(new[] {typeof (PropertyEditor)});
         } 
 
         /// <summary>
@@ -466,7 +468,9 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal IEnumerable<Type> ResolveDataTypes()
         {
-            return ResolveTypes<IDataType>();
+            //ensure we ignore types that should not be loaded
+            return ResolveTypes<IDataType>()
+                .Except(new[] {Type.GetType("umbraco.presentation.LiveEditing.Modules.ItemEditing.PageElementEditor,umbraco")});
         }
 
         /// <summary>

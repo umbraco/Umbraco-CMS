@@ -13,6 +13,7 @@ function valTab() {
             
             var tabId = "tab" + scope.tab.id;
             
+            //assign the form control to our isolated scope so we can watch it's values
             scope.formCtrl = formCtrl;
             scope.tabHasError = false;
 

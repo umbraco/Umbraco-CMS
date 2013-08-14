@@ -23,11 +23,9 @@ namespace Umbraco.Web.Models.Mapping
 
             propertyDto.IsRequired = originalProperty.PropertyType.Mandatory;
             propertyDto.ValidationRegExp = originalProperty.PropertyType.ValidationRegExp;
-            propertyDto.Alias = originalProperty.Alias;
             propertyDto.Description = originalProperty.PropertyType.Description;
             propertyDto.Label = originalProperty.PropertyType.Name;
             propertyDto.DataType = _applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(originalProperty.PropertyType.DataTypeDefinitionId);
-            propertyDto.PropertyEditor = PropertyEditorResolver.Current.GetById(originalProperty.PropertyType.DataTypeId);
 
             return propertyDto;
         }

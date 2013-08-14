@@ -45,6 +45,7 @@ namespace UmbracoExamine
             }
         }
 
+        [SecuritySafeCritical]
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
             if (name == null) throw new ArgumentNullException("name");

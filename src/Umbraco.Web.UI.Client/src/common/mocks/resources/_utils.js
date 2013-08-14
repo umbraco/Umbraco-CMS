@@ -45,7 +45,7 @@ angular.module('umbraco.mocks').
                         label: "Sample Editor",
                         id: 3,
                         properties: [
-                            { alias: "datepicker", label: "Datepicker", view: "datepicker", config: { rows: 7 } },
+                            { alias: "datepicker", label: "Datepicker", view: "datepicker", config: { pickTime: false, format: "yyyy-MM-dd" } },
                             { alias: "tags", label: "Tags", view: "tags", value: "" }
                         ]
                     },

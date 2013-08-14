@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Tests.AngularIntegration
@@ -29,7 +30,7 @@ namespace Umbraco.Tests.AngularIntegration
                             Label = "Property " + propertyIndex,
                             Id = propertyIndex,
                             Value = "value" + propertyIndex,
-                            Config = new[] {"config" + propertyIndex},
+                            Config = new Dictionary<string, string> {{ propertyIndex.ToInvariantString(), "value" }},
                             Description = "Description " + propertyIndex,
                             View = "~/Views/View" + propertyIndex,
                             HideLabel = false
@@ -68,7 +69,7 @@ namespace Umbraco.Tests.AngularIntegration
                     Assert.AreEqual("Property " + prop, jObject["tabs"][tab]["properties"][prop]["label"].ToString());
                     Assert.AreEqual(prop, jObject["tabs"][tab]["properties"][prop]["id"].Value<int>());
                     Assert.AreEqual("value" + prop, jObject["tabs"][tab]["properties"][prop]["value"].ToString());
-                    Assert.AreEqual("[\"config" + prop + "\"]", jObject["tabs"][tab]["properties"][prop]["config"].ToString(Formatting.None));
+                    Assert.AreEqual("{\"" + prop + "\":\"value\"}", jObject["tabs"][tab]["properties"][prop]["config"].ToString(Formatting.None));
                     Assert.AreEqual("Description " + prop, jObject["tabs"][tab]["properties"][prop]["description"].ToString());
                     Assert.AreEqual(false, jObject["tabs"][tab]["properties"][prop]["hideLabel"].Value<bool>());
                 }

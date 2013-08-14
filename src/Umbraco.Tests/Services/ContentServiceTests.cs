@@ -813,6 +813,48 @@ namespace Umbraco.Tests.Services
             Assert.That(hasPublishedVersion, Is.True);
         }
 
+	    [Test]
+	    public void Can_Verify_Property_Types_On_Content()
+	    {
+            // Arrange
+	        var contentTypeService = ServiceContext.ContentTypeService;
+            var contentType = MockedContentTypes.CreateAllTypesContentType("allDataTypes", "All DataTypes");
+            contentTypeService.Save(contentType);
+	        var contentService = ServiceContext.ContentService;
+	        var content = MockedContent.CreateAllTypesContent(contentType, "Random Content", -1);
+            contentService.Save(content);
+	        var id = content.Id;
+
+            // Act
+	        var sut = contentService.GetById(id);
+
+            // Arrange
+            Assert.That(sut.GetValue<bool>("isTrue"), Is.True);
+            Assert.That(sut.GetValue<int>("number"), Is.EqualTo(42));
+            Assert.That(sut.GetValue<string>("bodyText"), Is.EqualTo("Lorem Ipsum Body Text Test"));
+            Assert.That(sut.GetValue<string>("singleLineText"), Is.EqualTo("Single Line Text Test"));
+            Assert.That(sut.GetValue<string>("multilineText"), Is.EqualTo("Multiple lines \n in one box"));
+            Assert.That(sut.GetValue<string>("upload"), Is.EqualTo("/media/1234/koala.jpg"));
+            Assert.That(sut.GetValue<string>("label"), Is.EqualTo("Non-editable label"));
+            Assert.That(sut.GetValue<DateTime>("dateTime"), Is.EqualTo(content.GetValue<DateTime>("dateTime")));
+            Assert.That(sut.GetValue<string>("colorPicker"), Is.EqualTo("black"));
+	        Assert.That(sut.GetValue<string>("folderBrowser"), Is.Empty);
+            Assert.That(sut.GetValue<string>("ddlMultiple"), Is.EqualTo("1234,1235"));
+            Assert.That(sut.GetValue<string>("rbList"), Is.EqualTo("random"));
+            Assert.That(sut.GetValue<DateTime>("date"), Is.EqualTo(content.GetValue<DateTime>("date")));
+            Assert.That(sut.GetValue<string>("ddl"), Is.EqualTo("1234"));
+            Assert.That(sut.GetValue<string>("chklist"), Is.EqualTo("randomc"));
+            Assert.That(sut.GetValue<int>("contentPicker"), Is.EqualTo(1090));
+            Assert.That(sut.GetValue<int>("mediaPicker"), Is.EqualTo(1091));
+            Assert.That(sut.GetValue<int>("memberPicker"), Is.EqualTo(1092));
+            Assert.That(sut.GetValue<string>("simpleEditor"), Is.EqualTo("This is simply edited"));
+            Assert.That(sut.GetValue<string>("ultimatePicker"), Is.EqualTo("1234,1235"));
+            Assert.That(sut.GetValue<string>("relatedLinks"), Is.EqualTo("<links><link title=\"google\" link=\"http://google.com\" type=\"external\" newwindow=\"0\" /></links>"));
+            Assert.That(sut.GetValue<string>("tags"), Is.EqualTo("this,is,tags"));
+            Assert.That(sut.GetValue<string>("macroContainer"), Is.Empty);
+            Assert.That(sut.GetValue<string>("imgCropper"), Is.Empty);
+	    }
+
         private IEnumerable<IContent> CreateContentHierarchy()
         {
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");

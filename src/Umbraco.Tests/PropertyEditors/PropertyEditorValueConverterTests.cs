@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.PropertyEditors
 {
-	[TestFixture]
+    [TestFixture]
 	public class PropertyEditorValueConverterTests
 	{
 		[TestCase("2012-11-10", true)]

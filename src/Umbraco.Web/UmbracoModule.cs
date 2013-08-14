@@ -35,6 +35,7 @@ namespace Umbraco.Web
 		/// <param name="httpContext"></param>
         static void BeginRequest(HttpContextBase httpContext)
 		{
+
             //we need to set the initial url in our ApplicationContext, this is so our keep alive service works and this must
             //exist on a global context because the keep alive service doesn't run in a web context.
             //we are NOT going to put a lock on this because locking will slow down the application and we don't really care
@@ -170,26 +171,34 @@ namespace Umbraco.Web
                 var ticket = http.GetUmbracoAuthTicket();
                 if (ticket != null && !ticket.Expired && http.RenewUmbracoAuthTicket())
                 {
-                    //create the Umbraco user identity 
-                    var identity = new UmbracoBackOfficeIdentity(ticket);
-
-                    //set the principal object
-                    var principal = new GenericPrincipal(identity, identity.Roles);
-
-                    //It is actually not good enough to set this on the current app Context and the thread, it also needs
-                    // to be set explicitly on the HttpContext.Current !! This is a strange web api thing that is actually 
-                    // an underlying fault of asp.net not propogating the User correctly.
-                    if (HttpContext.Current != null)
+                    try
                     {
-                        HttpContext.Current.User = principal;
-                    }
-                    app.Context.User = principal;
-                    Thread.CurrentPrincipal = principal;
+                        //create the Umbraco user identity 
+                        var identity = new UmbracoBackOfficeIdentity(ticket);
 
-                    //This is a back office request, we will also set the culture/ui culture
-                    Thread.CurrentThread.CurrentCulture =
-                        Thread.CurrentThread.CurrentUICulture =
-                        new System.Globalization.CultureInfo(identity.Culture);
+                        //set the principal object
+                        var principal = new GenericPrincipal(identity, identity.Roles);
+
+                        //It is actually not good enough to set this on the current app Context and the thread, it also needs
+                        // to be set explicitly on the HttpContext.Current !! This is a strange web api thing that is actually 
+                        // an underlying fault of asp.net not propogating the User correctly.
+                        if (HttpContext.Current != null)
+                        {
+                            HttpContext.Current.User = principal;
+                        }
+                        app.Context.User = principal;
+                        Thread.CurrentPrincipal = principal;
+
+                        //This is a back office request, we will also set the culture/ui culture
+                        Thread.CurrentThread.CurrentCulture =
+                            Thread.CurrentThread.CurrentUICulture =
+                            new System.Globalization.CultureInfo(identity.Culture);
+                    }
+                    catch (FormatException)
+                    {
+                        //this will occur if the cookie data is invalid
+                        http.UmbracoLogout();
+                    }
                 }
             }
 

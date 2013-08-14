@@ -79,6 +79,53 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Determines if the published db flag should be set to true for the current entity version and all other db
+        /// versions should have their flag set to false.
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is determined by:
+        /// * If a new version is being created and the entity is published
+        /// * If the published state has changed and the entity is published OR the entity has been un-published.
+        /// </remarks>
+        internal static bool ShouldClearPublishedFlagForPreviousVersions(this IContent entity)
+        {
+            var publishedState = ((Content)entity).PublishedState;
+            return entity.ShouldClearPublishedFlagForPreviousVersions(publishedState, entity.ShouldCreateNewVersion(publishedState));
+        }
+
+        /// <summary>
+        /// Determines if the published db flag should be set to true for the current entity version and all other db
+        /// versions should have their flag set to false.
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="publishedState"></param>
+        /// <param name="isCreatingNewVersion"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is determined by:
+        /// * If a new version is being created and the entity is published
+        /// * If the published state has changed and the entity is published OR the entity has been un-published.
+        /// </remarks>
+        internal static bool ShouldClearPublishedFlagForPreviousVersions(this IContent entity, PublishedState publishedState, bool isCreatingNewVersion)
+        {
+            if (isCreatingNewVersion && entity.Published)
+            {
+                return true;
+            }
+
+            //If Published state has changed then previous versions should have their publish state reset.
+            //If state has been changed to unpublished the previous versions publish state should also be reset.
+            if (((ICanBeDirty)entity).IsPropertyDirty("Published") && (entity.Published || publishedState == PublishedState.Unpublished))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Returns a list of the current contents ancestors, not including the content itself.
         /// </summary>
         /// <param name="content">Current content</param>

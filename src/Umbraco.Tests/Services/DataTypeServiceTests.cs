@@ -23,6 +23,8 @@ namespace Umbraco.Tests.Services
             base.TearDown();
         }
 
+        
+
         [Test]
         public void DataTypeService_Can_Persist_New_DataTypeDefinition()
         {

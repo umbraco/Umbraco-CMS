@@ -14,6 +14,11 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentPropertyBasicConverter<T> : TypeConverter<Property, T>
         where T : ContentPropertyBasic, new()
     {
+        /// <summary>
+        /// Assigns the PropertyEditor, Id, Alias and Value to the property
+        /// </summary>
+        /// <param name="property"></param>
+        /// <returns></returns>
         protected override T ConvertCore(Property property)
         {
             var editor = PropertyEditorResolver.Current.GetById(property.PropertyType.DataTypeId);

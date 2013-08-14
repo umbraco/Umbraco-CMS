@@ -10,6 +10,9 @@ namespace Umbraco.Core.PropertyEditors
     /// <summary>
     /// Represents the value editor for the property editor during content editing
     /// </summary>
+    /// <remarks>
+    /// The Json serialization attributes are required for manifest property editors to work
+    /// </remarks>
     public class ValueEditor
     {
         /// <summary>
@@ -126,10 +129,12 @@ namespace Umbraco.Core.PropertyEditors
                     valueType = typeof(string);
                     break;
                 case DataTypeDatabaseType.Integer:
-                    valueType = typeof(int);
+                    //ensure these are nullable so we can return a null if required
+                    valueType = typeof(int?);
                     break;
                 case DataTypeDatabaseType.Date:
-                    valueType = typeof(DateTime);
+                    //ensure these are nullable so we can return a null if required
+                    valueType = typeof(DateTime?);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -180,9 +185,14 @@ namespace Umbraco.Core.PropertyEditors
                 case DataTypeDatabaseType.Integer:
                     //we can just ToString() any of these types
                     return dbValue.ToString();
-                case DataTypeDatabaseType.Date:
-                    //Dates will be formatted in 'o' format (otherwise known as xml format)
-                    return dbValue.ToXmlString<DateTime>();
+                case DataTypeDatabaseType.Date:                    
+                    var date = dbValue.TryConvertTo<DateTime?>();
+                    if (date.Success == false || date.Result == null)
+                    {
+                        return string.Empty;
+                    }
+                    //Dates will be formatted as yyyy-MM-dd HH:mm:ss
+                    return date.Result.Value.ToIsoString();
                 default:
                     throw new ArgumentOutOfRangeException();
             }            

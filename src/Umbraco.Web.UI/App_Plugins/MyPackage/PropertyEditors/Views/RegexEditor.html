@@ -1,10 +1,12 @@
 ﻿<div ng-controller="MyPackage.PropertyEditors.RegexEditor">
+    <span>{{model.value}}</span>
+    
     <p>
-        Value in the format of <span>{{config}}</span>
+        Value in the format of <span>{{model.config}}</span>
     </p>
     
     <input name="regex" id="regex"            
-           type="text" ng-model="value" 
+           type="text" ng-model="model.value" 
            required 
            val-regex="config" 
            val-server="value" />

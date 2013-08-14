@@ -12,7 +12,6 @@ namespace Umbraco.Web.Models.ContentEditing
         public IDataTypeDefinition DataType { get; set; }
         public string Label { get; set; }
         public string Description { get; set; }
-        public PropertyEditor PropertyEditor { get; set; }
         public bool IsRequired { get; set; }
         public string ValidationRegExp { get; set; }
     }

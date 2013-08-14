@@ -31,8 +31,8 @@ namespace Umbraco.Tests.Models.Mapping
 
         protected override void FreezeResolution()
         {
-            PropertyEditorResolver.Current = new PropertyEditorResolver(
-                () => new List<Type> {typeof (TestPropertyEditor)});
+            //PropertyEditorResolver.Current = new PropertyEditorResolver(
+            //    () => new List<Type> {typeof (TestPropertyEditor)});
 
             base.FreezeResolution();
         }
@@ -96,6 +96,13 @@ namespace Umbraco.Tests.Models.Mapping
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             var content = MockedContent.CreateSimpleContent(contentType);
+            //need ids for tabs
+            var id = 1;
+            foreach (var g in content.PropertyGroups)
+            {
+                g.Id = id;
+                id++;
+            }
 
             var result = Mapper.Map<IContent, ContentItemDisplay>(content);
 
@@ -131,6 +138,13 @@ namespace Umbraco.Tests.Models.Mapping
                 p.Id = idSeed;
                 idSeed++;
             }
+            //need ids for tabs
+            var id = 1;
+            foreach (var g in content.PropertyGroups)
+            {
+                g.Id = id;
+                id++;
+            }
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
             //ensure that nothing is marked as dirty
@@ -145,7 +159,7 @@ namespace Umbraco.Tests.Models.Mapping
             }
             Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count() - 1);
             Assert.IsTrue(result.Tabs.Any(x => x.Label == "Generic properties"));
-            Assert.AreEqual(2, result.Tabs.Where(x => x.Label == "Generic properties").SelectMany(x => x.Properties).Count());
+            Assert.AreEqual(2, result.Tabs.Where(x => x.Label == "Generic properties").SelectMany(x => x.Properties.Where(p => p.Alias.StartsWith("_umb_") == false)).Count());
         }
 
         #region Assertions
@@ -158,10 +172,11 @@ namespace Umbraco.Tests.Models.Mapping
             
             var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
             Assert.IsNotNull(pDto);
-            pDto.Alias = p.Alias;
-            pDto.Description = p.PropertyType.Description;
-            pDto.Label = p.PropertyType.Name;
-            pDto.Config = applicationContext.Services.DataTypeService.GetPreValuesByDataTypeId(p.PropertyType.DataTypeDefinitionId);
+            
+            //pDto.Alias = p.Alias;
+            //pDto.Description = p.PropertyType.Description;
+            //pDto.Label = p.PropertyType.Name;
+            //pDto.Config = applicationContext.Services.DataTypeService.GetPreValuesByDataTypeId(p.PropertyType.DataTypeDefinitionId);
 
         }
 
@@ -176,7 +191,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(content.UpdateDate, result.UpdateDate);
             Assert.AreEqual(content.CreateDate, result.CreateDate);
             Assert.AreEqual(content.Name, result.Name);
-            Assert.AreEqual(content.Properties.Count(), result.Properties.Count());
+            Assert.AreEqual(content.Properties.Count(), result.Properties.Count(x => x.Alias.StartsWith("_umb_") == false));
         }
 
         private void AssertBasicProperty<T, TPersisted>(ContentItemBasic<T, TPersisted> result, Property p)
