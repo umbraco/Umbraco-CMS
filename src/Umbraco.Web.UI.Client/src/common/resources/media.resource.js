@@ -106,7 +106,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
         },
         
         /** saves or updates a media object */
-        saveMedia: function (media, isNew, files) {
+        save: function (media, isNew, files) {
             return saveMediaItem(media, "save" + (isNew ? "New" : ""), files);
         }
     };

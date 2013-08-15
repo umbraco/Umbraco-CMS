@@ -12,14 +12,14 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
 
         mediaResource.getScaffold($routeParams.id, $routeParams.doctype)
             .then(function (data) {
-                $scope.contentLoaded = true;
+                $scope.loaded = true;
                 $scope.content = data;
             });
     }
     else {
         mediaResource.getById($routeParams.id)
             .then(function (data) {
-                $scope.contentLoaded = true;
+                $scope.loaded = true;
                 $scope.content = data;
                 
                 //in one particular special case, after we've created a new item we redirect back to the edit
@@ -55,7 +55,7 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
         
         serverValidationManager.reset();
 
-        mediaResource.saveMedia(cnt, $routeParams.create, $scope.files)
+        mediaResource.save(cnt, $routeParams.create, $scope.files)
             .then(function (data) {
                 contentEditingHelper.handleSuccessfulSave({
                     scope: $scope,

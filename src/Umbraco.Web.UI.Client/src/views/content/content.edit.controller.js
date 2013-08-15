@@ -12,7 +12,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
         //we are creating so get an empty content item
         contentResource.getScaffold($routeParams.id, $routeParams.doctype)
             .then(function(data) {
-                $scope.contentLoaded = true;
+                $scope.loaded = true;
                 $scope.content = data;
             });
     }
@@ -20,7 +20,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
         //we are editing so get the content item from the server
         contentResource.getById($routeParams.id)
             .then(function(data) {
-                $scope.contentLoaded = true;
+                $scope.loaded = true;
                 $scope.content = data;
                 
                 //in one particular special case, after we've created a new item we redirect back to the edit
@@ -56,7 +56,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
 
         serverValidationManager.reset();
         
-        contentResource.publishContent(cnt, $routeParams.create, $scope.files)
+        contentResource.publish(cnt, $routeParams.create, $scope.files)
             .then(function (data) {
                 contentEditingHelper.handleSuccessfulSave({
                     scope: $scope,
@@ -75,7 +75,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
 
         serverValidationManager.reset();
 
-        contentResource.saveContent(cnt, $routeParams.create, $scope.files)
+        contentResource.save(cnt, $routeParams.create, $scope.files)
             .then(function (data) {
                 contentEditingHelper.handleSuccessfulSave({
                     scope: $scope,

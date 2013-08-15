@@ -225,7 +225,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *        var myDoc = scaffold;
          *        myDoc.name = "My new document"; 
          *
-         *        contentResource.publishContent(myDoc, true)
+         *        contentResource.publish(myDoc, true)
          *            .then(function(content){
          *                alert("Retrieved, updated and published again");
          *            });
@@ -317,7 +317,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
          * @ngdoc method
-         * @name umbraco.resources.contentResource#saveContent
+         * @name umbraco.resources.contentResource#save
          * @methodOf umbraco.resources.contentResource
          *
          * @description
@@ -330,7 +330,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * contentResource.getById(1234)
          *    .then(function(content) {
          *          content.name = "I want a new name!";
-         *          contentResource.saveContent(content, false)
+         *          contentResource.save(content, false)
          *            .then(function(content){
          *                alert("Retrieved, updated and saved again");
          *            });
@@ -343,14 +343,14 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the saved content item.
          *
          */
-        saveContent: function (content, isNew, files) {
+        save: function (content, isNew, files) {
             return saveContentItem(content, "save" + (isNew ? "New" : ""), files);
         },
 
 
         /**
          * @ngdoc method
-         * @name umbraco.resources.contentResource#publishContent
+         * @name umbraco.resources.contentResource#publish
          * @methodOf umbraco.resources.contentResource
          *
          * @description
@@ -363,7 +363,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * contentResource.getById(1234)
          *    .then(function(content) {
          *          content.name = "I want a new name, and be published!";
-         *          contentResource.publishContent(content, false)
+         *          contentResource.publish(content, false)
          *            .then(function(content){
          *                alert("Retrieved, updated and published again");
          *            });
@@ -376,7 +376,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the saved content item.
          *
          */
-        publishContent: function (content, isNew, files) {
+        publish: function (content, isNew, files) {
             return saveContentItem(content, "publish" + (isNew ? "New" : ""), files);
         }
 

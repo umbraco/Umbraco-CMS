@@ -1,0 +1,40 @@
+<div ng-form name="contentForm" ng-show="loaded">
+    <umb-panel ng-controller="Umbraco.Editors.DataType.EditController" val-show-validation>
+
+        <umb-header>
+
+            <umb-content-name 
+                ng-model="content.name" 
+                placeholder="Enter a title">
+            </umb-content-name>
+
+            <div class="span8">
+                <div class="btn-toolbar pull-right umb-btn-toolbar">
+                    
+                    <div class="btn-group">
+                        
+                        <a class="btn btn-success" href="#" ng-click="save(content)" data-shortcut="ctrl+s"
+                           prevent-default>Save</a>
+
+                    </div>
+                </div>
+            </div>
+        </umb-header>
+
+        <umb-tab-view>
+            <umb-tab id="tab0" rel="0">
+
+                <div class="umb-pane">
+                    <umb-property 
+                        property="property"
+                        ng-repeat="property in properties">
+                        
+                        <umb-editor model="property"></umb-editor>
+                    </umb-property>
+                </div>
+
+            </umb-tab>
+        </umb-tab-view>
+
+    </umb-panel>
+</div>

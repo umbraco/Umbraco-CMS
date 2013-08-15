@@ -6,6 +6,7 @@ Umbraco.Sys.ServerVariables = {
     umbracoUrls: {
         "contentApiBaseUrl": "/umbraco/UmbracoApi/Content/",
         "mediaApiBaseUrl": "/umbraco/UmbracoApi/Media/",
+        "dataTypeApiBaseUrl": "/umbraco/UmbracoApi/DataType/",
         "sectionApiBaseUrl": "/umbraco/UmbracoApi/Section/",
         "treeApplicationApiBaseUrl": "/umbraco/UmbracoTrees/ApplicationTreeApi/",
         "contentTypeApiBaseUrl": "/umbraco/Api/ContentType/",
