@@ -30,7 +30,7 @@ namespace Umbraco.Tests.AngularIntegration
                             Label = "Property " + propertyIndex,
                             Id = propertyIndex,
                             Value = "value" + propertyIndex,
-                            Config = new Dictionary<string, string> {{ propertyIndex.ToInvariantString(), "value" }},
+                            Config = new Dictionary<string, object> {{ propertyIndex.ToInvariantString(), "value" }},
                             Description = "Description " + propertyIndex,
                             View = "~/Views/View" + propertyIndex,
                             HideLabel = false
