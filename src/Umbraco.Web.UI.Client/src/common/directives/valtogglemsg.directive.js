@@ -15,8 +15,9 @@ function valToggleMsg(serverValidationManager) {
                 throw "valToggleMsg requires that the attribute valMsgFor exists on the element";
             }
 
-            //assign the form control to our isolated scope so we can watch it's values
-            scope.formCtrl = formCtrl;
+            //we need to copy the form controller val to our isolated scope so that            
+            //we'll also maintain the current form name.
+            scope[formCtrl.$name] = formCtrl;
 
             //if there's any remaining errors in the server validation service then we should show them.
             var showValidation = serverValidationManager.items.length > 0;

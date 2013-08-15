@@ -20,21 +20,30 @@
                 </div>
             </div>
         </umb-header>
-
-        <umb-tab-view>
-            <umb-tab id="tab0" rel="0">
-
+        
+        <div class="umb-panel-body umb-scrollable row-fluid" auto-scale="1">
+            <div class="tab-content form-horizontal">
                 <div class="umb-pane">
-                    <umb-property 
-                        property="property"
-                        ng-repeat="property in properties">
+                    <umb-property property="properties.selectedEditor">
                         
-                        <umb-editor model="property"></umb-editor>
+                        <!-- TODO: We have more issues with transcluding and ng-form so the current validator toggle is not 
+                            executin, will investigate more tomorrow, if you are readin this, I discovered some crazy stuf with 
+                            ng-form controllers and transclusion which makes things interesting. //-->
+                        <div>
+                            <select name="selectedEditor" 
+                                    ng-model="availableEditors" 
+                                    required  
+                                    ng-options="e.name for e in content.availableEditors track by e.editorId"></select>
+                            <span class="help-inline" val-msg-for="selectedEditor" val-toggle-msg="requires">Requires</span>
+                        </div>
+
+                    </umb-property>
+                    <umb-property property="properties.selectedEditorId">
+                        <div>{{content.selectedEditor}}</div>
                     </umb-property>
                 </div>
-
-            </umb-tab>
-        </umb-tab-view>
+            </div>
+        </div>
 
     </umb-panel>
 </div>

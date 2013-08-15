@@ -7,7 +7,21 @@
  * The controller for the content editor
  */
 function DataTypeEditController($scope, $routeParams, $location, dataTypeResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper) {
-       
+
+    function createDisplayProps() {
+        $scope.properties = {
+            selectedEditor: {
+                alias: "selectedEditor",
+                description: "Select a property editor",
+                label: "Property editor"
+            },
+            selectedEditorId: {
+                alias: "selectedEditorId",
+                label: "Property editor GUID"
+            }
+        };
+    }
+
     if ($routeParams.create) {
         //we are creating so get an empty content item
         dataTypeResource.getScaffold($routeParams.id, $routeParams.doctype)
@@ -22,6 +36,7 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
             .then(function(data) {
                 $scope.loaded = true;
                 $scope.content = data;
+                createDisplayProps();
                 
                 //in one particular special case, after we've created a new item we redirect back to the edit
                 // route but there might be server validation errors in the collection which we need to display

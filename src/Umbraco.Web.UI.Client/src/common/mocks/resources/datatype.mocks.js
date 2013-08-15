@@ -13,7 +13,15 @@ angular.module('umbraco.mocks').
           var dataType = {
               id: id,
               name: "Data type " + id,
-              selectedEditor: String.CreateGuid()
+              selectedEditor: String.CreateGuid(),
+              availableEditors: [
+                  { name: "Some editor 1", editorId: String.CreateGuid() },
+                  { name: "Some editor 2", editorId: String.CreateGuid() },
+                  { name: "Some editor 3", editorId: String.CreateGuid() },
+                  { name: "Some editor 4", editorId: String.CreateGuid() },
+                  { name: "Some editor 5", editorId: String.CreateGuid() },
+                  { name: "Some editor 6", editorId: String.CreateGuid() }
+              ]
               
           };
           return [200, dataType, null];
