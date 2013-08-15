@@ -486,10 +486,6 @@ namespace Umbraco.Core.Persistence.Repositories
             return GetByVersion(dto.ContentVersionDto.VersionId);
         }
 
-        public bool EmptyRecycleBin()
-        {
-            var repo = new RecycleBinRepository(UnitOfWork);
-            return repo.EmptyRecycleBin(NodeObjectTypeId);
         }
 
         public void AssignEntityPermissions(IContent entity, string permission, IEnumerable<object> userIds)
@@ -502,8 +498,6 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork);
             return repo.GetPermissionsForEntity(entityId);
-        }
-
         #endregion
         
         /// <summary>

@@ -138,52 +138,17 @@ namespace umbraco.dialogs
             return true;
         }
 
-        
-
-        //PPH Handle doctype copies..
         private void HandleDocumentTypeCopy()
         {
-            var documentType = new DocumentType(int.Parse(Request.GetItemAsString("id")));
+            var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
+            var contentType = contentTypeService.GetContentType(
+                int.Parse(Request.GetItemAsString("id")));
 
-            //Documentype exists.. create new doc type... 
-            var alias = rename.Text;
-            var newDocumentType = DocumentType.MakeNew(base.getUser(), alias.Replace("'", "''"));
+            var alias = rename.Text.Replace("'", "''");
+            var clone = ((Umbraco.Core.Models.ContentType) contentType).Clone(alias);
+            contentTypeService.Save(clone);
 
-            newDocumentType.IconUrl = documentType.IconUrl;
-            newDocumentType.Thumbnail = documentType.Thumbnail;
-            newDocumentType.Description = documentType.Description;
-            newDocumentType.allowedTemplates = documentType.allowedTemplates;
-            newDocumentType.DefaultTemplate = documentType.DefaultTemplate;
-            newDocumentType.AllowedChildContentTypeIDs = documentType.AllowedChildContentTypeIDs;
-            newDocumentType.AllowAtRoot = documentType.AllowAtRoot;
-
-            newDocumentType.MasterContentType = int.Parse(masterType.SelectedValue);
-
-            var oldNewTabIds = new Hashtable();
-            foreach (var tab in documentType.getVirtualTabs.Where(t => t.ContentType == documentType.Id))
-            {
-                int tabId = newDocumentType.AddVirtualTab(tab.Caption);
-                oldNewTabIds.Add(tab.Id, tabId);
-            }
-
-            foreach (var propertyType in documentType.PropertyTypes.Where(p => p.ContentTypeId == documentType.Id))
-            {
-                var newPropertyType = cms.businesslogic.propertytype.PropertyType.MakeNew(propertyType.DataTypeDefinition, newDocumentType, propertyType.Name, propertyType.Alias);
-                newPropertyType.ValidationRegExp = propertyType.ValidationRegExp;
-                newPropertyType.SortOrder = propertyType.SortOrder;
-                newPropertyType.Mandatory = propertyType.Mandatory;
-                newPropertyType.Description = propertyType.Description;
-
-                if (propertyType.TabId > 0 && oldNewTabIds[propertyType.TabId] != null)
-                {
-                    var newTabId = (int)oldNewTabIds[propertyType.TabId];
-                    newPropertyType.TabId = newTabId;
-                }
-            }
-
-            var returnUrl = string.Format("{0}/settings/editNodeTypeNew.aspx?id={1}", SystemDirectories.Umbraco, newDocumentType.Id);
-
-            newDocumentType.Save();
+            var returnUrl = string.Format("{0}/settings/editNodeTypeNew.aspx?id={1}", SystemDirectories.Umbraco, clone.Id);
 
             pane_settings.Visible = false;
             panel_buttons.Visible = false;

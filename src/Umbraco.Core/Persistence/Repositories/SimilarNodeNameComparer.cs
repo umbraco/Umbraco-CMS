@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         public int Compare(string x, string y)
         {
-            if (x.LastIndexOf(')') == x.Length - 1 && y.LastIndexOf(')') == y.Length - 1)
+            if (x.LastIndexOf('(') != -1 && x.LastIndexOf(')') == x.Length - 1 && y.LastIndexOf(')') == y.Length - 1)
             {
                 if (x.ToLower().Substring(0, x.LastIndexOf('(')) == y.ToLower().Substring(0, y.LastIndexOf('(')))
                 {

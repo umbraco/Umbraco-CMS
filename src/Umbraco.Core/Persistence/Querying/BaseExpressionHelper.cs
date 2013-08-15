@@ -6,9 +6,9 @@ namespace Umbraco.Core.Persistence.Querying
     /// <summary>
     /// Logic that is shared with the expression helpers
     /// </summary>
-    internal class QueryHelper
+    internal class BaseExpressionHelper
     {
-        public static string GetQuotedValue(object value, Type fieldType, Func<object, string> escapeCallback = null, Func<Type, bool> shouldQuoteCallback = null)
+        public virtual string GetQuotedValue(object value, Type fieldType, Func<object, string> escapeCallback = null, Func<Type, bool> shouldQuoteCallback = null)
         {
             if (value == null) return "NULL";
 
@@ -57,14 +57,45 @@ namespace Umbraco.Core.Persistence.Querying
                        : value.ToString();
         }
 
-        public static string EscapeParam(object paramValue)
+        public virtual string EscapeParam(object paramValue)
         {
             return paramValue.ToString().Replace("'", "''");
         }
 
-        public static bool ShouldQuoteValue(Type fieldType)
+        public virtual string EscapeAtArgument(string exp)
+        {
+            if (exp.StartsWith("@"))
+                return string.Concat("@", exp);
+
+            return exp;
+        }
+
+        public virtual bool ShouldQuoteValue(Type fieldType)
         {
             return true;
+        }
+
+        protected virtual string RemoveQuote(string exp)
+        {
+            if (exp.StartsWith("'") && exp.EndsWith("'"))
+            {
+                exp = exp.Remove(0, 1);
+                exp = exp.Remove(exp.Length - 1, 1);
+            }
+            return exp;
+        }
+
+        protected virtual string RemoveQuoteFromAlias(string exp)
+        {
+
+            if ((exp.StartsWith("\"") || exp.StartsWith("`") || exp.StartsWith("'"))
+                &&
+                (exp.EndsWith("\"") || exp.EndsWith("`") || exp.EndsWith("'")))
+            {
+                exp = exp.Remove(0, 1);
+                exp = exp.Remove(exp.Length - 1, 1);
+            }
+            return exp;
         }
     }
 }

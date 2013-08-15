@@ -9,34 +9,6 @@ namespace Umbraco.Core.Persistence
     /// </summary>
     public class RepositoryFactory
     {
-        
-        internal virtual ServerRegistrationRepository CreateServerRegistrationRepository(IDatabaseUnitOfWork uow)
-        {
-            return new ServerRegistrationRepository(
-                uow,
-                NullCacheProvider.Current);
-        }
-
-		internal virtual IUserTypeRepository CreateUserTypeRepository(IDatabaseUnitOfWork uow)
-        {
-            return new UserTypeRepository(
-                uow,
-                NullCacheProvider.Current);
-        }
-
-		internal virtual IUserRepository CreateUserRepository(IDatabaseUnitOfWork uow)
-        {
-            return new UserRepository(
-                uow,
-                NullCacheProvider.Current,
-                CreateUserTypeRepository(uow));
-        }
-
-        internal virtual IEntityRepository CreateEntityRepository(IDatabaseUnitOfWork uow)
-        {
-            return new EntityRepository(uow);
-        }
-
         public virtual IContentRepository CreateContentRepository(IDatabaseUnitOfWork uow)
         {
             return new ContentRepository(
@@ -119,6 +91,38 @@ namespace Umbraco.Core.Persistence
         public virtual ITemplateRepository CreateTemplateRepository(IDatabaseUnitOfWork uow)
         {
             return new TemplateRepository(uow, RuntimeCacheProvider.Current);
+        }
+
+        internal virtual ServerRegistrationRepository CreateServerRegistrationRepository(IDatabaseUnitOfWork uow)
+        {
+            return new ServerRegistrationRepository(
+                uow,
+                NullCacheProvider.Current);
+        }
+
+        internal virtual IUserTypeRepository CreateUserTypeRepository(IDatabaseUnitOfWork uow)
+        {
+            return new UserTypeRepository(
+                uow,
+                NullCacheProvider.Current);
+        }
+
+        internal virtual IUserRepository CreateUserRepository(IDatabaseUnitOfWork uow)
+        {
+            return new UserRepository(
+                uow,
+                NullCacheProvider.Current,
+                CreateUserTypeRepository(uow));
+        }
+
+        internal virtual IEntityRepository CreateEntityRepository(IDatabaseUnitOfWork uow)
+        {
+            return new EntityRepository(uow);
+        }
+
+        internal virtual RecycleBinRepository CreateRecycleBinRepository(IDatabaseUnitOfWork uow)
+        {
+            return new RecycleBinRepository(uow);
         }
     }
 }

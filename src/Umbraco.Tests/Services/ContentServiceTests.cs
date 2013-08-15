@@ -725,15 +725,21 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.GetById(1048);
+            var temp = contentService.GetById(1048);
 
             // Act
-            var copy = contentService.Copy(content, content.ParentId, false, 0);
+            var copy = contentService.Copy(temp, temp.ParentId, false, 0);
+            var content = contentService.GetById(1048);
 
             // Assert
             Assert.That(copy, Is.Not.Null);
             Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
             Assert.AreNotSame(content, copy);
+            foreach (var property in copy.Properties)
+            {
+                Assert.AreNotEqual(property.Id, content.Properties[property.Alias].Id);
+                Assert.AreEqual(property.Value, content.Properties[property.Alias].Value);
+            }
             //Assert.AreNotEqual(content.Name, copy.Name);
         }
 

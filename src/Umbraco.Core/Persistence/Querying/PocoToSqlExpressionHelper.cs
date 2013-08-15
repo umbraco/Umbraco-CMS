@@ -8,7 +8,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Querying
 {
-    internal class PocoToSqlExpressionHelper<T>
+    internal class PocoToSqlExpressionHelper<T> : BaseExpressionHelper
     {
         private string sep = " ";
         private Database.PocoData pd;
@@ -250,7 +250,7 @@ namespace Umbraco.Core.Persistence.Querying
                 case "ToLower":
                     return string.Format("lower({0})", r);
                 case "StartsWith":
-                    return string.Format("upper({0}) like '{1}%'", r, RemoveQuote(args[0].ToString().ToUpper()));
+                    return string.Format("upper({0}) like '{1}%'", r, EscapeAtArgument(RemoveQuote(args[0].ToString().ToUpper())));
                 case "EndsWith":
                     return string.Format("upper({0}) like '%{1}'", r, RemoveQuote(args[0].ToString()).ToUpper());
                 case "Contains":
@@ -439,17 +439,7 @@ namespace Umbraco.Core.Persistence.Querying
 
         public virtual string GetQuotedValue(object value, Type fieldType)
         {
-            return QueryHelper.GetQuotedValue(value, fieldType, EscapeParam, ShouldQuoteValue);
-        }
-
-        public virtual string EscapeParam(object paramValue)
-        {
-            return paramValue.ToString().Replace("'", "''");
-        }
-
-        public virtual bool ShouldQuoteValue(Type fieldType)
-        {
-            return true;
+            return GetQuotedValue(value, fieldType, EscapeParam, ShouldQuoteValue);
         }
 
         protected virtual string GetFieldName(Database.PocoData pocoData, string name)
@@ -458,30 +448,6 @@ namespace Umbraco.Core.Persistence.Querying
             return string.Format("{0}.{1}",
                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(pocoData.TableInfo.TableName),
                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(column.Value.ColumnName));
-        }
-
-        protected string RemoveQuote(string exp)
-        {
-
-            if (exp.StartsWith("'") && exp.EndsWith("'"))
-            {
-                exp = exp.Remove(0, 1);
-                exp = exp.Remove(exp.Length - 1, 1);
-            }
-            return exp;
-        }
-
-        protected string RemoveQuoteFromAlias(string exp)
-        {
-
-            if ((exp.StartsWith("\"") || exp.StartsWith("`") || exp.StartsWith("'"))
-                &&
-                (exp.EndsWith("\"") || exp.EndsWith("`") || exp.EndsWith("'")))
-            {
-                exp = exp.Remove(0, 1);
-                exp = exp.Remove(exp.Length - 1, 1);
-            }
-            return exp;
         }
 
         private string GetTrueExpression()
