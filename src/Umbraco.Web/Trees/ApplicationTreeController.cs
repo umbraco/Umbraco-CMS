@@ -139,7 +139,7 @@ namespace Umbraco.Web.Trees
                 {
                     Children = legacyAttempt.Result
                 };
-                sectionRoot.AdditionalData.Add("treeType", Type.GetType(configTree.Type).FullName);
+                sectionRoot.AdditionalData.Add("treeAlias", configTree.Alias);
                 return sectionRoot;
             }
 

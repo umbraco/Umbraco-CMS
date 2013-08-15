@@ -284,7 +284,7 @@ namespace Umbraco.Web.Trees
             };
             if (isRoot)
             {
-                node.AdditionalData.Add("treeType", xmlTreeNode.TreeType);    
+                node.AdditionalData.Add("treeAlias", xmlTreeNode.TreeType);
             }
 
             //This is a special case scenario, we know that content/media works based on the normal Belle routing/editing so we'll ensure we don't

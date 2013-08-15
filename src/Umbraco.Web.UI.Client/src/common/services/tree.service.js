@@ -12,7 +12,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
     var treeArray = [];
     var standardCssClass = 'icon umb-tree-icon sprTree';
 
-    return {
+    return {  
         
         /** Internal method that ensures there's a routePath, parent and level property on each tree node and adds some icon specific properties so that the nodes display properly */
         _formatNodeDataForUseInUI: function (parentNode, treeNodes, section, level) {
@@ -29,6 +29,8 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     if (treeNodes[i].metaData && treeNodes[i].metaData["treeAlias"]) {
                         //this is a root node
                         treeNodes[i].routePath = section;
+                        //we're going to remove any js callbacks from legacy tree nodes here!
+                        treeNodes[i].metaData["jsClickCallback"] = null;
                     }
                     else {
                         var treeAlias = this.getTreeAlias(treeNodes[i]);
