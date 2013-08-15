@@ -485,9 +485,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return GetByVersion(dto.ContentVersionDto.VersionId);
         }
-
-        }
-
+        
         public void AssignEntityPermissions(IContent entity, string permission, IEnumerable<object> userIds)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork);
@@ -498,6 +496,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork);
             return repo.GetPermissionsForEntity(entityId);
+        }
+
         #endregion
         
         /// <summary>
