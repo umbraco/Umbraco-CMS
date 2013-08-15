@@ -6,6 +6,7 @@ using System.Security.Principal;
 using System.Threading;
 using System.Web;
 using System.Web.Routing;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -194,10 +195,18 @@ namespace Umbraco.Web
                             Thread.CurrentThread.CurrentUICulture =
                             new System.Globalization.CultureInfo(identity.Culture);
                     }
-                    catch (FormatException)
+                    catch (Exception ex)
                     {
-                        //this will occur if the cookie data is invalid
-                        http.UmbracoLogout();
+                        if (ex is FormatException || ex is JsonReaderException)
+                        {
+                            //this will occur if the cookie data is invalid
+                            http.UmbracoLogout();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                        
                     }
                 }
             }
