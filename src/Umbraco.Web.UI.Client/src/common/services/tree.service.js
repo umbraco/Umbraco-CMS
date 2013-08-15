@@ -12,41 +12,50 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
     var treeArray = [];
     var standardCssClass = 'icon umb-tree-icon sprTree';
 
-    /** ensures there's a routePath, parent and level property on each tree node and 
-        adds some icon specific properties so that the nodes display properly */
-    function formatNodeDataForUseInUI(parentNode, treeNodes, section, level) {
-        //if no level is set, then we make it 1   
-        var childLevel = (level ? level : 1);
-        for (var i = 0; i < treeNodes.length; i++) {
-            treeNodes[i].level = childLevel;
-            //if there is not route path specified, then set it automatically
-            if (!treeNodes[i].routePath) {
-                treeNodes[i].routePath = section + "/edit/" + treeNodes[i].id;
-            }
-            treeNodes[i].parent = parentNode;
-
-            //now, format the icon data
-            if (treeNodes[i].iconIsClass === undefined || treeNodes[i].iconIsClass) {
-                var converted = iconHelper.convertFromLegacyTreeNodeIcon(treeNodes[i]);
-                treeNodes[i].cssClass = standardCssClass + " " + converted;
-                if (converted.startsWith('.')) {
-                    //its legacy so add some width/height
-                    treeNodes[i].style = "height:16px;width:16px;";
-                }
-                else {
-                    treeNodes[i].style = "";
-                }                
-            }
-            else {
-                treeNodes[i].style = "background-image: url('" + treeNodes[i].iconFilePath + "');height:16px; background-position:2px 0px; background-repeat: no-repeat";
-                //we need an 'icon-' class in there for certain styles to work so if it is image based we'll add this
-                treeNodes[i].cssClass = standardCssClass + " icon-custom-file";
-            }            
-        }
-    }
-
     return {
         
+        /** Internal method that ensures there's a routePath, parent and level property on each tree node and adds some icon specific properties so that the nodes display properly */
+        _formatNodeDataForUseInUI: function (parentNode, treeNodes, section, level) {
+            //if no level is set, then we make it 1   
+            var childLevel = (level ? level : 1);
+            for (var i = 0; i < treeNodes.length; i++) {
+
+                treeNodes[i].level = childLevel;
+                treeNodes[i].parent = parentNode;
+                
+                //if there is not route path specified, then set it automatically,
+                //if this is a tree root node then we want to route to the section's dashboard
+                if (!treeNodes[i].routePath) {
+                    if (treeNodes[i].metaData && treeNodes[i].metaData["treeAlias"]) {
+                        //this is a root node
+                        treeNodes[i].routePath = section;
+                    }
+                    else {
+                        var treeAlias = this.getTreeAlias(treeNodes[i]);
+                        treeNodes[i].routePath = section + "/" + treeAlias + "/edit/" + treeNodes[i].id;
+                    }
+                }
+
+                //now, format the icon data
+                if (treeNodes[i].iconIsClass === undefined || treeNodes[i].iconIsClass) {
+                    var converted = iconHelper.convertFromLegacyTreeNodeIcon(treeNodes[i]);
+                    treeNodes[i].cssClass = standardCssClass + " " + converted;
+                    if (converted.startsWith('.')) {
+                        //its legacy so add some width/height
+                        treeNodes[i].style = "height:16px;width:16px;";
+                    }
+                    else {
+                        treeNodes[i].style = "";
+                    }
+                }
+                else {
+                    treeNodes[i].style = "background-image: url('" + treeNodes[i].iconFilePath + "');height:16px; background-position:2px 0px; background-repeat: no-repeat";
+                    //we need an 'icon-' class in there for certain styles to work so if it is image based we'll add this
+                    treeNodes[i].cssClass = standardCssClass + " icon-custom-file";
+                }
+            }
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.services.treeService#getMenuItemByAlias
@@ -147,12 +156,12 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
 
         /** Gets the root node of the current tree type for a given tree node */
         getTreeRoot: function(treeNode) {
-            //all root nodes have metadata key 'treeType'
+            //all root nodes have metadata key 'treeAlias'
             var root = null;
             var current = treeNode;            
             while (root === null && current !== undefined) {
                 
-                if (current.metaData && current.metaData["treeType"]) {
+                if (current.metaData && current.metaData["treeAlias"]) {
                     root = current;
                 }
                 else { 
@@ -160,6 +169,15 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                 }
             }
             return root;
+        },
+
+        /** Gets the node's tree alias, this is done by looking up the meta-data of the current node's root node */
+        getTreeAlias : function(treeNode) {
+            var root = this.getTreeRoot(treeNode);
+            if (root) {
+                return root.metaData["treeAlias"];
+            }
+            return "";
         },
 
         getTree: function (args) {
@@ -176,7 +194,9 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             if (treeArray[cacheKey] !== undefined){
                 return treeArray[cacheKey];
             }
-             
+
+            var self = this;
+
             return treeResource.loadApplication(args)
                 .then(function(data) {
                     //this will be called once the tree app data has loaded
@@ -186,7 +206,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                         root: data
                     };
                     //we need to format/modify some of the node data to be used in our app.
-                    formatNodeDataForUseInUI(result.root, result.root.children, section);
+                    self._formatNodeDataForUseInUI(result.root, result.root.children, section);
                     //cache this result
                     //TODO: We'll need to un-cache this in many circumstances
                     treeArray[cacheKey] = result;
@@ -266,11 +286,13 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             if(section === "content"){
                 action = "create";
             }
-            
+
+            var self = this;
+
             return treeResource.loadNodes({ section: section, node: treeItem })
-                .then(function(data) {
+                .then(function (data) {
                     //now that we have the data, we need to add the level property to each item and the view
-                    formatNodeDataForUseInUI(treeItem, data, section, treeItem.level + 1);
+                    self._formatNodeDataForUseInUI(treeItem, data, section, treeItem.level + 1);
                     return data;
                 });
         }

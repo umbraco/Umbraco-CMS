@@ -25,15 +25,24 @@ app.config(function ($routeProvider) {
                 if (!rp.method)
                     return "views/common/dashboard.html";
                 
+                //NOTE: This current isn't utilized by anything but does open up some cool opportunities for
+                // us since we'll be able to have specialized views for individual sections which is something
+                // we've never had before. So could utilize this for a new dashboard model when we get native
+                // angular dashboards working. Perhaps a normal section dashboard would list out the registered
+                // dashboards (as tabs if we wanted) and each tab could actually be a route link to one of these views?
+
                 return 'views/' + rp.section + '/' + rp.method + '.html';
             }
         })
-        .when('/:section/:method/:id', {
+        .when('/:section/:tree/:method/:id', {
             templateUrl: function (rp) {
-                if (!rp.method)
+                if (!rp.tree || !rp.method) {
                     return "views/common/dashboard.html";
-
-                return 'views/' + rp.section + '/' + rp.method + '.html';
+                }
+                    
+                //we don't need to put views into section folders since theoretically trees
+                // could be moved among sections, we only need folders for specific trees.
+                return 'views/' + rp.tree + '/' + rp.method + '.html';
             }
         })        
         .otherwise({ redirectTo: '/content' });

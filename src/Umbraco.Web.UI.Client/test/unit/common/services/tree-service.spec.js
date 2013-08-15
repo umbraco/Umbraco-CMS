@@ -1,19 +1,6 @@
 describe('tree service tests', function () {
     var treeService;
 
-    function ensureParentLevelAndView(parentNode, treeNodes, section, level) {
-        //if no level is set, then we make it 1   
-        var childLevel = (level ? level : 1);
-        for (var i = 0; i < treeNodes.length; i++) {
-            treeNodes[i].level = childLevel;
-            //if there is not route path specified, then set it automatically
-            if (!treeNodes[i].routePath) {
-                treeNodes[i].routePath = section + "/edit/" + treeNodes[i].id;
-            }
-            treeNodes[i].parent = parentNode;
-        }
-    }
-
     function getContentTree() {
 
         var url = "/umbraco/UmbracoTrees/ApplicationTreeApi/GetChildren?treeType=content&id=1234&level=1";
@@ -40,11 +27,11 @@ describe('tree service tests', function () {
             hasChildren: true,
             level: 0,
             menuUrl: menuUrl,
-            metaData: { treeType: "Umbraco.Web.Trees.ContentTreeController" }
+            metaData: { treeAlias: "content" }
         };
         
-        ensureParentLevelAndView(t, t.children, "content", 0);
-        ensureParentLevelAndView(t.children[0], t.children[0].children, "content", 1);
+        treeService._formatNodeDataForUseInUI(t, t.children, "content", 0);
+        treeService._formatNodeDataForUseInUI(t.children[0], t.children[0].children, "content", 1);
 
         return t;
     }

@@ -73,6 +73,14 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
+        /// Gets the current tree alias from the attribute assigned to it.
+        /// </summary>
+        public string TreeAlias
+        {
+            get { return _attribute.Alias; }
+        }
+
+        /// <summary>
         /// Returns the root node for the tree
         /// </summary>
         /// <param name="queryStrings"></param>
@@ -83,8 +91,8 @@ namespace Umbraco.Web.Trees
             if (queryStrings == null) queryStrings = new FormDataCollection("");
             var node = CreateRootNode(queryStrings);
 
-            //add the tree type to the root
-            node.AdditionalData.Add("treeType", GetType().FullName);
+            //add the tree alias to the root
+            node.AdditionalData.Add("treeAlias", TreeAlias);
 
             AddQueryStringsToAdditionalData(node, queryStrings);
 
@@ -188,9 +196,7 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         protected void AddQueryStringsToAdditionalData(TreeNode node, FormDataCollection queryStrings)
         {
-            // Add additional data, ensure treeId isn't added as we've already done that
-            foreach (var q in queryStrings
-                .Where(x => x.Key != "treeId" && node.AdditionalData.ContainsKey(x.Key) == false))
+            foreach (var q in queryStrings.Where(x => node.AdditionalData.ContainsKey(x.Key) == false))
             {
                 node.AdditionalData.Add(q.Key, q.Value);
             }

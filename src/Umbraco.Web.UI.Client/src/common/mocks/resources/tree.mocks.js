@@ -89,26 +89,43 @@ angular.module('umbraco.mocks').
                       hasChildren: true,
                       level: 0,
                       menuUrl: menuUrl,
-                      metaData: { treeType: "Umbraco.Web.Trees.ContentTreeController" }
+                      metaData: { treeAlias: "content" }
                   };
 
                   break;
+              case "media":
+                  t = {
+                      name: "media",
+                      id: -1,
+                      children: [
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1234, icon: "icon-home", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1235, icon: "icon-folder-close", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1236, icon: "icon-folder-close", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1237, icon: "icon-folder-close", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
+                      ],
+                      expanded: true,
+                      hasChildren: true,
+                      level: 0,
+                      menuUrl: menuUrl,
+                      metaData: { treeAlias: "media" }
+                  };
 
+                  break;
               case "developer":
                   t = {
                       name: "developer",
                       id: -1,
                       children: [
-                          { name: "Data types", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.DataTypeTreeController" } },
-                          { name: "Macros", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.MacrosTreeController" } },
-                          { name: "Pacakges", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.PackagesTreeController" } },
-                          { name: "XSLT Files", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.XsltTreeController" } },
-                          { name: "Razor Files", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.RazorTreeController" } }
+                          { name: "Data types", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeAlias: "datatype" } },
+                          { name: "Macros", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeAlias: "macros" } },
+                          { name: "Packages", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeAlias: "packager" } },
+                          { name: "XSLT Files", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeAlias: "xslt" } },
+                          { name: "Partial View Macros", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeAlias: "partialViewMacros" } }
                       ],
                       expanded: true,
                       hasChildren: true,
                       level: 0,
-                      isContainer: true                      
+                      isContainer: true
                   };
 
                   break;
@@ -117,11 +134,11 @@ angular.module('umbraco.mocks').
                       name: "settings",
                       id: -1,
                       children: [
-                          { name: "Stylesheets", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.StylesheetTreeController" } },
-                          { name: "Templates", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.TemplatesTreeController" } },
-                          { name: "Dictionary", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.DictionaryTreeController" } },
-                          { name: "Media types", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.MediaTypesTreeController" } },
-                          { name: "Document types", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeType: "Umbraco.Web.Trees.ContentTypesTreeController" } }
+                          { name: "Stylesheets", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeAlias: "stylesheets" } },
+                          { name: "Templates", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeAlias: "templates" } },
+                          { name: "Dictionary", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeAlias: "dictionary" } },
+                          { name: "Media types", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeAlias: "mediaTypes" } },
+                          { name: "Document types", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeAlias: "nodeTypes" } }
                       ],
                       expanded: true,
                       hasChildren: true,
@@ -145,7 +162,7 @@ angular.module('umbraco.mocks').
                       hasChildren: true,
                       level: 0,
                       menuUrl: menuUrl,
-                      metaData: { treeType: "Umbraco.Web.Trees.RandomTreeController" }
+                      metaData: { treeAlias: "randomTree" }
                   };
 
                   break;
