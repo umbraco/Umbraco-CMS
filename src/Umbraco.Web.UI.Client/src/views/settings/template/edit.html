@@ -1,0 +1,19 @@
+<div ng-form name="contentForm">
+    <umb-panel ng-controller="Umbraco.Editors.Settings.Template.EditController" val-show-validation>
+	<umb-header>
+    	<h1>woop</h1>
+    </umb-header>
+	
+	<div class="umb-pane row-fluid">
+		<div class="span6">
+			<div ace="html" ng-model="template">
+				<textarea></textarea>
+			</div>
+		</div>
+		<div class="span6">
+			<iframe style="width: 100%; height: 100%" id="preview" />
+		</div>
+	</div>
+
+	</umb-panel>
+</div>

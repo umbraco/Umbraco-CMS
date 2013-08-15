@@ -12,11 +12,7 @@ angular.module("umbraco.directives")
         },
         link: function (scope, iElement, iAttrs) {
 
-            if (!iAttrs.tabs){
-                throw "a 'tabs' attribute must be set for umbHeader which represents the collection of tabs";
-            }        
-            //var hasProcessed = false;
-
+            scope.showTabs = iAttrs.tabs ? true : false;
             scope.collectedTabs = [];
 
             //when the tabs change, we need to hack the planet a bit and force the first tab content to be active,
