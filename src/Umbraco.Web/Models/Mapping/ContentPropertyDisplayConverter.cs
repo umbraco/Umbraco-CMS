@@ -31,11 +31,11 @@ namespace Umbraco.Web.Models.Mapping
 
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(originalProp.PropertyType.DataTypeDefinitionId);
            
-            //let the property editor format the pre-values
-            display.Config = display.PropertyEditor.FormatPreValues(display.PropertyEditor.DefaultPreValues, preVals);
+            
             
             if (display.PropertyEditor == null)
             {
+                display.Config = PreValueCollection.AsDictionary(preVals);
                 //if there is no property editor it means that it is a legacy data type
                 // we cannot support editing with that so we'll just render the readonly value view.
                 display.View = GlobalSettings.Path.EnsureEndsWith('/') +
@@ -43,6 +43,8 @@ namespace Umbraco.Web.Models.Mapping
             }
             else
             {
+                //let the property editor format the pre-values
+                display.Config = display.PropertyEditor.FormatPreValues(display.PropertyEditor.DefaultPreValues, preVals);
                 display.View = display.PropertyEditor.ValueEditor.View;
             }
 

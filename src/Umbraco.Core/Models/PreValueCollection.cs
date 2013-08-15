@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Umbraco.Core.Models
 {
@@ -59,6 +60,23 @@ namespace Umbraco.Core.Models
         public PreValueCollection(IDictionary<string, object> preVals)
         {
             _preValuesAsDictionary = preVals;
+        }
+
+        internal static IDictionary<string, object> AsDictionary(PreValueCollection persistedPreVals)
+        {
+            if (persistedPreVals.IsDictionaryBased)
+            {
+                return persistedPreVals.PreValuesAsDictionary;
+            }
+
+            //it's an array so need to format it 
+            var result = new Dictionary<string, object>();
+            var asArray = persistedPreVals.PreValuesAsArray.ToArray();
+            for (var i = 0; i < asArray.Length; i++)
+            {
+                result.Add(i.ToInvariantString(), asArray[i]);
+            }
+            return result;
         }
     }
 }
