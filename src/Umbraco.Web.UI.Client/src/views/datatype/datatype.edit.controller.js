@@ -8,6 +8,7 @@
  */
 function DataTypeEditController($scope, $routeParams, $location, dataTypeResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper) {
 
+    //set up the standard data type props
     function createDisplayProps() {
         $scope.properties = {
             selectedEditor: {
@@ -22,6 +23,7 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
         };
     }
     
+    //setup the pre-values as props
     function createPreValueProps(preVals) {
         $scope.preValues = [];
         for (var i = 0; i < preVals.length; i++) {
@@ -33,17 +35,6 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
                 view: preVals[i].view,
             });
         }
-
-        //    {
-        //        alias: "selectedEditor",
-        //        description: "Select a property editor",
-        //        label: "Property editor"
-        //    },
-        //    {
-        //        alias: "selectedEditorId",
-        //        label: "Property editor GUID"
-        //    }
-        //];
     }
 
     if ($routeParams.create) {
@@ -52,6 +43,7 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
             .then(function(data) {
                 $scope.loaded = true;
                 $scope.content = data;
+                createDisplayProps();
             });
     }
     else {
@@ -74,6 +66,8 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
     //ensure there is a form object assigned.
     var currentForm = angularHelper.getRequiredCurrentForm($scope);
 
+    //TODO: We need to handle the dynamic loading of the pre-value editor view whenever the drop down changes!
+    
     $scope.save = function (cnt) {
         $scope.$broadcast("saving", { scope: $scope });
             
@@ -82,12 +76,12 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
 
         serverValidationManager.reset();
 
-        dataTypeResource.save(cnt, $routeParams.create, $scope.files)
+        dataTypeResource.save(cnt, $routeParams.create)
             .then(function (data) {
-                contentEditingHelper.handleSuccessfulSave({
-                    scope: $scope,
-                    newContent: data
-                });
+                
+                //TODO: SD: I need to finish this on monday!
+                alert("Woot!");
+
             }, function (err) {
                 contentEditingHelper.handleSaveError(err, $scope);
         });

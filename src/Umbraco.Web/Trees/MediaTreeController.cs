@@ -3,12 +3,15 @@ using System.Net.Http.Formatting;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.Trees.Menu;
 using umbraco.BusinessLogic.Actions;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
     [Tree(Constants.Applications.Media, Constants.Trees.Media, "Media")]
+    [PluginController("UmbracoTrees")]
     public class MediaTreeController : ContentTreeControllerBase
     {
         protected override int RecycleBinId

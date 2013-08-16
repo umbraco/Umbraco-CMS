@@ -34,12 +34,12 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
         /** saves or updates a data type object */
         save: function (dataType, isNew) {
             return umbRequestHelper.resourcePromise(
-               $http.post(
-                   umbRequestHelper.getApiUrl(
-                       "dataTypeApiBaseUrl",
-                       "PostSave",
-                       [{ id: id }])),
-               'Failed to save data for data type id ' + id);
+                 $http.post(umbRequestHelper.getApiUrl("dataTypeApiBaseUrl", "PostSave"),
+                    {
+                        //TODO: SD: I need to finish this on Monday!
+                        action: "save" + (isNew ? "New" : "")                        
+                    }),
+                'Failed to save data for data type id ' + id);
         }
     };
 }

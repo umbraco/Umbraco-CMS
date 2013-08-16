@@ -96,11 +96,11 @@ namespace Umbraco.Web
                 routeName = string.Format("umbraco-{0}-{1}-{2}", "api", area, controllerName);
                 if (id == null)
                 {
-                    return url.Link(routeName, new {controller = controllerName, action = actionName, area = area});
+                    return url.Link(routeName, new {controller = controllerName, action = actionName});
                 }
                 else
                 {
-                    return url.Link(routeName, new { controller = controllerName, action = actionName, area = area, id = id });
+                    return url.Link(routeName, new { controller = controllerName, action = actionName, id = id });
                 }
             }
         }

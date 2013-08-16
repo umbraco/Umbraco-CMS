@@ -2,7 +2,7 @@ angular.module('umbraco.mocks').
   factory('dataTypeMocks', ['$httpBackend', 'mocksUtils', function ($httpBackend, mocksUtils) {
       'use strict';
       
-      function returnNodebyId(status, data, headers) {
+      function returnById(status, data, headers) {
 
           if (!mocksUtils.checkAuth()) {
               return [401, null, null];
@@ -53,13 +53,33 @@ angular.module('umbraco.mocks').
           return [200, dataType, null];
       }
       
+      function returnEmpty(status, data, headers) {
 
+          if (!mocksUtils.checkAuth()) {
+              return [401, null, null];
+          }
+
+          var response = returnById(200, "", null);
+          var node = response[1];
+
+          node.name = "";
+          node.selectedEditor = "";
+          node.id = 0;
+          node.preValues = [];
+
+          return response;
+      }
 
       return {
           register: function() {
-            $httpBackend
-	            .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/DataType/GetById'))
-		          .respond(returnNodebyId);
+
+              $httpBackend
+                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/DataType/GetById'))
+                  .respond(returnById);
+              
+              $httpBackend
+                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/DataType/GetEmpty'))
+                  .respond(returnEmpty);
           },
           expectGetById: function() {
             $httpBackend
