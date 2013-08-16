@@ -54,7 +54,7 @@ angular.module('umbraco.services')
                     }
                     else {
                         currentUser = data;
-                        currentUser.avatar = 'http://www.gravatar.com/avatar/' + data.emailHash + '?s=40';
+                        currentUser.avatar = 'http://www.gravatar.com/avatar/' + data.emailHash + '?s=40&d=404';
                         return { user: data, authenticated: true };
                     }
                 });

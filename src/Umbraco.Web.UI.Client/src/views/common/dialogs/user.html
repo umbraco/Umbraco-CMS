@@ -13,21 +13,23 @@
 
 	<div class="umb-panel-body umb-scrollable" auto-scale="1">
 		<div class="tab-content umb-control-group">
+			<div class="umb-pane">
 			<h5>Your profile</h5>
-			
 			<p>
 				<a href="#/framed/%252Fumbraco%252Fusers%252Fedituser.aspx%253Fid%253D{{user.id}}" class="btn btn-primary">Edit your profile</a>
 			</p>
+			</div>
 
-			<hr />
-
+			<div class="umb-pane">
 			<h5>Your recent history</h5>
 			<ul class="umb-tree">
 					<li ng-repeat="item in history | orderBy:'time'">
 						<a ng-href="{{item.link}}" ng-click="gotoHistory(item.link)" prevent-default>
 							<i class="{{item.icon}}"></i> {{item.name}}</a>
 					</li>
-			</ul>	
+			</ul>
+			</div>
+
 		</div>
 	</div>
 </div>
