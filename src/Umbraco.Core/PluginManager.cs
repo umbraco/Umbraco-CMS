@@ -20,7 +20,6 @@ using File = System.IO.File;
 
 namespace Umbraco.Core
 {
-
     /// <summary>
     /// Used to resolve all plugin types and cache them and is also used to instantiate plugin types
     /// </summary>
@@ -307,15 +306,15 @@ namespace Umbraco.Core
                _appContext.ApplicationCache.ClearCacheItem("umbraco-plugins.list");
             }
         }
-
+        
         private string GetPluginListFilePath()
         {
-            return Path.Combine(_tempFolder, "umbraco-plugins.list");
+            return Path.Combine(_tempFolder, string.Format("umbraco-plugins.{0}.list", NetworkHelper.FileSafeMachineName));
         }
 
         private string GetPluginHashFilePath()
         {
-            return Path.Combine(_tempFolder, "umbraco-plugins.hash");
+            return Path.Combine(_tempFolder, string.Format("umbraco-plugins.{0}.hash", NetworkHelper.FileSafeMachineName));
         }
 
         /// <summary>
