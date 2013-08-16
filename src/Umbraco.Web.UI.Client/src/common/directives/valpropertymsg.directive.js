@@ -36,11 +36,7 @@ function valPropertyMsg(serverValidationManager) {
 
             //listen for error changes
             scope.$watch("formCtrl.$error", function () {
-                if (formCtrl.$valid === undefined) {
-                    return;
-                }
-
-                if (!formCtrl.$valid) {
+                if (formCtrl.$invalid) {
                     
                     //first we need to check if the valPropertyMsg validity is invalid
                     if (formCtrl.$error.valPropertyMsg && formCtrl.$error.valPropertyMsg.length > 0) {

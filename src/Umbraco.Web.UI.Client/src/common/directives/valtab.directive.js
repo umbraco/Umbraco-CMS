@@ -18,14 +18,10 @@ function valTab() {
             scope.tabHasError = false;
 
             //watch the current form's validation for the current field name
-            scope.$watch("formCtrl.$valid", function (isValid, lastValue) {
-                if (isValid === undefined) {
-                    return;
-                }
-                
+            scope.$watch("formCtrl.$valid", function () {                
                 var tabContent = element.closest(".umb-panel").find("#" + tabId);
 
-                if (!isValid) {
+                if (formCtrl.$invalid) {
                     //check if the validation messages are contained inside of this tabs 
                     if (tabContent.find(".ng-invalid").length > 0) {
                         scope.tabHasError = true;

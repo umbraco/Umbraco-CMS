@@ -14,19 +14,19 @@ function valToggleMsg(serverValidationManager) {
             if (!attr.valMsgFor){
                 throw "valToggleMsg requires that the attribute valMsgFor exists on the element";
             }
+            if (!formCtrl[attr.valMsgFor]) {
+                throw "valToggleMsg cannot find field " + attr.valMsgFor + " on form " + formCtrl.$name;
+            }
 
-            //we need to copy the form controller val to our isolated scope so that            
-            //we'll also maintain the current form name.
-            scope[formCtrl.$name] = formCtrl;
+            //assign the form control to our isolated scope so we can watch it's values
+            scope.formCtrl = formCtrl;
 
             //if there's any remaining errors in the server validation service then we should show them.
             var showValidation = serverValidationManager.items.length > 0;
-            var hasError = false;
             
             //add a watch to the validator for the value (i.e. myForm.value.$error.required )
-            scope.$watch(formCtrl.$name + "." + attr.valMsgFor + ".$error." + attr.valToggleMsg, function (isInvalid, oldValue) {
-                hasError = isInvalid;
-                if (hasError && showValidation) {
+            scope.$watch("formCtrl." + attr.valMsgFor + ".$error." + attr.valToggleMsg, function () {
+                if (formCtrl[attr.valMsgFor].$error[attr.valToggleMsg] && showValidation) {
                     element.show();
                 }
                 else {
@@ -36,7 +36,7 @@ function valToggleMsg(serverValidationManager) {
             
             scope.$on("saving", function(ev, args) {
                 showValidation = true;
-                if (hasError) {
+                if (formCtrl[attr.valMsgFor].$error[attr.valToggleMsg]) {
                     element.show();
                 }
                 else {
