@@ -26,10 +26,10 @@
                 <div class="umb-pane">
                     <umb-property property="properties.selectedEditor">                        
                         <div>
-                            <select name="selectedEditor" id="selectedEditor"
-                                    ng-model="availableEditors" 
+                            <select name="selectedEditor"
+                                    ng-model="content.selectedEditor" 
                                     required  
-                                    ng-options="e.name for e in content.availableEditors track by e.editorId"></select>
+                                    ng-options="e.editorId as e.name for e in content.availableEditors"></select>
                             <span class="help-inline" val-msg-for="selectedEditor" val-toggle-msg="required">Required</span>
                         </div>
 

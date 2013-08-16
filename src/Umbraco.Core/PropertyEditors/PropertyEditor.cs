@@ -32,7 +32,7 @@ namespace Umbraco.Core.PropertyEditors
                 
                 StaticallyDefinedValueEditor.ValueType = att.ValueType;
                 StaticallyDefinedValueEditor.View = att.EditorView;
-                StaticallyDefinedPreValueEditor.View = att.PreValueEditorView;
+                //StaticallyDefinedPreValueEditor.View = att.PreValueEditorView;
             }
         }
 
@@ -60,7 +60,7 @@ namespace Umbraco.Core.PropertyEditors
         [JsonProperty("name", Required = Required.Always)]
         public string Name { get; internal set; }
 
-        [JsonProperty("editor")]        
+        [JsonProperty("editor", Required = Required.Always)]        
         public ValueEditor ValueEditor
         {
             get { return CreateValueEditor(); }
@@ -105,7 +105,18 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <returns></returns>
         protected virtual PreValueEditor CreatePreValueEditor()
-        {
+        {            
+            if (StaticallyDefinedPreValueEditor != null)
+            {
+                foreach (var f in StaticallyDefinedPreValueEditor.Fields)
+                {
+                    //detect if the view is a virtual path (in most cases, yes) then convert it
+                    if (f.View.StartsWith("~/"))
+                    {
+                        f.View = IOHelper.ResolveUrl(f.View);
+                    }    
+                }                
+            }
             return StaticallyDefinedPreValueEditor;
         }
 

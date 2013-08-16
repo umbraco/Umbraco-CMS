@@ -15,6 +15,59 @@ namespace Umbraco.Belle.Tests
     {
 
         [Test]
+        public void Parse_Property_Editors_With_Pre_Vals()
+        {
+
+            var a = JsonConvert.DeserializeObject<JArray>(@"[
+    {
+        id: '0EEBB7CE-51BA-4F6B-9D9C-78BB3314366C',
+        name: 'Test 1',        
+        editor: {
+            view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
+            valueType: 'int',
+            validation: [
+                {
+                    type: 'Required'
+                },
+                {
+                    type: 'Regex',
+                    value: '\\d*'
+                },
+            ]
+        },
+        preValueEditor: {
+				fields: [
+					{
+						key: 'key1',
+						view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val1.html',
+						validation: [
+							{
+								type: 'Required' 
+							}						
+						]
+					},
+                    {
+						key: 'key2',
+						view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val2.html'
+					}
+				]
+			}
+    }
+]");
+            var parser = ManifestParser.GetPropertyEditors(a);
+
+            Assert.AreEqual(1, parser.Count());
+            Assert.AreEqual(2, parser.ElementAt(0).PreValueEditor.Fields.Count());
+            Assert.AreEqual("key1", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(0).Key);
+            Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/Views/pre-val1.html", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(0).View);
+            Assert.AreEqual(1, parser.ElementAt(0).PreValueEditor.Fields.ElementAt(0).Validators.Count());
+
+            Assert.AreEqual("key2", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(1).Key);
+            Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/Views/pre-val2.html", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(1).View);
+            Assert.AreEqual(0, parser.ElementAt(0).PreValueEditor.Fields.ElementAt(1).Validators.Count());
+        }
+
+        [Test]
         public void Parse_Property_Editors()
         {
 
@@ -39,22 +92,25 @@ namespace Umbraco.Belle.Tests
     {
         id: '1FCF5C39-5FC7-4BCE-AFBE-6500D9EBA261',
         name: 'Test 2',
+        defaultConfig: { key1: 'some default pre val' },
         editor: {
             view: '~/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html'
         }
-    },
+    }
 ]");
             var parser = ManifestParser.GetPropertyEditors(a);
 
             Assert.AreEqual(2, parser.Count());
             Assert.AreEqual(new Guid("0EEBB7CE-51BA-4F6B-9D9C-78BB3314366C"), parser.ElementAt(0).Id);
             Assert.AreEqual("Test 1", parser.ElementAt(0).Name);
-            Assert.AreEqual("~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html", parser.ElementAt(0).ValueEditor.View);
+            Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/MyEditor.html", parser.ElementAt(0).ValueEditor.View);
             Assert.AreEqual("int", parser.ElementAt(0).ValueEditor.ValueType);
             Assert.AreEqual(2, parser.ElementAt(0).ValueEditor.Validators.Count());
 
             Assert.AreEqual(new Guid("1FCF5C39-5FC7-4BCE-AFBE-6500D9EBA261"), parser.ElementAt(1).Id);
             Assert.AreEqual("Test 2", parser.ElementAt(1).Name);
+            Assert.IsTrue(parser.ElementAt(1).DefaultPreValues.ContainsKey("key1"));
+            Assert.AreEqual("some default pre val", parser.ElementAt(1).DefaultPreValues["key1"]);
         }
 
         [Test]

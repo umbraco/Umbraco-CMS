@@ -3,6 +3,9 @@
 		{
 			id: "0BA0F832-D759-4526-9B3E-94BBFC98F92E",
 			name: "Regex",
+			defaultConfig: {
+				regexStatement: "^\\d*$"
+			},
 			editor: {
 				view: "~/App_Plugins/MyPackage/PropertyEditors/Views/RegexEditor.html",
 				validation: [
@@ -15,8 +18,18 @@
 					}
 				]
 			},
-			preValues: {
-				view: "myPreValues1"				
+			preValueEditor: {
+				fields: [
+					{
+						key: "regex",
+						view: "~/App_Plugins/MyPackage/PropertyEditors/Views/regexStatement.html",
+						validation: [
+							{
+								type: "Required" 
+							}						
+						]
+					}
+				]
 			}
 		},
 		{

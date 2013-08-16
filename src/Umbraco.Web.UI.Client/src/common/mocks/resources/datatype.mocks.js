@@ -9,15 +9,17 @@ angular.module('umbraco.mocks').
           }
 
           var id = mocksUtils.getParameterByName(data, "id") || 1234;
-          
+
+          var selectedId = String.CreateGuid();
+
           var dataType = {
               id: id,
               name: "Data type " + id,
-              selectedEditor: String.CreateGuid(),
+              selectedEditor: selectedId,
               availableEditors: [
                   { name: "Some editor 1", editorId: String.CreateGuid() },
                   { name: "Some editor 2", editorId: String.CreateGuid() },
-                  { name: "Some editor 3", editorId: String.CreateGuid() },
+                  { name: "Some editor 3", editorId: selectedId },
                   { name: "Some editor 4", editorId: String.CreateGuid() },
                   { name: "Some editor 5", editorId: String.CreateGuid() },
                   { name: "Some editor 6", editorId: String.CreateGuid() }
