@@ -1913,12 +1913,16 @@
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\RelationTypesWebService.asmx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\DesktopMediaUploader.ascx" />
+    <Content Include="umbraco.presentation\umbraco\dashboard\DesktopMediaUploader.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dashboard\ChangePassword.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\DeveloperDashboardIntro.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\DeveloperDashboardVideos.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\MediaDashboardIntro.ascx" />
+    <Content Include="umbraco.presentation\umbraco\dashboard\MediaDashboardIntro.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dashboard\MediaDashboardVideos.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\MembersDashboardIntro.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\MembersDashboardVideos.ascx" />

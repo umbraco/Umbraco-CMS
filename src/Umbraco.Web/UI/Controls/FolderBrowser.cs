@@ -121,7 +121,7 @@ namespace Umbraco.Web.UI.Controls
                       "</div>");
 
             // Create the filter input
-            sb.Append("<div class='filter'>Filter: <input type='text' data-bind=\"value: filterTerm, valueUpdate: 'afterkeydown'\" id='filterTerm'/></div>");
+            sb.Append("<div class='filter'><input type='text' placeholder='filter...' data-bind=\"value: filterTerm, valueUpdate: 'afterkeydown'\" id='filterTerm'/></div>");
 
             // Create throbber to display whilst loading items
             sb.Append("<img src='images/throbber.gif' alt='' class='throbber' data-bind=\"visible: filtered().length == 0\" />");

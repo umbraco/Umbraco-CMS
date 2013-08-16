@@ -1,9 +1,5 @@
 ﻿.umbFolderBrowser {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+
 }
 
 .upload-overlay {
@@ -108,8 +104,7 @@
 .umbFolderBrowser .breadcrumb {
     margin: 20px 20px 15px;
     padding: 0 0 10px;
-
-    border-bottom: solid 1px #ccc;
+    background: none !Important;
 }
 
 .umbFolderBrowser .breadcrumb li {
@@ -137,6 +132,7 @@
     right: 270px;
     border-right: solid 1px #ccc;
     padding-right: 15px;
+    display: none;
 }
 
 .umbFolderBrowser .thumb-sizer input,
@@ -146,8 +142,8 @@
 
 .umbFolderBrowser .filter {
     position: absolute;
-    top: 15px;
-    right: 20px;
+    top: 30px;
+    right: 80px;
 }
 
 .umbFolderBrowser .filter input {
