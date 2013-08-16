@@ -11,21 +11,21 @@
             <div class="span8">
                 <div class="btn-toolbar pull-right umb-btn-toolbar">
                     <div class="btn-group">
-                        <a class="btn" ng-click="preview(content)" 
-                        data-shortcut="ctrl+s">Preview page</a>
+                        <a class="btn" ng-click="preview(content)">Preview page</a>
                     </div>
 
                     <div class="btn-group">
-                        <a class="btn btn-success" href="#" ng-click="saveAndPublish(content)" prevent-default data-shortcut="ctrl+p">Publish</a>
-
+                        <a class="btn btn-success" href="#" ng-click="saveAndPublish(content)"
+                        prevent-default data-hotkey="ctrl+p">Publish</a>
+                       
                         <a class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                             <span class="caret"></span>
                         </a>
 
                         <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                            <li>
+                           <li>
                                 <!--This should be changed to a submit button! but then we need to update the styles for dropdown-menu to support buttons -->
-                                <a href="#" data-shortcut="ctrl+s" prevent-default ng-click="save(content)">Save draft</a>
+                                <a href="#" data-hotkey="ctrl+s" prevent-default ng-click="save(content)">Save draft</a>
                             </li>
                          </ul>
                      </div>

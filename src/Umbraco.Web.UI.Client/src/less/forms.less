@@ -7,10 +7,15 @@
 .hideLabel label {
     display: none;
 }
-
 .hideLabel .controls-row {
     margin-left: 0px !Important;
 }
+
+//utill styll to hide child untill hover
+.hover-show{visibility: hidden;}
+*:hover > .hover-show{visibility: visible;}
+
+
 
 // GENERAL STYLES
 // --------------
@@ -44,6 +49,8 @@ legend {
     color: @grayLight;
   }
 }
+
+
 
 // Set font for forms
 label,

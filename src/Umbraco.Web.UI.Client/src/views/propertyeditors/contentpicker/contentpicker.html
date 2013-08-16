@@ -1,11 +1,9 @@
 <div ng-controller="Umbraco.Editors.ContentPickerController">
-
-	{{model | json }}
-	
-	<ul class="nav nav-stacked">	
+	<ul class="nav nav-stacked" style="width: 250px">	
 		<li ng-repeat="node in renderModel">
 			<a href="#" prevent-default ng-click="remove($index)">
-				<i class="icon umb-tree-icon sprTree {{node.icon}}"></i> 
+				<i class="icon icon-remove red hover-show pull-right"></i>
+				<i class="{{node.icon}}"></i> 
 					{{node.name}}
 			</a>
 		</li>
