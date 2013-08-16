@@ -32,7 +32,6 @@ namespace Umbraco.Core.PropertyEditors
                 
                 StaticallyDefinedValueEditor.ValueType = att.ValueType;
                 StaticallyDefinedValueEditor.View = att.EditorView;
-                //StaticallyDefinedPreValueEditor.View = att.PreValueEditorView;
             }
         }
 

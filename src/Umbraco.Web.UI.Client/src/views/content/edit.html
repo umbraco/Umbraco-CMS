@@ -1,4 +1,4 @@
-<form name="contentForm" ng-show="loaded">
+<form novalidate name="contentForm" ng-show="loaded" ng-submit="save(content)">
     <umb-panel ng-controller="Umbraco.Editors.Content.EditController" val-show-validation>
 
         <umb-header tabs="content.tabs">
@@ -16,16 +16,17 @@
                     </div>
 
                     <div class="btn-group">
-                        <a class="btn btn-success" href="#" ng-click="saveAndPublish(content)"
-                        prevent-default data-shortcut="ctrl+p">Publish</a>
+                        <a class="btn btn-success" href="#" ng-click="saveAndPublish(content)" prevent-default data-shortcut="ctrl+p">Publish</a>
 
                         <a class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                             <span class="caret"></span>
                         </a>
 
                         <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                            <li><a href="#" ng-click="save(content)"
-                             prevent-default data-shortcut="ctrl+s">Save draft</a></li>
+                            <li>
+                                <!--This should be changed to a submit button! but then we need to update the styles for dropdown-menu to support buttons -->
+                                <a href="#" data-shortcut="ctrl+s" prevent-default ng-click="save(content)">Save draft</a>
+                            </li>
                          </ul>
                      </div>
                  </div>

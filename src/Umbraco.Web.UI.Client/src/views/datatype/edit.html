@@ -1,4 +1,4 @@
-<form name="contentForm" ng-show="loaded">
+<form novalidate name="contentForm" ng-show="loaded" ng-submit="save(content)">
     <umb-panel ng-controller="Umbraco.Editors.DataType.EditController" val-show-validation>
 
         <umb-header>
@@ -13,8 +13,7 @@
                     
                     <div class="btn-group">
                         
-                        <a class="btn btn-success" href="#" ng-click="save(content)" data-shortcut="ctrl+s"
-                           prevent-default>Save</a>
+                        <button type="submit" class="btn btn-success" href="#">Save</button>
 
                     </div>
                 </div>
@@ -24,6 +23,7 @@
         <div class="umb-panel-body umb-scrollable row-fluid" auto-scale="1">
             <div class="tab-content form-horizontal">
                 <div class="umb-pane">
+                    
                     <umb-property property="properties.selectedEditor">                        
                         <div>
                             <select name="selectedEditor"
@@ -34,9 +34,20 @@
                         </div>
 
                     </umb-property>
+                    
                     <umb-property property="properties.selectedEditorId">
                         <div>{{content.selectedEditor}}</div>
                     </umb-property>
+                    
+                    <hr />
+                    
+                    <umb-property 
+                        property="preValue" 
+                        ng-repeat="preValue in preValues">
+                        
+                        <umb-editor model="preValue" is-pre-value="true"></umb-editor>
+                    </umb-property>
+
                 </div>
             </div>
         </div>

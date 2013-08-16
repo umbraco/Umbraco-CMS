@@ -21,6 +21,30 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
             }
         };
     }
+    
+    function createPreValueProps(preVals) {
+        $scope.preValues = [];
+        for (var i = 0; i < preVals.length; i++) {
+            $scope.preValues.push({
+                hideLabel: preVals[i].hideLabel,
+                alias: preVals[i].key,
+                description: preVals[i].description,
+                label: preVals[i].label,
+                view: preVals[i].view,
+            });
+        }
+
+        //    {
+        //        alias: "selectedEditor",
+        //        description: "Select a property editor",
+        //        label: "Property editor"
+        //    },
+        //    {
+        //        alias: "selectedEditorId",
+        //        label: "Property editor GUID"
+        //    }
+        //];
+    }
 
     if ($routeParams.create) {
         //we are creating so get an empty content item
@@ -37,6 +61,7 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
                 $scope.loaded = true;
                 $scope.content = data;
                 createDisplayProps();
+                createPreValueProps($scope.content.preValues);
                 
                 //in one particular special case, after we've created a new item we redirect back to the edit
                 // route but there might be server validation errors in the collection which we need to display

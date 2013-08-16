@@ -14,15 +14,39 @@ angular.module('umbraco.mocks').
 
           var dataType = {
               id: id,
-              name: "Data type " + id,
+              name: "Simple editor " + id,
               selectedEditor: selectedId,
               availableEditors: [
-                  { name: "Some editor 1", editorId: String.CreateGuid() },
-                  { name: "Some editor 2", editorId: String.CreateGuid() },
-                  { name: "Some editor 3", editorId: selectedId },
-                  { name: "Some editor 4", editorId: String.CreateGuid() },
-                  { name: "Some editor 5", editorId: String.CreateGuid() },
-                  { name: "Some editor 6", editorId: String.CreateGuid() }
+                  { name: "Simple editor 1", editorId: String.CreateGuid() },
+                  { name: "Simple editor 2", editorId: String.CreateGuid() },
+                  { name: "Simple editor 3", editorId: selectedId },
+                  { name: "Simple editor 4", editorId: String.CreateGuid() },
+                  { name: "Simple editor 5", editorId: String.CreateGuid() },
+                  { name: "Simple editor 6", editorId: String.CreateGuid() }
+              ],
+              preValues: [
+                    {
+                        label: "Custom pre value 1",
+                        description: "Enter a value for this pre-value",
+                        key: "myPreVal",
+                        view: "requiredfield",
+                        validation: [
+							{
+							    type: "Required"
+							}
+                        ]
+                    },
+                      {
+                          label: "Custom pre value 2",
+                          description: "Enter a value for this pre-value",
+                          key: "myPreVal",
+                          view: "requiredfield",
+                          validation: [
+                              {
+                                  type: "Required"
+                              }
+                          ]
+                      }
               ]
               
           };

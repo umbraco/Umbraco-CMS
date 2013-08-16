@@ -38,6 +38,7 @@ namespace Umbraco.Belle.Tests
         preValueEditor: {
 				fields: [
 					{
+                        label: 'Some config 1',
 						key: 'key1',
 						view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val1.html',
 						validation: [
@@ -47,6 +48,7 @@ namespace Umbraco.Belle.Tests
 						]
 					},
                     {
+                        label: 'Some config 2',
 						key: 'key2',
 						view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val2.html'
 					}
@@ -59,10 +61,12 @@ namespace Umbraco.Belle.Tests
             Assert.AreEqual(1, parser.Count());
             Assert.AreEqual(2, parser.ElementAt(0).PreValueEditor.Fields.Count());
             Assert.AreEqual("key1", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(0).Key);
+            Assert.AreEqual("Some config 1", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(0).Name);
             Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/Views/pre-val1.html", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(0).View);
             Assert.AreEqual(1, parser.ElementAt(0).PreValueEditor.Fields.ElementAt(0).Validators.Count());
 
             Assert.AreEqual("key2", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(1).Key);
+            Assert.AreEqual("Some config 2", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(1).Name);
             Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/Views/pre-val2.html", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(1).View);
             Assert.AreEqual(0, parser.ElementAt(0).PreValueEditor.Fields.ElementAt(1).Validators.Count());
         }
