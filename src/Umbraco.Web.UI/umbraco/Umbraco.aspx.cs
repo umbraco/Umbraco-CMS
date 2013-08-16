@@ -37,7 +37,7 @@ namespace Umbraco.Web.UI.Umbraco
                     jsEvents.Append(@"jQuery('." + appClass + "').click(function() { appClick.call(this, '" + a.alias + "'); } );");
                     jsEvents.Append(@"jQuery('." + appClass + "').dblclick(function() { appDblClick.call(this, '" + a.alias + "'); } );");
 
-                    string iconElement = String.Format("<li><a class=\"{0}\" title=\"" + ui.Text("sections", a.alias, UmbracoUser) + "\" href=\"javascript:void(0);\">", appClass);
+                    string iconElement = String.Format("<li><a class=\"{0}\" title=\"" + ui.Text("sections", a.alias, UmbracoUser) + "\" href=\"#" + a.alias + "\">", appClass);
                     if (a.icon.StartsWith("."))
                         iconElement +=
                             "<img src=\"images/nada.gif\" class=\"trayHolder\" alt=\"\" /></a></li>";

@@ -30,8 +30,11 @@ namespace umbraco.uicontrols {
             set { m_Text = value; }
         }
 
+	public void addProperty(string Caption, Control C ) {
+            addProperty( Caption, C, String.Empty );
+	}
 
-        public void addProperty(string Caption, Control C) {
+        public void addProperty(string Caption, Control C, string tooltip) {
             /*
             tr = new TableRow();
             td = new TableCell();
@@ -53,6 +56,7 @@ namespace umbraco.uicontrols {
             PropertyPanel pp = new PropertyPanel();
             pp.Controls.Add(C);
             pp.Text = Caption;
+            pp.ToolTip = tooltip;
 
             this.Controls.Add(pp);
         }
