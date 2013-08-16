@@ -1,4 +1,4 @@
-﻿<ng-form name="contentForm" ng-show="loaded">
+﻿<form novalidate name="contentForm" ng-show="loaded" ng-submit="save(content)">
     <umb-panel ng-controller="Umbraco.Editors.Media.EditController" val-show-validation>  
         <umb-header tabs="content.tabs">
             
@@ -9,8 +9,7 @@
                     
                     <div class="btn-group">
                         
-                        <a class="btn btn-success" href="#" ng-click="save(content)" data-shortcut="ctrl+s"
-                           prevent-default>Save</a>
+                        <button type="submit" class="btn btn-success" href="#">Save</button>
 
                     </div>
                 </div>
@@ -32,4 +31,4 @@
             </umb-tab>
         </umb-tab-view>
     </umb-panel>
-</ng-form>
+</form>

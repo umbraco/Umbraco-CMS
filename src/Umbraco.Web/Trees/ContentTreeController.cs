@@ -9,15 +9,18 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.Trees.Menu;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
 using umbraco.interfaces;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
     [Tree(Constants.Applications.Content, Constants.Trees.Content, "Content")]
+    [PluginController("UmbracoTrees")]
     public class ContentTreeController : ContentTreeControllerBase
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)

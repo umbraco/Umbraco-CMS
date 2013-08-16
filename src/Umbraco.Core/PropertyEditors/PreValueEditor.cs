@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace Umbraco.Core.PropertyEditors
@@ -7,20 +8,26 @@ namespace Umbraco.Core.PropertyEditors
     /// Defines a pre-value editor
     /// </summary>
     /// <remarks>
-    /// The Json serialization attributes are required for manifest property editors to work
+    /// A pre-value editor is made up of multiple pre-value fields, each field defines a key that the value is stored against.
+    /// Each field can have any editor and the value from each field can store any data such as a simple string or a json structure. 
+    /// 
+    /// The Json serialization attributes are required for manifest property editors to work.
     /// </remarks>
     public class PreValueEditor
     {
-        /// <summary>
-        /// The full virtual path or the relative path to the current Umbraco folder for the angular view
-        /// </summary>
-        [JsonProperty("view")]
-        public string View { get; set; }
+        public PreValueEditor()
+        {
+            Fields = Enumerable.Empty<PreValueField>();
+        }
 
         /// <summary>
-        /// A collection of validators for the pre value editor
+        /// A collection of pre-value fields to be edited
         /// </summary>
-        [JsonProperty("validation")]
-        public IEnumerable<ValidatorBase> Validators { get; set; }
+        /// <remarks>
+        /// If fields are specified then the master View and Validators will be ignored
+        /// </remarks>
+        [JsonProperty("fields")]
+        public IEnumerable<PreValueField> Fields { get; set; } 
+        
     }
 }

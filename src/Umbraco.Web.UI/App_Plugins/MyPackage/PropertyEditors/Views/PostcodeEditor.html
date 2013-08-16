@@ -4,7 +4,7 @@
     </p>
     <input name="myPackage_postcode" type="text" ng-model="model.value"
            val-server="value"
-           val-postcode="config.country"/>
+           val-postcode="model.config.country"/>
     
     <span class="help-inline" val-msg-for="myPackage_postcode" val-toggle-msg="valServer">{{propertyForm.myPackage_postcode.errorMsg}}</span>
     <span class="help-inline" val-msg-for="myPackage_postcode" val-toggle-msg="valPostcode">{{propertyForm.myPackage_postcode.errorMsg}}</span>

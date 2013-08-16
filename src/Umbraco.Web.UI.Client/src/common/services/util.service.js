@@ -196,15 +196,21 @@ function umbPropEditorHelper() {
      * 
      * @param {string} input the view path currently stored for the property editor
      */
-        getViewPath: function (input) {
+        getViewPath: function (input, isPreValue) {
             var path = String(input);
             if (path.startsWith('/')) {
                 return path;
             }
             else {
                 var pathName = path.replace('.', '/');
-                //i.e. views/propertyeditors/fileupload/fileupload.html
-                return "views/propertyeditors/" + pathName + "/" + pathName + ".html";
+                if (!isPreValue) {
+                    //i.e. views/propertyeditors/fileupload/fileupload.html
+                    return "views/propertyeditors/" + pathName + "/" + pathName + ".html";
+                }
+                else {
+                    //i.e. views/prevalueeditors/requiredfield.html
+                    return "views/prevalueeditors/" + pathName + ".html";
+                }
             }
         }
     };

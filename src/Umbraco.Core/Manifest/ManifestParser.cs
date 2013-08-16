@@ -33,7 +33,10 @@ namespace Umbraco.Core.Manifest
         /// <returns></returns>
         internal static IEnumerable<PropertyEditor> GetPropertyEditors(JArray jsonEditors)
         {
-            return JsonConvert.DeserializeObject<IEnumerable<PropertyEditor>>(jsonEditors.ToString(), new PropertyEditorConverter());
+            return JsonConvert.DeserializeObject<IEnumerable<PropertyEditor>>(
+                jsonEditors.ToString(), 
+                new PropertyEditorConverter(),
+                new PreValueFieldConverter());
         }
         
         /// <summary>

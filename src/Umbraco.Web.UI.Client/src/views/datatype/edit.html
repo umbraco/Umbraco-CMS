@@ -1,4 +1,4 @@
-<div ng-form name="contentForm" ng-show="loaded">
+<form novalidate name="contentForm" ng-show="loaded" ng-submit="save(content)">
     <umb-panel ng-controller="Umbraco.Editors.DataType.EditController" val-show-validation>
 
         <umb-header>
@@ -13,28 +13,44 @@
                     
                     <div class="btn-group">
                         
-                        <a class="btn btn-success" href="#" ng-click="save(content)" data-shortcut="ctrl+s"
-                           prevent-default>Save</a>
+                        <button type="submit" class="btn btn-success" href="#">Save</button>
 
                     </div>
                 </div>
             </div>
         </umb-header>
-
-        <umb-tab-view>
-            <umb-tab id="tab0" rel="0">
-
+        
+        <div class="umb-panel-body umb-scrollable row-fluid" auto-scale="1">
+            <div class="tab-content form-horizontal">
                 <div class="umb-pane">
-                    <umb-property 
-                        property="property"
-                        ng-repeat="property in properties">
-                        
-                        <umb-editor model="property"></umb-editor>
-                    </umb-property>
-                </div>
+                    
+                    <umb-property property="properties.selectedEditor">                        
+                        <div>
+                            <select name="selectedEditor"
+                                    ng-model="content.selectedEditor" 
+                                    required  
+                                    ng-options="e.editorId as e.name for e in content.availableEditors"></select>
+                            <span class="help-inline" val-msg-for="selectedEditor" val-toggle-msg="required">Required</span>
+                        </div>
 
-            </umb-tab>
-        </umb-tab-view>
+                    </umb-property>
+                    
+                    <umb-property property="properties.selectedEditorId">
+                        <div>{{content.selectedEditor}}</div>
+                    </umb-property>
+                    
+                    <hr />
+                    
+                    <umb-property 
+                        property="preValue" 
+                        ng-repeat="preValue in preValues">
+                        
+                        <umb-editor model="preValue" is-pre-value="true"></umb-editor>
+                    </umb-property>
+
+                </div>
+            </div>
+        </div>
 
     </umb-panel>
-</div>
+</form>

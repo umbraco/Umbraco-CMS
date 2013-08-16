@@ -27,6 +27,28 @@ namespace Umbraco.Core.Manifest
                 target.StaticallyDefinedValueEditor.Validators = new List<ManifestValidator>();
             }
 
+            if (jObject["preValueEditor"] != null)
+            {
+               target.StaticallyDefinedPreValueEditor.Fields = new List<PreValueField>();
+            }
+
+            base.Deserialize(jObject, target, serializer);
+        }
+    }
+
+    internal class PreValueFieldConverter : JsonCreationConverter<PreValueField>
+    {
+        protected override PreValueField Create(Type objectType, JObject jObject)
+        {
+            return new PreValueField()
+                {
+                    //assign manifest validators so the serialization process can continue
+                    Validators = new List<ManifestValidator>()
+                };
+        }
+
+        protected override void Deserialize(JObject jObject, PreValueField target, JsonSerializer serializer)
+        {            
             base.Deserialize(jObject, target, serializer);
         }
     }

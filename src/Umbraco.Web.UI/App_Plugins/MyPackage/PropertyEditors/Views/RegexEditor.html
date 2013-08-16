@@ -8,7 +8,7 @@
     <input name="regex" id="regex"            
            type="text" ng-model="model.value" 
            required 
-           val-regex="config" 
+           val-regex="model.config[0]" 
            val-server="value" />
         
     <span class="help-inline" val-msg-for="regex" val-toggle-msg="required">Required!</span>

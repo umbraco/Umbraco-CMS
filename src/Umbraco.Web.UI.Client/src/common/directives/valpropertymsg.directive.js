@@ -36,11 +36,7 @@ function valPropertyMsg(serverValidationManager) {
 
             //listen for error changes
             scope.$watch("formCtrl.$error", function () {
-                if (formCtrl.$valid === undefined) {
-                    return;
-                }
-
-                if (!formCtrl.$valid) {
+                if (formCtrl.$invalid) {
                     
                     //first we need to check if the valPropertyMsg validity is invalid
                     if (formCtrl.$error.valPropertyMsg && formCtrl.$error.valPropertyMsg.length > 0) {
@@ -53,7 +49,11 @@ function valPropertyMsg(serverValidationManager) {
                         hasError = true;
                         //update the validation message if we don't already have one assigned.
                         if (showValidation && scope.errorMsg === "") {
-                            var err = serverValidationManager.getPropertyError(scope.property.alias, "");
+                            var err;
+                            //this can be null if no property was assigned
+                            if (scope.property) {
+                                err = serverValidationManager.getPropertyError(scope.property.alias, "");
+                            }
                             scope.errorMsg = err ? err.errorMsg : "Property has errors";
                         }
                     }
@@ -72,7 +72,11 @@ function valPropertyMsg(serverValidationManager) {
             scope.$on("saving", function (ev, args) {
                 showValidation = true;
                 if (hasError && scope.errorMsg === "") {
-                    var err = serverValidationManager.getPropertyError(scope.property.alias, "");
+                    var err;
+                    //this can be null if no property was assigned
+                    if (scope.property) {
+                        err = serverValidationManager.getPropertyError(scope.property.alias, "");
+                    }
                     scope.errorMsg = err ? err.errorMsg : "Property has errors";                    
                 }
                 else if (!hasError) {
@@ -109,27 +113,30 @@ function valPropertyMsg(serverValidationManager) {
             // It's important to note that we need to subscribe to server validation changes here because we always must
             // indicate that a content property is invalid at the property level since developers may not actually implement
             // the correct field validation in their property editors.
-            serverValidationManager.subscribe(scope.property.alias, "", function (isValid, propertyErrors, allErrors) {
-                hasError = !isValid;
-                if (hasError) {
-                    //set the error message to the server message
-                    scope.errorMsg = propertyErrors[0].errorMsg;                                                         
-                    //flag that the current validator is invalid
-                    formCtrl.$setValidity('valPropertyMsg', false);
-                }
-                else {
-                    scope.errorMsg = "";
-                    //flag that the current validator is valid
-                    formCtrl.$setValidity('valPropertyMsg', true);                                 
-                }
-            });
             
-            //when the element is disposed we need to unsubscribe!
-            // NOTE: this is very important otherwise when this controller re-binds the previous subscriptsion will remain
-            // but they are a different callback instance than the above.
-            element.bind('$destroy', function () {
-                serverValidationManager.unsubscribe(scope.property.alias, "");
-            });
+            if (scope.property) { //this can be null if no property was assigned
+                serverValidationManager.subscribe(scope.property.alias, "", function(isValid, propertyErrors, allErrors) {
+                    hasError = !isValid;
+                    if (hasError) {
+                        //set the error message to the server message
+                        scope.errorMsg = propertyErrors[0].errorMsg;
+                        //flag that the current validator is invalid
+                        formCtrl.$setValidity('valPropertyMsg', false);
+                    }
+                    else {
+                        scope.errorMsg = "";
+                        //flag that the current validator is valid
+                        formCtrl.$setValidity('valPropertyMsg', true);
+                    }
+                });
+
+                //when the element is disposed we need to unsubscribe!
+                // NOTE: this is very important otherwise when this controller re-binds the previous subscriptsion will remain
+                // but they are a different callback instance than the above.
+                element.bind('$destroy', function() {
+                    serverValidationManager.unsubscribe(scope.property.alias, "");
+                });
+            }
         }
     };
 }

@@ -9,7 +9,8 @@ angular.module("umbraco.directives")
     .directive('umbEditor', function (umbPropEditorHelper) {
         return {
             scope: {
-                model: "="
+                model: "=",
+                isPreValue: "@"
             },
             require: "^form",
             restrict: 'E',
@@ -26,7 +27,7 @@ angular.module("umbraco.directives")
                    scope.model.alias = Math.random().toString(36).slice(2);
                 }
 
-                scope.propertyEditorView = umbPropEditorHelper.getViewPath(scope.model.view);
+                scope.propertyEditorView = umbPropEditorHelper.getViewPath(scope.model.view, scope.isPreValue);
             }
         };
     });

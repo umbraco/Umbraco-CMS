@@ -5,12 +5,15 @@ using System.Net;
 using System.Net.Http.Formatting;
 using System.Web.Http;
 using Umbraco.Core;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.Trees.Menu;
 using umbraco.BusinessLogic.Actions;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
     [Tree(Constants.Applications.Developer, Constants.Trees.DataTypes, "Data Types")]
+    [PluginController("UmbracoTrees")]
     public class DataTypeTreeController : TreeApiController
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)

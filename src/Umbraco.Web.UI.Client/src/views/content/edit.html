@@ -1,4 +1,4 @@
-<div ng-form name="contentForm" ng-show="loaded">
+<form novalidate name="contentForm" ng-show="loaded" ng-submit="save(content)">
     <umb-panel ng-controller="Umbraco.Editors.Content.EditController" val-show-validation>
 
         <umb-header tabs="content.tabs">
@@ -12,12 +12,13 @@
                 <div class="btn-toolbar pull-right umb-btn-toolbar">
                     <div class="btn-group">
                         <a class="btn" ng-click="preview(content)">Preview page</a>
+                        data-hotkey="ctrl+s">Preview page</a>
                     </div>
 
                     <div class="btn-group">
                         <a class="btn btn-success" href="#" ng-click="saveAndPublish(content)"
                         prevent-default data-hotkey="ctrl+p">Publish</a>
-
+                       
                         <a class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                             <span class="caret"></span>
                         </a>
@@ -47,4 +48,4 @@
         </umb-tab-view>
 
     </umb-panel>
-</div>
+</form>

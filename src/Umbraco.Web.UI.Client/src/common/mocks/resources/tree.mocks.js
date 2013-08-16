@@ -63,6 +63,38 @@ angular.module('umbraco.mocks').
           return [200, children, null];
       }
 
+      function returnDataTypes(status, data, headers) {
+          if (!mocksUtils.checkAuth()) {
+              return [401, null, null];
+          }
+          
+          var children = [
+              { name: "Textstring", childNodesUrl: null, id: 10, icon: "icon-file-alt", children: [], expanded: false, hasChildren: false, level: 1, defaultAction: null, menuUrl: null },
+              { name: "Multiple textstring", childNodesUrl: null, id: 11, icon: "icon-file-alt", children: [], expanded: false, hasChildren: false, level: 1, defaultAction: null, menuUrl: null },
+              { name: "Yes/No", childNodesUrl: null, id: 12, icon: "icon-file-alt", children: [], expanded: false, hasChildren: false, level: 1, defaultAction: null, menuUrl: null },
+              { name: "Rich Text Editor", childNodesUrl: null, id: 13, icon: "icon-file-alt", children: [], expanded: false, hasChildren: false, level: 1, defaultAction: null, menuUrl: null }
+          ];
+          
+          return [200, children, null];
+      }
+      
+      function returnDataTypeMenu(status, data, headers) {
+          if (!mocksUtils.checkAuth()) {
+              return [401, null, null];
+          }
+
+          var menu = [
+              {
+                   name: "Create", cssclass: "plus", alias: "create", metaData: {
+                       jsAction: "umbracoMenuActions.CreateChildEntity"
+                   }
+              },              
+              { seperator: true, name: "Reload", cssclass: "refresh", alias: "users", metaData: {} }
+          ];
+
+          return [200, menu, null];
+      }
+
       function returnApplicationTrees(status, data, headers) {
 
           if (!mocksUtils.checkAuth()) {
@@ -111,12 +143,16 @@ angular.module('umbraco.mocks').
                   };
 
                   break;
-              case "developer":
+              case "developer":                  
+
+                  var dataTypeChildrenUrl = "/umbraco/UmbracoTrees/DataTypeTree/GetNodes?id=-1&application=developer";
+                  var dataTypeMenuUrl = "/umbraco/UmbracoTrees/DataTypeTree/GetMenu?id=-1&application=developer";
+
                   t = {
                       name: "developer",
                       id: -1,
                       children: [
-                          { name: "Data types", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeAlias: "datatype" } },
+                          { name: "Data types", childNodesUrl: dataTypeChildrenUrl, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: dataTypeMenuUrl, metaData: { treeAlias: "datatype" } },
                           { name: "Macros", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeAlias: "macros" } },
                           { name: "Packages", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeAlias: "packager" } },
                           { name: "XSLT Files", childNodesUrl: url, id: -1, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl, metaData: { treeAlias: "xslt" } },
@@ -183,6 +219,15 @@ angular.module('umbraco.mocks').
               $httpBackend
                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoTrees/ApplicationTreeApi/GetChildren'))
                  .respond(returnChildren);
+              
+
+              $httpBackend
+                 .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoTrees/DataTypeTree/GetNodes'))
+                 .respond(returnDataTypes);
+              
+              $httpBackend
+                 .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoTrees/DataTypeTree/GetMenu'))
+                 .respond(returnDataTypeMenu);
               
               $httpBackend
                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoTrees/ApplicationTreeApi/GetMenu'))
