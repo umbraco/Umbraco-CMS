@@ -9,12 +9,17 @@
  * 
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope,$rootScope, $location, $log, navigationService, dialogService, historyService, sectionResource, angularHelper) {
+function NavigationController($scope,$rootScope, $location, $log, navigationService, keyboardService, dialogService, historyService, sectionResource, angularHelper) {
 
     //Put the navigation service on this scope so we can use it's methods/properties in the view.
     // IMPORTANT: all properties assigned to this scope are generally available on the scope object on dialogs since
     //   when we create a dialog we pass in this scope to be used for the dialog's scope instead of creating a new one.
     $scope.nav = navigationService;
+
+    //trigger search with a hotkey:
+    keyboardService.bind("ctrl+shift+s", function(){
+        $scope.nav.showTree($scope.ui.currentSection);
+    });
 
     //the tree event handler i used to subscribe to the main tree click events
     $scope.treeEventHandler = $({});

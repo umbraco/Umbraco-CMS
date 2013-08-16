@@ -19,19 +19,29 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
     {
-        public IUmbracoEntity GetById(int id)
+        public EntityDisplay GetById(int id)
         {
-            return Services.EntityService.Get(id);
+
+            return map((UmbracoEntity)Services.EntityService.Get(id, UmbracoObjectTypes.Document));
         }
 
-        public IEnumerable<IUmbracoEntity> GetByIds([FromUri]int[] ids)
+        public IEnumerable<EntityDisplay> GetByIds([FromUri]int[] ids)
         {
             if (ids == null) throw new ArgumentNullException("ids");
 
-            return ids.Select(id => Services.EntityService.Get(id)).Where(entity => entity != null).ToList();
+            return ids.Select(id => map(((UmbracoEntity)Services.EntityService.Get(id, UmbracoObjectTypes.Document)))).Where(entity => entity != null).ToList();
         }
 
-        
+        private EntityDisplay map(UmbracoEntity input)
+        {
+            EntityDisplay output = new EntityDisplay();
+            output.Name = input.Name;
+            output.Id = input.Id;
+            output.Key = input.Key;
+            output.Icon = input.ContentTypeIcon;
+            return output;
+        }
+
         //public IEnumerable<UmbracoEntity> GetContentByIds(int[] ids)
         //{
         //    var list = new List<UmbracoEntity>();

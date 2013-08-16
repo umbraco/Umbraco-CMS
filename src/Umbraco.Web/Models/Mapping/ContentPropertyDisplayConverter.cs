@@ -39,7 +39,7 @@ namespace Umbraco.Web.Models.Mapping
                 //if there is no property editor it means that it is a legacy data type
                 // we cannot support editing with that so we'll just render the readonly value view.
                 display.View = GlobalSettings.Path.EnsureEndsWith('/') +
-                               "views/propertyeditors/umbraco/readonlyvalue/readonlyvalue.html";
+                               "views/propertyeditors/readonlyvalue/readonlyvalue.html";
             }
             else
             {

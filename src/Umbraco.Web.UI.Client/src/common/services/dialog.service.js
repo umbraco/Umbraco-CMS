@@ -73,6 +73,7 @@ angular.module('umbraco.services')
            var $modal = $('<div data-backdrop="false"></div>');
            var id = templateUrl.replace('.html', '').replace('.aspx', '').replace(/[\/|\.|:\&\?\=]/g, "-") + '-' + scope.$id;
 
+           
 
            if(options.inline){
               animationClass = "";
@@ -136,6 +137,8 @@ angular.module('umbraco.services')
                        $timeout(function() {
                            $compile($modal)(scope);
                        });
+
+                       scope.dialogOptions = options;
 
                        //Scope to handle data from the modal form
                        scope.dialogData = {};
@@ -270,7 +273,7 @@ angular.module('umbraco.services')
             */
            mediaPicker: function (options) {
                return openDialog({
-                   scope: options.scope,
+                   scope: options.scope,  
                    callback: options.callback,
                    template: 'views/common/dialogs/mediaPicker.html',
                    show: true
@@ -286,6 +289,7 @@ angular.module('umbraco.services')
             * Opens a content picker tree in a modal, the callback returns an array of selected documents
             * @param {Object} options content picker dialog options object
             * @param {$scope} options.scope dialog scope
+            * @param {$scope} options.multipicker should the picker return one or multiple items
             * @param {Function} options.callback callback function
             * @returns {Object} modal object
             */
@@ -293,6 +297,7 @@ angular.module('umbraco.services')
                return openDialog({
                    scope: options.scope,
                    callback: options.callback,
+                   multipicker: options.multipicker,
                    template: 'views/common/dialogs/contentPicker.html',
                    show: true
                });
