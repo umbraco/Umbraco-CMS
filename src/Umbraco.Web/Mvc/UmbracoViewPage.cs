@@ -1,5 +1,8 @@
+using System;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Mvc
@@ -112,5 +115,43 @@ namespace Umbraco.Web.Mvc
 			
 		}
 
+        /// <summary>
+        /// This will detect the end /body tag and insert the preview badge if in preview mode
+        /// </summary>
+        /// <param name="value"></param>
+        public override void WriteLiteral(object value)
+        {
+            // filter / add preview banner
+            if (Response.ContentType.InvariantEquals("text/html")) // ASP.NET default value
+            {
+                if (UmbracoContext.Current.IsDebug || UmbracoContext.Current.InPreviewMode)
+                {
+                    var text = value.ToString().ToLowerInvariant();
+                    var pos = text.IndexOf("</body>", StringComparison.InvariantCultureIgnoreCase);
+                    if (pos > -1)
+                    {
+                        if (UmbracoContext.Current.InPreviewMode)
+                        {
+                            var htmlBadge =
+                                String.Format(UmbracoSettings.PreviewBadge,
+                                    IOHelper.ResolveUrl(SystemDirectories.Umbraco),
+                                    IOHelper.ResolveUrl(SystemDirectories.UmbracoClient),
+                                    Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));
+
+                            text = text.Substring(0, pos) + htmlBadge + text.Substring(pos, text.Length - pos);
+                        }
+                        else
+                        {
+                            var profilerMarkup = this.Html.RenderProfiler();
+                            text = text.Substring(0, pos) + profilerMarkup + text.Substring(pos, text.Length - pos);
+                        }
+                        base.WriteLiteral(text);
+                        return;
+                    }
+                }
+            }
+
+            base.WriteLiteral(value);
+        }
     }
 }
