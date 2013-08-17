@@ -32,4 +32,34 @@ namespace umbraco.presentation.umbraco_client.tinymce3.plugins.spellchecker
         /// <value>The error.</value>
         public string error { get; set; }
     }
+
+    /// <summary>
+    /// Object used to deserialise the Google Json response
+    /// </summary>
+    public class JsonSpellCheckerResult
+    {
+        public GoogleResponseResult result { get; set; }
+
+        public class GoogleResponseResult
+        {
+            public GoogleResponseSpellingCheckResponse spellingCheckResponse { get; set; }
+
+        }
+        public class GoogleResponseSpellingCheckResponse
+        {
+            public List<GoogleResponseMisspelling> misspellings { get; set; }
+
+        }
+        public class GoogleResponseMisspelling
+        {
+            public int charStart { get; set; }
+            public int charLength { get; set; }
+            public List<GoogleResponseSuggestion> suggestions { get; set; }
+
+        }
+        public class GoogleResponseSuggestion
+        {
+            public string suggestion { get; set; }
+        }              
+    }
 }
