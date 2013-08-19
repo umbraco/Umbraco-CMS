@@ -395,7 +395,7 @@ namespace umbraco.controls
             if (p.PropertyType.DataTypeDefinition.DataType.DataEditor.ShowLabel)
             {
                 string caption = p.PropertyType.Name;
-                if (p.PropertyType.Description != null && p.PropertyType.Description != String.Empty)
+                if (!string.IsNullOrEmpty(p.PropertyType.Description))
                     switch (UmbracoSettings.PropertyContextHelpOption)
                     {
                         case "icon":
