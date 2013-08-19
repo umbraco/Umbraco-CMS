@@ -1,4 +1,5 @@
 using System;
+using Sytem.Text;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -128,24 +129,30 @@ namespace Umbraco.Web.Mvc
                 {
                     var text = value.ToString().ToLowerInvariant();
                     var pos = text.IndexOf("</body>", StringComparison.InvariantCultureIgnoreCase);
+                    
                     if (pos > -1)
                     {
+                        string markupToInject;
+
                         if (UmbracoContext.Current.InPreviewMode)
                         {
-                            var htmlBadge =
+                            // creating previewBadge markup
+                            markupToInject =
                                 String.Format(UmbracoSettings.PreviewBadge,
                                     IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                                     IOHelper.ResolveUrl(SystemDirectories.UmbracoClient),
                                     Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));
-
-                            text = text.Substring(0, pos) + htmlBadge + text.Substring(pos, text.Length - pos);
                         }
                         else
                         {
-                            var profilerMarkup = this.Html.RenderProfiler();
-                            text = text.Substring(0, pos) + profilerMarkup + text.Substring(pos, text.Length - pos);
+                            // creating mini-profiler markup
+                            markupToInject = Html.RenderProfiler().ToHtmlString();
                         }
-                        base.WriteLiteral(text);
+
+                        var sb = new StringBuilder(text);
+                        sb.Insert(pos, markupToInject);
+
+                        base.WriteLiteral(sb.ToString());
                         return;
                     }
                 }
