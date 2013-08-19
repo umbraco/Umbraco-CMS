@@ -9,8 +9,10 @@ using Umbraco.Web.UI.Pages;
 
 namespace Umbraco.Web.UI.Umbraco.Developer.Packages
 {
+    using System.IO;
+
     public partial class StarterKits : UmbracoEnsuredPage
-	{
+    {
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -22,6 +24,16 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
 
         private void ShowStarterKits()
         {
+            if (Directory.Exists(this.Server.MapPath(SystemDirectories.Install)) == false)
+            {
+                this.InstallationDirectoryNotAvailable.Visible = true;
+                StarterKitNotInstalled.Visible = false;
+                StarterKitInstalled.Visible = false;
+            
+                return;
+            }
+
+
             var starterkitsctrl = (LoadStarterKits)LoadControl(SystemDirectories.Install + "/steps/Skinning/loadStarterKits.ascx");
             starterkitsctrl.StarterKitInstalled += StarterkitsctrlStarterKitInstalled;
 
@@ -29,6 +41,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
 
             StarterKitNotInstalled.Visible = true;
             StarterKitInstalled.Visible = false;
+            InstallationDirectoryNotAvailable.Visible = true;
 
         }
 
@@ -64,5 +77,5 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
             installationCompleted.Visible = true;
         }
 
-	}
+    }
 }

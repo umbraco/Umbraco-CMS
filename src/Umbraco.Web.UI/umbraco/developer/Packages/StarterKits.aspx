@@ -87,6 +87,12 @@
     <cc1:Pane id="installationCompleted" Text="Installation completed" runat="server" Visible="false">
         <p>Installation completed succesfully</p>
     </cc1:Pane>
+    
+    <cc1:Pane id="InstallationDirectoryNotAvailable" Text="Unable to install" runat="server" Visible="false">
+        <p>We can not install starterkits when the install directory is not present.</p>
+    </cc1:Pane>
+      
+
   </cc1:UmbracoPanel>
 
 
