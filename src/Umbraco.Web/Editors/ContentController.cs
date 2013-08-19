@@ -31,7 +31,6 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
- 
     /// <summary>
     /// The API controller used for editing content
     /// </summary>

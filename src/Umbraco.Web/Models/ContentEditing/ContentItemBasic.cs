@@ -13,19 +13,8 @@ namespace Umbraco.Web.Models.ContentEditing
     /// A model representing a basic content item
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
-    public class ContentItemBasic
+    public class ContentItemBasic : EntityBasic
     {
-        [DataMember(Name = "icon")]
-        public string Icon { get; set; }
-
-        [DataMember(Name = "id", IsRequired = true)]
-        [Required]
-        public int Id { get; set; }
-
-        [DataMember(Name = "name", IsRequired = true)]
-        [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
-        public string Name { get; set; }
-
         [DataMember(Name = "updateDate")]
         public DateTime UpdateDate { get; set; }
 

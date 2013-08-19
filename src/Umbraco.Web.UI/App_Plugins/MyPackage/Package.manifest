@@ -24,7 +24,7 @@
 						label: "Regular expression",
 						description: "Enter a regular expression to use to validate this editor",
 						key: "regex",
-						view: "~/App_Plugins/MyPackage/PropertyEditors/Views/regexStatement.html",
+						view: "requiredfield",
 						validation: [
 							{
 								type: "Required" 
