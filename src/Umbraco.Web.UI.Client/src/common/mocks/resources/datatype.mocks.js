@@ -12,44 +12,8 @@ angular.module('umbraco.mocks').
 
           var selectedId = String.CreateGuid();
 
-          var dataType = {
-              id: id,
-              name: "Simple editor " + id,
-              selectedEditor: selectedId,
-              availableEditors: [
-                  { name: "Simple editor 1", editorId: String.CreateGuid() },
-                  { name: "Simple editor 2", editorId: String.CreateGuid() },
-                  { name: "Simple editor 3", editorId: selectedId },
-                  { name: "Simple editor 4", editorId: String.CreateGuid() },
-                  { name: "Simple editor 5", editorId: String.CreateGuid() },
-                  { name: "Simple editor 6", editorId: String.CreateGuid() }
-              ],
-              preValues: [
-                    {
-                        label: "Custom pre value 1",
-                        description: "Enter a value for this pre-value",
-                        key: "myPreVal",
-                        view: "requiredfield",
-                        validation: [
-							{
-							    type: "Required"
-							}
-                        ]
-                    },
-                      {
-                          label: "Custom pre value 2",
-                          description: "Enter a value for this pre-value",
-                          key: "myPreVal",
-                          view: "requiredfield",
-                          validation: [
-                              {
-                                  type: "Required"
-                              }
-                          ]
-                      }
-              ]
+          var dataType = mocksUtils.getMockDataType(id, selectedId);
               
-          };
           return [200, dataType, null];
       }
       
@@ -69,17 +33,77 @@ angular.module('umbraco.mocks').
 
           return response;
       }
+      
+      function returnPreValues(status, data, headers) {
+
+          if (!mocksUtils.checkAuth()) {
+              return [401, null, null];
+          }
+
+          var editorId = mocksUtils.getParameterByName(data, "editorId") || "83E9AD36-51A7-4440-8C07-8A5623AC6979";
+
+          var preValues = [
+              {
+                  label: "Custom pre value 1 for editor " + editorId,
+                  description: "Enter a value for this pre-value",
+                  key: "myPreVal",
+                  view: "requiredfield",
+                  validation: [
+                      {
+                          type: "Required"
+                      }
+                  ]
+              },
+              {
+                  label: "Custom pre value 2 for editor " + editorId,
+                  description: "Enter a value for this pre-value",
+                  key: "myPreVal",
+                  view: "requiredfield",
+                  validation: [
+                      {
+                          type: "Required"
+                      }
+                  ]
+              }
+          ];
+          return [200, preValues, null];
+      }
+      
+      function returnSave(status, data, headers) {
+          if (!mocksUtils.checkAuth()) {
+              return [401, null, null];
+          }
+
+          var postedData = angular.fromJson(headers);
+
+          var dataType = mocksUtils.getMockDataType(postedData.id, postedData.selectedEditor);
+          dataType.notifications = [{
+              header: "Saved",
+              message: "Data type saved",
+              type: 0
+          }];
+
+          return [200, dataType, null];
+      }
 
       return {
           register: function() {
-
+              
+              $httpBackend
+                  .whenPOST(mocksUtils.urlRegex('/umbraco/UmbracoApi/DataType/PostSave'))
+                  .respond(returnSave);
+              
               $httpBackend
                   .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/DataType/GetById'))
-                  .respond(returnById);
+                  .respond(returnById);              
               
               $httpBackend
                   .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/DataType/GetEmpty'))
                   .respond(returnEmpty);
+              
+              $httpBackend
+                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/DataType/GetPreValues'))
+                  .respond(returnPreValues);
           },
           expectGetById: function() {
             $httpBackend

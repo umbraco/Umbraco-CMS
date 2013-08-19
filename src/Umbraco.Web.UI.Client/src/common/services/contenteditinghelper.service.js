@@ -196,9 +196,13 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
 
             args.scope.$broadcast("saved", { scope: args.scope });
             if (!this.redirectToCreatedContent(args.scope.content.id)) {
+                
                 //we are not redirecting because this is not new content, it is existing content. In this case
-                // we need to detect what properties have changed and re-bind them with the server data
-                this.reBindChangedProperties(args.scope.content, args.newContent);
+                // we need to detect what properties have changed and re-bind them with the server data.
+                //call the callback
+                if (args.rebindCallback && angular.isFunction(args.rebindCallback)) {
+                    args.rebindCallback();
+                }
             }
         },
 
@@ -227,7 +231,7 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
                 //clear the query strings
                 $location.search(null);
                 //change to new path
-                $location.path("/" + $routeParams.section + "/" + $routeParams.method + "/" + id);
+                $location.path("/" + $routeParams.section + "/" + $routeParams.tree  + "/" + $routeParams.method + "/" + id);
                 //don't add a browser history for this
                 $location.replace();
                 return true;

@@ -12,25 +12,14 @@ namespace Umbraco.Web.Models.ContentEditing
     /// Generally used to return the minimal amount of data about a content type
     /// </remarks> 
     [DataContract(Name = "contentType", Namespace = "")]
-    public class ContentTypeBasic
+    public class ContentTypeBasic : EntityBasic
     {
-        [DataMember(Name = "id", IsRequired = true)]
-        [Required]
-        public int Id { get; set; }
-
-        [DataMember(Name = "name", IsRequired = true)]
-        [Required]
-        public string Name { get; set; }
-
         [DataMember(Name = "alias", IsRequired = true)]
         [Required]
         public string Alias { get; set; }
 
         [DataMember(Name = "description")]
         public string Description { get; set; }
-
-        [DataMember(Name = "icon")]
-        public string Icon { get; set; }
 
         [DataMember(Name = "thumbnail")]
         public string Thumbnail { get; set; }

@@ -119,9 +119,22 @@ angular.module('umbraco.mocks').
           
           return [200, null, null];
       }
+      
+      function returnSave(status, data, headers) {
+          if (!mocksUtils.checkAuth()) {
+              return [401, null, null];
+          }
+
+          return [200, null, null];
+      }
 
       return {
           register: function () {
+
+              $httpBackend
+                  .whenPOST(mocksUtils.urlRegex('/umbraco/UmbracoApi/Content/PostSave'))
+                  .respond(returnSave);
+
               $httpBackend
                   .whenPOST(mocksUtils.urlRegex('/umbraco/UmbracoApi/Content/PostSort'))
                   .respond(returnSort);

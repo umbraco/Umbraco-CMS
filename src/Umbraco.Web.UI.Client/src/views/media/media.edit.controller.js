@@ -57,10 +57,13 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
 
         mediaResource.save(cnt, $routeParams.create, $scope.files)
             .then(function (data) {
+
                 contentEditingHelper.handleSuccessfulSave({
                     scope: $scope,
-                    newContent: data
+                    newContent: data,
+                    rebindCallback: contentEditingHelper.reBindChangedProperties(scope.content, data)
                 });
+                
             }, function (err) {
                 contentEditingHelper.handleSaveError(err, $scope);
             });

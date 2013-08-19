@@ -42,6 +42,7 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
         dataTypeResource.getScaffold($routeParams.id, $routeParams.doctype)
             .then(function(data) {
                 $scope.loaded = true;
+                $scope.preValuesLoaded = true;
                 $scope.content = data;
                 createDisplayProps();
             });
@@ -51,6 +52,7 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
         dataTypeResource.getById($routeParams.id)
             .then(function(data) {
                 $scope.loaded = true;
+                $scope.preValuesLoaded = true;
                 $scope.content = data;
                 createDisplayProps();
                 createPreValueProps($scope.content.preValues);
@@ -66,8 +68,19 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
     //ensure there is a form object assigned.
     var currentForm = angularHelper.getRequiredCurrentForm($scope);
 
-    //TODO: We need to handle the dynamic loading of the pre-value editor view whenever the drop down changes!
-    
+    $scope.$watch("content.selectedEditor", function (newVal, oldVal) {
+        //when the value changes, we need to dynamically load in the new editor
+        if (newVal && oldVal && newVal != oldVal) {
+            //we are editing so get the content item from the server
+            dataTypeResource.getPreValues(newVal)
+                .then(function (data) {
+                    $scope.preValuesLoaded = true;
+                    $scope.content.preValues = data;
+                    createPreValueProps($scope.content.preValues);
+                });
+        }
+    });
+
     $scope.save = function (cnt) {
         $scope.$broadcast("saving", { scope: $scope });
             
@@ -79,8 +92,13 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
         dataTypeResource.save(cnt, $routeParams.create)
             .then(function (data) {
                 
-                //TODO: SD: I need to finish this on monday!
-                alert("Woot!");
+                contentEditingHelper.handleSuccessfulSave({
+                    scope: $scope,
+                    newContent: data,
+                    rebindCallback: function() {
+                        createPreValueProps(data.preValues);
+                    }
+                });
 
             }, function (err) {
                 contentEditingHelper.handleSaveError(err, $scope);
