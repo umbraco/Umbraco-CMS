@@ -19,41 +19,24 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
     {
-        public EntityDisplay GetById(int id)
+        public EntityBasic GetById(int id)
         {
-
-            return map((UmbracoEntity)Services.EntityService.Get(id, UmbracoObjectTypes.Document));
+            return Mapper.Map<EntityBasic>(Services.EntityService.Get(id, UmbracoObjectTypes.Document));
         }
 
-        public IEnumerable<EntityDisplay> GetByIds([FromUri]int[] ids)
+
+        //TODO: This should probably be change to GetContentByIds since it will be different for media, etc...!
+
+        //TODO: Because this is a publicly accessible API, we need to filter the results for what the currently logged in user
+        // is actually allowed to access. We'll need to enhance the FilterAllowedOutgoingContent to acheive that.
+
+        public IEnumerable<EntityBasic> GetByIds([FromUri]int[] ids)
         {
             if (ids == null) throw new ArgumentNullException("ids");
 
-            return ids.Select(id => map(((UmbracoEntity)Services.EntityService.Get(id, UmbracoObjectTypes.Document)))).Where(entity => entity != null).ToList();
+            return ids.Select(id =>
+                              Mapper.Map<EntityBasic>(Services.EntityService.Get(id, UmbracoObjectTypes.Document)));
         }
 
-        private EntityDisplay map(UmbracoEntity input)
-        {
-            EntityDisplay output = new EntityDisplay();
-            output.Name = input.Name;
-            output.Id = input.Id;
-            output.Key = input.Key;
-            output.Icon = input.ContentTypeIcon;
-            return output;
-        }
-
-        //public IEnumerable<UmbracoEntity> GetContentByIds(int[] ids)
-        //{
-        //    var list = new List<UmbracoEntity>();
-        //    foreach (var id in ids)
-        //        list.Add((UmbracoEntity)Services.EntityService.Get(id));
-
-        //    return list;
-        //}
-
-        //public UmbracoEntity GetContentById(int id)
-        //{
-        //    return (UmbracoEntity)Services.EntityService.Get(id);
-        //}
     }
 }

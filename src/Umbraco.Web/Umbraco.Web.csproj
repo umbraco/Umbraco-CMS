@@ -299,8 +299,9 @@
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Editors\ContentController.cs" />
     <Compile Include="Editors\EntityController.cs" />
-    <Compile Include="Models\ContentEditing\EntityDisplay.cs" />
+    <Compile Include="Models\ContentEditing\EntityBasic.cs" />
     <Compile Include="Models\ContentEditing\TemplateBasic.cs" />
+    <Compile Include="Models\Mapping\EntityModelMapper.cs" />
     <Compile Include="Models\PagedResult.cs" />
     <Compile Include="PropertyEditors\DatePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimePropertyEditor.cs" />
