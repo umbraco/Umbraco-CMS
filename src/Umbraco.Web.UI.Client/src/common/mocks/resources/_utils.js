@@ -7,6 +7,48 @@ angular.module('umbraco.mocks').
 
         return {
             
+            getMockDataType: function(id, selectedId) {
+                var dataType = {
+                    id: id,
+                    name: "Simple editor " + id,
+                    selectedEditor: selectedId,
+                    availableEditors: [
+                        { name: "Simple editor 1", editorId: String.CreateGuid() },
+                        { name: "Simple editor 2", editorId: String.CreateGuid() },
+                        { name: "Simple editor " + id, editorId: selectedId },
+                        { name: "Simple editor 4", editorId: String.CreateGuid() },
+                        { name: "Simple editor 5", editorId: String.CreateGuid() },
+                        { name: "Simple editor 6", editorId: String.CreateGuid() }
+                    ],
+                    preValues: [
+                          {
+                              label: "Custom pre value 1 for editor " + selectedId,
+                              description: "Enter a value for this pre-value",
+                              key: "myPreVal",
+                              view: "requiredfield",
+                              validation: [
+                                  {
+                                      type: "Required"
+                                  }
+                              ]
+                          },
+                            {
+                                label: "Custom pre value 2 for editor " + selectedId,
+                                description: "Enter a value for this pre-value",
+                                key: "myPreVal",
+                                view: "requiredfield",
+                                validation: [
+                                    {
+                                        type: "Required"
+                                    }
+                                ]
+                            }
+                    ]
+
+                };
+                return dataType;
+            },
+
             /** Creats a mock content object */
             getMockContent: function(id) {
                 var node = {

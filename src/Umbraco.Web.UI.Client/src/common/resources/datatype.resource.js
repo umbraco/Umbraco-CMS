@@ -7,6 +7,17 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
     
     return {
         
+        getPreValues: function (editorId) {
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "dataTypeApiBaseUrl",
+                       "GetPreValues",
+                       [{ editorId: editorId }])),
+               'Failed to retreive pre values for editor id ' + editorId);
+        },
+
         getById: function (id) {
             
             return umbRequestHelper.resourcePromise(
@@ -39,7 +50,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         //TODO: SD: I need to finish this on Monday!
                         action: "save" + (isNew ? "New" : "")                        
                     }),
-                'Failed to save data for data type id ' + id);
+                'Failed to save data for data type id ' + dataType.id);
         }
     };
 }

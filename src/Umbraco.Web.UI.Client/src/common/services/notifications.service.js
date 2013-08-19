@@ -68,7 +68,7 @@ angular.module('umbraco.services')
             if (!args) {
                 throw "args cannot be null";
             }
-            if (!args.type) {
+            if (args.type === undefined || args.type === null) {
                 throw "args.type cannot be null";
             }
             if (!args.header) {
