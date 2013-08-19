@@ -146,28 +146,27 @@ namespace umbraco.cms.businesslogic.propertytype
         {
             get
             {
-                if (_description != null)
-                {
-                    if (!_description.StartsWith("#"))
-                        return _description;
-                    else
-                    {
-                        Language lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
-                        if (lang != null)
-                        {
-                            if (Dictionary.DictionaryItem.hasKey(_description.Substring(1, _description.Length - 1)))
-                            {
-                                var di =
-                                    new Dictionary.DictionaryItem(_description.Substring(1, _description.Length - 1));
-                                return di.Value(lang.id);
-                            }
-                        }
-                    }
+				if (string.IsNullOrEmpty(_description))
+					return string.Empty;
 
-                    return "[" + _description + "]";
-                }
 
-                return _description;
+				if (!_description.StartsWith("#"))
+					return _description;
+				else
+				{
+					Language lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
+					if (lang != null)
+					{
+						if (Dictionary.DictionaryItem.hasKey(_description.Substring(1, _description.Length - 1)))
+						{
+							var di =
+								new Dictionary.DictionaryItem(_description.Substring(1, _description.Length - 1));
+							return di.Value(lang.id);
+						}
+					}
+				}
+
+				return "[" + _description + "]";
             }
             set
             {
