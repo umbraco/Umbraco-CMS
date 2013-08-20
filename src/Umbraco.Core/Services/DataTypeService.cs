@@ -224,6 +224,8 @@ namespace Umbraco.Core.Services
         /// <param name="values">List of string values to save</param>
         public void SavePreValues(int id, IEnumerable<string> values)
         {
+            //TODO: Should we raise an event here since we are really saving values for the data type?
+
             using (new WriteLock(Locker))
             {
                 using (var uow = _uowProvider.GetUnitOfWork())
@@ -250,6 +252,93 @@ namespace Umbraco.Core.Services
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Saves/updates the pre-values
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="values"></param>
+        /// <remarks>
+        /// We will actually just remove all pre-values and re-insert them in one transaction
+        /// </remarks>
+        internal void SavePreValues(int id, PreValueCollection values)
+        {
+            //TODO: Should we raise an event here since we are really saving values for the data type?
+
+            using (new WriteLock(Locker))
+            {
+                using (var uow = _uowProvider.GetUnitOfWork())
+                {
+                    using (var transaction = uow.Database.GetTransaction())
+                    {
+                        uow.Database.Execute("DELETE FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = id });
+
+                        var sortOrder = 1;
+                        foreach (var value in PreValueCollection.AsDictionary(values))
+                        {
+                            var dto = new DataTypePreValueDto
+                                {
+                                    DataTypeNodeId = id, 
+                                    Value = (string)value.Value,
+                                    SortOrder = sortOrder,
+                                    Alias = value.Key
+                                };
+                            uow.Database.Insert(dto);
+                            sortOrder++;
+                        }
+
+                        transaction.Complete();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// This will save a data type and it's pre-values in one transaction
+        /// </summary>
+        /// <param name="dataTypeDefinition"></param>
+        /// <param name="values"></param>
+        /// <param name="userId"></param>
+        internal void SaveDataTypeAndPreValues(IDataTypeDefinition dataTypeDefinition, PreValueCollection values, int userId = 0)
+        {
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this))
+                return;
+
+            using (new WriteLock(Locker))
+            {
+                var uow = (PetaPocoUnitOfWork)_uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow))
+                {
+                    dataTypeDefinition.CreatorId = userId;
+                    repository.AddOrUpdate(dataTypeDefinition);
+
+                    //complete the transaction, but run the delegate before the db transaction is finalized
+                    uow.Commit(database =>
+                        {
+                            //Execute this before the transaction is completed!
+                            database.Execute("DELETE FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = dataTypeDefinition.Id });
+
+                            var sortOrder = 1;
+                            foreach (var value in PreValueCollection.AsDictionary(values))
+                            {
+                                var dto = new DataTypePreValueDto
+                                {
+                                    DataTypeNodeId = dataTypeDefinition.Id,
+                                    Value = (string)value.Value,
+                                    SortOrder = sortOrder,
+                                    Alias = value.Key
+                                };
+                                database.Insert(dto);
+                                sortOrder++;
+                            }
+                        });
+
+                    Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this);
+                }
+            }
+            
+            Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
         }
 
         /// <summary>

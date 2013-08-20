@@ -146,6 +146,8 @@ namespace Umbraco.Core.Models
             }
         }
 
+        //NOTE: SD: Why do we have this ??
+
         /// <summary>
         /// Boolean indicating whether this entity is Trashed or not.
         /// </summary>

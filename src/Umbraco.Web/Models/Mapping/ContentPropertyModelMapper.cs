@@ -1,7 +1,9 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -14,6 +16,8 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
+            var lazyDataTypeService = new Lazy<IDataTypeService>(() => applicationContext.Services.DataTypeService);
+
             //FROM Property TO ContentPropertyBasic
             config.CreateMap<PropertyGroup, Tab<ContentPropertyDisplay>>()
                   .ForMember(tab => tab.Label, expression => expression.MapFrom(@group => @group.Name))
@@ -26,11 +30,11 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM Property TO ContentPropertyDto
             config.CreateMap<Property, ContentPropertyDto>()
-                  .ConvertUsing(new ContentPropertyDtoConverter(applicationContext));
+                  .ConvertUsing(new ContentPropertyDtoConverter(lazyDataTypeService));
 
             //FROM Property TO ContentPropertyDisplay
             config.CreateMap<Property, ContentPropertyDisplay>()
-                  .ConvertUsing(new ContentPropertyDisplayConverter(applicationContext));
+                  .ConvertUsing(new ContentPropertyDisplayConverter(lazyDataTypeService));
         }
     }
 }

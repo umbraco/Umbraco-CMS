@@ -93,30 +93,49 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		/// </remarks>
 		public void Commit()
 		{
-			using (var transaction = Database.GetTransaction())
-			{
-				foreach (var operation in _operations.OrderBy(o => o.ProcessDate))
-				{
-					switch (operation.Type)
-					{
-						case TransactionType.Insert:
-							operation.Repository.PersistNewItem(operation.Entity);
-							break;
-						case TransactionType.Delete:
-							operation.Repository.PersistDeletedItem(operation.Entity);
-							break;
-						case TransactionType.Update:
-							operation.Repository.PersistUpdatedItem(operation.Entity);
-							break;
-					}
-				}
-				transaction.Complete();	
-			}
-
-			// Clear everything
-			_operations.Clear();
-			_key = Guid.NewGuid();
+		    Commit(null);
 		}
+
+        /// <summary>
+        /// Commits all batched changes within the scope of a PetaPoco transaction <see cref="Transaction"/>
+        /// </summary>
+        /// <param name="transactionCompleting">
+        /// Allows you to set a callback which is executed before the transaction is committed, allow you to add additional SQL
+        /// operations to the overall commit process after the queue has been processed.
+        /// </param>
+        internal void Commit(Action<UmbracoDatabase> transactionCompleting)
+        {
+            using (var transaction = Database.GetTransaction())
+            {
+                foreach (var operation in _operations.OrderBy(o => o.ProcessDate))
+                {
+                    switch (operation.Type)
+                    {
+                        case TransactionType.Insert:
+                            operation.Repository.PersistNewItem(operation.Entity);
+                            break;
+                        case TransactionType.Delete:
+                            operation.Repository.PersistDeletedItem(operation.Entity);
+                            break;
+                        case TransactionType.Update:
+                            operation.Repository.PersistUpdatedItem(operation.Entity);
+                            break;
+                    }
+                }
+
+                //Execute the callback if there is one
+                if (transactionCompleting != null)
+                {
+                    transactionCompleting(Database);    
+                }
+
+                transaction.Complete();
+            }
+
+            // Clear everything
+            _operations.Clear();
+            _key = Guid.NewGuid();
+        }
 
 		public object Key
 		{

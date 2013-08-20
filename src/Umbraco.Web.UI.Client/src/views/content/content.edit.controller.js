@@ -43,51 +43,69 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
         }
     };
 
-    //ensure there is a form object assigned.
-    var currentForm = angularHelper.getRequiredCurrentForm($scope);
-
     //TODO: Need to figure out a way to share the saving and event broadcasting with all editors!
 
-    $scope.saveAndPublish = function (cnt) {
+    $scope.saveAndPublish = function () {
         $scope.$broadcast("saving", { scope: $scope });
-
+        
+        var currentForm = angularHelper.getRequiredCurrentForm($scope);
+        
         //don't continue if the form is invalid
         if (currentForm.$invalid) return;
 
         serverValidationManager.reset();
         
-        contentResource.publish(cnt, $routeParams.create, $scope.files)
+        contentResource.publish($scope.content, $routeParams.create, $scope.files)
             .then(function (data) {
+                
                 contentEditingHelper.handleSuccessfulSave({
                     scope: $scope,
                     newContent: data,
-                    rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
+                    rebindCallback: contentEditingHelper.reBindChangedProperties(
+                        contentEditingHelper.getAllProps($scope.content),
+                        contentEditingHelper.getAllProps(data))
                 });
                 
-            }, function (err) {                
-                contentEditingHelper.handleSaveError(err, $scope);
+            }, function (err) {
+
+                var allNewProps = contentEditingHelper.getAllProps(err.data);
+                var allOrigProps = contentEditingHelper.getAllProps($scope.content);
+
+                contentEditingHelper.handleSaveError({
+                    err: err,
+                    redirectOnFailure: true,
+                    allNewProps: allNewProps,
+                    allOrigProps: contentEditingHelper.getAllProps($scope.content),
+                    rebindCallback: contentEditingHelper.reBindChangedProperties(allOrigProps, allNewProps)
+                });
             });	        
     };
 
-    $scope.save = function (cnt) {
+    $scope.save = function () {
         $scope.$broadcast("saving", { scope: $scope });
             
+        var currentForm = angularHelper.getRequiredCurrentForm($scope);
+
         //don't continue if the form is invalid
         if (currentForm.$invalid) return;
 
         serverValidationManager.reset();
 
-        contentResource.save(cnt, $routeParams.create, $scope.files)
+        contentResource.save($scope.content, $routeParams.create, $scope.files)
             .then(function (data) {
                 
                 contentEditingHelper.handleSuccessfulSave({
                     scope: $scope,
                     newContent: data,
-                    rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
+                    rebindCallback: contentEditingHelper.reBindChangedProperties(scope.content, data)
                 });
                 
             }, function (err) {
-                contentEditingHelper.handleSaveError(err, $scope);
+                contentEditingHelper.handleSaveError({
+                    err: err,
+                    allNewProps: contentEditingHelper.getAllProps(err.data),
+                    allOrigProps: contentEditingHelper.getAllProps($scope.content)
+                });
         });
     };
 

@@ -33,7 +33,7 @@ namespace Umbraco.Web.WebApi.Binders
     /// Binds the content model to the controller action for the posted multi-part Post
     /// </summary>
     internal abstract class ContentItemBaseBinder<TPersisted> : IModelBinder
-        where TPersisted : IContentBase
+        where TPersisted : class, IContentBase
     {
         protected ApplicationContext ApplicationContext { get; private set; }
 
@@ -168,10 +168,15 @@ namespace Umbraco.Web.WebApi.Binders
             }
 
             //create the dto from the persisted model
-            model.ContentDto = MapFromPersisted(model);
-            
-            //now map all of the saved values to the dto
-            MapPropertyValuesFromSaved(model, model.ContentDto);
+            if (model.PersistedContent != null)
+            {
+                model.ContentDto = MapFromPersisted(model);    
+            }
+            if (model.ContentDto != null)
+            {
+                //now map all of the saved values to the dto
+                MapPropertyValuesFromSaved(model, model.ContentDto);    
+            }
             
             return model;
         }

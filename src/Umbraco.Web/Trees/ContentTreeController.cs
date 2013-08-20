@@ -111,7 +111,7 @@ namespace Umbraco.Web.Trees
 
                 // add default actions for *all* users
                 allowedMenu.AddMenuItem<ActionRePublish>();
-                allowedMenu.AddMenuItem<RefreshNodeMenuItem, ActionRefresh>(true);
+                allowedMenu.AddMenuItem<RefreshNode, ActionRefresh>(true);
                 return allowedMenu;
             }
 
@@ -155,7 +155,7 @@ namespace Umbraco.Web.Trees
             menu.AddMenuItem<ActionNotify>(true);
             menu.AddMenuItem<ActionSendToTranslate>();
 
-            menu.AddMenuItem<RefreshNodeMenuItem, ActionRefresh>(true);
+            menu.AddMenuItem<RefreshNode, ActionRefresh>(true);
 
             return menu;
         }

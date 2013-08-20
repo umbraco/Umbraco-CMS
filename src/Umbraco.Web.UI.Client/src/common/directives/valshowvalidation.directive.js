@@ -8,7 +8,6 @@
 **/
 function valShowValidation(serverValidationManager) {
     return {
-        require: "ngController",
         restrict: "A",
         link: function (scope, element, attr, ctrl) {
 

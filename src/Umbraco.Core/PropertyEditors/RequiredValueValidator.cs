@@ -15,11 +15,11 @@ namespace Umbraco.Core.PropertyEditors
 
             if (value == null)
             {
-                yield return new ValidationResult("Value cannot be null");
+                yield return new ValidationResult("Value cannot be null", new[] { "value" });
             }
             if (value.IsNullOrWhiteSpace())
             {
-                yield return new ValidationResult("Value cannot be empty");
+                yield return new ValidationResult("Value cannot be empty", new[] { "value" });
             }
         }
     }

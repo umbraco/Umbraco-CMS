@@ -17,7 +17,7 @@ namespace Umbraco.Core.PropertyEditors
     {
         public PreValueEditor()
         {
-            Fields = Enumerable.Empty<PreValueField>();
+            Fields = Enumerable.Empty<PreValueField>();        
         }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace Umbraco.Core.PropertyEditors
         /// If fields are specified then the master View and Validators will be ignored
         /// </remarks>
         [JsonProperty("fields")]
-        public IEnumerable<PreValueField> Fields { get; set; } 
-        
+        public IEnumerable<PreValueField> Fields { get; set; }
+
     }
 }

@@ -5,8 +5,8 @@ namespace Umbraco.Web.Models.ContentEditing
     /// <summary>
     /// Defines a pre value editable field for a data type
     /// </summary>
-    [DataContract(Name = "propertyEditor", Namespace = "")]
-    public class PreValueFieldDisplay
+    [DataContract(Name = "preValue", Namespace = "")]
+    public class PreValueFieldDisplay : PreValueFieldSave
     {
         /// <summary>
         /// The name to display for this pre-value field
@@ -27,15 +27,10 @@ namespace Umbraco.Web.Models.ContentEditing
         public bool HideLabel { get; set; }
 
         /// <summary>
-        /// The key to store the pre-value against
-        /// </summary>
-        [DataMember(Name = "key", IsRequired = true)]
-        public string Key { get; set; }
-
-        /// <summary>
         /// The view to render for the field
         /// </summary>
         [DataMember(Name = "view", IsRequired = true)]
         public string View { get; set; }
+
     }
 }

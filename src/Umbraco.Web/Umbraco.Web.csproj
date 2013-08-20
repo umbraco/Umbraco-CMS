@@ -299,13 +299,17 @@
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Editors\ContentController.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
+    <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DataTypeSave.cs" />
     <Compile Include="Models\ContentEditing\EntityBasic.cs" />
     <Compile Include="Models\ContentEditing\PreValueFieldDisplay.cs" />
+    <Compile Include="Models\ContentEditing\PreValueFieldSave.cs" />
     <Compile Include="Models\ContentEditing\PropertyEditorBasic.cs" />
     <Compile Include="Models\ContentEditing\TemplateBasic.cs" />
     <Compile Include="Models\Mapping\AvailablePropertyEditorsResolver.cs" />
+    <Compile Include="Models\Mapping\DatabaseTypeResolver.cs" />
     <Compile Include="Models\Mapping\DataTypeModelMapper.cs" />
     <Compile Include="Models\Mapping\EntityModelMapper.cs" />
     <Compile Include="Models\Mapping\PreValueDisplayResolver.cs" />
@@ -317,6 +321,7 @@
     <Compile Include="PropertyEditors\LabelValueEditor.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
+    <Compile Include="Trees\Menu\CreateChildEntity.cs" />
     <Compile Include="WebApi\ControllerContextExtensions.cs" />
     <Compile Include="WebApi\CustomDateTimeConvertor.cs" />
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
@@ -376,7 +381,7 @@
     <Compile Include="Trees\Menu\MenuItem.cs" />
     <Compile Include="Trees\Menu\MenuItemCollection.cs" />
     <Compile Include="Trees\Menu\MenuItemExtensions.cs" />
-    <Compile Include="Trees\Menu\RefreshNodeMenuItem.cs" />
+    <Compile Include="Trees\Menu\RefreshNode.cs" />
     <Compile Include="Trees\SearchResultItem.cs" />
     <Compile Include="Trees\SectionRootNode.cs" />
     <Compile Include="Trees\TreeApiController.cs" />

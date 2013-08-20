@@ -74,12 +74,6 @@ namespace Umbraco.Core.PropertyEditors
         [JsonProperty("defaultConfig")]
         public virtual IDictionary<string, object> DefaultPreValues { get; set; }
 
-        //TODO: Now we need to implement a couple of methods for saving the data for editors and pre-value editors
-        // generally we can handle that automatically in this base class but people should be allowed to override 
-        // it so they can perform custom operations on saving the data.
-        // This also means that we should have methods for formatting the data upon retreival from the repository
-        // essentially we need serialization and deserialization methods to override.
-
         /// <summary>
         /// Creates a value editor instance
         /// </summary>

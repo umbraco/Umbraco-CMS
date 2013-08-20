@@ -45,8 +45,8 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 // root actions              
-                menu.AddMenuItem<ActionNew>();
-                menu.AddMenuItem<RefreshNodeMenuItem, ActionRefresh>(true);
+                menu.AddMenuItem<CreateChildEntity, ActionNew>();
+                menu.AddMenuItem<RefreshNode, ActionRefresh>(true);
                 return menu;
             }
 

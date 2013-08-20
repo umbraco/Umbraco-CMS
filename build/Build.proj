@@ -162,10 +162,21 @@
     <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />
   </Target>
 
-  <Target Name="CreateSystemFolders" DependsOnTargets="CopyLibraries" Inputs="@(SystemFolders)" Outputs="%(Identity).Dummy">
+  <Target Name="CreateSystemFolders" DependsOnTargets="CopyBelleBuild" Inputs="@(SystemFolders)" Outputs="%(Identity).Dummy">
     <MakeDir Directories="@(SystemFolders)" />
   </Target>
 
+  <Target Name="CopyBelleBuild" DependsOnTargets="CopyLibraries" >
+    <ItemGroup>
+      <BelleFiles Include="..\src\Umbraco.Web.UI.Client\build\belle\**\*.*" />
+    </ItemGroup>	
+	
+	<Copy SourceFiles="@(BelleFiles)"
+        DestinationFiles="@(BelleFiles->'$(WebAppFolder)umbraco\%(RecursiveDir)%(Filename)%(Extension)')"
+        OverwriteReadOnlyFiles="true"
+        SkipUnchangedFiles="false" />
+  </Target>
+  
   <Target Name="CopyLibraries" DependsOnTargets="OffsetTimestamps" >
     <!-- Copy SQL CE -->
     <ItemGroup>

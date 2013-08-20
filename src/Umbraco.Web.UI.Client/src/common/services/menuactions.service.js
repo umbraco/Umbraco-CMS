@@ -8,13 +8,13 @@
  * @description
  * Defines the methods that are called when menu items declare only an action to execute
  */
-function umbracoMenuActions($q, treeService, $location) {
+function umbracoMenuActions($q, treeService, $location, navigationService) {
     
     return {
         
         /**
          * @ngdoc method
-         * @name umbraco.services.umbracoMenuActions#RefreshNodeMenuItem
+         * @name umbraco.services.umbracoMenuActions#RefreshNode
          * @methodOf umbraco.services.umbracoMenuActions
          * @function
          *
@@ -24,7 +24,7 @@ function umbracoMenuActions($q, treeService, $location) {
          * @param {object} args.treeNode The tree node
          * @param {object} args.section The current section
          */
-        "RefreshNodeMenuItem": function (args) {
+        "RefreshNode": function (args) {
             treeService.loadNodeChildren({ node: args.treeNode, section: args.section });
         },
         
@@ -41,9 +41,13 @@ function umbracoMenuActions($q, treeService, $location) {
          * @param {object} args.section The current section
          */
         "CreateChildEntity": function (args) {
+
+            navigationService.hideNavigation();
+
             var route = "/" + args.section + "/" + treeService.getTreeAlias(args.treeNode) + "/edit/" + args.treeNode.id;
             //change to new path
             $location.path(route).search({ create: true });
+            
         }
     };
 } 

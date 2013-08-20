@@ -22,10 +22,14 @@ describe('contentEditingHelper tests', function () {
                 data: content,
                 status: 403
             };
-            err.data.modelState = {};
+            err.data.ModelState = {};
 
             //act
-            var handled = contentEditingHelper.handleSaveError(err, {content: content});
+            var handled = contentEditingHelper.handleSaveError({
+                err: err,
+                allNewProps: contentEditingHelper.getAllProps(content),
+                allOrigProps: contentEditingHelper.getAllProps(content)
+            });
 
             //assert
             expect(handled).toBe(true);
@@ -39,7 +43,11 @@ describe('contentEditingHelper tests', function () {
             };
             
             //act
-            var handled = contentEditingHelper.handleSaveError(err, null);
+            var handled = contentEditingHelper.handleSaveError({
+                err: err,
+                allNewProps: [],
+                allOrigProps: []
+            });
 
             //assert
             expect(handled).toBe(false);
@@ -55,7 +63,11 @@ describe('contentEditingHelper tests', function () {
             };
 
             //act
-            var handled = contentEditingHelper.handleSaveError(err, { content: content });
+            var handled = contentEditingHelper.handleSaveError({
+                err: err,
+                allNewProps: contentEditingHelper.getAllProps(content),
+                allOrigProps: contentEditingHelper.getAllProps(content)
+            });
 
             //assert
             expect(handled).toBe(false);
@@ -69,9 +81,10 @@ describe('contentEditingHelper tests', function () {
 
             //arrange
             var content = mocksUtils.getMockContent(1234);
+            var allProps = contentEditingHelper.getAllProps(content);
 
             //act
-            contentEditingHelper.handleValidationErrors(content, { Name: ["Required"] });
+            contentEditingHelper.handleValidationErrors(allProps, { Name: ["Required"] });
 
             //assert
             expect(serverValidationManager.items.length).toBe(1);
@@ -84,9 +97,10 @@ describe('contentEditingHelper tests', function () {
 
             //arrange
             var content = mocksUtils.getMockContent(1234);
+            var allProps = contentEditingHelper.getAllProps(content);
 
             //act
-            contentEditingHelper.handleValidationErrors(content, { "Property.bodyText": ["Required"] });
+            contentEditingHelper.handleValidationErrors(allProps, { "Property.bodyText": ["Required"] });
 
             //assert
             expect(serverValidationManager.items.length).toBe(1);
@@ -99,9 +113,10 @@ describe('contentEditingHelper tests', function () {
 
             //arrange
             var content = mocksUtils.getMockContent(1234);
+            var allProps = contentEditingHelper.getAllProps(content);
 
             //act
-            contentEditingHelper.handleValidationErrors(content, { "Property.bodyText.value": ["Required"] });
+            contentEditingHelper.handleValidationErrors(allProps, { "Property.bodyText.value": ["Required"] });
 
             //assert
             expect(serverValidationManager.items.length).toBe(1);
@@ -114,10 +129,11 @@ describe('contentEditingHelper tests', function () {
 
             //arrange
             var content = mocksUtils.getMockContent(1234);
+            var allProps = contentEditingHelper.getAllProps(content);
 
             //act
             contentEditingHelper.handleValidationErrors(
-                content,
+                allProps,
                 {
                     "Name": ["Required"],
                     "UpdateDate": ["Invalid date"],
@@ -202,7 +218,9 @@ describe('contentEditingHelper tests', function () {
             newContent.tabs[1].properties[2].value = "origValue4";
 
             //act
-            var changed = contentEditingHelper.reBindChangedProperties(origContent, newContent);
+            var changed = contentEditingHelper.reBindChangedProperties(
+                contentEditingHelper.getAllProps(origContent),
+                contentEditingHelper.getAllProps(newContent));
 
             //assert
             expect(changed.length).toBe(2);

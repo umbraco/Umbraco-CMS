@@ -284,6 +284,25 @@ angular.module('umbraco.services').factory('umbImageHelper', umbImageHelper);
 function umbDataFormatter() {
     return {
         
+        /** formats the display model used to display the data type to the model used to save the data type */
+        formatDataTypePostData: function(displayModel, preValues, action) {
+            var saveModel = {
+                id: displayModel.id,
+                name: displayModel.name,
+                selectedEditor: displayModel.selectedEditor,
+                //set the action on the save model
+                action: action,
+                preValues: []
+            };
+            for (var i = 0; i < preValues.length; i++) {
+                saveModel.preValues.push({
+                    key: preValues[i].alias,
+                    value: preValues[i].value
+                });
+            }
+            return saveModel;
+        },
+
         /** formats the display model used to display the content to the model used to save the content */
         formatContentPostData: function (displayModel, action) {
             //NOTE: the display model inherits from the save model so we can in theory just post up the display model but 

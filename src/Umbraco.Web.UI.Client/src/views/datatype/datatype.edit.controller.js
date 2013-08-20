@@ -8,22 +8,7 @@
  */
 function DataTypeEditController($scope, $routeParams, $location, dataTypeResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper) {
 
-    //set up the standard data type props
-    function createDisplayProps() {
-        $scope.properties = {
-            selectedEditor: {
-                alias: "selectedEditor",
-                description: "Select a property editor",
-                label: "Property editor"
-            },
-            selectedEditorId: {
-                alias: "selectedEditorId",
-                label: "Property editor GUID"
-            }
-        };
-    }
-    
-    //setup the pre-values as props
+    //method used to configure the pre-values when we retreive them from the server
     function createPreValueProps(preVals) {
         $scope.preValues = [];
         for (var i = 0; i < preVals.length; i++) {
@@ -33,9 +18,26 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
                 description: preVals[i].description,
                 label: preVals[i].label,
                 view: preVals[i].view,
+                value: preVals[i].value
             });
         }
     }
+
+    //set up the standard data type props
+    $scope.properties = {
+        selectedEditor: {
+            alias: "selectedEditor",
+            description: "Select a property editor",
+            label: "Property editor"
+        },
+        selectedEditorId: {
+            alias: "selectedEditorId",
+            label: "Property editor GUID"
+        }
+    };
+    
+    //setup the pre-values as props
+    $scope.preValues = [];
 
     if ($routeParams.create) {
         //we are creating so get an empty content item
@@ -44,7 +46,6 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
                 $scope.loaded = true;
                 $scope.preValuesLoaded = true;
                 $scope.content = data;
-                createDisplayProps();
             });
     }
     else {
@@ -54,7 +55,6 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
                 $scope.loaded = true;
                 $scope.preValuesLoaded = true;
                 $scope.content = data;
-                createDisplayProps();
                 createPreValueProps($scope.content.preValues);
                 
                 //in one particular special case, after we've created a new item we redirect back to the edit
@@ -65,9 +65,6 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
             });
     }
     
-    //ensure there is a form object assigned.
-    var currentForm = angularHelper.getRequiredCurrentForm($scope);
-
     $scope.$watch("content.selectedEditor", function (newVal, oldVal) {
         //when the value changes, we need to dynamically load in the new editor
         if (newVal && oldVal && newVal != oldVal) {
@@ -81,15 +78,18 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
         }
     });
 
-    $scope.save = function (cnt) {
+    $scope.save = function () {
         $scope.$broadcast("saving", { scope: $scope });
-            
+    
+        //ensure there is a form object assigned.
+        var currentForm = angularHelper.getRequiredCurrentForm($scope);
+
         //don't continue if the form is invalid
         if (currentForm.$invalid) return;
 
         serverValidationManager.reset();
-
-        dataTypeResource.save(cnt, $routeParams.create)
+        
+        dataTypeResource.save($scope.content, $scope.preValues, $routeParams.create)
             .then(function (data) {
                 
                 contentEditingHelper.handleSuccessfulSave({
@@ -101,7 +101,14 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
                 });
 
             }, function (err) {
-                contentEditingHelper.handleSaveError(err, $scope);
+                
+                //NOTE: in the case of data type values we are setting the orig/new props 
+                // to be the same thing since that only really matters for content/media.
+                contentEditingHelper.handleSaveError({
+                    err: err,
+                    allNewProps: $scope.preValues,
+                    allOrigProps: $scope.preValues
+                });
         });
     };
 

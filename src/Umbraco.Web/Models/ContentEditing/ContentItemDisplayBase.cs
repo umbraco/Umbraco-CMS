@@ -32,8 +32,10 @@ namespace Umbraco.Web.Models.ContentEditing
         /// A content item can be invalid but still be saved. This occurs when there's property validation errors, we will
         /// still save the item but it cannot be published. So we need a way of returning validation errors as well as the
         /// updated model.
+        /// 
+        /// NOTE: The ProperCase is important because when we return ModeState normally it will always be proper case.
         /// </remarks>
-        [DataMember(Name = "modelState")]
+        [DataMember(Name = "ModelState")]
         public IDictionary<string, object> Errors { get; set; }
     }
 }
