@@ -2,7 +2,7 @@ app.config(function ($routeProvider) {
     $routeProvider
         .when('/:section', {
             templateUrl: function (rp) {
-                if (rp.section === "default")
+                if (rp.section === "default" || rp.section === "")
                 {
                     rp.section = "content";
                 }

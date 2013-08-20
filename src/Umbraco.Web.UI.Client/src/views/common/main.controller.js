@@ -8,7 +8,7 @@
  * The main application controller
  * 
  */
-function MainController($scope, $routeParams, $rootScope, $timeout, notificationsService, userService, navigationService, legacyJsLoader) {
+function MainController($scope, $routeParams, $rootScope, $timeout, $http, notificationsService, userService, navigationService, legacyJsLoader) {
     //debugmode so I can easily turn on/off json output of property models:
     //TODO: find a better way
     $scope.$umbdebugmode = true;
@@ -17,6 +17,7 @@ function MainController($scope, $routeParams, $rootScope, $timeout, notification
     
     //the null is important because we do an explicit bool check on this in the view    
     $scope.authenticated = null;
+    $scope.avatar = "assets/img/application/logo.png";
 
     //subscribes to notifications in the notification service
     $scope.notifications = notificationsService.current;
@@ -58,6 +59,15 @@ function MainController($scope, $routeParams, $rootScope, $timeout, notification
             
             $scope.authenticated = data.authenticated;
             $scope.user = data.user;
+
+
+            if($scope.user.avatar){
+                $http.get($scope.user.avatar).then(function(){
+                    alert($scope.user.avatar);
+                    $scope.avatar = $scope.user.avatar;
+                });
+            }
+
             
         }, function (reason) {
             notificationsService.error("An error occurred checking authentication.");

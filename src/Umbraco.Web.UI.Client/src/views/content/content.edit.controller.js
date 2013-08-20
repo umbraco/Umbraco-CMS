@@ -78,7 +78,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
                     allOrigProps: contentEditingHelper.getAllProps($scope.content),
                     rebindCallback: contentEditingHelper.reBindChangedProperties(allOrigProps, allNewProps)
                 });
-            });	        
+            });     
     };
 
     $scope.save = function () {
@@ -97,7 +97,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
                 contentEditingHelper.handleSuccessfulSave({
                     scope: $scope,
                     newContent: data,
-                    rebindCallback: contentEditingHelper.reBindChangedProperties(scope.content, data)
+                    rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                 });
                 
             }, function (err) {

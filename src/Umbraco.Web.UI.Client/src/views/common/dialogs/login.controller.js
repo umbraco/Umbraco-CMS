@@ -1,4 +1,4 @@
-﻿angular.module("umbraco").controller("Umbraco.Dialogs.LoginController", function ($scope, userService, legacyJsLoader) {
+﻿angular.module("umbraco").controller("Umbraco.Dialogs.LoginController", function ($scope, userService, legacyJsLoader, $routeParams) {
     
     /**
      * @ngdoc function
@@ -13,11 +13,9 @@
     var weekday = new Array("Super Sunday", "Manic Monday", "Tremendous Tuesday", "Wonderfull Wednesday", "Thunder Thursday", "Friendly Friday", "Shiny Saturday");
     
     $scope.today = weekday[d.getDay()];
-
     $scope.errorMsg = "";
     
-    $scope.loginSubmit = function (login, password) {
-        
+    $scope.loginSubmit = function (login, password) {        
         if ($scope.loginForm.$invalid) {
             return;
         }
@@ -27,11 +25,15 @@
                 //We need to load in the legacy tree js.
                 legacyJsLoader.loadLegacyTreeJs($scope).then(
                     function(result) {
-                        var iframe = document.getElementById("right");
+                        var iframe = $("#right");
                         if(iframe){
-                            iframe.contentDocument.location.reload(true);
+                            var url = decodeURIComponent($routeParams.url);
+                            if(!url){
+                                url ="dashboard.aspx";
+                            }
+                            iframe.attr("src", url);
                         }
-                        
+
                         $scope.submit(true);
                     });
             }, function (reason) {

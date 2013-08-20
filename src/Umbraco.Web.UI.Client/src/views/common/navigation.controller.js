@@ -18,7 +18,7 @@ function NavigationController($scope,$rootScope, $location, $log, navigationServ
 
     //trigger search with a hotkey:
     keyboardService.bind("ctrl+shift+s", function(){
-        $scope.nav.showTree($scope.ui.currentSection);
+        $scope.nav.showTree($scope.nav.currentSection);
     });
 
     //the tree event handler i used to subscribe to the main tree click events
@@ -90,8 +90,7 @@ function NavigationController($scope,$rootScope, $location, $log, navigationServ
     });
 
     /** Opens a dialog but passes in this scope instance to be used for the dialog */
-    $scope.openDialog = function (currentNode, action, currentSection) {
-        
+    $scope.openDialog = function (currentNode, action, currentSection) {        
         navigationService.showDialog({
             scope: $scope,
             node: currentNode,
