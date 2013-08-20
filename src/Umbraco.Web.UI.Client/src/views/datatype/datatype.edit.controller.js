@@ -108,10 +108,7 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
                 contentEditingHelper.handleSaveError({
                     err: err,
                     allNewProps: $scope.preValues,
-                    allOrigProps: $scope.preValues,
-                    rebindCallback: function () {
-                        createPreValueProps(err.data.preValues);
-                    }
+                    allOrigProps: $scope.preValues
                 });
         });
     };

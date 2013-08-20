@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
+using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -24,6 +27,18 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "preValues")]
         public IEnumerable<PreValueFieldSave> PreValues { get; set; }
+
+        /// <summary>
+        /// The real persisted data type
+        /// </summary>
+        [JsonIgnore]
+        internal IDataTypeDefinition PersistedDataType { get; set; }
+
+        /// <summary>
+        /// The PropertyEditor assigned
+        /// </summary>
+        [JsonIgnore]
+        internal PropertyEditor PropertyEditor { get; set; }
 
     }
 }

@@ -47,7 +47,7 @@ namespace Umbraco.Web.Trees
                 // root actions         
                 menu.AddMenuItem<ActionNew>();
                 menu.AddMenuItem<ActionSort>(true);
-                menu.AddMenuItem<RefreshNodeMenuItem, ActionRefresh>(true);
+                menu.AddMenuItem<RefreshNode, ActionRefresh>(true);
                 return menu;
             }
 

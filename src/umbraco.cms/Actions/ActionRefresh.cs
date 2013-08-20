@@ -9,7 +9,7 @@ namespace umbraco.BusinessLogic.Actions
 	/// Concerns only the tree itself and thus you should not handle
 	/// this action from without umbraco.
 	/// </summary>
-    [LegacyActionMenuItem("umbracoMenuActions", "RefreshNodeMenuItem")]
+    [LegacyActionMenuItem("umbracoMenuActions", "RefreshNode")]
 	public class ActionRefresh : IAction
 	{
 		//create singleton

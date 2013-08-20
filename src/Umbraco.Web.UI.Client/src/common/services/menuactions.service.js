@@ -14,7 +14,7 @@ function umbracoMenuActions($q, treeService, $location) {
         
         /**
          * @ngdoc method
-         * @name umbraco.services.umbracoMenuActions#RefreshNodeMenuItem
+         * @name umbraco.services.umbracoMenuActions#RefreshNode
          * @methodOf umbraco.services.umbracoMenuActions
          * @function
          *
@@ -24,7 +24,7 @@ function umbracoMenuActions($q, treeService, $location) {
          * @param {object} args.treeNode The tree node
          * @param {object} args.section The current section
          */
-        "RefreshNodeMenuItem": function (args) {
+        "RefreshNode": function (args) {
             treeService.loadNodeChildren({ node: args.treeNode, section: args.section });
         },
         
