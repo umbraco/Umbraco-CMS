@@ -19,7 +19,7 @@ namespace Umbraco.Web.WebApi.Filters
     /// errors will just be added to the ModelState.
     /// </remarks>
     internal class ContentItemValidationHelper<TPersisted>
-        where TPersisted : IContentBase
+        where TPersisted : class, IContentBase
     {
         private readonly ApplicationContext _applicationContext;
 

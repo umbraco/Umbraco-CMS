@@ -66,9 +66,6 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
             });
     }
     
-    //ensure there is a form object assigned.
-    var currentForm = angularHelper.getRequiredCurrentForm($scope);
-
     $scope.$watch("content.selectedEditor", function (newVal, oldVal) {
         //when the value changes, we need to dynamically load in the new editor
         if (newVal && oldVal && newVal != oldVal) {
@@ -82,15 +79,18 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
         }
     });
 
-    $scope.save = function (cnt) {
+    $scope.save = function () {
         $scope.$broadcast("saving", { scope: $scope });
-            
+    
+        //ensure there is a form object assigned.
+        var currentForm = angularHelper.getRequiredCurrentForm($scope);
+
         //don't continue if the form is invalid
         if (currentForm.$invalid) return;
 
         serverValidationManager.reset();
-
-        dataTypeResource.save(cnt, $routeParams.create)
+        
+        dataTypeResource.save($scope.content, $scope.preValues, $routeParams.create)
             .then(function (data) {
                 
                 contentEditingHelper.handleSuccessfulSave({

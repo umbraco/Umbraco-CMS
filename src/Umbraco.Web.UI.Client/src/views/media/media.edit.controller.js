@@ -42,20 +42,18 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
             $scope.files.push({ id: propertyId, file: files[i] });
         }
     };
-    
-    //ensure there is a form object assigned.
-    var currentForm = angularHelper.getRequiredCurrentForm($scope);
-   
-    $scope.save = function (cnt) {
+        
+    $scope.save = function () {
         
         $scope.$broadcast("saving", { scope: $scope });
 
+        var currentForm = angularHelper.getRequiredCurrentForm($scope);
         //don't continue if the form is invalid
         if (currentForm.$invalid) return;
         
         serverValidationManager.reset();
 
-        mediaResource.save(cnt, $routeParams.create, $scope.files)
+        mediaResource.save($scope.content, $routeParams.create, $scope.files)
             .then(function (data) {
 
                 contentEditingHelper.handleSuccessfulSave({

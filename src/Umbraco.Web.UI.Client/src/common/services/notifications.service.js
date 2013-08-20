@@ -74,9 +74,7 @@ angular.module('umbraco.services')
             if (!args.header) {
                 throw "args.header cannot be null";
             }
-            if (!args.message) {
-                throw "args.message cannot be null";
-            }
+            
             switch(args.type) {
                 case 0:
                     //save

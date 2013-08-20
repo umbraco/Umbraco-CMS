@@ -9,8 +9,13 @@ namespace Umbraco.Web.Models.ContentEditing
     /// Represents a data type that is being edited
     /// </summary>
     [DataContract(Name = "dataType", Namespace = "")]
-    public class DataTypeDisplay : EntityBasic
+    public class DataTypeDisplay : EntityBasic, INotificationModel
     {
+        public DataTypeDisplay()
+        {
+            Notifications = new List<Notification>();
+        }
+
         [DataMember(Name = "selectedEditor", IsRequired = true)]
         [Required]
         public Guid SelectedEditor { get; set; }
@@ -20,5 +25,11 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "preValues")]
         public IEnumerable<PreValueFieldDisplay> PreValues { get; set; }
+
+        /// <summary>
+        /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
+        /// </summary>
+        [DataMember(Name = "notifications")]
+        public List<Notification> Notifications { get; private set; }
     }
 }

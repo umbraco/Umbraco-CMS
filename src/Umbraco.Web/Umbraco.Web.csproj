@@ -301,11 +301,14 @@
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DataTypeSave.cs" />
     <Compile Include="Models\ContentEditing\EntityBasic.cs" />
     <Compile Include="Models\ContentEditing\PreValueFieldDisplay.cs" />
+    <Compile Include="Models\ContentEditing\PreValueFieldSave.cs" />
     <Compile Include="Models\ContentEditing\PropertyEditorBasic.cs" />
     <Compile Include="Models\ContentEditing\TemplateBasic.cs" />
     <Compile Include="Models\Mapping\AvailablePropertyEditorsResolver.cs" />
+    <Compile Include="Models\Mapping\DatabaseTypeResolver.cs" />
     <Compile Include="Models\Mapping\DataTypeModelMapper.cs" />
     <Compile Include="Models\Mapping\EntityModelMapper.cs" />
     <Compile Include="Models\Mapping\PreValueDisplayResolver.cs" />

@@ -43,20 +43,19 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
         }
     };
 
-    //ensure there is a form object assigned.
-    var currentForm = angularHelper.getRequiredCurrentForm($scope);
-
     //TODO: Need to figure out a way to share the saving and event broadcasting with all editors!
 
-    $scope.saveAndPublish = function (cnt) {
+    $scope.saveAndPublish = function () {
         $scope.$broadcast("saving", { scope: $scope });
-
+        
+        var currentForm = angularHelper.getRequiredCurrentForm($scope);
+        
         //don't continue if the form is invalid
         if (currentForm.$invalid) return;
 
         serverValidationManager.reset();
         
-        contentResource.publish(cnt, $routeParams.create, $scope.files)
+        contentResource.publish($scope.content, $routeParams.create, $scope.files)
             .then(function (data) {
                 
                 contentEditingHelper.handleSuccessfulSave({
@@ -70,15 +69,17 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
             });	        
     };
 
-    $scope.save = function (cnt) {
+    $scope.save = function () {
         $scope.$broadcast("saving", { scope: $scope });
             
+        var currentForm = angularHelper.getRequiredCurrentForm($scope);
+
         //don't continue if the form is invalid
         if (currentForm.$invalid) return;
 
         serverValidationManager.reset();
 
-        contentResource.save(cnt, $routeParams.create, $scope.files)
+        contentResource.save($scope.content, $routeParams.create, $scope.files)
             .then(function (data) {
                 
                 contentEditingHelper.handleSuccessfulSave({
