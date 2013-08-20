@@ -11,7 +11,6 @@ function LegacyController($scope, $routeParams, $element) {
 
 	$scope.legacyPath = decodeURIComponent($routeParams.url);
     
-    
     //$scope.$on('$routeChangeSuccess', function () {
     //    var asdf = $element;
     //});
