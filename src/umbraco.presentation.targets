@@ -8,7 +8,7 @@
   -->
   
   <PropertyGroup Condition="$(BuildingInsideVisualStudio) != true">
-    <SolutionRootFolder>$(MSBuildStartupDirectory)\..\src\</SolutionRootFolder>
+    <SolutionRootFolder>$(ProjectDir)..\</SolutionRootFolder>
     <ConfigEnvironment></ConfigEnvironment>
   </PropertyGroup>
 

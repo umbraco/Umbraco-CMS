@@ -168,7 +168,7 @@
 
   <Target Name="CopyBelleBuild" DependsOnTargets="CopyLibraries" >
     <ItemGroup>
-      <BelleFiles Include="..\src\Umbraco.Web.UI.Client\build\belle\**\*.*" />
+      <BelleFiles Include="..\src\Umbraco.Web.UI.Client\build\belle\**\*.*" Exclude="..\src\Umbraco.Web.UI.Client\build\belle\index.html" />
     </ItemGroup>	
 	
 	<Copy SourceFiles="@(BelleFiles)"
