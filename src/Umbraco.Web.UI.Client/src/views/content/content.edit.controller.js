@@ -73,6 +73,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
 
                 contentEditingHelper.handleSaveError({
                     err: err,
+                    redirectOnFailure: true,
                     allNewProps: allNewProps,
                     allOrigProps: contentEditingHelper.getAllProps($scope.content),
                     rebindCallback: contentEditingHelper.reBindChangedProperties(allOrigProps, allNewProps)

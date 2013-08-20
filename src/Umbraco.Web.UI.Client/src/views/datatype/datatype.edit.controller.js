@@ -8,22 +8,7 @@
  */
 function DataTypeEditController($scope, $routeParams, $location, dataTypeResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper) {
 
-    //set up the standard data type props
-    function createDisplayProps() {
-        $scope.properties = {
-            selectedEditor: {
-                alias: "selectedEditor",
-                description: "Select a property editor",
-                label: "Property editor"
-            },
-            selectedEditorId: {
-                alias: "selectedEditorId",
-                label: "Property editor GUID"
-            }
-        };
-    }
-    
-    //setup the pre-values as props
+    //method used to configure the pre-values when we retreive them from the server
     function createPreValueProps(preVals) {
         $scope.preValues = [];
         for (var i = 0; i < preVals.length; i++) {
@@ -38,6 +23,22 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
         }
     }
 
+    //set up the standard data type props
+    $scope.properties = {
+        selectedEditor: {
+            alias: "selectedEditor",
+            description: "Select a property editor",
+            label: "Property editor"
+        },
+        selectedEditorId: {
+            alias: "selectedEditorId",
+            label: "Property editor GUID"
+        }
+    };
+    
+    //setup the pre-values as props
+    $scope.preValues = [];
+
     if ($routeParams.create) {
         //we are creating so get an empty content item
         dataTypeResource.getScaffold($routeParams.id, $routeParams.doctype)
@@ -45,7 +46,6 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
                 $scope.loaded = true;
                 $scope.preValuesLoaded = true;
                 $scope.content = data;
-                createDisplayProps();
             });
     }
     else {
@@ -55,7 +55,6 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
                 $scope.loaded = true;
                 $scope.preValuesLoaded = true;
                 $scope.content = data;
-                createDisplayProps();
                 createPreValueProps($scope.content.preValues);
                 
                 //in one particular special case, after we've created a new item we redirect back to the edit

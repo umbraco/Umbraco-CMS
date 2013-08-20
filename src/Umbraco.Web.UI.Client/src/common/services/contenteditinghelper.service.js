@@ -147,7 +147,7 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
                     
                     this.handleValidationErrors(args.allNewProps, args.err.data.ModelState);
 
-                    if (!this.redirectToCreatedContent(args.err.data.id, args.err.data.ModelState)) {
+                    if (!args.redirectOnFailure || !this.redirectToCreatedContent(args.err.data.id, args.err.data.ModelState)) {
                         //we are not redirecting because this is not new content, it is existing content. In this case
                         // we need to detect what properties have changed and re-bind them with the server data. Then we need
                         // to re-bind any server validation errors after the digest takes place.
@@ -204,7 +204,7 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
             }
 
             args.scope.$broadcast("saved", { scope: args.scope });
-            if (!this.redirectToCreatedContent(args.scope.content.id)) {
+            if (!this.redirectToCreatedContent(args.newContent.id)) {
                 
                 //we are not redirecting because this is not new content, it is existing content. In this case
                 // we need to detect what properties have changed and re-bind them with the server data.

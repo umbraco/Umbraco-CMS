@@ -71,6 +71,7 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
 
                 contentEditingHelper.handleSaveError({
                     err: err,
+                    redirectOnFailure: true,
                     allNewProps: allNewProps,
                     allOrigProps: contentEditingHelper.getAllProps($scope.content),
                     rebindCallback: contentEditingHelper.reBindChangedProperties(allOrigProps, allNewProps)

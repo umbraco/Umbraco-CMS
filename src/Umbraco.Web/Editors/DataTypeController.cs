@@ -44,6 +44,12 @@ namespace Umbraco.Web.Editors
             return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dataType);
         }
 
+        public DataTypeDisplay GetEmpty()
+        {
+            var dt = new DataTypeDefinition(-1, Guid.Empty);
+            return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dt);
+        }
+
         /// <summary>
         /// Returns the pre-values for the specified property editor
         /// </summary>

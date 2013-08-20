@@ -22,17 +22,26 @@ namespace Umbraco.Web.Models.Mapping
 
         protected override IEnumerable<PreValueFieldDisplay> ResolveCore(IDataTypeDefinition source)
         {
-            var propEd = PropertyEditorResolver.Current.GetById(source.ControlId);
-            if (propEd == null)
+            PropertyEditor propEd = null;
+            if (source.ControlId != Guid.Empty)
             {
-                throw new InvalidOperationException("Could not find property editor with id " + source.ControlId);
+                propEd = PropertyEditorResolver.Current.GetById(source.ControlId);
+                if (propEd == null)
+                {
+                    throw new InvalidOperationException("Could not find property editor with id " + source.ControlId);
+                }    
             }
+            
 
             var dataTypeService = (DataTypeService) _dataTypeService.Value;
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(source.Id);
             var dictionaryVals = PreValueCollection.AsDictionary(preVals);
 
-            var result = propEd.PreValueEditor.Fields.Select(Mapper.Map<PreValueFieldDisplay>).ToArray();
+            var result = Enumerable.Empty<PreValueFieldDisplay>();
+            if (propEd != null)
+            {
+                result = propEd.PreValueEditor.Fields.Select(Mapper.Map<PreValueFieldDisplay>).ToArray();    
+            }
             var currentIndex = 0; //used if the collection is non-dictionary based.
             foreach (var field in result)
             {

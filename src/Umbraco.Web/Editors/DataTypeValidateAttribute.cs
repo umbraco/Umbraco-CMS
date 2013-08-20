@@ -8,6 +8,7 @@ using System.Web.Http.Filters;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -70,9 +71,11 @@ namespace Umbraco.Web.Editors
                 case ContentSaveAction.SaveNew:
                     //create the persisted model from mapping the saved model
                     persisted = Mapper.Map<IDataTypeDefinition>(dataType);
+                    ((DataTypeDefinition)persisted).ResetIdentity();
                     break;
                 default:
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                    actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, new ArgumentOutOfRangeException());
+                    return;
             }
 
             //now assign the persisted entity to the model so we can use it in the action

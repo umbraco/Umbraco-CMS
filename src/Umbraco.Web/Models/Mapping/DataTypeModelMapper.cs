@@ -30,7 +30,8 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing<AvailablePropertyEditorsResolver>())
                   .ForMember(display => display.PreValues, expression => expression.ResolveUsing(
                       new PreValueDisplayResolver(lazyDataTypeService)))
-                  .ForMember(display => display.SelectedEditor, expression => expression.MapFrom(definition => definition.ControlId));
+                  .ForMember(display => display.SelectedEditor, expression => expression.MapFrom(
+                      definition => definition.ControlId == Guid.Empty ? null : (Guid?) definition.ControlId));
 
             config.CreateMap<DataTypeSave, IDataTypeDefinition>()
                   .ConstructUsing(save => new DataTypeDefinition(-1, save.SelectedEditor) {CreateDate = DateTime.Now})

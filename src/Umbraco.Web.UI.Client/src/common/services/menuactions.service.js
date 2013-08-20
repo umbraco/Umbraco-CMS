@@ -8,7 +8,7 @@
  * @description
  * Defines the methods that are called when menu items declare only an action to execute
  */
-function umbracoMenuActions($q, treeService, $location) {
+function umbracoMenuActions($q, treeService, $location, navigationService) {
     
     return {
         
@@ -41,9 +41,13 @@ function umbracoMenuActions($q, treeService, $location) {
          * @param {object} args.section The current section
          */
         "CreateChildEntity": function (args) {
+
+            navigationService.hideNavigation();
+
             var route = "/" + args.section + "/" + treeService.getTreeAlias(args.treeNode) + "/edit/" + args.treeNode.id;
             //change to new path
             $location.path(route).search({ create: true });
+            
         }
     };
 } 
