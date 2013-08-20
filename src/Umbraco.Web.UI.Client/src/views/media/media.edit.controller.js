@@ -59,11 +59,22 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
                 contentEditingHelper.handleSuccessfulSave({
                     scope: $scope,
                     newContent: data,
-                    rebindCallback: contentEditingHelper.reBindChangedProperties(scope.content, data)
+                    rebindCallback: contentEditingHelper.reBindChangedProperties(
+                        contentEditingHelper.getAllProps($scope.content),
+                        contentEditingHelper.getAllProps(data))
                 });
                 
             }, function (err) {
-                contentEditingHelper.handleSaveError(err, $scope);
+                
+                var allNewProps = contentEditingHelper.getAllProps(err.data);
+                var allOrigProps = contentEditingHelper.getAllProps($scope.content);
+
+                contentEditingHelper.handleSaveError({
+                    err: err,
+                    allNewProps: allNewProps,
+                    allOrigProps: contentEditingHelper.getAllProps($scope.content),
+                    rebindCallback: contentEditingHelper.reBindChangedProperties(allOrigProps, allNewProps)
+                });
             });
     };
 }

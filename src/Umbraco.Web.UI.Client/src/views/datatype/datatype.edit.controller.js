@@ -102,7 +102,17 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
                 });
 
             }, function (err) {
-                contentEditingHelper.handleSaveError(err, $scope);
+                
+                //NOTE: in the case of data type values we are setting the orig/new props 
+                // to be the same thing since that only really matters for content/media.
+                contentEditingHelper.handleSaveError({
+                    err: err,
+                    allNewProps: $scope.preValues,
+                    allOrigProps: $scope.preValues,
+                    rebindCallback: function () {
+                        createPreValueProps(err.data.preValues);
+                    }
+                });
         });
     };
 

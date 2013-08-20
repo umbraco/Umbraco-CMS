@@ -38,13 +38,9 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
          * @description
          * re-binds all changed property values to the origContent object from the newContent object and returns an array of changed properties.
          */
-        reBindChangedProperties: function (origContent, newContent) {
+        reBindChangedProperties: function (allOrigProps, allNewProps) {
 
             var changed = [];
-
-            //get a list of properties since they are contained in tabs
-            var allOrigProps = this.getAllProps(origContent);
-            var allNewProps = this.getAllProps(newContent);
 
             function getNewProp(alias) {
                 if (alias.startsWith("_umb_")) {
@@ -78,10 +74,8 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
          *  It's worth noting that when a 403 occurs, the data is still saved just never published, though this depends on if the entity is a new
          *  entity and whether or not the data fulfils the absolute basic requirements like having a mandatory Name.
          */
-        handleValidationErrors: function (content, modelState) {
-            //get a list of properties since they are contained in tabs
-            var allProps = this.getAllProps(content);
-
+        handleValidationErrors: function (allProps, modelState) {
+            
             //find the content property for the current error, for use in the loop below
             function findContentProp(props, propAlias) {
                 return _.find(props, function (item) {
@@ -132,21 +126,36 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
          * @description
          * A function to handle what happens when we have validation issues from the server side
          */
-        handleSaveError: function (err, scope) {
+        handleSaveError: function (args) {
+            
+            if (!args.err) {
+                throw "args.err cannot be null";
+            }
+            if (!args.allNewProps && !angular.isArray(args.allNewProps)) {
+                throw "args.allNewProps must be a valid array";
+            }
+            if (!args.allOrigProps && !angular.isArray(args.allOrigProps)) {
+                throw "args.allOrigProps must be a valid array";
+            }
+            
             //When the status is a 403 status, we have validation errors.
             //Otherwise the error is probably due to invalid data (i.e. someone mucking around with the ids or something).
             //Or, some strange server error
-            if (err.status === 403) {
+            if (args.err.status === 403) {
                 //now we need to look through all the validation errors
-                if (err.data && (err.data.modelState)) {
+                if (args.err.data && (args.err.data.ModelState)) {
+                    
+                    this.handleValidationErrors(args.allNewProps, args.err.data.ModelState);
 
-                    this.handleValidationErrors(err.data, err.data.modelState);
-
-                    if (!this.redirectToCreatedContent(err.data.id, err.data.modelState)) {
+                    if (!this.redirectToCreatedContent(args.err.data.id, args.err.data.ModelState)) {
                         //we are not redirecting because this is not new content, it is existing content. In this case
                         // we need to detect what properties have changed and re-bind them with the server data. Then we need
                         // to re-bind any server validation errors after the digest takes place.
-                        this.reBindChangedProperties(scope.content, err.data);
+
+                        if (args.rebindCallback && angular.isFunction(args.rebindCallback)) {
+                            args.rebindCallback();
+                        }
+                        
                         serverValidationManager.executeAndClearAllSubscriptions();
                     }
 
@@ -154,11 +163,11 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
                     return true;
                 }
                 else {
-                    dialogService.ysodDialog(err);
+                    dialogService.ysodDialog(args.err);
                 }
             }
             else {
-                dialogService.ysodDialog(err);
+                dialogService.ysodDialog(args.err);
             }
 
             return false;
@@ -166,7 +175,7 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
 
         /**
          * @ngdoc function
-         * @name umbraco.services.contentEditingHelper#handleSaveError
+         * @name umbraco.services.contentEditingHelper#handleSuccessfulSave
          * @methodOf umbraco.services.contentEditingHelper
          * @function
          *

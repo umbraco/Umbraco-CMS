@@ -61,11 +61,22 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
                 contentEditingHelper.handleSuccessfulSave({
                     scope: $scope,
                     newContent: data,
-                    rebindCallback: contentEditingHelper.reBindChangedProperties(scope.content, data)
+                    rebindCallback: contentEditingHelper.reBindChangedProperties(
+                        contentEditingHelper.getAllProps($scope.content),
+                        contentEditingHelper.getAllProps(data))
                 });
                 
-            }, function (err) {                
-                contentEditingHelper.handleSaveError(err, $scope);
+            }, function (err) {
+
+                var allNewProps = contentEditingHelper.getAllProps(err.data);
+                var allOrigProps = contentEditingHelper.getAllProps($scope.content);
+
+                contentEditingHelper.handleSaveError({
+                    err: err,
+                    allNewProps: allNewProps,
+                    allOrigProps: contentEditingHelper.getAllProps($scope.content),
+                    rebindCallback: contentEditingHelper.reBindChangedProperties(allOrigProps, allNewProps)
+                });
             });	        
     };
 
@@ -89,7 +100,11 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
                 });
                 
             }, function (err) {
-                contentEditingHelper.handleSaveError(err, $scope);
+                contentEditingHelper.handleSaveError({
+                    err: err,
+                    allNewProps: contentEditingHelper.getAllProps(err.data),
+                    allOrigProps: contentEditingHelper.getAllProps($scope.content)
+                });
         });
     };
 

@@ -85,7 +85,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
          *   In both of the above, the successCallback must accept these parameters: data, status, headers, config
          *   If using the errorCallback it must accept these parameters: data, status, headers, config
          *   The success callback must return the data which will be resolved by the deferred object.
-         *   The error callback must return an object containing: {errorMsg: errorMessage, data: originalData }
+         *   The error callback must return an object containing: {errorMsg: errorMessage, data: originalData, status: status }
          */
         resourcePromise: function (httpPromise, opts) {
             var deferred = $q.defer();
@@ -101,7 +101,8 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                 return {
                     //NOTE: the default error message here should never be used based on the above docs!
                     errorMsg: (angular.isString(opts) ? opts : 'An error occurred!'),
-                    data: data
+                    data: data,
+                    status: status
                 };
             }
 
@@ -137,7 +138,8 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     //return an error object including the error message for UI
                     deferred.reject({
                         errorMsg: result.errorMsg,
-                        data: result.data
+                        data: result.data,
+                        status: result.status
                     });
 
                 }
