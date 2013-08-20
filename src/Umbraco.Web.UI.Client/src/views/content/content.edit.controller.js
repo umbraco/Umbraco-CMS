@@ -58,11 +58,10 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
         
         contentResource.publish(cnt, $routeParams.create, $scope.files)
             .then(function (data) {
-                
                 contentEditingHelper.handleSuccessfulSave({
                     scope: $scope,
                     newContent: data,
-                    rebindCallback: contentEditingHelper.reBindChangedProperties(scope.content, data)
+                    rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                 });
                 
             }, function (err) {                
@@ -84,7 +83,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
                 contentEditingHelper.handleSuccessfulSave({
                     scope: $scope,
                     newContent: data,
-                    rebindCallback: contentEditingHelper.reBindChangedProperties(scope.content, data)
+                    rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                 });
                 
             }, function (err) {
