@@ -55,5 +55,12 @@ namespace Umbraco.Web.Editors
 
             return propEd.PreValueEditor.Fields.Select(Mapper.Map<PreValueFieldDisplay>);
         }
+
+        //TODO: Generally there probably won't be file uploads for pre-values but we should allow them just like we do for the content editor
+
+        public DataTypeDisplay PostSave()
+        {
+            return null;
+        }
     }
 }

@@ -1,6 +1,8 @@
-﻿using Umbraco.Core;
+﻿using System;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -10,22 +12,24 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentPropertyDtoConverter : ContentPropertyBasicConverter<ContentPropertyDto>
     {
-        private readonly ApplicationContext _applicationContext;
+        private readonly Lazy<IDataTypeService> _dataTypeService;
 
-        public ContentPropertyDtoConverter(ApplicationContext applicationContext)
+        public ContentPropertyDtoConverter(Lazy<IDataTypeService> dataTypeService)
         {
-            _applicationContext = applicationContext;
+            _dataTypeService = dataTypeService;
         }
 
         protected override ContentPropertyDto ConvertCore(Property originalProperty)
         {
             var propertyDto = base.ConvertCore(originalProperty);
 
+            var dataTypeService = (DataTypeService)_dataTypeService.Value;
+
             propertyDto.IsRequired = originalProperty.PropertyType.Mandatory;
             propertyDto.ValidationRegExp = originalProperty.PropertyType.ValidationRegExp;
             propertyDto.Description = originalProperty.PropertyType.Description;
             propertyDto.Label = originalProperty.PropertyType.Name;
-            propertyDto.DataType = _applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(originalProperty.PropertyType.DataTypeDefinitionId);
+            propertyDto.DataType = dataTypeService.GetDataTypeDefinitionById(originalProperty.PropertyType.DataTypeDefinitionId);
 
             return propertyDto;
         }

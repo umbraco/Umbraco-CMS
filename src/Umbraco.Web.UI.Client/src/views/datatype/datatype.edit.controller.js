@@ -33,6 +33,7 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
                 description: preVals[i].description,
                 label: preVals[i].label,
                 view: preVals[i].view,
+                value: preVals[i].value
             });
         }
     }

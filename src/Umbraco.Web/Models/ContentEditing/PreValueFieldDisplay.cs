@@ -37,5 +37,11 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "view", IsRequired = true)]
         public string View { get; set; }
+
+        /// <summary>
+        /// The value stored for the pre-value field
+        /// </summary>
+        [DataMember(Name = "value", IsRequired = true)]
+        public string Value { get; set; }
     }
 }

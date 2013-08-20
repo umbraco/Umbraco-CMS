@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
@@ -12,11 +13,11 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentPropertyDisplayConverter : ContentPropertyBasicConverter<ContentPropertyDisplay>
     {
-        private readonly ApplicationContext _applicationContext;
+        private readonly Lazy<IDataTypeService> _dataTypeService;
 
-        public ContentPropertyDisplayConverter(ApplicationContext applicationContext)
+        public ContentPropertyDisplayConverter(Lazy<IDataTypeService> dataTypeService)
         {
-            _applicationContext = applicationContext;
+            _dataTypeService = dataTypeService;
         }
 
         protected override ContentPropertyDisplay ConvertCore(Property originalProp)
@@ -27,12 +28,11 @@ namespace Umbraco.Web.Models.Mapping
             display.Alias = originalProp.Alias;
             display.Description = originalProp.PropertyType.Description;
             display.Label = originalProp.PropertyType.Name;
-            var dataTypeService = (DataTypeService) _applicationContext.Services.DataTypeService;
+
+            var dataTypeService = (DataTypeService)_dataTypeService.Value;
 
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(originalProp.PropertyType.DataTypeDefinitionId);
            
-            
-            
             if (display.PropertyEditor == null)
             {
                 display.Config = PreValueCollection.AsDictionary(preVals);

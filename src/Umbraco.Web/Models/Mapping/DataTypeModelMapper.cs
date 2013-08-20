@@ -1,8 +1,10 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -11,6 +13,8 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
+            var lazyDataTypeService = new Lazy<IDataTypeService>(() => applicationContext.Services.DataTypeService);
+
             config.CreateMap<PropertyEditor, PropertyEditorBasic>()
                   .ForMember(basic => basic.EditorId, expression => expression.MapFrom(editor => editor.Id));
 
@@ -18,7 +22,8 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<IDataTypeDefinition, DataTypeDisplay>()
                   .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing<AvailablePropertyEditorsResolver>())
-                  .ForMember(display => display.PreValues, expression => expression.ResolveUsing<PreValueDisplayResolver>())
+                  .ForMember(display => display.PreValues, expression => expression.ResolveUsing(
+                      new PreValueDisplayResolver(lazyDataTypeService)))
                   .ForMember(display => display.SelectedEditor, expression => expression.MapFrom(definition => definition.ControlId));
         }
     }
