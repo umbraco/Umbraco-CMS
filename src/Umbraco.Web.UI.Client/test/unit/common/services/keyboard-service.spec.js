@@ -2,7 +2,7 @@ describe('keyboard service tests', function () {
     var keyboardService, $window;
 
       var createKeyEvent = function (mainKey, alt, ctrl, shift, meta) {
-        var keyEvent = jQuery.Event("keypress");
+        var keyEvent = jQuery.Event("keydown");
         keyEvent.keyCode = mainKey.charCodeAt(0);
         keyEvent.altKey = alt;
         keyEvent.ctrlKey = ctrl;
@@ -26,17 +26,8 @@ describe('keyboard service tests', function () {
             var el = $("<span></span>");
             var ev = createKeyEvent("s", false, true, false);
 
-            el.keypress(function(ev) {
-              console.log(ev);  
-              console.log("Handler for .keypress() called.");
-            });
-
-
-            console.log("loaded");
-
             keyboardService.bind("ctrl+s", function(){
                 ctrls = true;
-                console.log("triggered");
             }, el);
 
             //initially it should be false
@@ -45,12 +36,9 @@ describe('keyboard service tests', function () {
             //trigger the ctrls+s event
             el.trigger(ev);
 
-            //it should now be true
-//            expect(ctrls).toBe(true);
-
-          //  expect(iconHelper.isFileBasedIcon(legacyBased)).toBe(false);
-          //  expect(iconHelper.isFileBasedIcon(belleBased)).toBe(false);
-        });
+            //it should now be true - this failes for some reason
+           //expect(ctrls).toBe(true);
+     });
         
         /*
         it('detects a legacy icon', function () {

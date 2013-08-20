@@ -25,6 +25,7 @@ angular.module('umbraco.services')
 			elt = document.getElementById(opt.target);	
 		} 
 
+	
 		fct = function (e) {
 			e = e || $window.event;
 
@@ -217,7 +218,6 @@ angular.module('umbraco.services')
 					return false;
 				}
 			}
-
 		};
 		// Store shortcut
 		keyboardManagerService.keyboardEvent[label] = {
