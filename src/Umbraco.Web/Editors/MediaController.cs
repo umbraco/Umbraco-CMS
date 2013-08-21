@@ -64,7 +64,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = new Core.Models.Media("Empty", parentId, contentType);
+            var emptyContent = new Core.Models.Media("", parentId, contentType);
             return Mapper.Map<IMedia, MediaItemDisplay>(emptyContent);
         }
 
@@ -112,26 +112,17 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>        
         [FileUploadCleanupFilter]
+        [MediaPostValidate]
         public MediaItemDisplay PostSave(
             [ModelBinder(typeof(MediaItemBinder))]
                 ContentItemSave<IMedia> contentItem)
         {
-            //We now need to validate that the user is allowed to be doing what they are doing
-            if (CheckPermissions(
-                Request.Properties,
-                Security.CurrentUser,
-                Services.MediaService,
-                contentItem.Id,
-                contentItem.PersistedContent) == false)
-            {
-                throw new HttpResponseException(HttpStatusCode.Unauthorized);
-            }
-
             //If we've reached here it means:
             // * Our model has been bound
             // * and validated
             // * any file attachments have been saved to their temporary location for us to use
             // * we have a reference to the DTO object and the persisted object
+            // * Permissions are valid
 
             UpdateName(contentItem);
 

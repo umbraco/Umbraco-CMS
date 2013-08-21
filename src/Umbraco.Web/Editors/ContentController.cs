@@ -173,6 +173,7 @@ namespace Umbraco.Web.Editors
             // * and validated
             // * any file attachments have been saved to their temporary location for us to use
             // * we have a reference to the DTO object and the persisted object
+            // * Permissions are valid
             
             UpdateName(contentItem);
             
