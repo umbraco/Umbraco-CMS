@@ -8,7 +8,7 @@ module.exports = function (grunt) {
   grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:app','karma:unit', 'copy:vs']);
   grunt.registerTask('watch-less', ['recess:build','copy:assets','copy:vs']);
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
-
+  grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
   grunt.registerTask('build', ['clean','concat','recess:build','copy']);
@@ -62,7 +62,7 @@ module.exports = function (grunt) {
     ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>;\n' +
     ' * Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n */\n',
     src: {
-      js: ['src/**/*.js'],
+      js: ['src/**/*.js', 'src/*.js'],
       common: ['src/common/**/*.js'],
       specs: ['test/**/*.spec.js'],
       scenarios: ['test/**/*.scenario.js'],
@@ -93,14 +93,10 @@ module.exports = function (grunt) {
       },
       app: {
         files: [
-            { dest: '<%= distdir %>/jshints', src : '*.js', expand: true, cwd: 'src/' }
+            { dest: '<%= distdir %>/js', src : '*.js', expand: true, cwd: 'src/' }
             ]
       },
 
-      media: {
-        files: [{ dest: 'build/media', src : '*.*', expand: true, cwd: 'media/' }]
-      },
-      
       mocks: {
         files: [{ dest: '<%= distdir %>/js', src : '*.js', expand: true, cwd: 'src/common/mocks/' }]
       },
@@ -222,6 +218,10 @@ module.exports = function (grunt) {
       js: {
           files: ['src/**/*.js', 'src/*.js'],
           tasks: ['watch-js', 'timestamp'],
+      },
+      test: {
+          files: ['test/**/*.js'],
+          tasks: ['watch-test', 'timestamp'],
       },
       html: {
         files: ['src/views/**/*.html', 'src/*.html'],
