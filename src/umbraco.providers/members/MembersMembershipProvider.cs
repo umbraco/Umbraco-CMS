@@ -820,6 +820,7 @@ namespace umbraco.providers.members
                     {
                         UpdateMemberProperty(updateMemberDataObject, m_LockPropertyTypeAlias, true);
                     }
+                    updateMemberDataObject.Save();
                 }
 
             }

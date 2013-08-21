@@ -112,7 +112,7 @@ namespace Umbraco.Core
         public void ConfigureEmbeddedDatabaseConnection()
         {
             const string providerName = "System.Data.SqlServerCe.4.0";
-            const string connectionString = @"Data Source=|DataDirectory|\Umbraco.sdf";
+            const string connectionString = @"Data Source=|DataDirectory|\Umbraco.sdf;Flush Interval=1;File Access Retry Timeout=10";
 
             SaveConnectionString(connectionString, providerName);
 
