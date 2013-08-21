@@ -116,6 +116,7 @@ angular.module('umbraco.services')
                 setMode("tree");
             }
         },
+        
 
         /**
          * @ngdoc method
@@ -127,7 +128,7 @@ angular.module('umbraco.services')
          * used by the leaveTree method to delay hiding
          */
         enterTree: function () {
-            servicea.active = true;
+            service.active = true;
         },
 
         /**

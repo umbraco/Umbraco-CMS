@@ -4,5 +4,6 @@ var app = angular.module('umbraco', [
 	'umbraco.resources',
 	'umbraco.services',
     'ngCookies',
+    'ngRoute',
     'ui.sortable'
 ]);
