@@ -37,7 +37,7 @@ function MainController($scope, $routeParams, $rootScope, $timeout, $http, notif
         var pEl = event.target.parentElement.nodeName;
 
         //SD: I've updated this so that we don't close the dialog when clicking inside of the dialog
-        if ($(event.target).closest("#dialog").length === 1) {
+        if ($(event.target).closest("#navigation").length === 1) {
             return;
         }
 
