@@ -3,6 +3,10 @@ describe('contentEditingHelper tests', function () {
 
     beforeEach(module('umbraco.services'));
     beforeEach(module('umbraco.mocks'));
+    
+
+    //Only for 1.2: beforeEach(module('ngRoute'));
+
 
     beforeEach(inject(function ($injector) {
         contentEditingHelper = $injector.get('contentEditingHelper');
