@@ -4,9 +4,13 @@ module.exports = function (grunt) {
   grunt.registerTask('default', ['jshint:dev','build','karma:unit']);
   grunt.registerTask('dev', ['jshint:dev', 'build', 'webserver', 'open:dev', 'watch']);
   
+
   //run by the watch task
-  grunt.registerTask('watch-build', ['jshint:dev','recess:build','concat','copy','karma:unit']);
-  
+  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:app','karma:unit', 'copy:vs', 'copy:assets']);
+  grunt.registerTask('watch-less', ['recess:build','copy:assets','copy:vs']);
+  grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
+
+
   //triggered from grunt dev or grunt
   grunt.registerTask('build', ['clean','concat','recess:build','copy']);
 
@@ -14,10 +18,12 @@ module.exports = function (grunt) {
   grunt.registerTask('docs', ['markdown', 'ngdocs']);
   grunt.registerTask('webserver', ['connect:devserver']);
 
+
   // Print a timestamp (useful for when watching)
   grunt.registerTask('timestamp', function() {
     grunt.log.subhead(Date());
   });
+
 
   // Project configuration.
   grunt.initConfig({
@@ -91,6 +97,7 @@ module.exports = function (grunt) {
             { dest: '<%= distdir %>/js', src : '*.js', expand: true, cwd: 'src/' }
             ]
       },
+
       media: {
         files: [{ dest: 'build/media', src : '*.*', expand: true, cwd: 'media/' }]
       },
@@ -108,6 +115,7 @@ module.exports = function (grunt) {
               { dest: '<%= vsdir %>/views', src: '**', expand: true, cwd: '<%= distdir %>/views' }
           ]
       },
+
       packages: {
         files: [{ dest: '<%= vsdir %>/../App_Plugins', src : '**', expand: true, cwd: 'src/packages/' }]
       }
@@ -227,9 +235,20 @@ module.exports = function (grunt) {
     },
 
     watch:{
-      dev: {
-        files:['<%= src.everything %>'],
-        tasks:['watch-build','timestamp']
+      css: {
+          files: '**/*.less',
+          tasks: ['watch-less', 'timestamp'],
+          options: {
+            livereload: true,
+          },
+      },
+      js: {
+          files: ['src/**/*.js', 'src/*.js'],
+          tasks: ['watch-js', 'timestamp'],
+      },
+      html: {
+        files: ['src/views/**/*.html', 'src/*.html'],
+        tasks:['watch-html','timestamp']
       }
     },
 

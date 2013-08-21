@@ -29,6 +29,11 @@ body {
   z-index: 1;
 }
 
+#mainwrapper {
+  height: 100%;
+  margin: 0
+}
+
 #contentwrapper {
   height: 100%;
   z-index: 10;
@@ -38,8 +43,11 @@ body {
 #contentcolumn {
   position: relative;
   margin-left: 80px;
-  z-index: 10
+  z-index: 10;
+  height: 100%;
 }
+
+.content-column-body{height: 100%;}
 
 #contentcolumn iframe {
   display: block;
@@ -93,6 +101,7 @@ body {
   padding: 15px 0px 20px 0px;
   position: relative;
   z-index: 100 !important;
+  height: 100%;
 }
 
 #search-results {
