@@ -4,6 +4,12 @@ var app = angular.module('umbraco', [
 	'umbraco.resources',
 	'umbraco.services',
     'ngCookies',
-    'ngRoute',
     'ui.sortable'
 ]);
+
+
+/* For Angular 1.2: we need to load in Route, animate and touch seperately
+	    'ngRoute',
+	    'ngAnimate',
+	    'ngTouch'
+*/
