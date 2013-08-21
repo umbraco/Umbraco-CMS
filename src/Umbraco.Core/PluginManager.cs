@@ -36,6 +36,7 @@ namespace Umbraco.Core
     internal class PluginManager
     {
         private readonly ApplicationContext _appContext;
+        private const string CacheKey = "umbraco-plugins.list";
 
         /// <summary>
         /// Creates a new PluginManager with an ApplicationContext instance which ensures that the plugin xml 
@@ -250,7 +251,7 @@ namespace Umbraco.Core
                 XDocument xml;
                 if (_appContext != null)
                 {
-                    xml = _appContext.ApplicationCache.GetCacheItem("umbraco-plugins.list",
+                    xml = _appContext.ApplicationCache.GetCacheItem(CacheKey,
                         new TimeSpan(0, 0, 5, 0),
                         () => XDocument.Load(filePath));
                 }
@@ -303,7 +304,7 @@ namespace Umbraco.Core
 
             if (_appContext != null)
             {
-               _appContext.ApplicationCache.ClearCacheItem("umbraco-plugins.list");
+               _appContext.ApplicationCache.ClearCacheItem(CacheKey);
             }
         }
         
