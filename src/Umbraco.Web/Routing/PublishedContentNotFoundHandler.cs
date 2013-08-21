@@ -37,7 +37,7 @@ namespace Umbraco.Web.Routing
 
 			response.Write("<html><body><h1>Page not found</h1>");
 			response.Write("<h3>");
-			response.Write(string.Format(reason, HttpUtility.HtmlEncode(UmbracoContext.Current.OriginalRequestUrl)));
+			response.Write(string.Format(reason, HttpUtility.HtmlEncode(UmbracoContext.Current.OriginalRequestUrl.PathAndQuery)));
 			response.Write("</h3>");
 			if (!string.IsNullOrWhiteSpace(_message))
 				response.Write("<p>" + _message + "</p>");
