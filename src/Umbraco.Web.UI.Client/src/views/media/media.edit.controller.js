@@ -6,7 +6,10 @@
  * @description
  * The controller for the media editor
  */
-function mediaEditController($scope, $routeParams, mediaResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper) {
+function mediaEditController($scope, $routeParams, mediaResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager) {
+
+    //initialize the file manager
+    fileManager.clearFiles();
 
     if ($routeParams.create) {
 
@@ -30,18 +33,6 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
 
             });
     }
-
-    $scope.files = [];
-    $scope.addFiles = function (propertyId, files) {
-        //this will clear the files for the current property and then add the new ones for the current property
-        $scope.files = _.reject($scope.files, function (item) {
-            return item.id == propertyId;
-        });
-        for (var i = 0; i < files.length; i++) {
-            //save the file object to the scope's files collection
-            $scope.files.push({ id: propertyId, file: files[i] });
-        }
-    };
         
     $scope.save = function () {
         
@@ -53,28 +44,22 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
         
         serverValidationManager.reset();
 
-        mediaResource.save($scope.content, $routeParams.create, $scope.files)
+        mediaResource.save($scope.content, $routeParams.create, fileManager.getFiles())
             .then(function (data) {
 
                 contentEditingHelper.handleSuccessfulSave({
                     scope: $scope,
                     newContent: data,
-                    rebindCallback: contentEditingHelper.reBindChangedProperties(
-                        contentEditingHelper.getAllProps($scope.content),
-                        contentEditingHelper.getAllProps(data))
+                    rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                 });
                 
             }, function (err) {
                 
-                var allNewProps = contentEditingHelper.getAllProps(err.data);
-                var allOrigProps = contentEditingHelper.getAllProps($scope.content);
-
                 contentEditingHelper.handleSaveError({
                     err: err,
                     redirectOnFailure: true,
-                    allNewProps: allNewProps,
-                    allOrigProps: contentEditingHelper.getAllProps($scope.content),
-                    rebindCallback: contentEditingHelper.reBindChangedProperties(allOrigProps, allNewProps)
+                    allNewProps: contentEditingHelper.getAllProps(err.data),
+                    rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
                 });
             });
     };

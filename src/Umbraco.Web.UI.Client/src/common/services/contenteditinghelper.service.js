@@ -38,9 +38,13 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
          * @description
          * re-binds all changed property values to the origContent object from the newContent object and returns an array of changed properties.
          */
-        reBindChangedProperties: function (allOrigProps, allNewProps) {
+        reBindChangedProperties: function (origContent, newContent) {
 
             var changed = [];
+
+            //get a list of properties since they are contained in tabs
+            var allOrigProps = this.getAllProps(origContent);
+            var allNewProps = this.getAllProps(newContent);
 
             function getNewProp(alias) {
                 if (alias.startsWith("_umb_")) {
@@ -54,7 +58,7 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
             for (var p in allOrigProps) {
                 var newProp = getNewProp(allOrigProps[p].alias);
                 if (newProp && !_.isEqual(allOrigProps[p].value, newProp.value)) {
-                    //they have changed so set the origContent prop's value to the new value
+                    //they have changed so set the origContent prop to the new one
                     allOrigProps[p].value = newProp.value;
                     changed.push(allOrigProps[p]);
                 }
@@ -133,9 +137,6 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
             }
             if (!args.allNewProps && !angular.isArray(args.allNewProps)) {
                 throw "args.allNewProps must be a valid array";
-            }
-            if (!args.allOrigProps && !angular.isArray(args.allOrigProps)) {
-                throw "args.allOrigProps must be a valid array";
             }
             
             //When the status is a 403 status, we have validation errors.

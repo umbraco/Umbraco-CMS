@@ -4,41 +4,64 @@
  * @function
  * 
  * @description
- * The controller for the file upload property editor
+ * The controller for the file upload property editor. It is important to note that the $scope.model.value
+ *  doesn't necessarily depict what is saved for this property editor. $scope.model.value can be empty when we 
+ *  are submitting files because in that case, we are adding files to the fileManager which is what gets peristed
+ *  on the server. However, when we are clearing files, we are setting $scope.model.value to "{clearFiles: true}"
+ *  to indicate on the server that we are removing files for this property. We will keep the $scope.model.value to 
+ *  be the name of the file selected (if it is a newly selected file) or keep it to be it's original value, this allows
+ *  for the editors to check if the value has changed and to re-bind the property if that is true.
  * 
 */
-function fileUploadController($scope, $element, $compile, umbImageHelper) {
+function fileUploadController($scope, $element, $compile, umbImageHelper, fileManager) {
 
     /** Clears the file collections when content is saving (if we need to clear) or after saved */
-    function clearFiles() {
-        //TODO: There should be a better way! We don't want to have to know about the parent scope
-        //clear the parent files collection (we don't want to upload any!)
-        $scope.$parent.addFiles($scope.id, []);
+    function clearFiles() {        
+        //clear the files collection (we don't want to upload any!)
+        fileManager.setFiles($scope.id, []);
         //clear the current files
         $scope.files = [];
     }
 
-    //clear the current files
-    $scope.files = [];
-
-    //create the property to show the list of files currently saved
-    if ($scope.model.value != "") {
-
-        var images = $scope.model.value.split(",");
+    /** this method is used to initialize the data and to re-initialize it if the server value is changed */
+    function initialize(index)
+    {
+        if (!index) {
+            index = 1;
+        }
         
-        $scope.persistedFiles = _.map(images, function (item) {
-            return { file: item, isImage: umbImageHelper.detectIfImageByExtension(item) };
+        //this is used in order to tell the umb-single-file-upload directive to 
+        //rebuild the html input control (and thus clearing the selected file) since
+        //that is the only way to manipulate the html for the file input control.
+        $scope.rebuildInput = {
+            index: index
+        };
+        //clear the current files
+        $scope.files = [];
+        //store the original value so we can restore it if the user clears and then cancels clearing.
+        $scope.originalValue = $scope.model.value;
+
+        //create the property to show the list of files currently saved
+        if ($scope.model.value != "") {
+
+            var images = $scope.model.value.split(",");
+
+            $scope.persistedFiles = _.map(images, function (item) {
+                return { file: item, isImage: umbImageHelper.detectIfImageByExtension(item) };
+            });
+        }
+        else {
+            $scope.persistedFiles = [];
+        }
+
+        _.each($scope.persistedFiles, function (file) {
+            file.thumbnail = umbImageHelper.getThumbnailFromPath(file.file);
         });
+
+        $scope.clearFiles = false;
     }
-    else {
-        $scope.persistedFiles = [];
-    }
-    
-    _.each($scope.persistedFiles, function (file) {
-        file.thumbnail = umbImageHelper.getThumbnailFromPath(file.file);
-    });
-    
-    $scope.clearFiles = false;
+
+    initialize();
 
     //listen for clear files changes to set our model to be sent up to the server
     $scope.$watch("clearFiles", function (isCleared) {
@@ -47,24 +70,47 @@ function fileUploadController($scope, $element, $compile, umbImageHelper) {
             clearFiles();
         }
         else {
-            $scope.model.value = "";
+            //reset to original value
+            $scope.model.value = $scope.originalValue;
         }
     });
 
     //listen for when a file is selected
     $scope.$on("filesSelected", function (event, args) {
         $scope.$apply(function () {
-            //set the parent files collection
-            $scope.$parent.addFiles($scope.model.id, args.files);
+            //set the files collection
+            fileManager.setFiles($scope.model.id, args.files);
             //clear the current files
             $scope.files = [];
+            var newVal = "";
             for (var i = 0; i < args.files.length; i++) {
                 //save the file object to the scope's files collection
                 $scope.files.push({ id: $scope.model.id, file: args.files[i] });
+                newVal += args.files[i].name + ",";
             }
             //set clear files to false, this will reset the model too
             $scope.clearFiles = false;
+            //set the model value to be the concatenation of files selected. Please see the notes
+            // in the description of this controller, it states that this value isn't actually used for persistence,
+            // but we need to set it to something so that the editor and the server can detect that it's been changed.
+            $scope.model.value = "{selectedFiles: '" + newVal.trimEnd(",") + "'}";
         });
+    });
+    
+    //listen for when the model value has changed
+    $scope.$watch("model.value", function(newVal, oldVal) {
+        //cannot just check for !newVal because it might be an empty string which we 
+        //want to look for.
+        if (newVal !== null && newVal !== undefined && newVal !== oldVal) {
+            //now we need to check if we need to re-initialize our structure which is kind of tricky
+            // since we only want to do that if the server has changed the value, not if this controller
+            // has changed the value. There's only 2 scenarios where we change the value internall so 
+            // we know what those values can be, if they are not either of them, then we'll re-initialize.
+            
+            if (newVal !== "{clearFiles: true}" && newVal !== $scope.originalValue && !newVal.startsWith("{selectedFiles:")) {
+                initialize($scope.rebuildInput.index + 1);
+            }
+        }
     });
 
 };

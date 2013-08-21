@@ -218,9 +218,7 @@ describe('contentEditingHelper tests', function () {
             newContent.tabs[1].properties[2].value = "origValue4";
 
             //act
-            var changed = contentEditingHelper.reBindChangedProperties(
-                contentEditingHelper.getAllProps(origContent),
-                contentEditingHelper.getAllProps(newContent));
+            var changed = contentEditingHelper.reBindChangedProperties(origContent, newContent);
 
             //assert
             expect(changed.length).toBe(2);

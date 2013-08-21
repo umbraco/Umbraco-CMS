@@ -94,6 +94,17 @@
             return this;
         };
     }
+    
+    if (!String.prototype.trimEnd) {
+
+        /** trims the end of the string*/
+        String.prototype.trimEnd = function (str) {
+            if (this.endsWith(str)) {
+                return this.substring(0, this.length - str.length);
+            }
+            return this;
+        };
+    }
 
     if (!String.prototype.utf8Encode) {
 

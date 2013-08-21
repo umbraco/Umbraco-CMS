@@ -28,7 +28,12 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Overrides the deserialize value so that we can save the file accordingly
         /// </summary>
-        /// <param name="editorValue"></param>
+        /// <param name="editorValue">
+        /// This is value passed in from the editor. We normally don't care what the editorValue.Value is set to because
+        /// we are more interested in the files collection associated with it, however we do care about the value if we 
+        /// are clearing files. By default the editorValue.Value will just be set to the name of the file (but again, we
+        /// just ignore this and deal with the file collection in editorValue.AdditionalData.ContainsKey("files") )
+        /// </param>
         /// <param name="currentValue">
         /// The current value persisted for this property. This will allow us to determine if we want to create a new
         /// file path or use the existing file path.
@@ -36,16 +41,20 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns></returns>
         public override object DeserializeValue(ContentPropertyData editorValue, object currentValue)
         {
+            if (currentValue == null)
+            {
+                currentValue = string.Empty;
+            }
 
-            //if the value is the same then just return the current value
-            if (currentValue != null && editorValue.Value == currentValue.ToString())
+            //if the value is the same then just return the current value so we don't re-process everything
+            if (string.IsNullOrEmpty(currentValue.ToString()) == false && editorValue.Value == currentValue.ToString())
             {
                 return currentValue;
             }
 
-            //check the editorValue value to see if we need to clear the files or not
+            //check the editorValue value to see if we need to clear the files or not.
             var clear = false;
-            if (editorValue.Value.IsNullOrWhiteSpace() == false)
+            if (editorValue.Value.IsNullOrWhiteSpace() == false && editorValue.Value.StartsWith("{clearFiles:"))
             {
                 try
                 {
@@ -59,7 +68,7 @@ namespace Umbraco.Web.PropertyEditors
             }
 
             var currentPersistedValues = new string[] {};
-            if (currentValue != null)
+            if (string.IsNullOrEmpty(currentValue.ToString()) == false)
             {
                 currentPersistedValues = currentValue.ToString().Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
             }

@@ -36,23 +36,7 @@ describe('edit content controller tests', function () {
     }));
 
     describe('content edit controller save and publish', function () {
-
-        it('it should define the default properties on construction', function () {
-            expect(scope.files).toNotBe(undefined);
-        });
         
-        it('adding a file adds to the collection', function () {
-            scope.addFiles(123, ["testFile"]);
-            expect(scope.files.length).toBe(1); 
-        });
-        
-        it('adding a file with the same property id replaces the existing one', function () {
-            scope.addFiles(123, ["testFile"]);
-            scope.addFiles(123, ["testFile2"]);
-            expect(scope.files.length).toBe(1);
-            expect(scope.files[0].file).toBe("testFile2");
-        });
-
         it('it should have an content object', function() {
 
             //controller should have a content object
