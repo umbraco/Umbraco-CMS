@@ -6,8 +6,11 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $location, contentResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper) {
+function ContentEditController($scope, $routeParams, $location, contentResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager) {
        
+    //initialize the file manager
+    fileManager.clearFiles();
+
     if ($routeParams.create) {
         //we are creating so get an empty content item
         contentResource.getScaffold($routeParams.id, $routeParams.doctype)
@@ -31,18 +34,6 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
             });
     }
 
-    $scope.files = [];
-    $scope.addFiles = function (propertyId, files) {
-        //this will clear the files for the current property and then add the new ones for the current property
-        $scope.files = _.reject($scope.files, function (item) {
-            return item.id == propertyId;
-        });
-        for (var i = 0; i < files.length; i++) {
-            //save the file object to the scope's files collection
-            $scope.files.push({ id: propertyId, file: files[i] });
-        }
-    };
-
     //TODO: Need to figure out a way to share the saving and event broadcasting with all editors!
 
     $scope.saveAndPublish = function () {
@@ -55,7 +46,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
 
         serverValidationManager.reset();
         
-        contentResource.publish($scope.content, $routeParams.create, $scope.files)
+        contentResource.publish($scope.content, $routeParams.create, fileManager.getFiles())
             .then(function (data) {
                 
                 contentEditingHelper.handleSuccessfulSave({
@@ -91,7 +82,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
 
         serverValidationManager.reset();
 
-        contentResource.save($scope.content, $routeParams.create, $scope.files)
+        contentResource.save($scope.content, $routeParams.create, fileManager.getFiles())
             .then(function (data) {
                 
                 contentEditingHelper.handleSuccessfulSave({

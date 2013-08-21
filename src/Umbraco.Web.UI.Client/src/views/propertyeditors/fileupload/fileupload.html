@@ -2,7 +2,7 @@
     
     <div ng-hide="clearFiles">
         <div class="file-uploader">
-            <input type="file" umb-file-upload multiple />
+            <umb-single-file-upload rebuild="rebuildInput"></umb-single-file-upload>
         </div>
         <ul ng-show="files.length > 0">
             <li ng-repeat="file in files">{{file.file.name}}</li>
@@ -18,7 +18,7 @@
                 </div>                
             </li>
         </ul>
-        <input type="checkbox" name="myPackage_clearFiles" ng-model="clearFiles" />
-        <label for="myPackage_clearFiles">Clear files</label>
+        <input type="checkbox" id="clearFiles-{{model.id}}" name="clearFiles" ng-model="clearFiles" />
+        <label for="clearFiles-{{model.id}}">Clear files</label>
     </div>
 </div>

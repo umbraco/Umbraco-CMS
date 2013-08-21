@@ -28,6 +28,19 @@ namespace Umbraco.Core
         [UmbracoWillObsolete("Do not use this constants. See IShortStringHelper.CleanStringForSafeAliasJavaScriptCode.")]
         public const string UmbracoInvalidFirstCharacters = "01234567890";
 
+        /// <summary>
+        /// This tries to detect a json string, this is not a fail safe way but it is quicker than doing 
+        /// a try/catch when deserializing when it is not json.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        internal static bool DetectIsJson(this string input)
+        {
+            input = input.Trim();
+            return input.StartsWith("{") && input.EndsWith("}")
+                   || input.StartsWith("[") && input.EndsWith("]");
+        }
+
         internal static string ReplaceNonAlphanumericChars(this string input, char replacement)
         {
             //any character that is not alphanumeric, convert to a hyphen

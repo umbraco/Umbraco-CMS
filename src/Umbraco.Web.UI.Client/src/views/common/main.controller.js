@@ -63,7 +63,7 @@ function MainController($scope, $routeParams, $rootScope, $timeout, $http, notif
 
             if($scope.user.avatar){
                 $http.get($scope.user.avatar).then(function(){
-                    alert($scope.user.avatar);
+                    //alert($scope.user.avatar);
                     $scope.avatar = $scope.user.avatar;
                 });
             }

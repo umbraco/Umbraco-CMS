@@ -66,18 +66,37 @@ namespace Umbraco.Web.PropertyEditors
                         UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
                             string.Format("uploadField [@alias = \"{0}\"]", p.Alias));
 
-                    if (uploadFieldConfigNode != null && p.Value != null && p.Value is string && ((string)p.Value).IsNullOrWhiteSpace() == false)
+                    if (uploadFieldConfigNode != null)
                     {
-                        //there might be multiple, we can only process the first one!
-                        var split = ((string) p.Value).Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
-                        if (split.Any())
+                        //now we need to check if there is a value
+                        if (p.Value is string && ((string) p.Value).IsNullOrWhiteSpace() == false)
                         {
-                            var umbracoFile = new UmbracoMediaFile(IOHelper.MapPath(split[0]));
-                            FillProperties(uploadFieldConfigNode, model, umbracoFile);    
+                            //there might be multiple, we can only process the first one!
+                            var split = ((string) p.Value).Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+                            if (split.Any())
+                            {
+                                var umbracoFile = new UmbracoMediaFile(IOHelper.MapPath(split[0]));
+                                FillProperties(uploadFieldConfigNode, model, umbracoFile);
+                            }
+                        }
+                        else
+                        {
+                            //there's no value so need to reset to zero
+                            ResetProperties(uploadFieldConfigNode, model);
                         }
                     }
                 }
             }
+        }
+
+        private static void ResetProperties(XmlNode uploadFieldConfigNode, IContentBase content)
+        {
+            // only add dimensions to web images
+            UpdateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias", string.Empty);
+            UpdateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias", string.Empty);
+
+            UpdateContentProperty(uploadFieldConfigNode, content, "lengthFieldAlias", string.Empty);
+            UpdateContentProperty(uploadFieldConfigNode, content, "extensionFieldAlias", string.Empty);
         }
 
         private static void FillProperties(XmlNode uploadFieldConfigNode, IContentBase content, UmbracoMediaFile um)
