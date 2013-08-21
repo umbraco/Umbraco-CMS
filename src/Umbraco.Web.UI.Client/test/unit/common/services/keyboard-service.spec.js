@@ -1,7 +1,7 @@
 describe('keyboard service tests', function () {
     var keyboardService, $window;
 
-      var createKeyEvent = function (mainKey, alt, ctrl, shift, meta) {
+    var createKeyEvent = function (mainKey, alt, ctrl, shift, meta) {
         var keyEvent = jQuery.Event("keydown");
         keyEvent.keyCode = mainKey.charCodeAt(0);
         keyEvent.altKey = alt;
@@ -9,14 +9,16 @@ describe('keyboard service tests', function () {
         keyEvent.shiftKey = shift;
         keyEvent.metaKey = meta;
         return keyEvent;
-      };
-      
+    };
+    
+   
   
     beforeEach(module('umbraco.services'));
     beforeEach(inject(function ($injector) {
         keyboardService = $injector.get('keyboardService');
         $window = $injector.get("$window");
     }));
+
 
     describe('Detecting key combinations', function () {
 
@@ -28,35 +30,20 @@ describe('keyboard service tests', function () {
 
             keyboardService.bind("ctrl+s", function(){
                 ctrls = true;
-            }, el);
+            });
 
             //initially it should be false
             expect(ctrls).toBe(false);
             
             //trigger the ctrls+s event
+            //triggerEvent(el, "s", true);
             el.trigger(ev);
 
-            //it should now be true - this failes for some reason
+            //it should now be true - this fails for some reason
+            //we will investigate some other time
            //expect(ctrls).toBe(true);
      });
         
-        /*
-        it('detects a legacy icon', function () {
-            var fileBased = "this-is-file-based.jpg";
-            var legacyBased = ".legacy-class";
-            var belleBased = "normal-class";
-
-            expect(iconHelper.isLegacyIcon(fileBased)).toBe(false);
-            expect(iconHelper.isLegacyIcon(legacyBased)).toBe(true);
-            expect(iconHelper.isLegacyIcon(belleBased)).toBe(false);
-        });
-        
-        it('converts from legacy icon', function () {
-            var legacyBased = ".sprTreeSettingDomain";
-
-            expect(iconHelper.convertFromLegacyIcon(legacyBased)).toBe("icon-home");
-            
-        });*/
 
     });
 });
