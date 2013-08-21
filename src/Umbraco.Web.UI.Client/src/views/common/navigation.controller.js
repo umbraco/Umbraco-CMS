@@ -85,7 +85,7 @@ function NavigationController($scope,$rootScope, $location, $log, navigationServ
             //add action to the history service
             historyService.add({ name: n.name, link: n.routePath, icon: n.icon });
             //not legacy, lets just set the route value and clear the query string if there is one.
-            $location.path(n.routePath).search(null);
+            $location.path(n.routePath).search("");
         }
     });
 

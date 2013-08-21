@@ -239,7 +239,8 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
                 // /belle/#/content/edit/9876 (where 9876 is the new id)
 
                 //clear the query strings
-                $location.search(null);
+                $location.search("");
+                
                 //change to new path
                 $location.path("/" + $routeParams.section + "/" + $routeParams.tree  + "/" + $routeParams.method + "/" + id);
                 //don't add a browser history for this
