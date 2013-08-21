@@ -17,7 +17,7 @@
  */
 
 angular.module('umbraco.services')
-.factory('navigationService', function ($rootScope, $routeParams, $log, $location, $q, dialogService, treeService, notificationsService) {
+.factory('navigationService', function ($rootScope, $routeParams, $log, $location, $q, $timeout, dialogService, treeService, notificationsService) {
 
     //TODO: would be nicer to set all of the options here first instead of implicitly below!
     var ui = {};
@@ -61,7 +61,8 @@ angular.module('umbraco.services')
         }
     }
 
-    return {
+    var service = {
+        active: false,
         mode: "default",
         ui: ui,
 
@@ -118,6 +119,36 @@ angular.module('umbraco.services')
 
         /**
          * @ngdoc method
+         * @name umbraco.services.navigationService#enterTree
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * Sets a service variable as soon as the user hovers the navigation with the mouse
+         * used by the leaveTree method to delay hiding
+         */
+        enterTree: function () {
+            servicea.active = true;
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.navigationService#leaveTree
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * Hides navigation tree, with a short delay, is cancelled if the user moves the mouse over the tree again
+         */
+        leaveTree: function () {
+            service.active = false;
+                $timeout(function(){
+                    if(!service.active){
+                        service.hideTree();
+                    }
+                }, 700);
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.navigationService#hideTree
          * @methodOf umbraco.services.navigationService
          *
@@ -126,7 +157,6 @@ angular.module('umbraco.services')
          */
         hideTree: function () {
             if (!this.ui.stickyNavigation) {
-                $log.log("hide tree");
                 this.ui.currentSection = "";
                 setMode("default-hidesectiontree");
             }
@@ -358,12 +388,16 @@ angular.module('umbraco.services')
           * hides any open navigation panes and resets the tree, actions and the currently selected node
           */
         hideNavigation: function () {
-            this.ui.currentSection = "";
-            this.ui.actions = [];
-            this.ui.currentNode = undefined;
 
-            setMode("default");
+            if(!service.active){
+                this.ui.currentSection = "";
+                this.ui.actions = [];
+                this.ui.currentNode = undefined;
+
+                setMode("default");
+            }
         }
     };
 
+    return service;
 });
