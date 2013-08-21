@@ -12,6 +12,7 @@ yepnope({
         'lib/jquery/jquery.ui.effect.min.js',
         'lib/jquery/jquery.ui.effect-highlight.min.js',
 		
+
 		'lib/angular/angular.min.js',
         'lib/angular/angular-cookies.min.js',
 		'lib/angular/angular-mocks.js',
@@ -34,7 +35,7 @@ yepnope({
 		'js/umbraco.security.js',
 		'js/umbraco.controllers.js',
 		'js/routes.js'
-  		],
+  ],
 
   complete: function () {
     jQuery(document).ready(function () {
