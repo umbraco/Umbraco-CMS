@@ -5,7 +5,7 @@ var app = angular.module('umbraco', [
 	'umbraco.services',
 	'umbraco.httpbackend',
     'ngCookies',
-    'ngMobile'
+    'ngMobile',
     'ui.sortable'
 ]);
 

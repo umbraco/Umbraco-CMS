@@ -8,14 +8,15 @@
  * The main application controller
  * 
  */
-function MainController($scope, $routeParams, $rootScope, $timeout, $http, notificationsService, userService, navigationService, legacyJsLoader) {
+function MainController($scope, $routeParams, $rootScope, $timeout, $http, $log, notificationsService, userService, navigationService, legacyJsLoader) {
     //debugmode so I can easily turn on/off json output of property models:
     //TODO: find a better way
     $scope.$umbdebugmode = true;
 
     //set default properties
     
-    //the null is important because we do an explicit bool check on this in the view    
+    //the null is important because we do an explicit bool check on this in the view
+    //the avatar is by default the umbraco logo    
     $scope.authenticated = null;
     $scope.avatar = "assets/img/application/logo.png";
 
@@ -61,12 +62,21 @@ function MainController($scope, $routeParams, $rootScope, $timeout, $http, notif
             $scope.user = data.user;
 
 
+            var url = "http://da.gravatar.com/" + $scope.user.emailHash + ".json";
+            $http.jsonp(url).then(function(response){
+                $log.log(response);
+            }, function(data){
+                $log.log(data);
+            });
+
+
+            /*    
             if($scope.user.avatar){
                 $http.get($scope.user.avatar).then(function(){
                     //alert($scope.user.avatar);
                     $scope.avatar = $scope.user.avatar;
                 });
-            }
+            }*/
 
             
         }, function (reason) {
