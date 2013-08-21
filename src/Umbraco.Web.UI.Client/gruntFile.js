@@ -4,9 +4,8 @@ module.exports = function (grunt) {
   grunt.registerTask('default', ['jshint:dev','build','karma:unit']);
   grunt.registerTask('dev', ['jshint:dev', 'build', 'webserver', 'open:dev', 'watch']);
   
-
   //run by the watch task
-  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:app','karma:unit', 'copy:vs', 'copy:assets']);
+  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:app','karma:unit', 'copy:vs']);
   grunt.registerTask('watch-less', ['recess:build','copy:assets','copy:vs']);
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
 
@@ -63,7 +62,7 @@ module.exports = function (grunt) {
     ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>;\n' +
     ' * Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n */\n',
     src: {
-      js: ['src/**/*.js', '<%= distdir %>/templates/**/*.js'],
+      js: ['src/**/*.js'],
       common: ['src/common/**/*.js'],
       specs: ['test/**/*.spec.js'],
       scenarios: ['test/**/*.scenario.js'],
@@ -94,7 +93,7 @@ module.exports = function (grunt) {
       },
       app: {
         files: [
-            { dest: '<%= distdir %>/js', src : '*.js', expand: true, cwd: 'src/' }
+            { dest: '<%= distdir %>/jshints', src : '*.js', expand: true, cwd: 'src/' }
             ]
       },
 
@@ -134,10 +133,6 @@ module.exports = function (grunt) {
         options: {
           process: true
         }
-      },
-      angular: {
-        src:['vendor/angular/angular.min.js'],
-        dest: '<%= distdir %>/lib/angular/angular.min.js'
       },
       controllers: {
         src:['src/views/**/*.controller.js'],
@@ -194,24 +189,6 @@ module.exports = function (grunt) {
             banner: "<%= banner %>\n(function() { \n\n",
             footer: "\n\n})();"
         }
-      }
-    },
-
-    uglify: {
-      dist:{
-        options: {
-          banner: "<%= banner %>"
-        },
-        src:['<%= src.js %>'],
-        dest:'<%= distdir %>/<%= pkg.name %>.js'
-      },
-      angular: {
-        src:['<%= concat.angular.src %>'],
-        dest: '<%= distdir %>/angular.js'
-      },
-      jquery: {
-        src:['vendor/jquery/*.js'],
-        dest: '<%= distdir %>/jquery.js'
       }
     },
 
@@ -322,7 +299,6 @@ module.exports = function (grunt) {
            smarttabs: true,
            globalstrict:true,
            globals:{$:false, jQuery:false,define:false,require:false,window:false}
-
          } 
       }
     }
@@ -332,7 +308,6 @@ module.exports = function (grunt) {
   
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-watch');
