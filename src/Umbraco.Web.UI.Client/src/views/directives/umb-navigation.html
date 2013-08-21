@@ -1,4 +1,4 @@
-<div id="leftcolumn" ng-controller="Umbraco.NavigationController" ng-mouseleave="nav.hideTree()">
+<div id="leftcolumn" ng-controller="Umbraco.NavigationController" ng-mouseleave="nav.leaveTree()" ng-mouseenter="nav.enterTree()" >
     <div id="applications" ng-class="{faded:nav.ui.stickyNavigation}">
         <ul class="sections">
             
@@ -10,8 +10,8 @@
 
             <li ng-repeat="section in sections" ng-class="{current: section.alias == nav.ui.currentSection}">
                 <a href="#/{{section.alias}}"
-                   ng-click="nav.changeSection(section.alias)"
-                   ng-mouseenter="nav.showTree(section.alias)"
+                   ng-dblclick="nav.changeSection(section.alias)"
+                   ng-click="nav.showTree(section.alias)"
                    prevent-default>
                     <section-icon icon="{{section.cssclass}}"></section-icon>  
                     <span>{{section.name}}</span>
@@ -31,53 +31,57 @@
     <div id="navigation" class="fill shadow umb-panel umb-modalcolumn"
             ng-show="nav.ui.showNavigation" 
             ng-animate="'slide'">
-        <!-- the search -->
-        <div id="search-form" ng-animate="'slide'">
-            <div class="umb-panel-header">
-                <form class="form-search" ng-controller="Umbraco.SearchController" novalidate>
-                    <i class="icon-search"></i>
-                    <input type="text"
-                        ng-model="nav.ui.searchTerm"
-                        class="umb-search-field search-query"
-                        placeholder="{{localization.app.search.typeToSearch}}"
-                        on-blur="deActivateSearch()"
-                        on-keyup="performSearch(nav.ui.searchTerm)">
-                </form>
+
+        <div class="navigation-inner-container span6">
+            <!-- the search -->
+            <div id="search-form" ng-animate="'slide'">
+                <div class="umb-panel-header">
+                    <form class="form-search" ng-controller="Umbraco.SearchController" novalidate>
+                        <i class="icon-search"></i>
+                        <input type="text"
+                            ng-model="nav.ui.searchTerm"
+                            class="umb-search-field search-query"
+                            placeholder="{{localization.app.search.typeToSearch}}"
+                            on-blur="deActivateSearch()"
+                            on-keyup="performSearch(nav.ui.searchTerm)">
+                    </form>
+                </div>
             </div>
+
+            <!-- Search results -->
+            <div id="search-results" class="umb-panel fill" ng-show="nav.ui.showSearchResults" ng-animate="'slide'">
+                <h5>Search results</h5>
+
+                <ul class="searchResults" ng-repeat="resultGroup in nav.ui.searchResults">
+                    <li class="umb-icon-item" ng-class="{selected:$index==nav.ui.selectedSearchResult}" ng-repeat="result in resultGroup.matches">
+                        <i class="icon umb-tree-icon sprTree {{result.icon}}" ng-show="$first"></i>
+                        <a ng-href="#{{result.view}}">{{result.name}}
+                                    <small>{{result.path}}</small>
+                        </a>
+                        <i class="umb-options" ng-click="nav.showMenu(result, $event)"><i></i><i></i><i></i></i>
+                    </li>
+                </ul>
+            </div>
+            
+
+            <!-- the tree -->
+            <div id="tree" class="umb-panel fill" ng-animate="'slide'">
+                <umb-tree eventhandler="treeEventHandler" section="{{nav.ui.currentSection}}" ></umb-tree>
+            </div>        
         </div>
 
-        <!-- Search results -->
-        <div id="search-results" class="umb-scrollable umb-panel" auto-scale="0"
-            ng-show="nav.ui.showSearchResults" ng-animate="'slide'">
-
-            <h5>Search results</h5>
-
-            <ul class="searchResults" ng-repeat="resultGroup in nav.ui.searchResults">
-                <li class="umb-icon-item" ng-class="{selected:$index==nav.ui.selectedSearchResult}" ng-repeat="result in resultGroup.matches">
-                    <i class="icon umb-tree-icon sprTree {{result.icon}}" ng-show="$first"></i>
-                    <a ng-href="#{{result.view}}">{{result.name}}
-                                <small>{{result.path}}</small>
-                    </a>
-                    <i class="umb-options" ng-click="nav.showMenu(result, $event)"><i></i><i></i><i></i></i>
-                </li>
-            </ul>
-        </div>
-
-        <!-- the tree -->
-        <div id="tree" class="span5 umb-scrollable umb-panel" auto-scale="0" ng-animate="'slide'">
-            <umb-tree eventhandler="treeEventHandler" section="{{nav.ui.currentSection}}" ></umb-tree>
-        </div>        
-
-        <!-- The context menu -->
-        <umb-context-menu></umb-context-menu>
-        
-        <!-- Tree dialogs -->
-        <div id="dialog" class='umb-modalcolumn fill shadow umb-panel'
-            ng-show="nav.ui.showContextMenuDialog" ng-animate="'slide'">
-            <div class='umb-panel-header'>
-                <h1>{{nav.ui.dialogTitle}}</h1>
-            </div>
-            <div class='umb-panel-body'>
+        <div class="offset6">
+            <!-- The context menu -->
+            <umb-context-menu></umb-context-menu>
+            
+            <!-- Tree dialogs -->
+            <div id="dialog" class='umb-modalcolumn fill shadow umb-panel'
+                ng-show="nav.ui.showContextMenuDialog" ng-animate="'slide'">
+                <div class='umb-panel-header'>
+                    <h1>{{nav.ui.dialogTitle}}</h1>
+                </div>
+                <div class='umb-panel-body'>
+                </div>
             </div>
         </div>
     </div>
