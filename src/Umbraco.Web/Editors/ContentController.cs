@@ -163,23 +163,11 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [FileUploadCleanupFilter]
+        [ContentPostValidate]
         public ContentItemDisplay PostSave(
             [ModelBinder(typeof(ContentItemBinder))]
                 ContentItemSave<IContent> contentItem)
-        {
-            //We now need to validate that the user is allowed to be doing what they are doing
-            if (CheckPermissions(
-                Request.Properties,
-                Security.CurrentUser,
-                Services.UserService,
-                Services.ContentService,
-                contentItem.Id,
-                (int) contentItem.Action >= 2 ? ActionPublish.Instance.Letter : ActionSave.Instance.Letter,
-                contentItem.PersistedContent) == false)
-            {
-                throw new HttpResponseException(HttpStatusCode.Unauthorized);
-            }
-
+        {            
             //If we've reached here it means:
             // * Our model has been bound
             // * and validated

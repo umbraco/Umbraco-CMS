@@ -40,6 +40,7 @@ namespace umbraco.BusinessLogic
 
         internal User(IUser user)
         {
+            _id = (int)user.Id;
             _userNoConsole = user.NoConsole;
             _userDisabled = user.IsLockedOut;
             _name = user.Name;

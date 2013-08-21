@@ -403,6 +403,12 @@
     <Compile Include="Install\Title.ascx.designer.cs">
       <DependentUpon>Title.ascx</DependentUpon>
     </Compile>
+    <Compile Include="MasterPages\Site1.Master.cs">
+      <DependentUpon>Site1.Master</DependentUpon>
+    </Compile>
+    <Compile Include="MasterPages\Site1.Master.designer.cs">
+      <DependentUpon>Site1.Master</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Umbraco\Controls\ContentTypeControlNew.ascx.cs">
       <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
@@ -657,6 +663,7 @@
     <None Include="Config\Dashboard.Release.config">
       <DependentUpon>Dashboard.config</DependentUpon>
     </None>
+    <Content Include="MasterPages\Site1.Master" />
     <None Include="packages.config" />
     <None Include="Umbraco\Config\Create\UI.Release.xml">
       <DependentUpon>UI.xml</DependentUpon>
@@ -2600,7 +2607,6 @@
     <Folder Include="App_Plugins\MyPackage\PropertyEditors\Css\" />
     <Folder Include="Css\" />
     <Folder Include="MacroScripts\" />
-    <Folder Include="MasterPages\" />
     <Folder Include="Media\" />
     <Folder Include="Scripts\" />
     <Folder Include="Umbraco\assets\" />

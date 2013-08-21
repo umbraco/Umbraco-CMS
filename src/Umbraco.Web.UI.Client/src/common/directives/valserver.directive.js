@@ -16,11 +16,15 @@ function valServer(serverValidationManager) {
             }
             var currentProperty = scope.model;
 
-            var fieldName = scope.$eval(attr.valServer);
-            if (!fieldName) {
-                //eval returned nothing so just use the string
-                fieldName = attr.valServer;
-            }
+            //default to 'value' if nothing is set
+            var fieldName = "value";
+            if (attr.valServer) {
+                fieldName = scope.$eval(attr.valServer);
+                if (!fieldName) {
+                    //eval returned nothing so just use the string
+                    fieldName = attr.valServer;
+                }
+            }            
 
             //subscribe to the changed event of the view model. This is required because when we
             // have a server error we actually invalidate the form which means it cannot be 

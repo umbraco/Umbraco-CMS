@@ -170,7 +170,7 @@ namespace umbraco.cms.presentation
             // The user is create with default access to content and as a writer user type
             if (BusinessLogic.User.getUserId(loginName) == -1)
             {
-                BusinessLogic.User.MakeNew(loginName, loginName, string.Empty, email ?? "", UserType.GetUserType(2));
+                BusinessLogic.User.MakeNew(loginName, loginName, string.Empty, email ?? "", BusinessLogic.UserType.GetUserType(2));
                 var u = new User(loginName);
                 u.addApplication(Constants.Applications.Content);
             }

@@ -298,6 +298,7 @@
     <Compile Include="Configuration\WebRouting.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Editors\ContentController.cs" />
+    <Compile Include="Editors\ContentPostValidateAttribute.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\EntityController.cs" />
