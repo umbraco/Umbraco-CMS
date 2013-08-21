@@ -108,6 +108,7 @@ namespace umbraco.dialogs
 
                     if (validAction == false)
                     {
+                        panel_buttons.Visible = false;
                         ScriptManager.RegisterStartupScript(this, GetType(), "notvalid", "notValid();", true);
                     }
                 }
@@ -121,21 +122,22 @@ namespace umbraco.dialogs
             return CheckPermissions(cmsNode, currentAction);
         }
 
+        /// <summary>
+        /// Checks if the current user has permissions to execute this action against this node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="currentAction"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This used to do a recursive check for all descendent nodes but this is not required and is a massive CPU hog.
+        /// See: http://issues.umbraco.org/issue/U4-2632, https://groups.google.com/forum/?fromgroups=#!topic/umbraco-dev/L1D4LwVSP2Y
+        /// </remarks>
         private bool CheckPermissions(IContentBase node, IAction currentAction)
         {
             var currUserPermissions = new UserPermissions(CurrentUser);
             var lstCurrUserActions = currUserPermissions.GetExistingNodePermission(node.Id);
 
-            if (lstCurrUserActions.Contains(currentAction) == false)
-                return false;
-
-            
-            if (Umbraco.Core.Models.ContentExtensions.HasChildren(node, Services))
-            {
-                return Umbraco.Core.Models.ContentExtensions.Children(node, Services)
-                    .All(child => CheckPermissions(child, currentAction));
-            }
-            return true;
+            return lstCurrUserActions.Contains(currentAction);
         }
 
         private void HandleDocumentTypeCopy()

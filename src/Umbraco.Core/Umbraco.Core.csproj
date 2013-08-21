@@ -264,6 +264,7 @@
     <Compile Include="Models\UmbracoObjectTypes.cs" />
     <Compile Include="Models\UmbracoObjectTypesExtensions.cs" />
     <Compile Include="Models\UserExtensions.cs" />
+    <Compile Include="NetworkHelper.cs" />
     <Compile Include="Models\Validation\RequiredForPersistenceAttribute.cs" />
     <Compile Include="ObjectResolution\ApplicationEventsResolver.cs" />
     <Compile Include="ObjectResolution\ResolverCollection.cs" />

@@ -466,7 +466,7 @@ namespace Umbraco.Web
 			Mandate.ParameterNotNullOrEmpty(action, "action");
 			Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
 
-			var formAction = UmbracoContext.Current.OriginalRequestUrl.ToString();
+		    var formAction = UmbracoContext.Current.OriginalRequestUrl.PathAndQuery;
 			return html.RenderForm(formAction, FormMethod.Post, htmlAttributes, controllerName, action, area, additionalRouteVals);
 		}
 

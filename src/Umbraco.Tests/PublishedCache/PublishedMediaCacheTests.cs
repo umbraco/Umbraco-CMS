@@ -61,7 +61,7 @@ namespace Umbraco.Tests.PublishedCache
 			Assert.AreEqual(mRoot.Id, publishedMedia.Id);
 			Assert.AreEqual(mRoot.CreateDateTime.ToString("dd/MM/yyyy HH:mm:ss"), publishedMedia.CreateDate.ToString("dd/MM/yyyy HH:mm:ss"));
 			Assert.AreEqual(mRoot.User.Id, publishedMedia.CreatorId);
-			Assert.AreEqual(mRoot.User.LoginName, publishedMedia.CreatorName);
+			Assert.AreEqual(mRoot.User.Name, publishedMedia.CreatorName);
 			Assert.AreEqual(mRoot.ContentType.Alias, publishedMedia.DocumentTypeAlias);
 			Assert.AreEqual(mRoot.ContentType.Id, publishedMedia.DocumentTypeId);
 			Assert.AreEqual(mRoot.Level, publishedMedia.Level);
