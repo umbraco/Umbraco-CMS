@@ -5,7 +5,6 @@
 
 html, body {
   height: 100%;
-  overflow: hidden;
 }
 
 body {
@@ -101,7 +100,6 @@ body {
     left: 0px;
     right: 0px;
     padding-top: 100px;
-    background: green;
 }
 
 
@@ -115,10 +113,15 @@ body {
 }
 
 #tree {
-  padding: 15px 0px 20px 0px;
+  padding: 0px;
   position: relative;
   z-index: 100 !important;
   height: 100%;
+  overflow: auto;
+}
+
+#tree .umb-tree {
+    padding: 15px 0px 20px 0px;
 }
 
 #search-results {

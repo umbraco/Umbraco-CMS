@@ -2,5 +2,6 @@
     <div id="wmd-button-bar-{{model.alias}}"></div>
         <textarea ng-model="model.value" class="wmd-input" id="wmd-input-{{model.alias}}"></textarea>
     </div>
-    <div id="wmd-preview-{{model.alias}}" class="wmd-panel wmd-preview"></div>
+
+    <div ng-show="model.config.preview" id="wmd-preview-{{model.alias}}" class="wmd-panel wmd-preview"></div>
 </div> 

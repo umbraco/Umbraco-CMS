@@ -5,6 +5,11 @@ function ($scope,assetsService) {
 
     //tell the assets service to load the markdown.editor libs from the markdown editors
     //plugin folder
+
+    if($scope.model.value === null || $scope.model.value === ""){
+        $scope.model.value = $scope.model.config.defaultValue;
+    }
+
     assetsService
 		.load([
 			"/app_plugins/markdowneditor/lib/markdown.converter.js",

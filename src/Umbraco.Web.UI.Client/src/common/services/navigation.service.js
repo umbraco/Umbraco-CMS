@@ -21,7 +21,7 @@ angular.module('umbraco.services')
 
     //TODO: would be nicer to set all of the options here first instead of implicitly below!
     var ui = {};
-
+    
     function setMode(mode) {
         switch (mode) {
             case 'tree':
@@ -30,7 +30,7 @@ angular.module('umbraco.services')
                 ui.showContextMenuDialog = false;
                 ui.stickyNavigation = false;
 
-                $("#search-form input").focus();
+                $("#search-form input").focus();    
                 break;
             case 'menu':
                 ui.showNavigation = true;
@@ -145,7 +145,7 @@ angular.module('umbraco.services')
                     if(!service.active){
                         service.hideTree();
                     }
-                }, 700);
+                }, 300);
         },
 
         /**

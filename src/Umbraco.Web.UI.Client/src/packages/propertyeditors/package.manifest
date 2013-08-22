@@ -5,7 +5,17 @@
 			name: "Multinode treepicker",
 			editor: {
 				view: "~/App_Plugins/propertyeditors/mntp/mntp.html"
-			}
+			},
+
+			preValueEditor: {
+							fields: [
+								{
+									label: "Multipicker",
+									key: "multi",
+									view: "boolean"
+								}
+							]
+						}
 		},
 		{
 			id: "71b8ad1a-8dc2-425c-b6b8-faa158075e63",
