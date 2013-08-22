@@ -25,7 +25,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public DateTime? ExpireDate { get; set; }
 
         [DataMember(Name = "template")]
-        public TemplateBasic Template { get; set; }
+        public string TemplateAlias { get; set; }
 
         [DataMember(Name = "urls")]
         public string[] Urls { get; set; }

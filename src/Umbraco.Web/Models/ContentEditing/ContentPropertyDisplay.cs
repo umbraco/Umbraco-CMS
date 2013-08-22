@@ -10,6 +10,11 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "property", Namespace = "")]
     public class ContentPropertyDisplay : ContentPropertyBasic
     {
+        public ContentPropertyDisplay()
+        {
+            Config = new Dictionary<string, object>();
+        }
+
         [DataMember(Name = "label", IsRequired = true)]
         [Required]
         public string Label { get; set; }

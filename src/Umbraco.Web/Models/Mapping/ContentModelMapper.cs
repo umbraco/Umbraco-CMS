@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.Serialization;
 using AutoMapper;
 using Newtonsoft.Json;
 using Umbraco.Core;
@@ -44,13 +45,7 @@ namespace Umbraco.Web.Models.Mapping
                       dto => dto.PublishDate,
                       expression => expression.MapFrom(content => GetPublishedDate(content, applicationContext)))
                   .ForMember(
-                      dto => dto.Template,
-                      expression => expression.MapFrom(content => new TemplateBasic
-                          {
-                              Alias = content.Template.Alias,
-                              Id = content.Template.Id,
-                              Name = content.Template.Name
-                          }))
+                      dto => dto.TemplateAlias, expression => expression.MapFrom(content => content.Template.Alias))
                   .ForMember(
                       dto => dto.Urls,
                       expression => expression.MapFrom(content =>
@@ -59,36 +54,7 @@ namespace Umbraco.Web.Models.Mapping
                                                            : content.GetContentUrls()))
                   .ForMember(display => display.Properties, expression => expression.Ignore())
                   .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
-                  .AfterMap((content, display) => TabsAndPropertiesResolver.MapGenericProperties(
-                      content, display,
-                      new ContentPropertyDisplay
-                          {
-                              Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                              Label = ui.Text("content", "releaseDate"),
-                              Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
-                              View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                          },
-                      new ContentPropertyDisplay
-                          {
-                              Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                              Label = ui.Text("content", "removeDate"),
-                              Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
-                              View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                          },
-                      new ContentPropertyDisplay
-                          {
-                              Alias = string.Format("{0}template", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                              Label = "Template", //TODO: localize this?
-                              Value = JsonConvert.SerializeObject(display.Template),
-                              View = "templatepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                          },
-                      new ContentPropertyDisplay
-                          {
-                              Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                              Label = ui.Text("content", "urls"),
-                              Value = string.Join(",", display.Urls),
-                              View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                          }));
+                  .AfterMap(MapGenericCustomProperties);
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
@@ -112,6 +78,62 @@ namespace Umbraco.Web.Models.Mapping
                       expression => expression.ResolveUsing<OwnerResolver<IContent>>());
 
             
+        }
+
+        /// <summary>
+        /// Maps the generic tab with custom properties for content
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="display"></param>
+        private static void MapGenericCustomProperties(IContent content, ContentItemDisplay display)
+        {
+            //fill in the template config to be passed to the template drop down.
+            var templateItemConfig = new List<AllowedTemplate> {new AllowedTemplate {Alias = "", Name = "Choose..."}};
+            templateItemConfig.AddRange(content.ContentType.AllowedTemplates.Select(t => new AllowedTemplate {Alias = t.Alias, Name = t.Name}));
+
+            TabsAndPropertiesResolver.MapGenericProperties(
+                content, display,
+                new ContentPropertyDisplay
+                    {
+                        Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = ui.Text("content", "releaseDate"),
+                        Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
+                        View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                    },
+                new ContentPropertyDisplay
+                    {
+                        Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = ui.Text("content", "removeDate"),
+                        Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
+                        View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                    },
+                new ContentPropertyDisplay
+                    {
+                        Alias = string.Format("{0}template", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = "Template", //TODO: localize this?
+                        Value = display.TemplateAlias,
+                        View = "dropdown", //TODO: Hard coding until we make a real dropdown property editor to lookup
+                        Config = new Dictionary<string, object>
+                            {
+                                {"items", templateItemConfig}
+                            }
+                    },
+                new ContentPropertyDisplay
+                    {
+                        Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = ui.Text("content", "urls"),
+                        Value = string.Join(",", display.Urls),
+                        View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                    });
+        }
+
+        [DataContract(Name = "template", Namespace = "")]
+        private class AllowedTemplate
+        {
+            [DataMember(Name = "alias")]
+            public string Alias { get; set; }
+            [DataMember(Name = "name")]
+            public string Name { get; set; }
         }
 
         /// <summary>

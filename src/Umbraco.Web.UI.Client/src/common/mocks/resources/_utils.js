@@ -131,7 +131,7 @@ angular.module('umbraco.mocks').
                                 view: "datepicker",
                                 alias: "_umb_releasedate"
                             },
-                            {
+                            { 
                                 label: 'Unpublish at',
                                 description: 'Date/time to un-publish this document',
                                 value: new Date().toIsoDateTimeString(),
@@ -140,9 +140,17 @@ angular.module('umbraco.mocks').
                             },
                             {
                                 label: 'Template', 
-                                value: "{id: 1234, alias: 'myTemplate', name: 'My Template'}",
-                                view: "templatepicker",
-                                alias: "_umb_template" 
+                                value: "myTemplate",
+                                view: "dropdown",
+                                alias: "_umb_template",
+                                config: {
+                                    items: [
+                                        { alias: "", name: "-- Choose template --" },
+                                        { alias: "myTemplate", name: "My Templates" },
+                                        { alias: "home", name: "Home Page" },
+                                        { alias: "news", name: "News Page" }
+                                    ]
+                                }
                             },
                             {
                                 label: 'Link to document',

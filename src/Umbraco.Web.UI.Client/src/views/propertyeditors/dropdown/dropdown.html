@@ -1,5 +1,7 @@
-<select ng-model="model.value">
-	<option>123</option>
-	<option>abc</option>
-	<option>xyx</option>
-</select>
+<div ng-controller="Umbraco.Editors.DropdownController">
+    <select name="dropDownList"
+        ng-model="model.value" 
+        required  
+        ng-options="e.alias as e.name for e in model.config.items"></select>    
+</div>
+ 
