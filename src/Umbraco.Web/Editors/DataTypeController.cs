@@ -5,6 +5,7 @@ using System.Net;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -54,8 +55,9 @@ namespace Umbraco.Web.Editors
         /// Returns the pre-values for the specified property editor
         /// </summary>
         /// <param name="editorId"></param>
+        /// <param name="dataTypeId">The data type id for the pre-values, -1 if it is a new data type</param>
         /// <returns></returns>
-        public IEnumerable<PreValueFieldDisplay> GetPreValues(Guid editorId)
+        public IEnumerable<PreValueFieldDisplay> GetPreValues(Guid editorId, int dataTypeId = -1)
         {
             var propEd = PropertyEditorResolver.Current.GetById(editorId);
             if (propEd == null)
@@ -63,6 +65,29 @@ namespace Umbraco.Web.Editors
                 throw new InvalidOperationException("Could not find property editor with id " + editorId);
             }
 
+            if (dataTypeId == -1)
+            {
+                //this is a new data type, so just return the field editors, there are no values yet
+                return propEd.PreValueEditor.Fields.Select(Mapper.Map<PreValueFieldDisplay>);                
+            }
+
+            //we have a data type associated
+            var dataType = Services.DataTypeService.GetDataTypeDefinitionById(dataTypeId);
+            if (dataType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            //now, lets check if the data type has the current editor selected, if that is true
+            //we will need to wire up it's saved values. Otherwise it's an existing data type
+            //that is changing it's underlying property editor, in which case there's no values.
+            if (dataType.ControlId == editorId)
+            {
+                //this is the currently assigned pre-value editor, return with values.
+                return Mapper.Map<IDataTypeDefinition, IEnumerable<PreValueFieldDisplay>>(dataType);
+            }
+
+            //return the pre value display without values
             return propEd.PreValueEditor.Fields.Select(Mapper.Map<PreValueFieldDisplay>);
         }
 
@@ -80,7 +105,23 @@ namespace Umbraco.Web.Editors
 
             //finally we need to save the data type and it's pre-vals
             var dtService = (DataTypeService) ApplicationContext.Services.DataTypeService;
-            var preVals = Mapper.Map<PreValueCollection>(dataType.PreValues);
+
+            //TODO: Check if the property editor has changed, if it has ensure we don't pass the 
+            // existing values to the new property editor!
+
+            //get the prevalues, current and new
+            var preValDictionary = dataType.PreValues.ToDictionary(x => x.Key, x => x.Value);
+            var currVal = ((DataTypeService) Services.DataTypeService).GetPreValuesCollectionByDataTypeId(dataType.PersistedDataType.Id);
+
+            //we need to allow for the property editor to deserialize the prevalues
+            var formattedVal = dataType.PropertyEditor.PreValueEditor.FormatDataForPersistence(
+                preValDictionary,
+                currVal);
+
+            //create the pre-value collection to be saved
+            var preVals = new PreValueCollection(formattedVal.ToDictionary(x => x.Key, x => x.Value));
+            
+            //save the data type
             dtService.SaveDataTypeAndPreValues(dataType.PersistedDataType, preVals, (int)Security.CurrentUser.Id);
 
             var display = Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dataType.PersistedDataType);

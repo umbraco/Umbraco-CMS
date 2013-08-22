@@ -39,7 +39,7 @@ namespace Umbraco.Web.PropertyEditors
         /// file path or use the existing file path.
         /// </param>
         /// <returns></returns>
-        public override object DeserializeValue(ContentPropertyData editorValue, object currentValue)
+        public override object FormatDataForPersistence(ContentPropertyData editorValue, object currentValue)
         {
             if (currentValue == null)
             {

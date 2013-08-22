@@ -443,7 +443,7 @@ namespace Umbraco.Core.Services
             internal static PreValueCollection ConvertToPreValuesCollection(IEnumerable<Tuple<int, string, int, string>> list)
             {
                 //now we need to determine if they are dictionary based, otherwise they have to be array based
-                var dictionary = new Dictionary<string, object>();
+                var dictionary = new Dictionary<string, string>();
 
                 //need to check all of the keys, if there's only one and it is empty then it's an array
                 var keys = list.Select(x => x.Item2).Distinct().ToArray();

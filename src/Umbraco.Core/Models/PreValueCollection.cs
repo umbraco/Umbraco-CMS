@@ -16,7 +16,7 @@ namespace Umbraco.Core.Models
     /// </remarks>
     public class PreValueCollection
     {
-        private IDictionary<string, object> _preValuesAsDictionary;
+        private IDictionary<string, string> _preValuesAsDictionary;
         private IEnumerable<string> _preValuesAsArray;
         public IEnumerable<string> PreValuesAsArray
         {
@@ -31,7 +31,7 @@ namespace Umbraco.Core.Models
             set { _preValuesAsArray = value; }
         }
 
-        public IDictionary<string, object> PreValuesAsDictionary
+        public IDictionary<string, string> PreValuesAsDictionary
         {
             get
             {
@@ -57,12 +57,12 @@ namespace Umbraco.Core.Models
             _preValuesAsArray = preVals;
         }
 
-        public PreValueCollection(IDictionary<string, object> preVals)
+        public PreValueCollection(IDictionary<string, string> preVals)
         {
             _preValuesAsDictionary = preVals;
         }
 
-        internal static IDictionary<string, object> AsDictionary(PreValueCollection persistedPreVals)
+        internal static IDictionary<string, string> AsDictionary(PreValueCollection persistedPreVals)
         {
             if (persistedPreVals.IsDictionaryBased)
             {
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Models
             }
 
             //it's an array so need to format it 
-            var result = new Dictionary<string, object>();
+            var result = new Dictionary<string, string>();
             var asArray = persistedPreVals.PreValuesAsArray.ToArray();
             for (var i = 0; i < asArray.Length; i++)
             {

@@ -107,7 +107,7 @@ namespace Umbraco.Web.Editors
                     //don't persist any bound value if the editor is readonly
                     if (valueEditor.IsReadOnly == false)
                     {
-                        dboProperty.Value = p.PropertyEditor.ValueEditor.DeserializeValue(data, dboProperty.Value);    
+                        dboProperty.Value = p.PropertyEditor.ValueEditor.FormatDataForPersistence(data, dboProperty.Value);    
                     }
                     
                 }
