@@ -34,25 +34,22 @@ namespace Umbraco.Core.PropertyEditors
             ValueType = "string";
         }
 
-        public PropertyEditorAttribute(string id, string name, string valueType, string editorView, string preValueEditorView)
+        public PropertyEditorAttribute(string id, string name, string valueType, string editorView)
         {
             Mandate.ParameterNotNullOrEmpty(id, "id");
             Mandate.ParameterNotNullOrEmpty(name, "name");
             Mandate.ParameterNotNullOrEmpty(valueType, "valueType");
             Mandate.ParameterNotNullOrEmpty(editorView, "editorView");
-            Mandate.ParameterNotNullOrEmpty(preValueEditorView, "preValueEditorView");
 
             Id = id;
             Name = name;
             ValueType = valueType;
             EditorView = editorView;
-            PreValueEditorView = preValueEditorView;
         }
 
         public string Id { get; private set; }
         public string Name { get; private set; }
         public string EditorView { get; private set; }
         public string ValueType { get; set; }
-        public string PreValueEditorView { get; set; }
     }
 }

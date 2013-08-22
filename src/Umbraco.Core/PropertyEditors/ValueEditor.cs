@@ -36,7 +36,10 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         /// <summary>
-        /// The full virtual path or the relative path to the current Umbraco folder for the angular view
+        /// Defines the view to use for the editor, this can be one of 3 things:
+        /// * the full virtual path or 
+        /// * the relative path to the current Umbraco folder 
+        /// * a simple view name which will map to the views/propertyeditors/{view}/{view}.html
         /// </summary>
         [JsonProperty("view", Required = Required.Always)]
         public string View { get; set; }

@@ -33,7 +33,10 @@ namespace Umbraco.Core.PropertyEditors
         public string Key { get; set; }
 
         /// <summary>
-        /// The view to render for the field
+        /// Defines the view to use for the editor, this can be one of 3 things:
+        /// * the full virtual path or 
+        /// * the relative path to the current Umbraco folder 
+        /// * a simple view name which will map to the views/prevalueeditors/{view}.html
         /// </summary>
         [JsonProperty("view", Required = Required.Always)]
         public string View { get; set; }
