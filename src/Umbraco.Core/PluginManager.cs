@@ -20,7 +20,6 @@ using File = System.IO.File;
 
 namespace Umbraco.Core
 {
-
     /// <summary>
     /// Used to resolve all plugin types and cache them and is also used to instantiate plugin types
     /// </summary>
@@ -37,6 +36,7 @@ namespace Umbraco.Core
     internal class PluginManager
     {
         private readonly ApplicationContext _appContext;
+        private const string CacheKey = "umbraco-plugins.list";
 
         /// <summary>
         /// Creates a new PluginManager with an ApplicationContext instance which ensures that the plugin xml 
@@ -251,7 +251,7 @@ namespace Umbraco.Core
                 XDocument xml;
                 if (_appContext != null)
                 {
-                    xml = _appContext.ApplicationCache.GetCacheItem("umbraco-plugins.list",
+                    xml = _appContext.ApplicationCache.GetCacheItem(CacheKey,
                         new TimeSpan(0, 0, 5, 0),
                         () => XDocument.Load(filePath));
                 }
@@ -304,18 +304,18 @@ namespace Umbraco.Core
 
             if (_appContext != null)
             {
-               _appContext.ApplicationCache.ClearCacheItem("umbraco-plugins.list");
+               _appContext.ApplicationCache.ClearCacheItem(CacheKey);
             }
         }
-
+        
         private string GetPluginListFilePath()
         {
-            return Path.Combine(_tempFolder, "umbraco-plugins.list");
+            return Path.Combine(_tempFolder, string.Format("umbraco-plugins.{0}.list", NetworkHelper.FileSafeMachineName));
         }
 
         private string GetPluginHashFilePath()
         {
-            return Path.Combine(_tempFolder, "umbraco-plugins.hash");
+            return Path.Combine(_tempFolder, string.Format("umbraco-plugins.{0}.hash", NetworkHelper.FileSafeMachineName));
         }
 
         /// <summary>
