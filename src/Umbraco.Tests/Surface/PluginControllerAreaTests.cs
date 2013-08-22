@@ -12,10 +12,10 @@ namespace Umbraco.Tests.Surface
 	[TestFixture]
 	public class PluginControllerAreaTests : BaseWebTest
 	{
-		protected override bool RequiresDbSetup
-		{
-			get { return false; }
-		}
+        protected override DatabaseBehavior DatabaseTestBehavior
+        {
+            get { return DatabaseBehavior.NoDatabasePerFixture; }
+        }
 
 		[Test]
 		public void Ensure_Same_Area1()
@@ -23,9 +23,9 @@ namespace Umbraco.Tests.Surface
 			Assert.Throws<InvalidOperationException>(() =>
 			                                         new PluginControllerArea(new PluginControllerMetadata[]
 			                                         	{
-															PluginController.GetMetadata(typeof(Controller1)),
-															PluginController.GetMetadata(typeof(Controller2)),
-															PluginController.GetMetadata(typeof(Controller3)) //not same area
+															PluginController.GetMetadata(typeof(Plugin1Controller)),
+															PluginController.GetMetadata(typeof(Plugin2Controller)),
+															PluginController.GetMetadata(typeof(Plugin3Controller)) //not same area
 			                                         	}));
 		}
 
@@ -35,9 +35,9 @@ namespace Umbraco.Tests.Surface
 			Assert.Throws<InvalidOperationException>(() =>
 													 new PluginControllerArea(new PluginControllerMetadata[]
 			                                         	{
-															PluginController.GetMetadata(typeof(Controller1)),
-															PluginController.GetMetadata(typeof(Controller2)),
-															PluginController.GetMetadata(typeof(Controller4)) //no area assigned
+															PluginController.GetMetadata(typeof(Plugin1Controller)),
+															PluginController.GetMetadata(typeof(Plugin2Controller)),
+															PluginController.GetMetadata(typeof(Plugin4Controller)) //no area assigned
 			                                         	}));
 		}
 
@@ -46,8 +46,8 @@ namespace Umbraco.Tests.Surface
 		{
 			var area = new PluginControllerArea(new PluginControllerMetadata[]
 				{
-					PluginController.GetMetadata(typeof(Controller1)),
-					PluginController.GetMetadata(typeof(Controller2))
+					PluginController.GetMetadata(typeof(Plugin1Controller)),
+					PluginController.GetMetadata(typeof(Plugin2Controller))
 				});
 			Assert.Pass();
 		}
@@ -55,34 +55,34 @@ namespace Umbraco.Tests.Surface
 		#region Test classes
 
 		[PluginController("Area1")]
-		public class Controller1 : PluginController
+		public class Plugin1Controller : PluginController
 		{
-			public Controller1(UmbracoContext umbracoContext) : base(umbracoContext)
+			public Plugin1Controller(UmbracoContext umbracoContext) : base(umbracoContext)
 			{
 			}
 		}
 
 		[PluginController("Area1")]
-		public class Controller2 : PluginController
+		public class Plugin2Controller : PluginController
 		{
-			public Controller2(UmbracoContext umbracoContext)
+			public Plugin2Controller(UmbracoContext umbracoContext)
 				: base(umbracoContext)
 			{
 			}
 		}
 
 		[PluginController("Area2")]
-		public class Controller3 : PluginController
+		public class Plugin3Controller : PluginController
 		{
-			public Controller3(UmbracoContext umbracoContext)
+			public Plugin3Controller(UmbracoContext umbracoContext)
 				: base(umbracoContext)
 			{
 			}
 		}
 
-		public class Controller4 : PluginController
+		public class Plugin4Controller : PluginController
 		{
-			public Controller4(UmbracoContext umbracoContext)
+			public Plugin4Controller(UmbracoContext umbracoContext)
 				: base(umbracoContext)
 			{
 			}

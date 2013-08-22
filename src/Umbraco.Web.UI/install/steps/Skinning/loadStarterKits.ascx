@@ -97,7 +97,7 @@
     <!-- btn box -->
     <footer class="btn-box">
         <div class="t">&nbsp;</div>
-        <asp:LinkButton ID="LinkButton1" class="btn-step btn btn-continue" runat="server" OnClick="gotoLastStep"><span>Continue</span></asp:LinkButton>
+        <asp:LinkButton ID="LinkButton1" class="btn-step btn btn-continue" runat="server" OnClick="GotoLastStep"><span>Continue</span></asp:LinkButton>
     </footer>
 
 </div>
@@ -112,7 +112,7 @@
     <!-- btn box -->
     <footer class="btn-box">
         <div class="t">&nbsp;</div>
-        <asp:LinkButton ID="LinkButton2" class="btn-step btn btn-continue" runat="server" OnClick="gotoLastStep"><span>Continue</span></asp:LinkButton>
+        <asp:LinkButton ID="LinkButton2" class="btn-step btn btn-continue" runat="server" OnClick="GotoLastStep"><span>Continue</span></asp:LinkButton>
     </footer>
 
 </div>

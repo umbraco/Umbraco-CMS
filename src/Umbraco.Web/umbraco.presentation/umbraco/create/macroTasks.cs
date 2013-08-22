@@ -61,8 +61,6 @@ namespace umbraco
 
         public bool Delete()
         {
-            // Clear cache!
-            macro.GetMacro(ParentID).removeFromCache();
             new cms.businesslogic.macro.Macro(ParentID).Delete();
             return true;
         }

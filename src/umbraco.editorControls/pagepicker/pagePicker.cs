@@ -26,7 +26,7 @@ namespace umbraco.editorControls
         {
             get
             {
-                return TreeService.GetPickerUrl("content", "content");
+                return TreeService.GetPickerUrl(Umbraco.Core.Constants.Applications.Content, "content");
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -15,6 +16,20 @@ namespace Umbraco.Core.Models
     {
         private readonly string _alias;
         private readonly string _name;
+        private int _creatorId;
+        private int _level;
+        private int _sortOrder;
+        private int _parentId;
+        private int _masterTemplateId;
+        private string _masterTemplateAlias;
+
+        private static readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.CreatorId);
+        private static readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.Level);
+        private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.SortOrder);
+        private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.ParentId);
+        //private static readonly PropertyInfo MasterTemplateIdSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.MasterTemplateId);
+        private static readonly PropertyInfo MasterTemplateAliasSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.MasterTemplateAlias);
+        
 
         internal Template(string path)
             : base(path)
@@ -33,25 +48,77 @@ namespace Umbraco.Core.Models
         }
 
         [DataMember]
-        internal int CreatorId { get; set; }
+        internal int CreatorId
+        {
+            get { return _creatorId; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _creatorId = value;
+                    return _creatorId;
+                }, _creatorId, CreatorIdSelector);    
+            }
+        }
 
         [DataMember]
-        internal int Level { get; set; }
+        internal int Level
+        {
+            get { return _level; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _level = value;
+                    return _level;
+                }, _level, LevelSelector);    
+            }
+        }
 
         [DataMember]
-        internal int SortOrder { get; set; }
+        internal int SortOrder
+        {
+            get { return _sortOrder; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _sortOrder = value;
+                    return _sortOrder;
+                }, _sortOrder, SortOrderSelector);    
+            }
+        }
 
         [DataMember]
-        internal int ParentId { get; set; }
-
-        [DataMember]
-        internal string NodePath { get; set; }
-
+        internal int ParentId
+        {
+            get { return _parentId; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _parentId = value;
+                    return _parentId;
+                }, _parentId, ParentIdSelector);    
+            }
+        }
+        
         [DataMember]
         internal Lazy<int> MasterTemplateId { get; set; }
 
         [DataMember]
-        internal string MasterTemplateAlias { get; set; }
+        internal string MasterTemplateAlias
+        {
+            get { return _masterTemplateAlias; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _masterTemplateAlias = value;
+                    return _masterTemplateAlias;
+                }, _masterTemplateAlias, MasterTemplateAliasSelector);    
+            }
+        }
 
         [DataMember]
         public override string Alias
@@ -97,7 +164,7 @@ namespace Umbraco.Core.Models
             }
             else
             {
-                exts.Add(UmbracoSettings.UseAspNetMasterPages ? "masterpage" : "aspx");
+                exts.Add(UmbracoSettings.UseAspNetMasterPages ? "master" : "aspx");
             }
 
             var dirs = SystemDirectories.Masterpages;
@@ -105,10 +172,10 @@ namespace Umbraco.Core.Models
                 dirs += "," + SystemDirectories.MvcViews;
 
             //Validate file
-            var validFile = IOHelper.ValidateEditPath(Path, dirs.Split(','));
+            var validFile = IOHelper.VerifyEditPath(Path, dirs.Split(','));
 
             //Validate extension
-            var validExtension = IOHelper.ValidateFileExtension(Path, exts);
+            var validExtension = IOHelper.VerifyFileExtension(Path, exts);
 
             return validFile && validExtension;
         }

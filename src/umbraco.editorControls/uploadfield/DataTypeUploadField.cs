@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.uploadfield
 {
@@ -44,7 +45,7 @@ namespace umbraco.editorControls.uploadfield
 
 		public override Guid Id 
 		{
-			get {return new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");}
+			get { return new Guid(Constants.PropertyEditors.UploadField); }
 		}
 
 		public override interfaces.IDataPrevalue PrevalueEditor 

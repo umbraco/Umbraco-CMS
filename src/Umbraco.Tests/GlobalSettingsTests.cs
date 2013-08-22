@@ -11,10 +11,10 @@ namespace Umbraco.Tests
 	[TestFixture]
 	public class GlobalSettingsTests : BaseWebTest
 	{
-		protected override bool RequiresDbSetup
-		{
-			get { return false; }
-		}
+        protected override DatabaseBehavior DatabaseTestBehavior
+        {
+            get { return DatabaseBehavior.NoDatabasePerFixture; }
+        }
 
 		public override void Initialize()
 		{            

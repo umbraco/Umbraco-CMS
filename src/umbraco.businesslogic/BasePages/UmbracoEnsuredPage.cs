@@ -12,6 +12,7 @@ namespace umbraco.BasePages
     /// <summary>
     /// UmbracoEnsuredPage is the standard protected page in the umbraco backend, and forces authentication.
     /// </summary>
+    [Obsolete("This class has been superceded by Umbraco.Web.UI.Pages.UmbracoEnsuredPage")]
     public class UmbracoEnsuredPage : BasePage
     {
         public string CurrentApp { get; set; }
@@ -107,9 +108,6 @@ namespace umbraco.BasePages
                 else
                     Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl), true);
             }
-
-            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(ui.Culture(this.getUser()));
-            System.Threading.Thread.CurrentThread.CurrentUICulture = System.Threading.Thread.CurrentThread.CurrentCulture;
         }
     }
 }

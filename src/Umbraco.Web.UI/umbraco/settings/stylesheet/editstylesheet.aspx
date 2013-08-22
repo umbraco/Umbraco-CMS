@@ -25,13 +25,13 @@
                     }
                 });
                 editor.init();
+                
+                //bind save shortcut
+                UmbClientMgr.appActions().bindSaveShortCut();
             });
-            
-            //bind save shortcut
-            UmbClientMgr.appActions().bindSaveShortCut();
-            
-        })(jQuery);
-        
+                
+            })(jQuery);
+
     </script>
 </asp:Content>
 

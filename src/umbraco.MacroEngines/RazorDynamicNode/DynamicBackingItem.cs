@@ -8,6 +8,7 @@ using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.property;
 using umbraco.presentation.nodeFactory;
 using System.Data;
+using Umbraco.Core;
 
 namespace umbraco.MacroEngines
 {
@@ -218,8 +219,8 @@ namespace umbraco.MacroEngines
                 string[] internalProperties = new string[] {
                     "id", "nodeName", "updateDate", "writerName", "path", "nodeTypeAlias",
                     "parentID", "__NodeId", "__IndexType", "__Path", "__NodeTypeAlias", 
-                    "__nodeName", "umbracoBytes","umbracoExtension","umbracoFile","umbracoWidth",
-                    "umbracoHeight"
+                    "__nodeName", Constants.Conventions.Media.Bytes, Constants.Conventions.Media.Extension, Constants.Conventions.Media.File, Constants.Conventions.Media.Width,
+                    Constants.Conventions.Media.Height
                 };
                 if (media.WasLoadedFromExamine && !internalProperties.Contains(alias) && !media.Values.ContainsKey(alias))
                 {

@@ -2,6 +2,7 @@ using System;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Mvc
@@ -26,8 +27,8 @@ namespace Umbraco.Web.Mvc
 					throw new InvalidOperationException("Cannot redirect, no entity was found for id " + _pageId);
 				}
 
-				var result = _umbracoContext.RoutingContext.NiceUrlProvider.GetNiceUrl(PublishedContent.Id);
-				if (result != NiceUrlProvider.NullUrl)
+				var result = _umbracoContext.RoutingContext.UrlProvider.GetUrl(PublishedContent.Id);
+				if (result != "#")
 				{
 					_url = result;
 					return _url;
@@ -45,7 +46,7 @@ namespace Umbraco.Web.Mvc
 				if (_publishedContent != null) return _publishedContent;
 
 				//need to get the URL for the page
-				_publishedContent = PublishedContentStoreResolver.Current.PublishedContentStore.GetDocumentById(_umbracoContext, _pageId);				
+			    _publishedContent = UmbracoContext.Current.ContentCache.GetById(_pageId);
 
 				return _publishedContent;
 			}

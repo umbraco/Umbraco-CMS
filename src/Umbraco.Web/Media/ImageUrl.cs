@@ -4,6 +4,8 @@ using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Web;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Media;
 using umbraco;
 
@@ -11,10 +13,17 @@ namespace Umbraco.Web.Media
 {
     public class ImageUrl
     {
+        [Obsolete("Use TryGetImageUrl() instead")]
         public static string GetImageUrl(string specifiedSrc, string field, string provider, string parameters, int? nodeId = null)
         {
             string url;
+            var found = TryGetImageUrl(specifiedSrc, field, provider, parameters, nodeId, out url);
 
+            return found ? url : string.Empty;
+        }
+
+        public static bool TryGetImageUrl(string specifiedSrc, string field, string provider, string parameters, int? nodeId, out string url)
+        {
             var imageUrlProvider = GetProvider(provider);
 
             var parsedParameters = string.IsNullOrEmpty(parameters) ? new NameValueCollection() : HttpUtility.ParseQueryString(parameters);
@@ -24,6 +33,7 @@ namespace Umbraco.Web.Media
             if (string.IsNullOrEmpty(field))
             {
                 url = imageUrlProvider.GetImageUrlFromFileName(specifiedSrc, queryValues);
+                return true;
             }
             else
             {
@@ -56,13 +66,18 @@ namespace Umbraco.Web.Media
                     }
                 }
 
-                int mediaId;
-                url = int.TryParse(fieldValue, out mediaId)
-                          ? imageUrlProvider.GetImageUrlFromMedia(mediaId, queryValues)
-                          : imageUrlProvider.GetImageUrlFromFileName(fieldValue, queryValues);
+                if (!string.IsNullOrWhiteSpace(fieldValue))
+                {
+                    int mediaId;
+                    url = int.TryParse(fieldValue, out mediaId)
+                              ? imageUrlProvider.GetImageUrlFromMedia(mediaId, queryValues)
+                              : imageUrlProvider.GetImageUrlFromFileName(fieldValue, queryValues);
+                    return true;
+                }
             }
 
-            return url;
+            url = string.Empty;
+            return false;
         }
 
         private static IImageUrlProvider GetProvider(string provider)
@@ -72,12 +87,8 @@ namespace Umbraco.Web.Media
 
         private static object GetContentFromCache(int nodeIdInt, string field)
         {
-            var context = HttpContext.Current;
-            
-            if (context == null)
-                return string.Empty;
-            
-            var content = context.Cache[String.Format("contentItem{0}_{1}", nodeIdInt.ToString(CultureInfo.InvariantCulture), field)];
+            var content = ApplicationContext.Current.ApplicationCache.GetCacheItem<object>(
+                string.Format("{0}{1}_{2}", CacheKeys.ContentItemCacheKey, nodeIdInt.ToString(CultureInfo.InvariantCulture), field));            
             return content;
         }
     }

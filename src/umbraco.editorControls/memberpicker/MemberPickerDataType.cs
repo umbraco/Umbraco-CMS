@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.memberpicker
 {
@@ -24,7 +25,7 @@ namespace umbraco.editorControls.memberpicker
 
         public override Guid Id
         {
-            get { return new Guid("39F533E4-0551-4505-A64B-E0425C5CE775"); }
+			get { return new Guid(Constants.PropertyEditors.MemberPicker); }
         }
 
         public override interfaces.IDataPrevalue PrevalueEditor

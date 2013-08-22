@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             Path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", Path);
            
-			MigrationResolver.Current = new MigrationResolver(new List<Type>
+			MigrationResolver.Current = new MigrationResolver(() => new List<Type>
 				{
 					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints),
 					typeof (DeleteAppTables),
@@ -93,7 +93,6 @@ namespace Umbraco.Tests.Migrations.Upgrades
             PluginManager.Current = null;
             SqlSyntaxContext.SqlSyntaxProvider = null;
 			MigrationResolver.Reset();
-	        Resolution.IsFrozen = false;
 
             TestHelper.CleanContentDirectories();
 

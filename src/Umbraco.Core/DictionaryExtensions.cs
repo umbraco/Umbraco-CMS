@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -10,10 +11,60 @@ using System.Web;
 namespace Umbraco.Core
 {
 	///<summary>
-	/// Extension methods for dictionary
+	/// Extension methods for dictionary & concurrentdictionary
 	///</summary>
 	internal static class DictionaryExtensions
 	{
+        /// <summary>
+        /// Updates an item with the specified key with the specified value
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="dict"></param>
+        /// <param name="key"></param>
+        /// <param name="updateFactory"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Taken from: http://stackoverflow.com/questions/12240219/is-there-a-way-to-use-concurrentdictionary-tryupdate-with-a-lambda-expression
+        /// 
+        /// If there is an item in the dictionary with the key, it will keep trying to update it until it can
+        /// </remarks>
+        public static bool TryUpdate<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dict, TKey key, Func<TValue, TValue> updateFactory)
+        {
+            TValue curValue;
+            while (dict.TryGetValue(key, out curValue))
+            {
+                if (dict.TryUpdate(key, updateFactory(curValue), curValue))
+                    return true;
+                //if we're looping either the key was removed by another thread, or another thread
+                //changed the value, so we start again.
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Updates an item with the specified key with the specified value
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="dict"></param>
+        /// <param name="key"></param>
+        /// <param name="updateFactory"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Taken from: http://stackoverflow.com/questions/12240219/is-there-a-way-to-use-concurrentdictionary-tryupdate-with-a-lambda-expression
+        /// 
+        /// WARNING: If the value changes after we've retreived it, then the item will not be updated
+        /// </remarks>
+        public static bool TryUpdateOptimisitic<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dict, TKey key, Func<TValue, TValue> updateFactory)
+        {
+            TValue curValue;
+            if (!dict.TryGetValue(key, out curValue))
+                return false;
+            dict.TryUpdate(key, updateFactory(curValue), curValue);
+            return true;//note we return true whether we succeed or not, see explanation below.
+        }
+
 		/// <summary>
 		/// Converts a dictionary to another type by only using direct casting
 		/// </summary>

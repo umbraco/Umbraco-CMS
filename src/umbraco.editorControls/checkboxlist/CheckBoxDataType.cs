@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.checkboxlist
 {
@@ -33,7 +34,7 @@ namespace umbraco.editorControls.checkboxlist
 
 		public override Guid Id 
 		{
-			get {return new Guid("b4471851-82b6-4c75-afa4-39fa9c6a75e9");}
+			get {return new Guid(Constants.PropertyEditors.CheckBoxList);}
 		}
 
 		public override interfaces.IDataPrevalue PrevalueEditor 

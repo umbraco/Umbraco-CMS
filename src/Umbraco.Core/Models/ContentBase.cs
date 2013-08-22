@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -13,6 +14,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Represents an abstract class for base Content properties and methods
     /// </summary>
+    [DebuggerDisplay("Id: {Id}, Name: {Name}, ContentType: {ContentTypeBase.Alias}")]
     public abstract class ContentBase : Entity, IContentBase
     {
         protected IContentTypeComposition ContentTypeBase;
@@ -25,6 +27,7 @@ namespace Umbraco.Core.Models
         private bool _trashed;
         private int _contentTypeId;
         private PropertyCollection _properties;
+        private readonly List<Property> _lastInvalidProperties = new List<Property>();
 
         /// <summary>
         /// Protected constructor for ContentBase (Base for Content and Media)
@@ -118,8 +121,11 @@ namespace Umbraco.Core.Models
             get { return _name; }
             set
             {
-                _name = value;
-                OnPropertyChanged(NameSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _name = value;
+                    return _name;
+                }, _name, NameSelector);
             }
         }
 
@@ -132,8 +138,11 @@ namespace Umbraco.Core.Models
             get { return _sortOrder; }
             set
             {
-                _sortOrder = value;
-                OnPropertyChanged(SortOrderSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _sortOrder = value;
+                    return _sortOrder;
+                }, _sortOrder, SortOrderSelector);
             }
         }
 
@@ -146,8 +155,11 @@ namespace Umbraco.Core.Models
             get { return _level; }
             set
             {
-                _level = value;
-                OnPropertyChanged(LevelSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _level = value;
+                    return _level;
+                }, _level, LevelSelector);
             }
         }
 
@@ -160,8 +172,11 @@ namespace Umbraco.Core.Models
             get { return _path; }
             set
             {
-                _path = value;
-                OnPropertyChanged(PathSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _path = value;
+                    return _path;
+                }, _path, PathSelector);
             }
         }
 
@@ -174,8 +189,11 @@ namespace Umbraco.Core.Models
             get { return _creatorId; }
             set
             {
-                _creatorId = value;
-                OnPropertyChanged(CreatorIdSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _creatorId = value;
+                    return _creatorId;
+                }, _creatorId, CreatorIdSelector);
             }
         }
         
@@ -190,8 +208,11 @@ namespace Umbraco.Core.Models
             get { return _trashed; }
             internal set
             {
-                _trashed = value;
-                OnPropertyChanged(TrashedSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _trashed = value;
+                    return _trashed;
+                }, _trashed, TrashedSelector);
             }
         }
 
@@ -210,8 +231,11 @@ namespace Umbraco.Core.Models
             get { return _contentTypeId; }
             protected set
             {
-                _contentTypeId = value;
-                OnPropertyChanged(DefaultContentTypeIdSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _contentTypeId = value;
+                    return _contentTypeId;
+                }, _contentTypeId, DefaultContentTypeIdSelector);
             }
         }
 
@@ -269,7 +293,10 @@ namespace Umbraco.Core.Models
         /// <returns><see cref="Property"/> Value as a <see cref="TPassType"/></returns>
         public virtual TPassType GetValue<TPassType>(string propertyTypeAlias)
         {
-            return (TPassType)Properties[propertyTypeAlias].Value;
+            if (Properties[propertyTypeAlias].Value is TPassType)
+                return (TPassType)Properties[propertyTypeAlias].Value;
+
+            return (TPassType)Convert.ChangeType(Properties[propertyTypeAlias].Value, typeof(TPassType));
         }
 
         /// <summary>
@@ -398,9 +425,34 @@ namespace Umbraco.Core.Models
         /// <returns>True if content is valid otherwise false</returns>
         public virtual bool IsValid()
         {
-            return Properties.Any(property => !property.IsValid()) == false;
+            _lastInvalidProperties.Clear();
+            _lastInvalidProperties.AddRange(Properties.Where(property => property.IsValid() == false));
+            return _lastInvalidProperties.Any() == false;
+        }
+
+        /// <summary>
+        /// Returns a collection of the result of the last validation process, this collection contains all invalid properties.
+        /// </summary>
+        internal IEnumerable<Property> LastInvalidProperties
+        {
+            get { return _lastInvalidProperties; }
         }
 
         public abstract void ChangeTrashedState(bool isTrashed, int parentId = -20);
+
+        /// <summary>
+        /// We will override this method to ensure that when we reset the dirty properties that we 
+        /// also reset the dirty changes made to the content's Properties (user defined)
+        /// </summary>
+        /// <param name="rememberPreviouslyChangedProperties"></param>
+        internal override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+        {
+            base.ResetDirtyProperties(rememberPreviouslyChangedProperties);
+
+            foreach (var prop in Properties)
+            {
+                prop.ResetDirtyProperties(rememberPreviouslyChangedProperties);
+            }
+        }
     }
 }

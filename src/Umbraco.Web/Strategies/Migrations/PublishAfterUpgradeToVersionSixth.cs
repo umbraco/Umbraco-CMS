@@ -6,6 +6,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.UnitOfWork;
 using umbraco.interfaces;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Strategies.Migrations
 {
@@ -39,7 +40,7 @@ namespace Umbraco.Web.Strategies.Migrations
                     .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
                     .InnerJoin<NodeDto>()
                     .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                    .Where<NodeDto>(x => x.NodeObjectType == new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"))
+                    .Where<NodeDto>(x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
                     .Where<NodeDto>(x => x.Path.StartsWith("-1"));
 
                 var uow = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();

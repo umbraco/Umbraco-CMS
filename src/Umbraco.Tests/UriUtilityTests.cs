@@ -15,7 +15,7 @@ namespace Umbraco.Tests
 		[TearDown]
 		public void TearDown()
 		{
-			UmbracoSettings.ResetSetters();
+			UmbracoSettings.Reset();
 		}
 
 		// test normal urls

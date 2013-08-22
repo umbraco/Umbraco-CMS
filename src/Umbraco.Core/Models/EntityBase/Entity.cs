@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Serialization;
 
@@ -12,12 +10,24 @@ namespace Umbraco.Core.Models.EntityBase
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public abstract class Entity : IEntity, ICanBeDirty
+    [DebuggerDisplay("Id: {Id}")]
+    public abstract class Entity : TracksChangesEntityBase, IEntity, IRememberBeingDirty, ICanBeDirty
     {
         private bool _hasIdentity;
         private int? _hash;
         private int _id;
         private Guid _key;
+        private DateTime _createDate;
+        private DateTime _updateDate;
+        private bool _wasCancelled;
+
+        private static readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<Entity, int>(x => x.Id);
+        private static readonly PropertyInfo KeySelector = ExpressionHelper.GetPropertyInfo<Entity, Guid>(x => x.Key);
+        private static readonly PropertyInfo CreateDateSelector = ExpressionHelper.GetPropertyInfo<Entity, DateTime>(x => x.CreateDate);
+        private static readonly PropertyInfo UpdateDateSelector = ExpressionHelper.GetPropertyInfo<Entity, DateTime>(x => x.UpdateDate);
+        private static readonly PropertyInfo HasIdentitySelector = ExpressionHelper.GetPropertyInfo<Entity, bool>(x => x.HasIdentity);
+        private static readonly PropertyInfo WasCancelledSelector = ExpressionHelper.GetPropertyInfo<Entity, bool>(x => x.WasCancelled);
+        
 
         /// <summary>
         /// Integer Id
@@ -31,8 +41,12 @@ namespace Umbraco.Core.Models.EntityBase
             }
             set
             {
-                _id = value;
-                HasIdentity = true;
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _id = value;
+                    HasIdentity = true; //set the has Identity
+                    return _id;
+                }, _id, IdSelector);
             }
         }
         
@@ -51,46 +65,67 @@ namespace Umbraco.Core.Models.EntityBase
 
                 return _key;
             }
-            set { _key = value; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _key = value;
+                    return _key;
+                }, _key, KeySelector);
+            }
         }
 
         /// <summary>
         /// Gets or sets the Created Date
         /// </summary>
         [DataMember]
-        public DateTime CreateDate { get; set; }
+        public DateTime CreateDate
+        {
+            get { return _createDate; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _createDate = value;
+                    return _createDate;
+                }, _createDate, CreateDateSelector);
+            }
+        }
 
         /// <summary>
-        /// Gets or sets the Modified Date
-        /// </summary>
-        [DataMember]
-        public DateTime UpdateDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets the WasCancelled flag, which is used to track
+        /// /// Gets or sets the WasCancelled flag, which is used to track
         /// whether some action against an entity was cancelled through some event.
         /// This only exists so we have a way to check if an event was cancelled through
         /// the new api, which also needs to take effect in the legacy api.
         /// </summary>
         [IgnoreDataMember]
-        internal bool WasCancelled { get; set; }
-
-        /// <summary>
-        /// Property changed event
-        /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        /// <summary>
-        /// Method to call on a property setter.
-        /// </summary>
-        /// <param name="propertyInfo">The property info.</param>
-        protected virtual void OnPropertyChanged(PropertyInfo propertyInfo)
+        internal bool WasCancelled
         {
-            _propertyChangedInfo[propertyInfo.Name] = true;
-
-            if (PropertyChanged != null)
+            get { return _wasCancelled; }
+            set
             {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyInfo.Name));
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _wasCancelled = value;
+                    return _wasCancelled;
+                }, _wasCancelled, WasCancelledSelector);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the Modified Date
+        /// </summary>
+        [DataMember]
+        public DateTime UpdateDate
+        {
+            get { return _updateDate; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _updateDate = value;
+                    return _updateDate;
+                }, _updateDate, UpdateDateSelector);
             }
         }
 
@@ -118,42 +153,6 @@ namespace Umbraco.Core.Models.EntityBase
         }
 
         /// <summary>
-        /// Tracks the properties that have changed
-        /// </summary>
-        private readonly IDictionary<string, bool> _propertyChangedInfo = new Dictionary<string, bool>();
-
-        /// <summary>
-        /// Indicates whether a specific property on the current entity is dirty.
-        /// </summary>
-        /// <param name="propertyName">Name of the property to check</param>
-        /// <returns>True if Property is dirty, otherwise False</returns>
-        public virtual bool IsPropertyDirty(string propertyName)
-        {
-            return _propertyChangedInfo.Any(x => x.Key == propertyName);
-        }
-
-        /// <summary>
-        /// Indicates whether the current entity is dirty.
-        /// </summary>
-        /// <returns>True if entity is dirty, otherwise False</returns>
-        public virtual bool IsDirty()
-        {
-            return _propertyChangedInfo.Any();
-        }
-
-        /// <summary>
-        /// Resets dirty properties by clearing the dictionary used to track changes.
-        /// </summary>
-        /// <remarks>
-        /// Please note that resetting the dirty properties could potentially
-        /// obstruct the saving of a new or updated entity.
-        /// </remarks>
-        public virtual void ResetDirtyProperties()
-        {
-            _propertyChangedInfo.Clear();
-        }
-
-        /// <summary>
         /// Indicates whether the current entity has an identity, eg. Id.
         /// </summary>
         public virtual bool HasIdentity
@@ -164,7 +163,11 @@ namespace Umbraco.Core.Models.EntityBase
             }
             protected set
             {
-                _hasIdentity = value;
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _hasIdentity = value;
+                    return _hasIdentity;
+                }, _hasIdentity, HasIdentitySelector);
             }
         }
 

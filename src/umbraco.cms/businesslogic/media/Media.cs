@@ -54,6 +54,13 @@ namespace umbraco.cms.businesslogic.media
 
         public Media(Guid id, bool noSetup) : base(id, noSetup) { }
 
+        internal Media(IUmbracoEntity entity, bool noSetup = true)
+            : base(entity)
+        {
+            if (noSetup == false)
+                setupNode();
+        }
+
         internal Media(IMedia media) : base(media)
         {
             SetupNode(media);
@@ -65,7 +72,7 @@ namespace umbraco.cms.businesslogic.media
         /// <summary>
         /// -
         /// </summary>
-        public static Guid _objectType = new Guid("b796f64c-1f99-4ffb-b886-4bf4bc011a9c");
+        public static Guid _objectType = new Guid(Constants.ObjectTypes.Media);
 
         /// <summary>
         /// Creates a new Media
@@ -85,12 +92,11 @@ namespace umbraco.cms.businesslogic.media
                 return null;
             }
 
-            var media = ApplicationContext.Current.Services.MediaService.CreateMedia(Name, ParentId, dct.Alias, u.Id);
+            var media = ApplicationContext.Current.Services.MediaService.CreateMediaWithIdentity(Name, ParentId, dct.Alias, u.Id);
             //The media object will only have the 'WasCancelled' flag set to 'True' if the 'Creating' event has been cancelled
             if (((Entity)media).WasCancelled)
                 return null;
 
-            ApplicationContext.Current.Services.MediaService.Save(media);
             var tmp = new Media(media);
 
             tmp.OnNew(e);
@@ -231,7 +237,8 @@ namespace umbraco.cms.businesslogic.media
                 var children = ApplicationContext.Current.Services.MediaService.GetChildren(Id).OrderBy(c => c.SortOrder);
                 return children.Select(x => new Media(x)).ToArray();
             }
-        } 
+        }
+        
         #endregion
 
         #region Public methods
@@ -375,7 +382,7 @@ namespace umbraco.cms.businesslogic.media
             MediaItem = media;
 
             //Setting private properties from IContentBase replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
-            base.PopulateCMSNodeFromContentBase(MediaItem, _objectType);
+            base.PopulateCMSNodeFromUmbracoEntity(MediaItem, _objectType);
 
             //If the version is empty we update with the latest version from the current IContent.
             if (Version == Guid.Empty)

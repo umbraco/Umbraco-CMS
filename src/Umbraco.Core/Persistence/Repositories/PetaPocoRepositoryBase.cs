@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <typeparam name="TId"></typeparam>
     /// <typeparam name="TEntity"></typeparam>
     internal abstract class PetaPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
-        where TEntity : IAggregateRoot
+        where TEntity : class, IAggregateRoot
     {
 		protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work)
 			: base(work)

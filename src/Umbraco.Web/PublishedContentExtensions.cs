@@ -9,6 +9,7 @@ using Examine.LuceneEngine.SearchCriteria;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 using umbraco;
@@ -66,7 +67,7 @@ namespace Umbraco.Web
 					var umbHelper = new UmbracoHelper(UmbracoContext.Current);
 					return umbHelper.NiceUrl(doc.Id);
 				case PublishedItemType.Media:
-					var prop = doc.GetProperty("umbracoFile");
+					var prop = doc.GetProperty(Constants.Conventions.Media.File);
 					if (prop == null)
 						throw new NotSupportedException("Cannot retreive a Url for a media item if there is no 'umbracoFile' property defined");
 					return prop.Value.ToString();
@@ -152,7 +153,7 @@ namespace Umbraco.Web
 
 			//Here we need to put the value through the IPropertyEditorValueConverter's
 			//get the data type id for the current property
-			var dataType = PublishedContentHelper.GetDataType(doc.DocumentTypeAlias, alias);
+			var dataType = PublishedContentHelper.GetDataType(ApplicationContext.Current, doc.DocumentTypeAlias, alias);
 			//convert the string value to a known type
 			var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, dataType, doc.DocumentTypeAlias, alias);
 			return converted.Success
@@ -187,7 +188,7 @@ namespace Umbraco.Web
 			//before we try to convert it manually, lets see if the PropertyEditorValueConverter does this for us
 			//Here we need to put the value through the IPropertyEditorValueConverter's
 			//get the data type id for the current property
-			var dataType = PublishedContentHelper.GetDataType(prop.DocumentTypeAlias, alias);
+			var dataType = PublishedContentHelper.GetDataType(ApplicationContext.Current, prop.DocumentTypeAlias, alias);
 			//convert the value to a known type
 			var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, dataType, prop.DocumentTypeAlias, alias);
 			object parsedLinksVal;
@@ -269,7 +270,7 @@ namespace Umbraco.Web
 				s = searchProvider;
 
 			var results = s.Search(criteria);
-			return results.ConvertSearchResultToPublishedContent(PublishedContentStoreResolver.Current.PublishedContentStore);
+			return results.ConvertSearchResultToPublishedContent(UmbracoContext.Current.ContentCache);
 		}
 		#endregion
 
@@ -1099,7 +1100,7 @@ namespace Umbraco.Web
         {
             //get the root docs if parent is null
             return content.Parent == null
-                       ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
+                       ? UmbracoContext.Current.ContentCache.GetAtRoot()
                        : content.Parent.Children;
         } 
 
@@ -1145,7 +1146,7 @@ namespace Umbraco.Web
 			if (firstNode == null)
 				return new DataTable(); //no children found 
 
-			var urlProvider = UmbracoContext.Current.RoutingContext.NiceUrlProvider;
+			var urlProvider = UmbracoContext.Current.RoutingContext.UrlProvider;
 
 			//use new utility class to create table so that we don't have to maintain code in many places, just one
 			var dt = Umbraco.Core.DataTableExtensions.GenerateDataTable(
@@ -1176,7 +1177,7 @@ namespace Umbraco.Web
 									{"UpdateDate", n.UpdateDate},
 									{"CreatorName", n.CreatorName},
 									{"WriterName", n.WriterName},
-									{"Url", urlProvider.GetNiceUrl(n.Id)}
+									{"Url", urlProvider.GetUrl(n.Id)}
 								};
 						var userVals = new Dictionary<string, object>();
 						foreach (var p in from IPublishedContentProperty p in n.Properties where p.Value != null select p)

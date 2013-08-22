@@ -24,13 +24,14 @@ using umbraco.DataLayer;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
 using System.Web.Security;
+using Umbraco.Core;
 
 namespace umbraco
 {
 	/// <summary>
 	/// Handles loading of the member groups into the application tree
 	/// </summary>
-    [Tree("member", "memberGroup", "Member Groups", sortOrder: 1)]
+    [Tree(Constants.Applications.Members, "memberGroup", "Member Groups", sortOrder: 1)]
     public class loadMemberGroups : BaseTree
 	{
         public loadMemberGroups(string application) : base(application) { }

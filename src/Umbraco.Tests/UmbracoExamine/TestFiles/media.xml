@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<media>
+	<node id="1111" version="902e13f7-5793-482a-9e06-cd94eebd1de0" parentID="-1" level="1" writerID="0" nodeType="1031" template="0" sortOrder="2" createDate="2010-05-19T15:26:08" updateDate="2010-05-19T15:26:09" nodeName="Product Images" urlName="productimages" writerName="Administrator" nodeTypeAlias="Folder" path="-1,1111">
+		<data alias="contents"></data>
+		<node id="2222" version="902e13f7-5793-482a-9e06-cd94eebd1de0" parentID="1111" level="2" writerID="0" nodeType="1031" template="0" sortOrder="2" createDate="2010-05-19T15:26:08" updateDate="2010-05-19T15:26:09" nodeName="Product Images" urlName="productimages" writerName="Administrator" nodeTypeAlias="Folder" path="-1,1111,2222">
+			<data alias="contents"></data>
+			<node id="2112" version="5b3e46ab-3e37-4cfa-ab70-014234b5bd39" parentID="2222" level="3" writerID="0" nodeType="1032" template="0" sortOrder="1" createDate="2010-05-19T17:32:46" updateDate="2010-05-19T17:32:46" nodeName="Sam's Umbraco Image" urlName="acnestressscrub" writerName="Administrator" nodeTypeAlias="Image" path="-1,1111,2222,2112">
+				<data alias="umbracoFile"><![CDATA[/media/1234/blah.pdf]]></data>
+				<data alias="umbracoWidth">115</data>
+				<data alias="umbracoHeight">268</data>
+				<data alias="umbracoBytes">10726</data>
+				<data alias="umbracoExtension">jpg</data>
+				<node id="3113" version="5b3e46ab-3e37-4cfa-ab70-014234b5bd33" parentID="2112" level="4" writerID="0" nodeType="1032" template="0" sortOrder="2" createDate="2010-05-19T17:32:46" updateDate="2010-05-19T17:32:46" nodeName="Another Umbraco Image" urlName="acnestressscrub" writerName="Administrator" nodeTypeAlias="Image" path="-1,1111,2222,2112,3113">
+					<data alias="umbracoFile"><![CDATA[/media/1234/blah.pdf]]></data>
+					<data alias="umbracoWidth">115</data>
+					<data alias="umbracoHeight">268</data>
+					<data alias="umbracoBytes">10726</data>
+					<data alias="umbracoExtension">jpg</data>
+				</node>
+			</node>
+		</node>
+		<node id="1113" version="5b3e46ab-3e37-4cfa-ab70-014234b5bd39" parentID="1111" level="2" writerID="0" nodeType="1032" template="0" sortOrder="1" createDate="2010-05-19T17:32:46" updateDate="2010-05-19T17:32:46" nodeName="Acne Stress Scrub" urlName="acnestressscrub" writerName="Administrator" nodeTypeAlias="File" path="-1,1111,1113">
+			<data alias="umbracoFile"><![CDATA[/App_Data/Converting_file_to_PDF.pdf]]></data>
+			<data alias="umbracoWidth">115</data>
+			<data alias="umbracoHeight">268</data>
+			<data alias="umbracoBytes">10726</data>
+			<data alias="umbracoExtension">jpg</data>
+		</node>
+		<node id="1114" version="5b3e46ab-3e37-4cfa-ab70-014234b5bd39" parentID="1111" level="2" writerID="0" nodeType="1032" template="0" sortOrder="1" createDate="2010-05-19T17:32:46" updateDate="2010-05-19T17:32:46" nodeName="String thoery" urlName="stringtheory" writerName="Administrator" nodeTypeAlias="File" path="-1,1111,1114">
+			<data alias="umbracoFile"><![CDATA[/App_Data/SurviorFlipCup.pdf]]></data>
+			<data alias="umbracoWidth">115</data>
+			<data alias="umbracoHeight">268</data>
+			<data alias="umbracoBytes">10726</data>
+			<data alias="umbracoExtension">jpg</data>
+		</node>
+		<node id="1115" version="5b3e46ab-3e37-4cfa-ab70-014234b5bd39" parentID="1111" level="2" writerID="0" nodeType="1032" template="0" sortOrder="1" createDate="2010-05-19T17:32:46" updateDate="2010-05-19T17:32:46" nodeName="Umbraco Contour" urlName="umbracocontour" writerName="Administrator" nodeTypeAlias="File" path="-1,1111,1115">
+			<data alias="umbracoFile"><![CDATA[/App_Data/windows_vista.pdf]]></data>
+			<data alias="umbracoWidth">115</data>
+			<data alias="umbracoHeight">268</data>
+			<data alias="umbracoBytes">10726</data>
+			<data alias="umbracoExtension">jpg</data>
+		</node>
+		<node id="1116" version="5b3e46ab-3e37-4cfa-ab70-014234b5bd39" parentID="1111" level="2" writerID="0" nodeType="1032" template="0" sortOrder="1" createDate="2010-05-19T17:32:46" updateDate="2010-05-19T17:32:46" nodeName="PDF Standards" urlName="pdfstandards" writerName="Administrator" nodeTypeAlias="File" path="-1,1111,1116">
+			<data alias="umbracoFile"><![CDATA[/App_Data/PDFStandards.pdf]]></data>
+			<data alias="umbracoWidth">115</data>
+			<data alias="umbracoHeight">268</data>
+			<data alias="umbracoBytes">10726</data>
+			<data alias="umbracoExtension">jpg</data>
+		</node>
+	</node>
+</media>

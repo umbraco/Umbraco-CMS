@@ -1,0 +1,58 @@
+﻿/* Custom styles for AssignDomain2.aspx dialog */
+
+button {
+    font-size: 11px;
+    color: #333333;
+    font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+}
+
+table.addDomain {
+    width: 100%;
+    margin-top: 8px;
+}
+
+table.domains {
+    width: 100%;
+}
+
+table.addDomain td.help {
+    padding-left:48px;
+    padding-top:4px;
+}
+
+button {
+    white-space: nowrap;
+}
+
+#komask {
+    background: #ffffff;
+    opacity: .6;
+    z-index: 99;
+    display: none;
+    position: absolute; 
+}
+
+input.domain {
+    width: 296px;
+}
+
+input.domain.error {
+    padding: 0;
+    margin: 0;
+}
+
+select.language {
+    width: 100px;
+}
+
+label.error {
+    padding: 0 0 6px 0;
+    margin: 0;
+    background: none;
+    border:none;
+}
+
+a.remove {
+    color: #ff0000;
+    padding-left: 8px;
+}

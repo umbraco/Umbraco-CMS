@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
@@ -32,8 +33,6 @@ namespace umbraco.cms.businesslogic.language
 
         #region Constants and static members
         
-        private const string UmbracoLanguageCacheKey = "UmbracoPropertyTypeCache";
-
         /// <summary>
         /// Gets the SQL helper.
         /// </summary>
@@ -91,8 +90,6 @@ namespace umbraco.cms.businesslogic.language
                         "insert into umbracoLanguage (languageISOCode) values (@CultureCode)",
                         SqlHelper.CreateParameter("@CultureCode", cultureCode));
 
-                    InvalidateCache();
-
                     //get it's id
                     var newId = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoLanguage WHERE languageISOCode=@cultureCode", SqlHelper.CreateParameter("@cultureCode", cultureCode));
 
@@ -123,11 +120,6 @@ namespace umbraco.cms.businesslogic.language
             }
         }
 
-        private static void InvalidateCache()
-        {
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(UmbracoLanguageCacheKey);
-        }
-
         /// <summary>
         /// Returns all installed languages
         /// </summary>
@@ -138,7 +130,8 @@ namespace umbraco.cms.businesslogic.language
         public static IEnumerable<Language> GetAllAsList()
         {
             return ApplicationContext.Current.ApplicationCache.GetCacheItem<IEnumerable<Language>>(
-                UmbracoLanguageCacheKey, TimeSpan.FromMinutes(60),
+                CacheKeys.LanguageCacheKey,
+                TimeSpan.FromMinutes(60),
                 () =>
                     {
                         var languages = new List<Language>();
@@ -268,7 +261,6 @@ namespace umbraco.cms.businesslogic.language
 
             if (!e.Cancel)
             {
-                InvalidateCache();
                 FireAfterSave(e);
             }
         }
@@ -297,8 +289,6 @@ namespace umbraco.cms.businesslogic.language
                         //remove the dictionary entries first
                         Item.RemoveByLanguage(id);
 
-                        InvalidateCache();
-
                         SqlHelper.ExecuteNonQuery("delete from umbracoLanguage where id = @id",
                             SqlHelper.CreateParameter("@id", id));
 
@@ -306,10 +296,10 @@ namespace umbraco.cms.businesslogic.language
                     }
                 }
                 else
-            {   
-                var e = new DataException("Cannot remove language " + _friendlyName + " because it's attached to a domain on a node");
-	            LogHelper.Error<Language>("Cannot remove language " + _friendlyName + " because it's attached to a domain on a node", e);
-	            throw e;
+                {
+                    var e = new DataException("Cannot remove language " + _friendlyName + " because it's attached to a domain on a node");
+                    LogHelper.Error<Language>("Cannot remove language " + _friendlyName + " because it's attached to a domain on a node", e);
+                    throw e;
                 }   
             }            
         }

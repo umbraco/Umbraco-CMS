@@ -9,10 +9,10 @@ using System.Web.UI.WebControls;
 using System.Xml.Linq;
 using ClientDependency.Core;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using umbraco.cms.presentation.Trees;
 using umbraco.controls.Images;
 using umbraco.controls.Tree;
-using umbraco.IO;
 
 [assembly: WebResource("umbraco.editorControls.MultiNodeTreePicker.MultiNodePickerStyles.css", "text/css")]
 [assembly: WebResource("umbraco.editorControls.MultiNodeTreePicker.MultiNodePickerScripts.js", "application/x-javascript")]
@@ -25,6 +25,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 	[ClientDependency(ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
 	[ClientDependency(ClientDependencyType.Javascript, "ui/jquery.tooltip.min.js", "UmbracoClient")]
 	[ClientDependency(ClientDependencyType.Javascript, "controls/Images/ImageViewer.js", "UmbracoRoot")]
+    [ValidationProperty("Value")]
 	public class MNTP_DataEditor : Control, INamingContainer
 	{
 		#region Static Constructor
@@ -44,7 +45,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 			//need to add our tree definitions to the collection.
 
 			//find the content tree to duplicate
-			var contentTree = TreeDefinitionCollection.Instance.Single(x => x.Tree.Alias.ToUpper() == "CONTENT");
+			var contentTree = TreeDefinitionCollection.Instance.Single(x => string.Equals(x.Tree.Alias, Umbraco.Core.Constants.Applications.Content, StringComparison.OrdinalIgnoreCase));
 			var filteredContentTree = new TreeDefinition(typeof(FilteredContentTree),
 			                                             new umbraco.BusinessLogic.ApplicationTree(true, false, 0,
 			                                                                                       contentTree.Tree.ApplicationAlias,
@@ -58,7 +59,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                                                                                                    contentTree.App);
 
 			//find the media tree to duplicate
-			var mediaTree = TreeDefinitionCollection.Instance.Single(x => x.Tree.Alias.ToUpper() == "MEDIA");
+			var mediaTree = TreeDefinitionCollection.Instance.Single(x => string.Equals(x.Tree.Alias, Umbraco.Core.Constants.Applications.Media, StringComparison.OrdinalIgnoreCase));
 			var filteredMediaTree = new TreeDefinition(typeof(FilteredMediaTree),
 			                                           new umbraco.BusinessLogic.ApplicationTree(true, false, 0,
 			                                                                                     mediaTree.Tree.ApplicationAlias,
@@ -83,9 +84,9 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 		/// </summary>
 		public MNTP_DataEditor()
 		{
-			this.MediaTypesWithThumbnails = new string[] { "image" };
+			this.MediaTypesWithThumbnails = new string[] { Umbraco.Core.Constants.Conventions.MediaTypes.Image };
 			ShowThumbnailsForMedia = true;
-			TreeToRender = "content";
+			TreeToRender = Umbraco.Core.Constants.Applications.Content;
 			MaxNodeCount = -1;
 			MinNodeCount = 0;
 			StartNodeId = uQuery.RootNodeId;
@@ -93,9 +94,15 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 			ControlHeight = 200;
 		}
 
+        /// <summary>
+        /// This is used for validation purposes only, see the [ValidationProperty("Value")] attribute above.
+        /// </summary>
+	    public string Value
+	    {
+	        get { return string.Join(",", SelectedIds); }
+	    }
 
-
-		#region Protected members
+	    #region Protected members
 
 		/// <summary>
 		/// 
@@ -295,14 +302,14 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 			//update the tree type (we need to do this each time because i don't think view state works with these controls)
 			switch (TreeToRender)
 			{
-				case "media":
+				case Umbraco.Core.Constants.Applications.Media:
 					TreePickerControl.TreeType = "FilteredMediaTree";
-					TreePickerControl.App = "media";
+					TreePickerControl.App = Umbraco.Core.Constants.Applications.Media;
 					break;
-				case "content":
+				case Umbraco.Core.Constants.Applications.Content:
 				default:
 					TreePickerControl.TreeType = "FilteredContentTree";
-					TreePickerControl.App = "content";
+					TreePickerControl.App = Umbraco.Core.Constants.Applications.Content;
 					break;
 			}
 
@@ -374,9 +381,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 			this.Controls.Add(PickedValue);
 			this.Controls.Add(RightColumn);
 		}
-
-
-
+        
 		/// <summary>
 		/// Ensure the repeater is data bound
 		/// </summary>
@@ -450,8 +455,8 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 							lnkSelectNode.Attributes["class"] += " noSpr";
 						}
 
-						//show the media preview if media and allowed                    
-						if (TreeToRender == "media" && ShowThumbnailsForMedia)
+						//show the media preview if media and allowed
+						if (TreeToRender == Umbraco.Core.Constants.Applications.Media && ShowThumbnailsForMedia)
 						{
 							var imgPreview = (ImageViewer)e.Item.FindControl("ImgPreview");
 							//show the thubmnail controls
@@ -466,7 +471,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 							//var inner = (HtmlGenericControl)e.Item.FindControl("InnerItem");
 							//inner.Style.Add(HtmlTextWriterStyle.Width, "224px");
 
-							//check if it's a thumbnail type element, we need to check both schemas                        
+							//check if it's a thumbnail type element, we need to check both schemas
 							if (MediaTypesWithThumbnails.Select(x => x.ToUpper())
 								.Contains(loadedNode.ContentType.Alias.ToUpper()))
 							{
@@ -561,7 +566,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 				MaxNodeCount,
 				tooltipAjaxUrl,
 				ShowToolTips.ToString().ToLower(),
-				(TreeToRender == "media" && ShowThumbnailsForMedia).ToString().ToLower(),
+				(TreeToRender == Umbraco.Core.Constants.Applications.Media && ShowThumbnailsForMedia).ToString().ToLower(),
 				IOHelper.ResolveUrl(SystemDirectories.Umbraco),
 				TreeToRender);
 			var js = "jQuery(window).load(function() { " + jsMethod + " });";

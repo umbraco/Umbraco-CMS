@@ -3,7 +3,9 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.CodeAnnotations;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 using umbraco;
 using umbraco.IO;
 using umbraco.presentation;
@@ -22,9 +24,8 @@ namespace Umbraco.Web
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
-    public class UmbracoContext
+    public class UmbracoContext : DisposableObject
     {
-
         private const string HttpContextItemName = "Umbraco.Web.UmbracoContext";
         private static readonly object Locker = new object();
 
@@ -49,10 +50,9 @@ namespace Umbraco.Web
         /// This is created in order to standardize the creation of the singleton. Normally it is created during a request
         /// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
         /// during the startup process as well.
-        /// See: http://issues.umbraco.org/issue/U4-1890
+        /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
         /// </remarks>
-        [UmbracoProposedPublic("http://issues.umbraco.org/issue/U4-1717")]
-        internal static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext)
+        public static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext)
         {
             return EnsureContext(httpContext, applicationContext, false);
         }
@@ -75,9 +75,9 @@ namespace Umbraco.Web
         /// This is created in order to standardize the creation of the singleton. Normally it is created during a request
         /// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
         /// during the startup process as well.
-        /// See: http://issues.umbraco.org/issue/U4-1890
+        /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
         /// </remarks>
-        internal static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext, bool replaceContext)
+        public static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext, bool replaceContext)
         {
             if (UmbracoContext.Current != null)
             {
@@ -86,18 +86,23 @@ namespace Umbraco.Web
                 UmbracoContext.Current._replacing = true;
             }
 
-            var umbracoContext = new UmbracoContext(httpContext, applicationContext, RoutesCacheResolver.Current.RoutesCache);
+            var umbracoContext = new UmbracoContext(
+                httpContext,
+                applicationContext,
+                PublishedCachesResolver.Current.Caches);
 
             // create the nice urls provider
-            var niceUrls = new NiceUrlProvider(PublishedContentStoreResolver.Current.PublishedContentStore, umbracoContext);
+            // there's one per request because there are some behavior parameters that can be changed
+            var urlProvider = new UrlProvider(
+                umbracoContext,
+                UrlProviderResolver.Current.Providers);
 
             // create the RoutingContext, and assign
             var routingContext = new RoutingContext(
                 umbracoContext,
-                DocumentLookupsResolver.Current.DocumentLookups,
-                LastChanceLookupResolver.Current.LastChanceLookup,
-                PublishedContentStoreResolver.Current.PublishedContentStore,
-                niceUrls);
+                ContentFinderResolver.Current.Finders,
+                ContentLastChanceFinderResolver.Current.Finder,
+                urlProvider);
 
             //assign the routing context back
             umbracoContext.RoutingContext = routingContext;
@@ -112,11 +117,13 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="httpContext"></param>
         /// <param name="applicationContext"> </param>
-        /// <param name="routesCache"> </param>
+        /// <param name="publishedCaches">The published caches.</param>
+        /// <param name="preview">An optional value overriding detection of preview mode.</param>
         internal UmbracoContext(
 			HttpContextBase httpContext, 
 			ApplicationContext applicationContext,
-			IRoutesCache routesCache)
+            IPublishedCaches publishedCaches,
+            bool? preview = null)
         {
             if (httpContext == null) throw new ArgumentNullException("httpContext");
             if (applicationContext == null) throw new ArgumentNullException("applicationContext");
@@ -126,7 +133,11 @@ namespace Umbraco.Web
 
             HttpContext = httpContext;            
             Application = applicationContext;
-        	RoutesCache = routesCache;
+            Security = new WebSecurity();
+
+            ContentCache = publishedCaches.CreateContextualContentCache(this);
+            MediaCache = publishedCaches.CreateContextualMediaCache(this);
+            InPreviewMode = preview ?? DetectInPreviewModeFromRequest();
 
 			// set the urls...
 			//original request url
@@ -203,13 +214,13 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the current ApplicationContext
         /// </summary>
-        public ApplicationContext Application { get; private set; }       
+        public ApplicationContext Application { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="IRoutesCache"/>
+        /// Gets the WebSecurity class
         /// </summary>
-		internal IRoutesCache RoutesCache { get; private set; }
-		
+        public WebSecurity Security { get; private set; }
+
 	    /// <summary>
 	    /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.
 	    /// </summary>
@@ -221,54 +232,17 @@ namespace Umbraco.Web
 		/// <remarks>That is, lowercase, no trailing slash after path, no .aspx...</remarks>
 		internal Uri CleanedUmbracoUrl { get; private set; }
 
-    	private Func<XmlDocument> _xmlDelegate; 
-
-		/// <summary>
-		/// Gets/sets the delegate used to retreive the Xml content, generally the setter is only used for unit tests
-		/// and by default if it is not set will use the standard delegate which ONLY works when in the context an Http Request
-		/// </summary>
-		/// <remarks>
-		/// If not defined, we will use the standard delegate which ONLY works when in the context an Http Request
-		/// mostly because the 'content' object heavily relies on HttpContext, SQL connections and a bunch of other stuff
-		/// that when run inside of a unit test fails.
-		/// </remarks>
-    	internal Func<XmlDocument> GetXmlDelegate
-    	{
-    		get
-    		{				
-    			return _xmlDelegate ?? (_xmlDelegate = () =>
-    				{
-    					if (InPreviewMode)
-    					{
-    						if (_previewContent == null)
-    						{
-    							_previewContent = new PreviewContent(UmbracoUser, new Guid(StateHelper.Cookies.Preview.GetValue()), true);
-    							if (_previewContent.ValidPreviewSet)
-    								_previewContent.LoadPreviewset();
-    						}
-    						if (_previewContent.ValidPreviewSet)
-    							return _previewContent.XmlContent;
-    					}
-    					return content.Instance.XmlContent;
-    				});
-    		}
-			set { _xmlDelegate = value; }
-    	} 
+        /// <summary>
+        /// Gets or sets the published content cache.
+        /// </summary>
+        public ContextualPublishedContentCache ContentCache { get; private set; }
 
         /// <summary>
-        /// Returns the XML Cache document
+        /// Gets or sets the published media cache.
         /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// This is marked internal for now because perhaps we might return a wrapper like CacheData so that it doesn't have a reliance
-        /// specifically on XML.
-        /// </remarks>
-        internal XmlDocument GetXml()
-        {
-        	return GetXmlDelegate();
-        }
+        public ContextualPublishedMediaCache MediaCache { get; private set; }
 
-		/// <summary>
+        /// <summary>
 		/// Boolean value indicating whether the current request is a front-end umbraco request
 		/// </summary>
 		public bool IsFrontEndUmbracoRequest
@@ -282,13 +256,13 @@ namespace Umbraco.Web
 		/// <remarks>
 		/// If the RoutingContext is null, this will throw an exception.
 		/// </remarks>
-    	internal NiceUrlProvider NiceUrlProvider
+    	internal UrlProvider UrlProvider
     	{
     		get
     		{
     			if (RoutingContext == null)
-					throw new InvalidOperationException("Cannot access the NiceUrlProvider when the UmbracoContext's RoutingContext is null");
-    			return RoutingContext.NiceUrlProvider;
+					throw new InvalidOperationException("Cannot access the UrlProvider when the UmbracoContext's RoutingContext is null");
+    			return RoutingContext.UrlProvider;
     		}
     	}
 
@@ -300,7 +274,7 @@ namespace Umbraco.Web
 		/// <summary>
 		/// Gets/sets the PublishedContentRequest object
 		/// </summary>
-		internal PublishedContentRequest PublishedContentRequest { get; set; }	
+		public PublishedContentRequest PublishedContentRequest { get; set; }	
 
         /// <summary>
         /// Exposes the HttpContext for the current request
@@ -327,6 +301,9 @@ namespace Umbraco.Web
         /// </summary>
         public int? PageId
         {
+            // TODO - this is dirty old legacy tricks, we should clean it up at some point
+            // also, what is a "custom page" and when should this be either null, or different
+            // from PublishedContentRequest.PublishedContent.Id ??
             get
             {
                 try
@@ -349,7 +326,7 @@ namespace Umbraco.Web
         {
             get
             {
-                return UmbracoEnsuredPage.CurrentUser;
+                return Security.CurrentUser;
             }
 
         }
@@ -357,22 +334,21 @@ namespace Umbraco.Web
         /// <summary>
         /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>
-        public bool InPreviewMode
-        {
-            get
-            {
-                var request = GetRequestFromContext();
-                if (request == null || request.Url == null)
-                    return false;
+        public bool InPreviewMode { get; private set; }
 
-                var currentUrl = request.Url.AbsolutePath;
-                // zb-00004 #29956 : refactor cookies names & handling
-                return
-                    StateHelper.Cookies.Preview.HasValue // has preview cookie
-                    && UmbracoUser != null // has user
-					&& !currentUrl.StartsWith(Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco)); // is not in admin UI
-            }
-        }   
+        private bool DetectInPreviewModeFromRequest()
+        {
+            var request = GetRequestFromContext();
+            if (request == null || request.Url == null)
+                return false;
+
+            var currentUrl = request.Url.AbsolutePath;
+            // zb-00004 #29956 : refactor cookies names & handling
+            return
+                StateHelper.Cookies.Preview.HasValue // has preview cookie
+                && UmbracoUser != null // has user
+                && !currentUrl.StartsWith(Core.IO.IOHelper.ResolveUrl(Core.IO.SystemDirectories.Umbraco)); // is not in admin UI
+        }
         
         private HttpRequestBase GetRequestFromContext()
         {
@@ -385,7 +361,17 @@ namespace Umbraco.Web
                 return null;
             }
         }
-
-
+        
+        protected override void DisposeResources()
+        {
+            Security.DisposeIfDisposable();
+            Security = null;
+            _previewContent = null;
+            _umbracoContext = null;
+            //ensure not to dispose this!
+            Application = null;
+            ContentCache = null;
+            MediaCache = null;     
+        }
     }
 }

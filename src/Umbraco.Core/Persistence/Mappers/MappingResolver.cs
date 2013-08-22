@@ -1,62 +1,91 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
-    internal static class MappingResolver
+    internal class MappingResolver : LazyManyObjectsResolverBase<MappingResolver, BaseMapper>
     {
-        internal static BaseMapper ResolveMapperByType(Type type)
+        /// <summary>
+        /// Constructor accepting a list of BaseMapper types that are attributed with the MapperFor attribute
+        /// </summary>
+        /// <param name="assignedMapperTypes"></param>
+        public MappingResolver(Func<IEnumerable<Type>> assignedMapperTypes)
+            : base(assignedMapperTypes)
         {
-            if (type == typeof (IContent) || type == typeof (Content))
-                return ContentMapper.Instance;
-
-            if (type == typeof (IContentType) || type == typeof (ContentType))
-                return ContentTypeMapper.Instance;
-
-            if (type == typeof(IDataTypeDefinition) || type == typeof(DataTypeDefinition))
-                return DataTypeDefinitionMapper.Instance;
-
-            if (type == typeof(IDictionaryItem) || type == typeof(DictionaryItem))
-                return DictionaryMapper.Instance;
-
-            if (type == typeof(IDictionaryTranslation) || type == typeof(DictionaryTranslation))
-                return DictionaryTranslationMapper.Instance;
-
-            if (type == typeof(ILanguage) || type == typeof(Language))
-                return LanguageMapper.Instance;
-
-            if (type == typeof(IMedia) || type == typeof(Models.Media))
-                return MediaMapper.Instance;
-
-            if (type == typeof(IMediaType) || type == typeof(MediaType))
-                return MediaTypeMapper.Instance;
-
-            if (type == typeof(PropertyGroup))
-                return PropertyGroupMapper.Instance;
-
-            if (type == typeof(Property))
-                return PropertyMapper.Instance;
-
-            if (type == typeof(PropertyType))
-                return PropertyTypeMapper.Instance;
-
-            if (type == typeof(Relation))
-                return RelationMapper.Instance;
-
-            if (type == typeof(RelationType))
-                return RelationTypeMapper.Instance;
-
-            if (type == typeof(IUser) || type == typeof(User))
-                return UserMapper.Instance;
-
-            if (type == typeof(IUserType) || type == typeof(UserType))
-                return UserTypeMapper.Instance;
-
-            throw new Exception("Invalid Type: A Mapper could not be resolved based on the passed in Type");
+            
         }
 
-        internal static string GetMapping(Type type, string propertyName)
+        /// <summary>
+        /// Caches the type -> mapper so that we don't have to type check each time we want one or lookup the attribute
+        /// </summary>
+        private readonly ConcurrentDictionary<Type, BaseMapper> _mapperCache = new ConcurrentDictionary<Type, BaseMapper>();
+
+        /// <summary>
+        /// Return a mapper by type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        internal BaseMapper ResolveMapperByType(Type type)
+        {
+            return _mapperCache.GetOrAdd(type, type1 =>
+                {
+                    
+                    //first check if we can resolve it by attribute
+
+                    var byAttribute = TryGetMapperByAttribute(type);
+                    if (byAttribute.Success)
+                    {
+                        return byAttribute.Result;
+                    }
+
+                    //static mapper registration if not using attributes, could be something like this:
+                    //if (type == typeof (UserType))
+                    //    return new UserTypeMapper();
+
+                    throw new Exception("Invalid Type: A Mapper could not be resolved based on the passed in Type");
+                });
+        }
+
+        /// <summary>
+        /// Check the entity type to see if it has a mapper attribute assigned and try to instantiate it
+        /// </summary>
+        /// <param name="entityType"></param>
+        /// <returns></returns>
+        private Attempt<BaseMapper> TryGetMapperByAttribute(Type entityType)
+        {
+            //get all BaseMapper types that have a MapperFor attribute:
+            var assignedMapperTypes = InstanceTypes;
+
+            //check if any of the mappers are assigned to this type
+            var mapper = assignedMapperTypes.FirstOrDefault(
+                x => x.GetCustomAttributes<MapperForAttribute>(false)
+                      .Any(m => m.EntityType == entityType));
+
+            if (mapper == null)
+            {
+                return Attempt<BaseMapper>.False;
+            }
+            try
+            {
+                var instance = Activator.CreateInstance(mapper) as BaseMapper;
+                return instance != null 
+                    ? new Attempt<BaseMapper>(true, instance) 
+                    : Attempt<BaseMapper>.False;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error(typeof(MappingResolver), "Could not instantiate mapper of type " + mapper, ex);
+                return new Attempt<BaseMapper>(ex);
+            }
+        }  
+
+        internal string GetMapping(Type type, string propertyName)
         {
             var mapper = ResolveMapperByType(type);
             var result = mapper.Map(propertyName);
@@ -65,5 +94,7 @@ namespace Umbraco.Core.Persistence.Mappers
 
             return result;
         }
+
     }
+
 }

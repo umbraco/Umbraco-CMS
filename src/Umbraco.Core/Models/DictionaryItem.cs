@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
@@ -41,8 +42,11 @@ namespace Umbraco.Core.Models
             get { return _parentId; }
             set
             {
-                _parentId = value;
-                OnPropertyChanged(ParentIdSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _parentId = value;
+                    return _parentId;
+                }, _parentId, ParentIdSelector);
             }
         }
 
@@ -55,8 +59,11 @@ namespace Umbraco.Core.Models
             get { return _itemKey; }
             set
             {
-                _itemKey = value;
-                OnPropertyChanged(ItemKeySelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _itemKey = value;
+                    return _itemKey;
+                }, _itemKey, ItemKeySelector);
             }
         }
 
@@ -69,8 +76,11 @@ namespace Umbraco.Core.Models
             get { return _translations; }
             set
             {
-                _translations = value;
-                OnPropertyChanged(TranslationsSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _translations = value;
+                    return _translations;
+                }, _translations, TranslationsSelector);
             }
         }
 

@@ -6,6 +6,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.cms.businesslogic.media;
+using Umbraco.Core;
 
 namespace Umbraco.Tests.LegacyApi
 {
@@ -24,7 +25,7 @@ namespace Umbraco.Tests.LegacyApi
         public void Can_Verify_AllowedChildContentTypes_On_MediaType()
         {
             // Arrange
-            var folder = MediaType.GetByAlias("Folder");
+            var folder = MediaType.GetByAlias(Constants.Conventions.MediaTypes.Folder);
             var folderStructure = folder.AllowedChildContentTypeIDs.ToList();
             folderStructure.Add(1045);
 
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.LegacyApi
             folder.Save();
 
             // Assert
-            var updated = MediaType.GetByAlias("Folder");
+            var updated = MediaType.GetByAlias(Constants.Conventions.MediaTypes.Folder);
 
             Assert.That(updated.AllowedChildContentTypeIDs.Any(), Is.True);
             Assert.That(updated.AllowedChildContentTypeIDs.Any(x => x == 1045), Is.True);
@@ -52,18 +53,18 @@ namespace Umbraco.Tests.LegacyApi
             int imageTab = mediaType.AddVirtualTab("Image");
             int cropTab = mediaType.AddVirtualTab("Crop");
 
-            mediaType.AddPropertyType(new DataTypeDefinition(UPLOAD_DATATYPE_ID), "umbracoFile", "Upload image");
-            mediaType.AddPropertyType(new DataTypeDefinition(LABEL_DATATYPE_ID), "umbracoWidth", "Width");
-            mediaType.AddPropertyType(new DataTypeDefinition(LABEL_DATATYPE_ID), "umbracoHeight", "Height");
-            mediaType.AddPropertyType(new DataTypeDefinition(LABEL_DATATYPE_ID), "umbracoBytes", "Size");
-            mediaType.AddPropertyType(new DataTypeDefinition(LABEL_DATATYPE_ID), "umbracoExtension", "Type");
+            mediaType.AddPropertyType(new DataTypeDefinition(UPLOAD_DATATYPE_ID), Constants.Conventions.Media.File, "Upload image");
+            mediaType.AddPropertyType(new DataTypeDefinition(LABEL_DATATYPE_ID), Constants.Conventions.Media.Width, "Width");
+            mediaType.AddPropertyType(new DataTypeDefinition(LABEL_DATATYPE_ID), Constants.Conventions.Media.Height, "Height");
+            mediaType.AddPropertyType(new DataTypeDefinition(LABEL_DATATYPE_ID), Constants.Conventions.Media.Bytes, "Size");
+            mediaType.AddPropertyType(new DataTypeDefinition(LABEL_DATATYPE_ID), Constants.Conventions.Media.Extension, "Type");
             mediaType.AddPropertyType(new DataTypeDefinition(CROP_DATATYPE_ID), "wideImage", "Wide image");
 
-            mediaType.SetTabOnPropertyType(mediaType.getPropertyType("umbracoFile"), imageTab);
-            mediaType.SetTabOnPropertyType(mediaType.getPropertyType("umbracoWidth"), imageTab);
-            mediaType.SetTabOnPropertyType(mediaType.getPropertyType("umbracoHeight"), imageTab);
-            mediaType.SetTabOnPropertyType(mediaType.getPropertyType("umbracoBytes"), imageTab);
-            mediaType.SetTabOnPropertyType(mediaType.getPropertyType("umbracoExtension"), imageTab);
+            mediaType.SetTabOnPropertyType(mediaType.getPropertyType(Constants.Conventions.Media.File), imageTab);
+            mediaType.SetTabOnPropertyType(mediaType.getPropertyType(Constants.Conventions.Media.Width), imageTab);
+            mediaType.SetTabOnPropertyType(mediaType.getPropertyType(Constants.Conventions.Media.Height), imageTab);
+            mediaType.SetTabOnPropertyType(mediaType.getPropertyType(Constants.Conventions.Media.Bytes), imageTab);
+            mediaType.SetTabOnPropertyType(mediaType.getPropertyType(Constants.Conventions.Media.Extension), imageTab);
             mediaType.SetTabOnPropertyType(mediaType.getPropertyType("wideImage"), cropTab);
 
             mediaType.Text = mediaTypeName;

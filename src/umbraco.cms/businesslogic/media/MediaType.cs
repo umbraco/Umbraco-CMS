@@ -42,7 +42,7 @@ namespace umbraco.cms.businesslogic.media
 
         #region Constants and static members
 
-        public static Guid _objectType = new Guid("4ea4382b-2f5a-4c2b-9587-ae9b3cf3602e");
+        public static Guid _objectType = new Guid(Constants.ObjectTypes.MediaType);
 
         #endregion
 
@@ -182,7 +182,7 @@ namespace umbraco.cms.businesslogic.media
             _mediaType = mediaType;
 
             base.PopulateContentTypeFromContentTypeBase(_mediaType);
-            base.PopulateCMSNodeFromContentTypeBase(_mediaType, _objectType);
+            base.PopulateCMSNodeFromUmbracoEntity(_mediaType, _objectType);
         }
         #endregion
 

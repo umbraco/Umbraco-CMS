@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = DataTypeDefinitionMapper.Instance.Map("Id");
+            string column = new DataTypeDefinitionMapper().Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoNode].[id]"));
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = DataTypeDefinitionMapper.Instance.Map("Key");
+            string column = new DataTypeDefinitionMapper().Map("Key");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoNode].[uniqueID]"));
@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = DataTypeDefinitionMapper.Instance.Map("DatabaseType");
+            string column = new DataTypeDefinitionMapper().Map("DatabaseType");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDataType].[dbType]"));
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = DataTypeDefinitionMapper.Instance.Map("ControlId");
+            string column = new DataTypeDefinitionMapper().Map("ControlId");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDataType].[controlId]"));

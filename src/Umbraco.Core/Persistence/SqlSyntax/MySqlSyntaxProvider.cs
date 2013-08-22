@@ -317,11 +317,10 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             {
                 db.OpenSharedConnection();
                 // Need 4 @ signs as it is regarded as a parameter, @@ escapes it once, @@@@ escapes it twice
-                var lowerCaseFileSystem = db.Fetch<int>("SELECT @@@@Global.lower_case_file_system");
                 var lowerCaseTableNames = db.Fetch<int>("SELECT @@@@Global.lower_case_table_names");
                 
-                if(lowerCaseFileSystem.Any() && lowerCaseTableNames.Any())
-                    supportsCaseInsensitiveQueries = lowerCaseFileSystem.First() == 1 && lowerCaseTableNames.First() == 1;
+                if(lowerCaseTableNames.Any())
+                    supportsCaseInsensitiveQueries = lowerCaseTableNames.First() == 1;
             }
             catch(Exception ex)
             {

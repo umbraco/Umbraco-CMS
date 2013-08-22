@@ -2,29 +2,43 @@
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Web.Security;
 using umbraco.BasePages;
 
 namespace Umbraco.Web.Mvc
 {
-	/// <summary>
-	/// Ensures authorization occurs for the installer if it has already completed. If install has not yet occured
-	/// then the authorization is successful
+	/// <summary>	
+	/// Ensures authorization is successful for a back office user
 	/// </summary>
-	internal class UmbracoAuthorizeAttribute : AuthorizeAttribute
+	public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
 	{
-		private readonly ApplicationContext _applicationContext;
+        private readonly ApplicationContext _applicationContext;
+        private readonly UmbracoContext _umbracoContext;
 
-		public UmbracoAuthorizeAttribute(ApplicationContext appContext)
-		{
-			if (appContext == null) throw new ArgumentNullException("appContext");
-			_applicationContext = appContext;
-		}
+        private ApplicationContext GetApplicationContext()
+        {
+            return _applicationContext ?? ApplicationContext.Current;
+        }
 
-		public UmbracoAuthorizeAttribute()
-			: this(ApplicationContext.Current)
-		{
+        private UmbracoContext GetUmbracoContext()
+        {
+            return _umbracoContext ?? UmbracoContext.Current;
+        }
 
-		}
+        /// <summary>
+        /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        public UmbracoAuthorizeAttribute(UmbracoContext umbracoContext)
+        {
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            _umbracoContext = umbracoContext;
+            _applicationContext = _umbracoContext.Application;
+        }
+
+        public UmbracoAuthorizeAttribute()
+        {
+        }
 
 		/// <summary>
 		/// Ensures that the user must be in the Administrator or the Install role
@@ -33,17 +47,15 @@ namespace Umbraco.Web.Mvc
 		/// <returns></returns>
 		protected override bool AuthorizeCore(HttpContextBase httpContext)
 		{
-			if (httpContext == null)
-			{
-				throw new ArgumentNullException("httpContext");
-			}
-
-			try
+		    if (httpContext == null) throw new ArgumentNullException("httpContext");
+            
+		    try
 			{						
 				//we need to that the app is configured and that a user is logged in
-				if (!_applicationContext.IsConfigured)
+                if (!GetApplicationContext().IsConfigured)
 					return false;
-				var isLoggedIn = BasePage.ValidateUserContextID(BasePage.umbracoUserContextID);
+			    var umbCtx = GetUmbracoContext();
+                var isLoggedIn = umbCtx.Security.ValidateUserContextId(umbCtx.Security.UmbracoUserContextId);
 				return isLoggedIn;
 			}
 			catch (Exception)
@@ -52,32 +64,14 @@ namespace Umbraco.Web.Mvc
 			}
 		}
 
-		/// <summary>
-		/// Override the OnAuthorization so that we can return a custom response.
-		/// </summary>
-		/// <param name="filterContext"></param>
-		public override void OnAuthorization(AuthorizationContext filterContext)
-		{
-			Mandate.ParameterNotNull(filterContext, "filterContext");
-			if (OutputCacheAttribute.IsChildActionCacheActive(filterContext))
-				throw new InvalidOperationException("Cannot use " + typeof(UmbracoAuthorizeAttribute).FullName +  " on a child action");
-			if (AuthorizeCore(filterContext.HttpContext))
-			{
-				//with a little help from dotPeek... this is what it normally would do
-				var cache = filterContext.HttpContext.Response.Cache;
-				cache.SetProxyMaxAge(new TimeSpan(0L));
-				cache.AddValidationCallback(CacheValidateHandler, null);
-			}
-			else
-			{
-				//they aren't authorized 
-				throw new HttpException((int)global::System.Net.HttpStatusCode.Unauthorized, "You must login to view this resource.");
-			}
-		}
+        /// <summary>
+        /// Override to throw exception instead of returning a 401 result
+        /// </summary>
+        /// <param name="filterContext"></param>
+        protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
+        {
+            throw new HttpException((int)global::System.Net.HttpStatusCode.Unauthorized, "You must login to view this resource.");
+        }
 
-		private void CacheValidateHandler(HttpContext context, object data, ref HttpValidationStatus validationStatus)
-		{
-			validationStatus = OnCacheAuthorization(new HttpContextWrapper(context));
-		}
 	}
 }

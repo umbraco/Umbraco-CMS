@@ -1,10 +1,12 @@
 using System;
 using System.Data;
 using System.Web;
-
+using Umbraco.Core;
+using Umbraco.Core.Cache;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using System.Collections.Generic;
+using umbraco.cms.businesslogic.web;
 
 namespace umbraco.cms.businesslogic.relation
 {
@@ -21,9 +23,7 @@ namespace umbraco.cms.businesslogic.relation
 		//private Guid _parentObjectType;
 		//private Guid _childObjectType;
 		private string _alias;
-
-		private static object relationTypeSyncLock = new object();
-
+        
 		#endregion
 
         private static ISqlHelper SqlHelper
@@ -71,7 +71,6 @@ namespace umbraco.cms.businesslogic.relation
 				_name = value;
 				SqlHelper.ExecuteNonQuery(
 					"UPDATE umbracoRelationType SET name = @name WHERE id = " + this.Id.ToString(), SqlHelper.CreateParameter("@name", value));
-				this.InvalidateCache();
 			}
 		}
 
@@ -83,7 +82,6 @@ namespace umbraco.cms.businesslogic.relation
 				_alias = value;
 				SqlHelper.ExecuteNonQuery(
 					"UPDATE umbracoRelationType SET alias = @alias WHERE id = " + this.Id.ToString(), SqlHelper.CreateParameter("@alias", value));
-				this.InvalidateCache();
 			}
 		}
 
@@ -95,7 +93,6 @@ namespace umbraco.cms.businesslogic.relation
 				_dual = value;
 				SqlHelper.ExecuteNonQuery(
 					"UPDATE umbracoRelationType SET [dual] = @dual WHERE id = " + this.Id.ToString(), SqlHelper.CreateParameter("@dual", value));
-				this.InvalidateCache();
 			}
 		}
 
@@ -145,9 +142,7 @@ namespace umbraco.cms.businesslogic.relation
 		{
 			try
 			{
-				return umbraco.cms.businesslogic.cache.Cache.GetCacheItem<RelationType>(
-					GetCacheKey(id), relationTypeSyncLock, TimeSpan.FromMinutes(30),
-					delegate { return new RelationType(id); });
+			    return new RelationType(id);
 			}
 			catch
 			{
@@ -168,17 +163,8 @@ namespace umbraco.cms.businesslogic.relation
 				return null;
 			}
 		}
-
-		protected virtual void InvalidateCache()
-		{
-			umbraco.cms.businesslogic.cache.Cache.ClearCacheItem(GetCacheKey(this.Id));
-		}
-
-		private static string GetCacheKey(int id)
-		{
-			return string.Format("RelationTypeCacheItem_{0}", id);
-		}
-
+        
 		#endregion
+
 	}
 }

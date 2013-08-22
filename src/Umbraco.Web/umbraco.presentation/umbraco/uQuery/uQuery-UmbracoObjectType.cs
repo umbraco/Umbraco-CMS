@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core;
 
 namespace umbraco
 {
@@ -17,98 +18,98 @@ namespace umbraco
 			/// <summary>
 			/// Content Item Type
 			/// </summary>
-			[Guid("7A333C54-6F43-40A4-86A2-18688DC7E532")]
+			[Guid(Constants.ObjectTypes.ContentItemType)]
 			[FriendlyName("Content Item Type")]
 			ContentItemType,
 
 			/// <summary>
 			/// Root
 			/// </summary>
-			[Guid("EA7D8624-4CFE-4578-A871-24AA946BF34D")]
+			[Guid(Constants.ObjectTypes.SystemRoot)]
 			[FriendlyName("Root")]
 			ROOT,
 
 			/// <summary>
 			/// Document
 			/// </summary>
-			[Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972")]
+			[Guid(Constants.ObjectTypes.Document)]
 			[FriendlyName("Document")]
 			Document,
 
 			/// <summary>
 			/// Media
 			/// </summary>
-			[Guid("B796F64C-1F99-4FFB-B886-4BF4BC011A9C")]
+			[Guid(Constants.ObjectTypes.Media)]
 			[FriendlyName("Media")]
 			Media,
 
 			/// <summary>
 			/// Member Type
 			/// </summary>
-			[Guid("9B5416FB-E72F-45A9-A07B-5A9A2709CE43")]
+			[Guid(Constants.ObjectTypes.MemberType)]
 			[FriendlyName("Member Type")]
 			MemberType,
 
 			/// <summary>
 			/// Template
 			/// </summary>
-			[Guid("6FBDE604-4178-42CE-A10B-8A2600A2F07D")]
+			[Guid(Constants.ObjectTypes.Template)]
 			[FriendlyName("Template")]
 			Template,
 
 			/// <summary>
 			/// Member Group
 			/// </summary>
-			[Guid("366E63B9-880F-4E13-A61C-98069B029728")]
+			[Guid(Constants.ObjectTypes.MemberGroup)]
 			[FriendlyName("Member Group")]
 			MemberGroup,
 
 			/// <summary>
 			/// Content Item
 			/// </summary>
-			[Guid("10E2B09F-C28B-476D-B77A-AA686435E44A")]
+			[Guid(Constants.ObjectTypes.ContentItem)]
 			[FriendlyName("Content Item")]
 			ContentItem,
 
 			/// <summary>
 			/// "Media Type
 			/// </summary>
-			[Guid("4EA4382B-2F5A-4C2B-9587-AE9B3CF3602E")]
+			[Guid(Constants.ObjectTypes.MediaType)]
 			[FriendlyName("Media Type")]
 			MediaType,
 
 			/// <summary>
 			/// Document Type
 			/// </summary>
-			[Guid("A2CB7800-F571-4787-9638-BC48539A0EFB")]
+			[Guid(Constants.ObjectTypes.DocumentType)]
 			[FriendlyName("Document Type")]
 			DocumentType,
 
 			/// <summary>
 			/// Recycle Bin
 			/// </summary>
-			[Guid("01BB7FF2-24DC-4C0C-95A2-C24EF72BBAC8")]
+			[Guid(Constants.ObjectTypes.ContentRecycleBin)]
 			[FriendlyName("Recycle Bin")]
 			RecycleBin,
 
 			/// <summary>
 			/// Stylesheet
 			/// </summary>
-			[Guid("9F68DA4F-A3A8-44C2-8226-DCBD125E4840")]
+			[Guid(Constants.ObjectTypes.Stylesheet)]
 			[FriendlyName("Stylesheet")]
 			Stylesheet,
 
 			/// <summary>
 			/// Member
 			/// </summary>
-			[Guid("39EB0F98-B348-42A1-8662-E7EB18487560")]
+			[Guid(Constants.ObjectTypes.Member)]
 			[FriendlyName("Member")]
 			Member,
 
 			/// <summary>
 			/// Data Type
 			/// </summary>
-			[Guid("30A2A501-1978-4DDB-A57B-F7EFED43BA3C")]
+			[Guid(Constants.ObjectTypes.DataType)]
 			[FriendlyName("Data Type")]
 			DataType
 		}

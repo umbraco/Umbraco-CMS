@@ -1,6 +1,15 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Publishing;
+using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence
 {
@@ -8,10 +17,42 @@ namespace Umbraco.Tests.Persistence
     public abstract class BaseTableByTableTest
     {
         [SetUp]
-        public abstract void Initialize();
+        public virtual void Initialize()
+        {
+            TestHelper.SetupLog4NetForTests();
+            TestHelper.InitializeContentDirectories();
+
+            string path = TestHelper.CurrentAssemblyDirectory;
+            AppDomain.CurrentDomain.SetData("DataDirectory", path);
+
+            RepositoryResolver.Current = new RepositoryResolver(
+                new RepositoryFactory());
+            
+            ApplicationContext.Current = new ApplicationContext(
+                //assign the db context
+                new DatabaseContext(new DefaultDatabaseFactory()),
+                //assign the service context
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy()),
+                //disable cache
+                false)
+                {
+                    IsReady = true
+                };
+
+            Resolution.Freeze();
+        }
 
         [TearDown]
-        public abstract void TearDown();
+        public virtual void TearDown()
+        {
+            SqlSyntaxContext.SqlSyntaxProvider = null;
+            AppDomain.CurrentDomain.SetData("DataDirectory", null);
+
+            //reset the app context
+            ApplicationContext.Current = null;
+
+            RepositoryResolver.Reset();
+        }
 
         public abstract Database Database { get; }
 

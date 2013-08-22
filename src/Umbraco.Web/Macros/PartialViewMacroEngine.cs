@@ -124,9 +124,9 @@ namespace Umbraco.Web.Macros
 			if (mvcHandler != null)
 			{
 				//try and extract the current view context from the route values, this would be set in the UmbracoViewPage.
-				if (mvcHandler.RequestContext.RouteData.DataTokens.ContainsKey(Constants.DataTokenCurrentViewContext))
+				if (mvcHandler.RequestContext.RouteData.DataTokens.ContainsKey(Umbraco.Web.Mvc.Constants.DataTokenCurrentViewContext))
 				{
-					viewContext = (ViewContext) mvcHandler.RequestContext.RouteData.DataTokens[Constants.DataTokenCurrentViewContext];
+					viewContext = (ViewContext) mvcHandler.RequestContext.RouteData.DataTokens[Umbraco.Web.Mvc.Constants.DataTokenCurrentViewContext];
 				}
 				routeVals.DataTokens.Add("ParentActionViewContext", viewContext);
 			}

@@ -22,13 +22,14 @@ using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic.Utils;
+using Umbraco.Core;
 
 namespace umbraco
 {
     /// <summary>
     /// Handles loading of the packager application into the developer application tree
     /// </summary>
-    [Tree("developer", "packager", "Packages", sortOrder: 3)]
+    [Tree(Constants.Applications.Developer, "packager", "Packages", sortOrder: 3)]
     public class loadPackager : ITree
     {
         #region TreeI Members

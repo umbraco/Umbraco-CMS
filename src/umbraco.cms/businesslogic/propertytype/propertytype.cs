@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence.Caching;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.cache;
@@ -22,9 +24,7 @@ namespace umbraco.cms.businesslogic.propertytype
     public class PropertyType
     {
         #region Declarations
-
-        private static readonly object propertyTypeCacheSyncLock = new object();
-        private static readonly string UmbracoPropertyTypeCacheKey = "UmbracoPropertyTypeCache";
+        
         private readonly int _contenttypeid;
         private readonly int _id;
         private int _DataTypeId;
@@ -301,7 +301,7 @@ namespace umbraco.cms.businesslogic.propertytype
             finally
             {
                 // Clear cached items
-                Cache.ClearCacheByKeySearch(UmbracoPropertyTypeCacheKey);
+                ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.PropertyTypeCacheKey);
             }
 
             return pt;
@@ -453,10 +453,10 @@ namespace umbraco.cms.businesslogic.propertytype
         protected virtual void FlushCache()
         {
             // clear local cache
-            Cache.ClearCacheItem(GetCacheKey(Id));
+            ApplicationContext.Current.ApplicationCache.ClearCacheItem(GetCacheKey(Id));
 
             // clear cache in contentype
-            Cache.ClearCacheItem("ContentType_PropertyTypes_Content:" + _contenttypeid);
+            ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.ContentTypePropertiesCacheKey + _contenttypeid);
 
             //Ensure that DocumentTypes are reloaded from db by clearing cache - this similar to the Save method on DocumentType.
             //NOTE Would be nice if we could clear cache by type instead of emptying the entire cache.
@@ -466,29 +466,30 @@ namespace umbraco.cms.businesslogic.propertytype
 
         public static PropertyType GetPropertyType(int id)
         {
-            return Cache.GetCacheItem(GetCacheKey(id), propertyTypeCacheSyncLock,
-                                      TimeSpan.FromMinutes(30),
-                                      delegate
-                                      {
-                                          try
-                                          {
-                                              return new PropertyType(id);
-                                          }
-                                          catch
-                                          {
-                                              return null;
-                                          }
-                                      });
+            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                GetCacheKey(id),
+                TimeSpan.FromMinutes(30),
+                delegate
+                    {
+                        try
+                        {
+                            return new PropertyType(id);
+                        }
+                        catch
+                        {
+                            return null;
+                        }
+                    });
         }
 
         private void InvalidateCache()
         {
-            Cache.ClearCacheItem(GetCacheKey(Id));
+            ApplicationContext.Current.ApplicationCache.ClearCacheItem(GetCacheKey(Id));
         }
 
         private static string GetCacheKey(int id)
         {
-            return UmbracoPropertyTypeCacheKey + id;
+            return CacheKeys.PropertyTypeCacheKey + id;
         }
 
         #endregion

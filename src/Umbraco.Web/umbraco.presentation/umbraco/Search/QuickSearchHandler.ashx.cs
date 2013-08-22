@@ -11,6 +11,7 @@ using UmbracoExamine;
 using System.Web.Script.Serialization;
 using Examine;
 using Examine.LuceneEngine.SearchCriteria;
+using Umbraco.Core;
 
 namespace umbraco.presentation.umbraco.Search
 {
@@ -44,7 +45,7 @@ namespace umbraco.presentation.umbraco.Search
             }
             
             //if it doesn't start with "*", then search only nodeName and nodeId
-            var internalSearcher = (app == "member")
+            var internalSearcher = (app == Constants.Applications.Members)
                 ? UmbracoContext.Current.InternalMemberSearchProvider 
                 : UmbracoContext.Current.InternalSearchProvider;
 

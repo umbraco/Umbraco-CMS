@@ -1,3 +1,4 @@
+using System;
 using System.Web.Mvc;
 using Umbraco.Web.Routing;
 
@@ -15,6 +16,12 @@ namespace Umbraco.Web.Mvc
 		/// The Controller instance found for routing to
 		/// </summary>
 		public ControllerBase Controller { get; set; }
+
+        /// <summary>
+        /// The Controller type found for routing to
+        /// </summary>
+        public Type ControllerType { get; set; }
+
 
 		/// <summary>
 		/// The current RenderModel found for the request

@@ -9,7 +9,10 @@ using System.Data;
 using System.Web.UI;
 using System.Collections;
 using System.Collections.Generic;
-
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Web;
+using Umbraco.Web.Cache;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using umbraco.IO;
@@ -24,15 +27,14 @@ namespace umbraco
     public class template
     {
         #region private variables
-        StringBuilder templateOutput = new StringBuilder();
 
-        // Cache
-        static System.Web.Caching.Cache templateCache = System.Web.HttpRuntime.Cache;
+        readonly StringBuilder _templateOutput = new StringBuilder();
 
         private string _templateDesign = "";
         int _masterTemplate = -1;
         private string _templateName = "";
         private string _templateAlias = "";
+
         #endregion
 
         #region public properties
@@ -40,11 +42,11 @@ namespace umbraco
         {
             set
             {
-                templateOutput.Append(value);
+                _templateOutput.Append(value);
             }
             get
             {
-                return templateOutput.ToString();
+                return _templateOutput.ToString();
             }
         }
 
@@ -125,7 +127,7 @@ namespace umbraco
             if (System.Web.HttpContext.Current.Items["macrosAdded"] == null)
                 System.Web.HttpContext.Current.Items.Add("macrosAdded", 0);
 
-            StringBuilder tempOutput = templateOutput;
+            StringBuilder tempOutput = _templateOutput;
 
             Control pageLayout = new Control();
             Control pageHeader = new Control();
@@ -135,8 +137,8 @@ namespace umbraco
             System.Web.UI.HtmlControls.HtmlHead pageAspNetHead = new System.Web.UI.HtmlControls.HtmlHead();
 
             // Find header and footer of page if there is an aspnet-form on page
-            if (templateOutput.ToString().ToLower().IndexOf("<?aspnet_form>") > 0 ||
-                templateOutput.ToString().ToLower().IndexOf("<?aspnet_form disablescriptmanager=\"true\">") > 0)
+            if (_templateOutput.ToString().ToLower().IndexOf("<?aspnet_form>") > 0 ||
+                _templateOutput.ToString().ToLower().IndexOf("<?aspnet_form disablescriptmanager=\"true\">") > 0)
             {
                 pageForm.Attributes.Add("method", "post");
                 pageForm.Attributes.Add("action", Convert.ToString(System.Web.HttpContext.Current.Items["VirtualUrl"]));
@@ -150,7 +152,7 @@ namespace umbraco
                 if (aspnetFormTagBegin == -1)
                 {
                     aspnetFormTagBegin =
-                        templateOutput.ToString().ToLower().IndexOf("<?aspnet_form disablescriptmanager=\"true\">");
+                        _templateOutput.ToString().ToLower().IndexOf("<?aspnet_form disablescriptmanager=\"true\">");
                     aspnetFormTagLength = 42;
                 }
                 else
@@ -394,7 +396,7 @@ namespace umbraco
             // First parse for known umbraco tags
             // <?UMBRACO_MACRO/> - macros
             // <?UMBRACO_GETITEM/> - print item from page, level, or recursive
-            MatchCollection tags = Regex.Matches(templateOutput.ToString(), "<\\?UMBRACO_MACRO[^>]*/>|<\\?UMBRACO_GETITEM[^>]*/>|<\\?(?<tagName>[\\S]*)[^>]*/>", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+            MatchCollection tags = Regex.Matches(_templateOutput.ToString(), "<\\?UMBRACO_MACRO[^>]*/>|<\\?UMBRACO_GETITEM[^>]*/>|<\\?(?<tagName>[\\S]*)[^>]*/>", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
             foreach (Match tag in tags)
             {
@@ -407,7 +409,7 @@ namespace umbraco
                     if (macroID != "")
                     {
                         macro tempMacro = getMacro(macroID);
-                        templateOutput.Replace(tag.Value.ToString(), tempMacro.MacroContent.ToString());
+                        _templateOutput.Replace(tag.Value.ToString(), tempMacro.MacroContent.ToString());
                     }
                 }
                 else
@@ -425,12 +427,12 @@ namespace umbraco
                                 if (Convert.ToInt32(macroID) > 0)
                                 {
                                     macro tempContentMacro = getMacro(macroID);
-                                    templateOutput.Replace(tag.Value.ToString(), tempContentMacro.MacroContent.ToString());
+                                    _templateOutput.Replace(tag.Value.ToString(), tempContentMacro.MacroContent.ToString());
                                 }
 
                             }
 
-                            templateOutput.Replace(tag.Value.ToString(), tempElementContent);
+                            _templateOutput.Replace(tag.Value.ToString(), tempElementContent);
                         }
                         catch (Exception e)
                         {
@@ -480,53 +482,53 @@ namespace umbraco
 
         public static string GetMasterPageName(int templateID, string templateFolder)
         {
-            template t = (template)templateCache["template" + templateID];
-            if (t == null)
-                t = new template(templateID);
-
-            if (t != null)
-                if (!string.IsNullOrEmpty(templateFolder))
-                    return t.AlternateMasterPageFile(templateFolder);
-                else
-                    return t.MasterPageFile;
-            else
-                throw new ArgumentException(String.Format("Template with id '{0}' not found", templateID));
+            var t = new template(templateID);
+            
+            return !string.IsNullOrEmpty(templateFolder) 
+                ? t.AlternateMasterPageFile(templateFolder) 
+                : t.MasterPageFile;
         }
 
         public template(int templateID)
         {
-            if (templateCache["template" + templateID.ToString()] != null)
-            {
-                template t = (template)templateCache["template" + templateID];
-                this._masterTemplate = t._masterTemplate;
-                this._templateAlias = t._templateAlias;
-                this._templateDesign = t._templateDesign;
-                this._masterTemplate = t._masterTemplate;
-                this._templateName = t._templateName;
-            }
-            else
-            {
-                using (IRecordsReader templateData = SqlHelper.ExecuteReader("select nodeId, alias, master, text, design from cmsTemplate inner join umbracoNode node on node.id = cmsTemplate.nodeId where nodeId = @templateID", SqlHelper.CreateParameter("@templateID", templateID)))
-                {
-                    if (templateData.Read())
-                    {
-                        // Get template master and replace content where the template
-                        if (!templateData.IsNull("master"))
-                            _masterTemplate = templateData.GetInt("master");
-                        if (!templateData.IsNull("alias"))
-                            _templateAlias = templateData.GetString("alias");
-                        if (!templateData.IsNull("text"))
-                            _templateName = templateData.GetString("text");
-                        if (!templateData.IsNull("design"))
-                            _templateDesign = templateData.GetString("design");
-                        templateData.Close();
-                        templateCache.Insert("template" + templateID.ToString(), this);
-                    }
-                }
-            }
+            var tId = templateID;
+
+            var t = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+               string.Format("{0}{1}", CacheKeys.TemplateFrontEndCacheKey, tId), () =>
+               {
+                   using (var templateData = SqlHelper.ExecuteReader("select nodeId, alias, master, text, design from cmsTemplate inner join umbracoNode node on node.id = cmsTemplate.nodeId where nodeId = @templateID", SqlHelper.CreateParameter("@templateID", templateID)))
+                   {
+                       if (templateData.Read())
+                       {
+                           // Get template master and replace content where the template
+                           if (!templateData.IsNull("master"))
+                               _masterTemplate = templateData.GetInt("master");
+                           if (!templateData.IsNull("alias"))
+                               _templateAlias = templateData.GetString("alias");
+                           if (!templateData.IsNull("text"))
+                               _templateName = templateData.GetString("text");
+                           if (!templateData.IsNull("design"))
+                               _templateDesign = templateData.GetString("design");
+                       }
+                   }
+                   return this;
+               });
+
+            if (t == null)
+                throw new InvalidOperationException("Could not find a tempalte with id " + templateID);
+
+            this._masterTemplate = t._masterTemplate;
+            this._templateAlias = t._templateAlias;
+            this._templateDesign = t._templateDesign;
+            this._masterTemplate = t._masterTemplate;
+            this._templateName = t._templateName;
+
             // Only check for master on legacy templates - can show error when using master pages.
-            if(!UmbracoSettings.UseAspNetMasterPages)
-                checkForMaster(templateID);
+            if (!UmbracoSettings.UseAspNetMasterPages)
+            {
+                checkForMaster(tId);
+            }
+                
         }
 
         private void checkForMaster(int templateID) {
@@ -535,12 +537,12 @@ namespace umbraco
                 template masterTemplateDesign = new template(_masterTemplate);
                 if (masterTemplateDesign.TemplateContent.IndexOf("<?UMBRACO_TEMPLATE_LOAD_CHILD/>") > -1
                     || masterTemplateDesign.TemplateContent.IndexOf("<?UMBRACO_TEMPLATE_LOAD_CHILD />") > -1) {
-                    templateOutput.Append(
+                    _templateOutput.Append(
                         masterTemplateDesign.TemplateContent.Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD/>",
                         _templateDesign).Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD />", _templateDesign)
                         );
                 } else
-                    templateOutput.Append(_templateDesign);
+                    _templateOutput.Append(_templateDesign);
             } else {
                 if (_masterTemplate == templateID)
                 {
@@ -548,73 +550,26 @@ namespace umbraco
                     string templateName = (t != null) ? t.Text : string.Format("'Template with id: '{0}", templateID);
                     System.Web.HttpContext.Current.Trace.Warn("template",
                         String.Format("Master template is the same as the current template. It would cause an endless loop! Make sure that the current template '{0}' has another Master Template than itself. You can change this in the template editor under 'Settings'", templateName));
-                    templateOutput.Append(_templateDesign);
+                    _templateOutput.Append(_templateDesign);
                 }
             }
         }
 
+        [Obsolete("Use ApplicationContext.Current.ApplicationCache.ClearCacheForTemplate instead")]
         public static void ClearCachedTemplate(int templateID)
         {
-            if (templateCache["template" + templateID.ToString()] != null)
-                templateCache.Remove("template" + templateID.ToString());
+            DistributedCache.Instance.RefreshTemplateCache(templateID);
         }
 
         public template(String templateContent)
         {
-            templateOutput.Append(templateContent);
+            _templateOutput.Append(templateContent);
             _masterTemplate = 0;
         }
 
         #endregion
     }
 
-    public class templateCacheRefresh : interfaces.ICacheRefresher
-    {
-        #region ICacheRefresher Members
-
-        public string Name
-        {
-            get
-            {
-                // TODO:  Add templateCacheRefresh.Name getter implementation
-                return "Template cache refresher";
-            }
-        }
-
-        public Guid UniqueIdentifier
-        {
-            get
-            {
-                // TODO:  Add templateCacheRefresh.UniqueIdentifier getter implementation
-                return new Guid("DD12B6A0-14B9-46e8-8800-C154F74047C8");
-            }
-        }
-
-        public void RefreshAll()
-        {
-            // Doesn't do anything
-        }
-
-        public void Refresh(Guid Id)
-        {
-            // Doesn't do anything
-        }
-
-        void umbraco.interfaces.ICacheRefresher.Refresh(int Id)
-        {
-            template.ClearCachedTemplate(Id);
-        }
-
-        //PPH remove tamplete from cache
-        public void Remove(int Id)
-        {
-
-            template.ClearCachedTemplate(Id);
-
-        }
-
-        #endregion
-
-    }
+    
 
 }

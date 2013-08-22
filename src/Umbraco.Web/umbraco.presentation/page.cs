@@ -98,7 +98,7 @@ namespace umbraco
 		internal page(PublishedContentRequest docreq)
 		{
 
-			if (!docreq.HasNode)
+			if (!docreq.HasPublishedContent)
 				throw new ArgumentException("Document request has no node.", "docreq");
 			
 			populatePageData(docreq.PublishedContent.Id,
@@ -109,7 +109,7 @@ namespace umbraco
 			if (docreq.HasTemplate)
 			{
 
-				this._template = docreq.Template.Id;
+				this._template = docreq.TemplateModel.Id;
 				_elements["template"] = _template.ToString();				
 			}
 
@@ -149,18 +149,18 @@ namespace umbraco
 			populatePageData(node);
 
 			// Check for alternative template
-			if (HttpContext.Current.Items["altTemplate"] != null &&
-				HttpContext.Current.Items["altTemplate"].ToString() != String.Empty)
+			if (HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate] != null &&
+				HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate].ToString() != String.Empty)
 			{
 				_template =
 					umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(
-						HttpContext.Current.Items["altTemplate"].ToString());
+						HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate].ToString());
 				_elements.Add("template", _template.ToString());
 			}
-			else if (helper.Request("altTemplate") != String.Empty)
+			else if (helper.Request(Constants.Conventions.Url.AltTemplate) != String.Empty)
 			{
 				_template =
-					umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(helper.Request("altTemplate").ToLower());
+					umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(helper.Request(Constants.Conventions.Url.AltTemplate).ToLower());
 				_elements.Add("template", _template.ToString());
 			}
 			if (_template == 0)
@@ -327,8 +327,6 @@ namespace umbraco
 			{				
 				template templateDesign = new template(templateId);
 			
-				HttpContext.Current.Items["umbPageObject"] = this;
-
 				_pageContentControl = templateDesign.ParseWithControls(this);
 				_pageContent.Append(templateDesign.TemplateContent);
 			}

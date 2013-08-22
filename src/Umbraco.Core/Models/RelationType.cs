@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
@@ -40,8 +41,11 @@ namespace Umbraco.Core.Models
             get { return _name; }
             set
             {
-                _name = value;
-                OnPropertyChanged(NameSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _name = value;
+                    return _name;
+                }, _name, NameSelector);
             }
         }
 
@@ -54,8 +58,11 @@ namespace Umbraco.Core.Models
             get { return _alias; }
             set
             {
-                _alias = value;
-                OnPropertyChanged(AliasSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _alias = value;
+                    return _alias;
+                }, _alias, AliasSelector);
             }
         }
 
@@ -68,8 +75,11 @@ namespace Umbraco.Core.Models
             get { return _isBidrectional; }
             set
             {
-                _isBidrectional = value;
-                OnPropertyChanged(IsBidirectionalSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _isBidrectional = value;
+                    return _isBidrectional;
+                }, _isBidrectional, IsBidirectionalSelector);
             }
         }
 
@@ -83,8 +93,11 @@ namespace Umbraco.Core.Models
             get { return _parentObjectType; }
             set
             {
-                _parentObjectType = value;
-                OnPropertyChanged(ParentObjectTypeSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _parentObjectType = value;
+                    return _parentObjectType;
+                }, _parentObjectType, ParentObjectTypeSelector);
             }
         }
 
@@ -98,8 +111,11 @@ namespace Umbraco.Core.Models
             get { return _childObjectType; }
             set
             {
-                _childObjectType = value;
-                OnPropertyChanged(ChildObjectTypeSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _childObjectType = value;
+                    return _childObjectType;
+                }, _childObjectType, ChildObjectTypeSelector);
             }
         }
     }

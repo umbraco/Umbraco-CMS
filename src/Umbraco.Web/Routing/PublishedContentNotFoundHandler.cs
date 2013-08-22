@@ -30,14 +30,14 @@ namespace Umbraco.Web.Routing
 
 			var docreq = UmbracoContext.Current.PublishedContentRequest;
 			var reason = "Cannot render the page at url '{0}'.";
-			if (!docreq.HasNode)
+			if (!docreq.HasPublishedContent)
 				reason = "No umbraco document matches the url '{0}'.";
 			else if (!docreq.HasTemplate)
 				reason = "No template exists to render the document at url '{0}'.";
 
 			response.Write("<html><body><h1>Page not found</h1>");
 			response.Write("<h3>");
-			response.Write(string.Format(reason, HttpUtility.HtmlEncode(UmbracoContext.Current.OriginalRequestUrl)));
+			response.Write(string.Format(reason, HttpUtility.HtmlEncode(UmbracoContext.Current.OriginalRequestUrl.PathAndQuery)));
 			response.Write("</h3>");
 			if (!string.IsNullOrWhiteSpace(_message))
 				response.Write("<p>" + _message + "</p>");

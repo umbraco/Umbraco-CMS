@@ -13,6 +13,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Xml.Linq;
 using System.Xml;
 using System.IO;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic;
@@ -32,6 +33,27 @@ namespace umbraco.presentation.preview
         public bool ValidPreviewSet { get; set; }
 
         private int _userId = -1;
+
+        public PreviewContent()
+        {
+            _initialized = false;
+        }
+
+        private readonly object _initLock = new object();
+        private bool _initialized = true;
+
+        public void EnsureInitialized(User user, string previewSet, bool validate, Action initialize)
+        {
+            lock (_initLock)
+            {
+                if (_initialized) return;
+
+                _userId = user.Id;
+                ValidPreviewSet = UpdatePreviewPaths(new Guid(previewSet), validate);
+                initialize();
+                _initialized = true;
+            }
+        }
 
         public PreviewContent(User user)
         {

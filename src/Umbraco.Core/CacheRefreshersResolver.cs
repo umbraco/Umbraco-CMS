@@ -31,7 +31,7 @@ namespace Umbraco.Core
 		{
 			get
 			{
-				EnsureIdsAreTracked();
+				EnsureIsInitialized();
 				return Values;
 			}
 		}

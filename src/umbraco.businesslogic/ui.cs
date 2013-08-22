@@ -4,9 +4,11 @@ using System.Threading;
 using System.Web;
 using System.Web.Caching;
 using System.Xml;
+using Umbraco.Core;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
-using umbraco.IO;
 
 namespace umbraco
 {
@@ -16,8 +18,8 @@ namespace umbraco
     /// </summary>
     public class ui
     {
-        private static readonly string umbracoDefaultUILanguage = GlobalSettings.DefaultUILanguage;
-        private static readonly string umbracoPath = SystemDirectories.Umbraco;
+        private static readonly string UmbracoDefaultUiLanguage = GlobalSettings.DefaultUILanguage;
+        private static readonly string UmbracoPath = SystemDirectories.Umbraco;
 
         /// <summary>
         /// Gets the current Culture for the logged-in users
@@ -26,7 +28,7 @@ namespace umbraco
         /// <returns></returns>
         public static string Culture(User u)
         {
-            XmlDocument langFile = getLanguageFile(u.Language);
+            var langFile = getLanguageFile(u.Language);
             try
             {
                 return langFile.SelectSingleNode("/language").Attributes.GetNamedItem("culture").Value;
@@ -43,9 +45,9 @@ namespace umbraco
         /// null, then return the default Umbraco culture.
         /// </summary>
         /// <returns></returns>
-        private static string getLanguage()
+        private static string GetLanguage()
         {
-            return getLanguage(UmbracoEnsuredPage.CurrentUser);
+            return GetLanguage(UmbracoEnsuredPage.CurrentUser);
         }
 
         /// <summary>
@@ -53,19 +55,16 @@ namespace umbraco
         /// If they aren't logged in, check the current thread culture and return it, however if that is
         /// null, then return the default Umbraco culture.
         /// </summary>
-        private static string getLanguage(User u)
+        private static string GetLanguage(User u)
         {
             if (u != null)
             {
                 return u.Language;
             }
-            else
-            {
-                string language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
-                if (string.IsNullOrEmpty(language))
-                    language = umbracoDefaultUILanguage;
-                return language;
-            }
+            var language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+            if (string.IsNullOrEmpty(language))
+                language = UmbracoDefaultUiLanguage;
+            return language;
         }
 
         /// <summary>
@@ -76,7 +75,7 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Key, User u)
         {
-            return GetText(string.Empty, Key, null, getLanguage(u));
+            return GetText(string.Empty, Key, null, GetLanguage(u));
         }
 
         /// <summary>
@@ -98,7 +97,7 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Area, string Key, User u)
         {
-            return GetText(Area, Key, null, getLanguage(u));
+            return GetText(Area, Key, null, GetLanguage(u));
         }
 
         /// <summary>
@@ -109,7 +108,7 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Area, string Key)
         {
-            return GetText(Area, Key, getLanguage());
+            return GetText(Area, Key, GetLanguage());
         }
 
         /// <summary>
@@ -122,7 +121,7 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Area, string Key, string[] Variables, User u)
         {
-            return GetText(Area, Key, Variables, getLanguage(u));
+            return GetText(Area, Key, Variables, GetLanguage(u));
         }
 
         /// <summary>
@@ -135,7 +134,7 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Area, string Key, string Variable, User u)
         {
-            return GetText(Area, Key, new string[] { Variable }, getLanguage(u));
+            return GetText(Area, Key, new[] { Variable }, GetLanguage(u));
         }
 
         /// <summary>
@@ -145,7 +144,7 @@ namespace umbraco
         /// <returns></returns>
         public static string GetText(string key)
         {
-            return GetText(string.Empty, key, null, getLanguage());            
+            return GetText(string.Empty, key, null, GetLanguage());
         }
 
         /// <summary>
@@ -156,7 +155,7 @@ namespace umbraco
         /// <returns></returns>
         public static string GetText(string area, string key)
         {
-            return GetText(area, key, null, getLanguage());
+            return GetText(area, key, null, GetLanguage());
         }
 
         /// <summary>
@@ -168,7 +167,7 @@ namespace umbraco
         /// <returns></returns>
         public static string GetText(string area, string key, string[] variables)
         {
-            return GetText(area, key, variables, getLanguage());
+            return GetText(area, key, variables, GetLanguage());
         }
 
         /// <summary>
@@ -180,7 +179,7 @@ namespace umbraco
         /// <returns></returns>
         public static string GetText(string area, string key, string variable)
         {
-            return GetText(area, key, new string[] { variable }, getLanguage());
+            return GetText(area, key, new[] { variable }, GetLanguage());
         }
 
         /// <summary>
@@ -199,9 +198,9 @@ namespace umbraco
 
             if (string.IsNullOrEmpty(language))
                 language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
-            
-            XmlDocument langFile = getLanguageFile(language);
-            
+
+            var langFile = getLanguageFile(language);
+
             if (langFile != null)
             {
                 XmlNode node;
@@ -213,17 +212,14 @@ namespace umbraco
                 {
                     node = langFile.SelectSingleNode(string.Format("//area [@alias = '{0}']/key [@alias = '{1}']", area, key));
                 }
-                
+
                 if (node != null)
                 {
                     if (variables != null && variables.Length > 0)
                     {
                         return GetStringWithVars(node, variables);
                     }
-                    else
-                    {
-                        return xmlHelper.GetNodeValue(node);
-                    }
+                    return xmlHelper.GetNodeValue(node);
                 }
             }
             return "[" + key + "]";
@@ -231,15 +227,14 @@ namespace umbraco
 
         private static string GetStringWithVars(XmlNode node, string[] variables)
         {
-            string stringWithVars = xmlHelper.GetNodeValue(node);
-            MatchCollection vars =
-                Regex.Matches(stringWithVars, @"\%(\d)\%",
-                              RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+            var stringWithVars = xmlHelper.GetNodeValue(node);
+            var vars = Regex.Matches(stringWithVars, @"\%(\d)\%",
+                                     RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
             foreach (Match var in vars)
             {
-                stringWithVars =
-                    stringWithVars.Replace(var.Value,
-                                           variables[Convert.ToInt32(var.Groups[0].Value.Replace("%", ""))]);
+                stringWithVars = stringWithVars.Replace(
+                    var.Value,
+                    variables[Convert.ToInt32(var.Groups[0].Value.Replace("%", ""))]);
             }
             return stringWithVars;
         }
@@ -251,40 +246,31 @@ namespace umbraco
         /// <returns></returns>
         public static XmlDocument getLanguageFile(string language)
         {
-            XmlDocument langFile = new XmlDocument();
+            var cacheKey = "uitext_" + language;
 
-            string cacheKey = "uitext_" + language;
-
-            // Check for language file in cache
-            if (HttpRuntime.Cache[cacheKey] == null)
-            {
-                using (XmlTextReader langReader =
-                    new XmlTextReader(
-                        IOHelper.MapPath(umbracoPath + "/config/lang/" + language + ".xml")))
-                {
-                    try
+            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                cacheKey,
+                CacheItemPriority.Default,
+                new CacheDependency(IOHelper.MapPath(UmbracoPath + "/config/lang/" + language + ".xml")),
+                () =>
                     {
-                        langFile.Load(langReader);
-                        HttpRuntime.Cache.Insert(cacheKey, langFile,
-                                                 new CacheDependency(
-                                                     IOHelper.MapPath(umbracoPath + "/config/lang/" +
-                                                                                        language + ".xml")));
-                    }
-                    catch (Exception e)
-                    {
-                        HttpContext.Current.Trace.Warn("ui",
-                                                       "Error reading umbraco language xml source (" + language + ")", e);
-                    }
-                }
-            }
-            else
-                langFile = (XmlDocument) HttpRuntime.Cache["uitext_" + language];
+                        using (var langReader = new XmlTextReader(IOHelper.MapPath(UmbracoPath + "/config/lang/" + language + ".xml")))
+                        {
+                            try
+                            {
+                                var langFile = new XmlDocument();
+                                langFile.Load(langReader);
+                                return langFile;
+                            }
+                            catch (Exception e)
+                            {
+                                LogHelper.Error<ui>("Error reading umbraco language xml source (" + language + ")", e);
+                                return null;
+                            }
+                        }
+                    });
 
-            return langFile;
         }
 
-        private void insertKey(string key, string area, string language) {
-            
-        }
     }
 }

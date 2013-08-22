@@ -1,14 +1,14 @@
-<%@ Control Language="c#" AutoEventWireup="True" CodeBehind="theend.ascx.cs" Inherits="umbraco.presentation.install.steps.theend"
+<%@ Control Language="c#" AutoEventWireup="True" CodeBehind="TheEnd.ascx.cs" Inherits="Umbraco.Web.UI.Install.Steps.TheEnd"
 	TargetSchema="http://schemas.microsoft.com/intellisense/ie5" %>
 <script type="text/javascript">
 jQuery(document).ready(function () {
 
-    $.post("utills/p.aspx?feed=sitebuildervids",
+    $.post("InstallerRestService.aspx?feed=sitebuildervids",
       function (data) {
           jQuery("#ajax-sitebuildervids").html(data);
       });
 
-      $.post("utills/p.aspx?feed=developervids",
+    $.post("InstallerRestService.aspx?feed=developervids",
       function (data) {
           jQuery("#ajax-developervids").html(data);
       });

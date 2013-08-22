@@ -67,7 +67,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 //Do something if adding fails? (Should hopefully not be possible unless someone created a circular reference)
             }
 
-            ((ICanBeDirty)contentType).ResetDirtyProperties();
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            ((Entity)contentType).ResetDirtyProperties(false);
             return contentType;
         }
 
@@ -159,7 +161,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Guid NodeObjectTypeId
         {
-            get { return new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"); }
+            get { return new Guid(Constants.ObjectTypes.DocumentType); }
         }
 
         #endregion

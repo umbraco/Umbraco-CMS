@@ -32,4 +32,5 @@ using System.Security;
 [assembly: InternalsVisibleTo("Umbraco.Web.UI")]
 [assembly: InternalsVisibleTo("Umbraco.Courier.Persistence")]
 [assembly: InternalsVisibleTo("umbraco.webservices")]
-
+[assembly: InternalsVisibleTo("Concorde.Sync")]
+[assembly: InternalsVisibleTo("Umbraco.Belle")]

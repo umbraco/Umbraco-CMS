@@ -24,11 +24,12 @@ using umbraco.DataLayer;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
 using umbraco.BusinessLogic.Actions;
+using Umbraco.Core;
 
 
 namespace umbraco
 {
-    [Tree("settings", "dictionary", "Dictionary", action: "openDictionary()", sortOrder: 3)]
+    [Tree(Constants.Applications.Settings, "dictionary", "Dictionary", action: "openDictionary()", sortOrder: 3)]
     public class loadDictionary : BaseTree
 	{
         public loadDictionary(string application) : base(application) { }

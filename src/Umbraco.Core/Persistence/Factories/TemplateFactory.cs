@@ -37,12 +37,15 @@ namespace Umbraco.Core.Persistence.Factories
                                    Level = dto.NodeDto.Level,
                                    ParentId = dto.NodeDto.ParentId,
                                    SortOrder = dto.NodeDto.SortOrder,
-                                   NodePath = dto.NodeDto.Path
+                                   Path = dto.NodeDto.Path
                                };
             
             if(dto.Master.HasValue)
                 template.MasterTemplateId = new Lazy<int>(() => dto.Master.Value);
 
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            template.ResetDirtyProperties(false);
             return template;
         }
 
@@ -80,7 +83,7 @@ namespace Umbraco.Core.Persistence.Factories
                                   Level = short.Parse(entity.Level.ToString(CultureInfo.InvariantCulture)),
                                   NodeObjectType = _nodeObjectTypeId,
                                   ParentId = entity.ParentId,
-                                  Path = entity.NodePath,
+                                  Path = entity.Path,
                                   SortOrder = entity.SortOrder,
                                   Text = entity.Name,
                                   Trashed = false,

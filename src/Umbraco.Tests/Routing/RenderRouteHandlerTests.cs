@@ -2,29 +2,29 @@
 using System.Web.Routing;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Tests.Stubs;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
+using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.template;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Tests.Routing
 {
 	[TestFixture]
 	public class RenderRouteHandlerTests : BaseRoutingTest
 	{
+        protected override DatabaseBehavior DatabaseTestBehavior
+        {
+            get { return DatabaseBehavior.NewSchemaPerFixture; }
+        }
 
 		public override void Initialize()
-		{
-            //this ensures its reset
-            PluginManager.Current = new PluginManager();
-
-            SurfaceControllerResolver.Current = new SurfaceControllerResolver(
-                PluginManager.Current.ResolveSurfaceControllers());
-
+		{                       
 			base.Initialize();
 
 		    SettingsForTests.UmbracoPath = "~/umbraco";
@@ -36,12 +36,35 @@ namespace Umbraco.Tests.Routing
 			webBoot.CreateRoutes();
 		}
 
+        protected override void FreezeResolution()
+        {
+            DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
+
+            SurfaceControllerResolver.Current = new SurfaceControllerResolver(
+                PluginManager.Current.ResolveSurfaceControllers());
+            UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
+                PluginManager.Current.ResolveUmbracoApiControllers());
+            ShortStringHelperResolver.Current = new ShortStringHelperResolver(new LegacyShortStringHelper());
+
+            base.FreezeResolution();
+        }
+
 		public override void TearDown()
 		{
 			base.TearDown();
-			RouteTable.Routes.Clear();
-			SurfaceControllerResolver.Reset();
+		    UmbracoContext.Current = null;
+			RouteTable.Routes.Clear();			
 		}
+
+        Template CreateTemplate(string alias)
+        {
+            var path = "template";
+            var name = "Template";
+            var template = new Template(path, name, alias);
+            template.Content = ""; // else saving throws with a dirty internal error
+            ApplicationContext.Services.FileService.SaveTemplate(template);
+            return template;
+        }
 
 		/// <summary>
 		/// Will route to the default controller and action since no custom controller is defined for this node route
@@ -49,21 +72,23 @@ namespace Umbraco.Tests.Routing
 		[Test]
 		public void Umbraco_Route_Umbraco_Defined_Controller_Action()
 		{
-			var template = Template.MakeNew("homePage", new User(0));
+            var template = CreateTemplate("homePage");
 			var route = RouteTable.Routes["Umbraco_default"];
 			var routeData = new RouteData() { Route = route };
-			var routingContext = GetRoutingContext("~/dummy-page", template, routeData);
+			var routingContext = GetRoutingContext("~/dummy-page", template.Id, routeData);
 			var docRequest = new PublishedContentRequest(routingContext.UmbracoContext.CleanedUmbracoUrl, routingContext)
 			{
-				PublishedContent = routingContext.PublishedContentStore.GetDocumentById(routingContext.UmbracoContext, 1174),
-				Template = template
+                PublishedContent = routingContext.UmbracoContext.ContentCache.GetById(1174),
+				TemplateModel = template
 			};
 
 			var handler = new RenderRouteHandler(new TestControllerFactory(), routingContext.UmbracoContext);
 
 			handler.GetHandlerForRoute(routingContext.UmbracoContext.HttpContext.Request.RequestContext, docRequest);
 			Assert.AreEqual("RenderMvc", routeData.Values["controller"].ToString());
-			Assert.AreEqual("Index", routeData.Values["action"].ToString());
+            //the route action will still be the one we've asked for because our RenderActionInvoker is the thing that decides
+            // if the action matches.
+            Assert.AreEqual("homePage", routeData.Values["action"].ToString());
 		}
 
 		//test all template name styles to match the ActionName
@@ -72,19 +97,25 @@ namespace Umbraco.Tests.Routing
         [TestCase("home-\\234^^*32page")]
         [TestCase("home-page")]
         [TestCase("home-page")]
-		[TestCase("Home-Page")]
+		[TestCase("Home-Page")] 
 		[TestCase("HomePage")]
 		[TestCase("homePage")]
-		public void Umbraco_Route_User_Defined_Controller_Action(string templateName)
+        [TestCase("site1/template2")]
+        [TestCase("site1\\template2")]
+        public void Umbraco_Route_User_Defined_Controller_Action(string templateName)
 		{
-			var template = Template.MakeNew(templateName, new User(0));
-			var route = RouteTable.Routes["Umbraco_default"];
+            // NOTE - here we create templates with crazy aliases... assuming that these
+            // could exist in the database... yet creating templates should sanitize
+            // aliases one way or another...
+
+            var template = CreateTemplate(templateName);
+            var route = RouteTable.Routes["Umbraco_default"];
 			var routeData = new RouteData() {Route = route};
-			var routingContext = GetRoutingContext("~/dummy-page", template, routeData);
+			var routingContext = GetRoutingContext("~/dummy-page", template.Id, routeData, true);
 			var docRequest = new PublishedContentRequest(routingContext.UmbracoContext.CleanedUmbracoUrl, routingContext)
 				{
-					PublishedContent = routingContext.PublishedContentStore.GetDocumentById(routingContext.UmbracoContext, 1172), 
-					Template = template
+                    PublishedContent = routingContext.UmbracoContext.ContentCache.GetById(1172), 
+					TemplateModel = template
 				};
 
 			var handler = new RenderRouteHandler(new TestControllerFactory(), routingContext.UmbracoContext);
@@ -92,7 +123,8 @@ namespace Umbraco.Tests.Routing
 			handler.GetHandlerForRoute(routingContext.UmbracoContext.HttpContext.Request.RequestContext, docRequest);
 			Assert.AreEqual("CustomDocument", routeData.Values["controller"].ToString());
 		    Assert.AreEqual(
-		        global::umbraco.cms.helpers.Casing.SafeAlias(templateName),
+                //global::umbraco.cms.helpers.Casing.SafeAlias(template.Alias),
+                template.Alias.ToSafeAlias(),
 		        routeData.Values["action"].ToString());
 		}
 

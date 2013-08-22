@@ -1,11 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <language alias="ru" intName="Russian" localName="русский" lcid="" culture="ru-RU">
   <creator>
     <name>Alexander Bryukhov (Unico Design company)</name>
     <link>http://unicodsgn.com</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Управление доменами</key>
+    <key alias="assignDomain">Языки и домены</key>
     <key alias="auditTrail">История исправлений</key>
     <key alias="browse">Просмотреть</key>
     <key alias="copy">Копировать</key>
@@ -42,13 +42,25 @@
     <key alias="domainDeleted">Домен '%0%' удален</key>
     <key alias="domainExists">Домен с именем '%0%' уже существует</key>
     <key alias="domainHelp">
-      <![CDATA[Например: example.com, www.example.com, example.com:8080,<br/>
-        https://www.example.com/, example.com/en, и т.п. Используйте символ '*'<br/>
-        если домен не важен, а нужно просто установить язык.]]>
+      <![CDATA[Примеры допустимых доменных имен: "example.com", "www.example.com", "example.com:8080" или
+        "https://www.example.com/".<br /><br />Также здесь допустимы части адресов URL первого уровня, например "example.com/en",
+        однако их следует по возможности избегать. Рекомендуется использовать настройку культуры (языка), расположенную выше.]]>
     </key>
     <key alias="domainUpdated">Домен '%0%' обновлен</key>
-    <key alias="invalidDomain">Неверное имя домена</key>
+    <key alias="duplicateDomain">Такой домен уже назначен.</key>
+    <key alias="invalidNode">Недопустимый узел.</key>
+    <key alias="invalidDomain">Недопустимый формат домена.</key>
+    <key alias="language">Язык</key>
+    <key alias="inherit">Унаследовать</key>
     <key alias="orEdit">Править существующие домены</key>
+    <key alias="permissionDenied">Недостаточно полномочий.</key>
+    <key alias="remove">удалить</key>
+    <key alias="setLanguage">Язык (культура)</key>
+    <key alias="setLanguageHelp">
+      <![CDATA[Установите язык (культуру) для всех дочерних узлов,<br /> или унаследуйте язык от родительских узлов.<br />
+		Эта установка будет применена также и к текущему узлу, если только для него ниже явно не задан домен.]]>
+    </key>
+    <key alias="setDomains">Домены</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Наблюдать за</key>
@@ -103,6 +115,7 @@
     <key alias="nodeName">Заголовок страницы</key>
     <key alias="otherElements">Свойства</key>
     <key alias="parentNotPublished">Этот документ опубликован, но скрыт, потому что его родительский документ '%0%' не опубликован</key>
+    <key alias="parentNotPublishedAnomaly">ВНИМАНИЕ: этот документ опубликован, но его нет в глобальном кэше (внутренняя ошибка)</key>
     <key alias="publish">Опубликовать</key>
     <key alias="publishStatus">Состояние публикации</key>
     <key alias="releaseDate">Опубликовать</key>
@@ -198,7 +211,7 @@
     <key alias="addPrevalue">Добавить предустановленное значение</key>
     <key alias="dataBaseDatatype">Тип данных в БД</key>
     <key alias="guid">GUID типа данных</key>
-    <key alias="renderControl">Отрисовать элемент</key>
+    <key alias="renderControl">Редактор свойства</key>
     <key alias="rteButtons">Кнопки</key>
     <key alias="rteEnableAdvancedSettings">Включить расширенные настройки для</key>
     <key alias="rteEnableContextMenu">Включить контекстное меню</key>
@@ -223,6 +236,7 @@
   <area alias="errors">
     <key alias="codemirroriewarning">ПРЕДУПРЕЖДЕНИЕ! Несмотря на то, что CodeMirror по-умолчанию разрешен в данной конфигурации, он по-прежнему отключен для браузеров Internet Explorer ввиду нестабильной работы</key>
     <key alias="contentTypeAliasAndNameNotNull">Укажите, пожалуйста, алиас и имя для этого свойства!</key>
+    <key alias="dissallowedMediaType">Использование данного типа файлов на сайте запрещено администратором</key>
     <key alias="filePermissionsError">Ошибка доступа к указанному файлу или папке</key>
     <key alias="missingTitle">Укажите заголовок</key>
     <key alias="missingType">Выберите тип</key>
@@ -485,7 +499,8 @@
     <key alias="moveDone">Узел %0% был перемещён в %1%</key>
     <key alias="moveTo">Выберите, куда должен быть перемещён узел %0%</key>
     <key alias="nodeSelected">был выбран как родительский узел для нового элемента, нажмите 'Ок'.</key>
-    <key alias="noNodeSelected">Не выбран узел! Пожалуйста выберите один из списка, прежде чем нажать 'Ок'.</key>
+    <key alias="noNodeSelected">Не выбран узел! Пожалуйста выберите узел назначения, прежде чем нажать 'Ок'.</key>
+    <key alias="notAllowedAtRoot">Текущий узел не может быть размещен непосредственно в корне дерева</key>
     <key alias="notAllowedByContentType">Текущий узел не может быть размещён в выбранном Вами из-за несоответствия типов.</key>
     <key alias="notAllowedByPath">Текущий узел не может быть перемещен внутрь своих дочерних узлов</key>
     <key alias="notValid">Данное действие не может быть осуществлено, так как Вы не имеете достаточных прав для совершения действий над одним или более дочерними документами.</key>
@@ -509,7 +524,7 @@
     <key alias="mailBodyHtml"><![CDATA[<p>Здравствуйте, %0%</p>
 
 		<p>Это автоматически сгенерированное уведомление. Операция <strong>'%1%'</strong>
-		была произведена на странице <a href="%7%"><strong>'%2%'</strong></a>
+		была произведена на странице <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a>
 		пользователем <strong>'%3%'</strong>.</p>
 
 		<div style="margin: 8px 0; padding: 8px; display: block;">
@@ -569,6 +584,7 @@
     <key alias="packageUpgradeInstructions">Руководство по обновлению</key>
     <key alias="packageUpgradeText">Для данного пакета доступно обновление. Вы можете загрузить это обновление непосредственно из центрального репозитория пакетов Umbraco.</key>
     <key alias="packageVersion">Версия пакета</key>
+    <key alias="packageVersionHistory">История версий пакета</key>
     <key alias="viewPackageWebsite">Перейти на веб-сайт пакета</key>
   </area>
   <area alias="paste">
@@ -596,6 +612,11 @@
     <key alias="paSimpleHelp">Применяйте, если хотите установить самый простой способ доступа к документу - явно указанные имя пользователя и пароль</key>
   </area>
   <area alias="publish">
+    <key alias="contentPublishedFailedInvalid">
+      <![CDATA[
+      Документ %0% не может быть опубликован, так как не все его свойства прошли проверку согласно установленным правилам валидации.
+    ]]>
+    </key>
     <key alias="contentPublishedFailedByEvent"><![CDATA[
 		Документ %0% не может быть опубликован. Операцию отменил установленный в системе пакет дополнений.
 		]]></key>
@@ -696,6 +717,8 @@
     <key alias="editContentSavedText">Не забудьте опубликовать, чтобы сделать видимым</key>
     <key alias="editContentSendToPublish">Отослано на утверждение</key>
     <key alias="editContentSendToPublishText">Изменения отосланы на утверждение</key>
+    <key alias="editMediaSaved">Медиа-элемент сохранен</key>
+    <key alias="editMediaSavedText"></key>
     <key alias="editMemberSaved">Участник сохранен</key>
     <key alias="editStylesheetPropertySaved">Правило стиля CSS сохранено</key>
     <key alias="editStylesheetSaved">Стиль CSS сохранен</key>

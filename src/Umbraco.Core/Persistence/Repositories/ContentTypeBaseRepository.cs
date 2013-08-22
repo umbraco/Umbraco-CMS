@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <typeparam name="TId"></typeparam>
     /// <typeparam name="TEntity"></typeparam>
     internal abstract class ContentTypeBaseRepository<TId, TEntity> : PetaPocoRepositoryBase<TId, TEntity>
-        where TEntity : IContentTypeComposition
+        where TEntity : class, IContentTypeComposition
     {
 		protected ContentTypeBaseRepository(IDatabaseUnitOfWork work)
 			: base(work)
@@ -53,6 +53,20 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 yield return dto.ContentTypeNodeId;
             }
+        }
+
+        /// <summary>
+        /// We need to override this method to ensure that any content cache is cleared
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <remarks>
+        /// see: http://issues.umbraco.org/issue/U4-1963
+        /// </remarks>
+        public override void PersistUpdatedItem(IEntity entity)
+        {
+            InMemoryCacheProvider.Current.Clear(typeof(IContent));
+            RuntimeCacheProvider.Current.Clear(typeof(IContent));
+            base.PersistUpdatedItem(entity);
         }
 
         protected void PersistNewBaseContentType(ContentTypeDto dto, IContentTypeComposition entity)
@@ -186,10 +200,10 @@ namespace Umbraco.Core.Persistence.Repositories
                    .From<ContentDto>()
                    .InnerJoin<NodeDto>()
                    .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                   .Where<NodeDto>(x => x.NodeObjectType == new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"))
+                   .Where<NodeDto>(x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
                    .Where<ContentDto>(x => x.ContentTypeId == entity.Id);
 
-                var contentDtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+                var contentDtos = Database.Fetch<ContentDto, NodeDto>(sql);
                 //Loop through all tracked keys, which corresponds to the ContentTypes that has been removed from the composition
                 foreach (var key in compositionBase.RemovedContentTypeKeyTracker)
                 {
@@ -306,10 +320,12 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
             sql.Select("*")
                .From<ContentTypeAllowedContentTypeDto>()
+               .LeftJoin<ContentTypeDto>()
+               .On<ContentTypeAllowedContentTypeDto, ContentTypeDto>(left => left.AllowedId, right => right.NodeId)
                .Where<ContentTypeAllowedContentTypeDto>(x => x.Id == id);
 
-            var allowedContentTypeDtos = Database.Fetch<ContentTypeAllowedContentTypeDto>(sql);
-            return allowedContentTypeDtos.Select(x => new ContentTypeSort { Id = new Lazy<int>(() => x.AllowedId), SortOrder = x.SortOrder }).ToList();
+            var allowedContentTypeDtos = Database.Fetch<ContentTypeAllowedContentTypeDto, ContentTypeDto>(sql);
+            return allowedContentTypeDtos.Select(x => new ContentTypeSort { Id = new Lazy<int>(() => x.AllowedId), Alias = x.ContentTypeDto.Alias, SortOrder = x.SortOrder }).ToList();
         }
 
         protected PropertyGroupCollection GetPropertyGroupCollection(int id, DateTime createDate, DateTime updateDate)
@@ -363,7 +379,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                 }).ToList();
 
             //Reset dirty properties
-            Parallel.ForEach(list, currentFile => currentFile.ResetDirtyProperties());
+            Parallel.ForEach(list, currentFile => currentFile.ResetDirtyProperties(false));
 
             return new PropertyTypeCollection(list);
         }

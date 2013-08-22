@@ -56,8 +56,6 @@ namespace Umbraco.Tests.Migrations.Upgrades
             Path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", Path);
 
-            Resolution.Freeze();
-
             //Delete database file before continueing
             string filePath = string.Concat(Path, "\\UmbracoPetaPocoTests.sdf");
             if (File.Exists(filePath))
@@ -67,6 +65,8 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
             //Get the connectionstring settings from config
             var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+
+            Resolution.Freeze();
 
             //Create the Sql CE database
             var engine = new SqlCeEngine(settings.ConnectionString);
@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         public virtual void TearDown()
         {
             SqlSyntaxContext.SqlSyntaxProvider = null;
-            Resolution.IsFrozen = false;
+            Resolution.Reset();
 
             TestHelper.CleanContentDirectories();
 
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf", "System.Data.SqlServerCe.4.0");
+            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;File Access Retry Timeout=10", "System.Data.SqlServerCe.4.0");
         }
 
         public string GetDatabaseSpecificSqlScript()

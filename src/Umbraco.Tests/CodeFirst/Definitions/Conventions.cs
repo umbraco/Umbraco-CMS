@@ -50,18 +50,18 @@ namespace Umbraco.Tests.CodeFirst.Definitions
         {
             if (type == typeof(bool))
             {
-                return GetDataTypeByControlId(new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a"));// Yes/No DataType
+                return GetDataTypeByControlId(new Guid(Constants.PropertyEditors.TrueFalse));// Yes/No DataType
             }
             if (type == typeof(int))
             {
-                return GetDataTypeByControlId(new Guid("1413afcb-d19a-4173-8e9a-68288d2a73b8"));// Number DataType
+                return GetDataTypeByControlId(new Guid(Constants.PropertyEditors.Integer));// Number DataType
             }
             if (type == typeof(DateTime))
             {
-                return GetDataTypeByControlId(new Guid("23e93522-3200-44e2-9f29-e61a6fcbb79a"));// Date Picker DataType
+                return GetDataTypeByControlId(new Guid(Constants.PropertyEditors.Date));// Date Picker DataType
             }
 
-            return GetDataTypeByControlId(new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea"));// Standard textfield
+            return GetDataTypeByControlId(new Guid(Constants.PropertyEditors.Textbox));// Standard textfield
         }
 
         /// <summary>

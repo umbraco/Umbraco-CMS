@@ -1,25 +1,21 @@
-@inherits PartialViewMacroPage
-@using Umbraco.Cms.Web
-@using Umbraco.Cms.Web.Macros
-@using Umbraco.Framework
-
+@inherits umbraco.MacroEngines.DynamicNodeContext
 
 @* Ensure that the Current Page has children, where the property umbracoNaviHide is not True *@
-@if (CurrentPage.Children.Where("umbracoNaviHide != @0", "True").Any())
+@if (Model.Children.Where("Visible").Any())
 {
     @* Get the first page in the children, where the property umbracoNaviHide is not True *@
-    var naviLevel = CurrentPage.Children.Where("umbracoNaviHide != @0", "True").First().Level;
+    var naviLevel = Model.Children.Where("Visible").First().Level;
     
     @* Add in level for a CSS hook *@
     <ul class="level-@naviLevel">            
         @* For each child page under the root node, where the property umbracoNaviHide is not True *@
-        @foreach (var childPage in CurrentPage.Children.Where("umbracoNaviHide != @0", "True"))
+        @foreach (var childPage in Model.Children.Where("Visible"))
         {
             <li>
                 <a href="@childPage.Url">@childPage.Name</a>
 
                 @* if the current page has any children, where the property umbracoNaviHide is not True *@
-                @if (childPage.Children.Where("umbracoNaviHide != @0", "True").Any())
+                @if (childPage.Children.Where("Visible").Any())
                 {                    
                     @* Call our helper to display the children *@
                     @childPages(childPage.Children)
@@ -40,13 +36,13 @@
         
         @* Add in level for a CSS hook *@
         <ul class="level-@(naviLevel)">
-            @foreach (var page in pages.Where("umbracoNaviHide != @0", "True"))
+            @foreach (var page in pages.Where("Visible"))
             {
                 <li>
                     <a href="@page.Url">@page.Name</a>
                     
                     @* if the current page has any children, where the property umbracoNaviHide is not True *@
-                    @if (page.Children.Where("umbracoNaviHide != @0", "True").Any())
+                    @if (page.Children.Where("Visible").Any())
                     {                        
                         @* Call our helper to display the children *@
                         @childPages(page.Children)

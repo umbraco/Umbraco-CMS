@@ -1,6 +1,10 @@
-using System;
+﻿using System;
 using System.Diagnostics;
+using System.Web.Mvc;
 using System.Web.UI;
+using StackExchange.Profiling;
+using Umbraco.Core.Profiling;
+using Umbraco.Web;
 using umbraco.presentation.LiveEditing;
 using umbraco.presentation.LiveEditing.Controls;
 using System.IO;
@@ -23,11 +27,32 @@ namespace umbraco.presentation.masterpages
             }
         }
 
+        protected override void OnPreRender(EventArgs e)
+        {
+            base.OnPreRender(e);
+        }
+
         protected override void Render(HtmlTextWriter writer)
         {
-            if (!m_LiveEditingContext.Enabled)
+            if (m_LiveEditingContext.Enabled == false)
             {
-                base.Render(writer);
+                // profiling
+                if (string.IsNullOrEmpty(Request.QueryString["umbDebug"]) == false && GlobalSettings.DebugMode)
+                {
+                    var baseWriter = new StringWriter();
+                    base.Render(new HtmlTextWriter(baseWriter));
+                    var baseOutput = baseWriter.ToString();
+
+                    var htmlHelper = new HtmlHelper(new ViewContext(), new ViewPage());
+                    baseOutput = baseOutput.Replace("</body>", htmlHelper.RenderProfiler() + "</body>");
+                    writer.Write(baseOutput);
+                }
+
+                else
+                {
+
+                    base.Render(writer);
+                }
             }
             else
             {
@@ -50,13 +75,17 @@ namespace umbraco.presentation.masterpages
             if (m_LiveEditingContext.Enabled)
             {
                 // require an ASP.Net form
-                if (Page.Form == null) {
+                if (Page.Form == null)
+                {
                     //turn live editing off so it won't annoying the hell out of people who doesn't have a form and try to refresh the page... 
                     UmbracoContext.Current.LiveEditingContext.Enabled = false;
                     throw new ApplicationException("Umbraco Canvas requires an ASP.Net form to function properly. Live editing has been turned off.");
-                } else {
+                }
+                else
+                {
                     // add a ScriptManager to the form if not present
-                    if (ScriptManager.GetCurrent(Page) == null) {
+                    if (ScriptManager.GetCurrent(Page) == null)
+                    {
                         Page.Form.Controls.Add(new ScriptManager());
                     }
 
@@ -65,5 +94,14 @@ namespace umbraco.presentation.masterpages
                 }
             }
         }
+
+        /// <summary>
+        /// ContentPlaceHolderDefault control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ContentPlaceHolder ContentPlaceHolderDefault;
     }
 }

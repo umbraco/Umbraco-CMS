@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Tests.TestHelpers;
@@ -12,7 +13,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Clause()
         {
-            var NodeObjectType = new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB");
+            var NodeObjectType = new Guid(Constants.ObjectTypes.DocumentType);
 
             var expected = new Sql();
             expected.Select("*")
@@ -42,7 +43,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Where_Clause()
         {
-            var NodeObjectType = new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB");
+            var NodeObjectType = new Guid(Constants.ObjectTypes.DocumentType);
 
             var expected = new Sql();
             expected.Select("*")

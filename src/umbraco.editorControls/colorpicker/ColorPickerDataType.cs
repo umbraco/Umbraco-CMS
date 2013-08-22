@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.colorpicker
 {
@@ -38,7 +39,7 @@ namespace umbraco.editorControls.colorpicker
 		}
 		public override Guid Id 
 		{
-			get {return new Guid("F8D60F68-EC59-4974-B43B-C46EB5677985");}
+			get { return new Guid(Constants.PropertyEditors.ColorPicker); }
 		}
 
 		public override interfaces.IDataPrevalue PrevalueEditor 

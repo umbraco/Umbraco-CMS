@@ -99,7 +99,7 @@ namespace Umbraco.Tests
             public IEnumerable<TestItem> Children { get; set; }
         }
 
-        [Test]
+	    [Test]
         public void InGroupsOf_ReturnsAllElements()
         {
             var integers = new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };

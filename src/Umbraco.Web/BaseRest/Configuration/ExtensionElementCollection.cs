@@ -9,7 +9,7 @@ namespace Umbraco.Web.BaseRest.Configuration
 	[ConfigurationCollection(typeof(ExtensionElement), CollectionType = ConfigurationElementCollectionType.BasicMapAlternate)]
 	public class ExtensionElementCollection : ConfigurationElementCollection
 	{
-		const string Key_Extension = "extension";
+		const string KeyExtension = "extension";
 
 		public override ConfigurationElementCollectionType CollectionType
 		{
@@ -18,12 +18,12 @@ namespace Umbraco.Web.BaseRest.Configuration
 
 		protected override string ElementName
 		{
-			get { return Key_Extension; }
+			get { return KeyExtension; }
 		}
 
 		protected override bool IsElementName(string elementName)
 		{
-			return elementName.Equals(Key_Extension, StringComparison.InvariantCultureIgnoreCase);
+			return elementName.Equals(KeyExtension, StringComparison.InvariantCultureIgnoreCase);
 		}
 
 		protected override ConfigurationElement CreateNewElement()

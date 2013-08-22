@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 
@@ -17,10 +14,10 @@ namespace Umbraco.Tests.PublishedContent
 	[TestFixture]
     public class PublishedContentTests : PublishedContentTestBase
 	{
-		protected override bool RequiresDbSetup
-		{
-			get { return false; }
-		}
+        protected override DatabaseBehavior DatabaseTestBehavior
+        {
+            get { return DatabaseBehavior.NoDatabasePerFixture; }
+        }
 
 		protected override string GetXmlContent(int templateId)
 		{
@@ -64,25 +61,46 @@ namespace Umbraco.Tests.PublishedContent
 </root>";
 		}
 
-		public override void Initialize()
-		{
-			base.Initialize();
-		}
-
-		public override void TearDown()
-		{
-			base.TearDown();
-			
-		}
-
 		internal IPublishedContent GetNode(int id)
 		{
 			var ctx = GetUmbracoContext("/test", 1234);
-			var contentStore = new DefaultPublishedContentStore();
-			var doc = contentStore.GetDocumentById(ctx, id);
+			var doc = ctx.ContentCache.GetById(id);
 			Assert.IsNotNull(doc);
 			return doc;
 		}
+
+        [Test]
+        [Ignore("IPublishedContent currently (6.1 as of april 25, 2013) has bugs")]
+        public void Fails()
+        {
+            var content = GetNode(1173);
+
+            var c1 = content.Children.First(x => x.Id == 1177);
+            Assert.IsFalse(c1.IsFirst());
+
+            var c2 = content.Children.Where(x => x.DocumentTypeAlias == "CustomDocument").First(x => x.Id == 1177);
+            Assert.IsTrue(c2.IsFirst());
+
+            // First is not implemented
+            var c2a = content.Children.First(x => x.DocumentTypeAlias == "CustomDocument" && x.Id == 1177);
+            Assert.IsTrue(c2a.IsFirst()); // so here it's luck
+
+            c1 = content.Children.First(x => x.Id == 1177);
+            Assert.IsFalse(c1.IsFirst()); // and here it fails
+
+            // but even using supported (where) method...
+            // do not replace by First(x => ...) here since it's not supported at the moment
+            c1 = content.Children.Where(x => x.Id == 1177).First();
+            c2 = content.Children.Where(x => x.DocumentTypeAlias == "CustomDocument" && x.Id == 1177).First();
+
+            Assert.IsFalse(c1.IsFirst()); // here it fails because c2 has corrupted it
+
+            // so there's only 1 IPublishedContent instance
+            // which keeps changing collection, ie being modified
+            // which is *bad* from a cache point of vue
+            // and from a consistency point of vue...
+            // => we want clones!
+        }
 
         [Test]
         public void Is_Last_From_Where_Filter_Dynamic_Linq()
@@ -337,7 +355,7 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var doc = GetNode(1173);
 
-			var hasProp = doc.HasProperty("umbracoUrlAlias");
+			var hasProp = doc.HasProperty(Constants.Conventions.Content.UrlAlias);
 
 			Assert.AreEqual(true, (bool)hasProp);
 
@@ -349,7 +367,7 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var doc = GetNode(1173);
 
-			var hasValue = doc.HasValue("umbracoUrlAlias");
+			var hasValue = doc.HasValue(Constants.Conventions.Content.UrlAlias);
 			var noValue = doc.HasValue("blahblahblah");
 
 			Assert.IsTrue(hasValue);

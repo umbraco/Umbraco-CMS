@@ -9,6 +9,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core;
 
 namespace umbraco.presentation.actions
 {
@@ -20,7 +21,7 @@ namespace umbraco.presentation.actions
         {
             d = new Document(int.Parse(helper.Request("id")));
 
-            if (!base.ValidateUserApp("content"))
+            if (!base.ValidateUserApp(Constants.Applications.Content))
                 throw new ArgumentException("The current user doesn't have access to this application. Please contact the system administrator.");
             if (!base.ValidateUserNodeTreePermissions(d.Path, "D"))
                 throw new ArgumentException("The current user doesn't have permissions to delete this document. Please contact the system administrator.");
@@ -37,8 +38,7 @@ namespace umbraco.presentation.actions
             deleted.Text =  "'" + d.Text + "' " + ui.Text("deleted");
             deleteMessage.Visible = true;
             confirm.Visible = false;
-            if (d.Published)
-                library.UnPublishSingleNode(d.Id);
+            
             d.delete();
         }
     }

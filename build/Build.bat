@@ -1,9 +1,11 @@
 @ECHO OFF
-SET release=6.0.6
+SET release=6.1.4
 SET comment=
 SET version=%release%
 
 IF [%comment%] EQU [] (SET version=%release%) ELSE (SET version=%release%-%comment%)
+
+ReplaceIISExpressPortNumber.exe ..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj %release%
 
 %windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe "Build.proj" /p:BUILD_RELEASE=%release% /p:BUILD_COMMENT=%comment%
 

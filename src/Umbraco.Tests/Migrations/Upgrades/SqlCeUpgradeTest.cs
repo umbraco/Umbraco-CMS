@@ -1,10 +1,12 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
 using NUnit.Framework;
 using SQLCE4Umbraco;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Migrations.Upgrades
 {
@@ -13,31 +15,45 @@ namespace Umbraco.Tests.Migrations.Upgrades
     {
         public override void DatabaseSpecificSetUp()
         {
-            //Delete database file before continueing
             string filePath = string.Concat(Path, "\\UmbracoPetaPocoTests.sdf");
-            if (File.Exists(filePath))
+
+            if (!File.Exists(filePath))
             {
-                File.Delete(filePath);
+                try
+                {
+                    //Delete database file before continueing                    
+                    if (File.Exists(filePath))
+                    {
+                        File.Delete(filePath);
+                    }
+                }
+                catch (Exception)
+                {
+                    //if this doesn't work we have to make sure everything is reset! otherwise
+                    // well run into issues because we've already set some things up
+                    TearDown();
+                    throw;
+                }
+
+                //Create the Sql CE database
+                //Get the connectionstring settings from config
+                var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+                var engine = new SqlCeEngine(settings.ConnectionString);
+                engine.CreateDatabase();
             }
-
-            //Get the connectionstring settings from config
-            var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
-
-            //Create the Sql CE database
-            var engine = new SqlCeEngine(settings.ConnectionString);
-            engine.CreateDatabase();
+            else
+            {
+                TestHelper.ClearDatabase();
+            }
+            
         }
 
         public override void DatabaseSpecificTearDown()
         {
             //legacy API database connection close
             SqlCeContextGuardian.CloseBackgroundConnection();
-			
-            string filePath = string.Concat(Path, "\\UmbracoPetaPocoTests.sdf");
-            if (File.Exists(filePath))
-            {
-                File.Delete(filePath);
-            }
+
+            TestHelper.ClearDatabase();
         }
 
         public override ISqlSyntaxProvider GetSyntaxProvider()
@@ -47,7 +63,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public override UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf", "System.Data.SqlServerCe.4.0");
+            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;File Access Retry Timeout=10", "System.Data.SqlServerCe.4.0");
         }
 
         public override DatabaseProviders GetDatabaseProvider()

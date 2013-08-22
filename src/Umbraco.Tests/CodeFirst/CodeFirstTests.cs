@@ -5,15 +5,12 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Serialization;
 using Umbraco.Tests.CodeFirst.Definitions;
 using Umbraco.Tests.CodeFirst.TestModels;
 using Umbraco.Tests.CodeFirst.TestModels.Composition;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using umbraco.editorControls.tinyMCE3;
-using umbraco.interfaces;
 
 namespace Umbraco.Tests.CodeFirst
 {
@@ -24,25 +21,11 @@ namespace Umbraco.Tests.CodeFirst
         public override void Initialize()
         {
             UmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
-
-            //this ensures its reset
-            PluginManager.Current = new PluginManager();
-
-            //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-            PluginManager.Current.AssembliesToScan = new[]
-				{
-                    typeof(IDataType).Assembly,
-                    typeof(tinyMCE3dataType).Assembly,
-                    typeof (ContentTypeBase).Assembly
-				};
-
-            DataTypesResolver.Current = new DataTypesResolver(
-                () => PluginManager.Current.ResolveDataTypes());
-
+           
             base.Initialize();
 
-            var serviceStackSerializer = new ServiceStackJsonSerializer();
-            SerializationService = new SerializationService(serviceStackSerializer);
+            var jsonNetSerializer = new JsonNetSerializer();
+            SerializationService = new SerializationService(jsonNetSerializer);
         }
 
         [Test]
@@ -72,8 +55,8 @@ namespace Umbraco.Tests.CodeFirst
             Assert.That(contentType.Value.PropertyTypes.Count(), Is.EqualTo(2));
 
             var result = SerializationService.ToStream(contentType.Value);
-            var xml = result.ResultStream.ToJsonString();
-            Console.WriteLine(xml);
+            var json = result.ResultStream.ToJsonString();
+            Console.WriteLine(json);
         }
 
         [Test]
@@ -103,8 +86,8 @@ namespace Umbraco.Tests.CodeFirst
             Assert.That(contentType.Value.PropertyTypes.Count(), Is.EqualTo(5));
 
             var result = SerializationService.ToStream(contentType.Value);
-            var xml = result.ResultStream.ToJsonString();
-            Console.WriteLine(xml);
+            var json = result.ResultStream.ToJsonString();
+            Console.WriteLine(json);
         }
 
         [Test]
@@ -230,18 +213,7 @@ namespace Umbraco.Tests.CodeFirst
         {
 			base.TearDown();
 
-            //reset the app context
-            DataTypesResolver.Reset();
-            ApplicationContext.Current = null;
-            Resolution.IsFrozen = false;
-            PluginManager.Current = null;
-
-            string path = TestHelper.CurrentAssemblyDirectory;
-            AppDomain.CurrentDomain.SetData("DataDirectory", null);
-            
             SerializationService = null;
-
-            UmbracoSettings.ResetSetters();
         }
     }
 }

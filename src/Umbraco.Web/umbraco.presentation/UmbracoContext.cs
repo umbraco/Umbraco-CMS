@@ -68,65 +68,27 @@ namespace umbraco.presentation
         /// <summary>
         /// Gets the current page ID, or <c>null</c> if no page ID is available (e.g. a custom page).
         /// </summary>
-        public virtual int? PageId
-        {
-            get
-            {
-                try
-                {
-                    return int.Parse(_httpContext.Items["pageID"].ToString());
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-        }
+        public virtual int? PageId { get { return Umbraco.Web.UmbracoContext.Current.PageId; } }
 
         /// <summary>
         /// Gets the current logged in Umbraco user (editor).
         /// </summary>
         /// <value>The Umbraco user object or null</value>
-        public virtual User UmbracoUser
-        {
-            get
-            {
-                return BasePages.UmbracoEnsuredPage.CurrentUser;
-            }
-
-        }
+        public virtual User UmbracoUser { get { return Umbraco.Web.UmbracoContext.Current.UmbracoUser; } }
 
         /// <summary>
         /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>
-        public virtual bool InPreviewMode
-        {
-            get
-            {
-                string currentUrl = Request.Url.AbsolutePath;
-                // zb-00004 #29956 : refactor cookies names & handling
-                return
-                    StateHelper.Cookies.Preview.HasValue // has preview cookie
-                    && UmbracoUser != null // has user
-                    && !currentUrl.StartsWith(IO.IOHelper.ResolveUrl(IO.SystemDirectories.Umbraco)); // is not in admin UI
-            }
-        }
+        public virtual bool InPreviewMode { get { return Umbraco.Web.UmbracoContext.Current.InPreviewMode; } }
 
         public XmlDocument GetXml()
         {
-            if (InPreviewMode)
-            {
-                if (_previewContent == null)
-                {
-                    _previewContent = new PreviewContent(UmbracoUser, new Guid(StateHelper.Cookies.Preview.GetValue()), true);
-                    if (_previewContent.ValidPreviewSet)
-                        _previewContent.LoadPreviewset();
-                }
-                if (_previewContent.ValidPreviewSet)
-                    return _previewContent.XmlContent;
-            }
-            return content.Instance.XmlContent;
+            var umbracoContext = Umbraco.Web.UmbracoContext.Current;
+            var cache = umbracoContext.ContentCache.InnerCache as Umbraco.Web.PublishedCache.XmlPublishedCache.PublishedContentCache;
+            if (cache == null)
+                throw new InvalidOperationException("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
+            return cache.GetXml(umbracoContext, umbracoContext.InPreviewMode);
         }
 
         /// <summary>

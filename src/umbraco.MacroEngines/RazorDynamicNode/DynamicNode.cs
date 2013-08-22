@@ -39,10 +39,10 @@ namespace umbraco.MacroEngines
 
         #region consts
         // these are private readonlys as const can't be Guids
-        private readonly Guid DATATYPE_YESNO_GUID = new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a");
-        private readonly Guid DATATYPE_TINYMCE_GUID = new Guid("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
-        private readonly Guid DATATYPE_DATETIMEPICKER_GUID = new Guid("b6fb1622-afa5-4bbf-a3cc-d9672a442222");
-        private readonly Guid DATATYPE_DATEPICKER_GUID = new Guid("23e93522-3200-44e2-9f29-e61a6fcbb79a");
+        private readonly Guid DATATYPE_YESNO_GUID = new Guid(Constants.PropertyEditors.TrueFalse);
+        private readonly Guid DATATYPE_TINYMCE_GUID = new Guid(Constants.PropertyEditors.TinyMCEv3);
+        private readonly Guid DATATYPE_DATETIMEPICKER_GUID = new Guid(Constants.PropertyEditors.DateTime);
+        private readonly Guid DATATYPE_DATEPICKER_GUID = new Guid(Constants.PropertyEditors.Date);
         //private readonly Guid DATATYPE_INTEGER_GUID = new Guid("1413afcb-d19a-4173-8e9a-68288d2a73b8");
         #endregion
 
@@ -1234,7 +1234,7 @@ namespace umbraco.MacroEngines
             get
             {
                 if (n == null) return true;
-                IProperty umbracoNaviHide = n.GetProperty("umbracoNaviHide");
+                IProperty umbracoNaviHide = n.GetProperty(Constants.Conventions.Content.NaviHide);
                 if (umbracoNaviHide != null)
                 {
                     return umbracoNaviHide.Value != "1";

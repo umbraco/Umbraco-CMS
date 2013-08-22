@@ -1,5 +1,8 @@
 using System;
 using System.Collections;
+using System.Web.Caching;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using umbraco.DataLayer;
 using System.Collections.Generic;
@@ -25,9 +28,6 @@ namespace umbraco.BusinessLogic
         private bool _userNoConsole;
         private bool _userDisabled;
         private bool _defaultToLiveEditing;
-
-        private Hashtable _cruds = new Hashtable();
-        private bool _crudsInitialized = false;
 
         private Hashtable _notifications = new Hashtable();
         private bool _notificationsInitialized = false;
@@ -646,12 +646,15 @@ namespace umbraco.BusinessLogic
             OnDisabling(EventArgs.Empty);
             //change disabled and userLogin (prefix with yyyyMMdd_ )
             this.Disabled = true;
+            //MUST clear out the umbraco logins otherwise if they are still logged in they can still do stuff:
+            //http://issues.umbraco.org/issue/U4-2042
+            SqlHelper.ExecuteNonQuery("delete from umbracoUserLogins where userID = @id", SqlHelper.CreateParameter("@id", Id));
             //can't rename if it's going to take up too many chars
             if (this.LoginName.Length + 9 <= 125)
             {
                 this.LoginName = DateTime.Now.ToString("yyyyMMdd") + "_" + this.LoginName;
             }
-
+            this.Save();
         }
 
         /// <summary>
@@ -663,52 +666,56 @@ namespace umbraco.BusinessLogic
         {
             if (!_isInitialized)
                 setupUser(_id);
-            string cruds = UserType.DefaultPermissions;
+            string defaultPermissions = UserType.DefaultPermissions;
 
-            if (!_crudsInitialized)
-                initCruds();
+            //get the cached permissions for the user
+            var cachedPermissions = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                string.Format("{0}{1}", CacheKeys.UserPermissionsCacheKey, _id),
+                //Since this cache can be quite large (http://issues.umbraco.org/issue/U4-2161) we will make this priority below average
+                CacheItemPriority.BelowNormal, 
+                null,
+                //Since this cache can be quite large (http://issues.umbraco.org/issue/U4-2161) we will only have this exist in cache for 20 minutes, 
+                // then it will refresh from the database.
+                new TimeSpan(0, 20, 0),
+                () =>
+                    {
+                        var cruds = new Hashtable();
+                        using (var dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodePermission where userId = @userId order by nodeId", SqlHelper.CreateParameter("@userId", this.Id)))
+                        {
+                            while (dr.Read())
+                            {
+                                if (!cruds.ContainsKey(dr.GetInt("nodeId")))
+                                {
+                                    cruds.Add(dr.GetInt("nodeId"), string.Empty);
+                                }
+                                cruds[dr.GetInt("nodeId")] += dr.GetString("permission");
+                            }
+                        }
+                        return cruds;
+                    });
 
             // NH 4.7.1 changing default permission behavior to default to User Type permissions IF no specific permissions has been
             // set for the current node
-            int nodeId = Path.Contains(",") ? int.Parse(Path.Substring(Path.LastIndexOf(",")+1)) : int.Parse(Path);
-            if (_cruds.ContainsKey(nodeId))
+            var nodeId = Path.Contains(",") ? int.Parse(Path.Substring(Path.LastIndexOf(",", StringComparison.Ordinal)+1)) : int.Parse(Path);
+            if (cachedPermissions.ContainsKey(nodeId))
             {
-                return _cruds[int.Parse(Path.Substring(Path.LastIndexOf(",")+1))].ToString();
+                return cachedPermissions[int.Parse(Path.Substring(Path.LastIndexOf(",", StringComparison.Ordinal) + 1))].ToString();
             }
 
             // exception to everything. If default cruds is empty and we're on root node; allow browse of root node
-            if (String.IsNullOrEmpty(cruds) && Path == "-1")
-                cruds = "F";
+            if (string.IsNullOrEmpty(defaultPermissions) && Path == "-1")
+                defaultPermissions = "F";
 
             // else return default user type cruds
-            return cruds;
+            return defaultPermissions;
         }
 
         /// <summary>
         /// Initializes the user node permissions
         /// </summary>
+        [Obsolete("This method doesn't do anything whatsoever and will be removed in future versions")]
         public void initCruds()
-        {
-            if (!_isInitialized)
-                setupUser(_id);
-
-            // clear cruds
-            System.Web.HttpContext.Current.Application.Lock();
-            _cruds.Clear();
-            System.Web.HttpContext.Current.Application.UnLock();
-
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodePermission where userId = @userId order by nodeId", SqlHelper.CreateParameter("@userId", this.Id)))
-            {
-                //	int currentId = -1;
-                while (dr.Read())
-                {
-                    if (!_cruds.ContainsKey(dr.GetInt("nodeId")))
-                        _cruds.Add(dr.GetInt("nodeId"), String.Empty);
-
-                    _cruds[dr.GetInt("nodeId")] += dr.GetString("permission");
-                }
-            }
-            _crudsInitialized = true;
+        {            
         }
 
         /// <summary>
@@ -896,12 +903,11 @@ namespace umbraco.BusinessLogic
         /// <summary>
         /// Flushes the user from cache.
         /// </summary>
+        [Obsolete("This method should not be used, cache flushing is handled automatically by event handling in the web application and ensures that all servers are notified, this will not notify all servers in a load balanced environment")]
         public void FlushFromCache()
         {
             OnFlushingFromCache(EventArgs.Empty);
-
-            if (System.Web.HttpRuntime.Cache[string.Format("UmbracoUser{0}", Id.ToString())] != null)
-                System.Web.HttpRuntime.Cache.Remove(string.Format("UmbracoUser{0}", Id.ToString()));
+            ApplicationContext.Current.ApplicationCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.UserCacheKey, Id.ToString()));            
         }
 
         /// <summary>
@@ -911,22 +917,19 @@ namespace umbraco.BusinessLogic
         /// <returns></returns>
         public static User GetUser(int id)
         {
-            if (System.Web.HttpRuntime.Cache[string.Format("UmbracoUser{0}", id.ToString())] == null)
-            {
-
-                try
-                {
-                    User u = new User(id);
-                    System.Web.HttpRuntime.Cache.Insert(string.Format("UmbracoUser{0}", id.ToString()), u);
-                }
-                catch (ArgumentException)
-                {
-                    //no user was found
-                    return null;
-                }
-
-            }
-            return (User)System.Web.HttpRuntime.Cache[string.Format("UmbracoUser{0}", id.ToString())];
+            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                string.Format("{0}{1}", CacheKeys.UserCacheKey, id.ToString()), () =>
+                    {
+                        try
+                        {
+                            return new User(id);
+                        }
+                        catch (ArgumentException)
+                        {
+                            //no user was found
+                            return null;
+                        }
+                    });
         }
 
 

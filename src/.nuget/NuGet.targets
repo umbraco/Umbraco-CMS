@@ -17,7 +17,8 @@
     </PropertyGroup>
     
     <ItemGroup Condition=" '$(PackageSources)' == '' ">
-        <!-- Package sources used to restore packages. By default will used the registered sources under %APPDATA%\NuGet\NuGet.Config -->
+        <!-- Package sources used to restore packages. By default, registered sources under %APPDATA%\NuGet\NuGet.Config will be used -->
+        <!-- The official NuGet package source (https://nuget.org/api/v2/) will be excluded if package sources are specified and it does not appear in the list -->
         <!--
             <PackageSource Include="https://nuget.org/api/v2/" />
             <PackageSource Include="https://my-nuget-source/nuget/" />
@@ -54,10 +55,10 @@
         <BuildCommand>$(NuGetCommand) pack "$(ProjectPath)" -p Configuration=$(Configuration) -o "$(PackageOutputDir)" -symbols</BuildCommand>
 
         <!-- We need to ensure packages are restored prior to assembly resolve -->
-        <ResolveReferencesDependsOn Condition="$(RestorePackages) == 'true'">
+        <BuildDependsOn Condition="$(RestorePackages) == 'true'">
             RestorePackages;
-            $(ResolveReferencesDependsOn);
-        </ResolveReferencesDependsOn>
+            $(BuildDependsOn);
+        </BuildDependsOn>
 
         <!-- Make the build depend on restore packages -->
         <BuildDependsOn Condition="$(BuildPackage) == 'true'">
@@ -75,7 +76,7 @@
         This effectively acts as a lock that makes sure that the download operation will only happen once and all
         parallel builds will have to wait for it to complete.
         -->
-        <MsBuild Targets="_DownloadNuGet" Projects="$(MSBuildThisFileFullPath)" Properties="Configuration=NOT_IMPORTANT" />
+        <MsBuild Targets="_DownloadNuGet" Projects="$(MSBuildThisFileFullPath)" Properties="Configuration=NOT_IMPORTANT;DownloadNuGetExe=$(DownloadNuGetExe)" />
     </Target>
 
     <Target Name="_DownloadNuGet">

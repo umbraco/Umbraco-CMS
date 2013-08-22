@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -19,6 +20,8 @@ namespace Umbraco.Tests.Persistence
 		{
 			RepositoryResolver.Current = new RepositoryResolver(
 				new RepositoryFactory());
+
+            Resolution.Freeze();
 		}
 
 		[TearDown]

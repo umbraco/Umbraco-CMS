@@ -30,7 +30,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         protected void Page_Load(object sender, EventArgs e)
         {
             _stylesheetproperty = new businesslogic.web.StylesheetProperty(int.Parse(Request.QueryString["id"]));
-            Panel1.Text = ui.Text("stylesheet", "editstylesheetproperty", getUser());
+            Panel1.Text = ui.Text("stylesheet", "editstylesheetproperty", UmbracoUser);
 
             if (IsPostBack == false)
             {
@@ -84,7 +84,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
                 _stylesheetproperty.StyleSheet().saveCssToFile();
             }
             catch { }
-            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editStylesheetPropertySaved", getUser()), "");
+            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editStylesheetPropertySaved", UmbracoUser), "");
             SetupPreView();
 
             _stylesheetproperty.Save();

@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <typeparam name="TEntity">Type of <see cref="IAggregateRoot"/> entity for which the repository is used</typeparam>
     /// <typeparam name="TId">Type of the Id used for this entity</typeparam>
     internal abstract class RepositoryBase<TId, TEntity> : DisposableObject, IRepositoryQueryable<TId, TEntity>, IUnitOfWorkRepository 
-		where TEntity : IAggregateRoot
+		where TEntity : class, IAggregateRoot
     {
 		private readonly IUnitOfWork _work;
         private readonly IRepositoryCacheProvider _cache;
@@ -85,11 +85,10 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public TEntity Get(TId id)
         {
-            Guid key = id is int ? ConvertIdToGuid(id) : ConvertStringIdToGuid(id.ToString());
-            var rEntity = _cache.GetById(typeof(TEntity), key);
-            if (rEntity != null)
+            var fromCache = TryGetFromCache(id);
+            if (fromCache.Success)
             {
-                return (TEntity)rEntity;
+                return fromCache.Result;
             }
 
             var entity = PerformGet(id);
@@ -98,8 +97,30 @@ namespace Umbraco.Core.Persistence.Repositories
                 _cache.Save(typeof(TEntity), entity);
             }
 
+            if (entity != null)
+            {
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                TracksChangesEntityBase asEntity = entity as TracksChangesEntityBase;
+                if (asEntity != null)
+                {
+                    asEntity.ResetDirtyProperties(false);
+                }
+            }
+            
             return entity;
         }
+
+        protected Attempt<TEntity> TryGetFromCache(TId id)
+        {
+            Guid key = id is int ? ConvertIdToGuid(id) : ConvertStringIdToGuid(id.ToString());
+            var rEntity = _cache.GetById(typeof(TEntity), key);
+            if (rEntity != null)
+            {
+                return new Attempt<TEntity>(true, (TEntity) rEntity);
+            }
+            return Attempt<TEntity>.False;
+        } 
 
         protected abstract IEnumerable<TEntity> PerformGetAll(params TId[] ids);
         /// <summary>
@@ -162,14 +183,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public bool Exists(TId id)
         {
-            Guid key = id is int ? ConvertIdToGuid(id) : ConvertStringIdToGuid(id.ToString());
-            var rEntity = _cache.GetById(typeof(TEntity), key);
-            if (rEntity != null)
+            var fromCache = TryGetFromCache(id);
+            if (fromCache.Success)
             {
                 return true;
             }
-
-            return PerformExists(id);
+            return PerformExists(id);            
         }
 
         protected abstract int PerformCount(IQuery<TEntity> query);

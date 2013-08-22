@@ -119,7 +119,7 @@ namespace Umbraco.Core
 
 		public static bool IsVisible(this IPublishedContent doc)
 		{
-			var umbracoNaviHide = doc.GetProperty("umbracoNaviHide");
+			var umbracoNaviHide = doc.GetProperty(Constants.Conventions.Content.NaviHide);
 			if (umbracoNaviHide != null)
 			{
 				return umbracoNaviHide.Value.ToString().Trim() != "1";

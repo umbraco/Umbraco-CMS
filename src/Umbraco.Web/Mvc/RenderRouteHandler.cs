@@ -4,8 +4,10 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.SessionState;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
@@ -99,6 +101,12 @@ namespace Umbraco.Web.Mvc
 			requestContext.RouteData.DataTokens.Add("umbraco-context", UmbracoContext); //required for UmbracoTemplatePage
 		}
 
+        private void UpdateRouteDataForRequest(RenderModel renderModel, RequestContext requestContext)
+        {
+            requestContext.RouteData.DataTokens["umbraco"] = renderModel;
+            // the rest should not change -- it's only the published content that has changed
+        }
+
 		/// <summary>
 		/// Checks the request and query strings to see if it matches the definition of having a Surface controller
 		/// posted value, if so, then we return a PostedDataProxyInfo object with the correct information.
@@ -155,7 +163,7 @@ namespace Umbraco.Web.Mvc
 				ReservedAdditionalKeys.Area }.Contains(x.Key)))
 			{
 				// Populate route with additional values which aren't reserved values so they eventually to action parameters
-				requestContext.RouteData.Values.Add(item.Key, item.Value);
+			    requestContext.RouteData.Values[item.Key] = item.Value;
 			}
 
 			//return the proxy info without the surface id... could be a local controller.
@@ -179,35 +187,49 @@ namespace Umbraco.Web.Mvc
 			requestContext.RouteData.Values["controller"] = postedInfo.ControllerName;
 			requestContext.RouteData.Values["action"] = postedInfo.ActionName;
 
-			IHttpHandler handler = new MvcHandler(requestContext);
-
-			//ensure the controllerType is set if found, meaning it is a plugin, not locally declared
-			if (!postedInfo.Area.IsNullOrWhiteSpace())
-			{
-				//requestContext.RouteData.Values["controllerType"] = postedInfo.ControllerType;
-				//find the other data tokens for this route and merge... things like Namespace will be included here
-				using (RouteTable.Routes.GetReadLock())
-				{
-					var surfaceRoute = RouteTable.Routes.OfType<Route>()
-						.SingleOrDefault(x => x.Defaults != null &&
-						                      x.Defaults.ContainsKey("controller") &&
+            IHttpHandler handler;
+            
+            //get the route from the defined routes
+		    using (RouteTable.Routes.GetReadLock())
+		    {
+		        Route surfaceRoute;
+		        if (postedInfo.Area.IsNullOrWhiteSpace())
+		        {
+                    //find the controller in the route table without an area
+		            surfaceRoute = RouteTable.Routes.OfType<Route>()
+		                                         .SingleOrDefault(x => x.Defaults != null &&
+		                                                               x.Defaults.ContainsKey("controller") &&
+		                                                               x.Defaults["controller"].ToString() == postedInfo.ControllerName &&
+		                                                               !x.DataTokens.ContainsKey("area"));                    
+		        }
+                else
+		        {
+                    //find the controller in the route table with the specified area
+		            surfaceRoute = RouteTable.Routes.OfType<Route>()
+		                                         .SingleOrDefault(x => x.Defaults != null &&
+		                                                               x.Defaults.ContainsKey("controller") &&
 						                      x.Defaults["controller"].ToString().InvariantEquals(postedInfo.ControllerName) &&
-						                      x.DataTokens.ContainsKey("area") &&
-						                      x.DataTokens["area"].ToString().InvariantEquals(postedInfo.Area));
-					if (surfaceRoute == null)
-						throw new InvalidOperationException("Could not find a Surface controller route in the RouteTable for controller name " + postedInfo.ControllerName + " and within the area of " + postedInfo.Area);
-                    
-                    requestContext.RouteData.DataTokens["area"] = surfaceRoute.DataTokens["area"];
-                    
-                    //set the 'Namespaces' token so the controller factory knows where to look to construct it
-					if (surfaceRoute.DataTokens.ContainsKey("Namespaces"))
-					{
-						requestContext.RouteData.DataTokens["Namespaces"] = surfaceRoute.DataTokens["Namespaces"];
-					}
-					handler = surfaceRoute.RouteHandler.GetHttpHandler(requestContext);
-				}
+		                                                               x.DataTokens.ContainsKey("area") &&
+						                      x.DataTokens["area"].ToString().InvariantEquals(postedInfo.Area));                    
+		        }
 
-			}
+                if (surfaceRoute == null)
+                    throw new InvalidOperationException("Could not find a Surface controller route in the RouteTable for controller name " + postedInfo.ControllerName);
+                
+                //set the area if one is there.
+                if (surfaceRoute.DataTokens.ContainsKey("area"))
+                {
+                    requestContext.RouteData.DataTokens["area"] = surfaceRoute.DataTokens["area"];
+                }
+
+                //set the 'Namespaces' token so the controller factory knows where to look to construct it
+                if (surfaceRoute.DataTokens.ContainsKey("Namespaces"))
+                {
+                    requestContext.RouteData.DataTokens["Namespaces"] = surfaceRoute.DataTokens["Namespaces"];
+                }
+                handler = surfaceRoute.RouteHandler.GetHttpHandler(requestContext);
+
+		    }
 
 			return handler;
 		}
@@ -220,64 +242,88 @@ namespace Umbraco.Web.Mvc
 		/// <returns></returns>
 		internal virtual RouteDefinition GetUmbracoRouteDefinition(RequestContext requestContext, PublishedContentRequest publishedContentRequest)
 		{
-			var defaultControllerName = ControllerExtensions.GetControllerName<RenderMvcController>();
+		    var defaultControllerType = DefaultRenderMvcControllerResolver.Current.GetDefaultControllerType();
+            var defaultControllerName = ControllerExtensions.GetControllerName(defaultControllerType);
 			//creates the default route definition which maps to the 'UmbracoController' controller
 			var def = new RouteDefinition
 				{
 					ControllerName = defaultControllerName,
-					Controller = new RenderMvcController(),
+                    ControllerType = defaultControllerType,
 					PublishedContentRequest = publishedContentRequest,
 					ActionName = ((Route)requestContext.RouteData.Route).Defaults["action"].ToString(),
 					HasHijackedRoute = false
 				};
 
-			//check if there's a custom controller assigned, base on the document type alias.
-			var controller = _controllerFactory.CreateController(requestContext, publishedContentRequest.PublishedContent.DocumentTypeAlias);
+            //check that a template is defined), if it doesn't and there is a hijacked route it will just route
+            // to the index Action
+            if (publishedContentRequest.HasTemplate)
+            {
+                //the template Alias should always be already saved with a safe name.
+                //if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
+                // with the action name attribute.
+                var templateName = publishedContentRequest.TemplateAlias.Split('.')[0].ToSafeAlias();
+                def.ActionName = templateName;
+            }
 
+			//check if there's a custom controller assigned, base on the document type alias.
+            var controllerType = _controllerFactory.GetControllerTypeInternal(requestContext, publishedContentRequest.PublishedContent.DocumentTypeAlias);
 
 			//check if that controller exists
-			if (controller != null)
-			{
-
-				//ensure the controller is of type 'RenderMvcController'
-				if (controller is RenderMvcController)
-				{
-					//set the controller and name to the custom one
-					def.Controller = (ControllerBase)controller;
-					def.ControllerName = ControllerExtensions.GetControllerName(controller.GetType());
-					if (def.ControllerName != defaultControllerName)
-					{
-						def.HasHijackedRoute = true;	
-					}
-				}
-				else
-				{
-					LogHelper.Warn<RenderRouteHandler>(
-						"The current Document Type {0} matches a locally declared controller of type {1}. Custom Controllers for Umbraco routing must inherit from '{2}'.",
-						() => publishedContentRequest.PublishedContent.DocumentTypeAlias,
-						() => controller.GetType().FullName,
-						() => typeof(RenderMvcController).FullName);
-					//exit as we cannnot route to the custom controller, just route to the standard one.
-					return def;
-				}
-
-				//check that a template is defined), if it doesn't and there is a hijacked route it will just route
-				// to the index Action
-				if (publishedContentRequest.HasTemplate)
-				{
-					//the template Alias should always be already saved with a safe name.
-                    //if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
-                    // with the action name attribute.
-                    var templateName = global::umbraco.cms.helpers.Casing.SafeAlias(publishedContentRequest.Template.Alias.Split('.')[0]);
-					def.ActionName = templateName;
-				}
-	
-			}
+		    if (controllerType != null)
+		    {
+                //ensure the controller is of type 'IRenderMvcController' and ControllerBase
+                if (TypeHelper.IsTypeAssignableFrom<IRenderMvcController>(controllerType)
+                    && TypeHelper.IsTypeAssignableFrom<ControllerBase>(controllerType))
+		        {
+		            //set the controller and name to the custom one
+		            def.ControllerType = controllerType;
+		            def.ControllerName = ControllerExtensions.GetControllerName(controllerType);
+		            if (def.ControllerName != defaultControllerName)
+		            {
+		                def.HasHijackedRoute = true;
+		            }
+		        }
+		        else
+		        {
+		            LogHelper.Warn<RenderRouteHandler>(
+						"The current Document Type {0} matches a locally declared controller of type {1}. Custom Controllers for Umbraco routing must implement '{2}' and inherit from '{3}'.",
+		                () => publishedContentRequest.PublishedContent.DocumentTypeAlias,
+		                () => controllerType.FullName,
+                        () => typeof(IRenderMvcController).FullName,
+                        () => typeof(ControllerBase).FullName);
+		            //exit as we cannnot route to the custom controller, just route to the standard one.
+		            return def;
+		        }
+		    }
 
             //store the route definition
             requestContext.RouteData.DataTokens["umbraco-route-def"] = def;
 
-			return def;
+		    return def;
+		}
+
+		internal IHttpHandler GetHandlerOnMissingTemplate(PublishedContentRequest pcr)
+		{
+            // missing template, so we're in a 404 here
+            // so the content, if any, is a custom 404 page of some sort
+
+			if (!pcr.HasPublishedContent)
+				// means the builder could not find a proper document to handle 404
+				return new PublishedContentNotFoundHandler();
+
+			if (!pcr.HasTemplate)
+				// means the engine could find a proper document, but the document has no template
+				// at that point there isn't much we can do and there is no point returning
+				// to Mvc since Mvc can't do much
+				return new PublishedContentNotFoundHandler("In addition, no template exists to render the custom 404.");
+
+            // so we have a template, so we should have a rendering engine
+            if (pcr.RenderingEngine == RenderingEngine.WebForms) // back to webforms ?                
+                return (global::umbraco.UmbracoDefault)System.Web.Compilation.BuildManager.CreateInstanceFromVirtualPath("~/default.aspx", typeof(global::umbraco.UmbracoDefault));
+            else if (pcr.RenderingEngine != RenderingEngine.Mvc) // else ?
+                return new PublishedContentNotFoundHandler("In addition, no rendering engine exists to render the custom 404.");
+
+			return null;
 		}
 
 		/// <summary>
@@ -300,13 +346,14 @@ namespace Umbraco.Web.Mvc
 			//we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
 			if (!publishedContentRequest.HasTemplate && !routeDef.HasHijackedRoute)
 			{
-				var handler = publishedContentRequest.ProcessNoTemplateInMvc(requestContext.HttpContext);
-				//though this code should never execute if the ProcessNoTemplateInMvc method redirects, it seems that we should check it
-				//and return null, this could be required for unit testing as well
-				if (publishedContentRequest.IsRedirect)
-				{
-					return null;
-				}
+				publishedContentRequest.UpdateOnMissingTemplate(); // will go 404
+
+                // HandleHttpResponseStatus returns a value indicating that the request should
+                // not be processed any further, eg because it has been redirect. then, exit.
+			    if (UmbracoModule.HandleHttpResponseStatus(requestContext.HttpContext, publishedContentRequest))
+			        return null;
+
+                var handler = GetHandlerOnMissingTemplate(publishedContentRequest);
 
 				// if it's not null it can be either the PublishedContentNotFoundHandler (no document was
 				// found to handle 404, or document with no template was found) or the WebForms handler 
@@ -319,7 +366,11 @@ namespace Umbraco.Web.Mvc
 					return handler;
 
 				// else we are running Mvc
-				// update the route definition
+                // update the route data - because the PublishedContent has changed
+                UpdateRouteDataForRequest(
+                    new RenderModel(publishedContentRequest.PublishedContent, publishedContentRequest.Culture),
+                    requestContext);
+                // update the route definition
 				routeDef = GetUmbracoRouteDefinition(requestContext, publishedContentRequest);
 			}
 
@@ -331,11 +382,19 @@ namespace Umbraco.Web.Mvc
 				requestContext.RouteData.Values["action"] = routeDef.ActionName;
 			}
 
+            // Set the session state requirements
+            requestContext.HttpContext.SetSessionStateBehavior(GetSessionStateBehavior(requestContext, routeDef.ControllerName));
+
 			// reset the friendly path so in the controllers and anything occuring after this point in time,
 			//the URL is reset back to the original request.
 			requestContext.HttpContext.RewritePath(UmbracoContext.OriginalRequestUrl.PathAndQuery);
 
-			return new MvcHandler(requestContext);
+            return new UmbracoMvcHandler(requestContext);
 		}
+
+        private SessionStateBehavior GetSessionStateBehavior(RequestContext requestContext, string controllerName)
+        {
+            return _controllerFactory.GetControllerSessionBehavior(requestContext, controllerName);
+        }
 	}
 }

@@ -3,6 +3,7 @@ using System.Xml;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.CodeAnnotations;
 
 namespace umbraco.cms.helpers
 {
@@ -18,23 +19,10 @@ namespace umbraco.cms.helpers
             //
         }
 
+        [UmbracoWillObsolete("Use Umbraco.Core.StringExtensions.ToUrlSegment() instead.")]
         public static string FormatUrl(string url)
         {
-            string _newUrl = url;
-            XmlNode replaceChars = UmbracoSettings.UrlReplaceCharacters;
-            foreach (XmlNode n in replaceChars.SelectNodes("char"))
-            {
-                if (n.Attributes.GetNamedItem("org") != null && n.Attributes.GetNamedItem("org").Value != "")
-                    _newUrl = _newUrl.Replace(n.Attributes.GetNamedItem("org").Value, xmlHelper.GetNodeValue(n));
-            }
-
-            // check for double dashes
-            if (UmbracoSettings.RemoveDoubleDashesFromUrlReplacing)
-            {
-                _newUrl = Regex.Replace(_newUrl, @"[-]{2,}", "-");
-            }
-
-            return _newUrl;
+            return url.ToUrlSegment();
         }
 
         /// <summary>

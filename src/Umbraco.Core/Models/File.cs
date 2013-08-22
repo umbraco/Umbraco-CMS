@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
 
@@ -12,10 +13,16 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public abstract class File : Entity, IFile
     {
+        private string _path;
+        private string _content = string.Empty; //initialize to empty string, not null
+
         protected File(string path)
         {
-            Path = path;
+            _path = path;
         }
+
+        private static readonly PropertyInfo ContentSelector = ExpressionHelper.GetPropertyInfo<File, string>(x => x.Content);
+        private static readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<File, string>(x => x.Path);
 
         /// <summary>
         /// Gets or sets the Name of the File including extension
@@ -48,13 +55,35 @@ namespace Umbraco.Core.Models
         /// Gets or sets the Path to the File from the root of the site
         /// </summary>
         [DataMember]
-        public virtual string Path { get; set; }
+        public virtual string Path
+        {
+            get { return _path; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _path = value;
+                    return _path;
+                }, _path, PathSelector);
+            }
+        }
 
         /// <summary>
         /// Gets or sets the Content of a File
         /// </summary>
         [DataMember]
-        public virtual string Content { get; set; }
+        public virtual string Content
+        {
+            get { return _content; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _content = value;
+                    return _content;
+                }, _content, ContentSelector);
+            }
+        }
 
         /// <summary>
         /// Boolean indicating whether the file could be validated

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using umbraco.cms.businesslogic.datatype;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.SettingControls.Pickers
 {
@@ -32,7 +33,7 @@ namespace umbraco.editorControls.SettingControls.Pickers
 
             mp.ID = sender.GetName().Replace(" ", "_");
 
-            mp.AppAlias = "media";
+            mp.AppAlias = Constants.Applications.Media;
             mp.TreeAlias = "media";
 
             int output;

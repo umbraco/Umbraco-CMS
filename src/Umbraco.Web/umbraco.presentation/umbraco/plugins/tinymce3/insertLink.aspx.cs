@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic.Exceptions;
 
@@ -28,7 +29,7 @@ namespace umbraco.presentation.plugins.tinymce3
             tp.Controls.Add(pane_content);
 
 
-            if (CurrentUser.GetApplications().Find(t => t.alias == "media") != null)
+            if (CurrentUser.GetApplications().Find(t => t.alias == Constants.Applications.Media) != null)
             {
                 uicontrols.TabPage tp2 = tv_options.NewTabPage(ui.Text("media"));
                 tp2.HasMenu = false;

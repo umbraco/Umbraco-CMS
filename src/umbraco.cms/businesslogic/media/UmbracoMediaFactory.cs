@@ -7,6 +7,7 @@ using System.Threading;
 using System.Xml;
 using Umbraco.Core.IO;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.media
 {
@@ -29,7 +30,7 @@ namespace umbraco.cms.businesslogic.media
             {
                 var parentNode = new Media(parentNodeId);
 
-                return parentNodeId <= -1 || user.Applications.Any(app => app.alias.ToLower() == "media") && (user.StartMediaId <= 0 || ("," + parentNode.Path + ",").Contains("," + user.StartMediaId + ",")) && parentNode.ContentType.AllowedChildContentTypeIDs.Contains(MediaType.GetByAlias(MediaTypeAlias).Id);
+                return parentNodeId <= -1 || user.Applications.Any(app => app.alias.ToLower() == Constants.Applications.Media) && (user.StartMediaId <= 0 || ("," + parentNode.Path + ",").Contains("," + user.StartMediaId + ",")) && parentNode.ContentType.AllowedChildContentTypeIDs.Contains(MediaType.GetByAlias(MediaTypeAlias).Id);
             }
             catch
             {
@@ -84,7 +85,7 @@ namespace umbraco.cms.businesslogic.media
             {
                 if (childMedia.ContentType.Alias == MediaTypeAlias)
                 {
-                    var prop = childMedia.getProperty("umbracoFile");
+                    var prop = childMedia.getProperty(Constants.Conventions.Media.File);
                     if (prop != null && prop.Value != null)
                     {
                         int subfolderId;

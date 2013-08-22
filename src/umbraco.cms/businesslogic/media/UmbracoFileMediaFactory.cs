@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.media
@@ -13,7 +14,7 @@ namespace umbraco.cms.businesslogic.media
     {
         public override string MediaTypeAlias
         {
-            get { return "File"; }
+            get { return Constants.Conventions.MediaTypes.File; }
         }
 
         public override List<string> Extensions
@@ -24,7 +25,7 @@ namespace umbraco.cms.businesslogic.media
         public override void DoHandleMedia(Media media, PostedMediaFile uploadedFile, User user)
         {
             // Get umbracoFile property
-            var propertyId = media.getProperty("umbracoFile").Id;
+            var propertyId = media.getProperty(Constants.Conventions.Media.File).Id;
 
             // Get paths
             var destFilePath = FileSystem.GetRelativePath(propertyId, uploadedFile.FileName);
@@ -34,12 +35,13 @@ namespace umbraco.cms.businesslogic.media
             //var absoluteDestFilePath = HttpContext.Current.Server.MapPath(destFilePath);
 
             // Set media properties
-            media.getProperty("umbracoFile").Value = FileSystem.GetUrl(destFilePath);
-            media.getProperty("umbracoBytes").Value = uploadedFile.ContentLength;
+            media.getProperty(Constants.Conventions.Media.File).Value = FileSystem.GetUrl(destFilePath);
+            media.getProperty(Constants.Conventions.Media.Bytes).Value = uploadedFile.ContentLength;
 
-            if (media.getProperty("umbracoExtension") != null)
-                media.getProperty("umbracoExtension").Value = ext;
+            if (media.getProperty(Constants.Conventions.Media.Extension) != null)
+                media.getProperty(Constants.Conventions.Media.Extension).Value = ext;
 
+            // Legacy: The 'extensio' typo applied to MySQL (bug in install script, prior to v4.6.x)
             if (media.getProperty("umbracoExtensio") != null)
                 media.getProperty("umbracoExtensio").Value = ext;
 

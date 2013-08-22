@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
@@ -10,10 +11,11 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Publishing;
 
 namespace Umbraco.Core.Services
 {
-	/// <summary>
+    /// <summary>
 	/// Represents the Media Service, which is an easy access to operations involving <see cref="IMedia"/>
 	/// </summary>
 	public class MediaService : IMediaService
@@ -62,9 +64,9 @@ namespace Umbraco.Core.Services
 
 			media.CreatorId = userId;
 
-			Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId), this);			
+			Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId), this);
 
-			Audit.Add(AuditTypes.New, "", media.CreatorId, media.Id);
+            Audit.Add(AuditTypes.New, string.Format("Media '{0}' was created", name), media.CreatorId, media.Id);
 
 	        return media;
 	    }
@@ -97,7 +99,7 @@ namespace Umbraco.Core.Services
 
             Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parent), this);
 
-            Audit.Add(AuditTypes.New, "", media.CreatorId, media.Id);
+            Audit.Add(AuditTypes.New, string.Format("Media '{0}' was created", name), media.CreatorId, media.Id);
 
             return media;
         }
@@ -141,7 +143,7 @@ namespace Umbraco.Core.Services
 
             Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId), this);
 
-            Audit.Add(AuditTypes.New, "", media.CreatorId, media.Id);
+            Audit.Add(AuditTypes.New, string.Format("Media '{0}' was created with Id {1}", name, media.Id), media.CreatorId, media.Id);
 
             return media;
         }
@@ -185,7 +187,7 @@ namespace Umbraco.Core.Services
 
             Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parent), this);
 
-            Audit.Add(AuditTypes.New, "", media.CreatorId, media.Id);
+            Audit.Add(AuditTypes.New, string.Format("Media '{0}' was created with Id {1}", name, media.Id), media.CreatorId, media.Id);
 
             return media;
         }
@@ -262,6 +264,34 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Gets a collection of <see cref="IMedia"/> objects, which are ancestors of the current media.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMedia"/> to retrieve ancestors for</param>
+        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
+        public IEnumerable<IMedia> GetAncestors(int id)
+        {
+            var media = GetById(id);
+            return GetAncestors(media);
+        }
+
+        /// <summary>
+        /// Gets a collection of <see cref="IMedia"/> objects, which are ancestors of the current media.
+        /// </summary>
+        /// <param name="media"><see cref="IMedia"/> to retrieve ancestors for</param>
+        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
+        public IEnumerable<IMedia> GetAncestors(IMedia media)
+        {
+            var ids = media.Path.Split(',').Where(x => x != "-1" && x != media.Id.ToString(CultureInfo.InvariantCulture)).Select(int.Parse).ToArray();
+            if(ids.Any() == false)
+                return new List<IMedia>();
+
+            using (var repository = _repositoryFactory.CreateMediaRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(ids);
+            }
+        }
+
 		/// <summary>
 		/// Gets a collection of <see cref="IMedia"/> objects by Parent Id
 		/// </summary>
@@ -305,6 +335,30 @@ namespace Umbraco.Core.Services
 
                 return medias;
             }
+        }
+
+        /// <summary>
+        /// Gets the parent of the current media as an <see cref="IMedia"/> item.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMedia"/> to retrieve the parent from</param>
+        /// <returns>Parent <see cref="IMedia"/> object</returns>
+        public IMedia GetParent(int id)
+        {
+            var media = GetById(id);
+            return GetParent(media);
+        }
+
+        /// <summary>
+        /// Gets the parent of the current media as an <see cref="IMedia"/> item.
+        /// </summary>
+        /// <param name="media"><see cref="IMedia"/> to retrieve the parent from</param>
+        /// <returns>Parent <see cref="IMedia"/> object</returns>
+        public IMedia GetParent(IMedia media)
+        {
+            if (media.ParentId == -1 || media.ParentId == -21)
+                return null;
+
+            return GetById(media.ParentId);
         }
 
 		/// <summary>
@@ -483,27 +537,29 @@ namespace Umbraco.Core.Services
 		/// </summary>
 		public void EmptyRecycleBin()
 		{
-			//TODO: Why don't we have a base class to share between MediaService/ContentService as some of this is exacty the same?
+            using (new WriteLock(Locker))
+            {
+                List<int> ids;
+                List<string> files;
+                bool success;
+                var nodeObjectType = new Guid(Constants.ObjectTypes.Media);
 
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
-			{
-				var query = Query<IMedia>.Builder.Where(x => x.Trashed == true);
-				var contents = repository.GetByQuery(query).OrderByDescending(x => x.Level);
+                using (var repository = _repositoryFactory.CreateRecycleBinRepository(_uowProvider.GetUnitOfWork()))
+                {
+                    ids = repository.GetIdsOfItemsInRecycleBin(nodeObjectType);
+                    files = repository.GetFilesInRecycleBin(nodeObjectType);
 
-				foreach (var content in contents)
-				{
-					if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMedia>(content), this))
-						continue;
+                    if (EmptyingRecycleBin.IsRaisedEventCancelled(new RecycleBinEventArgs(nodeObjectType, ids, files), this))
+                        return;
 
-					repository.Delete(content);
+                    success = repository.EmptyRecycleBin(nodeObjectType);
+                    if (success)
+                        repository.DeleteFiles(files);
+                }
 
-					Deleted.RaiseEvent(new DeleteEventArgs<IMedia>(content, false), this);
-				}
-				uow.Commit();
-			}
-
-            Audit.Add(AuditTypes.Delete, "Empty Recycle Bin performed by user", 0, -20);
+                EmptiedRecycleBin.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, ids, files, success), this);
+            }
+            Audit.Add(AuditTypes.Delete, "Empty Media Recycle Bin performed by user", 0, -21);
 		}
 
 	    /// <summary>
@@ -771,6 +827,73 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Rebuilds all xml content in the cmsContentXml table for all media
+        /// </summary>
+        /// <param name="contentTypeIds">
+        /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
+        /// for all media
+        /// </param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        internal void RebuildXmlStructures(params int[] contentTypeIds)
+        {
+            using (new WriteLock(Locker))
+            {
+                var list = new List<IMedia>();
+
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateContentRepository(uow))
+                {
+                    if (contentTypeIds.Any() == false)
+                    {
+                        //Remove all media records from the cmsContentXml table (DO NOT REMOVE Content/Members!)
+                        uow.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+                                                    INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
+                                                    WHERE nodeObjectType = @nodeObjectType)",
+                                             new {nodeObjectType = Constants.ObjectTypes.Media});
+                        
+                        //  Consider creating a Path query instead of recursive method:
+                        //  var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith("-1"));
+                        var rootMedia = GetRootMedia();
+                        foreach (var media in rootMedia)
+                        {
+                            list.Add(media);
+                            list.AddRange(GetDescendants(media));
+                        }
+                    }
+                    else
+                    {
+                        foreach (var id in contentTypeIds)
+                        {
+                            //first we'll clear out the data from the cmsContentXml table for this type
+                            uow.Database.Execute(@"delete from cmsContentXml where nodeId in 
+                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+                                INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
+                                INNER JOIN cmsContent ON cmsContent.nodeId = umbracoNode.id
+                                WHERE nodeObjectType = @nodeObjectType AND cmsContent.contentType = @contentTypeId)",
+                                                 new {contentTypeId = id, nodeObjectType = Constants.ObjectTypes.Media});
+
+                            //now get all media objects of this type and add to the list
+                            list.AddRange(GetMediaOfMediaType(id));
+                        }
+                    }
+
+                    var xmlItems = new List<ContentXmlDto>();
+                    foreach (var c in list)
+                    {
+                        //generate the xml
+                        var xml = c.ToXml();
+                        //create the dto to insert
+                        xmlItems.Add(new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) });
+                    }
+                    //bulk insert it into the database
+                    uow.Database.BulkInsertRecords(xmlItems);
+                }
+                Audit.Add(AuditTypes.Publish, "RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
+            }
+        }
+
+        /// <summary>
         /// Updates the Path and Level on a collection of <see cref="IMedia"/> objects
         /// based on the Parent's Path and Level.
         /// </summary>
@@ -890,6 +1013,16 @@ namespace Umbraco.Core.Services
 		/// Occurs after Move
 		/// </summary>
 		public static event TypedEventHandler<IMediaService, MoveEventArgs<IMedia>> Moved;
+
+        /// <summary>
+        /// Occurs before the Recycle Bin is emptied
+        /// </summary>
+        public static event TypedEventHandler<IMediaService, RecycleBinEventArgs> EmptyingRecycleBin;
+
+        /// <summary>
+        /// Occurs after the Recycle Bin has been Emptied
+        /// </summary>
+        public static event TypedEventHandler<IMediaService, RecycleBinEventArgs> EmptiedRecycleBin;
 		#endregion
 	}
 }

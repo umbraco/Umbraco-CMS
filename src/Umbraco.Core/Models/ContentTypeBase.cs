@@ -22,8 +22,8 @@ namespace Umbraco.Core.Models
         private string _alias;
         private string _description;
         private int _sortOrder;
-        private string _icon;
-        private string _thumbnail;
+        private string _icon = "folder.png";
+        private string _thumbnail = "folder.png";
         private int _creatorId;
         private bool _allowedAsRoot;
         private bool _isContainer;
@@ -31,6 +31,8 @@ namespace Umbraco.Core.Models
         private PropertyGroupCollection _propertyGroups;
         private PropertyTypeCollection _propertyTypes;
         private IEnumerable<ContentTypeSort> _allowedContentTypes;
+        private bool _hasPropertyTypeBeenRemoved;
+
 
         protected ContentTypeBase(int parentId)
         {
@@ -68,6 +70,8 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo AllowedContentTypesSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<ContentTypeSort>>(x => x.AllowedContentTypes);
         private static readonly PropertyInfo PropertyGroupCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, PropertyGroupCollection>(x => x.PropertyGroups);
         private static readonly PropertyInfo PropertyTypeCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<PropertyType>>(x => x.PropertyTypes);
+        private static readonly PropertyInfo HasPropertyTypeBeenRemovedSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.HasPropertyTypeBeenRemoved);
+
 
         protected void PropertyGroupsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -111,8 +115,11 @@ namespace Umbraco.Core.Models
             get { return _name; }
             set
             {
-                _name = value;
-                OnPropertyChanged(NameSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _name = value;
+                    return _name;
+                }, _name, NameSelector);
             }
         }
 
@@ -125,8 +132,11 @@ namespace Umbraco.Core.Models
             get { return _level; }
             set
             {
-                _level = value;
-                OnPropertyChanged(LevelSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _level = value;
+                    return _level;
+                }, _level, LevelSelector);
             }
         }
 
@@ -139,8 +149,11 @@ namespace Umbraco.Core.Models
             get { return _path; }
             set
             {
-                _path = value;
-                OnPropertyChanged(PathSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _path = value;
+                    return _path;
+                }, _path, PathSelector);
             }
         }
 
@@ -153,8 +166,11 @@ namespace Umbraco.Core.Models
             get { return _alias; }
             set
             {
-                _alias = value.ToSafeAlias();
-                OnPropertyChanged(AliasSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                    {
+                        _alias = value.ToSafeAlias();
+                        return _alias;
+                    }, _alias, AliasSelector);
             }
         }
 
@@ -167,8 +183,11 @@ namespace Umbraco.Core.Models
             get { return _description; }
             set
             {
-                _description = value;
-                OnPropertyChanged(DescriptionSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _description = value;
+                    return _description;
+                }, _description, DescriptionSelector);
             }
         }
 
@@ -181,8 +200,11 @@ namespace Umbraco.Core.Models
             get { return _sortOrder; }
             set
             {
-                _sortOrder = value;
-                OnPropertyChanged(SortOrderSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _sortOrder = value;
+                    return _sortOrder;
+                }, _sortOrder, SortOrderSelector);
             }
         }
 
@@ -195,8 +217,11 @@ namespace Umbraco.Core.Models
             get { return _icon; }
             set
             {
-                _icon = value;
-                OnPropertyChanged(IconSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _icon = value;
+                    return _icon;
+                }, _icon, IconSelector);
             }
         }
 
@@ -209,8 +234,11 @@ namespace Umbraco.Core.Models
             get { return _thumbnail; }
             set
             {
-                _thumbnail = value;
-                OnPropertyChanged(ThumbnailSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _thumbnail = value;
+                    return _thumbnail;
+                }, _thumbnail, ThumbnailSelector);
             }
         }
 
@@ -223,8 +251,11 @@ namespace Umbraco.Core.Models
             get { return _creatorId; }
             set
             {
-                _creatorId = value;
-                OnPropertyChanged(CreatorIdSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _creatorId = value;
+                    return _creatorId;
+                }, _creatorId, CreatorIdSelector);
             }
         }
 
@@ -237,8 +268,11 @@ namespace Umbraco.Core.Models
             get { return _allowedAsRoot; }
             set
             {
-                _allowedAsRoot = value;
-                OnPropertyChanged(AllowedAsRootSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _allowedAsRoot = value;
+                    return _allowedAsRoot;
+                }, _allowedAsRoot, AllowedAsRootSelector);
             }
         }
 
@@ -254,8 +288,11 @@ namespace Umbraco.Core.Models
             get { return _isContainer; }
             set
             {
-                _isContainer = value;
-                OnPropertyChanged(IsContainerSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _isContainer = value;
+                    return _isContainer;
+                }, _isContainer, IsContainerSelector);
             }
         }
 
@@ -269,8 +306,11 @@ namespace Umbraco.Core.Models
             get { return _trashed; }
             set
             {
-                _trashed = value;
-                OnPropertyChanged(TrashedSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _trashed = value;
+                    return _trashed;
+                }, _trashed, TrashedSelector);
             }
         }
 
@@ -283,8 +323,11 @@ namespace Umbraco.Core.Models
             get { return _allowedContentTypes; }
             set
             {
-                _allowedContentTypes = value;
-                OnPropertyChanged(AllowedContentTypesSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _allowedContentTypes = value;
+                    return _allowedContentTypes;
+                }, _allowedContentTypes, AllowedContentTypesSelector);
             }
         }
 
@@ -319,6 +362,24 @@ namespace Umbraco.Core.Models
             {
                 _propertyTypes = new PropertyTypeCollection(value);
                 _propertyTypes.CollectionChanged += PropertyTypesChanged;
+            }
+        }
+
+        /// <summary>
+        /// A boolean flag indicating if a property type has been removed from this instance.
+        /// </summary>
+        /// <remarks>
+        /// This is currently (specifically) used in order to know that we need to refresh the content cache which 
+        /// needs to occur when a property has been removed from a content type
+        /// </remarks>
+        [IgnoreDataMember]
+        internal bool HasPropertyTypeBeenRemoved
+        {
+            get { return _hasPropertyTypeBeenRemoved; }
+            private set
+            {
+                _hasPropertyTypeBeenRemoved = value;
+                OnPropertyChanged(HasPropertyTypeBeenRemovedSelector);
             }
         }
 
@@ -396,6 +457,15 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias">Alias of the <see cref="PropertyType"/> to remove</param>
         public void RemovePropertyType(string propertyTypeAlias)
         {
+
+            //check if the property exist in one of our collections
+            if (PropertyGroups.Any(group => group.PropertyTypes.Any(pt => pt.Alias == propertyTypeAlias))
+                || _propertyTypes.Any(x => x.Alias == propertyTypeAlias))
+            {
+                //set the flag that a property has been removed
+                HasPropertyTypeBeenRemoved = true;
+            }
+
             foreach (var propertyGroup in PropertyGroups)
             {
                 propertyGroup.PropertyTypes.RemoveItem(propertyTypeAlias);
@@ -403,8 +473,17 @@ namespace Umbraco.Core.Models
 
             if (_propertyTypes.Any(x => x.Alias == propertyTypeAlias))
             {
-                _propertyTypes.RemoveItem(propertyTypeAlias);
+                _propertyTypes.RemoveItem(propertyTypeAlias);               
             }
+        }
+
+        /// <summary>
+        /// Removes a PropertyGroup from the current ContentType
+        /// </summary>
+        /// <param name="propertyGroupName">Name of the <see cref="PropertyGroup"/> to remove</param>
+        public void RemovePropertyGroup(string propertyGroupName)
+        {
+            PropertyGroups.RemoveItem(propertyGroupName);
         }
 
         /// <summary>
@@ -414,6 +493,15 @@ namespace Umbraco.Core.Models
         public void SetLazyParentId(Lazy<int> id)
         {
             _parentId = id;
+        }
+
+        /// <summary>
+        /// PropertyTypes that are not part of a PropertyGroup
+        /// </summary>
+        [IgnoreDataMember]
+        internal PropertyTypeCollection PropertyTypeCollection
+        {
+             get { return _propertyTypes; }
         }
     }
 }

@@ -16,18 +16,13 @@ namespace Umbraco.Web
 	//   and it needs to be manually registered - which we want to avoid, in order
 	//   to be as unobtrusive as possible
 
-	internal sealed class LegacyScheduledTasks : IApplicationEventHandler
+	internal sealed class LegacyScheduledTasks : ApplicationEventHandler
 	{
 		Timer _pingTimer;
 		Timer _publishingTimer;
 		CacheItemRemovedCallback _onCacheRemove;
 
-        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, Core.ApplicationContext applicationContext)
-		{
-			// nothing yet
-		}
-
-        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, Core.ApplicationContext applicationContext)
+        protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication, Core.ApplicationContext applicationContext)
         {
             if (umbracoApplication.Context == null)
                 return;
@@ -46,11 +41,6 @@ namespace Umbraco.Web
 
 			// log scrubbing
 			AddTask(LOG_SCRUBBER_TASK_NAME, GetLogScrubbingInterval());
-		}
-
-        public void OnApplicationStarted(UmbracoApplicationBase httpApplication, Core.ApplicationContext applicationContext)
-		{
-			// nothing
 		}
 
 		#region Log Scrubbing

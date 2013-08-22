@@ -10,6 +10,7 @@ using Umbraco.Core.IO;
 using umbraco.interfaces;
 using Umbraco.Core;
 using Content = umbraco.cms.businesslogic.Content;
+using Umbraco.Core;
 
 namespace umbraco.editorControls
 {
@@ -126,8 +127,8 @@ namespace umbraco.editorControls
                 _text = "";
                 _data.Value = _text;
 
-
-                foreach (var prop in "umbracoExtension,umbracoBytes,umbracoWidth,umbracoHeight".Split(','))
+                var props = new[] { Constants.Conventions.Media.Bytes, Constants.Conventions.Media.Extension, Constants.Conventions.Media.Height, Constants.Conventions.Media.Width };
+                foreach (var prop in props)
                 {
                     try
                     {
@@ -166,12 +167,12 @@ namespace umbraco.editorControls
                 {
                     var content = _data.LoadedContentItem;
 
-                    // update extension in UI				
-                    UpdateLabelValue("umbracoExtension", "prop_umbracoExtension", Page, content);
+						// update extension in UI
+						UpdateLabelValue(Constants.Conventions.Media.Extension, "prop_umbracoExtension", Page, content);
                     // update file size in UI
-                    UpdateLabelValue("umbracoBytes", "prop_umbracoBytes", Page, content);
-                    UpdateLabelValue("umbracoWidth", "prop_umbracoWidth", Page, content);
-                    UpdateLabelValue("umbracoHeight", "prop_umbracoHeight", Page, content);
+						UpdateLabelValue(Constants.Conventions.Media.Bytes, "prop_umbracoBytes", Page, content);
+						UpdateLabelValue(Constants.Conventions.Media.Width, "prop_umbracoWidth", Page, content);
+						UpdateLabelValue(Constants.Conventions.Media.Height, "prop_umbracoHeight", Page, content);
                 }
 
             }

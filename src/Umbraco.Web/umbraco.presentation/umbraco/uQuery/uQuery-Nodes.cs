@@ -209,11 +209,11 @@ namespace umbraco
 				uri = uri.MakeAbsolute(Umbraco.Web.UmbracoContext.Current.CleanedUmbracoUrl);
 			uri = Umbraco.Web.UriUtility.UriToUmbraco(uri);
 
-			var docreq = new Umbraco.Web.Routing.PublishedContentRequest(uri, Umbraco.Web.UmbracoContext.Current.RoutingContext);
-			var builder = new Umbraco.Web.Routing.PublishedContentRequestBuilder(docreq);
-			builder.LookupDomain();
-			builder.LookupDocument1(); // will _not_ follow redirects, handle 404, nothing - just run lookups
-			return docreq.HasNode ? docreq.DocumentId : uQuery.RootNodeId;
+			var pcr = new Umbraco.Web.Routing.PublishedContentRequest(uri, Umbraco.Web.UmbracoContext.Current.RoutingContext);
+			// partially prepare the request: do _not_ follow redirects, handle 404, nothing - just find a content
+			pcr.Engine.FindDomain();
+			pcr.Engine.FindPublishedContent();
+			return pcr.HasPublishedContent ? pcr.PublishedContent.Id : uQuery.RootNodeId;
 		}
 
 		/// <summary>

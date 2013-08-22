@@ -9,20 +9,20 @@ namespace Umbraco.Web.BaseRest.Configuration
 	[ConfigurationCollection(typeof(ExtensionElement), CollectionType = ConfigurationElementCollectionType.BasicMapAlternate)]
 	public class ExtensionElement : ConfigurationElementCollection
 	{
-		const string Key_Alias = "alias";
-		const string Key_Type = "type";
-		const string Key_Method = "method";
+		const string KeyAlias = "alias";
+		const string KeyType = "type";
+		const string KeyMethod = "method";
 
-		[ConfigurationProperty(Key_Alias, IsKey = true, IsRequired = true)]
+		[ConfigurationProperty(KeyAlias, IsKey = true, IsRequired = true)]
 		public string Alias
 		{
-			get { return (string)base[Key_Alias]; }
+			get { return (string)base[KeyAlias]; }
 		}
 
-		[ConfigurationProperty(Key_Type, IsKey = false, IsRequired = true)]
+		[ConfigurationProperty(KeyType, IsKey = false, IsRequired = true)]
 		public string Type
 		{
-			get { return (string)base[Key_Type]; }
+			get { return (string)base[KeyType]; }
 		}
 
 		public override ConfigurationElementCollectionType CollectionType
@@ -32,12 +32,12 @@ namespace Umbraco.Web.BaseRest.Configuration
 
 		protected override string ElementName
 		{
-			get { return Key_Method; }
+			get { return KeyMethod; }
 		}
 
 		protected override bool IsElementName(string elementName)
 		{
-			return elementName.Equals(Key_Method, StringComparison.InvariantCultureIgnoreCase);
+			return elementName.Equals(KeyMethod, StringComparison.InvariantCultureIgnoreCase);
 		}
 
 		protected override ConfigurationElement CreateNewElement()

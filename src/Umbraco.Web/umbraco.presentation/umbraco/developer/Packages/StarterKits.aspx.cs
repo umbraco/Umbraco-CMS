@@ -10,6 +10,7 @@ using umbraco.BusinessLogic;
 
 namespace umbraco.presentation.umbraco.developer.Packages
 {
+    [Obsolete("This class is no longer used and will be removed in future version. The page that supercedes this is Umbraco.Web.UI.Umbraco.Developer.Packages.StarterKits")]
 	public partial class StarterKits : UmbracoEnsuredPage
 	{
 	    public StarterKits()

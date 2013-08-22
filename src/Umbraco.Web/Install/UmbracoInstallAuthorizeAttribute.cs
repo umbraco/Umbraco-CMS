@@ -2,6 +2,7 @@ using System;
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Web.Security;
 using umbraco.BasePages;
 
 namespace Umbraco.Web.Install
@@ -12,19 +13,33 @@ namespace Umbraco.Web.Install
 	/// </summary>
 	internal class UmbracoInstallAuthorizeAttribute : AuthorizeAttribute
 	{
-		private readonly ApplicationContext _applicationContext;
+        private readonly ApplicationContext _applicationContext;
+        private readonly UmbracoContext _umbracoContext;
 
-		public UmbracoInstallAuthorizeAttribute(ApplicationContext appContext)
-		{
-			if (appContext == null) throw new ArgumentNullException("appContext");
-			_applicationContext = appContext;
-		}
+        private ApplicationContext GetApplicationContext()
+        {
+            return _applicationContext ?? ApplicationContext.Current;
+        }
 
-		public UmbracoInstallAuthorizeAttribute()
-			: this(ApplicationContext.Current)
-		{
-			
-		}
+        private UmbracoContext GetUmbracoContext()
+        {
+            return _umbracoContext ?? UmbracoContext.Current;
+        }
+
+        /// <summary>
+        /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        public UmbracoInstallAuthorizeAttribute(UmbracoContext umbracoContext)
+        {
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            _umbracoContext = umbracoContext;
+            _applicationContext = _umbracoContext.Application;
+        }
+
+        public UmbracoInstallAuthorizeAttribute()
+        {
+        }
 
 		/// <summary>
 		/// Ensures that the user must be logged in or that the application is not configured just yet.
@@ -33,21 +48,18 @@ namespace Umbraco.Web.Install
 		/// <returns></returns>
 		protected override bool AuthorizeCore(HttpContextBase httpContext)
 		{
-			if (httpContext == null)
-			{
-				throw new ArgumentNullException("httpContext");
-			}
+		    if (httpContext == null) throw new ArgumentNullException("httpContext");
 
-			try
+		    try
 			{
 				//if its not configured then we can continue
-				if (!_applicationContext.IsConfigured)
+                if (!GetApplicationContext().IsConfigured)
 				{
 					return true;
 				}
-				
+			    var umbCtx = GetUmbracoContext();
 				//otherwise we need to ensure that a user is logged in
-				var isLoggedIn = BasePage.ValidateUserContextID(BasePage.umbracoUserContextID);
+                var isLoggedIn = umbCtx.Security.ValidateUserContextId(umbCtx.Security.UmbracoUserContextId);
 				if (isLoggedIn)
 				{
 					return true;
@@ -60,30 +72,16 @@ namespace Umbraco.Web.Install
 				return false;
 			}
 		}
+        
+        /// <summary>
+        /// Override to throw exception instead of returning 401 result
+        /// </summary>
+        /// <param name="filterContext"></param>
+        protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
+        {
+            //they aren't authorized but the app has installed
+            throw new HttpException((int)global::System.Net.HttpStatusCode.Unauthorized, "You must login to view this resource.");
+        }
 
-		public override void OnAuthorization(AuthorizationContext filterContext)
-		{
-			Mandate.ParameterNotNull(filterContext, "filterContext");
-			if (OutputCacheAttribute.IsChildActionCacheActive(filterContext))
-				throw new InvalidOperationException("Cannot use UmbracoInstallAuthorizeAttribute on a child action");
-			if (AuthorizeCore(filterContext.HttpContext))
-			{
-				//with a little help from dotPeek... this is what it normally would do
-				var cache = filterContext.HttpContext.Response.Cache;
-				cache.SetProxyMaxAge(new TimeSpan(0L));
-				cache.AddValidationCallback(CacheValidateHandler, null);
-			}
-			else
-			{
-				//they aren't authorized but the app has installed
-				throw new HttpException((int)global::System.Net.HttpStatusCode.Unauthorized,
-				                        "You must login to view this resource.");
-			}
-		}
-
-		private void CacheValidateHandler(HttpContext context, object data, ref HttpValidationStatus validationStatus)
-		{
-			validationStatus = OnCacheAuthorization(new HttpContextWrapper(context));
-		}
 	}
 }

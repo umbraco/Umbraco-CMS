@@ -10,18 +10,25 @@ namespace Umbraco.Core.Persistence.Mappers
     /// Represents a <see cref="DataTypeDefinition"/> to DTO mapper used to translate the properties of the public api 
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
-    internal sealed class DataTypeDefinitionMapper : BaseMapper
+    [MapperFor(typeof(DataTypeDefinition))]
+    [MapperFor(typeof(IDataTypeDefinition))]
+    public sealed class DataTypeDefinitionMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache = new ConcurrentDictionary<string, DtoMapModel>();
+        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
 
-        internal static DataTypeDefinitionMapper Instance = new DataTypeDefinitionMapper();
-
-        private DataTypeDefinitionMapper()
+        //NOTE: its an internal class but the ctor must be public since we're using Activator.CreateInstance to create it
+        // otherwise that would fail because there is no public constructor.
+        public DataTypeDefinitionMapper()
         {
             BuildMap();
         }
 
         #region Overrides of BaseMapper
+
+        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
+        {
+            get { return PropertyInfoCacheInstance; }
+        }
 
         internal override void BuildMap()
         {
@@ -38,22 +45,6 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<DataTypeDefinition, DataTypeDto>(src => src.ControlId, dto => dto.ControlId);
             CacheMap<DataTypeDefinition, DataTypeDto>(src => src.DatabaseType, dto => dto.DbType);
 
-        }
-
-        internal override string Map(string propertyName)
-        {
-            if (!PropertyInfoCache.ContainsKey(propertyName))
-                return string.Empty;
-
-            var dtoTypeProperty = PropertyInfoCache[propertyName];
-
-            return base.GetColumnName(dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo);
-        }
-
-        internal override void CacheMap<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
-        {
-            var property = base.ResolveMapping(sourceMember, destinationMember);
-            PropertyInfoCache.AddOrUpdate(property.SourcePropertyName, property, (x, y) => property);
         }
 
         #endregion

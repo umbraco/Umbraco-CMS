@@ -1,4 +1,4 @@
-<%@ Control Language="c#" AutoEventWireup="True" CodeBehind="welcome.ascx.cs" Inherits="umbraco.presentation.install.welcome"
+<%@ Control Language="c#" AutoEventWireup="True" CodeBehind="Welcome.ascx.cs" Inherits="Umbraco.Web.UI.Install.Steps.Welcome"
 	TargetSchema="http://schemas.microsoft.com/intellisense/ie5" %>
 <%@ Import Namespace="Umbraco.Core.Configuration" %>
 <!-- welcome box -->
@@ -31,7 +31,7 @@
 		 <asp:PlaceHolder ID="ph_upgrade" runat="server" Visible="false">
             <h1>Upgrading Umbraco</h1>
             <p>
-                Welcome to the umbraco upgrade wizard. This will make sure that you upgrade safely from your old version to <strong>Umbraco version <%=UmbracoVersion.Current.ToString(3) %></strong> 
+                Welcome to the umbraco upgrade wizard. This will make sure that you upgrade safely from your old version to <strong>Umbraco version <%=UmbracoVersion.Current.ToString(3) %> <%=UmbracoVersion.CurrentComment %></strong> 
             </p>
             <p>
                 As this is an upgrade, <strong>the wizard might skip steps</strong> that are only needed for new umbraco installations. It might also ask you questions you've already answered once. But do not worry, 
@@ -44,7 +44,7 @@
 	<!-- btn box -->
 	<footer class="btn-box">
         <div class="t">&nbsp;</div>
-        <asp:LinkButton ID="btnNext" CssClass="btn btn-get" runat="server" OnClick="gotoNextStep"><span>Let's get started!</span></asp:LinkButton>
+        <asp:LinkButton ID="btnNext" CssClass="btn btn-get" runat="server" OnClick="GotoNextStep"><span>Let's get started!</span></asp:LinkButton>
     </footer>
 
 </div>

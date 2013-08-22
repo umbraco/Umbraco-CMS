@@ -5,10 +5,13 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using System.Web.Caching;
+using System.Web.Security;
 using System.Xml;
+using System.Configuration;
 
 using System.Collections.Generic;
 using Umbraco.Core.Logging;
+using Umbraco.Core.CodeAnnotations;
 
 
 namespace Umbraco.Core.Configuration
@@ -19,6 +22,8 @@ namespace Umbraco.Core.Configuration
 	// http://issues.umbraco.org/issue/U4-115
 
 	//TODO: Re-enable logging !!!!
+
+    //TODO: We need to convert this to a real section, it's currently using HttpRuntime.Cache to detect cahnges, this is real poor, especially in a console app
 
 	/// <summary>
 	/// The UmbracoSettings Class contains general settings information for the entire Umbraco instance based on information from the /config/umbracoSettings.config file
@@ -52,15 +57,14 @@ namespace Umbraco.Core.Configuration
         /// <summary>
 		/// Used in unit testing to reset all config items that were set with property setters (i.e. did not come from config)
 		/// </summary>
-		internal static void ResetSetters()
+		private static void ResetInternal()
 		{
 			_addTrailingSlash = null;			
 			_forceSafeAliases = null;
 			_useLegacySchema = null;
 			_useDomainPrefixes = null;
 			_umbracoLibraryCacheDuration = null;
-            _trySkipIisCustomErrors = null;
-		    SettingsFilePath = null;
+            SettingsFilePath = null;
 		}
 
 		internal const string TempFriendlyXmlChildContainerNodename = ""; // "children";
@@ -132,7 +136,7 @@ namespace Umbraco.Core.Configuration
 		/// </summary>
 		/// <param name="key">The xpath query to the specific node.</param>
 		/// <returns>If found, it returns the specific configuration xml node.</returns>
-		public static XmlNode GetKeyAsNode(string key)
+		internal static XmlNode GetKeyAsNode(string key)
 		{
 			if (key == null)
 				throw new ArgumentException("Key cannot be null");
@@ -147,7 +151,7 @@ namespace Umbraco.Core.Configuration
 		/// </summary>
 		/// <param name="key">The key.</param>
 		/// <returns></returns>
-		public static string GetKey(string key)
+        internal static string GetKey(string key)
 		{
 			EnsureSettingsDocument();
 
@@ -184,7 +188,7 @@ namespace Umbraco.Core.Configuration
 		/// <value>
 		/// 	<c>true</c> if new directories are allowed otherwise, <c>false</c>.
 		/// </value>
-		public static bool UploadAllowDirectories
+        internal static bool UploadAllowDirectories
 		{
 			get { return bool.Parse(GetKey("/settings/content/UploadAllowDirectories")); }
 		}
@@ -211,7 +215,7 @@ namespace Umbraco.Core.Configuration
 		/// Gets a value indicating whether logging is enabled in umbracoSettings.config (/settings/logging/enableLogging).
 		/// </summary>
 		/// <value><c>true</c> if logging is enabled; otherwise, <c>false</c>.</value>
-		public static bool EnableLogging
+        internal static bool EnableLogging
 		{
 			get
 			{
@@ -226,7 +230,7 @@ namespace Umbraco.Core.Configuration
 		/// Gets a value indicating whether logging happens async.
 		/// </summary>
 		/// <value><c>true</c> if async logging is enabled; otherwise, <c>false</c>.</value>
-		public static bool EnableAsyncLogging
+        internal static bool EnableAsyncLogging
 		{
 			get
 			{
@@ -241,7 +245,7 @@ namespace Umbraco.Core.Configuration
 		/// <summary>
 		/// Gets the assembly of an external logger that can be used to store log items in 3rd party systems
 		/// </summary>
-		public static string ExternalLoggerAssembly
+        internal static string ExternalLoggerAssembly
 		{
 			get
 			{
@@ -253,7 +257,7 @@ namespace Umbraco.Core.Configuration
 		/// <summary>
 		/// Gets the type of an external logger that can be used to store log items in 3rd party systems
 		/// </summary>
-		public static string ExternalLoggerType
+        internal static string ExternalLoggerType
 		{
 			get
 			{
@@ -265,7 +269,7 @@ namespace Umbraco.Core.Configuration
 		/// <summary>
 		/// Long Audit Trail to external log too
 		/// </summary>
-		public static bool ExternalLoggerLogAuditTrail
+        internal static bool ExternalLoggerLogAuditTrail
 		{
 			get
 			{
@@ -284,7 +288,7 @@ namespace Umbraco.Core.Configuration
         /// <summary>
         /// Keep user alive as long as they have their browser open? Default is true
         /// </summary>
-        public static bool KeepUserLoggedIn
+        internal static bool KeepUserLoggedIn
         {
             get
             {
@@ -296,10 +300,36 @@ namespace Umbraco.Core.Configuration
             }
         }
 
+        internal static string AuthCookieName
+        {
+            get
+            {
+                var value = GetKey("/settings/security/authCookieName");
+                if (string.IsNullOrEmpty(value) == false)
+                {
+                    return value;
+                }
+                return "UMB_UCONTEXT";
+            }
+        }
+
+        internal static string AuthCookieDomain
+        {
+            get
+            {
+                var value = GetKey("/settings/security/authCookieDomain");
+                if (string.IsNullOrEmpty(value) == false)
+                {
+                    return value;
+                }
+                return FormsAuthentication.CookieDomain;
+            }
+        }
+
         /// <summary>
         /// Enables the experimental canvas (live) editing on the frontend of the website
         /// </summary>
-        public static bool EnableCanvasEditing
+        internal static bool EnableCanvasEditing
         {
             get
             {
@@ -314,7 +344,7 @@ namespace Umbraco.Core.Configuration
         /// <summary>
 		/// Show disabled users in the tree in the Users section in the backoffice
 		/// </summary>
-		public static bool HideDisabledUsersInBackoffice
+        internal static bool HideDisabledUsersInBackoffice
 		{
 			get
 			{
@@ -330,7 +360,7 @@ namespace Umbraco.Core.Configuration
 		/// Gets a value indicating whether the logs will be auto cleaned
 		/// </summary>
 		/// <value><c>true</c> if logs are to be automatically cleaned; otherwise, <c>false</c></value>
-		public static bool AutoCleanLogs
+        internal static bool AutoCleanLogs
 		{
 			get
 			{
@@ -345,7 +375,7 @@ namespace Umbraco.Core.Configuration
 		/// <summary>
 		/// Gets the value indicating the log cleaning frequency (in miliseconds)
 		/// </summary>
-		public static int CleaningMiliseconds
+        internal static int CleaningMiliseconds
 		{
 			get
 			{
@@ -357,7 +387,7 @@ namespace Umbraco.Core.Configuration
 			}
 		}
 
-		public static int MaxLogAge
+        internal static int MaxLogAge
 		{
 			get
 			{
@@ -373,7 +403,7 @@ namespace Umbraco.Core.Configuration
 		/// Gets the disabled log types.
 		/// </summary>
 		/// <value>The disabled log types.</value>
-		public static XmlNode DisabledLogTypes
+        internal static XmlNode DisabledLogTypes
 		{
 			get { return GetKeyAsNode("/settings/logging/disabledLogTypes"); }
 		}
@@ -382,7 +412,7 @@ namespace Umbraco.Core.Configuration
 		/// Gets the package server url.
 		/// </summary>
 		/// <value>The package server url.</value>
-		public static string PackageServer
+        internal static string PackageServer
 		{
 			get { return "packages.umbraco.org"; }
 		}
@@ -393,15 +423,14 @@ namespace Umbraco.Core.Configuration
 		/// Gets a value indicating whether umbraco will use domain prefixes.
 		/// </summary>
 		/// <value><c>true</c> if umbraco will use domain prefixes; otherwise, <c>false</c>.</value>
-		// TODO rename as EnforceAbsoluteUrls
-		public static bool UseDomainPrefixes
+        internal static bool UseDomainPrefixes
 		{
 			get
 			{
                 // default: false
                 return _useDomainPrefixes ?? GetKeyValue("/settings/requestHandler/useDomainPrefixes", false);
 			}
-			internal set
+			/*internal*/ set
 			{
                 // for unit tests only
                 _useDomainPrefixes = value;
@@ -414,7 +443,7 @@ namespace Umbraco.Core.Configuration
 		/// This will add a trailing slash (/) to urls when in directory url mode
 		/// NOTICE: This will always return false if Directory Urls in not active
 		/// </summary>
-		public static bool AddTrailingSlash
+        internal static bool AddTrailingSlash
 		{
 			get
 			{
@@ -422,7 +451,7 @@ namespace Umbraco.Core.Configuration
                 return GlobalSettings.UseDirectoryUrls
                     && (_addTrailingSlash ?? GetKeyValue("/settings/requestHandler/addTrailingSlash", false));
 			}
-			internal set
+			/*internal*/ set
 			{
                 // for unit tests only
                 _addTrailingSlash = value;
@@ -433,7 +462,7 @@ namespace Umbraco.Core.Configuration
 		/// Gets a value indicating whether umbraco will use ASP.NET MasterPages for rendering instead of its propriatary templating system.
 		/// </summary>
 		/// <value><c>true</c> if umbraco will use ASP.NET MasterPages; otherwise, <c>false</c>.</value>
-		public static bool UseAspNetMasterPages
+        internal static bool UseAspNetMasterPages
 		{
 			get
 			{
@@ -455,7 +484,7 @@ namespace Umbraco.Core.Configuration
 		/// Gets a value indicating whether umbraco will attempt to load any skins to override default template files
 		/// </summary>
 		/// <value><c>true</c> if umbraco will override templates with skins if present and configured <c>false</c>.</value>
-		public static bool EnableTemplateFolders
+        internal static bool EnableTemplateFolders
 		{
 			get
 			{
@@ -479,7 +508,7 @@ namespace Umbraco.Core.Configuration
 		/// <summary>
 		/// razor DynamicNode typecasting detects XML and returns DynamicXml - Root elements that won't convert to DynamicXml
 		/// </summary>
-		public static IEnumerable<string> NotDynamicXmlDocumentElements
+        internal static IEnumerable<string> NotDynamicXmlDocumentElements
 		{
 			get
 			{
@@ -503,7 +532,7 @@ namespace Umbraco.Core.Configuration
 		private static IEnumerable<RazorDataTypeModelStaticMappingItem> _razorDataTypeModelStaticMapping;
 		private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
 
-		public static IEnumerable<RazorDataTypeModelStaticMappingItem> RazorDataTypeModelStaticMapping
+		internal static IEnumerable<RazorDataTypeModelStaticMappingItem> RazorDataTypeModelStaticMapping
 		{
 			get
 			{
@@ -568,7 +597,7 @@ namespace Umbraco.Core.Configuration
 		/// <value>
 		/// 	<c>true</c> if umbraco will clone XML cache on publish; otherwise, <c>false</c>.
 		/// </value>
-		public static bool CloneXmlCacheOnPublish
+        internal static bool CloneXmlCacheOnPublish
 		{
 			get
 			{
@@ -590,7 +619,7 @@ namespace Umbraco.Core.Configuration
 		/// Gets a value indicating whether rich text editor content should be parsed by tidy.
 		/// </summary>
 		/// <value><c>true</c> if content is parsed; otherwise, <c>false</c>.</value>
-		public static bool TidyEditorContent
+        internal static bool TidyEditorContent
 		{
 			get { return bool.Parse(GetKey("/settings/content/TidyEditorContent")); }
 		}
@@ -599,7 +628,7 @@ namespace Umbraco.Core.Configuration
 		/// Gets the encoding type for the tidyied content.
 		/// </summary>
 		/// <value>The encoding type as string.</value>
-		public static string TidyCharEncoding
+        internal static string TidyCharEncoding
 		{
 			get
 			{
@@ -616,12 +645,12 @@ namespace Umbraco.Core.Configuration
 		/// Gets the property context help option, this can either be 'text', 'icon' or 'none'
 		/// </summary>
 		/// <value>The property context help option.</value>
-		public static string PropertyContextHelpOption
+        internal static string PropertyContextHelpOption
 		{
 			get { return GetKey("/settings/content/PropertyContextHelpOption").ToLower(); }
 		}
 
-		public static string DefaultBackofficeProvider
+        internal static string DefaultBackofficeProvider
 		{
 			get
 			{
@@ -638,37 +667,36 @@ namespace Umbraco.Core.Configuration
 		/// <summary>
 		/// Whether to force safe aliases (no spaces, no special characters) at businesslogic level on contenttypes and propertytypes
 		/// </summary>
-		public static bool ForceSafeAliases
+        internal static bool ForceSafeAliases
 		{
 			get
 			{
                 // default: true
                 return _forceSafeAliases ?? GetKeyValue("/settings/content/ForceSafeAliases", true);
 			}
-			internal set
+			/*internal*/ set
 			{
 				// used for unit  testing
 				_forceSafeAliases = value;
 			}
 		}
 
-        private static bool? _trySkipIisCustomErrors;
+        /// <summary>
+        /// Gets a value indicating whether to try to skip IIS custom errors.
+        /// </summary>
+        [UmbracoWillObsolete("Use UmbracoSettings.For<WebRouting>.TrySkipIisCustomErrors instead.")]
+        internal static bool TrySkipIisCustomErrors
+        {
+            get { return GetKeyValue("/settings/web.routing/@trySkipIisCustomErrors", false); }
+        }
 
         /// <summary>
-        /// Gets or sets a value indicating where to try to skip IIS custom errors.
+        /// Gets a value indicating whether internal redirect preserves the template.
         /// </summary>
-        public static bool TrySkipIisCustomErrors
-        {
-            get
-            {
-                // default: false
-                return _trySkipIisCustomErrors ?? GetKeyValue("/settings/web.routing/@trySkipIisCustomErrors", false);
-            }
-            internal set
-            {
-                // used for unit  testing
-                _trySkipIisCustomErrors = value;
-            }
+        [UmbracoWillObsolete("Use UmbracoSettings.For<WebRouting>.InternalRedirectPerservesTemplate instead.")]
+        internal static bool InternalRedirectPreservesTemplate
+	    {
+            get { return GetKeyValue("/settings/web.routing/@internalRedirectPreservesTemplate", false); }
         }
 
         /// <summary>
@@ -687,7 +715,7 @@ namespace Umbraco.Core.Configuration
 		/// Gets the allowed image file types.
 		/// </summary>
 		/// <value>The allowed image file types.</value>
-		public static string ImageFileTypes
+        internal static string ImageFileTypes
 		{
 			get { return GetKey("/settings/content/imaging/imageFileTypes").ToLowerInvariant(); }
 		}
@@ -696,7 +724,7 @@ namespace Umbraco.Core.Configuration
 		/// Gets the allowed script file types.
 		/// </summary>
 		/// <value>The allowed script file types.</value>
-		public static string ScriptFileTypes
+        internal static string ScriptFileTypes
 		{
 			get { return GetKey("/settings/content/scripteditor/scriptFileTypes"); }
 		}
@@ -707,14 +735,14 @@ namespace Umbraco.Core.Configuration
 		/// Gets the duration in seconds to cache queries to umbraco library member and media methods
 		/// Default is 1800 seconds (30 minutes)
 		/// </summary>
-		public static int UmbracoLibraryCacheDuration
+        internal static int UmbracoLibraryCacheDuration
 		{
 			get
 			{
                 // default: 1800
                 return _umbracoLibraryCacheDuration ?? GetKeyValue("/settings/content/UmbracoLibraryCacheDuration", 1800);
 			}
-			internal set
+			/*internal*/ set
             {
                 // for unit tests only
                 _umbracoLibraryCacheDuration = value;
@@ -725,7 +753,7 @@ namespace Umbraco.Core.Configuration
 		/// Gets the path to the scripts folder used by the script editor.
 		/// </summary>
 		/// <value>The script folder path.</value>
-		public static string ScriptFolderPath
+        internal static string ScriptFolderPath
 		{
 			get { return GetKey("/settings/content/scripteditor/scriptFolderPath"); }
 		}
@@ -733,7 +761,7 @@ namespace Umbraco.Core.Configuration
 		/// <summary>
 		/// Enabled or disable the script/code editor
 		/// </summary>
-		public static bool ScriptDisableEditor
+        internal static bool ScriptDisableEditor
 		{
 			get
 			{
@@ -751,7 +779,7 @@ namespace Umbraco.Core.Configuration
 		/// ex: existingnodename.aspx would become existingnodename(1).aspx if a node with the same name is found 
 		/// </summary>
 		/// <value><c>true</c> if umbraco ensures unique node naming; otherwise, <c>false</c>.</value>
-		public static bool EnsureUniqueNaming
+        internal static bool EnsureUniqueNaming
 		{
 			get
 			{
@@ -770,7 +798,7 @@ namespace Umbraco.Core.Configuration
 		/// Gets the notification email sender.
 		/// </summary>
 		/// <value>The notification email sender.</value>
-		public static string NotificationEmailSender
+        internal static string NotificationEmailSender
 		{
 			get { return GetKey("/settings/content/notifications/email"); }
 		}
@@ -781,7 +809,7 @@ namespace Umbraco.Core.Configuration
 		/// <value>
 		/// 	<c>true</c> if html notification-emails are disabled; otherwise, <c>false</c>.
 		/// </value>
-		public static bool NotificationDisableHtmlEmail
+        internal static bool NotificationDisableHtmlEmail
 		{
 			get
 			{
@@ -794,12 +822,12 @@ namespace Umbraco.Core.Configuration
 		/// Gets the allowed attributes on images.
 		/// </summary>
 		/// <value>The allowed attributes on images.</value>
-		public static string ImageAllowedAttributes
+        internal static string ImageAllowedAttributes
 		{
 			get { return GetKey("/settings/content/imaging/allowedAttributes"); }
 		}
 
-		public static XmlNode ImageAutoFillImageProperties
+        internal static XmlNode ImageAutoFillImageProperties
 		{
 			get { return GetKeyAsNode("/settings/content/imaging/autoFillImageProperties"); }
 		}
@@ -808,7 +836,7 @@ namespace Umbraco.Core.Configuration
 		/// Gets the scheduled tasks as XML
 		/// </summary>
 		/// <value>The scheduled tasks.</value>
-		public static XmlNode ScheduledTasks
+        internal static XmlNode ScheduledTasks
 		{
 			get { return GetKeyAsNode("/settings/scheduledTasks"); }
 		}
@@ -817,7 +845,7 @@ namespace Umbraco.Core.Configuration
 		/// Gets a list of characters that will be replaced when generating urls
 		/// </summary>
 		/// <value>The URL replacement characters.</value>
-		public static XmlNode UrlReplaceCharacters
+        internal static XmlNode UrlReplaceCharacters
 		{
 			get { return GetKeyAsNode("/settings/requestHandler/urlReplacing"); }
 		}
@@ -825,7 +853,7 @@ namespace Umbraco.Core.Configuration
 		/// <summary>
 		/// Whether to replace double dashes from url (ie my--story----from--dash.aspx caused by multiple url replacement chars
 		/// </summary>
-		public static bool RemoveDoubleDashesFromUrlReplacing
+        internal static bool RemoveDoubleDashesFromUrlReplacing
 		{
 			get
 			{
@@ -846,7 +874,7 @@ namespace Umbraco.Core.Configuration
 		/// Used for load-balancing high-traffic sites.
 		/// </summary>
 		/// <value><c>true</c> if umbraco uses distributed calls; otherwise, <c>false</c>.</value>
-		public static bool UseDistributedCalls
+        internal static bool UseDistributedCalls
 		{
 			get
 			{
@@ -866,7 +894,7 @@ namespace Umbraco.Core.Configuration
 		/// Gets the ID of the user with access rights to perform the distributed calls.
 		/// </summary>
 		/// <value>The distributed call user.</value>
-		public static int DistributedCallUser
+        internal static int DistributedCallUser
 		{
 			get
 			{
@@ -884,7 +912,7 @@ namespace Umbraco.Core.Configuration
 		/// <summary>
 		/// Gets the html injected into a (x)html page if Umbraco is running in preview mode
 		/// </summary>
-		public static string PreviewBadge
+        internal static string PreviewBadge
 		{
 			get
 			{
@@ -905,7 +933,7 @@ namespace Umbraco.Core.Configuration
 		/// and update their content cache accordingly, ensuring a consistent cache on all servers
 		/// </summary>
 		/// <value>The distribution servers.</value>
-		public static XmlNode DistributionServers
+        internal static XmlNode DistributionServers
 		{
 			get
 			{
@@ -925,7 +953,7 @@ namespace Umbraco.Core.Configuration
 		/// A help page configuration specify language, user type, application, application url and 
 		/// the target help page url.
 		/// </summary>
-		public static XmlNode HelpPages
+        internal static XmlNode HelpPages
 		{
 			get
 			{
@@ -947,7 +975,7 @@ namespace Umbraco.Core.Configuration
 		/// All packages installed from a repository gets the repository alias included in the install information
 		/// </summary>
 		/// <value>The repository servers.</value>
-		public static XmlNode Repositories
+        internal static XmlNode Repositories
 		{
 			get
 			{
@@ -970,7 +998,7 @@ namespace Umbraco.Core.Configuration
 		/// <value>
 		/// 	<c>true</c> if umbraco will use the viewstate mover module; otherwise, <c>false</c>.
 		/// </value>
-		public static bool UseViewstateMoverModule
+        internal static bool UseViewstateMoverModule
 		{
 			get
 			{
@@ -992,7 +1020,7 @@ namespace Umbraco.Core.Configuration
 		/// Tells us whether the Xml Content cache is disabled or not
 		/// Default is enabled
 		/// </summary>
-		public static bool IsXmlContentCacheDisabled
+        internal static bool IsXmlContentCacheDisabled
 		{
 			get
 			{
@@ -1017,7 +1045,7 @@ namespace Umbraco.Core.Configuration
 		/// Makes it possible to updates environments by syncing the umbraco.config file across instances
 		/// Relates to http://umbraco.codeplex.com/workitem/30722
 		/// </summary>
-		public static bool XmlContentCheckForDiskChanges
+        internal static bool XmlContentCheckForDiskChanges
 		{
 			get
 			{
@@ -1042,7 +1070,7 @@ namespace Umbraco.Core.Configuration
 		/// If disabled, only documents will generate data.
 		/// This feature is useful if anyone would like to see how data looked at a given time
 		/// </summary>
-		public static bool EnableGlobalPreviewStorage
+        internal static bool EnableGlobalPreviewStorage
 		{
 			get
 			{
@@ -1070,14 +1098,14 @@ namespace Umbraco.Core.Configuration
 		/// <value>
 		/// 	<c>true</c> if yes, use the old node/data model; otherwise, <c>false</c>.
 		/// </value>
-		public static bool UseLegacyXmlSchema
+        internal static bool UseLegacyXmlSchema
 		{
 			get
 			{
                 // default: true
                 return _useLegacySchema ?? GetKeyValue("/settings/content/UseLegacyXmlSchema", false);
 			}
-			internal set
+			/*internal*/ set
 			{
 				// used for unit testing
 				_useLegacySchema = value;
@@ -1085,7 +1113,7 @@ namespace Umbraco.Core.Configuration
 		}
 
 		[Obsolete("This setting is not used anymore, the only file extensions that are supported are .cs and .vb files")]
-		public static IEnumerable<string> AppCodeFileExtensionsList
+        internal static IEnumerable<string> AppCodeFileExtensionsList
 		{
 			get
 			{
@@ -1096,7 +1124,7 @@ namespace Umbraco.Core.Configuration
 		}
 
 		[Obsolete("This setting is not used anymore, the only file extensions that are supported are .cs and .vb files")]
-		public static XmlNode AppCodeFileExtensions
+        internal static XmlNode AppCodeFileExtensions
 		{
 			get
 			{
@@ -1118,7 +1146,7 @@ namespace Umbraco.Core.Configuration
 		/// Tells us whether the Xml to always update disk cache, when changes are made to content
 		/// Default is enabled
 		/// </summary>
-		public static bool ContinouslyUpdateXmlDiskCache
+        internal static bool ContinouslyUpdateXmlDiskCache
 		{
 			get
 			{
@@ -1144,7 +1172,7 @@ namespace Umbraco.Core.Configuration
 		/// have a splash page
 		/// Default is disabled
 		/// </summary>
-		public static bool EnableSplashWhileLoading
+        internal static bool EnableSplashWhileLoading
 		{
 			get
 			{
@@ -1165,7 +1193,7 @@ namespace Umbraco.Core.Configuration
 		}
 
 		private static bool? _resolveUrlsFromTextString;
-		public static bool ResolveUrlsFromTextString
+        internal static bool ResolveUrlsFromTextString
 		{
 			get
 			{
@@ -1202,7 +1230,7 @@ namespace Umbraco.Core.Configuration
 		/// is used instead of the masterpages editor
 		/// </summary>
 		/// <value><c>true</c> if umbraco defaults to using MVC views for templating, otherwise <c>false</c>.</value>
-		public static RenderingEngine DefaultRenderingEngine
+        internal static RenderingEngine DefaultRenderingEngine
 		{
 			get
 			{
@@ -1226,6 +1254,12 @@ namespace Umbraco.Core.Configuration
 				}
 				return _defaultRenderingEngine.Value;
 			}
+            //internal set
+            //{
+            //    _defaultRenderingEngine = value;
+            //    var node = UmbracoSettingsXmlDoc.DocumentElement.SelectSingleNode("/settings/templates/defaultRenderingEngine");
+            //    node.InnerText = value.ToString();
+            //}
 		}
 
 		private static MacroErrorBehaviour? _macroErrorBehaviour;
@@ -1237,7 +1271,7 @@ namespace Umbraco.Core.Configuration
 		/// - Throw  - Throw an exception and invoke the global error handler (if one is defined, if not you'll get a YSOD)
 		/// </summary>
 		/// <value>MacroErrorBehaviour enum defining how to handle macro errors.</value>
-		public static MacroErrorBehaviour MacroErrorBehaviour
+        internal static MacroErrorBehaviour MacroErrorBehaviour
 		{
 			get
 			{
@@ -1272,7 +1306,7 @@ namespace Umbraco.Core.Configuration
         /// - HideFileDuplicates   - Show files in the sprite and hide duplicates on disk
         /// </summary>
         /// <value>MacroErrorBehaviour enum defining how to show icons in the document type editor.</value>
-        public static IconPickerBehaviour IconPickerBehaviour
+        internal static IconPickerBehaviour IconPickerBehaviour
 		{
 			get
 			{
@@ -1500,6 +1534,80 @@ namespace Umbraco.Core.Configuration
 			}
 
 			#endregion
-		}
-	}
+        }
+
+        #region Extensible settings
+
+        /// <summary>
+        /// Resets settings that were set programmatically, to their initial values.
+        /// </summary>
+        /// <remarks>To be used in unit tests.</remarks>
+        internal static void Reset()
+        {
+            ResetInternal();
+
+            using (new WriteLock(SectionsLock))
+            {
+                foreach (var section in Sections.Values)
+                    section.ResetSection();
+            }
+        }
+
+        private static readonly ReaderWriterLockSlim SectionsLock = new ReaderWriterLockSlim();
+        private static readonly Dictionary<Type, UmbracoConfigurationSection> Sections = new Dictionary<Type, UmbracoConfigurationSection>();
+
+        /// <summary>
+        /// Gets the specified UmbracoConfigurationSection.
+        /// </summary>
+        /// <typeparam name="T">The type of the UmbracoConfigurationSectiont.</typeparam>
+        /// <returns>The UmbracoConfigurationSection of the specified type.</returns>
+        public static T For<T>()
+            where T : UmbracoConfigurationSection, new()
+        {
+            var sectionType = typeof (T);
+            using (new WriteLock(SectionsLock))
+            {
+                if (Sections.ContainsKey(sectionType)) return Sections[sectionType] as T;
+
+                var attr = sectionType.GetCustomAttribute<ConfigurationKeyAttribute>(false);
+                if (attr == null)
+                    throw new InvalidOperationException(string.Format("Type \"{0}\" is missing attribute ConfigurationKeyAttribute.", sectionType.FullName));
+
+                var sectionKey = attr.ConfigurationKey;
+                if (string.IsNullOrWhiteSpace(sectionKey))
+                    throw new InvalidOperationException(string.Format("Type \"{0}\" ConfigurationKeyAttribute value is null or empty.", sectionType.FullName));
+
+                var section = GetSection(sectionType, sectionKey);
+
+                Sections[sectionType] = section;
+                return section as T;
+            }
+        }
+
+        private static UmbracoConfigurationSection GetSection(Type sectionType, string key)
+        {
+            if (!sectionType.Inherits<UmbracoConfigurationSection>())
+                 throw new ArgumentException(string.Format(
+                    "Type \"{0}\" does not inherit from UmbracoConfigurationSection.", sectionType.FullName), "sectionType");
+
+            var section = ConfigurationManager.GetSection(key);
+
+            if (section != null && section.GetType() != sectionType)
+                throw new InvalidCastException(string.Format("Section at key \"{0}\" is of type \"{1}\" and not \"{2}\".",
+                    key, section.GetType().FullName, sectionType.FullName));
+
+            if (section != null) return section as UmbracoConfigurationSection;
+
+            section = Activator.CreateInstance(sectionType) as UmbracoConfigurationSection;
+
+            if (section == null)
+                throw new NullReferenceException(string.Format(
+                    "Activator failed to create an instance of type \"{0}\" for key\"{1}\" and returned null.",
+                    sectionType.FullName, key));
+
+            return section as UmbracoConfigurationSection;
+        }
+
+        #endregion
+    }
 }

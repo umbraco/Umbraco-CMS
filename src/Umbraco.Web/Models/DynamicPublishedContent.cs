@@ -76,8 +76,8 @@ namespace Umbraco.Web.Models
                     _ownersCollection = value;    
                 }
             }
-        }
-
+        }       
+        
 		public dynamic AsDynamic()
 		{
 			return this;
@@ -236,7 +236,10 @@ namespace Umbraco.Web.Models
 			}
 
 			//get the data type id for the current property
-			var dataType = Umbraco.Core.PublishedContentHelper.GetDataType(userProperty.DocumentTypeAlias, userProperty.Alias);
+			var dataType = Umbraco.Core.PublishedContentHelper.GetDataType(
+                ApplicationContext.Current,
+                userProperty.DocumentTypeAlias, 
+                userProperty.Alias);
 
 			//convert the string value to a known type
 			var converted = Umbraco.Core.PublishedContentHelper.ConvertPropertyValue(result, dataType, userProperty.DocumentTypeAlias, userProperty.Alias);

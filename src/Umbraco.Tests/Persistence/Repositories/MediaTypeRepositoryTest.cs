@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
@@ -128,7 +129,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Assert
             Assert.That(mediaType, Is.Not.Null);
             Assert.That(mediaType.Id, Is.EqualTo(1033));
-            Assert.That(mediaType.Name, Is.EqualTo("File"));
+            Assert.That(mediaType.Name, Is.EqualTo(Constants.Conventions.MediaTypes.File));
         }
 
         [Test]
@@ -145,7 +146,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             int count =
                 DatabaseContext.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
-                    new { NodeObjectType = new Guid("4ea4382b-2f5a-4c2b-9587-ae9b3cf3602e") });
+                    new { NodeObjectType = new Guid(Constants.ObjectTypes.MediaType) });
 
             // Assert
             Assert.That(mediaTypes.Any(), Is.True);

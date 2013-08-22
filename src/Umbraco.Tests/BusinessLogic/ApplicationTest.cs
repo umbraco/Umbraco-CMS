@@ -2,6 +2,7 @@
 using umbraco.BusinessLogic;
 using System;
 using System.Linq;
+using Umbraco.Core;
 
 namespace Umbraco.Tests.BusinessLogic
 {
@@ -48,9 +49,9 @@ namespace Umbraco.Tests.BusinessLogic
             //var app = Application.getAll().First();
 
             //assign the app
-            user.addApplication("content");
+            user.addApplication(Constants.Applications.Content);
             //ensure it's added
-            Assert.AreEqual(1, user.Applications.Count(x => x.alias == "content"));
+            Assert.AreEqual(1, user.Applications.Count(x => x.alias == Constants.Applications.Content));
 
             //delete the user
             user.delete();

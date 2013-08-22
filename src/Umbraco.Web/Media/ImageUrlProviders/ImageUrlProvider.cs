@@ -2,6 +2,7 @@
 using System.Xml.XPath;
 using Umbraco.Core.Media;
 using umbraco;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Media.ImageUrlProviders
 {
@@ -22,7 +23,7 @@ namespace Umbraco.Web.Media.ImageUrlProviders
 
             if (nodeIterator.Current != null)
             {
-                var filename = GetProperty(nodeIterator, "umbracoFile");
+                var filename = GetProperty(nodeIterator, Constants.Conventions.Media.File);
                 var withThumb = AddThumbInfo(filename, parameters);
                 url = AddCropInfo(withThumb, parameters);
             }
@@ -42,7 +43,7 @@ namespace Umbraco.Web.Media.ImageUrlProviders
             if (parameters.ContainsKey("thumb"))
                 thumb = parameters["thumb"];
 
-            if (!string.IsNullOrEmpty(thumb))
+            if (!string.IsNullOrEmpty(thumb) && filename.Contains("."))
             {
                 var lastIndexOf = filename.LastIndexOf('.');
                 var name = filename.Substring(0, lastIndexOf);
@@ -58,7 +59,7 @@ namespace Umbraco.Web.Media.ImageUrlProviders
             if (parameters.ContainsKey("crop"))
                 crop = parameters["crop"];
 
-            if (!string.IsNullOrEmpty(crop))
+            if (!string.IsNullOrEmpty(crop) && filename.Contains("."))
             {
                 var lastIndexOf = filename.LastIndexOf('.');
                 var name = filename.Substring(0, lastIndexOf);

@@ -5,6 +5,7 @@ using System.Text;
 using System.Configuration;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.language;
@@ -19,13 +20,19 @@ namespace Umbraco.Tests.Routing
             base.Initialize();
 
             // ensure we can create them although the content is not in the database
-            TestHelper.DropForeignKeys("umbracoDomains");
+            TestHelper.DropForeignKeys("umbracoDomains");            
         }
 
-		internal override IRoutesCache GetRoutesCache()
-		{
-			return new DefaultRoutesCache(false);
-		}
+        protected override DatabaseBehavior DatabaseTestBehavior
+        {
+            get { return DatabaseBehavior.NewSchemaPerFixture; }
+        }
+
+        protected override void FreezeResolution()
+        {
+            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
+            base.FreezeResolution();
+        }
 
 		void InitializeLanguagesAndDomains()
 		{
@@ -202,7 +209,7 @@ namespace Umbraco.Tests.Routing
 			SetDomains1();
 
 			var currentUri = new Uri(currentUrl);
-			var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId, currentUri, absolute);
+			var result = routingContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
 			Assert.AreEqual(expected, result);
 		}
 
@@ -231,7 +238,7 @@ namespace Umbraco.Tests.Routing
 			SetDomains2();
 
 			var currentUri = new Uri(currentUrl);
-			var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId, currentUri, absolute);
+			var result = routingContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
 			Assert.AreEqual(expected, result);
 		}
 
@@ -252,7 +259,7 @@ namespace Umbraco.Tests.Routing
 			SetDomains3();
 
 			var currentUri = new Uri(currentUrl);
-			var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId, currentUri, absolute);
+			var result = routingContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
 			Assert.AreEqual(expected, result);
 		}
 
@@ -279,7 +286,7 @@ namespace Umbraco.Tests.Routing
 			SetDomains4();
 
 			var currentUri = new Uri(currentUrl);
-			var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId, currentUri, absolute);
+			var result = routingContext.UrlProvider.GetUrl(nodeId, currentUri, absolute);
 			Assert.AreEqual(expected, result);
 		}
 
@@ -296,22 +303,24 @@ namespace Umbraco.Tests.Routing
 			SetDomains4();
 
 			string ignore;
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(1001, new Uri("http://domain1.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(10011, new Uri("http://domain1.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(100111, new Uri("http://domain1.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(10012, new Uri("http://domain1.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(100121, new Uri("http://domain1.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(10013, new Uri("http://domain1.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(1002, new Uri("http://domain1.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(1001, new Uri("http://domain2.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(10011, new Uri("http://domain2.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(100111, new Uri("http://domain2.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(1002, new Uri("http://domain2.com"), false);
+			ignore = routingContext.UrlProvider.GetUrl(1001, new Uri("http://domain1.com"), false);
+			ignore = routingContext.UrlProvider.GetUrl(10011, new Uri("http://domain1.com"), false);
+			ignore = routingContext.UrlProvider.GetUrl(100111, new Uri("http://domain1.com"), false);
+			ignore = routingContext.UrlProvider.GetUrl(10012, new Uri("http://domain1.com"), false);
+			ignore = routingContext.UrlProvider.GetUrl(100121, new Uri("http://domain1.com"), false);
+			ignore = routingContext.UrlProvider.GetUrl(10013, new Uri("http://domain1.com"), false);
+			ignore = routingContext.UrlProvider.GetUrl(1002, new Uri("http://domain1.com"), false);
+			ignore = routingContext.UrlProvider.GetUrl(1001, new Uri("http://domain2.com"), false);
+			ignore = routingContext.UrlProvider.GetUrl(10011, new Uri("http://domain2.com"), false);
+			ignore = routingContext.UrlProvider.GetUrl(100111, new Uri("http://domain2.com"), false);
+			ignore = routingContext.UrlProvider.GetUrl(1002, new Uri("http://domain2.com"), false);
 
-			var cachedRoutes = ((DefaultRoutesCache)routingContext.UmbracoContext.RoutesCache).GetCachedRoutes();
-			Assert.AreEqual(7, cachedRoutes.Count);
+            var cache = routingContext.UmbracoContext.ContentCache.InnerCache as PublishedContentCache;
+            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
+            var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
+            Assert.AreEqual(7, cachedRoutes.Count);
 
-			var cachedIds = ((DefaultRoutesCache)routingContext.UmbracoContext.RoutesCache).GetCachedIds();
+			var cachedIds = cache.RoutesCache.GetCachedIds();
 			Assert.AreEqual(7, cachedIds.Count);
 
 			CheckRoute(cachedRoutes, cachedIds, 1001, "1001/");
@@ -323,15 +332,15 @@ namespace Umbraco.Tests.Routing
 			CheckRoute(cachedRoutes, cachedIds, 1002, "/1002");
 
 			// use the cache
-			Assert.AreEqual("/", routingContext.NiceUrlProvider.GetNiceUrl(1001, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/en/", routingContext.NiceUrlProvider.GetNiceUrl(10011, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/en/1001-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100111, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/fr/", routingContext.NiceUrlProvider.GetNiceUrl(10012, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/fr/1001-2-1/", routingContext.NiceUrlProvider.GetNiceUrl(100121, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/1001-3/", routingContext.NiceUrlProvider.GetNiceUrl(10013, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/1002/", routingContext.NiceUrlProvider.GetNiceUrl(1002, new Uri("http://domain1.com"), false));
+			Assert.AreEqual("/", routingContext.UrlProvider.GetUrl(1001, new Uri("http://domain1.com"), false));
+			Assert.AreEqual("/en/", routingContext.UrlProvider.GetUrl(10011, new Uri("http://domain1.com"), false));
+			Assert.AreEqual("/en/1001-1-1/", routingContext.UrlProvider.GetUrl(100111, new Uri("http://domain1.com"), false));
+			Assert.AreEqual("/fr/", routingContext.UrlProvider.GetUrl(10012, new Uri("http://domain1.com"), false));
+			Assert.AreEqual("/fr/1001-2-1/", routingContext.UrlProvider.GetUrl(100121, new Uri("http://domain1.com"), false));
+			Assert.AreEqual("/1001-3/", routingContext.UrlProvider.GetUrl(10013, new Uri("http://domain1.com"), false));
+			Assert.AreEqual("/1002/", routingContext.UrlProvider.GetUrl(1002, new Uri("http://domain1.com"), false));
 
-			Assert.AreEqual("http://domain1.com/fr/1001-2-1/", routingContext.NiceUrlProvider.GetNiceUrl(100121, new Uri("http://domain2.com"), false));
+			Assert.AreEqual("http://domain1.com/fr/1001-2-1/", routingContext.UrlProvider.GetUrl(100121, new Uri("http://domain2.com"), false));
 		}
 
 		void CheckRoute(IDictionary<int, string> routes, IDictionary<string, int> ids, int id, string route)
@@ -354,23 +363,23 @@ namespace Umbraco.Tests.Routing
 			SetDomains4();
 
             SettingsForTests.UseDomainPrefixes = false;
-            Assert.AreEqual("/en/1001-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100111));
-			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100311));
+            Assert.AreEqual("/en/1001-1-1/", routingContext.UrlProvider.GetUrl(100111));
+			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.UrlProvider.GetUrl(100311));
 
             SettingsForTests.UseDomainPrefixes = true;
-            Assert.AreEqual("http://domain1.com/en/1001-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100111));
-			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100311));
+            Assert.AreEqual("http://domain1.com/en/1001-1-1/", routingContext.UrlProvider.GetUrl(100111));
+			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.UrlProvider.GetUrl(100311));
 
             SettingsForTests.UseDomainPrefixes = false;
-            routingContext.NiceUrlProvider.EnforceAbsoluteUrls = true;
-			Assert.AreEqual("http://domain1.com/en/1001-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100111));
-			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100311));
+            routingContext.UrlProvider.Mode = UrlProviderMode.Absolute;
+			Assert.AreEqual("http://domain1.com/en/1001-1-1/", routingContext.UrlProvider.GetUrl(100111));
+			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.UrlProvider.GetUrl(100311));
 		}
 
 		[Test]
 		public void Get_Nice_Url_Alternate()
 		{
-			var routingContext = GetRoutingContext("http://domain1.com/test", 1111);
+			var routingContext = GetRoutingContext("http://domain1.com/en/test", 1111);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false;
@@ -378,13 +387,12 @@ namespace Umbraco.Tests.Routing
 			InitializeLanguagesAndDomains();
 			SetDomains5();
 
-			var result = routingContext.NiceUrlProvider.GetAllAbsoluteNiceUrls(100111);
+		    var url = routingContext.UrlProvider.GetUrl(100111, true);
+            Assert.AreEqual("http://domain1.com/en/1001-1-1/", url);
+
+			var result = routingContext.UrlProvider.GetOtherUrls(100111).ToArray();
 			
-			// will always get absolute urls
-			// all of them
-			// including the local one - duplicate?! - then must manually exclude?
-			Assert.AreEqual(3, result.Count());
-			Assert.IsTrue(result.Contains("http://domain1.com/en/1001-1-1/"));
+			Assert.AreEqual(2, result.Count());
 			Assert.IsTrue(result.Contains("http://domain1a.com/en/1001-1-1/"));
 			Assert.IsTrue(result.Contains("http://domain1b.com/en/1001-1-1/"));
 		}

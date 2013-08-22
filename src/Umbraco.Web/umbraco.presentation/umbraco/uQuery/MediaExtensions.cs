@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using umbraco.cms.businesslogic.media;
+using Umbraco.Core;
 
 namespace umbraco
 {
@@ -190,9 +191,9 @@ namespace umbraco
 		/// <returns></returns>
 		public static string GetImageUrl(this Media media)
 		{
-			if (media.ContentType.Alias.Equals("Image"))
+			if (media.ContentType.Alias.Equals(Constants.Conventions.MediaTypes.Image))
 			{
-				var url = media.GetProperty<string>("umbracoFile");
+				var url = media.GetProperty<string>(Constants.Conventions.Media.File);
 				if (!string.IsNullOrEmpty(url))
 				{
 					return url;
@@ -209,13 +210,13 @@ namespace umbraco
 		/// <returns></returns>
 		public static string GetImageThumbnailUrl(this Media media)
 		{
-			if (media.ContentType.Alias.Equals("Image"))
+			if (media.ContentType.Alias.Equals(Constants.Conventions.MediaTypes.Image))
 			{
-				var url = media.GetProperty<string>("umbracoFile");
+				var url = media.GetProperty<string>(Constants.Conventions.Media.File);
 				if (!string.IsNullOrEmpty(url))
 				{
-					var extension = media.GetProperty<string>("umbracoExtension");
-					return url.Replace(string.Concat(".", extension), "_thumb.jpg");
+					var extension = media.GetProperty<string>(Constants.Conventions.Media.Extension);
+                    return url.Replace(string.Concat(".", extension), "_thumb.jpg", StringComparison.InvariantCultureIgnoreCase);
 				}
 			}
 

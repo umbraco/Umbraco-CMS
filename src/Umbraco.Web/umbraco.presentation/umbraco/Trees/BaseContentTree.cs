@@ -1,27 +1,15 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.IO;
+using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Web;
-using System.Xml;
-using System.Configuration;
+using Umbraco.Core.Models;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.contentitem;
-using umbraco.cms.businesslogic.datatype;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.media;
-using umbraco.cms.businesslogic.member;
-using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
-using umbraco.DataLayer;
 using umbraco.BusinessLogic.Actions;
-using umbraco.IO;
 
 
 namespace umbraco.cms.presentation.Trees
@@ -36,6 +24,15 @@ namespace umbraco.cms.presentation.Trees
         public BaseContentTree(string application) : base(application) { }
 
         private User _user;
+
+        /// <summary>
+        /// Determines whether the (legacy) Document object passed to the OnRenderNode-method
+        /// should be initialized with a full set of properties.
+        /// By default the Document will be initialized, so setting the boolean to True will
+        /// ensure that the Document object is loaded with a minimum set of properties to 
+        /// improve performance.
+        /// </summary>
+        protected virtual bool LoadMinimalDocument { get; set; }
 
         /// <summary>
         /// Returns the current User. This ensures that we don't instantiate a new User object 
@@ -72,31 +69,74 @@ function openContent(id) {
             }
         }
 
-
         /// <summary>
-        /// Creates the link for the current document 
-        /// </summary>
-        /// <param name="dd"></param>
-        /// <returns></returns>
-        protected string CreateNodeLink(Document dd)
+        /// Renders the specified tree item.
+        /// </summary>        
+        /// <param name="Tree">The tree.</param>
+        /*public override void Render(ref XmlTree Tree)
         {
-            string nodeLink = library.NiceUrl(dd.Id);
-            if (nodeLink == "")
+            //get documents to render
+            Document[] docs = Document.GetChildrenForTree(m_id);
+
+            var args = new TreeEventArgs(Tree);
+            OnBeforeTreeRender(docs, args);
+
+            foreach (Document dd in docs)
             {
-                nodeLink = "/" + dd.Id;
-                if (!GlobalSettings.UseDirectoryUrls)
-                    nodeLink += ".aspx";
+                List<IAction> allowedUserOptions = GetUserActionsForNode(dd);
+                if (CanUserAccessNode(dd, allowedUserOptions))
+                {
+
+                    XmlTreeNode node = CreateNode(dd, allowedUserOptions);
+
+                    OnRenderNode(ref node, dd);
+
+                    OnBeforeNodeRender(ref Tree, ref node, EventArgs.Empty);
+                    if (node != null)
+                    {
+                        Tree.Add(node);
+                        OnAfterNodeRender(ref Tree, ref node, EventArgs.Empty);
+                    }
+                }
             }
-            return nodeLink;
+            OnAfterTreeRender(docs, args);
+        }*/
+        public override void Render(ref XmlTree Tree)
+        {
+            //get documents to render
+            var entities = Services.EntityService.GetChildren(m_id, UmbracoObjectTypes.Document).ToArray();
+
+            var args = new TreeEventArgs(Tree);
+            OnBeforeTreeRender(entities, args, true);
+
+            foreach (var entity in entities)
+            {
+                var e = entity as UmbracoEntity;
+                List<IAction> allowedUserOptions = GetUserActionsForNode(e);
+                if (CanUserAccessNode(e, allowedUserOptions))
+                {
+                    XmlTreeNode node = CreateNode(e, allowedUserOptions);
+
+                    OnRenderNode(ref node, new Document(entity, LoadMinimalDocument));
+
+                    OnBeforeNodeRender(ref Tree, ref node, EventArgs.Empty);
+                    if (node != null)
+                    {
+                        Tree.Add(node);
+                        OnAfterNodeRender(ref Tree, ref node, EventArgs.Empty);
+                    }
+                }
+            }
+            OnAfterTreeRender(entities, args, true);
         }
 
+        #region Tree Create-node-helper Methods - Legacy
         /// <summary>
-        /// Inheritors override this method to modify the content node being created
+        /// Creates an XmlTreeNode based on the passed in Document
         /// </summary>
-        /// <param name="xNode"></param>
-        /// <param name="doc"></param>
-        protected virtual void OnRenderNode(ref XmlTreeNode xNode, Document doc) { }
-
+        /// <param name="dd"></param>
+        /// <param name="allowedUserOptions"></param>
+        /// <returns></returns>
         protected XmlTreeNode CreateNode(Document dd, List<IAction> allowedUserOptions)
         {
             XmlTreeNode node = XmlTreeNode.Create(this);
@@ -121,6 +161,30 @@ function openContent(id) {
 
             return node;
         }
+        
+        /// <summary>
+        /// Creates the link for the current document 
+        /// </summary>
+        /// <param name="dd"></param>
+        /// <returns></returns>
+        protected string CreateNodeLink(Document dd)
+        {
+            string nodeLink = library.NiceUrl(dd.Id);
+            if (nodeLink == "")
+            {
+                nodeLink = "/" + dd.Id;
+                if (GlobalSettings.UseDirectoryUrls == false)
+                    nodeLink += ".aspx";
+            }
+            return nodeLink;
+        }
+
+        /// <summary>
+        /// Inheritors override this method to modify the content node being created
+        /// </summary>
+        /// <param name="xNode"></param>
+        /// <param name="doc"></param>
+        protected virtual void OnRenderNode(ref XmlTreeNode xNode, Document doc) { }
 
         /// <summary>
         /// Determins if the user has access to view the node/document
@@ -149,47 +213,99 @@ function openContent(id) {
             List<IAction> actions = umbraco.BusinessLogic.Actions.Action.FromString(CurrentUser.GetPermissions(dd.Path));
 
             // A user is allowed to delete their own stuff
-            if (dd.UserId == CurrentUser.Id && !actions.Contains(ActionDelete.Instance))
+            if (dd.UserId == CurrentUser.Id && actions.Contains(ActionDelete.Instance) == false)
                 actions.Add(ActionDelete.Instance);
 
             return actions;
         }
 
+        #endregion
+
+        #region Tree Create-node-helper Methods - UmbracoEntity equivalent
         /// <summary>
-        /// Renders the specified tree item.
-        /// </summary>        
-        /// <param name="Tree">The tree.</param>
-        public override void Render(ref XmlTree Tree)
+        /// Creates an XmlTreeNode based on the passed in UmbracoEntity
+        /// </summary>
+        /// <param name="dd"></param>
+        /// <param name="allowedUserOptions"></param>
+        /// <returns></returns>
+        internal XmlTreeNode CreateNode(UmbracoEntity dd, List<IAction> allowedUserOptions)
         {
-            //get documents to render
-            Document[] docs = Document.GetChildrenForTree(m_id);
-
-            var args = new TreeEventArgs(Tree);
-            OnBeforeTreeRender(docs, args);
-
-            foreach (Document dd in docs)
+            XmlTreeNode node = XmlTreeNode.Create(this);
+            SetMenuAttribute(ref node, allowedUserOptions);
+            node.NodeID = dd.Id.ToString();
+            node.Text = dd.Name;
+            SetNonPublishedAttribute(ref node, dd);
+            SetProtectedAttribute(ref node, dd);
+            SetActionAttribute(ref node, dd);
+            SetSourcesAttributes(ref node, dd);
+            if (dd.ContentTypeIcon != null)
             {
-                List<IAction> allowedUserOptions = GetUserActionsForNode(dd);
-                if (CanUserAccessNode(dd, allowedUserOptions))
-                {
-
-                    XmlTreeNode node = CreateNode(dd, allowedUserOptions);
-
-                    OnRenderNode(ref node, dd);
-
-                    OnBeforeNodeRender(ref Tree, ref node, EventArgs.Empty);
-                    if (node != null)
-                    {
-                        Tree.Add(node);
-                        OnAfterNodeRender(ref Tree, ref node, EventArgs.Empty);
-                    }
-                }
+                node.Icon = dd.ContentTypeIcon;
+                node.OpenIcon = dd.ContentTypeIcon;
             }
-            //args = new TreeEventArgs(Tree);
-            OnAfterTreeRender(docs, args);
+
+            if (dd.IsPublished == false)
+                node.Style.DimNode();
+
+            if (dd.HasPendingChanges)
+                node.Style.HighlightNode();
+
+            return node;
         }
 
-        #region Tree Attribute Setter Methods
+        /// <summary>
+        /// Creates the link for the current UmbracoEntity 
+        /// </summary>
+        /// <param name="dd"></param>
+        /// <returns></returns>
+        internal string CreateNodeLink(UmbracoEntity dd)
+        {
+            string nodeLink = library.NiceUrl(dd.Id);
+            if (nodeLink == "")
+            {
+                nodeLink = "/" + dd.Id;
+                if (GlobalSettings.UseDirectoryUrls == false)
+                    nodeLink += ".aspx";
+            }
+            return nodeLink;
+        }
+
+        /// <summary>
+        /// Determins if the user has access to view the node/document
+        /// </summary>
+        /// <param name="doc">The Document to check permissions against</param>
+        /// <param name="allowedUserOptions">A list of IActions that the user has permissions to execute on the current document</param>
+        /// <remarks>By default the user must have Browse permissions to see the node in the Content tree</remarks>
+        /// <returns></returns>        
+        internal virtual bool CanUserAccessNode(UmbracoEntity doc, List<IAction> allowedUserOptions)
+        {
+            if (allowedUserOptions.Contains(ActionBrowse.Instance))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Builds a string of actions that the user is able to perform on the current document.
+        /// The list of actions is subject to the user's rights assigned to the document and also
+        /// is dependant on the type of node.
+        /// </summary>
+        /// <param name="dd"></param>
+        /// <returns></returns>
+        internal List<IAction> GetUserActionsForNode(UmbracoEntity dd)
+        {
+            List<IAction> actions = umbraco.BusinessLogic.Actions.Action.FromString(CurrentUser.GetPermissions(dd.Path));
+
+            // A user is allowed to delete their own stuff
+            if (dd.CreatorId == CurrentUser.Id && actions.Contains(ActionDelete.Instance) == false)
+                actions.Add(ActionDelete.Instance);
+
+            return actions;
+        }
+        #endregion
+
+        #region Tree Attribute Setter Methods - Legacy
+
         protected void SetNonPublishedAttribute(ref XmlTreeNode treeElement, Document dd)
         {
             treeElement.NotPublished = false;
@@ -202,6 +318,7 @@ function openContent(id) {
             else
                 treeElement.NotPublished = true;
         }
+        
         protected void SetProtectedAttribute(ref XmlTreeNode treeElement, Document dd)
         {
             if (Access.IsProtected(dd.Id, dd.Path))
@@ -209,6 +326,7 @@ function openContent(id) {
             else
                 treeElement.IsProtected = false;
         }
+        
         protected void SetActionAttribute(ref XmlTreeNode treeElement, Document dd)
         {
             
@@ -244,6 +362,7 @@ function openContent(id) {
                 }
             }
         }
+        
         protected void SetSourcesAttributes(ref XmlTreeNode treeElement, Document dd)
         {
             treeElement.HasChildren = dd.ContentType.IsContainerContentType == false && dd.HasChildren;
@@ -254,6 +373,72 @@ function openContent(id) {
         {
             //clear menu if we're to hide it
             treeElement.Menu = this.ShowContextMenu == false ? null : RemoveDuplicateMenuDividers(GetUserAllowedActions(AllowedActions, allowedUserActions));
+        }
+
+        #endregion
+
+        #region Tree Attribute Setter Methods - UmbracoEntity equivalent
+
+        internal void SetNonPublishedAttribute(ref XmlTreeNode treeElement, UmbracoEntity dd)
+        {
+            treeElement.NotPublished = false;
+            if (dd.IsPublished)
+                treeElement.NotPublished = dd.HasPendingChanges;
+            else
+                treeElement.NotPublished = true;
+        }
+
+        internal void SetProtectedAttribute(ref XmlTreeNode treeElement, UmbracoEntity dd)
+        {
+            if (Access.IsProtected(dd.Id, dd.Path))
+                treeElement.IsProtected = true;
+            else
+                treeElement.IsProtected = false;
+        }
+
+        internal void SetActionAttribute(ref XmlTreeNode treeElement, UmbracoEntity dd)
+        {
+
+            // Check for dialog behaviour
+            if (this.DialogMode == TreeDialogModes.fulllink)
+            {
+                string nodeLink = CreateNodeLink(dd);
+                treeElement.Action = String.Format("javascript:openContent('{0}');", nodeLink);
+            }
+            else if (this.DialogMode == TreeDialogModes.locallink)
+            {
+                string nodeLink = string.Format("{{localLink:{0}}}", dd.Id);
+                string nodeText = dd.Name.Replace("'", "\\'");
+                // try to make a niceurl too
+                string niceUrl = umbraco.library.NiceUrl(dd.Id).Replace("'", "\\'"); ;
+                if (niceUrl != "#" || niceUrl != "")
+                {
+                    nodeLink += "|" + niceUrl + "|" + HttpContext.Current.Server.HtmlEncode(nodeText);
+                }
+                else
+                {
+                    nodeLink += "||" + HttpContext.Current.Server.HtmlEncode(nodeText);
+                }
+
+                treeElement.Action = String.Format("javascript:openContent('{0}');", nodeLink);
+            }
+            else if (this.DialogMode == TreeDialogModes.id || this.DialogMode == TreeDialogModes.none)
+            {
+                treeElement.Action = String.Format("javascript:openContent('{0}');", dd.Id.ToString(CultureInfo.InvariantCulture));
+            }
+            else if (this.IsDialog == false || (this.DialogMode == TreeDialogModes.id))
+            {
+                if (CurrentUser.GetPermissions(dd.Path).Contains(ActionUpdate.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
+                {
+                    treeElement.Action = String.Format("javascript:openContent({0});", dd.Id);
+                }
+            }
+        }
+
+        internal void SetSourcesAttributes(ref XmlTreeNode treeElement, UmbracoEntity dd)
+        {
+            treeElement.HasChildren = dd.HasChildren;
+            treeElement.Source = IsDialog == false ? GetTreeServiceUrl(dd.Id) : GetTreeDialogUrl(dd.Id);
         }
 
         #endregion

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using System.IO;
@@ -7,6 +8,8 @@ using System.Collections;
 using System.Web.UI.WebControls;
 using System.Data.SqlClient;
 using System.Data;
+using Umbraco.Web;
+using Umbraco.Web.Security;
 using umbraco;
 using umbraco.BusinessLogic;
 using System.Web;
@@ -43,39 +46,34 @@ namespace umbraco.cms.presentation.user
         /// <param name="nodeIDs"></param>
         /// <param name="actions"></param>
         /// <param name="replaceChildren"></param>
-        public void SaveNewPermissions(int[] nodeIDs, List<umbraco.interfaces.IAction> actions, bool replaceChildren)
+        public void SaveNewPermissions(int[] nodeIDs, List<IAction> actions, bool replaceChildren)
         {
             //ensure permissions that are permission assignable
-            List<IAction> permissions = actions.FindAll(
-                delegate(IAction a)
-                {
-                    return (a.CanBePermissionAssigned);
-                }
-            );
+            var permissions = actions.FindAll(a => (a.CanBePermissionAssigned));
 
             //ensure that only the nodes that the user has permissions to update are updated
-            List<int> lstNoPermissions = new List<int>();
-            foreach (int nodeID in nodeIDs)
+            var lstNoPermissions = new List<int>();
+            foreach (var nodeId in nodeIDs)
             {
-                string nodeActions = UmbracoEnsuredPage.CurrentUser.GetPermissions(GetNodePath(nodeID));
-                List<IAction> lstActions = umbraco.BusinessLogic.Actions.Action.FromString(nodeActions);
+                var nodeActions = UmbracoContext.Current.UmbracoUser.GetPermissions(GetNodePath(nodeId));
+                var lstActions = BusinessLogic.Actions.Action.FromString(nodeActions);
                 if (lstActions == null || !lstActions.Contains(ActionRights.Instance))
-                    lstNoPermissions.Add(nodeID);
+                    lstNoPermissions.Add(nodeId);
             }
             //remove the nodes that the user doesn't have permission to update
-            List<int> lstNodeIDs = new List<int>();
+            var lstNodeIDs = new List<int>();
             lstNodeIDs.AddRange(nodeIDs);
-            foreach (int noPermission in lstNoPermissions)
+            foreach (var noPermission in lstNoPermissions)
                 lstNodeIDs.Remove(noPermission);
             nodeIDs = lstNodeIDs.ToArray();
 
             //get the complete list of node ids that this change will affect
-            List<int> allNodes = new List<int>();
+            var allNodes = new List<int>();
             if (replaceChildren)
-                foreach (int nodeID in nodeIDs)
+                foreach (var nodeId in nodeIDs)
                 {
-                    allNodes.Add(nodeID);
-                    allNodes.AddRange(FindChildNodes(nodeID));
+                    allNodes.Add(nodeId);
+                    allNodes.AddRange(FindChildNodes(nodeId));
                 }
             else
                 allNodes.AddRange(nodeIDs);
@@ -85,18 +83,18 @@ namespace umbraco.cms.presentation.user
 
             //if permissions are to be assigned, then assign them
             if (permissions.Count > 0)
-                foreach (umbraco.interfaces.IAction oPer in permissions)
+            {
+                foreach (var oPer in permissions)
+                {
                     InsertPermissions(allNodes.ToArray(), oPer);
+                }
+            }
             else
             {
                 //If there are NO permissions for this node, we need to assign the ActionNull permission otherwise
                 //the node will inherit from it's parent.
                 InsertPermissions(nodeIDs, ActionNull.Instance);
-            }
-
-            //clear umbraco cache (this is the exact syntax umbraco uses... which should be a public method).
-            HttpRuntime.Cache.Remove(string.Format("UmbracoUser{0}", m_user.Id.ToString()));
-            //TODO:can also set a user property which will flush the cache!
+            }            
         }
 
         /// <summary>
@@ -154,18 +152,8 @@ namespace umbraco.cms.presentation.user
 
         private void InsertPermissions(IEnumerable<int> nodeIDs, IAction permission)
         {
-            foreach (int i in nodeIDs)
-                InsertPermission(i, permission);
+            Permission.MakeNew(m_user, nodeIDs.Select(x => new CMSNode(x)), permission.Letter, true);
         }
-
-        private void InsertPermission(int nodeId, IAction permission)
-        {
-            //create a new CMSNode object but don't initialize (this prevents a db query)
-            var node = new CMSNode(nodeId, false);
-            Permission.MakeNew(m_user, node, permission.Letter);
-        }
-
         
-
     }
 }

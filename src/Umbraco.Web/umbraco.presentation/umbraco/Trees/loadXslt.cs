@@ -25,13 +25,14 @@ using umbraco.cms.presentation.Trees;
 using umbraco.BusinessLogic.Utils;
 using umbraco.BusinessLogic.Actions;
 using umbraco.IO;
+using Umbraco.Core;
 
 namespace umbraco
 {
 	/// <summary>
 	/// Handles loading of the xslt files into the application tree
 	/// </summary>
-    [Tree("developer", "xslt", "XSLT Files", sortOrder: 5)]
+    [Tree(Constants.Applications.Developer, "xslt", "XSLT Files", sortOrder: 5)]
     public class loadXslt : FileSystemTree
 	{
 

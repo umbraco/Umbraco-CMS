@@ -1,4 +1,4 @@
-<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="license.ascx.cs" Inherits="umbraco.presentation.install.steps.license" %>
+<%@ Control Language="C#" AutoEventWireup="True" CodeBehind="license.ascx.cs" Inherits="Umbraco.Web.UI.Install.Steps.License" %>
 <!-- licence box -->
 <div class="tab main-tabinfo">
 	<div class="container">
@@ -19,6 +19,6 @@
 	<!-- btn box -->
 	<footer class="btn-box">
 		<div class="t">&nbsp;</div>
-        <asp:LinkButton ID="btnNext" CssClass="btn btn-accept" runat="server" OnClick="gotoNextStep"><span>Accept and Continue</span></asp:LinkButton>
+        <asp:LinkButton ID="btnNext" CssClass="btn btn-accept" runat="server" OnClick="GotoNextStep"><span>Accept and Continue</span></asp:LinkButton>
 	</footer>
 </div>

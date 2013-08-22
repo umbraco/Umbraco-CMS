@@ -42,13 +42,22 @@ namespace Umbraco.Core.Configuration
         #endregion
 
         /// <summary>
-        /// used for unit tests
+        /// Used in unit testing to reset all config items that were set with property setters (i.e. did not come from config)
         /// </summary>
-        internal static void ResetCache()
+        private static void ResetInternal()
         {
             _reservedUrlsCache = null;
             _reservedPaths = null;
             _reservedUrls = null;
+        }
+
+        /// <summary>
+        /// Resets settings that were set programmatically, to their initial values.
+        /// </summary>
+        /// <remarks>To be used in unit tests.</remarks>
+        internal static void Reset()
+        {
+            ResetInternal();
         }
 
     	/// <summary>
@@ -571,6 +580,16 @@ namespace Umbraco.Core.Configuration
         }
 
         public static bool RequestIsLiveEditRedirector(HttpContext context)
+        {
+            return context.Request.Path.ToLower().IndexOf(SystemDirectories.Umbraco.ToLower() + "/liveediting.aspx") > -1;
+        }
+
+        public static bool RequestIsInUmbracoApplication(HttpContextBase context)
+        {
+            return context.Request.Path.ToLower().IndexOf(IOHelper.ResolveUrl(SystemDirectories.Umbraco).ToLower()) > -1;
+        }
+
+        public static bool RequestIsLiveEditRedirector(HttpContextBase context)
         {
             return context.Request.Path.ToLower().IndexOf(SystemDirectories.Umbraco.ToLower() + "/liveediting.aspx") > -1;
         }

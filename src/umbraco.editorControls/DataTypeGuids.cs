@@ -1,38 +1,48 @@
-﻿namespace umbraco.editorControls
+﻿using System;
+using Umbraco.Core;
+
+namespace umbraco.editorControls
 {
 	/// <summary>
 	/// Defines the Guids for all the DataTypes; e.g. quick access to 3rd-party developers.
 	/// </summary>
+	[Obsolete("This class is now obsolete please use Umbraco.Core.Constants.PropertyEditors", false)]
 	public static class DataTypeGuids
 	{
 		/// <summary>
 		/// Guid for the MultiNodeTreePicker data-type.
 		/// </summary>
-		public const string MultiNodeTreePickerId = "7E062C13-7C41-4AD9-B389-41D88AEEF87C";
+		[Obsolete("This property is now obsolete please use Umbraco.Core.Constants.PropertyEditors.MultiNodeTreePicker", false)]
+		public const string MultiNodeTreePickerId = Constants.PropertyEditors.MultiNodeTreePicker;
 
 		/// <summary>
 		/// Guid for the MultipleTextstring data-type.
 		/// </summary>
-		public const string MultipleTextstringId = "5359AD0B-06CC-4182-92BD-0A9117448D3F";
+		[Obsolete("This property is now obsolete please use Umbraco.Core.Constants.PropertyEditors.MultipleTextstring", false)]
+		public const string MultipleTextstringId = Constants.PropertyEditors.MultipleTextstring;
 
-        /// <summary>
-        /// Guid for the PickerRelations (previoulsy uComponents: MultiPickerRelations)
-        /// </summary>
-        public const string PickerRelationsId = "83396FF2-2E39-4A90-9066-17F5F3989374";
+		/// <summary>
+		/// Guid for the PickerRelations (previoulsy uComponents: MultiPickerRelations)
+		/// </summary>
+		[Obsolete("This property is now obsolete please use Umbraco.Core.Constants.PropertyEditors.PickerRelations", false)]
+		public const string PickerRelationsId = Constants.PropertyEditors.PickerRelations;
 
 		/// <summary>
 		/// Guid for the Slider data-type.
 		/// </summary>
-		public const string SliderId = "29E790E6-26B3-438A-B21F-908663A0B19E";
+		[Obsolete("This property is now obsolete please use Umbraco.Core.Constants.PropertyEditors.Slider", false)]
+		public const string SliderId = Constants.PropertyEditors.Slider;
 
 		/// <summary>
 		/// Guid for the XPathCheckBoxList data-type.
 		/// </summary>
-		public const string XPathCheckBoxListId = "34451D92-D270-49BA-8C7F-EE55BFEEE1CB";
+		[Obsolete("This property is now obsolete please use Umbraco.Core.Constants.PropertyEditors.XPathCheckBoxList", false)]
+		public const string XPathCheckBoxListId = Constants.PropertyEditors.XPathCheckBoxList;
 
 		/// <summary>
 		/// Guid for the XPathDropDownList data-type.
 		/// </summary>
-		public const string XPathDropDownListId = "173A96AE-00ED-4A7C-9F76-4B53D4A0A1B9";
+		[Obsolete("This property is now obsolete please use Umbraco.Core.Constants.PropertyEditors.XPathDropDownList", false)]
+		public const string XPathDropDownListId = Constants.PropertyEditors.XPathDropDownList;
 	}
 }

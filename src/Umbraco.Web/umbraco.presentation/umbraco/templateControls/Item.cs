@@ -6,6 +6,7 @@ using System.Security.Permissions;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core.Models;
 using umbraco.BusinessLogic.Actions;
 using umbraco.presentation.LiveEditing.Modules.ItemEditing;
 
@@ -19,12 +20,19 @@ namespace umbraco.presentation.templateControls
 	[Designer("umbraco.presentation.templateControls.ItemDesigner, umbraco")]
     public class Item : CompositeControl
     {
+        
         #region Private Fields
         
         /// <summary>The item's unique ID on the page.</summary>
         private readonly int m_ItemId;
         public AttributeCollectionAdapter LegacyAttributes;
         #endregion
+
+        /// <summary>
+        /// Used by the UmbracoHelper to assign an IPublishedContent to the Item which allows us to pass this in
+        /// to the 'item' ctor so that it renders with the new API instead of the old one.
+        /// </summary>
+        internal IPublishedContent ContentItem { get; private set; }
 
         #region Public Control Properties
         
@@ -189,6 +197,16 @@ namespace umbraco.presentation.templateControls
 
             Renderer = !UmbracoContext.Current.LiveEditingContext.Enabled ? ItemRenderer.Instance
                                                                           : LiveEditingItemRenderer.Instance;
+        }
+
+        /// <summary>
+        /// Internal ctor used to assign an IPublishedContent object.
+        /// </summary>
+        /// <param name="contentItem"></param>
+        internal Item(IPublishedContent contentItem)
+            :this()
+        {
+            ContentItem = contentItem;
         }
 
         #endregion

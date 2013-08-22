@@ -1,8 +1,10 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Generic;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core.Logging;
+using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Logging;
 using umbraco.BasePages;
@@ -12,6 +14,7 @@ namespace umbraco.dialogs
 	/// <summary>
 	/// Summary description for publish.
 	/// </summary>
+	[Obsolete("This is no longer used whatsoever and will be removed from the codebase")]
 	public partial class publish : UmbracoEnsuredPage
 	{
 		protected Literal total;
@@ -86,16 +89,6 @@ namespace umbraco.dialogs
 
                     DoPublishSubs(d);
 
-                    //PPH added load balancing...
-                    //content.Instance.PublishNode(documents);
-                    foreach (var doc in _documents)
-                    {
-                        if (doc.Published)
-                        {
-                            library.UpdateDocumentCache(doc);
-                        }
-                    }
-
                     Application.Lock();
                     Application["publishTotal" + _nodeId.ToString()] = 0;
                     Application.UnLock();
@@ -115,8 +108,7 @@ namespace umbraco.dialogs
                 else
                 {
                     if (d.PublishWithResult(getUser()))
-                    {
-                        library.UpdateDocumentCache(d);
+                    {                        
                         feedbackMsg.type = uicontrols.Feedback.feedbacktype.success;
 						feedbackMsg.Text = ui.Text("publish", "nodePublish", d.Text, getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";						
                     }
@@ -136,13 +128,9 @@ namespace umbraco.dialogs
 		{
             if (d.Published || PublishUnpublishedItems.Checked)
             {
-                if (d.PublishWithResult(base.getUser()))
+                if (d.PublishWithResult(UmbracoUser))
                 {
-                    // Needed for supporting distributed calls
-                    if (UmbracoSettings.UseDistributedCalls)
-                        library.UpdateDocumentCache(d);
-                    else
-                        _documents.Add(d);
+                    
 
                     _nodesPublished++;
                     Application.Lock();
@@ -167,5 +155,86 @@ namespace umbraco.dialogs
 	        ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/publication.asmx"));
 	        ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
 	    }
+
+        /// <summary>
+        /// masterPagePrefix control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal masterPagePrefix;
+
+        /// <summary>
+        /// JsInclude1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude1;
+
+        /// <summary>
+        /// TheForm control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel TheForm;
+
+        /// <summary>
+        /// PublishAll control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox PublishAll;
+
+        /// <summary>
+        /// PublishUnpublishedItems control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox PublishUnpublishedItems;
+
+        /// <summary>
+        /// ok control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button ok;
+
+        /// <summary>
+        /// ProgBar1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.ProgressBar ProgBar1;
+
+        /// <summary>
+        /// theEnd control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel theEnd;
+
+        /// <summary>
+        /// feedbackMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Feedback feedbackMsg;
 	}
 }

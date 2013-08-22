@@ -191,7 +191,7 @@ namespace umbraco.MacroEngines
         {
             get
             {
-                return GetValueAsString("umbracoFile");  
+                return GetValueAsString(Constants.Conventions.Media.File);
             }
         }
 
@@ -280,7 +280,7 @@ namespace umbraco.MacroEngines
         {
             get
             {
-                return GetValueAsString("umbracoFile");
+                return GetValueAsString(Constants.Conventions.Media.File);
             }
         }
 
@@ -469,7 +469,7 @@ namespace umbraco.MacroEngines
             string value = null;
 
             //First, try to get the 'raw' value, if that doesn't work try to get the normal one
-            if (Values.TryGetValue("__Raw_" + alias, out value)
+            if (Values.TryGetValue(UmbracoContentIndexer.RawFieldPrefix + alias, out value)
                 || Values.TryGetValue(alias, out value))
             {
                 propertyExists = true;

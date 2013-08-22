@@ -35,10 +35,11 @@ namespace umbraco.cms.presentation.settings.stylesheet
         }
 
         protected void Page_Load(object sender, EventArgs e)
-        {                        
-            Panel1.Text = ui.Text("stylesheet", "editstylesheet", getUser());
-            pp_name.Text = ui.Text("name", getUser());
-            pp_path.Text = ui.Text("path", getUser());
+        {
+            
+            Panel1.Text = ui.Text("stylesheet", "editstylesheet", UmbracoUser);
+            pp_name.Text = ui.Text("name", UmbracoUser);
+            pp_path.Text = ui.Text("path", UmbracoUser);
 
             stylesheet = new StyleSheet(int.Parse(Request.QueryString["id"]));
             var appPath = Request.ApplicationPath;

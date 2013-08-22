@@ -3,6 +3,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.media;
+using Umbraco.Core;
 
 namespace umbraco.controls.Images
 {
@@ -86,7 +87,7 @@ namespace umbraco.controls.Images
 
                 // TODO: Remove "Magic strings" from code.
                 var pFile = m.getProperty("fileName");
-                if (pFile == null) pFile = m.getProperty("umbracoFile");
+                if (pFile == null) pFile = m.getProperty(Constants.Conventions.Media.File);
                 if (pFile == null) pFile = m.getProperty("file");
                 if (pFile == null)
                 {
@@ -99,8 +100,8 @@ namespace umbraco.controls.Images
                     : "#";
                 AltText = MediaItemPath != "#" ? m.Text : ui.GetText("no") + " " + ui.GetText("media");
 
-                var pWidth = m.getProperty("umbracoWidth");
-                var pHeight = m.getProperty("umbracoHeight");
+                var pWidth = m.getProperty(Constants.Conventions.Media.Width);
+                var pHeight = m.getProperty(Constants.Conventions.Media.Height);
 
                 if (pWidth != null && pWidth.Value != null && pHeight != null && pHeight.Value != null)
                 {

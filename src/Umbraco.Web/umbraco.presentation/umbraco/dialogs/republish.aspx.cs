@@ -8,6 +8,7 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using Umbraco.Web;
 
 namespace umbraco.cms.presentation
 {
@@ -23,23 +24,23 @@ namespace umbraco.cms.presentation
 	    }
         protected void go(object sender, EventArgs e) {
             // re-create xml
-            if (helper.Request("xml") != "")
+            if (Request.GetItemAsString("xml") != "")
             {
                 Server.ScriptTimeout = 100000;
-                umbraco.cms.businesslogic.web.Document.RePublishAll();
+                Services.ContentService.RePublishAll();                
             }
-            else if (helper.Request("previews") != "")
+            else if (Request.GetItemAsString("previews") != "")
             {
                 Server.ScriptTimeout = 100000;
                 umbraco.cms.businesslogic.web.Document.RegeneratePreviews();
             }
-            else if (helper.Request("refreshNodes") != "")
+            else if (Request.GetItemAsString("refreshNodes") != "")
             {
                 Server.ScriptTimeout = 100000;
                 System.Xml.XmlDocument xd = new System.Xml.XmlDocument();
 
                 //store children array here because iterating over an Array object is very inneficient.
-                var doc = new cms.businesslogic.web.Document(int.Parse(helper.Request("refreshNodes")));
+                var doc = new cms.businesslogic.web.Document(int.Parse(Request.GetItemAsString("refreshNodes")));
                 var c = doc.Children;
                 foreach (cms.businesslogic.web.Document d in c)
                 {
@@ -48,9 +49,7 @@ namespace umbraco.cms.presentation
                     Response.Flush();
                 }
             }
-            // library.RePublishNodesDotNet(-1, true);
-            //content.Instance.RefreshContentFromDatabaseAsync();
-
+            
             //PPH changed this to a general library call for load balancing support
             library.RefreshContent();
 
@@ -63,23 +62,6 @@ namespace umbraco.cms.presentation
 			bt_go.Text = ui.Text("republish");
 		}
 
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
 		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
-		}
-		#endregion
 	}
 }

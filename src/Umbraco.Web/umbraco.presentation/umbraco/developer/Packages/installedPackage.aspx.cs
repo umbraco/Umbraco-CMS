@@ -335,6 +335,20 @@ namespace umbraco.presentation.developer.packages
                         bt_uninstall.Visible = false;
                         pane_uninstall.Visible = false;
                     }
+
+                    // List the package version history [LK 2013-067-10]
+                    Version v;
+                    var packageVersionHistory = cms.businesslogic.packager.InstalledPackage.GetAllInstalledPackages()
+                        .Where(x => x.Data.Id != _pack.Data.Id &&  string.Equals(x.Data.Name, _pack.Data.Name, StringComparison.OrdinalIgnoreCase))
+                        .OrderBy(x => Version.TryParse(x.Data.Version, out v) ? v : new Version());
+
+                    if (packageVersionHistory != null && packageVersionHistory.Count() > 0)
+                    {
+                        rptr_versions.DataSource = packageVersionHistory;
+                        rptr_versions.DataBind();
+
+                        pane_versions.Visible = true;
+                    }
                 }
             }
         }
@@ -411,9 +425,7 @@ namespace umbraco.presentation.developer.packages
                     {
                         var s = new Macro(nId);
                         if (!string.IsNullOrEmpty(s.Name))
-                        {
-                            // remove from cache
-                            runtimeMacro.GetMacro(s.Id).removeFromCache();
+                        {                            
                             s.Delete();
                         }
 
@@ -612,6 +624,8 @@ namespace umbraco.presentation.developer.packages
             bt_update.Text = ui.Text("packager", "packageUpgradeHeader");
             pp_upgradeInstruction.Text = ui.Text("packager", "packageUpgradeInstructions");
             bt_gotoUpgrade.Text = ui.Text("packager", "packageUpgradeDownload");
+
+            pane_versions.Text = ui.Text("packager", "packageVersionHistory");
 
             pane_noItems.Text = ui.Text("packager", "packageNoItemsHeader");
 

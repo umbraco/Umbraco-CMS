@@ -9,6 +9,7 @@ using System.Xml;
 using Examine;
 using Examine.LuceneEngine.SearchCriteria;
 using System.Linq;
+using Umbraco.Core;
 
 
 namespace umbraco.presentation.dialogs
@@ -55,7 +56,7 @@ namespace umbraco.presentation.dialogs
             }
 
             //if it doesn't start with "*", then search only nodeName and nodeId
-            var internalSearcher = (CurrentApp == "member")
+            var internalSearcher = (CurrentApp == Constants.Applications.Members)
                 ? UmbracoContext.Current.InternalMemberSearchProvider
                 : UmbracoContext.Current.InternalSearchProvider;
 

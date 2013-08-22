@@ -9,7 +9,7 @@
     <meta charset="utf-8">
 
     <title>Umbraco - no pages found</title>
-    <link rel="icon" type="image/png" href="<%=umbraco.GlobalSettings.Path + "/images/pinnedIcons/umb.ico" %>" />
+    <link rel="icon" type="image/png" href="<%=umbraco.GlobalSettings.Path + "/Images/PinnedIcons/umb.ico" %>" />
 
     <link media="all" rel="stylesheet" href="../../umbraco_client/installer/css/jquery-ui-1.8.6.custom.css" />
 
@@ -60,12 +60,12 @@
 
                         <script type="text/javascript">
                             jQuery(document).ready(function () {
-                                $.post("../../install/utills/p.aspx?feed=sitebuildervids",
+        $.post("../../install/InstallerRestService.aspx?feed=sitebuildervids",
                                     function(data) {
                                         jQuery("#ajax-sitebuildervids").html(data);
                                     });
 
-                                $.post("../../install/utills/p.aspx?feed=developervids",
+        $.post("../../install/InstallerRestService.aspx?feed=developervids",
                                     function(data) {
                                         jQuery("#ajax-developervids").html(data);
                                     });

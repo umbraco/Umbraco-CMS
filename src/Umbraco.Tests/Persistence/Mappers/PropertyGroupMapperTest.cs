@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = PropertyGroupMapper.Instance.Map("Id");
+            string column = new PropertyGroupMapper().Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyTypeGroup].[id]"));
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = PropertyGroupMapper.Instance.Map("ParentId");
+            string column = new PropertyGroupMapper().Map("ParentId");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyTypeGroup].[parentGroupId]"));
@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = PropertyGroupMapper.Instance.Map("SortOrder");
+            string column = new PropertyGroupMapper().Map("SortOrder");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyTypeGroup].[sortorder]"));
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = PropertyGroupMapper.Instance.Map("Name");
+            string column = new PropertyGroupMapper().Map("Name");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyTypeGroup].[text]"));

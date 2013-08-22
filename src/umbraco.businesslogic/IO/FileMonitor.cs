@@ -12,6 +12,7 @@ namespace umbraco.IO
     /// This class can be used to monitor file changes and update accordingly. This is copied
     /// from http://haacked.com/archive/2010/01/17/editable-routes.aspx and based on work in Dynamic Data
     /// </summary>
+    [Obsolete("This class is no longer used and will be removed from the codebase in the future")]
     public class FileMonitor
     {
         private FileMonitor(Action<string> changeCallback)

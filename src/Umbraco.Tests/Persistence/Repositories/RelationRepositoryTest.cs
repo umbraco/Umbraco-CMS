@@ -19,21 +19,7 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         [SetUp]
         public override void Initialize()
-        {
-            //NOTE The DataTypesResolver is only necessary because we are using the Save method in the ContentService
-            //this ensures its reset
-            PluginManager.Current = new PluginManager();
-
-            //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-            PluginManager.Current.AssembliesToScan = new[]
-				{
-                    typeof(IDataType).Assembly,
-                    typeof(tinyMCE3dataType).Assembly
-				};
-
-            DataTypesResolver.Current = new DataTypesResolver(
-                () => PluginManager.Current.ResolveDataTypes());
-
+        {           
             base.Initialize();
 
             CreateTestData();
@@ -254,16 +240,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         [TearDown]
         public override void TearDown()
         {
-            //reset the app context
-            DataTypesResolver.Reset();
-
             base.TearDown();
         }
 
         public void CreateTestData()
         {
-            var relateContent = new RelationType(new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"), new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"), "relateContentOnCopy") { IsBidirectional = true, Name = "Relate Content on Copy" };
-            var relateContentType = new RelationType(new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"), new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"), "relateContentTypeOnCopy") { IsBidirectional = true, Name = "Relate ContentType on Copy" };
+            var relateContent = new RelationType(new Guid(Constants.ObjectTypes.Document), new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"), "relateContentOnCopy") { IsBidirectional = true, Name = "Relate Content on Copy" };
+            var relateContentType = new RelationType(new Guid(Constants.ObjectTypes.DocumentType), new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"), "relateContentTypeOnCopy") { IsBidirectional = true, Name = "Relate ContentType on Copy" };
 
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();

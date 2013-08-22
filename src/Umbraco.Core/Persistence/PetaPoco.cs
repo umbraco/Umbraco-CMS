@@ -234,7 +234,7 @@ namespace Umbraco.Core.Persistence
 			{
 				_sharedConnection = _factory.CreateConnection();
 				_sharedConnection.ConnectionString = _connectionString;
-				_sharedConnection.Open();
+                _sharedConnection.OpenWithRetry();//Changed .Open() => .OpenWithRetry() extension method
 
 				_sharedConnection = OnConnectionOpened(_sharedConnection);
 
@@ -384,7 +384,7 @@ namespace Umbraco.Core.Persistence
 		}
 
 		// Add a parameter to a DB command
-		void AddParam(IDbCommand cmd, object item, string ParameterPrefix)
+		internal void AddParam(IDbCommand cmd, object item, string ParameterPrefix)
 		{
 			// Convert value to from poco type to db type
 			if (Database.Mapper != null && item!=null)
@@ -424,7 +424,8 @@ namespace Umbraco.Core.Persistence
 				}
 				else if (t == typeof(string))
 				{
-                    // out of memory exception occurs if trying to save more than 4000 characters to SQL Server CE NText column. Set before attempting to set Size, or Size will always max out at 4000
+                    // out of memory exception occurs if trying to save more than 4000 characters to SQL Server CE NText column. 
+                    //Set before attempting to set Size, or Size will always max out at 4000
                     if ((item as string).Length + 1 > 4000 && p.GetType().Name == "SqlCeParameter")
                         p.GetType().GetProperty("SqlDbType").SetValue(p, SqlDbType.NText, null); 
 
@@ -526,7 +527,7 @@ namespace Umbraco.Core.Persistence
 				{
 					using (var cmd = CreateCommand(_sharedConnection, sql, args))
 					{
-						var retv=cmd.ExecuteNonQuery();
+						var retv=cmd.ExecuteNonQueryWithRetry();
 						OnExecutedCommand(cmd);
 						return retv;
 					}
@@ -558,7 +559,7 @@ namespace Umbraco.Core.Persistence
 				{
 					using (var cmd = CreateCommand(_sharedConnection, sql, args))
 					{
-						object val = cmd.ExecuteScalar();
+						object val = cmd.ExecuteScalarWithRetry();
 						OnExecutedCommand(cmd);
 						return (T)Convert.ChangeType(val, typeof(T));
 					}
@@ -1077,7 +1078,7 @@ namespace Umbraco.Core.Persistence
 					IDataReader r;
 					try
 					{
-						r = cmd.ExecuteReader();
+						r = cmd.ExecuteReaderWithRetry();
 						OnExecutedCommand(cmd);
 					}
 					catch (Exception x)
@@ -1253,7 +1254,7 @@ namespace Umbraco.Core.Persistence
 						if (!autoIncrement)
 						{
 							DoPreExecute(cmd);
-							cmd.ExecuteNonQuery();
+							cmd.ExecuteNonQueryWithRetry();
 							OnExecutedCommand(cmd);
 							return true;
 						}
@@ -1264,14 +1265,14 @@ namespace Umbraco.Core.Persistence
 						{
 							case DBType.SqlServerCE:
 								DoPreExecute(cmd);
-								cmd.ExecuteNonQuery();
+								cmd.ExecuteNonQueryWithRetry();
 								OnExecutedCommand(cmd);
 								id = ExecuteScalar<object>("SELECT @@@IDENTITY AS NewID;");
 								break;
 							case DBType.SqlServer:
 								cmd.CommandText += ";\nSELECT SCOPE_IDENTITY() AS NewID;";
 								DoPreExecute(cmd);
-								id = cmd.ExecuteScalar();
+								id = cmd.ExecuteScalarWithRetry();
 								OnExecutedCommand(cmd);
 								break;
 							case DBType.PostgreSQL:
@@ -1279,13 +1280,13 @@ namespace Umbraco.Core.Persistence
 								{
 									cmd.CommandText += string.Format("returning {0} as NewID", EscapeSqlIdentifier(primaryKeyName));
 									DoPreExecute(cmd);
-									id = cmd.ExecuteScalar();
+									id = cmd.ExecuteScalarWithRetry();
 								}
 								else
 								{
 									id = -1;
 									DoPreExecute(cmd);
-									cmd.ExecuteNonQuery();
+									cmd.ExecuteNonQueryWithRetry();
 								}
 								OnExecutedCommand(cmd);
 								break;
@@ -1300,14 +1301,14 @@ namespace Umbraco.Core.Persistence
 									param.DbType = DbType.Int64;
 									cmd.Parameters.Add(param);
 									DoPreExecute(cmd);
-									cmd.ExecuteNonQuery();
+									cmd.ExecuteNonQueryWithRetry();
 									id = param.Value;
 								}
 								else
 								{
 									id = -1;
 									DoPreExecute(cmd);
-									cmd.ExecuteNonQuery();
+									cmd.ExecuteNonQueryWithRetry();
 								}
 								OnExecutedCommand(cmd);
 								break;
@@ -1316,20 +1317,20 @@ namespace Umbraco.Core.Persistence
                                 {
                                     cmd.CommandText += ";\nSELECT last_insert_rowid();";
                                     DoPreExecute(cmd);
-                                    id = cmd.ExecuteScalar();
+                                    id = cmd.ExecuteScalarWithRetry();
                                 }
                                 else
                                 {
                                     id = -1;
                                     DoPreExecute(cmd);
-                                    cmd.ExecuteNonQuery();
+                                    cmd.ExecuteNonQueryWithRetry();
                                 }
                                 OnExecutedCommand(cmd);
                                 break;
 							default:
 								cmd.CommandText += ";\nSELECT @@IDENTITY AS NewID;";
 								DoPreExecute(cmd);
-								id = cmd.ExecuteScalar();
+								id = cmd.ExecuteScalarWithRetry();
 								OnExecutedCommand(cmd);
 								break;
 						}
@@ -1442,7 +1443,7 @@ namespace Umbraco.Core.Persistence
 						DoPreExecute(cmd);
 
 						// Do it
-						var retv=cmd.ExecuteNonQuery();
+						var retv=cmd.ExecuteNonQueryWithRetry();
 						OnExecutedCommand(cmd);
 						return retv;
 					}

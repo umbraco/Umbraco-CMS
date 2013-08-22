@@ -24,6 +24,7 @@ using umbraco.DataLayer;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
 using umbraco.BusinessLogic.Actions;
+using Umbraco.Core;
 
 
 namespace umbraco
@@ -31,7 +32,7 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of all datatypes into the developer application tree
 	/// </summary>
-    [Tree("developer", "datatype", "Data Types", sortOrder: 1)]
+    [Tree(Constants.Applications.Developer, "datatype", "Data Types", sortOrder: 1)]
     public class loadDataTypes : BaseTree
 	{
         public loadDataTypes(string application) : base(application) { }

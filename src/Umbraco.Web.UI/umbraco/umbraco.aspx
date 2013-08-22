@@ -4,6 +4,9 @@
 <%@ Import Namespace="System.Web.Script.Serialization" %>
 
 <%@ Register Src="controls/Tree/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
+<%@ Import Namespace="StackExchange.Profiling" %>
+<%@ Import Namespace="Umbraco.Core.Profiling" %>
+<%@ Import Namespace="Umbraco.Web" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="uc1" TagName="quickSearch" Src="Search/QuickSearch.ascx" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
@@ -13,7 +16,7 @@
     <title>Umbraco CMS -
         <%=Request.Url.Host.ToLower().Replace("www.", "") %></title>
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
-    <link rel="icon" type="image/png" href="<%#umbraco.GlobalSettings.Path + "/images/pinnedIcons/umb.ico" %>" />
+    <link rel="icon" type="image/png" href="<%#umbraco.GlobalSettings.Path + "/Images/PinnedIcons/umb.ico" %>" />
     <cc1:UmbracoClientDependencyLoader runat="server" ID="ClientLoader" />
     <umb:CssInclude ID="CssInclude1" runat="server" FilePath="css/umbracoGui.css" PathNameAlias="UmbracoRoot" />
     <umb:CssInclude ID="CssInclude2" runat="server" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />
@@ -90,12 +93,12 @@
             <div class="topBarButtons">
                 <button onclick="UmbClientMgr.appActions().launchAbout();" class="topBarButton">
                     <img src="images/aboutNew.png" alt="about" /><span><%=umbraco.ui.Text("general", "about")%></span></button>
-                <button onclick="UmbClientMgr.appActions().launchHelp('<%=this.getUser().Language%>', '<%=this.getUser().UserType.Name%>');"
+                <button onclick="UmbClientMgr.appActions().launchHelp('<%=UmbracoUser.Language%>', '<%=UmbracoUser.UserType.Name%>');"
                     class="topBarButton">
                     <img src="images/help.png" alt="Help" /><span><%=umbraco.ui.Text("general", "help")%></span></button>
                 <button onclick="UmbClientMgr.appActions().logout();" class="topBarButton">
                     <img src="images/logout.png" alt="Log out" /><span><%=umbraco.ui.Text("general", "logout")%>:
-                        <%=this.getUser().Name%></span></button>
+                        <%=UmbracoUser.Name%></span></button>
             </div>
         </div>
     </div>
@@ -299,13 +302,13 @@
             if (password != "") {
 
                 var data = {
-                    username: <%= new JavaScriptSerializer().Serialize(this.getUser().LoginName) %>, 
+                    username: <%= new JavaScriptSerializer().Serialize(UmbracoUser.LoginName) %>, 
                     password: password
                 };
 
                 jQuery.ajax({
                     type: "POST",
-                    url: "<%=umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/webservices/legacyAjaxCalls.asmx/ValidateUser",
+                    url: "<%=Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) %>/webservices/legacyAjaxCalls.asmx/ValidateUser",
                     data: JSON.stringify(data),
                     processData: false, 
                     success: function (result) {
@@ -388,5 +391,9 @@
         }
 
     </script>
+    <%if(string.IsNullOrEmpty(Request["umbDebug"]) == false && umbraco.GlobalSettings.DebugMode)
+      {
+          Response.Write(Html.RenderProfiler());
+      }%>
 </body>
 </html>

@@ -1,10 +1,12 @@
 using System;
+using System.Diagnostics;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Defines a Content object
-    /// </summary>
+    /// </summary>    
     public interface IContent : IContentBase
     {
         /// <summary>

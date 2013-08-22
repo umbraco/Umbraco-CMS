@@ -6,7 +6,7 @@ namespace Umbraco.Core.PropertyEditors
 	{
 		public bool IsConverterFor(Guid propertyEditorId, string docTypeAlias, string propertyTypeAlias)
 		{
-			return Guid.Parse("38b352c1-e9f8-4fd8-9324-9a2eab06d97a").Equals(propertyEditorId);
+			return Guid.Parse(Constants.PropertyEditors.TrueFalse).Equals(propertyEditorId);
 		}
 
 		/// <summary>

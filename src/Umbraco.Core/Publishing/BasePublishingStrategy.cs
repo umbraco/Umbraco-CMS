@@ -8,6 +8,7 @@ namespace Umbraco.Core.Publishing
     /// </summary>
     public abstract class BasePublishingStrategy : IPublishingStrategy
     {
+
         public abstract bool Publish(IContent content, int userId);
         public abstract bool PublishWithChildren(IEnumerable<IContent> content, int userId);
         public abstract bool UnPublish(IContent content, int userId);

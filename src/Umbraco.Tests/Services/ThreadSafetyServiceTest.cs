@@ -26,21 +26,7 @@ namespace Umbraco.Tests.Services
 
 		[SetUp]
 		public override void Initialize()
-		{
-            //NOTE The DataTypesResolver is only necessary because we are using the Save method in the MediaService
-            //this ensures its reset
-            PluginManager.Current = new PluginManager();
-
-            //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-            PluginManager.Current.AssembliesToScan = new[]
-				{
-                    typeof(IDataType).Assembly,
-                    typeof(tinyMCE3dataType).Assembly
-				};
-
-            DataTypesResolver.Current = new DataTypesResolver(
-                () => PluginManager.Current.ResolveDataTypes());
-
+		{            
 			base.Initialize();
 			
 			//we need to use our own custom IDatabaseFactory for the DatabaseContext because we MUST ensure that 
@@ -63,9 +49,6 @@ namespace Umbraco.Tests.Services
 		[TearDown]
 		public override void TearDown()
 		{
-            //reset the app context
-            DataTypesResolver.Reset();
-
 			_error = null;
 
 			//dispose!
@@ -140,7 +123,7 @@ namespace Umbraco.Tests.Services
 			}
 			else
 			{
-				Assert.Fail("ERROR! " + _error);
+			    throw new Exception("Error!", _error);
 			}
 			
 		}
@@ -166,14 +149,14 @@ namespace Umbraco.Tests.Services
 						//create 2 content items
 
                         string name1 = "test" + Guid.NewGuid();
-					    var folder1 = mediaService.CreateMedia(name1, -1, "Folder", 0);
+					    var folder1 = mediaService.CreateMedia(name1, -1, Constants.Conventions.MediaTypes.Folder, 0);
 						Debug.WriteLine("Saving folder1 on thread: " + Thread.CurrentThread.ManagedThreadId);
 						mediaService.Save(folder1, 0);
 
 						Thread.Sleep(100); //quick pause for maximum overlap!
 
                         string name = "test" + Guid.NewGuid();
-                        var folder2 = mediaService.CreateMedia(name, -1, "Folder", 0);
+                        var folder2 = mediaService.CreateMedia(name, -1, Constants.Conventions.MediaTypes.Folder, 0);
 						Debug.WriteLine("Saving folder2 on thread: " + Thread.CurrentThread.ManagedThreadId);
 						mediaService.Save(folder2, 0);
 					}

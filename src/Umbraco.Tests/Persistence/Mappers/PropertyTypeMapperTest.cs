@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = PropertyTypeMapper.Instance.Map("Id");
+            string column = new PropertyTypeMapper().Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyType].[id]"));
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = PropertyTypeMapper.Instance.Map("Alias");
+            string column = new PropertyTypeMapper().Map("Alias");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyType].[Alias]"));
@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = PropertyTypeMapper.Instance.Map("DataTypeDefinitionId");
+            string column = new PropertyTypeMapper().Map("DataTypeDefinitionId");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyType].[dataTypeId]"));
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = PropertyTypeMapper.Instance.Map("SortOrder");
+            string column = new PropertyTypeMapper().Map("SortOrder");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyType].[sortOrder]"));
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = PropertyTypeMapper.Instance.Map("DataTypeId");
+            string column = new PropertyTypeMapper().Map("DataTypeId");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDataType].[controlId]"));
@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = PropertyTypeMapper.Instance.Map("DataTypeDatabaseType");
+            string column = new PropertyTypeMapper().Map("DataTypeDatabaseType");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDataType].[dbType]"));

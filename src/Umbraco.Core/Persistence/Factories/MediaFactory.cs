@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IMedia BuildEntity(ContentVersionDto dto)
         {
-            return new Models.Media(dto.ContentDto.NodeDto.Text, dto.ContentDto.NodeDto.ParentId, _contentType)
+            var media = new Models.Media(dto.ContentDto.NodeDto.Text, dto.ContentDto.NodeDto.ParentId, _contentType)
                        {
                            Id = _id,
                            Key =
@@ -46,6 +46,10 @@ namespace Umbraco.Core.Persistence.Factories
                            UpdateDate = dto.VersionDate,
                            Version = dto.VersionId
                        };
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            media.ResetDirtyProperties(false);
+            return media;
         }
 
         public ContentVersionDto BuildDto(IMedia entity)

@@ -1,37 +1,36 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Models;
-using Umbraco.Web.Routing;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Tests.PublishedContent
 {
 	[TestFixture]
 	public class StronglyTypedQueryTests : PublishedContentTestBase
 	{
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
+	    public override void Initialize()
+	    {
+	        base.Initialize();
+	    }
 
-        public override void TearDown()
+	    public override void TearDown()
         {
             base.TearDown();
         }
 
-		protected override bool RequiresDbSetup
-		{
-			get { return false; }
-		}
+        protected override DatabaseBehavior DatabaseTestBehavior
+        {
+            get { return DatabaseBehavior.NoDatabasePerFixture; }
+        }
 
 		protected override string GetXmlContent(int templateId)
 		{
@@ -78,8 +77,7 @@ namespace Umbraco.Tests.PublishedContent
 		internal IPublishedContent GetNode(int id)
 		{
 			var ctx = UmbracoContext.Current;
-			var contentStore = new DefaultPublishedContentStore();
-			var doc = contentStore.GetDocumentById(ctx, id);
+			var doc = ctx.ContentCache.GetById(id);
 			Assert.IsNotNull(doc);
 			return doc;
 		}

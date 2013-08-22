@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.skinning;
@@ -197,7 +198,7 @@ namespace umbraco.cms.presentation.settings
 
 					files.Add(new KeyValuePair<string, string>(
 								  filename,
-								  helper.SpaceCamelCasing(filename.Replace(extension, ""))
+                                  filename.Replace(extension, "").SplitPascalCasing().ToFirstUpperInvariant()
 								  ));
 				}
 			}

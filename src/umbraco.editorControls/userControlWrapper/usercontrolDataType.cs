@@ -7,6 +7,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.userControlGrapper
 {
@@ -37,7 +38,7 @@ namespace umbraco.editorControls.userControlGrapper
         }
         public override Guid Id
         {
-            get { return new Guid("D15E1281-E456-4b24-AA86-1DDA3E4299D5"); }
+            get { return new Guid(Constants.PropertyEditors.UmbracoUserControlWrapper); }
         }
 
         public override string DataTypeName

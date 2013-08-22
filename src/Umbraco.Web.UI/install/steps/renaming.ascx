@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="renaming.ascx.cs" Inherits="umbraco.presentation.install.steps.renaming" %>
+﻿<%@ Control Language="C#" AutoEventWireup="True" CodeBehind="Renaming.ascx.cs" Inherits="Umbraco.Web.UI.Install.Steps.Renaming" %>
 <h1>Step 3/5: Updating old conventions</h1>
 <asp:Panel ID="init" Runat="server" Visible="True">
 <p>
@@ -16,7 +16,7 @@
 </p>
 <asp:Literal id="identifyResult" Runat="server"></asp:Literal>
 <asp:Button ID="updateChanges" runat="server" Text="Update Changes" 
-        onclick="updateChanges_Click" />
+        onclick="UpdateChangesClick" />
 </asp:Panel>
 </asp:Panel>
 

@@ -114,7 +114,6 @@ namespace umbraco.controls
             Width = 350;
             Height = 350;
 
-            
             _prntpage = (UmbracoEnsuredPage)Page;
 
             // zb-00036 #29889 : load it only once
@@ -340,25 +339,16 @@ namespace umbraco.controls
             FireAfterContentControlLoad(contentcontrolEvent);
         }
 
-
-        private void SaveClick(object sender, ImageClickEventArgs e)
+        /// <summary>
+        /// Sets the name (text) and values on the data types of the document
+        /// </summary>
+        private void SetNameAndDataTypeValues()
         {
             //we only continue saving anything if: 
             // SavePropertyDataWhenInvalid == true
             // OR if the page is actually valid.
             if (SavePropertyDataWhenInvalid || Page.IsValid)
             {
-                var doc = this._content as Document;
-                if (doc != null)
-                {
-                    var docArgs = new SaveEventArgs();
-                    doc.FireBeforeSave(docArgs);
-
-                    if (docArgs.Cancel) //TODO: need to have some notification to the user here
-                    {
-                        return;
-                    }
-                }
 
                 foreach (var property in DataTypes)
                 {
@@ -377,6 +367,11 @@ namespace umbraco.controls
                     _content.Text = NameTxt.Text;
                 }
             }
+        }
+
+        private void SaveClick(object sender, ImageClickEventArgs e)
+        {
+            SetNameAndDataTypeValues();
 
             if (Save != null)
             {
@@ -387,7 +382,12 @@ namespace umbraco.controls
         private void DoSaveAndPublish(object sender, ImageClickEventArgs e)
         {
             DoesPublish = true;
-            SaveClick(sender, e);
+
+            SetNameAndDataTypeValues();
+
+            //NOTE: This is only here to keep backwards compatibility.
+            // see: http://issues.umbraco.org/issue/U4-1660
+            Save(this, new EventArgs());
 
             if (SaveAndPublish != null)
             {
@@ -545,16 +545,19 @@ namespace umbraco.controls
             {
                 try
                 {
-                    RequiredFieldValidator rq = new RequiredFieldValidator();
-                    rq.ControlToValidate = dt.DataEditor.Editor.ID;
-                    Control component = dt.DataEditor.Editor; // holder.FindControl(rq.ControlToValidate);
-                    ValidationPropertyAttribute attribute =
-                        (ValidationPropertyAttribute)
-                        TypeDescriptor.GetAttributes(component)[typeof(ValidationPropertyAttribute)];
+                    var rq = new RequiredFieldValidator
+                        {
+                            ControlToValidate = dt.DataEditor.Editor.ID,
+                            CssClass = "error"
+                        };
+                    rq.Style.Add(HtmlTextWriterStyle.Display, "block");
+                    rq.Style.Add(HtmlTextWriterStyle.Padding, "2px");
+                    var component = dt.DataEditor.Editor; // holder.FindControl(rq.ControlToValidate);
+                    var attribute = (ValidationPropertyAttribute)TypeDescriptor.GetAttributes(component)[typeof(ValidationPropertyAttribute)];
                     PropertyDescriptor pd = null;
                     if (attribute != null)
                     {
-                        pd = TypeDescriptor.GetProperties(component, (Attribute[])null)[attribute.Name];
+                        pd = TypeDescriptor.GetProperties(component, null)[attribute.Name];
                     }
                     if (pd != null)
                     {
@@ -578,17 +581,19 @@ namespace umbraco.controls
             {
                 try
                 {
-                    RegularExpressionValidator rv = new RegularExpressionValidator();
-                    rv.ControlToValidate = dt.DataEditor.Editor.ID;
-
-                    Control component = dt.DataEditor.Editor; // holder.FindControl(rq.ControlToValidate);
-                    ValidationPropertyAttribute attribute =
-                        (ValidationPropertyAttribute)
-                        TypeDescriptor.GetAttributes(component)[typeof(ValidationPropertyAttribute)];
+                    var rv = new RegularExpressionValidator
+                        {
+                            ControlToValidate = dt.DataEditor.Editor.ID,
+                            CssClass = "error"
+                        };
+                    rv.Style.Add(HtmlTextWriterStyle.Display, "block");
+                    rv.Style.Add(HtmlTextWriterStyle.Padding, "2px");
+                    var component = dt.DataEditor.Editor; // holder.FindControl(rq.ControlToValidate);
+                    var attribute = (ValidationPropertyAttribute)TypeDescriptor.GetAttributes(component)[typeof(ValidationPropertyAttribute)];
                     PropertyDescriptor pd = null;
                     if (attribute != null)
                     {
-                        pd = TypeDescriptor.GetProperties(component, (Attribute[])null)[attribute.Name];
+                        pd = TypeDescriptor.GetProperties(component, null)[attribute.Name];
                     }
                     if (pd != null)
                     {

@@ -1,5 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace umbraco.cms.helpers
 {
@@ -8,8 +11,11 @@ namespace umbraco.cms.helpers
 
     public class Casing
     {
+        [Obsolete("Use Umbraco.Core.StringExtensions.UmbracoValidAliasCharacters instead")]
         public const string VALID_ALIAS_CHARACTERS = "_-abcdefghijklmnopqrstuvwxyz1234567890";
-        public const string INVALID_FIRST_CHARACTERS = "01234567890";
+
+        [Obsolete("Use Umbraco.Core.StringExtensions.UmbracoInvalidFirstCharacters instead")]
+        public const string INVALID_FIRST_CHARACTERS = "0123456789";
 
         /// <summary>
         /// A helper method to ensure that an Alias string doesn't contains any illegal characters
@@ -18,63 +24,28 @@ namespace umbraco.cms.helpers
         /// </summary>
         /// <param name="alias">The alias.</param>
         /// <returns>An alias guaranteed not to contain illegal characters</returns>
+        [Obsolete("Use Umbraco.Core.StringExtensions.ToSafeAlias instead")]
         public static string SafeAlias(string alias)
         {
-            var safeString = new StringBuilder();
-            var aliasLength = alias.Length;
-            for (var i = 0; i < aliasLength;i++ )
-            {
-                var currentChar = alias.Substring(i, 1);
-                if (VALID_ALIAS_CHARACTERS.Contains(currentChar.ToLowerInvariant()))
-                {
-                    // check for camel (if previous character is a space, we'll upper case the current one
-                    if (safeString.Length == 0 && INVALID_FIRST_CHARACTERS.Contains(currentChar.ToLowerInvariant()))
-                    {
-                        currentChar = "";
-                    }
-                    else
-                    {
-                        // first char should always be lowercase (camel style)
-                        // Skipping this check as it can cause incompatibility issues with 3rd party packages
-                        if (i < aliasLength - 1 && i > 0 && alias.Substring(i - 1, 1) == " ")
-                            currentChar = currentChar.ToUpperInvariant();
-
-                        safeString.Append(currentChar);
-                    }
-                }
-            }
-
-            return safeString.ToString();
+            return alias.ToSafeAlias(); // and anyway the code is the same
         }
 
+        [Obsolete("Use Umbraco.Core.StringExtensions.ToSafeAliasWithForcingCheck instead")]
         public static string SafeAliasWithForcingCheck(string alias)
         {
-            return UmbracoSettings.ForceSafeAliases ? SafeAlias(alias) : alias;
+            return alias.ToSafeAliasWithForcingCheck(); // and anyway the code is the same
         }
 
+        //NOTE: Not sure what this actually does but is used a few places, need to figure it out and then move to StringExtensions and obsolete.
+        // it basically is yet another version of SplitPascalCasing
+        // plugging string extensions here to be 99% compatible
+        // the only diff. is with numbers, Number6Is was "Number6 Is", and the new string helper does it too,
+        // but the legacy one does "Number6Is"... assuming it is not a big deal.
+
+        [UmbracoWillObsolete("We should really obsolete that one too.")]
         public static string SpaceCamelCasing(string text)
         {
-            var s = text;
-
-            if (2 > s.Length)
-                return s;
-
-            var sb = new StringBuilder();
-            var ca = s.ToCharArray();
-            ca[0] = char.ToUpperInvariant(ca[0]);
-
-            sb.Append(ca[0]);
-            for (var i = 1; i < ca.Length - 1; i++)
-            {
-                var c = ca[i];
-                if (char.IsUpper(c) && (char.IsLower(ca[i + 1]) || char.IsLower(ca[i - 1])))
-                {
-                    sb.Append(' ');
-                }
-                sb.Append(c);
-            }
-            sb.Append(ca[ca.Length - 1]);
-            return sb.ToString();
+            return text.Length < 2 ? text : text.SplitPascalCasing().ToFirstUpperInvariant();
         }
     }
 }

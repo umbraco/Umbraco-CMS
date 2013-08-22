@@ -41,11 +41,6 @@
     <parameterEntry type="ProviderPath" scope="setAcl" match="umbraco/css$" />
   </parameter>
   
-  <!-- This is the parameter that is used to set ACLs on the data folder -->
-  <parameter name="SetAclParameter6" description="Sets the ACL on the data folder" defaultValue="{Application Path}/data" tags="Hidden">
-    <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco/data$" />
-  </parameter>
-  
   <!-- This is the parameter that is used to set ACLs on the masterpages folder -->
   <parameter name="SetAclParameter7" description="Sets the ACL on the masterpages folder" defaultValue="{Application Path}/masterpages" tags="Hidden">
     <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco/masterpages$" />
@@ -84,6 +79,11 @@
   <!-- This is the parameter that is used to set ACLs, it's set to the application path filled in by the user -->
   <parameter name="SetAclParameter14" description="Sets the ACL on the web.config file" defaultValue="{Application Path}/web.config" tags="Hidden">
     <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco/web.config$" />
+  </parameter>
+
+  <!-- This is the parameter that is used to set ACLs, it's set to the application path filled in by the user -->
+  <parameter name="SetAclParameter17" description="Sets the ACL on the views folder" defaultValue="{Application Path}/views" tags="Hidden">
+    <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco/views$" />
   </parameter>
 
   <!-- Prompts for database server name, this is used in the connection string parameter later -->
@@ -136,9 +136,9 @@
     <parameterEntry type="ProviderPath" scope="dbfullsql" match="installSQL2.sql" />
   </parameter>
 
-  <parameter name="SQLCE Database Location" defaultValue="datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf" 
+  <parameter name="SQLCE Database Preparation" defaultValue="local" 
              tags="SQLCE, Hidden,NoStore">
-    <parameterEntry type="XmlFile" scope="\\web.config$" match="//appSettings/add[@key='umbracoDbDSN']/@value" />
+    <parameterEntry type="XmlFile" scope="\\web.config$" match="//connectionStrings/add/@name" />
   </parameter>
   
   <!-- This is the hidden connection string with the newly created db account that is used in the web.config -->
@@ -146,7 +146,7 @@
              defaultValue="server={Database Server};database={Database Name};user id={Database Username};password={Database Password}" 
              tags="SQL, Hidden,NoStore">
     <!-- scope=”web.config” will look for all web.config files under the root directory . Using scope=”\\web.config$” will select only the root web.config -->
-    <parameterEntry type="XmlFile" scope="\\web.config$" match="//appSettings/add[@key='umbracoDbDSN']/@value" />
+    <parameterEntry type="XmlFile" scope="\\web.config$" match="//connectionStrings/add[@name='umbracoDbDSN']/@connectionString" />
   </parameter>
 
  <!-- This is the hidden connection string with the newly created db account that is used in the web.config -->

@@ -240,18 +240,15 @@ namespace umbraco
 		{
 			if (useAdminUser)
 			{
-				document.Publish(new User(0));
+                document.SaveAndPublish(new User(0));
 			}
 			else
 			{
 				if (User.GetCurrent() != null)
 				{
-					document.Publish(User.GetCurrent());
+					document.SaveAndPublish(User.GetCurrent());
 				}
 			}
-
-			library.UpdateDocumentCache(document);
-
 			return document;
 		}
 

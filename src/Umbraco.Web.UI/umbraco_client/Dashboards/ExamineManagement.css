@@ -1,0 +1,124 @@
+﻿#examineManagement .provider
+{
+    padding-top: 3px;
+}
+
+#examineManagement .propertyPane
+{
+    padding: 5px;
+}
+
+#examineManagement table th
+{
+    font-weight: normal;
+    color: #333;
+    width: 200px;
+}
+
+#examineManagement table td
+{
+    color: #999;
+}
+
+    #examineManagement table td.highlight
+    {
+        font-style: italic;
+    }
+
+#examineManagement .propertyPane > a
+{
+    padding: 3px;
+    display: block;
+}
+
+    #examineManagement .propertyPane > a.expanded
+    {
+        border-bottom: 1px solid #CCC;
+        margin-bottom: 5px;
+        padding-bottom: 5px;
+    }
+
+#examineManagement .provider > a
+{
+    padding: 7px;
+    display: block;
+    font-size: 1.1em;
+}
+
+#examineManagement .provider > div
+{
+    margin-left: 15px;
+}
+
+#examineManagement a
+{
+    text-decoration: none;
+}
+
+    #examineManagement a:hover
+    {
+        text-decoration: underline;
+    }
+
+#examineManagement .index-tools table
+{
+    width: 350px;
+}
+
+#examineManagement .index-tools .index-actions
+{
+    float: right;
+}
+
+    #examineManagement .index-tools .index-actions .error
+    {
+        width: 560px;
+        padding: 5px;
+    }
+
+#examineManagement .search-tools input[type="text"]
+{
+    width: 400px;
+}
+
+#examineManagement .search-tools a.hide
+{
+    float: right;
+}
+
+#examineManagement .search-tools .search-results
+{
+    margin-top: 5px;
+}
+
+    #examineManagement .search-tools .search-results table
+    {
+        border-collapse: collapse;
+    }
+
+    #examineManagement .search-tools .search-results th.score
+    {
+        width: 50px;
+    }
+
+    #examineManagement .search-tools .search-results th.id
+    {
+        width: 50px;
+    }
+
+    #examineManagement .search-tools .search-results tbody tr td
+    {
+        border-bottom: 1px solid #DDD;
+        padding: 3px;
+    }   
+     #examineManagement .search-tools .search-results tbody tr td span.key {
+         display: inline-block;
+         color: rgb(0, 64, 201);
+         font-style: italic;
+     }
+     #examineManagement .search-tools .search-results tbody tr td span.value {
+         font-weight: normal;
+         display: inline-block;
+         padding-right: 5px;
+         color: black;
+     }

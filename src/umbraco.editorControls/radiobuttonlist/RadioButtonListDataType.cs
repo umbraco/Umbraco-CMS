@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.radiobuttonlist
 {
@@ -38,7 +39,7 @@ namespace umbraco.editorControls.radiobuttonlist
 		}
 		public override Guid Id 
 		{
-			get {return new Guid("A52C7C1C-C330-476E-8605-D63D3B84B6A6");}
+			get { return new Guid(Constants.PropertyEditors.RadioButtonList); }
 		}
 
 		public override interfaces.IDataPrevalue PrevalueEditor 

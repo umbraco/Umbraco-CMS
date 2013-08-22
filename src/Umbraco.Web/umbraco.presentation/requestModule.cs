@@ -20,6 +20,7 @@ namespace umbraco.presentation
 	/// <summary>
 	/// Summary description for requestModule.
 	/// </summary>
+	[Obsolete("This class is not used anymore and will be removed from the codebase in future versions.")]
 	public class requestModule : IHttpModule
 	{
 		protected static Timer publishingTimer;

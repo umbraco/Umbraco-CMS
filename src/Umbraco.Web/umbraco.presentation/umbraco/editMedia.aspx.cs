@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml;
@@ -9,24 +9,25 @@ using System.Linq;
 using System.IO;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.property;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation
 {
-	/// <summary>
-	/// Summary description for editMedia.
-	/// </summary>
-	public partial class editMedia : BasePages.UmbracoEnsuredPage
-	{
+    /// <summary>
+    /// Summary description for editMedia.
+    /// </summary>
+    public partial class editMedia : BasePages.UmbracoEnsuredPage
+    {
         private readonly uicontrols.Pane _mediaPropertiesPane = new uicontrols.Pane();
         private readonly LiteralControl _updateDateLiteral = new LiteralControl();
         private readonly LiteralControl _mediaFileLinksLiteral = new LiteralControl();
 
-	    public editMedia()
-	    {
-	        CurrentApp = BusinessLogic.DefaultApps.media.ToString();
-	    }
+        public editMedia()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.media.ToString();
+        }
 
-		protected uicontrols.TabView TabView1;
+        protected uicontrols.TabView TabView1;
 		protected TextBox documentName;
 		private businesslogic.media.Media _media;
 		controls.ContentControl _contentControl;
@@ -73,16 +74,16 @@ namespace umbraco.cms.presentation
             _contentControl.tpProp.Controls.AddAt(1, _mediaPropertiesPane);                       
         }
 
-		protected void Page_Load(object sender, EventArgs e)
-		{
-			if (!IsPostBack)
-			{
-				ClientTools.SyncTree(_media.Path, false);
-			}			
-		}
+        protected void Page_Load(object sender, System.EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                ClientTools.SyncTree(_media.Path, false);
+            }
+        }
 
 		protected void Save(object sender, EventArgs e) 
-		{
+        {
             // do not continue saving anything if the page is invalid!
             // http://issues.umbraco.org/issue/U4-227
             if (!Page.IsValid)
@@ -127,7 +128,7 @@ namespace umbraco.cms.presentation
 
         private void UpdateMediaFileLinksLiteral()
         {
-            var uploadField = new Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+            var uploadField = new Factory().GetNewObject(new Guid(Constants.PropertyEditors.UploadField));
 
             // always clear, incase the upload file was removed
             this._mediaFileLinksLiteral.Text = string.Empty;
@@ -149,7 +150,7 @@ namespace umbraco.cms.presentation
                     {
                         this._mediaFileLinksLiteral.Text += string.Format("<tr><td>{0}&nbsp;</td><td><a href=\"{1}\" target=\"_blank\">{1}</a></td></tr>", property.PropertyType.Name, property.Value);
                     }
-                    
+
                     this._mediaFileLinksLiteral.Text += "</table>";
                 }
             }
@@ -159,5 +160,32 @@ namespace umbraco.cms.presentation
                 //have deleted it.
             }
         }
-	}
+
+        /// <summary>
+        /// plc control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder plc;
+
+        /// <summary>
+        /// doSave control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden doSave;
+
+        /// <summary>
+        /// doPublish control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden doPublish;
+    }
 }

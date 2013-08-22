@@ -15,12 +15,22 @@ namespace Umbraco.Core.Models
     {
         private int _defaultTemplate;
         private IEnumerable<ITemplate> _allowedTemplates;
-
+        
+        /// <summary>
+        /// Constuctor for creating a ContentType with the parent's id.
+        /// </summary>
+        /// <remarks>You usually only want to use this for creating ContentTypes at the root.</remarks>
+        /// <param name="parentId"></param>
         public ContentType(int parentId) : base(parentId)
         {
             _allowedTemplates = new List<ITemplate>();
         }
 
+        /// <summary>
+        /// Constuctor for creating a ContentType with the parent as an inherited type.
+        /// </summary>
+        /// <remarks>Use this to ensure inheritance from parent.</remarks>
+        /// <param name="parent"></param>
 		public ContentType(IContentType parent) : base(parent)
 		{
 			_allowedTemplates = new List<ITemplate>();
@@ -47,8 +57,11 @@ namespace Umbraco.Core.Models
             get { return _defaultTemplate; }
             set
             {
-                _defaultTemplate = value;
-                OnPropertyChanged(DefaultTemplateSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _defaultTemplate = value;
+                    return _defaultTemplate;
+                }, _defaultTemplate, DefaultTemplateSelector);
             }
         }
 
@@ -61,8 +74,11 @@ namespace Umbraco.Core.Models
             get { return _allowedTemplates; }
             set
             {
-                _allowedTemplates = value;
-                OnPropertyChanged(AllowedTemplatesSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _allowedTemplates = value;
+                    return _allowedTemplates;
+                }, _allowedTemplates, AllowedTemplatesSelector);
             }
         }
 
@@ -145,14 +161,56 @@ namespace Umbraco.Core.Models
         {
             base.ResetDirtyProperties();
 
+            //loop through each property group to reset the property types
+            var propertiesReset = new List<int>();
+
             foreach (var propertyGroup in PropertyGroups)
             {
                 propertyGroup.ResetDirtyProperties();
                 foreach (var propertyType in propertyGroup.PropertyTypes)
-                {
+                {                    
                     propertyType.ResetDirtyProperties();
+                    propertiesReset.Add(propertyType.Id);
                 }
             }
+            //then loop through our property type collection since some might not exist on a property group
+            //but don't re-reset ones we've already done.
+            foreach (var propertyType in PropertyTypes.Where(x => propertiesReset.Contains(x.Id) == false))
+            {
+                propertyType.ResetDirtyProperties();
+            }
+        }
+
+        /// <summary>
+        /// Creates a clone of the current entity
+        /// </summary>
+        /// <returns></returns>
+        public IContentType Clone(string alias)
+        {
+            var clone = (ContentType)this.MemberwiseClone();
+            clone.Alias = alias;
+            clone.Key = Guid.Empty;
+            var propertyGroups = this.PropertyGroups.Select(x => x.Clone()).ToList();
+            clone.PropertyGroups = new PropertyGroupCollection(propertyGroups);
+            clone.PropertyTypes = this.PropertyTypeCollection.Select(x => x.Clone()).ToList();
+            clone.ResetIdentity();
+            clone.ResetDirtyProperties(false);
+
+            foreach (var propertyGroup in clone.PropertyGroups)
+            {
+                propertyGroup.ResetIdentity();
+                foreach (var propertyType in propertyGroup.PropertyTypes)
+                {
+                    propertyType.ResetIdentity();
+                }
+            }
+
+            foreach (var propertyType in clone.PropertyTypes.Where(x => x.HasIdentity))
+            {
+                propertyType.ResetIdentity();
+            }
+
+            return clone;
         }
 
         /// <summary>

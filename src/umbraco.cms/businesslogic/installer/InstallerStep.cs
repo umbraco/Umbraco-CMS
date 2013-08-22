@@ -5,6 +5,7 @@ using System.Text;
 
 namespace umbraco.cms.businesslogic.installer
 {
+    [Obsolete("This is no longer used and will be removed from the codebase in future versions. It has been superceded by Umbraco.Web.Install.InstallerStep however that is marked internal and is not to be used in external code.")]
     public abstract class InstallerStep : IInstallerStep
     {
         public abstract string Alias { get; }

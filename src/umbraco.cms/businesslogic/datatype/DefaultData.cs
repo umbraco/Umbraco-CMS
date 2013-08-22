@@ -14,7 +14,7 @@ namespace umbraco.cms.businesslogic.datatype
     /// <summary>
     /// Default implementation of the <c>IData</c> interface that stores data inside the Umbraco database.
     /// </summary>
-    public class DefaultData : IData, IDataWithPreview
+    public class DefaultData : IData, IDataWithPreview, IDataValueSetter
 	{
 		private int _propertyId;
 		private object _value;
@@ -58,9 +58,28 @@ namespace umbraco.cms.businesslogic.datatype
         }
 
         /// <summary>
+        /// This is here for performance reasons since in some cases we will have already resolved the value from the db
+        /// and want to just give this object the value so it doesn't go re-look it up from the database.
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="strDbType"></param>
+        void IDataValueSetter.SetValue(object val, string strDbType)
+        {
+            _value = val;
+            //now that we've set our value, we can update our BaseDataType object with the correct values from the db
+            //instead of making it query for itself. This is a peformance optimization enhancement.
+            var dbType = BaseDataType.GetDBType(strDbType);
+            var fieldName = BaseDataType.GetDataFieldName(dbType);
+            _dataType.SetDataTypeProperties(fieldName, dbType);
+
+            //ensures that it doesn't go back to the db
+            _valueLoaded = true;
+        }
+
+        /// <summary>
         /// Loads the data value from the database.
         /// </summary>
-        protected virtual void LoadValueFromDatabase()
+        protected internal virtual void LoadValueFromDatabase()
         {
             var sql = new Sql();
             sql.Select("*")
@@ -243,5 +262,7 @@ namespace umbraco.cms.businesslogic.datatype
         }
 
         #endregion
+
+        
     }	
 }

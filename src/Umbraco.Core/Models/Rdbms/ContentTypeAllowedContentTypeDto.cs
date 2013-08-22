@@ -20,5 +20,8 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("SortOrder")]
         [Constraint(Name = "df_cmsContentTypeAllowedContentType_sortOrder", Default = "0")]
         public int SortOrder { get; set; }
+
+        [ResultColumn]
+        public ContentTypeDto ContentTypeDto { get; set; }
     }
 }

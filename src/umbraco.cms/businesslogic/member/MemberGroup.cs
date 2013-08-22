@@ -3,6 +3,7 @@ using System.Data;
 using umbraco.DataLayer;
 using System.Collections;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.member
 {
@@ -15,7 +16,7 @@ namespace umbraco.cms.businesslogic.member
 	/// </summary>
 	public class MemberGroup : CMSNode
 	{
-		private static Guid _objectType = new Guid("366e63b9-880f-4e13-a61c-98069b029728");
+        private static Guid _objectType = new Guid(Constants.ObjectTypes.MemberGroup);
         private string _oldGroupName;
 
 		/// <summary>

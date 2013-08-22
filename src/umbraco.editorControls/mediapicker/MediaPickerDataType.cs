@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.mediapicker
 {
@@ -23,10 +24,15 @@ namespace umbraco.editorControls.mediapicker
             get { return _baseData ?? (_baseData = new cms.businesslogic.datatype.DefaultData(this)); }
         }
 
-        public override Guid Id
-        {
-            get { return new Guid("EAD69342-F06D-4253-83AC-28000225583B"); }
-        }
+
+		public override Guid Id
+		{
+			get
+			{
+				return new Guid(Constants.PropertyEditors.MediaPicker);
+			}
+		}
+
 
         public override string DataTypeName
         {

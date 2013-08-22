@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.numberfield
 {
@@ -23,7 +24,7 @@ namespace umbraco.editorControls.numberfield
 		{
 			get
             {
-                return new Guid("1413afcb-d19a-4173-8e9a-68288d2a73b8");
+                return new Guid(Constants.PropertyEditors.Integer);
             }
 		}
 

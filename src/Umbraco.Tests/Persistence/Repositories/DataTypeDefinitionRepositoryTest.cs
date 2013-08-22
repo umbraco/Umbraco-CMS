@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Caching;
@@ -96,7 +97,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var repository = new DataTypeDefinitionRepository(unitOfWork, NullCacheProvider.Current);
 
             // Act
-            var query = Query<IDataTypeDefinition>.Builder.Where(x => x.ControlId == new Guid("A52C7C1C-C330-476E-8605-D63D3B84B6A6"));
+            var query = Query<IDataTypeDefinition>.Builder.Where(x => x.ControlId == new Guid(Constants.PropertyEditors.RadioButtonList));
             var result = repository.GetByQuery(query);
 
             // Assert

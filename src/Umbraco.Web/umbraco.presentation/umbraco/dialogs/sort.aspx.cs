@@ -48,7 +48,7 @@ namespace umbraco.cms.presentation
             int parentId;
             if (int.TryParse(Request.GetItemAsString("ID"), out parentId))
             {
-                if (app == "media")
+                if (app == Constants.Applications.Media)
                 {
                     icon = "../images/umbraco/mediaPhoto.gif";
                     var mediaService = ApplicationContext.Current.Services.MediaService;
@@ -66,7 +66,7 @@ namespace umbraco.cms.presentation
                     }
                 }
 
-                if (app == "content")
+                if (app == Constants.Applications.Content)
                 {
                     var contentService = ApplicationContext.Current.Services.ContentService;
 
@@ -78,19 +78,21 @@ namespace umbraco.cms.presentation
                     else
                     {
                         var children = contentService.GetChildren(parentId);
-                        foreach (var child in children.OrderBy(x => x.SortOrder))
+                        foreach (var child in children)
                             _nodes.Add(CreateNode(child.Id, child.SortOrder, child.Name, child.CreateDate, icon));
                     }
                 }
 
-                // "hack for stylesheet"
-                // TODO: I can't see where this is being used at all..?
-                if (app == "settings")
+                // hack for stylesheet, used to sort stylesheet properties
+                if (app == Constants.Applications.Settings)
                 {
                     icon = "../images/umbraco/settingCss.gif";
                     var ss = new StyleSheet(parentId);
                     foreach (var child in ss.Properties)
-                        _nodes.Add(CreateNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime, icon));
+                    {
+                        var node = new CMSNode(child.Id);
+                        _nodes.Add(CreateNode(child.Id, node.sortOrder, child.Text, child.CreateDateTime, icon));
+                    }
                 }
 
                 bindNodesToList(string.Empty);

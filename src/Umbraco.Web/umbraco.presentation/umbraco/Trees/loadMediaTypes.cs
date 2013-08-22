@@ -7,10 +7,11 @@ using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
 using umbraco.cms.presentation.Trees;
 using umbraco.interfaces;
+using Umbraco.Core;
 
 namespace umbraco
 {
-    [Tree("settings", "mediaTypes", "Media Types", sortOrder: 5)]
+    [Tree(Constants.Applications.Settings, "mediaTypes", "Media Types", sortOrder: 5)]
     public class loadMediaTypes : BaseTree
     {
         public loadMediaTypes(string application) : base(application) { }

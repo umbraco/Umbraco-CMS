@@ -14,13 +14,16 @@ namespace Umbraco.Core.Services
     {
         private Lazy<ContentService> _contentService;
         private Lazy<UserService> _userService;
+        private Lazy<MemberService> _memberService;
         private Lazy<MediaService> _mediaService;
-        private Lazy<MacroService> _macroService;
         private Lazy<ContentTypeService> _contentTypeService;
         private Lazy<DataTypeService> _dataTypeService;
         private Lazy<FileService> _fileService;
         private Lazy<LocalizationService> _localizationService;
         private Lazy<PackagingService> _packagingService;
+        private Lazy<ServerRegistrationService> _serverRegistrationService;
+        private Lazy<EntityService> _entityService;
+        private Lazy<RelationService> _relationService;
 
 		/// <summary>
 		/// Constructor
@@ -28,8 +31,8 @@ namespace Umbraco.Core.Services
 		/// <param name="dbUnitOfWorkProvider"></param>
 		/// <param name="fileUnitOfWorkProvider"></param>
 		/// <param name="publishingStrategy"></param>
-		internal ServiceContext(IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, IUnitOfWorkProvider fileUnitOfWorkProvider, IPublishingStrategy publishingStrategy)
-		{
+		internal ServiceContext(IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, IUnitOfWorkProvider fileUnitOfWorkProvider, BasePublishingStrategy publishingStrategy)
+		{   
 			BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy, 
 				//this needs to be lazy because when we create the service context it's generally before the
 				//resolvers have been initialized!
@@ -42,23 +45,26 @@ namespace Umbraco.Core.Services
 		private void BuildServiceCache(
 			IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, 
 			IUnitOfWorkProvider fileUnitOfWorkProvider, 
-			IPublishingStrategy publishingStrategy, 
+			BasePublishingStrategy publishingStrategy, 
 			Lazy<RepositoryFactory> repositoryFactory)
         {
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
 
+            if (_serverRegistrationService == null)
+                _serverRegistrationService = new Lazy<ServerRegistrationService>(() => new ServerRegistrationService(provider, repositoryFactory.Value));
+
 			if (_userService == null)
 				_userService = new Lazy<UserService>(() => new UserService(provider, repositoryFactory.Value));
+
+            if (_memberService == null)
+                _memberService = new Lazy<MemberService>(() => new MemberService(provider, repositoryFactory.Value));
 
             if (_contentService == null)
 				_contentService = new Lazy<ContentService>(() => new ContentService(provider, repositoryFactory.Value, publishingStrategy));
 
             if(_mediaService == null)
                 _mediaService = new Lazy<MediaService>(() => new MediaService(provider, repositoryFactory.Value));
-
-            if(_macroService == null)
-				_macroService = new Lazy<MacroService>(() => new MacroService(fileProvider, repositoryFactory.Value));
 
             if(_contentTypeService == null)
 				_contentTypeService = new Lazy<ContentTypeService>(() => new ContentTypeService(provider, repositoryFactory.Value, _contentService.Value, _mediaService.Value));
@@ -74,6 +80,36 @@ namespace Umbraco.Core.Services
 
             if(_packagingService == null)
                 _packagingService = new Lazy<PackagingService>(() => new PackagingService(_contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value, _fileService.Value, repositoryFactory.Value, provider));
+
+            if (_entityService == null)
+                _entityService = new Lazy<EntityService>(() => new EntityService(provider, repositoryFactory.Value, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value));
+
+            if(_relationService == null)
+                _relationService = new Lazy<RelationService>(() => new RelationService(provider, repositoryFactory.Value, _entityService.Value));
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ServerRegistrationService"/>
+        /// </summary>
+        internal ServerRegistrationService ServerRegistrationService
+        {
+            get { return _serverRegistrationService.Value; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="EntityService"/>
+        /// </summary>
+        public EntityService EntityService
+        {
+            get { return _entityService.Value; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="RelationService"/>
+        /// </summary>
+        public RelationService RelationService
+        {
+            get { return _relationService.Value; }
         }
 
         /// <summary>
@@ -133,19 +169,19 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets the <see cref="IMacroService"/>
-        /// </summary>
-        internal IMacroService MacroService
-        {
-			get { return _macroService.Value; }
-        }
-
-        /// <summary>
-        /// Gets the <see cref="IMacroService"/>
+        /// Gets the <see cref="UserService"/>
         /// </summary>
         internal IUserService UserService
         {
 			get { return _userService.Value; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="MemberService"/>
+        /// </summary>
+        internal IMemberService MemberService
+        {
+            get { return _memberService.Value; }
         }
     }
 }

@@ -17,7 +17,10 @@ using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.Net;
 using System.Web.UI;
+using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Web;
+using Umbraco.Web.Cache;
 using Umbraco.Web.WebServices;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic.Exceptions;
@@ -438,16 +441,9 @@ namespace umbraco.presentation.webservices
 	        tp.MasterTemplate = masterTemplateID;
 	        tp.Design = templateContents;
 
+            tp.Save();
+
 	        retVal = "true";
-
-	        // Clear cache in rutime
-	        if (UmbracoSettings.UseDistributedCalls)
-		        cache.dispatcher.Refresh(
-			        new Guid("dd12b6a0-14b9-46e8-8800-c154f74047c8"),
-			        tp.Id);
-	        else
-		        template.ClearCachedTemplate(tp.Id);
-
 
 	        return retVal;
         }

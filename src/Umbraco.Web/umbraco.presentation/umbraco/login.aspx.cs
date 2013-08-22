@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Data;
@@ -16,6 +16,7 @@ using umbraco.businesslogic.Exceptions;
 using umbraco.IO;
 using umbraco.cms.businesslogic.web;
 using System.Linq;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation
 {
@@ -24,6 +25,7 @@ namespace umbraco.cms.presentation
     /// </summary>
     public partial class login : BasePages.BasePage
     {
+        [Obsolete("This property is no longer used")]
         protected umbWindow treeWindow;
 
         protected override void OnLoad(EventArgs e)
@@ -59,25 +61,7 @@ namespace umbraco.cms.presentation
             if (BottomText.Text.Contains("</p>"))
                 BottomText.Text = BottomText.Text.Substring(29).Replace("<br />", "").Replace("</p>", "");
         }
-        #region Web Form Designer generated code
-        override protected void OnInit(EventArgs e)
-        {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
-            base.OnInit(e);
-        }
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-
-        }
-        #endregion
 
         protected void Button1_Click(object sender, System.EventArgs e)
         {
@@ -177,16 +161,170 @@ namespace umbraco.cms.presentation
         /// Maps active directory account to umbraco user account
         /// </summary>
         /// <param name="loginName">Name of the login.</param>
+        /// <param name="email">Email address of the user</param>
         private void ActiveDirectoryMapping(string loginName, string email)
         {
             // Password is not copied over because it is stored in active directory for security!
             // The user is create with default access to content and as a writer user type
             if (BusinessLogic.User.getUserId(loginName) == -1)
             {
-                BusinessLogic.User.MakeNew(loginName, loginName, string.Empty, email, BusinessLogic.UserType.GetUserType(2));
-                BusinessLogic.User u = new BusinessLogic.User(loginName);
-                u.addApplication("content");
+                BusinessLogic.User.MakeNew(loginName, loginName, string.Empty, email ?? "", UserType.GetUserType(2));
+                var u = new User(loginName);
+                u.addApplication(Constants.Applications.Content);
             }
         }
+
+        /// <summary>
+        /// ClientLoader control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.UmbracoClientDependencyLoader ClientLoader;
+
+        /// <summary>
+        /// CssInclude1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.CssInclude CssInclude1;
+
+        /// <summary>
+        /// JsInclude1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude1;
+
+        /// <summary>
+        /// JsInclude3 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude3;
+
+        /// <summary>
+        /// JsInclude2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude2;
+
+        /// <summary>
+        /// Form1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlForm Form1;
+
+        /// <summary>
+        /// Panel1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.UmbracoPanel Panel1;
+
+        /// <summary>
+        /// TopText control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal TopText;
+
+        /// <summary>
+        /// username control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label username;
+
+        /// <summary>
+        /// lname control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox lname;
+
+        /// <summary>
+        /// password control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label password;
+
+        /// <summary>
+        /// passw control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox passw;
+
+        /// <summary>
+        /// Button1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button Button1;
+
+        /// <summary>
+        /// BottomText control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal BottomText;
+
+        /// <summary>
+        /// hf_height control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hf_height;
+
+        /// <summary>
+        /// hf_width control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hf_width;
+
+        /// <summary>
+        /// loginError control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder loginError;
     }
 }

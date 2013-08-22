@@ -41,7 +41,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
             var definition = factory.BuildEntity(dataTypeDto);
-            ((ICanBeDirty)definition).ResetDirtyProperties();
+
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            ((Entity)definition).ResetDirtyProperties(false);
             return definition;
         }
 
@@ -105,7 +108,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Guid NodeObjectTypeId
         {
-            get { return new Guid("30A2A501-1978-4DDB-A57B-F7EFED43BA3C"); }
+            get { return new Guid(Constants.ObjectTypes.DataType); }
         }
 
         #endregion

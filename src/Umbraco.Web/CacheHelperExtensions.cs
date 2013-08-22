@@ -4,8 +4,11 @@ using System.Web.Caching;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Web.Cache;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
+using umbraco.presentation.cache;
 
 namespace Umbraco.Web
 {
@@ -15,16 +18,12 @@ namespace Umbraco.Web
 	/// </summary>
 	internal static class CacheHelperExtensions
 	{
-
 		/// <summary>
 		/// Application event handler to bind to events to clear the cache for the cache helper extensions
-		/// </summary>
-		/// <remarks>
-		/// This would be better left internal, however
-		/// </remarks>
-		public sealed class CacheHelperApplicationEventListener : IApplicationEventHandler
+		/// </summary>		
+		internal sealed class CacheHelperApplicationEventListener : ApplicationEventHandler
 		{
-            public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+            protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
 			{
                 if (applicationContext != null)
 				{
@@ -44,17 +43,10 @@ namespace Umbraco.Web
 				}
 			}
 
-            public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-			{
-			}
-
-            public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-			{
-			}
 		}
 
 		public const string PartialViewCacheKey = "Umbraco.Web.PartialViewCacheKey";
-
+       
 		/// <summary>
 		/// Outputs and caches a partial view in MVC
 		/// </summary>

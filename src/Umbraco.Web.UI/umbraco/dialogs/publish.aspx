@@ -1,119 +1,94 @@
-<%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master" Codebehind="publish.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.publish" %>
+<%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master" CodeBehind="Publish.aspx.cs" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Umbraco.Dialogs.Publish" %>
+
+<%@ Import Namespace="Umbraco.Core" %>
+<%@ Import Namespace="Umbraco.Web" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 
-  <script type="text/javascript" language="javascript">
-		var pubTotal = <asp:Literal ID="total" Runat="server"></asp:Literal>;
-		xmlHttpDebug = true;
-		var masterPagePrefix = '<asp:Literal ID="masterPagePrefix" Runat="server"></asp:Literal>';
-				
-		var reqNode;
-		function startPublication() {
-		    if (document.getElementById(masterPagePrefix+"PublishUnpublishedItems").checked) {		
-    		    umbraco.webservices.publication.GetPublicationStatusMaxAll('<%=umbraco.helper.Request("id")%>', updateTotal);
-    		  } else {
-    		    updateTotal(pubTotal);
-    		  }
-		}
-		
-		function showPublication() {
-	    var statusStr = '<%=umbraco.ui.Text("inProgressCounter").Replace("'", "\\'")%>'; 
-		  document.getElementById("counter").innerHTML = statusStr.replace('%0%', '0').replace('%1%', pubTotal);
-			document.getElementById('formDiv').style.display = 'none'; 
-			document.getElementById('animDiv').style.display = 'block'; 
-		}
-		
-		function updateTotal(totalNodes) {
-		  pubTotal = totalNodes;
-			setTimeout("showPublication()", 100);
-			setTimeout("updatePublication()", 200);
-		}
-		
-		function updatePublication() {
-		  umbraco.webservices.publication.GetPublicationStatus('<%=umbraco.helper.Request("id")%>', updatePublicationDo);
-		}
-		
-		function updatePublicationDo(retVal) {
-		  var statusStr = '<%=umbraco.ui.Text("inProgressCounter").Replace("'", "\\'")%>'; 
-		  document.getElementById("counter").innerHTML = statusStr.replace('%0%', retVal).replace('%1%', pubTotal);
-			setTimeout("updatePublication()", 200);
-		}
-		
-		function togglePublishingModes(cb){
-		    var pubCb = document.getElementById('<%= PublishUnpublishedItems.ClientID %>');  
-		    if (cb.checked){
-		        pubCb.disabled = false; 
-		        //document.getElementById('publishUnpublishedItemsLabel').disabled = false;
-		      } else {
-		        pubCb.disabled = true;
-		        pubCb.checked = false;
-		        //document.getElementById('publishUnpublishedItemsLabel').disabled = true;
-		     }
-		}
-		
-		// pubCounter
-  function doSubmit() {document.Form1["ok"].click()}
+    <umb:JsInclude ID="JsInclude1" runat="server" FilePath="js/umbracoCheckKeys.js" PathNameAlias="UmbracoRoot" />
+    <umb:JsInclude ID="JsInclude2" runat="server" FilePath="Dialogs/PublishDialog.js" PathNameAlias="UmbracoClient" />
+    <umb:CssInclude ID="CssInclude1" runat="server" FilePath="Dialogs/PublishDialog.css" PathNameAlias="UmbracoClient" />
 
-	var functionsFrame = this;
-	var tabFrame = this;
-	var isDialog = true;
-	var submitOnEnter = true;
-	
-  </script>
+    <script type="text/javascript">
+        //NOTE: These variables are required for the legacy UmbracoCheckKeys.js
+        var functionsFrame = this;
+        var tabFrame = this;
+        var isDialog = true;
+        var submitOnEnter = true;
+
+        (function ($) {
+            $(document).ready(function () {
+                Umbraco.Dialogs.PublishDialog.getInstance().init({
+                    restServiceLocation: "<%= Url.GetBulkPublishServicePath() %>",
+                    documentId: <%= DocumentId %>,
+                    documentPath: '<%= DocumentPath %>'
+                });
+            });
+        })(jQuery);
+    </script>
 
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="body" runat="server">
 
-	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="js/umbracoCheckKeys.js" PathNameAlias="UmbracoRoot"/>
-    
-    <asp:Panel ID="TheForm" Visible="True" runat="server">
-      <div id="formDiv" style="visibility: visible;">
-        <div class="propertyDiv">
-        <p>
-          <%= umbraco.ui.Text("publish", "publishHelp", pageName, base.getUser()) %>
-        </p>
-        
-        <p>
-        <asp:CheckBox runat="server" ID="PublishAll"></asp:CheckBox>
-            <div style="margin-left: 16px; margin-top: 2px;">
-                <asp:CheckBox runat="server" ID="PublishUnpublishedItems" Checked="false" />
-                <asp:Label runat="server" AssociatedControlID="PublishUnpublishedItems"><%= umbraco.ui.Text("publish", "includeUnpublished")%> </asp:Label>
+    <div id="container" >
+        <div class="propertyDiv" data-bind="visible: processStatus() == 'init'">
+            <p>
+                <%= umbraco.ui.Text("publish", "publishHelp", PageName, UmbracoUser) %>
+            </p>
+
+            <div>
+                <input type="checkbox" id="publishAllCheckBox" data-bind="checked: publishAll" />
+                <label for="publishAllCheckBox">
+                    <%=umbraco.ui.Text("publish", "publishAll", PageName, UmbracoUser) %>
+                </label>
             </div>
-        </p>
+
+            <div id="includeUnpublished">
+                <input type="checkbox" id="includeUnpublishedCheckBox" data-bind="checked: includeUnpublished, attr: { disabled: !publishAll() }" />
+                <label for="includeUnpublishedCheckBox" data-bind="css: { disabled: !publishAll() }">
+                    <%=umbraco.ui.Text("publish", "includeUnpublished") %>
+                </label>
+            </div>
+            
+            <button id="ok" class="guiInputButton" data-bind="click: startPublish">
+                <%=umbraco.ui.Text("content", "publish", UmbracoUser)%>
+            </button>
+
+            <em><%= umbraco.ui.Text("general","or") %></em>
+
+            <a href="#" data-bind="click: closeDialog">
+                <%=umbraco.ui.Text("general", "cancel", UmbracoUser)%>
+            </a>
+
         </div>
-               
-        <asp:Button ID="ok" runat="server" CssClass="guiInputButton"></asp:Button> <em><%= umbraco.ui.Text("general","or") %></em> <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
-      </div>
-      
-      <div id="animDiv" style="display: none;" align="center">
-        <script type="text/javascript">
-		    umbPgStep = 1;
-		    umbPgIgnoreSteps = true;
-        </script>
-        
-        <div class="propertyDiv">
-        <p>
-          <%=umbraco.ui.Text("publish", "inProgress", this.getUser())%>      
-        </p>
-        
-        <cc1:ProgressBar runat="server" ID="ProgBar1" />
-        
-        <br />
-        <small class="guiDialogTiny"><div id="counter"></div></small>
-        
+
+        <div id="animDiv" class="propertyDiv" data-bind="visible: processStatus() == 'publishing'">
+            <div>
+                <p>
+                    <%=umbraco.ui.Text("publish", "inProgress", UmbracoUser)%>
+                </p>
+                <cc1:ProgressBar runat="server" ID="ProgBar1" />
+                <br />
+            </div>
         </div>
-      </div>
-      
-    </asp:Panel>
-    
-    
-    <asp:Panel ID="theEnd" Visible="False" runat="server">
-    
-      <cc1:Feedback ID="feedbackMsg" runat="server" />
-      
-    </asp:Panel>
+
+        <div id="feedbackMsg" data-bind="visible: processStatus() == 'complete'">
+            <div data-bind="css: { success: isSuccessful(), error: !isSuccessful() }">
+                <span data-bind="text: resultMessage, visible: resultMessages().length == 0"></span>
+                <ul data-bind="foreach: resultMessages, visible: resultMessages().length > 1">
+                    <li data-bind="text: message"></li>
+                </ul>
+            </div>
+             <p>
+                 <a href='#' data-bind="click: closeDialog"><%=umbraco.ui.Text("closeThisWindow") %></a>
+             </p>
+        </div> 
+       
+
+    </div>
+
 </asp:Content>

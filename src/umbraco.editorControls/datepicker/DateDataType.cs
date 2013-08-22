@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.datepicker
 {
@@ -43,7 +44,7 @@ namespace umbraco.editorControls.datepicker
 
 		public override Guid Id 
 		{
-			get {return new Guid("23e93522-3200-44e2-9f29-e61a6fcbb79a");}
+			get { return new Guid(Constants.PropertyEditors.Date); }
 		}
 
 		public override interfaces.IDataPrevalue PrevalueEditor 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {

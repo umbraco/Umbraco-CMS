@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = RelationMapper.Instance.Map("Id");
+            string column = new RelationMapper().Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelation].[id]"));
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = RelationMapper.Instance.Map("ChildId");
+            string column = new RelationMapper().Map("ChildId");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelation].[childId]"));
@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = RelationMapper.Instance.Map("CreateDate");
+            string column = new RelationMapper().Map("CreateDate");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelation].[datetime]"));
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = RelationMapper.Instance.Map("Comment");
+            string column = new RelationMapper().Map("Comment");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelation].[comment]"));
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = RelationMapper.Instance.Map("RelationTypeId");
+            string column = new RelationMapper().Map("RelationTypeId");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelation].[relType]"));

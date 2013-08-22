@@ -9,28 +9,13 @@ namespace Umbraco.Core.Persistence
     /// </summary>
     public class RepositoryFactory
     {
-		internal virtual IUserTypeRepository CreateUserTypeRepository(IDatabaseUnitOfWork uow)
-        {
-            return new UserTypeRepository(
-                uow,
-                NullCacheProvider.Current);
-        }
-
-		internal virtual IUserRepository CreateUserRepository(IDatabaseUnitOfWork uow)
-        {
-            return new UserRepository(
-                uow,
-                NullCacheProvider.Current,
-                CreateUserTypeRepository(uow));
-        }
-
         public virtual IContentRepository CreateContentRepository(IDatabaseUnitOfWork uow)
         {
             return new ContentRepository(
                 uow,
                 RuntimeCacheProvider.Current,
                 CreateContentTypeRepository(uow),
-                CreateTemplateRepository(uow));
+                CreateTemplateRepository(uow)) { EnsureUniqueNaming = Umbraco.Core.Configuration.UmbracoSettings.EnsureUniqueNaming };
         }
 
         public virtual IContentTypeRepository CreateContentTypeRepository(IDatabaseUnitOfWork uow)
@@ -63,19 +48,12 @@ namespace Umbraco.Core.Persistence
                 InMemoryCacheProvider.Current);
         }
 
-		internal virtual IMacroRepository CreateMacroRepository(IUnitOfWork uow)
-        {
-            return new MacroRepository(
-                uow,
-                InMemoryCacheProvider.Current);
-        }
-
         public virtual IMediaRepository CreateMediaRepository(IDatabaseUnitOfWork uow)
         {
             return new MediaRepository(
                 uow,
                 RuntimeCacheProvider.Current,
-                CreateMediaTypeRepository(uow));
+                CreateMediaTypeRepository(uow)) { EnsureUniqueNaming = Umbraco.Core.Configuration.UmbracoSettings.EnsureUniqueNaming };
         }
 
         public virtual IMediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork uow)
@@ -112,7 +90,39 @@ namespace Umbraco.Core.Persistence
 
         public virtual ITemplateRepository CreateTemplateRepository(IDatabaseUnitOfWork uow)
         {
-            return new TemplateRepository(uow, NullCacheProvider.Current);
+            return new TemplateRepository(uow, RuntimeCacheProvider.Current);
+        }
+
+        internal virtual ServerRegistrationRepository CreateServerRegistrationRepository(IDatabaseUnitOfWork uow)
+        {
+            return new ServerRegistrationRepository(
+                uow,
+                NullCacheProvider.Current);
+        }
+
+        internal virtual IUserTypeRepository CreateUserTypeRepository(IDatabaseUnitOfWork uow)
+        {
+            return new UserTypeRepository(
+                uow,
+                NullCacheProvider.Current);
+        }
+
+        internal virtual IUserRepository CreateUserRepository(IDatabaseUnitOfWork uow)
+        {
+            return new UserRepository(
+                uow,
+                NullCacheProvider.Current,
+                CreateUserTypeRepository(uow));
+        }
+
+        internal virtual IEntityRepository CreateEntityRepository(IDatabaseUnitOfWork uow)
+        {
+            return new EntityRepository(uow);
+        }
+
+        internal virtual RecycleBinRepository CreateRecycleBinRepository(IDatabaseUnitOfWork uow)
+        {
+            return new RecycleBinRepository(uow);
         }
     }
 }

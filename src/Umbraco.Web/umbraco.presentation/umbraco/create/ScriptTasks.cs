@@ -42,7 +42,7 @@ namespace umbraco
 
         public bool Save()
         {
-            string[] scriptFileAr = _alias.Split('¤');
+            string[] scriptFileAr = _alias.Split('\u00A4');
 
 
 

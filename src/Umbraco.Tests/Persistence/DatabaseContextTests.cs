@@ -6,9 +6,6 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Publishing;
-using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence
@@ -24,7 +21,7 @@ namespace Umbraco.Tests.Persistence
 			_dbContext = new DatabaseContext(new DefaultDatabaseFactory());
 
 			//unfortunately we have to set this up because the PetaPocoExtensions require singleton access
-			ApplicationContext.Current = new ApplicationContext
+			ApplicationContext.Current = new ApplicationContext(false)
 				{
 					DatabaseContext = _dbContext,
 					IsReady = true
@@ -62,7 +59,8 @@ namespace Umbraco.Tests.Persistence
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
             //Delete database file before continueing
-            string filePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
+            //NOTE: we'll use a custom db file for this test since we're re-using the one created with BaseDatabaseFactoryTest
+            string filePath = string.Concat(path, "\\DatabaseContextTests.sdf");
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
@@ -71,8 +69,10 @@ namespace Umbraco.Tests.Persistence
             //Get the connectionstring settings from config
             var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
 
+            //by default the conn string is: Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;File Access Retry Timeout=10
+            //we'll just replace the sdf file with our custom one:
             //Create the Sql CE database
-            var engine = new SqlCeEngine(settings.ConnectionString);
+            var engine = new SqlCeEngine(settings.ConnectionString.Replace("UmbracoPetaPocoTests", "DatabaseContextTests"));
             engine.CreateDatabase();
 
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;

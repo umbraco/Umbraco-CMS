@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Media;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
+using Umbraco.Web.WebApi;
 using umbraco;
 using umbraco.interfaces;
 
@@ -19,6 +20,11 @@ namespace Umbraco.Web
 		{
 			return resolver.ResolveTypes<SurfaceController>();
 		}
+
+        internal static IEnumerable<Type> ResolveUmbracoApiControllers(this PluginManager resolver)
+        {
+            return resolver.ResolveTypes<UmbracoApiController>();
+        }
 
 		/// <summary>
 		/// Returns all available ITrees in application

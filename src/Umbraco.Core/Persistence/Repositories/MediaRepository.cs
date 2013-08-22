@@ -25,13 +25,19 @@ namespace Umbraco.Core.Persistence.Repositories
             : base(work)
         {
             _mediaTypeRepository = mediaTypeRepository;
+
+            EnsureUniqueNaming = true;
         }
 
 		public MediaRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMediaTypeRepository mediaTypeRepository)
             : base(work, cache)
         {
             _mediaTypeRepository = mediaTypeRepository;
+
+            EnsureUniqueNaming = true;
         }
+
+        public bool EnsureUniqueNaming { get; set; }
 
         #region Overrides of RepositoryBase<int,IMedia>
 
@@ -53,7 +59,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             media.Properties = GetPropertyCollection(id, dto.VersionId, mediaType, media.CreateDate, media.UpdateDate);
 
-            ((ICanBeDirty)media).ResetDirtyProperties();
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            ((Entity)media).ResetDirtyProperties(false);
             return media;
         }
 
@@ -134,7 +142,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Guid NodeObjectTypeId
         {
-            get { return new Guid("B796F64C-1F99-4FFB-B886-4BF4BC011A9C"); }
+            get { return new Guid(Constants.ObjectTypes.Media); }
         }
 
         #endregion
@@ -159,7 +167,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             media.Properties = GetPropertyCollection(dto.NodeId, dto.VersionId, mediaType, media.CreateDate, media.UpdateDate);
 
-            ((ICanBeDirty)media).ResetDirtyProperties();
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            ((Entity)media).ResetDirtyProperties(false);
             return media;
         }
 
@@ -177,6 +187,9 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override void PersistNewItem(IMedia entity)
         {
             ((Models.Media)entity).AddingEntity();
+
+            //Ensure unique name on the same level
+            entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
 
             var factory = new MediaFactory(NodeObjectTypeId, entity.Id);
             var dto = factory.BuildDto(entity);
@@ -241,6 +254,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //Updates Modified date
             ((Models.Media)entity).UpdatingEntity();
+
+            //Ensure unique name on the same level
+            entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
 
             //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
             if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
@@ -311,7 +327,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override void PersistDeletedItem(IMedia entity)
         {
             var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            var uploadFieldId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
+            var uploadFieldId = new Guid(Constants.PropertyEditors.UploadField);
             //Loop through properties to check if the media item contains images/file that should be deleted
             foreach (var property in entity.Properties)
             {
@@ -365,6 +381,38 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             return new PropertyCollection(properties);
+        }
+
+        private string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
+        {
+            if (EnsureUniqueNaming == false)
+                return nodeName;
+
+            var sql = new Sql();
+            sql.Select("*")
+               .From<NodeDto>()
+               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.ParentId == parentId && x.Text.StartsWith(nodeName));
+
+            int uniqueNumber = 1;
+            var currentName = nodeName;
+
+            var dtos = Database.Fetch<NodeDto>(sql);
+            if (dtos.Any())
+            {
+                var results = dtos.OrderBy(x => x.Text, new SimilarNodeNameComparer());
+                foreach (var dto in results)
+                {
+                    if (id != 0 && id == dto.NodeId) continue;
+
+                    if (dto.Text.ToLowerInvariant().Equals(currentName.ToLowerInvariant()))
+                    {
+                        currentName = nodeName + string.Format(" ({0})", uniqueNumber);
+                        uniqueNumber++;
+                    }
+                }
+            }
+
+            return currentName;
         }
     }
 }

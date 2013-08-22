@@ -20,21 +20,7 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         [SetUp]
         public override void Initialize()
-        {
-            //NOTE The DataTypesResolver is only necessary because we are using the Save method in the MediaService
-            //this ensures its reset
-            PluginManager.Current = new PluginManager();
-
-            //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-            PluginManager.Current.AssembliesToScan = new[]
-				{
-                    typeof(IDataType).Assembly,
-                    typeof(tinyMCE3dataType).Assembly
-				};
-
-            DataTypesResolver.Current = new DataTypesResolver(
-                () => PluginManager.Current.ResolveDataTypes());
-
+        {           
             base.Initialize();
 
             CreateTestData();
@@ -305,9 +291,6 @@ namespace Umbraco.Tests.Persistence.Repositories
         [TearDown]
         public override void TearDown()
         {
-            //reset the app context
-            DataTypesResolver.Reset();
-
             base.TearDown();
         }
 

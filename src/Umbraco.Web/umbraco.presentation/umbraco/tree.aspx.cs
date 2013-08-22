@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Data;
@@ -19,18 +19,18 @@ using umbraco.BusinessLogic;
 
 using System.Collections.Generic;
 
-namespace  umbraco.cms.presentation
+namespace umbraco.cms.presentation
 {
 
     /// <summary>
     /// This still outputs the xml format of the tree in case developers are using it.
     /// </summary>
-	[Obsolete("this is no longer used for the client side tree")]
+    [Obsolete("this is no longer used for the client side tree")]
     public partial class tree : umbraco.BasePages.UmbracoEnsuredPage
     {
 
         private XmlTree m_xTree = new XmlTree();
-		TreeRequestParams m_treeParams = TreeRequestParams.FromQueryStrings();
+        TreeRequestParams m_treeParams = TreeRequestParams.FromQueryStrings();
 
         /// <summary>
         /// This checks to see which request parameters have been set for the Tree xml service
@@ -43,13 +43,13 @@ namespace  umbraco.cms.presentation
         protected void Page_Load(object sender, System.EventArgs e)
         {
 
-			if (string.IsNullOrEmpty(m_treeParams.TreeType))
-				if (!string.IsNullOrEmpty(m_treeParams.Application))
-					LoadAppTrees(m_treeParams.Application);
+            if (string.IsNullOrEmpty(m_treeParams.TreeType))
+                if (!string.IsNullOrEmpty(m_treeParams.Application))
+                    LoadAppTrees(m_treeParams.Application);
                 else
                     LoadNullTree();
             else
-				LoadTree(m_treeParams.TreeType);
+                LoadTree(m_treeParams.TreeType);
 
             Response.Write(m_xTree.ToString(SerializedTreeType.XmlTree));
         }
@@ -67,7 +67,7 @@ namespace  umbraco.cms.presentation
             foreach (TreeDefinition treeDef in treeDefs)
             {
                 BaseTree bTree = treeDef.CreateInstance();
-				bTree.SetTreeParameters(m_treeParams);
+                bTree.SetTreeParameters(m_treeParams);
                 m_xTree.Add(bTree.RootNode);
             }
         }
@@ -81,15 +81,15 @@ namespace  umbraco.cms.presentation
         {
 
             TreeDefinition treeDef = TreeDefinitionCollection.Instance.FindTree(treeAlias);
-            
+
             if (treeDef != null)
             {
                 BaseTree bTree = treeDef.CreateInstance();
-				bTree.SetTreeParameters(m_treeParams);
+                bTree.SetTreeParameters(m_treeParams);
                 bTree.Render(ref m_xTree);
             }
             else
-                LoadNullTree();    
+                LoadNullTree();
         }
 
         /// <summary>
@@ -97,8 +97,8 @@ namespace  umbraco.cms.presentation
         /// </summary>
         private void LoadNullTree()
         {
-			BaseTree nullTree = new NullTree(m_treeParams.Application);
-			nullTree.SetTreeParameters(m_treeParams);
+            BaseTree nullTree = new NullTree(m_treeParams.Application);
+            nullTree.SetTreeParameters(m_treeParams);
             nullTree.Render(ref m_xTree);
         }
 

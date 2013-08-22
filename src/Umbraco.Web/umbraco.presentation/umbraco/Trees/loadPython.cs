@@ -24,6 +24,7 @@ using umbraco.DataLayer;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
 using umbraco.IO;
+using Umbraco.Core;
 
 
 namespace umbraco
@@ -31,7 +32,7 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of python items into the developer application tree
 	/// </summary>
-    [Tree("developer", "python", "Python Files", sortOrder: 4)]
+    [Tree(Constants.Applications.Developer, "python", "Python Files", sortOrder: 4)]
     public class loadPython : loadDLRScripts
 	{
         public loadPython(string application) : base(application) { }

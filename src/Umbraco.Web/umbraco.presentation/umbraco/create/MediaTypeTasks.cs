@@ -58,7 +58,11 @@ namespace umbraco
 
         public bool Delete()
         {
-            new cms.businesslogic.media.MediaType(_parentID).delete();
+            var mediaType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(ParentID);
+            if (mediaType != null)
+            {
+                ApplicationContext.Current.Services.ContentTypeService.Delete(mediaType);
+            }
             return false;
         }
 

@@ -16,7 +16,7 @@ using System.Web.Services;
 
 namespace umbraco.cms.presentation
 {
-    [Obsolete("Used the TreeControl control instead. This does however get used by the TreeService when requesting the tree init url.")]
+    [Obsolete("This class is no longer used and will be removed in future versions. The page that supercedes this is Umbraco.Web.UI.Umbraco.TreeInit")]
     public partial class TreeInit : UmbracoEnsuredPage
     {
 

@@ -20,6 +20,7 @@ using Post = CookComputing.MetaWeblog.Post;
 using System.Collections.Generic;
 using System.Web.Security;
 using umbraco.IO;
+using Umbraco.Core;
 
 namespace umbraco.presentation.channels
 {
@@ -47,8 +48,8 @@ namespace umbraco.presentation.channels
             if (validateUser(username, password))
             {
                 Channel userChannel = new Channel(username);
-                new Document(int.Parse(postid)).delete();
-                library.UnPublishSingleNode(int.Parse(postid));
+                new Document(int.Parse(postid))
+                    .delete();
                 return true;
             }
             return false;
@@ -83,8 +84,7 @@ namespace umbraco.presentation.channels
 
                 if (publish)
                 {
-                    doc.Publish(new User(username));
-                    library.UpdateDocumentCache(doc);
+                    doc.SaveAndPublish(new User(username));
                 }
                 return true;
             }
@@ -402,8 +402,7 @@ namespace umbraco.presentation.channels
 
                 if (publish)
                 {
-                    doc.Publish(new User(username));
-                    library.UpdateDocumentCache(doc);
+                    doc.SaveAndPublish(new User(username));
                 }
                 return doc.Id.ToString();
             }
@@ -465,20 +464,20 @@ namespace umbraco.presentation.channels
                     {
                         string orgExt = "";
                         // Size
-                        if (m.getProperty("umbracoBytes") != null)
-                            m.getProperty("umbracoBytes").Value = file.bits.Length;
+                        if (m.getProperty(Constants.Conventions.Media.Bytes) != null)
+                            m.getProperty(Constants.Conventions.Media.Bytes).Value = file.bits.Length;
                         // Extension
-                        if (m.getProperty("umbracoExtension") != null)
+                        if (m.getProperty(Constants.Conventions.Media.Extension) != null)
                         {
                             orgExt =
                                 ((string)
                                  file.name.Substring(file.name.LastIndexOf(".") + 1,
                                                      file.name.Length - file.name.LastIndexOf(".") - 1));
-                            m.getProperty("umbracoExtension").Value = orgExt.ToLower();
+                            m.getProperty(Constants.Conventions.Media.Extension).Value = orgExt.ToLower();
                         }
                         // Width and Height
                         // Check if image and then get sizes, make thumb and update database
-                        if (m.getProperty("umbracoWidth") != null && m.getProperty("umbracoHeight") != null &&
+                        if (m.getProperty(Constants.Conventions.Media.Width) != null && m.getProperty(Constants.Conventions.Media.Height) != null &&
                             ",jpeg,jpg,gif,bmp,png,tiff,tif,".IndexOf("," + orgExt.ToLower() + ",") > 0)
                         {
                             int fileWidth;
@@ -492,8 +491,8 @@ namespace umbraco.presentation.channels
                             stream.Close();
                             try
                             {
-                                m.getProperty("umbracoWidth").Value = fileWidth.ToString();
-                                m.getProperty("umbracoHeight").Value = fileHeight.ToString();
+                                m.getProperty(Constants.Conventions.Media.Width).Value = fileWidth.ToString();
+                                m.getProperty(Constants.Conventions.Media.Height).Value = fileHeight.ToString();
                             }
                             catch
                             {

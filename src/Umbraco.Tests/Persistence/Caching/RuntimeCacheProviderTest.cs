@@ -35,6 +35,22 @@ namespace Umbraco.Tests.Persistence.Caching
         }
 
         [Test]
+        public void Can_Clear_By_Type()
+        {
+            var customObj1 = new CustomMockedEntity { Id = 5, Key = 5.ToGuid(), Alias = "mocked5", Name = "Mocked5", Value = Guid.NewGuid().ToString("n") };
+            var customObj2 = new CustomMockedEntity { Id = 6, Key = 6.ToGuid(), Alias = "mocked6", Name = "Mocked6", Value = Guid.NewGuid().ToString("n") };
+
+            _registry.Save(typeof(CustomMockedEntity), customObj1);
+            _registry.Save(typeof(CustomMockedEntity), customObj2);
+
+            Assert.AreEqual(2, _registry.GetAllByType(typeof(CustomMockedEntity)).Count());
+
+            _registry.Clear(typeof(CustomMockedEntity));
+
+            Assert.AreEqual(0, _registry.GetAllByType(typeof(CustomMockedEntity)).Count());
+        }
+
+        [Test]
         public void Can_Get_Entity_From_Registry()
         {
             // Arrange

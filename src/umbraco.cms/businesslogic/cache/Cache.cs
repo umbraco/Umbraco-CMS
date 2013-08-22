@@ -13,10 +13,9 @@ namespace umbraco.cms.businesslogic.cache
     /// class so that is why the class declaration is not marked obsolete.
     /// We haven't migrated it because I don't know why it is needed.
     /// </remarks>
+    [Obsolete("Use the ApplicationContext.Current.ApplicationCache instead")]
     public class Cache
     {
-        private static readonly object m_Locker = new object();
-
         /// <summary>
         /// Clears everything in umbraco's runtime cache, which means that not only
         /// umbraco content is removed, but also other cache items from pages running in
@@ -68,6 +67,7 @@ namespace umbraco.cms.businesslogic.cache
         /// Retrieve all cached items
         /// </summary>
         /// <returns>A hastable containing all cacheitems</returns>
+        [Obsolete("This method should not be used, use other methods to return specific cached items")]
         public static System.Collections.Hashtable ReturnCacheItemsOrdred()
         {
             System.Collections.Hashtable ht = new System.Collections.Hashtable();
@@ -118,7 +118,7 @@ namespace umbraco.cms.businesslogic.cache
         {
 			var helper = new CacheHelper(System.Web.HttpRuntime.Cache);
 			Func<TT> f = () => getCacheItem();
-			return helper.GetCacheItem(cacheKey, priority, refreshAction, cacheDependency, timeout, f, syncLock);
+			return helper.GetCacheItem(cacheKey, priority, refreshAction, cacheDependency, timeout, f);
         }
     }
 }

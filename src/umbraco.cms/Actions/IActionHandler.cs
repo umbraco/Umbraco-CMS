@@ -1,12 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Web;
-using System.Reflection;
-using umbraco.BasePages;
-using umbraco.BusinessLogic.Utils;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.businesslogic.workflow;
 using umbraco.interfaces;
 
 namespace umbraco.BusinessLogic.Actions
@@ -20,6 +13,7 @@ namespace umbraco.BusinessLogic.Actions
     /// <example>
     /// 
     /// </example>
+    [Obsolete("Legacy! Use events instead")]
     public interface IActionHandler
     {
         bool Execute(Document documentObject, IAction action);

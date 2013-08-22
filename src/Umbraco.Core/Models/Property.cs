@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
@@ -82,8 +83,11 @@ namespace Umbraco.Core.Models
             get { return _version; }
             set
             {
-                _version = value;
-                OnPropertyChanged(VersionSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _version = value;
+                    return _version;
+                }, _version, VersionSelector);
             }
         }
 
@@ -108,8 +112,11 @@ namespace Umbraco.Core.Models
                             "Type validation failed. The value type: '{0}' does not match the DataType in PropertyType with alias: '{1}'",
                             value == null ? "null" : value.GetType().Name, Alias));
 
-                _value = value;
-                OnPropertyChanged(ValueSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _value = value;
+                    return _value;
+                }, _value, ValueSelector);
             }
         }
 

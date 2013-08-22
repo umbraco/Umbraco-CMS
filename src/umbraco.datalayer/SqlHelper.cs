@@ -222,7 +222,7 @@ namespace umbraco.DataLayer
         /// <exception cref="umbraco.DataLayer.SqlHelperException">If a data source error occurs.</exception>
         public int ExecuteNonQuery(string commandText, params IParameter[] parameters)
         {
-            string commandConverted = ConvertCommand(commandText);
+			string commandConverted = ConvertCommand(commandText);
             P[] parametersConverted = ConvertParameters(parameters);
             try
             {
@@ -246,7 +246,7 @@ namespace umbraco.DataLayer
         /// <exception cref="umbraco.DataLayer.SqlHelperException">If a data source error occurs.</exception>
         public IRecordsReader ExecuteReader(string commandText, params IParameter[] parameters)
         {
-            string commandConverted = ConvertCommand(commandText);
+			string commandConverted = ConvertCommand(commandText);
             P[] parametersConverted = ConvertParameters(parameters);
             try
             {
@@ -270,7 +270,7 @@ namespace umbraco.DataLayer
         /// <exception cref="umbraco.DataLayer.SqlHelperException">If a data source error occurs.</exception>
         public XmlReader ExecuteXmlReader(string commandText, params IParameter[] parameters)
         {
-            string commandConverted = ConvertCommand(commandText);
+			string commandConverted = ConvertCommand(commandText);
             P[] parametersConverted = ConvertParameters(parameters);
             try
             {

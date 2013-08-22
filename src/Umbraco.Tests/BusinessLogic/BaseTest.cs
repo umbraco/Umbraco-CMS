@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using NUnit.Framework;
 using SqlCE4Umbraco;
+using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -22,6 +23,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             ClearDatabase();
             ConfigurationManager.AppSettings.Set(Core.Configuration.GlobalSettings.UmbracoConnectionName, "");
+            ApplicationContext.Current.DisposeIfDisposable();
         }
 
         /// <summary>
@@ -30,6 +32,7 @@ namespace Umbraco.Tests.BusinessLogic
         [SetUp]
         public void Initialize()
         {
+            ApplicationContext.Current = new ApplicationContext(false){IsReady = true};
             InitializeDatabase();
             InitializeApps();
             InitializeAppConfigFile();
@@ -50,7 +53,7 @@ namespace Umbraco.Tests.BusinessLogic
 
         private void InitializeDatabase()
         {
-            ConfigurationManager.AppSettings.Set(Core.Configuration.GlobalSettings.UmbracoConnectionName, @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf");
+            ConfigurationManager.AppSettings.Set(Core.Configuration.GlobalSettings.UmbracoConnectionName, @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf;Flush Interval=1;File Access Retry Timeout=10");
 
 			ClearDatabase();
 
@@ -68,10 +71,11 @@ namespace Umbraco.Tests.BusinessLogic
 
         private void InitializeApps()
         {
-            Application.Apps = new List<Application>()
-                {
-                    new Application("content", "content", "content", 0)
-                };
+            Application.MakeNew("content", "content", "file", 0);
+            //Application.SetTestApps(new List<Application>()
+            //    {
+            //        new Application(Constants.Applications.Content, "content", "content", 0)
+            //    });
         }
 
         private void InitializeAppConfigFile()

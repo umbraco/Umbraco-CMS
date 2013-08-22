@@ -44,7 +44,7 @@ namespace umbraco.editorControls
         {
             get
             {
-                return _showadvanced ? IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/mediaPicker.aspx" : TreeService.GetPickerUrl("media", "media");
+                return _showadvanced ? IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/mediaPicker.aspx" : TreeService.GetPickerUrl(Umbraco.Core.Constants.Applications.Media, "media");
             }
         }
 

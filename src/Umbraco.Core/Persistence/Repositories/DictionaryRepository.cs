@@ -55,7 +55,9 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             entity.Translations = list;
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            ((Entity)entity).ResetDirtyProperties(false);
 
             return entity;
         }

@@ -24,6 +24,7 @@ using umbraco.DataLayer;
 using umbraco.BusinessLogic.Actions;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Core;
 
 
 namespace umbraco
@@ -31,7 +32,7 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of the cache application into the developer application tree
 	/// </summary>
-    [Tree("developer", "macros", "Macros", sortOrder: 2)]
+    [Tree(Constants.Applications.Developer, "macros", "Macros", sortOrder: 2)]
     public class loadMacros : BaseTree
 	{
 

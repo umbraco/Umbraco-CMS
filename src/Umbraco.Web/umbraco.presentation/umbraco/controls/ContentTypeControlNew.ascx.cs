@@ -4,8 +4,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Web;
+using System.Web.Mvc;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Routing;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
@@ -13,6 +16,7 @@ using ClientDependency.Core;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Web.UI.Controls;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.propertytype;
@@ -35,8 +39,7 @@ namespace umbraco.controls
     [ClientDependency(ClientDependencyType.Css, "Tree/Themes/umbraco/style.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Css, "GenericProperty/genericproperty.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "GenericProperty/genericproperty.js", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Javascript, "js/UmbracoCasingRules.aspx", "UmbracoRoot")]
-    public partial class ContentTypeControlNew : UserControl
+    public partial class ContentTypeControlNew : UmbracoUserControl
     {
         // General Private members
         private ContentType _contentType;
@@ -80,17 +83,21 @@ namespace umbraco.controls
             SetupGenericPropertiesPane();
             SetupTabPane();
 
+            // [ClientDependency(ClientDependencyType.Javascript, "js/UmbracoCasingRules.aspx", "UmbracoRoot")]
+            var loader = ClientDependency.Core.Controls.ClientDependencyLoader.GetInstance(new HttpContextWrapper(Context));
+            var helper = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData()));
+            loader.RegisterDependency(helper.GetCoreStringsControllerPath() + "ServicesJavaScript", ClientDependencyType.Javascript);
         }        
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            pp_newTab.Text = ui.Text("newtab", CurrentUser);
-            pp_alias.Text = ui.Text("alias", CurrentUser);
-            pp_name.Text = ui.Text("name", CurrentUser);
-            pp_allowedChildren.Text = ui.Text("allowedchildnodetypes", CurrentUser);
-            pp_description.Text = ui.Text("editcontenttype", "description", CurrentUser);
-            pp_icon.Text = ui.Text("icon", CurrentUser);
-            pp_thumbnail.Text = ui.Text("editcontenttype", "thumbnail", CurrentUser);
+            pp_newTab.Text = ui.Text("newtab", Security.CurrentUser);
+            pp_alias.Text = ui.Text("alias", Security.CurrentUser);
+            pp_name.Text = ui.Text("name", Security.CurrentUser);
+            pp_allowedChildren.Text = ui.Text("allowedchildnodetypes", Security.CurrentUser);
+            pp_description.Text = ui.Text("editcontenttype", "description", Security.CurrentUser);
+            pp_icon.Text = ui.Text("icon", Security.CurrentUser);
+            pp_thumbnail.Text = ui.Text("editcontenttype", "thumbnail", Security.CurrentUser);
 
 
             // we'll disable this...
@@ -103,25 +110,9 @@ namespace umbraco.controls
                 PanePropertiesInherited.Visible = true;
             }
 
-            theClientId.Text = this.ClientID;
+            checkTxtAliasJs.Text = string.Format("checkAlias('{0}');", txtAlias.ClientID);
         }
-
-        //SD: this is temporary in v4, in v6 we have a proper user control hierarchy
-        //containing this property.
-        //this is required due to this issue: http://issues.umbraco.org/issue/u4-493
-        //because we need to execute some code in async but due to the localization 
-        //framework requiring an httpcontext.current, it will not work. 
-        //http://issues.umbraco.org/issue/u4-2143
-        //so, we are going to make a property here and ensure that the basepage has
-        //resolved the user before we execute the async task so that in this method
-        //our calls to ui.text will include the current user and not rely on the 
-        //httpcontext.current. This also improves performance:
-        // http://issues.umbraco.org/issue/U4-2142
-        private User CurrentUser
-        {
-            get { return ((BasePage)Page).getUser(); }
-        }
-
+        
         /// <summary>
         /// A class to track the async state for deleting a doc type property
         /// </summary>
@@ -235,7 +226,7 @@ namespace umbraco.controls
             
             //get the args from the async state
             var state = (SaveAsyncState)ar.AsyncState;
-
+            
             // reload content type (due to caching)
             LoadContentType();
             BindTabs();
@@ -274,7 +265,7 @@ namespace umbraco.controls
         {
 
             var state = new SaveAsyncState(
-                Umbraco.Web.UmbracoContext.Current,
+                UmbracoContext,
                 new SaveClickEventArgs("Saved")
                 {
                     IconType = BasePage.speechBubbleIcon.success
@@ -360,12 +351,14 @@ namespace umbraco.controls
                         _contentType.AllowAtRoot = allowAtRoot.Checked;
                     
                         _contentType.Save();
-                    }
 
-                    // Only if the doctype alias changed, cause a regeneration of the xml cache file since
-                    // the xml element names will need to be updated to reflect the new alias
-                    if (asyncState.HasAliasChanged() || asyncState.HasAnyPropertyAliasChanged(_contentType))
-                        RegenerateXmlCaches();
+                        // Only if the doctype alias changed, cause a regeneration of the xml cache file since
+                        // the xml element names will need to be updated to reflect the new alias
+                        if (asyncState.HasAliasChanged() || asyncState.HasAnyPropertyAliasChanged(_contentType))
+                        {
+                            _contentType.RebuildXmlStructuresForContent();
+                        }
+                    }
 
                     Trace.Write("ContentTypeControlNew", "task completing");
                 };
@@ -404,25 +397,7 @@ namespace umbraco.controls
                 _contentType = new ContentType(docTypeId);
             }
         }
-
-        /// <summary>
-        /// Regenerates the XML caches. Used after a document type alias has been changed.
-        /// </summary>
-        /// <remarks>
-        /// We only regenerate any XML cache based on if this is a Document type, not a media type or 
-        /// a member type.
-        /// </remarks>
-        private void RegenerateXmlCaches()
-        {
-            _contentType.RebuildXmlStructuresForContent();
-
-            //special case for DocumentType's
-            if (_contentType is DocumentType)
-            {
-                library.RefreshContent();    
-            }
-        }
-
+        
         /// <summary>
         /// Updates the Node in the Tree
         /// </summary>
@@ -446,10 +421,10 @@ namespace umbraco.controls
             Save.Click += save_click;
 
             Save.ImageUrl = UmbracoPath + "/images/editor/save.gif";
-            Save.AlternateText = ui.Text("save", CurrentUser);
+            Save.AlternateText = ui.Text("save", Security.CurrentUser);
             Save.ID = "save";
             
-            var dirInfo = new DirectoryInfo(UmbracoContext.Current.Server.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
+            var dirInfo = new DirectoryInfo(Server.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
             var fileInfo = dirInfo.GetFiles();
 
             var spriteFileNames = CMSNode.DefaultIconClasses.Select(IconClassToIconFileName).ToList();
@@ -903,12 +878,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                         contentTypeItem.MovePropertyType(propertyType.Alias, propertyGroup.Name);
                     }
                 }
-                //Is only called to flush cache since gpw.PropertyType.Save() isn't called
-                // clear local cache
-                cms.businesslogic.cache.Cache.ClearCacheItem("UmbracoPropertyTypeCache" + gpw.PropertyType.Id);
-                // clear cache in ContentType
-                cms.businesslogic.cache.Cache.ClearCacheItem("ContentType_PropertyTypes_Content:" + contentTypeItem.Id);
-                _contentType.ClearVirtualTabs();
             }
         
             //Update the SortOrder of the PropertyTypes
@@ -965,7 +934,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 }
                 else
                 {
-                    e.Message = ui.Text("contentTypeDublicatePropertyType", CurrentUser);
+                    e.Message = ui.Text("contentTypeDublicatePropertyType", Security.CurrentUser);
                     e.IconType = BasePage.speechBubbleIcon.warning;
                 }
             }
@@ -973,7 +942,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             foreach (GenericPropertyWrapper gpw in _genericProperties)
             {
                 cms.businesslogic.propertytype.PropertyType pt = gpw.PropertyType;
-                pt.Alias = gpw.GenricPropertyControl.Alias;
+                pt.Alias = gpw.GenricPropertyControl.Alias; // FIXME so we blindly trust the UI for safe aliases?!
                 pt.Name = gpw.GenricPropertyControl.Name;
                 pt.Description = gpw.GenricPropertyControl.Description;
                 pt.ValidationRegExp = gpw.GenricPropertyControl.Validation.Trim();
@@ -1111,7 +1080,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         protected void gpw_Delete(object sender, EventArgs e)
         {
             var state = new DeleteAsyncState(
-                Umbraco.Web.UmbracoContext.Current,
+                UmbracoContext,
                 (GenericPropertyWrapper)sender);
 
             //Add the async operation to the page
@@ -1119,32 +1088,33 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
             //create the save task to be executed async
             _asyncDeleteTask = asyncState =>
-            {
-                Trace.Write("ContentTypeControlNew", "executing task");
-
-                //we need to re-set the UmbracoContext since it will be nulled and our cache handlers need it
-                global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
-
-                if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
                 {
-                    _contentType.ContentTypeItem.RemovePropertyType(asyncState.GenericPropertyWrapper.PropertyType.Alias);
-                    _contentType.Save();
-                }
+                    Trace.Write("ContentTypeControlNew", "executing task");
 
-                //delete the property
-                asyncState.GenericPropertyWrapper.GenricPropertyControl.PropertyType.delete();
-                
-                //we need to re-generate the xml structures because we're removing a content type property
-                RegenerateXmlCaches();
+                    //we need to re-set the UmbracoContext since it will be nulled and our cache handlers need it
+                    global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
 
-                Trace.Write("ContentTypeControlNew", "task completing");
-            };
+                    if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
+                    {
+                        _contentType.ContentTypeItem.RemovePropertyType(asyncState.GenericPropertyWrapper.PropertyType.Alias);
+                        _contentType.Save();
+                    }
+                    else
+                    {
+                        //if it is not a document type or a media type, then continue to call the legacy delete() method.
+                        //the new API for document type and media type's will ensure that the data is removed correctly and that
+                        //the cache is flushed correctly (using events).  If it is not one of these types, we'll rever to the 
+                        //legacy operation (... like for members i suppose ?)
+                        asyncState.GenericPropertyWrapper.GenricPropertyControl.PropertyType.delete();
+
+                    }
+
+                    Trace.Write("ContentTypeControlNew", "task completing");
+                };
 
             //execute the async tasks
             Page.ExecuteRegisteredAsyncTasks();
-
         }
-
 
         #endregion
 
@@ -1704,12 +1674,12 @@ Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
         protected global::System.Web.UI.WebControls.PlaceHolder PropertyTypes;
 
         /// <summary>
-        /// theClientId control.
+        /// checkTxtAliasJs control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal theClientId;
+        protected global::System.Web.UI.WebControls.Literal checkTxtAliasJs;
     }
 }

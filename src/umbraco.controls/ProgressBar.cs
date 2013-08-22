@@ -6,6 +6,7 @@ using System.Web.UI.WebControls;
 
 namespace umbraco.uicontrols
 {
+    [Obsolete("Use Umbraco.Web.UI.Controls.ProgressBar")]
     public class ProgressBar : System.Web.UI.WebControls.Image
     {
         private string _title = umbraco.ui.Text("publish", "inProgress", null);

@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Routing
 			
 			var result = _module.EnsureUmbracoRoutablePage(umbracoContext, httpContext);
 
-			Assert.AreEqual(assert, result);
+			Assert.AreEqual(assert, result.Success);
 		}
 
 		[TestCase("/favicon.ico", true)]
@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Routing
 		public void Is_Client_Side_Request(string url, bool assert)
 		{
 			var uri = new Uri("http://test.com" + url);			
-			var result = _module.IsClientSideRequest(uri);
+			var result = uri.IsClientSideRequest();
 			Assert.AreEqual(assert, result);
 		}
 

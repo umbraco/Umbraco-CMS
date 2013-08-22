@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Runtime.CompilerServices;
 using System.Web;
 using System.Web.Caching;
-
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Events;
 using umbraco.DataLayer;
 
 namespace umbraco.BusinessLogic
@@ -30,7 +33,6 @@ namespace umbraco.BusinessLogic
         /// <param name="id">The UserType id to find</param>
         public UserType(int id)
         {
-            Cache();
             this.LoadByPrimaryKey(id);
         }
 
@@ -41,8 +43,8 @@ namespace umbraco.BusinessLogic
         /// <param name="name">The name.</param>
         public UserType(int id, string name)
         {
-            m_id = id;
-            m_name = name;
+            _id = id;
+            _name = name;
         }
 
         /// <summary>
@@ -54,26 +56,17 @@ namespace umbraco.BusinessLogic
         /// <param name="alias"></param>
         public UserType(int id, string name, string defaultPermissions, string alias)
         {
-            m_name = name;
-            m_id = id;
-            m_defaultPermissions = defaultPermissions;
-            m_alias = alias;
+            _name = name;
+            _id = id;
+            _defaultPermissions = defaultPermissions;
+            _alias = alias;
         }
 
-        /// <summary>
-        /// A static constructor that will Cache the current UserTypes
-        /// </summary>
-        static UserType()
-        {
-            Cache();
-        }
-
-        private const string CACHE_KEY = "UserTypeCache";
         
-        private int m_id;
-        private string m_name;
-        private string m_defaultPermissions;
-        private string m_alias;
+        private int _id;
+        private string _name;
+        private string _defaultPermissions;
+        private string _alias;
 
         /// <summary>
         /// The cache storage for all user types
@@ -82,14 +75,24 @@ namespace umbraco.BusinessLogic
         {
             get
             {
-                //ensure cache exists
-                if (HttpRuntime.Cache[CACHE_KEY] == null)
-                    ReCache();
-                return HttpRuntime.Cache[CACHE_KEY] as List<UserType>;
-            }
-            set
-            {
-                HttpRuntime.Cache[CACHE_KEY] = value;
+                return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                    CacheKeys.UserTypeCacheKey,
+                    () =>
+                        {
+                            var tmp = new List<UserType>();
+                            using (var dr = SqlHelper.ExecuteReader("select id, userTypeName, userTypeAlias, userTypeDefaultPermissions from umbracoUserType"))
+                            {
+                                while (dr.Read())
+                                {
+                                    tmp.Add(new UserType(
+                                                dr.GetShort("id"),
+                                                dr.GetString("userTypeName"),
+                                                dr.GetString("userTypeDefaultPermissions"),
+                                                dr.GetString("userTypeAlias")));
+                                }
+                            }
+                            return tmp;
+                        });
             }
         }
 
@@ -104,8 +107,8 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public string Alias
         {
-            get { return m_alias; }
-            set { m_alias = value; }
+            get { return _alias; }
+            set { _alias = value; }
         }
 
         /// <summary>
@@ -113,8 +116,8 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public string Name
         {
-            get { return m_name; }
-            set { m_name = value; }
+            get { return _name; }
+            set { _name = value; }
         }
 
         /// <summary>
@@ -122,7 +125,7 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public int Id
         {
-            get { return m_id; }
+            get { return _id; }
         }
 
         /// <summary>
@@ -130,8 +133,8 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public string DefaultPermissions
         {
-            get { return m_defaultPermissions; }
-            set { m_defaultPermissions = value; }
+            get { return _defaultPermissions; }
+            set { _defaultPermissions = value; }
         }
 
         /// <summary>
@@ -150,20 +153,21 @@ namespace umbraco.BusinessLogic
         public void Save()
         {
             //ensure that this object has an ID specified (it exists in the database)
-            if (m_id <= 0)
+            if (_id <= 0)
                 throw new Exception("The current UserType object does not exist in the database. New UserTypes should be created with the MakeNew method");
 
             SqlHelper.ExecuteNonQuery(@"
 				update umbracoUserType set
 				userTypeAlias=@alias,userTypeName=@name,userTypeDefaultPermissions=@permissions
                 where id=@id",
-              SqlHelper.CreateParameter("@alias", m_alias),
-              SqlHelper.CreateParameter("@name", m_name),
-              SqlHelper.CreateParameter("@permissions", m_defaultPermissions),
-                SqlHelper.CreateParameter("@id", m_id)
-            );
+                                      SqlHelper.CreateParameter("@alias", _alias),
+                                      SqlHelper.CreateParameter("@name", _name),
+                                      SqlHelper.CreateParameter("@permissions", _defaultPermissions),
+                                      SqlHelper.CreateParameter("@id", _id)
+                );
 
-            ReCache();
+            //raise event
+            OnUpdated(this, new EventArgs());
         }
 
         /// <summary>
@@ -172,14 +176,13 @@ namespace umbraco.BusinessLogic
         public void Delete()
         {
             //ensure that this object has an ID specified (it exists in the database)
-            if (m_id <= 0)
+            if (_id <= 0)
                 throw new Exception("The current UserType object does not exist in the database. New UserTypes should be created with the MakeNew method");
 
-            SqlHelper.ExecuteNonQuery(@"
-				delete from umbracoUserType where id=@id",
-                SqlHelper.CreateParameter("@id", m_id));
-            
-            ReCache();
+            SqlHelper.ExecuteNonQuery(@"delete from umbracoUserType where id=@id", SqlHelper.CreateParameter("@id", _id));
+
+            //raise event
+            OnDeleted(this, new EventArgs());
         }
 
         /// <summary>
@@ -190,14 +193,14 @@ namespace umbraco.BusinessLogic
         /// and the data was loaded, false if it wasn't</returns>
         public bool LoadByPrimaryKey(int id)
         {
-            UserType userType = GetUserType(id);
+            var userType = GetUserType(id);
             if (userType == null)
                 return false;
 
-            this.m_id = userType.Id;
-            this.m_alias = userType.Alias;
-            this.m_defaultPermissions = userType.DefaultPermissions;
-            this.m_name = userType.Name;
+            _id = userType.Id;
+            _alias = userType.Alias;
+            _defaultPermissions = userType.DefaultPermissions;
+            _name = userType.Name;
 
             return true;
         }
@@ -208,16 +211,13 @@ namespace umbraco.BusinessLogic
         /// <param name="name"></param>
         /// <param name="defaultPermissions"></param>
         /// <param name="alias"></param>
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public static UserType MakeNew(string name, string defaultPermissions, string alias)
         {
             //ensure that the current alias does not exist
             //get the id for the new user type
-            UserType existing = UserTypes.Find(
-                delegate(UserType ut)
-                {
-                    return (ut.Alias == alias);
-                }
-            );
+            var existing = UserTypes.Find(ut => (ut.Alias == alias));
+
             if (existing != null)
                 throw new Exception("The UserType alias specified already exists");
 
@@ -228,18 +228,30 @@ namespace umbraco.BusinessLogic
                 SqlHelper.CreateParameter("@alias", alias),
                 SqlHelper.CreateParameter("@name", name),
                 SqlHelper.CreateParameter("@permissions", defaultPermissions));
+            
+            //get it's id
+            var newId = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoUserType WHERE userTypeAlias=@alias", SqlHelper.CreateParameter("@alias", alias));
 
-            ReCache();
-
-            //find the new user type
-            existing = UserTypes.Find(
-                delegate(UserType ut)
+            //load the instance and return it
+            using (var dr = SqlHelper.ExecuteReader(
+                "select id, userTypeName, userTypeAlias, userTypeDefaultPermissions from umbracoUserType where id=@id", 
+                SqlHelper.CreateParameter("@id", newId)))
+            {
+                if (dr.Read())
                 {
-                    return (ut.Alias == alias);
-                }
-            );
+                    var ut = new UserType(
+                        dr.GetShort("id"),
+                        dr.GetString("userTypeName"),
+                        dr.GetString("userTypeDefaultPermissions"),
+                        dr.GetString("userTypeAlias"));
 
-            return existing;
+                    //raise event
+                    OnNew(ut, new EventArgs());
+
+                    return ut;
+                }
+                throw new InvalidOperationException("Could not read the new User Type with id of " + newId);
+            }
         }
 
         /// <summary>
@@ -249,12 +261,7 @@ namespace umbraco.BusinessLogic
         /// <returns></returns>
         public static UserType GetUserType(int id)
         {
-            return UserTypes.Find(
-                delegate(UserType ut)
-                {
-                    return (ut.Id == id);
-                }
-            );
+            return UserTypes.Find(ut => (ut.Id == id));
         }
 
         /// <summary>
@@ -266,42 +273,32 @@ namespace umbraco.BusinessLogic
             return UserTypes;
         }
 
-        /// <summary>
-        /// Removes the UserType cache and re-reads the data from the db.
-        /// </summary>
-        private static void ReCache()
+        internal static event TypedEventHandler<UserType, EventArgs> New;
+        private static void OnNew(UserType userType, EventArgs args)
         {
-            HttpRuntime.Cache.Remove(CACHE_KEY);
-            Cache();
-        }
-
-        /// <summary>
-        /// Read all UserType data and store it in cache.
-        /// </summary>
-        private static void Cache()
-        {
-            //don't query the database is the cache is not null
-            if (HttpRuntime.Cache[CACHE_KEY] != null)
-                return;
-
-            List<UserType> tmp = new List<UserType>();
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader("select id, userTypeName, userTypeAlias, userTypeDefaultPermissions from umbracoUserType"))
+            if (New != null)
             {
-                while (dr.Read())
-                {
-                    tmp.Add(new UserType(
-                        dr.GetShort("id"),
-                        dr.GetString("userTypeName"),
-                        dr.GetString("userTypeDefaultPermissions"),
-                        dr.GetString("userTypeAlias")));
-                }
+                New(userType, args);
             }
-
-            UserTypes = tmp;
-
         }
 
+        internal static event TypedEventHandler<UserType, EventArgs> Deleted;
+        private static void OnDeleted(UserType userType, EventArgs args)
+        {
+            if (Deleted != null)
+            {
+                Deleted(userType, args);
+            }
+        }
+
+        internal static event TypedEventHandler<UserType, EventArgs> Updated;
+        private static void OnUpdated(UserType userType, EventArgs args)
+        {
+            if (Updated != null)
+            {
+                Updated(userType, args);
+            }
+        }
 
     }
 }

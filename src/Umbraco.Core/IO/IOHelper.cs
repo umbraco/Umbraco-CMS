@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+using System.Globalization;
 using System.Reflection;
-using System.Text;
 using System.IO;
 using System.Configuration;
 using System.Web;
 using System.Text.RegularExpressions;
-using System.Xml;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 
@@ -37,7 +34,7 @@ namespace Umbraco.Core.IO
             if (virtualPath.StartsWith("~"))
                 retval = virtualPath.Replace("~", SystemDirectories.Root);
 
-            if (virtualPath.StartsWith("/") && !virtualPath.StartsWith(SystemDirectories.Root))
+            if (virtualPath.StartsWith("/") && virtualPath.StartsWith(SystemDirectories.Root) == false)
                 retval = SystemDirectories.Root + "/" + virtualPath.TrimStart('/');
 
             return retval;
@@ -48,6 +45,8 @@ namespace Umbraco.Core.IO
         {
             if (virtualPath.StartsWith("~"))
                 return virtualPath.Replace("~", SystemDirectories.Root).Replace("//", "/");
+            else if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
+                return virtualPath;
             else
                 return VirtualPathUtility.ToAbsolute(virtualPath, SystemDirectories.Root);
         }
@@ -68,11 +67,7 @@ namespace Umbraco.Core.IO
 						if (tag.Groups[1].Success)
 							url = tag.Groups[1].Value;
 
-						// The richtext editor inserts a slash in front of the url. That's why we need this little fix
-						//                if (url.StartsWith("/"))
-						//                    text = text.Replace(url, ResolveUrl(url.Substring(1)));
-						//                else
-						if (!String.IsNullOrEmpty(url))
+						if (string.IsNullOrEmpty(url) == false)
 						{
 							string resolvedUrl = (url.Substring(0, 1) == "/") ? ResolveUrl(url.Substring(1)) : ResolveUrl(url);
 							text = text.Replace(url, resolvedUrl);
@@ -97,19 +92,15 @@ namespace Umbraco.Core.IO
             if (useHttpContext && HttpContext.Current != null)
             {
                 //string retval;
-                if (!string.IsNullOrEmpty(path) && (path.StartsWith("~") || path.StartsWith(SystemDirectories.Root)))
+                if (string.IsNullOrEmpty(path) == false && (path.StartsWith("~") || path.StartsWith(SystemDirectories.Root)))
                     return System.Web.Hosting.HostingEnvironment.MapPath(path);
                 else
                     return System.Web.Hosting.HostingEnvironment.MapPath("~/" + path.TrimStart('/'));
             }
 
-			//var root = (!string.IsNullOrEmpty(System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath)) 
-			//    ? System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath.TrimEnd(IOHelper.DirSepChar) 
-			//    : getRootDirectorySafe();
-
         	var root = GetRootDirectorySafe();
         	var newPath = path.TrimStart('~', '/').Replace('/', IOHelper.DirSepChar);
-        	var retval = root + IOHelper.DirSepChar.ToString() + newPath;
+        	var retval = root + IOHelper.DirSepChar.ToString(CultureInfo.InvariantCulture) + newPath;
 
         	return retval;
         }
@@ -137,51 +128,98 @@ namespace Umbraco.Core.IO
         }
 
         /// <summary>
-        /// Validates if the current filepath matches a directory where the user is allowed to edit a file
+        /// Verifies that the current filepath matches a directory where the user is allowed to edit a file.
         /// </summary>
-        /// <param name="filePath">filepath </param>
-        /// <param name="validDir"></param>
-        /// <returns>true if valid, throws a FileSecurityException if not</returns>
-        internal static bool ValidateEditPath(string filePath, string validDir)
+        /// <param name="filePath">The filepath to validate.</param>
+        /// <param name="validDir">The valid directory.</param>
+        /// <returns>A value indicating whether the filepath is valid.</returns>
+        internal static bool VerifyEditPath(string filePath, string validDir)
         {
-            if (!filePath.StartsWith(MapPath(SystemDirectories.Root)))
+            if (filePath.StartsWith(MapPath(SystemDirectories.Root)) == false)
                 filePath = MapPath(filePath);
-            if (!validDir.StartsWith(MapPath(SystemDirectories.Root)))
+            if (validDir.StartsWith(MapPath(SystemDirectories.Root)) == false)
                 validDir = MapPath(validDir);
 
-            if (!filePath.StartsWith(validDir))
-                throw new FileSecurityException(String.Format("The filepath '{0}' is not within an allowed directory for this type of files", filePath.Replace(MapPath(SystemDirectories.Root), "")));
+            return filePath.StartsWith(validDir);
+        }
 
+        /// <summary>
+        /// Validates that the current filepath matches a directory where the user is allowed to edit a file.
+        /// </summary>
+        /// <param name="filePath">The filepath to validate.</param>
+        /// <param name="validDir">The valid directory.</param>
+        /// <returns>True, if the filepath is valid, else an exception is thrown.</returns>
+        /// <exception cref="FileSecurityException">The filepath is invalid.</exception>
+        internal static bool ValidateEditPath(string filePath, string validDir)
+        {
+            if (VerifyEditPath(filePath, validDir) == false)
+                throw new FileSecurityException(String.Format("The filepath '{0}' is not within an allowed directory for this type of files", filePath.Replace(MapPath(SystemDirectories.Root), "")));
             return true;
         }
 
-        internal static bool ValidateEditPath(string filePath, IEnumerable<string> validDirs)
+        /// <summary>
+        /// Verifies that the current filepath matches one of several directories where the user is allowed to edit a file.
+        /// </summary>
+        /// <param name="filePath">The filepath to validate.</param>
+        /// <param name="validDirs">The valid directories.</param>
+        /// <returns>A value indicating whether the filepath is valid.</returns>
+        internal static bool VerifyEditPath(string filePath, IEnumerable<string> validDirs)
         {
             foreach (var dir in validDirs)
             {
                 var validDir = dir;
-                if (!filePath.StartsWith(MapPath(SystemDirectories.Root)))
+                if (filePath.StartsWith(MapPath(SystemDirectories.Root)) == false)
                     filePath = MapPath(filePath);
-                if (!validDir.StartsWith(MapPath(SystemDirectories.Root)))
+                if (validDir.StartsWith(MapPath(SystemDirectories.Root)) == false)
                     validDir = MapPath(validDir);
 
                 if (filePath.StartsWith(validDir))
                     return true;
             }
 
-           throw new FileSecurityException(String.Format("The filepath '{0}' is not within an allowed directory for this type of files", filePath.Replace(MapPath(SystemDirectories.Root), "")));
+            return false;
         }
 
-        internal static bool ValidateFileExtension(string filePath, List<string> validFileExtensions)
+        /// <summary>
+        /// Validates that the current filepath matches one of several directories where the user is allowed to edit a file.
+        /// </summary>
+        /// <param name="filePath">The filepath to validate.</param>
+        /// <param name="validDirs">The valid directories.</param>
+        /// <returns>True, if the filepath is valid, else an exception is thrown.</returns>
+        /// <exception cref="FileSecurityException">The filepath is invalid.</exception>
+        internal static bool ValidateEditPath(string filePath, IEnumerable<string> validDirs)
         {
-            if (!filePath.StartsWith(MapPath(SystemDirectories.Root)))
+            if (VerifyEditPath(filePath, validDirs) == false)
+           throw new FileSecurityException(String.Format("The filepath '{0}' is not within an allowed directory for this type of files", filePath.Replace(MapPath(SystemDirectories.Root), "")));
+            return true;
+        }
+
+        /// <summary>
+        /// Verifies that the current filepath has one of several authorized extensions.
+        /// </summary>
+        /// <param name="filePath">The filepath to validate.</param>
+        /// <param name="validFileExtensions">The valid extensions.</param>
+        /// <returns>A value indicating whether the filepath is valid.</returns>
+        internal static bool VerifyFileExtension(string filePath, List<string> validFileExtensions)
+        {
+            if (filePath.StartsWith(MapPath(SystemDirectories.Root)) == false)
                 filePath = MapPath(filePath);
             var f = new FileInfo(filePath);
+            
+            return validFileExtensions.Contains(f.Extension.Substring(1));
+        }
 
-
-            if (!validFileExtensions.Contains(f.Extension.Substring(1)))
+        /// <summary>
+        /// Validates that the current filepath has one of several authorized extensions.
+        /// </summary>
+        /// <param name="filePath">The filepath to validate.</param>
+        /// <param name="validFileExtensions">The valid extensions.</param>
+        /// <returns>True, if the filepath is valid, else an exception is thrown.</returns>
+        /// <exception cref="FileSecurityException">The filepath is invalid.</exception>
+        internal static bool ValidateFileExtension(string filePath, List<string> validFileExtensions)
+        {
+            if (VerifyFileExtension(filePath, validFileExtensions) == false)
                 throw new FileSecurityException(String.Format("The extension for the current file '{0}' is not of an allowed type for this editor. This is typically controlled from either the installed MacroEngines or based on configuration in /config/umbracoSettings.config", filePath.Replace(MapPath(SystemDirectories.Root), "")));
-
             return true;
         }
 
@@ -194,7 +232,7 @@ namespace Umbraco.Core.IO
         /// <returns></returns>
         internal static string GetRootDirectorySafe()
         {
-            if (!String.IsNullOrEmpty(_rootDir))
+            if (string.IsNullOrEmpty(_rootDir) == false)
             {
                 return _rootDir;
             }
@@ -203,11 +241,52 @@ namespace Umbraco.Core.IO
 			var uri = new Uri(codeBase);
 			var path = uri.LocalPath;
         	var baseDirectory = Path.GetDirectoryName(path);
-            _rootDir = baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin") - 1);
+            if (string.IsNullOrEmpty(baseDirectory))
+                throw new Exception("No root directory could be resolved. Please ensure that your Umbraco solution is correctly configured.");
+
+            _rootDir = baseDirectory.Contains("bin")
+                           ? baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin", StringComparison.OrdinalIgnoreCase) - 1)
+                           : baseDirectory;
 
             return _rootDir;
-
         }
+
+        internal static string GetRootDirectoryBinFolder()
+        {
+            string binFolder = string.Empty;
+            if (string.IsNullOrEmpty(_rootDir))
+            {
+                binFolder = Assembly.GetExecutingAssembly().GetAssemblyFile().Directory.FullName;
+                return binFolder;
+            }
+
+            binFolder = Path.Combine(GetRootDirectorySafe(), "bin");
+
+#if DEBUG
+            var debugFolder = Path.Combine(binFolder, "debug");
+            if (Directory.Exists(debugFolder))
+                return debugFolder;
+#endif   
+            var releaseFolder = Path.Combine(binFolder, "release");
+            if (Directory.Exists(releaseFolder))
+                return releaseFolder;
+
+            if (Directory.Exists(binFolder))
+                return binFolder;
+
+            return _rootDir;
+        }
+
+        /// <summary>
+        /// Allows you to overwrite RootDirectory, which would otherwise be resolved
+        /// automatically upon application start.
+        /// </summary>
+        /// <remarks>The supplied path should be the absolute path to the root of the umbraco site.</remarks>
+        /// <param name="rootPath"></param>
+        internal static void SetRootDirectory(string rootPath)
+	    {
+            _rootDir = rootPath;
+	    }
 
         /// <summary>
         /// Check to see if filename passed has any special chars in it and strips them to create a safe filename.  Used to overcome an issue when Umbraco is used in IE in an intranet environment.
@@ -216,55 +295,8 @@ namespace Umbraco.Core.IO
         /// <returns>A safe filename without any path specific chars.</returns>
         internal static string SafeFileName(string filePath)
         {
-            if (String.IsNullOrEmpty(filePath))
-                return String.Empty;
-
-            if (!String.IsNullOrWhiteSpace(filePath))
-            {
-                foreach (var character in Path.GetInvalidFileNameChars())
-                {
-                    filePath = filePath.Replace(character, '-');
-                }
-            }
-            else
-            {
-                filePath = String.Empty;
-            }
-
-            //Break up the file in name and extension before applying the UrlReplaceCharacters
-            var fileNamePart = filePath.Substring(0, filePath.LastIndexOf('.'));
-            var ext = filePath.Substring(filePath.LastIndexOf('.'));
-
-            //Because the file usually is downloadable as well we check characters against 'UmbracoSettings.UrlReplaceCharacters'
-            XmlNode replaceChars = UmbracoSettings.UrlReplaceCharacters;
-            foreach (XmlNode n in replaceChars.SelectNodes("char"))
-            {
-                if (n.Attributes.GetNamedItem("org") != null && n.Attributes.GetNamedItem("org").Value != "")
-                    fileNamePart = fileNamePart.Replace(n.Attributes.GetNamedItem("org").Value, XmlHelper.GetNodeValue(n));
-            }
-
-            filePath = string.Concat(fileNamePart, ext);
-
-            // Adapted from: http://stackoverflow.com/a/4827510/5018
-            // Combined both Reserved Characters and Character Data 
-            // from http://en.wikipedia.org/wiki/Percent-encoding
-            var stringBuilder = new StringBuilder();
-
-            const string reservedCharacters = "!*'();:@&=+$,/?%#[]-~{}\"<>\\^`| ";
-
-            foreach (var character in filePath)
-            {
-                if (reservedCharacters.IndexOf(character) == -1)
-                    stringBuilder.Append(character);
-                else
-                    stringBuilder.Append("-");
-            }
-
-            // Remove repeating dashes
-            // From: http://stackoverflow.com/questions/5111967/regex-to-remove-a-specific-repeated-character
-            var reducedString = Regex.Replace(stringBuilder.ToString(), "-+", "-");
-
-            return reducedString;
+            // use string extensions
+            return filePath.ToSafeFileName();
         }
     }
 }

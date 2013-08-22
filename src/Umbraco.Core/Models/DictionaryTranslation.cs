@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
@@ -40,8 +41,11 @@ namespace Umbraco.Core.Models
             get { return _language; }
             set
             {
-                _language = value;
-                OnPropertyChanged(LanguageSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _language = value;
+                    return _language;
+                }, _language, LanguageSelector);
             }
         }
 
@@ -54,8 +58,11 @@ namespace Umbraco.Core.Models
             get { return _value; }
             set
             {
-                _value = value;
-                OnPropertyChanged(ValueSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _value = value;
+                    return _value;
+                }, _value, ValueSelector);
             }
         }
     }

@@ -264,6 +264,16 @@ namespace Umbraco.Core
 			return TypeHelper.IsTypeAssignableFrom<T>(actualType);
 		}
 
+        public static bool Inherits<TBase>(this Type type)
+        {
+            return typeof (TBase).IsAssignableFrom(type);
+        }
+
+        public static bool Implements<TInterface>(this Type type)
+        {
+            return typeof (TInterface).IsAssignableFrom(type);
+        }
+
         public static TAttribute FirstAttribute<TAttribute>(this Type type)
         {
             return type.FirstAttribute<TAttribute>(true);

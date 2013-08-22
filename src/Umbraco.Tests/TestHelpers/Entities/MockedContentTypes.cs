@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 
@@ -6,12 +7,12 @@ namespace Umbraco.Tests.TestHelpers.Entities
 {
     public class MockedContentTypes
     {
-        public static ContentType CreateTextpageContentType()
+        public static ContentType CreateTextpageContentType(string alias = "textPage", string name = "Text Page")
         {
             var contentType = new ContentType(-1)
                                   {
-                                      Alias = "textPage",
-                                      Name = "Text Page",
+                                      Alias = alias,
+                                      Name = name,
                                       Description = "ContentType used for Text pages",
                                       Icon = ".sprTreeDoc3",
                                       Thumbnail = "doc.png",
@@ -30,6 +31,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
             contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
             contentType.PropertyGroups.Add(new PropertyGroup(metaCollection) { Name = "Meta", SortOrder = 2 });
+
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
 
             return contentType;
         }
@@ -53,6 +57,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
             metaCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "metadescription", Name = "Meta Description", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -89 });
 
             contentType.PropertyGroups.Add(new PropertyGroup(metaCollection) { Name = "Meta", SortOrder = 2 });
+
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
 
             return contentType;
         }
@@ -78,6 +85,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
             contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
 
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
+
             return contentType;
         }
 
@@ -100,6 +110,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentCollection.Add(new PropertyType(new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea"), DataTypeDatabaseType.Ntext) { Alias = "author", Name = "Author", Description = "Name of the author", HelpText = "", Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -88 });
 
 			contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
 
 			return contentType;
 		}	    
@@ -125,6 +138,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
             contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
 
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
+
             return contentType;
         }
 
@@ -143,6 +159,54 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                   };
 
             contentType.PropertyGroups.Add(new PropertyGroup(collection) { Name = "Content", SortOrder = 1 });
+
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
+
+            return contentType;
+        }
+
+        public static ContentType CreateAllTypesContentType(string alias, string name)
+        {
+            var contentType = new ContentType(-1)
+                              {
+                                  Alias = alias,
+                                  Name = name,
+                                  Description = "ContentType containing all standard DataTypes",
+                                  Icon = ".sprTreeDoc3",
+                                  Thumbnail = "doc.png",
+                                  SortOrder = 1,
+                                  CreatorId = 0,
+                                  Trashed = false
+                              };
+
+            var contentCollection = new PropertyTypeCollection();
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.TrueFalse), DataTypeDatabaseType.Integer) { Alias = "isTrue", Name = "Is True or False", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -49 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.Integer), DataTypeDatabaseType.Integer) { Alias = "number", Name = "Number", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -51 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.TinyMCEv3), DataTypeDatabaseType.Ntext) { Alias = "bodyText", Name = "Body Text", Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -87 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.Textbox), DataTypeDatabaseType.Nvarchar) { Alias = "singleLineText", Name = "Text String", Mandatory = false, SortOrder = 4, DataTypeDefinitionId = -88 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.TextboxMultiple), DataTypeDatabaseType.Ntext) { Alias = "multilineText", Name = "Multiple Text Strings", Mandatory = false, SortOrder = 5, DataTypeDefinitionId = -89 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.UploadField), DataTypeDatabaseType.Nvarchar) { Alias = "upload", Name = "Upload Field", Mandatory = false, SortOrder = 6, DataTypeDefinitionId = -90 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.NoEdit), DataTypeDatabaseType.Nvarchar) { Alias = "label", Name = "Label", Mandatory = false, SortOrder = 7, DataTypeDefinitionId = -92 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.DateTime), DataTypeDatabaseType.Date) { Alias = "dateTime", Name = "Date Time", Mandatory = false, SortOrder = 8, DataTypeDefinitionId = -36 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.ColorPicker), DataTypeDatabaseType.Nvarchar) { Alias = "colorPicker", Name = "Color Picker", Mandatory = false, SortOrder = 9, DataTypeDefinitionId = -37 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.FolderBrowser), DataTypeDatabaseType.Nvarchar) { Alias = "folderBrowser", Name = "Folder Browser", Mandatory = false, SortOrder = 10, DataTypeDefinitionId = -38 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.DropDownListMultiple), DataTypeDatabaseType.Nvarchar) { Alias = "ddlMultiple", Name = "Dropdown List Multiple", Mandatory = false, SortOrder = 11, DataTypeDefinitionId = -39 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.RadioButtonList), DataTypeDatabaseType.Nvarchar) { Alias = "rbList", Name = "Radio Button List", Mandatory = false, SortOrder = 12, DataTypeDefinitionId = -40 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.Date), DataTypeDatabaseType.Date) { Alias = "date", Name = "Date", Mandatory = false, SortOrder = 13, DataTypeDefinitionId = -41 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.DropDownList), DataTypeDatabaseType.Integer) { Alias = "ddl", Name = "Dropdown List", Mandatory = false, SortOrder = 14, DataTypeDefinitionId = -42 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.CheckBoxList), DataTypeDatabaseType.Nvarchar) { Alias = "chklist", Name = "Checkbox List", Mandatory = false, SortOrder = 15, DataTypeDefinitionId = -43 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.ContentPicker), DataTypeDatabaseType.Integer) { Alias = "contentPicker", Name = "Content Picker", Mandatory = false, SortOrder = 16, DataTypeDefinitionId = 1034 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.MediaPicker), DataTypeDatabaseType.Integer) { Alias = "mediaPicker", Name = "Media Picker", Mandatory = false, SortOrder = 17, DataTypeDefinitionId = 1035 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.MemberPicker), DataTypeDatabaseType.Integer) { Alias = "memberPicker", Name = "Member Picker", Mandatory = false, SortOrder = 18, DataTypeDefinitionId = 1036 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.UltraSimpleEditor), DataTypeDatabaseType.Ntext) { Alias = "simpleEditor", Name = "Ultra Simple Editor", Mandatory = false, SortOrder = 19, DataTypeDefinitionId = 1038 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.UltimatePicker), DataTypeDatabaseType.Ntext) { Alias = "ultimatePicker", Name = "Ultimate Picker", Mandatory = false, SortOrder = 20, DataTypeDefinitionId = 1039 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.RelatedLinks), DataTypeDatabaseType.Ntext) { Alias = "relatedLinks", Name = "Related Links", Mandatory = false, SortOrder = 21, DataTypeDefinitionId = 1040 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.Tags), DataTypeDatabaseType.Ntext) { Alias = "tags", Name = "Tags", Mandatory = false, SortOrder = 22, DataTypeDefinitionId = 1041 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.MacroContainer), DataTypeDatabaseType.Ntext) { Alias = "macroContainer", Name = "Macro Container", Mandatory = false, SortOrder = 23, DataTypeDefinitionId = 1042 });
+            contentCollection.Add(new PropertyType(new Guid(Constants.PropertyEditors.ImageCropper), DataTypeDatabaseType.Ntext) { Alias = "imgCropper", Name = "Image Cropper", Mandatory = false, SortOrder = 24, DataTypeDefinitionId = 1043 });
+
+            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
 
             return contentType;
         }
@@ -167,6 +231,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
             mediaType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Media", SortOrder = 1 });
 
+            //ensure that nothing is marked as dirty
+            mediaType.ResetDirtyProperties(false);
+
             return mediaType;
         }
 
@@ -174,7 +241,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
         {
             var mediaType = new MediaType(-1)
             {
-                Alias = "image",
+                Alias = Constants.Conventions.MediaTypes.Image,
                 Name = "Image",
                 Description = "ContentType used for images",
                 Icon = ".sprTreeDoc3",
@@ -185,13 +252,16 @@ namespace Umbraco.Tests.TestHelpers.Entities
             };
 
             var contentCollection = new PropertyTypeCollection();
-            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Nvarchar) { Alias = "umbracoFile", Name = "File", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -90 });
-            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Integer) { Alias = "umbracoWidth", Name = "Width", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
-            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Integer) { Alias = "umbracoHeight", Name = "Height", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
-            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Integer) { Alias = "umbracoBytes", Name = "Bytes", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
-            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Integer) { Alias = "umbracoExtension", Name = "File Extension", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
+            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Nvarchar) { Alias = Constants.Conventions.Media.File, Name = "File", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -90 });
+            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Integer) { Alias = Constants.Conventions.Media.Width, Name = "Width", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
+            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Integer) { Alias = Constants.Conventions.Media.Height, Name = "Height", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
+            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Integer) { Alias = Constants.Conventions.Media.Bytes, Name = "Bytes", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
+            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Integer) { Alias = Constants.Conventions.Media.Extension, Name = "File Extension", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
 
             mediaType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Media", SortOrder = 1 });
+
+            //ensure that nothing is marked as dirty
+            mediaType.ResetDirtyProperties(false);
 
             return mediaType;
         }

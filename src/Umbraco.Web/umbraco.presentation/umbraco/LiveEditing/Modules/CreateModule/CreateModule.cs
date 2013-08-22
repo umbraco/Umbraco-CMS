@@ -128,11 +128,10 @@ namespace umbraco.presentation.LiveEditing.Modules.CreateModule
             switch (e.Type)
             {
                 case "createcontent":      
-                    int userid = BasePages.UmbracoEnsuredPage.GetUserId(BasePages.UmbracoEnsuredPage.umbracoUserContextID);
-                    DocumentType typeToCreate = new DocumentType(Convert.ToInt32(m_AllowedDocTypesDropdown.SelectedValue));
-                    Document newDoc = Document.MakeNew(m_NameTextBox.Text, typeToCreate, new global::umbraco.BusinessLogic.User(userid), (int)UmbracoContext.Current.PageId);
-                    newDoc.Publish(new global::umbraco.BusinessLogic.User(userid));
-                    library.UpdateDocumentCache(newDoc);
+                    var userid = BasePages.UmbracoEnsuredPage.GetUserId(BasePages.UmbracoEnsuredPage.umbracoUserContextID);
+                    var typeToCreate = new DocumentType(Convert.ToInt32(m_AllowedDocTypesDropdown.SelectedValue));
+                    var newDoc = Document.MakeNew(m_NameTextBox.Text, typeToCreate, new BusinessLogic.User(userid), (int)UmbracoContext.Current.PageId);
+                    newDoc.SaveAndPublish(new BusinessLogic.User(userid));
                     Page.Response.Redirect(library.NiceUrl(newDoc.Id), false);
                     break;
             }

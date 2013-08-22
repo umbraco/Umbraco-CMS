@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models.Membership
 {
@@ -21,7 +22,7 @@ namespace Umbraco.Core.Models.Membership
 
         public User(IUserType userType)
         {
-            Groups = new List<object> {userType};
+            Groups = new List<object> { userType };
         }
 
         #region Implementation of IEntity
@@ -90,7 +91,8 @@ namespace Umbraco.Core.Models.Membership
         [DataMember]
         public string Language { get; set; }
         [DataMember]
-        public string Permissions { get; set; }
+        public string DefaultPermissions { get; set; }
+
         [DataMember]
         public bool DefaultToLiveEditing { get; set; }
         [DataMember]
@@ -99,8 +101,8 @@ namespace Umbraco.Core.Models.Membership
         [IgnoreDataMember]
         public IUserType UserType
         {
-            get 
-            { 
+            get
+            {
                 var type = Groups.FirstOrDefault();
                 return type as IUserType;
             }

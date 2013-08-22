@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = RelationTypeMapper.Instance.Map("Id");
+            string column = new RelationTypeMapper().Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelationType].[id]"));
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = RelationTypeMapper.Instance.Map("Alias");
+            string column = new RelationTypeMapper().Map("Alias");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelationType].[alias]"));
@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = RelationTypeMapper.Instance.Map("ChildObjectType");
+            string column = new RelationTypeMapper().Map("ChildObjectType");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelationType].[childObjectType]"));
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = RelationTypeMapper.Instance.Map("IsBidirectional");
+            string column = new RelationTypeMapper().Map("IsBidirectional");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelationType].[dual]"));

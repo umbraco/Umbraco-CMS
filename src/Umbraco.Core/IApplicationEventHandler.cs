@@ -2,7 +2,7 @@ using umbraco.interfaces;
 
 namespace Umbraco.Core
 {
-	/// <summary>
+    /// <summary>
 	/// Custom IApplicationStartupHandler that auto subscribes to the applications events
 	/// </summary>
 	public interface IApplicationEventHandler : IApplicationStartupHandler

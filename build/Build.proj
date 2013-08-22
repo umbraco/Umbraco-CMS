@@ -1,19 +1,19 @@
 
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
- <!-- 
+  <!-- 
  ****************************************************
  INCLUDES 
  *****************************************************
  -->
 
- <PropertyGroup>
-   <MSBuildCommunityTasksPath>..\MSBuildCommunityTasks</MSBuildCommunityTasksPath>
-   <UmbracoMSBuildTasksPath>..\UmbracoMSBuildTasks</UmbracoMSBuildTasksPath>
- </PropertyGroup>
- 
- <Import Project="..\tools\UmbracoMSBuildTasks\Umbraco.MSBuild.Tasks.Targets" />
- <Import Project="..\tools\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
+  <PropertyGroup>
+    <MSBuildCommunityTasksPath>..\MSBuildCommunityTasks</MSBuildCommunityTasksPath>
+    <UmbracoMSBuildTasksPath>..\UmbracoMSBuildTasks</UmbracoMSBuildTasksPath>
+  </PropertyGroup>
+
+  <Import Project="..\tools\UmbracoMSBuildTasks\Umbraco.MSBuild.Tasks.Targets" />
+  <Import Project="..\tools\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
  
  <UsingTask TaskName="GenerateHash" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
     <ParameterGroup>
@@ -53,65 +53,69 @@
  </UsingTask>
 
  
- <!-- 
+  <!-- 
  ****************************************************
  VARIABLES 
  *****************************************************
  -->
 
- <!-- NB: BUILD_NUMBER is passed in by the build server -->
- <PropertyGroup Condition="'$(BUILD_NUMBER)'!=''">
-   <DECIMAL_BUILD_NUMBER>.$(BUILD_NUMBER)</DECIMAL_BUILD_NUMBER>
- </PropertyGroup> 
- <PropertyGroup Condition="'$(BUILD_RELEASE)'!=''">
-   <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)</DECIMAL_BUILD_NUMBER>
- </PropertyGroup>
- <PropertyGroup Condition="'$(BUILD_RELEASE)'!='' AND '$(BUILD_COMMENT)'!=''">
-   <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)-$(BUILD_COMMENT)</DECIMAL_BUILD_NUMBER>
- </PropertyGroup>
- 
- <PropertyGroup>
-   <BuildConfiguration>Release</BuildConfiguration>
-   <BuildFolder>_BuildOutput\</BuildFolder>
-   <BuildZipFileName>UmbracoCms$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileName>
-   <BuildZipFileNameBin>UmbracoCms.AllBinaries$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileNameBin>
-   <BuildZipFileNameWebPi>UmbracoCms.WebPI$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileNameWebPi>
-   <IncludeSymbols>False</IncludeSymbols>
-   <BuildFolderRelativeToProjects>..\..\build\$(BuildFolder)</BuildFolderRelativeToProjects>
-   <BuildFolderAbsolutePath>$(MSBuildProjectDirectory)\$(BuildFolder)</BuildFolderAbsolutePath>
-   <SolutionBinFolder>$(BuildFolder)bin\</SolutionBinFolder>
-   <WebAppFolder>$(BuildFolder)WebApp\</WebAppFolder>
-   <WebPiFolder>$(BuildFolder)WebPi\</WebPiFolder>
-   <SolutionBinFolderRelativeToProjects>$(BuildFolderRelativeToProjects)bin\</SolutionBinFolderRelativeToProjects>
-   <SolutionBinFolderAbsolutePath>$(BuildFolderAbsolutePath)bin\</SolutionBinFolderAbsolutePath>
-   <WebAppFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebApp\</WebAppFolderRelativeToProjects>
-   <WebAppFolderAbsolutePath>$(BuildFolderAbsolutePath)WebApp\</WebAppFolderAbsolutePath>
-   <WebPiFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebPi\</WebPiFolderRelativeToProjects>
-   <WebPiFolderAbsolutePath>$(BuildFolderAbsolutePath)WebPi\</WebPiFolderAbsolutePath>
- </PropertyGroup>
+  <!-- NB: BUILD_NUMBER is passed in by the build server -->
+  <PropertyGroup Condition="'$(BUILD_NUMBER)'!=''">
+    <DECIMAL_BUILD_NUMBER>.$(BUILD_NUMBER)</DECIMAL_BUILD_NUMBER>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(BUILD_RELEASE)'!=''">
+    <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)</DECIMAL_BUILD_NUMBER>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(BUILD_RELEASE)'!='' AND '$(BUILD_COMMENT)'!=''">
+    <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)-$(BUILD_COMMENT)</DECIMAL_BUILD_NUMBER>
+  </PropertyGroup>
 
- <ItemGroup>
-   <SystemFolders Include="$(WebAppFolder)App_Plugins" />
-   <SystemFolders Include="$(WebAppFolder)App_Code" />
-   <SystemFolders Include="$(WebAppFolder)App_Data" />
-   <SystemFolders Include="$(WebAppFolder)media" />
-   <SystemFolders Include="$(WebAppFolder)masterpages" />
-   <SystemFolders Include="$(WebAppFolder)scripts" />
-   <SystemFolders Include="$(WebAppFolder)css" />
-   <SystemFolders Include="$(WebAppFolder)macroScripts" />
-   <SystemFolders Include="$(WebAppFolder)xslt" />
-   <SystemFolders Include="$(WebAppFolder)usercontrols" />
-   <SystemFolders Include="$(WebAppFolder)Views" />
- </ItemGroup>
+  <PropertyGroup>
+    <BuildConfiguration>Release</BuildConfiguration>
+    <BuildFolder>_BuildOutput\</BuildFolder>
+    <BuildZipFileName>UmbracoCms$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileName>
+    <BuildZipFileNameBin>UmbracoCms.AllBinaries$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileNameBin>
+    <BuildZipFileNameWebPi>UmbracoCms.WebPI$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileNameWebPi>
+    <IncludeSymbols>False</IncludeSymbols>
+    <BuildFolderRelativeToProjects>..\..\build\$(BuildFolder)</BuildFolderRelativeToProjects>
+    <BuildFolderAbsolutePath>$(MSBuildProjectDirectory)\$(BuildFolder)</BuildFolderAbsolutePath>
+    <SolutionBinFolder>$(BuildFolder)bin\</SolutionBinFolder>
+    <WebAppFolder>$(BuildFolder)WebApp\</WebAppFolder>
+    <WebPiFolder>$(BuildFolder)WebPi\</WebPiFolder>
+   <ConfigsFolder>$(BuildFolder)Configs\</ConfigsFolder>
+    <SolutionBinFolderRelativeToProjects>$(BuildFolderRelativeToProjects)bin\</SolutionBinFolderRelativeToProjects>
+    <SolutionBinFolderAbsolutePath>$(BuildFolderAbsolutePath)bin\</SolutionBinFolderAbsolutePath>
+    <WebAppFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebApp\</WebAppFolderRelativeToProjects>
+    <WebAppFolderAbsolutePath>$(BuildFolderAbsolutePath)WebApp\</WebAppFolderAbsolutePath>
+    <WebPiFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebPi\</WebPiFolderRelativeToProjects>
+    <WebPiFolderAbsolutePath>$(BuildFolderAbsolutePath)WebPi\</WebPiFolderAbsolutePath>
+    <ExaminePDFPath>$(BuildFolderAbsolutePath)UmbracoExamine.PDF\</ExaminePDFPath>
+    <ExamineAzurePath>$(BuildFolderAbsolutePath)UmbracoExamine.Azure\</ExamineAzurePath>
+    <ExaminePDFAzurePath>$(BuildFolderAbsolutePath)UmbracoExamine.PDF.Azure\</ExaminePDFAzurePath>
+  </PropertyGroup>
 
- <!-- 
+  <ItemGroup>
+    <SystemFolders Include="$(WebAppFolder)App_Plugins" />
+    <SystemFolders Include="$(WebAppFolder)App_Code" />
+    <SystemFolders Include="$(WebAppFolder)App_Data" />
+    <SystemFolders Include="$(WebAppFolder)Media" />
+    <SystemFolders Include="$(WebAppFolder)Masterpages" />
+    <SystemFolders Include="$(WebAppFolder)Scripts" />
+    <SystemFolders Include="$(WebAppFolder)Css" />
+    <SystemFolders Include="$(WebAppFolder)MacroScripts" />
+    <SystemFolders Include="$(WebAppFolder)Xslt" />
+    <SystemFolders Include="$(WebAppFolder)UserControls" />
+    <SystemFolders Include="$(WebAppFolder)Views" />
+  </ItemGroup>
+
+  <!-- 
  ****************************************************
  TARGETS 
  *****************************************************
  -->
 
  <Target Name="Build" DependsOnTargets="GenerateWebPiHash">
-   <Message Text="Build finished" />
+    <Message Text="Build finished" />
  </Target>
  
  <Target Name="GenerateWebPiHash" DependsOnTargets="ZipWebPiApp">
@@ -120,117 +124,183 @@
    </ItemGroup>
    <Message Text="Calculating hash for $(BuildZipFileNameWebPi)" />
    <GenerateHash InputFiles="@(WebPiFile)" OutputFile="webpihash.txt" />
- </Target>
- 
- <Target Name="CleanUp" DependsOnTargets="ZipWebPiApp">
-   <Message Text="Deleting $(BuildFolder)" Importance="high" />
-   <RemoveDir Directories="$(BuildFolder)" />
-   <Message Text="Finished deleting $(BuildFolder)" Importance="high" />
- </Target>
+  </Target>
 
- <Target Name="ZipWebPiApp" DependsOnTargets="ZipWebApp" >
-   <!-- Clean folders -->
-   <RemoveDir Directories="$(WebPiFolder)" />
-   <MakeDir Directories="$(WebPiFolder)" />
-   <MakeDir Directories="$(WebPiFolder)umbraco" />
+  <Target Name="CleanUp" DependsOnTargets="ZipWebPiApp">
+    <Message Text="Deleting $(BuildFolder)" Importance="high" />
+    <RemoveDir Directories="$(BuildFolder)" />
+    <Message Text="Finished deleting $(BuildFolder)" Importance="high" />
+  </Target>
 
-   <!-- Copy fresh built umbraco files -->
-   <Exec Command="xcopy %22$(WebAppFolderAbsolutePath)*%22 %22$(WebPiFolderAbsolutePath)umbraco%22 /S /E /Y /I" />
-   
-   <!-- Copy Web Pi template files -->
-   <ItemGroup>
-     <WebPiFiles Include="..\src\WebPi\**\*.*" />
-   </ItemGroup>
+  <Target Name="ZipWebPiApp" DependsOnTargets="ZipWebApp" >
+    <!-- Clean folders -->
+    <RemoveDir Directories="$(WebPiFolder)" />
+    <MakeDir Directories="$(WebPiFolder)" />
+    <MakeDir Directories="$(WebPiFolder)umbraco" />
 
-   <Copy SourceFiles="@(WebPiFiles)"
-       DestinationFiles="@(WebPiFiles->'$(WebPiFolder)%(RecursiveDir)%(Filename)%(Extension)')" />
+    <!-- Copy fresh built umbraco files -->
+    <Exec Command="xcopy %22$(WebAppFolderAbsolutePath)*%22 %22$(WebPiFolderAbsolutePath)umbraco%22 /S /E /Y /I" />
 
-   <!-- Zip the files -->
-   <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameWebPi)%22 %22$(WebPiFolderAbsolutePath)*%22" />
- </Target>
- 
- <Target Name="ZipWebApp" DependsOnTargets="CreateSystemFolders" >
-   <Message Text="Starting to zip to $(buildDate)-$(BuildZipFileName)" Importance="high" />
+    <!-- Copy Web Pi template files -->
+    <ItemGroup>
+      <WebPiFiles Include="..\src\WebPi\**\*.*" />
+    </ItemGroup>
 
-   <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameBin)%22 %22$(SolutionBinFolderAbsolutePath)*%22" />
-   <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileName)%22 %22$(WebAppFolderAbsolutePath)*%22" />
-   
-   <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />
- </Target>
+    <Copy SourceFiles="@(WebPiFiles)"
+        DestinationFiles="@(WebPiFiles->'$(WebPiFolder)%(RecursiveDir)%(Filename)%(Extension)')" />
 
- <Target Name="CreateSystemFolders" DependsOnTargets="CopyLibraries" Inputs="@(SystemFolders)" Outputs="%(Identity).Dummy">
-   <MakeDir Directories="@(SystemFolders)" />
- </Target>
- 
- <Target Name="CopyLibraries" DependsOnTargets="OffsetTimestamps" >
-   <!-- Copy SQL CE -->
-   <ItemGroup>
-     <SQLCE4Files 
-		Include="..\src\packages\SqlServerCE.4.0.0.0\**\*.*" 
-		Exclude="..\src\packages\SqlServerCE.4.0.0.0\lib\**\*;..\src\packages\SqlServerCE.4.0.0.0\**\*.nu*"
+    <!-- Zip the files -->
+    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameWebPi)%22 %22$(WebPiFolderAbsolutePath)*%22" />
+  </Target>
+
+  <Target Name="ZipWebApp" DependsOnTargets="CreateSystemFolders" >
+    <Message Text="Starting to zip to $(buildDate)-$(BuildZipFileName)" Importance="high" />
+
+    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameBin)%22 %22$(SolutionBinFolderAbsolutePath)*%22" />
+    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileName)%22 %22$(WebAppFolderAbsolutePath)*%22" />
+
+    <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />
+  </Target>
+
+  <Target Name="CreateSystemFolders" DependsOnTargets="CopyLibraries" Inputs="@(SystemFolders)" Outputs="%(Identity).Dummy">
+    <MakeDir Directories="@(SystemFolders)" />
+  </Target>
+
+  <Target Name="CopyLibraries" DependsOnTargets="OffsetTimestamps" >
+    <!-- Copy SQL CE -->
+    <ItemGroup>
+      <SQLCE4Files
+     Include="..\src\packages\SqlServerCE.4.0.0.0\**\*.*"
+     Exclude="..\src\packages\SqlServerCE.4.0.0.0\lib\**\*;..\src\packages\SqlServerCE.4.0.0.0\**\*.nu*"
 		/>
-   </ItemGroup>
+    </ItemGroup>
 
-   <Copy SourceFiles="@(SQLCE4Files)"
-       DestinationFiles="@(SQLCE4Files->'$(SolutionBinFolder)%(RecursiveDir)%(Filename)%(Extension)')"
-       OverwriteReadOnlyFiles="true"
-       SkipUnchangedFiles="false" />
+    <Copy SourceFiles="@(SQLCE4Files)"
+        DestinationFiles="@(SQLCE4Files->'$(SolutionBinFolder)%(RecursiveDir)%(Filename)%(Extension)')"
+        OverwriteReadOnlyFiles="true"
+        SkipUnchangedFiles="false" />
 
-   <Copy SourceFiles="@(SQLCE4Files)"
-       DestinationFiles="@(SQLCE4Files->'$(WebAppFolder)bin\%(RecursiveDir)%(Filename)%(Extension)')"
-       OverwriteReadOnlyFiles="true"
-       SkipUnchangedFiles="false" />
- 
+    <Copy SourceFiles="@(SQLCE4Files)"
+        DestinationFiles="@(SQLCE4Files->'$(WebAppFolder)bin\%(RecursiveDir)%(Filename)%(Extension)')"
+        OverwriteReadOnlyFiles="true"
+        SkipUnchangedFiles="false" />
+
+  </Target>
+
+  <!-- Offset the modified timestamps on all umbraco dlls, as WebResources break if date is in the future, which, due to timezone offsets can happen. -->
+  <Target Name="OffsetTimestamps" DependsOnTargets="CopyTransformedWebConfig">
+    <CreateItem Include="$(BuildFolder)**\umbraco.*.dll">
+      <Output TaskParameter="Include" ItemName="FilesToOffsetTimestamp" />
+    </CreateItem>
+    <Message Text="Starting to offset timestamps" Importance="high" />
+    <Umbraco.MSBuild.Tasks.TimestampOffset Files="@(FilesToOffsetTimestamp)" Offset="-11" />
+    <Message Text="Finished offsetting timestamps" Importance="high" />
+  </Target>
+
+  <!-- Copy the transformed web.config file to the root -->
+ <Target Name="CopyTransformedWebConfig"  DependsOnTargets="CopyTransformedConfig">
+    <ItemGroup>
+      <WebConfigFile Include="..\src\Umbraco.Web.UI\web.$(BuildConfiguration).Config.transformed" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(WebConfigFile)"
+        DestinationFiles="$(WebAppFolder)Web.config"
+        OverwriteReadOnlyFiles="true"
+        SkipUnchangedFiles="false" />
  </Target>
-
- <!-- Offset the modified timestamps on all umbraco dlls, as WebResources break if date is in the future, which, due to timezone offsets can happen. -->
- <Target Name="OffsetTimestamps" DependsOnTargets="CopyTransformedWebConfig">
-   <CreateItem Include="$(BuildFolder)**\umbraco.*.dll">
-     <Output TaskParameter="Include" ItemName="FilesToOffsetTimestamp" />
-   </CreateItem>
-   <Message Text="Starting to offset timestamps" Importance="high" />
-   <Umbraco.MSBuild.Tasks.TimestampOffset Files="@(FilesToOffsetTimestamp)" Offset="-11" />
-   <Message Text="Finished offsetting timestamps" Importance="high" />
- </Target>
  
- <!-- Copy the transformed web.config file to the root -->
- <Target Name="CopyTransformedWebConfig"  DependsOnTargets="CopyXmlDocumentation">
-   <ItemGroup>
-     <WebConfigFile Include="..\src\Umbraco.Web.UI\web.$(BuildConfiguration).Config.transformed" />
+ <!-- Copy the config files and rename them to *.config.transform -->
+ <Target Name="CopyTransformedConfig"  DependsOnTargets="CopyXmlDocumentation">
+    <ItemGroup>
+     <ConfigFiles Include="$(WebAppFolder)config\*.config" />
+	 <WebConfigTransformFile Include="$(WebAppFolder)Web.config" />
    </ItemGroup>
    
-   <Copy SourceFiles="@(WebConfigFile)"
-       DestinationFiles="$(WebAppFolder)Web.config"
+   <Copy SourceFiles="@(ConfigFiles)"
+       DestinationFiles="@(ConfigFiles->'$(ConfigsFolder)\%(RecursiveDir)%(Filename)%(Extension)')"
        OverwriteReadOnlyFiles="true"
        SkipUnchangedFiles="false" />
- </Target>
- 
- <!-- Copy the xml documentation to the bin folder -->
- <Target Name="CopyXmlDocumentation"  DependsOnTargets="CompileProjects">
-   <ItemGroup>
-     <XmlDocumentationFiles Include="$(SolutionBinFolder)*.xml" />
-   </ItemGroup>
-   
-   <Copy SourceFiles="@(XmlDocumentationFiles)"
-       DestinationFiles="@(XmlDocumentationFiles->'$(WebAppFolder)bin\%(RecursiveDir)%(Filename)%(Extension)')"
-       OverwriteReadOnlyFiles="true"
-       SkipUnchangedFiles="false" />
-	<Message Text="CopyXmlDocumentation" />
- </Target>
- 
- <Target Name="CompileProjects" DependsOnTargets="SetVersionNumber">
-   <Message Text="Compiling web project to build\$(BuildFolder)" Importance="high" />
-   <!-- For UseWPP_CopyWebApplication=True see http://stackoverflow.com/questions/1983575/copywebapplication-with-web-config-transformations -->
-   <MSBuild Projects="..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderAbsolutePath);WebProjectOutputDir=$(WebAppFolderAbsolutePath)" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
-   </MSBuild>
+	   
+   <Copy SourceFiles="@(WebConfigTransformFile)"
+	   DestinationFiles="$(ConfigsFolder)Web.config.transform"
+	   OverwriteReadOnlyFiles="true"
+	   SkipUnchangedFiles="false" />
+  </Target>
 
-   <!-- DONE -->
-   <Message Text="Finished compiling projects" Importance="high" />
- </Target>
+  <!-- Copy the xml documentation to the bin folder -->
+  <Target Name="CopyXmlDocumentation"  DependsOnTargets="CleanupPresentation">
+    <ItemGroup>
+      <XmlDocumentationFiles Include="$(SolutionBinFolder)*.xml" />
+    </ItemGroup>
 
- <Target Name="SetVersionNumber" Condition="'$(BUILD_RELEASE)'!=''">
+    <Copy SourceFiles="@(XmlDocumentationFiles)"
+        DestinationFiles="@(XmlDocumentationFiles->'$(WebAppFolder)bin\%(RecursiveDir)%(Filename)%(Extension)')"
+        OverwriteReadOnlyFiles="true"
+        SkipUnchangedFiles="false" />
+    <Message Text="CopyXmlDocumentation" />
+  </Target>
+
+  <!-- Unlike 2010, the VS2012 build targets file doesn't clean up the umbraco.presentation dir, do it manually -->
+  <!-- Also, it places umbraco.XmlSerializers.dll in the root, even though it's also in the bin folder. Kill! -->
+  <Target Name="CleanupPresentation" DependsOnTargets="CompileProjects">
+	<ItemGroup>
+		<PresentationFolderToDelete Include="$(WebAppFolder)umbraco.presentation" />
+		<XmlSerializersDll Include="$(WebAppFolder)umbraco.XmlSerializers.dll" />
+    </ItemGroup>
+	<RemoveDir Directories="@(PresentationFolderToDelete)" />
+    <Delete Files="@(XmlSerializersDll)" />
+  </Target>
+
+  <Target Name="CompileProjects" DependsOnTargets="CompileExternalExamineProjects">
+    
+    <Message Text="Compiling web project to build\$(BuildFolder)" Importance="high" />
+    <!-- For UseWPP_CopyWebApplication=True see http://stackoverflow.com/questions/1983575/copywebapplication-with-web-config-transformations -->
+    <!-- Build the Umbraco.Web.UI project -->
+    <MSBuild Projects="..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderAbsolutePath);WebProjectOutputDir=$(WebAppFolderAbsolutePath)" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
+    </MSBuild>
+    
+    <!-- DONE -->
+    <Message Text="Finished compiling projects" Importance="high" />
+  </Target>
+
+  <Target Name="CompileExternalExamineProjects" DependsOnTargets="SetVersionNumber">
+    <Message Text="Building externally shipped examine projects" Importance="high" />
+
+    <!-- First remove old files from the examine builds -->
+    <ItemGroup>
+      <FilesToDeleteBeforeBuild Include="$(ExaminePDFPath)*;$(ExamineAzurePath)*"/>
+    </ItemGroup>
+    <Delete Files="@(FilesToDeleteBeforeBuild)" />
+    <!-- 
+      Build the UmbracoExamine.PDF.Azure library ... this builds the 3 projects that we want to bundle separately so no need to build each one separately .
+      We'll just build this one and then manually copy the DLLs to where we want them.
+    -->
+    <MSBuild Projects="..\src\UmbracoExamine.PDF.Azure\UmbracoExamine.PDF.Azure.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);PipelineDependsOnBuild=False;OutDir=$(ExaminePDFAzurePath);" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
+    </MSBuild>
+    <ItemGroup>
+      <ExaminePDFFiles Include="$(ExaminePDFAzurePath)**\UmbracoExamine.PDF.dll;$(ExaminePDFAzurePath)**\UmbracoExamine.PDF.pdf;$(ExaminePDFAzurePath)**\UmbracoExamine.PDF.xml;$(ExaminePDFAzurePath)**\itextsharp.dll" />
+      <ExamineAzureFiles Include="$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.dll;$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.pdb;$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.xml" />
+      <ExaminePDFAzureFiles Include="$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.PDF.dll;$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.PDF.pdb;$(ExaminePDFAzurePath)**\UmbracoExamine.Azure.PDF.xml" />
+    </ItemGroup>
+    <!-- Now copy the built files to their correct deployment folders-->
+    <Copy SourceFiles="@(ExaminePDFFiles)"
+        DestinationFolder="$(ExaminePDFPath)"
+        OverwriteReadOnlyFiles="true"
+        SkipUnchangedFiles="false" />
+    <Copy SourceFiles="@(ExamineAzureFiles)"
+        DestinationFolder="$(ExamineAzurePath)"
+        OverwriteReadOnlyFiles="true"
+        SkipUnchangedFiles="false" />
+    <!-- Then just delete the files we don't want to ship in the UmbracoExamine.Azure.PDF folder -->
+    <ItemGroup>
+      <FilesToDeleteAfterBuild Include="$(ExaminePDFAzurePath)*" Exclude="$(ExaminePDFAzurePath)UmbracoExamine.PDF.Azure.dll;$(ExaminePDFAzurePath)UmbracoExamine.PDF.Azure.pdb;$(ExaminePDFAzurePath)UmbracoExamine.PDF.Azure.xml"/>
+    </ItemGroup>
+    <Delete Files="@(FilesToDeleteAfterBuild)" />
+  </Target>
+
+  <Target Name="SetVersionNumber" Condition="'$(BUILD_RELEASE)'!=''">
     <!-- Match & replace 3 and 4 digit version numbers and -beta (if it's there) -->
-    <FileUpdate 
+    <FileUpdate
       Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
       Regex="(\d+)\.(\d+)\.(\d+)(.(\d+))?"
       ReplacementText="$(BUILD_RELEASE)"/>
@@ -238,5 +308,5 @@
     <FileUpdate Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
       Regex="CurrentComment { get { return &quot;([a-zA-Z]+)?&quot;"
       ReplacementText="CurrentComment { get { return &quot;$(BUILD_COMMENT)&quot;"/>
- </Target>
+  </Target>
 </Project>

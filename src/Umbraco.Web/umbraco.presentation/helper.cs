@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Text.RegularExpressions;
 using System.Web;
-
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.Profiling;
 using umbraco.BusinessLogic;
 using System.Xml;
 using umbraco.presentation;
@@ -149,9 +151,10 @@ namespace umbraco
             return attributeValue;
         }
 
+        [UmbracoWillObsolete("We should really obsolete that one.")]
         public static string SpaceCamelCasing(string text)
         {
-            return cms.helpers.Casing.SpaceCamelCasing(text);
+            return text.SplitPascalCasing().ToFirstUpperInvariant();
         }
 
         [Obsolete("Use umbraco.presentation.UmbracContext.Current.GetBaseUrl()")]

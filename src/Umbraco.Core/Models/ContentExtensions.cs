@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -11,14 +12,246 @@ using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Strings;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models
 {
     public static class ContentExtensions
     {
+        #region IContent
+
+        /// <summary>
+        /// Determines if a new version should be created
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// A new version needs to be created when:
+        /// * The publish status is changed
+        /// * The language is changed
+        /// * The item is already published and is being published again and any property value is changed (to enable a rollback)
+        /// </remarks>
+        internal static bool ShouldCreateNewVersion(this IContent entity)
+        {
+            var publishedState = ((Content)entity).PublishedState;
+            return ShouldCreateNewVersion(entity, publishedState);
+        }
+
+        /// <summary>
+        /// Determines if a new version should be created
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="publishedState"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// A new version needs to be created when:
+        /// * The publish status is changed
+        /// * The language is changed
+        /// * The item is already published and is being published again and any property value is changed (to enable a rollback)
+        /// </remarks>
+        internal static bool ShouldCreateNewVersion(this IContent entity, PublishedState publishedState)
+        {
+            var dirtyEntity = (ICanBeDirty)entity;
+            
+            //check if the published state has changed or the language
+            var contentChanged =
+                (dirtyEntity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished)
+                || dirtyEntity.IsPropertyDirty("Language");
+
+            //return true if published or language has changed
+            if (contentChanged)
+            {
+                return true;
+            }
+
+            //check if any user prop has changed
+            var propertyValueChanged = ((Content) entity).IsAnyUserPropertyDirty();
+            //check if any content prop has changed
+            var contentDataChanged = ((Content) entity).IsEntityDirty();
+
+            //return true if the item is published and a property has changed or if any content property has changed
+            return (propertyValueChanged && publishedState == PublishedState.Published) || contentDataChanged;
+        }
+
+        /// <summary>
+        /// Determines if the published db flag should be set to true for the current entity version and all other db
+        /// versions should have their flag set to false.
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is determined by:
+        /// * If a new version is being created and the entity is published
+        /// * If the published state has changed and the entity is published OR the entity has been un-published.
+        /// </remarks>
+        internal static bool ShouldClearPublishedFlagForPreviousVersions(this IContent entity)
+        {
+            var publishedState = ((Content)entity).PublishedState;
+            return entity.ShouldClearPublishedFlagForPreviousVersions(publishedState, entity.ShouldCreateNewVersion(publishedState));
+        }
+
+        /// <summary>
+        /// Determines if the published db flag should be set to true for the current entity version and all other db
+        /// versions should have their flag set to false.
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="publishedState"></param>
+        /// <param name="isCreatingNewVersion"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is determined by:
+        /// * If a new version is being created and the entity is published
+        /// * If the published state has changed and the entity is published OR the entity has been un-published.
+        /// </remarks>
+        internal static bool ShouldClearPublishedFlagForPreviousVersions(this IContent entity, PublishedState publishedState, bool isCreatingNewVersion)
+        {
+            if (isCreatingNewVersion && entity.Published)
+            {
+                return true;
+            }
+
+            //If Published state has changed then previous versions should have their publish state reset.
+            //If state has been changed to unpublished the previous versions publish state should also be reset.
+            if (((ICanBeDirty)entity).IsPropertyDirty("Published") && (entity.Published || publishedState == PublishedState.Unpublished))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Returns a list of the current contents ancestors, not including the content itself.
+        /// </summary>
+        /// <param name="content">Current content</param>
+        /// <returns>An enumerable list of <see cref="IContent"/> objects</returns>
+        public static IEnumerable<IContent> Ancestors(this IContent content)
+        {
+            return ApplicationContext.Current.Services.ContentService.GetAncestors(content);
+        }
+
+        /// <summary>
+        /// Returns a list of the current contents children.
+        /// </summary>
+        /// <param name="content">Current content</param>
+        /// <returns>An enumerable list of <see cref="IContent"/> objects</returns>
+        public static IEnumerable<IContent> Children(this IContent content)
+        {
+            return ApplicationContext.Current.Services.ContentService.GetChildren(content.Id);
+        }
+
+        /// <summary>
+        /// Returns a list of the current contents descendants, not including the content itself.
+        /// </summary>
+        /// <param name="content">Current content</param>
+        /// <returns>An enumerable list of <see cref="IContent"/> objects</returns>
+        public static IEnumerable<IContent> Descendants(this IContent content)
+        {
+            return ApplicationContext.Current.Services.ContentService.GetDescendants(content);
+        }
+
+        /// <summary>
+        /// Returns the parent of the current content.
+        /// </summary>
+        /// <param name="content">Current content</param>
+        /// <returns>An <see cref="IContent"/> object</returns>
+        public static IContent Parent(this IContent content)
+        {
+            return ApplicationContext.Current.Services.ContentService.GetById(content.ParentId);
+        }
+        #endregion
+
+        #region IMedia
+        /// <summary>
+        /// Returns a list of the current medias ancestors, not including the media itself.
+        /// </summary>
+        /// <param name="media">Current media</param>
+        /// <returns>An enumerable list of <see cref="IMedia"/> objects</returns>
+        public static IEnumerable<IMedia> Ancestors(this IMedia media)
+        {
+            return ApplicationContext.Current.Services.MediaService.GetAncestors(media);
+        }
+
+        /// <summary>
+        /// Returns a list of the current medias children.
+        /// </summary>
+        /// <param name="media">Current media</param>
+        /// <returns>An enumerable list of <see cref="IMedia"/> objects</returns>
+        public static IEnumerable<IMedia> Children(this IMedia media)
+        {
+            return ApplicationContext.Current.Services.MediaService.GetChildren(media.Id);
+        }
+
+        /// <summary>
+        /// Returns a list of the current medias descendants, not including the media itself.
+        /// </summary>
+        /// <param name="media">Current media</param>
+        /// <returns>An enumerable list of <see cref="IMedia"/> objects</returns>
+        public static IEnumerable<IMedia> Descendants(this IMedia media)
+        {
+            return ApplicationContext.Current.Services.MediaService.GetDescendants(media);
+        }
+
+        /// <summary>
+        /// Returns the parent of the current media.
+        /// </summary>
+        /// <param name="media">Current media</param>
+        /// <returns>An <see cref="IMedia"/> object</returns>
+        public static IMedia Parent(this IMedia media)
+        {
+            return ApplicationContext.Current.Services.MediaService.GetById(media.ParentId);
+        }
+        #endregion
+
+        /// <summary>
+        /// Checks if the IContentBase has children
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is a bit of a hack because we need to type check!
+        /// </remarks>
+        internal static bool HasChildren(IContentBase content, ServiceContext services)
+        {
+            if (content is IContent)
+            {
+                return services.ContentService.HasChildren(content.Id);
+            }
+            if (content is IMedia)
+            {
+                return services.MediaService.HasChildren(content.Id);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns the children for the content base item
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is a bit of a hack because we need to type check!
+        /// </remarks>
+        internal static IEnumerable<IContentBase> Children(IContentBase content, ServiceContext services)
+        {
+            if (content is IContent)
+            {
+                return services.ContentService.GetChildren(content.Id);
+            }
+            if (content is IMedia)
+            {
+                return services.MediaService.GetChildren(content.Id);
+            }
+            return null;
+        }
+
         /// <summary>
         /// Set property values by alias with an annonymous object
         /// </summary>
@@ -165,7 +398,7 @@ namespace Umbraco.Core.Models
                 var thumbUrl = Resize(fs, fileName, extension, 100, "thumb");
 
                 //Look up Prevalues for this upload datatype - if it is an upload datatype
-                var uploadFieldId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
+                var uploadFieldId = new Guid(Constants.PropertyEditors.UploadField);
                 if (property.PropertyType.DataTypeId == uploadFieldId)
                 {
                     //Get Prevalues by the DataType's Id: property.PropertyType.DataTypeId
@@ -337,8 +570,16 @@ namespace Umbraco.Core.Models
             return new Tuple<int, int, string>(widthTh, heightTh, newFileName);
         }
 
+		/// <summary>
+		/// Gets the <see cref="IProfile"/> for the Creator of this media item.
+		/// </summary>
+		public static IProfile GetCreatorProfile(this IMedia media)
+		{
+            return ApplicationContext.Current.Services.UserService.GetProfileById(media.CreatorId);
+        }
+
         /// <summary>
-        /// Gets the <see cref="IProfile"/> for the Creator of this content/media item.
+        /// Gets the <see cref="IProfile"/> for the Creator of this content item.
         /// </summary>
         public static IProfile GetCreatorProfile(this IContentBase content)
         {
@@ -367,27 +608,23 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Creates the full xml representation for the <see cref="IContent"/> object and all of it's descendants
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> to generate xml for</param>
+        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        internal static XElement ToDeepXml(this IContent content)
+        {
+            return ApplicationContext.Current.Services.PackagingService.Export(content, true);
+        }
+
+        /// <summary>
         /// Creates the xml representation for the <see cref="IContent"/> object
         /// </summary>
         /// <param name="content"><see cref="IContent"/> to generate xml for</param>
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         public static XElement ToXml(this IContent content)
         {
-            //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
-
-            var x = content.ToXml(nodeName);
-            x.Add(new XAttribute("nodeType", content.ContentType.Id));
-            x.Add(new XAttribute("creatorName", content.GetCreatorProfile().Name));
-            x.Add(new XAttribute("writerName", content.GetWriterProfile().Name));
-            x.Add(new XAttribute("writerID", content.WriterId));
-            x.Add(new XAttribute("template", content.Template == null ? "0" : content.Template.Id.ToString()));
-            if (UmbracoSettings.UseLegacyXmlSchema)
-            {
-                x.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
-            }
-
-            return x;
+            return ApplicationContext.Current.Services.PackagingService.Export(content);
         }
 
         /// <summary>
@@ -397,59 +634,12 @@ namespace Umbraco.Core.Models
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         public static XElement ToXml(this IMedia media)
         {
-            //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
-
-            var x = media.ToXml(nodeName);
-            x.Add(new XAttribute("nodeType", media.ContentType.Id));
-            x.Add(new XAttribute("writerName", media.GetCreatorProfile().Name));
-            x.Add(new XAttribute("writerID", media.CreatorId));
-            x.Add(new XAttribute("version", media.Version));
-            x.Add(new XAttribute("template", 0));
-            if (UmbracoSettings.UseLegacyXmlSchema)
-            {
-                x.Add(new XAttribute("nodeTypeAlias", media.ContentType.Alias));
-            }
-
-            return x;
+            return ApplicationContext.Current.Services.PackagingService.Export(media);
         }
 
-        /// <summary>
-        /// Creates the xml representation for the <see cref="IContentBase"/> object
-        /// </summary>
-        /// <param name="contentBase"><see cref="IContent"/> to generate xml for</param>
-        /// <param name="nodeName"></param>
-        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
-        private static XElement ToXml(this IContentBase contentBase, string nodeName)
+        internal static XElement ToDeepXml(this IMedia media)
         {
-            var niceUrl = contentBase.Name.FormatUrl().ToLower();
-
-            var xml = new XElement(nodeName,
-                                   new XAttribute("id", contentBase.Id),
-                                   new XAttribute("parentID", contentBase.Level > 1 ? contentBase.ParentId : -1),
-                                   new XAttribute("level", contentBase.Level),
-                                   new XAttribute("creatorID", contentBase.CreatorId),
-                                   new XAttribute("sortOrder", contentBase.SortOrder),
-                                   new XAttribute("createDate", contentBase.CreateDate.ToString("s")),
-                                   new XAttribute("updateDate", contentBase.UpdateDate.ToString("s")),
-                                   new XAttribute("nodeName", contentBase.Name),
-                                   new XAttribute("urlName", niceUrl),//Format Url ?								   
-                                   new XAttribute("path", contentBase.Path),
-                                   new XAttribute("isDoc", ""));
-
-            foreach (var property in contentBase.Properties)
-            {
-                if (property == null) continue;
-
-                xml.Add(property.ToXml());
-
-                //Check for umbracoUrlName convention
-                if (property.Alias == "umbracoUrlName" && property.Value != null && 
-                        property.Value.ToString().Trim() != string.Empty)
-                    xml.SetAttributeValue("urlName", property.Value.ToString().FormatUrl().ToLower());
-            }
-
-            return xml;
+            return ApplicationContext.Current.Services.PackagingService.Export(media, true);
         }
 
         /// <summary>

@@ -14,7 +14,7 @@ using System.Xml;
 
 namespace Umbraco.Core
 {
-	internal static class ObjectExtensions
+	public static class ObjectExtensions
 	{
 		
 		//private static readonly ConcurrentDictionary<Type, Func<object>> ObjectFactoryCache = new ConcurrentDictionary<Type, Func<object>>();
@@ -36,7 +36,7 @@ namespace Umbraco.Core
 		/// <typeparam name="T"></typeparam>
 		/// <param name="input">The input.</param>
 		/// <returns></returns>
-		public static T SafeCast<T>(this object input)
+		internal static T SafeCast<T>(this object input)
 		{
 			if (ReferenceEquals(null, input) || ReferenceEquals(default(T), input)) return default(T);
 			if (input is T) return (T)input;
@@ -52,6 +52,19 @@ namespace Umbraco.Core
 		public static Attempt<T> TryConvertTo<T>(this object input)
 		{
 			var result = TryConvertTo(input, typeof(T));
+            if (!result.Success)
+            {
+                //just try a straight up conversion
+                try
+                {
+                    var converted = (T) input;
+                    return new Attempt<T>(true, converted);
+                }
+                catch (Exception e)
+                {
+                    return new Attempt<T>(e);
+                }
+            }
 			return !result.Success ? Attempt<T>.False : new Attempt<T>(true, (T)result.Result);
 		}
 
@@ -72,11 +85,21 @@ namespace Umbraco.Core
 
 			if (!destinationType.IsGenericType || destinationType.GetGenericTypeDefinition() != typeof(Nullable<>))
 			{
+                //TODO: Do a check for destination type being IEnumerable<T> and source type implementing IEnumerable<T> with
+                // the same 'T', then we'd have to find the extension method for the type AsEnumerable() and execute it.
+
 				if (TypeHelper.IsTypeAssignableFrom(destinationType, input.GetType())
 					&& TypeHelper.IsTypeAssignableFrom<IConvertible>(input))
 				{
-					var casted = Convert.ChangeType(input, destinationType);
-					return new Attempt<object>(true, casted);
+                    try
+                    {
+                        var casted = Convert.ChangeType(input, destinationType);
+                        return new Attempt<object>(true, casted);
+                    }
+                    catch (Exception e)
+                    {
+                        return new Attempt<object>(e);
+                    }
 				}
 			}
 
@@ -142,7 +165,7 @@ namespace Umbraco.Core
 			return Attempt<object>.False;
 		}
 
-		public static void CheckThrowObjectDisposed(this IDisposable disposable, bool isDisposed, string objectname)
+		internal static void CheckThrowObjectDisposed(this IDisposable disposable, bool isDisposed, string objectname)
 		{
 			//TODO: Localise this exception
 			if (isDisposed)
@@ -223,7 +246,7 @@ namespace Umbraco.Core
 		/// <param name="o"></param>
 		/// <param name="ignoreProperties"></param>
 		/// <returns></returns>
-		public static IDictionary<string, TVal> ToDictionary<T, TProperty, TVal>(this T o,
+        internal static IDictionary<string, TVal> ToDictionary<T, TProperty, TVal>(this T o,
 																				 params Expression<Func<T, TProperty>>[] ignoreProperties)
 		{
 			return o.ToDictionary<TVal>(ignoreProperties.Select(e => o.GetPropertyInfo(e)).Select(propInfo => propInfo.Name).ToArray());
@@ -235,7 +258,7 @@ namespace Umbraco.Core
 		/// <param name="o"></param>
 		/// <param name="ignoreProperties">Properties to ignore</param>
 		/// <returns></returns>
-		public static IDictionary<string, TVal> ToDictionary<TVal>(this object o, params string[] ignoreProperties)
+		internal static IDictionary<string, TVal> ToDictionary<TVal>(this object o, params string[] ignoreProperties)
 		{
 			if (o != null)
 			{
@@ -254,7 +277,7 @@ namespace Umbraco.Core
 			return new Dictionary<string, TVal>();
 		}
 
-		public static string ToDebugString(this object obj, int levels = 0)
+		internal static string ToDebugString(this object obj, int levels = 0)
 		{
 			if (obj == null) return "{null}";
 			try
@@ -323,7 +346,7 @@ namespace Umbraco.Core
 		/// <param name="value"></param>
 		/// <param name="type"></param>
 		/// <returns></returns>
-		public static Attempt<string> TryConvertToXmlString(this object value, Type type)
+		internal static Attempt<string> TryConvertToXmlString(this object value, Type type)
 		{
 			try
 			{
@@ -342,7 +365,7 @@ namespace Umbraco.Core
 		/// <param name="value"></param>
 		/// <param name="type">The Type can only be a primitive type or Guid and byte[] otherwise an exception is thrown</param>
 		/// <returns></returns>
-		public static string ToXmlString(this object value, Type type)
+		internal static string ToXmlString(this object value, Type type)
 		{
 			if (type == typeof(string)) return ((string)value).IsNullOrWhiteSpace() ? "" : (string)value;
 			if (type == typeof(bool)) return XmlConvert.ToString((bool)value);

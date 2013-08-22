@@ -10,13 +10,14 @@ using umbraco.DataLayer;
 using umbraco.interfaces;
 using umbraco.cms.presentation.developer.RelationTypes.TreeMenu;
 using umbraco.businesslogic;
+using Umbraco.Core;
 
 namespace umbraco
 {
 	/// <summary>
 	/// RelationTypes tree for developer section
 	/// </summary>
-	[Tree("developer", "relationTypes", "Relation Types", sortOrder: 4)]
+	[Tree(Constants.Applications.Developer, "relationTypes", "Relation Types", sortOrder: 4)]
 	public class loadRelationTypes : BaseTree
 	{
 		/// <summary>

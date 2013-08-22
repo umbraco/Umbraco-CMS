@@ -1,0 +1,28 @@
+﻿#includeUnpublished {
+    margin-left: 16px;
+    margin-bottom: 20px;
+    margin-top: 5px;
+}
+
+#animDiv > div {
+    width: 230px;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+#container a {
+    color: blue;
+}
+
+.disabled {
+    color: #999;
+}
+
+#feedbackMsg > div {
+    padding: 5px;
+}
+
+#feedbackMsg ul {
+    margin: 0;
+    padding-left: 15px;
+}

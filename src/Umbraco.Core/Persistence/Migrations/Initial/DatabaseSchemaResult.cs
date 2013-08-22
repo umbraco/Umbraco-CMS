@@ -43,27 +43,30 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 return new Version(0, 0, 0);
 
             //If Errors is empty or if TableDefinitions tables + columns correspond to valid tables + columns then we're at current version
-            if (Errors.Any() == false || 
-                TableDefinitions.Any(x => ValidTables.Contains(x.Name) == false) == false && 
-                TableDefinitions.SelectMany(definition => definition.Columns).Any(x => ValidColumns.Contains(x.Name) == false) == false)
+            if (!Errors.Any() ||
+                (TableDefinitions.All(x => ValidTables.Contains(x.Name))
+                 && TableDefinitions.SelectMany(definition => definition.Columns).All(x => ValidColumns.Contains(x.Name))))
                 return UmbracoVersion.Current;
 
             //If Errors contains umbracoApp or umbracoAppTree its pre-6.0.0 -> new Version(4, 10, 0);
-            if (
-                Errors.Any(
-                    x => x.Item1.Equals("Table") && (x.Item2.Equals("umbracoApp") || x.Item2.Equals("umbracoAppTree"))))
+            if (Errors.Any(x => x.Item1.Equals("Table") && (x.Item2.Equals("umbracoApp") || x.Item2.Equals("umbracoAppTree"))))
             {
                 //If Errors contains umbracoUser2app or umbracoAppTree foreignkey to umbracoApp exists its pre-4.8.0 -> new Version(4, 7, 0);
-                if (
-                    Errors.Any(
-                        x =>
-                        x.Item1.Equals("Constraint") &&
-                        (x.Item2.Contains("umbracoUser2app_umbracoApp") || x.Item2.Contains("umbracoAppTree_umbracoApp"))))
+                if (Errors.Any(x =>
+                               x.Item1.Equals("Constraint")
+                               && (x.Item2.Contains("umbracoUser2app_umbracoApp")
+                                   || x.Item2.Contains("umbracoAppTree_umbracoApp"))))
                 {
                     return new Version(4, 7, 0);
                 }
 
                 return new Version(4, 9, 0);
+            }
+            
+            //if the error is for umbracoServer
+            if (Errors.Any(x => x.Item1.Equals("Table") && (x.Item2.Equals("umbracoServer"))))
+            {
+                return new Version(6, 0, 0);
             }
 
             return UmbracoVersion.Current;

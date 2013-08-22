@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Umbraco.Core;
 
 namespace umbraco.uicontrols.TreePicker
 {
@@ -11,7 +12,7 @@ namespace umbraco.uicontrols.TreePicker
         {
             get
             {
-                return TreeUrlGenerator.GetPickerUrl("content", "content");
+                return TreeUrlGenerator.GetPickerUrl(Constants.Applications.Content, "content");
             }
         }
 

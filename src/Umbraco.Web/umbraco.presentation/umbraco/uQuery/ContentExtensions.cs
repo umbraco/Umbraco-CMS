@@ -5,6 +5,7 @@ using System.Linq;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.datatype;
 using System.Xml;
+using Umbraco.Core;
 
 namespace umbraco
 {
@@ -251,8 +252,8 @@ namespace umbraco
 					// switch based on datatype of property being set - if setting a built in ddl or radion button list, then string supplied is checked against prevalues
 					switch (dataTypeGuid.ToUpper())
 					{
-						case "A74EA9C9-8E18-4D2A-8CF6-73C6206C5DA6": // DropDownList
-						case "A52C7C1C-C330-476E-8605-D63D3B84B6A6": // RadioButtonList
+						case Constants.PropertyEditors.DropDownList: // DropDownList
+						case Constants.PropertyEditors.RadioButtonList: // RadioButtonList
 
 							var preValues = PreValues.GetPreValues(property.PropertyType.DataTypeDefinition.Id);
 							PreValue preValue = null;
@@ -290,7 +291,7 @@ namespace umbraco
 
 							break;
 
-						case "23E93522-3200-44E2-9F29-E61A6FCBB79A": // Date (NOTE: currently assumes database type is set to Date)
+						case Constants.PropertyEditors.Date: // Date (NOTE: currently assumes database type is set to Date)
 
 							switch (Type.GetTypeCode(value.GetType()))
 							{

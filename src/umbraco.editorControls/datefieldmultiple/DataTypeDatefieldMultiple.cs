@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.datefieldmultiple
 {
@@ -13,7 +14,7 @@ namespace umbraco.editorControls.datefieldmultiple
 		{
 			get 
 			{
-				return new Guid("B6FB1622-AFA5-4BBF-A3CC-D9672A442222");
+				return new Guid(Constants.PropertyEditors.DateTime);
 			}
 		}
 

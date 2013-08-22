@@ -4,6 +4,8 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Services;
 using Umbraco.Core;
+using Umbraco.Core.Services;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.WebServices
 {
@@ -56,20 +58,28 @@ namespace Umbraco.Web.WebServices
             get { return _url ?? (_url = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData()))); }
         }
 
-        ///// <summary>
-        ///// Returns a ServiceContext
-        ///// </summary>
-        //public ServiceContext Services
-        //{
-        //    get { return ApplicationContext.Services; }
-        //}
+        /// <summary>
+        /// Returns a ServiceContext
+        /// </summary>
+        public ServiceContext Services
+        {
+            get { return ApplicationContext.Services; }
+        }
 
-        ///// <summary>
-        ///// Returns a DatabaseContext
-        ///// </summary>
-        //public DatabaseContext DatabaseContext
-        //{
-        //    get { return ApplicationContext.DatabaseContext; }
-        //}
+        /// <summary>
+        /// Returns a DatabaseContext
+        /// </summary>
+        public DatabaseContext DatabaseContext
+        {
+            get { return ApplicationContext.DatabaseContext; }
+        }
+
+        /// <summary>
+        /// Returns a WebSecurity instance
+        /// </summary>
+        public WebSecurity Security
+        {
+            get { return UmbracoContext.Security; }
+        }
     }
 }

@@ -1,4 +1,7 @@
 ﻿using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Tests.TestHelpers
@@ -10,7 +13,11 @@ namespace Umbraco.Tests.TestHelpers
         public virtual void Initialize()
         {
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            PluginManager.Current = new PluginManager(false);
+            MappingResolver.Current = new MappingResolver(
+                () => PluginManager.Current.ResolveAssignedMapperTypes());
 
+            Resolution.Freeze();
             SetUp();
         }
 
@@ -20,7 +27,9 @@ namespace Umbraco.Tests.TestHelpers
         [TearDown]
         public virtual void TearDown()
         {
+            MappingResolver.Reset();
             SqlSyntaxContext.SqlSyntaxProvider = null;
+            PluginManager.Current = null;
         }
     }
 }

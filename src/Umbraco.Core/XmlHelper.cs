@@ -138,6 +138,7 @@ namespace Umbraco.Core
             }
         }
         
+
         public static string StripDashesInElementOrAttributeNames(string xml)
         {
             using (var outputms = new MemoryStream())

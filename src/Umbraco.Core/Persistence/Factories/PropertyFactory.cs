@@ -44,10 +44,11 @@ namespace Umbraco.Core.Persistence.Factories
                                    : propertyType.CreatePropertyFromRawValue(propertyDataDto.GetValue,
                                                                              propertyDataDto.VersionId.Value,
                                                                              propertyDataDto.Id);
-
+                //on initial construction we don't want to have dirty properties tracked
                 property.CreateDate = _createDate;
                 property.UpdateDate = _updateDate;
-                property.ResetDirtyProperties();
+                // http://issues.umbraco.org/issue/U4-1946
+                property.ResetDirtyProperties(false);
                 properties.Add(property);
             }
 
@@ -66,17 +67,18 @@ namespace Umbraco.Core.Persistence.Factories
                 if (property.HasIdentity)
                     dto.Id = property.Id;
 
-                if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer && property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false)
+                if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer)
                 {
-                    if (property.Value is bool)
+                    if (property.Value is bool || property.PropertyType.DataTypeId == new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a"))
                     {
-                        int val = Convert.ToInt32(property.Value);
-                        dto.Integer = val;
+                        dto.Integer = property.Value != null && string.IsNullOrEmpty(property.Value.ToString())
+                                          ? 0
+                                          : Convert.ToInt32(property.Value);
                     }
                     else
                     {
                         int val;
-                        if (int.TryParse(property.Value.ToString(), out val))
+                        if ((property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false) && int.TryParse(property.Value.ToString(), out val))
                         {
                             dto.Integer = val;
                         }

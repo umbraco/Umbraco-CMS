@@ -19,8 +19,12 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IDictionaryTranslation BuildEntity(LanguageTextDto dto)
         {
-            return new DictionaryTranslation(_language, dto.Value, _uniqueId) 
+            var item = new DictionaryTranslation(_language, dto.Value, _uniqueId) 
                                             {Id = dto.PrimaryKey};
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            item.ResetDirtyProperties(false);
+            return item;
         }
 
         public LanguageTextDto BuildDto(IDictionaryTranslation entity)

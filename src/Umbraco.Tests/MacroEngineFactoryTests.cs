@@ -27,6 +27,12 @@ namespace Umbraco.Tests
 				};
 		}
 
+        [TearDown]
+        public void TearDown()
+        {
+            PluginManager.Current = null;
+        }
+
 		[Test]
 		public void Get_All()
 		{			

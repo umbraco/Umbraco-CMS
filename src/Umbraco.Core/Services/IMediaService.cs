@@ -193,7 +193,42 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="mediaPath">Path of the media item to retreive (for example: /media/1024/koala_403x328.jpg)</param>
         /// <returns><see cref="IMedia"/></returns>
-        IMedia GetMediaByPath(string mediaPath);
+        IMedia GetMediaByPath(string mediaPath);        
+
+        /// <summary>
+        /// Gets a collection of <see cref="IMedia"/> objects, which are ancestors of the current media.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMedia"/> to retrieve ancestors for</param>
+        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
+        IEnumerable<IMedia> GetAncestors(int id);
+
+        /// <summary>
+        /// Gets a collection of <see cref="IMedia"/> objects, which are ancestors of the current media.
+        /// </summary>
+        /// <param name="media"><see cref="IMedia"/> to retrieve ancestors for</param>
+        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
+        IEnumerable<IMedia> GetAncestors(IMedia media);
+
+        /// <summary>
+        /// Gets descendants of a <see cref="IMedia"/> object by its Id
+        /// </summary>
+        /// <param name="media">The Parent <see cref="IMedia"/> object to retrieve descendants from</param>
+        /// <returns>An Enumerable flat list of <see cref="IMedia"/> objects</returns>
+        IEnumerable<IMedia> GetDescendants(IMedia media);
+
+        /// <summary>
+        /// Gets the parent of the current media as an <see cref="IMedia"/> item.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMedia"/> to retrieve the parent from</param>
+        /// <returns>Parent <see cref="IMedia"/> object</returns>
+        IMedia GetParent(int id);
+
+        /// <summary>
+        /// Gets the parent of the current media as an <see cref="IMedia"/> item.
+        /// </summary>
+        /// <param name="media"><see cref="IMedia"/> to retrieve the parent from</param>
+        /// <returns>Parent <see cref="IMedia"/> object</returns>
+        IMedia GetParent(IMedia media);
 
         /// <summary>
         /// Sorts a collection of <see cref="IMedia"/> objects by updating the SortOrder according

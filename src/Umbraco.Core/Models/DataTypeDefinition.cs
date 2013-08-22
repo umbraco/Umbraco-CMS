@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
@@ -52,8 +53,11 @@ namespace Umbraco.Core.Models
             get { return _parentId; }
             set
             {
-                _parentId = value;
-                OnPropertyChanged(ParentIdSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _parentId = value;
+                    return _parentId;
+                }, _parentId, ParentIdSelector);
             }
         }
 
@@ -66,8 +70,11 @@ namespace Umbraco.Core.Models
             get { return _name; }
             set
             {
-                _name = value;
-                OnPropertyChanged(NameSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _name = value;
+                    return _name;
+                }, _name, NameSelector);
             }
         }
 
@@ -80,8 +87,11 @@ namespace Umbraco.Core.Models
             get { return _sortOrder; }
             set
             {
-                _sortOrder = value;
-                OnPropertyChanged(SortOrderSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _sortOrder = value;
+                    return _sortOrder;
+                }, _sortOrder, SortOrderSelector);
             }
         }
 
@@ -94,8 +104,11 @@ namespace Umbraco.Core.Models
             get { return _level; }
             set
             {
-                _level = value;
-                OnPropertyChanged(LevelSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _level = value;
+                    return _level;
+                }, _level, LevelSelector);
             }
         }
 
@@ -108,8 +121,11 @@ namespace Umbraco.Core.Models
             get { return _path; }
             set
             {
-                _path = value;
-                OnPropertyChanged(PathSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _path = value;
+                    return _path;
+                }, _path, PathSelector);
             }
         }
 
@@ -122,8 +138,11 @@ namespace Umbraco.Core.Models
             get { return _creatorId; }
             set
             {
-                _creatorId = value;
-                OnPropertyChanged(UserIdSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _creatorId = value;
+                    return _creatorId;
+                }, _creatorId, UserIdSelector);
             }
         }
 
@@ -136,8 +155,11 @@ namespace Umbraco.Core.Models
             get { return _trashed; }
             internal set
             {
-                _trashed = value;
-                OnPropertyChanged(TrashedSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _trashed = value;
+                    return _trashed;
+                }, _trashed, TrashedSelector);
             }
         }
 
@@ -149,9 +171,12 @@ namespace Umbraco.Core.Models
         {
             get { return _controlId; }
             private set 
-            { 
-                _controlId = value;
-                OnPropertyChanged(ControlIdSelector);
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _controlId = value;
+                    return _controlId;
+                }, _controlId, ControlIdSelector);
             }
         }
 
@@ -163,9 +188,12 @@ namespace Umbraco.Core.Models
         {
             get { return _databaseType; }
             set 
-            { 
-                _databaseType = value;
-                OnPropertyChanged(DatabaseTypeSelector);
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _databaseType = value;
+                    return _databaseType;
+                }, _databaseType, DatabaseTypeSelector);
             }
         }
 

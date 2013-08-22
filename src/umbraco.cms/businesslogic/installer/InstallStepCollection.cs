@@ -6,6 +6,8 @@ using System.Collections.Specialized;
 
 namespace umbraco.cms.businesslogic.installer
 {
+
+    [Obsolete("This is no longer used and will be removed from the codebase in future versions. It has been superceded by Umbraco.Web.Install.InstallerStepCollection however that is marked internal and is not to be used in external code.")]
     public class InstallerStepCollection : Dictionary<string,InstallerStep>
     {
         public void Add(InstallerStep step){

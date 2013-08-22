@@ -8,45 +8,63 @@ using umbraco.interfaces;
 
 namespace Umbraco.Tests.Resolvers
 {
-
 	[TestFixture]
 	public class ActionsResolverTests
 	{
 		[SetUp]
 		public void Initialize()
 		{
-			TestHelper.SetupLog4NetForTests();
+            TestHelper.SetupLog4NetForTests();
 
-			//this ensures its reset
+            ActionsResolver.Reset();
+
+			// this ensures it's reset
 			PluginManager.Current = new PluginManager(false);
 
-			//for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
+			// for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
 			PluginManager.Current.AssembliesToScan = new[]
 				{
-					this.GetType().Assembly
+					this.GetType().Assembly // this assembly only
 				};
-
-			ActionsResolver.Current = new ActionsResolver(
-				() => PluginManager.Current.ResolveActions());
-
-			Resolution.Freeze();
 		}
 
 		[TearDown]
 		public void TearDown()
 		{
-			ActionsResolver.Reset();
-			Resolution.IsFrozen = false;
+            ActionsResolver.Reset();
+		    PluginManager.Current = null;
 		}
 
-		[Test]
-		public void Create_Types()
+        // NOTE
+        // ManyResolverTests ensure that we'll get our actions back and ActionsResolver works,
+        // so all we're testing here is that plugin manager _does_ find our actions
+        // which should be ensured by PlugingManagerTests anyway, so this is useless?
+        // maybe not as it seems to handle the "instance" thing... so we test that we respect the singleton?
+        [Test]
+		public void FindAllActions()
 		{
-			var found = ActionsResolver.Current.Actions;
-			Assert.AreEqual(2, found.Count());
-		}		
+            ActionsResolver.Current = new ActionsResolver(
+                () => PluginManager.Current.ResolveActions());
+
+            Resolution.Freeze();
+
+            var actions = ActionsResolver.Current.Actions;
+			Assert.AreEqual(2, actions.Count());
+
+            // order is unspecified, but both must be there
+            bool hasAction1 = actions.ElementAt(0) is SingletonAction || actions.ElementAt(1) is SingletonAction;
+            bool hasAction2 = actions.ElementAt(0) is NonSingletonAction || actions.ElementAt(1) is NonSingletonAction;
+            Assert.IsTrue(hasAction1);
+            Assert.IsTrue(hasAction2);
+
+            SingletonAction action = (SingletonAction)(actions.ElementAt(0) is SingletonAction ? actions.ElementAt(0) : actions.ElementAt(1));
+
+            // ensure we respect the singleton
+            Assert.AreSame(SingletonAction.Instance, action);
+        }		
 
 		#region Classes for tests
+
 		public class SingletonAction : IAction
 		{
 			//create singleton
@@ -176,7 +194,6 @@ namespace Umbraco.Tests.Resolvers
 			}
 			#endregion
 		}
-
 		
 		#endregion
 	}

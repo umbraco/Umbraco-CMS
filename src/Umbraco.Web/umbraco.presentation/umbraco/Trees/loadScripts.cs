@@ -27,11 +27,12 @@ using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
 using umbraco.BusinessLogic.Actions;
 using umbraco.IO;
+using Umbraco.Core;
 
 
 namespace umbraco
 {
-    [Tree("settings", "scripts", "Scripts", "folder.gif", "folder_o.gif", sortOrder: 2)]
+    [Tree(Constants.Applications.Settings, "scripts", "Scripts", "folder.gif", "folder_o.gif", sortOrder: 2)]
     public class loadScripts : FileSystemTree
 	{
         public loadScripts(string application) : base(application) { }

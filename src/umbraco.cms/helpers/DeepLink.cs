@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using umbraco.BusinessLogic;
 using System.Web;
+using Umbraco.Core;
 
 namespace umbraco.cms.helpers
 {
@@ -50,57 +51,57 @@ namespace umbraco.cms.helpers
             switch (type)
             {
                 case DeepLinkType.Content:
-                    section = "content";
+                    section = Constants.Applications.Content;
                     editorUrl = "editContent.aspx";
                     idKey = "id";
                     break;
                 case DeepLinkType.Css:
-                    section = "settings";
+                    section = Constants.Applications.Settings;
                     editorUrl = "settings/stylesheet/editStylesheet.aspx";
                     idKey = "id";
                     break;
                 case DeepLinkType.DataType:
-                    section = "developer";
+                    section = Constants.Applications.Developer;
                     editorUrl = "developer/datatypes/editDataType.aspx";
                     idKey = "id";
                     break;
                 case DeepLinkType.DocumentType:
-                    section = "settings";
+                    section = Constants.Applications.Settings;
                     editorUrl = "settings/editNodeTypeNew.aspx";
                     idKey = "id";
                     break;
                 case DeepLinkType.Javascript:
-                    section = "settings";
+                    section = Constants.Applications.Settings;
                     editorUrl = "settings/scripts/editScript.aspx";
                     idKey = "file";
                     break;
                 case DeepLinkType.Macro:
-                    section = "developer";
+                    section = Constants.Applications.Developer;
                     editorUrl = "developer/macros/editMacro.aspx";
                     idKey = "macroID";
                     break;
                 case DeepLinkType.Media:
-                    section = "media";
+                    section = Constants.Applications.Media;
                     editorUrl = "editMedia.aspx";
                     idKey = "id";
                     break;
                 case DeepLinkType.MediaType:
-                    section = "settings";
+                    section = Constants.Applications.Settings;
                     editorUrl = "settings/editMediaType.aspx";
                     idKey = "id";
                     break;
                 case DeepLinkType.RazorScript:
-                    section = "developer";
+                    section = Constants.Applications.Developer;
                     editorUrl = "developer/python/editPython.aspx";
                     idKey = "file";
                     break;
                 case DeepLinkType.Template:
-                    section = "settings";
+                    section = Constants.Applications.Settings;
                     editorUrl = "settings/editTemplate.aspx";
                     idKey = "templateId";
                     break;
                 case DeepLinkType.XSLT:
-                    section = "developer";
+                    section = Constants.Applications.Developer;
                     editorUrl = "developer/xslt/editXslt.aspx";
                     idKey = "file";
                     break;

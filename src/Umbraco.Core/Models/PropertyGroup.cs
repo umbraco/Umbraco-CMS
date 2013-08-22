@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
@@ -45,8 +46,11 @@ namespace Umbraco.Core.Models
             get { return _name; }
             set
             {
-                _name = value;
-                OnPropertyChanged(NameSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _name = value;
+                    return _name;
+                }, _name, NameSelector);
             }
         }
 
@@ -82,8 +86,11 @@ namespace Umbraco.Core.Models
             get { return _sortOrder; }
             set
             {
-                _sortOrder = value;
-                OnPropertyChanged(SortOrderSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _sortOrder = value;
+                    return _sortOrder;
+                }, _sortOrder, SortOrderSelector);
             }
         }
 
@@ -99,6 +106,23 @@ namespace Umbraco.Core.Models
                 _propertyTypes = value;
                 _propertyTypes.CollectionChanged += PropertyTypesChanged;
             }
+        }
+
+        internal PropertyGroup Clone()
+        {
+            var clone = (PropertyGroup) this.MemberwiseClone();
+            var collection = new PropertyTypeCollection();
+            foreach (var propertyType in this.PropertyTypes)
+            {
+                var property = propertyType.Clone();
+                property.ResetIdentity();
+                property.ResetDirtyProperties(false);
+                collection.Add(property);
+            }
+            clone.PropertyTypes = collection;
+            clone.ResetIdentity();
+            clone.ResetDirtyProperties(false);
+            return clone;
         }
 
         /// <summary>

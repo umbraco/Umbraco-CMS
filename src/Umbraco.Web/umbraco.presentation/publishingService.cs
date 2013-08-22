@@ -30,15 +30,12 @@ namespace umbraco.presentation
 				if(!content.Instance.isInitializing)
 				{
                    
-                    foreach (Document d in Document.GetDocumentsForRelease())
+                    foreach (var d in Document.GetDocumentsForRelease())
 					{
 						try
 						{
                             d.ReleaseDate = DateTime.MinValue; //new DateTime(1, 1, 1); // Causes release date to be null
-
-							d.Publish(d.User);
-							library.UpdateDocumentCache(d);
-
+                            d.SaveAndPublish(d.User);
 						}
 						catch(Exception ee)
 						{
@@ -47,13 +44,11 @@ namespace umbraco.presentation
 					}
 					foreach(Document d in Document.GetDocumentsForExpiration())
 					{
-						
                         try
                         {
                             d.ExpireDate = DateTime.MinValue;
 
                             d.UnPublish();
-                            library.UnPublishSingleNode(d.Id);
                         }
                         catch (Exception ee)
                         {

@@ -5,7 +5,6 @@ using System.Runtime.Serialization;
 using System.Text;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Css;
-using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
@@ -119,10 +118,10 @@ namespace Umbraco.Core.Models
             var dirs = SystemDirectories.Css;
 
             //Validate file
-            var validFile = IOHelper.ValidateEditPath(Path, dirs.Split(','));
+            var validFile = IOHelper.VerifyEditPath(Path, dirs.Split(','));
 
             //Validate extension
-            var validExtension = IOHelper.ValidateFileExtension(Path, new List<string> {"css"});
+            var validExtension = IOHelper.VerifyFileExtension(Path, new List<string> {"css"});
 
             return validFile && validExtension;
         }
@@ -158,26 +157,5 @@ namespace Umbraco.Core.Models
         {
             get { return string.IsNullOrEmpty(Path) == false; }
         }
-    }
-
-    /// <summary>
-    /// Represents a Stylesheet Property
-    /// </summary>
-    /// <remarks>
-    /// Properties are always formatted to have a single selector, so it can be used in the backoffice
-    /// </remarks>
-    [Serializable]
-    [DataContract(IsReference = true)]
-    public class StylesheetProperty : IValueObject
-    {
-        public StylesheetProperty(string @alias, string value)
-        {
-            Alias = alias;
-            Value = value;
-        }
-
-        public string Alias { get; set; }
-        public string Value { get; set; }
-        public bool IsPartOfAtRule { get; set; }
     }
 }

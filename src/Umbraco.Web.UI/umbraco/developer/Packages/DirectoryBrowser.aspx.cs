@@ -8,7 +8,7 @@ using System.Web;
 using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using umbraco.BasePages;
+using Umbraco.Web.UI.Pages;
 using umbraco.BusinessLogic;
 
 namespace Umbraco.Web.UI.Umbraco.Developer.Packages

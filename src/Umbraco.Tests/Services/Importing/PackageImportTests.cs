@@ -1,6 +1,9 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Linq;
 using NUnit.Framework;
+using Umbraco.Core.Models.Rdbms;
+using umbraco.editorControls.MultiNodeTreePicker;
 
 namespace Umbraco.Tests.Services.Importing
 {
@@ -214,6 +217,42 @@ namespace Umbraco.Tests.Services.Importing
         }
 
         [Test]
+        public void PackagingService_Can_Import_CheckboxList_Content_Package_Xml()
+        {
+            // Arrange
+            string strXml = ImportResources.CheckboxList_Content_Package;
+            var xml = XElement.Parse(strXml);
+            var dataTypeElement = xml.Descendants("DataTypes").First();
+            var docTypesElement = xml.Descendants("DocumentTypes").First();
+            var element = xml.Descendants("DocumentSet").First();
+            var packagingService = ServiceContext.PackagingService;
+
+            // Act
+            var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement);
+            var contentTypes = packagingService.ImportContentTypes(docTypesElement);
+            var contents = packagingService.ImportContent(element);
+            var numberOfDocs = (from doc in element.Descendants()
+                                where (string) doc.Attribute("isDoc") == ""
+                                select doc).Count();
+
+            var database = ApplicationContext.DatabaseContext.Database;
+            var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { dataTypeDefinitions.First().Id });
+            int preValueId;
+            int.TryParse(contents.First().GetValue<string>("testList"), out preValueId);
+            var preValueKey = dtos.SingleOrDefault(x => x.Id == preValueId);
+
+            // Assert
+            Assert.That(dataTypeDefinitions, Is.Not.Null);
+            Assert.That(dataTypeDefinitions.Any(), Is.True);
+            Assert.That(contents, Is.Not.Null);
+            Assert.That(contentTypes.Any(), Is.True);
+            Assert.That(contents.Any(), Is.True);
+            Assert.That(contents.Count(), Is.EqualTo(numberOfDocs));
+            Assert.That(preValueKey, Is.Not.Null);
+            Assert.That(preValueKey.Value, Is.EqualTo("test3"));
+        }
+
+        [Test]
         public void PackagingService_Can_Import_Templates_Package_Xml_With_Invalid_Master()
         {
             // Arrange
@@ -246,6 +285,29 @@ namespace Umbraco.Tests.Services.Importing
             Assert.That(contentTypes.Any(), Is.True);
             Assert.That(contentTypes.Any(x => x.HasIdentity == false), Is.False);
             Assert.That(contentTypes.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void PackagingService_Can_Export_Single_DocType()
+        {
+            // Arrange
+            string strXml = ImportResources.SingleDocType;
+            var docTypeElement = XElement.Parse(strXml);
+            var packagingService = ServiceContext.PackagingService;
+
+            // Act
+            var contentTypes = packagingService.ImportContentTypes(docTypeElement);
+            var contentType = contentTypes.FirstOrDefault();
+            var element = packagingService.Export(contentType);
+
+            // Assert
+            Assert.That(element, Is.Not.Null);
+            Assert.That(element.Element("Info"), Is.Not.Null);
+            Assert.That(element.Element("Structure"), Is.Not.Null);
+            Assert.That(element.Element("GenericProperties"), Is.Not.Null);
+            Assert.That(element.Element("Tabs"), Is.Not.Null);
+            //Can't compare this XElement because the templates are not imported (they don't exist)
+            //Assert.That(XNode.DeepEquals(docTypeElement, element), Is.True);
         }
 
         [Test]

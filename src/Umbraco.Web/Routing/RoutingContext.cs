@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Routing
 {
@@ -9,26 +9,23 @@ namespace Umbraco.Web.Routing
 	/// </summary>
     public class RoutingContext
     {
-		/// <summary>
-		/// Initializes a new instance of the <see cref="RoutingContext"/> class.
-		/// </summary>
-		/// <param name="umbracoContext"> </param>
-		/// <param name="documentLookups">The document lookups resolver.</param>
-		/// <param name="documentLastChanceLookup"> </param>
-		/// <param name="publishedContentStore">The content store.</param>
-		/// <param name="niceUrlResolver">The nice urls resolver.</param>
-		internal RoutingContext(
+	    /// <summary>
+	    /// Initializes a new instance of the <see cref="RoutingContext"/> class.
+	    /// </summary>
+	    /// <param name="umbracoContext"> </param>
+	    /// <param name="contentFinders">The document lookups resolver.</param>
+	    /// <param name="contentLastChanceFinder"> </param>
+	    /// <param name="urlProvider">The nice urls provider.</param>
+	    internal RoutingContext(
 			UmbracoContext umbracoContext,
-			IEnumerable<IPublishedContentLookup> documentLookups,
-			IDocumentLastChanceLookup documentLastChanceLookup,
-            IPublishedContentStore publishedContentStore,
-			NiceUrlProvider niceUrlResolver)
+			IEnumerable<IContentFinder> contentFinders,
+			IContentFinder contentLastChanceFinder,
+            UrlProvider urlProvider)
         {
-			this.UmbracoContext = umbracoContext;
-			this.DocumentLookups = documentLookups;
-			DocumentLastChanceLookup = documentLastChanceLookup;
-			this.PublishedContentStore = publishedContentStore;
-        	this.NiceUrlProvider = niceUrlResolver;
+			UmbracoContext = umbracoContext;
+			PublishedContentFinders = contentFinders;
+			PublishedContentLastChanceFinder = contentLastChanceFinder;
+        	UrlProvider = urlProvider;
         }
 
 		/// <summary>
@@ -37,23 +34,18 @@ namespace Umbraco.Web.Routing
 		public UmbracoContext UmbracoContext { get; private set; }
 
 		/// <summary>
-		/// Gets the document lookups resolver.
+		/// Gets the published content finders.
 		/// </summary>
-		internal IEnumerable<IPublishedContentLookup> DocumentLookups { get; private set; }
+		internal IEnumerable<IContentFinder> PublishedContentFinders { get; private set; }
 
 		/// <summary>
-		/// Gets the last chance lookup
+		/// Gets the published content last chance finder.
 		/// </summary>
-		internal IDocumentLastChanceLookup DocumentLastChanceLookup { get; private set; }
+		internal IContentFinder PublishedContentLastChanceFinder { get; private set; }
 
 		/// <summary>
-		/// Gets the content store.
+		/// Gets the urls provider.
 		/// </summary>
-		internal IPublishedContentStore PublishedContentStore { get; private set; }
-
-		/// <summary>
-		/// Gets the nice urls provider.
-		/// </summary>
-		internal NiceUrlProvider NiceUrlProvider { get; private set; }
+		public UrlProvider UrlProvider { get; private set; }
     }
 }

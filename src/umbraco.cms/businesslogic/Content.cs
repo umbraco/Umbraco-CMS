@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using umbraco.cms.businesslogic.property;
 using umbraco.DataLayer;
 using System.Runtime.CompilerServices;
@@ -52,6 +53,8 @@ namespace umbraco.cms.businesslogic
         protected Content(Guid id) : base(id) { }
 
         protected Content(Guid id, bool noSetup) : base(id, noSetup) { }
+
+        protected internal Content(IUmbracoEntity entity) : base(entity) { }
 
         protected internal Content(IContentBase contentBase)
             : base(contentBase)
@@ -121,7 +124,7 @@ namespace umbraco.cms.businesslogic
                     if (o == null)
                         return null;
                     int contentTypeId;
-                    if (!int.TryParse(o.ToString(), out contentTypeId))
+                    if (int.TryParse(o.ToString(), out contentTypeId) == false)
                         return null;
                     try
                     {
@@ -565,7 +568,7 @@ namespace umbraco.cms.businesslogic
             // Remove all files
 
             var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            var uploadField = new Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+            var uploadField = new Factory().GetNewObject(new Guid(Constants.PropertyEditors.UploadField));
              
             foreach (Property p in GenericProperties)
             {               

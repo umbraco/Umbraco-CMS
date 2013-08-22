@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web.Mvc;
@@ -9,16 +7,13 @@ using Umbraco.Core.Logging;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Mvc;
 using umbraco;
-using umbraco.BasePages;
 using umbraco.cms.businesslogic.macro;
-using umbraco.cms.businesslogic.template;
-using umbraco.presentation.cache;
 using Umbraco.Core;
+using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace Umbraco.Web.WebServices
 {
-
-	/// <summary>
+    /// <summary>
 	/// A REST controller used to save files such as templates, partial views, macro files, etc...
 	/// </summary>
 	/// <remarks>
@@ -114,12 +109,6 @@ namespace Umbraco.Web.WebServices
 			try
 			{
 				t.Save();
-
-				// Clear cache in rutime
-				if (UmbracoSettings.UseDistributedCalls)
-					dispatcher.Refresh(new Guid("dd12b6a0-14b9-46e8-8800-c154f74047c8"), t.Id);
-				else
-					template.ClearCachedTemplate(t.Id);
 
 				return Success(ui.Text("speechBubbles", "templateSavedText"), ui.Text("speechBubbles", "templateSavedHeader"));
 			}

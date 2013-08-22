@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
@@ -151,7 +152,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             int count =
                 DatabaseContext.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
-                    new { NodeObjectType = new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB") });
+                    new { NodeObjectType = new Guid(Constants.ObjectTypes.DocumentType) });
 
             // Assert
             Assert.That(contentTypes.Any(), Is.True);

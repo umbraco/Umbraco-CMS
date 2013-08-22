@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Models;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.editorControls.tinyMCE3;
@@ -16,34 +17,22 @@ namespace Umbraco.Tests.Models
     {
         [SetUp]
         public override void Initialize()
-        {
-            Resolution.IsFrozen = false;
-
-            //this ensures its reset
-            PluginManager.Current = new PluginManager();
-
-            //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-            PluginManager.Current.AssembliesToScan = new[]
-                {
-                    typeof(IDataType).Assembly,
-                    typeof(tinyMCE3dataType).Assembly
-                };
-
-            DataTypesResolver.Reset();
-            DataTypesResolver.Current = new DataTypesResolver(
-                () => PluginManager.Current.ResolveDataTypes());
-
+        {            
             base.Initialize();
+        }
+
+        protected override void FreezeResolution()
+        {
+            UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(typeof(DefaultUrlSegmentProvider));
+            base.FreezeResolution();
         }
 
         [TearDown]
         public override void TearDown()
         {
             base.TearDown();
-
-            //reset the app context
-            DataTypesResolver.Reset();
         }
+
         [Test]
         public void Can_Generate_Xml_Representation_Of_Media()
         {
@@ -55,6 +44,7 @@ namespace Umbraco.Tests.Models
             ServiceContext.MediaService.Save(media, 0);
 
             var nodeName = media.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var urlName = media.GetUrlSegment();
 
             // Act
             XElement element = media.ToXml();
@@ -69,7 +59,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(media.CreateDate.ToString("s"), (string)element.Attribute("createDate"));
             Assert.AreEqual(media.UpdateDate.ToString("s"), (string)element.Attribute("updateDate"));
             Assert.AreEqual(media.Name, (string)element.Attribute("nodeName"));
-            Assert.AreEqual(media.Name.FormatUrl().ToLower(), (string)element.Attribute("urlName"));
+            Assert.AreEqual(urlName, (string)element.Attribute("urlName"));
             Assert.AreEqual(media.Path, (string)element.Attribute("path"));
             Assert.AreEqual("", (string)element.Attribute("isDoc"));
             Assert.AreEqual(media.ContentType.Id.ToString(), (string)element.Attribute("nodeType"));
@@ -78,11 +68,11 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(media.Version.ToString(), (string)element.Attribute("version"));
             Assert.AreEqual("0", (string)element.Attribute("template"));
 
-            Assert.AreEqual(media.Properties["umbracoFile"].Value.ToString(), element.Elements("umbracoFile").Single().Value);
-            Assert.AreEqual(media.Properties["umbracoWidth"].Value.ToString(), element.Elements("umbracoWidth").Single().Value);
-            Assert.AreEqual(media.Properties["umbracoHeight"].Value.ToString(), element.Elements("umbracoHeight").Single().Value);
-            Assert.AreEqual(media.Properties["umbracoBytes"].Value.ToString(), element.Elements("umbracoBytes").Single().Value);
-            Assert.AreEqual(media.Properties["umbracoExtension"].Value.ToString(), element.Elements("umbracoExtension").Single().Value);
+            Assert.AreEqual(media.Properties[Constants.Conventions.Media.File].Value.ToString(), element.Elements(Constants.Conventions.Media.File).Single().Value);
+            Assert.AreEqual(media.Properties[Constants.Conventions.Media.Width].Value.ToString(), element.Elements(Constants.Conventions.Media.Width).Single().Value);
+            Assert.AreEqual(media.Properties[Constants.Conventions.Media.Height].Value.ToString(), element.Elements(Constants.Conventions.Media.Height).Single().Value);
+            Assert.AreEqual(media.Properties[Constants.Conventions.Media.Bytes].Value.ToString(), element.Elements(Constants.Conventions.Media.Bytes).Single().Value);
+            Assert.AreEqual(media.Properties[Constants.Conventions.Media.Extension].Value.ToString(), element.Elements(Constants.Conventions.Media.Extension).Single().Value);
         }
     }
 }

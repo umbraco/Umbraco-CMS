@@ -1,17 +1,31 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
-    internal abstract class BaseMapper
+    public abstract class BaseMapper
     {
+        
+        internal abstract ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache { get; }
+
         internal abstract void BuildMap();
 
-        internal abstract string Map(string propertyName);
+        internal string Map(string propertyName)
+        {
+            DtoMapModel dtoTypeProperty;
+            return PropertyInfoCache.TryGetValue(propertyName, out dtoTypeProperty)
+                ? GetColumnName(dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo)
+                : string.Empty;
+        }
 
-        internal abstract void CacheMap<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember);
+        internal void CacheMap<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
+        {
+            var property = ResolveMapping(sourceMember, destinationMember);
+            PropertyInfoCache.AddOrUpdate(property.SourcePropertyName, property, (x, y) => property);
+        }
 
         internal DtoMapModel ResolveMapping<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
         {

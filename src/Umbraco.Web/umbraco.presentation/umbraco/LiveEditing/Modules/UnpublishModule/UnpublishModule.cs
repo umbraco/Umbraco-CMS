@@ -88,8 +88,7 @@ namespace umbraco.presentation.LiveEditing.Modules.UnpublishModule
             switch (e.Type)
             {
                 case "unpublishcontent":
-                    Document currentPage = new Document(int.Parse(UmbracoContext.Current.PageId.ToString()));
-                    library.UnPublishSingleNode(currentPage.Id);
+                    var currentPage = new Document(int.Parse(UmbracoContext.Current.PageId.ToString()));                    
                     currentPage.UnPublish();
                     string redirectUrl = "/";
                     try

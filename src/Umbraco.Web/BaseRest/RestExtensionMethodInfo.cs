@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Reflection;
 using System.Xml;
 using System.IO;
@@ -16,19 +16,23 @@ namespace Umbraco.Web.BaseRest
 	{
 		#region Utilities
 
-		static char[] Split = new char[] { ',' };
+		static readonly char[] Split = new[] { ',' };
 
 		static string[] SplitString(string s)
 		{
-			if (string.IsNullOrWhiteSpace(s))
-				return new string[] { };
-			else
-				return s.ToLower().Split(Split, StringSplitOptions.RemoveEmptyEntries);
+		    return string.IsNullOrWhiteSpace(s) 
+                ? new string[] { } 
+                : s.ToLower().Split(Split, StringSplitOptions.RemoveEmptyEntries);
 		}
 
-		static string GetAttribute(XmlNode node, string name)
+	    static string GetAttribute(XmlNode node, string name)
 		{
-			var attribute = node.Attributes[name];
+            if (node == null)
+                throw new ArgumentNullException("node");
+	        var attributes = node.Attributes;
+            if (attributes == null)
+                throw new ArgumentException(@"Node has no Attributes collection.", "node"); 
+			var attribute = attributes[name];
 			return attribute == null ? null : attribute.Value;
 		}
 
@@ -36,28 +40,28 @@ namespace Umbraco.Web.BaseRest
 
 		private RestExtensionMethodInfo()
 		{
-			this.Exists = false;
+			Exists = false;
 		}
 
 		private RestExtensionMethodInfo(bool allowAll, string allowGroup, string allowType, string allowMember, bool returnXml, MethodInfo method)
 		{
-			this.Exists = true;
+			Exists = true;
 			_allowAll = allowAll;
 			_allowGroups = SplitString(allowGroup);
 			_allowTypes = SplitString(allowType);
 			_allowMembers = SplitString(allowMember);
-			this.ReturnXml = returnXml;
+			ReturnXml = returnXml;
 			_method = method;
 		}
 
-		static RestExtensionMethodInfo MissingMethod = new RestExtensionMethodInfo();
-		static Dictionary<string, RestExtensionMethodInfo> _cache = new Dictionary<string, RestExtensionMethodInfo>();
+		static readonly RestExtensionMethodInfo MissingMethod = new RestExtensionMethodInfo();
+		static readonly Dictionary<string, RestExtensionMethodInfo> Cache = new Dictionary<string, RestExtensionMethodInfo>();
 
-		bool _allowAll;
-		string[] _allowGroups;
-		string[] _allowTypes;
-		string[] _allowMembers;
-		MethodInfo _method;
+	    readonly bool _allowAll;
+	    readonly string[] _allowGroups;
+	    readonly string[] _allowTypes;
+	    readonly string[] _allowMembers;
+	    readonly MethodInfo _method;
 
 		public bool Exists { get; private set; }
 		public bool ReturnXml { get; private set; }
@@ -68,10 +72,12 @@ namespace Umbraco.Web.BaseRest
 		// by looking everywhere (configuration, attributes, legacy attributes)
 		// returns MissingMethod (ie .Exists == false) if not found
 		//
-		public static RestExtensionMethodInfo GetMethod(string extensionAlias, string methodName)
+		public static RestExtensionMethodInfo GetMethod(string extensionAlias, string methodName, int paramsCount)
 		{
-			return GetFromConfiguration(extensionAlias, methodName)
-				?? GetFromAttribute(extensionAlias, methodName)
+            // note - legacy does not support paramsCount
+
+			return GetFromConfiguration(extensionAlias, methodName, paramsCount)
+				?? GetFromAttribute(extensionAlias, methodName, paramsCount)
 				?? GetFromLegacyConfiguration(extensionAlias, methodName) // that one should be obsoleted at some point
 				?? GetFromLegacyAttribute(extensionAlias, methodName) // that one should be obsoleted at some point
 				?? MissingMethod;
@@ -83,36 +89,40 @@ namespace Umbraco.Web.BaseRest
 		//
 		static RestExtensionMethodInfo GetFromLegacyConfiguration(string extensionAlias, string methodName)
 		{
-			const string ExtensionXPath = "/RestExtensions/ext [@alias='{0}']";
-			const string MethodXPath = "./permission [@method='{0}']";
+			const string extensionXPath = "/RestExtensions/ext [@alias='{0}']";
+			const string methodXPath = "./permission [@method='{0}']";
 
 			var config = (Configuration.BaseRestSection)System.Configuration.ConfigurationManager.GetSection("BaseRestExtensions");
 
 			if (config == null)
 				return null; // does not exist
 
-			// fixme - at the moment we reload the config file each time
+			// note - at the moment we reload the config file each time
 			//   we have to support live edits of the config file for backward compatibility reason
 			//   so if we want to cache, we'd also need to implement a watcher on the config file...
 
 			var doc = new XmlDocument();
 			doc.Load(IOHelper.MapPath(SystemFiles.RestextensionsConfig));
 
-			var eNode = doc.SelectSingleNode(string.Format(ExtensionXPath, extensionAlias));
+			var eNode = doc.SelectSingleNode(string.Format(extensionXPath, extensionAlias));
 
 			if (eNode == null)
 				return null; // does not exist
 
-			var mNode = eNode.SelectSingleNode(string.Format(MethodXPath, methodName));
+			var mNode = eNode.SelectSingleNode(string.Format(methodXPath, methodName));
 
 			if (mNode == null)
 				return null; // does not exist
 
-			string assemblyName = eNode.Attributes["assembly"].Value;
+		    var attributes = eNode.Attributes;
+		    if (attributes == null)
+		        return null; // has no attributes
+
+			var assemblyName = attributes["assembly"].Value;
 			var assembly = Assembly.Load(assemblyName);
 
-			string typeName = eNode.Attributes["type"].Value;
-			Type type = assembly.GetType(typeName);
+			var typeName = attributes["type"].Value;
+			var type = assembly.GetType(typeName);
 
 			if (type == null)
 				return null; // does not exist
@@ -137,31 +147,45 @@ namespace Umbraco.Web.BaseRest
 		// by looking at the configuration file
 		// returns null if not found
 		//
-		static RestExtensionMethodInfo GetFromConfiguration(string extensionAlias, string methodName)
+		static RestExtensionMethodInfo GetFromConfiguration(string extensionAlias, string methodName, int paramsCount)
 		{
-			var config = (Configuration.BaseRestSection)System.Configuration.ConfigurationManager.GetSection("BaseRestExtensions");
+		    var config = Core.Configuration.UmbracoSettings.For<Configuration.BaseRestSection>();
 
-			if (config == null)
-				return null; // does not exist
-
-			Configuration.ExtensionElement configExtension = config.Items[extensionAlias];
+			var configExtension = config.Items[extensionAlias];
 			if (configExtension == null)
 				return null; // does not exist
 
-			Configuration.MethodElement configMethod = configExtension[methodName];
+			var configMethod = configExtension[methodName];
 			if (configMethod == null)
 				return null; // does not exist
 
-			MethodInfo method;
+			MethodInfo method = null;
 			try
 			{
 				var parts = configExtension.Type.Split(',');
 				if (parts.Length > 2)
-					throw new Exception(string.Format("Failed to load extension '{0}', invalid type."));
+                    throw new Exception(string.Format("Failed to load extension '{0}', invalid type.", configExtension.Type));
 
 				var assembly = parts.Length == 1 ? Assembly.GetExecutingAssembly() : Assembly.Load(parts[1]);
 				var type = assembly.GetType(parts[0]);
-				method = type.GetMethod(methodName);
+
+			    if (type == null)
+			        throw new Exception(string.Format("Could not get type \"{0}\".", parts[0]));
+                
+                var methods = type.GetMethods()
+			                      .Where(m => m.Name == methodName)
+			                      .Where(m => m.GetParameters().Count() == paramsCount)
+                                  .ToArray();
+
+			    if (methods.Length > 1)
+			        throw new Exception(string.Format("Method \"{0}\" has many overloads with same number of parameters.", methodName));
+
+                if (methods.Length > 0)
+                {
+                    method = methods[0];
+                    if (!method.IsPublic || !method.IsStatic)
+                        throw new Exception(string.Format("Method \"{0}\" has to be public and static.", methodName));
+                }
 			}
 			catch (Exception e)
 			{
@@ -187,20 +211,24 @@ namespace Umbraco.Web.BaseRest
 		{
 			// here we can cache because any change would trigger an app restart anyway
 
-			string cacheKey = extensionAlias + "." + methodName;
-			lock (_cache)
+			var cacheKey = extensionAlias + "." + methodName;
+			lock (Cache)
 			{
 				// if it's in the cache, return
-				if (_cache.ContainsKey(cacheKey))
-					return _cache[cacheKey];
+				if (Cache.ContainsKey(cacheKey))
+					return Cache[cacheKey];
 			}
 
 			// find an extension with that alias, then find a method with that name,
 			// which has been properly marked with the attribute, and use the attribute
 			// properties to setup a RestExtensionMethodInfo
 
+            // note: add #pragma - yes it's obsolete but we still want to support it for the time being
+
 			var extensions = PluginManager.Current.ResolveLegacyRestExtensions()
+#pragma warning disable 612,618
 				.Where(type => type.GetCustomAttribute<global::umbraco.presentation.umbracobase.RestExtension>(false).GetAlias() == extensionAlias);
+#pragma warning restore 612,618
 
 			RestExtensionMethodInfo info = null;
 
@@ -209,7 +237,9 @@ namespace Umbraco.Web.BaseRest
 				var method = extension.GetMethod(methodName);
                 if (method == null) continue; // not implementing the method = ignore
 
+#pragma warning disable 612,618
 			    var attribute = method.GetCustomAttributes(typeof(global::umbraco.presentation.umbracobase.RestExtensionMethod), false).Cast<global::umbraco.presentation.umbracobase.RestExtensionMethod>().SingleOrDefault();
+#pragma warning restore 612,618
                 if (attribute == null) continue; // method has not attribute = ignore
 
                 // got it!
@@ -219,9 +249,9 @@ namespace Umbraco.Web.BaseRest
 			                                       method);
 
 			    // cache
-			    lock (_cache)
+			    lock (Cache)
 			    {
-			        _cache[cacheKey] = info;
+			        Cache[cacheKey] = info;
 			    }
             
                 // got it, no need to look any further
@@ -235,16 +265,16 @@ namespace Umbraco.Web.BaseRest
 		// by looking for the attributes
 		// returns null if not found
 		//
-		static RestExtensionMethodInfo GetFromAttribute(string extensionAlias, string methodName)
+		static RestExtensionMethodInfo GetFromAttribute(string extensionAlias, string methodName, int paramsCount)
 		{
 			// here we can cache because any change would trigger an app restart
 
-			string cacheKey = extensionAlias + "." + methodName;
-			lock (_cache)
+		    var cacheKey = string.Format("{0}.{1}[{2}]", extensionAlias, methodName, paramsCount);
+			lock (Cache)
 			{
 				// if it's in the cache, return
-				if (_cache.ContainsKey(cacheKey))
-					return _cache[cacheKey];
+				if (Cache.ContainsKey(cacheKey))
+					return Cache[cacheKey];
 			}
 
 			// find an extension with that alias, then find a method with that name,
@@ -260,8 +290,19 @@ namespace Umbraco.Web.BaseRest
 
             foreach (var extension in extensions) // foreach classes with extension alias
             {
-                var method = extension.GetMethod(methodName);
-                if (method == null) continue; // not implementing the method = ignore
+                var methods = extension.GetMethods()
+                                  .Where(m => m.Name == methodName)
+                                  .Where(m => m.GetParameters().Count() == paramsCount)
+                                  .ToArray();
+
+                if (methods.Length == 0) continue; // not implementing the method = ignore
+
+                if (methods.Length > 1)
+                    throw new Exception(string.Format("Method \"{0}\" has many overloads with same number of parameters.", methodName));
+
+                var method = methods[0];
+                if (!method.IsPublic || !method.IsStatic)
+                    throw new Exception(string.Format("Method \"{0}\" has to be public and static.", methodName));
 
                 var attribute = method.GetCustomAttributes(typeof(RestExtensionMethodAttribute), false).Cast<RestExtensionMethodAttribute>().SingleOrDefault();
                 if (attribute == null) continue; // method has not attribute = ignore
@@ -273,9 +314,9 @@ namespace Umbraco.Web.BaseRest
                                                    method);
 
                 // cache
-                lock (_cache)
+                lock (Cache)
                 {
-                    _cache[cacheKey] = info;
+                    Cache[cacheKey] = info;
                 }
 
                 // got it, no need to look any further
@@ -301,11 +342,11 @@ namespace Umbraco.Web.BaseRest
 				if (member == null)
 					return false;
 
-				bool allowed = false;
+				var allowed = false;
 
 				if (_allowGroups.Length > 0)
 				{
-					// fixme - are these equivalent?
+					// note - assuming these are equivalent
 					//var groups = member.Groups.Values.Cast<MemberGroup>().Select(group => group.Text);
 					var groups = System.Web.Security.Roles.GetRolesForUser(member.LoginName);
 					allowed = groups.Select(s => s.ToLower()).Intersect(_allowGroups).Any();
@@ -318,7 +359,7 @@ namespace Umbraco.Web.BaseRest
 
 				if (!allowed && _allowMembers.Length > 0)
 				{
-					allowed = _allowMembers.Contains(member.Id.ToString());
+					allowed = _allowMembers.Contains(member.Id.ToString(CultureInfo.InvariantCulture));
 				}
 
 				return allowed;
@@ -351,13 +392,14 @@ namespace Umbraco.Web.BaseRest
 				}
 				else
 				{
-					object[] methodParams = new object[parameters.Length];
+					var methodParams = new object[parameters.Length];
 
-					int i = 0;
+					var i = 0;
 
-					foreach (ParameterInfo pInfo in _method.GetParameters())
+					foreach (var pInfo in _method.GetParameters())
 					{
-						Type myType = Type.GetType(pInfo.ParameterType.ToString());
+						var myType = Type.GetType(pInfo.ParameterType.ToString());
+                        if (myType == null) throw new Exception("Failed to get type.");
 						methodParams[(i)] = Convert.ChangeType(parameters[i], myType);
 						i++;
 					}
@@ -375,34 +417,27 @@ namespace Umbraco.Web.BaseRest
 						case "System.Xml.Linq.XDocument":
 							return response.ToString();
 						case "System.Xml.XmlDocument":
-							XmlDocument xmlDoc = (XmlDocument)response;
-							StringWriter sw = new StringWriter();
-							XmlTextWriter xw = new XmlTextWriter(sw);
+							var xmlDoc = (XmlDocument)response;
+							var sw = new StringWriter();
+							var xw = new XmlTextWriter(sw);
 							xmlDoc.WriteTo(xw);
 							return sw.ToString();
 						default:
-							string strResponse = (string)response.ToString();
+							var strResponse = response.ToString();
 
-							if (this.ReturnXml)
+							if (ReturnXml)
 							{
 								// do a quick "is this html?" check... if it is add CDATA... 
 								if (strResponse.Contains("<") || strResponse.Contains(">"))
 									strResponse = "<![CDATA[" + strResponse + "]]>";
 								return "<value>" + strResponse + "</value>";
 							}
-							else
-							{
-								return strResponse;
-							}
+					        
+                            return strResponse;
 					}
 				}
-				else
-				{
-					if (this.ReturnXml)
-						return "<error>Null value returned</error>";
-					else
-						return string.Empty;
-				}
+			    
+                return ReturnXml ? "<error>Null value returned</error>" : string.Empty;
 			}
 			catch (Exception ex)
 			{

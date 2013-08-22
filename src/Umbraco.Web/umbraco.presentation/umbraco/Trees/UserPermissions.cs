@@ -13,10 +13,11 @@ using System.Xml;
 using System.Collections.Generic;
 using System.Text;
 using umbraco.BusinessLogic.Actions;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation.Trees
 {
-    [Tree("users", "userPermissions", "User Permissions", sortOrder: 2)]
+    [Tree(Constants.Applications.Users, "userPermissions", "User Permissions", sortOrder: 2)]
     public class UserPermissions : BaseTree
     {
 

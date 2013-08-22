@@ -14,6 +14,21 @@ namespace Umbraco.Tests.Models
     public class ContentTests
     {
         [Test]
+        public void All_Dirty_Properties_Get_Reset()
+        {
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+
+            content.ResetDirtyProperties(false);
+
+            Assert.IsFalse(content.IsDirty());
+            foreach (var prop in content.Properties)
+            {
+                Assert.IsFalse(prop.IsDirty());
+            }
+        }
+
+        [Test]
         public void Can_Verify_Mocked_Content()
         {
             // Arrange
@@ -402,6 +417,51 @@ namespace Umbraco.Tests.Models
             Assert.That(contentType.IsDirty(), Is.True);
             Assert.That(contentType.PropertyGroups.Any(x => x.Name == "Test Group"), Is.True);
             //Assert.That(contentType.IsPropertyDirty("PropertyGroups"), Is.True);
+        }
+
+        [Test]
+        public void After_Committing_Changes_Was_Dirty_Is_True()
+        {
+            // Arrange
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            contentType.ResetDirtyProperties(); //reset 
+
+            // Act
+            contentType.Alias = "newAlias";
+            contentType.ResetDirtyProperties(); //this would be like committing the entity
+
+            // Assert
+            Assert.That(contentType.IsDirty(), Is.False);
+            Assert.That(contentType.WasDirty(), Is.True);
+            Assert.That(contentType.WasPropertyDirty("Alias"), Is.True);
+        }
+
+        [Test]
+        public void If_Not_Committed_Was_Dirty_Is_False()
+        {
+            // Arrange
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+
+            // Act
+            contentType.Alias = "newAlias";           
+
+            // Assert
+            Assert.That(contentType.IsDirty(), Is.True);
+            Assert.That(contentType.WasDirty(), Is.False);
+        }
+
+        [Test]
+        public void Detect_That_A_Property_Is_Removed()
+        {
+            // Arrange
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            Assert.That(contentType.WasPropertyDirty("HasPropertyTypeBeenRemoved"), Is.False);
+
+            // Act
+            contentType.RemovePropertyType("title");
+
+            // Assert
+            Assert.That(contentType.IsPropertyDirty("HasPropertyTypeBeenRemoved"), Is.True);
         }
 
         [Test]

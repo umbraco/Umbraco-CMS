@@ -1,54 +1,50 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Configuration;
+﻿using System.Configuration;
 
 namespace Umbraco.Web.BaseRest.Configuration
 {
 	public class MethodElement : ConfigurationElement
 	{
-		const string Key_Name = "name";
-		const string Key_AllowAll = "allowAll";
-		const string Key_AllowGroup = "allowGroup";
-		const string Key_AllowType = "allowType";
-		const string Key_AllowMember = "allowMember";
-		const string Key_ReturnXml = "returnXml";
+		const string KeyName = "name";
+		const string KeyAllowAll = "allowAll";
+		const string KeyAllowGroup = "allowGroup";
+		const string KeyAllowType = "allowType";
+		const string KeyAllowMember = "allowMember";
+		const string KeyReturnXml = "returnXml";
 
-		[ConfigurationProperty(Key_Name, IsKey = true, IsRequired = true)]
+		[ConfigurationProperty(KeyName, IsKey = true, IsRequired = true)]
 		public string Name
 		{
-			get { return (string)base[Key_Name]; }
+			get { return (string)base[KeyName]; }
 		}
 
-		[ConfigurationProperty(Key_AllowAll, IsKey = false, IsRequired = false, DefaultValue = false)]
+		[ConfigurationProperty(KeyAllowAll, IsKey = false, IsRequired = false, DefaultValue = false)]
 		public bool AllowAll
 		{
-			get { return (bool)base[Key_AllowAll]; }
+			get { return (bool)base[KeyAllowAll]; }
 		}
 
-		[ConfigurationProperty(Key_AllowGroup, IsKey = false, IsRequired = false, DefaultValue = null)]
+		[ConfigurationProperty(KeyAllowGroup, IsKey = false, IsRequired = false, DefaultValue = null)]
 		public string AllowGroup
 		{
-			get { return (string)base[Key_AllowGroup]; }
+			get { return (string)base[KeyAllowGroup]; }
 		}
 
-		[ConfigurationProperty(Key_AllowType, IsKey = false, IsRequired = false, DefaultValue = null)]
+		[ConfigurationProperty(KeyAllowType, IsKey = false, IsRequired = false, DefaultValue = null)]
 		public string AllowType
 		{
-			get { return (string)base[Key_AllowType]; }
+			get { return (string)base[KeyAllowType]; }
 		}
 
-		[ConfigurationProperty(Key_AllowMember, IsKey = false, IsRequired = false, DefaultValue = null)]
+		[ConfigurationProperty(KeyAllowMember, IsKey = false, IsRequired = false, DefaultValue = null)]
 		public string AllowMember
 		{
-			get { return (string)base[Key_AllowMember]; }
+			get { return (string)base[KeyAllowMember]; }
 		}
 
-		[ConfigurationProperty(Key_ReturnXml, IsKey = false, IsRequired = false, DefaultValue = true)]
+		[ConfigurationProperty(KeyReturnXml, IsKey = false, IsRequired = false, DefaultValue = true)]
 		public bool ReturnXml
 		{
-			get { return (bool)base[Key_ReturnXml]; }
+			get { return (bool)base[KeyReturnXml]; }
 		}
 	}
 }

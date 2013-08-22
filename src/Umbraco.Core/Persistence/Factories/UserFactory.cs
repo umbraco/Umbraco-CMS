@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models.Membership;
+﻿using System.Collections.Generic;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
@@ -16,8 +17,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IUser BuildEntity(UserDto dto)
         {
-            //TODO Add list of applications for user
-            return new User(_userType)
+            var user = new User(_userType)
                        {
                            Id = dto.Id,
                            ProfileId = dto.Id,
@@ -32,8 +32,19 @@ namespace Umbraco.Core.Persistence.Factories
                            Language = dto.UserLanguage,
                            DefaultToLiveEditing = dto.DefaultToLiveEditing,
                            NoConsole = dto.NoConsole,
-                           Permissions = dto.DefaultPermissions
+                           DefaultPermissions = dto.DefaultPermissions
                        };
+
+            foreach (var app in dto.User2AppDtos)
+            {
+                user.AddAllowedSection(app.AppAlias);
+            }
+
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            user.ResetDirtyProperties(false);
+
+            return user;
         }
 
         public UserDto BuildDto(IUser entity)
@@ -51,8 +62,23 @@ namespace Umbraco.Core.Persistence.Factories
                               UserLanguage = entity.Language,
                               UserName = entity.Name,
                               Type = short.Parse(entity.UserType.Id.ToString()),
-                              DefaultPermissions = entity.Permissions
+                              DefaultPermissions = entity.DefaultPermissions,
+                              User2AppDtos = new List<User2AppDto>()
                           };
+
+            foreach (var app in entity.AllowedSections)
+            {
+                var appDto = new User2AppDto
+                    {
+                        AppAlias = app
+                    };
+                if (entity.Id != null)
+                {
+                    appDto.UserId = (int) entity.Id;
+                }
+
+                dto.User2AppDtos.Add(appDto);
+            }
 
             if (entity.HasIdentity)
                 dto.Id = entity.Id.SafeCast<int>();

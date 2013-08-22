@@ -13,8 +13,8 @@ namespace Umbraco.Web.UI.Config.Splashes
         {
             base.OnInit(e);
 
-            var store = UmbracoContext.Current.RoutingContext.PublishedContentStore;
-            if (store.HasContent(UmbracoContext.Current))
+            var store = UmbracoContext.Current.ContentCache;
+            if (store.HasContent())
 			{
                 //if there is actually content, go to the root
 			    Response.Redirect("~/");

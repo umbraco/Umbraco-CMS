@@ -60,7 +60,6 @@ namespace Umbraco.Core
 							if (isHosted)
 							{
 								assemblies = new List<Assembly>(BuildManager.GetReferencedAssemblies().Cast<Assembly>());
-								//_allAssemblies = new ReadOnlyCollection<Assembly>(BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToList());
 							}
 						}
 						catch (InvalidOperationException e)
@@ -69,8 +68,43 @@ namespace Umbraco.Core
 								throw;
 						}
 
-						assemblies = assemblies ?? new List<Assembly>(AppDomain.CurrentDomain.GetAssemblies().ToList());
-						//_allAssemblies = _allAssemblies ?? new ReadOnlyCollection<Assembly>(AppDomain.CurrentDomain.GetAssemblies().ToList());
+
+                        if (assemblies == null)
+                        {
+                            //NOTE: we cannot use AppDomain.CurrentDomain.GetAssemblies() because this only returns assemblies that have
+                            // already been loaded in to the app domain, instead we will look directly into the bin folder and load each one.
+                            var binFolder = IOHelper.GetRootDirectoryBinFolder();
+                            var binAssemblyFiles = Directory.GetFiles(binFolder, "*.dll", SearchOption.TopDirectoryOnly).ToList();
+                            //var binFolder = Assembly.GetExecutingAssembly().GetAssemblyFile().Directory;
+                            //var binAssemblyFiles = Directory.GetFiles(binFolder.FullName, "*.dll", SearchOption.TopDirectoryOnly).ToList();
+                            assemblies = new List<Assembly>();
+                            foreach (var a in binAssemblyFiles)
+                            {
+                                try
+                                {
+                                    var assName = AssemblyName.GetAssemblyName(a);
+                                    var ass = Assembly.Load(assName);
+                                    assemblies.Add(ass);
+                                }
+                                catch (Exception e)
+                                {
+                                    if (e is SecurityException || e is BadImageFormatException)
+                                    {
+                                        //swallow these exceptions
+                                    }
+                                    else
+                                    {
+                                        throw;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        //if for some reason they are still no assemblies, then use the AppDomain to load in already loaded assemblies.
+						if (!assemblies.Any())
+						{
+						    assemblies.AddRange(AppDomain.CurrentDomain.GetAssemblies().ToList());
+						}
 
 						//here we are trying to get the App_Code assembly
 						var fileExtensions = new[] {".cs", ".vb"}; //only vb and cs files are supported
@@ -508,7 +542,7 @@ namespace Umbraco.Core
                     foreach (var typeToSearch in subTypesToSearch)
                     {
                         //recursively find the types inheriting from this sub type in the other non-scanned assemblies.
-                        var foundTypes = GetClasses(typeToSearch, otherAssemblies, onlyConcreteClasses);
+                        var foundTypes = GetClasses(typeToSearch, otherAssemblies, onlyConcreteClasses, additionalFilter);
                         foundAssignableTypes.AddRange(foundTypes);
                     }
                     

@@ -18,6 +18,7 @@ using umbraco.uicontrols;
 using umbraco.providers;
 using umbraco.cms.presentation.Trees;
 using umbraco.IO;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation.user
 {
@@ -116,7 +117,7 @@ namespace umbraco.cms.presentation.user
             DefaultToLiveEditing.Checked = u.DefaultToLiveEditing;
 
             PlaceHolder medias = new PlaceHolder();
-            mediaPicker.AppAlias = "media";
+            mediaPicker.AppAlias = Constants.Applications.Media;
             mediaPicker.TreeAlias = "media";
 
             if (u.StartMediaId > 0)
@@ -127,7 +128,7 @@ namespace umbraco.cms.presentation.user
             medias.Controls.Add(mediaPicker);
 
             PlaceHolder content = new PlaceHolder();
-            contentPicker.AppAlias = "content";
+            contentPicker.AppAlias = Constants.Applications.Content;
             contentPicker.TreeAlias = "content";
 
             if (u.StartNodeId > 0)
@@ -245,7 +246,7 @@ namespace umbraco.cms.presentation.user
             // Handle content and media pickers
 
             PlaceHolder medias = new PlaceHolder();
-            cMediaPicker.AppAlias = "media";
+            cMediaPicker.AppAlias = Constants.Applications.Media;
             cMediaPicker.TreeAlias = "media";
 
             if (userChannel.MediaFolder > 0)
@@ -256,7 +257,7 @@ namespace umbraco.cms.presentation.user
             medias.Controls.Add(cMediaPicker);
 
             PlaceHolder content = new PlaceHolder();
-            cContentPicker.AppAlias = "content";
+            cContentPicker.AppAlias = Constants.Applications.Content;
             cContentPicker.TreeAlias = "content";
 
             if (userChannel.StartNode > 0)
@@ -347,16 +348,12 @@ namespace umbraco.cms.presentation.user
                 }
             }
         }
-
-        #region Web Form Designer generated code
-
+        
         protected override void OnInit(EventArgs e)
         {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
-            base.OnInit(e);
+            //lapps.SelectionMode = ListSelectionMode.Multiple;
+            lapps.RepeatLayout = RepeatLayout.Flow;
+            lapps.RepeatDirection = RepeatDirection.Vertical;
         }
 
         protected override void OnPreRender(EventArgs e)
@@ -365,22 +362,8 @@ namespace umbraco.cms.presentation.user
 
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/CMSNode.asmx"));
             //      ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
-
-
+            
         }
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-            //lapps.SelectionMode = ListSelectionMode.Multiple;
-            lapps.RepeatLayout = RepeatLayout.Flow;
-            lapps.RepeatDirection = RepeatDirection.Vertical;
-        }
-
-        #endregion
 
         /// <summary>
         /// Handles the Click event of the saveUser control.
@@ -493,8 +476,8 @@ namespace umbraco.cms.presentation.user
                         c.DocumentTypeAlias = cDocumentType.SelectedValue;
 
                         //
-                        c.MediaTypeAlias = "image";
-                        c.MediaTypeFileProperty = "umbracoFile";
+                        c.MediaTypeAlias = Constants.Conventions.MediaTypes.Image; // [LK:2013-03-22] This was previously lowercase; unsure if using const will cause an issue.
+                        c.MediaTypeFileProperty = Constants.Conventions.Media.File;
                         c.ImageSupport = true;
 
                         c.Save();

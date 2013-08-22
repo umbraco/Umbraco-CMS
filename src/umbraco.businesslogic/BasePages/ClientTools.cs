@@ -14,6 +14,7 @@ namespace umbraco.BasePages
 	/// Renders the client side code necessary to interact with the Umbraco client side API.
 	/// Each method returns an instance of this class so you can chain calls together.
 	/// </summary>
+    [Obsolete("This class has been superceded by Umbraco.Web.UI.Pages.ClientTools but requires the use of Umbraco.Web.UI.Pages.BasePage")]
 	public sealed class ClientTools
 	{
 

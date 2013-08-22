@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.textfield
 {
@@ -29,7 +30,7 @@ namespace umbraco.editorControls.textfield
 		}
 		public override Guid Id 
 		{
-			get {return new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea");}
+			get { return new Guid(Constants.PropertyEditors.Textbox); }
 		}
 
 		public override string DataTypeName 

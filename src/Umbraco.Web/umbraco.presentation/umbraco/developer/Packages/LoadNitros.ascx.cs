@@ -9,6 +9,7 @@ using System.Collections;
 using System.Web.UI;
 using System.Web.UI.WebControls.WebParts;
 using System.Collections.Generic;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 
@@ -52,7 +53,7 @@ namespace umbraco.presentation.developer.packages {
 
             }
 
-            cms.businesslogic.cache.Cache.ClearAllCache();
+            ApplicationContext.Current.ApplicationCache.ClearAllCache();
             library.RefreshContent();
 
             loadNitros.Visible = false;

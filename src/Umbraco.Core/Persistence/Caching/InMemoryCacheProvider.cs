@@ -92,6 +92,20 @@ namespace Umbraco.Core.Persistence.Caching
             bool result = _cache.TryRemove(GetCompositeId(type, entity.Id), out entity1);
         }
 
+        /// <summary>
+        /// Clear cache by type
+        /// </summary>
+        /// <param name="type"></param>
+        public void Clear(Type type)
+        {
+            var keys = _cache.Keys;
+            foreach (var key in keys.Where(x => x.StartsWith(string.Format("{0}-", type.Name))))
+            {
+                IEntity e;
+                _cache.TryRemove(key, out e);
+            }
+        }
+
         public void Clear()
         {
             _cache.Clear();

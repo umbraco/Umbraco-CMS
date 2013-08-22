@@ -10,9 +10,13 @@ using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
+using Umbraco.Core.Macros;
 using Umbraco.Core.Services;
+using Umbraco.Core.Sync;
+using Umbraco.Core.Strings;
 using MigrationsVersionFourNineZero = Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero;
 
 namespace Umbraco.Core
@@ -49,8 +53,9 @@ namespace Umbraco.Core
 			if (_isInitialized)
 				throw new InvalidOperationException("The boot manager has already been initialized");
 
-			LogHelper.Info<CoreBootManager>("Umbraco application starting");
-			_timer = DisposableTimer.Start(x => LogHelper.Info<CoreBootManager>("Umbraco application startup complete" + " (took " + x + "ms)"));
+	        InitializeProfilerResolver();
+
+            _timer = DisposableTimer.DebugDuration<CoreBootManager>("Umbraco application starting", "Umbraco application startup complete");
 
 			//create database and service contexts for the app context
 			var dbFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName);
@@ -91,6 +96,20 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Special method to initialize the ProfilerResolver
+        /// </summary>
+        protected virtual void InitializeProfilerResolver()
+        {
+            //By default we'll initialize the Log profiler (in the web project, we'll override with the web profiler)
+            ProfilerResolver.Current = new ProfilerResolver(new LogProfiler())
+                {
+                    //This is another special resolver that needs to be resolvable before resolution is frozen
+                    //since it is used for profiling the application startup
+                    CanResolveBeforeFrozen = true
+                };
+        }
+
+        /// <summary>
         /// Special method to initialize the ApplicationEventsResolver and any modifications required for it such 
         /// as adding custom types to the resolver.
         /// </summary>
@@ -106,6 +125,19 @@ namespace Umbraco.Core
             {
                 CanResolveBeforeFrozen = true
             };
+            //add custom types here that are internal
+            ApplicationEventsResolver.Current.AddType<PublishedContentHelper>();
+        }
+
+        /// <summary>
+        /// Special method to extend the use of Umbraco by enabling the consumer to overwrite
+        /// the absolute path to the root of an Umbraco site/solution, which is used for stuff
+        /// like Umbraco.Core.IO.IOHelper.MapPath etc.
+        /// </summary>
+        /// <param name="rootPath">Absolute</param>
+        protected virtual void InitializeApplicationRootPath(string rootPath)
+        {
+            Umbraco.Core.IO.IOHelper.SetRootDirectory(rootPath);
         }
 
 		/// <summary>
@@ -153,7 +185,7 @@ namespace Umbraco.Core
                 .ForEach(x => x.OnApplicationStarted(UmbracoApplication, ApplicationContext));
 
             //Now, startup all of our legacy startup handler
-            ApplicationEventsResolver.Current.InstantiateLegacyStartupHanlders();
+            ApplicationEventsResolver.Current.InstantiateLegacyStartupHandlers();
 
             if (afterComplete != null)
             {
@@ -175,12 +207,26 @@ namespace Umbraco.Core
         {
             Resolution.Freeze();
         }
-
+        
 		/// <summary>
 		/// Create the resolvers
 		/// </summary>
 		protected virtual void InitializeResolvers()
-		{
+		{           
+
+            //by default we'll use the standard configuration based sync
+            ServerRegistrarResolver.Current = new ServerRegistrarResolver(
+                new ConfigServerRegistrar()); 
+
+            //by default (outside of the web) we'll use the default server messenger without
+            //supplying a username/password, this will automatically disable distributed calls
+            // .. we'll override this in the WebBootManager
+            ServerMessengerResolver.Current = new ServerMessengerResolver(
+                new DefaultServerMessenger());
+
+            MappingResolver.Current = new MappingResolver(
+                () => PluginManager.Current.ResolveAssignedMapperTypes());
+
 			RepositoryResolver.Current = new RepositoryResolver(
 				new RepositoryFactory());
 
@@ -205,30 +251,11 @@ namespace Umbraco.Core
 			ActionsResolver.Current = new ActionsResolver(
 				() => PluginManager.Current.ResolveActions());
 
-            MacroPropertyTypeResolver.Current = new MacroPropertyTypeResolver(
-                PluginManager.Current.ResolveMacroPropertyTypes());
-
-            //TODO: Y U NO WORK?
-            //MigrationResolver.Current = new MigrationResolver(
-            //    PluginManager.Current.ResolveMigrationTypes());
+            //the database migration objects
+            MigrationResolver.Current = new MigrationResolver(
+                () => PluginManager.Current.ResolveMigrationTypes());
             
-			//the database migration objects
-			MigrationResolver.Current = new MigrationResolver(new List<Type>
-				{
-					typeof (MigrationsVersionFourNineZero.RemoveUmbracoAppConstraints),
-					typeof (DeleteAppTables),
-					typeof (EnsureAppsTreesUpdated),
-					typeof (MoveMasterContentTypeData),
-					typeof (NewCmsContentType2ContentTypeTable),
-					typeof (RemoveMasterContentTypeColumn),
-					typeof (RenameCmsTabTable),
-					typeof (RenameTabIdColumn),
-					typeof (UpdateCmsContentTypeAllowedContentTypeTable),
-					typeof (UpdateCmsContentTypeTable),
-					typeof (UpdateCmsContentVersionTable),
-					typeof (UpdateCmsPropertyTypeGroupTable),
-                    typeof (UpdatePropertyTypesAndGroups)
-				});
+
 
 			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
 				PluginManager.Current.ResolvePropertyEditorValueConverters());
@@ -236,6 +263,18 @@ namespace Umbraco.Core
 			PropertyEditorValueConvertersResolver.Current.AddType<DatePickerPropertyEditorValueConverter>();
 			PropertyEditorValueConvertersResolver.Current.AddType<TinyMcePropertyEditorValueConverter>();
 			PropertyEditorValueConvertersResolver.Current.AddType<YesNoPropertyEditorValueConverter>();
-        }
+
+            // this is how we'd switch over to DefaultShortStringHelper _and_ still use
+            // UmbracoSettings UrlReplaceCharacters...
+            //ShortStringHelperResolver.Current = new ShortStringHelperResolver(
+            //    new DefaultShortStringHelper().WithConfig(DefaultShortStringHelper.ApplyUrlReplaceCharacters));
+
+            // use the Legacy one for now
+            ShortStringHelperResolver.Current = new ShortStringHelperResolver(
+		        new LegacyShortStringHelper());
+
+		    UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(
+		        typeof (DefaultUrlSegmentProvider));
+		}
 	}
 }

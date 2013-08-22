@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
@@ -61,8 +62,11 @@ namespace Umbraco.Core.Models
             get { return _name; }
             set
             {
-                _name = value;
-                OnPropertyChanged(NameSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _name = value;
+                    return _name;
+                }, _name, NameSelector);
             }
         }
 
@@ -75,8 +79,11 @@ namespace Umbraco.Core.Models
             get { return _alias; }
             set
             {
-                _alias = value;
-                OnPropertyChanged(AliasSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _alias = value;
+                    return _alias;
+                }, _alias, AliasSelector);
             }
         }
 
@@ -89,8 +96,11 @@ namespace Umbraco.Core.Models
             get { return _description; }
             set
             {
-                _description = value;
-                OnPropertyChanged(DescriptionSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _description = value;
+                    return _description;
+                }, _description, DescriptionSelector);
             }
         }
 
@@ -104,8 +114,11 @@ namespace Umbraco.Core.Models
             get { return _dataTypeDefinitionId; }
             set
             {
-                _dataTypeDefinitionId = value;
-                OnPropertyChanged(DataTypeDefinitionIdSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _dataTypeDefinitionId = value;
+                    return _dataTypeDefinitionId;
+                }, _dataTypeDefinitionId, DataTypeDefinitionIdSelector);
             }
         }
 
@@ -119,8 +132,11 @@ namespace Umbraco.Core.Models
             get { return _dataTypeId; }
             internal set
             {
-                _dataTypeId = value;
-                OnPropertyChanged(DataTypeControlIdSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _dataTypeId = value;
+                    return _dataTypeId;
+                }, _dataTypeId, DataTypeControlIdSelector);
             }
         }
 
@@ -133,8 +149,11 @@ namespace Umbraco.Core.Models
             get { return _dataTypeDatabaseType; }
             set
             {
-                _dataTypeDatabaseType = value;
-                OnPropertyChanged(DataTypeDatabaseTypeSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _dataTypeDatabaseType = value;
+                    return _dataTypeDatabaseType;
+                }, _dataTypeDatabaseType, DataTypeDatabaseTypeSelector);
             }
         }
 
@@ -147,8 +166,11 @@ namespace Umbraco.Core.Models
             get { return _propertyGroupId; }
             set
             {
-                _propertyGroupId = value;
-                OnPropertyChanged(PropertyGroupIdSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _propertyGroupId = value;
+                    return _propertyGroupId;
+                }, _propertyGroupId, PropertyGroupIdSelector);
             }
         }
 
@@ -161,8 +183,11 @@ namespace Umbraco.Core.Models
             get { return _mandatory; }
             set
             {
-                _mandatory = value;
-                OnPropertyChanged(MandatorySelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _mandatory = value;
+                    return _mandatory;
+                }, _mandatory, MandatorySelector);
             }
         }
 
@@ -176,8 +201,11 @@ namespace Umbraco.Core.Models
             get { return _helpText; }
             set
             {
-                _helpText = value;
-                OnPropertyChanged(HelpTextSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _helpText = value;
+                    return _helpText;
+                }, _helpText, HelpTextSelector);
             }
         }
 
@@ -190,8 +218,11 @@ namespace Umbraco.Core.Models
             get { return _sortOrder; }
             set
             {
-                _sortOrder = value;
-                OnPropertyChanged(SortOrderSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _sortOrder = value;
+                    return _sortOrder;
+                }, _sortOrder, SortOrderSelector);
             }
         }
 
@@ -204,8 +235,11 @@ namespace Umbraco.Core.Models
             get { return _validationRegExp; }
             set
             {
-                _validationRegExp = value;
-                OnPropertyChanged(ValidationRegExpSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _validationRegExp = value;
+                    return _validationRegExp;
+                }, _validationRegExp, ValidationRegExpSelector);
             }
         }
 
@@ -342,6 +376,14 @@ namespace Umbraco.Core.Models
             }*/
 
             return true;
+        }
+
+        internal PropertyType Clone()
+        {
+            var clone = (PropertyType) this.MemberwiseClone();
+            clone.ResetIdentity();
+            clone.ResetDirtyProperties(false);
+            return clone;
         }
 
         public bool Equals(PropertyType other)

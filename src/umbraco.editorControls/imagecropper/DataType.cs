@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.imagecropper
 {
@@ -30,7 +31,7 @@ namespace umbraco.editorControls.imagecropper
         }
         public override Guid Id
         {
-            get { return new Guid("7A2D436C-34C2-410F-898F-4A23B3D79F54"); }
+            get { return new Guid(Constants.PropertyEditors.ImageCropper); }
         }
 
         public override string DataTypeName

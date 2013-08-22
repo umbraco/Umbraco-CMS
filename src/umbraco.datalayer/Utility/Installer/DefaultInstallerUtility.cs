@@ -199,12 +199,8 @@ namespace umbraco.DataLayer.Utility.Installer
                         using (var reader = SqlHelper.ExecuteReader(v.Sql))
                         {
                             var rowCount = 0;
-
-                            //if (reader.HasRecords)
-                            //{
-                                while (reader.Read())
-                                    rowCount++;
-                            //}
+                            while (reader.Read())
+                                rowCount++;
 
                             if (v.ExpectedRows != rowCount)
                                 continue;

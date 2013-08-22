@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Publishing;
-using umbraco;
-using umbraco.cms.businesslogic.web;
-using umbraco.interfaces;
-using umbraco.presentation.cache;
+using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.Strategies.Publishing
 {
+    //TODO: I think we should move this logic into the CacheRefresherEventHandler since all other handlers are registered there for invalidating cache.
+
     /// <summary>
     /// Represents the UpdateCacheAfterPublish class, which subscribes to the Published event
     /// of the <see cref="PublishingStrategy"/> class and is responsible for doing the actual
@@ -21,13 +20,13 @@ namespace Umbraco.Web.Strategies.Publishing
     /// and PublishingStrategy.
     /// This event subscriber will only be relevant as long as there is an xml cache.
     /// </remarks>
-    public class UpdateCacheAfterPublish : IApplicationStartupHandler
+    public class UpdateCacheAfterPublish : ApplicationEventHandler
     {
-        public UpdateCacheAfterPublish()
+        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             PublishingStrategy.Published += PublishingStrategy_Published;
         }
-
+        
         void PublishingStrategy_Published(IPublishingStrategy sender, PublishEventArgs<IContent> e)
         {
             if (e.PublishedEntities.Any())
@@ -55,14 +54,7 @@ namespace Umbraco.Web.Strategies.Publishing
         /// </summary>
         private void UpdateEntireCache()
         {
-            if (UmbracoSettings.UseDistributedCalls)
-            {
-                dispatcher.RefreshAll(new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"));
-            }
-            else
-            {
-                content.Instance.RefreshContentFromDatabaseAsync();
-            }
+            DistributedCache.Instance.RefreshAllPageCache();
         }
 
         /// <summary>
@@ -70,18 +62,7 @@ namespace Umbraco.Web.Strategies.Publishing
         /// </summary>
         private void UpdateMultipleContentCache(IEnumerable<IContent> content)
         {
-            if (UmbracoSettings.UseDistributedCalls)
-            {
-                foreach (var c in content)
-                {
-                    dispatcher.Refresh(new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"), c.Id);
-                }
-            }
-            else
-            {
-                var documents = content.Select(x => new Document(x)).ToList();
-                global::umbraco.content.Instance.UpdateDocumentCache(documents);
-            }
+            DistributedCache.Instance.RefreshPageCache(content.ToArray());          
         }
 
         /// <summary>
@@ -89,15 +70,7 @@ namespace Umbraco.Web.Strategies.Publishing
         /// </summary>
         private void UpdateSingleContentCache(IContent content)
         {
-            if (UmbracoSettings.UseDistributedCalls)
-            {
-                dispatcher.Refresh(new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"), content.Id);
-            }
-            else
-            {
-                var doc = new Document(content);
-                global::umbraco.content.Instance.UpdateDocumentCache(doc);
-            }
+            DistributedCache.Instance.RefreshPageCache(content);
         }
     }
 }

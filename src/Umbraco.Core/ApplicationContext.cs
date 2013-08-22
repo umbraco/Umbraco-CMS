@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Configuration;
+using System.Threading;
 using System.Web;
 using System.Web.Caching;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Services;
 
 
@@ -15,32 +18,52 @@ namespace Umbraco.Core
     /// <remarks>
     /// one per AppDomain, represents the global Umbraco application
     /// </remarks>
-    public class ApplicationContext
+    public class ApplicationContext : IDisposable
     {
     	/// <summary>
         /// Constructor
         /// </summary>        
         internal ApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
-			:this()
+            : this(dbContext, serviceContext, true)
     	{
-    		if (dbContext == null) throw new ArgumentNullException("dbContext");
-    		if (serviceContext == null) throw new ArgumentNullException("serviceContext");
-
-			_databaseContext = dbContext;
-			_services = serviceContext;			
+    			
     	}
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="dbContext"></param>
+        /// <param name="serviceContext"></param>
+        /// <param name="enableCache"></param>
+        internal ApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext, bool enableCache)
+            : this(enableCache)
+        {
+            if (dbContext == null) throw new ArgumentNullException("dbContext");
+            if (serviceContext == null) throw new ArgumentNullException("serviceContext");
+
+            _databaseContext = dbContext;
+            _services = serviceContext;		
+        }
 
 		/// <summary>
 		/// Empty constructor normally reserved for unit tests when a DatabaseContext or a ServiceContext is not
 		/// necessarily required or needs to be set after construction.
 		/// </summary>
-		internal ApplicationContext()
-		{
-			//create a new application cache from the HttpRuntime.Cache
-			ApplicationCache = HttpRuntime.Cache == null
-				? new CacheHelper(new Cache())
-				: new CacheHelper(HttpRuntime.Cache);
+		internal ApplicationContext() : this(true)
+		{			
 		}
+
+        /// <summary>
+        /// Constructor used to specify if we will enable application cache or not
+        /// </summary>
+        /// <param name="enableCache"></param>
+        internal ApplicationContext(bool enableCache)
+        {
+            //create a new application cache from the HttpRuntime.Cache
+            ApplicationCache = HttpRuntime.Cache == null
+                ? new CacheHelper(new System.Web.Caching.Cache(), enableCache)
+                : new CacheHelper(HttpRuntime.Cache, enableCache);
+        }
 
 		/// <summary>
     	/// Singleton accessor
@@ -197,5 +220,54 @@ namespace Umbraco.Core
 			}
 			internal set { _services = value; }
 		}
+
+
+        private volatile bool _disposed;
+        private readonly ReaderWriterLockSlim _disposalLocker = new ReaderWriterLockSlim();
+
+        /// <summary>
+        /// This will dispose and reset all resources used to run the application
+        /// </summary>
+        /// <remarks>
+        /// IMPORTANT: Never dispose this object if you require the Umbraco application to run, disposing this object
+        /// is generally used for unit testing and when your application is shutting down after you have booted Umbraco.
+        /// </remarks>
+        void IDisposable.Dispose()
+        {
+            // Only operate if we haven't already disposed
+            if (_disposed) return;
+
+            using (new WriteLock(_disposalLocker))
+            {
+                // Check again now we're inside the lock
+                if (_disposed) return;
+
+                //clear the cache
+                if (ApplicationCache != null)
+                {
+                    ApplicationCache.ClearAllCache();    
+                }
+                //reset all resolvers
+                ResolverCollection.ResetAll();
+                //reset resolution itself (though this should be taken care of by resetting any of the resolvers above)
+                Resolution.Reset();
+                
+                //reset the instance objects
+                this.ApplicationCache = null;
+                if (_databaseContext != null) //need to check the internal field here
+                {
+                    if (DatabaseContext.IsDatabaseConfigured)
+                    {
+                        DatabaseContext.Database.Dispose();       
+                    }                    
+                }
+                this.DatabaseContext = null;
+                this.Services = null;
+                this._isReady = false; //set the internal field
+                
+                // Indicate that the instance has been disposed.
+                _disposed = true;
+            }
+        }
     }
 }

@@ -22,21 +22,7 @@ namespace Umbraco.Tests.Persistence
         [SetUp]
         public override void Initialize()
         {
-            TestHelper.SetupLog4NetForTests();
-            TestHelper.InitializeContentDirectories();
-
-            string path = TestHelper.CurrentAssemblyDirectory;
-            AppDomain.CurrentDomain.SetData("DataDirectory", path);
-
-            RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory());
-
-            Resolution.Freeze();
-            ApplicationContext.Current = new ApplicationContext(
-                //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory()),
-                //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
+            base.Initialize();
 
             SqlSyntaxContext.SqlSyntaxProvider = MySqlSyntax.Provider;
 
@@ -47,13 +33,7 @@ namespace Umbraco.Tests.Persistence
         [TearDown]
         public override void TearDown()
         {
-            AppDomain.CurrentDomain.SetData("DataDirectory", null);
-
-            //reset the app context
-            ApplicationContext.Current = null;
-            Resolution.IsFrozen = false;
-
-            RepositoryResolver.Reset();
+            base.TearDown();
         }
 
         public override Database Database

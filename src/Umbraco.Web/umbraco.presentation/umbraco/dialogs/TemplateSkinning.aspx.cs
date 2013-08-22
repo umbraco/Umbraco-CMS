@@ -128,6 +128,7 @@ namespace umbraco.presentation.umbraco.dialogs
                     p.InstallBusinessLogic(pId, tempFile);
                     p.InstallCleanUp(pId, tempFile);
 
+                    //NOTE: This seems excessive to have to re-load all content from the database here!?
                     library.RefreshContent();
 
                     if (Skinning.GetAllSkins().Count > 0)
