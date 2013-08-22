@@ -22,7 +22,7 @@ namespace umbraco.NodeFactory
 		private string _parsedValue;
 		public string Value
 		{
-			get { return _parsedValue ?? (_parsedValue = TemplateUtilities.ParseInternalLinks(TemplateUtilities.ResolveUrlsFromTextString(_value))); }
+            get { return _parsedValue ?? (_parsedValue = TemplateUtilities.ResolveUrlsFromTextString(_value)); }
 		}
 
 		public Guid Version
