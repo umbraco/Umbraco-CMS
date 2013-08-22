@@ -161,7 +161,7 @@ namespace Umbraco.Core.PropertyEditors
         /// If overridden then the object returned must match the type supplied in the ValueType, otherwise persisting the 
         /// value to the DB will fail when it tries to validate the value type.
         /// </remarks>
-        public virtual object DeserializeValue(ContentPropertyData editorValue, object currentValue)
+        public virtual object FormatDataForPersistence(ContentPropertyData editorValue, object currentValue)
         {
             var result = TryConvertValueToCrlType(editorValue.Value);
             if (result.Success == false)
@@ -177,7 +177,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <param name="dbValue"></param>
         /// <returns></returns>
-        public virtual string SerializeValue(object dbValue)
+        public virtual string FormatDataForEditor(object dbValue)
         {
             if (dbValue == null) return string.Empty;
 

@@ -8,6 +8,11 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public class PreValueField
     {
+        public PreValueField()
+        {
+            Validators = new List<ValidatorBase>();
+        }
+
         /// <summary>
         /// The name to display for this pre-value field
         /// </summary>

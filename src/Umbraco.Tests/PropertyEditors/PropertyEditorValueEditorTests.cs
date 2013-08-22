@@ -52,7 +52,7 @@ namespace Umbraco.Tests.PropertyEditors
                     ValueType = valueType
                 };
 
-            var result = valueEditor.SerializeValue(val);
+            var result = valueEditor.FormatDataForEditor(val);
             Assert.AreEqual(expected, result);
         }
 
@@ -65,7 +65,7 @@ namespace Umbraco.Tests.PropertyEditors
                     ValueType = "DATE"
                 };
 
-            var result = valueEditor.SerializeValue(now);
+            var result = valueEditor.FormatDataForEditor(now);
             Assert.AreEqual(now.ToXmlString<DateTime>(), result);
         }
     }
