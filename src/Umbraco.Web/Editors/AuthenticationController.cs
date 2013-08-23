@@ -59,22 +59,6 @@ namespace Umbraco.Web.Editors
             throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
 
-        /// <summary>
-        /// Returns all users
-        /// </summary>
-        /// <returns></returns>
-        public UserDetail GetCurrentUser()
-        {
-            var attempt = UmbracoContext.Security.AuthorizeRequest();
-            if (attempt == ValidateRequestAttempt.Success)
-            {
-                var user = Services.UserService.GetUserById(UmbracoContext.Security.GetUserId());
-                return _userModelMapper.ToUserDetail(user);
-            }
-
-            //return Unauthorized (401) because the user is not authorized right now
-            throw new HttpResponseException(HttpStatusCode.Unauthorized);
-        }
 
         /// <summary>
         /// Logs a user in
