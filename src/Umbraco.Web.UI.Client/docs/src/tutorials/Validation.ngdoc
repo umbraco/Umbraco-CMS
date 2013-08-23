@@ -1,0 +1,9 @@
+@ngdoc overview
+@name Creating a property editor
+@description
+
+##Overview
+
+First, I'll explain the validation system in the manifest:
+The validation specified in the manifest is for server side only. Client side validation needs to be put into markup (I will write up a whole thing on the full validation process real soon!). Preferably a dev (and ourselves) will setup the same client side validation as the server side validation but the most important validation is server side so people cannot hack stuff.
+Each validation item in the validation array specifies a validation type that is executed against the posted value. What this means is that manifest based property editors will generally only be able to store 'simple' values, otherwise are auto-validation will not 

@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
@@ -18,7 +20,62 @@ namespace Umbraco.Core.PropertyEditors
     {
         public PreValueEditor()
         {
-            Fields = Enumerable.Empty<PreValueField>();        
+            var fields = new List<PreValueField>();
+               
+            //the ctor checks if we have PreValueFieldAttributes applied and if so we construct our fields from them
+            var props = TypeHelper.CachedDiscoverableProperties(GetType())
+                .Where(x => x.Name != "Fields");
+            foreach (var p in props)
+            {
+                var att = p.GetCustomAttributes(typeof (PreValueFieldAttribute), false).OfType<PreValueFieldAttribute>().SingleOrDefault();
+                if (att != null)
+                {
+                    if (att.PreValueFieldType != null)
+                    {
+                        //try to create it
+                        try
+                        {
+                            var instance = (PreValueField) Activator.CreateInstance(att.PreValueFieldType);
+                            //overwrite values if they are assigned
+                            if (!att.Key.IsNullOrWhiteSpace())
+                                instance.Key = att.Key;
+                            if (!att.Name.IsNullOrWhiteSpace())
+                                instance.Name = att.Name;
+                            if (!att.View.IsNullOrWhiteSpace())
+                                instance.View = att.View;
+                            if (!att.Description.IsNullOrWhiteSpace())
+                                instance.Description = att.Description;
+                            if (att.HideLabel)
+                                instance.HideLabel = att.HideLabel;
+
+                            //add the custom field
+                            fields.Add(instance);
+                        }
+                        catch (Exception ex)
+                        {
+                            LogHelper.WarnWithException<PreValueEditor>("Could not create an instance of " + att.PreValueFieldType, ex);                            
+                        }
+                    }
+                    else
+                    {
+                        fields.Add(MapAttributeToField(att));
+                    }
+                }
+            }
+
+            Fields = fields;
+        }
+
+        private static PreValueField MapAttributeToField(PreValueFieldAttribute att)
+        {
+            return new PreValueField
+                {
+                    Key = att.Key,
+                    Name = att.Name,
+                    Description = att.Description,
+                    HideLabel = att.HideLabel,
+                    View = att.View
+                };
         }
 
         /// <summary>

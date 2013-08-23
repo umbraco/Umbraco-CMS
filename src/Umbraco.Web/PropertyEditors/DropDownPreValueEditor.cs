@@ -11,6 +11,7 @@ namespace Umbraco.Web.PropertyEditors
 {
     internal class DropDownPreValueEditor : PreValueEditor
     {
+
         /// <summary>
         /// The editor is expecting a json array for a field with a key named "temp" so we need to format the persisted values
         /// to this format to be used in the editor.
