@@ -17,6 +17,7 @@ function ($scope, assetsService, dialogService, $log, umbImageHelper) {
             "/app_plugins/markdowneditor/lib/markdown.editor.js"
         ])
 		.then(function () {
+
 		    //this function will execute when all dependencies have loaded
 		    var converter2 = new Markdown.Converter();
 		    var editor2 = new Markdown.Editor(converter2, "-" + $scope.model.alias);
@@ -36,7 +37,6 @@ function ($scope, assetsService, dialogService, $log, umbImageHelper) {
 
 		        return true; // tell the editor that we'll take care of getting the image url
 		    });
-		});
 
     //load the seperat css for the editor to avoid it blocking our js loading TEMP HACK
     assetsService.loadCss("/app_plugins/markdowneditor/lib/markdown.css");

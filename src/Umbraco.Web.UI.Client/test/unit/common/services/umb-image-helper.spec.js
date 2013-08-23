@@ -5,7 +5,7 @@ describe('icon helper tests', function () {
     beforeEach(module('umbraco.mocks'));
 
     beforeEach(inject(function ($injector) {
-        umbImageHelper = $injector.get('umbImageHelper');
+        umbImageHelper = $injector.get('imageHelper');
     }));
 
     describe('basic utility methods return correct values', function () {

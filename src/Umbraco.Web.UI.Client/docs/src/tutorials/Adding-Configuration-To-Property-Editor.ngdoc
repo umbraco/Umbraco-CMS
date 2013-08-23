@@ -61,6 +61,7 @@ Because we can also use the configuration directly in our html like here, where 
 
 
 ##Get the codes
-The latest update to the markdowneditor project is on github where you can see all the [files and the manifest.](https://github.com/umbraco/Umbraco-CMS/tree/7.0.0/src/Umbraco.Web.UI.Client/src/packages/MarkdownEditor) 	 
+The latest update to the markdowneditor project is on github where you can see all the files and the manifest [here](https://github.com/umbraco/Umbraco-CMS/tree/7.0.0/src/Umbraco.Web.UI.Client/src/packages/MarkdownEditor).
+	 
 
 

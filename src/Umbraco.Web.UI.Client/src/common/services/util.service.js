@@ -71,10 +71,10 @@ angular.module('umbraco.services').factory('umbPropEditorHelper', umbPropEditorH
 
 /**
 * @ngdoc service
-* @name umbraco.services.umbImageHelper
+* @name umbraco.services.imageHelper
 * @description A helper object used for parsing image paths
 **/
-function umbImageHelper() {
+function imageHelper() {
     return {
         /** Returns the actual image path associated with the image property if there is one */
         getImagePropertyVaue: function(options) {
@@ -126,7 +126,7 @@ function umbImageHelper() {
         }
     };
 }
-angular.module('umbraco.services').factory('umbImageHelper', umbImageHelper);
+angular.module('umbraco.services').factory('imageHelper', imageHelper);
 
 /**
 * @ngdoc service
