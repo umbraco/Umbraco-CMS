@@ -46,15 +46,15 @@ function entityResource($q, $http, umbRequestHelper) {
         
         /**
          * @ngdoc method
-         * @name umbraco.resources.contentResource#getByIds
-         * @methodOf umbraco.resources.contentResource
+         * @name umbraco.resources.entityResource#getByIds
+         * @methodOf umbraco.resources.entityResource
          *
          * @description
-         * Gets an array of content items, given a collection of ids
+         * Gets an array of entities, given a collection of ids
          *
          * ##usage
          * <pre>
-         * contentResource.getByIds( [1234,2526,28262])
+         * entityResource.getByIds( [1234,2526,28262])
          *    .then(function(contentArray) {
          *        var myDoc = contentArray; 
          *        alert('they are here!');
