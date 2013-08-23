@@ -1,12 +1,12 @@
 angular.module("umbraco")
 .controller("My.MarkdownEditorController",
 //inject umbracos assetsServce and dialog service
-function ($scope,assetsService, dialogService) {
+function ($scope, assetsService, dialogService, $log, umbImageHelper) {
 
     //tell the assets service to load the markdown.editor libs from the markdown editors
     //plugin folder
 
-    if($scope.model.value === null || $scope.model.value === ""){
+    if ($scope.model.value === null || $scope.model.value === "") {
         $scope.model.value = $scope.model.config.defaultValue;
     }
 
@@ -17,33 +17,35 @@ function ($scope,assetsService, dialogService) {
             "/app_plugins/markdowneditor/lib/markdown.editor.js"
         ])
 		.then(function () {
-            //this function will execute when all dependencies have loaded
-            var converter2 = new Markdown.Converter();
-            var editor2 = new Markdown.Editor(converter2, "-" + $scope.model.alias);
-            editor2.run();
+		    //this function will execute when all dependencies have loaded
+		    var converter2 = new Markdown.Converter();
+		    var editor2 = new Markdown.Editor(converter2, "-" + $scope.model.alias);
+		    editor2.run();
 
-            //subscribe to the image dialog clicks
-            editor2.hooks.set("insertImageDialog", function (callback) {
-                   alert("Please click okay to start scanning your brain...");
-                   
-                   dialogService.mediaPicker({callback: function(data){
-                        $(data.selection).each(function(i, item){
-                               alert(item);
-                        });
-                   }});
+		    //subscribe to the image dialog clicks
+		    editor2.hooks.set("insertImageDialog", function (callback) {
 
-/*
-                   setTimeout(function () {
-                       var prompt = "We have detected that you like cats. Do you want to insert an image of a cat?";
-                       if (confirm(prompt))
-                           callback("http://icanhascheezburger.files.wordpress.com/2007/06/schrodingers-lolcat1.jpg")
-                       else
-                           callback(null);
-                   }, 2000);
-*/
 
-                   return true; // tell the editor that we'll take care of getting the image url
-               });
+		        dialogService.mediaPicker({ callback: function (data) {
+		                $(data.selection).each(function (i, item) {
+                            var imagePropVal = umbImageHelper.getImagePropertyVaue({ imageModel: item, scope: $scope });
+		                    callback(imagePropVal);
+		                });
+		            }
+		        });
+
+		        /*
+		        setTimeout(function () {
+		        var prompt = "We have detected that you like cats. Do you want to insert an image of a cat?";
+		        if (confirm(prompt))
+		        callback("http://icanhascheezburger.files.wordpress.com/2007/06/schrodingers-lolcat1.jpg")
+		        else
+		        callback(null);
+		        }, 2000);
+		        */
+
+		        return true; // tell the editor that we'll take care of getting the image url
+		    });
 		});
 
     //load the seperat css for the editor to avoid it blocking our js loading TEMP HACK
