@@ -102,9 +102,10 @@ namespace Umbraco.Core.PropertyEditors
         /// This can be overridden if perhaps you have a comma delimited string posted value but want to convert those to individual rows, or to convert
         /// a json structure to multiple rows.
         /// </remarks>
-        public virtual IDictionary<string, string> FormatDataForPersistence(IDictionary<string, string> editorValue, PreValueCollection currentValue)
+        public virtual IDictionary<string, string> FormatDataForPersistence(IDictionary<string, object> editorValue, PreValueCollection currentValue)
         {
-            return editorValue;
+            //convert to a string based value to be saved in the db
+            return editorValue.ToDictionary(x => x.Key, x => x.Value == null ? null : x.Value.ToString());
         }
 
         /// <summary>

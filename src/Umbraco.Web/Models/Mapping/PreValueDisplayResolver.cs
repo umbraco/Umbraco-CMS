@@ -70,7 +70,7 @@ namespace Umbraco.Web.Models.Mapping
                         LogHelper.Warn<PreValueDisplayResolver>("Could not find persisted pre-value for field " + field.Key);
                         continue;
                     }
-                    field.Value = dictionaryVals.Single(x => x.Key.InvariantEquals(field.Key)).Value.ToString();
+                    field.Value = dictionaryVals.Single(x => x.Key.InvariantEquals(field.Key)).Value;
                 }
 
 

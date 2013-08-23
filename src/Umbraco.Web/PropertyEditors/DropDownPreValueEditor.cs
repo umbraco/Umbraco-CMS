@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -23,9 +24,9 @@ namespace Umbraco.Web.PropertyEditors
         {
             var dictionary = PreValueCollection.AsDictionary(persistedPreVals);
             var arrayOfVals = dictionary.Select(item => item.Value).ToList();
-            var json = JsonConvert.SerializeObject(arrayOfVals);
+            //var json = JsonConvert.SerializeObject(arrayOfVals);
 
-            return new Dictionary<string, object> {{"temp", json}};
+            return new Dictionary<string, object> { { "temp", arrayOfVals } };
         }
 
         /// <summary>
@@ -33,23 +34,28 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="editorValue"></param>
         /// <param name="currentValue"></param>
-        /// <returns></returns>
+        /// <returns>
+        /// A string/string dictionary since all values that need to be persisted in the database are strings.
+        /// </returns>
         /// <remarks>
         /// This is mostly because we want to maintain compatibility with v6 drop down property editors that store their prevalues in different db rows.
         /// </remarks>
-        public override IDictionary<string, string> FormatDataForPersistence(IDictionary<string, string> editorValue, Core.Models.PreValueCollection currentValue)
+        public override IDictionary<string, string> FormatDataForPersistence(IDictionary<string, object> editorValue, PreValueCollection currentValue)
         {
-            var val = editorValue["temp"];
+            var val = editorValue["temp"] as JArray;
             var result = new Dictionary<string, string>();
-            if (val.IsNullOrWhiteSpace()) return result;
+            
+            if (val == null)
+            {
+                return result;
+            }
 
             try
             {
-                var deserialized = JsonConvert.DeserializeObject<string[]>(val);
                 var index = 0;
-                foreach (var item in deserialized)
+                foreach (var item in val)
                 {
-                    result.Add(index.ToInvariantString(), item);
+                    result.Add(index.ToInvariantString(), item.ToString());
                     index++;
                 }
             }

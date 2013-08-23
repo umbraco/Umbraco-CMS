@@ -171,6 +171,8 @@ namespace Umbraco.Core.PropertyEditors
             return result.Result;
         }
 
+        //TODO: Change the result to object so we can pass back JSON or json converted clr types if we want!
+
         /// <summary>
         /// A method used to serialize the databse value to a string value which is then used to be sent
         /// to the editor in JSON format.
