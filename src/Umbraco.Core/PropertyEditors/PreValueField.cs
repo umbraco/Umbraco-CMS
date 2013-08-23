@@ -11,6 +11,17 @@ namespace Umbraco.Core.PropertyEditors
         public PreValueField()
         {
             Validators = new List<ValidatorBase>();
+
+            //check for an attribute and fill the values
+            var att = GetType().GetCustomAttribute<PreValueFieldAttribute>(false);
+            if (att != null)
+            {
+                Name = att.Name;
+                Description = att.Description;
+                HideLabel = att.HideLabel;
+                Key = att.Key;
+                View = att.View;
+            }
         }
 
         /// <summary>
