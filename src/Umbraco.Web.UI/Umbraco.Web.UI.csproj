@@ -657,7 +657,9 @@
     <None Include="Config\Dashboard.Release.config">
       <DependentUpon>Dashboard.config</DependentUpon>
     </None>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Umbraco\Config\Create\UI.Release.xml">
       <DependentUpon>UI.xml</DependentUpon>
     </None>
