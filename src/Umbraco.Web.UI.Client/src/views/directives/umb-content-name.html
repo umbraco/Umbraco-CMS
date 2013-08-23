@@ -1,6 +1,8 @@
-<div class="span4 control-group" ng-class="{error: contentNameForm.name.$invalid}">
+<div class="umb-headline-editor-wrapper" ng-class="{error: contentNameForm.name.$invalid}">
     <ng-form name="contentNameForm">        
-        <input name="name" type="text" placeholder="{{placeholder}}" headline ng-model="model" 
+        
+    	<h1>{{model}}</h1>
+        <input name="name" type="text" placeholder="{{placeholder}}" ng-model="model" 
             required   
             val-server-field="Name" />
 

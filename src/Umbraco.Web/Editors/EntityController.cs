@@ -14,7 +14,7 @@ using Umbraco.Core.Models;
 namespace Umbraco.Web.Editors
 {
     /// <summary>
-    /// The API controller used for using the list of sections
+    /// The API controller used for getting entity objects, basic name, icon, id representation of any umbraco object
     /// </summary>
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController

@@ -59,6 +59,7 @@ namespace Umbraco.Web.Editors
             throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
 
+
         /// <summary>
         /// Logs a user in
         /// </summary>

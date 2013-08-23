@@ -5,9 +5,10 @@ module.exports = function (grunt) {
   grunt.registerTask('dev', ['jshint:dev', 'build', 'webserver', 'open:dev', 'watch']);
   
   //run by the watch task
-  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:app','karma:unit', 'copy:vs']);
+  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','karma:unit', 'copy:vs']);
   grunt.registerTask('watch-less', ['recess:build','copy:assets','copy:vs']);
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
+  grunt.registerTask('watch-packages', ['copy:packages']);
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
@@ -226,6 +227,11 @@ module.exports = function (grunt) {
       html: {
         files: ['src/views/**/*.html', 'src/*.html'],
         tasks:['watch-html','timestamp']
+      },
+
+      packages: {
+          files: 'src/packages/**/*.*',
+          tasks: ['watch-packages', 'timestamp'],
       }
     },
 

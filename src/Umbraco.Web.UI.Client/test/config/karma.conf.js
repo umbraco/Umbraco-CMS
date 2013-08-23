@@ -24,8 +24,9 @@ module.exports = function(karma) {
         */
 
         'lib/underscore/underscore.js',
-        'lib/umbraco/Extensions.js',
-        
+        'lib/umbraco/Extensions.js',  
+        'lib/yepnope/yepnope.min.js',
+
         'test/config/app.unit.js',
         'src/common/mocks/umbraco.servervariables.js',
 

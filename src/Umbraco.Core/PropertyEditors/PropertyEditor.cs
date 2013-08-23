@@ -112,49 +112,7 @@ namespace Umbraco.Core.PropertyEditors
             }
             return StaticallyDefinedPreValueEditor;
         }
-
-        /// <summary>
-        /// This can be used to re-format the currently saved pre-values that will be passed to the editor,
-        /// by default this returns the merged default and persisted pre-values.
-        /// </summary>
-        /// <param name="defaultPreVals">
-        /// The default/static pre-vals for the property editor
-        /// </param>
-        /// <param name="persistedPreVals">
-        /// The persisted pre-vals for the property editor
-        /// </param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This is generally not going to be used by anything unless a property editor wants to change the merging
-        /// functionality or needs to convert some legacy persisted data, or convert the string values to strongly typed values in json (i.e. booleans)
-        /// </remarks>
-        public virtual IDictionary<string, object> FormatPreValues(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
-        {
-            if (defaultPreVals == null)
-            {
-                defaultPreVals = new Dictionary<string, object>();
-            }
-
-            if (persistedPreVals.IsDictionaryBased)
-            {
-                //we just need to merge the dictionaries now, the persisted will replace default.
-               foreach (var item in persistedPreVals.PreValuesAsDictionary)
-               {
-                   defaultPreVals[item.Key] = item.Value;
-               }
-                return defaultPreVals;
-            }
-
-            //it's an array so need to format it 
-            var result = new Dictionary<string, object>();
-            var asArray = persistedPreVals.PreValuesAsArray.ToArray();
-            for (var i = 0; i < asArray.Length; i++)
-            {
-                result.Add(i.ToInvariantString(), asArray[i]);
-            }
-            return result;
-        } 
-
+        
         protected bool Equals(PropertyEditor other)
         {
             return Id.Equals(other.Id);

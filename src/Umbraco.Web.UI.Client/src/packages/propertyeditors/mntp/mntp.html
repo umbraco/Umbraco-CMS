@@ -1,18 +1,17 @@
-<div ng-controller="uComponents.Editors.MNTPController">
+<div ng-controller="uComponents.Editors.MNTPController" class="span8">
 	<ul class="nav nav-stacked">	
-		<li ng-repeat="node in renderModel">
-			<a href="#" prevent-default ng-click="remove($index)">
-				<i class="icon umb-tree-icon sprTree {{node.icon}}"></i> 
-					{{node.name}}
-			</a>
-		</li>
+			<li ng-repeat="node in renderModel">
+				<a href="#" prevent-default ng-click="remove($index)">
+					<i class="icon icon-remove red hover-show pull-right"></i>
+					<i class="{{node.icon}}"></i> 
+						{{node.name}}
+				</a>
+			</li>
 
-		<li>
-			<a href="#" ng-click="openContentPicker()" prevent-default>
-				<i class="icon icon-plus"></i> Add
-			</a>
-		</li>
-	</ul>
-
-	<br/><br/>
+			<li>
+				<a href="#" ng-click="openContentPicker()" prevent-default>
+					<i class="icon icon-plus"></i> Select
+				</a>
+			</li>
+		</ul>
 </div>

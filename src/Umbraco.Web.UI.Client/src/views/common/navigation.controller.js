@@ -9,12 +9,16 @@
  * 
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope,$rootScope, $location, $log, navigationService, keyboardService, dialogService, historyService, sectionResource, angularHelper) {
+function NavigationController($scope,$rootScope, $location, $log, $routeParams, navigationService, keyboardService, dialogService, historyService, sectionResource, angularHelper) {
 
     //Put the navigation service on this scope so we can use it's methods/properties in the view.
     // IMPORTANT: all properties assigned to this scope are generally available on the scope object on dialogs since
     //   when we create a dialog we pass in this scope to be used for the dialog's scope instead of creating a new one.
     $scope.nav = navigationService;
+    $scope.routeParams = $routeParams;
+    $scope.$watch("routeParams.section", function (newVal, oldVal) {
+            $scope.currentSection = newVal;
+    });
 
     //trigger search with a hotkey:
     keyboardService.bind("ctrl+shift+s", function(){

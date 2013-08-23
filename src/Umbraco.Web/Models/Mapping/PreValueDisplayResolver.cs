@@ -20,7 +20,7 @@ namespace Umbraco.Web.Models.Mapping
             _dataTypeService = dataTypeService;
         }
 
-        protected override IEnumerable<PreValueFieldDisplay> ResolveCore(IDataTypeDefinition source)
+        internal IEnumerable<PreValueFieldDisplay> Convert(IDataTypeDefinition source)
         {
             PropertyEditor propEd = null;
             if (source.ControlId != Guid.Empty)
@@ -29,20 +29,25 @@ namespace Umbraco.Web.Models.Mapping
                 if (propEd == null)
                 {
                     throw new InvalidOperationException("Could not find property editor with id " + source.ControlId);
-                }    
+                }
             }
-            
 
-            var dataTypeService = (DataTypeService) _dataTypeService.Value;
+            //set up the defaults
+            var dataTypeService = (DataTypeService)_dataTypeService.Value;
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(source.Id);
-            var dictionaryVals = PreValueCollection.AsDictionary(preVals);
+            IDictionary<string, object> dictionaryVals = PreValueCollection.AsDictionary(preVals).ToDictionary(x => x.Key, x => (object)x.Value);
+            var result = Enumerable.Empty<PreValueFieldDisplay>().ToArray();
 
-            var result = Enumerable.Empty<PreValueFieldDisplay>();
+            //if we have a prop editor, then format the pre-values based on it and create it's fields.
             if (propEd != null)
             {
-                result = propEd.PreValueEditor.Fields.Select(Mapper.Map<PreValueFieldDisplay>).ToArray();    
+                result = propEd.PreValueEditor.Fields.Select(Mapper.Map<PreValueFieldDisplay>).ToArray();
+                dictionaryVals = propEd.PreValueEditor.FormatDataForEditor(propEd.DefaultPreValues, preVals);
             }
+
             var currentIndex = 0; //used if the collection is non-dictionary based.
+
+            //now we need to wire up the pre-values values with the actual fields defined
             foreach (var field in result)
             {
                 if (preVals.IsDictionaryBased == false)
@@ -54,7 +59,7 @@ namespace Umbraco.Web.Models.Mapping
                         LogHelper.Warn<PreValueDisplayResolver>("Could not find persisted pre-value for index " + currentIndex);
                         continue;
                     }
-                    field.Value = (string) dictionaryVals.Single(x => x.Key.InvariantEquals(currentIndex.ToInvariantString())).Value;
+                    field.Value = dictionaryVals.Single(x => x.Key.InvariantEquals(currentIndex.ToInvariantString())).Value.ToString();
                     currentIndex++;
                 }
                 else
@@ -65,13 +70,18 @@ namespace Umbraco.Web.Models.Mapping
                         LogHelper.Warn<PreValueDisplayResolver>("Could not find persisted pre-value for field " + field.Key);
                         continue;
                     }
-                    field.Value = (string)dictionaryVals.Single(x => x.Key.InvariantEquals(field.Key)).Value;
+                    field.Value = dictionaryVals.Single(x => x.Key.InvariantEquals(field.Key)).Value;
                 }
 
-                
+
             }
 
             return result;
+        }
+
+        protected override IEnumerable<PreValueFieldDisplay> ResolveCore(IDataTypeDefinition source)
+        {
+            return Convert(source);
         }
     }
 }

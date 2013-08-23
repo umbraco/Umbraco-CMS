@@ -9,7 +9,7 @@ using Umbraco.Web.Models.ContentEditing;
 namespace Umbraco.Web.Models.Mapping
 {
     /// <summary>
-    /// Creates a ContentPropertyDto from a Property
+    /// Creates a ContentPropertyDisplay from a Property
     /// </summary>
     internal class ContentPropertyDisplayConverter : ContentPropertyBasicConverter<ContentPropertyDisplay>
     {
@@ -35,16 +35,15 @@ namespace Umbraco.Web.Models.Mapping
            
             if (display.PropertyEditor == null)
             {
-                display.Config = PreValueCollection.AsDictionary(preVals);
+                //display.Config = PreValueCollection.AsDictionary(preVals);
                 //if there is no property editor it means that it is a legacy data type
                 // we cannot support editing with that so we'll just render the readonly value view.
-                display.View = GlobalSettings.Path.EnsureEndsWith('/') +
-                               "views/propertyeditors/readonlyvalue/readonlyvalue.html";
+                display.View = "views/propertyeditors/readonlyvalue/readonlyvalue.html";
             }
             else
             {
                 //let the property editor format the pre-values
-                display.Config = display.PropertyEditor.FormatPreValues(display.PropertyEditor.DefaultPreValues, preVals);
+                display.Config = display.PropertyEditor.PreValueEditor.FormatDataForEditor(display.PropertyEditor.DefaultPreValues, preVals);
                 display.View = display.PropertyEditor.ValueEditor.View;
             }
 

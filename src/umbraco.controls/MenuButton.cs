@@ -25,7 +25,7 @@ namespace umbraco.uicontrols
         {
             //setup a hotkey if present
             if (ButtonType == MenuButtonType.Primary && String.IsNullOrEmpty(Hotkey))
-                Data.Add("shortcut", "ctrl+" + this.Text.ToLower()[0]);
+                Data.Add("hotkey", "ctrl+" + this.Text.ToLower()[0]);
             else if (!string.IsNullOrEmpty(Hotkey))
                 Data.Add("shortcut", Hotkey);
 

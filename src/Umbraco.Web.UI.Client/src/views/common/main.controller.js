@@ -62,13 +62,14 @@ function MainController($scope, $routeParams, $rootScope, $timeout, $http, $log,
             $scope.user = data.user;
 
 
-            var url = "http://da.gravatar.com/" + $scope.user.emailHash + ".json";
+/*
+            var url = "http://www.gravatar.com/avatar/" + $scope.user.emailHash + ".json?404=404";
             $http.jsonp(url).then(function(response){
-                $log.log(response);
+                $log.log("found: " + response);
             }, function(data){
                 $log.log(data);
             });
-
+*/
 
             /*    
             if($scope.user.avatar){

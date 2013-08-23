@@ -1,5 +1,5 @@
-<div ng-controller="Umbraco.Editors.ContentPickerController">
-	<ul class="nav nav-stacked" style="width: 250px">	
+<div ng-controller="Umbraco.Editors.ContentPickerController" class="span8">
+	<ul class="nav nav-stacked">	
 		<li ng-repeat="node in renderModel">
 			<a href="#" prevent-default ng-click="remove($index)">
 				<i class="icon icon-remove red hover-show pull-right"></i>
@@ -14,6 +14,4 @@
 			</a>
 		</li>
 	</ul>
-
-	<br/><br/>
 </div>

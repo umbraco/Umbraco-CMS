@@ -1,5 +1,4 @@
 function booleanEditorController($scope, $rootScope, assetsService) {
-
     $scope.renderModel = {
         value: false
     };

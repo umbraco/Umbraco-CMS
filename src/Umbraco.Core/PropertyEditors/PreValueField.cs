@@ -8,6 +8,22 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public class PreValueField
     {
+        public PreValueField()
+        {
+            Validators = new List<ValidatorBase>();
+
+            //check for an attribute and fill the values
+            var att = GetType().GetCustomAttribute<PreValueFieldAttribute>(false);
+            if (att != null)
+            {
+                Name = att.Name;
+                Description = att.Description;
+                HideLabel = att.HideLabel;
+                Key = att.Key;
+                View = att.View;
+            }
+        }
+
         /// <summary>
         /// The name to display for this pre-value field
         /// </summary>

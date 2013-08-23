@@ -5,7 +5,23 @@
 			name: "Markdown editor",
 			editor: {
 				view: "~/App_Plugins/MarkDownEditor/markdowneditor.html"
-			}
+			},
+			preValueEditor: {
+							fields: [
+								{
+									label: "Preview",
+									description: "Display a live preview",
+									key: "preview",
+									view: "boolean"
+								},
+								{
+									label: "Default value",
+									description: "If value is blank, the editor will show this",
+									key: "defaultValue",
+									view: "textarea"
+								}
+							]
+						}
 		}
 	]
 	,

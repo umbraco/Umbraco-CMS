@@ -1,14 +1,14 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Dialogs.MediaPickerController",
-        function ($scope, mediaResource, umbImageHelper) {
+        function ($scope, mediaResource, imageHelper) {
 
             mediaResource.rootMedia()
                 .then(function(data) {
                     $scope.images = data;
                     //update the thumbnail property
                     _.each($scope.images, function(img) {
-                        img.thumbnail = umbImageHelper.getThumbnail({ imageModel: img, scope: $scope });
+                        img.thumbnail = imageHelper.getThumbnail({ imageModel: img, scope: $scope });
                     });
                 });
             
@@ -19,7 +19,7 @@ angular.module("umbraco")
                             $scope.images = data;
                             //update the thumbnail property
                             _.each($scope.images, function (img) {
-                                img.thumbnail = umbImageHelper.getThumbnail({ imageModel: img, scope: $scope });
+                                img.thumbnail = imageHelper.getThumbnail({ imageModel: img, scope: $scope });
                             });
                         });
                 }
