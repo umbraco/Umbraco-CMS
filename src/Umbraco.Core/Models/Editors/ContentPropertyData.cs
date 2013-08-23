@@ -22,6 +22,8 @@ namespace Umbraco.Core.Models.Editors
             AdditionalData = new ReadOnlyDictionary<string, object>(additionalData);
         }
 
+        //TODO: Change this to an object so we can post JSON or json converted clr types if we want!
+
         /// <summary>
         /// The string value submitted for the property
         /// </summary>
