@@ -9,11 +9,13 @@ namespace Umbraco.Core.IO
 		[UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1156", "Will be declared public after 4.10")]
 		internal static long GetSize(this IFileSystem fs, string path)
         {
-            var s = fs.OpenFile(path);
-            var size = s.Length;
-            s.Close();
+            using (var s = fs.OpenFile(path))
+            {
+                var size = s.Length;
+                s.Close();
 
-            return size;
+                return size;    
+            }
         }
 
 		[UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1156", "Will be declared public after 4.10")]
