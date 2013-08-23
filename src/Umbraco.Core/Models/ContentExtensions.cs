@@ -467,43 +467,46 @@ namespace Umbraco.Core.Models
             return fileSystem.GetUrl(fileNameThumb);
         }
 
-        private static Tuple<int, int> GetDimensions(MediaFileSystem fileSystem, string path)
+        private static Tuple<int, int> GetDimensions(IFileSystem fileSystem, string path)
         {
-            var fs = fileSystem.OpenFile(path);
-            var image = Image.FromStream(fs);
-            var fileWidth = image.Width;
-            var fileHeight = image.Height;
-            fs.Close();
-            image.Dispose();
-
-            return new Tuple<int, int>(fileWidth, fileHeight);
+            using (var fs = fileSystem.OpenFile(path))
+            {
+                using (var image = Image.FromStream(fs))
+                {
+                    var fileWidth = image.Width;
+                    var fileHeight = image.Height;            
+                    return new Tuple<int, int>(fileWidth, fileHeight);
+                }    
+            }
         }
 
         private static string DoResize(MediaFileSystem fileSystem, string path, string extension, int width, int height, int maxWidthHeight, string fileNameAddition)
         {
-            var fs = fileSystem.OpenFile(path);
-            var image = Image.FromStream(fs);
-            fs.Close();
+            using (var fs = fileSystem.OpenFile(path))
+            {
+                using (var image = Image.FromStream(fs))
+                {
+                    fs.Close();
 
-            string fileNameThumb = String.IsNullOrEmpty(fileNameAddition) ?
-                string.Format("{0}_UMBRACOSYSTHUMBNAIL.jpg", path.Substring(0, path.LastIndexOf("."))) :
-                string.Format("{0}_{1}.jpg", path.Substring(0, path.LastIndexOf(".")), fileNameAddition);
+                    var fileNameThumb = String.IsNullOrEmpty(fileNameAddition)
+                                            ? string.Format("{0}_UMBRACOSYSTHUMBNAIL.jpg", path.Substring(0, path.LastIndexOf(".")))
+                                            : string.Format("{0}_{1}.jpg", path.Substring(0, path.LastIndexOf(".")), fileNameAddition);
 
-            var thumb = GenerateThumbnail(fileSystem,
-                image,
-                maxWidthHeight,
-                width,
-                height,
-                path,
-                extension,
-                fileNameThumb,
-                maxWidthHeight == 0);
+                    var thumb = GenerateThumbnail(fileSystem,
+                        image,
+                        maxWidthHeight,
+                        width,
+                        height,
+                        path,
+                        extension,
+                        fileNameThumb,
+                        maxWidthHeight == 0);
 
-            fileNameThumb = thumb.Item3;
+                    fileNameThumb = thumb.Item3;
 
-            image.Dispose();
-
-            return fileNameThumb;
+                    return fileNameThumb;
+                }
+            }            
         }
 
         private static Tuple<int, int, string> GenerateThumbnail(MediaFileSystem fileSystem, Image image, int maxWidthHeight, int fileWidth,
@@ -530,44 +533,45 @@ namespace Umbraco.Core.Models
                 heightTh = 1;
 
             // Create new image with best quality settings
-            var bp = new Bitmap(widthTh, heightTh);
-            var g = Graphics.FromImage(bp);
-            g.SmoothingMode = SmoothingMode.HighQuality;
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            g.CompositingQuality = CompositingQuality.HighQuality;
+            using (var bp = new Bitmap(widthTh, heightTh))
+            {
+                using (var g = Graphics.FromImage(bp))
+                {
+                    g.SmoothingMode = SmoothingMode.HighQuality;
+                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                    g.CompositingQuality = CompositingQuality.HighQuality;
 
-            // Copy the old image to the new and resized
-            var rect = new Rectangle(0, 0, widthTh, heightTh);
-            g.DrawImage(image, rect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
+                    // Copy the old image to the new and resized
+                    var rect = new Rectangle(0, 0, widthTh, heightTh);
+                    g.DrawImage(image, rect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
 
-            // Copy metadata
-            var imageEncoders = ImageCodecInfo.GetImageEncoders();
-            ImageCodecInfo codec = null;
-            if (extension.ToLower() == "png" || extension.ToLower() == "gif")
-                codec = imageEncoders.Single(t => t.MimeType.Equals("image/png"));
-            else
-                codec = imageEncoders.Single(t => t.MimeType.Equals("image/jpeg"));
+                    // Copy metadata
+                    var imageEncoders = ImageCodecInfo.GetImageEncoders();
+                    ImageCodecInfo codec = null;
+                    if (extension.ToLower() == "png" || extension.ToLower() == "gif")
+                        codec = imageEncoders.Single(t => t.MimeType.Equals("image/png"));
+                    else
+                        codec = imageEncoders.Single(t => t.MimeType.Equals("image/jpeg"));
+                    
+                    // Set compresion ratio to 90%
+                    var ep = new EncoderParameters();
+                    ep.Param[0] = new EncoderParameter(Encoder.Quality, 90L);
 
+                    // Save the new image using the dimensions of the image
+                    var newFileName = thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL",
+                                                                   string.Format("{0}x{1}", widthTh, heightTh));
+                    using (var ms = new MemoryStream())
+                    {
+                        bp.Save(ms, codec, ep);
+                        ms.Seek(0, 0);
 
-            // Set compresion ratio to 90%
-            var ep = new EncoderParameters();
-            ep.Param[0] = new EncoderParameter(Encoder.Quality, 90L);
+                        fileSystem.AddFile(newFileName, ms);                  
+                    }
 
-            // Save the new image using the dimensions of the image
-            string newFileName = thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL",
-                                                           string.Format("{0}x{1}", widthTh, heightTh));
-            var ms = new MemoryStream();
-            bp.Save(ms, codec, ep);
-            ms.Seek(0, 0);
-
-            fileSystem.AddFile(newFileName, ms);
-
-            ms.Close();
-            bp.Dispose();
-            g.Dispose();
-
-            return new Tuple<int, int, string>(widthTh, heightTh, newFileName);
+                    return new Tuple<int, int, string>(widthTh, heightTh, newFileName);    
+                }                
+            }
         }
 
 		/// <summary>
