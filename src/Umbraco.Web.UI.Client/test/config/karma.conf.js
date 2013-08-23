@@ -24,8 +24,9 @@ module.exports = function(karma) {
         */
 
         'lib/underscore/underscore.js',
-        'lib/umbraco/Extensions.js',
-        
+        'lib/umbraco/Extensions.js',  
+        'lib/yepnope/yepnope.min.js',
+
         'test/config/app.unit.js',
         'src/common/mocks/umbraco.servervariables.js',
 
@@ -62,7 +63,7 @@ module.exports = function(karma) {
     // level of logging
     // possible values: karma.LOG_DISABLE || karma.LOG_ERROR || karma.LOG_WARN || karma.LOG_INFO || karma.LOG_DEBUG
     // CLI --log-level debug
-    logLevel: karma.LOG_INFO,
+    logLevel: karma.LOG_DEBUG,
 
     // enable / disable watching file and executing tests whenever any file changes
     // CLI --auto-watch --no-auto-watch
