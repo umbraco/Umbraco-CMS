@@ -24,7 +24,7 @@ namespace Umbraco.Tests.AngularIntegration
         [Test]
         public void Parse_Main()
         {
-            var result = JsInitialization.ParseMain("[World]");
+            var result = JsInitialization.ParseMain(new[] { "[World]", "Hello" });
 
             Assert.IsTrue(result.StartsWith(@"yepnope({
 
