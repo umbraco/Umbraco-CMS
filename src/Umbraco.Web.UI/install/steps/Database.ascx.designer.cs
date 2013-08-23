@@ -102,8 +102,6 @@ namespace Umbraco.Web.UI.Install.Steps {
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox DatabaseName;
 
-        protected global::System.Web.UI.WebControls.CheckBox DatabaseIntegratedSecurity;
-
         /// <summary>
         /// DatabaseIntegratedSecurity control.
         /// </summary>
