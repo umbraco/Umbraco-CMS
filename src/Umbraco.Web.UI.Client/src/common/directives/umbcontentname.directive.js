@@ -45,8 +45,6 @@ angular.module("umbraco.directives")
 					            input.show().focus();
 					        }    
 				}, 500);	
-				    
-				
 			}
 	    };
 	});
