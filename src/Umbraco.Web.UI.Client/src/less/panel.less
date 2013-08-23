@@ -14,26 +14,41 @@
   cursor: text;
 }
 
-.umb-panel-header h1 {
+.umb-panel-header h1.umb-headline-editor {
+  cursor: text;
+}
+
+.umb-headline-editor-wrapper h1 {
   margin: 0;
   font-size: @fontSizeLarge;
   font-weight: 400;
 }
 
-.umb-panel-header h1.umb-headline-editor:hover {
+.umb-panel-header h1 {
+  margin: 0;
   font-size: @fontSizeLarge;
   font-weight: 400;
   color: @gray;
-  border: 1px solid @grayLight;
+}
+
+.umb-headline-editor-wrapper input{
+  display: none;
+}
+
+.umb-headline-editor-wrapper h1:hover, .umb-headline-editor-wrapper input  {
+  border-bottom: 1px dashed @grayLight;
   padding: 4px 0px 4px 6px;
   line-height: 22px;
   margin: 4px 0 0 -7px;
-  background: @white
+  width: 100%;
 }
 
-.umb-panel-header h1:hover {
-  display: none
+.umb-headline-editor-wrapper input:focus  {
+  border: 1px solid @grayLight;
+  background: @white;
+  width: 100%;
 }
+
 
 .umb-panel-header .form-search {
   position: relative;
