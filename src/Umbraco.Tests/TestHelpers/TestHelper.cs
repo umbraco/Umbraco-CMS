@@ -1,6 +1,7 @@
 using System;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using SqlCE4Umbraco;
 using Umbraco.Core;
@@ -123,5 +124,38 @@ namespace Umbraco.Tests.TestHelpers
                     directoryInfo.GetFiles().ForEach(x => x.Delete());
             }
         }
+
+
+	    public static void EnsureUmbracoSettingsConfig()
+        {
+            var currDir = new DirectoryInfo(CurrentAssemblyDirectory);
+
+            var configPath = Path.Combine(currDir.Parent.Parent.FullName, "config");
+            if (Directory.Exists(configPath) == false)
+                Directory.CreateDirectory(configPath);
+
+            var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
+            if (File.Exists(umbracoSettingsFile) == false)
+                File.Copy(
+                        currDir.Parent.Parent.Parent.GetDirectories("Umbraco.Web.UI")
+                        .First()
+                        .GetDirectories("config").First()
+                        .GetFiles("umbracoSettings.Release.config").First().FullName,
+                    Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
+                    true);
+            
+            Core.Configuration.UmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
+        }
+
+	    public static void CleanUmbracoSettingsConfig()
+        {
+            var currDir = new DirectoryInfo(CurrentAssemblyDirectory);
+
+            var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
+            if (File.Exists(umbracoSettingsFile))
+                File.Delete(umbracoSettingsFile);
+        }
+
+
 	}
 }

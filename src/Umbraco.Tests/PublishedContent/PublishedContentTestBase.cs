@@ -19,8 +19,6 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Initialize();
             
-            UmbracoSettings.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
-
             //need to specify a custom callback for unit tests
             PublishedContentHelper.GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
                 {
