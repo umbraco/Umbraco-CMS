@@ -197,7 +197,7 @@ namespace Umbraco.Core.Configuration
         /// Gets the database connection string
         /// </summary>
         /// <value>The database connection string.</value>
-        [Obsolete("Use System.ConfigurationManager.ConnectionStrings to get the connection with the key Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName instead")]
+        [Obsolete("Use System.Configuration.ConfigurationManager.ConnectionStrings[\"umbracoDbDSN\"] instead")]
         public static string DbDsn
         {
             get
@@ -209,7 +209,7 @@ namespace Umbraco.Core.Configuration
                 {
                     connectionString = settings.ConnectionString;
 
-                    // The SqlCe connectionString is formatted slightly differently, so we need to updat it
+                    // The SqlCe connectionString is formatted slightly differently, so we need to update it
                     if (settings.ProviderName.Contains("SqlServerCe"))
                         connectionString = string.Format("datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;{0}", connectionString);
                 }
