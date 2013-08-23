@@ -8,12 +8,14 @@ angular.module("umbraco").controller("Umbraco.Editors.DropdownController",
             keyName: "alias",
             valueName: "name"
         };
-        
+
         //map the user config
         angular.extend(config, $scope.model.config);
         //map back to the model
         $scope.model.config = config;
         
+        $scope.selectExpression = "e." + config.keyName + " as e." + config.valueName + " for e in model.config.items";
+
         //now we need to format the items in the array because we always want to have a dictionary
         for (var i = 0; i < $scope.model.config.items.length; i++) {
             if (angular.isString($scope.model.config.items[i])) {

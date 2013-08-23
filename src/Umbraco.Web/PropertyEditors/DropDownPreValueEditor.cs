@@ -14,7 +14,7 @@ namespace Umbraco.Web.PropertyEditors
     {
 
         /// <summary>
-        /// The editor is expecting a json array for a field with a key named "temp" so we need to format the persisted values
+        /// The editor is expecting a json array for a field with a key named "items" so we need to format the persisted values
         /// to this format to be used in the editor.
         /// </summary>
         /// <param name="defaultPreVals"></param>
@@ -24,9 +24,8 @@ namespace Umbraco.Web.PropertyEditors
         {
             var dictionary = PreValueCollection.AsDictionary(persistedPreVals);
             var arrayOfVals = dictionary.Select(item => item.Value).ToList();
-            //var json = JsonConvert.SerializeObject(arrayOfVals);
 
-            return new Dictionary<string, object> { { "temp", arrayOfVals } };
+            return new Dictionary<string, object> { { "items", arrayOfVals } };
         }
 
         /// <summary>
@@ -42,7 +41,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </remarks>
         public override IDictionary<string, string> FormatDataForPersistence(IDictionary<string, object> editorValue, PreValueCollection currentValue)
         {
-            var val = editorValue["temp"] as JArray;
+            var val = editorValue["items"] as JArray;
             var result = new Dictionary<string, string>();
             
             if (val == null)

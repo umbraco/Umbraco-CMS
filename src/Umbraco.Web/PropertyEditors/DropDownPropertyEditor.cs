@@ -17,10 +17,13 @@ namespace Umbraco.Web.PropertyEditors
                             new PreValueField
                                 {
                                     Description = "Add and remove values for the drop down list",
-                                    //we're going to call this 'temp' because we are going to override the 
+                                    //we're going to call this 'items' because we are going to override the 
                                     //serialization of the pre-values to ensure that each one gets saved with it's own key 
                                     //(new db row per pre-value, thus to maintain backwards compatibility)
-                                    Key = "temp",
+
+                                    //It's also important to note that by default the dropdown angular controller is expecting the 
+                                    // config options to come in with a property called 'items'
+                                    Key = "items",
                                     Name = ui.Text("editdatatype", "addPrevalue"),
                                     View = "Views/PropertyEditors/dropdown/dropdown.prevalue.html"
                                 }
