@@ -255,6 +255,7 @@
     <Compile Include="businesslogic\Packager\PackageActions\moveRootDocument.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\publishRootDocument.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\removeStringFromTemplate.cs" />
+    <Compile Include="businesslogic\Packager\PackageActions\RunDatabaseMigration.cs" />
     <Compile Include="businesslogic\propertytype\PropertyTypeGroup.cs" />
     <Compile Include="businesslogic\Property\Properties.cs" />
     <Compile Include="businesslogic\skinning\controls\ColorPicker.cs" />
