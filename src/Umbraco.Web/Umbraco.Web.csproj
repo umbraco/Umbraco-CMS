@@ -1957,7 +1957,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\users\EditUser.aspx" />
-    <Content Include="umbraco.presentation\umbraco\users\EditUserType.aspx" />
+    <Content Include="umbraco.presentation\umbraco\users\EditUserType.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="umbraco.presentation\umbraco\webService.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\CacheRefresher.asmx">
