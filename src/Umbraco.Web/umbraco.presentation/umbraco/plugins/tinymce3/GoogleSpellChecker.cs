@@ -12,7 +12,7 @@ using System.Collections.Generic;
 namespace umbraco.presentation.umbraco_client.tinymce3.plugins.spellchecker
 {
     public class GoogleSpellChecker : SpellChecker, IHttpHandler
-    {                        
+    {
         private static string SendRequest(string lang, string data)
         {
             string googleResponse;
@@ -25,7 +25,7 @@ namespace umbraco.presentation.umbraco_client.tinymce3.plugins.spellchecker
             requestData.Add("method", "spelling.check");
             requestData.Add("apiVersion", "v2");
             requestData.Add("params", requestParams);
-            string jsonString = new JavaScriptSerializer().Serialize(requestData);                        
+            string jsonString = new JavaScriptSerializer().Serialize(requestData);
             StreamReader reader = null;
             HttpWebResponse response = null;
             Stream requestStream = null;
@@ -35,7 +35,7 @@ namespace umbraco.presentation.umbraco_client.tinymce3.plugins.spellchecker
                 request.KeepAlive = false;
                 request.Method = "POST";
                 request.ContentType = "application/json";
-                request.ContentLength = jsonString.Length;                
+                request.ContentLength = jsonString.Length;
                 requestStream = request.GetRequestStream();
                 byte[] bytes = new ASCIIEncoding().GetBytes(jsonString);
                 requestStream.Write(bytes, 0, bytes.Length);
@@ -68,20 +68,20 @@ namespace umbraco.presentation.umbraco_client.tinymce3.plugins.spellchecker
         /// <param name="words">The words to be checked.</param>
         /// <returns></returns>
         public override SpellCheckerResult CheckWords(string language, string[] words)
-        {            
+        {
             string data = string.Join(" ", words); //turn them into a space-separated string as that's what google takes
             string json = SendRequest(language, data);
             var jsonRes = new JavaScriptSerializer().Deserialize<JsonSpellCheckerResult>(json);
 
-            var res = new SpellCheckerResult();            
+            var res = new SpellCheckerResult();
             // Get list of misspelled words
             if (jsonRes.result != null && jsonRes.result.spellingCheckResponse != null)
             {
                 foreach (var misspelling in jsonRes.result.spellingCheckResponse.misspellings)
-                {                    
+                {
                     res.result.Add(data.Substring(misspelling.charStart, misspelling.charLength));
                 }
-            }                                    
+            }
 
             return res;
         }
@@ -93,12 +93,12 @@ namespace umbraco.presentation.umbraco_client.tinymce3.plugins.spellchecker
         /// <param name="word">The word that is misspelt.</param>
         /// <returns></returns>
         public override SpellCheckerResult GetSuggestions(string language, string word)
-        {                          
+        {
             string json = SendRequest(language, word);
             var jsonRes = new JavaScriptSerializer().Deserialize<JsonSpellCheckerResult>(json);
 
             var res = new SpellCheckerResult();
-            // Get list of suggestions            
+            // Get list of suggestions
             if (jsonRes.result != null && jsonRes.result.spellingCheckResponse != null)
             {
                 foreach (var misspelling in jsonRes.result.spellingCheckResponse.misspellings)
@@ -138,7 +138,7 @@ namespace umbraco.presentation.umbraco_client.tinymce3.plugins.spellchecker
                     suggestions = new SpellCheckerResult();
                     break;
             }
-            
+
             suggestions.id = input.Id;
             JavaScriptSerializer ser = new JavaScriptSerializer();
             var res = ser.Serialize(suggestions);

@@ -60,6 +60,6 @@ namespace umbraco.presentation.umbraco_client.tinymce3.plugins.spellchecker
         public class GoogleResponseSuggestion
         {
             public string suggestion { get; set; }
-        }              
+        }
     }
 }
