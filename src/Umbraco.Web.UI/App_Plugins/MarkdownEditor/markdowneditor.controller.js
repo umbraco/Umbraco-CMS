@@ -24,7 +24,6 @@ function ($scope,assetsService, dialogService) {
 
             //subscribe to the image dialog clicks
             editor2.hooks.set("insertImageDialog", function (callback) {
-                   alert("Please click okay to start scanning your brain...");
                    
                    dialogService.mediaPicker({callback: function(data){
                         $(data.selection).each(function(i, item){
