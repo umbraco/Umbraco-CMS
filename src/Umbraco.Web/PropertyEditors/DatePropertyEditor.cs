@@ -33,21 +33,16 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override ValueEditor CreateValueEditor()
         {
-            var baseEditor = base.CreateValueEditor();
-
-            return new DateValueEditor
-            {
-                View = baseEditor.View
-            };
+            return new DateValueEditor(base.CreateValueEditor());
         }
 
         /// <summary>
         /// CUstom value editor so we can serialize with the correct date format (excluding time)
         /// and includes the date validator
         /// </summary>
-        private class DateValueEditor : ValueEditor
+        private class DateValueEditor : ValueEditorWrapper
         {
-            public DateValueEditor()
+            public DateValueEditor(ValueEditor wrapped) : base(wrapped)
             {
                 Validators = new List<ValidatorBase> { new DateTimeValidator() };
             }

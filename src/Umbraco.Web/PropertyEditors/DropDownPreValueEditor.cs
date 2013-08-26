@@ -7,11 +7,41 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using umbraco;
 
 namespace Umbraco.Web.PropertyEditors
 {
     internal class DropDownPreValueEditor : PreValueEditor
     {
+
+        public DropDownPreValueEditor()
+        {
+            Fields = CreatePreValueFields();
+        }
+
+        /// <summary>
+        /// Creates the pre-value fields
+        /// </summary>
+        /// <returns></returns>
+        protected List<PreValueField> CreatePreValueFields()
+        {
+            return new List<PreValueField>
+                {
+                    new PreValueField
+                        {
+                            Description = "Add and remove values for the drop down list",
+                            //we're going to call this 'items' because we are going to override the 
+                            //serialization of the pre-values to ensure that each one gets saved with it's own key 
+                            //(new db row per pre-value, thus to maintain backwards compatibility)
+
+                            //It's also important to note that by default the dropdown angular controller is expecting the 
+                            // config options to come in with a property called 'items'
+                            Key = "items",
+                            Name = ui.Text("editdatatype", "addPrevalue"),
+                            View = "Views/PropertyEditors/dropdown/dropdown.prevalue.html"
+                        }                   
+                };
+        } 
 
         /// <summary>
         /// The editor is expecting a json array for a field with a key named "items" so we need to format the persisted values
@@ -25,7 +55,8 @@ namespace Umbraco.Web.PropertyEditors
             var dictionary = PreValueCollection.AsDictionary(persistedPreVals);
             var arrayOfVals = dictionary.Select(item => item.Value).ToList();
 
-            return new Dictionary<string, object> { { "items", arrayOfVals } };
+            //the items list will be a dictionary of it's id -> value we need to use the id for persistence for backwards compatibility
+            return new Dictionary<string, object> { { "items", arrayOfVals.ToDictionary(x => x.Id, x => x.Value) } };
         }
 
         /// <summary>

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using AutoMapper;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
@@ -19,26 +21,29 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class UserController : UmbracoAuthorizedJsonController
     {
-        private readonly UserModelMapper _userModelMapper;
-        public UserController()
-            : this(new UserModelMapper())
-        {            
-        }
-        internal UserController(UserModelMapper userModelMapper)
-        {
-            _userModelMapper = userModelMapper;
-        }
-
+        /// <summary>
+        /// Returns a user by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public UserDetail GetById(int id)
         {
             var user = Services.UserService.GetUserById(id);
-            return _userModelMapper.ToUserDetail(user);
+            if (user == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            return Mapper.Map<UserDetail>(user);
         }
 
-        //TODO: Change to a service / repo
+        /// <summary>
+        /// Returns all active users
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<UserBasic> GetAll()
         {
-            return legacyUser.getAll().Where(x => !x.Disabled).Select(x => new UserBasic() { Name = x.Name, UserId = x.Id });
+            return Services.UserService.GetAllUsers().Where(x => x.IsLockedOut == false).Select(Mapper.Map<UserBasic>);
         }
     }
 }

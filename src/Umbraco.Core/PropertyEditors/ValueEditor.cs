@@ -202,5 +202,42 @@ namespace Umbraco.Core.PropertyEditors
                     throw new ArgumentOutOfRangeException();
             }            
         }
+
+        /// <summary>
+        /// Converts the property value for use in the front-end cache
+        /// </summary>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        public virtual object FormatValueForCache(Property property)
+        {
+            if (property.Value == null)
+            {
+                return string.Empty;
+            }
+
+            switch (GetDatabaseType())
+            {
+                case DataTypeDatabaseType.Nvarchar:
+                case DataTypeDatabaseType.Ntext:
+                    property.Value.ToXmlString<string>();
+                    return property.Value.ToXmlString<string>();
+                case DataTypeDatabaseType.Integer:
+                    return property.Value.ToXmlString(property.Value.GetType());                
+                case DataTypeDatabaseType.Date:
+                    //treat dates differently, output the format as xml format
+                    if (property.Value == null)
+                    {
+                        return string.Empty;
+                    }
+                    var date = property.Value.TryConvertTo<DateTime?>();
+                    if (date.Success == false || date.Result == null)
+                    {
+                        return string.Empty;
+                    }
+                    return date.Result.ToXmlString<DateTime>();
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
 }

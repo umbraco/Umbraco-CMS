@@ -9,8 +9,6 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class UserModelMapper : MapperConfiguration
     {
-
-        #region Mapper config
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<IUser, UserDetail>()
@@ -21,8 +19,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IProfile, UserBasic>()
                   .ForMember(detail => detail.UserId, opt => opt.MapFrom(profile => GetIntId(profile.Id)));
         } 
-        #endregion
-
+     
         private static int GetIntId(object id)
         {
             var result = id.TryConvertTo<int>();
@@ -33,15 +30,6 @@ namespace Umbraco.Web.Models.Mapping
             }
             return result.Result;
         } 
-
-        public UserDetail ToUserDetail(IUser user)
-        {
-            return Mapper.Map<UserDetail>(user);
-        }
-
-        public UserBasic ToUserBasic(IProfile profile)
-        {
-            return Mapper.Map<UserBasic>(profile);
-        }        
+ 
     }
 }

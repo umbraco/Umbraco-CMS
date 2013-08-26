@@ -21,6 +21,12 @@ namespace Umbraco.Core.Services
         IUser GetUserById(int id);
 
         /// <summary>
+        /// Returns all users
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<IUser> GetAllUsers();
+        
+        /// <summary>
         /// Gets an IUserType by its Alias
         /// </summary>
         /// <param name="alias">Alias of the UserType to retrieve</param>

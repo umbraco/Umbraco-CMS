@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
+using AutoMapper;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
@@ -20,17 +21,6 @@ namespace Umbraco.Web.Editors
     [ValidationFilter]
     public class AuthenticationController : UmbracoApiController
     {
-        private readonly UserModelMapper _userModelMapper;
-
-        public AuthenticationController()
-            : this(new UserModelMapper())
-        {            
-        }
-
-        internal AuthenticationController(UserModelMapper userModelMapper)
-        {
-            _userModelMapper = userModelMapper;
-        }
 
         /// <summary>
         /// Remove the xml formatter... only support JSON!
@@ -52,7 +42,7 @@ namespace Umbraco.Web.Editors
             if (attempt == ValidateRequestAttempt.Success)
             {
                 var user = Services.UserService.GetUserById(UmbracoContext.Security.GetUserId());
-                return _userModelMapper.ToUserDetail(user);
+                return Mapper.Map<UserDetail>(user);
             }
 
             //return Unauthorized (401) because the user is not authorized right now
@@ -73,7 +63,7 @@ namespace Umbraco.Web.Editors
                 var user = Services.UserService.GetUserByUserName(username);
                 //TODO: Clean up the int cast!
                 UmbracoContext.Security.PerformLogin((int)user.Id);
-                return _userModelMapper.ToUserDetail(user);
+                return Mapper.Map<UserDetail>(user);
             }
 
             //return Forbidden (403), we don't want to return a 401 because that get's intercepted 

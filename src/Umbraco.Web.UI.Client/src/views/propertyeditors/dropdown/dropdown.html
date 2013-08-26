@@ -1,6 +1,19 @@
-<div ng-controller="Umbraco.Editors.DropdownController">
+<div ng-controller="Umbraco.Editors.DropdownController" ng-switch="model.config.multiple">
+    
     <select name="dropDownList"
-        ng-model="model.value" 
-        ng-options="{{selectExpression}}"></select>    
+        ng-switch-default
+        ng-model="model.value"
+        ng-options="key as val for (key, val) in model.config.items">
+    </select>
+    
+    <!--NOTE: This ng-switch is required because ng-multiple doesn't actually support dynamic bindings with multi-select lists -->
+    <select name="dropDownList"
+        ng-switch-when="1"
+        multiple
+        ng-model="model.value"
+        ng-options="key as val for (key, val) in model.config.items">
+    </select>
+
 </div>
- 
+
+{{model.value | json}}

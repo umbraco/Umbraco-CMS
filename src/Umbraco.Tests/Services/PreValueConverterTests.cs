@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Services
@@ -12,12 +13,12 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Convert_To_Dictionary_Pre_Value_Collection()
         {
-            var list = new List<Tuple<int, string, int, string>>
+            var list = new List<Tuple<PreValue, string, int>>
                 {
-                    new Tuple<int, string, int, string>(10, "key1", 0, "value1"),
-                    new Tuple<int, string, int, string>(11, "key2", 3, "value2"),
-                    new Tuple<int, string, int, string>(12, "key3", 2, "value3"),
-                    new Tuple<int, string, int, string>(13, "key4", 1, "value4")
+                    new Tuple<PreValue, string, int>(new PreValue(10, "value1"), "key1", 0),
+                    new Tuple<PreValue, string, int>(new PreValue(11, "value2"), "key2", 3),
+                    new Tuple<PreValue, string, int>(new PreValue(12, "value3"), "key3", 2),
+                    new Tuple<PreValue, string, int>(new PreValue(13, "value4"), "key4", 1)
                 };
 
             var result = DataTypeService.PreValueConverter.ConvertToPreValuesCollection(list);
@@ -38,12 +39,12 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Convert_To_Array_Pre_Value_Collection_When_Empty_Key()
         {
-            var list = new List<Tuple<int, string, int, string>>
+            var list = new List<Tuple<PreValue, string, int>>
                 {
-                    new Tuple<int, string, int, string>(10, "", 0, "value1"),
-                    new Tuple<int, string, int, string>(11, "", 3, "value2"),
-                    new Tuple<int, string, int, string>(12, "", 2, "value3"),
-                    new Tuple<int, string, int, string>(13, "", 1, "value4")
+                    new Tuple<PreValue, string, int>(new PreValue(10, "value1"), "", 0),
+                    new Tuple<PreValue, string, int>(new PreValue(11, "value2"), "", 3),
+                    new Tuple<PreValue, string, int>(new PreValue(12, "value3"), "", 2),
+                    new Tuple<PreValue, string, int>(new PreValue(13, "value4"), "", 1)
                 };
 
             var result = DataTypeService.PreValueConverter.ConvertToPreValuesCollection(list);
@@ -54,22 +55,22 @@ namespace Umbraco.Tests.Services
                 });
 
             Assert.AreEqual(4, result.PreValuesAsArray.Count());
-            Assert.AreEqual("value1", result.PreValuesAsArray.ElementAt(0));
-            Assert.AreEqual("value4", result.PreValuesAsArray.ElementAt(1));
-            Assert.AreEqual("value3", result.PreValuesAsArray.ElementAt(2));
-            Assert.AreEqual("value2", result.PreValuesAsArray.ElementAt(3));
+            Assert.AreEqual("value1", result.PreValuesAsArray.ElementAt(0).Value);
+            Assert.AreEqual("value4", result.PreValuesAsArray.ElementAt(1).Value);
+            Assert.AreEqual("value3", result.PreValuesAsArray.ElementAt(2).Value);
+            Assert.AreEqual("value2", result.PreValuesAsArray.ElementAt(3).Value);
 
         }
 
         [Test]
         public void Can_Convert_To_Array_Pre_Value_Collection()
         {
-            var list = new List<Tuple<int, string, int, string>>
+            var list = new List<Tuple<PreValue, string, int>>
                 {
-                    new Tuple<int, string, int, string>(10, "key1", 0, "value1"),
-                    new Tuple<int, string, int, string>(11, "key1", 3, "value2"),
-                    new Tuple<int, string, int, string>(12, "key3", 2, "value3"),
-                    new Tuple<int, string, int, string>(13, "key4", 1, "value4")
+                    new Tuple<PreValue, string, int>(new PreValue(10, "value1"), "key1", 0),
+                    new Tuple<PreValue, string, int>(new PreValue(11, "value2"), "key1", 3),
+                    new Tuple<PreValue, string, int>(new PreValue(12, "value3"), "key3", 2),
+                    new Tuple<PreValue, string, int>(new PreValue(13, "value4"), "key4", 1)
                 };
 
             var result = DataTypeService.PreValueConverter.ConvertToPreValuesCollection(list);
@@ -80,10 +81,10 @@ namespace Umbraco.Tests.Services
                 });
 
             Assert.AreEqual(4, result.PreValuesAsArray.Count());
-            Assert.AreEqual("value1", result.PreValuesAsArray.ElementAt(0));
-            Assert.AreEqual("value4", result.PreValuesAsArray.ElementAt(1));
-            Assert.AreEqual("value3", result.PreValuesAsArray.ElementAt(2));
-            Assert.AreEqual("value2", result.PreValuesAsArray.ElementAt(3));
+            Assert.AreEqual("value1", result.PreValuesAsArray.ElementAt(0).Value);
+            Assert.AreEqual("value4", result.PreValuesAsArray.ElementAt(1).Value);
+            Assert.AreEqual("value3", result.PreValuesAsArray.ElementAt(2).Value);
+            Assert.AreEqual("value2", result.PreValuesAsArray.ElementAt(3).Value);
 
         }
     }

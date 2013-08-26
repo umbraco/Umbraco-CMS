@@ -3,14 +3,31 @@ angular.module("umbraco").controller("Umbraco.Editors.DropdownPreValueController
        
         $scope.newItem = "";
         $scope.hasError = false;
+       
+        if (!angular.isArray($scope.model.value)) {
+            //make an array from the dictionary
+            var items = [];
+            for (var i in $scope.model.value) {
+                items.push($scope.model.value[i]);
+            }
+            //now make the editor model the array
+            $scope.model.value = items;
+        }
 
         $scope.remove = function(item, evt) {
 
             evt.preventDefault();
 
-            $scope.model.value = _.reject($scope.model.value, function(i) {
+            $scope.model.value = _.reject($scope.model.value, function (i) {
                 return i === item;
             });
+            
+            //setup the dictionary from array
+            $scope.model.value = {};
+            for (var i = 0; i < $scope.model.value.length; i++) {
+                //just make the key the iteration
+                $scope.model.value[i] = $scope.model.value[i];
+            }
         };
 
         $scope.add = function (evt) {

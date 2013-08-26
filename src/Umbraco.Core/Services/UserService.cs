@@ -12,6 +12,8 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
+
+
     /// <summary>
     /// Represents the UserService, which is an easy access to operations involving <see cref="IProfile"/>, <see cref="IMembershipUser"/> and eventually Backoffice Users.
     /// </summary>
@@ -62,6 +64,18 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Returns all users
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<IUser> GetAllUsers()
+        {
+            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll();
+            }
+        }
+
         public IUser GetUserById(int id)
         {
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
@@ -69,8 +83,7 @@ namespace Umbraco.Core.Services
                 return repository.Get(id);
             }
         }
-
-
+        
         /// <summary>
         /// Gets an IUserType by its Alias
         /// </summary>
