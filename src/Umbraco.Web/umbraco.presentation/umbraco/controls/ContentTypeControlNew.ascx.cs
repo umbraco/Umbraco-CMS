@@ -76,10 +76,16 @@ namespace umbraco.controls
             LoadContentType();
 
             SetupInfoPane();
-            if (!HideStructure)
+
+            if (HideStructure)
+            {
+                pnlStructure.Visible = false;
+            }
+            else
             {
                 SetupStructurePane();
             }
+
             SetupGenericPropertiesPane();
             SetupTabPane();
 
