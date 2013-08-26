@@ -1,33 +1,59 @@
-<div class="umb-panel" ng-controller="Umbraco.Dialogs.MediaPickerController">
+<form ng-controller="Umbraco.Dialogs.MediaPickerController" id="fileupload" method="POST" enctype="multipart/form-data" 
+data-file-upload="options" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
+
+<div class="umb-panel">
 	<div class="umb-panel-header">
+
 		<div class="umb-el-wrap umb-panel-buttons">
-	        <div class="pull-right umb-btn-toolbar">
-	         	<button class="btn">Create <i class="icon-upload"></i></button> 
-	         	<button type="button" ng-click="submit(dialogData)" class="btn btn-primary">Select (x)</button>
+			<div class="span5">
+	                <div class="form-search">
+	                    <i class="icon-search"></i>
+	                    <input type="text" 
+	                           ng-model="searchTerm" 
+	                           class="umb-search-field search-query" 
+	                           placeholder="Filter..."
+	                           on-keyup="performSearch(searchTerm)">
+	                </div>
+	        </div>
+
+		    <div class="pull-right umb-btn-toolbar">
+				    	<span class="btn fileinput-button" ng-class="{disabled: disabled}">
+				    	    <i class="icon-upload"></i>
+				    	    <input type="file" name="files[]" multiple ng-disabled="disabled">
+				    	</span>
+
 	        </div>
 		</div>
 	</div>
 
 
-	<div class="umb-panel-body umb-scrollable" auto-scale="1">
-		<div class="umb-panel">
+	<div class="umb-panel-body umb-scrollable" auto-scale="70">
+		<div class="umb-pane">
 			<div class="umb-control-group">
+				
 				<ul class="breadcrumb">
 					<li><strong>You are here:</strong></li>
 					<li><a href="#">Media</a></li>
 				</ul>
-				<div id="search-form" ng-animate="'slide'">
-                        <form class="form-search" ng-controller="Umbraco.SearchController">
-                            <i class="icon-search"></i>
-                            <input type="text" 
-                                   ng-model="nav.ui.searchTerm" 
-                                   class="umb-search-field search-query" 
-                                   placeholder="{{localization.app.search.typeToSearch}}"
-                                   on-blur="deActivateSearch()" 
-                                   on-keyup="performSearch(nav.ui.searchTerm)">
-                        </form>
-                </div>
-				</ul>
+
+				<table class="table table-striped files ng-cloak">
+				            <tr data-ng-repeat="file in queue">
+				                <td>
+				                    <p class="name" data-ng-switch data-on="!!file.url">
+				                        <span data-ng-switch-when="true" data-ng-switch data-on="!!file.thumbnailUrl">
+				                            <a data-ng-switch-when="true" data-ng-href="{{file.url}}" title="{{file.name}}" download="{{file.name}}" data-gallery>{{file.name}}</a>
+				                            <a data-ng-switch-default data-ng-href="{{file.url}}" title="{{file.name}}" download="{{file.name}}">{{file.name}}</a>
+				                        </span>
+				                        <span data-ng-switch-default>{{file.name}}</span>
+				                    </p>
+				                    <div data-ng-show="file.error"><span class="label label-important">Error</span> {{file.error}}</div>
+				                </td>
+				                <td>
+				                    <p class="size">{{file.size | formatFileSize}}</p>
+				                    <div class="progress progress-striped active fade" data-ng-class="{pending: 'in'}[file.$state()]" data-file-upload-progress="file.$progress()"><div class="progress-bar progress-bar-success" data-ng-style="{width: num + '%'}"></div></div>
+				                </td>
+				            </tr>
+				        </table>
 
 			    <ul class="thumbnails">
 			        
@@ -48,7 +74,17 @@
 			    </ul>	
 			</div>
 		</div>
+	</div>
 
+
+	<div class="umb-panel-footer">
+		<div class="umb-el-wrap umb-panel-buttons">
+	        <div class="pull-right umb-btn-toolbar"> 
+	         	<button type="button" ng-click="submit(dialogData)" class="btn btn-primary">Select ({{selectedItems}})</button>
+	        </div>
+		</div>
 	</div>
 
 </div>
+
+</form>

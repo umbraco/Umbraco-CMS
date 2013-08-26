@@ -1,6 +1,7 @@
 /* Modals
 // -------------------------*/
 
+/* Modalcolumn is used for menu panels */
 .umb-modalcolumn {
 	background: #fff;
 	border-left: #f6f6f6 1px solid;
@@ -20,6 +21,7 @@
 	top: 13px;
 	right: 15px
 }
+
 .umb-modalcolumn .umb-modal-close-icon {
 	position: absolute;
 	top: 17px;
@@ -41,11 +43,11 @@
 }
 
 
+/* umb.dialog is used for the dialogs on the conent tree*/
 .umb-dialog {
 	padding: 20px 20px 0px 20px;
 	outline: none;
 }
-
 .umb-dialog .umb-btn-toolbar {
 	text-align: right;
 	padding-top: 15px;
@@ -53,10 +55,11 @@
 	clear: both;
 	border-top: #efefef 1px solid
 }
-
 .umb-dialog-body{
     overflow:auto;
 }
+
+/* modal and umb-modal are used for right.hand dialogs */
 
 .modal.fade.in{border: none !important; border-radius: none !important;}
 .umb-modal.fade {
@@ -98,43 +101,28 @@
 	display: block;
 }
 
+/*Modal default panel styles*/
+.umb-modal .umb-panel-header {
+  padding: 20px;
+  background: @white;
+  border: none;
+  height: auto; 
+}
+.umb-modal .umb-panel-body{
+	padding: 0px 20px 0px 20px;
+}
 
 .umb-modal.fade.in.wide {
     margin-left: -640px;
 	width: 640px !important;
 }
-
-/* MEDIA PICKER */
-.umb-modal .umb-btn-toolbar {
-	margin: 10px 0 0 0
-}
-
-.umb-modal .form-search {
-  position: relative;
-  padding: 0;
-}
-
-.umb-modal .form-search input {
-  padding: 4px 24px;
-  width: 350px
- }
-
-.umb-modal .form-search .icon-search {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  color: @grayLight;
-}
-
 .umb-modal i {
   font-size: 14px;
 } 
-
 .umb-modal .breadcrumb {
 	background: none;
 	padding: 0
 }
-
 .umb-modal .thumbnail {
 	padding: 0;
 	border:none;
@@ -185,7 +173,6 @@
 
 
 /* YSOD */
-
 /* These styles are an exact replica of a real .Net YSOD */
 .umb-modal .ysod {
     font-family:"Verdana";font-weight:normal;font-size: .7em;color:black;padding:5px;
