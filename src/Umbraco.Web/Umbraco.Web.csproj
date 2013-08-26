@@ -292,6 +292,7 @@
     <Compile Include="Configuration\WebRouting.cs" />
     <Compile Include="Editors\MediaController.cs" />
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
+    <Compile Include="Routing\ContentLastChanceFinderByNotFoundHandlers.cs" />
     <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
     <Compile Include="Security\Providers\UsersMembershipProvider.cs" />
     <Compile Include="Standalone\ServiceContextManager.cs" />
