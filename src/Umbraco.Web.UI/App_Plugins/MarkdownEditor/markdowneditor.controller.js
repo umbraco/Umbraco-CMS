@@ -17,22 +17,27 @@ function ($scope, assetsService, dialogService, $log, imageHelper) {
             "/app_plugins/markdowneditor/lib/markdown.editor.js"
         ])
 		.then(function () {
-         
+
 		    //this function will execute when all dependencies have loaded
 		    var converter2 = new Markdown.Converter();
 		    var editor2 = new Markdown.Editor(converter2, "-" + $scope.model.alias);
 		    editor2.run();
-          
+
 		    //subscribe to the image dialog clicks
 		    editor2.hooks.set("insertImageDialog", function (callback) {
+
+
 		        dialogService.mediaPicker({ callback: function (data) {
 		            $(data.selection).each(function (i, item) {
 		                var imagePropVal = imageHelper.getImagePropertyVaue({ imageModel: item, scope: $scope });
 		                callback(imagePropVal);
 		            });
+		        }
 		        });
+
 		        return true; // tell the editor that we'll take care of getting the image url
 		    });
+
 		});
 
     //load the seperat css for the editor to avoid it blocking our js loading TEMP HACK
