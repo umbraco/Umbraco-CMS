@@ -15,7 +15,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public int Id { get; set; }
 
         [DataMember(Name = "value")]
-        public string Value { get; set; }
+        public object Value { get; set; }
 
         [DataMember(Name = "alias", IsRequired = true)]
         [Required(AllowEmptyStrings = false)]

@@ -585,7 +585,6 @@
     <Compile Include="PropertyEditors\ValidatorBase.cs" />
     <Compile Include="PropertyEditors\ValidatorsResolver.cs" />
     <Compile Include="PropertyEditors\ValueEditor.cs" />
-    <Compile Include="PropertyEditors\ValueTypeValueValidator.cs" />
     <Compile Include="PropertyEditors\ValueValidatorAttribute.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />

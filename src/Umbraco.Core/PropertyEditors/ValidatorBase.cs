@@ -12,7 +12,7 @@ namespace Umbraco.Core.PropertyEditors
         /// Validates the object with the resolved ValueValidator found for this type
         /// </summary>
         /// <param name="value">
-        /// Depending on what is being validated, this value can be a json structure representing an editor's model, it could be a single
+        /// Depending on what is being validated, this value can be a json structure (JObject, JArray, etc...) representing an editor's model, it could be a single
         /// string representing an editor's model, this class structure is also used to validate pre-values and in that case this value
         /// could be a json structure or a single value representing a pre-value field.
         /// </param>
@@ -22,6 +22,6 @@ namespace Umbraco.Core.PropertyEditors
         /// </param>
         /// <param name="editor">The property editor instance that we are validating for</param>
         /// <returns></returns>
-        public abstract IEnumerable<ValidationResult> Validate(string value, string preValues, PropertyEditor editor);
+        public abstract IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor);
     }
 }

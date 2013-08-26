@@ -9,18 +9,24 @@ namespace Umbraco.Core.PropertyEditors
     [ValueValidator("Required")]
     internal sealed class RequiredValueValidator : ValueValidator
     {
-        public override IEnumerable<ValidationResult> Validate(string value, string config, string preValues, PropertyEditor editor)
+        public override IEnumerable<ValidationResult> Validate(object value, string config, string preValues, PropertyEditor editor)
         {
             //TODO: localize these!
 
             if (value == null)
             {
-                yield return new ValidationResult("Value cannot be null", new[] { "value" });
+                yield return new ValidationResult("Value cannot be null", new[] {"value"});
             }
-            if (value.IsNullOrWhiteSpace())
+            else
             {
-                yield return new ValidationResult("Value cannot be empty", new[] { "value" });
+                var asString = value.ToString();
+                if (asString.IsNullOrWhiteSpace())
+                {
+                    yield return new ValidationResult("Value cannot be empty", new[] { "value" });
+                }
             }
+
+            
         }
     }
 }

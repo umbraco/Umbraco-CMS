@@ -262,7 +262,6 @@ namespace Umbraco.Core
                 {
                     new Lazy<Type>(() => typeof (RequiredValueValidator)),
                     new Lazy<Type>(() => typeof (RegexValueValidator)),
-                    new Lazy<Type>(() => typeof (ValueTypeValueValidator)),
                     new Lazy<Type>(() => typeof (DelimitedValueValidator))
                 });
 

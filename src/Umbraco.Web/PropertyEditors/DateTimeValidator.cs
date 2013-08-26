@@ -11,10 +11,10 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     internal class DateTimeValidator : ValidatorBase
     {        
-        public override IEnumerable<ValidationResult> Validate(string value, string preValues, PropertyEditor editor)
+        public override IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
         {
             DateTime dt;
-            if (value.IsNullOrWhiteSpace() == false &&  DateTime.TryParse(value, out dt) == false)
+            if (value != null &&  DateTime.TryParse(value.ToString(), out dt) == false)
             {
                 yield return new ValidationResult(string.Format("The string value {0} cannot be parsed into a DateTime", value),
                                                   new[]

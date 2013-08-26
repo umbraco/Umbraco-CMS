@@ -54,17 +54,10 @@ namespace Umbraco.Web.PropertyEditors
 
             //check the editorValue value to see if we need to clear the files or not.
             var clear = false;
-            if (editorValue.Value.IsNullOrWhiteSpace() == false && editorValue.Value.StartsWith("{clearFiles:"))
+            var json = editorValue.Value as JObject;
+            if (json != null && json["clearFiles"] != null && json["clearFiles"].Value<bool>())
             {
-                try
-                {
-                    var parsed = JObject.Parse(editorValue.Value);
-                    clear = parsed["clearFiles"].Value<bool>();
-                }
-                catch (JsonReaderException)
-                {
-                    clear = false;
-                }
+                clear = json["clearFiles"].Value<bool>();
             }
 
             var currentPersistedValues = new string[] {};

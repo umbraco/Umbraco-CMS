@@ -13,31 +13,35 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
     internal class PostcodeValidator : ValidatorBase
     {
         
-        public override IEnumerable<ValidationResult> Validate(string value, string preValues, PropertyEditor editor)
+        public override IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
         {
-            var stringVal = value;
-
-            if (preValues.IsNullOrWhiteSpace()) yield break;
-            var asJson = JObject.Parse(preValues);
-            if (asJson["country"] == null) yield break;
-
-            if (asJson["country"].ToString() == "Australia")
+            if (value != null)
             {
-                if (Regex.IsMatch(stringVal, "^\\d{4}$") == false)
+                var stringVal = value.ToString();
+
+                if (preValues.IsNullOrWhiteSpace()) yield break;
+                var asJson = JObject.Parse(preValues);
+                if (asJson["country"] == null) yield break;
+
+                if (asJson["country"].ToString() == "Australia")
                 {
-                    yield return new ValidationResult("Australian postcodes must be a 4 digit number",
-                        new[]
+                    if (Regex.IsMatch(stringVal, "^\\d{4}$") == false)
+                    {
+                        yield return new ValidationResult("Australian postcodes must be a 4 digit number",
+                            new[]
                             {
                                 //we only store a single value for this editor so the 'member' or 'field' 
                                 // we'll associate this error with will simply be called 'value'
                                 "value" 
                             });
+                    }
+                }
+                else
+                {
+                    yield return new ValidationResult("Only Australian postcodes are supported for this validator");
                 }
             }
-            else
-            {
-                yield return new ValidationResult("Only Australian postcodes are supported for this validator");
-            }
+            
         }
     }
 }

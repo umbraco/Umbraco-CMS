@@ -40,14 +40,14 @@ namespace Umbraco.Web.PropertyEditors
         /// CUstom value editor so we can serialize with the correct date format (excluding time)
         /// and includes the date validator
         /// </summary>
-        private class DateValueEditor : ValueEditorWrapper
+        internal class DateValueEditor : ValueEditorWrapper
         {
             public DateValueEditor(ValueEditor wrapped) : base(wrapped)
             {
                 Validators = new List<ValidatorBase> { new DateTimeValidator() };
             }
 
-            public override string FormatDataForEditor(object dbValue)
+            public override object FormatDataForEditor(object dbValue)
             {
                 var date = dbValue.TryConvertTo<DateTime?>();
                 if (date.Success == false || date.Result == null)

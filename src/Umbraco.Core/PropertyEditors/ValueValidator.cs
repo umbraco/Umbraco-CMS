@@ -24,7 +24,10 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Performs the validation against the value
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="value">
+        /// Depending on what is being validated, this value can be a json structure (JObject, JArray, etc...) representing an editor's model, it could be a single
+        /// string representing an editor's model.
+        /// </param>
         /// <param name="config">
         /// An object that is used to configure the validator. An example could be a regex 
         /// expression if the validator was a regex validator. This is defined in the manifest along with
@@ -37,6 +40,6 @@ namespace Umbraco.Core.PropertyEditors
         /// the validation message applies to the entire property type being validated. If there is a field name applied to a 
         /// validation result we will try to match that field name up with a field name on the item itself.
         /// </returns>
-        public abstract IEnumerable<ValidationResult> Validate(string value, string config, string preValues, PropertyEditor editor);
+        public abstract IEnumerable<ValidationResult> Validate(object value, string config, string preValues, PropertyEditor editor);
     }
 }

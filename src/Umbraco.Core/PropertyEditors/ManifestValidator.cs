@@ -56,7 +56,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="preValues">The current pre-values stored for the data type</param>
         /// <param name="editor">The property editor instance that we are validating for</param>
         /// <returns></returns>
-        public override IEnumerable<ValidationResult> Validate(string value, string preValues, PropertyEditor editor)
+        public override IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
         {
             return ValidatorInstance.Validate(value, Config, preValues, editor);
         }

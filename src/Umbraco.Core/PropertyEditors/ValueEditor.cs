@@ -121,7 +121,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        internal Attempt<object> TryConvertValueToCrlType(string value)
+        internal Attempt<object> TryConvertValueToCrlType(object value)
         {
             Type valueType;
             //convert the string to a known type
@@ -174,12 +174,15 @@ namespace Umbraco.Core.PropertyEditors
         //TODO: Change the result to object so we can pass back JSON or json converted clr types if we want!
 
         /// <summary>
-        /// A method used to serialize the databse value to a string value which is then used to be sent
-        /// to the editor in JSON format.
+        /// A method used to format the databse value to a value that can be used by the editor
         /// </summary>
         /// <param name="dbValue"></param>
         /// <returns></returns>
-        public virtual string FormatDataForEditor(object dbValue)
+        /// <remarks>
+        /// The object returned will automatically be serialized into json notation. For most property editors
+        /// the value returned is probably just a string but in some cases a json structure will be returned.
+        /// </remarks>
+        public virtual object FormatDataForEditor(object dbValue)
         {
             if (dbValue == null) return string.Empty;
 
