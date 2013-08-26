@@ -31,6 +31,7 @@ angular.module("umbraco")
 
                                     var imagePropVal = imageHelper.getImagePropertyVaue({imageModel: img, scope: $scope});
                                     var data = {
+                                        style: 'width: 400px; height: 300px;',
                                         src: (imagePropVal != null && imagePropVal != "") ? imagePropVal: "nothing.jpg",
                                         id: '__mcenew'
                                     };
