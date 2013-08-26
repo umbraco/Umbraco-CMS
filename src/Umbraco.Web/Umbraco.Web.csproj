@@ -318,10 +318,14 @@
     <Compile Include="PropertyEditors\DatePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimeValidator.cs" />
+    <Compile Include="PropertyEditors\DropDownMultiplePreValueEditor.cs" />
+    <Compile Include="PropertyEditors\DropDownMultiplePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DropDownPreValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\DropDownValueEditor.cs" />
     <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
     <Compile Include="PropertyEditors\LabelValueEditor.cs" />
+    <Compile Include="PropertyEditors\ValueEditorWrapper.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
     <Compile Include="Trees\Menu\CreateChildEntity.cs" />

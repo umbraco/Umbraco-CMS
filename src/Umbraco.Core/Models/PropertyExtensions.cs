@@ -44,37 +44,19 @@ namespace Umbraco.Core.Models
             var propertyEditor = PropertyEditorResolver.Current.GetById(property.PropertyType.DataTypeId);
             if (propertyEditor != null)
             {
+                var cacheValue = propertyEditor.ValueEditor.FormatValueForCache(property);
+
                 switch (property.PropertyType.DataTypeDatabaseType)
                 {                    
-                    case DataTypeDatabaseType.Nvarchar:          
-                        xmlNode.AppendChild(xd.CreateTextNode(property.Value.ToXmlString<string>()));
-                        break;
+                    case DataTypeDatabaseType.Nvarchar:
+                    case DataTypeDatabaseType.Date:
                     case DataTypeDatabaseType.Integer:
-                        xmlNode.AppendChild(xd.CreateTextNode(property.Value.ToXmlString(property.Value.GetType())));    
+                        xmlNode.AppendChild(xd.CreateTextNode(cacheValue.ToString()));    
                         break;
                     case DataTypeDatabaseType.Ntext:
                         //put text in cdata
-                        xmlNode.AppendChild(xd.CreateCDataSection(property.Value.ToXmlString<string>()));
-                        break;
-                    case DataTypeDatabaseType.Date:
-                        //treat dates differently, output the format as xml format
-                        if (property.Value == null)
-                        {
-                            xmlNode.AppendChild(xd.CreateTextNode(string.Empty));
-                        }
-                        else
-                        {
-                            var date = property.Value.TryConvertTo<DateTime?>();
-                            if (date.Success == false || date.Result == null)
-                            {
-                                xmlNode.AppendChild(xd.CreateTextNode(string.Empty));
-                            }
-                            else
-                            {
-                                xmlNode.AppendChild(xd.CreateTextNode(date.Result.ToXmlString<DateTime>()));
-                            }                                                       
-                        }                        
-                        break;
+                        xmlNode.AppendChild(xd.CreateCDataSection(cacheValue.ToString()));
+                        break;                    
                     default:
                         throw new ArgumentOutOfRangeException();
                 }

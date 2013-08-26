@@ -16,9 +16,9 @@ namespace Umbraco.Core.Models
     /// </remarks>
     public class PreValueCollection
     {
-        private IDictionary<string, string> _preValuesAsDictionary;
-        private IEnumerable<string> _preValuesAsArray;
-        public IEnumerable<string> PreValuesAsArray
+        private IDictionary<string, PreValue> _preValuesAsDictionary;
+        private IEnumerable<PreValue> _preValuesAsArray;
+        public IEnumerable<PreValue> PreValuesAsArray
         {
             get
             {
@@ -31,7 +31,7 @@ namespace Umbraco.Core.Models
             set { _preValuesAsArray = value; }
         }
 
-        public IDictionary<string, string> PreValuesAsDictionary
+        public IDictionary<string, PreValue> PreValuesAsDictionary
         {
             get
             {
@@ -52,25 +52,25 @@ namespace Umbraco.Core.Models
             get { return _preValuesAsDictionary != null; }
         }
 
-        public PreValueCollection(IEnumerable<string> preVals)
+        public PreValueCollection(IEnumerable<PreValue> preVals)
         {
             _preValuesAsArray = preVals;
         }
 
-        public PreValueCollection(IDictionary<string, string> preVals)
+        public PreValueCollection(IDictionary<string, PreValue> preVals)
         {
             _preValuesAsDictionary = preVals;
         }
 
-        internal static IDictionary<string, string> AsDictionary(PreValueCollection persistedPreVals)
+        internal static IDictionary<string, PreValue> AsDictionary(PreValueCollection persistedPreVals)
         {
             if (persistedPreVals.IsDictionaryBased)
             {
                 return persistedPreVals.PreValuesAsDictionary;
             }
 
-            //it's an array so need to format it 
-            var result = new Dictionary<string, string>();
+            //it's an array so need to format it, the alias will just be an iteration
+            var result = new Dictionary<string, PreValue>();
             var asArray = persistedPreVals.PreValuesAsArray.ToArray();
             for (var i = 0; i < asArray.Length; i++)
             {

@@ -143,7 +143,7 @@ namespace Umbraco.Core.Services
             using (var uow = _uowProvider.GetUnitOfWork())
             {
                 var dtos = uow.Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = id });
-                var list = dtos.Select(x => new Tuple<int, string, int, string>(x.Id, x.Alias, x.SortOrder, x.Value)).ToList();
+                var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value), x.Alias, x.SortOrder)).ToList();
 
                 return PreValueConverter.ConvertToPreValuesCollection(list);
             }
@@ -262,7 +262,7 @@ namespace Umbraco.Core.Services
         /// <remarks>
         /// We will actually just remove all pre-values and re-insert them in one transaction
         /// </remarks>
-        internal void SavePreValues(int id, PreValueCollection values)
+        internal void SavePreValues(int id, IDictionary<string, string> values)
         {
             //TODO: Should we raise an event here since we are really saving values for the data type?
 
@@ -275,12 +275,12 @@ namespace Umbraco.Core.Services
                         uow.Database.Execute("DELETE FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = id });
 
                         var sortOrder = 1;
-                        foreach (var value in PreValueCollection.AsDictionary(values))
+                        foreach (var value in values)
                         {
                             var dto = new DataTypePreValueDto
                                 {
                                     DataTypeNodeId = id, 
-                                    Value = (string)value.Value,
+                                    Value = value.Value,
                                     SortOrder = sortOrder,
                                     Alias = value.Key
                                 };
@@ -300,7 +300,7 @@ namespace Umbraco.Core.Services
         /// <param name="dataTypeDefinition"></param>
         /// <param name="values"></param>
         /// <param name="userId"></param>
-        internal void SaveDataTypeAndPreValues(IDataTypeDefinition dataTypeDefinition, PreValueCollection values, int userId = 0)
+        internal void SaveDataTypeAndPreValues(IDataTypeDefinition dataTypeDefinition, IDictionary<string, string> values, int userId = 0)
         {
             if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this))
                 return;
@@ -320,12 +320,12 @@ namespace Umbraco.Core.Services
                             database.Execute("DELETE FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = dataTypeDefinition.Id });
 
                             var sortOrder = 1;
-                            foreach (var value in PreValueCollection.AsDictionary(values))
+                            foreach (var value in values)
                             {
                                 var dto = new DataTypePreValueDto
                                 {
                                     DataTypeNodeId = dataTypeDefinition.Id,
-                                    Value = (string)value.Value,
+                                    Value = value.Value,
                                     SortOrder = sortOrder,
                                     Alias = value.Key
                                 };
@@ -440,29 +440,29 @@ namespace Umbraco.Core.Services
             /// </summary>
             /// <param name="list"></param>
             /// <returns></returns>
-            internal static PreValueCollection ConvertToPreValuesCollection(IEnumerable<Tuple<int, string, int, string>> list)
+            internal static PreValueCollection ConvertToPreValuesCollection(IEnumerable<Tuple<PreValue, string, int>> list)
             {
                 //now we need to determine if they are dictionary based, otherwise they have to be array based
-                var dictionary = new Dictionary<string, string>();
+                var dictionary = new Dictionary<string, PreValue>();
 
                 //need to check all of the keys, if there's only one and it is empty then it's an array
                 var keys = list.Select(x => x.Item2).Distinct().ToArray();
                 if (keys.Length == 1 && keys[0].IsNullOrWhiteSpace())
                 {
-                    return new PreValueCollection(list.OrderBy(x => x.Item3).Select(x => x.Item4));
+                    return new PreValueCollection(list.OrderBy(x => x.Item3).Select(x => x.Item1));
                 }
 
                 foreach (var item in list
                     .OrderBy(x => x.Item3) //we'll order them first so we maintain the order index in the dictionary
-                    .GroupBy(x => x.Item2))
+                    .GroupBy(x => x.Item2)) //group by alias
                 {
                     if (item.Count() > 1)
                     {
                         //if there's more than 1 item per key, then it cannot be a dictionary, just return the array
-                        return new PreValueCollection(list.OrderBy(x => x.Item3).Select(x => x.Item4));
+                        return new PreValueCollection(list.OrderBy(x => x.Item3).Select(x => x.Item1));
                     }
 
-                    dictionary.Add(item.Key, item.First().Item4);
+                    dictionary.Add(item.Key, item.First().Item1);
                 }
 
                 return new PreValueCollection(dictionary);

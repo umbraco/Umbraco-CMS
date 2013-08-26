@@ -24,13 +24,13 @@ angular.module('umbraco.mocks').
                           {
                               label: "Custom pre value 1 for editor " + selectedId,
                               description: "Enter a value for this pre-value",
-                              key: "myPreVal",
+                              key: "myPreVal1",
                               view: "requiredfield"                              
                           },
                             {
                                 label: "Custom pre value 2 for editor " + selectedId,
                                 description: "Enter a value for this pre-value",
-                                key: "myPreVal",
+                                key: "myPreVal2",
                                 view: "requiredfield"                                
                             }
                     ]

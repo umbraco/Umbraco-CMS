@@ -11,12 +11,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override ValueEditor CreateValueEditor()
         {
-            var baseEditor = base.CreateValueEditor();
-
-            return new LabelValueEditor
-            {
-                View = baseEditor.View
-            };
+            return new LabelValueEditor(base.CreateValueEditor());
         }
 
     }

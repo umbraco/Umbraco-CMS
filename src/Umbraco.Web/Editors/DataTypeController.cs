@@ -118,11 +118,8 @@ namespace Umbraco.Web.Editors
                 preValDictionary,
                 currVal);
 
-            //create the pre-value collection to be saved
-            var preVals = new PreValueCollection(formattedVal.ToDictionary(x => x.Key, x => x.Value));
-            
             //save the data type
-            dtService.SaveDataTypeAndPreValues(dataType.PersistedDataType, preVals, (int)Security.CurrentUser.Id);
+            dtService.SaveDataTypeAndPreValues(dataType.PersistedDataType, formattedVal, (int)Security.CurrentUser.Id);
 
             var display = Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dataType.PersistedDataType);
             display.AddSuccessNotification(ui.Text("speechBubbles", "dataTypeSaved"), "");

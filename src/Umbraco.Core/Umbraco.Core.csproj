@@ -225,6 +225,7 @@
     <Compile Include="Models\Mapping\MapperConfiguration.cs" />
     <Compile Include="Models\Membership\EntityPermission.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipUser.cs" />
+    <Compile Include="Models\PreValue.cs" />
     <Compile Include="Models\PreValueCollection.cs" />
     <Compile Include="Models\ServerRegistration.cs" />
     <Compile Include="Models\ITemplate.cs" />
