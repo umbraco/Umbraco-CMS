@@ -27,7 +27,14 @@ yepnope({
     'lib/angular/1.2/angular-mocks.js',
     */
 
+    /* temporary sorter lib, should be updated */
     'lib/angular/angular-ui-sortable.js',
+
+    /* App-wide file-upload helper */
+    'lib/jquery/jquery.upload/js/jquery.fileupload.js',
+    'lib/jquery/jquery.upload/js/jquery.fileupload-process.js',
+    'lib/jquery/jquery.upload/js/jquery.fileupload-angular.js',
+
 
     'lib/bootstrap/js/bootstrap.js',
     'lib/underscore/underscore.js',
