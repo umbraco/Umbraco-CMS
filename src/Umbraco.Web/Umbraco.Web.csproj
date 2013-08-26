@@ -319,8 +319,11 @@
     <Compile Include="PropertyEditors\DateTimePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimeValidator.cs" />
     <Compile Include="PropertyEditors\DropDownMultiplePropertyEditor.cs" />
+    <Compile Include="PropertyEditors\DropDownMultipleValueEditor.cs" />
+    <Compile Include="PropertyEditors\DropDownMultipleWithKeysPropertyEditor.cs" />
     <Compile Include="PropertyEditors\DropDownPreValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\DropDownValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownWithKeysPropertyEditor.cs" />
     <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
     <Compile Include="PropertyEditors\LabelValueEditor.cs" />

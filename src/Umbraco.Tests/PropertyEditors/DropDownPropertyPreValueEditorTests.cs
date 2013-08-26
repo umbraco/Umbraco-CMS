@@ -1,15 +1,79 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
+using Rhino.Mocks;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.PropertyEditors
 {
     [TestFixture]
-    public class DropDownPropertyPreValueEditorTests
+    public class DropDownPropertyEditorTests
     {
+        //TODO: Test the other formatting methods for the drop down classes
+
         [Test]
-        public void Format_Data_For_Editor()
+        public void DropDownMultipleValueEditor_With_Keys_Format_Data_For_Cache()
+        {
+            var dataTypeService = MockRepository.GenerateStub<IDataTypeService>();
+            var editor = new DropDownMultipleValueEditor(true, dataTypeService, new ValueEditor());
+
+            var result = editor.FormatValueForCache(
+                new Property(1, Guid.NewGuid(),
+                             new PropertyType(new DataTypeDefinition(1, Guid.NewGuid())),
+                             "1234,4567,8910"));
+
+            Assert.AreEqual("1234,4567,8910", result);
+        }
+
+        [Test]
+        public void DropDownMultipleValueEditor_No_Keys_Format_Data_For_Cache()
+        {
+            var dataTypeService = MockRepository.GenerateStub<IDataTypeService>();
+            dataTypeService
+                .Stub(x => x.GetPreValuesCollectionByDataTypeId(Arg<int>.Is.Anything))
+                           .Return(new PreValueCollection(new Dictionary<string, PreValue>
+                               {
+                                   {"key0", new PreValue(4567, "Value 1")},
+                                   {"key1", new PreValue(1234, "Value 2")},
+                                   {"key2", new PreValue(8910, "Value 3")}
+                               }));
+            var editor = new DropDownMultipleValueEditor(false, dataTypeService, new ValueEditor());
+
+            var result = editor.FormatValueForCache(
+                new Property(1, Guid.NewGuid(),
+                             new PropertyType(new DataTypeDefinition(1, Guid.NewGuid())),
+                             "1234,4567,8910"));
+
+            Assert.AreEqual("Value 1,Value 2,Value 3", result);
+        }
+
+        [Test]
+        public void DropDownValueEditor_Format_Data_For_Cache()
+        {
+            var dataTypeService = MockRepository.GenerateStub<IDataTypeService>();
+            dataTypeService
+                .Stub(x => x.GetPreValuesCollectionByDataTypeId(Arg<int>.Is.Anything))
+                           .Return(new PreValueCollection(new Dictionary<string, PreValue>
+                               {
+                                   {"key0", new PreValue(10, "Value 1")},
+                                   {"key1", new PreValue(1234, "Value 2")},
+                                   {"key2", new PreValue(11, "Value 3")}
+                               }));
+            var editor = new DropDownValueEditor(dataTypeService, new ValueEditor());
+
+            var result = editor.FormatValueForCache(
+                new Property(1, Guid.NewGuid(),
+                             new PropertyType(new DataTypeDefinition(1, Guid.NewGuid())),
+                             "1234"));
+
+            Assert.AreEqual("Value 2", result);
+        }
+
+        [Test]
+        public void DropDownPreValueEditor_Format_Data_For_Editor()
         {
 
             var defaultVals = new Dictionary<string, object>();

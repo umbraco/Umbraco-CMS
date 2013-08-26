@@ -138,7 +138,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        internal PreValueCollection GetPreValuesCollectionByDataTypeId(int id)
+        public PreValueCollection GetPreValuesCollectionByDataTypeId(int id)
         {
             using (var uow = _uowProvider.GetUnitOfWork())
             {

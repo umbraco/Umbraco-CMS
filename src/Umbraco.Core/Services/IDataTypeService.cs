@@ -84,6 +84,13 @@ namespace Umbraco.Core.Services
         IEnumerable<string> GetPreValuesByDataTypeId(int id);
 
         /// <summary>
+        /// Gets a pre-value collection by data type id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        PreValueCollection GetPreValuesCollectionByDataTypeId(int id);
+
+        /// <summary>
         /// Saves a list of PreValues for a given DataTypeDefinition
         /// </summary>
         /// <param name="id">Id of the DataTypeDefinition to save PreValues for</param>

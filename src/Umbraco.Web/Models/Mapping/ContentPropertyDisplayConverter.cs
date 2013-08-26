@@ -29,7 +29,7 @@ namespace Umbraco.Web.Models.Mapping
             display.Description = originalProp.PropertyType.Description;
             display.Label = originalProp.PropertyType.Name;
 
-            var dataTypeService = (DataTypeService)_dataTypeService.Value;
+            var dataTypeService = _dataTypeService.Value;
 
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(originalProp.PropertyType.DataTypeDefinitionId);
            
