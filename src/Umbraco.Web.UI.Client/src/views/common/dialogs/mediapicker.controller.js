@@ -13,7 +13,7 @@ angular.module("umbraco")
                 $scope.submitFiles();
             });    
 
-            /*
+            
             mediaResource.rootMedia()
                 .then(function(data) {
                     $scope.images = data;
@@ -22,7 +22,7 @@ angular.module("umbraco")
                         img.thumbnail = imageHelper.getThumbnail({ imageModel: img, scope: $scope });
                     });
                 });
-            */
+            
 
             $scope.selectMediaItem = function(image) {
                 if (image.contentTypeAlias.toLowerCase() == 'folder') {
