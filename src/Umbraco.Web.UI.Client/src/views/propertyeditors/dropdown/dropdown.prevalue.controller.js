@@ -22,12 +22,6 @@ angular.module("umbraco").controller("Umbraco.Editors.DropdownPreValueController
                 return i === item;
             });
             
-            //setup the dictionary from array
-            $scope.model.value = {};
-            for (var i = 0; i < $scope.model.value.length; i++) {
-                //just make the key the iteration
-                $scope.model.value[i] = $scope.model.value[i];
-            }
         };
 
         $scope.add = function (evt) {

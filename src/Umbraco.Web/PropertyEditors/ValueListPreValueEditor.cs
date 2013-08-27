@@ -91,6 +91,12 @@ namespace Umbraco.Web.PropertyEditors
                 var index = 0;
                 foreach (var item in val)
                 {
+                    var asString = item.ToString();
+                    //don't allow empties
+                    if (asString.IsNullOrWhiteSpace())
+                    {
+                        continue;
+                    }
                     result.Add(index.ToInvariantString(), item.ToString());
                     index++;
                 }

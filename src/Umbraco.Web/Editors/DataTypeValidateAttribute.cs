@@ -88,7 +88,7 @@ namespace Umbraco.Web.Editors
 
                 foreach (var v in propertyEditor.PreValueEditor.Fields.SelectMany(x => x.Validators))
                 {
-                    foreach (var result in v.Validate(postedValue != null ? postedValue.ToString() : null, preVal.Key, propertyEditor))
+                    foreach (var result in v.Validate(postedValue, preVal.Key, propertyEditor))
                     {
                         //if there are no member names supplied then we assume that the validation message is for the overall property
                         // not a sub field on the property editor

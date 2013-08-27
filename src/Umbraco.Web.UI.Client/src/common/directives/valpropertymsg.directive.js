@@ -99,12 +99,20 @@ function valPropertyMsg(serverValidationManager) {
             // the form. Of course normal client-side validators will continue to execute.          
             scope.$watch("property.value", function (newValue) {
                 //we are explicitly checking for valServer errors here, since we shouldn't auto clear
-                // based on other errors.
-                if (formCtrl.$invalid && scope.formCtrl.$error.valServer !== undefined) {
+                // based on other errors. We'll also check if there's no other validation errors apart from valPropertyMsg, if valPropertyMsg
+                // is the only one, then we'll clear.
+
+                var errCount = 0;
+                for (var e in scope.formCtrl.$error) {
+                    errCount++;
+                }
+
+                if ((errCount === 1 && scope.formCtrl.$error.valPropertyMsg !== undefined) ||
+                    (formCtrl.$invalid && scope.formCtrl.$error.valServer !== undefined)) {
                     scope.errorMsg = "";
                     formCtrl.$setValidity('valPropertyMsg', true);
                 }
-            });
+            }, true);
             
             //listen for server validation changes
             // NOTE: we pass in "" in order to listen for all validation changes to the content property, not for

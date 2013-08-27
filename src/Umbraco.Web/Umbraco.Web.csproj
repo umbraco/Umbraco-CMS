@@ -316,6 +316,7 @@
     <Compile Include="Models\Mapping\PreValueDisplayResolver.cs" />
     <Compile Include="Models\PagedResult.cs" />
     <Compile Include="PropertyEditors\CheckBoxListPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\ColorPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\DatePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimeValidator.cs" />
