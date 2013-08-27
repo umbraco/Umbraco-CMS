@@ -8,7 +8,7 @@ namespace umbraco.editorControls.imagecropper
 
         public override XmlNode ToXMl(XmlDocument data)
         {
-            if (Value.ToString() != "") {
+            if (Value!=null && Value.ToString() != "") {
                 XmlDocument xd = new XmlDocument();
                 xd.LoadXml(Value.ToString());
                 return data.ImportNode(xd.DocumentElement, true);
