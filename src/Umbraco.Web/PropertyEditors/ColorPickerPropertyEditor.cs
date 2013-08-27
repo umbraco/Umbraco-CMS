@@ -30,6 +30,8 @@ namespace Umbraco.Web.PropertyEditors
         public ColorListPreValueEditor()
         {
             Fields = CreatePreValueFields();
+            //use a custom editor too
+            Fields.First().View = "views/propertyeditors/colorpicker/colorpicker.prevalues.html";
             //change the description
             Fields.First().Description = "Add and remove colors in HEX format without a prefixed '#'";
             //need to have some custom validation happening here

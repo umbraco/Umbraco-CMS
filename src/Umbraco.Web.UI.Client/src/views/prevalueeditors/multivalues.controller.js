@@ -30,8 +30,9 @@ angular.module("umbraco").controller("Umbraco.Editors.MultiValuesController",
             
             evt.preventDefault();
             
-            if (!_.contains($scope.model.value, $scope.newItem)) {
-                if ($scope.newItem) {
+            
+            if ($scope.newItem) {
+                if (!_.contains($scope.model.value, $scope.newItem)) {                
                     $scope.model.value.push({ value: $scope.newItem });
                     $scope.newItem = "";
                     $scope.hasError = false;
