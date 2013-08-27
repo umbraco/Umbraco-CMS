@@ -28,7 +28,7 @@ angular.module("umbraco.directives")
 
       setTimeout(function () {
         el.height(window.height() - (el.offset().top + totalOffset));
-      }, 300);
+      }, 500);
 
       window.bind("resize", function () {
         el.height(window.height() - (el.offset().top + totalOffset));

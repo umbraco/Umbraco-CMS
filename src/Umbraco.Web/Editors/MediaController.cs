@@ -207,6 +207,37 @@ namespace Umbraco.Web.Editors
             }
         }
 
+        //shorthand to use with the media dialog
+        public MediaItemDisplay PostAddFolder(MediaFolderSave folder)
+        {
+            var mediaService = base.ApplicationContext.Services.MediaService;
+            var f = mediaService.CreateMedia(folder.Name, folder.ParentId, "Folder");
+            mediaService.Save(f);
+
+            return Mapper.Map<IMedia, MediaItemDisplay>(f);
+        }
+
+        //short hand to use with the uploader in the media dialog
+        public HttpResponseMessage PostAddFile()
+        {
+            var context = UmbracoContext.HttpContext;
+            if(context.Request.Files.Count > 0){
+                var parentId = int.Parse(context.Request.Form[0]);
+                var file = context.Request.Files[0];
+                var name = file.FileName;
+
+                var mediaService = base.ApplicationContext.Services.MediaService;
+                var f = mediaService.CreateMedia(name, parentId, "Image");
+                f.SetValue("umbracoFile", file); 
+                mediaService.Save(f);
+
+                return new HttpResponseMessage( HttpStatusCode.OK);
+            }
+
+            return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+        }
+       
+
         /// <summary>
         /// Performs a permissions check for the user to check if it has access to the node based on 
         /// start node and/or permissions for the node

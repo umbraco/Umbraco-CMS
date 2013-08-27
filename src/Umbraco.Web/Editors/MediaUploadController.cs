@@ -149,6 +149,9 @@ namespace Umbraco.Web.Editors
             // Upload entire file
             private void UploadWholeFile(HttpContext context, List<FilesStatus> statuses)
             {
+                var folderId = context.Request.Form["currentFolder"];
+
+            
                 for (int i = 0; i < context.Request.Files.Count; i++)
                 {
                     var file = context.Request.Files[i];

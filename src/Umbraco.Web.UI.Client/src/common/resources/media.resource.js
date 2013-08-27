@@ -108,6 +108,18 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
         /** saves or updates a media object */
         save: function (media, isNew, files) {
             return saveMediaItem(media, "save" + (isNew ? "New" : ""), files);
+        },
+
+        //** shorthand for creating a new folder under a given parent **/
+        addFolder: function(name, parentId){
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper
+                    .getApiUrl("mediaApiBaseUrl", "PostAddFolder"),
+                    {
+                        name: name,
+                        parentId: parentId
+                    }),
+                'Failed to add folder');
         }
     };
 }

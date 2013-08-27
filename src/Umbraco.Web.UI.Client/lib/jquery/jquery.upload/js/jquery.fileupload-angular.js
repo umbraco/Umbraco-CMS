@@ -324,7 +324,7 @@
             }
         ])
 
-        // Provide File Upload progress feedback:
+        /* Provide File Upload progress feedback:
         .controller('FileUploadProgressController', [
             '$scope', '$attrs', '$parse',
             function ($scope, $attrs, $parse) {
@@ -360,14 +360,14 @@
                     $element.append(file.preview);
                 }
             }
-        ])
+        ])*/
 
         .directive('fileUpload', function () {
             return {
                 controller: 'FileUploadController'
             };
         })
-
+/*
         .directive('fileUploadProgress', function () {
             return {
                 controller: 'FileUploadProgressController'
@@ -378,7 +378,7 @@
             return {
                 controller: 'FileUploadPreviewController'
             };
-        })
+        })*/
 
         // Enhance the HTML5 download attribute to
         // allow drag&drop of files to the desktop:

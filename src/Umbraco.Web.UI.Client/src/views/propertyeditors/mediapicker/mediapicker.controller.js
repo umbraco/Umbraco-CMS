@@ -3,7 +3,7 @@
 angular.module('umbraco').controller("Umbraco.Editors.MediaPickerController", 
 	function($rootScope, $scope, dialogService, $log){
 	// 
-	$( "#draggable" ).draggable();
+	//$( "#draggable" ).draggable();
  	
     $scope.openMediaPicker =function(value){
             var d = dialogService.mediaPicker({scope: $scope, callback: populate});

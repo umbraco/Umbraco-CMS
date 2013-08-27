@@ -11,6 +11,21 @@
     * the entity only contains the basic node data, name, id and guid, whereas content
     * nodes fetched through the entity service also contains additional meta data such
     * as icon, document type, path and so on.
+    *
+    * ##Entity object types?
+    * As an optional parameter, you can pass in the specific type name. So if you know you
+    * are looking for a specific type, you should pass in the object name, to make lookup faster
+    * and to return more data.
+    * 
+    * The core object types are:
+    *
+    * - Document
+    * - Media
+    * - Member
+    * - Template
+    * - DocumentType
+    * - MediaType
+    * - MemberType
     **/
 function entityResource($q, $http, umbRequestHelper) {
 
@@ -32,19 +47,27 @@ function entityResource($q, $http, umbRequestHelper) {
          *        var myDoc = ent; 
          *        alert('its here!');
          *    });
+         *
+         * //Only return users
+         * entityResource.getEntityById(0, "User")
+         *    .then(function(ent) {
+         *        var myDoc = ent; 
+         *        alert('its here!');
+         *    });
          * </pre> 
          * 
-         * @param {Int} id id of entity to return        
+         * @param {Int} id id of entity to return
+         * @param {string} type optional Object type name        
          * @returns {Promise} resourcePromise object containing the entity.
          *
          */
-        getEntityById: function (id) {            
+        getById: function (id, type) {            
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
-                       "GetEntityById",
-                       [{ id: id }])),
+                       "GetById",
+                       [{ id: id, type: type }])),
                'Failed to retreive entity data for id ' + id);
         },
         
@@ -63,13 +86,21 @@ function entityResource($q, $http, umbRequestHelper) {
          *        var myDoc = contentArray; 
          *        alert('they are here!');
          *    });
+         * 
+         * //Only return templates
+         * entityResource.getEntitiesByIds( [1234,2526,28262], "Template")
+         *    .then(function(templateArray) {
+         *        var myDoc = contentArray; 
+         *        alert('they are here!');
+         *    });
          * </pre> 
          * 
-         * @param {Array} ids ids of entities to return as an array        
+         * @param {Array} ids ids of entities to return as an array
+         * @param {string} type optional type name        
          * @returns {Promise} resourcePromise object containing the entity array.
          *
          */
-        getEntitiesByIds: function (ids) {
+        getByIds: function (ids) {
             
             var idQuery = "";
             _.each(ids, function(item) {
@@ -80,10 +111,89 @@ function entityResource($q, $http, umbRequestHelper) {
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
-                       "GetEntitiesByIds",
+                       "GetByIds",
                        idQuery)),
                'Failed to retreive entity data for ids ' + idQuery);
         },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.entityResource#getEntityById
+         * @methodOf umbraco.resources.entityResource
+         *
+         * @description
+         * Gets an entity with a given id
+         *
+         * ##usage
+         * <pre>
+         * //returns all entities, you should NEVER do that
+         * entityResource.getAll()
+         *    .then(function(ent) {
+         *        var myDoc = ent; 
+         *        alert('its here!');
+         *    });
+         *
+         * //Only return users
+         * entityResource.getAll("User")
+         *    .then(function(ent) {
+         *        var myDoc = ent; 
+         *        alert('its here!');
+         *    });
+         * </pre> 
+         * 
+         * @param {string} type Object type name        
+         * @returns {Promise} resourcePromise object containing the entity.
+         *
+         */
+        getAll: function (type) {            
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "entityApiBaseUrl",
+                       "GetAll",
+                       [{type: type }])),
+               'Failed to retreive entity data for id ' + id);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.entityResource#getEntityById
+         * @methodOf umbraco.resources.entityResource
+         *
+         * @description
+         * Gets an entity with a given id
+         *
+         * ##usage
+         * <pre>
+         * //returns all entities, you should NEVER do that
+         * entityResource.getAll()
+         *    .then(function(ent) {
+         *        var myDoc = ent; 
+         *        alert('its here!');
+         *    });
+         *
+         * //Only return users
+         * entityResource.getAll("User")
+         *    .then(function(ent) {
+         *        var myDoc = ent; 
+         *        alert('its here!');
+         *    });
+         * </pre> 
+         * 
+         * @param {string} type Object type name        
+         * @returns {Promise} resourcePromise object containing the entity.
+         *
+         */
+        getAncestors: function (id) {            
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "entityApiBaseUrl",
+                       "GetAncestors",
+                       [{id: id}])),
+               'Failed to retreive entity data for id ' + id);
+        },
+
 
         /**
          * @ngdoc method

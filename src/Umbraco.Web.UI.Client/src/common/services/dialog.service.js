@@ -173,8 +173,11 @@ angular.module('umbraco.services')
                        };
 
                        scope.select = function(item) {
-                           if (scope.dialogData.selection.indexOf(item) < 0) {
+                          var i = scope.dialogData.selection.indexOf(item);
+                           if (i < 0) {
                                scope.dialogData.selection.push(item);
+                           }else{
+                              scope.dialogData.selection.splice(i, 1);
                            }
                        };
 

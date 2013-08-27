@@ -1,5 +1,5 @@
 <form ng-controller="Umbraco.Dialogs.MediaPickerController" id="fileupload" method="POST" enctype="multipart/form-data" 
-data-file-upload="options" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
+data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
 
 <div class="umb-panel">
 	<div class="umb-panel-header">
@@ -17,9 +17,6 @@ data-file-upload="options" data-ng-class="{'fileupload-processing': processing()
 	        </div>
 
 		    <div class="pull-right umb-btn-toolbar">
-
-		    		{{progress | json}}
-
 				    	<span class="btn fileinput-button" ng-class="{disabled: disabled}">
 				    	    <i class="icon-upload"></i>
 				    	    <input type="file" name="files[]" multiple ng-disabled="disabled">
@@ -29,65 +26,56 @@ data-file-upload="options" data-ng-class="{'fileupload-processing': processing()
 		</div>
 	</div>
 
-
 	<div class="umb-panel-body umb-scrollable" auto-scale="70">
-		<div class="umb-pane">
-			<div class="umb-control-group">
+
+		<div class="control-group umb-control-group">
+			<ul class="breadcrumb">
+				<li><a href ng-click="gotoFolder(-1)" prevent-default>Media</a> /</li>
 				
-				<ul class="breadcrumb">
-					<li><strong>You are here:</strong></li>
-					<li><a href ng-click="gotoFolder(-1)" prevent-default>Media</a></li>
-					
-					
-				</ul>
+				<li ng-repeat="item in path">
+					<a href ng-click="gotoFolder(item.id)" prevent-default>{{item.name}}</a>/
+				</li>
+				
 
-				{{queue | json}}
+				<li>
+					<a href ng-hide="showFolderInput" ng-click="showFolderInput = true">
+						<i class="icon icon-expand-alt"></i>
+					</a>
 
-				<table class="table table-striped files ng-cloak">
-				            <tr data-ng-repeat="file in queue">
-				                <td>
-				                    <p class="name" data-ng-switch data-on="!!file.url">
-				                        <span data-ng-switch-when="true" data-ng-switch data-on="!!file.thumbnailUrl">
-				                            <a data-ng-switch-when="true" data-ng-href="{{file.url}}" title="{{file.name}}" download="{{file.name}}" data-gallery>{{file.name}}</a>
-				                            <a data-ng-switch-default data-ng-href="{{file.url}}" title="{{file.name}}" download="{{file.name}}">{{file.name}}</a>
-				                        </span>
-				                        <span data-ng-switch-default>{{file.name}}</span>
-				                    </p>
-				                    <div data-ng-show="file.error"><span class="label label-important">Error</span> {{file.error}}</div>
-				                </td>
-				                <td>
-				                    <p class="size">{{file.size | formatFileSize}}</p>
-				                    <div class="progress progress-striped active fade" data-ng-class="{pending: 'in'}[file.$state()]" data-file-upload-progress="file.$progress()"><div class="progress-bar progress-bar-success" data-ng-style="{width: num + '%'}"></div></div>
-				                </td>
-				            </tr>
-				        </table>
-
-			    <ul class="thumbnails">
-			        
-			        <li class="span2 folder" ng-repeat="image in images">
-							
-			            <a href="#" class="thumbnail" ng-class="{selected: dialogData.selection.indexOf(image) > -1}" 
-			               ng-click="selectMediaItem(image)" 
-			               prevent-default>
-							
-                            <div ng-switch on="image.contentTypeAlias" >
-                                <img ng-src="{{image.thumbnail}}" ng-switch-when="Image" alt="{{image.name}}"/>
-                                <i ng-switch-default class="icon-folder-close"></i>
-                            </div>       
-
-			                {{image.name}}
-			            </a>
-			        </li>
-			    </ul>	
-			</div>
+					<input type="text" 
+						class="input-foldername input-mini inline" 
+						ng-show="showFolderInput" 
+						ng-model="newFolderName"
+						ng-keyup="submitFolder($event)"
+						ng-blur="showFolderInput = false"
+						>
+				</li>
+			</ul>
 		</div>
+		
+        <div style="height: 10px; margin: 10px 0px 10px 0px" class="umb-loader" ng-hide="active() == 0"></div>
+
+        <ul class="thumbnails">
+	        <li class="span2 folder" ng-repeat="image in images | orderBy:'contentTypeAlias'">
+			    <a href="#" class="thumbnail" ng-class="{selected: dialogData.selection.indexOf(image) > -1}" 
+	               ng-click="selectMediaItem(image)" 
+	               prevent-default>
+					
+                    <div ng-switch on="image.contentTypeAlias" >
+                        <img ng-src="{{image.thumbnail}}" ng-switch-when="Image" alt="{{image.name}}"/>
+                        <i ng-switch-default class="icon-folder-close"></i>
+                    </div>       
+	                {{image.name}}
+	            </a>
+	        </li>
+	    </ul>
 	</div>
 
 
 	<div class="umb-panel-footer">
 		<div class="umb-el-wrap umb-panel-buttons">
 	        <div class="pull-right umb-btn-toolbar"> 
-	         	<button type="button" ng-click="submit(dialogData)" class="btn btn-primary">Select ({{selectedItems}})</button>
+	         	<button ng-show="dialogData.selection.length > 0" type="button" ng-click="submit(dialogData)" class="btn btn-primary">Select ({{dialogData.selection.length}})</button>
 	        </div>
 		</div>
 	</div>
