@@ -307,7 +307,6 @@
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\DataTypeSave.cs" />
     <Compile Include="Models\ContentEditing\EntityBasic.cs" />
-    <Compile Include="Models\ContentEditing\MediaFolderSave.cs" />
     <Compile Include="Models\ContentEditing\PreValueFieldDisplay.cs" />
     <Compile Include="Models\ContentEditing\PreValueFieldSave.cs" />
     <Compile Include="Models\ContentEditing\PropertyEditorBasic.cs" />

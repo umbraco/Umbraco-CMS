@@ -20,11 +20,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "createDate")]
         public DateTime CreateDate { get; set; }
-
-        [DataMember(Name = "parentId", IsRequired = true)]
-        [Required]
-        public int ParentId { get; set; }
-
+        
         [DataMember(Name = "owner")]
         public UserBasic Owner { get; set; }
 

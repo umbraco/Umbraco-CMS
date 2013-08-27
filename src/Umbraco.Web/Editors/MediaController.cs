@@ -208,33 +208,33 @@ namespace Umbraco.Web.Editors
         }
 
         //shorthand to use with the media dialog
-        public MediaItemDisplay PostAddFolder(MediaFolderSave folder)
+        public MediaItemDisplay PostAddFolder(EntityBasic folder)
         {
-            var mediaService = base.ApplicationContext.Services.MediaService;
-            var f = mediaService.CreateMedia(folder.Name, folder.ParentId, "Folder");
+            var mediaService = ApplicationContext.Services.MediaService;
+            var f = mediaService.CreateMedia(folder.Name, folder.ParentId, Constants.Conventions.MediaTypes.Folder);
             mediaService.Save(f);
 
             return Mapper.Map<IMedia, MediaItemDisplay>(f);
         }
 
         //short hand to use with the uploader in the media dialog
-        public HttpResponseMessage PostAddFile()
+        public HttpResponseMessage PostAddFile(int parentId)
         {
             var context = UmbracoContext.HttpContext;
-            if(context.Request.Files.Count > 0){
-                var parentId = int.Parse(context.Request.Form[0]);
-                var file = context.Request.Files[0];
-                var name = file.FileName;
+            if(context.Request.Files.Count > 0)
+            {
+                var postedFile = context.Request.Files[0];
+                var name = postedFile.FileName;
 
                 var mediaService = base.ApplicationContext.Services.MediaService;
-                var f = mediaService.CreateMedia(name, parentId, "Image");
-                f.SetValue("umbracoFile", file); 
+                var f = mediaService.CreateMedia(name, parentId, Constants.Conventions.MediaTypes.Image);
+                f.SetValue(Constants.Conventions.Media.File, postedFile);
                 mediaService.Save(f);
 
-                return new HttpResponseMessage( HttpStatusCode.OK);
+                return new HttpResponseMessage(HttpStatusCode.OK);
             }
 
-            return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+            return new HttpResponseMessage(HttpStatusCode.NotFound);
         }
        
 
