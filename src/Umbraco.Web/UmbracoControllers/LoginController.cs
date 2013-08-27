@@ -11,6 +11,7 @@ namespace Umbraco.Web.UmbracoControllers
         [HttpPost]
         public ActionResult HandleLogin([Bind(Prefix="loginModel")]LoginModel model)
         {
+            // TODO: Use new Member API
             if (ModelState.IsValid)
             {
                 var m = Member.GetMemberFromLoginNameAndPassword(model.Username, model.Password);
