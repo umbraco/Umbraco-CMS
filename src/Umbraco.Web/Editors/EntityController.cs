@@ -49,17 +49,54 @@ namespace Umbraco.Web.Editors
 
 
 
-        public EntityBasic GetEntityById(int id)
-        {
-            return Mapper.Map<EntityBasic>(Services.EntityService.Get(id));
-        }
 
-        public IEnumerable<EntityBasic> GetEntitiesByIds([FromUri]int[] ids)
+
+        public EntityBasic GetById(int id, string type = null)
+        {
+            if(string.IsNullOrEmpty(type))
+                return Mapper.Map<EntityBasic>(Services.EntityService.Get(id));
+
+            return getEntityById(id, (UmbracoObjectTypes)Enum.Parse(typeof(UmbracoObjectTypes), type));
+        }
+        public IEnumerable<EntityBasic> GetByIds([FromUri]int[] ids, string type = null)
         {
             if (ids == null) throw new ArgumentNullException("ids");
+
+            if (string.IsNullOrEmpty(type))
             return ids.Select(id =>
                               Mapper.Map<EntityBasic>(Services.EntityService.Get(id)));
+
+            return getEntitiesById(ids, (UmbracoObjectTypes)Enum.Parse(typeof(UmbracoObjectTypes), type));
         }
+        public IEnumerable<EntityBasic> GetChildren(int id, string type = null)
+        {
+            if (id == null) throw new ArgumentNullException("id");
+
+            if (string.IsNullOrEmpty(type))
+                return Services.EntityService.GetChildren(id).Select(x => Mapper.Map<EntityBasic>(x));
+
+            return getChildren(id, (UmbracoObjectTypes)Enum.Parse(typeof(UmbracoObjectTypes), type));
+        }
+        public IEnumerable<EntityBasic> GetAncestors(int id, string type = null)
+        {
+            if (id == null) throw new ArgumentNullException("id");
+
+            var ids = Services.EntityService.Get(id).Path.Split(',').Select(x => int.Parse(x));
+            
+
+            if (string.IsNullOrEmpty(type))
+                return ids.Select(m =>
+                              Mapper.Map<EntityBasic>(Services.EntityService.Get(m)));
+
+            return getEntitiesById(ids.ToArray(), (UmbracoObjectTypes)Enum.Parse(typeof(UmbracoObjectTypes),type) );
+        }
+        public IEnumerable<EntityBasic> GetAll(string type = "Document")
+        {
+            return Services.EntityService.GetAll((UmbracoObjectTypes)Enum.Parse(typeof(UmbracoObjectTypes), type)).Select(x =>
+                              Mapper.Map<EntityBasic>(x));
+        }
+
+
 
         private EntityBasic getEntityById(int id, UmbracoObjectTypes type)
         {
