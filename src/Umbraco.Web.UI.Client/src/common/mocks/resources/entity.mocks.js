@@ -27,7 +27,7 @@ angular.module('umbraco.mocks').
 
           $(ids).each(function(i, id){
             var _id = parseInt(id, 10);
-            nodes.push(mocksUtils.getMockEntity(_id)); 
+            nodes.push(mocksUtils.getMockEntity(_id));
           });
           
           return [200, nodes, null];
@@ -37,12 +37,20 @@ angular.module('umbraco.mocks').
       return {
           register: function () {
               $httpBackend
-                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetByIds'))
+                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetEntitiesByIds'))
                   .respond(returnEntitybyIds);
 
               $httpBackend
-                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetById?'))
+                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetEntityById?'))
                   .respond(returnEntitybyId);
+
+              $httpBackend
+                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetDocumentsByIds'))
+                  .respond(returnEntitybyIds);
+
+              $httpBackend
+                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetDocumentById?'))
+                  .respond(returnEntitybyId);   
           }
       };
   }]);
