@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 
@@ -22,17 +23,22 @@ namespace Umbraco.Core.PropertyEditors
         {
             ValueType = "string";
             //set a default for validators
-            Validators = Enumerable.Empty<ValidatorBase>();
+            Validators = new List<ValidatorBase>();
         }
 
         /// <summary>
         /// Creates a new editor with the specified view
         /// </summary>
         /// <param name="view"></param>
-        public ValueEditor(string view)
+        /// <param name="validators">Allows adding custom validators during construction instead of specifying them later</param>
+        public ValueEditor(string view, params ValidatorBase[] validators)
             : this()
         {
             View = view;
+            foreach (var v in validators)
+            {
+                Validators.Add(v);
+            }
         }
 
         /// <summary>
@@ -53,8 +59,8 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// A collection of validators for the pre value editor
         /// </summary>
-        [JsonProperty("validation")]
-        public IEnumerable<ValidatorBase> Validators { get; set; }
+        [JsonProperty("validation", ItemConverterType = typeof(ManifestValidatorConverter))]
+        public List<ValidatorBase> Validators { get; private set; }
 
         /// <summary>
         /// Returns the validator used for the required field validation which is specified on the PropertyType

@@ -44,7 +44,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             public DateValueEditor(ValueEditor wrapped) : base(wrapped)
             {
-                Validators = new List<ValidatorBase> { new DateTimeValidator() };
+                Validators.Add(new DateTimeValidator());
             }
 
             public override object FormatDataForEditor(object dbValue)

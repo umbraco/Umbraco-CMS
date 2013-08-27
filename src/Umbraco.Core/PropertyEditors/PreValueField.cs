@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using Umbraco.Core.Manifest;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -8,6 +9,9 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public class PreValueField
     {
+        /// <summary>
+        /// Standard constructor
+        /// </summary>
         public PreValueField()
         {
             Validators = new List<ValidatorBase>();
@@ -21,6 +25,19 @@ namespace Umbraco.Core.PropertyEditors
                 HideLabel = att.HideLabel;
                 Key = att.Key;
                 View = att.View;
+            }
+        }
+
+        /// <summary>
+        /// Constructor used to set validators instead of adding them later
+        /// </summary>
+        /// <param name="validators"></param>
+        public PreValueField(params ValidatorBase[] validators)
+            : this()
+        {
+            foreach (var v in validators)
+            {
+                Validators.Add(v);
             }
         }
 
@@ -60,7 +77,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// A collection of validators for the pre value field
         /// </summary>
-        [JsonProperty("validation")]
-        public IEnumerable<ValidatorBase> Validators { get; set; }
+        [JsonProperty("validation", ItemConverterType = typeof(ManifestValidatorConverter))]
+        public List<ValidatorBase> Validators { get; private set; }
     }
 }

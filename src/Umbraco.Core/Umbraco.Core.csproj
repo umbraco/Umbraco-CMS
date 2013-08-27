@@ -184,7 +184,9 @@
     <Compile Include="IO\UmbracoMediaFile.cs" />
     <Compile Include="Manifest\ManifestBuilder.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
+    <Compile Include="Manifest\ManifestValidatorConverter.cs" />
     <Compile Include="Manifest\PackageManifest.cs" />
+    <Compile Include="Manifest\PreValueFieldConverter.cs" />
     <Compile Include="Manifest\PropertyEditorConverter.cs" />
     <Compile Include="Media\MediaSubfolderCounter.cs" />
     <Compile Include="ModelMapperHelper.cs" />

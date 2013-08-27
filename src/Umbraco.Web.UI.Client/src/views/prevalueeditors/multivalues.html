@@ -1,0 +1,13 @@
+<div ng-controller="Umbraco.Editors.MultiValuesController">
+    <div class="control-group">
+        <input name="newItem" type="text" ng-model="newItem" val-highlight="hasError" />
+        <button class="btn btn-small" ng-click="add($event)">Add</button>
+    </div>
+    <div class="control-group" ng-repeat="item in model.value">
+        <input type="text" ng-model="item.value" val-server="item_{{$index}}" required />
+        <button class="btn btn-small btn-danger" ng-click="remove(item, $event)">Remove</button>
+    </div>
+    
+    {{model.value | json}}
+
+</div>

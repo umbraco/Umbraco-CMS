@@ -22,10 +22,10 @@ namespace Umbraco.Core.Serialization
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             // Load JObject from stream
-            JObject jObject = JObject.Load(reader);
+            var jObject = JObject.Load(reader);
 
             // Create target object based on JObject
-            T target = Create(objectType, jObject);
+            var target = Create(objectType, jObject);
 
             Deserialize(jObject, target, serializer);
 

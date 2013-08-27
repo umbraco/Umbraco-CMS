@@ -12,7 +12,10 @@ namespace Umbraco.Web.PropertyEditors
         {
             this.View = wrapped.View;
             this.ValueType = wrapped.ValueType;
-            this.Validators = wrapped.Validators;         
+            foreach (var v in wrapped.Validators)
+            {
+                Validators.Add(v);
+            }
         }
     }
 }

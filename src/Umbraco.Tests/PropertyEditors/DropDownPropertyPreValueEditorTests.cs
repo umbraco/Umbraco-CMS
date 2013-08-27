@@ -9,8 +9,12 @@ using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.PropertyEditors
 {
+    /// <summary>
+    /// Tests for the base classes of ValueEditors and PreValueEditors that are used for Property Editors that edit
+    /// multiple values such as the drop down list, check box list, color picker, etc....
+    /// </summary>
     [TestFixture]
-    public class DropDownPropertyEditorTests
+    public class MultiValuePropertyEditorTests
     {
         //TODO: Test the other formatting methods for the drop down classes
 
@@ -96,5 +100,6 @@ namespace Umbraco.Tests.PropertyEditors
             Assert.AreEqual("Item 2", items[2]);
             Assert.AreEqual("Item 3", items[3]);
         }
+
     }
 }

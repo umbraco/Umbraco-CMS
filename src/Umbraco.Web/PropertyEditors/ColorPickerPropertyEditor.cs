@@ -29,16 +29,11 @@ namespace Umbraco.Web.PropertyEditors
     {
         public ColorListPreValueEditor()
         {
-            var fields = CreatePreValueFields();
+            Fields = CreatePreValueFields();
             //change the description
-            fields.First().Description = "Add and remove colors in HEX format without a prefixed '#'";
+            Fields.First().Description = "Add and remove colors in HEX format without a prefixed '#'";
             //need to have some custom validation happening here
-            fields.First().Validators = new List<ValidatorBase>
-                {
-                    new ColorListValidator()
-                };
-
-            Fields = fields;
+            Fields.First().Validators.Add(new ColorListValidator());
         }
 
         internal class ColorListValidator : ValidatorBase
@@ -46,25 +41,26 @@ namespace Umbraco.Web.PropertyEditors
             public override IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
             {
                 var json = value as JArray;
-                if (json != null)
+                if (json == null) yield break;
+                
+                //validate each item which is a json object
+                for (var index = 0; index < json.Count; index++)
                 {
-                    //validate each item
-                    foreach (var i in json)
+                    var i = json[index];
+                    var jItem = i as JObject;
+                    if (jItem == null || jItem["value"] == null) continue;
+
+                    //NOTE: we will be removing empty values when persisting so no need to validate
+                    var asString = jItem["value"].ToString();
+                    if (asString.IsNullOrWhiteSpace()) continue;
+
+                    if (Regex.IsMatch(asString, "^([0-9a-f]{3}|[0-9a-f]{6})$", RegexOptions.IgnoreCase) == false)
                     {
-                        //NOTE: we will be removing empty values when persisting so no need to validate
-                        var asString = i.ToString();
-                        if (asString.IsNullOrWhiteSpace() == false)
-                        {
-                            if (Regex.IsMatch(asString, "^([0-9a-f]{3}|[0-9a-f]{6})$", RegexOptions.IgnoreCase) == false)
+                        yield return new ValidationResult("The value " + asString + " is not a valid hex color", new[]
                             {
-                                yield return new ValidationResult("The value " + asString + " is not a valid hex color", new[]
-                                    {
-                                        //we'll make the server field name the value of the hex color so we can wire it back up to the
-                                        //individual row in the UI.
-                                        asString
-                                    });
-                            }
-                        }
+                                //we'll make the server field the index number of the value so it can be wired up to the view
+                                "item_" + index.ToInvariantString()
+                            });
                     }
                 }
             }

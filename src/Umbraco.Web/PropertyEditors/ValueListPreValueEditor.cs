@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
@@ -33,7 +35,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             return new List<PreValueField>
                 {
-                    new PreValueField
+                    new PreValueField(new EnsureUniqueValuesValidator())
                         {
                             Description = "Add and remove values for the list",
                             //we're going to call this 'items' because we are going to override the 
@@ -44,7 +46,7 @@ namespace Umbraco.Web.PropertyEditors
                             // config options to come in with a property called 'items'
                             Key = "items",
                             Name = ui.Text("editdatatype", "addPrevalue"),
-                            View = "Views/PropertyEditors/dropdown/dropdown.prevalue.html"
+                            View = "multivalues"
                         }                   
                 };
         } 
@@ -89,15 +91,14 @@ namespace Umbraco.Web.PropertyEditors
             try
             {
                 var index = 0;
-                foreach (var item in val)
+
+                //get all values in the array that are not empty 
+                foreach (var asString in val.OfType<JObject>()
+                    .Where(jItem => jItem["value"] != null)
+                    .Select(jItem => jItem["value"].ToString())
+                    .Where(asString => asString.IsNullOrWhiteSpace() == false))
                 {
-                    var asString = item.ToString();
-                    //don't allow empties
-                    if (asString.IsNullOrWhiteSpace())
-                    {
-                        continue;
-                    }
-                    result.Add(index.ToInvariantString(), item.ToString());
+                    result.Add(index.ToInvariantString(), asString);
                     index++;
                 }
             }
@@ -107,6 +108,36 @@ namespace Umbraco.Web.PropertyEditors
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// A custom validator to ensure that all values in the list are unique
+        /// </summary>
+        internal class EnsureUniqueValuesValidator : ValidatorBase
+        {
+            public override IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
+            {
+                var json = value as JArray;
+                if (json == null) yield break;
+
+                //get all values in the array that are not empty (we'll remove empty values when persisting anyways)
+                var groupedValues = json.OfType<JObject>()
+                                        .Where(jItem => jItem["value"] != null)
+                                        .Select((jItem, index) => new {value = jItem["value"].ToString(), index = index})
+                                        .Where(asString => asString.value.IsNullOrWhiteSpace() == false)
+                                        .GroupBy(x => x.value);
+                
+                foreach (var g in groupedValues.Where(g => g.Count() > 1))
+                {
+                    yield return new ValidationResult("The value " + g.Last().value + " must be unique", new[]
+                        {
+                            //we'll make the server field the index number of the value so it can be wired up to the view
+                            "item_" + g.Last().index.ToInvariantString()
+                        });
+                }
+
+
+            }
         }
     }
 }

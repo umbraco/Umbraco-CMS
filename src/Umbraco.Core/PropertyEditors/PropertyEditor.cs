@@ -7,6 +7,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
 {
+
     /// <summary>
     /// Basic definition of a property editor
     /// </summary>

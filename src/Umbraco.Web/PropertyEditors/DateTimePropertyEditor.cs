@@ -31,7 +31,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             var editor = base.CreateValueEditor();
 
-            editor.Validators = new List<ValidatorBase> { new DateTimeValidator() };
+            editor.Validators.Add(new DateTimeValidator());
 
             return editor;
         }

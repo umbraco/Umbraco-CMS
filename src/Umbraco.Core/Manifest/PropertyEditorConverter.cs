@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.PropertyEditors;
@@ -7,7 +8,6 @@ using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.Manifest
 {
-
     /// <summary>
     /// Used to convert a property editor manifest to a property editor object
     /// </summary>
@@ -23,8 +23,7 @@ namespace Umbraco.Core.Manifest
             if (jObject["editor"] != null)
             {
                 //we need to specify the view value for the editor here otherwise we'll get an exception
-                target.StaticallyDefinedValueEditor.View = jObject["editor"]["view"].ToString();
-                target.StaticallyDefinedValueEditor.Validators = new List<ManifestValidator>();
+                target.StaticallyDefinedValueEditor.View = jObject["editor"]["view"].ToString();                
             }
 
             if (jObject["preValueEditor"] != null)
@@ -32,23 +31,6 @@ namespace Umbraco.Core.Manifest
                target.StaticallyDefinedPreValueEditor.Fields = new List<PreValueField>();
             }
 
-            base.Deserialize(jObject, target, serializer);
-        }
-    }
-
-    internal class PreValueFieldConverter : JsonCreationConverter<PreValueField>
-    {
-        protected override PreValueField Create(Type objectType, JObject jObject)
-        {
-            return new PreValueField()
-                {
-                    //assign manifest validators so the serialization process can continue
-                    Validators = new List<ManifestValidator>()
-                };
-        }
-
-        protected override void Deserialize(JObject jObject, PreValueField target, JsonSerializer serializer)
-        {            
             base.Deserialize(jObject, target, serializer);
         }
     }

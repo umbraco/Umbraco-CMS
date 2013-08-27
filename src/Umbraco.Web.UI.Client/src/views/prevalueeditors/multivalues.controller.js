@@ -1,6 +1,8 @@
-angular.module("umbraco").controller("Umbraco.Editors.DropdownPreValueController",
+angular.module("umbraco").controller("Umbraco.Editors.MultiValuesController",
     function ($scope, $timeout) {
        
+        //NOTE: We need to make each item an object, not just a string because you cannot 2-way bind to a primitive.
+
         $scope.newItem = "";
         $scope.hasError = false;
        
@@ -8,7 +10,7 @@ angular.module("umbraco").controller("Umbraco.Editors.DropdownPreValueController
             //make an array from the dictionary
             var items = [];
             for (var i in $scope.model.value) {
-                items.push($scope.model.value[i]);
+                items.push({value: $scope.model.value[i]});
             }
             //now make the editor model the array
             $scope.model.value = items;
@@ -18,8 +20,8 @@ angular.module("umbraco").controller("Umbraco.Editors.DropdownPreValueController
 
             evt.preventDefault();
 
-            $scope.model.value = _.reject($scope.model.value, function (i) {
-                return i === item;
+            $scope.model.value = _.reject($scope.model.value, function (x) {
+                return x.value === item.value;
             });
             
         };
@@ -30,7 +32,7 @@ angular.module("umbraco").controller("Umbraco.Editors.DropdownPreValueController
             
             if (!_.contains($scope.model.value, $scope.newItem)) {
                 if ($scope.newItem) {
-                    $scope.model.value.push($scope.newItem);
+                    $scope.model.value.push({ value: $scope.newItem });
                     $scope.newItem = "";
                     $scope.hasError = false;
                     return;
