@@ -90,6 +90,57 @@
 				public const string Image = "Image";
 			}
 
+		    /// <summary>
+		    /// Constants for Umbraco Member property aliases.
+		    /// </summary>
+		    public static class Member
+		    {
+                /// <summary>
+                /// Property alias for a Members Password Question
+                /// </summary>
+                public const string PasswordQuestion = "umbracoPasswordRetrievalQuestionPropertyTypeAlias";
+
+                /// <summary>
+                /// Property alias for Members Password Answer
+                /// </summary>
+                public const string PasswordAnswer = "umbracoPasswordRetrievalAnswerPropertyTypeAlias";
+
+                /// <summary>
+                /// Property alias for the Comments on a Member
+                /// </summary>
+                public const string Comments = "umbracoCommentPropertyTypeAlias";
+
+                /// <summary>
+                /// Property alias for the Approved boolean of a Member
+                /// </summary>
+                public const string IsApproved = "umbracoApprovePropertyTypeAlias";
+
+                /// <summary>
+                /// Property alias for the Locked out boolean of a Member
+                /// </summary>
+                public const string IsLockedOut = "umbracoLockPropertyTypeAlias";
+
+                /// <summary>
+                /// Property alias for the last date the Member logged in
+                /// </summary>
+                public const string LastLoginDate = "umbracoLastLoginPropertyTypeAlias";
+
+                /// <summary>
+                /// Property alias for the last date a Member changed its password
+                /// </summary>
+                public const string LastPasswordChangeDate = "umbracoMemberLastPasswordChange";
+
+                /// <summary>
+                /// Property alias for the last date a Member was locked out
+                /// </summary>
+                public const string LastLockoutDate = "umbracoMemberLastLockout";
+
+                /// <summary>
+                /// Property alias for the number of failed login attemps
+                /// </summary>
+		        public const string FailedPasswordAttempts = "umbracoFailedPasswordAttemptsPropertyTypeAlias";
+		    }
+
 			/// <summary>
 			/// Constants for Umbraco URLs/Querystrings.
 			/// </summary>
