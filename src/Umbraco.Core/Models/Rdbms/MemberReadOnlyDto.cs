@@ -43,6 +43,10 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("createDate")]
         public DateTime CreateDate { get; set; }
 
+        /* cmsContent */
+        [Column("contentType")]
+        public int ContentTypeId { get; set; }
+
         /* from cmsContentType joined with cmsContent */
         [Column("ContentTypeAlias")]
         public string ContentTypeAlias { get; set; }

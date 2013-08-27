@@ -12,9 +12,6 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("id")]
         public int Id { get; set; }
 
-        [Column("contentNodeId")]
-        public int NodeId { get; set; }
-
         [Column("VersionId")]
         public Guid? VersionId { get; set; }
 
@@ -61,5 +58,37 @@ namespace Umbraco.Core.Models.Rdbms
         /* cmsDataType */
         [Column("controlId")]
         public Guid ControlId { get; set; }
+
+        [Column("dbType")]
+        public string DbType { get; set; }
+
+        [Ignore]
+        public object GetValue
+        {
+            get
+            {
+                if (Integer.HasValue)
+                {
+                    return Integer.Value;
+                }
+
+                if (Date.HasValue)
+                {
+                    return Date.Value;
+                }
+
+                if (string.IsNullOrEmpty(VarChar) == false)
+                {
+                    return VarChar;
+                }
+
+                if (string.IsNullOrEmpty(Text) == false)
+                {
+                    return Text;
+                }
+
+                return null;
+            }
+        }
     }
 }
