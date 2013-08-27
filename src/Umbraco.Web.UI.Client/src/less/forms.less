@@ -391,19 +391,23 @@ input[type="checkbox"][readonly] {
 // --------------------------
 
 // Warning
-.show-validation .control-group.warning {
+.show-validation .control-group.warning,
+.show-validation .umb-headline-editor-wrapper.warning {
   .formFieldState(@formWarningText, @formWarningText, @formWarningBackground);
 }
 // Error
-.show-validation .control-group.error {
+.show-validation .control-group.error,
+.show-validation .umb-headline-editor-wrapper.error {
   .formFieldState(@formErrorText, @formErrorText, @formErrorBackground);
 }
 // Success
-.show-validation .control-group.success {
+.show-validation .control-group.success,
+.show-validation .umb-headline-editor-wrapper.success {
   .formFieldState(@formSuccessText, @formSuccessText, @formSuccessBackground);
 }
 // Success
-.show-validation .control-group.info {
+.show-validation .control-group.info
+.show-validation .umb-headline-editor-wrapper.info {
   .formFieldState(@formInfoText, @formInfoText, @formInfoBackground);
 }
 
