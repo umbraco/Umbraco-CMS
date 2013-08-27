@@ -23,6 +23,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /* The following methods might be relevant for this specific repository (in an optimized form)
          * GetById - get a member by its integer Id
          * GetByKey - get a member by its unique guid Id (which should correspond to a membership provider user's id)
+         * GetByUsername - get a member by its username
          * GetByPropertyValue - get members with a certain property value (supply both property alias and value?)
          * GetByMemberTypeAlias - get all members of a certain type
          * GetByMemberGroup - get all members in a specific group
@@ -65,14 +66,14 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //TODO Count
             var sql = new Sql();
-            sql.Select("umbracoNode.*", "cmsContentType.alias AS ContentTypeAlias", "cmsContentVersion.VersionId",
+            sql.Select("umbracoNode.*", "cmsContent.contentType", "cmsContentType.alias AS ContentTypeAlias", "cmsContentVersion.VersionId",
                 "cmsContentVersion.VersionDate", "cmsContentVersion.LanguageLocale", "cmsMember.Email",
                 "cmsMember.LoginName", "cmsMember.Password", "cmsPropertyData.id", "cmsPropertyData.dataDate",
                 "cmsPropertyData.dataInt", "cmsPropertyData.dataNtext", "cmsPropertyData.dataNvarchar",
                 "cmsPropertyData.propertytypeid", "cmsPropertyType.Alias", "cmsPropertyType.Description",
                 "cmsPropertyType.Name", "cmsPropertyType.mandatory", "cmsPropertyType.validationRegExp",
                 "cmsPropertyType.helpText", "cmsPropertyType.propertyTypeGroupId", "cmsPropertyType.dataTypeId",
-                "cmsDataType.controlId")
+                "cmsDataType.controlId", "cmsDataType.dbType")
                 .From<NodeDto>()
                 .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                 .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)

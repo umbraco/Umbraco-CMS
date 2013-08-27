@@ -200,6 +200,7 @@
     <Compile Include="Models\IDictionaryTranslation.cs" />
     <Compile Include="Models\IFile.cs" />
     <Compile Include="Models\ILanguage.cs" />
+    <Compile Include="Models\Membership\UmbracoMember.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipUser.cs" />
     <Compile Include="Models\Rdbms\MemberReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\PropertyDataReadOnlyDto.cs" />
@@ -247,6 +248,7 @@
     <Compile Include="Persistence\Caching\IRepositoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\NullCacheProvider.cs" />
     <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
+    <Compile Include="Persistence\Factories\MemberReadOnlyFactory.cs" />
     <Compile Include="Persistence\Factories\ServerRegistrationFactory.cs" />
     <Compile Include="Persistence\Factories\UmbracoEntityFactory.cs" />
     <Compile Include="Persistence\FaultHandling\ITransientErrorDetectionStrategy.cs" />
