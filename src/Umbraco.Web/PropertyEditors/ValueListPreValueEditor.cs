@@ -11,10 +11,16 @@ using umbraco;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    internal class DropDownPreValueEditor : PreValueEditor
+    /// <summary>
+    /// Pre-value editor used to create a list of items
+    /// </summary>
+    /// <remarks>
+    /// This pre-value editor is shared with editors like drop down, checkbox list, etc....
+    /// </remarks>
+    internal class ValueListPreValueEditor : PreValueEditor
     {
 
-        public DropDownPreValueEditor()
+        public ValueListPreValueEditor()
         {
             Fields = CreatePreValueFields();
         }
@@ -29,7 +35,7 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     new PreValueField
                         {
-                            Description = "Add and remove values for the drop down list",
+                            Description = "Add and remove values for the list",
                             //we're going to call this 'items' because we are going to override the 
                             //serialization of the pre-values to ensure that each one gets saved with it's own key 
                             //(new db row per pre-value, thus to maintain backwards compatibility)
@@ -91,7 +97,7 @@ namespace Umbraco.Web.PropertyEditors
             }
             catch (Exception ex)
             {
-                LogHelper.Error<DropDownPreValueEditor>("Could not deserialize the posted value: " + val, ex);                
+                LogHelper.Error<ValueListPreValueEditor>("Could not deserialize the posted value: " + val, ex);                
             }
 
             return result;

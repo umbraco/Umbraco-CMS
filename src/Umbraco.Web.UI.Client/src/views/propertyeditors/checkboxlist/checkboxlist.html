@@ -1,0 +1,14 @@
+﻿<div ng-controller="Umbraco.Editors.CheckboxListController">
+
+    <ul class="unstyled">
+        <li ng-repeat="item in selectedItems">
+            <label class="checkbox">
+                <input type="checkbox" name="checkboxlist"
+                       value="{{item.key}}"
+                       ng-model="item.checked" />
+                {{item.val}}
+            </label>
+        </li>
+    </ul>
+
+</div>

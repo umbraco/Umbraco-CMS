@@ -21,7 +21,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns></returns>
         protected override PreValueEditor CreatePreValueEditor()
         {
-            return new DropDownPreValueEditor();
+            return new ValueListPreValueEditor();
         }
     }
 }

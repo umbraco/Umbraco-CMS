@@ -47,12 +47,12 @@ namespace Umbraco.Core.Models
                 var cacheValue = propertyEditor.ValueEditor.FormatValueForCache(property);
 
                 switch (property.PropertyType.DataTypeDatabaseType)
-                {                    
-                    case DataTypeDatabaseType.Nvarchar:
+                {                                        
                     case DataTypeDatabaseType.Date:
                     case DataTypeDatabaseType.Integer:
                         xmlNode.AppendChild(xd.CreateTextNode(cacheValue.ToString()));    
                         break;
+                    case DataTypeDatabaseType.Nvarchar:
                     case DataTypeDatabaseType.Ntext:
                         //put text in cdata
                         xmlNode.AppendChild(xd.CreateCDataSection(cacheValue.ToString()));

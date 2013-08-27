@@ -17,7 +17,7 @@ namespace Umbraco.Web.PropertyEditors
     {
         protected override ValueEditor CreateValueEditor()
         {
-            return new DropDownMultipleValueEditor(true, base.CreateValueEditor());
+            return new PublishValuesMultipleValueEditor(true, base.CreateValueEditor());
         }
 
         protected override PreValueEditor CreatePreValueEditor()
@@ -32,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <remarks>
         /// This is mostly to maintain backwards compatibility with old property editors. Devs can now simply use the Drop down property editor and check the multiple pre-value checkbox
         /// </remarks>
-        internal class DropDownMultiplePreValueEditor : DropDownPreValueEditor
+        internal class DropDownMultiplePreValueEditor : ValueListPreValueEditor
         {
             public DropDownMultiplePreValueEditor()
             {

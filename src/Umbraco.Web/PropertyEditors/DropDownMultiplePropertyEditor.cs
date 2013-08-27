@@ -17,7 +17,7 @@ namespace Umbraco.Web.PropertyEditors
     {
         protected override ValueEditor CreateValueEditor()
         {
-            return new DropDownMultipleValueEditor(false, base.CreateValueEditor());
+            return new PublishValuesMultipleValueEditor(false, base.CreateValueEditor());
         }
 
     }

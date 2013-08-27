@@ -9,19 +9,23 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
-    /// Custom value editor to handle posted json data and to return json data for the multiple selected items.
+    /// Custom value editor to handle posted json data and to return json data for the multiple selected items as well as ensuring
+    /// that the multiple selected int IDs are published to cache as a delimited string (values)
     /// </summary>
-    internal class DropDownMultipleValueEditor : DropDownValueEditor
+    /// <remarks>
+    /// This is re-used by editors such as the multiple drop down list or check box list
+    /// </remarks>
+    internal class PublishValuesMultipleValueEditor : PublishValueValueEditor
     {
         private readonly bool _publishIds;
 
-        internal DropDownMultipleValueEditor(bool publishIds, IDataTypeService dataTypeService, ValueEditor wrapped)
+        internal PublishValuesMultipleValueEditor(bool publishIds, IDataTypeService dataTypeService, ValueEditor wrapped)
             : base(dataTypeService, wrapped)
         {
             _publishIds = publishIds;
         }
 
-        public DropDownMultipleValueEditor(bool publishIds, ValueEditor wrapped)
+        public PublishValuesMultipleValueEditor(bool publishIds, ValueEditor wrapped)
             : this(publishIds, ApplicationContext.Current.Services.DataTypeService, wrapped)
         {
         }

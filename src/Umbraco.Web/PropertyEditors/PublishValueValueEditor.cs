@@ -9,23 +9,23 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
-    /// A custom value editor for the drop down so that we can ensure that the 'value' not the ID get's put into cache
+    /// A custom value editor for any property editor that stores a pre-value int id so that we can ensure that the 'value' not the ID get's put into cache
     /// </summary>
     /// <remarks>
     /// This is required for legacy/backwards compatibility, otherwise we'd just store the string version and cache the string version without
     /// needing additional lookups.
     /// </remarks>
-    internal class DropDownValueEditor : ValueEditorWrapper
+    internal class PublishValueValueEditor : ValueEditorWrapper
     {
         private readonly IDataTypeService _dataTypeService;
 
-        internal DropDownValueEditor(IDataTypeService dataTypeService, ValueEditor wrapped)
+        internal PublishValueValueEditor(IDataTypeService dataTypeService, ValueEditor wrapped)
             : base(wrapped)
         {
             _dataTypeService = dataTypeService;
         }
 
-        public DropDownValueEditor(ValueEditor wrapped)
+        public PublishValueValueEditor(ValueEditor wrapped)
             : this(ApplicationContext.Current.Services.DataTypeService, wrapped)
         {
         }
@@ -49,7 +49,7 @@ namespace Umbraco.Web.PropertyEditors
                         return preVals.Single(x => x.Value.Id == preValId).Value.Value;
                     }
 
-                    LogHelper.Warn<DropDownValueEditor>("Could not find a pre value with ID " + preValId + " for property alias " + property.Alias);
+                    LogHelper.Warn<PublishValueValueEditor>("Could not find a pre value with ID " + preValId + " for property alias " + property.Alias);
                 }
             }
 
