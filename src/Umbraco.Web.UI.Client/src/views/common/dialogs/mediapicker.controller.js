@@ -4,28 +4,37 @@ angular.module("umbraco")
         function ($scope, mediaResource, $log, imageHelper) {
 
             $scope.options = {
-                url: "/"
+                url: "/umbraco/UmbracoApi/MediaUpload/Post",
+                formData:{
+                    currentFolder: -1
+                }
             };
 
-            $log.log("added");
+            $scope.gotoFolder = function(folderId){
+                //mediaResource.rootMedia()
+                mediaResource.getChildren(folderId)
+                    .then(function(data) {
+                        $scope.images = data;
+                        //update the thumbnail property
+                        _.each($scope.images, function(img) {
+                            img.thumbnail = imageHelper.getThumbnail({ imageModel: img, scope: $scope });
+                        });
+                    });
+            }
+            
 
             $scope.$on('fileuploadadd', function(event, files){
                 $scope.submitFiles();
-            });    
+            });
 
-            
-            mediaResource.rootMedia()
-                .then(function(data) {
-                    $scope.images = data;
-                    //update the thumbnail property
-                    _.each($scope.images, function(img) {
-                        img.thumbnail = imageHelper.getThumbnail({ imageModel: img, scope: $scope });
-                    });
-                });
+            $scope.$on('fileuploadstop', function(event, files){
+                alert("done");
+            });
             
 
             $scope.selectMediaItem = function(image) {
-                if (image.contentTypeAlias.toLowerCase() == 'folder') {
+                if (image.contentTypeAlias.toLowerCase() == 'folder') {        
+                    options.formData.currentFolder = image.id;
                     mediaResource.getChildren(image.id)
                         .then(function(data) {
                             $scope.images = data;
