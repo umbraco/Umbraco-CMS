@@ -15,7 +15,7 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
         {
             var editor = base.CreateValueEditor();
 
-            editor.Validators = new List<ValidatorBase> { new PostcodeValidator() };
+            editor.Validators.Add(  new PostcodeValidator() );
 
             return editor;
         }

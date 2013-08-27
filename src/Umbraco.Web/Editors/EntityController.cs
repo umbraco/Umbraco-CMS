@@ -19,23 +19,71 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
     {
-        public EntityBasic GetById(int id)
+        public EntityBasic GetDocumentById(int id)
         {
             return Mapper.Map<EntityBasic>(Services.EntityService.Get(id, UmbracoObjectTypes.Document));
         }
+        public IEnumerable<EntityBasic> GetDocumentChildren(int id)
+        {
+            return getChildren(id, UmbracoObjectTypes.Document);
+        }
+        public IEnumerable<EntityBasic> GetDocumentsByIds([FromUri]int[] ids)
+        {
+           return getEntitiesById(ids, UmbracoObjectTypes.Document);
+        }
 
 
-        //TODO: This should probably be change to GetContentByIds since it will be different for media, etc...!
 
-        //TODO: Because this is a publicly accessible API, we need to filter the results for what the currently logged in user
-        // is actually allowed to access. We'll need to enhance the FilterAllowedOutgoingContent to acheive that.
+        public EntityBasic GetMediaById(int id)
+        {
+            return getEntityById(id, UmbracoObjectTypes.Media);
+        }
+        public IEnumerable<EntityBasic> GetMediaChildren(int id)
+        {
+            return getChildren(id, UmbracoObjectTypes.Media);
+        }
+        public IEnumerable<EntityBasic> GetMediaByIds([FromUri]int[] ids)
+        {
+            return getEntitiesById(ids, UmbracoObjectTypes.Media);
+        }
 
-        public IEnumerable<EntityBasic> GetByIds([FromUri]int[] ids)
+
+
+        public EntityBasic GetEntityById(int id)
+        {
+            return Mapper.Map<EntityBasic>(Services.EntityService.Get(id));
+        }
+
+        public IEnumerable<EntityBasic> GetEntitiesByIds([FromUri]int[] ids)
         {
             if (ids == null) throw new ArgumentNullException("ids");
-
             return ids.Select(id =>
-                              Mapper.Map<EntityBasic>(Services.EntityService.Get(id, UmbracoObjectTypes.Document)));
+                              Mapper.Map<EntityBasic>(Services.EntityService.Get(id)));
+        }
+
+        private EntityBasic getEntityById(int id, UmbracoObjectTypes type)
+        {
+            return Mapper.Map<EntityBasic>(Services.EntityService.Get(id, type));
+        }
+
+        private IEnumerable<EntityBasic> getChildren(int id, UmbracoObjectTypes type)
+        {
+            return Services.EntityService.GetChildren(id, type)
+                    .Select(child => 
+                        Mapper.Map<EntityBasic>(child));
+        }
+
+        private IEnumerable<EntityBasic> getAncestors(int id, UmbracoObjectTypes type)
+        {
+            var ids = Services.EntityService.Get(id).Path.Split(',').Select(x => int.Parse(x));
+            return getEntitiesById(ids.ToArray(), type);
+        }
+
+        private IEnumerable<EntityBasic> getEntitiesById(int[] ids, UmbracoObjectTypes type)
+        {
+            if (ids == null) throw new ArgumentNullException("ids");
+            return ids.Select(id =>
+                              Mapper.Map<EntityBasic>(Services.EntityService.Get(id, type)));
         }
 
     }

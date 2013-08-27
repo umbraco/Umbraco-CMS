@@ -8,7 +8,7 @@ angular.module('umbraco')
 		$scope.renderModel = [];
 		$scope.multipicker = true;
 
-		entityResource.getByIds($scope.ids).then(function(data){
+		entityResource.getDocumentsByIds($scope.ids).then(function(data){
 			$(data).each(function(i, item){
 				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
 				$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
