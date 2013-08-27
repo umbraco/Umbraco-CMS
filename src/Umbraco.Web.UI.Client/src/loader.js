@@ -11,6 +11,7 @@ yepnope({
     'lib/jquery/jquery.ui.sortable.min.js',
     'lib/jquery/jquery.ui.effect.min.js',
     'lib/jquery/jquery.ui.effect-highlight.min.js',
+    'lib/jquery/jquery.ui.draggable.js',
 
     /* 1.1.5 */
     'lib/angular/1.1.5/angular.min.js',

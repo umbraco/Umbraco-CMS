@@ -1,4 +1,33 @@
 <div ng-controller="Umbraco.Editors.MediaPickerController">
+<div class="umb-image-crop">
+	<div class="umb-image-mask">
+			<i class="icon-screenshot"></i>
+			<i class="icon-circle"></i>
+		<img src="/media/dummy/crop-large.png" alt="">
+	</div>
+	<div class="umb-image-controls clearfix">
+		<i class="icon icon-minus"></i> 
+		<input class="range" type="range" min="0" max="100" step="5" value="35">
+		<i class="icon icon-plus"></i> 
+	</div>
+</div>
+<ul class="thumbnails umb-crop-preview">
+		<li class="umb-thumbnail">
+			<a href="#">
+				<img src="/media/dummy/crop-preview-horizontal.png" alt="">
+			</a>
+		</li>
+		<li class="umb-thumbnail">
+			<a href="#">
+				<img src="/media/dummy/crop-preview-square.png" alt="">
+			</a>
+		</li>
+		<li class="umb-thumbnail">
+			<a href="#">
+				<img src="/media/dummy/crop-preview-vertical.png" alt="">
+			</a>
+		</li>
+	</ul>
 	<ul class="thumbnails">
 		<li class="span4" ng-repeat="image in value">
 			<a href="#" class="thumbnail" prevent-default>
@@ -9,7 +38,25 @@
 			<a href="#" ng-click="openMediaPicker(value)" prevent-default>
 				<i class="icon icon-plus"></i> 
 			</a>
-		</li>    
+		</li>
+		<li class="umb-thumbnail">
+			<a href="#" ng-click="openMediaPicker(value)" prevent-default>
+				<img src="/media/dummy/crop-horizontal.png" alt="">
+			</a>
+		</li>
+		<li class="umb-thumbnail">
+			<div class="umb-icons">
+				<i class="icon-crop"></i>
+				<i class="icon-remove"></i>
+			</div>
+			<a href="#" ng-click="openMediaPicker(value)" prevent-default>
+				<img src="/media/dummy/crop-vertival.png" alt="">
+			</a>
+		</li>
+		<li class="umb-thumbnail">
+			<a href="#" ng-click="openMediaPicker(value)" prevent-default>
+				<img src="/media/dummy/crop-square.png" alt="">
+			</a>
+		</li>
 	</ul> 
-	<br/><br/>
 </div>

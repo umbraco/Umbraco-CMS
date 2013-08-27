@@ -115,6 +115,9 @@ div.umb-codeeditor .umb-btn-toolbar {
 
 /*BUTTONS */
 
+.thumbnails > li.umb-plus-btn {
+  margin: 0 10px 10px 0
+}
 
 .umb-plus-btn a {
   border: 2px dashed @grayLight;
@@ -272,4 +275,129 @@ table thead a {
     height:5px;
     padding:0px;
     line-height:0px;
+}
+
+/* MEDIA PICKER */
+
+.thumbnails > li.umb-thumbnail {
+  margin: 0 10px 10px 0;
+  position: relative;
+}
+
+.thumbnails > li.umb-thumbnail .umb-icons {
+  background: @grayDarker;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 17px 0
+}
+
+.thumbnails > li.umb-thumbnail .icon-crop {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  color: @white;
+  font-size: 14px
+}
+
+.thumbnails > li.umb-thumbnail .icon-remove {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  color: @white;
+  font-size: 14px
+}
+
+/* IMAGE CROPPER */
+
+.umb-image-crop {
+  margin: 0 30px 25px 0;
+  padding: 0 0 30px 0;
+  width: 400px;
+  float: left
+}
+
+.umb-image-mask {
+  width: 399px;
+  height: 300px;
+  position: relative;
+  margin: 0 30px 0 0
+}
+
+.umb-image-mask:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5999;
+  opacity: .6;
+  filter: alpha(opacity=6);
+  -webkit-box-shadow: inset 0 0 0 40px white,inset 0 0 0 41px rgba(0,0,0,0.2),inset 0 0 20px 41px rgba(0,0,0,0.2);
+  box-shadow: inset 0 0 0 40px white,inset 0 0 0 41px rgba(0,0,0,0.2),inset 0 0 20px 41px rgba(0,0,0,0.2);
+}
+
+.umb-image-mask .icon-screenshot {
+  color: @white;
+  font-size: 30px;
+  position: absolute;
+  top: 125px;
+  left: 110px;
+  z-index: 1000;
+}
+
+.umb-image-mask .icon-circle {
+  color: #4285f4;
+  position: absolute;
+  top: 130px;
+  left: 115px;
+  z-index: 1;
+  font-size: 20px
+}
+
+.umb-crop-preview {
+  float: left;
+  width: 400px
+}
+
+
+.umb-image-controls {
+  width: 400px; /* Need to be set dynamic, accounding to the width of the current image */
+}
+
+.umb-image-controls .icon-minus {
+  float: left;
+  padding: 14px 10px 0 10px;
+  color: @inputBorder;
+}
+
+.umb-image-controls .icon-plus {
+  float: right;
+  text-align: left;
+  padding: 14px 10px 0 10px;
+  color: @inputBorder;
+}
+
+.umb-image-crop .range {
+  display: block;
+  -webkit-appearance: none;
+  background: @inputBorder;
+  height: 1px;
+  margin: 20px 0 0 0;
+  width: 82%; 
+  float: left;
+}
+
+.umb-image-crop .range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width:14px;
+  height:14px;
+  border:1px solid @inputBorder;
+  border-radius:2px;
+  content:"1";
+  background:#f2f2f2;
+  margin-top: -1px;
 }
