@@ -260,9 +260,9 @@ namespace Umbraco.Core
             //setup the validators resolver with our predefined validators
             ValidatorsResolver.Current = new ValidatorsResolver(new[]
                 {
-                    new Lazy<Type>(() => typeof (RequiredValueValidator)),
-                    new Lazy<Type>(() => typeof (RegexValueValidator)),
-                    new Lazy<Type>(() => typeof (DelimitedValueValidator))
+                    new Lazy<Type>(() => typeof (RequiredManifestValueValidator)),
+                    new Lazy<Type>(() => typeof (RegexValidator)),
+                    new Lazy<Type>(() => typeof (DelimitedManifestValueValidator))
                 });
 
             //by default we'll use the standard configuration based sync

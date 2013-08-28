@@ -38,9 +38,9 @@ namespace Umbraco.Web.PropertyEditors
             Fields.First().Validators.Add(new ColorListValidator());
         }
 
-        internal class ColorListValidator : ValidatorBase
+        internal class ColorListValidator : IPropertyValidator
         {
-            public override IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
+            public IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
             {
                 var json = value as JArray;
                 if (json == null) yield break;

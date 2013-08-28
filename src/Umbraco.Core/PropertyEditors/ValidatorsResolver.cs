@@ -8,7 +8,7 @@ namespace Umbraco.Core.PropertyEditors
     /// <summary>
     /// A resolver to resolve all registered validators
     /// </summary>
-    internal class ValidatorsResolver : LazyManyObjectsResolverBase<ValidatorsResolver, ValueValidator>
+    internal class ValidatorsResolver : LazyManyObjectsResolverBase<ValidatorsResolver, ManifestValueValidator>
     {        
         public ValidatorsResolver(IEnumerable<Lazy<Type>> lazyTypeList)
             : base(lazyTypeList, ObjectLifetimeScope.Application)
@@ -18,7 +18,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Returns the validators
         /// </summary>
-        public IEnumerable<ValueValidator> Validators
+        public IEnumerable<ManifestValueValidator> Validators
         {
             get { return Values; }
         }
@@ -28,7 +28,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public ValueValidator GetValidator(string name)
+        public ManifestValueValidator GetValidator(string name)
         {
             return Values.FirstOrDefault(x => x.TypeName == name);
         } 

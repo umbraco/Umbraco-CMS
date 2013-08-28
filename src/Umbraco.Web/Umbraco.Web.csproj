@@ -322,6 +322,7 @@
     <Compile Include="PropertyEditors\DateTimePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimeValidator.cs" />
     <Compile Include="PropertyEditors\DropDownMultiplePropertyEditor.cs" />
+    <Compile Include="PropertyEditors\IntegerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MediaPicker.cs" />
     <Compile Include="PropertyEditors\PublishValuesMultipleValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownMultipleWithKeysPropertyEditor.cs" />
@@ -381,7 +382,7 @@
     <Compile Include="PropertyEditors\FileUploadValueEditor.cs" />
     <Compile Include="PropertyEditors\RichTextPropertyEditor.cs" />
     <Compile Include="PropertyEditors\TextAreaPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\TextStringPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\TextboxPropertyEditor.cs" />
     <Compile Include="PropertyEditors\TrueFalsePropertyEditor.cs" />
     <Compile Include="Trees\MediaTreeController.cs" />
     <Compile Include="Trees\Menu\ActionMenuItem.cs" />

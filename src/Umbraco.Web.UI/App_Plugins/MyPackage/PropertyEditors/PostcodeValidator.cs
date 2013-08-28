@@ -10,10 +10,10 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
     /// <summary>
     /// Validates a postcode
     /// </summary>
-    internal class PostcodeValidator : ValidatorBase
+    internal class PostcodeValidator : IPropertyValidator
     {
         
-        public override IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
+        public IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
         {
             if (value != null)
             {

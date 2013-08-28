@@ -23,7 +23,7 @@ namespace Umbraco.Core.PropertyEditors
         {
             ValueType = "string";
             //set a default for validators
-            Validators = new List<ValidatorBase>();
+            Validators = new List<IPropertyValidator>();
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <param name="view"></param>
         /// <param name="validators">Allows adding custom validators during construction instead of specifying them later</param>
-        public ValueEditor(string view, params ValidatorBase[] validators)
+        public ValueEditor(string view, params IPropertyValidator[] validators)
             : this()
         {
             View = view;
@@ -60,7 +60,7 @@ namespace Umbraco.Core.PropertyEditors
         /// A collection of validators for the pre value editor
         /// </summary>
         [JsonProperty("validation", ItemConverterType = typeof(ManifestValidatorConverter))]
-        public List<ValidatorBase> Validators { get; private set; }
+        public List<IPropertyValidator> Validators { get; private set; }
 
         /// <summary>
         /// Returns the validator used for the required field validation which is specified on the PropertyType
@@ -71,9 +71,9 @@ namespace Umbraco.Core.PropertyEditors
         /// The default validator used is the RequiredValueValidator but this can be overridden by property editors
         /// if they need to do some custom validation, or if the value being validated is a json object.
         /// </remarks>
-        internal virtual ValueValidator RequiredValidator
+        internal virtual ManifestValueValidator RequiredValidator
         {
-            get { return new RequiredValueValidator(); }
+            get { return new RequiredManifestValueValidator(); }
         }
 
         /// <summary>
@@ -85,9 +85,9 @@ namespace Umbraco.Core.PropertyEditors
         /// The default validator used is the RegexValueValidator but this can be overridden by property editors
         /// if they need to do some custom validation, or if the value being validated is a json object.
         /// </remarks>
-        internal virtual ValueValidator RegexValidator
+        internal virtual ManifestValueValidator RegexValidator
         {
-            get { return new RegexValueValidator(); }
+            get { return new RegexValidator(); }
         }
 
         /// <summary>

@@ -9,11 +9,11 @@ namespace Umbraco.Core.Manifest
     /// Used when deserialing the validation collection, any serialized property editors are from a manifest and thus the
     /// validators are manifest validators.
     /// </summary>
-    internal class ManifestValidatorConverter : JsonCreationConverter<ValidatorBase>
+    internal class ManifestValidatorConverter : JsonCreationConverter<IPropertyValidator>
     {
-        protected override ValidatorBase Create(Type objectType, JObject jObject)
+        protected override IPropertyValidator Create(Type objectType, JObject jObject)
         {
-            return new ManifestValidator();
+            return new ManifestPropertyValidator();
         }
     }
 }

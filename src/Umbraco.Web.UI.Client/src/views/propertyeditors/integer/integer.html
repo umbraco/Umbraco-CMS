@@ -1,0 +1,9 @@
+﻿<div>
+    <input name="integerField" type="text" class="umb-textstring span7 textstring"
+        ng-model="model.value"
+        val-regex="^\d*$"
+        val-server="value" />
+
+    <span class="help-inline" val-msg-for="integerField" val-toggle-msg="valRegex">Invalid integer value</span>
+    <span class="help-inline" val-msg-for="integerField" val-toggle-msg="valServer">{{propertyForm.requiredField.errorMsg}}</span>
+</div>

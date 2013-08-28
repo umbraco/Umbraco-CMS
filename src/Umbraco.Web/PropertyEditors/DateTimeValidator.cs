@@ -9,9 +9,9 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Used to validate if the value is a valid date/time
     /// </summary>
-    internal class DateTimeValidator : ValidatorBase
+    internal class DateTimeValidator : IPropertyValidator
     {        
-        public override IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
+        public IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
         {
             DateTime dt;
             if (value != null &&  DateTime.TryParse(value.ToString(), out dt) == false)

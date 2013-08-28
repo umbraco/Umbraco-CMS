@@ -14,7 +14,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         public PreValueField()
         {
-            Validators = new List<ValidatorBase>();
+            Validators = new List<IPropertyValidator>();
 
             //check for an attribute and fill the values
             var att = GetType().GetCustomAttribute<PreValueFieldAttribute>(false);
@@ -32,7 +32,7 @@ namespace Umbraco.Core.PropertyEditors
         /// Constructor used to set validators instead of adding them later
         /// </summary>
         /// <param name="validators"></param>
-        public PreValueField(params ValidatorBase[] validators)
+        public PreValueField(params IPropertyValidator[] validators)
             : this()
         {
             foreach (var v in validators)
@@ -78,6 +78,6 @@ namespace Umbraco.Core.PropertyEditors
         /// A collection of validators for the pre value field
         /// </summary>
         [JsonProperty("validation", ItemConverterType = typeof(ManifestValidatorConverter))]
-        public List<ValidatorBase> Validators { get; private set; }
+        public List<IPropertyValidator> Validators { get; private set; }
     }
 }

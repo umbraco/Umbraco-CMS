@@ -113,9 +113,9 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// A custom validator to ensure that all values in the list are unique
         /// </summary>
-        internal class EnsureUniqueValuesValidator : ValidatorBase
+        internal class EnsureUniqueValuesValidator : IPropertyValidator
         {
-            public override IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
+            public IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
             {
                 var json = value as JArray;
                 if (json == null) yield break;
