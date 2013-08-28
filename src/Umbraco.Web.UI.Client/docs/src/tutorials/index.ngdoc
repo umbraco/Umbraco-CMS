@@ -6,7 +6,35 @@
 
 This section contains longer written tutorials on how to perform certain tasks with the new angular-based UI. 
 
-Our initial focus is getting up on running with their own property editors, and secondly we will focus on how to use the serverside support methods to hook into the clientside code from asp.net.
+Our initial focus is getting developers up and running with their own property editors, and secondly we will focus on how to use the serverside support methods to hook into the clientside code from asp.net.
+
+##Getting up and running
+There are 2 ways to get umbraco 7 running, either from source, or from one of the nightly builds. 
+
+###{@link Running Running a nightly build}
+This only works on windows with IIS or IISExpress
+
+###{@link Building Building from source} 
+You can run the client bits on osx and windows, or simple run the source from Visual Studio
+
+
+
+##Create your own editor
+One of the big breaking changes in Umbraco 7 is the new format for property editors / data types. Get ahead by reading through our series on how to build your own: 
+
+###{@link CreatingAPropertyEditor Create an editor}
+The initial setup of the plugin, the manifest and files
+
+###{@link Adding-Configuration-To-Property-Editor Adding configuration}
+How we make the editor configurable so it becomes flexible and reusable
+
+###{@link Intergrating-Services-With-PropertyEditor Intergrating services}
+How you can get access to all the standard services inside of Umbraco from your editor
+
+##Start developing
+
+###{@link Source-Code-Structure how the source code is structured}
+An overview of the different folders and files in the Umbraco 7 client project
 
 ##Recommended reading
 

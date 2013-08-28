@@ -1,0 +1,31 @@
+@ngdoc overview
+@name Running Umbraco 7
+@description
+
+##Overview
+This document explains how you can run Umbraco from one of our nightly builds on Windows.
+
+You must have either IIS, IISExpress and/or WebMatrix installed
+
+##Getting the build
+Our buildserver runs every morning at 9 danish time, and each day it produces 3 zip files with the latest changes compiled and ready to run.
+
+The umbraco 7 nightly builds can be downloaded from [http://nightly.umbraco.org/umbraco%207.0.0/](nightly.umbraco.org)
+
+As you can see, there are different types of builds: 
+
+- UmbracoCms.7.0.0-build.##.zip
+- UmbracoCms.AllBinaries.7.0.0.build.##.zip
+- UmbracoCms.WebPi.7.0.0.build.##.zip
+
+The first one contains the full website, ready to run in IIS, the AllBinaries one only contains the comiled .dll's and finally WebPi is for installing through microsoft platform installer. 
+
+You should download the latest of the first kind. 
+
+##Unzipping and installing
+When downloaded, *Remember* to right-click the file, choose properties and select *Unblock file* 
+
+UnZip and setup IIS/IISExpress to run the site from this folder, or if you have webmatrix installed, right click it and choose "run as website from webmatrix"
+
+During install, you can choose between Sql Server and Sql CE, both versions work, with CE being perfectly fine for local developement on machines where you dont want to bother with SQL Server. 
+
