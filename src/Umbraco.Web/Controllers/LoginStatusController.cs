@@ -16,9 +16,13 @@ namespace Umbraco.Web.Controllers
             {
                 if (Member.IsLoggedOn())
                 {
-                    var memberId = Member.CurrentMemberId();
-                    Member.RemoveMemberFromCache(memberId);
-                    Member.ClearMemberFromClient(memberId);
+                    var member = Member.GetCurrentMember();
+                    if (member != null)
+                    {
+                        var memberId = member.Id;
+                        Member.RemoveMemberFromCache(memberId);
+                        Member.ClearMemberFromClient(memberId);
+                    }
                 }
 
                 return Redirect("/");                

@@ -2,13 +2,13 @@
 
 @using System.Web.Mvc.Html
 @using ClientDependency.Core.Mvc
+@using Umbraco.Web
 @using Umbraco.Web.Models
 @using Umbraco.Web.Controllers
 
 @{
     var registerModel = new RegisterModel();
-    registerModel.FillModel(registerModel, Model.MacroParameters);
-
+  
     Html.EnableClientValidation();
     Html.EnableUnobtrusiveJavaScript();
     Html.RequiresJs("/umbraco_client/ui/jquery.js");
@@ -23,6 +23,11 @@
     <fieldset>
         <legend>Register Member</legend>
         
+        @Html.LabelFor(m => registerModel.Name)
+        @Html.TextBoxFor(m => registerModel.Name)
+        @Html.ValidationMessageFor(m => registerModel.Name)
+        <br />
+
         @Html.LabelFor(m => registerModel.Email)
         @Html.TextBoxFor(m => registerModel.Email)
         @Html.ValidationMessageFor(m => registerModel.Email)
@@ -33,14 +38,16 @@
         @Html.ValidationMessageFor(m => registerModel.Password)
         <br />
         
-        @for (var i = 0; i < registerModel.MemberProperties.Count; i++)
-        {
-            @Html.LabelFor(m => registerModel.MemberProperties[i].Value, registerModel.MemberProperties[i].Name)
-            @Html.EditorFor(m => registerModel.MemberProperties[i].Value)
-            @Html.HiddenFor(m => registerModel.MemberProperties[i].Alias)
-            <br />
+        @if (registerModel.MemberProperties != null) { 
+            for (var i = 0; i < registerModel.MemberProperties.Count; i++)
+            {
+                @Html.LabelFor(m => registerModel.MemberProperties[i].Value, registerModel.MemberProperties[i].Name)
+                @Html.EditorFor(m => registerModel.MemberProperties[i].Value)
+                @Html.HiddenFor(m => registerModel.MemberProperties[i].Alias)
+                <br />
+            }
         }
-        
+
         @Html.HiddenFor(m => registerModel.MemberTypeAlias)
 
         <button>Register</button>
