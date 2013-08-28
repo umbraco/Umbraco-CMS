@@ -82,7 +82,14 @@ function imageHelper() {
                 throw "The options objet does not contain the required parameters: imageModel";
             }
             if (options.imageModel.contentTypeAlias.toLowerCase() === "image") {
-                var imageProp = _.find(options.imageModel.properties, function (item) {
+
+                //combine all props, TODO: we really need a better way then this
+                var props = [];
+                $(options.imageModel.tabs).each(function(i, tab){
+                    props = props.concat(tab.properties);
+                });
+
+                var imageProp = _.find(props, function (item) {
                     return item.alias === 'umbracoFile';
                 });
                 var imageVal;
