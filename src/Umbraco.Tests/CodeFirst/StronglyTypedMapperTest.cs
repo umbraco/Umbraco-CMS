@@ -58,34 +58,14 @@ namespace Umbraco.Tests.CodeFirst
         #region Test setup
         public override void Initialize()
         {
-            var currDir = new DirectoryInfo(TestHelper.CurrentAssemblyDirectory);
-
-            var configPath = Path.Combine(currDir.Parent.Parent.FullName, "config");
-            if (Directory.Exists(configPath) == false)
-                Directory.CreateDirectory(configPath); 
-            
-            var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
-            if (System.IO.File.Exists(umbracoSettingsFile) == false)
-                System.IO.File.Copy(
-                    currDir.Parent.Parent.Parent.GetDirectories("Umbraco.Web.UI")
-                        .First()
-                        .GetDirectories("config").First()
-                        .GetFiles("umbracoSettings.Release.config").First().FullName,
-                    Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
-                    true);
-
-            Core.Configuration.UmbracoSettings.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
+            TestHelper.EnsureUmbracoSettingsConfig();
             
             base.Initialize();
         }
 
         public override void TearDown()
         {
-            var currDir = new DirectoryInfo(TestHelper.CurrentAssemblyDirectory);
-
-            var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
-            if (System.IO.File.Exists(umbracoSettingsFile))
-                System.IO.File.Delete(umbracoSettingsFile);
+            TestHelper.CleanUmbracoSettingsConfig();
 
             base.TearDown();
         }

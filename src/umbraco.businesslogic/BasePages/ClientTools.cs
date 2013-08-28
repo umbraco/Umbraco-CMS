@@ -48,6 +48,9 @@ namespace umbraco.BasePages
 			public static string ChangeContentFrameUrl(string url) {
 				return string.Format("alert('sdsd'); " + ClientMgrScript + ".contentFrame('{0}');", url);
 			}
+			public static string ReloadContentFrameUrlIfPathLoaded(string url) {
+                return string.Format(ClientMgrScript + ".reloadContentFrameUrlIfPathLoaded('{0}');", url);
+			}
 			public static string ChildNodeCreated = GetMainTree + ".childNodeCreated();";
 			public static string SyncTree { get { return GetMainTree + ".syncTree('{0}', {1});"; } }
 			public static string ClearTreeCache { get { return GetMainTree + ".clearTreeCache();"; } }
@@ -147,8 +150,7 @@ namespace umbraco.BasePages
             //don't load if there is no url
 			if (string.IsNullOrEmpty(url)) return this;
 
-            if (url.StartsWith("/") && !url.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
-                url = IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/" + url;
+            url = EnsureUmbracoUrl(url);
 
             if (url.Trim().StartsWith("~"))
                 url = IOHelper.ResolveUrl(url);
@@ -157,6 +159,30 @@ namespace umbraco.BasePages
 			
             return this;
 		}
+
+        /// <summary>
+        /// Reloads the content in the content frame if the specified URL is currently loaded
+        /// </summary>
+        /// <param name="url"></param>
+        public ClientTools ReloadContentFrameUrlIfPathLoaded(string url)
+        {
+            if (string.IsNullOrEmpty(url)) return this;
+
+            url = EnsureUmbracoUrl(url);
+
+            RegisterClientScript(Scripts.ReloadContentFrameUrlIfPathLoaded(url));
+
+            return this;
+        }
+
+        private string EnsureUmbracoUrl(string url)
+        {
+            if (url.StartsWith("/") && !url.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
+            {
+                url = IOHelper.ResolveUrl(SystemDirectories.Umbraco) + url;
+            }
+            return url;
+        }
 
 		/// <summary>
 		/// Shows the dashboard for the given application

@@ -8,6 +8,7 @@
     <key alias="assignDomain">Culture and Hostnames</key>
     <key alias="auditTrail">Audit Trail</key>
     <key alias="browse">Browse Node</key>
+    <key alias="changeDocType">Change Document Type</key>
     <key alias="copy">Copy</key>
     <key alias="create">Create</key>
     <key alias="createPackage">Create Package</key>
@@ -92,6 +93,26 @@
     <key alias="styleShow">Show styles</key>
     <key alias="tableInsert">Insert table</key>
   </area>
+  <area alias="changeDocType">
+    <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
+    <key alias="changeDocTypeInstruction2">Then confirm and/or amend the mapping of properties from the current type to the new, and click Save.</key>
+    <key alias="contentRepublished">The content has been re-published.</key>    
+    <key alias="currentProperty">Current Property</key>
+    <key alias="currentType">Current type</key>
+    <key alias="docTypeCannotBeChanged">The document type cannot be changed, as there are no alternatives valid for this location.</key>
+    <key alias="docTypeChanged">Document Type Changed</key>    
+    <key alias="mapProperties">Map Properties</key>
+    <key alias="mapToProperty">Map to Property</key>
+    <key alias="newTemplate">New Template</key>
+    <key alias="newType">New Type</key>
+    <key alias="none">none</key>    
+    <key alias="selectedContent">Content</key>
+    <key alias="selectNewDocType">Select New Document Type</key>
+    <key alias="successMessage">The document type of the selected content has been successfully changed to [new type] and the following properties mapped:</key>
+    <key alias="to">to</key>
+    <key alias="validationErrorPropertyWithMoreThanOneMapping">Could not complete property mapping as one or more properties have more than one mapping defined.</key>
+    <key alias="validDocTypesNote">Only alternate types valid for the current location are displayed.</key>    
+  </area>  
   <area alias="content">
     <key alias="about">About this page</key>
     <key alias="alias">Alias</key>
@@ -129,6 +150,8 @@
     <key alias="updateDate">Last edited</key>
     <key alias="uploadClear">Remove file</key>
     <key alias="urls">Link to document</key>
+    <key alias="memberof">Member of group(s)</key>
+    <key alias="notmemberof">Not a member of group(s)</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Where do you want to create the new %0%</key>
@@ -748,6 +771,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="contentTypeEnabled">Master Content Type enabled</key>
     <key alias="contentTypeUses">This Content Type uses</key>
     <key alias="asAContentMasterType">as a Master Content Type. Tabs from Master Content Types are not shown and can only be edited on the Master Content Type itself</key>
+    <key alias="noPropertiesDefinedOnTab">No properties defined on this tab. Click on the "add a new property" link at the top to create a new property.</key>
   </area>
   <area alias="sort">
     <key alias="sortDone">Sorting complete.</key>

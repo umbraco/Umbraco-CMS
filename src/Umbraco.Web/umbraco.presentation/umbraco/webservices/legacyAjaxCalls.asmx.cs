@@ -63,6 +63,9 @@ namespace umbraco.presentation.webservices
             if (!AuthorizeRequest())
                 return;
             
+            //U4-2686 - alias is html encoded, make sure to decode 
+            alias = HttpUtility.HtmlDecode(alias);
+
             //check which parameters to pass depending on the types passed in
             int intNodeId;
             if (nodeType == "memberGroup")

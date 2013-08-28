@@ -2,6 +2,8 @@ using System;
 using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Windows.Forms.VisualStyles;
+using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.web;
 using umbraco.controls;
 using umbraco.cms.helpers;
@@ -193,7 +195,8 @@ namespace umbraco.presentation.umbraco.dialogs
                         {
                             try
                             {
-                                if (cms.businesslogic.member.MemberType.GetByAlias("_umbracoSystemDefaultProtectType") == null)
+                                if (
+                                    cms.businesslogic.member.MemberType.GetByAlias("_umbracoSystemDefaultProtectType") == null)
                                 {
                                     cms.businesslogic.member.MemberType.MakeNew(BusinessLogic.User.GetUser(0), "_umbracoSystemDefaultProtectType");
                                 }
@@ -202,11 +205,21 @@ namespace umbraco.presentation.umbraco.dialogs
                             {
                                 cms.businesslogic.member.MemberType.MakeNew(BusinessLogic.User.GetUser(0), "_umbracoSystemDefaultProtectType");
                             }
+
                             // create member
-                            cms.businesslogic.member.Member mem = cms.businesslogic.member.Member.MakeNew(simpleLogin.Text, "", cms.businesslogic.member.MemberType.GetByAlias("_umbracoSystemDefaultProtectType"), base.getUser());
+                            Member mem = cms.businesslogic.member.Member.MakeNew(simpleLogin.Text, "", cms.businesslogic.member.MemberType.GetByAlias("_umbracoSystemDefaultProtectType"), base.getUser());
                             // working around empty password restriction for Umbraco Member Mode
                             mem.Password = simplePassword.Text;
                             member = Membership.GetUser(simpleLogin.Text);
+                        }
+                    }
+                    else
+                    {
+                        // change password if it's not empty
+                        if (string.IsNullOrWhiteSpace(simplePassword.Text) == false)
+                        {
+                            var mem = Member.GetMemberFromLoginName(simpleLogin.Text);
+                            mem.Password = simplePassword.Text;
                         }
                     }
 

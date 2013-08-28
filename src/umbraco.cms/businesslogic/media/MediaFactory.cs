@@ -60,24 +60,27 @@ namespace umbraco.cms.businesslogic.media
 
         public void SaveAs(string filename)
         {
-            var s = new FileStream(filename, FileMode.Create);
-            try
+            using (var s = new FileStream(filename, FileMode.Create))
             {
-                int readCount;
-                var buffer = new byte[8192];
+                try
+                {
+                    int readCount;
+                    var buffer = new byte[8192];
 
-                if (InputStream.CanSeek)
-                    InputStream.Seek(0, SeekOrigin.Begin);
+                    if (InputStream.CanSeek)
+                        InputStream.Seek(0, SeekOrigin.Begin);
 
-                while ((readCount = InputStream.Read(buffer, 0, buffer.Length)) != 0)
-                    s.Write(buffer, 0, readCount);
+                    while ((readCount = InputStream.Read(buffer, 0, buffer.Length)) != 0)
+                        s.Write(buffer, 0, readCount);
 
-                s.Flush();
+                    s.Flush();
+                }
+                finally
+                {
+                    s.Close();
+                }
             }
-            finally
-            {
-                s.Close();
-            }
+            
         }
     }
 }

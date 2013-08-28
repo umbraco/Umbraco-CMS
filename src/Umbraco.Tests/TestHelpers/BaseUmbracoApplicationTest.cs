@@ -25,6 +25,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
+            TestHelper.EnsureUmbracoSettingsConfig();
 
             SettingsForTests.UseLegacyXmlSchema = false;
             SettingsForTests.ForceSafeAliases = true;
@@ -44,6 +45,7 @@ namespace Umbraco.Tests.TestHelpers
             SettingsForTests.Reset();
             UmbracoContext.Current = null;
             TestHelper.CleanContentDirectories();
+            TestHelper.CleanUmbracoSettingsConfig();
             //reset the app context, this should reset most things that require resetting like ALL resolvers
             ApplicationContext.Current.DisposeIfDisposable();
             ApplicationContext.Current = null;

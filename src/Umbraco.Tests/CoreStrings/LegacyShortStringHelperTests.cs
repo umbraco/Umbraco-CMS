@@ -6,6 +6,7 @@ using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.CoreStrings
 {
@@ -17,30 +18,14 @@ namespace Umbraco.Tests.CoreStrings
         [SetUp]
         public void Setup()
         {
+            TestHelper.EnsureUmbracoSettingsConfig();
             _helper = new LegacyShortStringHelper();
-            var currDir = new DirectoryInfo(TestHelpers.TestHelper.CurrentAssemblyDirectory);
-            Directory.CreateDirectory(Path.Combine(currDir.Parent.Parent.FullName, "config"));
-            File.Copy(
-                currDir.Parent.Parent.Parent.GetDirectories("Umbraco.Web.UI")
-                    .First()
-                    .GetDirectories("config").First()
-                    .GetFiles("umbracoSettings.Release.config").First().FullName,
-                Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
-                true);
-
-            Core.Configuration.UmbracoSettings.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
         }
 
         [TearDown]
         public void TearDown()
         {
-            //TODO: Deleting the umbracoSettings.config file makes a lot of tests fail
-
-            //var currDir = new DirectoryInfo(TestHelpers.TestHelper.CurrentAssemblyDirectory);
-            
-            //var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
-            //if (File.Exists(umbracoSettingsFile))
-            //    File.Delete(umbracoSettingsFile);
+            TestHelper.CleanUmbracoSettingsConfig();
         }
 
 

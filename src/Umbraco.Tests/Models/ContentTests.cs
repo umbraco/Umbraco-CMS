@@ -6,6 +6,7 @@ using System.Web;
 using NUnit.Framework;
 using Rhino.Mocks;
 using Umbraco.Core.Models;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Models
@@ -13,6 +14,18 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class ContentTests
     {
+        [SetUp]
+        public void Init()
+        {
+            TestHelper.EnsureUmbracoSettingsConfig();
+        }
+
+        [TearDown]
+        public void Dispose()
+        {
+            TestHelper.CleanUmbracoSettingsConfig();
+        }
+
         [TestCase("-1,-20,12,34,56", false)]
         [TestCase("-1,-21,12,34,56", true)]
         [TestCase("-1,12,34,56", false)]

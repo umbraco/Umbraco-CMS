@@ -143,6 +143,20 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     }, 200);
                 }
             },
+            reloadContentFrameUrlIfPathLoaded: function (url) {
+                var contentFrame;
+                if (typeof this.mainWindow().right != "undefined") {
+                    contentFrame = this.mainWindow().right;
+                }
+                else {
+                    contentFrame = this.mainWindow(); 
+                }
+
+                var currentPath = contentFrame.location.pathname + (contentFrame.location.search ? contentFrame.location.search : "");
+                if (currentPath == url) {
+                    contentFrame.location.reload();
+                }
+            },
             openModalWindow: function(url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback) {
                 //need to create the modal on the top window if the top window has a client manager, if not, create it on the current window                
 

@@ -11,12 +11,10 @@ Filename (without .cshtml):
 <div>
     <asp:TextBox ID="FileName" runat="server" CssClass="bigInput"></asp:TextBox>
 </div>
-<%--<div>
+<div>
     Choose a template:<br />
-    <asp:ListBox ID="PartialViewTemplate" runat="server" Rows="1" SelectionMode="Single">
-        <asp:ListItem Value="clean.xslt">Clean</asp:ListItem>
-    </asp:ListBox>
-</div>--%>
+    <asp:ListBox ID="PartialViewTemplate" runat="server" Width="350" CssClass="bigInput" Rows="1"  SelectionMode="Single" />
+</div>
 
 <div>
     <asp:CheckBox ID="CreateMacroCheckBox" runat="server" Checked="true" Text="Create Macro"></asp:CheckBox>

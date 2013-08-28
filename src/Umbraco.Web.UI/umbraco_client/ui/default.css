@@ -730,3 +730,29 @@ guiEditor {
 	padding: 3px;
 	color: #000;
 }
+
+/* SORTABLE DOCUMENT TYPE LISTS */
+table.tabs-table {width: 100%;}
+table.tabs-table tbody {float: left; width: 100%; }
+table.tabs-table tr.propertyContent 
+{
+    float: left; 
+    clear: both;    
+    cursor: move; 
+    width: 100%;
+    border: solid 1px #CCC;
+    background: url(../tabView/images/background.gif) #EEE repeat-x bottom;
+    margin-bottom: 4px;
+}
+table.tabs-table tr.propertyContent td
+{
+    padding-right: 40px;
+    width: 100%;
+}
+table.tabs-table input[type=text] { width: 200px;  }
+table.tabs-table input[type=submit] { text-align: right;  }
+table.tabs-table tr.propertyContent input.sort-order {display: none;}
+
+li.no-properties-on-tab {background: none; background-color: #fff; cursor: default; }
+
+.doc-type-property-drop-zone { border: dashed 1px #ccc; padding: 4px; }

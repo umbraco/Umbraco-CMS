@@ -16,23 +16,23 @@ namespace umbraco
 	/// </summary>
 	[UmbracoWillObsolete("http://issues.umbraco.org/issue/U4-1373", "This will one day be removed when we overhaul the create process")]
     public class PartialViewTasks : LegacyDialogTask
-	{
+    {
 		
 
-		protected virtual string EditViewFile
-		{
-			get { return "Settings/Views/EditView.aspx"; }
-		}
+        protected virtual string EditViewFile
+        {
+            get { return "Settings/Views/EditView.aspx"; }
+        }
 
-		protected string BasePath
-		{
-			get { return SystemDirectories.MvcViews + "/" + ParentFolderName.EnsureEndsWith('/'); }
-		}
+        protected string BasePath
+        {
+            get { return SystemDirectories.MvcViews + "/" + ParentFolderName.EnsureEndsWith('/'); }
+        }
 
-		protected virtual string ParentFolderName
-		{
-			get { return "Partials"; }
-		}
+        protected virtual string ParentFolderName
+        {
+            get { return "Partials"; }
+        }
 
 	    public override bool PerformSave()
 	    {
@@ -100,5 +100,5 @@ namespace umbraco
             get { return DefaultApps.settings.ToString(); }
 	    }
 
-	}
+    }
 }

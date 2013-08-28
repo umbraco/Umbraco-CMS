@@ -210,6 +210,7 @@
     <Compile Include="Models\DataValueSetterTests.cs" />
     <Compile Include="Models\UserExtensionsTests.cs" />
     <Compile Include="Persistence\PetaPocoExtensionsTest.cs" />
+    <Compile Include="Persistence\Repositories\MemberRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserTypeRepositoryTest.cs" />
     <Compile Include="Models\Mapping\ContentWebModelMappingTests.cs" />
