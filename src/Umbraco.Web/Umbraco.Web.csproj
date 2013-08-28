@@ -149,6 +149,7 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data">
       <Name>System.Data</Name>
@@ -292,6 +293,9 @@
     <Compile Include="Configuration\WebRouting.cs" />
     <Compile Include="Editors\MediaController.cs" />
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
+    <Compile Include="UmbracoControllers\RegisterController.cs" />
+    <Compile Include="UmbracoModels\RegisterModel.cs" />
+    <Compile Include="UmbracoModels\LoginModel.cs" />
     <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
     <Compile Include="Security\Providers\UsersMembershipProvider.cs" />
     <Compile Include="Standalone\ServiceContextManager.cs" />
@@ -391,6 +395,7 @@
     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="UmbracoControllers\LoginController.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
@@ -1872,9 +1877,13 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\importDocumenttype.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\insertMacro.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\insertTable.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\notifications.aspx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\notifications.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\protectPage.aspx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\protectPage.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\RegexWs.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx" />
@@ -1943,11 +1952,15 @@
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltInsertValueOf.aspx" />
     <Content Include="umbraco.presentation\umbraco\js\language.aspx" />
-    <Content Include="umbraco.presentation\umbraco\members\EditMember.aspx" />
+    <Content Include="umbraco.presentation\umbraco\members\EditMember.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\members\EditMemberType.aspx" />
+    <Content Include="umbraco.presentation\umbraco\members\EditMemberType.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\schemas\umbraco.xsd">
       <SubType>Designer</SubType>
     </Content>
@@ -1957,7 +1970,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\users\EditUser.aspx" />
-    <Content Include="umbraco.presentation\umbraco\users\EditUserType.aspx" />
+    <Content Include="umbraco.presentation\umbraco\users\EditUserType.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="umbraco.presentation\umbraco\webService.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\CacheRefresher.asmx">

@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models.Membership
         /// <summary>
         /// Initializes a new instance of the <see cref="Profile"/> class.
         /// </summary>
-        public Profile()
+        protected Profile()
         {
             ProviderUserKeyType = typeof(int);
         }
@@ -29,14 +29,16 @@ namespace Umbraco.Core.Models.Membership
 
         private object _id;
         private string _name;
+        private object _providerUserKey;
         private Type _userTypeKey;
 
         private static readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<Profile, object>(x => x.Id);
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<Profile, string>(x => x.Name);
+        private static readonly PropertyInfo ProviderUserKeySelector = ExpressionHelper.GetPropertyInfo<Profile, object>(x => x.ProviderUserKey);
         private static readonly PropertyInfo UserTypeKeySelector = ExpressionHelper.GetPropertyInfo<Profile, Type>(x => x.ProviderUserKeyType);
 
         [DataMember]
-        public object Id
+        public virtual object Id
         {
             get
             {
@@ -53,7 +55,7 @@ namespace Umbraco.Core.Models.Membership
         }
 
         [DataMember]
-        public string Name
+        public virtual string Name
         {
             get
             {
@@ -72,8 +74,18 @@ namespace Umbraco.Core.Models.Membership
         [IgnoreDataMember]
         public virtual object ProviderUserKey
         {
-            get { throw new System.NotImplementedException(); }
-            set { throw new System.NotImplementedException(); }
+            get
+            {
+                return _providerUserKey;
+            }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _providerUserKey = value;
+                    return _id;
+                }, _providerUserKey, ProviderUserKeySelector);
+            }
         }
 
         /// <summary>

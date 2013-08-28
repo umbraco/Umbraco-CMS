@@ -1,4 +1,5 @@
 using System;
+using System.Web.Razor;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
@@ -57,6 +58,13 @@ namespace umbraco.controls
             table.CellPadding = 5;
             table.CellSpacing = 0;
             table.Border = 0;
+
+            HtmlTableRow header = new HtmlTableRow();
+            header.Controls.Add(new HtmlTableCell { InnerHtml = ui.Text("content", "notmemberof") });
+            header.Controls.Add(new HtmlTableCell { InnerHtml= "&nbsp;" });
+            header.Controls.Add(new HtmlTableCell { InnerHtml = ui.Text("content", "memberof") });
+            table.Controls.Add(header);
+
             HtmlTableRow row = new HtmlTableRow();
             table.Controls.Add(row);
             HtmlTableCell cFirst = new HtmlTableCell();

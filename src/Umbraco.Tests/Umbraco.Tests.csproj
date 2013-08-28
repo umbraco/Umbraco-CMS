@@ -188,6 +188,7 @@
     <Compile Include="Models\ContentExtensionsTests.cs" />
     <Compile Include="Models\DataValueSetterTests.cs" />
     <Compile Include="Persistence\PetaPocoExtensionsTest.cs" />
+    <Compile Include="Persistence\Repositories\MemberRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserTypeRepositoryTest.cs" />
     <Compile Include="Services\PackagingServiceTests.cs" />

@@ -201,6 +201,8 @@
     <Compile Include="Models\IFile.cs" />
     <Compile Include="Models\ILanguage.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipUser.cs" />
+    <Compile Include="Models\Rdbms\MemberReadOnlyDto.cs" />
+    <Compile Include="Models\Rdbms\PropertyDataReadOnlyDto.cs" />
     <Compile Include="Models\ServerRegistration.cs" />
     <Compile Include="Models\ITemplate.cs" />
     <Compile Include="Models\Language.cs" />
@@ -444,6 +446,7 @@
     <Compile Include="Persistence\Migrations\Syntax\Update\UpdateDataBuilder.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourNineZero\RemoveUmbracoAppConstraints.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixOneZero\CreateServerRegistryTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\AddChangeDocumentTypePermission.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixZeroOne\UpdatePropertyTypesAndGroups.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\DeleteAppTables.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\EnsureAppsTreesUpdated.cs" />
@@ -467,6 +470,7 @@
     <Compile Include="Persistence\Querying\Query.cs" />
     <Compile Include="Persistence\Querying\SqlTranslator.cs" />
     <Compile Include="Persistence\Relators\DictionaryLanguageTextRelator.cs" />
+    <Compile Include="Persistence\Relators\PropertyDataRelator.cs" />
     <Compile Include="Persistence\Relators\UserSectionRelator.cs" />
     <Compile Include="Persistence\Repositories\ContentRepository.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeBaseRepository.cs" />
@@ -483,6 +487,7 @@
     <Compile Include="Persistence\Repositories\Interfaces\ILanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IMediaRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IMediaTypeRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IMemberRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRelationRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRelationTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRepositoryQueryable.cs" />
@@ -497,6 +502,9 @@
     <Compile Include="Persistence\Repositories\LanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\MediaRepository.cs" />
     <Compile Include="Persistence\Repositories\MediaTypeRepository.cs" />
+    <Compile Include="Persistence\Repositories\MemberGroupRepository.cs" />
+    <Compile Include="Persistence\Repositories\MemberRepository.cs" />
+    <Compile Include="Persistence\Repositories\MemberTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\PermissionRepository.cs" />
     <Compile Include="Persistence\Repositories\PetaPocoRepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\RecycleBinRepository.cs" />

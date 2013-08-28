@@ -140,12 +140,35 @@ namespace Umbraco.Web.Routing
 
             // unless a template has been set already by the finder,
             // template should be null at that point. 
-            var initial = IsInitialPublishedContent;
+
+            // IsInternalRedirect if IsInitial, or already IsInternalRedirect
+            var isInternalRedirect = IsInitialPublishedContent || IsInternalRedirectPublishedContent;
+
+            // redirecting to self
+            if (content.Id == PublishedContent.Id) // neither can be null
+            {
+                // no need to set PublishedContent, we're done
+                IsInternalRedirectPublishedContent = isInternalRedirect;
+                return;
+            }
+
+            // else
+
+            // save
             var template = _template;
+            var renderingEngine = RenderingEngine;
+
+            // set published content - this resets the template, and sets IsInternalRedirect to false
             PublishedContent = content;
-            IsInternalRedirectPublishedContent = (initial && !IsInitialPublishedContent);
-            if (IsInternalRedirectPublishedContent && UmbracoSettings.For<WebRouting>().InternalRedirectPreservesTemplate)
+		    IsInternalRedirectPublishedContent = isInternalRedirect;
+
+            // must restore the template if it's an internal redirect & the config option is set
+            if (isInternalRedirect && UmbracoSettings.For<WebRouting>().InternalRedirectPreservesTemplate)
+            {
+                // restore
                 _template = template;
+                RenderingEngine = renderingEngine;
+            }
         }
 
         /// <summary>
@@ -179,9 +202,11 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the current published has been obtained from the
-        /// initial published content following internal redirections exclusively.
+        /// Gets or sets a value indicating whether the current published content has been obtained
+        /// from the initial published content following internal redirections exclusively.
         /// </summary>
+        /// <remarks>Used by PublishedContentRequestEngine.FindTemplate() to figure out whether to
+        /// apply the internal redirect or not, when content is not the initial content.</remarks>
         public bool IsInternalRedirectPublishedContent { get; private set; }
 
         /// <summary>
