@@ -4,12 +4,12 @@
 		<div class="umb-image-mask">
 				<i class="icon-screenshot"></i>
 				<i class="icon-circle"></i>
-			<img src="/media/dummy/crop-large.png" alt="">
+			<img ng-src="{{currentImage.src}}" style="max-width: 600px; max-height: 400px" alt="">
 		</div>
 
 		<div class="umb-image-controls clearfix">
 			<i class="icon icon-minus"></i> 
-			<input class="range" type="range" min="0" max="100" step="5" value="35">
+			<input class="range" type="range" min="1" max="200" step="1" value="100">
 			<i class="icon icon-plus"></i> 
 		</div>
 	</div>
@@ -18,7 +18,7 @@
 	<ul class="thumbnails umb-crop-preview">
 		<li class="umb-thumbnail" ng-repeat="image in images">
 			<a href ng-click="crop(image)">
-				<img ng-src="image.src" alt="">
+				<img ng-src="{{image.thumbnail}}" alt="">
 			</a>
 		</li>
 		
@@ -29,4 +29,5 @@
 		</li>
 	</ul>
 
+	{{images | json}}
 </div>
