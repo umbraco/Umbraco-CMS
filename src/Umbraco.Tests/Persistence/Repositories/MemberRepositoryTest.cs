@@ -60,13 +60,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             RepositoryResolver.Current = new RepositoryResolver(
                 new RepositoryFactory());
 
+            //disable cache
+            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
+
+            var dbFactory = new DefaultDatabaseFactory();
+
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory()),
+                new DatabaseContext(dbFactory),
                 //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy()),
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),
                 //disable cache
-                false)
+                cacheHelper)
             {
                 IsReady = true
             };
