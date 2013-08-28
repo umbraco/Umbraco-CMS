@@ -11,7 +11,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class MemberRepository : VersionableRepositoryBase<int, IMembershipUser>, IMemberRepository
+    internal class MemberRepository : VersionableRepositoryBase<int, IMember>, IMemberRepository
     {
         public MemberRepository(IDatabaseUnitOfWork work) : base(work)
         {
@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of RepositoryBase<int, IMembershipUser>
 
-        protected override IMembershipUser PerformGet(int id)
+        protected override IMember PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
@@ -52,12 +52,12 @@ namespace Umbraco.Core.Persistence.Repositories
             return member;
         }
 
-        protected override IEnumerable<IMembershipUser> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IMember> PerformGetAll(params int[] ids)
         {
             throw new NotImplementedException();
         }
 
-        protected override IEnumerable<IMembershipUser> PerformGetByQuery(IQuery<IMembershipUser> query)
+        protected override IEnumerable<IMember> PerformGetByQuery(IQuery<IMember> query)
         {
             throw new NotImplementedException();
         }
@@ -110,12 +110,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Unit of Work Implementation
 
-        protected override void PersistNewItem(IMembershipUser entity)
+        protected override void PersistNewItem(IMember entity)
         {
             throw new NotImplementedException();
         }
 
-        protected override void PersistUpdatedItem(IMembershipUser entity)
+        protected override void PersistUpdatedItem(IMember entity)
         {
             throw new NotImplementedException();
         }
@@ -124,7 +124,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of VersionableRepositoryBase<IMembershipUser>
 
-        public override IMembershipUser GetByVersion(Guid versionId)
+        public override IMember GetByVersion(Guid versionId)
         {
             throw new NotImplementedException();
         }

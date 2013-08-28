@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal interface IMemberRepository : IRepositoryVersionable<int, IMembershipUser>
+    internal interface IMemberRepository : IRepositoryVersionable<int, IMember>
     {
          
     }

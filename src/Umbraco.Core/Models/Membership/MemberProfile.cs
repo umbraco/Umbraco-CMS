@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Reflection;
+using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models.Membership
@@ -12,6 +14,7 @@ namespace Umbraco.Core.Models.Membership
         private string _path;
         private int _creatorId;
         private bool _trashed;
+        private PropertyCollection _properties;
 
         private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<MemberProfile, int>(x => ((IUmbracoEntity)x).ParentId);
         private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<MemberProfile, int>(x => ((IUmbracoEntity)x).SortOrder);
@@ -19,6 +22,12 @@ namespace Umbraco.Core.Models.Membership
         private static readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<MemberProfile, string>(x => ((IUmbracoEntity)x).Path);
         private static readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<MemberProfile, int>(x => ((IUmbracoEntity)x).CreatorId);
         private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<MemberProfile, bool>(x => x.Trashed);
+        private readonly static PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<Member, PropertyCollection>(x => x.Properties);
+
+        protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(PropertyCollectionSelector);
+        }
 
         public abstract new int Id { get; set; }
         public abstract Guid Key { get; set; }
@@ -29,6 +38,7 @@ namespace Umbraco.Core.Models.Membership
         /// <summary>
         /// Profile of the user who created this Content
         /// </summary>
+        [DataMember]
         int IUmbracoEntity.CreatorId
         {
             get
@@ -48,7 +58,8 @@ namespace Umbraco.Core.Models.Membership
         /// <summary>
         /// Gets or sets the level of the content entity
         /// </summary>
-        int IUmbracoEntity.Level 
+        [DataMember]
+        int IUmbracoEntity.Level
         { 
             get { return _level; }
             set
@@ -63,6 +74,7 @@ namespace Umbraco.Core.Models.Membership
         /// <summary>
         /// Gets or sets the Id of the Parent entity
         /// </summary>
+        [DataMember]
         int IUmbracoEntity.ParentId
         {
             get
@@ -84,6 +96,7 @@ namespace Umbraco.Core.Models.Membership
         /// <summary>
         /// Gets or sets the path
         /// </summary>
+        [DataMember]
         string IUmbracoEntity.Path
         {
             get { return _path; }
@@ -100,6 +113,7 @@ namespace Umbraco.Core.Models.Membership
         /// <summary>
         /// Gets or sets the sort order of the content entity
         /// </summary>
+        [DataMember]
         int IUmbracoEntity.SortOrder
         {
             get { return _sortOrder; }
@@ -117,6 +131,7 @@ namespace Umbraco.Core.Models.Membership
         /// Boolean indicating whether this Content is Trashed or not.
         /// If Content is Trashed it will be located in the Recyclebin.
         /// </summary>
+        [DataMember]
         public virtual bool Trashed
         {
             get { return _trashed; }
@@ -127,6 +142,17 @@ namespace Umbraco.Core.Models.Membership
                     _trashed = value;
                     return _trashed;
                 }, _trashed, TrashedSelector);
+            }
+        }
+
+        [DataMember]
+        public PropertyCollection Properties
+        {
+            get { return _properties; }
+            set
+            {
+                _properties = value;
+                _properties.CollectionChanged += PropertiesChanged;
             }
         }
     }

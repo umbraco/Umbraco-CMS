@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -17,27 +16,24 @@ namespace Umbraco.Core.Models.Membership
     [Serializable]
     [DataContract(IsReference = true)]
     [DebuggerDisplay("Id: {Id}")]
-    internal class Member : MemberProfile, IMembershipUser
+    internal class Member : MemberProfile, IMember
     {
         private bool _hasIdentity;
         private int _id;
         private Guid _key;
         private DateTime _createDate;
         private DateTime _updateDate;
-        private PropertyCollection _properties;
+        private int _contentTypeId;
+        private string _contentTypeAlias;
 
         private static readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<Member, int>(x => x.Id);
         private static readonly PropertyInfo KeySelector = ExpressionHelper.GetPropertyInfo<Member, Guid>(x => x.Key);
         private static readonly PropertyInfo CreateDateSelector = ExpressionHelper.GetPropertyInfo<Member, DateTime>(x => x.CreateDate);
         private static readonly PropertyInfo UpdateDateSelector = ExpressionHelper.GetPropertyInfo<Member, DateTime>(x => x.UpdateDate);
         private static readonly PropertyInfo HasIdentitySelector = ExpressionHelper.GetPropertyInfo<Member, bool>(x => x.HasIdentity);
-        private readonly static PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<Member, PropertyCollection>(x => x.Properties);
-
-        protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            OnPropertyChanged(PropertyCollectionSelector);
-        }
-
+        private static readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<Member, int>(x => x.ContentTypeId);
+        private static readonly PropertyInfo DefaultContentTypeAliasSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.ContentTypeAlias);
+        
         /// <summary>
         /// Integer Id
         /// </summary>
@@ -386,20 +382,49 @@ namespace Umbraco.Core.Models.Membership
         [IgnoreDataMember]
         public bool IsOnline { get; set; }
 
-        public object ProfileId { get; set; }
-        public IEnumerable<object> Groups { get; set; }
-
+        /// <summary>
+        /// Guid Id of the curent Version
+        /// </summary>
         [DataMember]
-        public PropertyCollection Properties
+        public Guid Version { get; internal set; }
+
+        /// <summary>
+        /// Integer Id of the default ContentType
+        /// </summary>
+        [DataMember]
+        public virtual int ContentTypeId
         {
-            get { return _properties; }
-            set
+            get { return _contentTypeId; }
+            internal set
             {
-                _properties = value;
-                _properties.CollectionChanged += PropertiesChanged;
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _contentTypeId = value;
+                    return _contentTypeId;
+                }, _contentTypeId, DefaultContentTypeIdSelector);
             }
         }
 
+        /// <summary>
+        /// String alias of the default ContentType
+        /// </summary>
+        [DataMember]
+        public virtual string ContentTypeAlias
+        {
+            get { return _contentTypeAlias; }
+            internal set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _contentTypeAlias = value;
+                    return _contentTypeAlias;
+                }, _contentTypeAlias, DefaultContentTypeAliasSelector);
+            }
+        }
+
+        public object ProfileId { get; set; }
+        public IEnumerable<object> Groups { get; set; }
+        
         #region Internal methods
 
         internal virtual void ResetIdentity()

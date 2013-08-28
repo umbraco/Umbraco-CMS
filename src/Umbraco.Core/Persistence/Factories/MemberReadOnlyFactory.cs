@@ -8,9 +8,9 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class MemberReadOnlyFactory : IEntityFactory<IMembershipUser, MemberReadOnlyDto>
+    internal class MemberReadOnlyFactory : IEntityFactory<IMember, MemberReadOnlyDto>
     {
-        public IMembershipUser BuildEntity(MemberReadOnlyDto dto)
+        public IMember BuildEntity(MemberReadOnlyDto dto)
         {
             var member = new Member
                          {
@@ -24,7 +24,9 @@ namespace Umbraco.Core.Persistence.Factories
                              ProviderUserKey = dto.UniqueId,
                              Trashed = dto.Trashed,
                              Key = dto.UniqueId.Value,
-                             ProfileId = dto.UniqueId.Value
+                             ProfileId = dto.UniqueId.Value,
+                             ContentTypeId = dto.ContentTypeId,
+                             ContentTypeAlias = dto.ContentTypeAlias
                          };
 
             ((IUmbracoEntity)member).CreatorId = dto.UserId.Value;
@@ -55,7 +57,7 @@ namespace Umbraco.Core.Persistence.Factories
             return member;
         }
 
-        public MemberReadOnlyDto BuildDto(IMembershipUser entity)
+        public MemberReadOnlyDto BuildDto(IMember entity)
         {
             throw new System.NotImplementedException();
         }
