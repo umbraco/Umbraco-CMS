@@ -218,20 +218,28 @@ namespace Umbraco.Web.Editors
         }
 
         //short hand to use with the uploader in the media dialog
-        public HttpResponseMessage PostAddFile(int parentId)
+        public HttpResponseMessage PostAddFile()
         {
             var context = UmbracoContext.HttpContext;
             if(context.Request.Files.Count > 0)
             {
-                var postedFile = context.Request.Files[0];
-                var name = postedFile.FileName;
+                if (context.Request.Form.Count > 0)
+                {
+                    int parentId;
+                    if (int.TryParse(context.Request.Form[0], out parentId))
+                    {
+                        var file = context.Request.Files[0];
+                        var name = file.FileName;
 
-                var mediaService = base.ApplicationContext.Services.MediaService;
-                var f = mediaService.CreateMedia(name, parentId, Constants.Conventions.MediaTypes.Image);
-                f.SetValue(Constants.Conventions.Media.File, postedFile);
-                mediaService.Save(f);
+                        var mediaService = base.ApplicationContext.Services.MediaService;
+                        var f = mediaService.CreateMedia(name, parentId, Constants.Conventions.MediaTypes.Image);
+                        f.SetValue(Constants.Conventions.Media.File, file);
+                        mediaService.Save(f);
 
-                return new HttpResponseMessage(HttpStatusCode.OK);
+                        return new HttpResponseMessage(HttpStatusCode.OK);        
+                    }
+                }
+                
             }
 
             return new HttpResponseMessage(HttpStatusCode.NotFound);

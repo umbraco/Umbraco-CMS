@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Linq;
 using System.Xml;
 using Umbraco.Core;
@@ -101,9 +102,11 @@ namespace Umbraco.Web.PropertyEditors
 
         private static void FillProperties(XmlNode uploadFieldConfigNode, IContentBase content, UmbracoMediaFile um)
         {
+            var size = um.SupportsResizing ? (Size?)um.GetDimensions() : null;
+
             // only add dimensions to web images
-            UpdateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias", um.SupportsResizing ? um.GetDimensions().Width.ToString() : string.Empty);
-            UpdateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias", um.SupportsResizing ? um.GetDimensions().Height.ToString() : string.Empty);
+            UpdateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias", size.HasValue ? size.Value.Width.ToInvariantString() : string.Empty);
+            UpdateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias", size.HasValue ? size.Value.Height.ToInvariantString() : string.Empty);
 
             UpdateContentProperty(uploadFieldConfigNode, content, "lengthFieldAlias", um.Length);
             UpdateContentProperty(uploadFieldConfigNode, content, "extensionFieldAlias", um.Extension);

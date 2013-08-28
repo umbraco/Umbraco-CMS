@@ -120,7 +120,7 @@ function imageHelper() {
             return imagePath.substr(0, imagePath.lastIndexOf('.')) + "_thumb" + ".jpg";
         },
         detectIfImageByExtension: function(imagePath) {
-            var lowered = imagePath;
+            var lowered = imagePath.toLowerCase();
             var ext = lowered.substr(lowered.lastIndexOf(".") + 1);
             return ("," + Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes + ",").indexOf("," + ext + ",") !== -1;
         }
