@@ -34,6 +34,9 @@ namespace Umbraco.Core.Models.Membership
         private static readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<Member, int>(x => x.ContentTypeId);
         private static readonly PropertyInfo DefaultContentTypeAliasSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.ContentTypeAlias);
         
+        public Member()
+        {}
+
         /// <summary>
         /// Integer Id
         /// </summary>
@@ -424,6 +427,16 @@ namespace Umbraco.Core.Models.Membership
 
         public object ProfileId { get; set; }
         public IEnumerable<object> Groups { get; set; }
+
+        /* Internal experiment - only used for mapping queries. 
+         * Adding these to have first level properties instead of the Properties collection.
+         */
+        internal string LongStringPropertyValue { get; set; }
+        internal string ShortStringPropertyValue { get; set; }
+        internal int IntegerropertyValue { get; set; }
+        internal bool BoolPropertyValue { get; set; }
+        internal DateTime DateTimePropertyValue { get; set; }
+        internal string PropertyTypeAlias { get; set; }
         
         #region Internal methods
 

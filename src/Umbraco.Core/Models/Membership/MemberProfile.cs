@@ -6,7 +6,7 @@ using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models.Membership
 {
-    internal abstract class MemberProfile : Profile, IUmbracoEntity
+    internal class MemberProfile : Profile, IUmbracoEntity
     {
         private Lazy<int> _parentId;
         private int _sortOrder;
@@ -16,12 +16,12 @@ namespace Umbraco.Core.Models.Membership
         private bool _trashed;
         private PropertyCollection _properties;
 
-        private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<MemberProfile, int>(x => ((IUmbracoEntity)x).ParentId);
-        private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<MemberProfile, int>(x => ((IUmbracoEntity)x).SortOrder);
-        private static readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<MemberProfile, int>(x => ((IUmbracoEntity)x).Level);
-        private static readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<MemberProfile, string>(x => ((IUmbracoEntity)x).Path);
-        private static readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<MemberProfile, int>(x => ((IUmbracoEntity)x).CreatorId);
-        private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<MemberProfile, bool>(x => x.Trashed);
+        private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<IUmbracoEntity, int>(x => x.ParentId);
+        private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<IUmbracoEntity, int>(x => x.SortOrder);
+        private static readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<IUmbracoEntity, int>(x => x.Level);
+        private static readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<IUmbracoEntity, string>(x => x.Path);
+        private static readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<IUmbracoEntity, int>(x => x.CreatorId);
+        private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<Member, bool>(x => x.Trashed);
         private readonly static PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<Member, PropertyCollection>(x => x.Properties);
 
         protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -29,11 +29,14 @@ namespace Umbraco.Core.Models.Membership
             OnPropertyChanged(PropertyCollectionSelector);
         }
 
-        public abstract new int Id { get; set; }
-        public abstract Guid Key { get; set; }
-        public abstract DateTime CreateDate { get; set; }
-        public abstract DateTime UpdateDate { get; set; }
-        public abstract bool HasIdentity { get; protected set; }
+        protected MemberProfile()
+        {}
+
+        public virtual new int Id { get; set; }
+        public virtual Guid Key { get; set; }
+        public virtual DateTime CreateDate { get; set; }
+        public virtual DateTime UpdateDate { get; set; }
+        public virtual bool HasIdentity { get; protected set; }
 
         /// <summary>
         /// Profile of the user who created this Content

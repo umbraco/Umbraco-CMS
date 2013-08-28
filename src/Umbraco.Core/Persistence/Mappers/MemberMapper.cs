@@ -60,6 +60,14 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<Member, PropertyDataDto>(src => src.LastLockoutDate, dto => dto.Date);
             CacheMap<Member, PropertyDataDto>(src => src.LastLoginDate, dto => dto.Date);
             CacheMap<Member, PropertyDataDto>(src => src.LastPasswordChangeDate, dto => dto.Date);
+
+            /* Internal experiment */
+            CacheMap<Member, PropertyDataDto>(src => src.DateTimePropertyValue, dto => dto.Date);
+            CacheMap<Member, PropertyDataDto>(src => src.IntegerropertyValue, dto => dto.Integer);
+            CacheMap<Member, PropertyDataDto>(src => src.BoolPropertyValue, dto => dto.Integer);
+            CacheMap<Member, PropertyDataDto>(src => src.LongStringPropertyValue, dto => dto.Text);
+            CacheMap<Member, PropertyDataDto>(src => src.ShortStringPropertyValue, dto => dto.VarChar);
+            CacheMap<Member, PropertyTypeDto>(src => src.PropertyTypeAlias, dto => dto.Alias);
         }
 
         #endregion

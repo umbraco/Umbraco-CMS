@@ -25,10 +25,10 @@ namespace Umbraco.Core.Persistence.Repositories
          * GetById - get a member by its integer Id
          * GetByKey - get a member by its unique guid Id (which should correspond to a membership provider user's id)
          * GetByUsername - get a member by its username
+         * 
          * GetByPropertyValue - get members with a certain property value (supply both property alias and value?)
          * GetByMemberTypeAlias - get all members of a certain type
          * GetByMemberGroup - get all members in a specific group
-         * GetAllMembers
          */
 
         #region Overrides of RepositoryBase<int, IMembershipUser>
@@ -43,23 +43,39 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
                     new PropertyDataRelator().Map, sql);
 
-            if (dto == null || dto.Any() == false)
-                return null;
-
-            var factory = new MemberReadOnlyFactory();
-            var member = factory.BuildEntity(dto.First());
-
-            return member;
+            return BuildFromDto(dto);
         }
 
         protected override IEnumerable<IMember> PerformGetAll(params int[] ids)
         {
-            throw new NotImplementedException();
+            var sql = GetBaseQuery(false);
+            if (ids.Any())
+            {
+                var statement = string.Join(" OR ", ids.Select(x => string.Format("umbracoNode.id='{0}'", x)));
+                sql.Where(statement);
+            }
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+
+            var dtos =
+                Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
+                    new PropertyDataRelator().Map, sql);
+
+            return BuildFromDtos(dtos);
         }
 
         protected override IEnumerable<IMember> PerformGetByQuery(IQuery<IMember> query)
         {
-            throw new NotImplementedException();
+            var sqlClause = GetBaseQuery(false);
+            var translator = new SqlTranslator<IMember>(sqlClause, query);
+            var sql = translator.Translate()
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
+                .OrderBy<NodeDto>(x => x.SortOrder);
+
+            var dtos =
+                Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
+                    new PropertyDataRelator().Map, sql);
+
+            return BuildFromDtos(dtos);
         }
 
         #endregion
@@ -68,7 +84,19 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql GetBaseQuery(bool isCount)
         {
-            //TODO Count
+            if (isCount)
+            {
+                var sqlCount = new Sql()
+                    .Select("COUNT(*)")
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+                    .InnerJoin<ContentVersionDto>().On<ContentVersionDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<MemberDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                return sqlCount;
+            }
+
             var sql = new Sql();
             sql.Select("umbracoNode.*", "cmsContent.contentType", "cmsContentType.alias AS ContentTypeAlias", "cmsContentVersion.VersionId",
                 "cmsContentVersion.VersionDate", "cmsContentVersion.LanguageLocale", "cmsMember.Email",
@@ -98,7 +126,21 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
-            throw new NotImplementedException();
+            var list = new List<string>
+                           {
+                               "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
+                               "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                               "DELETE FROM umbracoRelation WHERE parentId = @Id",
+                               "DELETE FROM umbracoRelation WHERE childId = @Id",
+                               "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
+                               "DELETE FROM cmsPropertyData WHERE contentNodeId = @Id",
+                               "DELETE FROM cmsMember WHERE nodeId = @Id",
+                               "DELETE FROM cmsContentVersion WHERE ContentId = @Id",
+                               "DELETE FROM cmsContentXml WHERE nodeID = @Id",
+                               "DELETE FROM cmsContent WHERE NodeId = @Id",
+                               "DELETE FROM umbracoNode WHERE id = @Id"
+                           };
+            return list;
         }
 
         protected override Guid NodeObjectTypeId
@@ -135,5 +177,91 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
+
+        //NOTE Might be sufficient to use the GetByQuery method for this, as the mapping should cover it
+        public IMember GetByKey(Guid key)
+        {
+            var sql = GetBaseQuery(false);
+            sql.Where<NodeDto>(x => x.UniqueId == key);
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+
+            var dto =
+                Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
+                    new PropertyDataRelator().Map, sql);
+
+            return BuildFromDto(dto);
+        }
+
+        //NOTE Might be sufficient to use the GetByQuery method for this, as the mapping should cover it
+        public IMember GetByUsername(string username)
+        {
+            var sql = GetBaseQuery(false);
+            sql.Where<MemberDto>(x => x.LoginName == username);
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+
+            var dto =
+                Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
+                    new PropertyDataRelator().Map, sql);
+
+            return BuildFromDto(dto);
+        }
+
+        //NOTE Might be sufficient to use the GetByQuery method for this, as the mapping should cover it
+        public IEnumerable<IMember> GetByMemberTypeAlias(string memberTypeAlias)
+        {
+            var sql = GetBaseQuery(false);
+            sql.Where<ContentTypeDto>(x => x.Alias == memberTypeAlias);
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+
+            var dtos =
+                Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
+                    new PropertyDataRelator().Map, sql);
+
+            return BuildFromDtos(dtos);
+        }
+
+        /*public IEnumerable<IMember> GetByPropertyValue(string value)
+        {}
+
+        public IEnumerable<IMember> GetByPropertyValue(bool value)
+        { }
+
+        public IEnumerable<IMember> GetByPropertyValue(int value)
+        { }
+
+        public IEnumerable<IMember> GetByPropertyValue(DateTime value)
+        { }
+
+        public IEnumerable<IMember> GetByPropertyValue(string propertyTypeAlias, string value)
+        { }
+
+        public IEnumerable<IMember> GetByPropertyValue(string propertyTypeAlias, bool value)
+        { }
+
+        public IEnumerable<IMember> GetByPropertyValue(string propertyTypeAlias, int value)
+        { }
+
+        public IEnumerable<IMember> GetByPropertyValue(string propertyTypeAlias, DateTime value)
+        { }*/
+
+        private IMember BuildFromDto(List<MemberReadOnlyDto> dtos)
+        {
+            if (dtos == null || dtos.Any() == false)
+                return null;
+
+            var factory = new MemberReadOnlyFactory();
+            var member = factory.BuildEntity(dtos.First());
+
+            return member;
+        }
+
+        private IEnumerable<IMember> BuildFromDtos(List<MemberReadOnlyDto> dtos)
+        {
+            if (dtos == null || dtos.Any() == false)
+                return Enumerable.Empty<IMember>();
+
+            var factory = new MemberReadOnlyFactory();
+            return dtos.Select(factory.BuildEntity);
+        }
     }
 }

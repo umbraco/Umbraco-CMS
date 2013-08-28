@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public IMember BuildEntity(MemberReadOnlyDto dto)
         {
-            var member = new Member
+            var member = new Member()
                          {
                              Id = dto.NodeId,
                              CreateDate = dto.CreateDate,
