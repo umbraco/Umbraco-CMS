@@ -207,6 +207,19 @@ namespace Umbraco.Core.Services
 		}
 
         /// <summary>
+        /// Gets an <see cref="IMedia"/> object by Id
+        /// </summary>
+        /// <param name="ids">Ids of the Media to retrieve</param>
+        /// <returns><see cref="IMedia"/></returns>
+        internal IEnumerable<IMedia> GetByIds(IEnumerable<int> ids)
+        {
+            using (var repository = _repositoryFactory.CreateMediaRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(ids.ToArray());
+            }
+        }
+
+        /// <summary>
         /// Gets an <see cref="IMedia"/> object by its 'UniqueId'
         /// </summary>
         /// <param name="key">Guid key of the Media to retrieve</param>

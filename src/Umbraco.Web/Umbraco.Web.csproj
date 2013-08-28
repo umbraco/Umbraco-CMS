@@ -303,7 +303,6 @@
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Editors\MediaPostValidateAttribute.cs" />
-    <Compile Include="Editors\MediaUploadController.cs" />
     <Compile Include="Editors\UserController.cs" />
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\DataTypeSave.cs" />
