@@ -54,7 +54,7 @@ namespace umbraco.uicontrols.DatePicker
                 }
                 else
                 {
-                    m_DateTextBox.Text = value.ToString(ShowTime ? "yyyy-MM-dd HH:mm" : "yyyy-MM-dd");
+                    m_DateTextBox.Text = value.ToString(ShowTime ? "yyyy-MM-dd'T'HH:mm" : "yyyy-MM-dd");
                 }
             }
         }

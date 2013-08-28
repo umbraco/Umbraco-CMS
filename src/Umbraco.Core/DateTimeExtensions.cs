@@ -15,7 +15,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         public static string ToIsoString(this DateTime dt)
         {
-            return dt.ToString("yyyy-MM-dd HH:mm:ss");
+            return dt.ToString("yyyy-MM-dd'T'HH:mm:ss");
         }
 
     }
