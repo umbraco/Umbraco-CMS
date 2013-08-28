@@ -2,47 +2,21 @@
 
 @using System.Web.Mvc.Html
 @using ClientDependency.Core.Mvc
-@using umbraco.cms.businesslogic.member
-@using Umbraco.Web.UmbracoModels
-@using Umbraco.Web.UmbracoControllers
+@using Umbraco.Web.Models
+@using Umbraco.Web.Controllers
 
 @{
+    var registerModel = new RegisterModel();
+    registerModel.FillModel(registerModel, Model.MacroParameters);
+
     Html.EnableClientValidation();
     Html.EnableUnobtrusiveJavaScript();
-
-    // TODO: CDF doesn't work at the moment, Shannon is looking at it
-    //Html.RequiresJs("/umbraco_client/ui/jquery.js");
-    //Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.min.js");
-    //Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.unobtrusive.min.js");
-
-    // TODO: Make a helper for this
-    var memberTypeAlias = "UmbracoMember";
-    if (Model.MacroParameters.Any() && Model.MacroParameters.ContainsKey("memberTypeAlias"))
-    {
-        var alias = Model.MacroParameters["memberTypeAlias"];
-        if (string.IsNullOrWhiteSpace(alias.ToString()) == false)
-        {
-            memberTypeAlias = alias.ToString();
-        }
-    }
-    
-    var registerModel = new RegisterModel
-                        {
-                            MemberProperties = new List<UmbracoProperty>(),
-                            MemberTypeAlias = memberTypeAlias
-                        };
-
-    // TODO: Fill model somewhere else
-    var memberType = MemberType.GetByAlias(registerModel.MemberTypeAlias);
-    foreach (var prop in memberType.PropertyTypes.Where(memberType.MemberCanEdit))
-    {
-        registerModel.MemberProperties.Add(new UmbracoProperty {Alias = prop.Alias, Name = prop.Name, Value = string.Empty});
-    }
+    Html.RequiresJs("/umbraco_client/ui/jquery.js");
+    Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.min.js");
+    Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.unobtrusive.min.js");
 }
 
-<script src="@Url.Content("~/umbraco_client/ui/jquery.js")" type="text/javascript"></script>
-<script src="@Url.Content("~/umbraco_client/Application/JQuery/jquery.validate.min.js")" type="text/javascript"></script>
-<script src="@Url.Content("~/umbraco_client/Application/JQuery/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+@Html.RenderJsHere()
 
 @using (Html.BeginUmbracoForm<RegisterController>("HandleRegisterMember"))
 {
