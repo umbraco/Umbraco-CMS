@@ -22,19 +22,13 @@
   <cc2:Pane ID="Pane1" runat="server" Width="216" Height="80">
     <asp:DataGrid ID="dgTabs" Width="100%" runat="server" CellPadding="2" HeaderStyle-CssClass="propertyHeader"
       ItemStyle-CssClass="propertyContent" GridLines="None" OnItemCommand="dgTabs_ItemCommand"
-      HeaderStyle-Font-Bold="True" AutoGenerateColumns="False">
+      HeaderStyle-Font-Bold="True" AutoGenerateColumns="False" CssClass="tabs-table">
       <Columns>
         <asp:BoundColumn DataField="id" Visible="False"></asp:BoundColumn>
-        <asp:TemplateColumn HeaderText="Name">
+        <asp:TemplateColumn HeaderText="Name (drag to re-order)">
           <ItemTemplate>
-            <asp:TextBox ID="txtTab" runat="server" Value='<%#DataBinder.Eval(Container.DataItem,"name")%>'>
-            </asp:TextBox>
-          </ItemTemplate>
-        </asp:TemplateColumn>
-        <asp:TemplateColumn HeaderText="Sort order">
-          <ItemTemplate>
-            <asp:TextBox ID="txtSortOrder" runat="server" Value='<%#DataBinder.Eval(Container.DataItem,"order") %>'>
-            </asp:TextBox>
+            <asp:TextBox ID="txtTab" runat="server" Value='<%#DataBinder.Eval(Container.DataItem,"name")%>'></asp:TextBox>
+            <asp:TextBox ID="txtSortOrder" runat="server" CssClass="sort-order" Value='<%#DataBinder.Eval(Container.DataItem,"order") %>'></asp:TextBox>
           </ItemTemplate>
         </asp:TemplateColumn>
         <asp:ButtonColumn ButtonType="PushButton" Text="Delete" CommandName="Delete"></asp:ButtonColumn>
@@ -109,5 +103,26 @@
 <script type="text/javascript">
     $(function () {
         <asp:Literal runat="server" ID="checkTxtAliasJs" />
+    });
+
+    jQuery(document).ready(function () {
+
+        // Make each tr of the tabs table sortable (prevent dragging of header row, and set up a callback for when row dragged)
+        jQuery("table.tabs-table tbody").sortable({
+            containment: 'parent',
+            cancel: '.propertyHeader, input',
+            tolerance: 'pointer',
+            update: function (event, ui) {
+                saveOrder();
+            }
+        });
+
+        // Fired after row dragged; go through each tr and save position to the hidden sort order field
+        function saveOrder() {
+            jQuery("table.tabs-table tbody tr.propertyContent").each(function (index) {
+                jQuery("input.sort-order", this).val(index + 1);
+            });
+        }
+
     });
 </script>

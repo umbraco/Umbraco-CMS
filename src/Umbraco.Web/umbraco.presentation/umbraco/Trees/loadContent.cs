@@ -124,6 +124,8 @@ namespace umbraco
             actions.Add(ActionSort.Instance);
             actions.Add(ActionRollback.Instance);
             actions.Add(ContextMenuSeperator.Instance);
+            actions.Add(ActionChangeDocType.Instance);
+            actions.Add(ContextMenuSeperator.Instance);
             actions.Add(ActionPublish.Instance);
             actions.Add(ActionToPublish.Instance);
             actions.Add(ActionAssignDomain.Instance);

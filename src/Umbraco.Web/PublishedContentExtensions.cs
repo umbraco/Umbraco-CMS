@@ -114,7 +114,7 @@ namespace Umbraco.Web
 		public static string GetTemplateAlias(this IPublishedContent doc)
 		{
 			var template = Template.GetTemplate(doc.TemplateId);
-			return template.Alias;
+            return template != null ? template.Alias : string.Empty;
 		}
 
 		#region GetPropertyValue
