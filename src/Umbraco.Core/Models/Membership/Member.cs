@@ -42,7 +42,7 @@ namespace Umbraco.Core.Models.Membership
         /// Integer Id
         /// </summary>
         [DataMember]
-        public new int Id
+        public override int Id
         {
             get
             {
@@ -65,7 +65,7 @@ namespace Umbraco.Core.Models.Membership
         /// <remarks>The key is currectly used to store the Unique Id from the 
         /// umbracoNode table, which many of the entities are based on.</remarks>
         [DataMember]
-        public Guid Key
+        public override Guid Key
         {
             get
             {
@@ -88,7 +88,7 @@ namespace Umbraco.Core.Models.Membership
         /// Gets or sets the Created Date
         /// </summary>
         [DataMember]
-        public DateTime CreateDate
+        public override DateTime CreateDate
         {
             get { return _createDate; }
             set
@@ -105,7 +105,7 @@ namespace Umbraco.Core.Models.Membership
         /// Gets or sets the Modified Date
         /// </summary>
         [DataMember]
-        public DateTime UpdateDate
+        public override DateTime UpdateDate
         {
             get { return _updateDate; }
             set
@@ -122,7 +122,7 @@ namespace Umbraco.Core.Models.Membership
         /// Indicates whether the current entity has an identity, eg. Id.
         /// </summary>
         [IgnoreDataMember]
-        public virtual bool HasIdentity
+        public override bool HasIdentity
         {
             get
             {
@@ -168,7 +168,9 @@ namespace Umbraco.Core.Models.Membership
         {
             get
             {
-                return Properties[Constants.Conventions.Member.PasswordQuestion].Value.ToString();
+                return Properties[Constants.Conventions.Member.PasswordQuestion].Value == null
+                    ? string.Empty
+                    : Properties[Constants.Conventions.Member.PasswordQuestion].Value.ToString();
             }
             set
             {
@@ -188,7 +190,9 @@ namespace Umbraco.Core.Models.Membership
         {
             get
             {
-                return Properties[Constants.Conventions.Member.PasswordAnswer].Value.ToString();
+                return Properties[Constants.Conventions.Member.PasswordAnswer].Value == null
+                    ? string.Empty
+                    : Properties[Constants.Conventions.Member.PasswordAnswer].Value.ToString();
             }
             set
             {
@@ -208,7 +212,9 @@ namespace Umbraco.Core.Models.Membership
         {
             get
             {
-                return Properties[Constants.Conventions.Member.Comments].Value.ToString();
+                return Properties[Constants.Conventions.Member.Comments].Value == null
+                    ? string.Empty
+                    : Properties[Constants.Conventions.Member.Comments].Value.ToString();
             }
             set
             {
@@ -228,6 +234,9 @@ namespace Umbraco.Core.Models.Membership
         {
             get
             {
+                if (Properties[Constants.Conventions.Member.IsApproved].Value == null)
+                    return default(bool);
+
                 if (Properties[Constants.Conventions.Member.IsApproved].Value is bool)
                     return (bool)Properties[Constants.Conventions.Member.IsApproved].Value;
 
@@ -251,6 +260,9 @@ namespace Umbraco.Core.Models.Membership
         {
             get
             {
+                if (Properties[Constants.Conventions.Member.IsLockedOut].Value == null)
+                    return default(bool);
+
                 if (Properties[Constants.Conventions.Member.IsLockedOut].Value is bool)
                     return (bool)Properties[Constants.Conventions.Member.IsLockedOut].Value;
 
@@ -274,6 +286,9 @@ namespace Umbraco.Core.Models.Membership
         {
             get
             {
+                if (Properties[Constants.Conventions.Member.LastLoginDate].Value == null)
+                    return default(DateTime);
+
                 if (Properties[Constants.Conventions.Member.LastLoginDate].Value is DateTime)
                     return (DateTime)Properties[Constants.Conventions.Member.LastLoginDate].Value;
 
@@ -297,6 +312,9 @@ namespace Umbraco.Core.Models.Membership
         {
             get
             {
+                if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value == null)
+                    return default(DateTime);
+
                 if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value is DateTime)
                     return (DateTime)Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value;
 
@@ -320,6 +338,9 @@ namespace Umbraco.Core.Models.Membership
         {
             get
             {
+                if (Properties[Constants.Conventions.Member.LastLockoutDate].Value == null)
+                    return default(DateTime);
+
                 if (Properties[Constants.Conventions.Member.LastLockoutDate].Value is DateTime)
                     return (DateTime)Properties[Constants.Conventions.Member.LastLockoutDate].Value;
 
@@ -344,6 +365,9 @@ namespace Umbraco.Core.Models.Membership
         {
             get
             {
+                if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value == null)
+                    return default(int);
+
                 if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value is int)
                     return (int)Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value;
 

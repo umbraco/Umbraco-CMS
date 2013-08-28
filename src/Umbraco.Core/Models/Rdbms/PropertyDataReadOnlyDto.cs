@@ -3,34 +3,15 @@ using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("cmsPropertyData")]
+    [TableName("cmsPropertyType")]
     [PrimaryKey("id")]
     [ExplicitColumns]
     public class PropertyDataReadOnlyDto
     {
-        /* cmsPropertyData */
+        /* cmsPropertyType */
         [Column("id")]
         public int Id { get; set; }
 
-        [Column("VersionId")]
-        public Guid? VersionId { get; set; }
-
-        [Column("propertytypeid")]
-        public int PropertyTypeId { get; set; }
-
-        [Column("dataInt")]
-        public int? Integer { get; set; }
-
-        [Column("dataDate")]
-        public DateTime? Date { get; set; }
-
-        [Column("dataNvarchar")]
-        public string VarChar { get; set; }
-
-        [Column("dataNtext")]
-        public string Text { get; set; }
-
-        /* cmsPropertyType */
         [Column("dataTypeId")]
         public int DataTypeId { get; set; }
 
@@ -55,12 +36,37 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("Description")]
         public string Description { get; set; }
 
+        [Column("PropertyTypeSortOrder")]
+        public int SortOrder { get; set; }
+
         /* cmsDataType */
         [Column("controlId")]
         public Guid ControlId { get; set; }
 
         [Column("dbType")]
         public string DbType { get; set; }
+
+        /* cmsPropertyData */
+        [Column("PropertyDataId")]
+        public int? PropertyDataId { get; set; }
+
+        [Column("propertytypeid")]
+        public int? PropertyTypeId { get; set; }
+
+        [Column("VersionId")]
+        public Guid VersionId { get; set; }
+
+        [Column("dataInt")]
+        public int? Integer { get; set; }
+
+        [Column("dataDate")]
+        public DateTime? Date { get; set; }
+
+        [Column("dataNvarchar")]
+        public string VarChar { get; set; }
+
+        [Column("dataNtext")]
+        public string Text { get; set; }
 
         [Ignore]
         public object GetValue
@@ -87,7 +93,7 @@ namespace Umbraco.Core.Models.Rdbms
                     return Text;
                 }
 
-                return null;
+                return string.Empty;
             }
         }
     }

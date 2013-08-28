@@ -100,45 +100,63 @@
                 /// </summary>
                 public const string PasswordQuestion = "umbracoPasswordRetrievalQuestionPropertyTypeAlias";
 
+                public const string PasswordQuestionLabel = "Password Question";
+
                 /// <summary>
                 /// Property alias for Members Password Answer
                 /// </summary>
                 public const string PasswordAnswer = "umbracoPasswordRetrievalAnswerPropertyTypeAlias";
+
+                public const string PasswordAnswerLabel = "Password Answer";
 
                 /// <summary>
                 /// Property alias for the Comments on a Member
                 /// </summary>
                 public const string Comments = "umbracoCommentPropertyTypeAlias";
 
+		        public const string CommentsLabel = "Comments";
+
                 /// <summary>
                 /// Property alias for the Approved boolean of a Member
                 /// </summary>
                 public const string IsApproved = "umbracoApprovePropertyTypeAlias";
+
+		        public const string IsApprovedLabel = "Is Approved";
 
                 /// <summary>
                 /// Property alias for the Locked out boolean of a Member
                 /// </summary>
                 public const string IsLockedOut = "umbracoLockPropertyTypeAlias";
 
+		        public const string IsLockedOutLabel = "Is Locked Out";
+
                 /// <summary>
                 /// Property alias for the last date the Member logged in
                 /// </summary>
                 public const string LastLoginDate = "umbracoLastLoginPropertyTypeAlias";
+
+		        public const string LastLoginDateLabel = "Last Login Date";
 
                 /// <summary>
                 /// Property alias for the last date a Member changed its password
                 /// </summary>
                 public const string LastPasswordChangeDate = "umbracoMemberLastPasswordChange";
 
+                public const string LastPasswordChangeDateLabel = "Last Password Change Date";
+
                 /// <summary>
                 /// Property alias for the last date a Member was locked out
                 /// </summary>
                 public const string LastLockoutDate = "umbracoMemberLastLockout";
 
+                public const string LastLockoutDateLabel = "Last Lockout Date";
+
                 /// <summary>
                 /// Property alias for the number of failed login attemps
                 /// </summary>
 		        public const string FailedPasswordAttempts = "umbracoFailedPasswordAttemptsPropertyTypeAlias";
+
+                public const string FailedPasswordAttemptsLabel = "Failed Password Attempts";
 		    }
 
 			/// <summary>
