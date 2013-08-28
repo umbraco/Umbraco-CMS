@@ -139,6 +139,7 @@ function umbDataFormatter() {
         /** formats the display model used to display the data type to the model used to save the data type */
         formatDataTypePostData: function(displayModel, preValues, action) {
             var saveModel = {
+                parentId: -1,
                 id: displayModel.id,
                 name: displayModel.name,
                 selectedEditor: displayModel.selectedEditor,
@@ -149,7 +150,7 @@ function umbDataFormatter() {
             for (var i = 0; i < preValues.length; i++) {
                 saveModel.preValues.push({
                     key: preValues[i].alias,
-                    value: preValues[i].value
+                    value: preValues[i].value.value
                 });
             }
             return saveModel;

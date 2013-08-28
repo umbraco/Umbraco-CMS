@@ -22,13 +22,17 @@ namespace Umbraco.Core.Manifest
         {
             if (jObject["editor"] != null)
             {
-                //we need to specify the view value for the editor here otherwise we'll get an exception
-                target.StaticallyDefinedValueEditor.View = jObject["editor"]["view"].ToString();                
+                //since it's a manifest editor, we need to create it's instance.
+                //we need to specify the view value for the editor here otherwise we'll get an exception.
+                target.ManifestDefinedValueEditor = new ValueEditor
+                    {
+                        View = jObject["editor"]["view"].ToString()
+                    };
+                
             }
-
             if (jObject["preValueEditor"] != null)
             {
-               target.StaticallyDefinedPreValueEditor.Fields = new List<PreValueField>();
+                target.ManifestDefinedPreValueEditor = new PreValueEditor();
             }
 
             base.Deserialize(jObject, target, serializer);

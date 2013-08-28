@@ -36,15 +36,14 @@ namespace Umbraco.Web.PropertyEditors
         {
             public DropDownMultiplePreValueEditor()
             {
-                var fields = CreatePreValueFields();
+                Fields.AddRange(CreatePreValueFields());
                 //add the multiple field, we'll make it hidden so it is not seen in the pre-value editor
-                fields.Add(new PreValueField
+                Fields.Add(new PreValueField
                     {
                         Key = "multiple",
                         Name = "multiple",
                         View = "hidden"
-                    });
-                Fields = fields;
+                    });                
             }
 
             /// <summary>

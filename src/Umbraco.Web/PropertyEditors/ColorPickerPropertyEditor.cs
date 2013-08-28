@@ -8,6 +8,30 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
+    [PropertyEditor(Constants.PropertyEditors.MultipleTextstring, "Multiple Textbox", "multipletextbox")]
+    public class MultipleTextStringPropertyEditor : PropertyEditor
+    {
+        protected override PreValueEditor CreatePreValueEditor()
+        {
+            var prevals = base.CreatePreValueEditor();
+            prevals.Fields.Add(new PreValueField(new IntegerValidator())
+                {
+                    Description = "Enter the minimum amount of text boxes to be displayed",
+                    Key = "min",
+                    View = "requiredfield",
+                    Name = "Minimum"
+                });
+            prevals.Fields.Add(new PreValueField(new IntegerValidator())
+            {
+                Description = "Enter the maximum amount of text boxes to be displayed, enter -1 for unlimited",
+                Key = "max",
+                View = "requiredfield",
+                Name = "Maximum"
+            });
+            return prevals;
+        }
+    }
+
     [PropertyEditor(Constants.PropertyEditors.ColorPicker, "Color Picker", "colorpicker")]
     public class ColorPickerPropertyEditor : PropertyEditor
     {
@@ -29,7 +53,7 @@ namespace Umbraco.Web.PropertyEditors
     {
         public ColorListPreValueEditor()
         {
-            Fields = CreatePreValueFields();
+            Fields.AddRange(CreatePreValueFields());
             //use a custom editor too
             Fields.First().View = "views/propertyeditors/colorpicker/colorpicker.prevalues.html";
             //change the description

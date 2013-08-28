@@ -24,7 +24,7 @@ namespace Umbraco.Web.PropertyEditors
 
         public ValueListPreValueEditor()
         {
-            Fields = CreatePreValueFields();
+            Fields.AddRange(CreatePreValueFields());
         }
 
         /// <summary>

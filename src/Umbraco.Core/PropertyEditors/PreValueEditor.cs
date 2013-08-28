@@ -85,7 +85,7 @@ namespace Umbraco.Core.PropertyEditors
         /// If fields are specified then the master View and Validators will be ignored
         /// </remarks>
         [JsonProperty("fields")]
-        public IEnumerable<PreValueField> Fields { get; set; }
+        public List<PreValueField> Fields { get; private set; }
 
         /// <summary>
         /// A method to format the posted values from the editor to the values to be persisted
@@ -135,7 +135,13 @@ namespace Umbraco.Core.PropertyEditors
                 //we just need to merge the dictionaries now, the persisted will replace default.
                 foreach (var item in persistedPreVals.PreValuesAsDictionary)
                 {
-                    defaultPreVals[item.Key] = item.Value;
+                    //we want the json output to be in camelcase so change the value to a custom dictionary
+
+                    defaultPreVals[item.Key] = new Dictionary<string, object>
+                        {
+                            {"id", item.Value.Id},
+                            {"value", item.Value.Value}
+                        };
                 }
                 return defaultPreVals;
             }

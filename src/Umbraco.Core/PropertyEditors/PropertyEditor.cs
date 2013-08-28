@@ -16,23 +16,20 @@ namespace Umbraco.Core.PropertyEditors
     /// </remarks>
     public class PropertyEditor
     {
+        private readonly PropertyEditorAttribute _attribute;
+
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
         internal PropertyEditor()
         {
-            StaticallyDefinedValueEditor = new ValueEditor();
-            StaticallyDefinedPreValueEditor = new PreValueEditor();
-
             //assign properties based on the attribute if it is found
-            var att = GetType().GetCustomAttribute<PropertyEditorAttribute>(false);
-            if (att != null)
+            _attribute = GetType().GetCustomAttribute<PropertyEditorAttribute>(false);
+            if (_attribute != null)
             {
-                Id = Guid.Parse(att.Id);
-                Name = att.Name;
-                
-                StaticallyDefinedValueEditor.ValueType = att.ValueType;
-                StaticallyDefinedValueEditor.View = att.EditorView;
+                //set the id/name from the attribute
+                Id = Guid.Parse(_attribute.Id);
+                Name = _attribute.Name;                
             }
         }
 
@@ -40,13 +37,13 @@ namespace Umbraco.Core.PropertyEditors
         /// These are assigned by default normally based on property editor attributes or manifest definitions,
         /// developers have the chance to override CreateValueEditor if they don't want to use the pre-defined instance
         /// </summary>
-        internal ValueEditor StaticallyDefinedValueEditor = null;
+        internal ValueEditor ManifestDefinedValueEditor = null;
 
         /// <summary>
         /// These are assigned by default normally based on property editor attributes or manifest definitions,
         /// developers have the chance to override CreatePreValueEditor if they don't want to use the pre-defined instance
         /// </summary>
-        internal PreValueEditor StaticallyDefinedPreValueEditor = null;
+        internal PreValueEditor ManifestDefinedPreValueEditor = null;
 
         /// <summary>
         /// The id  of the property editor
@@ -81,17 +78,28 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         protected virtual ValueEditor CreateValueEditor()
         {
-            if (StaticallyDefinedValueEditor != null && !StaticallyDefinedValueEditor.View.IsNullOrWhiteSpace())
+            if (ManifestDefinedValueEditor != null)
             {
                 //detect if the view is a virtual path (in most cases, yes) then convert it
-                if (StaticallyDefinedValueEditor.View.StartsWith("~/"))
+                if (ManifestDefinedValueEditor.View.StartsWith("~/"))
                 {
-                    StaticallyDefinedValueEditor.View = IOHelper.ResolveUrl(StaticallyDefinedValueEditor.View);
+                    ManifestDefinedValueEditor.View = IOHelper.ResolveUrl(ManifestDefinedValueEditor.View);
                 }
-
-                return StaticallyDefinedValueEditor;
+                return ManifestDefinedValueEditor;
             }
-            throw new NotImplementedException("This method must be implemented if a view is not explicitly set");
+
+            //create a new editor
+            var editor = new ValueEditor();
+
+            if (_attribute.EditorView.IsNullOrWhiteSpace())
+            {
+                throw new NotImplementedException("This method must be implemented if a view is not explicitly set");
+            }
+
+            editor.View = _attribute.EditorView;
+            editor.ValueType = _attribute.ValueType;
+            return editor;
+
         }
 
         /// <summary>
@@ -99,19 +107,23 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <returns></returns>
         protected virtual PreValueEditor CreatePreValueEditor()
-        {            
-            if (StaticallyDefinedPreValueEditor != null)
+        {      
+            //This will not be null if it is a manifest defined editor
+            if (ManifestDefinedPreValueEditor != null)
             {
-                foreach (var f in StaticallyDefinedPreValueEditor.Fields)
+                foreach (var f in ManifestDefinedPreValueEditor.Fields)
                 {
                     //detect if the view is a virtual path (in most cases, yes) then convert it
                     if (f.View.StartsWith("~/"))
                     {
                         f.View = IOHelper.ResolveUrl(f.View);
                     }    
-                }                
+                }
+                return ManifestDefinedPreValueEditor;
             }
-            return StaticallyDefinedPreValueEditor;
+
+            //There's no manifest, just return an empty one
+            return new PreValueEditor();
         }
         
         protected bool Equals(PropertyEditor other)

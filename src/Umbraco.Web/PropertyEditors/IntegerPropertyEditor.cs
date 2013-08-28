@@ -13,7 +13,7 @@ namespace Umbraco.Web.PropertyEditors
         protected override ValueEditor CreateValueEditor()
         {
             var editor = base.CreateValueEditor();
-            editor.Validators.Add(new RegexValidator("^\\d*$"));
+            editor.Validators.Add(new IntegerValidator());
             return editor;
         }
 

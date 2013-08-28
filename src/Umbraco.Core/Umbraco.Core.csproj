@@ -582,6 +582,7 @@
     <Compile Include="Profiling\ProfilerResolver.cs" />
     <Compile Include="Profiling\WebProfiler.cs" />
     <Compile Include="PropertyEditors\DelimitedManifestValueValidator.cs" />
+    <Compile Include="PropertyEditors\IntegerValidator.cs" />
     <Compile Include="PropertyEditors\ManifestPropertyValidator.cs" />
     <Compile Include="PropertyEditors\PreValueField.cs" />
     <Compile Include="PropertyEditors\PreValueFieldAttribute.cs" />
