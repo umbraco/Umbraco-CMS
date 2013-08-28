@@ -11,7 +11,9 @@ namespace Umbraco.Web.Models.Mapping
     {
         protected override IEnumerable<PropertyEditorBasic> ResolveCore(IDataTypeDefinition source)
         {
-            return PropertyEditorResolver.Current.PropertyEditors.Select(Mapper.Map<PropertyEditorBasic>);
+            return PropertyEditorResolver.Current.PropertyEditors
+                .OrderBy(x => x.Name)
+                .Select(Mapper.Map<PropertyEditorBasic>);
         }
     }
 }
