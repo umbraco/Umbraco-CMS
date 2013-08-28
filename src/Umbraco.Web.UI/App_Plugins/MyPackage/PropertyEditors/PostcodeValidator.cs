@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
@@ -12,15 +14,17 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
     /// </summary>
     internal class PostcodeValidator : IPropertyValidator
     {
-        
-        public IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
+
+        public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
         {
             if (value != null)
             {
                 var stringVal = value.ToString();
 
-                if (preValues.IsNullOrWhiteSpace()) yield break;
-                var asJson = JObject.Parse(preValues);
+                if (preValues == null) yield break;
+                var preValDicionary = preValues.FormatAsDictionary();
+                if (preValDicionary.Any() == false) yield break;
+                var asJson = JObject.Parse(preValDicionary.First().Value.ToString());
                 if (asJson["country"] == null) yield break;
 
                 if (asJson["country"].ToString() == "Australia")

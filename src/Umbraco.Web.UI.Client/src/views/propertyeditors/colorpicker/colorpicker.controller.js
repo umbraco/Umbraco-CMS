@@ -1,8 +1,7 @@
-angular.module("umbraco").controller("Umbraco.Editors.ColorPickerController",
-    function($scope) {
-        
-        $scope.selectItem = function(color) {
-            $scope.model.value = color;
-        };
+function ColorPickerController($scope) {
+    $scope.selectItem = function (color) {
+        $scope.model.value = color;
+    };
+}
 
-    });
+angular.module("umbraco").controller("Umbraco.Editors.ColorPickerController", ColorPickerController);

@@ -9,13 +9,13 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-
     /// <summary>
     /// Declares how model mappings for content
     /// </summary>
@@ -73,7 +73,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemDto<IContent>
             config.CreateMap<IContent, ContentItemDto<IContent>>()
-                  .ForMember(
+                .ForMember(
                       dto => dto.Owner,
                       expression => expression.ResolveUsing<OwnerResolver<IContent>>());
 

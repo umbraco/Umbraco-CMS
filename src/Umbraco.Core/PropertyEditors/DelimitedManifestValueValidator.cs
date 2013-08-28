@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -21,7 +22,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="preValues">The current pre-values stored for the data type</param>
         /// <param name="editor"></param>
         /// <returns></returns>
-        public override IEnumerable<ValidationResult> Validate(object value, string config, string preValues, PropertyEditor editor)
+        public override IEnumerable<ValidationResult> Validate(object value, string config, PreValueCollection preValues, PropertyEditor editor)
         {
             //TODO: localize these!
             if (value != null)

@@ -127,7 +127,7 @@ namespace Umbraco.Web.WebApi.Filters
                 var postedValue = postedItem.Properties.Single(x => x.Alias == p.Alias).Value;
 
                 //get the pre-values for this property
-                var preValues = _applicationContext.Services.DataTypeService.GetPreValueAsString(p.DataType.Id);
+                var preValues = p.PreValues;
 
                 //TODO: when we figure out how to 'override' certain pre-value properties we'll either need to:
                 // * Combine the preValues with the overridden values stored with the document type property (but how to combine?)

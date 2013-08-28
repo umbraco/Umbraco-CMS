@@ -63,7 +63,7 @@ namespace Umbraco.Web.PropertyEditors
             var preVals = _dataTypeService.GetPreValuesCollectionByDataTypeId(property.PropertyType.DataTypeDefinitionId);
             if (preVals != null)
             {
-                var dictionary = PreValueCollection.AsDictionary(preVals);
+                var dictionary = preVals.FormatAsDictionary();
                 return dictionary;
             }
             return null;

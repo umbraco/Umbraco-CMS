@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -9,7 +10,7 @@ namespace Umbraco.Core.PropertyEditors
     [ValueValidator("Integer")]
     internal sealed class IntegerValidator : ManifestValueValidator, IPropertyValidator
     {
-        public override IEnumerable<ValidationResult> Validate(object value, string config, string preValues, PropertyEditor editor)
+        public override IEnumerable<ValidationResult> Validate(object value, string config, PreValueCollection preValues, PropertyEditor editor)
         {
             var result = value.TryConvertTo<int>();
             if (result.Success == false)
@@ -18,7 +19,7 @@ namespace Umbraco.Core.PropertyEditors
             }
         }
 
-        public IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
+        public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
         {
             return Validate(value, "", preValues, editor);
         }

@@ -4,34 +4,11 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MultipleTextstring, "Multiple Textbox", "multipletextbox")]
-    public class MultipleTextStringPropertyEditor : PropertyEditor
-    {
-        protected override PreValueEditor CreatePreValueEditor()
-        {
-            var prevals = base.CreatePreValueEditor();
-            prevals.Fields.Add(new PreValueField(new IntegerValidator())
-                {
-                    Description = "Enter the minimum amount of text boxes to be displayed",
-                    Key = "min",
-                    View = "requiredfield",
-                    Name = "Minimum"
-                });
-            prevals.Fields.Add(new PreValueField(new IntegerValidator())
-            {
-                Description = "Enter the maximum amount of text boxes to be displayed, enter -1 for unlimited",
-                Key = "max",
-                View = "requiredfield",
-                Name = "Maximum"
-            });
-            return prevals;
-        }
-    }
-
     [PropertyEditor(Constants.PropertyEditors.ColorPicker, "Color Picker", "colorpicker")]
     public class ColorPickerPropertyEditor : PropertyEditor
     {
@@ -64,7 +41,7 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class ColorListValidator : IPropertyValidator
         {
-            public IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
+            public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
             {
                 var json = value as JArray;
                 if (json == null) yield break;

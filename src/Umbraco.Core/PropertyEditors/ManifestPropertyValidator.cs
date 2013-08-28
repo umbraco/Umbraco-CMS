@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
+using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.PropertyEditors
@@ -56,7 +57,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="preValues">The current pre-values stored for the data type</param>
         /// <param name="editor">The property editor instance that we are validating for</param>
         /// <returns></returns>
-        public IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
+        public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
         {
             return ValidatorInstance.Validate(value, Config, preValues, editor);
         }

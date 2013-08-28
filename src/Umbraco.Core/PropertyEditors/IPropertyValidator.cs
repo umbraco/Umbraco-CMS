@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -18,10 +19,10 @@ namespace Umbraco.Core.PropertyEditors
         /// </param>
         /// <param name="preValues">
         /// When validating a property editor value (not a pre-value), this is the current pre-values stored for the data type.
-        /// When validating a pre-value field, this is the name of that field.
+        /// When validating a pre-value field this will be null.
         /// </param>
         /// <param name="editor">The property editor instance that we are validating for</param>
         /// <returns></returns>
-        IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor);
+        IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor);
     }
 }

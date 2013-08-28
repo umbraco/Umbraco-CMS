@@ -1,0 +1,17 @@
+﻿<div ng-controller="Umbraco.Editors.MultipleTextBoxController">
+
+    <div class="control-group" ng-repeat="item in model.value">
+        <input type="text" name="item_{{$index}}" ng-model="item.value" />
+        <a prevent-default href="" title="Remove this text box"
+            ng-show="model.value.length > model.config.min.value"
+            ng-click="remove($index)">
+            <i class="icon icon-minus"></i>
+        </a>
+    </div>
+    <a prevent-default href="" title="Add another text box"
+        ng-show="model.config.max.value <= 0 || model.value.length < model.config.max.value"
+        ng-click="add()">
+        <i class="icon icon-plus"></i>
+    </a>
+    
+</div>

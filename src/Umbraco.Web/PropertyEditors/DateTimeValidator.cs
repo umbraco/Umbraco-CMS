@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core;
 
@@ -10,8 +11,8 @@ namespace Umbraco.Web.PropertyEditors
     /// Used to validate if the value is a valid date/time
     /// </summary>
     internal class DateTimeValidator : IPropertyValidator
-    {        
-        public IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
+    {
+        public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
         {
             DateTime dt;
             if (value != null &&  DateTime.TryParse(value.ToString(), out dt) == false)

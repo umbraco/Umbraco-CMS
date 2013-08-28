@@ -60,7 +60,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns></returns>
         public override IDictionary<string, object> FormatDataForEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
         {
-            var dictionary = PreValueCollection.AsDictionary(persistedPreVals);
+            var dictionary = persistedPreVals.FormatAsDictionary();
             var arrayOfVals = dictionary.Select(item => item.Value).ToList();
 
             //the items list will be a dictionary of it's id -> value we need to use the id for persistence for backwards compatibility
@@ -115,7 +115,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         internal class EnsureUniqueValuesValidator : IPropertyValidator
         {
-            public IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
+            public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
             {
                 var json = value as JArray;
                 if (json == null) yield break;

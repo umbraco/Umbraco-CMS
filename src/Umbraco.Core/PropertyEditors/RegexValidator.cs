@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -30,7 +31,7 @@ namespace Umbraco.Core.PropertyEditors
             _regex = regex;
         }
 
-        public override IEnumerable<ValidationResult> Validate(object value, string config, string preValues, PropertyEditor editor)
+        public override IEnumerable<ValidationResult> Validate(object value, string config, PreValueCollection preValues, PropertyEditor editor)
         {
             //TODO: localize these!
             if (config.IsNullOrWhiteSpace() == false && value != null)
@@ -54,7 +55,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="preValues"></param>
         /// <param name="editor"></param>
         /// <returns></returns>
-        public IEnumerable<ValidationResult> Validate(object value, string preValues, PropertyEditor editor)
+        public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
         {
             if (_regex == null)
             {

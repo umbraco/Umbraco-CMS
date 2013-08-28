@@ -94,7 +94,7 @@ namespace Umbraco.Web.Editors
                 {
                     d.Add("files", files);
                 }
-                var data = new ContentPropertyData(p.Value, d);
+                var data = new ContentPropertyData(p.Value, p.PreValues, d);
 
                 //get the deserialized value from the property editor
                 if (p.PropertyEditor == null)

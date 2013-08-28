@@ -35,7 +35,7 @@ namespace Umbraco.Web.Models.Mapping
             //set up the defaults
             var dataTypeService = _dataTypeService.Value;
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(source.Id);
-            IDictionary<string, object> dictionaryVals = PreValueCollection.AsDictionary(preVals).ToDictionary(x => x.Key, x => (object)x.Value);
+            IDictionary<string, object> dictionaryVals = preVals.FormatAsDictionary().ToDictionary(x => x.Key, x => (object)x.Value);
             var result = Enumerable.Empty<PreValueFieldDisplay>().ToArray();
 
             //if we have a prop editor, then format the pre-values based on it and create it's fields.

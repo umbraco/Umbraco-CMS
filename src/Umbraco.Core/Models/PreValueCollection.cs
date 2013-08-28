@@ -62,16 +62,20 @@ namespace Umbraco.Core.Models
             _preValuesAsDictionary = preVals;
         }
 
-        internal static IDictionary<string, PreValue> AsDictionary(PreValueCollection persistedPreVals)
+        /// <summary>
+        /// Regardless of how the pre-values are stored this will return as a dictionary, it will convert an array based to a dictionary
+        /// </summary>
+        /// <returns></returns>
+        public IDictionary<string, PreValue> FormatAsDictionary()
         {
-            if (persistedPreVals.IsDictionaryBased)
+            if (IsDictionaryBased)
             {
-                return persistedPreVals.PreValuesAsDictionary;
+                return PreValuesAsDictionary;
             }
 
             //it's an array so need to format it, the alias will just be an iteration
             var result = new Dictionary<string, PreValue>();
-            var asArray = persistedPreVals.PreValuesAsArray.ToArray();
+            var asArray = PreValuesAsArray.ToArray();
             for (var i = 0; i < asArray.Length; i++)
             {
                 result.Add(i.ToInvariantString(), asArray[i]);

@@ -16,9 +16,10 @@ namespace Umbraco.Core.Models.Editors
     /// </remarks>
     public class ContentPropertyData
     {
-        public ContentPropertyData(object value, IDictionary<string, object> additionalData)
+        public ContentPropertyData(object value, PreValueCollection preValues, IDictionary<string, object> additionalData)
         {
             Value = value;
+            PreValues = preValues;
             AdditionalData = new ReadOnlyDictionary<string, object>(additionalData);
         }
 
@@ -28,6 +29,8 @@ namespace Umbraco.Core.Models.Editors
         /// The string value submitted for the property
         /// </summary>
         public object Value { get; private set; }
+
+        public PreValueCollection PreValues { get; private set; }
 
         /// <summary>
         /// A dictionary containing any additional objects that are related to this property when saving
