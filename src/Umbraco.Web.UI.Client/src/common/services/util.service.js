@@ -78,8 +78,8 @@ function imageHelper() {
     return {
         /** Returns the actual image path associated with the image property if there is one */
         getImagePropertyVaue: function(options) {
-            if (!options && !options.imageModel && !options.scope) {
-                throw "The options objet does not contain the required parameters: imageModel, scope";
+            if (!options && !options.imageModel) {
+                throw "The options objet does not contain the required parameters: imageModel";
             }
             if (options.imageModel.contentTypeAlias.toLowerCase() === "image") {
                 var imageProp = _.find(options.imageModel.properties, function (item) {
@@ -105,8 +105,8 @@ function imageHelper() {
         /** formats the display model used to display the content to the model used to save the content */
         getThumbnail: function (options) {
             
-            if (!options && !options.imageModel && !options.scope) {
-                throw "The options objet does not contain the required parameters: imageModel, scope";
+            if (!options && !options.imageModel) {
+                throw "The options objet does not contain the required parameters: imageModel";
             }
 
             var imagePropVal = this.getImagePropertyVaue(options);
