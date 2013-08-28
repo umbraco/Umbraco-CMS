@@ -86,11 +86,11 @@ namespace Umbraco.Web.PropertyEditors
                         if (json["Minimum"] != null)
                         {
                             //by default pre-values are sent out with an id/value pair
-                            returnVal["min"] = JObject.FromObject(new { id = 0, value = json["Minimum"].Value<int>() });
+                            returnVal["min"] = json["Minimum"].Value<int>();
                         }
                         if (json["Maximum"] != null)
                         {
-                            returnVal["max"] = JObject.FromObject(new { id = 0, value = json["Maximum"].Value<int>() });
+                            returnVal["max"] = json["Maximum"].Value<int>();
                         }
                     }
                     catch (Exception e)

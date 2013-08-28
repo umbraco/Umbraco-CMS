@@ -135,13 +135,9 @@ namespace Umbraco.Core.PropertyEditors
                 //we just need to merge the dictionaries now, the persisted will replace default.
                 foreach (var item in persistedPreVals.PreValuesAsDictionary)
                 {
-                    //we want the json output to be in camelcase so change the value to a custom dictionary
-
-                    defaultPreVals[item.Key] = new Dictionary<string, object>
-                        {
-                            {"id", item.Value.Id},
-                            {"value", item.Value.Value}
-                        };
+                    //The persisted dictionary contains values of type PreValue which contain the ID and the Value, we don't care
+                    // about the Id, just the value so ignore the id.
+                    defaultPreVals[item.Key] = item.Value.Value;
                 }
                 return defaultPreVals;
             }
@@ -151,7 +147,8 @@ namespace Umbraco.Core.PropertyEditors
             var asArray = persistedPreVals.PreValuesAsArray.ToArray();
             for (var i = 0; i < asArray.Length; i++)
             {
-                result.Add(i.ToInvariantString(), asArray[i]);
+                //each item is of type PreValue but we don't want the ID, just the value so ignore the ID
+                result.Add(i.ToInvariantString(), asArray[i].Value);
             }
             return result;
         } 

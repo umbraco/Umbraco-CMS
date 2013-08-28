@@ -5,8 +5,8 @@
     }
     
     //add any fields that there isn't values for
-    if ($scope.model.config.min.value > 0) {
-        for (var i = 0; i < $scope.model.config.min.value; i++) {
+    if ($scope.model.config.min > 0) {
+        for (var i = 0; i < $scope.model.config.min; i++) {
             if ((i + 1) > $scope.model.value.length) {
                 $scope.model.value.push({ value: "" });
             }
@@ -14,7 +14,7 @@
     }
 
     $scope.add = function () {
-        if ($scope.model.config.max.value <= 0 || $scope.model.value.length < $scope.model.config.max.value) {
+        if ($scope.model.config.max <= 0 || $scope.model.value.length < $scope.model.config.max) {
             $scope.model.value.push({ value: "" });
         }
     };

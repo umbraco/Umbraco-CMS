@@ -148,9 +148,10 @@ function umbDataFormatter() {
                 preValues: []
             };
             for (var i = 0; i < preValues.length; i++) {
+
                 saveModel.preValues.push({
                     key: preValues[i].alias,
-                    value: preValues[i].value.value
+                    value: preValues[i].value
                 });
             }
             return saveModel;

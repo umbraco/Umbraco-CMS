@@ -30,7 +30,6 @@ namespace Umbraco.Web.PropertyEditors
     {
         public ColorListPreValueEditor()
         {
-            Fields.AddRange(CreatePreValueFields());
             //use a custom editor too
             Fields.First().View = "views/propertyeditors/colorpicker/colorpicker.prevalues.html";
             //change the description
