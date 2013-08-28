@@ -2137,6 +2137,7 @@
     <Content Include="Umbraco\PartialViews\Templates\Login.cshtml" />
     <Content Include="Umbraco\PartialViews\Templates\EmptyTemplate.cshtml" />
     <Content Include="Umbraco\PartialViews\Templates\RegisterMember.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\LoginStatus.cshtml" />
     <None Include="Umbraco_client\CodeMirror\js\mode\coffeescript\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\pascal\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\perl\LICENSE" />

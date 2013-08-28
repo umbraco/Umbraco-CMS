@@ -3,10 +3,10 @@ using System.Web.Mvc;
 using System.Xml;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.member;
+using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.UmbracoModels;
 
-namespace Umbraco.Web.UmbracoControllers
+namespace Umbraco.Web.Controllers
 {
     public class RegisterController : SurfaceController
     {
