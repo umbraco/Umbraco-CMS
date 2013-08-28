@@ -257,7 +257,7 @@ namespace umbraco.BusinessLogic
                 try
                 {
                     DateTime oldestPermittedLogEntry = DateTime.Now.Subtract(new TimeSpan(0, maximumAgeOfLogsInMinutes, 0));
-                    var formattedDate = oldestPermittedLogEntry.ToString("yyyy-MM-dd HH:mm:ss");
+                    var formattedDate = oldestPermittedLogEntry.ToIsoString();
 
                     SqlHelper.ExecuteNonQuery("delete from umbracoLog where datestamp < @oldestPermittedLogEntry and logHeader in ('open','system')",
                         SqlHelper.CreateParameter("@oldestPermittedLogEntry", formattedDate));

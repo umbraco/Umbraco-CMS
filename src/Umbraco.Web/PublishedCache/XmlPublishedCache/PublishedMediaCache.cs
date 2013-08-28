@@ -230,7 +230,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			if (!new[] { "creatorID" }.Any(values.ContainsKey))
 				values.Add("creatorID", 0.ToString());
 			if (!new[] { "createDate" }.Any(values.ContainsKey))
-				values.Add("createDate", default(DateTime).ToString("yyyy-MM-dd HH:mm:ss"));
+				values.Add("createDate", default(DateTime).ToIsoString());
 			if (!new[] { "level" }.Any(values.ContainsKey))
 			{				
 				values.Add("level", values["__Path"].Split(',').Length.ToString());

@@ -349,9 +349,9 @@ namespace umbraco
 				case "sortOrder":
 			        return doc.SortOrder.ToString();
 				case "createDate":
-					return doc.CreateDate.ToString("yyyy-MM-dd'T'HH:mm:ss");
+					return doc.CreateDate.ToIsoString();
 				case "updateDate":
-					return doc.UpdateDate.ToString("yyyy-MM-dd'T'HH:mm:ss");
+					return doc.UpdateDate.ToIsoString();
 				case "nodeName":
 			        return doc.Name;
 				case "writerName":
