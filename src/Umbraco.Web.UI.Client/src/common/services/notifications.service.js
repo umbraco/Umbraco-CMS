@@ -29,6 +29,11 @@ angular.module('umbraco.services')
 	function add(item) {	    
 	    angularHelper.safeApply($rootScope, function () {
 	        
+	        //add a colon after the headline if there is a message as well
+	        if (item.messsage) {
+	            item.headline += ":";
+	        }
+
 	        //we need to ID the item, going by index isn't good enough because people can remove at different indexes 
 	        // whenever they want. Plus once we remove one, then the next index will be different. The only way to 
 	        // effectively remove an item is by an Id.
