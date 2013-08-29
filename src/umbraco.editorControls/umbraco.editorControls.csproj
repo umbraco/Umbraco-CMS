@@ -387,8 +387,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="tinymce\tinyMCEConfiguration.cs" />
-    <Compile Include="tinymce\TinyMCEDataType.cs" />
-    <Compile Include="tinymce\TinyMCELegacyControl.cs" />
     <Compile Include="tinymce\tinyMCEImageHelper.cs" />
     <Compile Include="tinymce\tinyMCEPreValueConfigurator.cs" />
     <Compile Include="userControlWrapper\SerializationHelper.cs" />

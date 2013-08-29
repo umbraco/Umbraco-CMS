@@ -1,6 +1,6 @@
 ﻿using Umbraco.Tests.CodeFirst.Attributes;
 using umbraco.editorControls.textfield;
-using umbraco.editorControls.tinymce;
+using umbraco.editorControls.tinyMCE3;
 
 namespace Umbraco.Tests.CodeFirst.TestModels
 {
@@ -9,7 +9,7 @@ namespace Umbraco.Tests.CodeFirst.TestModels
         [PropertyType(typeof(TextFieldDataType), PropertyGroup = "Content")]
         public string Title { get; set; }
 
-        [PropertyType(typeof(TinyMCEDataType), PropertyGroup = "Content")]
+        [PropertyType(typeof(tinyMCE3dataType), PropertyGroup = "Content")]
         public string BodyContent { get; set; } 
     }
 }
