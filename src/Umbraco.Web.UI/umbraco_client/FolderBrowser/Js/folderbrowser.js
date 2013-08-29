@@ -178,7 +178,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             var overlay = $("<div class='upload-overlay'>" +
                 "<div class='upload-panel'>" +
                 instructions +
-                "<form action=\"/umbraco/webservices/MediaUploader.ashx?format=json&action=upload&parentNodeId=" + this._parentId + "\" method=\"post\" enctype=\"multipart/form-data\">" +
+                "<form action=\"" + self._opts.umbracoPath + "/webservices/MediaUploader.ashx?format=json&action=upload&parentNodeId=" + this._parentId + "\" method=\"post\" enctype=\"multipart/form-data\">" +
                 "<input id='fileupload' type='file' name='file' multiple>" +
                 "<input type='hidden' name='name' />" +
                 "<input type='hidden' name='replaceExisting' />" +
@@ -374,17 +374,30 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     if (self._viewModel.filterTerm().length > 0) {
                         $(this).sortable("cancel");
                         alert("Can't sort items which have been filtered");
-                    } else {
-                        $.post(self._opts.umbracoPath + "/webservices/nodeSorter.asmx/UpdateSortOrder", {
-                            ParentId: self._parentId,
-                            SortOrder: self._viewModel.itemIds().join(","),
-                            app: "media"
-                        }, function (data, textStatus) {
-                            if (textStatus == "error") {
-                                alert("Oops. Could not update sort order");
+                    }
+                    else {
+
+                        $.ajax({
+                            url: self._opts.umbracoPath + "/umbracoapi/media/postsort",
+                            type: 'POST',
+                            contentType: "application/json; charset=utf-8",
+                            dataType: 'json',
+                            data: JSON.stringify({
+                                parentId: self._parentId,
+                                idSortOrder: self._viewModel.itemIds()
+                            }),
+                            processData: false,
+                            success: function (data, textStatus) {
+                                if (textStatus == "error") {
+                                    alert("Oops. Could not update sort order");
+                                    self._getChildNodes();
+                                }
+                            },
+                            error: function(data) {
+                                alert("Oops. Could not update sort order. Err: " + data.statusText);
                                 self._getChildNodes();
                             }
-                        }, "json");
+                        });
                     }
                 }
             });

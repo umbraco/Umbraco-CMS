@@ -64,7 +64,12 @@ namespace Umbraco.Web.Mvc
         /// </remarks>
         public override UmbracoHelper Umbraco
         {
-            get { return _helper ?? (_helper = new UmbracoHelper(UmbracoContext, Model.Content)); }
+            get
+            {
+                return _helper ?? (_helper = Model == null
+                                                 ? new UmbracoHelper(UmbracoContext)
+                                                 : new UmbracoHelper(UmbracoContext, Model.Content));
+            }
         }
 
         /// <summary>

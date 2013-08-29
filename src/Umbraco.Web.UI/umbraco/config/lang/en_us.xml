@@ -535,6 +535,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="noNodeSelected">No node selected yet, please select a node in the list above before clicking 'ok'</key>
     <key alias="notAllowedByContentType">The current node is not allowed under the chosen node because of its type</key>
     <key alias="notAllowedByPath">The current node cannot be moved to one of its subpages</key>
+    <key alias="notAllowedAtRoot">The current node cannot exist at the root</key>
     <key alias="notValid">The action isn't allowed since you have insufficient permissions on 1 or more child documents.</key>
     <key alias="relateToOriginal">Relate copied items to original</key>
   </area>
@@ -559,7 +560,7 @@ To manage your website, simply open the umbraco back office and start adding con
       <![CDATA[<p>Hi %0%</p>
 
 		  <p>This is an automated mail to inform you that the task <strong>'%1%'</strong> 
-		  has been performed on the page <a href="%7%"><strong>'%2%'</strong></a>
+		  has been performed on the page <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a>
 		  by the user <strong>'%3%'</strong>
 	  </p>
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
@@ -655,7 +656,7 @@ To manage your website, simply open the umbraco back office and start adding con
   <area alias="publish">
     <key alias="contentPublishedFailedInvalid">
       <![CDATA[
-      %0% could not be published because some of it's data did not pass validation rules.
+      %0% could not be published because these properties:  %1%  did not pass validation rules.
     ]]>
     </key>
     <key alias="contentPublishedFailedByEvent">

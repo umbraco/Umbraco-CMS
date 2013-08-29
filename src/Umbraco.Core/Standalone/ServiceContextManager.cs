@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -14,12 +15,27 @@ namespace Umbraco.Core.Standalone
         private ServiceContext _serviceContext;
         private readonly StandaloneCoreApplication _application;
 
-        public ServiceContextManager(string connectionString, string providerName)
+        public ServiceContextManager(string connectionString, string providerName, string baseDirectory)
         {
             _connectionString = connectionString;
             _providerName = providerName;
 
-            _application = StandaloneCoreApplication.GetApplication();
+            Trace.WriteLine("ServiceContextManager-Current AppDomain: " + AppDomain.CurrentDomain.FriendlyName);
+            Trace.WriteLine("ServiceContextManager-Current AppDomain: " + AppDomain.CurrentDomain.BaseDirectory);
+
+            //var webAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.FullName.StartsWith("umbraco"));
+            //if (webAssembly != null && examineEventHandlerToRemove == null)
+            //{
+            //    var examineEventType = webAssembly.GetType("Umbraco.Web.Search.ExamineEvents");
+            //    examineEventHandlerToRemove = examineEventType;
+            //}
+
+            _application = StandaloneCoreApplication.GetApplication(baseDirectory);
+
+            var examineEventHandlerToRemove = Type.GetType("Umbraco.Web.Search.ExamineEvents, umbraco");
+            if (examineEventHandlerToRemove != null)
+                _application.WithoutApplicationEventHandler(examineEventHandlerToRemove);
+
             _application.Start();
         }
 

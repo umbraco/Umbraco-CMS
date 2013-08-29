@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Publishing;
 using Umbraco.Web.Cache;
-using umbraco;
-using umbraco.cms.businesslogic.web;
-using umbraco.interfaces;
-using umbraco.presentation.cache;
-using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.Strategies.Publishing
 {
+    //TODO: I think we should move this logic into the CacheRefresherEventHandler since all other handlers are registered there for invalidating cache.
+
     /// <summary>
     /// Represents the UpdateCacheAfterPublish class, which subscribes to the Published event
     /// of the <see cref="PublishingStrategy"/> class and is responsible for doing the actual

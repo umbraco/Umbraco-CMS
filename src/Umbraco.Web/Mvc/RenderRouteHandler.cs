@@ -163,7 +163,7 @@ namespace Umbraco.Web.Mvc
 				ReservedAdditionalKeys.Area }.Contains(x.Key)))
 			{
 				// Populate route with additional values which aren't reserved values so they eventually to action parameters
-				requestContext.RouteData.Values.Add(item.Key, item.Value);
+			    requestContext.RouteData.Values[item.Key] = item.Value;
 			}
 
 			//return the proxy info without the surface id... could be a local controller.
@@ -271,8 +271,9 @@ namespace Umbraco.Web.Mvc
 			//check if that controller exists
 		    if (controllerType != null)
 		    {
-                //ensure the controller is of type 'RenderMvcController'
-                if (TypeHelper.IsTypeAssignableFrom<RenderMvcController>(controllerType))
+                //ensure the controller is of type 'IRenderMvcController' and ControllerBase
+                if (TypeHelper.IsTypeAssignableFrom<IRenderMvcController>(controllerType)
+                    && TypeHelper.IsTypeAssignableFrom<ControllerBase>(controllerType))
 		        {
 		            //set the controller and name to the custom one
 		            def.ControllerType = controllerType;
@@ -285,10 +286,11 @@ namespace Umbraco.Web.Mvc
 		        else
 		        {
 		            LogHelper.Warn<RenderRouteHandler>(
-		                "The current Document Type {0} matches a locally declared controller of type {1}. Custom Controllers for Umbraco routing must inherit from '{2}'.",
+						"The current Document Type {0} matches a locally declared controller of type {1}. Custom Controllers for Umbraco routing must implement '{2}' and inherit from '{3}'.",
 		                () => publishedContentRequest.PublishedContent.DocumentTypeAlias,
 		                () => controllerType.FullName,
-		                () => typeof (RenderMvcController).FullName);
+                        () => typeof(IRenderMvcController).FullName,
+                        () => typeof(ControllerBase).FullName);
 		            //exit as we cannnot route to the custom controller, just route to the standard one.
 		            return def;
 		        }

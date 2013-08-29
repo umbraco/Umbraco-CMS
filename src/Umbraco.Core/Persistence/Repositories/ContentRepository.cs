@@ -27,6 +27,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
+
+            EnsureUniqueNaming = true;
         }
 
 		public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
@@ -34,7 +36,11 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
+
+		    EnsureUniqueNaming = true;
         }
+
+        public bool EnsureUniqueNaming { get; set; }
 
         #region Overrides of RepositoryBase<IContent>
 
@@ -180,6 +186,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((Content)entity).AddingEntity();
 
+            //Ensure unique name on the same level
+            entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
+
             var factory = new ContentFactory(NodeObjectTypeId, entity.Id);
             var dto = factory.BuildDto(entity);
 
@@ -197,7 +206,7 @@ namespace Umbraco.Core.Persistence.Repositories
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
             nodeDto.SortOrder = sortOrder;
             var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
-
+        
             //Update with new correct path
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
             Database.Update(nodeDto);
@@ -207,6 +216,24 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.Path = nodeDto.Path;
             entity.SortOrder = sortOrder;
             entity.Level = level;
+
+
+            //Assign the same permissions to it as the parent node
+            // http://issues.umbraco.org/issue/U4-2161            
+            var parentPermissions = GetPermissionsForEntity(entity.ParentId).ToArray();
+            //if there are parent permissions then assign them, otherwise leave null and permissions will become the
+            // user's default permissions.
+            if (parentPermissions.Any())
+            {
+                var userPermissions = parentPermissions.Select(
+                    permissionDto => new KeyValuePair<object, string>(
+                                         permissionDto.UserId,
+                                         permissionDto.Permission));                
+                AssignEntityPermissions(entity, userPermissions);
+                //flag the entity's permissions changed flag so we can track those changes.
+                //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.
+                ((Content) entity).PermissionsChanged = true;
+            }
 
             //Create the Content specific data - cmsContent
             var contentDto = dto.ContentVersionDto.ContentDto;
@@ -260,6 +287,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 entity.UpdateDate = DateTime.Now;
             }
 
+            //Ensure unique name on the same level
+            entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
+
             //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
             if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
             {
@@ -271,6 +301,10 @@ namespace Umbraco.Core.Persistence.Repositories
                         "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
                         new {ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId});
                 entity.SortOrder = maxSortOrder + 1;
+
+                //Question: If we move a node, should we update permissions to inherit from the new parent if the parent has permissions assigned?
+                // if we do that, then we'd need to propogate permissions all the way downward which might not be ideal for many people.
+                // Gonna just leave it as is for now, and not re-propogate permissions.
             }
 
             var factory = new ContentFactory(NodeObjectTypeId, entity.Id);
@@ -488,6 +522,38 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             return new PropertyCollection(properties);
+        }
+
+        private string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
+        {
+            if (EnsureUniqueNaming == false)
+                return nodeName;
+
+            var sql = new Sql();
+            sql.Select("*")
+               .From<NodeDto>()
+               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.ParentId == parentId && x.Text.StartsWith(nodeName));
+
+            int uniqueNumber = 1;
+            var currentName = nodeName;
+
+            var dtos = Database.Fetch<NodeDto>(sql);
+            if (dtos.Any())
+            {
+                var results = dtos.OrderBy(x => x.Text, new SimilarNodeNameComparer());
+                foreach (var dto in results)
+                {
+                    if(id != 0 && id == dto.NodeId) continue;
+
+                    if (dto.Text.ToLowerInvariant().Equals(currentName.ToLowerInvariant()))
+                    {
+                        currentName = nodeName + string.Format(" ({0})", uniqueNumber);
+                        uniqueNumber++;
+                    }
+                }
+            }
+
+            return currentName;
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Web.UI;
+using System.Web.UI.Design.WebControls;
 using System.Web.UI.WebControls;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.member;
@@ -28,6 +29,7 @@ namespace umbraco.cms.presentation.members
 
 		protected PlaceHolder MemberPasswordTxt = new PlaceHolder();
 		protected TextBox MemberEmail = new TextBox();
+        protected CustomValidator MemberEmailExistCheck = new CustomValidator();
 		protected controls.DualSelectbox _memberGroups = new controls.DualSelectbox();
 
 
@@ -65,8 +67,15 @@ namespace umbraco.cms.presentation.members
                 MemberLoginNameVal.EnableClientScript = false;
                 MemberLoginNameVal.Display = ValidatorDisplay.Dynamic;
 
+                MemberEmailExistCheck.ErrorMessage = ui.Text("errorHandling", "errorExistsWithoutTab", "E-mail", BasePages.UmbracoEnsuredPage.CurrentUser);
+                MemberEmailExistCheck.EnableClientScript = false;
+                MemberEmailExistCheck.ValidateEmptyText = false;
+                MemberEmailExistCheck.ControlToValidate = MemberEmail.ID;
+                MemberEmailExistCheck.ServerValidate += MemberEmailExistCheck_ServerValidate;
+
                 _contentControl.PropertiesPane.addProperty(ui.Text("login"), ph);
                 _contentControl.PropertiesPane.addProperty(ui.Text("password"), MemberPasswordTxt);
+                _contentControl.PropertiesPane.addProperty("", MemberEmailExistCheck);
                 _contentControl.PropertiesPane.addProperty("Email", MemberEmail);
             }
             else
@@ -131,6 +140,28 @@ namespace umbraco.cms.presentation.members
                 m_MemberShipPanel.Controls.Add(p);
 
 		}
+
+        void MemberEmailExistCheck_ServerValidate(object source, ServerValidateEventArgs args)
+        {
+            var oldEmail = _document.Email.ToLower();
+            var newEmail = MemberEmail.Text.ToLower();
+
+            var requireUniqueEmail = Membership.Providers[Member.UmbracoMemberProviderName].RequiresUniqueEmail;
+
+            var howManyMembersWithEmail = 0;
+            var membersWithEmail = Member.GetMembersFromEmail(newEmail);
+            if (membersWithEmail != null)
+                howManyMembersWithEmail = membersWithEmail.Length;
+
+            if (((oldEmail == newEmail && howManyMembersWithEmail > 1) ||
+                (oldEmail != newEmail && howManyMembersWithEmail > 0))
+                && requireUniqueEmail)
+                // If the value hasn't changed and there are more than 1 member with that email, then false
+                // If the value has changed and there are any member with that new email, then false
+                args.IsValid = false;
+            else
+                args.IsValid = true;
+        }
 
         void MenuSaveClick(object sender, ImageClickEventArgs e)
         {

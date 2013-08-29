@@ -217,11 +217,13 @@ namespace umbraco.cms.businesslogic.member
                 throw new ArgumentException("The loginname must be different from an empty string", "loginName");
 
             // Test for e-mail
-            if (Email != "" && Member.GetMemberFromEmail(Email) != null)
+            if (Email != "" && Member.GetMemberFromEmail(Email) != null && Membership.Providers[UmbracoMemberProviderName].RequiresUniqueEmail)
                 throw new Exception(String.Format("Duplicate Email! A member with the e-mail {0} already exists", Email));
             else if (Member.GetMemberFromLoginName(loginName) != null)
                 throw new Exception(String.Format("Duplicate User name! A member with the user name {0} already exists", loginName));
 
+            // Lowercased to prevent duplicates
+            Email = Email.ToLower();
             Guid newId = Guid.NewGuid();
 
             //create the cms node first
@@ -286,7 +288,7 @@ namespace umbraco.cms.businesslogic.member
         }
 
         /// <summary>
-        /// Retrieve a Member given an email
+        /// Retrieve a Member given an email, the first if there multiple members with same email
         /// 
         /// Used when authentifying the Member
         /// </summary>
@@ -299,7 +301,7 @@ namespace umbraco.cms.businesslogic.member
 
             object o = SqlHelper.ExecuteScalar<object>(
                 "select nodeID from cmsMember where Email = @email",
-                SqlHelper.CreateParameter("@email", email));
+                SqlHelper.CreateParameter("@email", email.ToLower()));
 
             if (o == null)
                 return null;
@@ -312,6 +314,35 @@ namespace umbraco.cms.businesslogic.member
         }
 
         /// <summary>
+        /// Retrieve Members given an email
+        /// 
+        /// Used when authentifying a Member
+        /// </summary>
+        /// <param name="email">The email of the member(s)</param>
+        /// <returns>The members with the specified email</returns>
+        public static Member[] GetMembersFromEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return null;
+
+            var tmp = new List<Member>();
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(m_SQLOptimizedMany.Trim(),
+                                        "Email = @email",
+                                        "umbracoNode.text"),
+                                            SqlHelper.CreateParameter("@nodeObjectType", Member._objectType),
+                                            SqlHelper.CreateParameter("@email", email.ToLower())))
+            {
+                while (dr.Read())
+                {
+                    Member m = new Member(dr.GetInt("id"), true);
+                    m.PopulateMemberFromReader(dr);
+                    tmp.Add(m);
+                }
+            }
+            return tmp.ToArray();
+        }
+
+        /// <summary>
         /// Retrieve a Member given the credentials
         /// 
         /// Used when authentifying the member
@@ -319,7 +350,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="loginName">Member login</param>
         /// <param name="password">Member password</param>
         /// <returns>The member with the credentials - null if none exists</returns>
-        [Obsolete("Log members in via the standard Forms Authentiaction login")]
+        
         public static Member GetMemberFromLoginNameAndPassword(string loginName, string password)
         {
             if (IsMember(loginName))
@@ -520,13 +551,32 @@ namespace umbraco.cms.businesslogic.member
                        SqlHelper.CreateParameter("@id", Id));
                 }
 
-                return m_Email;
+                return string.IsNullOrWhiteSpace(m_Email) ? m_Email : m_Email.ToLower();
             }
             set
             {
+                var oldEmail = Email;
+                var newEmail = string.IsNullOrWhiteSpace(value) ? value : value.ToLower();
+                var requireUniqueEmail = Membership.Providers[UmbracoMemberProviderName].RequiresUniqueEmail;
+
+                var howManyMembersWithEmail = 0;
+                var membersWithEmail = GetMembersFromEmail(newEmail);
+                if (membersWithEmail != null)
+                    howManyMembersWithEmail = membersWithEmail.Length;
+
+                if (((oldEmail == newEmail && howManyMembersWithEmail > 1) ||
+                    (oldEmail != newEmail && howManyMembersWithEmail > 0))
+                    && requireUniqueEmail)
+                {
+                    // If the value hasn't changed and there are more than 1 member with that email, then throw
+                    // If the value has changed and there are any member with that new email, then throw
+                    throw new Exception(String.Format("Duplicate Email! A member with the e-mail {0} already exists", newEmail));
+                }
                 SqlHelper.ExecuteNonQuery(
                     "update cmsMember set Email = @email where nodeId = @id",
-                    SqlHelper.CreateParameter("@id", Id), SqlHelper.CreateParameter("@email", value));
+                    SqlHelper.CreateParameter("@id", Id), SqlHelper.CreateParameter("@email", newEmail));
+                // Set the backing field to new value
+                m_Email = newEmail;
             }
         }
         #endregion
@@ -582,10 +632,11 @@ namespace umbraco.cms.businesslogic.member
                             string dbType = property.PropertyType.DataTypeDefinition.DbType;
                             if (dbType.Equals("Integer"))
                             {
-                                if (property.Value is bool)
+                                if (property.Value is bool || property.PropertyType.DataTypeDefinition.DataType.Id == new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a"))
                                 {
-                                    int val = Convert.ToInt32(property.Value);
-                                    poco.Integer = val;
+                                    poco.Integer = property.Value != null && string.IsNullOrEmpty(property.Value.ToString())
+                                          ? 0
+                                          : Convert.ToInt32(property.Value);
                                 }
                                 else
                                 {

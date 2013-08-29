@@ -6,6 +6,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.XPath;
 using Umbraco.Core.Logging;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Routing;

@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -6,6 +7,7 @@ using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
+using File = Umbraco.Core.Models.File;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -13,9 +15,26 @@ namespace Umbraco.Tests.PublishedContent
 	public class DynamicPublishedContentTests : DynamicDocumentTestsBase<DynamicPublishedContent, DynamicPublishedContentList>
 	{
 		public override void Initialize()
-		{            
-            base.Initialize();
+		{
+            var currDir = new DirectoryInfo(TestHelpers.TestHelper.CurrentAssemblyDirectory);
 
+            var configPath = Path.Combine(currDir.Parent.Parent.FullName, "config");
+            if (Directory.Exists(configPath) == false)
+                Directory.CreateDirectory(configPath);
+
+            var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
+            if (System.IO.File.Exists(umbracoSettingsFile) == false)
+                System.IO.File.Copy(
+                    currDir.Parent.Parent.Parent.GetDirectories("Umbraco.Web.UI")
+                        .First()
+                        .GetDirectories("config").First()
+                        .GetFiles("umbracoSettings.Release.config").First().FullName,
+                    Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
+                    true);
+
+            Core.Configuration.UmbracoSettings.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
+
+            base.Initialize();
 		}
 
 		public override void TearDown()

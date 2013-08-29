@@ -45,7 +45,7 @@ namespace UmbracoExamine.DataServices
 			var xmlMedia = XDocument.Parse("<media></media>");
 			foreach (var m in _services.MediaService.GetRootMedia())
 			{
-				xmlMedia.Root.Add(m.ToXml());
+				xmlMedia.Root.Add(m.ToDeepXml());
 			}
 			var result = ((IEnumerable)xmlMedia.XPathEvaluate(xpath)).Cast<XElement>();
 			return result.ToXDocument();

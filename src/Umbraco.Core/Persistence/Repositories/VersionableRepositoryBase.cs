@@ -8,7 +8,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal abstract class VersionableRepositoryBase<TId, TEntity> : PetaPocoRepositoryBase<TId, TEntity>
+    internal abstract class VersionableRepositoryBase<TId, TEntity> : PermissionRepository<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
         protected VersionableRepositoryBase(IDatabaseUnitOfWork work) : base(work)

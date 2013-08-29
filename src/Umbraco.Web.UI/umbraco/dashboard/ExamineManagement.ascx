@@ -50,7 +50,7 @@
                                     <div class="index-actions">
                                         <div data-bind="visible: processingAttempts() < 100">
                                             <button data-bind="click: rebuildIndex, disable: isProcessing">Rebuild index</button>
-                                            <button data-bind="click: optimizeIndex, disable: isProcessing">Optimize index</button>
+                                            <button data-bind="click: optimizeIndex, disable: isProcessing, visible: DocumentCount() > 0">Optimize index</button>
                                         </div>
                                         <div data-bind="visible: isProcessing()">
                                             <cc1:ProgressBar runat="server" ID="ProgressBar1" Text="Loading..." />

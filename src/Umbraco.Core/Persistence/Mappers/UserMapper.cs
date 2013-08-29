@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(User))]
     public sealed class UserMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache = new ConcurrentDictionary<string, DtoMapModel>();
+        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
 
         //NOTE: its an internal class but the ctor must be public since we're using Activator.CreateInstance to create it
         // otherwise that would fail because there is no public constructor.
@@ -21,6 +21,11 @@ namespace Umbraco.Core.Persistence.Mappers
 
         #region Overrides of BaseMapper
 
+        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
+        {
+            get { return PropertyInfoCacheInstance; }
+        }
+
         internal override void BuildMap()
         {
             CacheMap<User, UserDto>(src => src.Id, dto => dto.Id);
@@ -28,7 +33,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<User, UserDto>(src => src.Username, dto => dto.Login);
             CacheMap<User, UserDto>(src => src.Password, dto => dto.Password);
             CacheMap<User, UserDto>(src => src.Name, dto => dto.UserName);
-            CacheMap<User, UserDto>(src => src.Permissions, dto => dto.DefaultPermissions);
+            CacheMap<User, UserDto>(src => src.DefaultPermissions, dto => dto.DefaultPermissions);
             CacheMap<User, UserDto>(src => src.StartMediaId, dto => dto.MediaStartId);
             CacheMap<User, UserDto>(src => src.StartContentId, dto => dto.ContentStartId);
             CacheMap<User, UserDto>(src => src.DefaultToLiveEditing, dto => dto.DefaultToLiveEditing);
@@ -36,22 +41,6 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<User, UserDto>(src => src.NoConsole, dto => dto.NoConsole);
             CacheMap<User, UserDto>(src => src.UserType, dto => dto.Type);
             CacheMap<User, UserDto>(src => src.Language, dto => dto.UserLanguage);
-        }
-
-        internal override string Map(string propertyName)
-        {
-            if (!PropertyInfoCache.ContainsKey(propertyName))
-                return string.Empty;
-
-            var dtoTypeProperty = PropertyInfoCache[propertyName];
-
-            return base.GetColumnName(dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo);
-        }
-
-        internal override void CacheMap<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
-        {
-            var property = base.ResolveMapping(sourceMember, destinationMember);
-            PropertyInfoCache.AddOrUpdate(property.SourcePropertyName, property, (x, y) => property);
         }
 
         #endregion

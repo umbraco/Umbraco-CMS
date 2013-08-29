@@ -504,7 +504,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     ]]></key>
     <key alias="mailBodyHtml"><![CDATA[<p>前略 %0% さま</p>
 
-			<p>ユーザー <strong>'%3%'</strong> によりページ <a href="%7%"><strong>'%2%'</strong></a> 上のタスク <strong>'%1%'</strong> から自動的にメールします。</p>
+			<p>ユーザー <strong>'%3%'</strong> によりページ <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a> 上のタスク <strong>'%1%'</strong> から自動的にメールします。</p>
 			<div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
 				<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;公開&nbsp;&nbsp;</a> &nbsp; 

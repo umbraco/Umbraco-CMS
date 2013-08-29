@@ -7,17 +7,25 @@ namespace Umbraco.Core.Models.Membership
     /// Defines the interface for a <see cref="User"/>
     /// </summary>
     /// <remarks>Will be left internal until a proper Membership implementation is part of the roadmap</remarks>
-    internal interface IUser : IMembershipUser
+    internal interface IUser : IMembershipUser, IUserProfile
     {
-        string Name { get; set; }
+        new object Id { get; set; }
+        //string Name { get; set; }
         int SessionTimeout { get; set; }
         int StartContentId { get; set; }
         int StartMediaId { get; set; }
         string Language { get; set; }
         bool DefaultToLiveEditing { get; set; }
-        IEnumerable<string> Applications { get; set; }
+
         bool NoConsole { get; set; }
         IUserType UserType { get; }
-        string Permissions { get; set; }
+        string DefaultPermissions { get; set; }
+    }
+
+    internal interface IUserProfile : IProfile
+    {
+        IEnumerable<string> AllowedSections { get; }
+        void RemoveAllowedSection(string sectionAlias);
+        void AddAllowedSection(string sectionAlias);
     }
 }

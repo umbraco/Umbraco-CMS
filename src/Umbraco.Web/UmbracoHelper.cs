@@ -182,10 +182,18 @@ namespace Umbraco.Web
 					// within Razor since it will never be inserted into the page pipeline (which may even not exist at all
 					// if we're running MVC).
 					//
+                    // I'm sure there's more things that will get lost with this context changing but I guess we'll figure 
+                    // those out as we go along. One thing we lose is the content type response output.
+                    // http://issues.umbraco.org/issue/U4-1599 if it is setup during the macro execution. So 
+                    // here we'll save the content type response and reset it after execute is called.
+
+				    var contentType = _umbracoContext.HttpContext.Response.ContentType;
 					var traceIsEnabled = containerPage.Trace.IsEnabled;
 					containerPage.Trace.IsEnabled = false;
 					_umbracoContext.HttpContext.Server.Execute(containerPage, output, false);
 					containerPage.Trace.IsEnabled = traceIsEnabled;
+                    //reset the content type
+				    _umbracoContext.HttpContext.Response.ContentType = contentType;
 
 					//Now, we need to ensure that local links are parsed
 					html = TemplateUtilities.ParseInternalLinks(output.ToString());
@@ -314,18 +322,26 @@ namespace Umbraco.Web
 
 
 
-		    var item = new Item()
+            var item = new Item(currentPage)
 		                   {		        
 		                       Field = fieldAlias,
 		                       TextIfEmpty = altText,
 		                       LegacyAttributes = attributesForItem
 		                   };
 
-            //this is here to figure out if this request is in the context of a partial
-            if (_umbracoContext.PublishedContentRequest.PublishedContent.Id != currentPage.Id)
+            //here we are going to check if we are in the context of an Umbraco routed page, if we are we 
+            //will leave the NodeId empty since the underlying ItemRenderer will work ever so slightly faster
+            //since it already knows about the current page. Otherwise, we'll assign the id based on our
+            //currently assigned node. The PublishedContentRequest will be null if:
+            // * we are rendering a partial view or child action
+            // * we are rendering a view from a custom route
+            if (_umbracoContext.PublishedContentRequest == null 
+                || _umbracoContext.PublishedContentRequest.PublishedContent.Id != currentPage.Id)
+            {
                 item.NodeId = currentPage.Id.ToString();
-            
-		
+            }
+                
+		    
 			var containerPage = new FormlessPage();
 			containerPage.Controls.Add(item);
 

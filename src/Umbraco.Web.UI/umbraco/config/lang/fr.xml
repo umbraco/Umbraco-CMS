@@ -534,7 +534,7 @@ Pour gerer votre site, accéder simplement au back office et commencez à contri
 
       Ceci est un email automatique pour vous informer que la tâche '%1%' a été activée sur la page '%2%' par l'utilisateur '%3%'
 
-      Allez à http://%4%/umbraco/actions/editContent.aspx?id=%5% pour éditer.
+      Allez à http://%4%/actions/editContent.aspx?id=%5% pour éditer.
 
       Bonne journée!
 
@@ -545,14 +545,14 @@ Pour gerer votre site, accéder simplement au back office et commencez à contri
 	<![CDATA[<p>Bonjour %0%</p>
 
 		  <p>Ceci est un email automatique pour vous informer que la tâche <strong>'%1%'</strong> 
-		  a été activée sur la page <strong>'%2%'</strong> 
+		  a été activée sur la page <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a> 
 		  par l'utilisateur <strong>'%3%'</strong>
 	  </p>
 		  <div class="buttons">
 				<br />
-				<a class="buttonPublish" href="http://%4%/umbraco/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLIER&nbsp;&nbsp;</a> &nbsp; 
-				<a class="buttonEdit" href="http://%4%/umbraco/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDITER&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
-				<a class="buttonDelete" href="http://%4%/umbraco/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;SUPPRIMER&nbsp;&nbsp;&nbsp;&nbsp;</a>
+				<a class="buttonPublish" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLIER&nbsp;&nbsp;</a> &nbsp; 
+				<a class="buttonEdit" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDITER&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a class="buttonDelete" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;SUPPRIMER&nbsp;&nbsp;&nbsp;&nbsp;</a>
 				<br />
 		  </div>
 		  <p>
@@ -564,9 +564,9 @@ Pour gerer votre site, accéder simplement au back office et commencez à contri
 
 		  <div class="buttons">
 				<br />
-				<a class="buttonPublish" href="http://%4%/umbraco/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLIER&nbsp;&nbsp;</a> &nbsp; 
-				<a class="buttonEdit" href="http://%4%/umbraco/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDITER&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
-				<a class="buttonDelete" href="http://%4%/umbraco/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;SUPPRIMER&nbsp;&nbsp;&nbsp;&nbsp;</a>
+				<a class="buttonPublish" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLIER&nbsp;&nbsp;</a> &nbsp; 
+				<a class="buttonEdit" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDITER&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a class="buttonDelete" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;SUPPRIMER&nbsp;&nbsp;&nbsp;&nbsp;</a>
 				<br />
 		  </div>
 

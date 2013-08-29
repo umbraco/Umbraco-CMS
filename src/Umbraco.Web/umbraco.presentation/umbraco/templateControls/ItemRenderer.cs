@@ -110,13 +110,15 @@ namespace umbraco.presentation.templateControls
                     if (cache == null) throw new InvalidOperationException("Unsupported IPublishedContentCache, only the Xml one is supported.");
                     var xml = cache.GetXml(Umbraco.Web.UmbracoContext.Current, Umbraco.Web.UmbracoContext.Current.InPreviewMode);
                     var itemPage = new page(xml.GetElementById(tempNodeId.ToString()));
-                    tempElementContent = new item(itemPage.Elements, item.LegacyAttributes).FieldContent;
+                    tempElementContent = 
+                        new item(item.ContentItem, itemPage.Elements, item.LegacyAttributes).FieldContent;
                 }
             }
             else
             {
                 // gets the field content from the current page (via the PageElements collection)
-                tempElementContent = new item(item.PageElements, item.LegacyAttributes).FieldContent;
+                tempElementContent =
+                    new item(item.ContentItem, item.PageElements, item.LegacyAttributes).FieldContent;
             }
 
             return tempElementContent;

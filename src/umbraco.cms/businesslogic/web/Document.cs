@@ -10,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Caching;
+using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
@@ -305,13 +306,10 @@ namespace umbraco.cms.businesslogic.web
             }
 
             //Create a new IContent object based on the passed in DocumentType's alias, set the name and save it
-            IContent content = ApplicationContext.Current.Services.ContentService.CreateContent(Name, ParentId, dct.Alias, u.Id);
+            IContent content = ApplicationContext.Current.Services.ContentService.CreateContentWithIdentity(Name, ParentId, dct.Alias, u.Id);
             //The content object will only have the 'WasCancelled' flag set to 'True' if the 'Creating' event has been cancelled, so we return null.
             if (((Entity)content).WasCancelled)
                 return null;
-
-            //don't raise events here (false), they will get raised with the d.Save() call.
-            ApplicationContext.Current.Services.ContentService.Save(content, u.Id, false); 
 
             //read the whole object from the db
             Document d = new Document(content);
@@ -407,7 +405,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetChildren()", false)]
         public static Document[] GetChildrenForTree(int NodeId)
         {
-            var children = ApplicationContext.Current.Services.ContentService.GetChildren(NodeId).OrderBy(c => c.SortOrder);
+            var children = ApplicationContext.Current.Services.ContentService.GetChildren(NodeId);
             var list = children.Select(x => new Document(x));
             return list.ToArray();
         }
@@ -914,11 +912,74 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                var publishedResults = ((ContentService)ApplicationContext.Current.Services.ContentService)
+                IEnumerable<Attempt<PublishStatus>> publishedResults = ((ContentService)ApplicationContext.Current.Services.ContentService)
                     .PublishWithChildrenInternal(Content, u.Id);
 
                 FireAfterPublish(e);
             }
+        }
+
+        [Obsolete("Don't use! Only used internally to support the legacy events", false)]
+        internal IEnumerable<Attempt<PublishStatus>> PublishWithSubs(int userId, bool includeUnpublished)
+        {
+            PublishEventArgs e = new PublishEventArgs();
+            FireBeforePublish(e);
+
+            IEnumerable<Attempt<PublishStatus>> publishedResults = Enumerable.Empty<Attempt<PublishStatus>>();
+
+            if (!e.Cancel)
+            {
+                publishedResults = ((ContentService) ApplicationContext.Current.Services.ContentService)
+                    .PublishWithChildrenInternal(Content, userId, includeUnpublished);
+
+                FireAfterPublish(e);
+            }
+
+            return publishedResults;
+        }
+
+        [Obsolete("Don't use! Only used internally to support the legacy events", false)]
+        internal Attempt<PublishStatus> SaveAndPublish(int userId)
+        {
+            var result = new Attempt<PublishStatus>(false,
+                                                    new PublishStatus(Content,
+                                                                      PublishStatusType
+                                                                          .FailedCancelledByEvent));
+            foreach (var property in GenericProperties)
+            {
+                Content.SetValue(property.PropertyType.Alias, property.Value);
+            }
+
+            var saveArgs = new SaveEventArgs();
+            FireBeforeSave(saveArgs);
+
+            if (!saveArgs.Cancel)
+            {
+                var publishArgs = new PublishEventArgs();
+                FireBeforePublish(publishArgs);
+
+                if (!publishArgs.Cancel)
+                {
+                    //NOTE: The 'false' parameter will cause the PublishingStrategy events to fire which will ensure that the cache is refreshed.
+                    result = ((ContentService)ApplicationContext.Current.Services.ContentService)
+                        .SaveAndPublishInternal(Content, userId);
+                    base.VersionDate = Content.UpdateDate;
+                    this.UpdateDate = Content.UpdateDate;
+
+                    //NOTE: This is just going to call the CMSNode Save which will launch into the CMSNode.BeforeSave and CMSNode.AfterSave evenths
+                    // which actually do dick all and there's no point in even having them there but just in case for some insane reason someone
+                    // has bound to those events, I suppose we'll need to keep this here.
+                    base.Save();
+
+                    //Launch the After Save event since we're doing 2 things in one operation: Saving and publishing.
+                    FireAfterSave(saveArgs);
+
+                    //Now we need to fire the After publish event
+                    FireAfterPublish(publishArgs);
+                }
+            }
+
+            return result;
         }
 
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.UnPublish()", false)]
@@ -930,7 +991,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                _published = ((ContentService)ApplicationContext.Current.Services.ContentService).UnPublish(Content);
+                _published = ApplicationContext.Current.Services.ContentService.UnPublish(Content);
                 
                 FireAfterUnPublish(e);
             }
@@ -966,11 +1027,12 @@ namespace umbraco.cms.businesslogic.web
         }
 
         /// <summary>
-        /// Saves and publishes a document
+        /// Do not use! only used internally in order to get the published status until we upgrade everything to use the new API
         /// </summary>
-        /// <param name="u">The usercontext under which the action are performed</param>
+        /// <param name="u"></param>
         /// <returns></returns>
-        public bool SaveAndPublish(User u)
+        [Obsolete("Do not use! only used internally in order to get the published status until we upgrade everything to use the new API")]
+        internal Attempt<PublishStatus> SaveAndPublishWithResult(User u)
         {
             foreach (var property in GenericProperties)
             {
@@ -1004,13 +1066,24 @@ namespace umbraco.cms.businesslogic.web
                     //Now we need to fire the After publish event
                     FireAfterPublish(publishArgs);
 
-                    return result.Success;
+                    return result;
                 }
-                
-                return false;
+
+                return Attempt<PublishStatus>.False;
             }
 
-            return false;
+            return Attempt<PublishStatus>.False;
+        }
+
+        /// <summary>
+        /// Saves and publishes a document
+        /// </summary>
+        /// <param name="u">The usercontext under which the action are performed</param>
+        /// <returns></returns>
+        public bool SaveAndPublish(User u)
+        {
+            var result = SaveAndPublishWithResult(u);
+            return result.Success;
         }
 
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.HasPublishedVersion()", false)]

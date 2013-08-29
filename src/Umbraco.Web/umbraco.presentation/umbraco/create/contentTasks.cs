@@ -13,14 +13,14 @@ namespace umbraco
     {
 
         private string _alias;
-        private int _parentID;
-        private int _typeID;
-        private int _userID;
+        private int _parentId;
+        private int _typeId;
+        private int _userId;
         private string _returnUrl = "";
 
         public int UserId
         {
-            set { _userID = value; }
+            set { _userId = value; }
         }
 
         public string ReturnUrl
@@ -30,8 +30,8 @@ namespace umbraco
 
         public int TypeID
         {
-            set { _typeID = value; }
-            get { return _typeID; }
+            set { _typeId = value; }
+            get { return _typeId; }
         }
 
         public string Alias
@@ -44,18 +44,18 @@ namespace umbraco
         {
             set
             {
-                _parentID = value;
+                _parentId = value;
             }
             get
             {
-                return _parentID;
+                return _parentId;
             }
         }
 
         public bool Save()
         {
-            cms.businesslogic.web.DocumentType dt = new cms.businesslogic.web.DocumentType(TypeID);
-            cms.businesslogic.web.Document d = cms.businesslogic.web.Document.MakeNew(Alias, dt, BusinessLogic.User.GetUser(_userID), ParentID);
+            var dt = new cms.businesslogic.web.DocumentType(TypeID);
+            var d = cms.businesslogic.web.Document.MakeNew(Alias, dt, User.GetUser(_userId), ParentID);
             if (d == null)
             {
                 //TODO: Slace - Fix this to use the language files
@@ -71,12 +71,12 @@ namespace umbraco
 
         public bool Delete()
         {
-            cms.businesslogic.web.Document d = new cms.businesslogic.web.Document(ParentID);
-
-            // Log
-            BusinessLogic.Log.Add(BusinessLogic.LogTypes.Delete, User.GetCurrent(), d.Id, "");
+            var d = new cms.businesslogic.web.Document(ParentID);
 
             d.delete();
+
+            // Log
+            Log.Add(LogTypes.Delete, User.GetCurrent(), d.Id, "");
 
             return true;
 

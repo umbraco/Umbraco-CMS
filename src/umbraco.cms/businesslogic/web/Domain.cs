@@ -138,12 +138,12 @@ namespace umbraco.cms.businesslogic.web
         #region Statics
 
 
-        internal static List<Domain> GetDomains()
+        public static IEnumerable<Domain> GetDomains()
         {
             return GetDomains(false);
         }
 
-        internal static List<Domain> GetDomains(bool includeWildcards)
+        internal static IEnumerable<Domain> GetDomains(bool includeWildcards)
         {
             var domains = ApplicationContext.Current.ApplicationCache.GetCacheItem(
                 CacheKeys.DomainCacheKey,
@@ -177,7 +177,7 @@ namespace umbraco.cms.businesslogic.web
 
         public static Domain GetDomain(string DomainName)
         {
-        	return GetDomains().Find(delegate(Domain d) { return d.Name == DomainName; });
+        	return GetDomains().FirstOrDefault(d => d.Name == DomainName);
         }
 
         public static int GetRootFromDomain(string DomainName)
@@ -189,7 +189,7 @@ namespace umbraco.cms.businesslogic.web
 
         public static Domain[] GetDomainsById(int nodeId)
         {
-			return GetDomains().FindAll(delegate(Domain d) { return d._root == nodeId; }).ToArray();
+			return GetDomains().Where(d => d._root == nodeId).ToArray();
         }
 
         public static bool Exists(string DomainName)

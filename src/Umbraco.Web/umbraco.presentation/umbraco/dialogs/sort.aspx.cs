@@ -78,19 +78,21 @@ namespace umbraco.cms.presentation
                     else
                     {
                         var children = contentService.GetChildren(parentId);
-                        foreach (var child in children.OrderBy(x => x.SortOrder))
+                        foreach (var child in children)
                             _nodes.Add(CreateNode(child.Id, child.SortOrder, child.Name, child.CreateDate, icon));
                     }
                 }
 
-                // "hack for stylesheet"
-                // TODO: I can't see where this is being used at all..?
+                // hack for stylesheet, used to sort stylesheet properties
                 if (app == Constants.Applications.Settings)
                 {
                     icon = "../images/umbraco/settingCss.gif";
                     var ss = new StyleSheet(parentId);
                     foreach (var child in ss.Properties)
-                        _nodes.Add(CreateNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime, icon));
+                    {
+                        var node = new CMSNode(child.Id);
+                        _nodes.Add(CreateNode(child.Id, node.sortOrder, child.Text, child.CreateDateTime, icon));
+                    }
                 }
 
                 bindNodesToList(string.Empty);

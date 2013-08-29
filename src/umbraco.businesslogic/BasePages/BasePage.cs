@@ -56,7 +56,7 @@ namespace umbraco.BasePages
         protected static ISqlHelper SqlHelper
         {
             get { return BusinessLogic.Application.SqlHelper; }
-        }
+        }        
 
         /// <summary>
         /// Returns the current ApplicationContext

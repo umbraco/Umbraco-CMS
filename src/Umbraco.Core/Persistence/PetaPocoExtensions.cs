@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
@@ -26,6 +28,80 @@ namespace Umbraco.Core.Persistence
         {
             var tableType = typeof(T);
             CreateTable(db, overwrite, tableType);
+        }
+
+        public static void BulkInsertRecords<T>(this Database db, IEnumerable<T> collection)
+        {
+            using (var tr = db.GetTransaction())
+            {
+                try
+                {
+                    if (SqlSyntaxContext.SqlSyntaxProvider is SqlCeSyntaxProvider)
+                    {
+                        //SqlCe doesn't support bulk insert statements!
+
+                        foreach (var poco in collection)
+                        {
+                            db.Insert(poco);
+                        }
+
+                    }
+                    else
+                    {
+                        string sql;
+                        using (var cmd = db.GenerateBulkInsertCommand(collection, db.Connection, out sql))
+                        {
+                            cmd.CommandText = sql;
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+
+                    tr.Complete();
+                }
+                catch
+                {
+                    tr.Dispose();
+                    throw;
+                }
+            }
+        }
+
+        internal static IDbCommand GenerateBulkInsertCommand<T>(this Database db, IEnumerable<T> collection, IDbConnection connection, out string sql)
+        {
+            var pd = Database.PocoData.ForType(typeof(T));
+            var tableName = db.EscapeTableName(pd.TableInfo.TableName);
+
+            //get all columns but not the primary key if it is auto-incremental
+            var cols = string.Join(", ", (
+                from c in pd.Columns
+                where 
+                    //don't return ResultColumns
+                    !c.Value.ResultColumn
+                    //if the table is auto-incremental, don't return the primary key
+                    && (pd.TableInfo.AutoIncrement && c.Key != pd.TableInfo.PrimaryKey)
+                select tableName + "." + db.EscapeSqlIdentifier(c.Key))
+                .ToArray());
+
+            var cmd = db.CreateCommand(connection, "");
+
+            var pocoValues = new List<string>();
+            var index = 0;
+            foreach (var poco in collection)
+            {
+                var values = new List<string>();
+                foreach (var i in pd.Columns)
+                {
+                    if (pd.TableInfo.AutoIncrement && i.Key == pd.TableInfo.PrimaryKey)
+                    {
+                        continue;
+                    }
+                    values.Add(string.Format("{0}{1}", "@", index++));
+                    db.AddParam(cmd, i.Value.GetValue(poco), "@");
+                }
+                pocoValues.Add("(" + string.Join(",", values.ToArray()) + ")");
+            }
+            sql = string.Format("INSERT INTO {0} ({1}) VALUES {2}", tableName, cols, string.Join(", ", pocoValues));
+            return cmd;
         }
 
         public static void CreateTable(this Database db, bool overwrite, Type modelType)
@@ -67,7 +143,7 @@ namespace Umbraco.Core.Persistence
                         //Turn on identity insert if db provider is not mysql
                         if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
                             db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName))));
-                        
+
                         //Call the NewTable-event to trigger the insert of base/default data
                         NewTable(tableName, db, e);
 
@@ -106,7 +182,7 @@ namespace Umbraco.Core.Persistence
         public static void DropTable<T>(this Database db)
             where T : new()
         {
-            Type type = typeof (T);
+            Type type = typeof(T);
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
             if (tableNameAttribute == null)
                 throw new Exception(
@@ -184,5 +260,5 @@ namespace Umbraco.Core.Persistence
         }
     }
 
-    internal class TableCreationEventArgs : System.ComponentModel.CancelEventArgs{}
+    internal class TableCreationEventArgs : System.ComponentModel.CancelEventArgs { }
 }

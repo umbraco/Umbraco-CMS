@@ -7,6 +7,7 @@ namespace Umbraco.Web.Mvc
 	/// <summary>
 	/// Creates SurfaceControllers
 	/// </summary>
+	[Obsolete("This is not used in the codebase and will be removed from the core in future versions")]
 	public class SurfaceControllerFactory : RenderControllerFactory
 	{
 		/// <summary>

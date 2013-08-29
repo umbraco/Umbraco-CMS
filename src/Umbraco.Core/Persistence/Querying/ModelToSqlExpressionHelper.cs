@@ -455,8 +455,11 @@ namespace Umbraco.Core.Persistence.Querying
             if (fieldType == typeof(decimal))
                 return ((decimal)value).ToString(CultureInfo.InvariantCulture);
 
-            if (fieldType == typeof(DateTime))
-                return "'" + EscapeParam(((DateTime)value).ToString(CultureInfo.InvariantCulture)) + "'";
+            if (fieldType == typeof (DateTime))
+            {
+                return "'" + EscapeParam(((DateTime)value).ToIsoString()) + "'";
+            }
+                
             
             if (fieldType == typeof(bool))
                 return ((bool)value) ? Convert.ToString(1, CultureInfo.InvariantCulture) : Convert.ToString(0, CultureInfo.InvariantCulture);

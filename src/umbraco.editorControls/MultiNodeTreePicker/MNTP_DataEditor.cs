@@ -9,10 +9,10 @@ using System.Web.UI.WebControls;
 using System.Xml.Linq;
 using ClientDependency.Core;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using umbraco.cms.presentation.Trees;
 using umbraco.controls.Images;
 using umbraco.controls.Tree;
-using umbraco.IO;
 
 [assembly: WebResource("umbraco.editorControls.MultiNodeTreePicker.MultiNodePickerStyles.css", "text/css")]
 [assembly: WebResource("umbraco.editorControls.MultiNodeTreePicker.MultiNodePickerScripts.js", "application/x-javascript")]
@@ -25,6 +25,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 	[ClientDependency(ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
 	[ClientDependency(ClientDependencyType.Javascript, "ui/jquery.tooltip.min.js", "UmbracoClient")]
 	[ClientDependency(ClientDependencyType.Javascript, "controls/Images/ImageViewer.js", "UmbracoRoot")]
+    [ValidationProperty("Value")]
 	public class MNTP_DataEditor : Control, INamingContainer
 	{
 		#region Static Constructor
@@ -93,9 +94,15 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 			ControlHeight = 200;
 		}
 
+        /// <summary>
+        /// This is used for validation purposes only, see the [ValidationProperty("Value")] attribute above.
+        /// </summary>
+	    public string Value
+	    {
+	        get { return string.Join(",", SelectedIds); }
+	    }
 
-
-		#region Protected members
+	    #region Protected members
 
 		/// <summary>
 		/// 
@@ -374,9 +381,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 			this.Controls.Add(PickedValue);
 			this.Controls.Add(RightColumn);
 		}
-
-
-
+        
 		/// <summary>
 		/// Ensure the repeater is data bound
 		/// </summary>

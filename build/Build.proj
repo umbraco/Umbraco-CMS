@@ -82,6 +82,7 @@
     <SolutionBinFolder>$(BuildFolder)bin\</SolutionBinFolder>
     <WebAppFolder>$(BuildFolder)WebApp\</WebAppFolder>
     <WebPiFolder>$(BuildFolder)WebPi\</WebPiFolder>
+   <ConfigsFolder>$(BuildFolder)Configs\</ConfigsFolder>
     <SolutionBinFolderRelativeToProjects>$(BuildFolderRelativeToProjects)bin\</SolutionBinFolderRelativeToProjects>
     <SolutionBinFolderAbsolutePath>$(BuildFolderAbsolutePath)bin\</SolutionBinFolderAbsolutePath>
     <WebAppFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebApp\</WebAppFolderRelativeToProjects>
@@ -197,7 +198,7 @@
   </Target>
 
   <!-- Copy the transformed web.config file to the root -->
-  <Target Name="CopyTransformedWebConfig"  DependsOnTargets="CopyXmlDocumentation">
+ <Target Name="CopyTransformedWebConfig"  DependsOnTargets="CopyTransformedConfig">
     <ItemGroup>
       <WebConfigFile Include="..\src\Umbraco.Web.UI\web.$(BuildConfiguration).Config.transformed" />
     </ItemGroup>
@@ -206,6 +207,24 @@
         DestinationFiles="$(WebAppFolder)Web.config"
         OverwriteReadOnlyFiles="true"
         SkipUnchangedFiles="false" />
+ </Target>
+ 
+ <!-- Copy the config files and rename them to *.config.transform -->
+ <Target Name="CopyTransformedConfig"  DependsOnTargets="CopyXmlDocumentation">
+    <ItemGroup>
+     <ConfigFiles Include="$(WebAppFolder)config\*.config" />
+	 <WebConfigTransformFile Include="$(WebAppFolder)Web.config" />
+   </ItemGroup>
+   
+   <Copy SourceFiles="@(ConfigFiles)"
+       DestinationFiles="@(ConfigFiles->'$(ConfigsFolder)\%(RecursiveDir)%(Filename)%(Extension)')"
+       OverwriteReadOnlyFiles="true"
+       SkipUnchangedFiles="false" />
+	   
+   <Copy SourceFiles="@(WebConfigTransformFile)"
+	   DestinationFiles="$(ConfigsFolder)Web.config.transform"
+	   OverwriteReadOnlyFiles="true"
+	   SkipUnchangedFiles="false" />
   </Target>
 
   <!-- Copy the xml documentation to the bin folder -->

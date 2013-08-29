@@ -36,7 +36,7 @@ namespace Umbraco.Web.Mvc
                                                     bool isMvc = true)
         {
             Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
-            Mandate.ParameterNotNullOrEmpty(controllerSuffixName, "controllerSuffixName");
+            Mandate.ParameterNotNull(controllerSuffixName, "controllerSuffixName");
             
             Mandate.ParameterNotNull(controllerType, "controllerType");
             Mandate.ParameterNotNull(routes, "routes");
@@ -86,13 +86,18 @@ namespace Umbraco.Web.Mvc
                 controllerPluginRoute.DataTokens.Add("Namespaces", new[] {controllerType.Namespace});
             }
 
+            //Don't look anywhere else except this namespace!
+            controllerPluginRoute.DataTokens.Add("UseNamespaceFallback", false);
+
             //constraints: only match controllers ending with 'controllerSuffixName' and only match this controller's ID for this route            
+            if (controllerSuffixName.IsNullOrWhiteSpace() == false)
+            {                
             controllerPluginRoute.Constraints = new RouteValueDictionary(
                 new Dictionary<string, object>
                     {
                         {"controller", @"(\w+)" + controllerSuffixName}
                     });
-
+            }
 
             //match this area
             controllerPluginRoute.DataTokens.Add("area", area.AreaName);

@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using System.Web;
 using System.Xml.Linq;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
@@ -88,7 +86,7 @@ namespace Umbraco.Core.Services
 
             Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this);
 
-            Audit.Add(AuditTypes.New, "", content.CreatorId, content.Id);
+            Audit.Add(AuditTypes.New, string.Format("Content '{0}' was created", name), content.CreatorId, content.Id);
 
             return content;
         }
@@ -123,7 +121,7 @@ namespace Umbraco.Core.Services
 
             Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parent), this);
 
-            Audit.Add(AuditTypes.New, "", content.CreatorId, content.Id);
+            Audit.Add(AuditTypes.New, string.Format("Content '{0}' was created", name), content.CreatorId, content.Id);
 
             return content;
         }
@@ -163,7 +161,7 @@ namespace Umbraco.Core.Services
 
             Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this);
 
-            Audit.Add(AuditTypes.New, "", content.CreatorId, content.Id);
+            Audit.Add(AuditTypes.New, string.Format("Content '{0}' was created with Id {1}", name, content.Id), content.CreatorId, content.Id);
 
             return content;
         }
@@ -203,7 +201,7 @@ namespace Umbraco.Core.Services
 
             Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parent), this);
 
-            Audit.Add(AuditTypes.New, "", content.CreatorId, content.Id);
+            Audit.Add(AuditTypes.New, string.Format("Content '{0}' was created with Id {1}", name, content.Id), content.CreatorId, content.Id);
 
             return content;
         }
@@ -333,7 +331,7 @@ namespace Umbraco.Core.Services
             using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
             {
                 var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
-                var contents = repository.GetByQuery(query);
+                var contents = repository.GetByQuery(query).OrderBy(x => x.SortOrder);
 
                 return contents;
             }
@@ -1036,7 +1034,10 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentRepository(uow))
                 {
-                    content.WriterId = userId;
+                    // Update the create author and last edit author
+                    copy.CreatorId = userId;
+                    copy.WriterId = userId;
+
                     repository.AddOrUpdate(copy);
                     uow.Commit();
 
@@ -1111,7 +1112,7 @@ namespace Umbraco.Core.Services
                 }
 
                 //Look for children and copy those as well
-                var children = GetChildren(content.Id).OrderBy(x => x.SortOrder);
+                var children = GetChildren(content.Id);
                 foreach (var child in children)
                 {
                     Copy(child, copy.Id, relateToOriginal, userId);
@@ -1121,6 +1122,9 @@ namespace Umbraco.Core.Services
 
                 Audit.Add(AuditTypes.Copy, "Copy Content performed by user", content.WriterId, content.Id);
 
+
+                //TODO: Don't think we need this here because cache should be cleared by the event listeners
+                // and the correct ICacheRefreshers!?
                 RuntimeCacheProvider.Current.Clear();
 
                 return copy;
@@ -1172,6 +1176,7 @@ namespace Umbraco.Core.Services
             {
                 content.WriterId = userId;
                 content.CreatorId = userId;
+                content.ChangePublishedState(PublishedState.Unpublished);
 
                 repository.AddOrUpdate(content);
                 uow.Commit();
@@ -1451,11 +1456,10 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentRepository(uow))
                 {
-                    //Only loop through content that was successfully published, was not already published and where the Published property has been updated
+                    //NOTE The Publish with subpages-dialog was used more as a republish-type-thing, so we'll have to include PublishStatusType.SuccessAlreadyPublished
+                    //in the updated-list, so the Published event is triggered with the expected set of pages and the xml is updated.
                     foreach (var item in publishedOutcome.Where(
-                        x => x.Success
-                             && x.Result.StatusType != PublishStatusType.SuccessAlreadyPublished
-                             && ((ICanBeDirty)x.Result.ContentItem).IsPropertyDirty("Published")))
+                        x => x.Success || x.Result.StatusType == PublishStatusType.SuccessAlreadyPublished))
                     {
                         item.Result.ContentItem.WriterId = userId;
                         repository.AddOrUpdate(item.Result.ContentItem);
@@ -1548,6 +1552,8 @@ namespace Umbraco.Core.Services
                 publishStatus.StatusType = CheckAndLogIsPublishable(content);
                 //Content contains invalid property values and can therefore not be published - fire event?
                 publishStatus.StatusType = CheckAndLogIsValid(content);
+                //set the invalid properties (if there are any)
+                publishStatus.InvalidProperties = ((ContentBase) content).LastInvalidProperties;
 
                 //if we're still successful, then publish using the strategy
                 if (publishStatus.StatusType == PublishStatusType.Success)
