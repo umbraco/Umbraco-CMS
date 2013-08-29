@@ -26,6 +26,8 @@
         <fieldset>
             <legend>Edit profile</legend>
        
+            @Html.ValidationSummary(true)
+
             @Html.LabelFor(m => profileModel.Name)
             @Html.TextBoxFor(m => profileModel.Name)
             @Html.ValidationMessageFor(m => profileModel.Name)
