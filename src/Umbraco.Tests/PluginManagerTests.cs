@@ -289,7 +289,7 @@ namespace Umbraco.Tests
         public void Resolves_Actions()
         {
             var actions = PluginManager.Current.ResolveActions();
-            Assert.AreEqual(37, actions.Count());
+            Assert.AreEqual(38, actions.Count());
         }
 
         [Test]

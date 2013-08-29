@@ -29,114 +29,76 @@ namespace Umbraco.Web.Routing
 
 		#region Copied over and adapted from presentation.requestHandler
 
-		void HandlePageNotFound(PublishedContentRequest docRequest)
+		private static void HandlePageNotFound(PublishedContentRequest docRequest)
         {			
 			var url = NotFoundHandlerHelper.GetLegacyUrlForNotFoundHandlers();
             LogHelper.Debug<ContentFinderByNotFoundHandlers>("Running for legacy url='{0}'.", () => url);
 
-            foreach (var handler in GetNotFoundHandlers())
+            foreach (var handler in NotFoundHandlerHelper.GetNotFoundHandlers())
             {
-                IContentFinder finder = null;
                 var handlerName = handler.GetType().FullName;
-
                 LogHelper.Debug<ContentFinderByNotFoundHandlers>("Handler '{0}'.", () => handlerName);
 
-                // replace with our own implementation
-                if (handler is global::umbraco.SearchForAlias)
-                    finder = new ContentFinderByUrlAlias();
-                else if (handler is global::umbraco.SearchForProfile)
-                    finder = new ContentFinderByProfile();
-                else if (handler is global::umbraco.SearchForTemplate)
-                    finder = new ContentFinderByNiceUrlAndTemplate();
-                else if (handler is global::umbraco.handle404)
-                    finder = new ContentFinderByLegacy404();
-
+                var finder = NotFoundHandlerHelper.SubsituteFinder(handler);
                 if (finder != null)
                 {
                     var finderName = finder.GetType().FullName;
                     LogHelper.Debug<ContentFinderByNotFoundHandlers>("Replace handler '{0}' by new finder '{1}'.", () => handlerName, () => finderName);
-                    if (finder.TryFindContent(docRequest))
-                    {
-                        // do NOT set docRequest.PublishedContent again here as 
-                        // it would clear any template that the finder might have set
-                        LogHelper.Debug<ContentFinderByNotFoundHandlers>("Finder '{0}' found node with id={1}.", () => finderName, () => docRequest.PublishedContent.Id);
-                        if (docRequest.Is404)
-                            LogHelper.Debug<ContentFinderByNotFoundHandlers>("Finder '{0}' set status to 404.", () => finderName);
 
-                        // if we found a document, break, don't look at more handler -- we're done
-                        break;
-                    }
+                    // can't find a document => continue with other handlers
+                    if (finder.TryFindContent(docRequest) == false)
+                        continue;
 
-                    // if we did not find a document, continue, look at other handlers
-                    continue;
-                }
+                    // found a document => break, don't run other handlers, we're done
 
-                // else it's a legacy handler, run
+                    // in theory an IContentFinder can return true yet set no document
+                    // but none of the substitued finders (see SubstituteFinder) do it.
 
-				if (handler.Execute(url) && handler.redirectID > 0)
-				{
-				    var redirectId = handler.redirectID;
-                    docRequest.PublishedContent = docRequest.RoutingContext.UmbracoContext.ContentCache.GetById(redirectId);
+                    // do NOT set docRequest.PublishedContent again here
+                    // as it would clear any template that the finder might have set
 
-                    if (!docRequest.HasPublishedContent)
-                    {
-                        LogHelper.Debug<ContentFinderByNotFoundHandlers>("Handler '{0}' found node with id={1} which is not valid.", () => handlerName, () => redirectId);
-                        break;
-                    }
+                    LogHelper.Debug<ContentFinderByNotFoundHandlers>("Finder '{0}' found node with id={1}.", () => finderName, () => docRequest.PublishedContent.Id);
+                    if (docRequest.Is404)
+                        LogHelper.Debug<ContentFinderByNotFoundHandlers>("Finder '{0}' set status to 404.", () => finderName);
 
-                    LogHelper.Debug<ContentFinderByNotFoundHandlers>("Handler '{0}' found valid node with id={1}.", () => handlerName, () => redirectId);
-
-                    if (docRequest.RoutingContext.UmbracoContext.HttpContext.Response.StatusCode == 404)
-                    {
-                        LogHelper.Debug<ContentFinderByNotFoundHandlers>("Handler '{0}' set status code to 404.", () => handlerName);
-                        docRequest.Is404 = true;
-                    }
-
-                    //// check for caching
-                    //if (handler.CacheUrl)
-                    //{
-                    //    if (url.StartsWith("/"))
-                    //        url = "/" + url;
-
-                    //    var cacheKey = (currentDomain == null ? "" : currentDomain.Name) + url;
-                    //    var culture = currentDomain == null ? null : currentDomain.Language.CultureAlias;
-                    //    SetCache(cacheKey, new CacheEntry(handler.redirectID.ToString(), culture));
-
-                    //    HttpContext.Current.Trace.Write("NotFoundHandler",
-                    //        string.Format("Added to cache '{0}', {1}.", url, handler.redirectID));
-                    //}
-
-                    // if we found a document, break, don't look at more handler -- we're done
+                    LogHelper.Debug<ContentFinderByNotFoundHandlers>("Handler '{0}' found valid node with id={1}.", () => handlerName, () => docRequest.PublishedContent.Id);
                     break;
                 }
 
-                // if we did not find a document, continue, look at other handlers
+                // else it's a legacy handler: run
+
+                // can't find a document => continue with other handlers
+                if (handler.Execute(url) == false || handler.redirectID <= 0)
+                    continue;
+
+                // found a document ID => ensure it's a valid document
+                var redirectId = handler.redirectID;
+                docRequest.PublishedContent = docRequest.RoutingContext.UmbracoContext.ContentCache.GetById(redirectId);
+
+                if (docRequest.HasPublishedContent == false)
+                {
+                    // the handler said it could handle the url, and returned a content ID
+                    // yet that content ID is invalid... should we run the other handlers?
+                    // I don't think so, not here, let the "last chance" finder take care.
+                    // so, break.
+
+                    LogHelper.Debug<ContentFinderByNotFoundHandlers>("Handler '{0}' found node with id={1} which is not valid.", () => handlerName, () => redirectId);
+                    break;
+                }
+
+                // found a valid document => break, don't run other handlers, we're done
+
+                LogHelper.Debug<ContentFinderByNotFoundHandlers>("Handler '{0}' found valid node with id={1}.", () => handlerName, () => redirectId);
+
+                if (docRequest.RoutingContext.UmbracoContext.HttpContext.Response.StatusCode == 404)
+                {
+                    LogHelper.Debug<ContentFinderByNotFoundHandlers>("Handler '{0}' set status code to 404.", () => handlerName);
+                    docRequest.Is404 = true;
+                }
+
+                break;
             }
         }
-
-        IEnumerable<INotFoundHandler> GetNotFoundHandlers()
-        {
-            // instanciate new handlers
-            // using definition cache
-
-            var handlers = new List<INotFoundHandler>();
-
-            foreach (var type in NotFoundHandlerHelper.CustomHandlerTypes)
-            {
-                try
-                {
-                    var handler = Activator.CreateInstance(type) as INotFoundHandler;
-                    if (handler != null)
-                        handlers.Add(handler);
-                }
-                catch (Exception e)
-                {
-					LogHelper.Error<ContentFinderByNotFoundHandlers>(string.Format("Error instanciating handler {0}, ignoring.", type.FullName), e);                         
-                }
-            }
-
-            return handlers;
-		}
 
 		#endregion
 	}

@@ -454,6 +454,13 @@
     <Compile Include="Umbraco\Developer\Python\EditPython.aspx.designer.cs">
       <DependentUpon>editPython.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.cs">
+      <DependentUpon>ChangeDocType.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.designer.cs">
+      <DependentUpon>ChangeDocType.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Dialogs\EditMacro.aspx.cs">
       <DependentUpon>EditMacro.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -663,6 +670,9 @@
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionDeleteRelationType.js" />
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionNewRelationType.js" />
     <Content Include="Umbraco\Dialogs\AssignDomain2.aspx" />
+    <Content Include="Umbraco\Dialogs\ChangeDocType.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Umbraco\Dialogs\EditMacro.aspx" />
     <Content Include="Umbraco\Images\delete.gif" />
     <Content Include="Umbraco\Images\delete.png" />
@@ -695,7 +705,9 @@
     <Content Include="Umbraco\Plugins\UGoLive\throbber.gif" />
     <Content Include="Umbraco\Plugins\UGoLive\tick.png" />
     <Content Include="Umbraco\Settings\Views\EditView.aspx" />
+    <Content Include="Umbraco_Client\Application\JQuery\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.min.js" />
+    <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.unobtrusive.min.js" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Lib\codemirror.css" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Lib\codemirror.js" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\closetag.js" />
@@ -2122,6 +2134,11 @@
     </Content>
     <Content Include="Umbraco\Scripting\templates\cshtml\MultinodeTree-picker.cshtml" />
     <Content Include="Umbraco\Scripting\templates\cshtml\TwitterFeed.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\Login.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\EmptyTemplate.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\RegisterMember.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\LoginStatus.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\EditProfile.cshtml" />
     <None Include="Umbraco_client\CodeMirror\js\mode\coffeescript\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\pascal\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\perl\LICENSE" />
@@ -2582,6 +2599,7 @@
     <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
     <Folder Include="Umbraco_Client\Tags\images\" />
     <Folder Include="UserControls\" />
+    <Folder Include="Views\MacroPartials\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -2602,9 +2620,9 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>6140</DevelopmentServerPort>
+          <DevelopmentServerPort>6200</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:6140</IISUrl>
+          <IISUrl>http://localhost:6200</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

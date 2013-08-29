@@ -82,6 +82,10 @@ namespace umbraco.uicontrols
                     ClientDependencyLoader.Instance.RegisterDependency(1, "CodeMirror/js/mode/css/css.js", "UmbracoClient", ClientDependencyType.Javascript);
                 }
 
+                ClientDependencyLoader.Instance.RegisterDependency(2, "CodeMirror/js/lib/util/search.js", "UmbracoClient", ClientDependencyType.Javascript);
+                ClientDependencyLoader.Instance.RegisterDependency(2, "CodeMirror/js/lib/util/searchcursor.js", "UmbracoClient", ClientDependencyType.Javascript);
+                ClientDependencyLoader.Instance.RegisterDependency(2, "CodeMirror/js/lib/util/dialog.js", "UmbracoClient", ClientDependencyType.Javascript);
+                ClientDependencyLoader.Instance.RegisterDependency(2, "CodeMirror/js/lib/util/dialog.css", "UmbracoClient", ClientDependencyType.Css);
 
                 ClientDependencyLoader.Instance.RegisterDependency(2, "CodeMirror/js/lib/codemirror.css", "UmbracoClient", ClientDependencyType.Css);
                 ClientDependencyLoader.Instance.RegisterDependency(3, "CodeMirror/css/umbracoCustom.css", "UmbracoClient", ClientDependencyType.Css);

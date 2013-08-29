@@ -187,6 +187,25 @@ namespace Umbraco.Core
 			return String.Empty;
 		}
 
+	    /// <summary>
+	    /// Returns the value of the key value based on the key as it's string value, if the key is not found or is an empty string, then the provided default value is returned
+	    /// </summary>
+	    /// <param name="d"></param>
+	    /// <param name="key"></param>
+	    /// <param name="defaultValue"></param>
+	    /// <returns></returns>
+	    public static string GetValueAsString<TKey, TVal>(this IDictionary<TKey, TVal> d, TKey key, string defaultValue)
+		{
+			if (d.ContainsKey(key))
+			{
+				var value = d[key].ToString();
+			    if (value != string.Empty)
+                    return value;
+			}
+			
+            return defaultValue;
+		}
+
 		/// <summary>contains key ignore case.</summary>
 		/// <param name="dictionary">The dictionary.</param>
 		/// <param name="key">The key.</param>
