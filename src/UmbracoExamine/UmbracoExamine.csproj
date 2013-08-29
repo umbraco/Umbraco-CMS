@@ -120,11 +120,9 @@
     <Compile Include="DataServices\UmbracoContentService.cs" />
     <Compile Include="DataServices\UmbracoMediaService.cs" />
     <Compile Include="IndexTypes.cs" />
-    <Compile Include="LegacyClasses.cs" />
     <Compile Include="LegacyLibrary.cs" />
     <Compile Include="LoggingLevel.cs" />
     <Compile Include="StaticField.cs" />
-    <Compile Include="UmbracoEventManager.cs" />
     <Compile Include="UmbracoMemberIndexer.cs" />
     <Compile Include="ContentExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

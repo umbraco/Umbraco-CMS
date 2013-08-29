@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Tests.PartialTrust;
 using Umbraco.Web;
 using UmbracoExamine;
+using UmbracoExamine.DataServices;
 using umbraco;
 using umbraco.presentation;
 using umbraco.presentation.nodeFactory;
@@ -61,9 +62,9 @@ namespace Umbraco.Tests
                                                    typeof(int));
             Assert.IsFalse(t4.Success);
 
-            var t5 = TypeHelper.GetLowestBaseType(typeof(UmbracoEventManager));
+            var t5 = TypeHelper.GetLowestBaseType(typeof(PropertyAliasDto));
             Assert.IsTrue(t5.Success);
-            Assert.AreEqual(typeof(UmbracoEventManager), t5.Result);
+            Assert.AreEqual(typeof(PropertyAliasDto), t5.Result);
 
             var t6 = TypeHelper.GetLowestBaseType(typeof (IApplicationEventHandler),
                                                   typeof (LegacyScheduledTasks),
