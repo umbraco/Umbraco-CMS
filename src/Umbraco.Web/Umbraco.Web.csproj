@@ -298,6 +298,8 @@
     <Compile Include="Configuration\WebRouting.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Editors\ContentController.cs" />
+    <Compile Include="Controllers\ProfileController.cs" />
+    <Compile Include="Controllers\LoginStatusController.cs" />
     <Compile Include="Editors\ContentPostValidateAttribute.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
@@ -343,9 +345,12 @@
     <Compile Include="Editors\ContentControllerBase.cs" />
     <Compile Include="Editors\ContentTypeController.cs" />
     <Compile Include="Editors\LegacyController.cs" />
-    <Compile Include="UmbracoControllers\RegisterController.cs" />
-    <Compile Include="UmbracoModels\RegisterModel.cs" />
-    <Compile Include="UmbracoModels\LoginModel.cs" />
+    <Compile Include="Controllers\RegisterController.cs" />
+    <Compile Include="Models\ProfileModel.cs" />
+    <Compile Include="Models\LoginStatusModel.cs" />
+    <Compile Include="Routing\ContentLastChanceFinderByNotFoundHandlers.cs" />
+    <Compile Include="Models\RegisterModel.cs" />
+    <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Editors\MediaTypeController.cs" />
     <Compile Include="Editors\SectionController.cs" />
     <Compile Include="Editors\UmbracoAuthorizedJsonController.cs" />
@@ -530,7 +535,8 @@
     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UmbracoControllers\LoginController.cs" />
+    <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="UmbracoProperty.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="Editors\MediaController.cs" />
     <Compile Include="WebApi\Binders\ContentItemBaseBinder.cs" />

@@ -236,10 +236,11 @@ namespace Umbraco.Web.Models
 			}
 
 			//get the data type id for the current property
-			var dataType = Umbraco.Core.PublishedContentHelper.GetDataType(
+			var dataType = PublishedContentHelper.GetDataType(
                 ApplicationContext.Current,
                 userProperty.DocumentTypeAlias, 
-                userProperty.Alias);
+                userProperty.Alias,
+                ItemType);
 
 			//convert the string value to a known type
 			var converted = Umbraco.Core.PublishedContentHelper.ConvertPropertyValue(result, dataType, userProperty.DocumentTypeAlias, userProperty.Alias);

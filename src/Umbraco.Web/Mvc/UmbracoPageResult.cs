@@ -34,8 +34,13 @@ namespace Umbraco.Web.Mvc
 			//ensure TempData and ViewData is copied across
 			foreach (var d in context.Controller.ViewData)
 				routeDef.Controller.ViewData[d.Key] = d.Value;
-			routeDef.Controller.TempData = context.Controller.TempData;
 
+            //We cannot simply merge the temp data because during controller execution it will attempt to 'load' temp data
+            // but since it has not been saved, there will be nothing to load and it will revert to nothing, so the trick is 
+            // to Save the state of the temp data first then it will automatically be picked up.
+            // http://issues.umbraco.org/issue/U4-1339
+            context.Controller.TempData.Save(context, ((Controller)context.Controller).TempDataProvider);
+    
 			using (DisposableTimer.TraceDuration<UmbracoPageResult>("Executing Umbraco RouteDefinition controller", "Finished"))
 			{
 				try

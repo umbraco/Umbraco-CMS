@@ -3,10 +3,10 @@ using System.Web.Mvc;
 using System.Xml;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.member;
+using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.UmbracoModels;
 
-namespace Umbraco.Web.UmbracoControllers
+namespace Umbraco.Web.Controllers
 {
     public class RegisterController : SurfaceController
     {
@@ -21,13 +21,22 @@ namespace Umbraco.Web.UmbracoControllers
                 var mt = MemberType.GetByAlias(model.MemberTypeAlias) ?? MemberType.MakeNew(user, model.MemberTypeAlias);
 
                 var member = Member.MakeNew(model.Email, mt, user);
+
+                if (model.Name != null)
+                {
+                    member.Text = model.Name;
+                }
+
                 member.Email = model.Email;
                 member.LoginName = model.Email;
                 member.Password = model.Password;
 
-                foreach (var property in model.MemberProperties)
+                if (model.MemberProperties != null)
                 {
-                    member.getProperty(property.Alias).Value = property.Value;
+                    foreach (var property in model.MemberProperties.Where(p => p.Value != null))
+                    {
+                        member.getProperty(property.Alias).Value = property.Value;
+                    }
                 }
 
                 member.Save();

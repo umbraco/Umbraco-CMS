@@ -91,3 +91,6 @@ src/Umbraco.Web.UI/App_Plugins/*
 src/*.psess
 src/*.vspx
 src/Umbraco.Web.UI/umbraco/js/routes.js.*
+NDependOut/*
+*.ndproj
+QueryResult.htm

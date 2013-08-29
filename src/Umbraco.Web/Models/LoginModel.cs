@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
-namespace Umbraco.Web.UmbracoModels
+namespace Umbraco.Web.Models
 {
     public class LoginModel
     {
