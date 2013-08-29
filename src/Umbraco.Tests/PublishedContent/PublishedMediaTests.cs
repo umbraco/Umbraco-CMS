@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Web;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Examine;
@@ -16,6 +17,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.UmbracoExamine;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
@@ -66,6 +68,38 @@ namespace Umbraco.Tests.PublishedContent
         private IPublishedContent GetNode(int id)
         {
             return GetNode(id, GetUmbracoContext("/test", 1234));
+        }
+
+        [Test]
+        public void Get_Property_Value_Uses_Converter()
+        {            
+            var mType = MockedContentTypes.CreateImageMediaType();
+            //lets add an RTE to this
+            mType.PropertyGroups.First().PropertyTypes.Add(
+                new PropertyType(new Guid(), DataTypeDatabaseType.Nvarchar)
+                    {
+                        Alias = "content", 
+                        Name = "Rich Text",
+                        DataTypeDefinitionId = -87 //tiny mce
+                    });
+            ServiceContext.ContentTypeService.Save(mType);
+            var media = MockedMedia.CreateMediaImage(mType, -1);
+            media.Properties["content"].Value = "<div>This is some content</div>";
+            ServiceContext.MediaService.Save(media);
+
+            var publishedMedia = GetNode(media.Id);
+
+            var propVal = publishedMedia.GetPropertyValue("content");
+            Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<IHtmlString>(propVal.GetType()));
+            Assert.AreEqual("<div>This is some content</div>", propVal.ToString());
+
+            var propVal2 = publishedMedia.GetPropertyValue<IHtmlString>("content");
+            Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<IHtmlString>(propVal2.GetType()));
+            Assert.AreEqual("<div>This is some content</div>", propVal2.ToString());
+
+            var propVal3 = publishedMedia.GetPropertyValue("Content");
+            Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<IHtmlString>(propVal3.GetType()));
+            Assert.AreEqual("<div>This is some content</div>", propVal3.ToString());
         }
 
         [Test]
@@ -338,7 +372,6 @@ namespace Umbraco.Tests.PublishedContent
             var publishedSubChild1 = GetNode(mSubChild1.Id);
             Assert.AreEqual(mChild1.Id, publishedSubChild1.Parent.Id);
         }
-
 
         [Test]
         public void Ancestors_Without_Examine()
