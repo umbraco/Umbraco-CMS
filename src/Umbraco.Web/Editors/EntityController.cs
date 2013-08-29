@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Web.Http;
+using System.Web.Http.Controllers;
+using System.Web.Http.ModelBinding;
 using AutoMapper;
+using Newtonsoft.Json;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -10,6 +13,8 @@ using Umbraco.Web.WebApi;
 using System.Linq;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
+using Umbraco.Web.WebApi.Filters;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -19,37 +24,46 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
     {
+
+        [UmbracoApplicationAuthorize(Constants.Applications.Content)]
         public EntityBasic GetDocumentById(int id)
         {
             return Mapper.Map<EntityBasic>(Services.EntityService.Get(id, UmbracoObjectTypes.Document));
         }
 
+        [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
         public IEnumerable<EntityBasic> GetDocumentChildren(int id)
         {
             return GetChildren(id, UmbracoObjectTypes.Document);
         }
 
+        [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
         public IEnumerable<EntityBasic> GetDocumentsByIds([FromUri]int[] ids)
         {
             if (ids == null) throw new ArgumentNullException("ids");
             return GetEntitiesById(ids, UmbracoObjectTypes.Document);
         }
 
+        [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Media)]
         public EntityBasic GetMediaById(int id)
         {
             return GetEntityById(id, UmbracoObjectTypes.Media);
         }
 
+        [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Media)]
         public IEnumerable<EntityBasic> GetMediaChildren(int id)
         {
             return GetChildren(id, UmbracoObjectTypes.Media);
         }
 
+        [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Media)]
         public IEnumerable<EntityBasic> GetMediaByIds([FromUri]int[] ids)
         {
             if (ids == null) throw new ArgumentNullException("ids");
             return GetEntitiesById(ids, UmbracoObjectTypes.Media);
         }
+
+        //TODO: Need to add app level security for all of this below
 
         public EntityBasic GetById(int id, UmbracoObjectTypes? type = null)
         {

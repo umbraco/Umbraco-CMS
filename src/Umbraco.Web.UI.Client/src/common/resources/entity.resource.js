@@ -152,7 +152,7 @@ function entityResource($q, $http, umbRequestHelper) {
                        "entityApiBaseUrl",
                        "GetAll",
                        [{type: type }])),
-               'Failed to retreive entity data for id ' + id);
+               'Failed to retreive entity data for type ' + type);
         },
 
         /**
