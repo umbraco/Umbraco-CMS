@@ -146,7 +146,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         
         private void CreateUmbracoUserTypeData()
         {
-            _database.Insert("umbracoUserType", "id", false, new UserTypeDto { Id = 1, Alias = "admin", Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:5F" });
+            _database.Insert("umbracoUserType", "id", false, new UserTypeDto { Id = 1, Alias = "admin", Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:5F7" });
             _database.Insert("umbracoUserType", "id", false, new UserTypeDto { Id = 2, Alias = "writer", Name = "Writer", DefaultPermissions = "CAH:F" });
             _database.Insert("umbracoUserType", "id", false, new UserTypeDto { Id = 3, Alias = "editor", Name = "Editors", DefaultPermissions = "CADMOSKTPUZ:5F" });
             _database.Insert("umbracoUserType", "id", false, new UserTypeDto { Id = 4, Alias = "translator", Name = "Translator", DefaultPermissions = "AF" });

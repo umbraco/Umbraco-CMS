@@ -291,11 +291,14 @@
     <Compile Include="Cache\UserPermissionsCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />
+    <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\LoginStatusController.cs" />
     <Compile Include="Editors\MediaController.cs" />
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
+    <Compile Include="Models\ProfileModel.cs" />
     <Compile Include="Models\LoginStatusModel.cs" />
+    <Compile Include="Routing\ContentLastChanceFinderByNotFoundHandlers.cs" />
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
@@ -398,6 +401,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="UmbracoProperty.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />

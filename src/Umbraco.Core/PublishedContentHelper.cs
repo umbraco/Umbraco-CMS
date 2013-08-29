@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 
@@ -35,7 +36,7 @@ namespace Umbraco.Core
         /// </summary>
         internal static Func<string, string, Guid> GetDataTypeCallback = null;
 
-        private static readonly ConcurrentDictionary<Tuple<string, string>, Guid> PropertyTypeCache = new ConcurrentDictionary<Tuple<string, string>, Guid>();
+        private static readonly ConcurrentDictionary<Tuple<string, string, PublishedItemType>, Guid> PropertyTypeCache = new ConcurrentDictionary<Tuple<string, string, PublishedItemType>, Guid>();
 
         /// <summary>
         /// Return the GUID Id for the data type assigned to the document type with the property alias
@@ -43,16 +44,29 @@ namespace Umbraco.Core
         /// <param name="applicationContext"></param>
         /// <param name="docTypeAlias"></param>
         /// <param name="propertyAlias"></param>
+        /// <param name="itemType"></param>
         /// <returns></returns>
-		internal static Guid GetDataType(ApplicationContext applicationContext, string docTypeAlias, string propertyAlias)
+        internal static Guid GetDataType(ApplicationContext applicationContext, string docTypeAlias, string propertyAlias, PublishedItemType itemType)
         {
             if (GetDataTypeCallback != null)
                 return GetDataTypeCallback(docTypeAlias, propertyAlias);
 
-            var key = new Tuple<string, string>(docTypeAlias, propertyAlias);
+            var key = new Tuple<string, string, PublishedItemType>(docTypeAlias, propertyAlias, itemType);
             return PropertyTypeCache.GetOrAdd(key, tuple =>
                 {
-                    var result = applicationContext.Services.ContentTypeService.GetContentType(docTypeAlias);
+                    IContentTypeComposition result = null;
+                    switch (itemType)
+                    {
+                        case PublishedItemType.Content:
+                            result = applicationContext.Services.ContentTypeService.GetContentType(docTypeAlias);                            
+                            break;
+                        case PublishedItemType.Media:
+                            result = applicationContext.Services.ContentTypeService.GetMediaType(docTypeAlias);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException("itemType");
+                    }
+                    
                     if (result == null) return Guid.Empty;
                     
                     //SD: we need to check for 'any' here because the collection is backed by KeyValuePair which is a struct

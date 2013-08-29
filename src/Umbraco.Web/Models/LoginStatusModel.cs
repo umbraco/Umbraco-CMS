@@ -9,10 +9,14 @@ namespace Umbraco.Web.Models
             //TODO Use new Member API
             if (Member.IsLoggedOn())
             {
-                this.Name = Member.GetCurrentMember().Text;
-                this.Username = Member.GetCurrentMember().LoginName;
-                this.Email = Member.GetCurrentMember().Email;
-                this.IsLoggedIn = true;
+                var member = Member.GetCurrentMember();
+                if (member != null)
+                {
+                    this.Name = member.Text;
+                    this.Username = member.LoginName;
+                    this.Email = member.Email;
+                    this.IsLoggedIn = true;
+                }
             }
         }
 

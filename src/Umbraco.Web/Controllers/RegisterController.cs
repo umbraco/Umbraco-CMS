@@ -21,13 +21,22 @@ namespace Umbraco.Web.Controllers
                 var mt = MemberType.GetByAlias(model.MemberTypeAlias) ?? MemberType.MakeNew(user, model.MemberTypeAlias);
 
                 var member = Member.MakeNew(model.Email, mt, user);
+
+                if (model.Name != null)
+                {
+                    member.Text = model.Name;
+                }
+
                 member.Email = model.Email;
                 member.LoginName = model.Email;
                 member.Password = model.Password;
 
-                foreach (var property in model.MemberProperties)
+                if (model.MemberProperties != null)
                 {
-                    member.getProperty(property.Alias).Value = property.Value;
+                    foreach (var property in model.MemberProperties.Where(p => p.Value != null))
+                    {
+                        member.getProperty(property.Alias).Value = property.Value;
+                    }
                 }
 
                 member.Save();
