@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using umbraco.cms.businesslogic.member;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Models
 {
@@ -9,7 +10,13 @@ namespace Umbraco.Web.Models
     {
         public RegisterModel()
         {
-            this.MemberTypeAlias = "UmbracoMember";
+            this.MemberTypeAlias = Constants.Conventions.MemberTypes.Member;
+
+            this.RedirectOnSucces = false;
+
+            this.RedirectUrl = "/";
+
+            this.UsernameIsEmail = true;
 
             var memberType = MemberType.GetByAlias(this.MemberTypeAlias);
 
@@ -17,14 +24,7 @@ namespace Umbraco.Web.Models
             {
                 this.MemberProperties = new List<UmbracoProperty>();
 
-                var memberTypeProperties = memberType.PropertyTypes.ToList();
-
-                if (memberTypeProperties.Where(memberType.MemberCanEdit).Any())
-                {
-                    memberTypeProperties = memberTypeProperties.Where(memberType.MemberCanEdit).ToList();
-                }
-
-                foreach (var prop in memberTypeProperties)
+                foreach (var prop in memberType.PropertyTypes.Where(memberType.MemberCanEdit))
                 {
                     this.MemberProperties.Add(new UmbracoProperty
                                               {
@@ -41,13 +41,21 @@ namespace Umbraco.Web.Models
             ErrorMessage = "Please enter a valid e-mail address")]
         public string Email { get; set; }
 
-        [Required]
-        public string Password { get; set; }
+        public List<UmbracoProperty> MemberProperties { get; set; }
+        
+        public string MemberTypeAlias { get; set; }
 
         public string Name { get; set; }
 
-        public string MemberTypeAlias { get; set; }
+        [Required]
+        public string Password { get; set; }
+        
+        public bool RedirectOnSucces { get; set; }
+        
+        public string RedirectUrl { get; set; }
 
-        public List<UmbracoProperty> MemberProperties { get; set; }
+        public string Username { get; set; }
+
+        public bool UsernameIsEmail { get; set; }
     }
 }
