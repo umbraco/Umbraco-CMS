@@ -139,7 +139,9 @@ namespace Umbraco.Core.PropertyEditors
                     break;
                 case DataTypeDatabaseType.Integer:
                     //ensure these are nullable so we can return a null if required
-                    valueType = typeof(int?);
+                    //NOTE: This is allowing type of 'long' because I think json.net will deserialize a numerical value as long
+                    // instead of int. Even though our db will not support this (will get truncated), we'll at least parse to this.
+                    valueType = typeof(long?);
                     break;
                 case DataTypeDatabaseType.Date:
                     //ensure these are nullable so we can return a null if required
