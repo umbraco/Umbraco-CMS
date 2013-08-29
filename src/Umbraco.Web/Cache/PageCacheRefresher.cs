@@ -4,8 +4,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Sync;
 using umbraco;
 using umbraco.cms.businesslogic.web;
-using umbraco.interfaces;
-using umbraco.presentation.cache;
 
 namespace Umbraco.Web.Cache
 {

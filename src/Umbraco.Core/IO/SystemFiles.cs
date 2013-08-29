@@ -60,15 +60,6 @@ namespace Umbraco.Core.IO
             }
         }
 
-        public static string RestextensionsConfig
-        {
-            get
-            {
-                return SystemDirectories.Config + "/restextensions.config";
-            }
-        }
-
-
         public static string SkinningXml
         {
             get

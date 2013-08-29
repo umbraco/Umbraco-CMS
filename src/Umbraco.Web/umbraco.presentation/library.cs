@@ -14,8 +14,6 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
@@ -25,18 +23,11 @@ using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.relation;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
-using umbraco.presentation.cache;
 using umbraco.scripting;
 using umbraco.DataLayer;
-using System.Web.Security;
 using umbraco.cms.businesslogic.language;
 using umbraco.IO;
-using System.Collections;
-using System.Collections.Generic;
-using umbraco.cms.businesslogic.cache;
-using umbraco.NodeFactory;
 using UmbracoContext = umbraco.presentation.UmbracoContext;
-using System.Linq;
 
 namespace umbraco
 {

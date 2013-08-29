@@ -78,71 +78,9 @@ namespace Umbraco.Web.BaseRest
 
 			return GetFromConfiguration(extensionAlias, methodName, paramsCount)
 				?? GetFromAttribute(extensionAlias, methodName, paramsCount)
-				?? GetFromLegacyConfiguration(extensionAlias, methodName) // that one should be obsoleted at some point
-				?? GetFromLegacyAttribute(extensionAlias, methodName) // that one should be obsoleted at some point
 				?? MissingMethod;
 		}
-
-		// gets a RestExtensionMethodInfo matching extensionAlias and methodName
-		// by looking at the legacy configuration file
-		// returns null if not found
-		//
-		static RestExtensionMethodInfo GetFromLegacyConfiguration(string extensionAlias, string methodName)
-		{
-			const string extensionXPath = "/RestExtensions/ext [@alias='{0}']";
-			const string methodXPath = "./permission [@method='{0}']";
-
-			var config = (Configuration.BaseRestSection)System.Configuration.ConfigurationManager.GetSection("BaseRestExtensions");
-
-			if (config == null)
-				return null; // does not exist
-
-			// note - at the moment we reload the config file each time
-			//   we have to support live edits of the config file for backward compatibility reason
-			//   so if we want to cache, we'd also need to implement a watcher on the config file...
-
-			var doc = new XmlDocument();
-			doc.Load(IOHelper.MapPath(SystemFiles.RestextensionsConfig));
-
-			var eNode = doc.SelectSingleNode(string.Format(extensionXPath, extensionAlias));
-
-			if (eNode == null)
-				return null; // does not exist
-
-			var mNode = eNode.SelectSingleNode(string.Format(methodXPath, methodName));
-
-			if (mNode == null)
-				return null; // does not exist
-
-		    var attributes = eNode.Attributes;
-		    if (attributes == null)
-		        return null; // has no attributes
-
-			var assemblyName = attributes["assembly"].Value;
-			var assembly = Assembly.Load(assemblyName);
-
-			var typeName = attributes["type"].Value;
-			var type = assembly.GetType(typeName);
-
-			if (type == null)
-				return null; // does not exist
-
-			var method = type.GetMethod(methodName);
-
-			if (method == null)
-				return null; // does not exist
-
-			var allowAll = GetAttribute(mNode, "allowAll");
-			var returnXml = GetAttribute(mNode, "returnXml");
-
-			var info = new RestExtensionMethodInfo(allowAll != null && allowAll.ToLower() == "true",
-				GetAttribute(mNode, "allowGroup"), GetAttribute(mNode, "allowType"), GetAttribute(mNode, "allowMember"),
-				returnXml == null || returnXml.ToLower() != "false",
-				method);
-
-			return info;
-		}
-
+        
 		// gets a RestExtensionMethodInfo matching extensionAlias and methodName
 		// by looking at the configuration file
 		// returns null if not found
@@ -199,64 +137,6 @@ namespace Umbraco.Web.BaseRest
 				configMethod.AllowGroup, configMethod.AllowType, configMethod.AllowMember,
 				configMethod.ReturnXml,
 				method);
-
-			return info;
-		}
-
-		// gets a RestExtensionMethodInfo matching extensionAlias and methodName
-		// by looking for the legacy attributes
-		// returns null if not found
-		//
-		static RestExtensionMethodInfo GetFromLegacyAttribute(string extensionAlias, string methodName)
-		{
-			// here we can cache because any change would trigger an app restart anyway
-
-			var cacheKey = extensionAlias + "." + methodName;
-			lock (Cache)
-			{
-				// if it's in the cache, return
-				if (Cache.ContainsKey(cacheKey))
-					return Cache[cacheKey];
-			}
-
-			// find an extension with that alias, then find a method with that name,
-			// which has been properly marked with the attribute, and use the attribute
-			// properties to setup a RestExtensionMethodInfo
-
-            // note: add #pragma - yes it's obsolete but we still want to support it for the time being
-
-			var extensions = PluginManager.Current.ResolveLegacyRestExtensions()
-#pragma warning disable 612,618
-				.Where(type => type.GetCustomAttribute<global::umbraco.presentation.umbracobase.RestExtension>(false).GetAlias() == extensionAlias);
-#pragma warning restore 612,618
-
-			RestExtensionMethodInfo info = null;
-
-            foreach (var extension in extensions) // foreach classes with extension alias
-			{
-				var method = extension.GetMethod(methodName);
-                if (method == null) continue; // not implementing the method = ignore
-
-#pragma warning disable 612,618
-			    var attribute = method.GetCustomAttributes(typeof(global::umbraco.presentation.umbracobase.RestExtensionMethod), false).Cast<global::umbraco.presentation.umbracobase.RestExtensionMethod>().SingleOrDefault();
-#pragma warning restore 612,618
-                if (attribute == null) continue; // method has not attribute = ignore
-
-                // got it!
-			    info = new RestExtensionMethodInfo(attribute.GetAllowAll(),
-			                                       attribute.GetAllowGroup(), attribute.GetAllowType(), attribute.GetAllowMember(),
-			                                       attribute.returnXml,
-			                                       method);
-
-			    // cache
-			    lock (Cache)
-			    {
-			        Cache[cacheKey] = info;
-			    }
-            
-                // got it, no need to look any further
-                break;
-            }
 
 			return info;
 		}

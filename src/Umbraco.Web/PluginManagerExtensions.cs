@@ -50,16 +50,6 @@ namespace Umbraco.Web
 		}
 
 		/// <summary>
-		/// Returns all classes attributed with legacy RestExtension attribute
-		/// </summary>
-		/// <param name="resolver"></param>
-		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveLegacyRestExtensions(this PluginManager resolver)
-		{
-			return resolver.ResolveAttributedTypes<global::umbraco.presentation.umbracobase.RestExtension>();
-		}
-
-		/// <summary>
 		/// Returns all classes attributed with RestExtensionAttribute attribute
 		/// </summary>
 		/// <param name="resolver"></param>

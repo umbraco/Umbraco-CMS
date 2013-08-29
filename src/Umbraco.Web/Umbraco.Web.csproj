@@ -514,7 +514,6 @@
     </Compile>
     <Compile Include="UI\JavaScript\ServerVariablesParser.cs" />
     <Compile Include="UI\CdfLogger.cs" />
-    <Compile Include="umbraco.presentation\LegacyClasses.cs" />
     <Compile Include="umbraco.presentation\umbraco\ActionHandlers\SimilarNodeNameComparer.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -861,11 +860,6 @@
     <Compile Include="umbraco.presentation\template.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbracobase\attributes\RestExtension.cs" />
-    <Compile Include="umbraco.presentation\umbracobase\attributes\RestExtensionMethod.cs" />
-    <Compile Include="umbraco.presentation\umbracobase\baseHttpModule.cs" />
-    <Compile Include="umbraco.presentation\umbracobase\baseLibrary.cs" />
-    <Compile Include="umbraco.presentation\umbracobase\restExtension.cs" />
     <Compile Include="umbraco.presentation\UmbracoContext.cs" />
     <Compile Include="umbraco.presentation\UmbracoPage.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -910,9 +904,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\actions\publish.aspx.designer.cs">
       <DependentUpon>publish.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\cache\LegacyClasses.cs">
-      <SubType>code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\channels\Blogger.cs" />
     <Compile Include="umbraco.presentation\umbraco\channels\config.cs" />
@@ -1928,7 +1919,6 @@
     <EmbeddedResource Include="UI\JavaScript\Main.js" />
     <EmbeddedResource Include="UI\JavaScript\JsInitialize.js" />
     <EmbeddedResource Include="UI\JavaScript\ServerVariables.js" />
-    <Content Include="umbraco.presentation\umbracobase\readme.txt" />
     <Content Include="umbraco.presentation\umbraco\controls\Tree\CustomTreeService.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx" />

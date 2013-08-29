@@ -645,9 +645,6 @@
     <None Include="Config\scripting.Release.config">
       <DependentUpon>scripting.config</DependentUpon>
     </None>
-    <None Include="Config\restExtensions.Release.config">
-      <DependentUpon>restExtensions.config</DependentUpon>
-    </None>
     <None Include="Config\metablogConfig.Release.config">
       <DependentUpon>metablogConfig.config</DependentUpon>
     </None>
@@ -2598,9 +2595,6 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Config\metablogConfig.config" />
-    <Content Include="Config\restExtensions.config">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="Config\tinyMceConfig.config" />
     <Content Include="Config\umbracoSettings.config">
       <SubType>Designer</SubType>

@@ -4,11 +4,7 @@ using System.Web.Caching;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Web.Cache;
-using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
-using umbraco.presentation.cache;
 
 namespace Umbraco.Web
 {

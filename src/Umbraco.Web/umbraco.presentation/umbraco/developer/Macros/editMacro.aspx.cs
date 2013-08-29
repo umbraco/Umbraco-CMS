@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections;
-using System.Data;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.IO;
 using Umbraco.Core.IO;
-using Umbraco.Web.Cache;
 using umbraco.BasePages;
-using umbraco.presentation.cache;
 using umbraco.uicontrols;
 using umbraco.DataLayer;
 using umbraco.cms.presentation.Trees;

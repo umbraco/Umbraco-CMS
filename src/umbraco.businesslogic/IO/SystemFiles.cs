@@ -42,13 +42,7 @@ namespace umbraco.IO
 		{
 			get { return Umbraco.Core.IO.SystemFiles.XsltextensionsConfig; }
 		}
-
-		public static string RestextensionsConfig
-		{
-			get { return Umbraco.Core.IO.SystemFiles.RestextensionsConfig; }
-		}
-
-
+        
 		public static string SkinningXml
 		{
 			get { return Umbraco.Core.IO.SystemFiles.SkinningXml; }
