@@ -278,12 +278,6 @@ namespace Umbraco.Web
                 LogHelper.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
                 return null;
             }));
-
-            //We are going to manually remove a few cache refreshers here because we've obsoleted them and we don't want them
-            // to be registered more than once
-            CacheRefreshersResolver.Current.RemoveType<pageRefresher>();
-            CacheRefreshersResolver.Current.RemoveType<global::umbraco.presentation.cache.MediaLibraryRefreshers>();
-            CacheRefreshersResolver.Current.RemoveType<global::umbraco.presentation.cache.MemberLibraryRefreshers>();
             
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
                 PluginManager.Current.ResolveSurfaceControllers());
