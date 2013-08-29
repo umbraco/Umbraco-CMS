@@ -91,6 +91,17 @@
 			}
 
 			/// <summary>
+			/// Defines the alias identifiers for Umbraco member types.
+			/// </summary>
+			public static class MemberTypes
+			{
+				/// <summary>
+				/// MemberType alias for default member type.
+				/// </summary>
+				public const string Member = "Member";
+			}
+
+			/// <summary>
 			/// Constants for Umbraco URLs/Querystrings.
 			/// </summary>
 			public static class Url
