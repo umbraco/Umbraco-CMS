@@ -36,7 +36,10 @@ namespace umbraco
 
 	    public override bool PerformSave()
 	    {
-            var fileName = Alias + ".cshtml";
+            var pipesIndex = Alias.IndexOf("|||", System.StringComparison.Ordinal);
+            var template = Alias.Substring(0, pipesIndex).Trim();
+            var fileName = Alias.Substring(pipesIndex + 3, Alias.Length - pipesIndex - 3) + ".cshtml";
+
             var fullFilePath = IOHelper.MapPath(BasePath + fileName);
 
             //return the link to edit the file if it already exists
@@ -49,7 +52,11 @@ namespace umbraco
             //create the file
             using (var sw = File.CreateText(fullFilePath))
             {
-                WriteTemplateHeader(sw);
+                using (var templateFile = File.OpenText(IOHelper.MapPath(SystemDirectories.Umbraco + "/partialviews/templates/" + template)))
+                {
+                    var templateContent = templateFile.ReadToEnd();
+                    sw.Write(templateContent);
+                }
             }
 
             // Create macro?

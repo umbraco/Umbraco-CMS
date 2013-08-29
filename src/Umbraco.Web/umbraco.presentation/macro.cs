@@ -1358,40 +1358,7 @@ namespace umbraco
             retVal.Result = ret;
             return retVal;
         }
-
-        [Obsolete("Replaced with loadMacroScript", true)]
-        public DLRMacroResult loadMacroDLR(MacroModel macro)
-        {
-            var retVal = new DLRMacroResult();
-            var ret = new LiteralControl();
-            IMacroEngine engine = null;
-            if (!String.IsNullOrEmpty(macro.ScriptCode))
-            {
-                engine = MacroEngineFactory.GetByExtension(macro.ScriptLanguage);
-                ret.Text = engine.Execute(
-                    macro,
-                    Node.GetCurrent());
-            }
-            else
-            {
-                string path = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + macro.ScriptName);
-                engine = MacroEngineFactory.GetByFilename(path);
-                ret.Text = engine.Execute(macro, Node.GetCurrent());
-            }
-
-            // if the macro engine supports success reporting and executing failed, then return an empty control so it's not cached
-            if (engine is IMacroEngineResultStatus)
-            {
-                var result = engine as IMacroEngineResultStatus;
-                if (!result.Success)
-                {
-                    retVal.ResultException = result.ResultException;
-                }
-            }
-            retVal.Control = ret;
-            return retVal;
-        }
-
+        
         /// <summary>
         /// Loads a custom or webcontrol using reflection into the macro object
         /// </summary>

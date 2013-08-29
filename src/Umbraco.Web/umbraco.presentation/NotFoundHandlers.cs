@@ -14,7 +14,117 @@ using umbraco.IO;
 using umbraco.NodeFactory;
 
 namespace umbraco {
-    
+
+
+    /// <summary>
+    /// THIS CLASS IS PURELY HERE TO SUPPORT THE QUERYBYXPATH METHOD WHICH IS USED BY OTHER LEGACY BITS
+    /// </summary>    
+    internal class LegacyRequestHandler
+    {
+        private const string PageXPathQueryStart = "/root";
+        private const string UrlName = "@urlName";
+        
+        public static string CreateXPathQuery(string url, bool checkDomain)
+        {
+
+            string _tempQuery = "";
+            if (GlobalSettings.HideTopLevelNodeFromPath && checkDomain)
+            {
+                _tempQuery = "/root" + GetChildContainerName() + "/*";
+            }
+            else if (checkDomain)
+                _tempQuery = "/root" + GetChildContainerName();
+
+
+            string[] requestRawUrl = url.Split("/".ToCharArray());
+
+            // Check for Domain prefix
+            string domainUrl = "";
+            if (checkDomain && Domain.Exists(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]))
+            {
+                // we need to get the node based on domain
+                INode n = new Node(Domain.GetRootFromDomain(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]));
+                domainUrl = n.UrlName; // we don't use niceUrlFetch as we need more control
+                if (n.Parent != null)
+                {
+                    while (n.Parent != null)
+                    {
+                        n = n.Parent;
+                        domainUrl = n.UrlName + "/" + domainUrl;
+                    }
+                }
+                domainUrl = "/" + domainUrl;
+
+                // If at domain root
+                if (url == "")
+                {
+                    _tempQuery = "";
+                    requestRawUrl = domainUrl.Split("/".ToCharArray());
+                    HttpContext.Current.Trace.Write("requestHandler",
+                                                    "Redirecting to domain: " +
+                                                    HttpContext.Current.Request.ServerVariables["SERVER_NAME"] +
+                                                    ", nodeId: " +
+                                                    Domain.GetRootFromDomain(
+                                                        HttpContext.Current.Request.ServerVariables["SERVER_NAME"]).
+                                                        ToString());
+                }
+                else
+                {
+                    // if it matches a domain url, skip all other xpaths and use this!
+                    string langXpath = CreateXPathQuery(domainUrl + "/" + url, false);
+                    if (content.Instance.XmlContent.DocumentElement.SelectSingleNode(langXpath) != null)
+                        return langXpath;
+                    else if (UmbracoSettings.UseDomainPrefixes)
+                        return "/domainprefixes-are-used-so-i-do-not-work";
+                }
+            }
+            else if (url == "" && !GlobalSettings.HideTopLevelNodeFromPath)
+                _tempQuery += "/*";
+
+            bool rootAdded = false;
+            if (GlobalSettings.HideTopLevelNodeFromPath && requestRawUrl.Length == 1)
+            {
+                HttpContext.Current.Trace.Write("umbracoRequestHandler", "xpath: '" + _tempQuery + "'");
+                if (_tempQuery == "")
+                    _tempQuery = "/root" + GetChildContainerName() + "/*";
+                _tempQuery = "/root" + GetChildContainerName() + "/* [" + UrlName +
+                             " = \"" + requestRawUrl[0].Replace(".aspx", "").ToLower() + "\"] | " + _tempQuery;
+                HttpContext.Current.Trace.Write("umbracoRequestHandler", "xpath: '" + _tempQuery + "'");
+                rootAdded = true;
+            }
+
+
+            for (int i = 0; i <= requestRawUrl.GetUpperBound(0); i++)
+            {
+                if (requestRawUrl[i] != "")
+                    _tempQuery += GetChildContainerName() + "/* [" + UrlName + " = \"" + requestRawUrl[i].Replace(".aspx", "").ToLower() +
+                                  "\"]";
+            }
+
+            if (GlobalSettings.HideTopLevelNodeFromPath && requestRawUrl.Length == 2)
+            {
+                _tempQuery += " | " + PageXPathQueryStart + GetChildContainerName() + "/* [" + UrlName + " = \"" +
+                              requestRawUrl[1].Replace(".aspx", "").ToLower() + "\"]";
+            }
+            HttpContext.Current.Trace.Write("umbracoRequestHandler", "xpath: '" + _tempQuery + "'");
+
+            Debug.Write(_tempQuery + "(" + PageXPathQueryStart + ")");
+
+            if (checkDomain)
+                return _tempQuery;
+            else if (!rootAdded)
+                return PageXPathQueryStart + _tempQuery;
+            else
+                return _tempQuery;
+        }
+
+        private static string GetChildContainerName()
+        {
+            if (string.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME) == false)
+                return "/" + UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME;
+            return "";
+        }
+    }
 
     public class SearchForAlias : INotFoundHandler {
         private int _redirectID = -1;
@@ -94,7 +204,7 @@ namespace umbraco {
                         if (_profileId < 0) {
                             // /root added to query to solve umbRuntime bug
                             string _tempQuery =
-                                requestHandler.CreateXPathQuery(url.Substring(0, url.IndexOf("/")), false);
+                                LegacyRequestHandler.CreateXPathQuery(url.Substring(0, url.IndexOf("/")), false);
                             _profileId =
                                 int.Parse(
                                     content.Instance.XmlContent.SelectSingleNode(_tempQuery).Attributes.GetNamedItem(
@@ -156,7 +266,7 @@ namespace umbraco {
                 else
                 {
                     string theRealUrl = url.Substring(0, url.LastIndexOf("/"));
-                    string realUrlXPath = requestHandler.CreateXPathQuery(theRealUrl, true);
+                    string realUrlXPath = LegacyRequestHandler.CreateXPathQuery(theRealUrl, true);
                     urlNode = content.Instance.XmlContent.SelectSingleNode(realUrlXPath);
                     templateAlias =
                         url.Substring(url.LastIndexOf("/") + 1, url.Length - url.LastIndexOf(("/")) - 1).ToLower();
@@ -200,7 +310,7 @@ namespace umbraco {
         public bool Execute(string url) {
 			try
 			{
-                LogHelper.Info<requestHandler>(string.Format("NotFound url {0} (from '{1}')", url, HttpContext.Current.Request.UrlReferrer));
+                LogHelper.Info<handle404>(string.Format("NotFound url {0} (from '{1}')", url, HttpContext.Current.Request.UrlReferrer));
 
 				// Test if the error404 not child elements
 				string error404 = umbraco.library.GetCurrentNotFoundPageId();

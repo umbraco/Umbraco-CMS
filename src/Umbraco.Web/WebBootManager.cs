@@ -124,8 +124,6 @@ namespace Umbraco.Web
         protected override void InitializeApplicationEventsResolver()
         {
             base.InitializeApplicationEventsResolver();
-            //We need to remove these types because we've obsoleted them and we don't want them executing:
-            ApplicationEventsResolver.Current.RemoveType<global::umbraco.LibraryCacheRefresher>();
         }
 
         /// <summary>
@@ -286,8 +284,6 @@ namespace Umbraco.Web
             CacheRefreshersResolver.Current.RemoveType<pageRefresher>();
             CacheRefreshersResolver.Current.RemoveType<global::umbraco.presentation.cache.MediaLibraryRefreshers>();
             CacheRefreshersResolver.Current.RemoveType<global::umbraco.presentation.cache.MemberLibraryRefreshers>();
-            CacheRefreshersResolver.Current.RemoveType<global::umbraco.templateCacheRefresh>();
-            CacheRefreshersResolver.Current.RemoveType<global::umbraco.macroCacheRefresh>();
             
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
                 PluginManager.Current.ResolveSurfaceControllers());
