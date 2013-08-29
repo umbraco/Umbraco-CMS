@@ -182,6 +182,9 @@
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
+    <Compile Include="Macros\XsltExtension.cs" />
+    <Compile Include="Macros\XsltExtensionAttribute.cs" />
+    <Compile Include="Macros\XsltExtensionsResolver.cs" />
     <Compile Include="Manifest\ManifestBuilder.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\ManifestValidatorConverter.cs" />

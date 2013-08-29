@@ -8,6 +8,7 @@ using Examine.LuceneEngine.Providers;
 using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
 using Examine.Providers;
+using Umbraco.Core.Macros;
 using UmbracoExamine.DataServices;
 
 namespace UmbracoExamine
@@ -18,6 +19,7 @@ namespace UmbracoExamine
     /// <remarks>
     /// XSLT extensions will ONLY work for provider that have a base class of BaseUmbracoIndexer
     /// </remarks>
+    [XsltExtension("Examine")]
     public class XsltExtensions
     {
         ///<summary>

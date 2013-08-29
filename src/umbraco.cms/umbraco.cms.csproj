@@ -251,7 +251,6 @@
     <Compile Include="businesslogic\Packager\PackageActions\addDashboardSection.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\addProxyFeedHost.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\addStringToHtmlElement.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\addXsltExtension.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\allowDoctype.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\helper.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\moveRootDocument.cs" />

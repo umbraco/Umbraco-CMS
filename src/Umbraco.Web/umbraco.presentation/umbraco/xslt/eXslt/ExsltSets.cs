@@ -9,6 +9,7 @@ namespace umbraco.presentation.xslt.Exslt
 		/// <summary>
 		///   This class implements the EXSLT functions in the http://exslt.org/sets namespace.
 		/// </summary>		
+    [Umbraco.Core.Macros.XsltExtension("Exslt.ExsltSets")]
 			public class ExsltSets {
 				
 				/// <summary>

@@ -488,7 +488,7 @@ namespace Umbraco.Core.ObjectResolution
         /// </summary>
         /// <param name="value">The type to test.</param>
         /// <exception cref="InvalidOperationException">the type is not a valid type for the resolver.</exception>
-        protected void EnsureCorrectType(Type value)
+        protected virtual void EnsureCorrectType(Type value)
         {
             if (!TypeHelper.IsTypeAssignableFrom<TResolved>(value))
                 throw new InvalidOperationException(string.Format(

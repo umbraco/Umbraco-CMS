@@ -8,7 +8,7 @@ using umbraco.interfaces;
 
 namespace Umbraco.Tests.Resolvers
 {
-	[TestFixture]
+    [TestFixture]
 	public class ActionsResolverTests
 	{
 		[SetUp]

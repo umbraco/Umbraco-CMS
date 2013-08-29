@@ -9,6 +9,7 @@ namespace umbraco.presentation.xslt.Exslt
 	/// <summary>
 	/// Implements the functions in the http://exslt.org/strings namespace 
 	/// </summary>
+    [Umbraco.Core.Macros.XsltExtension("Exslt.ExsltStrings")]
 	public class ExsltStrings {
 		/// <summary>
 		/// Implements the following function 

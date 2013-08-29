@@ -66,7 +66,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		internal static IEnumerable<Type> ResolveXsltExtensions(this PluginManager resolver)
 		{
-			return resolver.ResolveAttributedTypes<XsltExtensionAttribute>();
+			return resolver.ResolveAttributedTypes<Umbraco.Core.Macros.XsltExtensionAttribute>();
 		}
 
 		/// <summary>

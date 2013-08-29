@@ -7,6 +7,7 @@ namespace umbraco.presentation.xslt.Exslt
 	/// <summary>
 	/// This class implements the EXSLT functions in the http://exslt.org/math namespace.
 	/// </summary>
+    [Umbraco.Core.Macros.XsltExtension("Exslt.ExsltMath")]
 	public class ExsltMath {
 		/// <summary>
 		/// Implements the following function 

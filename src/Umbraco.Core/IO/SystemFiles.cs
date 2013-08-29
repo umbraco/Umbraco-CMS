@@ -51,15 +51,7 @@ namespace Umbraco.Core.IO
                 return SystemDirectories.Config + "/dashboard.config";
             }
         }
-
-        public static string XsltextensionsConfig
-        {
-            get
-            {
-                return SystemDirectories.Config + "/xsltextensions.config";
-            }
-        }
-
+        
         public static string SkinningXml
         {
             get

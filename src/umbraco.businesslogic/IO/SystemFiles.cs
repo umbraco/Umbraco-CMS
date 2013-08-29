@@ -38,11 +38,6 @@ namespace umbraco.IO
 			get { return Umbraco.Core.IO.SystemFiles.DashboardConfig; }
 		}
 
-		public static string XsltextensionsConfig
-		{
-			get { return Umbraco.Core.IO.SystemFiles.XsltextensionsConfig; }
-		}
-        
 		public static string SkinningXml
 		{
 			get { return Umbraco.Core.IO.SystemFiles.SkinningXml; }

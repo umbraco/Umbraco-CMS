@@ -218,6 +218,7 @@
     <Compile Include="PropertyEditors\DropDownPropertyPreValueEditorTests.cs" />
     <Compile Include="PropertyEditors\EnsureUniqueValuesValidatorTest.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueEditorTests.cs" />
+    <Compile Include="Resolvers\XsltExtensionsResolverTests.cs" />
     <Compile Include="Services\PackagingServiceTests.cs" />
     <Compile Include="Services\PerformanceTests.cs" />
     <Compile Include="Services\PreValueConverterTests.cs" />

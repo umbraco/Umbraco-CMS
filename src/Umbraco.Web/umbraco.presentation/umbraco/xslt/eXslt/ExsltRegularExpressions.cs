@@ -8,6 +8,7 @@ namespace umbraco.presentation.xslt.Exslt
 	/// <summary>
 	/// This class implements the EXSLT functions in the http://exslt.org/regular-expressions namespace.
 	/// </summary>
+    [Umbraco.Core.Macros.XsltExtension("Exslt.ExsltRegularExpressions")]
 	public class ExsltRegularExpressions {
 		
 		/// <summary>

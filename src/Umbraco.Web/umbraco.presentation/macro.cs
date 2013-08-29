@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Security;
@@ -17,19 +15,17 @@ using System.Web.UI.WebControls;
 using System.Xml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
-using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Macros;
 using Umbraco.Core.Profiling;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.member;
 using umbraco.DataLayer;
@@ -38,6 +34,7 @@ using umbraco.presentation.templateControls;
 using Content = umbraco.cms.businesslogic.Content;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
 using MacroErrorEventArgs = Umbraco.Core.Events.MacroErrorEventArgs;
+using System.Linq;
 
 namespace umbraco
 {
@@ -160,12 +157,6 @@ namespace umbraco
         #endregion
 
         private const string XsltExtensionsCacheKey = "UmbracoXsltExtensions";
-
-        private static readonly string XsltExtensionsConfig =
-            IOHelper.MapPath(SystemDirectories.Config + "/xsltExtensions.config");
-
-        private static readonly Func<CacheDependency> _xsltExtensionsDependency =
-            () => new CacheDependency(XsltExtensionsConfig);
 
         /// <summary>
         /// Creates an empty macro object.
@@ -1063,122 +1054,10 @@ namespace umbraco
         /// <returns>A dictionary of name/extension instance pairs.</returns>
         public static Dictionary<string, object> GetXsltExtensions()
         {
-            // zb-00041 #29966 : cache the extensions
-
-            // We could cache the extensions in a static variable but then the cache
-            // would not be refreshed when the .config file is modified. An application
-            // restart would be required. Better use the cache and add a dependency.
-			
-			// SD: The only reason the above statement might be true is because the xslt extension .config file is not a 
-            // real config file!! if it was, we wouldn't have this issue. Having these in a static variable would be preferred!
-			//  If you modify a config file, the app restarts and thus all static variables are reset.
-			//  Having this stuff in cache just adds to the gigantic amount of cache data and will cause more cache turnover to happen.
-
-            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                XsltExtensionsCacheKey, 
-                CacheItemPriority.NotRemovable, // NH 4.7.1, Changing to NotRemovable
-                null, // no refresh action
-                _xsltExtensionsDependency(), // depends on the .config file
-                TimeSpan.FromDays(1), // expires in 1 day (?)
-                GetXsltExtensionsImpl);
+            return XsltExtensionsResolver.Current.XsltExtensions
+                                         .ToDictionary(x => x.Namespace, x => x.ExtensionObject);
         }
-
-        private static Dictionary<string, object> GetXsltExtensionsImpl()
-        {
-            // fill a dictionary with the predefined extensions
-            var extensions = new Dictionary<string, object>(GetPredefinedXsltExtensions());
-
-            // Load the XSLT extensions configuration
-            var xsltExt = new XmlDocument();
-            xsltExt.Load(XsltExtensionsConfig);
-
-            // add all descendants of the XsltExtensions element
-            foreach (XmlNode xsltEx in xsltExt.SelectSingleNode("/XsltExtensions"))
-            {
-                if (xsltEx.NodeType == XmlNodeType.Element)
-                {
-                    Debug.Assert(xsltEx.Attributes["assembly"] != null, "Extension attribute 'assembly' not specified.");
-                    Debug.Assert(xsltEx.Attributes["type"] != null, "Extension attribute 'type' not specified.");
-                    Debug.Assert(xsltEx.Attributes["alias"] != null, "Extension attribute 'alias' not specified.");
-
-                    // load the extension assembly
-                    string extensionFile =
-                        IOHelper.MapPath(string.Format("{0}/{1}.dll", SystemDirectories.Bin,
-                                                       xsltEx.Attributes["assembly"].Value));
-
-                    Assembly extensionAssembly;
-                    try
-                    {
-                        extensionAssembly = Assembly.LoadFrom(extensionFile);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new Exception(
-                            String.Format(
-                                "Could not load assembly {0} for XSLT extension {1}. Please check config/xsltExtensions.config.",
-                                extensionFile, xsltEx.Attributes["alias"].Value), ex);
-                    }
-
-                    // load the extension type
-                    Type extensionType = extensionAssembly.GetType(xsltEx.Attributes["type"].Value);
-                    if (extensionType == null)
-                        throw new Exception(
-                            String.Format(
-                                "Could not load type {0} ({1}) for XSLT extension {1}. Please check config/xsltExtensions.config.",
-                                xsltEx.Attributes["type"].Value, extensionFile, xsltEx.Attributes["alias"].Value));
-
-                    // create an instance and add it to the extensions list
-                    extensions.Add(xsltEx.Attributes["alias"].Value, Activator.CreateInstance(extensionType));
-                }
-            }
-
-            //also get types marked with XsltExtension attribute
-
-            // zb-00042 #29949 : do not hide errors, refactor
-        	
-			var foundExtensions = Umbraco.Web.PluginManagerExtensions.ResolveXsltExtensions(PluginManager.Current);
-			foreach (var xsltType in foundExtensions)
-            {
-                var tpAttributes = xsltType.GetCustomAttributes(typeof(XsltExtensionAttribute), true);
-                foreach (XsltExtensionAttribute tpAttribute in tpAttributes)
-                {
-                    var ns = !string.IsNullOrEmpty(tpAttribute.Namespace) 
-						? tpAttribute.Namespace 
-						: xsltType.FullName;
-                    extensions.Add(ns, Activator.CreateInstance(xsltType));
-                }
-            }
-
-            return extensions;
-        }
-
-        /// <summary>
-        /// Gets the predefined XSLT extensions.
-        /// </summary>
-        /// <remarks>
-        ///     This is a legacy list of EXSLT extensions.
-        ///     The Umbraco library is not included, because its instance is page specific.
-        /// </remarks>
-        /// <returns>A dictionary of name/extension instance pairs.</returns>
-        public static Dictionary<string, object> GetPredefinedXsltExtensions()
-        {
-            if (_predefinedExtensions == null)
-            {
-                _predefinedExtensions = new Dictionary<string, object>();
-
-                // [LK] U4-86 Move EXSLT references from being predefined in core to xsltExtensions.config
-                //// add predefined EXSLT extensions
-                //m_PredefinedExtensions.Add("Exslt.ExsltCommon", new ExsltCommon());
-                //m_PredefinedExtensions.Add("Exslt.ExsltDatesAndTimes", new ExsltDatesAndTimes());
-                //m_PredefinedExtensions.Add("Exslt.ExsltMath", new ExsltMath());
-                //m_PredefinedExtensions.Add("Exslt.ExsltRegularExpressions", new ExsltRegularExpressions());
-                //m_PredefinedExtensions.Add("Exslt.ExsltStrings", new ExsltStrings());
-                //m_PredefinedExtensions.Add("Exslt.ExsltSets", new ExsltSets());
-            }
-
-            return _predefinedExtensions;
-        }
-
+        
         /// <summary>
         /// Returns an XSLT argument list with all XSLT extensions added,
         /// both predefined and configured ones.
