@@ -16,9 +16,6 @@ namespace Umbraco.Web.UI.Install.Steps
             // check xslt extensions
             identifyResult.Text += CheckExtensionPaths("xsltExtensions.config", "XSLT Extension");
 
-            // check rest extensions
-            identifyResult.Text += CheckExtensionPaths("restExtensions.config", "REST Extension");
-
             // check access.xml file
             identifyResult.Text += CheckAccessFile();
 
@@ -118,18 +115,6 @@ namespace Umbraco.Web.UI.Install.Steps
                     progressText += String.Format("<li>Error renaming access file: {0}</li>", ee.ToString());
                     succes = false;
                 }
-            }
-
-            // update rest exts
-            try
-            {
-                UpdateExtensionPaths("restExtensions.config");
-                progressText += "<li>restExtensions.config ensured.</li>";
-            }
-            catch (Exception ee)
-            {
-                progressText += String.Format("<li>Error updating restExtensions.config: {0}</li>", ee.ToString());
-                succes = false;
             }
 
             // update xslt exts
