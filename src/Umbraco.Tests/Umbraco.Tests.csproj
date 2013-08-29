@@ -321,7 +321,6 @@
     <Compile Include="TestHelpers\Entities\MockedUserType.cs" />
     <Compile Include="TreesAndSections\SectionTests.cs" />
     <Compile Include="TreesAndSections\ApplicationTreeTest.cs" />
-    <Compile Include="CacheRefresherFactoryTests.cs" />
     <Compile Include="PublishedContent\DynamicPublishedContentCustomExtensionMethods.cs" />
     <Compile Include="PublishedContent\DynamicPublishedContentTests.cs" />
     <Compile Include="PublishedContent\DynamicDocumentTestsBase.cs" />

@@ -655,15 +655,6 @@
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\install\steps\LegacyClasses.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\LegacyClasses.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\Skinning\LegacyClasses.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\MacroCacheContent.cs" />
     <Compile Include="umbraco.presentation\ScriptingMacroResult.cs" />
     <Compile Include="umbraco.presentation\umbraco\cacheBrowser.aspx.cs">
@@ -736,9 +727,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\StarterKits.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\editXslt.aspx.cs">
@@ -828,12 +816,6 @@
     <Compile Include="Routing\IContentFinder.cs" />
     <Compile Include="Routing\RoutingContext.cs" />
     <Compile Include="umbraco.presentation\EnsureSystemPathsApplicationStartupHandler.cs" />
-    <Compile Include="umbraco.presentation\install\steps\Definitions\LegacyClasses.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\utills\LegacyClasses.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
