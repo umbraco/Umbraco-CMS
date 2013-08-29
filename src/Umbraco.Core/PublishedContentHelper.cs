@@ -36,7 +36,7 @@ namespace Umbraco.Core
         /// </summary>
         internal static Func<string, string, Guid> GetDataTypeCallback = null;
 
-        private static readonly ConcurrentDictionary<Tuple<string, string>, Guid> PropertyTypeCache = new ConcurrentDictionary<Tuple<string, string>, Guid>();
+        private static readonly ConcurrentDictionary<Tuple<string, string, PublishedItemType>, Guid> PropertyTypeCache = new ConcurrentDictionary<Tuple<string, string, PublishedItemType>, Guid>();
 
         /// <summary>
         /// Return the GUID Id for the data type assigned to the document type with the property alias
@@ -51,7 +51,7 @@ namespace Umbraco.Core
             if (GetDataTypeCallback != null)
                 return GetDataTypeCallback(docTypeAlias, propertyAlias);
 
-            var key = new Tuple<string, string>(docTypeAlias, propertyAlias);
+            var key = new Tuple<string, string, PublishedItemType>(docTypeAlias, propertyAlias, itemType);
             return PropertyTypeCache.GetOrAdd(key, tuple =>
                 {
                     IContentTypeComposition result = null;
@@ -61,7 +61,7 @@ namespace Umbraco.Core
                             result = applicationContext.Services.ContentTypeService.GetContentType(docTypeAlias);                            
                             break;
                         case PublishedItemType.Media:
-                            applicationContext.Services.ContentTypeService.GetMediaType(docTypeAlias);
+                            result = applicationContext.Services.ContentTypeService.GetMediaType(docTypeAlias);
                             break;
                         default:
                             throw new ArgumentOutOfRangeException("itemType");
