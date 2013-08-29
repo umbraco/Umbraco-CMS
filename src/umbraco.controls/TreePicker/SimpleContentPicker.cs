@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,9 @@ namespace umbraco.uicontrols.TreePicker
         {
             get
             {
+                if (HttpContext.Current.Request.QueryString["id"] != null)
+                    return TreeUrlGenerator.GetPickerUrl(Constants.Applications.Content, "content") + "&selected=" + HttpContext.Current.Request.QueryString["id"];
+
                 return TreeUrlGenerator.GetPickerUrl(Constants.Applications.Content, "content");
             }
         }
