@@ -1,0 +1,12 @@
+﻿<div>
+    <ul class="unstyled">
+        <li ng-repeat="(key, val) in model.config.items">
+            <label class="radio">
+                <input type="radio" name="checkboxlist"
+                       value="{{key}}"
+                       ng-model="model.value" />
+                {{val}}
+            </label>
+        </li>
+    </ul>    
+</div>
