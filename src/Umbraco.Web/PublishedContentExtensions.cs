@@ -191,7 +191,7 @@ namespace Umbraco.Web
 			//before we try to convert it manually, lets see if the PropertyEditorValueConverter does this for us
 			//Here we need to put the value through the IPropertyEditorValueConverter's
 			//get the data type id for the current property
-			var dataType = PublishedContentHelper.GetDataType(ApplicationContext.Current, prop.DocumentTypeAlias, alias);
+            var dataType = PublishedContentHelper.GetDataType(ApplicationContext.Current, prop.DocumentTypeAlias, alias, prop.ItemType);
 			//convert the value to a known type
 			var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, dataType, prop.DocumentTypeAlias, alias);
 			object parsedLinksVal;
