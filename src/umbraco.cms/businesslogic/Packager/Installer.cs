@@ -807,7 +807,11 @@ namespace umbraco.cms.businesslogic.packager
         public void LoadConfig(string tempDir)
         {
             _packageConfig = new XmlDocument();
-            _packageConfig.Load(tempDir + Path.DirectorySeparatorChar + "package.xml");
+            try
+            {
+                _packageConfig.Load(tempDir + Path.DirectorySeparatorChar + "package.xml");
+            }
+            catch { throw new Exception("This file is not a valid Umbraco package! No package.xml found!"); }
 
             _name = _packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/package/name").FirstChild.Value;
             _version = _packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/package/version").FirstChild.Value;

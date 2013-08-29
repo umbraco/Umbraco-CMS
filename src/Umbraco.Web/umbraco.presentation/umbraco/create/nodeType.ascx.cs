@@ -11,6 +11,7 @@ namespace umbraco.cms.presentation.create.controls
 	using umbraco.cms.helpers;
 	using umbraco.BasePages;
     using umbraco.cms.businesslogic.web;
+    using System.Text.RegularExpressions;
 
 	/// <summary>
 	///		Summary description for nodeType.
@@ -46,7 +47,7 @@ namespace umbraco.cms.presentation.create.controls
 		}
 
         protected void validationDoctypeName(object sender, ServerValidateEventArgs e) {
-            if (DocumentType.GetByAlias(rename.Text) != null)
+            if (DocumentType.GetByAlias(Regex.Replace(rename.Text, "[^a-zA-Z]+", "")) != null)
                 e.IsValid = false;
         }
 

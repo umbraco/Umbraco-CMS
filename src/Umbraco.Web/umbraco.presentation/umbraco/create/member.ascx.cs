@@ -40,8 +40,8 @@ namespace umbraco.cms.presentation.create.controls
             }
 
             string[] pwRules = { Membership.MinRequiredPasswordLength.ToString(), Membership.MinRequiredNonAlphanumericCharacters.ToString() };
-            PasswordRules.Text = PasswordRules.Text = ui.Text(
-                "errorHandling", "errorInPasswordFormat", pwRules, BasePages.UmbracoEnsuredPage.CurrentUser);
+            //PasswordRules.Text = PasswordRules.Text = ui.Text(
+            //    "errorHandling", "errorInPasswordFormat", pwRules, BasePages.UmbracoEnsuredPage.CurrentUser);
 
             if (!IsPostBack)
             {
