@@ -137,7 +137,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 532, NodeId = 1031, Alias = Constants.Conventions.MediaTypes.Folder, Icon = "folder.gif", Thumbnail = "folder.png", IsContainer = true, AllowAtRoot = true });
             _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 533, NodeId = 1032, Alias = Constants.Conventions.MediaTypes.Image, Icon = "mediaPhoto.gif", Thumbnail = "mediaPhoto.png" });
             _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 534, NodeId = 1033, Alias = Constants.Conventions.MediaTypes.File, Icon = "mediaFile.gif", Thumbnail = "mediaFile.png" });
-            _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 535, NodeId = 1044, Alias = Constants.Conventions.MemberTypes.Member, Icon = "folder.gif", Thumbnail = "folder.png" });
+            _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 531, NodeId = 1044, Alias = Constants.Conventions.MemberTypes.Member, Icon = "member.gif", Thumbnail = "folder.png" });
         }
 
         private void CreateUmbracoUserData()
