@@ -453,7 +453,7 @@ namespace umbraco.controls
 
             foreach (var file in fileInfo)
             {
-                if (file.FullName != "thumbs.db")
+                if (file.Name.ToLowerInvariant() != "thumbs.db".ToLowerInvariant())
                 {
                     // NH: don't show the sprite file
                     if (file.Name.ToLowerInvariant() == "sprites.png".ToLowerInvariant() || file.Name.ToLowerInvariant() == "sprites_ie6.gif".ToLowerInvariant())
