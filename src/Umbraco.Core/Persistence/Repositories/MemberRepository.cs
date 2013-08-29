@@ -65,9 +65,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<IMember> PerformGetByQuery(IQuery<IMember> query)
         {
-            var sqlClause = GetBaseQuery(false);
-            var translator = new SqlTranslator<IMember>(sqlClause, query);
-            var sql = translator.Translate()
+            var sqlSubquery = GetSubquery();
+            var translator = new SqlTranslator<IMember>(sqlSubquery, query);
+            var subquery = translator.Translate();
+            var sql = GetBaseQuery(false)
+                .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
                 .OrderBy<NodeDto>(x => x.SortOrder);
 
@@ -124,6 +126,23 @@ namespace Umbraco.Core.Persistence.Repositories
             return "umbracoNode.id = @Id";
         }
 
+        protected Sql GetSubquery()
+        {
+            var sql = new Sql();
+            sql.Select("umbracoNode.id")
+                .From<NodeDto>()
+                .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<MemberDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, ContentDto>(left => left.ContentTypeId, right => right.ContentTypeId)
+                .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .LeftJoin<PropertyDataDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .Append("AND cmsPropertyData.versionId = cmsContentVersion.VersionId")
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+            return sql;
+        }
+
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
@@ -177,72 +196,6 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
-
-        //NOTE Might be sufficient to use the GetByQuery method for this, as the mapping should cover it
-        public IMember GetByKey(Guid key)
-        {
-            var sql = GetBaseQuery(false);
-            sql.Where<NodeDto>(x => x.UniqueId == key);
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
-
-            var dto =
-                Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
-                    new PropertyDataRelator().Map, sql);
-
-            return BuildFromDto(dto);
-        }
-
-        //NOTE Might be sufficient to use the GetByQuery method for this, as the mapping should cover it
-        public IMember GetByUsername(string username)
-        {
-            var sql = GetBaseQuery(false);
-            sql.Where<MemberDto>(x => x.LoginName == username);
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
-
-            var dto =
-                Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
-                    new PropertyDataRelator().Map, sql);
-
-            return BuildFromDto(dto);
-        }
-
-        //NOTE Might be sufficient to use the GetByQuery method for this, as the mapping should cover it
-        public IEnumerable<IMember> GetByMemberTypeAlias(string memberTypeAlias)
-        {
-            var sql = GetBaseQuery(false);
-            sql.Where<ContentTypeDto>(x => x.Alias == memberTypeAlias);
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
-
-            var dtos =
-                Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
-                    new PropertyDataRelator().Map, sql);
-
-            return BuildFromDtos(dtos);
-        }
-
-        /*public IEnumerable<IMember> GetByPropertyValue(string value)
-        {}
-
-        public IEnumerable<IMember> GetByPropertyValue(bool value)
-        { }
-
-        public IEnumerable<IMember> GetByPropertyValue(int value)
-        { }
-
-        public IEnumerable<IMember> GetByPropertyValue(DateTime value)
-        { }
-
-        public IEnumerable<IMember> GetByPropertyValue(string propertyTypeAlias, string value)
-        { }
-
-        public IEnumerable<IMember> GetByPropertyValue(string propertyTypeAlias, bool value)
-        { }
-
-        public IEnumerable<IMember> GetByPropertyValue(string propertyTypeAlias, int value)
-        { }
-
-        public IEnumerable<IMember> GetByPropertyValue(string propertyTypeAlias, DateTime value)
-        { }*/
 
         private IMember BuildFromDto(List<MemberReadOnlyDto> dtos)
         {
