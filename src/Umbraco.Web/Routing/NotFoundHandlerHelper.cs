@@ -91,14 +91,19 @@ namespace Umbraco.Web.Routing
             LogHelper.Debug<NotFoundHandlerHelper>("Registering custom handlers.");
 
             var customHandlerTypes = new List<Type>();
-            Type customLastChanceHandlerType = null;
-            var hasLast = false;
+            Type customHandlerType = null;
 
             var customHandlers = new XmlDocument();
             customHandlers.Load(Core.IO.IOHelper.MapPath(Core.IO.SystemFiles.NotFoundhandlersConfig));
 
             foreach (XmlNode n in customHandlers.DocumentElement.SelectNodes("notFound"))
             {
+                if (customHandlerType != null)
+                {
+                    LogHelper.Debug<NotFoundHandlerHelper>("Registering '{0}'.", () => customHandlerType.FullName);
+                    customHandlerTypes.Add(customHandlerType);
+                }
+
                 var assemblyName = n.Attributes.GetNamedItem("assembly").Value;
                 var typeName = n.Attributes.GetNamedItem("type").Value;
 
@@ -107,36 +112,40 @@ namespace Umbraco.Web.Routing
                 if (nsAttr != null && string.IsNullOrWhiteSpace(nsAttr.Value) == false)
                     ns = nsAttr.Value;
 
-                var lcAttr = n.Attributes.GetNamedItem("last");
-                var last = lcAttr != null && lcAttr.Value != null && lcAttr.Value.InvariantEquals("true");
+                LogHelper.Debug<NotFoundHandlerHelper>("Configured: '{0}.{1},{2}'.", () => ns, () => typeName, () => assemblyName);
 
-                if (last) // there can only be one last chance handler in the config file
-                {
-                    if (hasLast)
-                        throw new Exception();
-                    hasLast = true;
-                }
-
-                LogHelper.Debug<NotFoundHandlerHelper>("Registering '{0}.{1},{2}'{3}", () => ns, () => typeName, () => assemblyName,
-                    () => last ? " (last)." : ".");
-
-                Type type = null;
+                customHandlerType = null;
                 try
                 {
                     var assembly = Assembly.Load(new AssemblyName(assemblyName));
-                    type = assembly.GetType(ns + "." + typeName);
+                    customHandlerType = assembly.GetType(ns + "." + typeName);
                 }
                 catch (Exception e)
                 {
-                    LogHelper.Error<NotFoundHandlerHelper>("Error registering handler, ignoring.", e);
+                    LogHelper.Error<NotFoundHandlerHelper>("Error: could not load handler, ignoring.", e);
                 }
+            }
 
-                if (type == null) continue;
+            // what shall we do with the last one, assuming it's not null?
+            // if the last chance finder wants a handler, then use the last one as the last chance handler
+            // else assume that the last one is a normal handler since noone else wants it, and add it to the list
+            if (customHandlerType != null)
+            {
+                var lastChanceFinder = ContentLastChanceFinderResolver.Current.Finder; // can be null
+                var finderWantsHandler = lastChanceFinder != null &&
+                    lastChanceFinder.GetType() == typeof(ContentLastChanceFinderByNotFoundHandlers);
 
-                if (last)
-                    _customLastChanceHandlerType = type;
+                if (finderWantsHandler)
+                {
+                    LogHelper.Debug<NotFoundHandlerHelper>("Registering '{0}' as \"last chance\" handler.", () => customHandlerType.FullName);
+                    _customLastChanceHandlerType = customHandlerType;
+                }
                 else
-                    customHandlerTypes.Add(type);
+                {
+                    LogHelper.Debug<NotFoundHandlerHelper>("Registering '{0}'.", () => customHandlerType.FullName);
+                    customHandlerTypes.Add(customHandlerType);
+                    _customLastChanceHandlerType = null;
+                }
             }
 
             _customHandlerTypes = customHandlerTypes.ToArray();

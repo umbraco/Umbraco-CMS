@@ -80,7 +80,7 @@
                     }),
                     function(e) {
                         if (e.success) {
-                            self.submitSuccess(e.message, e.header);
+                            self.submitSuccess(e);
                         } else {
                             self.submitFailure(e.message, e.header);
                         }
@@ -97,7 +97,7 @@
                     }),
                     function(e) {
                         if (e.success) {
-                            self.submitSuccess(e.message, e.header);
+                            self.submitSuccess(e);
                         } else {
                             self.submitFailure(e.message, e.header);
                         }
@@ -105,8 +105,20 @@
             }
         },
         
-        submitSuccess: function (err, header) {
-            top.UmbSpeechBubble.ShowMessage('save', header, err);
+        submitSuccess: function (args) {
+            
+            var msg = args.message;
+            var header = args.header;
+            var path = this._opts.treeSyncPath;
+            var pathChanged = false;
+            if (args.path) {
+                if (path != args.path) {
+                    pathChanged = true;
+                }
+                path = args.path;
+            }
+
+            top.UmbSpeechBubble.ShowMessage('save', header, msg);
             
             UmbClientMgr.mainTree().setActiveTreeType(this._opts.currentTreeType);
 
@@ -114,11 +126,19 @@
 
             if (this._opts.editorType == "Template") {
                 //templates are different because they are ID based, whereas view files are file based without a static id
-                UmbClientMgr.mainTree().syncTree(this._opts.treeSyncPath, true);
+
+                if (pathChanged) {
+                    UmbClientMgr.mainTree().moveNode(this._opts.templateId, path);
+                }
+                else {
+                    UmbClientMgr.mainTree().syncTree(path, true);
+                }
+
+                
             }
             else {
                 //we need to pass in the newId parameter so it knows which node to resync after retreival from the server
-                UmbClientMgr.mainTree().syncTree(this._opts.treeSyncPath, true, null, newFilePath.split("/")[1]);
+                UmbClientMgr.mainTree().syncTree(path, true, null, newFilePath.split("/")[1]);
             }
 
             //then we need to update our current tree sync path to represent the new one

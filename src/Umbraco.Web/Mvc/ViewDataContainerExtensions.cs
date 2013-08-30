@@ -2,7 +2,7 @@ using System.Web.Mvc;
 
 namespace Umbraco.Web.Mvc
 {
-	internal static class ViewDataContainerExtensions
+    internal static class ViewDataContainerExtensions
 	{
 		private class ViewDataContainer : IViewDataContainer
 		{
