@@ -382,7 +382,7 @@ angular.module('umbraco.services').factory('iconHelper', iconHelper);
  * @description
  * Used to convert legacy xml data to json and back again
  */
-function xmlhelper() {
+function xmlhelper($http) {
     /*
      Copyright 2011 Abdulla Abdurakhmanov
      Original sources are available at https://code.google.com/p/x2js/
@@ -748,7 +748,10 @@ function xmlhelper() {
         fromJson: function(json) {
             var xml = x2js.json2xml_str( json );
             return xml;
-        }  
+        },
+        parseFeed: function (url) {             
+            return $http.jsonp('//ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=50&callback=JSON_CALLBACK&q=' + encodeURIComponent(url));         
+        }
     };
 }
 angular.module('umbraco.services').factory('xmlhelper', xmlhelper);

@@ -49,6 +49,8 @@ namespace umbraco.cms.presentation
         {
 
             base.OnInit(e);
+
+            /*
             // Load dashboard content
             if (helper.Request("app") != "")
                 _section = helper.Request("app");
@@ -60,6 +62,9 @@ namespace umbraco.cms.presentation
             XmlDocument dashBoardXml = new XmlDocument();
             dashBoardXml.Load(IOHelper.MapPath(SystemFiles.DashboardConfig));
 
+            var control = dashBoardXml.DocumentElement.SelectSingleNode("//control [areas/area = '" + _section.ToLower() + "']");
+            */
+            /*
             // test for new tab interface
             foreach (XmlNode section in dashBoardXml.DocumentElement.SelectNodes("//section [areas/area = '" + _section.ToLower() + "']"))
             {
@@ -161,7 +166,7 @@ namespace umbraco.cms.presentation
                         dashBoardContent.Controls.Add(placeHolder);
                     }
                 }
-            }
+            }*/
         }
 
         private object parseControlValues(string value)

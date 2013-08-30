@@ -439,6 +439,13 @@
     <Compile Include="Umbraco\Dashboard\ExamineManagement.ascx.designer.cs">
       <DependentUpon>ExamineManagement.ascx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Dashboard\UserControlProxy.aspx.cs">
+      <DependentUpon>UserControlProxy.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Dashboard\UserControlProxy.aspx.designer.cs">
+      <DependentUpon>UserControlProxy.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Developer\Macros\EditMacro.aspx.cs">
       <DependentUpon>editMacro.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -588,6 +595,7 @@
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\RegexEditor.html" />
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
+    <Content Include="Umbraco\Dashboard\UserControlProxy.aspx" />
     <Content Include="Umbraco\Images\PinnedIcons\task_content.ico" />
     <Content Include="Umbraco\Images\PinnedIcons\task_default.ico" />
     <Content Include="Umbraco\Images\PinnedIcons\task_developer.ico" />

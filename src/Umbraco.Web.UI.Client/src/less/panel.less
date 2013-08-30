@@ -19,29 +19,29 @@
   cursor: text;
 }
 
-.umb-headline-editor-wrapper h1 {
+.umb-headline-editor-wrapper{height: 50px;}
+.umb-headline-editor-wrapper h1, h1.headline {
   margin: 0;
   font-size: @fontSizeLarge;
   font-weight: 400;
 }
 
-.umb-panel-header h1 {
+.umb-panel-header h1, {
   margin: 0;
   font-size: @fontSizeLarge;
   font-weight: 400;
   color: @gray;
+  padding: 4px 0px 4px 6px;
+  line-height: 22px;
+  width: 100%;
 }
 
 .umb-headline-editor-wrapper input{
   display: none;
 }
 
-.umb-headline-editor-wrapper h1:hover, .umb-headline-editor-wrapper input  {
+.umb-headline-editor-wrapper h1.umb-headline-editor:hover, .umb-headline-editor-wrapper input  {
   border-bottom: 1px dashed @grayLight;
-  padding: 4px 0px 4px 6px;
-  line-height: 22px;
-  margin: 4px 0 0 -7px;
-  width: 100%;
 }
 
 .umb-headline-editor-wrapper input:focus  {
