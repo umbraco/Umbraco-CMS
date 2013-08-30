@@ -85,9 +85,13 @@ function imageHelper() {
 
                 //combine all props, TODO: we really need a better way then this
                 var props = [];
-                $(options.imageModel.tabs).each(function(i, tab){
-                    props = props.concat(tab.properties);
-                });
+                if(options.imageModel.properties){
+                    props = options.imageModel.properties;
+                }else{
+                    $(options.imageModel.tabs).each(function(i, tab){
+                        props = props.concat(tab.properties);
+                    });    
+                }
 
                 var imageProp = _.find(props, function (item) {
                     return item.alias === 'umbracoFile';
