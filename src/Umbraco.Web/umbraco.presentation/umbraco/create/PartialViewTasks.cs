@@ -94,8 +94,7 @@ namespace umbraco
 		{
 			//write out the template header
 			sw.Write("@inherits ");
-			sw.Write(typeof(UmbracoViewPage<>).FullName.TrimEnd("`1"));
-			sw.Write("<dynamic>");
+			sw.Write(typeof(UmbracoTemplatePage).FullName.TrimEnd("`1"));
 		}
 
 		public bool Delete()
