@@ -585,7 +585,6 @@
       <DependentUpon>umbraco.aspx</DependentUpon>
     </Compile>
     <Content Include="App_Plugins\MyPackage\Common\Js\MyPackage.js" />
-    <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\CustomJsonEditor.js" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\CsvEditor.js" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\PostcodeEditor.js" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\RegexEditor.js" />
