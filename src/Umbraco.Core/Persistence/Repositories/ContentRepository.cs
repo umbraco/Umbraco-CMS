@@ -170,11 +170,31 @@ namespace Umbraco.Core.Persistence.Repositories
             return content;
         }
 
+        public override void DeleteVersion(Guid versionId)
+        {
+            var sql = new Sql()
+                .Select("*")
+                .From<DocumentDto>()
+                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, DocumentDto>(left => left.VersionId, right => right.VersionId)
+                .Where<ContentVersionDto>(x => x.VersionId == versionId)
+                .Where<DocumentDto>(x => x.Newest == true);
+            var dto = Database.Fetch<DocumentDto, ContentVersionDto>(sql).FirstOrDefault();
+
+            if(dto == null) return;
+
+            using (var transaction = Database.GetTransaction())
+            {
+                PerformDeleteVersion(dto.NodeId, versionId);
+
+                transaction.Complete();
+            }
+        }
+
         protected override void PerformDeleteVersion(int id, Guid versionId)
         {
             Database.Delete<PreviewXmlDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
-            Database.Delete<PropertyDataDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
-            Database.Delete<ContentVersionDto>("WHERE nodeId = @Id AND VersionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<PropertyDataDto>("WHERE contentNodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<ContentVersionDto>("WHERE ContentId = @Id AND VersionId = @VersionId", new { Id = id, VersionId = versionId });
             Database.Delete<DocumentDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
         }
 

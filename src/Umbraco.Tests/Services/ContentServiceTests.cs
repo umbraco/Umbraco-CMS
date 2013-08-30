@@ -861,6 +861,22 @@ namespace Umbraco.Tests.Services
             Assert.That(sut.GetValue<string>("imgCropper"), Is.Empty);
 	    }
 
+	    [Test]
+	    public void Can_Delete_Previous_Versions_Not_Latest()
+	    {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.GetById(1049);
+	        var version = content.Version;
+
+	        // Act
+            contentService.DeleteVersion(1049, version, true, 0);
+            var sut = contentService.GetById(1049);
+
+            // Assert
+            Assert.That(sut.Version, Is.EqualTo(version));
+	    }
+
         private IEnumerable<IContent> CreateContentHierarchy()
         {
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
