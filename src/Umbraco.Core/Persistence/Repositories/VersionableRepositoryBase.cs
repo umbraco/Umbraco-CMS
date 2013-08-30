@@ -43,8 +43,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual void DeleteVersion(Guid versionId)
         {
-            var dto = Database.FirstOrDefault<ContentVersionDto>("WHERE versionId = @VersionId AND newest = @Newest", new { VersionId = versionId, Newest = false });
-            Mandate.That<Exception>(dto != null);
+            var dto = Database.FirstOrDefault<ContentVersionDto>("WHERE versionId = @VersionId", new { VersionId = versionId });
+            if(dto == null) return;
 
             using (var transaction = Database.GetTransaction())
             {
@@ -56,8 +56,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual void DeleteVersions(int id, DateTime versionDate)
         {
-            var list = Database.Fetch<ContentVersionDto>("WHERE nodeId = @Id AND VersionDate < @VersionDate", new { Id = id, VersionDate = versionDate });
-            Mandate.That<Exception>(list.Any());
+            var list = Database.Fetch<ContentVersionDto>("WHERE ContentId = @Id AND VersionDate < @VersionDate", new { Id = id, VersionDate = versionDate });
+            if (list.Any() == false) return;
 
             using (var transaction = Database.GetTransaction())
             {
