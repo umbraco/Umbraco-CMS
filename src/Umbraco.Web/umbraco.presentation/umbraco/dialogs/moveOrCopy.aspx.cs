@@ -272,11 +272,15 @@ namespace umbraco.dialogs
                     {
                         if (CurrentApp == Constants.Applications.Content)
                         {
-                            Services.ContentService.Move((IContent)currContent, Request.GetItemAs<int>("copyTo"), getUser().Id);
+                            //Backwards comp. change, so old events are fired #U4-2731
+                            var doc = new Document(currContent as IContent);
+                            doc.Move(Request.GetItemAs<int>("copyTo"));
                         }
                         else
                         {
-                            Services.MediaService.Move((IMedia)currContent, Request.GetItemAs<int>("copyTo"), getUser().Id);
+                            //Backwards comp. change, so old events are fired #U4-2731
+                            var media = new umbraco.cms.businesslogic.media.Media(currContent as IMedia);
+                            media.Move(Request.GetItemAs<int>("copyTo"));
                             library.ClearLibraryCacheForMedia(currContent.Id);
                         }
 
@@ -290,7 +294,9 @@ namespace umbraco.dialogs
                     {
                         //NOTE: We ONLY support Copy on content not media for some reason.
 
-                        var newContent = Services.ContentService.Copy((IContent)currContent, Request.GetItemAs<int>("copyTo"), RelateDocuments.Checked, getUser().Id);
+                        //Backwards comp. change, so old events are fired #U4-2731
+                        var newContent = new Document(currContent as IContent);
+                        newContent.Copy(Request.GetItemAs<int>("copyTo"), getUser(), RelateDocuments.Checked);
                         
                         feedback.Text = ui.Text("moveOrCopy", "copyDone", nodes, getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
                         feedback.type = uicontrols.Feedback.feedbacktype.success;
