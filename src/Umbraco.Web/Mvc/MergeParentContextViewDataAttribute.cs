@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Web.Mvc;
 
 namespace Umbraco.Web.Mvc
@@ -13,6 +14,8 @@ namespace Umbraco.Web.Mvc
     /// 
     /// NOTE: This does not mean that the parent context's view data will be merged before the action executes, if you need access to the parent context's view
     /// data during controller execution you can access it normally.
+    /// 
+    /// NOTE: This recursively merges in all ParentActionViewContext ancestry in case there's child actions inside of child actions.
     /// </remarks>
     public class MergeParentContextViewDataAttribute : ActionFilterAttribute
     {
@@ -24,13 +27,30 @@ namespace Umbraco.Web.Mvc
         {
             if (filterContext.IsChildAction)
             {
-                if (filterContext.ParentActionViewContext != null && filterContext.ParentActionViewContext.ViewData != null)
-                {
-                    filterContext.Controller.ViewData.MergeViewDataFrom(filterContext.ParentActionViewContext.ViewData);
-                }
+                MergeCurrentParent(filterContext.Controller, filterContext.ParentActionViewContext);
             }
 
             base.OnResultExecuting(filterContext);
+        }
+
+        /// <summary>
+        /// Recursively merges in each parent view context into the target
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="currentParent"></param>
+        private static void MergeCurrentParent(ControllerBase target, ViewContext currentParent)
+        {
+            if (currentParent != null && currentParent.ViewData != null && currentParent.ViewData.Any())
+            {
+                target.ViewData.MergeViewDataFrom(currentParent.ViewData);
+
+                //Recurse!
+                if (currentParent.IsChildAction)
+                {
+                    MergeCurrentParent(target, currentParent.ParentActionViewContext);    
+                }
+                
+            }
         }
     }
 }
