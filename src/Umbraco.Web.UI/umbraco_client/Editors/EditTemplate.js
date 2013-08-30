@@ -101,27 +101,57 @@
         save: function(templateName, templateAlias, codeVal) {
             var self = this;
 
-            umbraco.presentation.webservices.codeEditorSave.SaveTemplate(
-                templateName, templateAlias, codeVal, self._opts.templateId, this._opts.masterPageDropDown.val(),
-                function(t) { self.submitSucces(t); },
-                function(t) { self.submitFailure(t); });
-
+            $.post(self._opts.restServiceLocation + "SaveTemplate",
+                    JSON.stringify({
+                        templateName: templateName,
+                        templateAlias: templateAlias,
+                        templateContents: codeVal,
+                        templateId: self._opts.templateId,
+                        masterTemplateId: this._opts.masterPageDropDown.val()
+                    }),
+                    function (e) {
+                        if (e.success) {
+                            self.submitSuccess(e);
+                        } else {
+                            self.submitFailure(e.message, e.header);
+                        }
+                    });
+            
         },
 
-        submitSucces: function(t) {
-            if (t != 'true') {
-                top.UmbSpeechBubble.ShowMessage('error', this._opts.text.templateErrorHeader, this._opts.text.templateErrorText);
+        submitSuccess: function (args) {
+            var msg = args.message;
+            var header = args.header;
+            var path = this._opts.treeSyncPath;
+            var pathChanged = false;
+            if (args.path) {
+                if (path != args.path) {
+                    pathChanged = true;
+                }
+                path = args.path;
+            }
+            
+            top.UmbSpeechBubble.ShowMessage('save', header, msg);
+            UmbClientMgr.mainTree().setActiveTreeType('templates');
+            if (pathChanged) {
+                UmbClientMgr.mainTree().moveNode(this._opts.templateId, path);
             }
             else {
-                top.UmbSpeechBubble.ShowMessage('save', this._opts.text.templateSavedHeader, this._opts.text.templateSavedText);
+                UmbClientMgr.mainTree().syncTree(path, true);
             }
 
-            UmbClientMgr.mainTree().setActiveTreeType('templates');
-            UmbClientMgr.mainTree().syncTree(this._opts.treeSyncPath, true);
         },
 
-        submitFailure: function(t) {
-            top.UmbSpeechBubble.ShowMessage('error', this._opts.text.templateErrorHeader, this._opts.text.templateErrorText);
+        submitFailure: function (err, header) {
+            top.UmbSpeechBubble.ShowMessage('error', header, err);
         }
     });
+    
+    //Set defaults for jQuery ajax calls.
+    $.ajaxSetup({
+        dataType: 'json',
+        cache: false,
+        contentType: 'application/json; charset=utf-8'
+    });
+
 })(jQuery);
