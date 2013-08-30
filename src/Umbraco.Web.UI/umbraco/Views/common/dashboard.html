@@ -7,7 +7,6 @@
 	</umb-header>
 	<umb-tab-view>
         <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in dashboard.tabs">
-
             <div class="umb-pane">
             		<div ng-repeat="property in tab.properties" ng-switch on="property.serverSide">
 

@@ -588,7 +588,6 @@
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\CsvEditor.js" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\PostcodeEditor.js" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\RegexEditor.js" />
-    <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\CustomJson.html" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\CsvEditor.html" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\PostcodeEditor.html" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\RegexEditor.html" />
