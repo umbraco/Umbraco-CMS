@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Web.Mvc;
 using Umbraco.Web.Models;
+using Umbraco.Web.Mvc;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace Umbraco.Web.Macros
     /// <summary>
     /// Controller to render macro content for Parital View Macros
     /// </summary>
+    [MergeParentContextViewData]
     internal class PartialViewMacroController : Controller
     {
         private readonly UmbracoContext _umbracoContext;

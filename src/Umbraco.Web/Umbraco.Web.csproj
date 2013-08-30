@@ -299,6 +299,8 @@
     <Compile Include="Models\ProfileModel.cs" />
     <Compile Include="Models\LoginStatusModel.cs" />
     <Compile Include="Models\UmbracoProperty.cs" />
+    <Compile Include="Mvc\MergeParentContextViewDataAttribute.cs" />
+    <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
     <Compile Include="Routing\ContentLastChanceFinderByNotFoundHandlers.cs" />
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
