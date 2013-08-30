@@ -82,7 +82,7 @@ namespace Umbraco.Core.Profiling
                 return false;
 
             var request = TryGetRequest(sender);
-            if (request.Success == false || request.Result.Url.IsClientSideRequest() || string.IsNullOrEmpty(request.Result["umbDebug"]))
+            if (request.Success == false || request.Result.Url.IsClientSideRequest() || string.IsNullOrEmpty(request.Result.QueryString["umbDebug"]))
                 return false;
             
             return true;
