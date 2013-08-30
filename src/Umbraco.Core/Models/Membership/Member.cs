@@ -440,6 +440,27 @@ namespace Umbraco.Core.Models.Membership
         
         #region Internal methods
 
+        /// <summary>
+        /// Method to call when Entity is being saved
+        /// </summary>
+        /// <remarks>Created date is set and a Unique key is assigned</remarks>
+        internal void AddingEntity()
+        {
+            CreateDate = DateTime.Now;
+            UpdateDate = DateTime.Now;
+
+            if (Key == Guid.Empty)
+                Key = Guid.NewGuid();
+        }
+
+        /// <summary>
+        /// Method to call on entity saved/updated
+        /// </summary>
+        internal virtual void UpdatingEntity()
+        {
+            UpdateDate = DateTime.Now;
+        }
+
         internal virtual void ResetIdentity()
         {
             _hasIdentity = false;

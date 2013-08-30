@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
@@ -21,16 +25,6 @@ namespace Umbraco.Core.Persistence.Repositories
         {
         }
 
-        /* The following methods might be relevant for this specific repository (in an optimized form)
-         * GetById - get a member by its integer Id
-         * GetByKey - get a member by its unique guid Id (which should correspond to a membership provider user's id)
-         * GetByUsername - get a member by its username
-         * 
-         * GetByPropertyValue - get members with a certain property value (supply both property alias and value?)
-         * GetByMemberTypeAlias - get all members of a certain type
-         * GetByMemberGroup - get all members in a specific group
-         */
-
         #region Overrides of RepositoryBase<int, IMembershipUser>
 
         protected override IMember PerformGet(int id)
@@ -39,11 +33,11 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(GetBaseWhereClause(), new { Id = id });
             sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dto =
+            var dtos =
                 Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
                     new PropertyDataRelator().Map, sql);
 
-            return BuildFromDto(dto);
+            return BuildFromDto(dtos);
         }
 
         protected override IEnumerable<IMember> PerformGetAll(params int[] ids)
@@ -86,20 +80,20 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql GetBaseQuery(bool isCount)
         {
+            var sql = new Sql();
+
             if (isCount)
             {
-                var sqlCount = new Sql()
-                    .Select("COUNT(*)")
+                sql.Select("COUNT(*)")
                     .From<NodeDto>()
                     .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                     .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
                     .InnerJoin<ContentVersionDto>().On<ContentVersionDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                     .InnerJoin<MemberDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
                     .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
-                return sqlCount;
+                return sql;
             }
 
-            var sql = new Sql();
             sql.Select("umbracoNode.*", "cmsContent.contentType", "cmsContentType.alias AS ContentTypeAlias", "cmsContentVersion.VersionId",
                 "cmsContentVersion.VersionDate", "cmsContentVersion.LanguageLocale", "cmsMember.Email",
                 "cmsMember.LoginName", "cmsMember.Password", "cmsPropertyData.id AS PropertyDataId", "cmsPropertyData.propertytypeid", 
@@ -129,7 +123,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected Sql GetSubquery()
         {
             var sql = new Sql();
-            sql.Select("umbracoNode.id")
+            sql.Select("DISTINCT(umbracoNode.id)")
                 .From<NodeDto>()
                 .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                 .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
@@ -140,6 +134,16 @@ namespace Umbraco.Core.Persistence.Repositories
                 .LeftJoin<PropertyDataDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
                 .Append("AND cmsPropertyData.versionId = cmsContentVersion.VersionId")
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+            return sql;
+        }
+
+        protected Sql GetMemberGroupSubquery()
+        {
+            var sql = new Sql();
+            sql.Select("DISTINCT(cmsMember2MemberGroup.Member)")
+                .From<Member2MemberGroupDto>()
+                .InnerJoin<NodeDto>().On<NodeDto, Member2MemberGroupDto>(left => left.NodeId, right => right.MemberGroup)
+                .Where<NodeDto>(x => x.NodeObjectType == new Guid(Constants.ObjectTypes.MemberGroup));
             return sql;
         }
 
@@ -173,29 +177,226 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(IMember entity)
         {
-            throw new NotImplementedException();
+            ((Member)entity).AddingEntity();
+
+            var factory = new MemberFactory(NodeObjectTypeId, entity.Id);
+            var dto = factory.BuildDto(entity);
+
+            //NOTE Should the logic below have some kind of fallback for empty parent ids ?
+            //Logic for setting Path, Level and SortOrder
+            var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = ((IUmbracoEntity)entity).ParentId });
+            int level = parent.Level + 1;
+            int sortOrder =
+                Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE parentID = @ParentId AND nodeObjectType = @NodeObjectType",
+                                                      new { ParentId = ((IUmbracoEntity)entity).ParentId, NodeObjectType = NodeObjectTypeId });
+
+            //Create the (base) node data - umbracoNode
+            var nodeDto = dto.ContentVersionDto.ContentDto.NodeDto;
+            nodeDto.Path = parent.Path;
+            nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
+            nodeDto.SortOrder = sortOrder;
+            var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
+
+            //Update with new correct path
+            nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
+            Database.Update(nodeDto);
+
+            //Update entity with correct values
+            entity.Id = nodeDto.NodeId; //Set Id on entity to ensure an Id is set
+            ((IUmbracoEntity)entity).Path = nodeDto.Path;
+            ((IUmbracoEntity)entity).SortOrder = sortOrder;
+            ((IUmbracoEntity)entity).Level = level;
+
+            //Create the Content specific data - cmsContent
+            var contentDto = dto.ContentVersionDto.ContentDto;
+            contentDto.NodeId = nodeDto.NodeId;
+            Database.Insert(contentDto);
+
+            //Create the first version - cmsContentVersion
+            //Assumes a new Version guid and Version date (modified date) has been set
+            dto.ContentVersionDto.NodeId = nodeDto.NodeId;
+            Database.Insert(dto.ContentVersionDto);
+
+            //Create the first entry in cmsMember
+            dto.NodeId = nodeDto.NodeId;
+            Database.Insert(dto);
+
+            //TODO ContentType for the Member entity
+
+            //Create the PropertyData for this version - cmsPropertyData
+            /*var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
+            var propertyDataDtos = propertyFactory.BuildDto(((Member)entity).Properties);
+            var keyDictionary = new Dictionary<int, int>();
+
+            //Add Properties
+            foreach (var propertyDataDto in propertyDataDtos)
+            {
+                var primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
+                keyDictionary.Add(propertyDataDto.PropertyTypeId, primaryKey);
+            }
+
+            //Update Properties with its newly set Id
+            foreach (var property in ((Member)entity).Properties)
+            {
+                property.Id = keyDictionary[property.PropertyTypeId];
+            }*/
+
+            ((Member)entity).ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IMember entity)
         {
-            throw new NotImplementedException();
+            //Updates Modified date
+            ((Member)entity).UpdatingEntity();
+
+            //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
+            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            {
+                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = ((IUmbracoEntity)entity).ParentId });
+                ((IUmbracoEntity)entity).Path = string.Concat(parent.Path, ",", entity.Id);
+                ((IUmbracoEntity)entity).Level = parent.Level + 1;
+                var maxSortOrder =
+                    Database.ExecuteScalar<int>(
+                        "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
+                        new { ParentId = ((IUmbracoEntity)entity).ParentId, NodeObjectType = NodeObjectTypeId });
+                ((IUmbracoEntity)entity).SortOrder = maxSortOrder + 1;
+            }
+
+            var factory = new MemberFactory(NodeObjectTypeId, entity.Id);
+            //Look up Content entry to get Primary for updating the DTO
+            var contentDto = Database.SingleOrDefault<ContentDto>("WHERE nodeId = @Id", new { Id = entity.Id });
+            factory.SetPrimaryKey(contentDto.PrimaryKey);
+            var dto = factory.BuildDto(entity);
+
+            //Updates the (base) node data - umbracoNode
+            var nodeDto = dto.ContentVersionDto.ContentDto.NodeDto;
+            var o = Database.Update(nodeDto);
+
+            //Only update this DTO if the contentType has actually changed
+            if (contentDto.ContentTypeId != ((Member)entity).ContentTypeId)
+            {
+                //Create the Content specific data - cmsContent
+                var newContentDto = dto.ContentVersionDto.ContentDto;
+                Database.Update(newContentDto);
+            }
+
+            //In order to update the ContentVersion we need to retreive its primary key id
+            var contentVerDto = Database.SingleOrDefault<ContentVersionDto>("WHERE VersionId = @Version", new { Version = entity.Version });
+            dto.ContentVersionDto.Id = contentVerDto.Id;
+            //Updates the current version - cmsContentVersion
+            //Assumes a Version guid exists and Version date (modified date) has been set/updated
+            Database.Update(dto.ContentVersionDto);
+            //Updates the cmsMember entry
+            Database.Update(dto);
+
+            //TODO ContentType for the Member entity
+
+            //Create the PropertyData for this version - cmsPropertyData
+            /*var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
+            var propertyDataDtos = propertyFactory.BuildDto(((Member)entity).Properties);
+            var keyDictionary = new Dictionary<int, int>();
+
+            //Add Properties
+            foreach (var propertyDataDto in propertyDataDtos)
+            {
+                if (propertyDataDto.Id > 0)
+                {
+                    Database.Update(propertyDataDto);
+                }
+                else
+                {
+                    int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
+                    keyDictionary.Add(propertyDataDto.PropertyTypeId, primaryKey);
+                }
+            }
+
+            //Update Properties with its newly set Id
+            if (keyDictionary.Any())
+            {
+                foreach (var property in ((Member)entity).Properties)
+                {
+                    property.Id = keyDictionary[property.PropertyTypeId];
+                }
+            }*/
+
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
-        
+
+        protected override void PersistDeletedItem(IMember entity)
+        {
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+            var uploadFieldId = new Guid(Constants.PropertyEditors.UploadField);
+            //Loop through properties to check if the media item contains images/file that should be deleted
+            foreach (var property in ((Member)entity).Properties)
+            {
+                if (property.PropertyType.DataTypeId == uploadFieldId &&
+                    string.IsNullOrEmpty(property.Value.ToString()) == false
+                    && fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
+                {
+                    var relativeFilePath = fs.GetRelativePath(property.Value.ToString());
+                    var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);
+
+                    // don't want to delete the media folder if not using directories.
+                    if (UmbracoSettings.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
+                    {
+                        //issue U4-771: if there is a parent directory the recursive parameter should be true
+                        fs.DeleteDirectory(parentDirectory, String.IsNullOrEmpty(parentDirectory) == false);
+                    }
+                    else
+                    {
+                        fs.DeleteFile(relativeFilePath, true);
+                    }
+                }
+            }
+
+            base.PersistDeletedItem(entity);
+        }
+
         #endregion
 
         #region Overrides of VersionableRepositoryBase<IMembershipUser>
 
         public override IMember GetByVersion(Guid versionId)
         {
-            throw new NotImplementedException();
+            var sql = GetBaseQuery(false);
+            sql.Where<ContentVersionDto>(x => x.VersionId == versionId);
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+
+            var dtos =
+                Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
+                    new PropertyDataRelator().Map, sql);
+
+            return BuildFromDto(dtos);
         }
 
         protected override void PerformDeleteVersion(int id, Guid versionId)
         {
-            throw new NotImplementedException();
+            Database.Delete<PreviewXmlDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<PropertyDataDto>("WHERE contentNodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<ContentVersionDto>("WHERE ContentId = @Id AND VersionId = @VersionId", new { Id = id, VersionId = versionId });
         }
 
         #endregion
+
+        /// <summary>
+        /// Get all members in a specific group
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <returns></returns>
+        public IEnumerable<IMember> GetByMemberGroup(string groupName)
+        {
+            var subquery = GetSubquery().Where<NodeDto>(x => x.Text == groupName);
+            var sql = GetBaseQuery(false)
+                .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
+                .OrderBy<NodeDto>(x => x.SortOrder);
+
+            var dtos =
+                Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
+                    new PropertyDataRelator().Map, sql);
+
+            return BuildFromDtos(dtos);
+        }
 
         private IMember BuildFromDto(List<MemberReadOnlyDto> dtos)
         {

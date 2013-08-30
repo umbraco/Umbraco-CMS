@@ -201,6 +201,7 @@
     <Compile Include="Models\IFile.cs" />
     <Compile Include="Models\ILanguage.cs" />
     <Compile Include="Models\Membership\IMember.cs" />
+    <Compile Include="Models\Membership\IMemberType.cs" />
     <Compile Include="Models\Membership\UmbracoMember.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipUser.cs" />
     <Compile Include="Models\Rdbms\MemberReadOnlyDto.cs" />
@@ -249,7 +250,9 @@
     <Compile Include="Persistence\Caching\IRepositoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\NullCacheProvider.cs" />
     <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
+    <Compile Include="Persistence\Factories\MemberFactory.cs" />
     <Compile Include="Persistence\Factories\MemberReadOnlyFactory.cs" />
+    <Compile Include="Persistence\Factories\MemberTypeFactory.cs" />
     <Compile Include="Persistence\Factories\ServerRegistrationFactory.cs" />
     <Compile Include="Persistence\Factories\UmbracoEntityFactory.cs" />
     <Compile Include="Persistence\FaultHandling\ITransientErrorDetectionStrategy.cs" />
@@ -266,6 +269,7 @@
     <Compile Include="Persistence\FaultHandling\ThrottlingCondition.cs" />
     <Compile Include="Persistence\Mappers\MapperForAttribute.cs" />
     <Compile Include="Persistence\Mappers\MemberMapper.cs" />
+    <Compile Include="Persistence\Mappers\MemberTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\PetaPocoMapper.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ConstraintAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\SpecialDbTypeAttribute.cs" />
@@ -492,6 +496,7 @@
     <Compile Include="Persistence\Repositories\Interfaces\IMediaRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IMediaTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IMemberRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IMemberTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRelationRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRelationTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRepositoryQueryable.cs" />
