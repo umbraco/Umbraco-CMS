@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.templateControls;
+using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace Umbraco.Web
 {

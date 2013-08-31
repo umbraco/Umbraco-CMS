@@ -18,6 +18,7 @@ using umbraco.cms.businesslogic.member;
 using umbraco.interfaces;
 using Content = umbraco.cms.businesslogic.Content;
 using Document = umbraco.cms.businesslogic.web.Document;
+using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace Umbraco.Web.Search
 {
