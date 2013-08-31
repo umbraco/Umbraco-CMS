@@ -6,7 +6,7 @@ namespace Umbraco.Core.Models.Rdbms
     [TableName("cmsPropertyType")]
     [PrimaryKey("id")]
     [ExplicitColumns]
-    public class PropertyDataReadOnlyDto
+    internal class PropertyDataReadOnlyDto
     {
         /* cmsPropertyType */
         [Column("id")]

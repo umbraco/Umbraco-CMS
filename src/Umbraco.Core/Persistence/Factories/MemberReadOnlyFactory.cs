@@ -5,6 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
+using IMember = Umbraco.Core.Models.Membership.IMember;
 
 namespace Umbraco.Core.Persistence.Factories
 {
@@ -12,7 +13,7 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public IMember BuildEntity(MemberReadOnlyDto dto)
         {
-            var member = new Member()
+            var member = new Umbraco.Core.Models.Membership.Member()
                          {
                              Id = dto.NodeId,
                              CreateDate = dto.CreateDate,

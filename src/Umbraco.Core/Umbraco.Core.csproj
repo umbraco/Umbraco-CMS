@@ -200,11 +200,16 @@
     <Compile Include="Models\IDictionaryTranslation.cs" />
     <Compile Include="Models\IFile.cs" />
     <Compile Include="Models\ILanguage.cs" />
+    <Compile Include="Models\IMember.cs" />
+    <Compile Include="Models\IMemberType.cs" />
+    <Compile Include="Models\Member.cs" />
     <Compile Include="Models\Membership\IMember.cs" />
     <Compile Include="Models\Membership\IMemberType.cs" />
     <Compile Include="Models\Membership\UmbracoMember.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipUser.cs" />
+    <Compile Include="Models\MemberType.cs" />
     <Compile Include="Models\Rdbms\MemberReadOnlyDto.cs" />
+    <Compile Include="Models\Rdbms\MemberTypeReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\PropertyDataReadOnlyDto.cs" />
     <Compile Include="Models\ServerRegistration.cs" />
     <Compile Include="Models\ITemplate.cs" />
@@ -253,6 +258,7 @@
     <Compile Include="Persistence\Factories\MemberFactory.cs" />
     <Compile Include="Persistence\Factories\MemberReadOnlyFactory.cs" />
     <Compile Include="Persistence\Factories\MemberTypeFactory.cs" />
+    <Compile Include="Persistence\Factories\MemberTypeReadOnlyFactory.cs" />
     <Compile Include="Persistence\Factories\ServerRegistrationFactory.cs" />
     <Compile Include="Persistence\Factories\UmbracoEntityFactory.cs" />
     <Compile Include="Persistence\FaultHandling\ITransientErrorDetectionStrategy.cs" />
