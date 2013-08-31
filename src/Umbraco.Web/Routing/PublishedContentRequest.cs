@@ -1,11 +1,12 @@
 using System;
 using System.Globalization;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Web.Configuration;
 using umbraco;
 using umbraco.cms.businesslogic.web;
+using RenderingEngine = Umbraco.Core.RenderingEngine;
 
 namespace Umbraco.Web.Routing
 {
@@ -163,7 +164,7 @@ namespace Umbraco.Web.Routing
 		    IsInternalRedirectPublishedContent = isInternalRedirect;
 
             // must restore the template if it's an internal redirect & the config option is set
-            if (isInternalRedirect && UmbracoSettings.For<WebRouting>().InternalRedirectPreservesTemplate)
+            if (isInternalRedirect && LegacyUmbracoSettings.For<WebRouting>().InternalRedirectPreservesTemplate)
             {
                 // restore
                 _template = template;

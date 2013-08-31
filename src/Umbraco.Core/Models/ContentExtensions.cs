@@ -423,7 +423,7 @@ namespace Umbraco.Core.Models
                 return;
 
             var numberedFolder = MediaSubfolderCounter.Current.Increment();
-            var fileName = UmbracoSettings.UploadAllowDirectories
+            var fileName = LegacyUmbracoSettings.UploadAllowDirectories
                                               ? Path.Combine(numberedFolder.ToString(CultureInfo.InvariantCulture), name)
                                               : numberedFolder + "-" + name;
 
@@ -436,16 +436,16 @@ namespace Umbraco.Core.Models
             fs.AddFile(fileName, fileStream);
             
             //Check if file supports resizing and create thumbnails
-            var supportsResizing = ("," + UmbracoSettings.ImageFileTypes + ",").Contains(string.Format(",{0},", extension));
+            var supportsResizing = ("," + LegacyUmbracoSettings.ImageFileTypes + ",").Contains(string.Format(",{0},", extension));
 
             //the config section used to auto-fill properties
             XmlNode uploadFieldConfigNode = null;
 
             //Check for auto fill of additional properties
-            if (UmbracoSettings.ImageAutoFillImageProperties != null)
+            if (LegacyUmbracoSettings.ImageAutoFillImageProperties != null)
             {
                 uploadFieldConfigNode =
-                    UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
+                    LegacyUmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
                         string.Format("uploadField [@alias = \"{0}\"]", propertyTypeAlias));
             }
 

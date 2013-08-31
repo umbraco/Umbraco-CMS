@@ -20,7 +20,7 @@ namespace umbraco
         /// <value>The _umbraco settings.</value>
         public static XmlDocument _umbracoSettings
         {
-            get { return Umbraco.Core.Configuration.UmbracoSettings.UmbracoSettingsXmlDoc; }
+            get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.UmbracoSettingsXmlDoc; }
         }
 
 		/// <summary>
@@ -28,8 +28,8 @@ namespace umbraco
 		/// </summary>
 		internal static string SettingsFilePath
     	{
-    		get { return Umbraco.Core.Configuration.UmbracoSettings.SettingsFilePath; }
-			set { Umbraco.Core.Configuration.UmbracoSettings.SettingsFilePath = value; }
+    		get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.SettingsFilePath; }
+			set { Umbraco.Core.Configuration.LegacyUmbracoSettings.SettingsFilePath = value; }
     	}
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace umbraco
         /// <returns>If found, it returns the specific configuration xml node.</returns>
         public static XmlNode GetKeyAsNode(string Key)
         {
-			return Umbraco.Core.Configuration.UmbracoSettings.GetKeyAsNode(Key);
+			return Umbraco.Core.Configuration.LegacyUmbracoSettings.GetKeyAsNode(Key);
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace umbraco
         /// <returns></returns>
         public static string GetKey(string Key)
         {
-			return Umbraco.Core.Configuration.UmbracoSettings.GetKey(Key);
+			return Umbraco.Core.Configuration.LegacyUmbracoSettings.GetKey(Key);
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace umbraco
         /// </value>
         public static bool UploadAllowDirectories
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.UploadAllowDirectories; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.UploadAllowDirectories; }
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace umbraco
         /// <value><c>true</c> if logging is enabled; otherwise, <c>false</c>.</value>
         public static bool EnableLogging
         {
-            get { return Umbraco.Core.Configuration.UmbracoSettings.EnableLogging; }
+            get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.EnableLogging; }
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace umbraco
         /// <value><c>true</c> if async logging is enabled; otherwise, <c>false</c>.</value>
         public static bool EnableAsyncLogging
         {
-            get { return Umbraco.Core.Configuration.UmbracoSettings.EnableAsyncLogging; }
+            get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.EnableAsyncLogging; }
         }
 
         /// <summary>
@@ -86,14 +86,14 @@ namespace umbraco
         /// </summary>
         public static string ExternalLoggerAssembly
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.ExternalLoggerAssembly; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.ExternalLoggerAssembly; }
         }
         /// <summary>
         /// Gets the type of an external logger that can be used to store log items in 3rd party systems
         /// </summary>
         public static string ExternalLoggerType
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.ExternalLoggerType; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.ExternalLoggerType; }
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace umbraco
         /// </summary>
         public static bool ExternalLoggerLogAuditTrail
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.ExternalLoggerLogAuditTrail; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.ExternalLoggerLogAuditTrail; }
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace umbraco
         /// </summary>
         public static bool KeepUserLoggedIn
         {
-            get { return Umbraco.Core.Configuration.UmbracoSettings.KeepUserLoggedIn; }
+            get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.KeepUserLoggedIn; }
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace umbraco
         /// </summary>
         public static bool EnableCanvasEditing
         {
-            get { return Umbraco.Core.Configuration.UmbracoSettings.EnableCanvasEditing; }
+            get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.EnableCanvasEditing; }
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace umbraco
         /// </summary>
         public static bool HideDisabledUsersInBackoffice
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.HideDisabledUsersInBackoffice; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.HideDisabledUsersInBackoffice; }
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace umbraco
         /// <value><c>true</c> if logs are to be automatically cleaned; otherwise, <c>false</c></value>
         public static bool AutoCleanLogs
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.AutoCleanLogs; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.AutoCleanLogs; }
         }
 
         /// <summary>
@@ -142,12 +142,12 @@ namespace umbraco
         /// </summary>
         public static int CleaningMiliseconds
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.CleaningMiliseconds; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.CleaningMiliseconds; }
         }
 
         public static int MaxLogAge
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.MaxLogAge; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.MaxLogAge; }
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace umbraco
         /// <value>The disabled log types.</value>
         public static XmlNode DisabledLogTypes
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.DisabledLogTypes; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.DisabledLogTypes; }
         }
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace umbraco
         /// <value>The package server url.</value>
         public static string PackageServer
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.PackageServer; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.PackageServer; }
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace umbraco
         /// <value><c>true</c> if umbraco will use domain prefixes; otherwise, <c>false</c>.</value>
         public static bool UseDomainPrefixes
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.UseDomainPrefixes; }
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace umbraco
         /// </summary>
         public static bool AddTrailingSlash
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.AddTrailingSlash; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.AddTrailingSlash; }
         }
 
         /// <summary>
@@ -192,7 +192,7 @@ namespace umbraco
         /// <value><c>true</c> if umbraco will use ASP.NET MasterPages; otherwise, <c>false</c>.</value>
         public static bool UseAspNetMasterPages
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.UseAspNetMasterPages; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.UseAspNetMasterPages; }
         }
 
 
@@ -202,7 +202,7 @@ namespace umbraco
         /// <value><c>true</c> if umbraco will override templates with skins if present and configured <c>false</c>.</value>
         public static bool EnableTemplateFolders
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.EnableTemplateFolders; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.EnableTemplateFolders; }
         }
 
         /// <summary>
@@ -210,14 +210,14 @@ namespace umbraco
         /// </summary>
         public static List<string> NotDynamicXmlDocumentElements
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.NotDynamicXmlDocumentElements.ToList(); }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.NotDynamicXmlDocumentElements.ToList(); }
         }
 
         public static List<RazorDataTypeModelStaticMappingItem> RazorDataTypeModelStaticMapping
         {
 			get
 			{
-				var mapping = Umbraco.Core.Configuration.UmbracoSettings.RazorDataTypeModelStaticMapping;
+				var mapping = Umbraco.Core.Configuration.LegacyUmbracoSettings.RazorDataTypeModelStaticMapping;
 				
 				//now we need to map to the old object until we can clean all this nonsense up
 				return mapping.Select(x => new RazorDataTypeModelStaticMappingItem()
@@ -239,7 +239,7 @@ namespace umbraco
         /// </value>
         public static bool CloneXmlCacheOnPublish
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.CloneXmlCacheOnPublish; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.CloneXmlCacheOnPublish; }
         }
 
         /// <summary>
@@ -248,7 +248,7 @@ namespace umbraco
         /// <value><c>true</c> if content is parsed; otherwise, <c>false</c>.</value>
         public static bool TidyEditorContent
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.TidyEditorContent; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.TidyEditorContent; }
         }
 
         /// <summary>
@@ -257,7 +257,7 @@ namespace umbraco
         /// <value>The encoding type as string.</value>
         public static string TidyCharEncoding
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.TidyCharEncoding; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.TidyCharEncoding; }
         }
 
         /// <summary>
@@ -266,12 +266,12 @@ namespace umbraco
         /// <value>The property context help option.</value>
         public static string PropertyContextHelpOption
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.PropertyContextHelpOption; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.PropertyContextHelpOption; }
         }
 
         public static string DefaultBackofficeProvider
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.DefaultBackofficeProvider; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.DefaultBackofficeProvider; }
         }
 
         /// <summary>
@@ -279,7 +279,7 @@ namespace umbraco
         /// </summary>
         public static bool ForceSafeAliases
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.ForceSafeAliases; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.ForceSafeAliases; }
         }
 
         /// <summary>
@@ -287,7 +287,7 @@ namespace umbraco
         /// </summary>
         public static IEnumerable<string> DisallowedUploadFiles
         {
-            get { return Umbraco.Core.Configuration.UmbracoSettings.DisallowedUploadFiles; }
+            get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.DisallowedUploadFiles; }
         }
 
         /// <summary>
@@ -296,7 +296,7 @@ namespace umbraco
         /// <value>The allowed image file types.</value>
         public static string ImageFileTypes
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.ImageFileTypes; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.ImageFileTypes; }
         }
 
         /// <summary>
@@ -305,7 +305,7 @@ namespace umbraco
         /// <value>The allowed script file types.</value>
         public static string ScriptFileTypes
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.ScriptFileTypes; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.ScriptFileTypes; }
         }
 
         /// <summary>
@@ -314,7 +314,7 @@ namespace umbraco
         /// </summary>
         public static int UmbracoLibraryCacheDuration
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.UmbracoLibraryCacheDuration; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.UmbracoLibraryCacheDuration; }
         }
 
         /// <summary>
@@ -323,7 +323,7 @@ namespace umbraco
         /// <value>The script folder path.</value>
         public static string ScriptFolderPath
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.ScriptFolderPath; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.ScriptFolderPath; }
         }
 
         /// <summary>
@@ -331,7 +331,7 @@ namespace umbraco
         /// </summary>
         public static bool ScriptDisableEditor
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.ScriptDisableEditor; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.ScriptDisableEditor; }
         }
         
         /// <summary>
@@ -342,7 +342,7 @@ namespace umbraco
         /// <value><c>true</c> if umbraco ensures unique node naming; otherwise, <c>false</c>.</value>
         public static bool EnsureUniqueNaming
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.EnsureUniqueNaming; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.EnsureUniqueNaming; }
         }
 
         /// <summary>
@@ -351,7 +351,7 @@ namespace umbraco
         /// <value>The notification email sender.</value>
         public static string NotificationEmailSender
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.NotificationEmailSender; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.NotificationEmailSender; }
         }
 
         /// <summary>
@@ -362,7 +362,7 @@ namespace umbraco
         /// </value>
         public static bool NotificationDisableHtmlEmail
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.NotificationDisableHtmlEmail; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.NotificationDisableHtmlEmail; }
         }
 
         /// <summary>
@@ -371,12 +371,12 @@ namespace umbraco
         /// <value>The allowed attributes on images.</value>
         public static string ImageAllowedAttributes
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.ImageAllowedAttributes; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.ImageAllowedAttributes; }
         }
 
         public static XmlNode ImageAutoFillImageProperties
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.ImageAutoFillImageProperties; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.ImageAutoFillImageProperties; }
         }
 
         /// <summary>
@@ -385,7 +385,7 @@ namespace umbraco
         /// <value>The scheduled tasks.</value>
         public static XmlNode ScheduledTasks
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.ScheduledTasks; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.ScheduledTasks; }
         }
 
         /// <summary>
@@ -394,7 +394,7 @@ namespace umbraco
         /// <value>The URL replacement characters.</value>
         public static XmlNode UrlReplaceCharacters
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.UrlReplaceCharacters; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.UrlReplaceCharacters; }
         }
 
         /// <summary>
@@ -402,7 +402,7 @@ namespace umbraco
         /// </summary>
         public static bool RemoveDoubleDashesFromUrlReplacing
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.RemoveDoubleDashesFromUrlReplacing; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.RemoveDoubleDashesFromUrlReplacing; }
         }
 
         /// <summary>
@@ -413,7 +413,7 @@ namespace umbraco
         /// <value><c>true</c> if umbraco uses distributed calls; otherwise, <c>false</c>.</value>
         public static bool UseDistributedCalls
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.UseDistributedCalls; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.UseDistributedCalls; }
         }
 
 
@@ -423,7 +423,7 @@ namespace umbraco
         /// <value>The distributed call user.</value>
         public static int DistributedCallUser
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.DistributedCallUser; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.DistributedCallUser; }
         }
 
         /// <summary>
@@ -431,7 +431,7 @@ namespace umbraco
         /// </summary>
         public static string PreviewBadge
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.PreviewBadge; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.PreviewBadge; }
         }
 
         /// <summary>
@@ -442,7 +442,7 @@ namespace umbraco
         /// <value>The distribution servers.</value>
         public static XmlNode DistributionServers
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.DistributionServers; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.DistributionServers; }
         }
 
         /// <summary>
@@ -452,7 +452,7 @@ namespace umbraco
         /// </summary>
         public static XmlNode HelpPages
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.HelpPages; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.HelpPages; }
         }
 
         /// <summary>
@@ -464,7 +464,7 @@ namespace umbraco
         /// <value>The repository servers.</value>
         public static XmlNode Repositories
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.Repositories; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.Repositories; }
         }
 
         /// <summary>
@@ -477,7 +477,7 @@ namespace umbraco
         /// </value>
         public static bool UseViewstateMoverModule
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.UseViewstateMoverModule; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.UseViewstateMoverModule; }
         }
 
 
@@ -487,7 +487,7 @@ namespace umbraco
         /// </summary>
         public static bool isXmlContentCacheDisabled
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.IsXmlContentCacheDisabled; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.IsXmlContentCacheDisabled; }
         }
 
         /// <summary>
@@ -497,7 +497,7 @@ namespace umbraco
         /// </summary>
         public static bool XmlContentCheckForDiskChanges
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.XmlContentCheckForDiskChanges; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.XmlContentCheckForDiskChanges; }
         }
 
         /// <summary>
@@ -507,7 +507,7 @@ namespace umbraco
         /// </summary>
         public static bool EnableGlobalPreviewStorage
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.EnableGlobalPreviewStorage; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.EnableGlobalPreviewStorage; }
         }
 
         /// <summary>
@@ -518,18 +518,18 @@ namespace umbraco
         /// </value>
         public static bool UseLegacyXmlSchema
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.UseLegacyXmlSchema; }
         }
 
     	public static IEnumerable<string> AppCodeFileExtensionsList
     	{
-			get { return Umbraco.Core.Configuration.UmbracoSettings.AppCodeFileExtensionsList; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.AppCodeFileExtensionsList; }
     	}
 
 		[Obsolete("Use AppCodeFileExtensionsList instead")]
         public static XmlNode AppCodeFileExtensions
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.AppCodeFileExtensions; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.AppCodeFileExtensions; }
         }
 
         /// <summary>
@@ -538,7 +538,7 @@ namespace umbraco
         /// </summary>
         public static bool continouslyUpdateXmlDiskCache
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.ContinouslyUpdateXmlDiskCache; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.ContinouslyUpdateXmlDiskCache; }
         }
 
         /// <summary>
@@ -549,12 +549,12 @@ namespace umbraco
         /// </summary>
         public static bool EnableSplashWhileLoading
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.EnableSplashWhileLoading; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.EnableSplashWhileLoading; }
         }
 
         public static bool ResolveUrlsFromTextString
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.ResolveUrlsFromTextString; }
+			get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.ResolveUrlsFromTextString; }
         }
 
         /// <summary>
@@ -566,7 +566,7 @@ namespace umbraco
         /// <value>MacroErrorBehaviour enum defining how to handle macro errors.</value>
         public static MacroErrorBehaviour MacroErrorBehaviour
         {
-            get { return Umbraco.Core.Configuration.UmbracoSettings.MacroErrorBehaviour; }
+            get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.MacroErrorBehaviour; }
         }
 
         /// <summary>
@@ -578,7 +578,7 @@ namespace umbraco
         /// <value>MacroErrorBehaviour enum defining how to show icons in the document type editor.</value>
         public static IconPickerBehaviour IconPickerBehaviour
         {
-            get { return Umbraco.Core.Configuration.UmbracoSettings.IconPickerBehaviour; }
+            get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.IconPickerBehaviour; }
         }
 
         /// <summary>
@@ -588,7 +588,7 @@ namespace umbraco
         /// <remarks>If undefined, 'Textstring' is the default</remarks>
         public static string DefaultDocumentTypeProperty
         {
-            get { return Umbraco.Core.Configuration.UmbracoSettings.DefaultDocumentTypeProperty; }
+            get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.DefaultDocumentTypeProperty; }
         }
 
         /// <summary>
@@ -603,7 +603,7 @@ namespace umbraco
             /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
             public static bool Enabled
             {
-				get { return Umbraco.Core.Configuration.UmbracoSettings.WebServices.Enabled; }
+				get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.WebServices.Enabled; }
             }
 
             #region "Webservice configuration"
@@ -614,7 +614,7 @@ namespace umbraco
             /// <value>The document service users.</value>
             public static string[] documentServiceUsers
             {
-				get { return Umbraco.Core.Configuration.UmbracoSettings.WebServices.DocumentServiceUsers; }
+				get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.WebServices.DocumentServiceUsers; }
             }
 
             /// <summary>
@@ -623,7 +623,7 @@ namespace umbraco
             /// <value>The file service users.</value>
             public static string[] fileServiceUsers
             {
-				get { return Umbraco.Core.Configuration.UmbracoSettings.WebServices.FileServiceUsers; }
+				get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.WebServices.FileServiceUsers; }
             }
 
 
@@ -633,7 +633,7 @@ namespace umbraco
             /// <value>The file service folders.</value>
             public static string[] fileServiceFolders
             {
-				get { return Umbraco.Core.Configuration.UmbracoSettings.WebServices.FileServiceFolders; }
+				get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.WebServices.FileServiceFolders; }
             }
 
             /// <summary>
@@ -642,7 +642,7 @@ namespace umbraco
             /// <value>The member service users.</value>
             public static string[] memberServiceUsers
             {
-				get { return Umbraco.Core.Configuration.UmbracoSettings.WebServices.MemberServiceUsers; }
+				get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.WebServices.MemberServiceUsers; }
             }
 
             /// <summary>
@@ -651,7 +651,7 @@ namespace umbraco
             /// <value>The stylesheet service users.</value>
             public static string[] stylesheetServiceUsers
             {
-				get { return Umbraco.Core.Configuration.UmbracoSettings.WebServices.StylesheetServiceUsers; }
+				get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.WebServices.StylesheetServiceUsers; }
             }
 
             /// <summary>
@@ -660,7 +660,7 @@ namespace umbraco
             /// <value>The template service users.</value>
             public static string[] templateServiceUsers
             {
-				get { return Umbraco.Core.Configuration.UmbracoSettings.WebServices.TemplateServiceUsers; }
+				get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.WebServices.TemplateServiceUsers; }
             }
 
             /// <summary>
@@ -669,7 +669,7 @@ namespace umbraco
             /// <value>The media service users.</value>
             public static string[] mediaServiceUsers
             {
-				get { return Umbraco.Core.Configuration.UmbracoSettings.WebServices.MediaServiceUsers; }
+				get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.WebServices.MediaServiceUsers; }
             }
 
 
@@ -679,7 +679,7 @@ namespace umbraco
             /// <value>The maintenance service users.</value>
             public static string[] maintenanceServiceUsers
             {
-				get { return Umbraco.Core.Configuration.UmbracoSettings.WebServices.MaintenanceServiceUsers; }
+				get { return Umbraco.Core.Configuration.LegacyUmbracoSettings.WebServices.MaintenanceServiceUsers; }
             }
 
             #endregion

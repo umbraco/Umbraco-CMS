@@ -16,7 +16,7 @@ namespace Umbraco.Core.Sync
         private readonly XmlNode _xmlServers;
 
         public ConfigServerRegistrar()
-            : this(UmbracoSettings.DistributionServers)
+            : this(LegacyUmbracoSettings.DistributionServers)
         {
             
         }

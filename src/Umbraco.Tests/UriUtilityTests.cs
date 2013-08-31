@@ -15,7 +15,7 @@ namespace Umbraco.Tests
 		[TearDown]
 		public void TearDown()
 		{
-			UmbracoSettings.Reset();
+			LegacyUmbracoSettings.Reset();
 		}
 
 		// test normal urls
@@ -83,7 +83,7 @@ namespace Umbraco.Tests
 		public void Uri_From_Umbraco(string sourceUrl, string expectedUrl, bool directoryUrls, bool trailingSlash)
 		{
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", directoryUrls ? "true" : "false");
-			Umbraco.Core.Configuration.UmbracoSettings.AddTrailingSlash = trailingSlash;
+			Umbraco.Core.Configuration.LegacyUmbracoSettings.AddTrailingSlash = trailingSlash;
 			UriUtility.SetAppDomainAppVirtualPath("/");
 
 			var expectedUri = NewUri(expectedUrl);

@@ -262,7 +262,7 @@ namespace Umbraco.Web
                 {                    
                     try
                     {
-                        var user = User.GetUser(UmbracoSettings.DistributedCallUser);
+                        var user = User.GetUser(LegacyUmbracoSettings.DistributedCallUser);
                         return new System.Tuple<string, string>(user.LoginName, user.GetPassword());
                     }
                     catch (Exception e)

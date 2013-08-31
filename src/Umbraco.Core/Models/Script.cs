@@ -33,7 +33,7 @@ namespace Umbraco.Core.Models
             //into 4 private methods.
             //See codeEditorSave.asmx.cs for reference.
 
-            var exts = UmbracoSettings.ScriptFileTypes.Split(',').ToList();
+            var exts = LegacyUmbracoSettings.ScriptFileTypes.Split(',').ToList();
             /*if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
             {
                 exts.Add("cshtml");

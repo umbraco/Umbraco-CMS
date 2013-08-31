@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Routing;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
@@ -15,8 +16,9 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using umbraco;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
-using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Web.Configuration;
+using ObjectExtensions = Umbraco.Core.ObjectExtensions;
+using RenderingEngine = Umbraco.Core.RenderingEngine;
 
 namespace Umbraco.Web
 {
@@ -317,7 +319,7 @@ namespace Umbraco.Web
 			{
 				LogHelper.Warn<UmbracoModule>("Umbraco is not ready");
 
-				if (!UmbracoSettings.EnableSplashWhileLoading)
+				if (!LegacyUmbracoSettings.EnableSplashWhileLoading)
 				{
 					// let requests pile up and wait for 10s then show the splash anyway
 					ready = ApplicationContext.Current.WaitForReady(10 * 1000);
@@ -327,7 +329,7 @@ namespace Umbraco.Web
 				{
 					httpContext.Response.StatusCode = 503;
 
-					var bootUrl = UmbracoSettings.BootSplashPage;
+					var bootUrl = LegacyUmbracoSettings.BootSplashPage;
 					if (string.IsNullOrWhiteSpace(bootUrl))
 						bootUrl = "~/config/splashes/booting.aspx";
 					httpContext.RewritePath(UriUtility.ToAbsolute(bootUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
@@ -396,7 +398,7 @@ namespace Umbraco.Web
             else if (pcr.Is404)
             {
                 response.StatusCode = 404;
-                response.TrySkipIisCustomErrors = UmbracoSettings.For<WebRouting>().TrySkipIisCustomErrors;
+                response.TrySkipIisCustomErrors = LegacyUmbracoSettings.For<WebRouting>().TrySkipIisCustomErrors;
             }
 
             if (pcr.ResponseStatusCode > 0)
@@ -527,8 +529,8 @@ namespace Umbraco.Web
         {
             foreach (DictionaryEntry i in http.Items)
             {
-                i.Value.DisposeIfDisposable();
-                i.Key.DisposeIfDisposable();
+                ObjectExtensions.DisposeIfDisposable(i.Value);
+                ObjectExtensions.DisposeIfDisposable(i.Key);
             }
         }
 

@@ -20,7 +20,7 @@ namespace Umbraco.Tests.CodeFirst
         [SetUp]
         public override void Initialize()
         {
-            UmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
+            LegacyUmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
            
             base.Initialize();
 

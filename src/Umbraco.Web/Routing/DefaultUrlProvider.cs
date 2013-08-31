@@ -105,14 +105,14 @@ namespace Umbraco.Web.Routing
 
             if (mode == UrlProviderMode.AutoLegacy)
             {
-                mode = Core.Configuration.UmbracoSettings.UseDomainPrefixes
+                mode = Core.Configuration.LegacyUmbracoSettings.UseDomainPrefixes
                     ? UrlProviderMode.Absolute
                     : UrlProviderMode.Auto;
             }
 
             if (mode == UrlProviderMode.AutoLegacy)
             {
-                mode = Core.Configuration.UmbracoSettings.UseDomainPrefixes
+                mode = Core.Configuration.LegacyUmbracoSettings.UseDomainPrefixes
                     ? UrlProviderMode.Absolute
                     : UrlProviderMode.Auto;
             }

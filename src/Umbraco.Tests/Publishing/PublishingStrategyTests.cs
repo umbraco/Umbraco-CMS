@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Publishing
         {
             base.Initialize();
 
-            UmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);              
+            LegacyUmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);              
         }
 
         [TearDown]

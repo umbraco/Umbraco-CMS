@@ -57,7 +57,7 @@ namespace Umbraco.Core.Strings
 
         static void InitializeLegacyUrlReplaceCharacters()
         {
-            var replaceChars = UmbracoSettings.UrlReplaceCharacters;
+            var replaceChars = LegacyUmbracoSettings.UrlReplaceCharacters;
             if (replaceChars == null) return;
             var nodes = replaceChars.SelectNodes("char");
             if (nodes == null) return;
@@ -234,7 +234,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         public string GetShortStringServicesJavaScript(string controllerPath)
         {
                 return string.Format(SssjsFormat,
-                    UmbracoSettings.ForceSafeAliases ? "true" : "false", controllerPath);
+                    LegacyUmbracoSettings.ForceSafeAliases ? "true" : "false", controllerPath);
         }
 
         #endregion

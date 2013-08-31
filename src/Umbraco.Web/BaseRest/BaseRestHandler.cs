@@ -28,7 +28,7 @@ namespace Umbraco.Web.BaseRest
 		/// <returns>A value indicating whether the specified Uri should be routed to the BaseRestHandler.</returns>
 		public static bool IsBaseRestRequest(Uri uri)
 		{
-            return Core.Configuration.UmbracoSettings.For<Configuration.BaseRestSection>().Enabled
+            return Core.Configuration.LegacyUmbracoSettings.For<Configuration.BaseRestSection>().Enabled
 				&& uri.AbsolutePath.ToLowerInvariant().StartsWith(BaseUrl);
 		}
 

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.PublishedCache;
-using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.Routing
 {
@@ -22,7 +22,7 @@ namespace Umbraco.Web.Routing
         {
             _umbracoContext = umbracoContext;
             _urlProviders = urlProviders;
-            Mode = UmbracoSettings.For<Configuration.WebRouting>().UrlProviderMode;
+            Mode = LegacyUmbracoSettings.For<Configuration.WebRouting>().UrlProviderMode;
         }
 
         private readonly UmbracoContext _umbracoContext;

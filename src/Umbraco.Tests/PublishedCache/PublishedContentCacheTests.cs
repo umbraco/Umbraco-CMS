@@ -79,7 +79,7 @@ namespace Umbraco.Tests.PublishedCache
 			//ensure the StateHelper is using our custom context
 			StateHelper.HttpContext = _httpContextFactory.HttpContext;
 
-			UmbracoSettings.UseLegacyXmlSchema = false;
+			LegacyUmbracoSettings.UseLegacyXmlSchema = false;
             var cache = new PublishedContentCache
                 {
                     GetXmlDelegate = (context, preview) =>
@@ -101,7 +101,7 @@ namespace Umbraco.Tests.PublishedCache
 
 		private void SetupForLegacy()
 		{
-			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = true;
+			Umbraco.Core.Configuration.LegacyUmbracoSettings.UseLegacyXmlSchema = true;
 
             var cache = _umbracoContext.ContentCache.InnerCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
@@ -117,7 +117,7 @@ namespace Umbraco.Tests.PublishedCache
 		[TearDown]
 		public void TearDown()
 		{
-			UmbracoSettings.Reset();
+			LegacyUmbracoSettings.Reset();
 		}
 
 		[Test]

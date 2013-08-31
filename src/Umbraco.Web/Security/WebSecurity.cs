@@ -6,6 +6,7 @@ using System.Web.Security;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
@@ -14,7 +15,6 @@ using umbraco.DataLayer;
 using umbraco.businesslogic.Exceptions;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using Member = umbraco.cms.businesslogic.member.Member;
-using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
 using User = umbraco.BusinessLogic.User;
 
 namespace Umbraco.Web.Security
@@ -177,7 +177,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         internal bool ValidateBackOfficeCredentials(string username, string password)
         {
-            var membershipProvider = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider];
+            var membershipProvider = Membership.Providers[LegacyUmbracoSettings.DefaultBackofficeProvider];
             return membershipProvider != null && membershipProvider.ValidateUser(username, password);
         }
 

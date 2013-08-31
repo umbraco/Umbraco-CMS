@@ -27,7 +27,7 @@ namespace Umbraco.Web.Strategies.DataTypes
 
 		void DocumentBeforeSave(global::umbraco.cms.businesslogic.web.Document sender, global::umbraco.cms.businesslogic.SaveEventArgs e)
 		{
-			if (UmbracoSettings.ImageAutoFillImageProperties != null)
+			if (LegacyUmbracoSettings.ImageAutoFillImageProperties != null)
 			{
 				var property = sender.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id == new Guid(Constants.PropertyEditors.UploadField));
 				if (property == null)
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Strategies.DataTypes
 
 		void MediaBeforeSave(global::umbraco.cms.businesslogic.media.Media sender, global::umbraco.cms.businesslogic.SaveEventArgs e)
 		{
-			if (UmbracoSettings.ImageAutoFillImageProperties != null)
+			if (LegacyUmbracoSettings.ImageAutoFillImageProperties != null)
 			{
 				var property = sender.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id == new Guid(Constants.PropertyEditors.UploadField));
 				if (property == null)
@@ -76,7 +76,7 @@ namespace Umbraco.Web.Strategies.DataTypes
 						? fileSystem.GetExtension(path).Substring(1).ToLowerInvariant()
 						: "";
 
-					var isImageType = ("," + UmbracoSettings.ImageFileTypes + ",").Contains(string.Format(",{0},", extension));
+					var isImageType = ("," + LegacyUmbracoSettings.ImageFileTypes + ",").Contains(string.Format(",{0},", extension));
 					var dimensions = isImageType ? GetDimensions(path, fileSystem) : null;
 
 					// only add dimensions to web images

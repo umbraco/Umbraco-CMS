@@ -22,16 +22,16 @@ namespace Umbraco.Web.UI.Install.Steps
             if (Page.IsValid)
             {
                 var u = User.GetUser(0);
-                var user = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(0, true);
+                var user = Membership.Providers[LegacyUmbracoSettings.DefaultBackofficeProvider].GetUser(0, true);
                 user.ChangePassword(u.GetPassword(), tb_password.Text.Trim());
 
                 // Is it using the default membership provider
-                if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is UsersMembershipProvider)
+                if (Membership.Providers[LegacyUmbracoSettings.DefaultBackofficeProvider] is UsersMembershipProvider)
                 {
                     // Save user in membership provider
                     var umbracoUser = user as UsersMembershipUser;
                     umbracoUser.FullName = tb_name.Text.Trim();
-                    Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].UpdateUser(umbracoUser);
+                    Membership.Providers[LegacyUmbracoSettings.DefaultBackofficeProvider].UpdateUser(umbracoUser);
 
                     // Save user details
                     u.Email = tb_email.Text.Trim();
@@ -39,7 +39,7 @@ namespace Umbraco.Web.UI.Install.Steps
                 else
                 {
                     u.Name = tb_name.Text.Trim();
-                    if (!(Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is ActiveDirectoryMembershipProvider)) Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].UpdateUser(user);
+                    if (!(Membership.Providers[LegacyUmbracoSettings.DefaultBackofficeProvider] is ActiveDirectoryMembershipProvider)) Membership.Providers[LegacyUmbracoSettings.DefaultBackofficeProvider].UpdateUser(user);
                 }
 
                 // we need to update the login name here as it's set to the old name when saving the user via the membership provider!

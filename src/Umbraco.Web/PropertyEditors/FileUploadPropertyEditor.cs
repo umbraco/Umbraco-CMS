@@ -59,12 +59,12 @@ namespace Umbraco.Web.PropertyEditors
 
         static void AutoFillProperties(IContentBase model)
         {
-            if (UmbracoSettings.ImageAutoFillImageProperties != null)
+            if (LegacyUmbracoSettings.ImageAutoFillImageProperties != null)
             {
                 foreach (var p in model.Properties)
                 {
                     var uploadFieldConfigNode =
-                        UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
+                        LegacyUmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
                             string.Format("uploadField [@alias = \"{0}\"]", p.Alias));
 
                     if (uploadFieldConfigNode != null)

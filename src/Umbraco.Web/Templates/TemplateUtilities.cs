@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.Templates
 {
@@ -56,7 +56,7 @@ namespace Umbraco.Web.Templates
 		/// </remarks>
 		public static string ResolveUrlsFromTextString(string text)
 		{
-			if (UmbracoSettings.ResolveUrlsFromTextString)
+			if (LegacyUmbracoSettings.ResolveUrlsFromTextString)
 			{
 				using (var timer = DisposableTimer.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
 				{

@@ -144,7 +144,7 @@ namespace Umbraco.Tests.TestHelpers
                     Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
                     true);
             
-            Core.Configuration.UmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
+            Core.Configuration.LegacyUmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
         }
 
 	    public static void CleanUmbracoSettingsConfig()

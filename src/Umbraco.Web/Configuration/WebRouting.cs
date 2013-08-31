@@ -37,7 +37,7 @@ namespace Umbraco.Web.Configuration
             {
                 return _trySkipIisCustomErrors ?? (IsPresent 
                     ? (bool)this[KeyTrySkipIisCustomErrors] 
-                    : UmbracoSettings.TrySkipIisCustomErrors);
+                    : LegacyUmbracoSettings.TrySkipIisCustomErrors);
             }
             internal set { _trySkipIisCustomErrors = value; }
         }
@@ -69,7 +69,7 @@ namespace Umbraco.Web.Configuration
             {
                 return _internalRedirectPreservesTemplate ?? (IsPresent
                     ? (bool)this[KeyInternalRedirectPreservesTemplate]
-                    : UmbracoSettings.InternalRedirectPreservesTemplate);
+                    : LegacyUmbracoSettings.InternalRedirectPreservesTemplate);
             }
             internal set { _internalRedirectPreservesTemplate = value; }
         }

@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence
                 uow,
                 RuntimeCacheProvider.Current,
                 CreateContentTypeRepository(uow),
-                CreateTemplateRepository(uow)) { EnsureUniqueNaming = Umbraco.Core.Configuration.UmbracoSettings.EnsureUniqueNaming };
+                CreateTemplateRepository(uow)) { EnsureUniqueNaming = Umbraco.Core.Configuration.LegacyUmbracoSettings.EnsureUniqueNaming };
         }
 
         public virtual IContentTypeRepository CreateContentTypeRepository(IDatabaseUnitOfWork uow)
@@ -53,7 +53,7 @@ namespace Umbraco.Core.Persistence
             return new MediaRepository(
                 uow,
                 RuntimeCacheProvider.Current,
-                CreateMediaTypeRepository(uow)) { EnsureUniqueNaming = Umbraco.Core.Configuration.UmbracoSettings.EnsureUniqueNaming };
+                CreateMediaTypeRepository(uow)) { EnsureUniqueNaming = Umbraco.Core.Configuration.LegacyUmbracoSettings.EnsureUniqueNaming };
         }
 
         public virtual IMediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork uow)

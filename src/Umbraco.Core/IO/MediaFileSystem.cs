@@ -18,7 +18,7 @@ namespace Umbraco.Core.IO
 
 		public string GetRelativePath(int propertyId, string fileName)
 		{
-			var seperator = UmbracoSettings.UploadAllowDirectories
+			var seperator = LegacyUmbracoSettings.UploadAllowDirectories
 				? Path.DirectorySeparatorChar
 				: '-';
 
@@ -27,7 +27,7 @@ namespace Umbraco.Core.IO
 
         public string GetRelativePath(string subfolder, string fileName)
         {
-            var seperator = UmbracoSettings.UploadAllowDirectories
+            var seperator = LegacyUmbracoSettings.UploadAllowDirectories
                 ? Path.DirectorySeparatorChar
                 : '-';
 

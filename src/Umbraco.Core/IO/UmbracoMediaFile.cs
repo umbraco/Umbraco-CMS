@@ -120,7 +120,7 @@ namespace Umbraco.Core.IO
         {
             get
             {
-                return ("," + UmbracoSettings.ImageFileTypes + ",").Contains(string.Format(",{0},", Extension));
+                return ("," + LegacyUmbracoSettings.ImageFileTypes + ",").Contains(string.Format(",{0},", Extension));
             }
         }
 

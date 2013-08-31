@@ -311,7 +311,7 @@ namespace Umbraco.Tests.CodeFirst.Definitions
         private static IEnumerable<ITemplate> AllowedTemplatesConvention(IEnumerable<string> templateNames)
         {
             var templates = new List<ITemplate>();
-            var engine = UmbracoSettings.DefaultRenderingEngine;
+            var engine = LegacyUmbracoSettings.DefaultRenderingEngine;
             foreach (var templateName in templateNames)
             {
                 var @alias = engine == RenderingEngine.Mvc

@@ -13,38 +13,38 @@ namespace Umbraco.Tests.TestHelpers
 
         public static int UmbracoLibraryCacheDuration
         {
-            get { return UmbracoSettings.UmbracoLibraryCacheDuration; }
-            set { UmbracoSettings.UmbracoLibraryCacheDuration = value; }
+            get { return LegacyUmbracoSettings.UmbracoLibraryCacheDuration; }
+            set { LegacyUmbracoSettings.UmbracoLibraryCacheDuration = value; }
         }
 
         public static bool UseLegacyXmlSchema
         {
-            get { return UmbracoSettings.UseLegacyXmlSchema; }
-            set { UmbracoSettings.UseLegacyXmlSchema = value; }
+            get { return LegacyUmbracoSettings.UseLegacyXmlSchema; }
+            set { LegacyUmbracoSettings.UseLegacyXmlSchema = value; }
         }
 
         public static bool AddTrailingSlash
         {
-            get { return UmbracoSettings.AddTrailingSlash; }
-            set { UmbracoSettings.AddTrailingSlash = value; }
+            get { return LegacyUmbracoSettings.AddTrailingSlash; }
+            set { LegacyUmbracoSettings.AddTrailingSlash = value; }
         }
 
         public static bool UseDomainPrefixes
         {
-            get { return UmbracoSettings.UseDomainPrefixes; }
-            set { UmbracoSettings.UseDomainPrefixes = value; }
+            get { return LegacyUmbracoSettings.UseDomainPrefixes; }
+            set { LegacyUmbracoSettings.UseDomainPrefixes = value; }
         }
 
         public static string SettingsFilePath
         {
-            get { return UmbracoSettings.SettingsFilePath; }
-            set { UmbracoSettings.SettingsFilePath = value; }
+            get { return LegacyUmbracoSettings.SettingsFilePath; }
+            set { LegacyUmbracoSettings.SettingsFilePath = value; }
         }
 
         public static bool ForceSafeAliases
         {
-            get { return UmbracoSettings.ForceSafeAliases; }
-            set { UmbracoSettings.ForceSafeAliases = value; }
+            get { return LegacyUmbracoSettings.ForceSafeAliases; }
+            set { LegacyUmbracoSettings.ForceSafeAliases = value; }
         }
 
         // from appSettings
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static void Reset()
         {
-            UmbracoSettings.Reset();
+            LegacyUmbracoSettings.Reset();
             GlobalSettings.Reset();
 
             foreach (var kvp in SavedAppSettings)

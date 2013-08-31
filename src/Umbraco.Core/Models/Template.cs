@@ -157,18 +157,18 @@ namespace Umbraco.Core.Models
         public override bool IsValid()
         {
             var exts = new List<string>();
-            if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
+            if (LegacyUmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
             {
                 exts.Add("cshtml");
                 exts.Add("vbhtml");
             }
             else
             {
-                exts.Add(UmbracoSettings.UseAspNetMasterPages ? "master" : "aspx");
+                exts.Add(LegacyUmbracoSettings.UseAspNetMasterPages ? "master" : "aspx");
             }
 
             var dirs = SystemDirectories.Masterpages;
-            if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
+            if (LegacyUmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
                 dirs += "," + SystemDirectories.MvcViews;
 
             //Validate file

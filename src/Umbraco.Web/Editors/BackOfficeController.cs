@@ -70,7 +70,7 @@ namespace Umbraco.Web.Editors
                         "umbracoSettings", new Dictionary<string, object>
                             {
                                 {"umbracoPath", GlobalSettings.Path},
-                                {"imageFileTypes", UmbracoSettings.ImageFileTypes},
+                                {"imageFileTypes", LegacyUmbracoSettings.ImageFileTypes},
                             }
                     },
                     { "isDebuggingEnabled", HttpContext.IsDebuggingEnabled }

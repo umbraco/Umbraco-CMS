@@ -194,7 +194,7 @@ namespace umbraco
                 xNode.Source = GetTreeServiceUrl(t.Id);
                 xNode.HasChildren = t.HasChildren;
                 
-                if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(t))
+                if (Umbraco.Core.Configuration.LegacyUmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(t))
                 {
                     xNode.Action = "javascript:openView(" + t.Id + ");";
                     xNode.Icon = "settingView.gif";

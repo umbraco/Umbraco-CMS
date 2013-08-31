@@ -144,7 +144,7 @@ namespace Umbraco.Core
 					var documentElement = e.Name.LocalName;
 
 					//TODO: See note against this setting, pretty sure we don't need this
-					if (!UmbracoSettings.NotDynamicXmlDocumentElements.Any(
+					if (!LegacyUmbracoSettings.NotDynamicXmlDocumentElements.Any(
 						tag => string.Equals(tag, documentElement, StringComparison.CurrentCultureIgnoreCase)))
 					{
 						return new Attempt<object>(true, new DynamicXml(e));

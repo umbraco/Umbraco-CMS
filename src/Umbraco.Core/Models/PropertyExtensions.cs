@@ -22,13 +22,13 @@ namespace Umbraco.Core.Models
 
         internal static XElement ToXml(this Property property, IDataTypeService dataTypeService)
         {
-            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "data" : property.Alias.ToSafeAlias();
+            var nodeName = LegacyUmbracoSettings.UseLegacyXmlSchema ? "data" : property.Alias.ToSafeAlias();
 
             var xd = new XmlDocument();
             var xmlNode = xd.CreateNode(XmlNodeType.Element, nodeName, "");
 
             //Add the property alias to the legacy schema
-            if (UmbracoSettings.UseLegacyXmlSchema)
+            if (LegacyUmbracoSettings.UseLegacyXmlSchema)
             {
                 var alias = xd.CreateAttribute("alias");
                 alias.Value = property.Alias.ToSafeAlias();
