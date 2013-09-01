@@ -62,8 +62,18 @@ $.datepicker._connectDatepicker = function(target, inst) {
  */
 $.datepicker._showDatepickerOverride = $.datepicker._showDatepicker;
 $.datepicker._showDatepicker = function (input) {
+    // keep the current value
+    var originalval = input.value;
+
+    // Keep the first 10 chars for now yyyy-mm-dd - this removes the time part which was breaking the standardDatePicker parsing code
+    input.value = originalval.length>10 ? originalval.substring(0, 10) : originalval;
+
+
     // Call the original method which will show the datepicker
     $.datepicker._showDatepickerOverride(input);
+
+    // Put it back
+    input.value = originalval;
 
     input = input.target || input;
 
