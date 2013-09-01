@@ -70,15 +70,15 @@ namespace Umbraco.Web.Security
                 var allowGroupsList = allowGroups as IList<string> ?? allowGroups.ToList();
                 if (allowAction && allowGroupsList.Any(allowGroup => allowGroup != string.Empty))
                 {
-                    // Allow only if member's type is in list
+                    // Allow only if member is assigned to a group in the list
                     var groups = Roles.GetRolesForUser(member.LoginName);
-                    allowAction = groups.Select(s => s.ToLowerInvariant()).Intersect(groups.Select(myGroup => myGroup.ToLowerInvariant())).Any();
+                    allowAction = allowGroupsList.Select(s => s.ToLowerInvariant()).Intersect(groups.Select(myGroup => myGroup.ToLowerInvariant())).Any();
                 }
 
                 // If specific members defined, check member is of one of those
                 if (allowAction && allowMembers.Any())
                 {
-                    // Allow only if member's type is in list
+                    // Allow only if member's Id is in the list
                     allowAction = allowMembers.Contains(member.Id);
                 }
             }
