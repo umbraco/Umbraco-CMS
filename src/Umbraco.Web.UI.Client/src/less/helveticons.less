@@ -16,9 +16,20 @@
   	font-style: normal;
   	display: inline-block;
   	text-decoration: inherit;
-  	font-size: 14px
+  	font-size: 14px;
+  	-webkit-font-smoothing: antialiased;
 }
 
+i.large:before{
+	font-size: 32px;
+}
+
+i.medium:before{
+	font-size: 24px;
+}
+i.small:before{
+	font-size: 14px;
+}
 
 .icon-zoom-out:before {
 	content: "\e000";
@@ -1415,7 +1426,7 @@
 .icon-folders:before {
 	content: "\e1d0";
 }
-.icon-folder:before {
+.icon-folder:before, .icon-folder-close:before {
 	content: "\e1d1";
 }
 .icon-folder-outline:before {
