@@ -4,10 +4,25 @@ using NUnit.Framework;
 namespace Umbraco.Tests.Configurations.UmbracoSettings
 {
     [TestFixture]
+    public class ScheduledTasksElementDefaultTests : ScheduledTasksElementTests
+    {
+        protected override bool TestingDefaults
+        {
+            get { return true; }
+        }
+
+        [Test]
+        public override void Tasks()
+        {
+            Assert.IsTrue(Section.ScheduledTasks.Tasks.Count == 0);
+        }
+    }
+
+    [TestFixture]
     public class ScheduledTasksElementTests : UmbracoSettingsTests
     {
         [Test]
-        public void Tasks()
+        public virtual void Tasks()
         {
             Assert.IsTrue(Section.ScheduledTasks.Tasks.Count == 2);
             Assert.IsTrue(Section.ScheduledTasks.Tasks.ElementAt(0).Alias == "test60");

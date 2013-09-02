@@ -204,7 +204,6 @@
     <Compile Include="Configuration\UmbracoSettings\UserProviderElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ViewstateMoverModuleElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\WebRoutingElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\WebServicesElement.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
     <Compile Include="CoreBootManager.cs" />
     <Compile Include="DatabaseContext.cs" />

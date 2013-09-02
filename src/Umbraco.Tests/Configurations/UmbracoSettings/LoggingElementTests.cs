@@ -4,8 +4,59 @@ using NUnit.Framework;
 namespace Umbraco.Tests.Configurations.UmbracoSettings
 {
     [TestFixture]
+    public class LoggingElementDefaultTests : LoggingElementTests
+    {
+        protected override bool TestingDefaults
+        {
+            get { return true; }
+        }
+
+        [Test]
+        public override void ExternalLoggerConfigured()
+        {
+            Assert.IsTrue(Section.Logging.ExternalLoggerIsConfigured == false);
+        }
+        [Test]
+        public override void ExternalLogger_Assembly()
+        {
+            Assert.IsTrue(Section.Logging.ExternalLoggerIsConfigured == false);
+        }
+        [Test]
+        public override void ExternalLogger_LogAuditTrail()
+        {
+            Assert.IsTrue(Section.Logging.ExternalLoggerIsConfigured == false);
+        }
+        [Test]
+        public override void ExternalLogger_Type()
+        {
+            Assert.IsTrue(Section.Logging.ExternalLoggerIsConfigured == false);
+        }
+        [Test]
+        public override void DisabledLogTypes()
+        {
+            Assert.IsTrue(Section.Logging.DisabledLogTypes.Count == 0);
+        }
+        [Test]
+        public override void CleaningMiliseconds()
+        {
+            Assert.IsTrue(Section.Logging.CleaningMiliseconds == -1);
+        }
+        [Test]
+        public override void MaxLogAge()
+        {
+            Assert.IsTrue(Section.Logging.MaxLogAge == -1);
+        }
+    }
+
+    [TestFixture]
     public class LoggingElementTests : UmbracoSettingsTests
     {
+        [Test]
+        public virtual void ExternalLoggerConfigured()
+        {
+            Assert.IsTrue(Section.Logging.ExternalLoggerIsConfigured == true);
+        }
+
         [Test]
         public void EnableLogging()
         {
@@ -17,24 +68,24 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(Section.Logging.EnableAsyncLogging == true);
         }
         [Test]
-        public void DisabledLogTypes()
+        public virtual void DisabledLogTypes()
         {
             Assert.IsTrue(Section.Logging.DisabledLogTypes.Count == 2);
             Assert.IsTrue(Section.Logging.DisabledLogTypes.ElementAt(0) == "[alias-of-log-type-in-lowercase]");
             Assert.IsTrue(Section.Logging.DisabledLogTypes.ElementAt(1) == "anotherlogalias");
         }
         [Test]
-        public void Assembly()
+        public virtual void ExternalLogger_Assembly()
         {
             Assert.IsTrue(Section.Logging.ExternalLogger.Assembly == "~/bin/assemblyFileName.dll");
         }
         [Test]
-        public void Type()
+        public virtual void ExternalLogger_Type()
         {
             Assert.IsTrue(Section.Logging.ExternalLogger.Type == "fully.qualified.namespace.and.type");
         }
         [Test]
-        public void LogAuditTrail()
+        public virtual void ExternalLogger_LogAuditTrail()
         {
             Assert.IsTrue(Section.Logging.ExternalLogger.LogAuditTrail == false);
         }
@@ -45,13 +96,13 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         }
 
         [Test]
-        public void CleaningMiliseconds()
+        public virtual void CleaningMiliseconds()
         {
             Assert.IsTrue(Section.Logging.CleaningMiliseconds == 86400);
 
         }
         [Test]
-        public void MaxLogAge()
+        public virtual void MaxLogAge()
         {
             Assert.IsTrue(Section.Logging.MaxLogAge == 1440);
 

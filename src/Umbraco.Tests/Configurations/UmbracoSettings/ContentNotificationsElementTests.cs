@@ -3,6 +3,20 @@
 namespace Umbraco.Tests.Configurations.UmbracoSettings
 {
     [TestFixture]
+    public class ContentNotificationsElementDefaultTests : ContentNotificationsElementTests
+    {
+        protected override bool TestingDefaults
+        {
+            get { return true; }
+        }
+
+        public override void DisableHtmlEmail()
+        {
+            Assert.IsTrue(Section.Content.Notifications.DisableHtmlEmail == false);
+        }
+    }
+
+    [TestFixture]
     public class ContentNotificationsElementTests : UmbracoSettingsTests
     {
         [Test]
@@ -11,9 +25,9 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(Section.Content.Notifications.EmailAddress == "robot@umbraco.dk");
         }
         [Test]
-        public void DisableHtmlEmail()
+        public virtual void DisableHtmlEmail()
         {
-            Assert.IsTrue(Section.Content.Notifications.DisableHtmlEmail == false);
+            Assert.IsTrue(Section.Content.Notifications.DisableHtmlEmail == true);
         }
     }
 }

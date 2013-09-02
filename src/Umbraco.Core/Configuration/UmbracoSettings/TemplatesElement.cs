@@ -7,16 +7,28 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("useAspNetMasterPages")]
         internal InnerTextConfigurationElement<bool> UseAspNetMasterPages
         {
-            get { return (InnerTextConfigurationElement<bool>)this["useAspNetMasterPages"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                    (InnerTextConfigurationElement<bool>)this["useAspNetMasterPages"],
+                    //set the default
+                    true);
+            }
         }
 
         [ConfigurationProperty("enableSkinSupport")]
         internal InnerTextConfigurationElement<bool> EnableSkinSupport
         {
-            get { return (InnerTextConfigurationElement<bool>)this["enableSkinSupport"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                    (InnerTextConfigurationElement<bool>)this["enableSkinSupport"],
+                    //set the default
+                    true);
+            }
         }
 
-        [ConfigurationProperty("defaultRenderingEngine")]
+        [ConfigurationProperty("defaultRenderingEngine", IsRequired = true)]
         internal InnerTextConfigurationElement<RenderingEngine> DefaultRenderingEngine
         {
             get { return (InnerTextConfigurationElement<RenderingEngine>)this["defaultRenderingEngine"]; }

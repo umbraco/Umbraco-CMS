@@ -3,6 +3,16 @@ using Umbraco.Core;
 
 namespace Umbraco.Tests.Configurations.UmbracoSettings
 {
+
+    [TestFixture]
+    public class TemplateElementDefaultTests : TemplateElementTests
+    {
+        protected override bool TestingDefaults
+        {
+            get { return true; }
+        }
+    }
+
     [TestFixture]
     public class TemplateElementTests : UmbracoSettingsTests
     {
@@ -10,6 +20,11 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         public void UseAspNetMasterPages()
         {
             Assert.IsTrue(Section.Templates.UseAspNetMasterPages == true);
+        }
+        [Test]
+        public void EnableSkinSupport()
+        {
+            Assert.IsTrue(Section.Templates.EnableSkinSupport);
         }
         [Test]
         public void DefaultRenderingEngine()

@@ -4,6 +4,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class LoggingElement : ConfigurationElement
     {
+        
         [ConfigurationProperty("autoCleanLogs")]
         internal InnerTextConfigurationElement<bool> AutoCleanLogs
         {
@@ -19,13 +20,25 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("enableLogging")]
         internal InnerTextConfigurationElement<bool> EnableLogging
         {
-            get { return (InnerTextConfigurationElement<bool>)this["enableLogging"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                    (InnerTextConfigurationElement<bool>)this["enableLogging"],
+                    //set the default
+                    true);            
+            }
         }
 
         [ConfigurationProperty("enableAsyncLogging")]
         internal InnerTextConfigurationElement<bool> EnableAsyncLogging
         {
-            get { return (InnerTextConfigurationElement<bool>)this["enableAsyncLogging"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                    (InnerTextConfigurationElement<bool>)this["enableAsyncLogging"],
+                    //set the default
+                    true);           
+            }
         }
 
         [ConfigurationProperty("cleaningMiliseconds")]
@@ -59,10 +72,25 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (DisabledLogTypesCollection)base["disabledLogTypes"]; }
         }
 
-        [ConfigurationProperty("externalLogger")]
+        [ConfigurationProperty("externalLogger", IsRequired = false)]
         internal ExternalLoggerElement ExternalLogger
         {
-            get { return (ExternalLoggerElement)this["externalLogger"]; }
+            get { return (ExternalLoggerElement) base["externalLogger"]; }
         }
+
+        internal bool ExternalLoggerIsConfigured
+        {
+            get
+            {
+                var externalLoggerProperty = Properties["externalLogger"];
+                var externalLogger = this[externalLoggerProperty] as ConfigurationElement;
+                if (externalLogger != null && externalLogger.ElementInformation.IsPresent)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
     }
 }

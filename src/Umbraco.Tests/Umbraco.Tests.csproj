@@ -222,7 +222,6 @@
     <Compile Include="Configurations\UmbracoSettings\UmbracoSettingsTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ViewstateMoverModuleElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\WebServicesElementTests.cs" />
     <Compile Include="Controllers\WebApiEditors\EnsureUserPermissionForContentAttributeTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
     <Compile Include="Integration\CreateContent.cs" />

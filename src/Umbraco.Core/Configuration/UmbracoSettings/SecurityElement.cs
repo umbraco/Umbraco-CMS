@@ -7,13 +7,25 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("keepUserLoggedIn")]
         internal InnerTextConfigurationElement<bool> KeepUserLoggedIn
         {
-            get { return (InnerTextConfigurationElement<bool>)this["keepUserLoggedIn"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                    (InnerTextConfigurationElement<bool>)this["keepUserLoggedIn"],
+                    //set the default
+                    true);   
+            }
         }
 
         [ConfigurationProperty("hideDisabledUsersInBackoffice")]
         internal InnerTextConfigurationElement<bool> HideDisabledUsersInBackoffice
         {
-            get { return (InnerTextConfigurationElement<bool>)this["hideDisabledUsersInBackoffice"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                    (InnerTextConfigurationElement<bool>)this["hideDisabledUsersInBackoffice"],
+                    //set the default
+                    false);                          
+            }
         }
 
         [ConfigurationProperty("authCookieName")]

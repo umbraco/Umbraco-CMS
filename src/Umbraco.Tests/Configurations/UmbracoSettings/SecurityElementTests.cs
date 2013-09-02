@@ -3,6 +3,15 @@
 namespace Umbraco.Tests.Configurations.UmbracoSettings
 {
     [TestFixture]
+    public class SecurityElementDefaultTests : SecurityElementTests
+    {
+        protected override bool TestingDefaults
+        {
+            get { return true; }
+        }
+    }
+
+    [TestFixture]
     public class SecurityElementTests : UmbracoSettingsTests
     {
         [Test]
