@@ -129,7 +129,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1041, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1041", SortOrder = 2, UniqueId = new Guid("b6b73142-b9c1-4bf8-a16d-e1c23320b549"), Text = "Tags", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1042, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1042", SortOrder = 2, UniqueId = new Guid("0a452bd5-83f9-4bc3-8403-1286e13fb77e"), Text = "Macro Container", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1043, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1043", SortOrder = 2, UniqueId = new Guid("1df9f033-e6d4-451f-b8d2-e0cbc50a836f"), Text = "Image Cropper", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
-            _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1044, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1044", SortOrder = 2, UniqueId = new Guid("7e062c13-7c41-4ad9-b389-41d88aeef87c"), Text = "Multi-Node TreePicker", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
+            _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1030, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1030", SortOrder = 2, UniqueId = new Guid("7e062c13-7c41-4ad9-b389-41d88aeef87c"), Text = "Multi-Node TreePicker", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
         }
 
         private void CreateCmsContentTypeData()
@@ -242,7 +242,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 22, DataTypeId = 1041, ControlId = new Guid(Constants.PropertyEditors.Tags), DbType = "Ntext" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 23, DataTypeId = 1042, ControlId = new Guid(Constants.PropertyEditors.MacroContainer), DbType = "Ntext" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 24, DataTypeId = 1043, ControlId = new Guid(Constants.PropertyEditors.ImageCropper), DbType = "Ntext" });
-            _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 25, DataTypeId = 1044, ControlId = new Guid(Constants.PropertyEditors.MultiNodeTreePicker), DbType = "Ntext" });
+            _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 25, DataTypeId = 1030, ControlId = new Guid(Constants.PropertyEditors.MultiNodeTreePicker), DbType = "Ntext" });
         }
 
         private void CreateCmsDataTypePreValuesData()
@@ -250,19 +250,19 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 3, Alias = "", SortOrder = 0, DataTypeNodeId = -87, Value = ",code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,|1|1,2,3,|0|500,400|1049,|true|" });
             _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 4, Alias = "group", SortOrder = 0, DataTypeNodeId = 1041, Value = "default" });
             //MNTP Prevalues
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 5, Alias = "", SortOrder = 0, DataTypeNodeId = 1044, Value = "content" });
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 6, Alias = "", SortOrder = 0, DataTypeNodeId = 1044, Value = "" });
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 7, Alias = "", SortOrder = 0, DataTypeNodeId = 1044, Value = "-1" });
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 8, Alias = "", SortOrder = 0, DataTypeNodeId = 1044, Value = "True" });
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 9, Alias = "", SortOrder = 0, DataTypeNodeId = 1044, Value = "1" });
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 10, Alias = "", SortOrder = 0, DataTypeNodeId = 1044, Value = "0" });
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 11, Alias = "", SortOrder = 0, DataTypeNodeId = 1044, Value = "-1" });
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 12, Alias = "", SortOrder = 0, DataTypeNodeId = 1044, Value = "False" });
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 13, Alias = "", SortOrder = 0, DataTypeNodeId = 1044, Value = "0" });
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 14, Alias = "", SortOrder = 0, DataTypeNodeId = 1044, Value = "-1" });
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 15, Alias = "", SortOrder = 0, DataTypeNodeId = 1044, Value = "" });
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 16, Alias = "", SortOrder = 0, DataTypeNodeId = 1044, Value = "250" });
-            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 17, Alias = "", SortOrder = 0, DataTypeNodeId = 1044, Value = "0" });
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 5, Alias = "", SortOrder = 0, DataTypeNodeId = 1030, Value = "content" });
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 6, Alias = "", SortOrder = 0, DataTypeNodeId = 1030, Value = "" });
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 7, Alias = "", SortOrder = 0, DataTypeNodeId = 1030, Value = "-1" });
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 8, Alias = "", SortOrder = 0, DataTypeNodeId = 1030, Value = "True" });
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 9, Alias = "", SortOrder = 0, DataTypeNodeId = 1030, Value = "1" });
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 10, Alias = "", SortOrder = 0, DataTypeNodeId = 1030, Value = "0" });
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 11, Alias = "", SortOrder = 0, DataTypeNodeId = 1030, Value = "-1" });
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 12, Alias = "", SortOrder = 0, DataTypeNodeId = 1030, Value = "False" });
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 13, Alias = "", SortOrder = 0, DataTypeNodeId = 1030, Value = "0" });
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 14, Alias = "", SortOrder = 0, DataTypeNodeId = 1030, Value = "-1" });
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 15, Alias = "", SortOrder = 0, DataTypeNodeId = 1030, Value = "" });
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 16, Alias = "", SortOrder = 0, DataTypeNodeId = 1030, Value = "250" });
+            _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 17, Alias = "", SortOrder = 0, DataTypeNodeId = 1030, Value = "0" });
             //Media Picker Advanced Settings
             _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = 18, Alias = "", SortOrder = 0, DataTypeNodeId = 1035, Value = "True|True" });
         }
