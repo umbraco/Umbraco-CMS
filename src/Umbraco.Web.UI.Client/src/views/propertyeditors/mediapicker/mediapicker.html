@@ -4,7 +4,7 @@
 		<div class="umb-image-mask">
 				<i class="icon-screenshot"></i>
 				<i class="icon-circle"></i>
-			<img ng-src="{{currentImage.src}}" style="max-width: 600px; max-height: 400px" alt="">
+				<img ng-src="{{currentImage.src}}" style="max-width: 600px; max-height: 400px" alt="">
 		</div>
 
 		<div class="umb-image-controls clearfix">
@@ -13,6 +13,14 @@
 			<i class="icon icon-plus"></i> 
 		</div>
 	</div>
+
+	<ul ng-show="currentImage" class="thumbnails umb-crop-preview">
+		<li class="umb-thumbnail"  ng-repeat="crop in config.crops">
+			<a href="#">
+				<img src="/media/dummy/crop-preview-horizontal.png" alt="">
+			</a>
+		</li>
+	</ul>
 
 
 	<ul class="thumbnails umb-crop-preview">

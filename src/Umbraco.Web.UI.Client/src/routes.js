@@ -8,7 +8,7 @@ app.config(function ($routeProvider) {
                 }
 
                 rp.url = "dashboard.aspx?app=" + rp.section;
-                return 'views/common/legacy.html';
+                return 'views/common/dashboard.html';
             }
         })
         .when('/framed/:url', {

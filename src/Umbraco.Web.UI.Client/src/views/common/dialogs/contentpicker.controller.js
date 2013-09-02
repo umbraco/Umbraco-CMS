@@ -4,12 +4,10 @@ angular.module("umbraco").controller("Umbraco.Dialogs.ContentPickerController",
 	var dialogOptions = $scope.$parent.dialogOptions;
 	$scope.dialogTreeEventHandler = $({});
 
-	$log.log($scope);
-
 	$scope.dialogTreeEventHandler.bind("treeNodeSelect", function(ev, args){
 		args.event.preventDefault();
 		args.event.stopPropagation();
-		
+
 
 		eventsService.publish("Umbraco.Dialogs.ContentPickerController.Select", args, "hello").then(function(args){
 			if(dialogOptions && dialogOptions.multipicker){
