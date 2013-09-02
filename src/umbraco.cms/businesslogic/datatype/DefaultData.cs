@@ -65,6 +65,17 @@ namespace umbraco.cms.businesslogic.datatype
         /// <param name="strDbType"></param>
         void IDataValueSetter.SetValue(object val, string strDbType)
         {
+            //We need to ensure that val is not a null value, if it is then we'll convert this to an empty string.
+            //The reason for this is because by default the DefaultData.Value property returns an empty string when 
+            // there is no value, this is based on the PropertyDataDto.GetValue return value which defaults to an 
+            // empty string (which is called from this class's method LoadValueFromDatabase). 
+            //Some legacy implementations of DefaultData are expecting an empty string when there is 
+            // no value so we need to keep this consistent.
+            if (val == null)
+            {
+                val = string.Empty;
+            }
+
             _value = val;
             //now that we've set our value, we can update our BaseDataType object with the correct values from the db
             //instead of making it query for itself. This is a peformance optimization enhancement.

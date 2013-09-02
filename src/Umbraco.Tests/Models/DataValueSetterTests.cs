@@ -66,6 +66,7 @@ namespace Umbraco.Tests.Models
             var dataTypeId = Guid.NewGuid();
             
             var dataTypeData = MockRepository.GenerateMock<IData, IDataValueSetter>();
+            
             dataTypeData
                 .Stub(data => data.ToXMl(Arg<XmlDocument>.Is.Anything))
                 .Return(null) // you have to call Return() even though we're about to override it
@@ -96,6 +97,19 @@ namespace Umbraco.Tests.Models
             // Assert
 
             ((IDataValueSetter)dataTypeData).AssertWasCalled(setter => setter.SetValue("Hello world", DataTypeDatabaseType.Nvarchar.ToString()));
+        }
+
+        [TestCase(DataTypeDatabaseType.Nvarchar)]
+        [TestCase(DataTypeDatabaseType.Date)]
+        [TestCase(DataTypeDatabaseType.Integer)]
+        [TestCase(DataTypeDatabaseType.Ntext)]
+        public void DefaultData_SetValue_Ensures_Empty_String_When_Null_Value_Any_Data_Type(DataTypeDatabaseType type)
+        {
+            var defaultData = new DefaultData(MockRepository.GenerateMock<BaseDataType>());
+
+            ((IDataValueSetter)defaultData).SetValue(null, type.ToString());
+
+            Assert.AreEqual(string.Empty, defaultData.Value);
         }
 
     }

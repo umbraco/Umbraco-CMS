@@ -302,23 +302,31 @@ namespace Umbraco.Web
                     typeof(DefaultUrlProvider)
                 );
 
-            // the legacy 404 will run from within ContentFinderByNotFoundHandlers below
-            // so for the time being there is no last chance finder
-			ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver();
+            ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver(
+                // handled by ContentLastChanceFinderByNotFoundHandlers for the time being
+                // soon as we get rid of INotFoundHandler support, we must enable this
+                //new ContentFinderByLegacy404()
+
+                // implement INotFoundHandler support... remove once we get rid of it
+                new ContentLastChanceFinderByNotFoundHandlers());
 
 			ContentFinderResolver.Current = new ContentFinderResolver(
-				// add all known resolvers in the correct order, devs can then modify this list
-                // on application startup either by binding to events or in their own global.asax
-						typeof (ContentFinderByPageIdQuery),
-						typeof (ContentFinderByNiceUrl),
-						typeof (ContentFinderByIdPath),
-                        // these will be handled by ContentFinderByNotFoundHandlers
-                        // so they can be enabled/disabled even though resolvers are not public yet
-						//typeof (ContentFinderByNiceUrlAndTemplate),
-						//typeof (ContentFinderByProfile),
-						//typeof (ContentFinderByUrlAlias),
-                        typeof (ContentFinderByNotFoundHandlers)
-					);
+                // all built-in finders in the correct order, devs can then modify this list
+                // on application startup via an application event handler.
+                typeof (ContentFinderByPageIdQuery),
+                typeof (ContentFinderByNiceUrl),
+                typeof (ContentFinderByIdPath),
+
+                // these will be handled by ContentFinderByNotFoundHandlers so they can be enabled/disabled
+                // via the config file... soon as we get rid of INotFoundHandler support, we must enable
+                // them here.
+                //typeof (ContentFinderByNiceUrlAndTemplate),
+                //typeof (ContentFinderByProfile),
+                //typeof (ContentFinderByUrlAlias),
+
+                // implement INotFoundHandler support... remove once we get rid of it
+                typeof (ContentFinderByNotFoundHandlers)
+			);
 
             SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
 
