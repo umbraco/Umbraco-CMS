@@ -31,14 +31,20 @@ angular.module("umbraco")
 
                                     var imagePropVal = imageHelper.getImagePropertyVaue({imageModel: img, scope: $scope});
                                     var data = {
-                                        style: 'width: 400px; height: 300px;',
                                         src: (imagePropVal != null && imagePropVal != "") ? imagePropVal: "nothing.jpg",
                                         id: '__mcenew'
                                     };
                                         
                                         editor.insertContent(editor.dom.createHTML('img', data));
                                         var imgElm = editor.dom.get('__mcenew');
+                                        var size = editor.dom.getSize(imgElm);
+
+                                        var newSize = imageHelper.scaleToMaxSize(500, size.w, size.h);
+                                        var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
+                                        editor.dom.setAttrib(imgElm, 'style', s);
+                                        editor.dom.setAttrib(imgElm, 'rel', newSize.width + "," + newSize.height);
                                         editor.dom.setAttrib(imgElm, 'id', null);
+
                                 });    
                                    
 
