@@ -1,0 +1,31 @@
+<div class="umb-panel" ng-controller="Umbraco.Dialogs.IconPickerController">
+	<div class="umb-panel-header">
+
+		<div class="umb-el-wrap umb-panel-buttons">
+			<div class="span6">
+	                <div class="form-search">
+	                    <i class="icon-search"></i>
+	                    <input type="text" 
+	                           ng-model="searchTerm" 
+	                           class="umb-search-field search-query" 
+	                           placeholder="Filter...">
+	                </div>
+	        </div>
+		</div>
+	</div>
+
+	<div class="umb-panel-body umb-scrollable" auto-scale="0">
+        
+        <div class="umb-control-group">
+	        <ul class="thumbnails">
+		        <li class="span1" ng-repeat="icon in icons|filter: searchTerm">
+				    <a href="#" title="{{icon}}" class="thumbnail" ng-click="submit(icon)" prevent-default>
+						<i class="{{icon}}" style="font-size: 32px"></i>
+		            </a>
+		        </li>
+		    </ul>
+		</div>
+	</div>
+</div>
+
+</form>
