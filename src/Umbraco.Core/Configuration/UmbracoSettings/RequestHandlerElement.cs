@@ -7,13 +7,25 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("useDomainPrefixes")]
         internal InnerTextConfigurationElement<bool> UseDomainPrefixes
         {
-            get { return (InnerTextConfigurationElement<bool>)this["useDomainPrefixes"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                    (InnerTextConfigurationElement<bool>)this["useDomainPrefixes"],
+                    //set the default
+                    false);  
+            }
         }
 
         [ConfigurationProperty("addTrailingSlash")]
         internal InnerTextConfigurationElement<bool> AddTrailingSlash
         {
-            get { return (InnerTextConfigurationElement<bool>)this["addTrailingSlash"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                    (InnerTextConfigurationElement<bool>)this["addTrailingSlash"],
+                    //set the default
+                    true);  
+            }
         }
 
         [ConfigurationProperty("urlReplacing")]

@@ -11,9 +11,9 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(Section.Content.Notifications.EmailAddress == "robot@umbraco.dk");
         }
         [Test]
-        public void DisableHtmlEmail()
+        public virtual void DisableHtmlEmail()
         {
-            Assert.IsTrue(Section.Content.Notifications.DisableHtmlEmail == false);
+            Assert.IsTrue(Section.Content.Notifications.DisableHtmlEmail == true);
         }
     }
 }

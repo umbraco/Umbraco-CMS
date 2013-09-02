@@ -7,7 +7,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
     public class ScheduledTasksElementTests : UmbracoSettingsTests
     {
         [Test]
-        public void Tasks()
+        public virtual void Tasks()
         {
             Assert.IsTrue(Section.ScheduledTasks.Tasks.Count == 2);
             Assert.IsTrue(Section.ScheduledTasks.Tasks.ElementAt(0).Alias == "test60");

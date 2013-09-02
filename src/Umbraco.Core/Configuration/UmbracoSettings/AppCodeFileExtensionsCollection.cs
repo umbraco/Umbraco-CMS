@@ -5,6 +5,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class AppCodeFileExtensionsCollection : ConfigurationElementCollection, IEnumerable<FileExtensionElement>
     {
+        internal void Add(FileExtensionElement element)
+        {
+            base.BaseAdd(element);
+        }
+
         protected override ConfigurationElement CreateNewElement()
         {
             return new FileExtensionElement();

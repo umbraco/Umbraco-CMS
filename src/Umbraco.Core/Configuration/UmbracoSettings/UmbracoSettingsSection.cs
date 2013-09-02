@@ -67,13 +67,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return (DistributedCallElement)this["distributedCall"]; }
         }
-
-        [ConfigurationProperty("webservices")]
-        internal WebServicesElement WebServices
-        {
-            get { return (WebServicesElement)this["webservices"]; }
-        }
-
+        
         [ConfigurationProperty("repositories")]
         internal RepositoriesElement PackageRepositories
         {
@@ -103,6 +97,26 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return (ScriptingElement)this["scripting"]; }
         }
+
+        ///// <summary>
+        ///// This ensures that any element that is not defined will get replaced with a Null value
+        ///// </summary>
+        ///// <remarks>
+        ///// This is a work around because setting defaultValue on the attribute to null doesn't work.
+        ///// </remarks>
+        //protected override void PostDeserialize()
+        //{
+        //    //ensure externalLogger is null when it is not defined
+        //    var loggingProperty = Properties["logging"];
+        //    var logging = this[loggingProperty] as ConfigurationElement;
+        //    if (logging != null && logging.ElementInformation.IsPresent == false)
+        //    {
+        //        this[loggingProperty] = new ;
+        //    }
+
+
+        //    base.PostDeserialize();
+        //}
 
     }
 }

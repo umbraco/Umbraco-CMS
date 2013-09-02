@@ -5,6 +5,22 @@ using NUnit.Framework;
 namespace Umbraco.Tests.Configurations.UmbracoSettings
 {
     [TestFixture]
+    public class ScriptingElementDefaultTests : ScriptingElementTests
+    {
+        protected override bool TestingDefaults
+        {
+            get { return true; }
+        }
+
+        [Test]
+        public override void DataTypeModelStaticMappings()
+        {
+            Assert.AreEqual(0, Section.Scripting.Razor.DataTypeModelStaticMappings.Count);
+        }
+
+    }
+
+    [TestFixture]
     public class ScriptingElementTests : UmbracoSettingsTests
     {
         [Test]
@@ -15,7 +31,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         }
 
         [Test]
-        public void DataTypeModelStaticMappings()
+        public virtual void DataTypeModelStaticMappings()
         {
             var mappings = Section.Scripting.Razor.DataTypeModelStaticMappings.ToArray();
             Assert.IsTrue(mappings[0].DataTypeGuid == Guid.Parse("A3DB4034-BCB0-4E69-B3EE-DD4E6ECA74C2"));

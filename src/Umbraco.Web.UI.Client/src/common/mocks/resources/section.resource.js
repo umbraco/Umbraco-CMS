@@ -14,11 +14,11 @@ function sectionMocks($httpBackend, mocksUtils) {
         }
 
         var sections = [
-            { name: "Content", cssclass: "traycontent", alias: "content" },
-            { name: "Media", cssclass: "traymedia", alias: "media" },
-            { name: "Settings", cssclass: "traysettings", alias: "settings" },
-            { name: "Developer", cssclass: "traydeveloper", alias: "developer" },
-            { name: "Users", cssclass: "trayuser", alias: "users" }
+            { name: "Content", cssclass: "icon-umb-content", alias: "content" },
+            { name: "Media", cssclass: "icon-umb-media", alias: "media" },
+            { name: "Settings", cssclass: "icon-umb-settings", alias: "settings" },
+            { name: "Developer", cssclass: "icon-umb-developer", alias: "developer" },
+            { name: "Users", cssclass: "icon-umb-users", alias: "users" }
         ];
         
         return [200, sections, null];

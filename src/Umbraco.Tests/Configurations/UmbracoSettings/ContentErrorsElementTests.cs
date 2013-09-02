@@ -7,7 +7,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
     public class ContentErrorsElementTests : UmbracoSettingsTests
     {
         [Test]
-        public void Can_Set_Multiple()
+        public virtual void Can_Set_Multiple()
         {
             Assert.IsTrue(Section.Content.Errors.Error404Collection.Count == 3);
             Assert.IsTrue(Section.Content.Errors.Error404Collection.ElementAt(0).Culture == "default");

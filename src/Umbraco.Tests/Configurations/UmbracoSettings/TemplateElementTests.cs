@@ -12,6 +12,11 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(Section.Templates.UseAspNetMasterPages == true);
         }
         [Test]
+        public void EnableSkinSupport()
+        {
+            Assert.IsTrue(Section.Templates.EnableSkinSupport);
+        }
+        [Test]
         public void DefaultRenderingEngine()
         {        
             Assert.IsTrue(Section.Templates.DefaultRenderingEngine == RenderingEngine.Mvc);

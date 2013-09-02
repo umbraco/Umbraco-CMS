@@ -4,7 +4,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class UrlReplacingElement : ConfigurationElement
     {
-        [ConfigurationProperty("removeDoubleDashes")]
+        [ConfigurationProperty("removeDoubleDashes", DefaultValue = true)]
         internal bool RemoveDoubleDashes
         {
             get { return (bool) base["removeDoubleDashes"]; }
