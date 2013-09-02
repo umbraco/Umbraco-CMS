@@ -25,6 +25,7 @@ namespace umbraco.cms.presentation
     /// <summary>
     /// Summary description for login.
     /// </summary>
+    [Obsolete("This class is no longer used and will be removed")]
     public partial class login : BasePages.BasePage
     {
         [Obsolete("This property is no longer used")]

@@ -14,6 +14,10 @@ using System.Linq;
 
 namespace umbraco
 {
+
+    //TODO: There's no app checking security in here which means that any authorized user can query for all content and all media 
+    // with all information exposed even when they don't have access to content or media.
+
     /// <summary>
     /// Summary description for webService.
     /// </summary>

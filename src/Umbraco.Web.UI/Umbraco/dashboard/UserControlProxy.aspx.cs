@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
-namespace Umbraco.Web.UI.Dashboard
+
+namespace Umbraco.Web.UI.Umbraco.Dashboard
 {
     public partial class UserControlProxy : Pages.UmbracoEnsuredPage
     {
@@ -20,13 +17,13 @@ namespace Umbraco.Web.UI.Dashboard
             base.OnInit(e);
 
             var path = Request.QueryString["ctrl"];
-            if (!string.IsNullOrEmpty(path))
+            if (string.IsNullOrEmpty(path) == false)
             {
                 path = IOHelper.FindFile(path);
 
                 try
                 {
-                    Control c = LoadControl(path);
+                    var c = LoadControl(path);
                     container.Controls.Add(c);
                 }
                 catch (Exception ee)

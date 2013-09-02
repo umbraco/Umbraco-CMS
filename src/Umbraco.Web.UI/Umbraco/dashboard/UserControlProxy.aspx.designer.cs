@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Umbraco.Web.UI.Dashboard {
+namespace Umbraco.Web.UI.Umbraco.Dashboard {
     
     
     public partial class UserControlProxy {

@@ -56,7 +56,7 @@ namespace Umbraco.Web.Editors
                     foreach (XmlNode entry in dashboard.SelectNodes("./tab"))
                     {
 
-                        if (validateAccess(entry, user))
+                        if (ValidateAccess(entry, user))
                         {
                             i++;
 
@@ -69,7 +69,7 @@ namespace Umbraco.Web.Editors
 
                             foreach (XmlNode uc in entry.SelectNodes("./control"))
                             {
-                                if (validateAccess(uc, user))
+                                if (ValidateAccess(uc, user))
                                 {
                                     Control ctrl = new Control();
                                     
@@ -138,7 +138,7 @@ namespace Umbraco.Web.Editors
 
         //TODO: This has to go away, jesus
         //for now I'm just returning true, this is likely to change anyway
-        private bool validateAccess(XmlNode node, IUser currentUser)
+        private bool ValidateAccess(XmlNode node, IUser currentUser)
         {
             return true;
     
