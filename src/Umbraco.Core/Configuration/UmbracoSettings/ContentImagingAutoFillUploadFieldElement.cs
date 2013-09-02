@@ -4,10 +4,14 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class ContentImagingAutoFillUploadFieldElement : ConfigurationElement
     {
+        /// <summary>
+        /// Allow setting internally so we can create a default
+        /// </summary>
         [ConfigurationProperty("alias", IsKey = true, IsRequired = true)]
         internal string Alias
         {
             get { return (string)this["alias"]; }
+            set { this["alias"] = value; }
         }
 
         [ConfigurationProperty("widthFieldAlias")]

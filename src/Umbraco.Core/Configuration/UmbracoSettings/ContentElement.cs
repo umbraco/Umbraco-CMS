@@ -52,13 +52,13 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        [ConfigurationProperty("errors")]
+        [ConfigurationProperty("errors", IsRequired = true)]
         public ContentErrorsElement Errors
         {
-            get { return (ContentErrorsElement)base["errors"]; }
+            get { return (ContentErrorsElement) base["errors"]; }
         }
 
-        [ConfigurationProperty("notifications")]
+        [ConfigurationProperty("notifications", IsRequired = true)]
         public NotificationsElement Notifications
         {
             get { return (NotificationsElement)base["notifications"]; }

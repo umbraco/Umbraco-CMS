@@ -9,6 +9,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         public AppCodeFileExtensionsCollection AppCodeFileExtensionsCollection
         {
             get { return (AppCodeFileExtensionsCollection)base[""]; }
+            set { base[""] = value; }
         }
     }
 }
