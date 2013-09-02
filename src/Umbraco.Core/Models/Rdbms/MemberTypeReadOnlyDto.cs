@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Models.Rdbms
@@ -66,8 +67,12 @@ namespace Umbraco.Core.Models.Rdbms
 
         /* PropertyTypes */
         //TODO Add PropertyTypeDto (+MemberTypeDto and DataTypeDto as one) ReadOnly list
+        [ResultColumn]
+        public List<PropertyTypeReadOnlyDto> PropertyTypes { get; set; }
 
         /* PropertyTypeGroups */
         //TODO Add PropertyTypeGroupDto ReadOnly list
+        [ResultColumn]
+        public List<PropertyTypeGroupReadOnlyDto> PropertyTypeGroups { get; set; }
     }
 }

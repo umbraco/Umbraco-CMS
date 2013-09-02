@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -27,19 +29,56 @@ namespace Umbraco.Core.Persistence.Repositories
 
          #region Overrides of RepositoryBase<int, IMemberType>
 
-         protected override IMemberType PerformGet(int id)
+        protected override IMemberType PerformGet(int id)
         {
-            throw new NotImplementedException();
+            var sql = GetBaseQuery(false);
+            sql.Where(GetBaseWhereClause(), new { Id = id });
+            sql.OrderByDescending<NodeDto>(x => x.NodeId);
+
+            var dtos =
+                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
+                    new PropertyTypePropertyGroupRelator().Map, sql);
+
+             if (dtos == null || dtos.Any() == false)
+                 return null;
+
+             var factory = new MemberTypeReadOnlyFactory();
+             var member = factory.BuildEntity(dtos.First());
+
+             return member;
         }
 
         protected override IEnumerable<IMemberType> PerformGetAll(params int[] ids)
         {
-            throw new NotImplementedException();
+            var sql = GetBaseQuery(false);
+            if (ids.Any())
+            {
+                var statement = string.Join(" OR ", ids.Select(x => string.Format("umbracoNode.id='{0}'", x)));
+                sql.Where(statement);
+            }
+            sql.OrderByDescending<NodeDto>(x => x.NodeId);
+
+            var dtos =
+                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
+                    new PropertyTypePropertyGroupRelator().Map, sql);
+
+            return BuildFromDtos(dtos);
         }
 
         protected override IEnumerable<IMemberType> PerformGetByQuery(IQuery<IMemberType> query)
         {
-            throw new NotImplementedException();
+            var sqlSubquery = GetSubquery();
+            var translator = new SqlTranslator<IMemberType>(sqlSubquery, query);
+            var subquery = translator.Translate();
+            var sql = GetBaseQuery(false)
+                .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
+                .OrderBy<NodeDto>(x => x.SortOrder);
+
+            var dtos =
+                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
+                    new PropertyTypePropertyGroupRelator().Map, sql);
+
+            return BuildFromDtos(dtos);
         }
 
         #endregion
@@ -59,12 +98,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 return sql;
             }
 
-            sql.Select("umbracoNode.*", "cmsContentType.*", "cmsPropertyType.Alias", "cmsPropertyType.Name", 
-                "cmsPropertyType.Description", "cmsPropertyType.helpText", "cmsPropertyType.mandatory",
-                "cmsPropertyType.validationRegExp", "cmsPropertyType.dataTypeId", "cmsPropertyType.sortOrder",
+            sql.Select("umbracoNode.*", "cmsContentType.*", "cmsPropertyType.id AS PropertyTypeId", "cmsPropertyType.Alias", 
+                "cmsPropertyType.Name", "cmsPropertyType.Description", "cmsPropertyType.helpText", "cmsPropertyType.mandatory",
+                "cmsPropertyType.validationRegExp", "cmsPropertyType.dataTypeId", "cmsPropertyType.sortOrder AS PropertyTypeSortOrder",
                 "cmsPropertyType.propertyTypeGroupId", "cmsMemberType.memberCanEdit", "cmsMemberType.viewOnProfile",
-                "cmsDataType.controlId", "cmsDataType.dbType", "cmsPropertyTypeGroup.text AS PropertyGroupName", 
-                "cmsPropertyTypeGroup.parentGroupId", "cmsPropertyTypeGroup.sortorder AS PropertyGroupSortOrder")
+                "cmsDataType.controlId", "cmsDataType.dbType", "cmsPropertyTypeGroup.id AS PropertyTypeGroupId", 
+                "cmsPropertyTypeGroup.text AS PropertyGroupName", "cmsPropertyTypeGroup.parentGroupId", 
+                "cmsPropertyTypeGroup.sortorder AS PropertyGroupSortOrder")
                 .From<NodeDto>()
                 .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                 .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, NodeDto>(left => left.ContentTypeId, right => right.NodeId)
@@ -127,6 +167,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((MemberType)entity).AddingEntity();
 
+            //By Convention we add 9 stnd PropertyTypes to an Umbraco MemberType
+            var standardPropertyTypes = Constants.Conventions.Member.StandardPropertyTypeStubs;
+            foreach (var standardPropertyType in standardPropertyTypes)
+            {
+                entity.AddPropertyType(standardPropertyType.Value);
+            }
+
             var factory = new MemberTypeFactory(NodeObjectTypeId);
             var dto = factory.BuildDto(entity);
 
@@ -179,5 +226,14 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
+
+        private IEnumerable<IMemberType> BuildFromDtos(List<MemberTypeReadOnlyDto> dtos)
+        {
+            if (dtos == null || dtos.Any() == false)
+                return Enumerable.Empty<IMemberType>();
+
+            var factory = new MemberTypeReadOnlyFactory();
+            return dtos.Select(factory.BuildEntity);
+        }
     }
 }

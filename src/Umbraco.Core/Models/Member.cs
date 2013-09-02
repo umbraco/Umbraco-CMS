@@ -398,6 +398,18 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Method to call when Entity is being saved
+        /// </summary>
+        /// <remarks>Created date is set and a Unique key is assigned</remarks>
+        internal override void AddingEntity()
+        {
+            base.AddingEntity();
+
+            if (Key == Guid.Empty)
+                Key = Guid.NewGuid();
+        }
+
+        /// <summary>
         /// Gets the ContentType used by this content object
         /// </summary>
         [IgnoreDataMember]
@@ -408,7 +420,7 @@ namespace Umbraco.Core.Models
 
         public override void ChangeTrashedState(bool isTrashed, int parentId = -20)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Members can't be trashed as no Recycle Bin exists, so use of this method is invalid");
         }
 
         /* Internal experiment - only used for mapping queries. 

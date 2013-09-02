@@ -40,16 +40,22 @@ namespace Umbraco.Core.Persistence.Factories
         public IEnumerable<MemberTypeDto> BuildMemberTypeDtos(IMemberType entity)
         {
             var memberType = entity as MemberType;
-            if (memberType == null || memberType.MemberTypePropertyTypes.Any() == false)
+            if (memberType == null ||  memberType.PropertyTypes.Any() == false)
                 return Enumerable.Empty<MemberTypeDto>();
 
-            return memberType.MemberTypePropertyTypes.Select(propertyType => new MemberTypeDto
-                                                                             {
-                                                                                 NodeId = entity.Id, 
-                                                                                 CanEdit = propertyType.Value.Item1, 
-                                                                                 ViewOnProfile = propertyType.Value.Item2, 
-                                                                                 PropertyTypeId = propertyType.Value.Item3
-                                                                             }).ToList();
+            var memberTypes = new List<MemberTypeDto>();
+            foreach (var propertyType in memberType.PropertyTypes)
+            {
+                memberTypes.Add(new MemberTypeDto
+                                {
+                                    NodeId = entity.Id,
+                                    PropertyTypeId = propertyType.Id,
+                                    CanEdit = memberType.MemberCanEditProperty(propertyType.Alias),
+                                    ViewOnProfile = memberType.MemberCanViewProperty(propertyType.Alias)
+                                });
+            }
+
+            return memberTypes;
         }
 
         private NodeDto BuildNodeDto(IMemberType entity)
@@ -69,6 +75,20 @@ namespace Umbraco.Core.Persistence.Factories
                                   UserId = entity.CreatorId
                               };
             return nodeDto;
+        }
+
+        private int DeterminePropertyTypeId(int initialId, string alias, IEnumerable<PropertyType> propertyTypes)
+        {
+            if (initialId == 0 || initialId == default(int))
+            {
+                var propertyType = propertyTypes.SingleOrDefault(x => x.Alias.Equals(alias));
+                if (propertyType == null)
+                    return default(int);
+
+                return propertyType.Id;
+            }
+
+            return initialId;
         }
     }
 }

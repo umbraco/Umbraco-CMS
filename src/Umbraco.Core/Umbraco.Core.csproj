@@ -211,6 +211,8 @@
     <Compile Include="Models\Rdbms\MemberReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\MemberTypeReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\PropertyDataReadOnlyDto.cs" />
+    <Compile Include="Models\Rdbms\PropertyTypeGroupReadOnlyDto.cs" />
+    <Compile Include="Models\Rdbms\PropertyTypeReadOnlyDto.cs" />
     <Compile Include="Models\ServerRegistration.cs" />
     <Compile Include="Models\ITemplate.cs" />
     <Compile Include="Models\Language.cs" />
@@ -485,6 +487,7 @@
     <Compile Include="Persistence\Querying\SqlTranslator.cs" />
     <Compile Include="Persistence\Relators\DictionaryLanguageTextRelator.cs" />
     <Compile Include="Persistence\Relators\PropertyDataRelator.cs" />
+    <Compile Include="Persistence\Relators\PropertyTypePropertyGroupRelator.cs" />
     <Compile Include="Persistence\Relators\UserSectionRelator.cs" />
     <Compile Include="Persistence\Repositories\ContentRepository.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeBaseRepository.cs" />
