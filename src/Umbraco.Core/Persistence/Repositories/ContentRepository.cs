@@ -361,7 +361,6 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //Look up (newest) entries by id in cmsDocument table to set newest = false
-            //NOTE: This is only relevant when a new version is created, which is why its done inside this if-statement.
             var documentDtos = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND newest = @IsNewest", new { Id = entity.Id, IsNewest = true });
             foreach (var documentDto in documentDtos)
             {
