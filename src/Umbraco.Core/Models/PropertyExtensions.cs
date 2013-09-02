@@ -43,7 +43,7 @@ namespace Umbraco.Core.Models
             //This seems to fail during testing 
             //SD: With the new null checks below, this shouldn't fail anymore.
             var dt = property.PropertyType.DataType(property.Id, dataTypeService);
-            if (dt != null && dt.Data != null && dt.Data.Value != null)
+            if (dt != null && dt.Data != null)
             {
                 //We've already got the value for the property so we're going to give it to the 
                 // data type's data property so it doesn't go re-look up the value from the db again.
