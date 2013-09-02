@@ -84,3 +84,4 @@ src/*.psess
 NDependOut/*
 *.ndproj
 QueryResult.htm
+*.ndproj
