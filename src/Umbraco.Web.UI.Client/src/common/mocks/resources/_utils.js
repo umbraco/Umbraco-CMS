@@ -48,7 +48,7 @@ angular.module('umbraco.mocks').
                     createDate: new Date().toIsoDateTimeString(),
                     id: id,
                     parentId: 1234,
-                    icon: "icon-file-alt",
+                    icon: "icon-umb-content",
                     owner: { name: "Administrator", id: 0 },
                     updater: { name: "Per Ploug Krogslund", id: 1 },
 
