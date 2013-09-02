@@ -126,6 +126,37 @@ function imageHelper() {
             }
             return "";
         },
+
+        scaleToMaxSize: function(maxSize, width, height){
+            var retval = {width: width, height: height};
+
+            var maxWidth = maxSize; // Max width for the image
+            var maxHeight = maxSize;    // Max height for the image
+            var ratio = 0;  // Used for aspect ratio
+           
+            // Check if the current width is larger than the max
+            if(width > maxWidth){
+                ratio = maxWidth / width;   // get ratio for scaling image
+                
+                retval.width = maxWidth;
+                retval.height = height * ratio;
+
+                height = height * ratio;    // Reset height to match scaled image
+                width = width * ratio;    // Reset width to match scaled image
+            }
+
+            // Check if current height is larger than max
+            if(height > maxHeight){
+                ratio = maxHeight / height; // get ratio for scaling image
+
+                retval.height = maxHeight;
+                retval.width = width * ratio;
+                width = width * ratio;    // Reset width to match scaled image
+            }
+
+            return retval;
+        },
+
         getThumbnailFromPath: function(imagePath) {
             var ext = imagePath.substr(imagePath.lastIndexOf('.'));
             return imagePath.substr(0, imagePath.lastIndexOf('.')) + "_thumb" + ".jpg";
@@ -353,6 +384,31 @@ function iconHelper() {
             }
             return false;
         },
+
+        /** Return a list of icons, optionally filter them */
+        /** It fetches them directly from the active stylesheet in the browser */
+        getIcons: function(filter){
+
+            var classes = document.styleSheets[0].rules || document.styleSheets[0].cssRules;
+            var result = [];
+            var f = filter || "";
+            var c = ".icon-" + f;
+
+            for(var x=0;x<classes.length;x++) {
+                var cur = classes[x];
+                if(cur.selectorText && cur.selectorText.indexOf(c) === 0 && cur.selectorText.indexOf("before") > 0 && cur.selectorText.indexOf(",") < 0) {
+                    var s = cur.selectorText;
+                    s = cur.selectorText.substring(1, s.indexOf(":"));
+                    
+                    if(result.indexOf(s) < 0){
+                        result.push(s);   
+                    }
+                }
+            }
+
+            return result;
+        },
+
         /** Converts the icon from legacy to a new one if an old one is detected */
         convertFromLegacyIcon: function (icon) {
             if (this.isLegacyIcon(icon)) {
