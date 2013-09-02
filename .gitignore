@@ -81,3 +81,6 @@ build/_BuildOutput/
 tools/NDepend/
 src/*.vspx
 src/*.psess
+NDependOut/*
+QueryResult.htm
+*.ndproj

@@ -66,6 +66,8 @@ namespace Umbraco.Tests.Models
             var dataTypeId = Guid.NewGuid();
             
             var dataTypeData = MockRepository.GenerateMock<IData, IDataValueSetter>();
+            //needs to have a value for SetValue to be called
+            dataTypeData.Stub(data => data.Value).Return(string.Empty);
             dataTypeData
                 .Stub(data => data.ToXMl(Arg<XmlDocument>.Is.Anything))
                 .Return(null) // you have to call Return() even though we're about to override it
