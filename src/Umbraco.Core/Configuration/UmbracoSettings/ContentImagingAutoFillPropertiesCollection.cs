@@ -16,6 +16,10 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             return ((ContentImagingAutoFillUploadFieldElement)element).Alias;
         }
         
+        internal void Add(ContentImagingAutoFillUploadFieldElement item)
+        {
+            BaseAdd(item);
+        }
 
         IEnumerator<ContentImagingAutoFillUploadFieldElement> IEnumerable<ContentImagingAutoFillUploadFieldElement>.GetEnumerator()
         {

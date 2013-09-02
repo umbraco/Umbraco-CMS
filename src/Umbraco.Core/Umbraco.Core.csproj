@@ -180,6 +180,7 @@
     <Compile Include="Configuration\UmbracoSettings\NotDynamicXmlDocumentElementCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\NotificationsElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ObjectExtensions.cs" />
+    <Compile Include="Configuration\UmbracoSettings\OptionalCommaDelimitedConfigurationElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\OptionalInnerTextConfigurationElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ProvidersElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RawXmlConfigurationElement.cs" />

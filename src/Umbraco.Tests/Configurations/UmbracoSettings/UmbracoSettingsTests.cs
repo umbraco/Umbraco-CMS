@@ -8,16 +8,30 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
 {
     public abstract class UmbracoSettingsTests
     {
-        //TODO: Need to test defaults after all this is done.
+        
+        protected virtual bool TestingDefaults
+        {
+            get { return false; }
+        }
 
         [SetUp]
         public void Init()
         {
             var config = new FileInfo(TestHelper.MapPathForTest("~/Configurations/UmbracoSettings/web.config"));
-
+            
             var fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = config.FullName };
             var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
-            Section = configuration.GetSection("umbracoConfiguration/settings") as UmbracoSettingsSection;
+
+            if (TestingDefaults)
+            {
+                Section = configuration.GetSection("umbracoConfiguration/defaultSettings") as UmbracoSettingsSection;
+            }
+            else
+            {
+                Section = configuration.GetSection("umbracoConfiguration/settings") as UmbracoSettingsSection;    
+            }
+
+            
 
             Assert.IsNotNull(Section);
         }

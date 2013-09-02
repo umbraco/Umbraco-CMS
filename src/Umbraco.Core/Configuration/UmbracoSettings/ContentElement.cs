@@ -43,7 +43,13 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("UploadAllowDirectories")]
         internal InnerTextConfigurationElement<bool> UploadAllowDirectories
         {
-            get { return (InnerTextConfigurationElement<bool>)this["UploadAllowDirectories"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                       (InnerTextConfigurationElement<bool>)this["UploadAllowDirectories"],
+                    //set the default
+                       true);
+            }
         }
 
         [ConfigurationProperty("errors")]
@@ -61,13 +67,25 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("ensureUniqueNaming")]
         public InnerTextConfigurationElement<bool> EnsureUniqueNaming
         {
-            get { return (InnerTextConfigurationElement<bool>)base["ensureUniqueNaming"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                      (InnerTextConfigurationElement<bool>)this["ensureUniqueNaming"],
+                    //set the default
+                      true);
+            }
         }
 
         [ConfigurationProperty("TidyEditorContent")]
         public InnerTextConfigurationElement<bool> TidyEditorContent
         {
-            get { return (InnerTextConfigurationElement<bool>)base["TidyEditorContent"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                      (InnerTextConfigurationElement<bool>)this["TidyEditorContent"],
+                    //set the default
+                      false);
+            }
         }
 
         [ConfigurationProperty("TidyCharEncoding")]
@@ -78,80 +96,155 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 return new OptionalInnerTextConfigurationElement<string>(
                           (InnerTextConfigurationElement<string>)this["TidyCharEncoding"],
                             //set the default
-                          "Raw");
+                          "UTF8");
             }
         }
 
         [ConfigurationProperty("XmlCacheEnabled")]
         public InnerTextConfigurationElement<bool> XmlCacheEnabled
         {
-            get { return (InnerTextConfigurationElement<bool>)base["XmlCacheEnabled"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                          (InnerTextConfigurationElement<bool>)this["XmlCacheEnabled"],
+                    //set the default
+                          true);
+            }
         }
 
         [ConfigurationProperty("ContinouslyUpdateXmlDiskCache")]
         public InnerTextConfigurationElement<bool> ContinouslyUpdateXmlDiskCache
         {
-            get { return (InnerTextConfigurationElement<bool>)base["ContinouslyUpdateXmlDiskCache"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                          (InnerTextConfigurationElement<bool>)this["ContinouslyUpdateXmlDiskCache"],
+                    //set the default
+                          true);                
+            }
         }
 
         [ConfigurationProperty("XmlContentCheckForDiskChanges")]
         public InnerTextConfigurationElement<bool> XmlContentCheckForDiskChanges
         {
-            get { return (InnerTextConfigurationElement<bool>)base["XmlContentCheckForDiskChanges"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                          (InnerTextConfigurationElement<bool>)this["XmlContentCheckForDiskChanges"],
+                    //set the default
+                          false); 
+            }
         }
 
         [ConfigurationProperty("EnableSplashWhileLoading")]
         public InnerTextConfigurationElement<bool> EnableSplashWhileLoading
         {
-            get { return (InnerTextConfigurationElement<bool>)base["EnableSplashWhileLoading"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                          (InnerTextConfigurationElement<bool>)this["EnableSplashWhileLoading"],
+                    //set the default
+                          false); 
+            }
         }
 
         [ConfigurationProperty("PropertyContextHelpOption")]
         public InnerTextConfigurationElement<string> PropertyContextHelpOption
         {
-            get { return (InnerTextConfigurationElement<string>)base["PropertyContextHelpOption"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<string>(
+                          (InnerTextConfigurationElement<string>)this["PropertyContextHelpOption"],
+                    //set the default
+                          "text"); 
+            }
         }
 
         [ConfigurationProperty("UseLegacyXmlSchema")]
         public InnerTextConfigurationElement<bool> UseLegacyXmlSchema
         {
-            get { return (InnerTextConfigurationElement<bool>)base["UseLegacyXmlSchema"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                          (InnerTextConfigurationElement<bool>)this["UseLegacyXmlSchema"],
+                    //set the default
+                          false); 
+            }
         }
         
         [ConfigurationProperty("ForceSafeAliases")]
         public InnerTextConfigurationElement<bool> ForceSafeAliases
         {
-            get { return (InnerTextConfigurationElement<bool>)base["ForceSafeAliases"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                          (InnerTextConfigurationElement<bool>)this["ForceSafeAliases"],
+                    //set the default
+                          true); 
+            }
         }
 
         [ConfigurationProperty("PreviewBadge")]
         public InnerTextConfigurationElement<string> PreviewBadge
         {
-            get { return (InnerTextConfigurationElement<string>)base["PreviewBadge"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<string>(
+                          (InnerTextConfigurationElement<string>)this["PreviewBadge"],
+                    //set the default
+                          @"<a id=""umbracoPreviewBadge"" style=""position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px; background: url('{1}/preview/previewModeBadge.png') no-repeat;"" href=""{0}/endPreview.aspx?redir={2}""><span style=""display:none;"">In Preview Mode - click to end</span></a>"); 
+            }
         }
 
         [ConfigurationProperty("UmbracoLibraryCacheDuration")]
         public InnerTextConfigurationElement<int> UmbracoLibraryCacheDuration
         {
-            get { return (InnerTextConfigurationElement<int>)base["UmbracoLibraryCacheDuration"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<int>(
+                          (InnerTextConfigurationElement<int>)this["UmbracoLibraryCacheDuration"],
+                    //set the default
+                          1800); 
+                
+            }
         }
 
         [ConfigurationProperty("MacroErrors")]
-        public InnerTextConfigurationElement<string> MacroErrors
+        public InnerTextConfigurationElement<MacroErrorBehaviour> MacroErrors
         {
-            get { return (InnerTextConfigurationElement<string>)base["MacroErrors"]; }
+            get
+            {
+
+                return new OptionalInnerTextConfigurationElement<MacroErrorBehaviour>(
+                          (InnerTextConfigurationElement<MacroErrorBehaviour>)this["MacroErrors"],
+                    //set the default
+                          MacroErrorBehaviour.Inline); 
+            }
         }
 
         [ConfigurationProperty("DocumentTypeIconList")]
         public InnerTextConfigurationElement<IconPickerBehaviour> DocumentTypeIconList
         {
-            get { return (InnerTextConfigurationElement<IconPickerBehaviour>)base["DocumentTypeIconList"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<IconPickerBehaviour>(
+                          (InnerTextConfigurationElement<IconPickerBehaviour>)this["DocumentTypeIconList"],
+                    //set the default
+                          IconPickerBehaviour.HideFileDuplicates);
+            }
         }
 
         [ConfigurationProperty("disallowedUploadFiles")]
-        public CommaDelimitedConfigurationElement DisallowedUploadFiles
+        public OptionalCommaDelimitedConfigurationElement DisallowedUploadFiles
         {
-            get { return (CommaDelimitedConfigurationElement)base["disallowedUploadFiles"]; }
+            get
+            {
+                return new OptionalCommaDelimitedConfigurationElement(
+                       (CommaDelimitedConfigurationElement)this["disallowedUploadFiles"],
+                    //set the default
+                       new[] { "ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd" });
+
+            }
         }
 
         [ConfigurationProperty("cloneXmlContent")]

@@ -4,7 +4,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class ContentImagingAutoFillUploadFieldElement : ConfigurationElement
     {
-        [ConfigurationProperty("alias", IsKey = true)]
+        [ConfigurationProperty("alias", IsKey = true, IsRequired = true)]
         internal string Alias
         {
             get { return (string)this["alias"]; }
@@ -13,25 +13,49 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("widthFieldAlias")]
         internal InnerTextConfigurationElement<string> WidthFieldAlias
         {
-            get { return (InnerTextConfigurationElement<string>)this["widthFieldAlias"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<string>(
+                       (InnerTextConfigurationElement<string>)this["widthFieldAlias"],
+                    //set the default
+                       "umbracoWidth");
+            }
         }
 
         [ConfigurationProperty("heightFieldAlias")]
         internal InnerTextConfigurationElement<string> HeightFieldAlias
         {
-            get { return (InnerTextConfigurationElement<string>)this["heightFieldAlias"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<string>(
+                       (InnerTextConfigurationElement<string>)this["heightFieldAlias"],
+                    //set the default
+                       "umbracoHeight");
+            }
         }
 
         [ConfigurationProperty("lengthFieldAlias")]
         internal InnerTextConfigurationElement<string> LengthFieldAlias
         {
-            get { return (InnerTextConfigurationElement<string>)this["lengthFieldAlias"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<string>(
+                       (InnerTextConfigurationElement<string>)this["lengthFieldAlias"],
+                    //set the default
+                       "umbracoBytes");
+            }
         }
 
         [ConfigurationProperty("extensionFieldAlias")]
         internal InnerTextConfigurationElement<string> ExtensionFieldAlias
         {
-            get { return (InnerTextConfigurationElement<string>)this["extensionFieldAlias"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<string>(
+                       (InnerTextConfigurationElement<string>)this["extensionFieldAlias"],
+                    //set the default
+                       "umbracoExtension");
+            }
         }
     }
 }

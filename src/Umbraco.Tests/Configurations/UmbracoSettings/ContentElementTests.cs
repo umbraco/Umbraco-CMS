@@ -9,10 +9,29 @@ using Umbraco.Core;
 namespace Umbraco.Tests.Configurations.UmbracoSettings
 {
     [TestFixture]
+    public class ContentElementDefaultTests : ContentElementTests
+    {
+        protected override bool TestingDefaults
+        {
+            get { return true; }
+        }
+
+        public override void TidyCharEncoding()
+        {
+            Assert.IsTrue(Section.Content.TidyCharEncoding == "UTF8");
+        }
+
+        public override void XmlContentCheckForDiskChanges()
+        {
+            Assert.IsTrue(Section.Content.XmlContentCheckForDiskChanges == false);
+        }
+    }
+
+    [TestFixture]
     public class ContentElementTests : UmbracoSettingsTests
     {
         [Test]
-        public void ScriptFolderPath()
+        public void UploadAllowDirectories()
         {
             Assert.IsTrue(Section.Content.UploadAllowDirectories == true);
         }
@@ -42,7 +61,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(Section.Content.TidyEditorContent == false);
         }
         [Test]
-        public void TidyCharEncoding()
+        public virtual void TidyCharEncoding()
         {
             Assert.IsTrue(Section.Content.TidyCharEncoding == "Raw");
         }
@@ -67,7 +86,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(Section.Content.ContinouslyUpdateXmlDiskCache == true);
         }
         [Test]
-        public void XmlContentCheckForDiskChanges()
+        public virtual void XmlContentCheckForDiskChanges()
         {
             Assert.IsTrue(Section.Content.XmlContentCheckForDiskChanges == true);
         }
@@ -104,7 +123,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void MacroErrors()
         {
-            Assert.IsTrue(Section.Content.MacroErrors == "inline");
+            Assert.IsTrue(Section.Content.MacroErrors == MacroErrorBehaviour.Inline);
         }
         [Test]
         public void DocumentTypeIconList()

@@ -7,19 +7,37 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("scriptFolderPath")]
         internal InnerTextConfigurationElement<string> ScriptFolderPath
         {
-            get { return (InnerTextConfigurationElement<string>)this["scriptFolderPath"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<string>(
+                       (InnerTextConfigurationElement<string>)this["scriptFolderPath"],
+                    //set the default
+                       "/scripts");
+            }
         }
 
         [ConfigurationProperty("scriptFileTypes")]
-        internal CommaDelimitedConfigurationElement ScriptFileTypes
+        internal OptionalCommaDelimitedConfigurationElement ScriptFileTypes
         {
-            get { return (CommaDelimitedConfigurationElement)this["scriptFileTypes"]; }
+            get
+            {
+                return new OptionalCommaDelimitedConfigurationElement(
+                       (OptionalCommaDelimitedConfigurationElement)this["scriptFileTypes"],
+                    //set the default
+                       new[] { "js", "xml" });                
+            }
         }
 
         [ConfigurationProperty("scriptDisableEditor")]
         internal InnerTextConfigurationElement<bool> DisableScriptEditor
         {
-            get { return (InnerTextConfigurationElement<bool>)this["scriptDisableEditor"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                    (InnerTextConfigurationElement<bool>) this["scriptDisableEditor"],
+                    //set the default
+                    false);
+            }
         }
     }
 }
