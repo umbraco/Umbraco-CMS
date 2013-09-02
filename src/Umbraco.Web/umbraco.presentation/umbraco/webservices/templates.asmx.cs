@@ -89,13 +89,24 @@ namespace umbraco.webservices
 	    {
             //NOTE: The legacy code threw an exception so will continue to do that.
 	        AuthorizeRequest(DefaultApps.settings.ToString(), true);
-            
-	        var templateFile = 
-                System.IO.File.OpenText(IOHelper.MapPath(SystemDirectories.Umbraco + "/scripting/templates/cshtml/" + templateId));
-            var content = templateFile.ReadToEnd();
-            templateFile.Close();
 
-            return content;
+	        var snippetPath = SystemDirectories.Umbraco + "/scripting/templates/cshtml/";
+	        var filePath = IOHelper.MapPath(snippetPath + templateId);
+
+            //Directory check.. only allow files in script dir and below to be edited
+            if (filePath.StartsWith(IOHelper.MapPath(snippetPath)))
+            {
+                var templateFile =
+                    System.IO.File.OpenText(filePath);
+                var content = templateFile.ReadToEnd();
+                templateFile.Close();
+                return content;
+            }
+            else
+            {
+                throw new ArgumentException("Couldn't open snippet - Illegal path");
+                
+            }
         }
 		
 	}
