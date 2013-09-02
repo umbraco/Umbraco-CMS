@@ -1,8 +1,9 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Dialogs.MediaPickerController",
-        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, imageHelper) {
+        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, imageHelper, eventsService) {
 
+            var dialogOptions = $scope.$parent.dialogOptions;
             $scope.options = {
                 url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
                 autoUpload: true,
@@ -61,7 +62,14 @@ angular.module("umbraco")
                     $scope.gotoFolder(image.id);
                 }
                 else if (image.contentTypeAlias.toLowerCase() == 'image') {
-                    $scope.select(image);
+
+                    eventsService.publish("Umbraco.Dialogs.MediaPickerController.Select", image).then(function(image){
+                        if(dialogOptions && dialogOptions.multipicker){
+                            $scope.select(image);
+                        }else{
+                            $scope.submit(image);                  
+                        }
+                    });
                 }
             };
 
