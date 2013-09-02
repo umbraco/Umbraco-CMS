@@ -50,24 +50,28 @@
 
             <!-- Search results -->
             <div id="search-results" class="umb-panel fill" ng-show="nav.ui.showSearchResults" ng-animate="'slide'">
-                <h5>Search results</h5>
 
-                <ul class="searchResults" ng-repeat="resultGroup in nav.ui.searchResults">
+                <h5 class="umb-tree-header">Search results</h5>
+                <ul class="umb-item-list" ng-repeat="resultGroup in nav.ui.searchResults">
                     <li class="umb-icon-item" ng-class="{selected:$index==nav.ui.selectedSearchResult}" ng-repeat="result in resultGroup.matches">
                         <i class="icon umb-tree-icon sprTree {{result.icon}}" ng-show="$first"></i>
                         <a ng-href="#{{result.view}}">{{result.name}}
                                     <small>{{result.path}}</small>
                         </a>
+
                         <i class="umb-options" ng-click="nav.showMenu(result, $event)"><i></i><i></i><i></i></i>
                     </li>
+
                 </ul>
+
             </div>
             
 
             <!-- the tree -->
             <div id="tree" class="umb-panel fill" ng-animate="'slide'">
                 <umb-tree eventhandler="treeEventHandler" section="{{nav.ui.currentSection}}" ></umb-tree>
-            </div>        
+            </div>
+
         </div>
 
         <div class="offset6">

@@ -1,4 +1,4 @@
-angular.module("umbraco")
+angular.module("umbraco.packages")
 .controller("My.MarkdownEditorController",
 //inject umbracos assetsServce and dialog service
 function ($scope, assetsService, dialogService, $log, imageHelper) {
