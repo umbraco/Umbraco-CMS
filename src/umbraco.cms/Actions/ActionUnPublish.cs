@@ -68,7 +68,7 @@ namespace umbraco.BusinessLogic.Actions
 		{
 			get
 			{
-                return "remove";
+                return "circle-dotted";
 			}
 		}
 

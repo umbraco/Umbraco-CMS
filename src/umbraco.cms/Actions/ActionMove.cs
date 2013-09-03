@@ -69,7 +69,7 @@ namespace umbraco.BusinessLogic.Actions
 			get
 			{
 
-                return "move";
+                return "enter";
 			}
 		}
 

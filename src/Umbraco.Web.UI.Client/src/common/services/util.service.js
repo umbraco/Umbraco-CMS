@@ -293,7 +293,7 @@ function iconHelper() {
         { oldIcon: ".sprTreeDoc4", newIcon: "icon-file-text-alt" },
         { oldIcon: ".sprTreeDoc5", newIcon: "icon-book" },        
         { oldIcon: ".sprTreeDocPic", newIcon: "icon-picture" },        
-        { oldIcon: ".sprTreeFolder", newIcon: "icon-folder-close" },
+        { oldIcon: ".sprTreeFolder", newIcon: "icon-folder" },
         { oldIcon: ".sprTreeFolder_o", newIcon: "icon-folder-open" },
         { oldIcon: ".sprTreeMediaFile", newIcon: "icon-music" },
         { oldIcon: ".sprTreeMediaMovie", newIcon: "icon-movie" },
@@ -332,17 +332,7 @@ function iconHelper() {
         { oldIcon: ".sprTreeDeveloperCacheTypes", newIcon: "icon-box" },
         { oldIcon: ".sprTreeDeveloperMacro", newIcon: "icon-cogs" },
         { oldIcon: ".sprTreeDeveloperRegistry", newIcon: "icon-windows" },
-        { oldIcon: ".sprTreeDeveloperPython", newIcon: "icon-linux" },
-        
-        
-        //tray icons
-        { oldIcon: ".traycontent", newIcon: "traycontent" },
-        { oldIcon: ".traymedia", newIcon: "traymedia" },
-        { oldIcon: ".traysettings", newIcon: "traysettings" },
-        { oldIcon: ".traydeveloper", newIcon: "traydeveloper" },
-        { oldIcon: ".trayusers", newIcon: "trayusers" },
-        { oldIcon: ".traymember", newIcon: "traymember" },
-        { oldIcon: ".traytranslation", newIcon: "traytranslation" }
+        { oldIcon: ".sprTreeDeveloperPython", newIcon: "icon-linux" }
     ];
 
     return {
@@ -361,7 +351,12 @@ function iconHelper() {
             }
             return contentTypes;
         },
-
+        formatContentTypeIcons: function (contentTypes) {
+            for (var i = 0; i < contentTypes.length; i++) {
+                contentTypes[i].icon = this.convertFromLegacyIcon(contentTypes[i].icon);
+            }
+            return contentTypes;
+        },
         /** If the icon is file based (i.e. it has a file path) */
         isFileBasedIcon: function (icon) {
             //if it doesn't start with a '.' but contains one then we'll assume it's file based
