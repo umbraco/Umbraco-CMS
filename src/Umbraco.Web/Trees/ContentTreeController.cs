@@ -119,7 +119,7 @@ namespace Umbraco.Web.Trees
             int iid;
             if (int.TryParse(id, out iid) == false)
             {
-                throw new InvalidOperationException("The Id for a content item must be an integer");
+                throw new HttpResponseException(HttpStatusCode.NotFound);
             }
             var item = Services.EntityService.Get(iid, UmbracoObjectTypes.Document);
             if (item == null)
@@ -128,7 +128,7 @@ namespace Umbraco.Web.Trees
             }
 
             return GetUserAllowedMenuItems(
-                CreateAllowedActions(), 
+                CreateAllowedActions(item), 
                 GetUserMenuItemsForNode(item));
         }
 
@@ -137,23 +137,27 @@ namespace Umbraco.Web.Trees
             get { return UmbracoObjectTypes.Document; }
         }
 
-        protected IEnumerable<MenuItem> CreateAllowedActions()
+        protected IEnumerable<MenuItem> CreateAllowedActions(IUmbracoEntity item)
         {
             var menu = new MenuItemCollection();
             menu.AddMenuItem<ActionNew>();
             menu.AddMenuItem<ActionDelete>(true);
-            menu.AddMenuItem<ActionMove>(true);
-            menu.AddMenuItem<ActionCopy>();
+            
+            //need to ensure some of these are converted to the legacy system - until we upgrade them all to be angularized.
+            menu.AddMenuItem<ActionMove>(true).ConvertLegacyMenuItem(item, "content", "content");
+            menu.AddMenuItem<ActionCopy>().ConvertLegacyMenuItem(item, "content", "content");
+            
             menu.AddMenuItem<ActionSort>(true);
-            menu.AddMenuItem<ActionRollback>();
-            menu.AddMenuItem<ActionPublish>(true);
-            menu.AddMenuItem<ActionToPublish>();
-            menu.AddMenuItem<ActionAssignDomain>();
-            menu.AddMenuItem<ActionRights>();
-            menu.AddMenuItem<ActionProtect>(true);
-            menu.AddMenuItem<ActionUnPublish>(true);
-            menu.AddMenuItem<ActionNotify>(true);
-            menu.AddMenuItem<ActionSendToTranslate>();
+
+            menu.AddMenuItem<ActionRollback>().ConvertLegacyMenuItem(item, "content", "content");
+            menu.AddMenuItem<ActionPublish>(true).ConvertLegacyMenuItem(item, "content", "content");
+            menu.AddMenuItem<ActionToPublish>().ConvertLegacyMenuItem(item, "content", "content");
+            menu.AddMenuItem<ActionAssignDomain>().ConvertLegacyMenuItem(item, "content", "content");
+            menu.AddMenuItem<ActionRights>().ConvertLegacyMenuItem(item, "content", "content");
+            menu.AddMenuItem<ActionProtect>(true).ConvertLegacyMenuItem(item, "content", "content");
+            menu.AddMenuItem<ActionUnPublish>(true).ConvertLegacyMenuItem(item, "content", "content");
+            menu.AddMenuItem<ActionNotify>(true).ConvertLegacyMenuItem(item, "content", "content");
+            menu.AddMenuItem<ActionSendToTranslate>().ConvertLegacyMenuItem(item, "content", "content");
 
             menu.AddMenuItem<RefreshNode, ActionRefresh>(true);
 

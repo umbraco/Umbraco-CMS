@@ -1,5 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Net;
 using System.Net.Http.Formatting;
+using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -51,9 +54,19 @@ namespace Umbraco.Web.Trees
                 return menu;
             }
 
+            int iid;
+            if (int.TryParse(id, out iid) == false)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            var item = Services.EntityService.Get(iid, UmbracoObjectTypes.Media);
+            if (item == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
             //return a normal node menu:
             menu.AddMenuItem<ActionNew>();
-            menu.AddMenuItem<ActionMove>();
+            menu.AddMenuItem<ActionMove>().ConvertLegacyMenuItem(item, "media", "media");
             menu.AddMenuItem<ActionDelete>();
             menu.AddMenuItem<ActionSort>();
             menu.AddMenuItem<ActionRefresh>(true);

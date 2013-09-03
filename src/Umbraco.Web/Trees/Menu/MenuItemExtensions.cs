@@ -1,4 +1,8 @@
-﻿namespace Umbraco.Web.Trees.Menu
+﻿using Umbraco.Core;
+using Umbraco.Core.Models.EntityBase;
+using umbraco;
+
+namespace Umbraco.Web.Trees.Menu
 {
     public static class MenuItemExtensions
     {
@@ -55,6 +59,19 @@
         {
             menuItem.AdditionalData[ActionUrlKey] = url;
             menuItem.AdditionalData[ActionUrlMethodKey] = url;
+        }
+
+        internal static void ConvertLegacyMenuItem(this MenuItem menuItem, IUmbracoEntity item, string nodeType, string currentSection)
+        {
+            //First try to get a URL/title from the legacy action,
+            // if that doesn't work, try to get the legacy confirm view
+            Attempt<LegacyTreeDataConverter.LegacyUrlAction>
+                .Try(LegacyTreeDataConverter.GetUrlAndTitleFromLegacyAction(menuItem.Action, item.Id.ToInvariantString(), nodeType, item.Name, currentSection),
+                     action => menuItem.LaunchDialogUrl(action.Url, action.DialogTitle))
+                .IfFailed(() => LegacyTreeDataConverter.GetLegacyConfirmView(menuItem.Action, currentSection),
+                          view => menuItem.LaunchDialogView(
+                              view,
+                              ui.GetText("defaultdialogs", "confirmdelete") + " '" + item.Name + "' ?"));
         }
     }
 }
