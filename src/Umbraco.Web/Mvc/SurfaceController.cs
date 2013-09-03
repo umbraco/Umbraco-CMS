@@ -12,6 +12,7 @@ namespace Umbraco.Web.Mvc
     /// The base controller that all Presentation Add-in controllers should inherit from
     /// </summary>
     [MergeModelStateToChildAction]
+    [MergeParentContextViewData]
     public abstract class SurfaceController : PluginController
     {
 

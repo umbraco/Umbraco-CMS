@@ -13,6 +13,7 @@ namespace Umbraco.Web.Models
             {
                 //TODO Use new Member API
                 var member = Member.GetCurrentMember();
+
                 if (member != null)
                 {
                     this.Name = member.Text;
@@ -22,16 +23,9 @@ namespace Umbraco.Web.Models
                     this.MemberProperties = new List<UmbracoProperty>();
 
                     var memberType = MemberType.GetByAlias(member.ContentType.Alias);
-                    var memberTypeProperties = memberType.PropertyTypes.ToList();
 
-                    if (memberTypeProperties.Where(memberType.MemberCanEdit).Any())
+                    foreach (var prop in memberType.PropertyTypes.Where(memberType.MemberCanEdit))
                     {
-                        memberTypeProperties = memberTypeProperties.Where(memberType.MemberCanEdit).ToList();
-                    }
-
-                    foreach (var prop in memberTypeProperties)
-                    {
-
                         var value = string.Empty;
                         var propValue = member.getProperty(prop.Alias);
                         if (propValue != null)

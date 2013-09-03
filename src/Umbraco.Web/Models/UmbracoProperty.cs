@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web
+﻿namespace Umbraco.Web.Models
 {
     public class UmbracoProperty
     {

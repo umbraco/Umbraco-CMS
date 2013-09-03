@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.UI;
 using Umbraco.Core.IO;
 using Umbraco.Web.UI.Install.Steps.Skinning;
 using Umbraco.Web.UI.Pages;
@@ -24,9 +21,9 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
 
         private void ShowStarterKits()
         {
-            if (Directory.Exists(this.Server.MapPath(SystemDirectories.Install)) == false)
+            if (Directory.Exists(Server.MapPath(SystemDirectories.Install)) == false)
             {
-                this.InstallationDirectoryNotAvailable.Visible = true;
+                InstallationDirectoryNotAvailable.Visible = true;
                 StarterKitNotInstalled.Visible = false;
                 StarterKitInstalled.Visible = false;
             
@@ -41,7 +38,6 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
 
             StarterKitNotInstalled.Visible = true;
             StarterKitInstalled.Visible = false;
-            InstallationDirectoryNotAvailable.Visible = true;
 
         }
 

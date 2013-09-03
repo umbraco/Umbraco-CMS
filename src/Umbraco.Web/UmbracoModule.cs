@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Principal;
@@ -527,10 +528,34 @@ namespace Umbraco.Web
         /// <param name="http"></param>
         private static void DisposeHttpContextItems(HttpContext http)
         {
+            //get a list of keys to dispose
+            var keys = new HashSet<object>();            
             foreach (DictionaryEntry i in http.Items)
             {
-                ObjectExtensions.DisposeIfDisposable(i.Value);
-                ObjectExtensions.DisposeIfDisposable(i.Key);
+                if (i.Value is IDisposable || i.Key is IDisposable)
+                {
+                    keys.Add(i.Key);
+                }
+            }
+            //dispose each item and key that was found as disposable.
+            foreach (var k in keys)
+            {
+                try
+                {
+                    http.Items[k].DisposeIfDisposable();
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<UmbracoModule>("Could not dispose item with key " + k, ex);
+                }
+                try
+                {
+                    k.DisposeIfDisposable();
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<UmbracoModule>("Could not dispose item key " + k, ex);
+                }
             }
         }
 

@@ -21,7 +21,7 @@ namespace Umbraco.Web.UI.Umbraco.Create
 
         private static void LoadTemplates(ListControl list)
         {
-            var path = IOHelper.MapPath(SystemDirectories.Umbraco + "/partialviews/templates/");
+            var path = IOHelper.MapPath(SystemDirectories.Umbraco + "/partialviewmacros/templates/");
             list.Items.Clear();
 
             // always add the option of an empty one

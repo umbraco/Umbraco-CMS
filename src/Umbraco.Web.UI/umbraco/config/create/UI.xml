@@ -344,7 +344,7 @@
 
 	<nodeType alias="partialViews">
 		<header>Macro</header>
-		<usercontrol>/create/simple.ascx</usercontrol>
+    <usercontrol>/Create/PartialView.ascx</usercontrol>
 		<tasks>
 			<create assembly="umbraco" type="PartialViewTasks" />
 			<delete assembly="umbraco" type="PartialViewTasks" />

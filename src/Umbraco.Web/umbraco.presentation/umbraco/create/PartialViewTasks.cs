@@ -73,12 +73,11 @@ namespace umbraco
             return true;
 	    }
 
-	    protected virtual void WriteTemplateHeader(StreamWriter sw)
-		{
-			//write out the template header
-			sw.Write("@inherits ");
-			sw.Write(typeof(UmbracoViewPage<>).FullName.TrimEnd("`1"));
-			sw.Write("<dynamic>");
+        protected virtual void WriteTemplateHeader(StreamWriter sw)
+        {
+            //write out the template header
+            sw.Write("@inherits ");
+			sw.Write(typeof(UmbracoTemplatePage).FullName.TrimEnd("`1"));
 		}
 
 	    public override bool PerformDelete()

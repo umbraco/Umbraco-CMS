@@ -240,6 +240,8 @@
     <Compile Include="Models\ContentExtensionsTests.cs" />
     <Compile Include="Models\DataValueSetterTests.cs" />
     <Compile Include="Models\UserExtensionsTests.cs" />
+    <Compile Include="Mvc\MergeParentContextViewDataAttributeTests.cs" />
+    <Compile Include="Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\PetaPocoExtensionsTest.cs" />
     <Compile Include="Persistence\Repositories\MemberRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />

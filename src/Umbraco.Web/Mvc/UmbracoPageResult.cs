@@ -25,27 +25,33 @@ namespace Umbraco.Web.Mvc
 
 			var routeDef = (RouteDefinition)context.RouteData.DataTokens["umbraco-route-def"];
 
+            var targetController = ((Controller)routeDef.Controller);
+		    var sourceController = ((Controller) context.Controller);
+
 			//ensure the original template is reset
 			context.RouteData.Values["action"] = routeDef.ActionName;
 
 			//ensure ModelState is copied across
-			routeDef.Controller.ViewData.ModelState.Merge(context.Controller.ViewData.ModelState);
+            routeDef.Controller.ViewData.ModelState.Merge(sourceController.ViewData.ModelState);
 
 			//ensure TempData and ViewData is copied across
-			foreach (var d in context.Controller.ViewData)
+            foreach (var d in sourceController.ViewData)
 				routeDef.Controller.ViewData[d.Key] = d.Value;
+
 
             //We cannot simply merge the temp data because during controller execution it will attempt to 'load' temp data
             // but since it has not been saved, there will be nothing to load and it will revert to nothing, so the trick is 
             // to Save the state of the temp data first then it will automatically be picked up.
             // http://issues.umbraco.org/issue/U4-1339
-            context.Controller.TempData.Save(context, ((Controller)context.Controller).TempDataProvider);
-    
+            targetController.TempDataProvider = sourceController.TempDataProvider;
+		    targetController.TempData = sourceController.TempData;
+            targetController.TempData.Save(sourceController.ControllerContext, sourceController.TempDataProvider);
+
 			using (DisposableTimer.TraceDuration<UmbracoPageResult>("Executing Umbraco RouteDefinition controller", "Finished"))
 			{
 				try
 				{
-					((IController)routeDef.Controller).Execute(context.RequestContext);
+                    ((IController)targetController).Execute(context.RequestContext);
 				}
 				finally
 				{

@@ -350,6 +350,9 @@
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Models\ProfileModel.cs" />
     <Compile Include="Models\LoginStatusModel.cs" />
+    <Compile Include="Models\UmbracoProperty.cs" />
+    <Compile Include="Mvc\MergeParentContextViewDataAttribute.cs" />
+    <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
     <Compile Include="Routing\ContentLastChanceFinderByNotFoundHandlers.cs" />
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
@@ -537,7 +540,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Controllers\LoginController.cs" />
-    <Compile Include="UmbracoProperty.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="Editors\MediaController.cs" />
     <Compile Include="WebApi\Binders\ContentItemBaseBinder.cs" />

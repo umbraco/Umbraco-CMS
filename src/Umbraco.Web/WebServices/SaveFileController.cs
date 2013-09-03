@@ -8,7 +8,9 @@ using Umbraco.Web.Macros;
 using Umbraco.Web.Mvc;
 using umbraco;
 using umbraco.cms.businesslogic.macro;
+using System.Collections.Generic;
 using Umbraco.Core;
+
 using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace Umbraco.Web.WebServices
@@ -90,15 +92,22 @@ namespace Umbraco.Web.WebServices
 		public JsonResult SaveTemplate(string templateName, string templateAlias, string templateContents, int templateId, int masterTemplateId)
 		{
 			Template t;
+		    bool pathChanged = false;
 			try
 			{
 				t = new Template(templateId)
 						{
 							Text = templateName,
-							Alias = templateAlias,
-							MasterTemplate = masterTemplateId,
+							Alias = templateAlias,							
 							Design = templateContents
 						};
+
+                //check if the master page has changed
+                if (t.MasterTemplate != masterTemplateId)
+                {
+                    pathChanged = true;
+                    t.MasterTemplate = masterTemplateId;
+                }
 			}
 			catch (ArgumentException ex)
 			{
@@ -110,7 +119,17 @@ namespace Umbraco.Web.WebServices
 			{
 				t.Save();
 
-				return Success(ui.Text("speechBubbles", "templateSavedText"), ui.Text("speechBubbles", "templateSavedHeader"));
+                //ensure the correct path is synced as the parent might have been changed
+                // http://issues.umbraco.org/issue/U4-2300                
+                if (pathChanged)
+                {
+                    //need to re-look it up
+                    t = new Template(templateId);
+                }
+                var syncPath = "-1,init," + t.Path.Replace("-1,", "");
+
+			    return Success(ui.Text("speechBubbles", "templateSavedText"), ui.Text("speechBubbles", "templateSavedHeader"), 
+                    new {path = syncPath});
 			}
 			catch (Exception ex)
 			{
@@ -118,20 +137,21 @@ namespace Umbraco.Web.WebServices
 			}
 		}
 
-		/// <summary>
-		/// Returns a successful message
-		/// </summary>
-		/// <param name="message">The message to display in the speach bubble</param>
-		/// <param name="header">The header to display in the speach bubble</param>
-		/// <returns></returns>
-		private JsonResult Success(string message, string header)
-		{
-			return Json(new
-			{
-				success = true,
-				message = message,
-				header = header
-			});
+        /// <summary>
+        /// Returns a successful message
+        /// </summary>
+        /// <param name="message">The message to display in the speach bubble</param>
+        /// <param name="header">The header to display in the speach bubble</param>
+        /// <param name="additionalVals"></param>
+        /// <returns></returns>
+        private JsonResult Success(string message, string header, object additionalVals = null)
+        {
+            var d = additionalVals == null ? new Dictionary<string, object>() : additionalVals.ToDictionary<object>();
+            d["success"] = true;
+            d["message"] = message;
+            d["header"] = header;
+
+			return Json(d);
 		}
 
 		/// <summary>
