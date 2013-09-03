@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -66,15 +67,15 @@ namespace Umbraco.Web.WebApi.Filters
             base.OnActionExecuted(actionExecutedContext);
         }
 
-        protected virtual void FilterItems(IUser user, List<dynamic> items)
+        protected virtual void FilterItems(IUser user, IList items)
         {
             FilterBasedOnStartNode(items, user);
         }
 
-        internal void FilterBasedOnStartNode(List<dynamic> items, IUser user)
+        internal void FilterBasedOnStartNode(IList items, IUser user)
         {
             var toRemove = new List<dynamic>();
-            foreach (var item in items)
+            foreach (dynamic item in items)
             {
                 var hasPathAccess = UserExtensions.HasPathAccess(item.Path, user.StartContentId, Constants.System.RecycleBinContent);
                 if (!hasPathAccess)

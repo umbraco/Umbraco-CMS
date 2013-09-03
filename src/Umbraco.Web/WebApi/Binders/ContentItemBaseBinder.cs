@@ -16,6 +16,7 @@ using System.Web.ModelBinding;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
@@ -54,7 +55,7 @@ namespace Umbraco.Web.WebApi.Binders
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = HttpContext.Current.Server.MapPath("~/App_Data/TEMP/FileUploads");
+            var root = IOHelper.MapPath("~/App_Data/TEMP/FileUploads");
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);

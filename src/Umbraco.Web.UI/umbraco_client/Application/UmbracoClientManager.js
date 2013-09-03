@@ -57,7 +57,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                         || this.mainWindow().jQuery(".umbTree").UmbracoTreeAPI() == null) {
                         //creates a false tree with all the public tree params set to a false method.
                         var tmpTree = {};
-                        var treeProps = ["init", "setRecycleBinNodeId", "clearTreeCache", "toggleEditMode", "refreshTree", "rebuildTree", "saveTreeState", "syncTree", "childNodeCreated", "moveNode", "copyNode", "findNode", "selectNode", "reloadActionNode", "getActionNode", "setActiveTreeType", "getNodeDef"];
+                        var treeProps = ["init", "setRecycleBinNodeId", "clearTreeCache", "toggleEditMode", "refreshTree", "rebuildTree", "saveTreeState", "syncTree", "childNodeCreated", "moveNode", "copyNode", "findNode", "selectNode", "reloadActionNode", "getActionNode", "setActiveTreeType", "getNodeDef", "addEventHandler", "removeEventHandler"];
                         for (var p in treeProps) {
                             tmpTree[treeProps[p]] = function() { return false; };
                         }

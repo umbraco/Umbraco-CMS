@@ -22,6 +22,14 @@ namespace Umbraco.Web.WebApi.Filters
     {
         private readonly int? _nodeId;
         private readonly string _paramName;
+        private DictionarySource _source;
+
+        public enum DictionarySource
+        {
+            ActionArguments,
+            RequestForm,
+            RequestQueryString
+        }
 
         /// <summary>
         /// This constructor will only be able to test the start node access
@@ -34,7 +42,15 @@ namespace Umbraco.Web.WebApi.Filters
         public EnsureUserPermissionForMediaAttribute(string paramName)
         {
             Mandate.ParameterNotNullOrEmpty(paramName, "paramName");
-            _paramName = paramName;            
+            _paramName = paramName;
+            _source = DictionarySource.ActionArguments;            
+        }
+
+        public EnsureUserPermissionForMediaAttribute(string paramName, DictionarySource source)
+        {
+            Mandate.ParameterNotNullOrEmpty(paramName, "paramName");
+            _paramName = paramName;
+            _source = source;  
         }
        
         public override bool AllowMultiple
@@ -93,6 +109,21 @@ namespace Umbraco.Web.WebApi.Filters
             }
             
         }
+
+        //private object GetValueFromSource(HttpActionContext actionContext, string key)
+        //{
+        //    switch (_source)
+        //    {
+        //        case DictionarySource.ActionArguments:
+        //            return actionContext.ActionArguments[key];
+        //        case DictionarySource.RequestForm:
+        //            return actionContext.Request.Properties
+        //        case DictionarySource.RequestQueryString:
+        //            break;
+        //        default:
+        //            throw new ArgumentOutOfRangeException();
+        //    }
+        //}
 
         
 

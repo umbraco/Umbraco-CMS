@@ -26,7 +26,7 @@ namespace Umbraco.Web.Models.Mapping
             
             //FROM IContent TO ContentItemDisplay
             config.CreateMap<IContent, ContentItemDisplay>()
-                  .ForMember(
+                .ForMember(
                       dto => dto.Owner,
                       expression => expression.ResolveUsing<OwnerResolver<IContent>>())
                   .ForMember(

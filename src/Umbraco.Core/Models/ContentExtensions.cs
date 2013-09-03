@@ -365,20 +365,7 @@ namespace Umbraco.Core.Models
         /// <param name="value">The <see cref="HttpPostedFile"/> containing the file that will be uploaded</param>
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFile value)
         {
-            // Ensure we get the filename without the path in IE in intranet mode 
-            // http://stackoverflow.com/questions/382464/httppostedfile-filename-different-from-ie
-            var fileName = value.FileName;
-            if (fileName.LastIndexOf(@"\") > 0)
-                fileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
-
-            var name =
-                IOHelper.SafeFileName(
-                    fileName.Substring(fileName.LastIndexOf(IOHelper.DirSepChar) + 1,
-                                       fileName.Length - fileName.LastIndexOf(IOHelper.DirSepChar) - 1)
-                            .ToLower());
-
-            if (string.IsNullOrEmpty(name) == false)
-                SetFileOnContent(content, propertyTypeAlias, name, value.InputStream);
+            SetValue(content, propertyTypeAlias, (HttpPostedFileBase)new HttpPostedFileWrapper(value));
         }
 
         /// <summary>
@@ -387,20 +374,12 @@ namespace Umbraco.Core.Models
         /// <param name="content"><see cref="IContentBase"/> to add property value to</param>
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="value">The <see cref="HttpPostedFileWrapper"/> containing the file that will be uploaded</param>
+        [Obsolete("There is no reason for this overload since HttpPostedFileWrapper inherits from HttpPostedFileBase")]
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileWrapper value)
         {
-            // Ensure we get the filename without the path in IE in intranet mode 
-            // http://stackoverflow.com/questions/382464/httppostedfile-filename-different-from-ie
-            var fileName = value.FileName;
-            if (fileName.LastIndexOf(@"\") > 0)
-                fileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
-
-            var name = IOHelper.SafeFileName(fileName);
-
-            if (string.IsNullOrEmpty(name) == false)
-                SetFileOnContent(content, propertyTypeAlias, name, value.InputStream);
+            SetValue(content, propertyTypeAlias, (HttpPostedFileBase)value);
         }
-
+        
         /// <summary>
         /// Sets and uploads the file from a <see cref="Stream"/> as the property value
         /// </summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -35,25 +36,25 @@ namespace Umbraco.Web.WebApi.Filters
         {
         }
 
-        protected override void FilterItems(IUser user, List<dynamic> items)
+        protected override void FilterItems(IUser user, IList items)
         {
             base.FilterItems(user, items);
 
             FilterBasedOnPermissions(items, user, ApplicationContext.Current.Services.UserService);
         }
-        
-        internal void FilterBasedOnPermissions(List<dynamic> items, IUser user, IUserService userService)
+
+        internal void FilterBasedOnPermissions(IList items, IUser user, IUserService userService)
         {
             var length = items.Count;
             var ids = new List<int>();
             for (var i = 0; i < length; i++)
             {
-                ids.Add(items[i].Id);
+                ids.Add(((dynamic)items[i]).Id);
             }
             //get all the permissions for these nodes in one call
             var permissions = userService.GetPermissions(user, ids.ToArray()).ToArray();
             var toRemove = new List<dynamic>();
-            foreach(var item in items)
+            foreach(dynamic item in items)
             {
                 var nodePermission = permissions.Where(x => x.EntityId == item.Id).ToArray();
                 //if there are no permissions for this id, then remove the item

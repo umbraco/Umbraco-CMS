@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Formatting;
+using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -89,6 +94,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))]
         public IEnumerable<MediaItemDisplay> GetByIds([FromUri]int[] ids)
         {
             var foundMedia = ((MediaService)Services.MediaService).GetByIds(ids);
@@ -99,6 +105,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns the root media objects
         /// </summary>
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>))]
         public IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>> GetRootMedia()
         {
             //TODO: Add permissions check!
@@ -110,11 +117,11 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns the child media objects
         /// </summary>
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>))]
         public IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(int parentId)
         {
             //TODO: Change this to be like content with paged params
-            //TODO: filter results based on permissions!
-
+            
             return Services.MediaService.GetChildren(parentId)
                            .Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
         }
@@ -185,6 +192,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="sorted"></param>
         /// <returns></returns>
+        [EnsureUserPermissionForMedia("sorted.ParentId")]
         public HttpResponseMessage PostSort(ContentSortOrder sorted)
         {
             if (sorted == null)
@@ -219,7 +227,7 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        //shorthand to use with the media dialog
+        [EnsureUserPermissionForMedia("folder.ParentId")]
         public MediaItemDisplay PostAddFolder(EntityBasic folder)
         {
             var mediaService = ApplicationContext.Services.MediaService;
@@ -229,32 +237,64 @@ namespace Umbraco.Web.Editors
             return Mapper.Map<IMedia, MediaItemDisplay>(f);
         }
 
-        //short hand to use with the uploader in the media dialog
-        public HttpResponseMessage PostAddFile()
+        /// <summary>
+        /// Used to submit a media file
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// We cannot validate this request with attributes (nicely) due to the nature of the multi-part for data.
+        /// </remarks>
+        public async Task<HttpResponseMessage> PostAddFile()
         {
-            var context = UmbracoContext.HttpContext;
-            if(context.Request.Files.Count > 0)
+            if (Request.Content.IsMimeMultipartContent() == false)
             {
-                if (context.Request.Form.Count > 0)
-                {
-                    int parentId;
-                    if (int.TryParse(context.Request.Form[0], out parentId))
-                    {
-                        var file = context.Request.Files[0];
-                        var name = file.FileName;
-
-                        var mediaService = base.ApplicationContext.Services.MediaService;
-                        var f = mediaService.CreateMedia(name, parentId, Constants.Conventions.MediaTypes.Image);
-                        f.SetValue(Constants.Conventions.Media.File, file);
-                        mediaService.Save(f);
-
-                        return new HttpResponseMessage(HttpStatusCode.OK);        
-                    }
-                }
-                
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            return new HttpResponseMessage(HttpStatusCode.NotFound);
+            var root = IOHelper.MapPath("~/App_Data/TEMP/FileUploads");
+            //ensure it exists
+            Directory.CreateDirectory(root);
+            var provider = new MultipartFormDataStreamProvider(root);
+
+            var result = await Request.Content.ReadAsMultipartAsync(provider);
+            
+            //must have a file
+            if (result.FileData.Count == 0)
+            {
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+            }
+
+            //get the string json from the request
+            int parentId;
+            if (int.TryParse(result.FormData["currentFolder"], out parentId) == false)
+            {
+                throw new HttpResponseException(
+                    new HttpResponseMessage(HttpStatusCode.BadRequest)
+                    {
+                        ReasonPhrase = "The request was not formatted correctly, the currentFolder is not an integer"
+                    });
+            }
+
+            //get the files
+            foreach (var file in result.FileData)
+            {
+                var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' });
+
+                var mediaService = ApplicationContext.Services.MediaService;
+                var f = mediaService.CreateMedia(fileName, parentId, Constants.Conventions.MediaTypes.Image);
+
+                using (var fs = System.IO.File.OpenRead(file.LocalFileName))
+                {
+                    f.SetValue(Constants.Conventions.Media.File, fileName, fs);
+                }
+
+                mediaService.Save(f);
+
+                //now we can remove the temp file
+                System.IO.File.Delete(file.LocalFileName);
+            }
+
+            return new HttpResponseMessage(HttpStatusCode.OK);
         }
        
 

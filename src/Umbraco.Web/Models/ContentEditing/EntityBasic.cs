@@ -31,6 +31,6 @@ namespace Umbraco.Web.Models.ContentEditing
         /// For now we'll exclude this from the json results, this is needed for permissions check filtering
         /// </summary>
         [IgnoreDataMember]
-        internal string Path { get; set; }
+        public string Path { get; set; }
     }
 }

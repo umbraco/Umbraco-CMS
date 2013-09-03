@@ -372,7 +372,7 @@ namespace Umbraco.Core.Models
         /// Sets the <see cref="System.Web.HttpPostedFile"/> value of a Property
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
+        /// <param name="value">Value to set for the Property</param>        
         public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFile value)
         {
             ContentExtensions.SetValue(this, propertyTypeAlias, value);
@@ -393,6 +393,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
         /// <param name="value">Value to set for the Property</param>
+        [Obsolete("There is no reason for this overload since HttpPostedFileWrapper inherits from HttpPostedFileBase")]
         public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFileWrapper value)
         {
             ContentExtensions.SetValue(this, propertyTypeAlias, value);
