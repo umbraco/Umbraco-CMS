@@ -193,6 +193,10 @@
     <Compile Include="Persistence\Repositories\MemberRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserTypeRepositoryTest.cs" />
+    <Compile Include="PublishedContent\StronglyTypedModels\CallingMethodTests.cs" />
+    <Compile Include="PublishedContent\StronglyTypedModels\TextpageModel.cs" />
+    <Compile Include="PublishedContent\StronglyTypedModels\TypedModelBase.cs" />
+    <Compile Include="PublishedContent\StronglyTypedModels\UmbracoTemplatePage`T.cs" />
     <Compile Include="Services\PackagingServiceTests.cs" />
     <Compile Include="Services\PerformanceTests.cs" />
     <Compile Include="Services\UserServiceTests.cs" />
