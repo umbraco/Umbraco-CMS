@@ -9,9 +9,8 @@
 function contentCreateController($scope, $routeParams, contentTypeResource, iconHelper) {
 
     contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function(data) {
-        $scope.allowedTypes = iconHelper.formatContentTypeThumbnails(data);
+        $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
     });
-    
 }
 
 angular.module('umbraco').controller("Umbraco.Editors.Content.CreateController", contentCreateController);

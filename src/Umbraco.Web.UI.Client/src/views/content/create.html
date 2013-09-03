@@ -1,37 +1,36 @@
 <div class="umb-dialog" ng-controller="Umbraco.Editors.Content.CreateController">
 	<div class="umb-dialog-body" auto-scale="90">
-	<p class="umb-abstract">Create a page under {{currentNode.name}}</p>
+	<h5>Create a page under {{currentNode.name}}</h5>
 
-		<ul class="umb-actions">
-			<li class="action">
-				<ul class="umb-actions-child">
+	<ul class="umb-actions umb-actions-child">
 
-					<li ng-repeat="docType in allowedTypes">
-					    <a href="#content/content/edit/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
-					        <i class="icon-large {{docType.cssClass}}" style="{{docType.style}}"></i>
-					        <span class="menu-label">
-					            {{docType.name}}
-					            <small>
-					                {{docType.description}}
-					            </small>
-					        </span>
-					    </a>
-					</li>
+		<li ng-repeat="docType in allowedTypes">
+		    <a href="#content/content/edit/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
+		        
+		        <i class="large {{docType.icon}}"></i>
 
-					<li class="add">
-					    <a href="#settings/documenttype/create/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
-					        <i class="icon-large icon-plus"></i>
-					        <span class="menu-label">
-					            Create a new document type
-					            <small>
-					                Design and configure a new document type
-					            </small>
-					        </span>
-					    </a>
-					</li>	
-				</ul>
-			</li>
-		</ul>
+		        <span class="menu-label">
+		        	{{docType.name}}
+		            <small>
+		                {{docType.description}}
+		            </small>
+		        </span>
+		    </a>
+		</li>
+
+		<li class="add">
+		    <a href="#settings/documenttype/create/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
+		        <i class="large icon-add"></i>
+		        <span class="menu-label">
+		            Create a new document type
+		            <small>
+		                Design and configure a new document type
+		            </small>
+		        </span>
+		    </a>
+		</li>	
+	</ul>
+			
 	</div>
 	
 	<div class="btn-toolbar umb-btn-toolbar">
