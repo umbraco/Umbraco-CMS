@@ -84,7 +84,7 @@ namespace umbraco
                 XmlElement treeElement = Tree.CreateElement("tree");
                 treeElement.SetAttribute("nodeID", "-1");
                 treeElement.SetAttribute("text", items[i, 1]);
-                treeElement.SetAttribute("icon", "folder.gif");
+                treeElement.SetAttribute("icon", "icon-folder");
                 treeElement.SetAttribute("openIcon", "folder_o.gif");
 
                 //Make sure the different sections load the correct childnodes.
@@ -132,8 +132,8 @@ namespace umbraco
                             treeElement.SetAttribute("nodeType", "packagesRepository");
                             treeElement.SetAttribute("menu", "L");
                             treeElement.SetAttribute("action", "javascript:openPackageCategory('BrowseRepository.aspx?repoGuid=" + repos[0].Guid + "');");
-                            treeElement.SetAttribute("icon", "repository.gif");
-                            treeElement.SetAttribute("openIcon", "repository.gif");
+                            treeElement.SetAttribute("icon", "icon-server-alt");
+                            treeElement.SetAttribute("openIcon", "icon-server-alt");
                             treeElement.SetAttribute("hasChildren", "true");
                         }
 
@@ -158,8 +158,8 @@ namespace umbraco
                         treeElement.SetAttribute("src", "");
                         treeElement.SetAttribute("nodeType", "uploadPackage");
                         //treeElement.SetAttribute("menu", "");
-                        treeElement.SetAttribute("icon", "uploadpackage.gif");
-                        treeElement.SetAttribute("openIcon", "uploadpackage.gif");
+                        treeElement.SetAttribute("icon", "icon-page-up");
+                        treeElement.SetAttribute("openIcon", "icon-page-up");
                         treeElement.SetAttribute("action", "javascript:openPackageCategory('" + items[i, 0] + "');");
                         treeElement.SetAttribute("text", ui.Text("treeHeaders", "localPackage"));
                         break;
@@ -169,8 +169,8 @@ namespace umbraco
                         treeElement.SetAttribute("nodeType", "starterKits");
                         //treeElement.SetAttribute("menu", "L");
                         treeElement.SetAttribute("action", "javascript:openPackageCategory('" + items[i, 0] + "');");
-                        treeElement.SetAttribute("icon", "nitros.gif");
-                        treeElement.SetAttribute("openIcon", "nitros.gif");
+                        treeElement.SetAttribute("icon", "icon-flash");
+                        treeElement.SetAttribute("openIcon", "icon-flash");
 
                         treeElement.SetAttribute("text", ui.Text("treeHeaders", "installStarterKit"));
 

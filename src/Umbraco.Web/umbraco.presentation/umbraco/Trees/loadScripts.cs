@@ -75,8 +75,8 @@ namespace umbraco
         protected override void OnRenderFileNode(ref XmlTreeNode xNode)
         {
             xNode.Action = xNode.Action.Replace("openFile", "openScriptEditor");
-            xNode.Icon = "settingsScript.gif";
-            xNode.OpenIcon = "settingsScript.gif";
+            xNode.Icon = "icon-code";
+            xNode.OpenIcon = "icon.code";
         }
 
         

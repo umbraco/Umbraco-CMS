@@ -65,8 +65,8 @@ function openDataType(id) {
                 xNode.NodeID = dt.Id.ToString();
                 xNode.Text = dt.Text;
                 xNode.Action = "javascript:openDataType(" + dt.Id + ");";
-                xNode.Icon = "developerDatatype.gif";
-                xNode.OpenIcon = "developerDatatype.gif";
+                xNode.Icon = "icon-autofill";
+                xNode.OpenIcon = "icon-autofill";
 
                 OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
                 if (xNode != null)

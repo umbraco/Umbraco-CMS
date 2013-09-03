@@ -79,8 +79,8 @@ function openMacro(id) {
                     xNode.NodeID = macros.GetInt("id").ToString();
                     xNode.Text = macros.GetString("macroName");
                     xNode.Action = "javascript:openMacro(" + macros.GetInt("id") + ");";
-                    xNode.Icon = "developerMacro.gif";
-                    xNode.OpenIcon = "developerMacro.gif";
+                    xNode.Icon = " icon-settings-alt";
+                    xNode.OpenIcon = "icon-settings-alt";
                     OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
                     if (xNode != null)
                     {

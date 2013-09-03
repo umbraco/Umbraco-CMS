@@ -69,8 +69,8 @@ namespace umbraco
                 loadStylesheetProperty styleSheetPropertyTree = new loadStylesheetProperty(this.app);
                 xNode.Source = styleSheetPropertyTree.GetTreeServiceUrl(n.Id);
 				xNode.HasChildren = n.HasChildren;
-                xNode.Icon = "settingCss.gif";
-                xNode.OpenIcon = "settingCss.gif";
+                xNode.Icon = " icon-brackets";
+                xNode.OpenIcon = "icon-brackets";
                 xNode.NodeType = "stylesheet"; //this shouldn't be like this, it should be this.TreeAlias but the ui.config file points to this name.
 
                 OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);

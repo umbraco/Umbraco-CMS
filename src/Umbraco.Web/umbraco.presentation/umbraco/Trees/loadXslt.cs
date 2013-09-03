@@ -71,8 +71,8 @@ function openXslt(id) {
         protected override void OnRenderFileNode(ref XmlTreeNode xNode)
         {
             xNode.Action = xNode.Action.Replace("openFile", "openXslt");
-            xNode.Icon = "developerXslt.gif";
-            xNode.OpenIcon = "developerXslt.gif";
+            xNode.Icon = "icon-code";
+            xNode.OpenIcon = "icon-code";
         }
 
         protected override void OnRenderFolderNode(ref XmlTreeNode xNode)

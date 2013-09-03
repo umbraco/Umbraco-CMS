@@ -54,7 +54,7 @@ namespace umbraco
 				node = XmlTreeNode.Create(this);
 				node.NodeID = relationType.Id.ToString();
 				node.Text = relationType.Name;
-				node.Icon = "settingAgent.gif";
+				node.Icon = "icon-trafic";
 				node.Action = string.Concat("javascript:openRelationType('", node.NodeID, "');");
 
 				tree.Add(node);

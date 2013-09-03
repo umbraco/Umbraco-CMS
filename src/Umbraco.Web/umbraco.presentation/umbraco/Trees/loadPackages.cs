@@ -22,6 +22,7 @@ namespace umbraco
         
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
         {
+            
         }
         
         private int m_id;
@@ -62,8 +63,8 @@ namespace umbraco
                         xNode.NodeID = string.Concat(PACKAGE_TREE_PREFIX, p.Data.Id);
                         xNode.Text = p.Data.Name;
                         xNode.Action = string.Format("javascript:openInstalledPackage('{0}');", p.Data.Id);
-                        xNode.Icon = "package.gif";
-                        xNode.OpenIcon = "package.gif";
+                        xNode.Icon = "icon-box";
+                        xNode.OpenIcon = "icon-box";
                         xNode.NodeType = "createdPackageInstance";
                         xNode.Menu = null;
                         tree.Add(xNode);
@@ -78,8 +79,8 @@ namespace umbraco
                         xNode.NodeID = PACKAGE_TREE_PREFIX + p.Data.Id.ToString();
                         xNode.Text = p.Data.Name;
                         xNode.Action = "javascript:openCreatedPackage('" + p.Data.Id.ToString() + "');";
-                        xNode.Icon = "package.gif";
-                        xNode.OpenIcon = "package.gif";
+                        xNode.Icon = "icon-box";
+                        xNode.OpenIcon = "icon-box";
                         xNode.NodeType = "createdPackageInstance";
 //                        xNode.Menu.Add( umbraco.BusinessLogic.Actions.ActionDelete.Instance );
 
@@ -95,8 +96,8 @@ namespace umbraco
                         XmlTreeNode xNode = XmlTreeNode.Create(this);
                         xNode.Text = repo.Name;
                         xNode.Action = "javascript:openPackageCategory('BrowseRepository.aspx?repoGuid=" + repo.Guid + "');";
-                        xNode.Icon = "repository.gif";
-                        xNode.OpenIcon = "repository.gif";
+                        xNode.Icon = "icon-server-alt";
+                        xNode.OpenIcon = "icon-server-alt";
                         xNode.NodeType = "packagesRepo" + repo.Guid;
                         xNode.Menu.Add( umbraco.BusinessLogic.Actions.ActionRefresh.Instance );
                         xNode.Source = "tree.aspx?app=" + this.m_app + "&id=" + this.m_id + "&treeType=packagerPackages&packageType=repository&repoGuid=" + repo.Guid + "&rnd=" + Guid.NewGuid();
@@ -106,8 +107,8 @@ namespace umbraco
                         catElement.SetAttribute("text", repo.Name);
                         catElement.SetAttribute("menu", "L");
 
-                        catElement.SetAttribute("icon", "repository.gif");
-                        catElement.SetAttribute("openIcon", "repository.gif");
+                        catElement.SetAttribute("icon", "icon-server-alt");
+                        catElement.SetAttribute("openIcon", "icon-server-alt");
 
                         catElement.SetAttribute("nodeType", "packagesRepo" + repo.Guid);
                         catElement.SetAttribute("src", "tree.aspx?app=" + this.m_app + "&id=" + this.m_id + "&treeType=packagerPackages&packageType=repository&repoGuid=" + repo.Guid + "&rnd=" + Guid.NewGuid());
@@ -130,8 +131,8 @@ namespace umbraco
                             XmlTreeNode xNode = XmlTreeNode.Create(this);
                             xNode.Text = cat.Text;
                             xNode.Action = "javascript:openPackageCategory('BrowseRepository.aspx?category=" + cat.Id + "&repoGuid=" + currentRepo.Guid + "');";
-                            xNode.Icon = "folder.gif";
-                            xNode.OpenIcon = "folder.gif";
+                            xNode.Icon = "icon-folder";
+                            xNode.OpenIcon = "icon-folder";
                             xNode.NodeType = "packagesCategory" + cat.Id;                        
                             tree.Add(xNode);
                             /*
@@ -187,8 +188,8 @@ namespace umbraco
                         treeElement.SetAttribute("action", "javascript:openInstalledPackage('" + p.Data.Id.ToString() + "');");
                         treeElement.SetAttribute("menu", "");
                         //treeElement.SetAttribute("src", "");
-                        treeElement.SetAttribute("icon", "package.gif");
-                        treeElement.SetAttribute("openIcon", "package.gif");
+                        treeElement.SetAttribute("icon", "icon-box");
+                        treeElement.SetAttribute("openIcon", "icon-box");
                         treeElement.SetAttribute("nodeType", "createdPackageInstance");
                         root.AppendChild(treeElement);
                     }
@@ -203,8 +204,8 @@ namespace umbraco
                         treeElement.SetAttribute("action", "javascript:openCreatedPackage('" + p.Data.Id.ToString() + "');");
                         treeElement.SetAttribute("menu", "D");
                         treeElement.SetAttribute("src", "");
-                        treeElement.SetAttribute("icon", "package.gif");
-                        treeElement.SetAttribute("openIcon", "package.gif");
+                        treeElement.SetAttribute("icon", "icon-box");
+                        treeElement.SetAttribute("openIcon", "icon-box");
                         treeElement.SetAttribute("nodeType", "createdPackageInstance");
                         root.AppendChild(treeElement);
                     }
@@ -219,8 +220,8 @@ namespace umbraco
                         catElement.SetAttribute("text", repo.Name);
                         catElement.SetAttribute("menu", "L");
 
-                        catElement.SetAttribute("icon", "repository.gif");
-                        catElement.SetAttribute("openIcon", "repository.gif");
+                        catElement.SetAttribute("icon", "icon-server-alt");
+                        catElement.SetAttribute("openIcon", "icon-server-alt");
 
                         catElement.SetAttribute("nodeType", "packagesRepo" + repo.Guid);
                         catElement.SetAttribute("src", "tree.aspx?app=" + this.m_app + "&id=" + this.m_id + "&treeType=packagerPackages&packageType=repository&repoGuid=" + repo.Guid + "&rnd=" + Guid.NewGuid());
@@ -241,8 +242,8 @@ namespace umbraco
                             XmlElement catElement = Tree.CreateElement("tree");
                             catElement.SetAttribute("text", cat.Text);
                             //catElement.SetAttribute("menu", "");
-                            catElement.SetAttribute("icon", "folder.gif");
-                            catElement.SetAttribute("openIcon", "folder_o.gif");
+                            catElement.SetAttribute("icon", "icon-folder");
+                            catElement.SetAttribute("openIcon", "icon-folder");
                             catElement.SetAttribute("nodeType", "packagesCategory" + cat.Id);
                             catElement.SetAttribute("action", "javascript:openPackageCategory('BrowseRepository.aspx?category=" + cat.Id + "&repoGuid=" + currentRepo.Guid + "');");
                             root.AppendChild(catElement);

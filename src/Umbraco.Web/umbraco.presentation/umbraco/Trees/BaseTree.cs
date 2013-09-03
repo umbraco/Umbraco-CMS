@@ -26,8 +26,8 @@ namespace umbraco.cms.presentation.Trees
             this.app = application;
         }
 
-        protected const string FolderIcon = ".sprTreeFolder";
-        protected const string FolderIconOpen = ".sprTreeFolder_o";        
+        protected const string FolderIcon = "icon-folder";
+        protected const string FolderIconOpen = "icon-folder";        
 
         /// <summary>
         /// Returns the node definition of the root node for this tree

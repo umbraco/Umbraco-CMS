@@ -69,14 +69,14 @@ function openNodeType(id) {
                 xNode.NodeID = docType.Id.ToString(CultureInfo.InvariantCulture);
                 xNode.Text = docType.Name;
                 xNode.Action = "javascript:openNodeType(" + docType.Id + ");";
-                xNode.Icon = "settingDataType.gif";
-                xNode.OpenIcon = "settingDataType.gif";
+                xNode.Icon = "icon-item-arrangement";
+                xNode.OpenIcon = "icon-item-arrangement";
                 xNode.Source = GetTreeServiceUrl(docType.Id);
                 xNode.HasChildren = hasChildren;
                 if (hasChildren)
                 {
-                    xNode.Icon = "settingMasterDataType.gif";
-                    xNode.OpenIcon = "settingMasterDataType.gif";
+                    xNode.Icon = "icon-item-arrangement";
+                    xNode.OpenIcon = "icon-item-arrangement";
                 }
 
                 OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);

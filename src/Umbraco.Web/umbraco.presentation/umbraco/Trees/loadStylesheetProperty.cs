@@ -59,8 +59,8 @@ namespace umbraco
                 xNode.NodeID = n.Id.ToString();
                 xNode.Text = n.Text;
                 xNode.Action = "javascript:openStylesheetProperty(" + n.Id + ");";
-                xNode.Icon = "settingCssItem.gif";
-                xNode.OpenIcon = "settingCssItem.gif";
+                xNode.Icon = "icon-brackets";
+                xNode.OpenIcon = "icon-brackets";
 
                 OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
                 if (xNode != null)
