@@ -33,7 +33,7 @@ namespace Umbraco.Web.Trees
                                     dt.Id.ToInvariantString(),
                                     queryStrings,
                                     dt.Name,
-                                    "icon-tasks",
+                                    "icon-autofill",
                                     false)));
             return collection;
         }
