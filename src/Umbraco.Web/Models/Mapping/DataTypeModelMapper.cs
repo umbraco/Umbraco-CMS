@@ -45,6 +45,7 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<DataTypeSave, IDataTypeDefinition>()
                   .ConstructUsing(save => new DataTypeDefinition(-1, save.SelectedEditor) {CreateDate = DateTime.Now})
+                  .ForMember(definition => definition.Path, expression => expression.Ignore())
                   .ForMember(definition => definition.ControlId, expression => expression.MapFrom(save => save.SelectedEditor))
                   .ForMember(definition => definition.ParentId, expression => expression.MapFrom(save => -1))
                   .ForMember(definition => definition.DatabaseType, expression => expression.ResolveUsing<DatabaseTypeResolver>());

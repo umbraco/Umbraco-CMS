@@ -1,5 +1,7 @@
 ﻿namespace Umbraco.Core.Media
 {
+
+    //NOTE: Could definitely have done with a better name
     public class Result
     {
         public Status Status { get; set; }

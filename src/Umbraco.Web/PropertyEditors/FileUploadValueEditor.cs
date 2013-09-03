@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
@@ -94,7 +95,7 @@ namespace Umbraco.Web.PropertyEditors
 
                         var name = IOHelper.SafeFileName(file.FileName.Substring(file.FileName.LastIndexOf(IOHelper.DirSepChar) + 1, file.FileName.Length - file.FileName.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
 
-                        var subfolder = UmbracoSettings.UploadAllowDirectories
+                        var subfolder = LegacyUmbracoSettings.UploadAllowDirectories
                                             ? currentPersistedFile.Replace(fs.GetUrl("/"), "").Split('/')[0]
                                             : currentPersistedFile.Substring(currentPersistedFile.LastIndexOf("/", StringComparison.Ordinal) + 1).Split('-')[0];
 
@@ -103,7 +104,7 @@ namespace Umbraco.Web.PropertyEditors
                                                  ? subfolderId.ToString(CultureInfo.InvariantCulture)
                                                  : MediaSubfolderCounter.Current.Increment().ToString(CultureInfo.InvariantCulture);
 
-                        var fileName = UmbracoSettings.UploadAllowDirectories
+                        var fileName = LegacyUmbracoSettings.UploadAllowDirectories
                                            ? Path.Combine(numberedFolder, name)
                                            : numberedFolder + "-" + name;
 

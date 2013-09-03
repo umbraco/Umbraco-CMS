@@ -923,6 +923,7 @@
     <Content Include="Strings\Notes.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Imaging\" />
     <Folder Include="Packaging\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
