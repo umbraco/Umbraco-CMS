@@ -5,7 +5,7 @@ using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
@@ -17,12 +17,17 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class MemberRepository : VersionableRepositoryBase<int, IMember>, IMemberRepository
     {
-        public MemberRepository(IDatabaseUnitOfWork work) : base(work)
+        private readonly IMemberTypeRepository _memberTypeRepository;
+
+        public MemberRepository(IDatabaseUnitOfWork work, IMemberTypeRepository memberTypeRepository) : base(work)
         {
+            _memberTypeRepository = memberTypeRepository;
         }
 
-        public MemberRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
+        public MemberRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMemberTypeRepository memberTypeRepository)
+            : base(work, cache)
         {
+            _memberTypeRepository = memberTypeRepository;
         }
 
         #region Overrides of RepositoryBase<int, IMembershipUser>
@@ -402,9 +407,18 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (dtos == null || dtos.Any() == false)
                 return null;
+            var dto = dtos.First();
 
-            var factory = new MemberReadOnlyFactory();
-            var member = factory.BuildEntity(dtos.First());
+            var memberTypes = new Dictionary<string, IMemberType>
+                              {
+                                  {
+                                      dto.ContentTypeAlias,
+                                      _memberTypeRepository.Get(dto.ContentTypeId)
+                                  }
+                              };
+
+            var factory = new MemberReadOnlyFactory(memberTypes);
+            var member = factory.BuildEntity(dto);
 
             return member;
         }
@@ -414,7 +428,12 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dtos == null || dtos.Any() == false)
                 return Enumerable.Empty<IMember>();
 
-            var factory = new MemberReadOnlyFactory();
+            //We assume that there won't exist a lot of MemberTypes, so the following should be fairly fast
+            var memberTypes = new Dictionary<string, IMemberType>();
+            var memberTypeList = _memberTypeRepository.GetAll();
+            memberTypeList.ForEach(x => memberTypes.Add(x.Alias, x));
+
+            var factory = new MemberReadOnlyFactory(memberTypes);
             return dtos.Select(factory.BuildEntity);
         }
     }

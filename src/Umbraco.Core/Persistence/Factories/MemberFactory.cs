@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories

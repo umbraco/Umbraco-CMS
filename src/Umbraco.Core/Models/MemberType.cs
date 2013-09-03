@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models
             _memberTypePropertyTypes = new Dictionary<string, Tuple<bool, bool, int>>();
         }
 
-        private static readonly PropertyInfo MemberTypePropertyTypesSelector = ExpressionHelper.GetPropertyInfo<Membership.MemberType, IDictionary<string, Tuple<bool, bool, int>>>(x => x.MemberTypePropertyTypes);
+        private static readonly PropertyInfo MemberTypePropertyTypesSelector = ExpressionHelper.GetPropertyInfo<MemberType, IDictionary<string, Tuple<bool, bool, int>>>(x => x.MemberTypePropertyTypes);
 
         /// <summary>
         /// Gets or Sets a Dictionary of Tuples (MemberCanEdit, VisibleOnProfile, PropertyTypeId) by the PropertyTypes' alias.

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Mappers
@@ -41,7 +41,6 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<Member, NodeDto>(src => src.Name, dto => dto.Text);
             CacheMap<Member, NodeDto>(src => src.Trashed, dto => dto.Trashed);
             CacheMap<Member, NodeDto>(src => src.Key, dto => dto.UniqueId);
-            CacheMap<Member, NodeDto>(src => src.ProfileId, dto => dto.UniqueId);
             CacheMap<Member, ContentDto>(src => src.ContentTypeId, dto => dto.ContentTypeId);
             CacheMap<Member, ContentTypeDto>(src => src.ContentTypeAlias, dto => dto.Alias);
             CacheMap<Member, ContentVersionDto>(src => src.UpdateDate, dto => dto.VersionDate);

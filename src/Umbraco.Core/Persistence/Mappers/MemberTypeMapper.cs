@@ -1,5 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Mappers

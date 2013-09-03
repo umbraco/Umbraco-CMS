@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
