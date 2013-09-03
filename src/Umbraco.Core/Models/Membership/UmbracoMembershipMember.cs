@@ -2,11 +2,11 @@
 
 namespace Umbraco.Core.Models.Membership
 {
-    internal class UmbracoMember : MembershipUser
+    internal class UmbracoMembershipMember : MembershipUser
     {
-        private readonly IMembershipUser _member;
+        private readonly IMember _member;
 
-        public UmbracoMember(IMembershipUser member)
+        public UmbracoMembershipMember(IMember member)
         {
             _member = member;
         }
