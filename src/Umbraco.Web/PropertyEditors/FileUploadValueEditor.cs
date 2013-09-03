@@ -23,8 +23,6 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     internal class FileUploadValueEditor : ValueEditor
     {
-        //TODO: This needs to come from pre-values
-        private const string ThumbnailSizes = "100";
 
         /// <summary>
         /// Overrides the deserialize value so that we can save the file accordingly
@@ -117,15 +115,22 @@ namespace Umbraco.Web.PropertyEditors
                                 // make default thumbnail
                                 umbracoFile.Resize(100, "thumb");
 
-                                // additional thumbnails configured as prevalues on the DataType
-                                char sep = (ThumbnailSizes.Contains("") == false && ThumbnailSizes.Contains(",")) ? ',' : ';';
-
-                                foreach (string thumb in ThumbnailSizes.Split(sep))
+                                //get the pre-vals value
+                                var thumbs = editorValue.PreValues.FormatAsDictionary();
+                                if (thumbs.Any())
                                 {
-                                    int thumbSize;
-                                    if (thumb != "" && int.TryParse(thumb, out thumbSize))
+                                    var thumbnailSizes = thumbs.First().Value.Value;
+
+                                    // additional thumbnails configured as prevalues on the DataType
+                                    var sep = (thumbnailSizes.Contains("") == false && thumbnailSizes.Contains(",")) ? ',' : ';';
+
+                                    foreach (var thumb in thumbnailSizes.Split(sep))
                                     {
-                                        umbracoFile.Resize(thumbSize, string.Format("thumb_{0}", thumbSize));
+                                        int thumbSize;
+                                        if (thumb != "" && int.TryParse(thumb, out thumbSize))
+                                        {
+                                            umbracoFile.Resize(thumbSize, string.Format("thumb_{0}", thumbSize));
+                                        }
                                     }
                                 }
                             }
