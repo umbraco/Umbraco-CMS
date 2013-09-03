@@ -1,4 +1,5 @@
-﻿using System.Web.Http;
+﻿using System.Linq;
+using System.Web.Http;
 using System.Web.Http.Controllers;
 
 namespace Umbraco.Web.WebApi.Filters
@@ -13,11 +14,17 @@ namespace Umbraco.Web.WebApi.Filters
         /// </summary>
         internal static bool Enable = true;
 
-        private readonly string _appName;
+        private readonly string[] _appNames;
 
-        public UmbracoApplicationAuthorizeAttribute(string appName)
+        /// <summary>
+        /// Constructor to set any number of applications that the user needs access to to be authorized
+        /// </summary>
+        /// <param name="appName">
+        /// If the user has access to any of the specified apps, they will be authorized.
+        /// </param>
+        public UmbracoApplicationAuthorizeAttribute(params string[] appName)
         {
-            _appName = appName;
+            _appNames = appName;
         }
 
         protected override bool IsAuthorized(HttpActionContext actionContext)
@@ -27,8 +34,9 @@ namespace Umbraco.Web.WebApi.Filters
                 return true;
             }
 
-            return UmbracoContext.Current.Security.CurrentUser != null 
-                && UmbracoContext.Current.Security.UserHasAppAccess(_appName, UmbracoContext.Current.Security.CurrentUser);
+            return UmbracoContext.Current.Security.CurrentUser != null
+                   && _appNames.Any(app => UmbracoContext.Current.Security.UserHasAppAccess(
+                       app, UmbracoContext.Current.Security.CurrentUser));
         }
     }
 }

@@ -16,14 +16,19 @@ namespace Umbraco.Core.Models
         {
             if (user == null) throw new ArgumentNullException("user");
             if (content == null) throw new ArgumentNullException("content");
-            var formattedPath = "," + content.Path + ",";
-            var formattedStartNodeId = "," + user.StartContentId.ToString(CultureInfo.InvariantCulture) + ",";
-            var formattedRecycleBinId = "," + Constants.System.RecycleBinContent + ",";
-            
+            return HasPathAccess(content.Path, user.StartContentId, Constants.System.RecycleBinContent);
+        }
+
+        internal static bool HasPathAccess(string path, int startNodeId, int recycleBinId)
+        {
+            var formattedPath = "," + path + ",";
+            var formattedStartNodeId = "," + startNodeId.ToInvariantString() + ",";
+            var formattedRecycleBinId = "," + recycleBinId.ToInvariantString() + ",";
+
             //only users with root access have access to the recycle bin
             if (formattedPath.Contains(formattedRecycleBinId))
             {
-                return user.StartContentId == Constants.System.Root;
+                return startNodeId == Constants.System.Root;
             }
 
             return formattedPath.Contains(formattedStartNodeId);
@@ -39,17 +44,7 @@ namespace Umbraco.Core.Models
         {
             if (user == null) throw new ArgumentNullException("user");
             if (media == null) throw new ArgumentNullException("media");
-            var formattedPath = "," + media.Path + ",";
-            var formattedStartNodeId = "," + user.StartContentId.ToString(CultureInfo.InvariantCulture) + ",";
-            var formattedRecycleBinId = "," + Constants.System.RecycleBinMedia + ",";
-
-            //only users with root access have access to the recycle bin
-            if (formattedPath.Contains(formattedRecycleBinId) && user.StartContentId == Constants.System.Root)
-            {
-                return true;
-            }
-
-            return formattedPath.Contains(formattedStartNodeId);
+            return HasPathAccess(media.Path, user.StartMediaId, Constants.System.RecycleBinMedia);
         }
     }
 }

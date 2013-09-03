@@ -64,7 +64,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [FilterAllowedOutgoingContent]
+        [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemDisplay>))]
         public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)
         {
             var foundContent = ((ContentService) Services.ContentService).GetByIds(ids);
@@ -110,7 +110,7 @@ namespace Umbraco.Web.Editors
         /// Gets the children for the content id passed in
         /// </summary>
         /// <returns></returns>        
-        [FilterAllowedOutgoingContent("Items")]
+        [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IContent>>), "Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>> GetChildren(
             int id, 
             int pageNumber = 0, 

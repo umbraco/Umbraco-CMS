@@ -2,138 +2,82 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection;
-using System.Web.Http.Filters;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services;
 using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 
 namespace Umbraco.Web.WebApi.Filters
 {
-
-    //TODO: Verify that this works!!
-
     /// <summary>
     /// This inspects the result of the action that returns a collection of content and removes 
     /// any item that the current user doesn't have access to
     /// </summary>
-    internal sealed class FilterAllowedOutgoingContentAttribute : ActionFilterAttribute
+    internal sealed class FilterAllowedOutgoingContentAttribute : FilterAllowedOutgoingMediaAttribute
     {
-        private readonly string _propertyName;
         private readonly char _permissionToCheck;
 
-        public FilterAllowedOutgoingContentAttribute()
+        public FilterAllowedOutgoingContentAttribute(Type outgoingType) 
+            : base(outgoingType)
         {
             _permissionToCheck = ActionBrowse.Instance.Letter;
         }
 
-        public FilterAllowedOutgoingContentAttribute(char permissionToCheck)
+        public FilterAllowedOutgoingContentAttribute(Type outgoingType, char permissionToCheck)
+            : base(outgoingType)
         {
             _permissionToCheck = permissionToCheck;
         }
 
-        public FilterAllowedOutgoingContentAttribute(string propertyName)
-            : this()
+        public FilterAllowedOutgoingContentAttribute(Type outgoingType, string propertyName)
+            : base(outgoingType, propertyName)
         {
-            _propertyName = propertyName;
         }
 
-        /// <summary>
-        /// Returns true so that other filters can execute along with this one
-        /// </summary>
-        public override bool AllowMultiple
+        protected override void FilterItems(IUser user, List<dynamic> items)
         {
-            get { return true; }
-        }
+            base.FilterItems(user, items);
 
-        public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
+            FilterBasedOnPermissions(items, user, ApplicationContext.Current.Services.UserService);
+        }
+        
+        internal void FilterBasedOnPermissions(List<dynamic> items, IUser user, IUserService userService)
         {
-            var user = UmbracoContext.Current.Security.CurrentUser;
-            if (user == null)
+            var length = items.Count;
+            var ids = new List<int>();
+            for (var i = 0; i < length; i++)
             {
-                base.OnActionExecuted(actionExecutedContext);
-                return;
+                ids.Add(items[i].Id);
             }
-
-            var objectContent = actionExecutedContext.Response.Content as ObjectContent;
-            if (objectContent != null)
+            //get all the permissions for these nodes in one call
+            var permissions = userService.GetPermissions(user, ids.ToArray()).ToArray();
+            var toRemove = new List<dynamic>();
+            foreach(var item in items)
             {
-                var collection = GetValueFromResponse(objectContent);
-
-                if (collection != null)
+                var nodePermission = permissions.Where(x => x.EntityId == item.Id).ToArray();
+                //if there are no permissions for this id, then remove the item
+                if (nodePermission.Any() == false)
                 {
-                    var items = Enumerable.ToList(collection);
-                    var length = items.Count;
-                    var ids = new List<int>();                    
-                    for (var i = 0; i < length; i++)
+                    toRemove.Add(item);                    
+                }
+                else
+                {
+                    foreach (var n in nodePermission)
                     {
-                        ids.Add(items[i].Id);
-                    }
-                    //get all the permissions for these nodes in one call
-                    var permissions = ApplicationContext.Current.Services.UserService.GetPermissions(user, ids.ToArray()).ToArray();
-                    for (var i = 0; i < length; i++)
-                    {
-                        var nodePermission = permissions.Where(x => x.EntityId == items[i].Id).ToArray();
-                        foreach (var n in nodePermission)
+                        //if the permission being checked doesn't exist then remove the item
+                        if (n.AssignedPermissions.Contains(_permissionToCheck.ToString(CultureInfo.InvariantCulture)) == false)
                         {
-                            if (n.AssignedPermissions.Contains(_permissionToCheck.ToString(CultureInfo.InvariantCulture)) == false)
-                            {
-                                items.RemoveAt(i);
-                                length--;
-                            }
+                            toRemove.Add(item);
                         }
                     }
-
-                    //set the return value
-                    SetValueForResponse(objectContent, items);
                 }
             }
-
-            base.OnActionExecuted(actionExecutedContext);
+            foreach (var item in toRemove)
+            {
+                items.Remove(item);
+            }
         }
 
-        private void SetValueForResponse(ObjectContent objectContent, dynamic newVal)
-        {
-            if (objectContent.Value is IEnumerable<ContentItemBasic>)
-            {
-                //objectContent.Value = DynamicCast(newVal, t);
-                objectContent.Value = newVal;
-            }
-            else if (_propertyName.IsNullOrWhiteSpace() == false)
-            {
-                //try to get the enumerable collection from a property on the result object using reflection
-                var property = objectContent.Value.GetType().GetProperty(_propertyName);
-                if (property != null)
-                {                  
-                    property.SetValue(objectContent.Value, newVal);                    
-                }
-            }
-            
-        }
-
-        private dynamic GetValueFromResponse(ObjectContent objectContent)
-        {
-            if (objectContent.Value is IEnumerable<ContentItemBasic>)
-            {
-                return objectContent.Value;
-            }
-
-            if (_propertyName.IsNullOrWhiteSpace() == false)
-            {
-                //try to get the enumerable collection from a property on the result object using reflection
-                var property = objectContent.Value.GetType().GetProperty(_propertyName);
-                if (property != null)
-                {
-                    var result = property.GetValue(objectContent.Value);
-                    if (result is IEnumerable<ContentItemBasic>)
-                    {
-                        return result;
-                    }
-                }
-            }
-
-            return null;
-        }
     }
 }

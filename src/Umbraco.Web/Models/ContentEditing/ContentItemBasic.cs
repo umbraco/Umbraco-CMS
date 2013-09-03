@@ -14,7 +14,8 @@ namespace Umbraco.Web.Models.ContentEditing
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
     public class ContentItemBasic : EntityBasic
-    {
+    {   
+
         [DataMember(Name = "updateDate")]
         public DateTime UpdateDate { get; set; }
 

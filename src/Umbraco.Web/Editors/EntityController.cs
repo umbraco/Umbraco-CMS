@@ -24,19 +24,22 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
     {
-
+        [EnsureUserPermissionForContent("id")]
         [UmbracoApplicationAuthorize(Constants.Applications.Content)]
         public EntityBasic GetDocumentById(int id)
         {
             return Mapper.Map<EntityBasic>(Services.EntityService.Get(id, UmbracoObjectTypes.Document));
         }
 
+        [EnsureUserPermissionForContent("id")]
         [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
+        [FilterAllowedOutgoingContent(typeof(IEnumerable<EntityBasic>))]
         public IEnumerable<EntityBasic> GetDocumentChildren(int id)
         {
             return GetChildren(id, UmbracoObjectTypes.Document);
         }
 
+        [FilterAllowedOutgoingContent(typeof(IEnumerable<EntityBasic>))]
         [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
         public IEnumerable<EntityBasic> GetDocumentsByIds([FromUri]int[] ids)
         {
@@ -44,19 +47,44 @@ namespace Umbraco.Web.Editors
             return GetEntitiesById(ids, UmbracoObjectTypes.Document);
         }
 
-        [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Media)]
+        /// <summary>
+        /// The user must have access to either content or media for this to return data
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [UmbracoApplicationAuthorizeAttribute(
+            Constants.Applications.Media, 
+            Constants.Applications.Content)]
+        [EnsureUserPermissionForMedia("id")]
         public EntityBasic GetMediaById(int id)
         {
             return GetEntityById(id, UmbracoObjectTypes.Media);
         }
 
-        [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Media)]
+        /// <summary>
+        /// The user must have access to either content or media for this to return data
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [UmbracoApplicationAuthorizeAttribute(
+            Constants.Applications.Media,
+            Constants.Applications.Content)]
+        [EnsureUserPermissionForMedia("id")]
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<EntityBasic>))]
         public IEnumerable<EntityBasic> GetMediaChildren(int id)
         {
             return GetChildren(id, UmbracoObjectTypes.Media);
         }
 
-        [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Media)]
+        /// <summary>
+        /// The user must have access to either content or media for this to return data
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [UmbracoApplicationAuthorizeAttribute(
+            Constants.Applications.Media,
+            Constants.Applications.Content)]
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<EntityBasic>))]
         public IEnumerable<EntityBasic> GetMediaByIds([FromUri]int[] ids)
         {
             if (ids == null) throw new ArgumentNullException("ids");

@@ -1,0 +1,133 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Web.Http.Filters;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Web.Models.ContentEditing;
+
+namespace Umbraco.Web.WebApi.Filters
+{
+    /// <summary>
+    /// This inspects the result of the action that returns a collection of content and removes 
+    /// any item that the current user doesn't have access to
+    /// </summary>
+    internal class FilterAllowedOutgoingMediaAttribute : ActionFilterAttribute
+    {
+        private readonly Type _outgoingType;
+        private readonly string _propertyName;
+
+        public FilterAllowedOutgoingMediaAttribute(Type outgoingType)
+        {
+            _outgoingType = outgoingType;
+        }
+
+        public FilterAllowedOutgoingMediaAttribute(Type outgoingType, string propertyName)
+            : this(outgoingType)
+        {
+            _propertyName = propertyName;
+        }
+
+        /// <summary>
+        /// Returns true so that other filters can execute along with this one
+        /// </summary>
+        public override bool AllowMultiple
+        {
+            get { return true; }
+        }
+
+        public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
+        {
+            var user = UmbracoContext.Current.Security.CurrentUser;
+            if (user == null)
+            {
+                base.OnActionExecuted(actionExecutedContext);
+                return;
+            }
+
+            var objectContent = actionExecutedContext.Response.Content as ObjectContent;
+            if (objectContent != null)
+            {
+                var collection = GetValueFromResponse(objectContent);
+
+                if (collection != null)
+                {
+                    var items = Enumerable.ToList(collection);
+
+                    FilterItems(user, items);
+
+                    //set the return value
+                    SetValueForResponse(objectContent, items);
+                }
+            }
+
+            base.OnActionExecuted(actionExecutedContext);
+        }
+
+        protected virtual void FilterItems(IUser user, List<dynamic> items)
+        {
+            FilterBasedOnStartNode(items, user);
+        }
+
+        internal void FilterBasedOnStartNode(List<dynamic> items, IUser user)
+        {
+            var toRemove = new List<dynamic>();
+            foreach (var item in items)
+            {
+                var hasPathAccess = UserExtensions.HasPathAccess(item.Path, user.StartContentId, Constants.System.RecycleBinContent);
+                if (!hasPathAccess)
+                {
+                    toRemove.Add(item);
+                }
+            }
+            foreach (var item in toRemove)
+            {
+                items.Remove(item);
+            }
+        }
+
+        private void SetValueForResponse(ObjectContent objectContent, dynamic newVal)
+        {
+            if (TypeHelper.IsTypeAssignableFrom(_outgoingType, objectContent.Value.GetType()))
+            {
+                objectContent.Value = newVal;
+            }
+            else if (_propertyName.IsNullOrWhiteSpace() == false)
+            {
+                //try to get the enumerable collection from a property on the result object using reflection
+                var property = objectContent.Value.GetType().GetProperty(_propertyName);
+                if (property != null)
+                {
+                    property.SetValue(objectContent.Value, newVal);
+                }
+            }
+
+        }
+
+        internal dynamic GetValueFromResponse(ObjectContent objectContent)
+        {
+            if (TypeHelper.IsTypeAssignableFrom(_outgoingType, objectContent.Value.GetType()))
+            {
+                return objectContent.Value;
+            }
+
+            if (_propertyName.IsNullOrWhiteSpace() == false)
+            {
+                //try to get the enumerable collection from a property on the result object using reflection
+                var property = objectContent.Value.GetType().GetProperty(_propertyName);
+                if (property != null)
+                {
+                    var result = property.GetValue(objectContent.Value);
+                    if (TypeHelper.IsTypeAssignableFrom(_outgoingType, result.GetType()))
+                    {
+                        return result;
+                    }
+                }
+            }
+
+            return null;
+        }
+    }
+}

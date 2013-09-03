@@ -26,5 +26,11 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "parentId", IsRequired = true)]
         [Required]
         public int ParentId { get; set; }
+
+        /// <summary>
+        /// For now we'll exclude this from the json results, this is needed for permissions check filtering
+        /// </summary>
+        [IgnoreDataMember]
+        internal string Path { get; set; }
     }
 }
