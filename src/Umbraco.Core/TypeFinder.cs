@@ -585,8 +585,16 @@ namespace Umbraco.Core
 
             try
             {
-				//return a.GetExportedTypes();
-			    return a.GetTypes();
+                //we need to detect if an assembly is partially trusted, if so we cannot go interrogating all of it's types
+                //only its exported types, otherwise we'll get exceptions.
+                if (a.GetCustomAttribute<AllowPartiallyTrustedCallersAttribute>() == null)
+                {
+                    return a.GetTypes();
+                }
+                else
+                {
+                    return a.GetExportedTypes();
+                }
             }
             catch (ReflectionTypeLoadException ex)
             {
