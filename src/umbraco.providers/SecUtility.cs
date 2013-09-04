@@ -13,6 +13,7 @@ namespace umbraco.providers
     /// <summary>
     /// Security Helper Methods
     /// </summary>
+    [ObsoleteAttribute("This clas is obsolete. Use Umbraco.Web.Security.Helper.SecurityHelper instead.", false)] 
     internal class SecUtility
     {
         /// <summary>
