@@ -5,10 +5,11 @@
     /* NOTE: I've opted not to use the full lib, just the parts we need to save on DL */
     'lib/jquery/jquery.ui.core.min.js',
     'lib/jquery/jquery.ui.widget.min.js',
+    /*
     'lib/jquery/jquery.ui.mouse.min.js',
     'lib/jquery/jquery.ui.sortable.min.js',
     'lib/jquery/jquery.ui.effect.min.js',
-    'lib/jquery/jquery.ui.effect-highlight.min.js',
+    'lib/jquery/jquery.ui.effect-highlight.min.js',*/
     
     /* 1.1.5 */
     'lib/angular/1.1.5/angular.min.js',
@@ -23,8 +24,9 @@
 	'lib/angular/1.2/angular-animate.min.js',
     */
 
-    /* temporary sorter lib, should be updated */
-    'lib/angular/angular-ui-sortable.js',
+    /* temporary sorter lib, should be updated
+    'lib/angular/angular-ui-sortable.js',*/
+    'lib/jquery/jquery.sortable/jquery.sortable.js',
 
     /* App-wide file-upload helper */
     'lib/jquery/jquery.upload/js/jquery.fileupload.js',
