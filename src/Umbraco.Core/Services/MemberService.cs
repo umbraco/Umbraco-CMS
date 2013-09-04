@@ -197,6 +197,15 @@ namespace Umbraco.Core.Services
 
         #region IMembershipMemberService Implementation
 
+        /// <summary>
+        /// Creates a new Member
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        /// <param name="memberTypeAlias"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public IMember CreateMember(string username, string email, string password, string memberTypeAlias, int userId = 0)
         {
             var uow = _uowProvider.GetUnitOfWork();
@@ -226,6 +235,14 @@ namespace Umbraco.Core.Services
             return member;
         }
 
+        /// <summary>
+        /// Gets a Member by its Id
+        /// </summary>
+        /// <remarks>
+        /// The Id should be an integer or Guid.
+        /// </remarks>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public IMember GetById(object id)
         {
             if (id is int)
@@ -241,6 +258,11 @@ namespace Umbraco.Core.Services
             return null;
         }
 
+        /// <summary>
+        /// Gets a Member by its Email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
         public IMember GetByEmail(string email)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
@@ -252,6 +274,11 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Gets a Member by its Username
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <returns></returns>
         public IMember GetByUsername(string userName)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
@@ -263,6 +290,10 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Deletes a Member
+        /// </summary>
+        /// <param name="member"></param>
         public void Delete(IMember member)
         {
             var uow = _uowProvider.GetUnitOfWork();
@@ -273,6 +304,10 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Saves an updated Member
+        /// </summary>
+        /// <param name="member"></param>
         public void Save(IMember member)
         {
             var uow = _uowProvider.GetUnitOfWork();
