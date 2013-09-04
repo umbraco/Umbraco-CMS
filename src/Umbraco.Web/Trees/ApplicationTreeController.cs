@@ -43,7 +43,7 @@ namespace Umbraco.Web.Trees
             var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
 
             //find all tree definitions that have the current application alias
-            var appTrees = ApplicationContext.Current.Services.ApplicationTreeService.GetApplicationTrees(application).Where(x => x.Initialize).ToArray();
+            var appTrees = ApplicationContext.Current.Services.ApplicationTreeService.GetApplicationTrees(application, true).ToArray();
             if (appTrees.Count() == 1)
             {
                 return GetRootForSingleAppTree(

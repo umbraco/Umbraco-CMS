@@ -7,8 +7,11 @@ using System.Web;
 using System.Web.Http.Routing;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Web.Trees.Menu;
 using umbraco;
+using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.helpers;
 using umbraco.cms.presentation.Trees;
@@ -17,6 +20,13 @@ using umbraco.interfaces;
 
 namespace Umbraco.Web.Trees
 {
+    /// <summary>
+    /// This attribute is used purely to maintain some compatibility with legacy webform tree pickers
+    /// </summary>
+    /// <remarks>
+    /// This allows us to attribute new trees with their legacy counterparts and when a legacy tree is loaded this will indicate 
+    /// on the new tree which legacy tree to load (it won't actually render using the new tree)
+    /// </remarks>
     [AttributeUsage(AttributeTargets.Class)]
     internal sealed class LegacyBaseTreeAttribute : Attribute
     {
@@ -32,80 +42,59 @@ namespace Umbraco.Web.Trees
             BaseTreeType = baseTreeType;
         }
     }
-
-    internal class LegacyBaseTreeWrapper : BaseTree
-    {
-        
-        private readonly string _treeAlias;
-        private readonly TreeNodeCollection _children;
-        private readonly TreeNode _root;
-
-        public LegacyBaseTreeWrapper(string treeAlias, string application, TreeNode root, TreeNodeCollection children = null)
-            : base(application)
-        {
-            _treeAlias = treeAlias;
-            _root = root;
-            _children = children;
-        }
-        
-        public override void RenderJS(ref StringBuilder javascript)
-        {
-            
-        }
-
-        public override void Render(ref XmlTree tree)
-        {
-            foreach (var c in _children)
-            {
-                var node = XmlTreeNode.Create(this);
-                LegacyTreeDataConverter.ConvertToLegacyNode(node, c, _treeAlias);
-                node.Source = IsDialog == false ? GetTreeServiceUrl(int.Parse(node.NodeID)) : GetTreeDialogUrl(int.Parse(node.NodeID));
-                tree.Add(node);
-            }
-        }
-
-        protected override void CreateRootNode(ref XmlTreeNode rootNode)
-        {
-            rootNode.NodeID = _root.NodeId;
-            rootNode.Icon = _root.IconIsClass ? _root.Icon.EnsureStartsWith('.') : _root.IconFilePath;
-            rootNode.HasChildren = _root.HasChildren;
-            rootNode.NodeID = _root.NodeId;
-            rootNode.Text = _root.Title;
-            rootNode.NodeType = _root.NodeType;
-            rootNode.OpenIcon = _root.IconIsClass ? _root.Icon.EnsureStartsWith('.') : _root.IconFilePath;
-        }
-
-        public override string TreeAlias
-        {
-            get { return _treeAlias; }
-        }
-    }
-
+    
     /// <summary>
     /// Converts the legacy tree data to the new format
     /// </summary>
     internal class LegacyTreeDataConverter
     {
-
-        internal static FormDataCollection ConvertFromLegacyTreeParams(TreeRequestParams treeParams)
+        /// <summary>
+        /// This is used by any legacy services that require rendering a BaseTree, if a new controller tree is detected it will try to invoke it's legacy predecessor.
+        /// </summary>
+        /// <param name="appTreeService"></param>
+        /// <param name="treeType"></param>
+        /// <returns></returns>
+        internal static BaseTree GetLegacyTreeForLegacyServices(ApplicationTreeService appTreeService, string treeType)
         {
-            return new FormDataCollection(new Dictionary<string, string>
+            BaseTree tree;
+
+            //first get the app tree definition so we can then figure out if we need to load by legacy or new
+            //now we'll look up that tree
+            var appTree = appTreeService.GetByAlias(treeType);
+            if (appTree == null)
+                throw new InvalidOperationException("No tree found with alias " + treeType);
+
+            var controllerAttempt = appTree.TryGetControllerTree();
+            if (controllerAttempt.Success)
+            {
+                var legacyAtt = controllerAttempt.Result.GetCustomAttribute<LegacyBaseTreeAttribute>(false);
+                if (legacyAtt == null)
                 {
-                    {TreeQueryStringParameters.Application, treeParams.Application},
-                    {TreeQueryStringParameters.DialogMode, treeParams.IsDialog.ToString()},
-                });
-        }
+                    LogHelper.Warn<LegacyTreeDataConverter>("Cannot render tree: " + treeType + ". Cannot render a " + typeof(TreeApiController) + " tree type with the legacy web services unless attributed with " + typeof(LegacyBaseTreeAttribute));
+                    return null;
+                }
 
-        internal static void ConvertToLegacyNode(XmlTreeNode legacy, TreeNode node, string treeType)
-        {
-            legacy.Action = node.AdditionalData.ContainsKey("legacyDialogAction") ? node.AdditionalData["legacyDialogAction"].ToString() : "";
-            legacy.HasChildren = node.HasChildren;
-            legacy.Icon = node.IconIsClass ? node.Icon.EnsureStartsWith('.') : node.IconFilePath;
-            legacy.NodeID = node.NodeId;
-            legacy.NodeType = node.NodeType;
-            legacy.OpenIcon = node.IconIsClass ? node.Icon.EnsureStartsWith('.') : node.IconFilePath;
-            legacy.Text = node.Title;
-            legacy.TreeType = treeType;
+                var treeDef = new TreeDefinition(
+                    legacyAtt.BaseTreeType,
+                    new ApplicationTree(false, true, appTree.SortOrder, appTree.ApplicationAlias, appTree.Alias, appTree.Title, appTree.IconClosed, appTree.IconOpened, "", legacyAtt.BaseTreeType.GetFullNameWithAssembly(), ""),
+                    new Application(treeType, treeType, "", 0));
+
+                tree = treeDef.CreateInstance();
+                tree.TreeAlias = appTree.Alias;
+
+            }
+            else
+            {
+                //get the tree that we need to render                    
+                var treeDef = TreeDefinitionCollection.Instance.FindTree(treeType);
+                if (treeDef == null)
+                {
+                    return null;
+                }
+                tree = treeDef.CreateInstance();
+            }
+
+            return tree;
         }
 
         /// <summary>

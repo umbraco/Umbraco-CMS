@@ -81,14 +81,15 @@ namespace umbraco.presentation.webservices
         /// <param name="context"></param>
         private void LoadAppTrees(TreeRequestParams treeParams, HttpContext context)
         {
-            //find all tree definitions that have the current application alias
-            List<TreeDefinition> treeDefs = TreeDefinitionCollection.Instance.FindActiveTrees(treeParams.Application);
-
-            foreach (TreeDefinition treeDef in treeDefs)
+            var appTrees = Services.ApplicationTreeService.GetApplicationTrees(treeParams.Application, true);
+            foreach (var appTree in appTrees)
             {
-                BaseTree bTree = treeDef.CreateInstance();
-                bTree.SetTreeParameters(treeParams);
-                _xTree.Add(bTree.RootNode);
+                var tree = LegacyTreeDataConverter.GetLegacyTreeForLegacyServices(Services.ApplicationTreeService, appTree.Alias);
+                if (tree != null)
+                {
+                    tree.SetTreeParameters(treeParams);
+                    _xTree.Add(tree.RootNode);
+                }
             }
         }
 
@@ -99,64 +100,17 @@ namespace umbraco.presentation.webservices
         /// <param name="httpContext"></param>
         private void LoadTree(TreeRequestParams treeParams, HttpContext httpContext)
         {
-
-            var appTree = Services.ApplicationTreeService.GetByAlias(treeParams.TreeType);
-            if (appTree == null)
-                throw new InvalidOperationException("No tree found with alias " + treeParams.TreeType);
-
-            var controllerAttempt = appTree.TryGetControllerTree();
-            if (controllerAttempt.Success)
+            var tree = LegacyTreeDataConverter.GetLegacyTreeForLegacyServices(Services.ApplicationTreeService, treeParams.TreeType);
+            if (tree != null)
             {
-                var legacyAtt = controllerAttempt.Result.GetCustomAttribute<LegacyBaseTreeAttribute>(false);
-                if (legacyAtt == null)
-                {
-                    throw new InvalidOperationException("Cannot render a " + typeof(TreeApiController) + " tree type with the legacy web services unless attributed with " + typeof(LegacyBaseTreeAttribute));
-                }
-
-                var treeDef = new TreeDefinition(
-                    legacyAtt.BaseTreeType,
-                    new ApplicationTree(false, true, appTree.SortOrder, appTree.ApplicationAlias, appTree.Alias, appTree.Title, appTree.IconClosed, appTree.IconOpened, "", legacyAtt.BaseTreeType.GetFullNameWithAssembly(), ""),
-                    new Application(treeParams.TreeType, treeParams.TreeType, "", 0));
-
-                var tree = treeDef.CreateInstance();
-                tree.TreeAlias = appTree.Alias;
                 tree.SetTreeParameters(treeParams);
                 tree.Render(ref _xTree);
-
-                //var context = WebApiHelper.CreateContext(new HttpMethod("GET"), httpContext.Request.Url, new HttpContextWrapper(httpContext));
-
-                //var rootAttempt = appTree.TryGetRootNodeFromControllerTree(
-                //    LegacyTreeDataConverter.ConvertFromLegacyTreeParams(treeParams),
-                //    context);
-
-                //var nodesAttempt = appTree.TryLoadFromControllerTree(
-                //    treeParams.StartNodeID.ToInvariantString(),
-                //    LegacyTreeDataConverter.ConvertFromLegacyTreeParams(treeParams),
-                //    context);
-
-                //if (rootAttempt.Success && nodesAttempt.Success)
-                //{
-                //    var tree = new LegacyBaseTreeWrapper(treeParams.TreeType, treeParams.Application, rootAttempt.Result, nodesAttempt.Result);
-                //    tree.SetTreeParameters(treeParams);
-                //    tree.Render(ref _xTree);
-                //}
             }
             else
             {
-                var treeDef = TreeDefinitionCollection.Instance.FindTree(treeParams.TreeType);
-
-                if (treeDef != null)
-                {
-                    var bTree = treeDef.CreateInstance();
-                    bTree.SetTreeParameters(treeParams);
-                    bTree.Render(ref _xTree);
-                }
-                else
-                    LoadNullTree(treeParams);
+                LoadNullTree(treeParams);
             }
-
-
-
+            
         }
 
         /// <summary>
