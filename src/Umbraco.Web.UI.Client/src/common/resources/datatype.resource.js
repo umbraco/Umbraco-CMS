@@ -33,6 +33,17 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                'Failed to retreive data for data type id ' + id);
         },
 
+        getAll: function () {
+            
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "dataTypeApiBaseUrl",
+                       "GetAll",
+                       [{ id: id }])),
+               'Failed to retreive data for data type id ' + id);
+        },
+
         /** returns an empty content object which can be persistent on the content service
             requires the parent id and the alias of the content type to base the scaffold on */
         getScaffold: function (parentId, alias) {
