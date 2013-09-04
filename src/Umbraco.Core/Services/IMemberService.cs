@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
@@ -10,6 +11,9 @@ namespace Umbraco.Core.Services
     {
         IMember GetById(int id);
         IMember GetByKey(Guid id);
+        IEnumerable<IMember> GetMembersByMemberType(string memberTypeAlias);
+        IEnumerable<IMember> GetMembersByGroup(string memberGroupName);
+        IEnumerable<IMember> GetAllMembers(params int[] ids);
     }
 
     /// <summary>
@@ -22,11 +26,11 @@ namespace Umbraco.Core.Services
     {
         IMember CreateMember(string username, string email, string password, string memberTypeAlias, int userId = 0);
 
-        IMember GetByUsername(string login);
+        IMember GetById(object id);
 
         IMember GetByEmail(string email);
 
-        IMember GetById(object id);
+        IMember GetByUsername(string login);
 
         void Delete(IMember membershipUser);
 

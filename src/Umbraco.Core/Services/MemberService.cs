@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
@@ -31,6 +33,13 @@ namespace Umbraco.Core.Services
             _uowProvider = provider;
         }
 
+        #region IMemberService Implementation
+
+        /// <summary>
+        /// Gets a Member by its integer Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public IMember GetById(int id)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
@@ -39,6 +48,15 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Gets a Member by its Guid key
+        /// </summary>
+        /// <remarks>
+        /// The guid key corresponds to the unique id in the database
+        /// and the user id in the membership provider.
+        /// </remarks>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public IMember GetByKey(Guid id)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
@@ -48,6 +66,134 @@ namespace Umbraco.Core.Services
                 return member;
             }
         }
+
+        /// <summary>
+        /// Gets a list of Members by their MemberType
+        /// </summary>
+        /// <param name="memberTypeAlias"></param>
+        /// <returns></returns>
+        public IEnumerable<IMember> GetMembersByMemberType(string memberTypeAlias)
+        {
+            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IMember>.Builder.Where(x => x.ContentTypeAlias == memberTypeAlias);
+                var members = repository.GetByQuery(query);
+                return members;
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of Members by the MemberGroup they are part of
+        /// </summary>
+        /// <param name="memberGroupName"></param>
+        /// <returns></returns>
+        public IEnumerable<IMember> GetMembersByGroup(string memberGroupName)
+        {
+            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetByMemberGroup(memberGroupName);
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of all Members
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public IEnumerable<IMember> GetAllMembers(params int[] ids)
+        {
+            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(ids);
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of Members with a certain string property value
+        /// </summary>
+        /// <param name="propertyTypeAlias"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, string value)
+        {
+            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query =
+                    Query<IMember>.Builder.Where(
+                        x =>
+                            ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
+                            (((Member)x).LongStringPropertyValue.Contains(value) ||
+                             ((Member)x).ShortStringPropertyValue.Contains(value)));
+
+                var members = repository.GetByQuery(query);
+                return members;
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of Members with a certain integer property value
+        /// </summary>
+        /// <param name="propertyTypeAlias"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value)
+        {
+            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query =
+                    Query<IMember>.Builder.Where(
+                        x =>
+                            ((Member)x).PropertyTypeAlias == propertyTypeAlias && 
+                            ((Member)x).IntegerropertyValue == value);
+
+                var members = repository.GetByQuery(query);
+                return members;
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of Members with a certain boolean property value
+        /// </summary>
+        /// <param name="propertyTypeAlias"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, bool value)
+        {
+            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query =
+                    Query<IMember>.Builder.Where(
+                        x =>
+                            ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
+                            ((Member)x).BoolPropertyValue == value);
+
+                var members = repository.GetByQuery(query);
+                return members;
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of Members with a certain date time property value
+        /// </summary>
+        /// <param name="propertyTypeAlias"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value)
+        {
+            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query =
+                    Query<IMember>.Builder.Where(
+                        x =>
+                            ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
+                            ((Member)x).DateTimePropertyValue == value);
+
+                var members = repository.GetByQuery(query);
+                return members;
+            }
+        }
+        
+        #endregion
 
         #region IMembershipMemberService Implementation
 
@@ -80,28 +226,6 @@ namespace Umbraco.Core.Services
             return member;
         }
 
-        public IMember GetByUsername(string userName)
-        {
-            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
-            {
-                var query = Query<IMember>.Builder.Where(x => x.Username == userName);
-                var member = repository.GetByQuery(query).FirstOrDefault();
-
-                return member;
-            }
-        }
-
-        public IMember GetByEmail(string email)
-        {
-            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
-            {
-                var query = Query<IMember>.Builder.Where(x => x.Email == email);
-                var member = repository.GetByQuery(query).FirstOrDefault();
-
-                return member;
-            }
-        }
-
         public IMember GetById(object id)
         {
             if (id is int)
@@ -115,6 +239,28 @@ namespace Umbraco.Core.Services
             }
 
             return null;
+        }
+
+        public IMember GetByEmail(string email)
+        {
+            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IMember>.Builder.Where(x => x.Email == email);
+                var member = repository.GetByQuery(query).FirstOrDefault();
+
+                return member;
+            }
+        }
+
+        public IMember GetByUsername(string userName)
+        {
+            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IMember>.Builder.Where(x => x.Username == userName);
+                var member = repository.GetByQuery(query).FirstOrDefault();
+
+                return member;
+            }
         }
 
         public void Delete(IMember member)
