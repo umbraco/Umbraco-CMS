@@ -22,18 +22,28 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
             _publishedContent = publishedContent;
         }
 
-        public readonly Func<MethodBase> ForThis = MethodBase.GetCurrentMethod;
-
-        public object Resolve(Type type, MethodBase methodBase)
-        {
-            var propertyTypeAlias = methodBase.ToUmbracoAlias();
-            return _publishedContent.GetPropertyValue(propertyTypeAlias);
-        }
+        public readonly Func<MethodBase> Property = MethodBase.GetCurrentMethod;
+        public static string DefaultString = default(string);
+        public static int DefaultInteger = default(int);
+        public static bool DefaultBool = default(bool);
+        public static DateTime DefaultDateTime = default(DateTime);
 
         public T Resolve<T>(MethodBase methodBase)
         {
             var propertyTypeAlias = methodBase.ToUmbracoAlias();
             return _publishedContent.GetPropertyValue<T>(propertyTypeAlias);
+        }
+
+        public T Resolve<T>(MethodBase methodBase, T ifCannotConvert)
+        {
+            var propertyTypeAlias = methodBase.ToUmbracoAlias();
+            return _publishedContent.GetPropertyValue<T>(propertyTypeAlias, false, ifCannotConvert);
+        }
+
+        public T Resolve<T>(MethodBase methodBase, bool recursive, T ifCannotConvert)
+        {
+            var propertyTypeAlias = methodBase.ToUmbracoAlias();
+            return _publishedContent.GetPropertyValue<T>(propertyTypeAlias, recursive, ifCannotConvert);
         }
 
         public string ResolveString(MethodBase methodBase)

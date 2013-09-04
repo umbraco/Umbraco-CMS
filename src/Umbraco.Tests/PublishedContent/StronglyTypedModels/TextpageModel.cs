@@ -9,10 +9,12 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
         {
         }
 
-        public string Title { get { return ResolveString(ForThis()); } }
+        public string Title { get { return Resolve(Property(), DefaultString); } }
 
-        public string BodyText { get { return ResolveString(ForThis()); } }
+        public string BodyText { get { return Resolve(Property(), DefaultString); } }
 
-        public DateTime Date { get { return ResolveDate(ForThis()); } }
+        public string AuthorName { get { return Resolve<string>(Property()); } }
+
+        public DateTime Date { get { return Resolve(Property(), DefaultDateTime); } }
     }
 }
