@@ -31,7 +31,6 @@
     "grunt-contrib-uglify": "~0.1.1",
     "grunt-html2js": "~0.1.0",
     "grunt-contrib-watch": "~0.3.1",
-    "grunt-markdown": "~0.2.0",
     "grunt-open": "~0.2.0",
     "grunt-contrib-connect": "~0.3.0",
     "grunt-karma": "~0.5",
@@ -43,6 +42,7 @@
     "karma-coffee-preprocessor": "0.0.1",
     "karma": "~0.9",
     "karma-phantomjs-launcher": "0.0.2",
-    "grunt-ngdocs": "~0.1.2"
+    "grunt-ngdocs": "~0.1.2",
+    "grunt-ngmin": "0.0.3"
   }
 }

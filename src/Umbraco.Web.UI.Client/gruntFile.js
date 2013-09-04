@@ -5,17 +5,17 @@ module.exports = function (grunt) {
   grunt.registerTask('dev', ['jshint:dev', 'build', 'webserver', 'open:dev', 'watch']);
   
   //run by the watch task
-  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','karma:unit', 'copy:vs']);
+  grunt.registerTask('watch-js', ['jshint:dev','concat:dev','copy:app','copy:mocks','copy:packages','copy:vs','karma:unit']);
   grunt.registerTask('watch-less', ['recess:build','copy:assets','copy:vs']);
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
   grunt.registerTask('watch-packages', ['copy:packages']);
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
-  grunt.registerTask('build', ['clean','concat','recess:build','copy']);
+  grunt.registerTask('build', ['clean','concat','uglify','recess:build','copy']);
 
   //utillity tasks
-  grunt.registerTask('docs', ['markdown', 'ngdocs']);
+  grunt.registerTask('docs', ['ngdocs']);
   grunt.registerTask('webserver', ['connect:devserver']);
 
 
@@ -97,7 +97,6 @@ module.exports = function (grunt) {
             { dest: '<%= distdir %>/js', src : '*.js', expand: true, cwd: 'src/' }
             ]
       },
-
       mocks: {
         files: [{ dest: '<%= distdir %>/js', src : '*.js', expand: true, cwd: 'src/common/mocks/' }]
       },
@@ -124,71 +123,82 @@ module.exports = function (grunt) {
     },
 
     concat:{
-      index: {
-        src: ['src/index.html'],
-        dest: '<%= distdir %>/index.html',
-        options: {
-          process: true
+        index: {
+          src: ['src/index.html'],
+          dest: '<%= distdir %>/index.html',
+          options: {
+            process: true
+          }
+        },
+        controllers: {
+          src:['src/views/**/*.controller.js'],
+          dest: '<%= distdir %>/js/umbraco.controllers.js',
+          options: {
+              banner: "<%= banner %>\n(function() { \n\n",
+              footer: "\n\n})();"
+          }
+        },
+        services: {
+          src:['src/common/services/*.js'],
+          dest: '<%= distdir %>/js/umbraco.services.js',
+          options: {
+              banner: "<%= banner %>\n(function() { \n\n",
+              footer: "\n\n})();"
+          }
+        },
+        security: {
+          src:['src/common/security/*.js'],
+          dest: '<%= distdir %>/js/umbraco.security.js',
+          options: {
+              banner: "<%= banner %>\n(function() { \n\n",
+              footer: "\n\n})();"
+          }
+        },
+        resources: {
+          src:['src/common/resources/*.js'],
+          dest: '<%= distdir %>/js/umbraco.resources.js',
+          options: {
+              banner: "<%= banner %>\n(function() { \n\n",
+              footer: "\n\n})();"
+          }
+        },
+        testing: {
+          src:['src/common/mocks/resources/*.js'],
+          dest: '<%= distdir %>/js/umbraco.testing.js',
+          options: {
+              banner: "<%= banner %>\n(function() { \n\n",
+              footer: "\n\n})();"
+          }
+        },
+        directives: {
+          src:['src/common/directives/**/*.js'],
+          dest: '<%= distdir %>/js/umbraco.directives.js',
+          options: {
+              banner: "<%= banner %>\n(function() { \n\n",
+              footer: "\n\n})();"
+          }
+        },
+        filters: {
+          src:['src/common/filters/*.js'],
+          dest: '<%= distdir %>/js/umbraco.filters.js',
+          options: {
+              banner: "<%= banner %>\n(function() { \n\n",
+              footer: "\n\n})();"
+          }
         }
+    },
+
+    uglify: {
+      options: {
+        mangle: true
       },
-      controllers: {
-        src:['src/views/**/*.controller.js'],
-        dest: '<%= distdir %>/js/umbraco.controllers.js',
-        options: {
-            banner: "<%= banner %>\n(function() { \n\n",
-            footer: "\n\n})();"
-        }
-      },
-      services: {
-        src:['src/common/services/*.js'],
-        dest: '<%= distdir %>/js/umbraco.services.js',
-        options: {
-            banner: "<%= banner %>\n(function() { \n\n",
-            footer: "\n\n})();"
-        }
-      },
-      security: {
-        src:['src/common/security/*.js'],
-        dest: '<%= distdir %>/js/umbraco.security.js',
-        options: {
-            banner: "<%= banner %>\n(function() { \n\n",
-            footer: "\n\n})();"
-        }
-      },
-      resources: {
-        src:['src/common/resources/*.js'],
-        dest: '<%= distdir %>/js/umbraco.resources.js',
-        options: {
-            banner: "<%= banner %>\n(function() { \n\n",
-            footer: "\n\n})();"
-        }
-      },
-      testing: {
-        src:['src/common/mocks/resources/*.js'],
-        dest: '<%= distdir %>/js/umbraco.testing.js',
-        options: {
-            banner: "<%= banner %>\n(function() { \n\n",
-            footer: "\n\n})();"
-        }
-      },
-      directives: {
-        src:['src/common/directives/**/*.js'],
-        dest: '<%= distdir %>/js/umbraco.directives.js',
-        options: {
-            banner: "<%= banner %>\n(function() { \n\n",
-            footer: "\n\n})();"
-        }
-      },
-      filters: {
-        src:['src/common/filters/*.js'],
-        dest: '<%= distdir %>/js/umbraco.filters.js',
-        options: {
-            banner: "<%= banner %>\n(function() { \n\n",
-            footer: "\n\n})();"
+      my_target: {
+        files: {
+          '<%= distdir %>/js/umbraco.min.js': ['<%= distdir %>/js/umbraco.*.js']
         }
       }
     },
-
+    
     recess: {
       build: {
         files: {
@@ -207,6 +217,8 @@ module.exports = function (grunt) {
         }
       }
     },
+
+
 
     watch:{
       css: {
@@ -235,12 +247,6 @@ module.exports = function (grunt) {
       }
     },
 
-    markdown: {
-        all: {
-          files: ['docs/src/*.md'],
-          dest: 'docs/html/'
-        }
-    },
 
     ngdocs: {
       options: {
@@ -316,6 +322,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-recess');
 
@@ -324,6 +331,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-open');
   grunt.loadNpmTasks('grunt-contrib-connect');
 
-  grunt.loadNpmTasks('grunt-markdown');
   grunt.loadNpmTasks('grunt-ngdocs');
+  grunt.loadNpmTasks('grunt-ngmin');
+
 };
