@@ -1,0 +1,633 @@
+/* CSS Reset */
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td
+{
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+}
+/* adjust toolbar menu after reset */
+.editorArrow, .editorArrowOver 
+{
+	margin: 0 4px 0 0;
+	}
+.editorIcon
+{
+	margin: 2px;
+	padding: 0;
+}
+.editorIconOver
+{
+	margin: 1px;
+	padding: 0;
+}
+.sl {margin-top: 3px;}
+.menubar table
+{
+	margin: 0 0 0 3px;
+}
+body
+{
+	line-height: 1;
+}
+ol, ul
+{
+	list-style: none;
+}
+blockquote, q
+{
+	quotes: none;
+}
+blockquote:before, blockquote:after, q:before, q:after
+{
+	content: '';
+	content: none;
+}
+
+/* remember to define focus styles! */
+:focus
+{
+	outline: 0;
+}
+
+/* remember to highlight inserts somehow! */
+ins
+{
+	text-decoration: none;
+}
+del
+{
+	text-decoration: line-through;
+}
+
+/* tables still need 'cellspacing="0"' in the markup */
+table
+{
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+
+/* Modal */
+
+#simplemodal-overlay
+{
+	background-color: #ccc;
+	cursor: wait;
+}
+
+#simplemodal-container
+{
+	height: 400px;
+	width: 600px;
+	background-color: #fff;
+	border: 3px solid #ccc;
+}
+
+#simplemodal-container a.modalCloseImg
+{
+	background: url(img/x.png) no-repeat;
+	width: 25px;
+	height: 29px;
+	display: inline;
+	z-index: 3200;
+	position: absolute;
+	top: -14px;
+	right: -18px;
+	cursor: pointer;
+}
+
+
+.modal
+{
+	padding: 8px;
+}
+
+/* Design Surface */
+
+a.iconButton
+{
+	display: block;
+	padding: 20px 20px 0px 0px;
+	width: 0px;
+	height: 0px;
+	overflow: hidden;
+/*	background: no-repeat center center url(../../../images/false.png);*/
+}
+
+a.add
+{
+	background: url(img/add_small.png) no-repeat;
+    margin-left: 5px;
+}
+a.delete
+{
+	background: url(img/delete_small.png) no-repeat;
+	margin-left: 5px;
+}
+a.copy
+{
+	background: url(img/copy_small.png)  no-repeat;
+	margin-left: 5px;
+}
+a.update
+{
+	background: url(img/edit_small.png)  no-repeat;
+	margin-left: 5px;
+}
+
+.handle
+{
+	cursor: move;
+	display: block;
+	padding: 30px 30px 0px 0px;
+	width: 0px;
+	height: 0px;
+	overflow: hidden;
+}
+.handle:hover
+{
+	cursor: move;
+	display: block;
+	padding: 30px 30px 0px 0px;
+	width: 0px;
+	height: 0px;
+	overflow: hidden;
+	background: transparent no-repeat 8px -34px url(../images/drag.png);
+}
+.activefield .handle
+{
+	cursor: move;
+	display: block;
+	padding: 30px 30px 0px 0px;
+	width: 0px;
+	height: 0px;
+	overflow: hidden;
+	background: transparent no-repeat 8px 11px url(../images/drag.png);
+}
+
+#formbuilder
+{
+	padding: 10px;
+}
+
+#actions
+{
+	padding-bottom: 10px;
+}
+
+#designsurface
+{
+	min-width: 600px;
+	width: 98%;
+	min-height: 50px;
+	padding-top: 0px;
+	padding-bottom: 10px;
+	margin-top: 0px;
+}
+
+
+.page
+{
+	padding: 0px;
+	margin: 5px;
+	position: relative;
+}
+
+.pageheader
+{
+	border-bottom: 1px solid #efefef;
+	padding: 3px;
+	margin-bottom: 5px;
+	font-size: 125%;
+	height: 20px;
+}
+
+.pageheader .pagename
+{
+	float: left;
+}
+
+.pageheader a.iconButton
+{
+	float: right;
+	
+}
+
+.fieldset
+{
+	position: relative;
+	padding: 5px 0px 5px 20px;
+	margin: 0px;
+}
+
+.fieldset .handle
+{
+	position: absolute;
+	left: -5px;
+	top: 1px;
+}
+
+.fieldsetheader
+{
+	font-size: 110%;
+	padding: 5px;
+	border-bottom: 1px solid #efefef;
+	margin-bottom: 5px;
+	height: 17px;
+	padding-right: 3px;
+}
+
+.fieldsetheader .fieldsetname
+{
+	float: left;
+}
+.fieldsetheader a.iconButton
+{
+	float: right;
+	margin-left: 5px;
+}
+
+.fieldControl
+{
+	float: left;
+	padding-left: 10px;
+}
+
+.field
+{
+	position: relative;
+	background-color: #fff;
+	padding: 15px 0px 15px 20px;
+	margin: 0;
+	padding-right: 0px;
+	
+}
+
+.field .handle
+{
+	left: -5px;
+	top:4px;
+}
+
+.field a.iconButton
+{
+	position: relative;
+	float: right;
+	display: none;
+}
+.fieldexamplelabel, .fieldControl
+{
+	position: relative;
+}
+.activefield
+{
+	background-color: #e7fbe0;
+}
+
+.activefield a.iconButton
+{
+	display: block;
+}
+
+.field label.fieldexamplelabel, #FieldModal label.fieldexamplelabel
+{
+	clear: left;
+	float: left;
+	font-weight: bold;
+	padding-bottom: 10px;
+	padding-right: 10px;
+	width: 180px;
+}
+
+#toggleadditionalsettings, #toggleconditions
+{
+	padding: 3px 0px 0px 15px;
+	cursor: pointer;
+	background: transparent no-repeat url(img/bullet_arrow_down.png);
+}
+.leftPad10
+{
+	padding-left: 10px;
+}
+
+.fieldsetcontainer
+{
+	min-height: 10px;
+}
+
+.fieldcontainer
+{
+	min-height: 10px;
+}
+
+#fieldprevalues, #fieldprevalueslist, #fieldprevalueslist li
+{
+	
+}
+
+.fieldeditprevalues 
+{
+	margin-top: 5px;
+}
+
+#editprevaluelist li 
+{
+	display: block;
+
+	clear:both;
+
+    height: 20px;
+}
+
+#editprevaluelist li .prevaluetext
+{
+	float:left;
+}
+
+#editprevaluelist .iconButton
+{
+	display: inline;
+	margin: 0;
+	padding: 20px 20px 0 0;
+}
+
+#prevalueform fieldset 
+{
+	padding: 5px;
+	border: 1px solid #368216;
+	width: 250px;
+	margin: 5px;
+}
+
+#prevalueform h1 
+{
+	margin-bottom: 5px;
+	font-weight: bold;
+}
+
+#fieldprevalueslist li
+{
+	background-color: #DDDDDD;
+}
+
+.disabled
+{
+	color: #CCCCCC;
+	cursor: default;
+}
+
+.mandatory
+{
+	color: #FF0000;
+}
+
+
+
+/* INLINE FORMS */
+#FieldModal
+{
+	margin: 10px 10px 10px 0px;
+	padding: 10px;
+	border: 2px dotted #368216;
+	background-color: #d0f4c5;
+}
+#FieldModal h1
+{
+	display: none;
+}
+.modalform label
+{
+	width: 100px;
+	float: left;
+	clear: left;
+	padding-right: 10px;
+}
+.modalform p
+{
+	padding: 10px 5px;
+}
+.modalform .fieldContainer
+{
+	margin: 10px 0px;
+	padding-left: 5px;
+}
+.formControl
+{
+	float: left;
+	clear: right;
+}
+
+.ui-sortable-helper
+{
+	border: 2px dashed #ccc;
+}
+.ui-sortable-helper .handle
+{
+	background: none;
+}
+
+/* Fieldtype previews */
+input.textfield, textarea.textarea
+{
+	color: #333333;
+	font-family: Trebuchet MS,Lucida Grande,verdana,arial;
+	font-size: 12px;
+	padding: 2px;
+	width: 250px;
+}
+
+select.dropdownlist
+{
+}
+
+#stepsnavigation{padding: 10px; border-top: 1px solid #efefef; margin-top: 15px; }
+
+/* WORKFLOWS */
+#workflows
+{
+	text-align: center;
+	margin-bottom: 30px;
+}
+#workflows .stateholder
+{
+	font-size: 12px;
+	border: 2px dashed #BFBFBF;
+	background: #F4F4F4;
+	padding: 15px;
+	width: 70%;
+	margin: auto;
+	margin-top: 30px;
+	
+}
+
+#workflows .stateholder h2
+{
+	font-size: 1.5em !important;
+	color: #ccc;
+	padding: 5px;
+	margin: 0px;
+}
+
+#workflows .advanced
+{
+	display: none;
+	border-color: #D7D7D7;
+	background: #FFFCDF;
+}
+#workflows .stateholder a.iconButton
+{
+    cursor: pointer;
+	float: right;
+	margin-left: 5px;
+}
+
+#workflows .empty
+{
+	padding: 10px;
+}
+
+#workflows .iconButton
+{
+	display: block !important;
+}
+
+#workflows button
+{
+	font-size: 1em;
+}
+
+#workflows .arrow
+{
+	background: no-repeat center center url(../images/down-arrow.gif);
+	padding: 40px 40px 0px 0px;
+	overflow: hidden;
+	width: 0px;
+	height: 0px;
+	margin: auto;
+	margin-top: 20px;
+}
+
+#workflows .sortablepropertypane
+{
+	padding: 10px;
+	margin: 5px;
+	background: #fff;
+	cursor: move;
+}
+
+
+.notification{
+  background:#FFF6BF;
+  color:#514721;
+  border: #FFD324 2px solid; 
+  padding: 15px; 
+  font-size: 1em;  
+  margin-bottom: 20px;
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+  }
+  
+label.error
+{
+	background-color:#D0F4C5;
+	border-style:none;
+	padding:0;
+	width:200px;
+	float:none;
+	padding-left:10px;
+}
+
+.field 
+{
+	clear:both;
+	height:auto;
+}
+
+.iconButton
+{
+	z-index: 50;
+}
+
+/* entries viewer */
+.recordOption
+{
+    display:block;
+    height:0;
+    overflow:hidden;
+    padding:16px 16px 0 0;
+    width:0;
+    background:url("img/options.png") no-repeat scroll 0 0 transparent;
+    float:left;
+}
+
+#recordContextMenu
+{
+    background:url("img/contextMenuBg.gif") repeat-y scroll left center #F0F0F0;
+    display: block; 
+    border:1px solid #979797;
+    width: 180px; 
+    position: absolute;
+    padding:3px;
+}
+
+
+
+#recordContextMenu li
+{
+    padding:2px;
+    color:#1A1818;
+    cursor:pointer;
+    font-family:Arial,Lucida Grande;
+    font-size:11px;
+    height:20px;
+    margin:1px;
+    background-repeat:no-repeat;
+    background-position:left center;
+}
+
+#recordContextMenu li div
+{
+    padding-left: 30px;
+    
+    
+}
+
+#recordContextMenu li.activemenuitem
+{
+	background:#dcecf3;
+	border:1px solid #a8d8eb;
+	padding-top:1px;
+	padding-bottom:1px;
+	padding-left:1px;
+	background-repeat:no-repeat;
+    background-position:left center;
+}
+
+#columnToggler .hidden
+{
+    color: #cccccc;
+}
+
+.inlineEditor input{
+	width:100px !important;
+}
+
+.field .grey {
+    color: #CCC;
+}
+
+#editprevaluelist .move{
+    background: url(../images/drag.png) no-repeat;
+    cursor: move;
+    display: none;
+}
+
+#editprevaluelist .activeprevalue .move {
+    display: block;
+}

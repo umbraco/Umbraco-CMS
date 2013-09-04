@@ -1,0 +1,95 @@
+﻿body {
+  	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+	  font-size: 12px;
+	  font-weight: normal;
+	  background-color: #fff}
+	  
+h1
+{
+	color:#999999;
+    font-size:14px;
+    line-height:14px;
+    margin:7px 0 0;
+}
+
+.propertypane {
+    background:#FFFFFF url(/umbraco_client/propertypane/images/propertyBackground.gif) repeat-x scroll center top;
+    border:1px solid #D9D7D7;
+    clear:both;
+    display:block;
+    float:none;
+    line-height:1.1;
+    margin:7px 0 0;
+    padding:5px;
+    position:relative;
+    text-align:left;
+}
+div.propertyPaneFooter {
+    clear:both;
+    color:#FFFFFF;
+    height:1px;
+    overflow:hidden;
+}
+div.propertyItem {
+    clear:both;
+    font-family:Trebuchet MS,Lucida Grande,verdana,arial;
+    font-size:12px;
+    padding-bottom:5px;
+}
+div.propertyItem .propertyItemheader {
+    clear:left;
+    float:left;
+    font-weight:bold;
+    padding-bottom:10px;
+    padding-right:1%;
+    width:16%;
+}
+
+div.propertyItem .propertyItemContent {
+    clear:right;
+    float:left;
+    padding-bottom:5px;
+}
+
+.guiInputStandardSize,
+.propertyFormInput {
+    width:300px;
+    z-index:9999;
+}
+input, select {
+    color:#333333;
+    font-family:Trebuchet MS,Lucida Grande,verdana,arial;
+    font-size:11px;
+    padding: 2px;
+}
+
+small {
+    color:#666666;
+    font-weight:normal;
+}
+
+.dialogcontrols
+{
+	padding-top: 5px;
+	clear:both;
+}
+
+#dialogcontainer
+{
+	overflow:auto;
+}
+
+#fieldMapper{}
+#fieldMapper .mapping{border-bottom: 1px dotted #efefef; padding: 5px 0px 5px 0px;}
+#fieldMapper .mapping div{width: 150px; padding-right: 10px; float: left;}
+#fieldMapper .mapping label{display: block; font-size: 10px;}
+#fieldMapper .mapping a{display: block; color: red; text-decoration: none; float: right; margin-top: 10px; font-size: 12px;}
+
+
+ .docMapper{margin: 10px 0px 10px 20px; border-left: 1px dotted #ccc; padding-left: 10px;}
+
+ .docmapping{border-bottom: 1px dotted #efefef; padding: 5px 0px 5px 0px;}
+ .docmapping label{display: block; font-size: 11px; clear: right; float: left; width: 120px;}
+ .docmapping input ,.docmapping select {width: 200px !Important;} 
+ 
+  .addmapping{margin-bottom:0px;}

@@ -21,7 +21,10 @@ angular.module('umbraco.services')
 
     //TODO: would be nicer to set all of the options here first instead of implicitly below!
     var ui = {};
-    
+    $rootScope.$on("closeDialogs", function(){
+        
+    });
+
     function setMode(mode) {
         switch (mode) {
             case 'tree':

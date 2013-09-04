@@ -1,0 +1,13 @@
+@model Umbraco.Forms.Mvc.Models.FieldViewModel
+<select name="@Model.Name" id="@Model.Id"
+@if (Model.Mandatory){<text> data-val="true" data-val-required="@Model.RequiredErrorMessage"</text>}
+>
+    <option value=""></option>
+    @foreach (var pv in Model.PreValues)
+    {
+        <option value="@pv.Value" 
+        @if (Model.ContainsValue(pv.Value))
+        {<text>selected="selected"</text>}
+        >@pv.Value</option>
+    }
+</select>

@@ -1,0 +1,1 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="RecordActions.aspx.cs" Inherits="Umbraco.Forms.UI.Webservices.RecordActions" %>
