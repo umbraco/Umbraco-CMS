@@ -183,16 +183,16 @@ namespace Umbraco.Web.Security.Providers
             // Initialize base provider class
             base.Initialize(name, config);
 
-            _applicationName = string.IsNullOrEmpty(config["applicationName"]) ? SecurityHelper.GetDefaultAppName() : config["applicationName"];
+            _applicationName = string.IsNullOrEmpty(config["applicationName"]) ? GetDefaultAppName() : config["applicationName"];
 
-            _enablePasswordRetrieval = SecurityHelper.GetBooleanValue(config, "enablePasswordRetrieval", false);
-            _enablePasswordReset = SecurityHelper.GetBooleanValue(config, "enablePasswordReset", false);
-            _requiresQuestionAndAnswer = SecurityHelper.GetBooleanValue(config, "requiresQuestionAndAnswer", false);
-            _requiresUniqueEmail = SecurityHelper.GetBooleanValue(config, "requiresUniqueEmail", true);
-            _maxInvalidPasswordAttempts = SecurityHelper.GetIntValue(config, "maxInvalidPasswordAttempts", 5, false, 0);
-            _passwordAttemptWindow = SecurityHelper.GetIntValue(config, "passwordAttemptWindow", 10, false, 0);
-            _minRequiredPasswordLength = SecurityHelper.GetIntValue(config, "minRequiredPasswordLength", 7, true, 0x80);
-            _minRequiredNonAlphanumericCharacters = SecurityHelper.GetIntValue(config, "minRequiredNonalphanumericCharacters", 1, true, 0x80);
+            _enablePasswordRetrieval = GetBooleanValue(config, "enablePasswordRetrieval", false);
+            _enablePasswordReset = GetBooleanValue(config, "enablePasswordReset", false);
+            _requiresQuestionAndAnswer = GetBooleanValue(config, "requiresQuestionAndAnswer", false);
+            _requiresUniqueEmail = GetBooleanValue(config, "requiresUniqueEmail", true);
+            _maxInvalidPasswordAttempts = GetIntValue(config, "maxInvalidPasswordAttempts", 5, false, 0);
+            _passwordAttemptWindow = GetIntValue(config, "passwordAttemptWindow", 10, false, 0);
+            _minRequiredPasswordLength = GetIntValue(config, "minRequiredPasswordLength", 7, true, 0x80);
+            _minRequiredNonAlphanumericCharacters = GetIntValue(config, "minRequiredNonalphanumericCharacters", 1, true, 0x80);
             _passwordStrengthRegularExpression = config["passwordStrengthRegularExpression"];
 
             // make sure password format is Hashed by default.
