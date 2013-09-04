@@ -36,11 +36,9 @@ function MainController($scope, $routeParams, $rootScope, $timeout, $http, $log,
         //only close dialogs if non-lin and non-buttons are clicked
         var el = event.target.nodeName;
         var pEl = event.target.parentElement.nodeName;
-        var close = $(event.target).closest("#navigation");
-        var parents = $(event.target).parents("#navigation");
 
         //SD: I've updated this so that we don't close the dialog when clicking inside of the dialog
-        if (parents.length === 1) {
+        if ($(event.target).closest("#navigation").length === 1) {
             return;
         }
 

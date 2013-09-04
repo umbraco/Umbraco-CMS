@@ -332,13 +332,8 @@ function iconHelper() {
         { oldIcon: ".sprTreeDeveloperCacheTypes", newIcon: "icon-box" },
         { oldIcon: ".sprTreeDeveloperMacro", newIcon: "icon-cogs" },
         { oldIcon: ".sprTreeDeveloperRegistry", newIcon: "icon-windows" },
-        { oldIcon: ".sprTreeDeveloperPython", newIcon: "icon-linux" },
-        { oldIcon: "images/tray/contour.png", newIcon: "icon-umb-contour" }
+        { oldIcon: ".sprTreeDeveloperPython", newIcon: "icon-linux" }
     ];
-
-    var imageConverter = [
-            {oldImage: "contour.png", newIcon: "icon-umb-contour"}
-            ];
 
     return {
         
@@ -420,14 +415,6 @@ function iconHelper() {
             }
             return icon;
         },
-
-        convertFromLegacyImage: function (icon) {
-                var found = _.find(imageConverter, function (item) {
-                    return item.oldImage.toLowerCase() === icon.toLowerCase();
-                });
-                return (found ? found.newIcon : undefined);
-        },
-
         /** If we detect that the tree node has legacy icons that can be converted, this will convert them */
         convertFromLegacyTreeNodeIcon: function (treeNode) {
             if (this.isLegacyTreeNodeIcon(treeNode)) {

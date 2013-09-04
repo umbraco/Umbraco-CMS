@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <createUI>
   <nodeType alias="nodeTypes">
     <header>Nodetype</header>
@@ -252,34 +252,36 @@
       <delete assembly="umbraco" type="cacheTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="initpython">
-    <header>Scripting file</header>
-    <usercontrol>/create/DLRScripting.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="PythonTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="python">
-    <header>Macro</header>
-    <usercontrol>/create/DLRScripting.ascx</usercontrol>
-    <tasks>
-      <delete assembly="umbraco" type="PythonTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="initdlrscripting">
-    <header>Scripting file</header>
-    <usercontrol>/create/DLRScripting.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="DLRScriptingTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="dlrscripting">
-    <header>Macro</header>
-    <usercontrol>/create/DLRScripting.ascx</usercontrol>
-    <tasks>
-      <delete assembly="umbraco" type="DLRScriptingTasks" />
-    </tasks>
-  </nodeType>
+    <nodeType alias="initpython">
+        <header>Scripting file</header>
+        <usercontrol>/create/DLRScripting.ascx</usercontrol>
+        <tasks>
+            <create assembly="umbraco" type="PythonTasks" />
+        </tasks>
+    </nodeType>
+    <nodeType alias="python">
+        <header>Macro</header>
+        <usercontrol>/create/DLRScripting.ascx</usercontrol>
+        <tasks>
+            <delete assembly="umbraco" type="PythonTasks" />
+        </tasks>
+    </nodeType>
+
+    <nodeType alias="initdlrscripting">
+        <header>Scripting file</header>
+        <usercontrol>/create/DLRScripting.ascx</usercontrol>
+        <tasks>
+            <create assembly="umbraco" type="DLRScriptingTasks" />
+        </tasks>
+    </nodeType>
+
+    <nodeType alias="dlrscripting">
+        <header>Macro</header>
+        <usercontrol>/create/DLRScripting.ascx</usercontrol>
+        <tasks>
+            <delete assembly="umbraco" type="DLRScriptingTasks" />
+        </tasks>
+    </nodeType>
   <nodeType alias="initscripts">
     <header>Script file</header>
     <usercontrol>/create/script.ascx</usercontrol>
@@ -302,6 +304,7 @@
       <delete assembly="umbraco" type="ScriptTasks" />
     </tasks>
   </nodeType>
+    
   <nodeType alias="initpackager">
     <header>Package</header>
     <usercontrol>/create/simple.ascx</usercontrol>
@@ -338,44 +341,22 @@
       <delete assembly="umbraco" type="cms.presentation.user.UserTypeTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="partialViews">
-    <header>Macro</header>
+
+	<nodeType alias="partialViews">
+		<header>Macro</header>
     <usercontrol>/Create/PartialView.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="PartialViewTasks" />
-      <delete assembly="umbraco" type="PartialViewTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="partialViewMacros">
-    <header>Macro</header>
-    <usercontrol>/Create/PartialViewMacro.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="MacroPartialViewTasks" />
-      <delete assembly="umbraco" type="MacroPartialViewTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="forms">
-    <header>Forms</header>
-    <usercontrol>/plugins/umbracocontour/createform.ascx</usercontrol>
-    <tasks>
-      <create assembly="Umbraco.Forms.UI" type="Tasks.FormTasks" />
-      <delete assembly="Umbraco.Forms.UI" type="Tasks.FormTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="formdatasources">
-    <header>Datasources</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <create assembly="Umbraco.Forms.UI" type="Tasks.DataSourceTasks" />
-      <delete assembly="Umbraco.Forms.UI" type="Tasks.DataSourceTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="formprevaluesource">
-    <header>Prevalue source</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <create assembly="Umbraco.Forms.UI" type="Tasks.PrevalueSourceTasks" />
-      <delete assembly="Umbraco.Forms.UI" type="Tasks.PrevalueSourceTasks" />
-    </tasks>
-  </nodeType>
+		<tasks>
+			<create assembly="umbraco" type="PartialViewTasks" />
+			<delete assembly="umbraco" type="PartialViewTasks" />
+		</tasks>
+	</nodeType>
+	<nodeType alias="partialViewMacros">
+		<header>Macro</header>
+		<usercontrol>/Create/PartialViewMacro.ascx</usercontrol>
+		<tasks>
+			<create assembly="umbraco" type="MacroPartialViewTasks" />
+			<delete assembly="umbraco" type="MacroPartialViewTasks" />
+		</tasks>
+	</nodeType>
+	
 </createUI>
