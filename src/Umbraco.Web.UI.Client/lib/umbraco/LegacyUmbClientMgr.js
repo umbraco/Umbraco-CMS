@@ -166,7 +166,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 //get our angular navigation service
                 var injector = getRootInjector();
                 var dialogService = injector.get("dialogService");
-                
+
+                var self = this;
+
+                //TODO: need to get the closeTriggers working for compatibility too somehow.
+
                 var dialog = dialogService.open({
                     template: url,
                     width: width,
@@ -174,57 +178,29 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     iframe: true,
                     show: true,
                     callback: function (result) {
+                        
+                        if (typeof onCloseCallback == "function") {
+                            onCloseCallback.apply(self, [result]);
+                        }
+                        
                         dialog.hide();
                     }
                 });
 
-               // var m = new Umbraco.Controls.ModalWindow();
-               // this._modal.push(m);
-               // m.open(url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback);
-
-                //throw "Not implemented!";
-
-                ////if this is the top window, or if the top window doesn't have a client manager, create the modal in this manager
-                //if (window == this.mainWindow() || !this.mainWindow().UmbClientMgr) {
-                //    var m = new Umbraco.Controls.ModalWindow();
-                //    this._modal.push(m);
-                //    m.open(url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback);
-                //}
-                //else {
-                //    //if the main window has a client manager, then call the main window's open modal method whilst keeping the context of it's manager.
-                //    if (this.mainWindow().UmbClientMgr) {
-                //        this.mainWindow().UmbClientMgr.openModalWindow.apply(this.mainWindow().UmbClientMgr,
-                //            [url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback]);
-                //    }
-                //    else {
-                //        return; //exit recurse.
-                //    }
-                //}
+                return dialog;
             },
             closeModalWindow: function(rVal) {
                 
-                getRootScope().$emit("closeDialogs");
+                if (rVal) {
+                    //trigger the closeDialogs event with arguments, note: using the term 'outVal' since that is what is expected in the tree picker.
+                    getRootScope().$emit("closeDialogs", { outVal: rVal });
+                }
+                else {
+                    //no arg vals
+                    getRootScope().$emit("closeDialogs");
+                }
+                
 
-                //if (this._modal != null && this._modal.length > 0) {
-                //    this._modal.pop().close(rVal);
-                //}
-                //else {
-                //    //this will recursively try to close a modal window until the parent window has a modal object or the window is the top and has the modal object
-                //    var mgr = null;
-                //    if (window.parent == null || window.parent == window) {
-                //        //we are at the root window, check if we can close the modal window from here
-                //        if (window.UmbClientMgr != null && window.UmbClientMgr._modal != null && window.UmbClientMgr._modal.length > 0) {
-                //            mgr = window.UmbClientMgr;
-                //        }
-                //        else {
-                //            return; //exit recursion.
-                //        }
-                //    }
-                //    else if (typeof window.parent.UmbClientMgr != "undefined") {
-                //        mgr = window.parent.UmbClientMgr;
-                //    }
-                //    mgr.closeModalWindow.call(mgr, rVal);
-                //}
             },
             _debug: function(strMsg) {
                 if (this._isDebug) {

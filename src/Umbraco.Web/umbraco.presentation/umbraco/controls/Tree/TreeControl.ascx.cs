@@ -5,7 +5,9 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.Script.Serialization;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Web.Trees;
+using Umbraco.Web.UI.Controls;
 using umbraco.interfaces;
 using System.Text.RegularExpressions;
 using umbraco.BusinessLogic.Actions;
@@ -15,7 +17,6 @@ using umbraco.cms.presentation.Trees;
 using umbraco.BasePages;
 using System.Web.Services;
 using System.Drawing;
-using umbraco.BusinessLogic;
 using System.Linq;
 using Umbraco.Core;
 
@@ -26,7 +27,7 @@ namespace umbraco.controls.Tree
     /// The Umbraco tree control.
     /// <remarks>If this control doesn't exist on an UmbracoEnsuredPage it will not work.</remarks>
     /// </summary>
-    public partial class TreeControl : System.Web.UI.UserControl, ITreeService
+    public partial class TreeControl : UmbracoUserControl, ITreeService
     {
 
         /// <summary>
@@ -59,7 +60,7 @@ namespace umbraco.controls.Tree
 
         private List<BaseTree> m_ActiveTrees = new List<BaseTree>();
         private List<BaseTree> m_AllAppTrees = new List<BaseTree>();
-        private List<TreeDefinition> m_ActiveTreeDefs = null;
+        private List<ApplicationTree> m_ActiveTreeDefs = null;
         private TreeMode m_TreeType = TreeMode.Standard;
         private bool m_IsInit = false;
         private TreeService m_TreeService = new TreeService();
@@ -223,27 +224,31 @@ namespace umbraco.controls.Tree
 
             //find all tree definitions that have the current application alias that are ACTIVE.
             //if an explicit tree has been requested, then only load that tree in.
-            m_ActiveTreeDefs = TreeDefinitionCollection.Instance.FindActiveTrees(GetCurrentApp());
+            //m_ActiveTreeDefs = TreeDefinitionCollection.Instance.FindActiveTrees(GetCurrentApp());
+
+            m_ActiveTreeDefs = Services.ApplicationTreeService.GetApplicationTrees(GetCurrentApp(), true).ToList();
+            
             if (!string.IsNullOrEmpty(this.TreeType))
             {
                 m_ActiveTreeDefs = m_ActiveTreeDefs
-                    .Where(x => x.Tree.Alias == this.TreeType)
+                    .Where(x => x.Alias == this.TreeType)
                     .ToList(); //this will only return 1
             }
 
             //find all tree defs that exists for the current application regardless of if they are active
-            List<TreeDefinition> appTreeDefs = TreeDefinitionCollection.Instance.FindTrees(GetCurrentApp());
+            var appTreeDefs = Services.ApplicationTreeService.GetApplicationTrees(GetCurrentApp()).ToList();
 
             //Create the BaseTree's based on the tree definitions found
-            foreach (TreeDefinition treeDef in appTreeDefs)
+            foreach (var treeDef in appTreeDefs)
             {
                 //create the tree and initialize it
-                BaseTree bTree = treeDef.CreateInstance();
+                var bTree = LegacyTreeDataConverter.GetLegacyTreeForLegacyServices(treeDef);
+                //BaseTree bTree = treeDef.CreateInstance();
                 bTree.SetTreeParameters(m_TreeService);
 
                 //store the created tree
                 m_AllAppTrees.Add(bTree);
-                if (treeDef.Tree.Initialize)
+                if (treeDef.Initialize)
                     m_ActiveTrees.Add(bTree);
             }
 
@@ -359,7 +364,7 @@ namespace umbraco.controls.Tree
             //stand alone tree, so we'll just add a TreeType to the TreeService and ensure that the right method gets loaded in tree.aspx
             if (m_ActiveTrees.Count == 1)
             {
-                m_TreeService.TreeType = m_ActiveTreeDefs[0].Tree.Alias;
+                m_TreeService.TreeType = m_ActiveTreeDefs[0].Alias;
 
                 //convert the menu to a string
                 //string initActions = (TreeSvc.ShowContextMenu ? Action.ToString(m_ActiveTrees[0].RootNodeActions) : "");

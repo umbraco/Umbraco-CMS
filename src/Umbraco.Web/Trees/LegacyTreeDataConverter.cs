@@ -48,21 +48,11 @@ namespace Umbraco.Web.Trees
     /// </summary>
     internal class LegacyTreeDataConverter
     {
-        /// <summary>
-        /// This is used by any legacy services that require rendering a BaseTree, if a new controller tree is detected it will try to invoke it's legacy predecessor.
-        /// </summary>
-        /// <param name="appTreeService"></param>
-        /// <param name="treeType"></param>
-        /// <returns></returns>
-        internal static BaseTree GetLegacyTreeForLegacyServices(ApplicationTreeService appTreeService, string treeType)
+        internal static BaseTree GetLegacyTreeForLegacyServices(Core.Models.ApplicationTree appTree)
         {
-            BaseTree tree;
+            if (appTree == null) throw new ArgumentNullException("appTree");
 
-            //first get the app tree definition so we can then figure out if we need to load by legacy or new
-            //now we'll look up that tree
-            var appTree = appTreeService.GetByAlias(treeType);
-            if (appTree == null)
-                throw new InvalidOperationException("No tree found with alias " + treeType);
+            BaseTree tree;
 
             var controllerAttempt = appTree.TryGetControllerTree();
             if (controllerAttempt.Success)
@@ -70,14 +60,14 @@ namespace Umbraco.Web.Trees
                 var legacyAtt = controllerAttempt.Result.GetCustomAttribute<LegacyBaseTreeAttribute>(false);
                 if (legacyAtt == null)
                 {
-                    LogHelper.Warn<LegacyTreeDataConverter>("Cannot render tree: " + treeType + ". Cannot render a " + typeof(TreeApiController) + " tree type with the legacy web services unless attributed with " + typeof(LegacyBaseTreeAttribute));
+                    LogHelper.Warn<LegacyTreeDataConverter>("Cannot render tree: " + appTree.Alias + ". Cannot render a " + typeof(TreeApiController) + " tree type with the legacy web services unless attributed with " + typeof(LegacyBaseTreeAttribute));
                     return null;
                 }
 
                 var treeDef = new TreeDefinition(
                     legacyAtt.BaseTreeType,
                     new ApplicationTree(false, true, appTree.SortOrder, appTree.ApplicationAlias, appTree.Alias, appTree.Title, appTree.IconClosed, appTree.IconOpened, "", legacyAtt.BaseTreeType.GetFullNameWithAssembly(), ""),
-                    new Application(treeType, treeType, "", 0));
+                    new Application(appTree.Alias, appTree.Alias, "", 0));
 
                 tree = treeDef.CreateInstance();
                 tree.TreeAlias = appTree.Alias;
@@ -86,7 +76,7 @@ namespace Umbraco.Web.Trees
             else
             {
                 //get the tree that we need to render                    
-                var treeDef = TreeDefinitionCollection.Instance.FindTree(treeType);
+                var treeDef = TreeDefinitionCollection.Instance.FindTree(appTree.Alias);
                 if (treeDef == null)
                 {
                     return null;
@@ -95,6 +85,26 @@ namespace Umbraco.Web.Trees
             }
 
             return tree;
+        }
+
+        /// <summary>
+        /// This is used by any legacy services that require rendering a BaseTree, if a new controller tree is detected it will try to invoke it's legacy predecessor.
+        /// </summary>
+        /// <param name="appTreeService"></param>
+        /// <param name="treeType"></param>
+        /// <returns></returns>
+        internal static BaseTree GetLegacyTreeForLegacyServices(ApplicationTreeService appTreeService, string treeType)
+        {
+            if (appTreeService == null) throw new ArgumentNullException("appTreeService");
+            if (treeType == null) throw new ArgumentNullException("treeType");
+
+            //first get the app tree definition so we can then figure out if we need to load by legacy or new
+            //now we'll look up that tree
+            var appTree = appTreeService.GetByAlias(treeType);
+            if (appTree == null)
+                throw new InvalidOperationException("No tree found with alias " + treeType);
+
+            return GetLegacyTreeForLegacyServices(appTree);
         }
 
         /// <summary>

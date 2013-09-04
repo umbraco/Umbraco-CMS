@@ -34,16 +34,25 @@ angular.module('umbraco.services')
        var dialogs = [];
        
        /** Internal method that removes all dialogs */
-       function removeAllDialogs() {
+       function removeAllDialogs(args) {
            for (var i = 0; i < dialogs.length; i++) {
                var dialog = dialogs[i];
-               removeDialog(dialog);
+               removeDialog(dialog, args);
                dialogs.splice(i, 1);
            }
        }
 
        /** Internal method that handles closing a specific dialog */
-       function removeDialog(dialog) {
+       function removeDialog(dialog, args) {
+
+           //if there's arguments passed in then check if there's a callback registered in the current modal then call it.
+           //this occurs when the "closeDialogs" event is triggered with arguments.
+
+           if (args && dialog.data("modalCb") != null && angular.isFunction(dialog.data("modalCb"))) {
+               var cb = dialog.data("modalCb");
+               cb.apply(dialog, [args]);
+           }
+
            dialog.modal("hide");
 
            $timeout(function () {
@@ -72,9 +81,7 @@ angular.module('umbraco.services')
            //Modal dom obj and unique id
            var $modal = $('<div data-backdrop="false"></div>');
            var id = templateUrl.replace('.html', '').replace('.aspx', '').replace(/[\/|\.|:\&\?\=]/g, "-") + '-' + scope.$id;
-
            
-
            if(options.inline){
               animationClass = "";
               modalClass = "";
@@ -115,6 +122,9 @@ angular.module('umbraco.services')
                    $modal.modal('show');
                }
 
+               //store the callback in the modal jquery data
+               $modal.data("modalCb", callback);
+
                return $modal;
            }
            else {
@@ -132,6 +142,9 @@ angular.module('umbraco.services')
 
                        //append to body or other container element	
                        container.append($modal);
+
+                       //store the callback in the modal jquery data
+                       $modal.data("modalCb", callback);
 
                        // Compile modal content
                        $timeout(function() {
@@ -207,8 +220,8 @@ angular.module('umbraco.services')
        }
 
        /** Handles the closeDialogs event */
-       $rootScope.$on("closeDialogs", function () {
-           removeAllDialogs();
+       $rootScope.$on("closeDialogs", function (evt, args) {
+           removeAllDialogs(args);
        });
 
        return {
