@@ -22,7 +22,7 @@ namespace Umbraco.Web.Trees
     internal static class ApplicationTreeExtensions
     {
 
-        private static Attempt<Type> TryGetControllerTree(this ApplicationTree appTree)
+        internal static Attempt<Type> TryGetControllerTree(this ApplicationTree appTree)
         {
             //get reference to all TreeApiControllers
             var controllerTrees = UmbracoApiControllerResolver.Current.RegisteredUmbracoApiControllers
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Trees
             return new Attempt<Type>(true, foundControllerTree);
         }
 
-        internal static Attempt<TreeNode> TryGetRootNodeFromControllerTree(this ApplicationTree appTree, FormDataCollection formCollection, HttpControllerContext controllerContext, HttpRequestMessage request)
+        internal static Attempt<TreeNode> TryGetRootNodeFromControllerTree(this ApplicationTree appTree, FormDataCollection formCollection, HttpControllerContext controllerContext)
         {
             var foundControllerTreeAttempt = appTree.TryGetControllerTree();
             if (foundControllerTreeAttempt.Success == false)
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Trees
             //instantiate it, since we are proxying, we need to setup the instance with our current context
             var instance = (TreeApiController)DependencyResolver.Current.GetService(foundControllerTree);
             instance.ControllerContext = controllerContext;
-            instance.Request = request;
+            instance.Request = controllerContext.Request;
             //return the root
             var node = instance.GetRootNode(formCollection);
             return node == null
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Trees
                 : new Attempt<TreeNode>(true, node);
         }
 
-        internal static  Attempt<TreeNodeCollection> TryLoadFromControllerTree(this ApplicationTree appTree, string id, FormDataCollection formCollection, HttpControllerContext controllerContext, HttpRequestMessage request)
+        internal static  Attempt<TreeNodeCollection> TryLoadFromControllerTree(this ApplicationTree appTree, string id, FormDataCollection formCollection, HttpControllerContext controllerContext)
         {
             var foundControllerTreeAttempt = appTree.TryGetControllerTree();
             if (foundControllerTreeAttempt.Success == false)
@@ -69,7 +69,7 @@ namespace Umbraco.Web.Trees
             //instantiate it, since we are proxying, we need to setup the instance with our current context
             var instance = (TreeApiController)DependencyResolver.Current.GetService(foundControllerTree);
             instance.ControllerContext = controllerContext;
-            instance.Request = request;
+            instance.Request = controllerContext.Request;
             //return it's data
             return new Attempt<TreeNodeCollection>(true, instance.GetNodes(id, formCollection));
         }
@@ -99,7 +99,7 @@ namespace Umbraco.Web.Trees
             return new Attempt<XmlTreeNode>(true, bTree.RootNode);
         }
 
-        private static Attempt<TreeDefinition> TryGetLegacyTreeDef(this ApplicationTree appTree)
+        internal static Attempt<TreeDefinition> TryGetLegacyTreeDef(this ApplicationTree appTree)
         {
             //This is how the legacy trees worked....
             var treeDef = TreeDefinitionCollection.Instance.FindTree(appTree.Alias);

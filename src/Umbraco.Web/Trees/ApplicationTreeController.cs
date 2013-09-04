@@ -77,7 +77,7 @@ namespace Umbraco.Web.Trees
         private TreeNode GetRootForMultipleAppTree(ApplicationTree configTree, FormDataCollection queryStrings)
         {
             if (configTree == null) throw new ArgumentNullException("configTree");
-            var byControllerAttempt = configTree.TryGetRootNodeFromControllerTree(queryStrings, ControllerContext, Request);
+            var byControllerAttempt = configTree.TryGetRootNodeFromControllerTree(queryStrings, ControllerContext);
             if (byControllerAttempt.Success)
             {
                 return byControllerAttempt.Result;
@@ -103,10 +103,10 @@ namespace Umbraco.Web.Trees
         {
             var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
             if (configTree == null) throw new ArgumentNullException("configTree");
-            var byControllerAttempt = configTree.TryLoadFromControllerTree(id, queryStrings, ControllerContext, Request);
+            var byControllerAttempt = configTree.TryLoadFromControllerTree(id, queryStrings, ControllerContext);
             if (byControllerAttempt.Success)
             {
-                var rootNode = configTree.TryGetRootNodeFromControllerTree(queryStrings, ControllerContext, Request);
+                var rootNode = configTree.TryGetRootNodeFromControllerTree(queryStrings, ControllerContext);
                 if (rootNode.Success == false)
                 {
                     //This should really never happen if we've successfully got the children above.

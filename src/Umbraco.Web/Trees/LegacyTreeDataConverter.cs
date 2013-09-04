@@ -20,6 +20,7 @@ namespace Umbraco.Web.Trees
     /// </summary>
     internal class LegacyTreeDataConverter
     {
+        
         /// <summary>
         /// Gets the menu item collection from a legacy tree node based on it's parent node's child collection
         /// </summary>
