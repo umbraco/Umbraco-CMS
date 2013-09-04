@@ -1,0 +1,11 @@
+@model Umbraco.Forms.Mvc.Models.FieldViewModel
+<input type="file" name="@Model.Name" id="@Model.Id"
+@if(Model.Mandatory){<text> data-val="true" data-val-required="@Model.RequiredErrorMessage"</text>}
+/>
+
+@if (!string.IsNullOrEmpty(Model.Value))
+{
+ <br />
+ <a href="@Model.Value" target"_blank">Show current file</a>
+ <input type="hidden" name="@{@Model.Name}_file" value="@Model.Value"/>
+}

@@ -1,0 +1,3 @@
+@using Umbraco.Forms.Mvc.Helpers
+@model Umbraco.Forms.Mvc.Models.FieldViewModel
+@ReCaptchaHelper.ReCaptcha(Model.AdditionalSettings.FirstOrDefault(x => x.Key == "Theme").Value)

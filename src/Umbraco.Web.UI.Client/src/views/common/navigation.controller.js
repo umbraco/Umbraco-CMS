@@ -38,7 +38,7 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
 
     //This reacts to clicks passed to the body element which emits a global call to close all dialogs
     $rootScope.$on("closeDialogs", function (event) {
-        if (navigationService.ui.stickyNavigation && (!event.target || $(event.target).parents(".umb-modalcolumn").size() == 0)) {
+        if (navigationService.ui.stickyNavigation) {
            navigationService.hideNavigation();
             angularHelper.safeApply($scope);
         }

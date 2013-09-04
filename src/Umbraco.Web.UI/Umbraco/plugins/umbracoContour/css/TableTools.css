@@ -1,0 +1,97 @@
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * TableTools styles
+ */
+.TableTools {
+	padding: 3px 0 3px 3px;
+	border: 1px solid #d0d0d0;
+	background-color: #f0f0f0;
+	float: right;
+	margin-bottom: 1em;
+}
+
+.TableTools_button {
+	position: relative;
+	float: left;
+	margin-right: 3px;
+}
+
+.TableTools_csv {
+	background: url(../images/recordviewericons/csv.png) no-repeat center center;
+	border: 1px solid #f0f0f0;
+}
+
+.TableTools_csv_hover {
+	background: url(../images/recordviewericons/csv_hover.png) no-repeat center center;
+	border: 1px solid #d0d0d0;
+	background-color: #fdfdfd;
+}
+
+.TableTools_xls {
+	background: url(../images/recordviewericons/xls.png) no-repeat center center;
+	border: 1px solid #f0f0f0;
+}
+
+.TableTools_xls_hover {
+	background: url(../images/recordviewericons/xls_hover.png) no-repeat center center;
+	border: 1px solid #d0d0d0;
+	background-color: #fdfdfd;
+}
+
+.TableTools_clipboard {
+	background: url(../images/recordviewericons/copy.png) no-repeat center center;
+	border: 1px solid #f0f0f0;
+}
+
+.TableTools_clipboard_hover {
+	background: url(../images/recordviewericons/copy_hover.png) no-repeat center center;
+	border: 1px solid #d0d0d0;
+	background-color: #fdfdfd;
+}
+
+.TableTools_print {
+	background: url(../images/recordviewericons/print.png) no-repeat center center;
+	border: 1px solid #f0f0f0;
+}
+
+.TableTools_print_hover {
+	background: url(../images/recordviewericons/print_hover.png) no-repeat center center;
+	border: 1px solid #d0d0d0;
+	background-color: #fdfdfd;
+}
+
+.TableTools_PrintInfo {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 400px;
+	height: 150px;
+	margin-left: -200px;
+	margin-top: -75px;
+	text-align: center;
+	background-color: #3f3f3f;
+	color: white;
+	padding: 10px 30px;
+	
+	opacity: 0.9;
+	
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	
+	box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
+	-webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
+}
+
+.TableTools_PrintInfo h6 {
+	font-weight: normal;
+	font-size: 28px;
+	line-height: 28px;
+	margin: 1em;
+}
+
+.TableTools_PrintInfo p {
+	font-size: 14px;
+	line-height: 20px;
+}

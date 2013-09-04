@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="UmbracoContour">
+  <Name>Comment</Name>
+  <Created>2012-11-19T11:46:09.333</Created>
+  <FieldIndicationType>NoIndicator</FieldIndicationType>
+  <Indicator />
+  <ShowValidationSummary>false</ShowValidationSummary>
+  <HideFieldValidation>false</HideFieldValidation>
+  <RequiredErrorMessage>{0} is mandatory</RequiredErrorMessage>
+  <InvalidErrorMessage>{0} is not valid</InvalidErrorMessage>
+  <MessageOnSubmit>Thank you</MessageOnSubmit>
+  <GoToPageOnSubmit>0</GoToPageOnSubmit>
+  <ManualApproval>false</ManualApproval>
+  <Archived>false</Archived>
+  <StoreRecordsLocally>true</StoreRecordsLocally>
+  <DisableDefaultStylesheet>false</DisableDefaultStylesheet>
+  <Pages>
+    <Page>
+      <FieldSets>
+        <FieldSet>
+          <Fields>
+            <Field>
+              <PreValues />
+              <Caption>Name</Caption>
+              <ToolTip />
+              <SortOrder>0</SortOrder>
+              <PageIndex>0</PageIndex>
+              <FieldsetIndex>0</FieldsetIndex>
+              <Id>00000000-0000-0000-0000-000000000000</Id>
+              <FieldSet>087ef1e5-ca08-4840-93b2-8fc5786f41fd</FieldSet>
+              <Form>7a307e8c-d592-4dd8-a6ba-0e711f4a9b2e</Form>
+              <FieldTypeId>3f92e01b-29e2-4a30-bf33-9df5580ed52c</FieldTypeId>
+              <Mandatory>true</Mandatory>
+              <RegEx />
+              <RequiredErrorMessage />
+              <InvalidErrorMessage />
+              <PreValueSourceId>00000000-0000-0000-0000-000000000000</PreValueSourceId>
+              <Settings />
+              <Condition>
+                <Id>c0cc21c8-3983-4d34-bb3a-9af1c4637513</Id>
+                <Field>14ef362e-725f-47cf-94bd-1d2729cb530c</Field>
+                <Enabled>false</Enabled>
+                <ActionType>Show</ActionType>
+                <LogicType>All</LogicType>
+                <Rules />
+              </Condition>
+            </Field>
+            <Field>
+              <PreValues />
+              <Caption>Email</Caption>
+              <ToolTip />
+              <SortOrder>1</SortOrder>
+              <PageIndex>0</PageIndex>
+              <FieldsetIndex>0</FieldsetIndex>
+              <Id>00000000-0000-0000-0000-000000000000</Id>
+              <FieldSet>087ef1e5-ca08-4840-93b2-8fc5786f41fd</FieldSet>
+              <Form>7a307e8c-d592-4dd8-a6ba-0e711f4a9b2e</Form>
+              <FieldTypeId>3f92e01b-29e2-4a30-bf33-9df5580ed52c</FieldTypeId>
+              <Mandatory>true</Mandatory>
+              <RegEx>^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$</RegEx>
+              <RequiredErrorMessage />
+              <InvalidErrorMessage />
+              <PreValueSourceId>00000000-0000-0000-0000-000000000000</PreValueSourceId>
+              <Settings />
+              <Condition>
+                <Id>c4d63009-fb47-4bf2-b0ca-a7b4026269d8</Id>
+                <Field>c25ee441-e0b9-4bda-8469-121d20c8d12c</Field>
+                <Enabled>false</Enabled>
+                <ActionType>Show</ActionType>
+                <LogicType>All</LogicType>
+                <Rules />
+              </Condition>
+            </Field>
+            <Field>
+              <PreValues />
+              <Caption>Website</Caption>
+              <ToolTip />
+              <SortOrder>2</SortOrder>
+              <PageIndex>0</PageIndex>
+              <FieldsetIndex>0</FieldsetIndex>
+              <Id>00000000-0000-0000-0000-000000000000</Id>
+              <FieldSet>087ef1e5-ca08-4840-93b2-8fc5786f41fd</FieldSet>
+              <Form>7a307e8c-d592-4dd8-a6ba-0e711f4a9b2e</Form>
+              <FieldTypeId>3f92e01b-29e2-4a30-bf33-9df5580ed52c</FieldTypeId>
+              <Mandatory>false</Mandatory>
+              <RegEx>(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;amp;:/~\+#]*[\w\-\@?^=%&amp;amp;/~\+#])?</RegEx>
+              <RequiredErrorMessage />
+              <InvalidErrorMessage />
+              <PreValueSourceId>00000000-0000-0000-0000-000000000000</PreValueSourceId>
+              <Settings />
+              <Condition>
+                <Id>8d816c6b-b7c8-4cee-95a8-200c4c7701a4</Id>
+                <Field>9a427713-338a-4c5d-9562-4b2e04c1b292</Field>
+                <Enabled>false</Enabled>
+                <ActionType>Show</ActionType>
+                <LogicType>All</LogicType>
+                <Rules />
+              </Condition>
+            </Field>
+            <Field>
+              <PreValues />
+              <Caption>Comment</Caption>
+              <ToolTip />
+              <SortOrder>3</SortOrder>
+              <PageIndex>0</PageIndex>
+              <FieldsetIndex>0</FieldsetIndex>
+              <Id>00000000-0000-0000-0000-000000000000</Id>
+              <FieldSet>087ef1e5-ca08-4840-93b2-8fc5786f41fd</FieldSet>
+              <Form>7a307e8c-d592-4dd8-a6ba-0e711f4a9b2e</Form>
+              <FieldTypeId>023f09ac-1445-4bcb-b8fa-ab49f33bd046</FieldTypeId>
+              <Mandatory>true</Mandatory>
+              <RegEx />
+              <RequiredErrorMessage />
+              <InvalidErrorMessage />
+              <PreValueSourceId>00000000-0000-0000-0000-000000000000</PreValueSourceId>
+              <Settings />
+              <Condition>
+                <Id>df7f280c-988c-4d3c-8a2f-aecd4d2dcf12</Id>
+                <Field>329d6f2b-9756-4abb-abf7-ef4f0723b37b</Field>
+                <Enabled>false</Enabled>
+                <ActionType>Show</ActionType>
+                <LogicType>All</LogicType>
+                <Rules />
+              </Condition>
+            </Field>
+          </Fields>
+          <Caption>Your comment</Caption>
+          <SortOrder>0</SortOrder>
+          <Id>00000000-0000-0000-0000-000000000000</Id>
+          <Page>1d2a9d94-8e35-43c4-9127-d65edb03ef05</Page>
+        </FieldSet>
+      </FieldSets>
+      <Caption>Leave a comment</Caption>
+      <SortOrder>0</SortOrder>
+      <Id>00000000-0000-0000-0000-000000000000</Id>
+      <Form>7a307e8c-d592-4dd8-a6ba-0e711f4a9b2e</Form>
+    </Page>
+  </Pages>
+  <DataSource>00000000-0000-0000-0000-000000000000</DataSource>
+  <Id>7a307e8c-d592-4dd8-a6ba-0e711f4a9b2e</Id>
+</Form>
