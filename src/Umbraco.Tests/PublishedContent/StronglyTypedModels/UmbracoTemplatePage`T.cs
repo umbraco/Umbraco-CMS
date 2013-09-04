@@ -1,8 +1,9 @@
-﻿using Umbraco.Web.Mvc;
+﻿using Umbraco.Core.Models;
+using Umbraco.Web.Mvc;
 
 namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 {
-    public abstract class UmbracoTemplatePage<T> : UmbracoTemplatePage where T : TypedModelBase, new()
+    public abstract class UmbracoTemplatePage<T> : UmbracoTemplatePage where T : TypedModelBase
     {
         protected override void InitializePage()
         {
@@ -12,8 +13,11 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 			if (Model != null)
 			{
 			    //Map CurrentModel here
-                TypedModel = new T();
-                TypedModel.Add(Model.Content);
+                var constructorInfo = typeof(T).GetConstructor(new []{typeof(IPublishedContent)});
+			    if (constructorInfo != null)
+			    {
+			        TypedModel = constructorInfo.Invoke(new object[]{Model.Content}) as T;
+			    }
 			}
         }
 

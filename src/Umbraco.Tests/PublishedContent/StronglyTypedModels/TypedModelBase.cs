@@ -8,16 +8,9 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 {
     public abstract class TypedModelBase
     {
-        private IPublishedContent _publishedContent;
-
-        protected TypedModelBase(){}
+        private readonly IPublishedContent _publishedContent;
 
         protected TypedModelBase(IPublishedContent publishedContent)
-        {
-            _publishedContent = publishedContent;
-        }
-
-        internal void Add(IPublishedContent publishedContent)
         {
             _publishedContent = publishedContent;
         }
