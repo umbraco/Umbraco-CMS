@@ -262,7 +262,7 @@ namespace Umbraco.Web
                 reason = EnsureRoutableOutcome.NoContent;
             }
 
-            return new Attempt<EnsureRoutableOutcome>(reason == EnsureRoutableOutcome.IsRoutable, reason);
+            return Attempt.If(reason == EnsureRoutableOutcome.IsRoutable, reason);
 		}
 
 		/// <summary>

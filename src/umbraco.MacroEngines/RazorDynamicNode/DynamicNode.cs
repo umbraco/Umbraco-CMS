@@ -649,7 +649,7 @@ namespace umbraco.MacroEngines
                     {
                         try
                         {
-                            return new Attempt<object>(true,
+                            return Attempt<object>.Succ(
                                                        n.GetType().InvokeMember(memberAlias,
                                                                                 System.Reflection.BindingFlags.GetProperty |
                                                                                 System.Reflection.BindingFlags.Instance |
@@ -660,7 +660,7 @@ namespace umbraco.MacroEngines
                         }
                         catch (MissingMethodException ex)
                         {
-                            return new Attempt<object>(ex);
+                            return Attempt<object>.Fail(ex);
                         }
                     };
 

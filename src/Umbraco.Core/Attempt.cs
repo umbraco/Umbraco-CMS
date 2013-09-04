@@ -2,65 +2,55 @@ using System;
 
 namespace Umbraco.Core
 {
-	/// <summary>
-	/// Represents the result of an operation attempt
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	/// <remarks></remarks>
-	[Serializable]
-	public struct Attempt<T>
-	{
-		private readonly bool _success;
-		private readonly T _result;
-		private readonly Exception _error;
+    /// <summary>
+    /// Provides ways to create attempts.
+    /// </summary>
+    public static class Attempt
+    {
+        /// <summary>
+        /// Creates a successful attempt with a result.
+        /// </summary>
+        /// <typeparam name="T">The type of the attempted operation result.</typeparam>
+        /// <param name="result">The result of the attempt.</param>
+        /// <returns>The successful attempt.</returns>
+        public static Attempt<T> Succ<T>(T result)
+        {
+            return Attempt<T>.Succ(result);
+        }
 
-		/// <summary>
-		/// Gets a value indicating whether this <see cref="Attempt{T}"/> represents a successful operation.
-		/// </summary>
-		/// <remarks></remarks>
-		public bool Success
-		{
-			get { return _success; }
-		}
+        /// <summary>
+        /// Creates a failed attempt with a result.
+        /// </summary>
+        /// <typeparam name="T">The type of the attempted operation result.</typeparam>
+        /// <param name="result">The result of the attempt.</param>
+        /// <returns>The failed attempt.</returns>
+        public static Attempt<T> Fail<T>(T result)
+        {
+            return Attempt<T>.Fail(result);
+        }
 
-		/// <summary>
-		/// Gets the error associated with an unsuccessful attempt.
-		/// </summary>
-		/// <value>The error.</value>
-		public Exception Error { get { return _error; } }
+        /// <summary>
+        /// Creates a failed attempt with a result and an exception.
+        /// </summary>
+        /// <typeparam name="T">The type of the attempted operation result.</typeparam>
+        /// <param name="result">The result of the attempt.</param>
+        /// <param name="exception">The exception causing the failure of the attempt.</param>
+        /// <returns>The failed attempt.</returns>
+        public static Attempt<T> Fail<T>(T result, Exception exception)
+        {
+            return Attempt<T>.Fail(result, exception);
+        }
 
-		/// <summary>
-		/// Gets the parse result.
-		/// </summary>
-		/// <remarks></remarks>
-		public T Result
-		{
-			get { return _result; }
-		}
-
-		/// <summary>
-		/// Represents an unsuccessful parse operation
-		/// </summary>
-		public static readonly Attempt<T> False = new Attempt<T>(false, default(T));
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Attempt{T}"/> struct.
-		/// </summary>
-		/// <param name="success">If set to <c>true</c> this tuple represents a successful parse result.</param>
-		/// <param name="result">The parse result.</param>
-		/// <remarks></remarks>
-		public Attempt(bool success, T result)
-		{
-			_success = success;
-			_result = result;
-			_error = null;
-		}
-
-		public Attempt(Exception error)
-		{
-			_success = false;
-			_result = default(T);
-			_error = error;
-		}
-	}
+        /// <summary>
+        /// Creates a successful or a failed attempt, with a result.
+        /// </summary>
+        /// <typeparam name="T">The type of the attempted operation result.</typeparam>
+        /// <param name="success">A value indicating whether the attempt is successful.</param>
+        /// <param name="result">The result of the attempt.</param>
+        /// <returns>The attempt.</returns>
+        public static Attempt<T> If<T>(bool success, T result)
+        {
+            return Attempt<T>.If(success, result);
+        }
+    }
 }

@@ -20,7 +20,7 @@ namespace Umbraco.Core.PropertyEditors
 		/// <returns></returns>
 		public virtual Attempt<object> ConvertPropertyValue(object value)
 		{
-			return new Attempt<object>(true, new HtmlString(value.ToString()));
+			return Attempt<object>.Succ(new HtmlString(value.ToString()));
 		}
 	}
 }

@@ -105,7 +105,7 @@
     <Compile Include="ApplicationContext.cs" />
     <Compile Include="ApplicationEventHandler.cs" />
     <Compile Include="AssemblyExtensions.cs" />
-    <Compile Include="Attempt.cs" />
+    <Compile Include="Attempt{T}.cs" />
     <Compile Include="Auditing\AuditTrail.cs" />
     <Compile Include="Auditing\Audit.cs" />
     <Compile Include="Auditing\AuditTypes.cs" />
@@ -137,6 +137,7 @@
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
     <Compile Include="Configuration\UmbracoConfigurationSection.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
+    <Compile Include="Attempt.cs" />
     <Compile Include="CoreBootManager.cs" />
     <Compile Include="DatabaseContext.cs" />
     <Compile Include="DataTableExtensions.cs" />

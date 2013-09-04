@@ -35,15 +35,15 @@ namespace Umbraco.Web.WebApi
                 var httpContext = context as HttpContextBase;
                 if (httpContext != null)
                 {
-                    return new Attempt<HttpContextBase>(true, httpContext);
+                    return Attempt.Succ(httpContext);
                 }
             }
             if (HttpContext.Current != null)
             {
-                return new Attempt<HttpContextBase>(true, new HttpContextWrapper(HttpContext.Current));
+                return Attempt<HttpContextBase>.Succ(new HttpContextWrapper(HttpContext.Current));
             }
 
-            return Attempt<HttpContextBase>.False;
+            return Attempt<HttpContextBase>.Fail();
         }
 
         /// <summary>
