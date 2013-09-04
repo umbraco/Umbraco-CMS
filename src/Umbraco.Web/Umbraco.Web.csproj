@@ -294,6 +294,7 @@
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\LoginStatusController.cs" />
     <Compile Include="Editors\MediaController.cs" />
+    <Compile Include="Helpers\SecurityHelper.cs" />
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Models\ProfileModel.cs" />
