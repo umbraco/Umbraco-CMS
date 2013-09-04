@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Models.Membership;
+﻿using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
 {
@@ -18,16 +18,16 @@ namespace Umbraco.Core.Services
     /// </remarks>
     internal interface IMembershipMemberService : IService
     {
-        IMembershipUser CreateMember(string username, string email, string password, string memberType, int userId = 0);
-        
-        IMembershipUser GetByUsername(string login);
+        IMember CreateMember(string username, string email, string password, string memberTypeAlias, int userId = 0);
 
-        IMembershipUser GetByEmail(string email);
+        IMember GetByUsername(string login);
 
-        IMembershipUser GetById(object id);
+        IMember GetByEmail(string email);
 
-        void Delete(IMembershipUser membershipUser);
+        IMember GetById(object id);
 
-        void Save(IMembershipUser membershipUser);
+        void Delete(IMember membershipUser);
+
+        void Save(IMember membershipUser);
     }
 }

@@ -2,7 +2,7 @@
 using System.Configuration.Provider;
 using System.Web.Hosting;
 
-namespace Umbraco.Web.Helpers
+namespace Umbraco.Web.Security
 {
     internal class SecurityHelper
     {

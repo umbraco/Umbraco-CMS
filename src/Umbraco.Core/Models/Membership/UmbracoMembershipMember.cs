@@ -11,6 +11,11 @@ namespace Umbraco.Core.Models.Membership
             _member = member;
         }
 
+        internal IMember Member
+        {
+            get { return _member; }
+        }
+
         public override string Email
         {
             get { return _member.Email; }

@@ -4,67 +4,20 @@ using System.Configuration.Provider;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web.Hosting;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
-using Umbraco.Web.Helpers;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.Security.Providers
 {
-    /// <summary>
-    /// Extension methods
-    /// </summary>
-    static internal class Extensions
-    {
-        public static MembershipUser AsConcreteMembershipUser(this IMembershipUser member)
-        {
-            // TODO: Provider name?? first constructor arg... Replace DateTime.Now;
-            var m = new MembershipUser("", 
-                member.Username, 
-                member.ProviderUserKey, 
-                member.Email, 
-                member.PasswordQuestion, 
-                member.Comments, 
-                member.IsApproved, 
-                member.IsLockedOut, 
-                member.CreateDate, 
-                member.LastLoginDate, 
-                member.UpdateDate, 
-                member.LastPasswordChangeDate, 
-                member.LastLockoutDate);
-            
-            return m;
-        }
-
-        public static IMembershipUser AsIMembershipUser(this MembershipUser membershipUser)
-        {
-            var m = new Member
-                {
-                    Username = membershipUser.UserName,
-                    Password = membershipUser.GetPassword(),
-                    Email = membershipUser.Email,
-                    CreateDate = membershipUser.CreationDate,
-                    Comments = membershipUser.Comment,
-                    IsApproved = membershipUser.IsApproved,
-                    IsLockedOut = membershipUser.IsLockedOut,
-                    LastLockoutDate = membershipUser.LastLockoutDate,
-                    LastLoginDate = membershipUser.LastLoginDate,
-                    LastPasswordChangeDate = membershipUser.LastPasswordChangedDate
-                };
-
-            return m;
-        }
-
-    }
-
     /// <summary>
     /// Custom Membership Provider for Umbraco Members (User authentication for Frontend applications NOT umbraco CMS)  
     /// </summary>
     internal class MembersMembershipProvider : MembershipProvider
     {
-        
         #region Fields
         private string _applicationName;
         private bool _enablePasswordReset;
@@ -76,9 +29,9 @@ namespace Umbraco.Web.Security.Providers
 
         private MembershipPasswordFormat _passwordFormat;
 
-        private string  _passwordStrengthRegularExpression;
-        private bool    _requiresQuestionAndAnswer;
-        private bool    _requiresUniqueEmail;
+        private string _passwordStrengthRegularExpression;
+        private bool _requiresQuestionAndAnswer;
+        private bool _requiresUniqueEmail;
 
         #endregion
 
@@ -534,7 +487,7 @@ namespace Umbraco.Web.Security.Providers
         /// <param name="user">A <see cref="T:System.Web.Security.MembershipUser"></see> object that represents the user to update and the updated information for the user.</param>      
         public override void UpdateUser(MembershipUser user)
         {
-            var member = user.AsIMembershipUser();
+            var member = user.AsIMember();
             MemberService.Save(member);
         }
 
@@ -742,6 +695,8 @@ namespace Umbraco.Web.Security.Providers
             throw new System.NotImplementedException();
         }
 
+        #region Private methods
+
         private bool IsPasswordValid(string password)
         {
             if (_minRequiredNonAlphanumericCharacters > 0)
@@ -796,6 +751,87 @@ namespace Umbraco.Web.Security.Providers
                     throw new ProviderException("Unsupported password format.");
             }
             return encodedPassword;
-        }        
+        }
+
+        /// <summary>
+        /// Gets the boolean value.
+        /// </summary>
+        /// <param name="config">The config.</param>
+        /// <param name="valueName">Name of the value.</param>
+        /// <param name="defaultValue">if set to <c>true</c> [default value].</param>
+        /// <returns></returns>
+        private bool GetBooleanValue(NameValueCollection config, string valueName, bool defaultValue)
+        {
+            bool flag;
+            var str = config[valueName];
+            if (str == null)
+                return defaultValue;
+
+            if (bool.TryParse(str, out flag) == false)
+            {
+                throw new ProviderException("Value must be boolean.");
+            }
+            return flag;
+        }
+
+        /// <summary>
+        /// Gets the int value.
+        /// </summary>
+        /// <param name="config">The config.</param>
+        /// <param name="valueName">Name of the value.</param>
+        /// <param name="defaultValue">The default value.</param>
+        /// <param name="zeroAllowed">if set to <c>true</c> [zero allowed].</param>
+        /// <param name="maxValueAllowed">The max value allowed.</param>
+        /// <returns></returns>
+        private int GetIntValue(NameValueCollection config, string valueName, int defaultValue, bool zeroAllowed, int maxValueAllowed)
+        {
+            int num;
+            var s = config[valueName];
+            if (s == null)
+            {
+                return defaultValue;
+            }
+            if (int.TryParse(s, out num) == false)
+            {
+                if (zeroAllowed)
+                {
+                    throw new ProviderException("Value must be non negative integer");
+                }
+                throw new ProviderException("Value must be positive integer");
+            }
+            if (zeroAllowed && (num < 0))
+            {
+                throw new ProviderException("Value must be non negativeinteger");
+            }
+            if (zeroAllowed == false && (num <= 0))
+            {
+                throw new ProviderException("Value must be positive integer");
+            }
+            if ((maxValueAllowed > 0) && (num > maxValueAllowed))
+            {
+                throw new ProviderException("Value too big");
+            }
+            return num;
+        }
+
+
+        /// <summary>
+        /// Gets the name of the default app.
+        /// </summary>
+        /// <returns></returns>
+        private string GetDefaultAppName()
+        {
+            try
+            {
+                var applicationVirtualPath = HostingEnvironment.ApplicationVirtualPath;
+                return string.IsNullOrEmpty(applicationVirtualPath) ? "/" : applicationVirtualPath;
+            }
+            catch
+            {
+                return "/";
+            }
+        }
+
+        #endregion
     }
 }

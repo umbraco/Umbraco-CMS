@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models.Membership;
+﻿using System;
+using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -30,11 +31,21 @@ namespace Umbraco.Core.Services
             _uowProvider = provider;
         }
 
-        public IMembershipUser CreateMember(string username, string email, string password, string memberType, int userId = 0)
+        public IMember CreateMember(string username, string email, string password, string memberTypeAlias, int userId = 0)
         {
             var uow = _uowProvider.GetUnitOfWork();
+            IMemberType memberType;
 
-            var member = new Member();
+            using (var repository = _repositoryFactory.CreateMemberTypeRepository(uow))
+            {
+                var query = Query<IMemberType>.Builder.Where(x => x.Alias == memberTypeAlias);
+                memberType = repository.GetByQuery(query).FirstOrDefault();
+            }
+
+            if (memberType == null)
+                throw new Exception(string.Format("No MemberType matching the passed in Alias: '{0}' was found", memberTypeAlias));
+
+            var member = new Member(email, -1, memberType, new PropertyCollection());
 
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
@@ -49,50 +60,68 @@ namespace Umbraco.Core.Services
             return member;
         }
 
-        public IMembershipUser GetByUsername(string userName)
+        public IMember GetByUsername(string userName)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IMembershipUser>.Builder.Where(x => x.Username == userName);
-                var membershipUser = repository.GetByQuery(query).FirstOrDefault();
+                var query = Query<IMember>.Builder.Where(x => x.Username == userName);
+                var member = repository.GetByQuery(query).FirstOrDefault();
 
-                return membershipUser;
+                return member;
             }
         }
 
-        public IMembershipUser GetByEmail(string email)
+        public IMember GetByEmail(string email)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IMembershipUser>.Builder.Where(x => x.Email == email);
-                var membershipUser = repository.GetByQuery(query).FirstOrDefault();
+                var query = Query<IMember>.Builder.Where(x => x.Email == email);
+                var member = repository.GetByQuery(query).FirstOrDefault();
 
-                return membershipUser;
+                return member;
             }
         }
 
-        public IMembershipUser GetById(object id)
+        public IMember GetById(object id)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IMembershipUser>.Builder.Where(x => x.Id == id);
-                var membershipUser = repository.GetByQuery(query).FirstOrDefault();
+                if (id is int)
+                {
+                    var query = Query<IMember>.Builder.Where(x => x.Id == (int)id);
+                    var member = repository.GetByQuery(query).FirstOrDefault();
+                    return member;
+                }
 
-                return membershipUser;
+                if (id is Guid)
+                {
+                    var query = Query<IMember>.Builder.Where(x => x.Key == (Guid)id);
+                    var member = repository.GetByQuery(query).FirstOrDefault();
+                    return member;
+                }
+
+                return null;
             }
         }
 
-        public void Delete(IMembershipUser membershipUser)
+        public void Delete(IMember member)
         {
-            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                repository.Delete(membershipUser);
+                repository.Delete(member);
+                uow.Commit();
             }
         }
 
-        public void Save(IMembershipUser membershipUser)
+        public void Save(IMember member)
         {
-            throw new System.NotImplementedException();
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+            {
+                repository.AddOrUpdate(member);
+                uow.Commit();
+            }
         }
     }
 }
