@@ -9,7 +9,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.ContentPickerController",
 		args.event.stopPropagation();
 
 
-		eventsService.publish("Umbraco.Dialogs.ContentPickerController.Select", args, "hello").then(function(args){
+		eventsService.publish("Umbraco.Dialogs.ContentPickerController.Select", args).then(function(args){
 			if(dialogOptions && dialogOptions.multipicker){
 				$(args.event.target.parentElement)
 					.find("i.umb-tree-icon")
