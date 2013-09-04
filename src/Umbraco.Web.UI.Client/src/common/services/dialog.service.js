@@ -258,9 +258,10 @@ angular.module('umbraco.services')
             * @description
             * Closes a specific dialog
             * @param {Object} dialog the dialog object to close
+            * @param {Object} args if specified this object will be sent to any callbacks registered on the dialogs.
             */
-           close: function (dialog) {
-               removeDialog(dialog);
+           close: function (dialog, args) {
+               removeDialog(dialog, args);
            },
            
            /**
@@ -270,9 +271,10 @@ angular.module('umbraco.services')
             *
             * @description
             * Closes all dialogs
+            * @param {Object} args if specified this object will be sent to any callbacks registered on the dialogs.
             */
-           closeAll: function() {
-               removeAllDialogs();
+           closeAll: function(args) {
+               removeAllDialogs(args);
            },
 
            /**

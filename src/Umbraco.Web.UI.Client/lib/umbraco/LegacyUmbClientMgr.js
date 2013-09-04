@@ -187,20 +187,24 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     }
                 });
 
+                this._modal.push(dialog);
+
                 return dialog;
             },
             closeModalWindow: function(rVal) {
                 
-                if (rVal) {
-                    //trigger the closeDialogs event with arguments, note: using the term 'outVal' since that is what is expected in the tree picker.
-                    getRootScope().$emit("closeDialogs", { outVal: rVal });
+                //get our angular navigation service
+                var injector = getRootInjector();
+                var dialogService = injector.get("dialogService");
+
+                // all legacy calls to closeModalWindow are expecting to just close the last opened one so we'll ensure
+                // that this is still the case.
+                if (this._modal != null && this._modal.length > 0) {
+                    dialogService.close(this._modal.pop(), { outVal: rVal });
                 }
                 else {
-                    //no arg vals
-                    getRootScope().$emit("closeDialogs");
-                }
-                
-
+                    dialogService.closeAll(rVal);
+                }                
             },
             _debug: function(strMsg) {
                 if (this._isDebug) {
