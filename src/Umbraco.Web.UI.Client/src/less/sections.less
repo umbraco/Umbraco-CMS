@@ -11,13 +11,10 @@ ul.sections {
 ul.sections li {
 	border-bottom: 1px solid @grayDark;
 	display: block;
-	padding: 0px;
-	height: 56px;
-	padding: 23px 0 0 0
 }
 
 ul.sections li [class^="icon-"]:before, ul.sections li [class*=" icon-"]:before{
-	font-size: 32px;
+	font-size: 24px;
 }
 
 ul.sections li a {
@@ -25,24 +22,24 @@ ul.sections li a {
 	text-decoration: none;
 	font-size: 10px;
 	text-align: center;
-	color: @grayLight;
-	-webkit-transition: color .2s linear;
-	-moz-transition: color .2s linear;
-	transition: color .2s linear;
+	color: @gray;
+	-webkit-transition: color .5s linear;
+	-moz-transition: color .5s linear;
+	transition: color .5s linear;
+
+	padding-top: 15px;
+	padding-bottom: 15px;
 }
 
 ul.sections a span {
 	display: block;
-	visibility: hidden;
 	font-size: 10px;
 	line-height: 1em;
-	-webkit-transition: color .2s linear;
-	-moz-transition: color .2s linear;
-	transition: color .2s linear;
 }
 
-ul.sections:hover li a span {
-	visibility: visible;
+
+ul.sections:hover li a {
+	color: @grayLight;
 }
 
 
@@ -57,6 +54,7 @@ ul.sections li.avatar {
 
 ul.sections li.avatar a {
 	margin: 0 auto;
+	padding: 0;
 	width: 40px;
 	height: 40px;
 }
@@ -71,38 +69,20 @@ ul.sections li.avatar a img {
 
 ul.sections li i {
 	display: inline-block;
-	background-repeat: no-repeat;
-	background-position: 0 0;
-	width: 30px;
-	height: 30px
+}
+
+ul.sections li a {
+	display: inline-block;
+	padding-left: 4px;
+	padding-right: 4px;
 }
 
 ul.sections li.current {
     border-left: 4px @orange solid;
 }
 
-ul.sections li i.traycontent {
-	background-image: url(../img/applicationIcons/Umbraco_icons-02.svg);
-}
-
-ul.sections li i.traymedia {
-	background-image: url(../img/applicationIcons/Umbraco_icons-03.svg);
-}
-
-ul.sections li i.traysettings {
-	background-image: url(../img/applicationIcons/Umbraco_icons-05.svg);
-}
-
-ul.sections li i.traydeveloper {
-	background-image: url(../img/applicationIcons/Umbraco_icons-01.svg);
-}
-
-ul.sections li i.trayusers {
-	background-image: url(../img/applicationIcons/Umbraco_icons-04.svg);
-}
-
-ul.sections li i.traymember {
-	background-image: url(../img/applicationIcons/Umbraco_icons-05.svg);
+ul.sections li.current a{
+    padding-left: 0px;
 }
 
 ul.sections li.help {
@@ -115,9 +95,3 @@ ul.sections li.help {
 	display: block;
 	width: 100%;
 }
-
-ul.sections li.help a span {
- 
-	visibility: hidden;// remove when helvicons is ready
-}
-

@@ -1,0 +1,167 @@
+@inherits WebViewPage<Umbraco.Forms.Mvc.Models.FormViewModel>      
+@using Umbraco.Forms.Core
+@using Umbraco.Forms.Mvc.Models
+@using Umbraco.Forms.Mvc.BusinessLogic
+@using Umbraco.Forms.MVC.Extensions
+@using Umbraco.Forms.Core.Extensions
+                      
+   <script type="text/javascript">
+       var contourDateFormat = "@Html.ConvertDateFormat()";
+    </script> 
+    <script src="@Url.Content("~/umbraco/plugins/umbracocontour/scripts/frontend/contourform.js")" type="text/javascript"></script>
+    <script type="text/javascript">
+        
+        function PopulateRecordValues() {
+            contourFieldValues = new Array();
+            
+            @foreach (var recordVal in Model.RecordValues)
+            {
+                <text>
+                if($("#@recordVal.Key").length == 0)
+                {
+                    contourFieldValues["@recordVal.Key"] = "@recordVal.Value";
+                }
+                </text>
+            }
+        }
+
+        function CheckRules() {
+            
+            @foreach (FieldsetViewModel fs in Model.CurrentPage.Fieldsets)
+            {
+                foreach (FieldViewModel f in fs.Fields)
+                {
+                    if (f.HasCondition && f.ConditionRules.Any())
+                    {
+                        var current = 1;
+                        var currentParent = 1;
+
+                     <text>
+                        if(
+                            @foreach (var parentCondition in f.ParentConditions)
+                            {
+                                if (parentCondition.Rules.Any())
+                                {
+                                 <text>(</text>
+                                }
+                                foreach (FieldConditionRule r in parentCondition.Rules)
+                                {
+                                <text>(contourFieldValues["@r.Field"] != null && </text>
+                                    switch (r.Operator)
+                                    {
+                                        case FieldConditionRuleOperator.Is:
+                                        <text>contourFieldValues["@r.Field"] == "@Html.Raw(r.Value.ParsePlaceHolders())"</text>
+                                            break;
+                                        case FieldConditionRuleOperator.IsNot:
+                                        <text>contourFieldValues["@r.Field"] != "@Html.Raw(r.Value.ParsePlaceHolders())"</text>
+                                            break;
+                                        case FieldConditionRuleOperator.GreaterThen:
+                                        <text>parseInt(contourFieldValues["@r.Field"]) > parseInt("@r.Value")</text>
+                                            break;
+                                        case FieldConditionRuleOperator.LessThen:
+                                        <text>parseInt(contourFieldValues["@r.Field"]) < parseInt("@r.Value")</text>
+                                            break;
+                                        case FieldConditionRuleOperator.Contains:
+                                        <text>contourFieldValues["@r.Field"].indexOf("@Html.Raw(r.Value.ParsePlaceHolders())") != -1</text>
+                                            break;
+                                        case FieldConditionRuleOperator.StartsWith:
+                                         <text>contourFieldValues["@r.Field"].indexOf("@Html.Raw(r.Value.ParsePlaceHolders())") != -1</text>
+                                            break;
+                                        case FieldConditionRuleOperator.EndsWith:
+                                        <text>contourFieldValues["@r.Field"].indexOf("@Html.Raw(r.Value.ParsePlaceHolders())") != -1</text>
+                                            break;
+                                    }
+                                <text>)</text>
+                                    if (parentCondition.Rules.Count > 1 && currentParent < parentCondition.Rules.Count)
+                                    {
+                                        if (parentCondition.LogicType == FieldConditionLogicType.All)
+                                        {
+                                        <text>||</text> 
+                                        }
+                                        else
+                                        {
+                                        <text>||</text>
+                                        }
+                                    }
+
+                                    currentParent++;
+
+                                }
+                            if (parentCondition.Rules.Any())
+                            {
+                                <text>) &&</text>
+                            } 
+                            }   
+                            @foreach (FieldConditionRule r in f.ConditionRules)
+                            {
+                                <text>(contourFieldValues["@r.Field"] != null && </text>
+                                switch (r.Operator)
+                                {
+                                    case FieldConditionRuleOperator.Is:
+                                        <text>contourFieldValues["@r.Field"] == "@Html.Raw(r.Value.ParsePlaceHolders())"</text>
+                                        break;
+                                    case FieldConditionRuleOperator.IsNot:
+                                        <text>contourFieldValues["@r.Field"] != "@Html.Raw(r.Value.ParsePlaceHolders())"</text>
+                                        break;
+                                    case FieldConditionRuleOperator.GreaterThen:
+                                        <text>parseInt(contourFieldValues["@r.Field"]) > parseInt("@r.Value")</text>
+                                        break;
+                                    case FieldConditionRuleOperator.LessThen:
+                                        <text>parseInt(contourFieldValues["@r.Field"]) < parseInt("@r.Value")</text>
+                                        break;
+                                    case FieldConditionRuleOperator.Contains:
+                                        <text>contourFieldValues["@r.Field"].indexOf("@Html.Raw(r.Value.ParsePlaceHolders())") != -1</text>
+                                        break;
+                                    case FieldConditionRuleOperator.StartsWith:
+                                         <text>contourFieldValues["@r.Field"].indexOf("@Html.Raw(r.Value.ParsePlaceHolders())") != -1</text>
+                                        break;
+                                    case FieldConditionRuleOperator.EndsWith:
+                                        <text>contourFieldValues["@r.Field"].indexOf("@Html.Raw(r.Value.ParsePlaceHolders())") != -1</text>
+                                        break;
+                                }
+                                <text>)</text>
+                                if (f.ConditionRules.Count > 1 && current < f.ConditionRules.Count)
+                                {
+                                    if (f.ConditionLogicType == FieldConditionLogicType.All)
+                                    {
+                                        <text>&&</text> 
+                                    }
+                                    else
+                                    {
+                                        <text>||</text>
+                                    }
+                                }
+
+                                current++;
+                            }
+                        )
+                        {
+                             @if (f.ConditionActionType == FieldConditionActionType.Show)
+                             {
+                                 <text>$("#@f.Id").closest(".contourField").show();</text>
+                             }
+                             else
+                             {
+                                 <text>$("#@f.Id").closest(".contourField").hide();</text>
+                             }
+                             
+                        }
+                        else
+                        {
+                             @if (f.ConditionActionType == FieldConditionActionType.Show)
+                             {
+                                 <text>$("#@f.Id").closest(".contourField").hide();</text>
+                             }
+                             else
+                             {
+                                 <text>$("#@f.Id").closest(".contourField").show();</text>
+                             }
+                        }
+                     </text>
+
+                    }
+                }
+            }
+            
+        }
+    </script>

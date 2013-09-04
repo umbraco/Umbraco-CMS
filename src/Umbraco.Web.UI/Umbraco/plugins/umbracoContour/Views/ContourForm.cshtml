@@ -1,0 +1,76 @@
+﻿﻿@inherits WebViewPage<Umbraco.Forms.Mvc.Models.FormViewModel>      
+@using Umbraco.Forms.Mvc.Models
+@using Umbraco.Forms.Mvc.BusinessLogic
+@using Umbraco.Forms.MVC.Extensions
+
+@if (Model.SubmitHandled)
+{
+    <p class="contourMessageOnSubmit">@Model.MessageOnSubmit</p>
+}
+else
+{
+    Html.EnableClientValidation();
+    Html.EnableUnobtrusiveJavaScript();
+
+    string dateFormat = Html.ConvertDateFormat();
+       
+     <script type="text/javascript">
+         var contourDateFormat = "@dateFormat";
+    </script> 
+    
+    <div id="contour">
+       
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken("UmbracoContourForm")
+            @Html.HiddenFor(x => Model.FormStep)
+            @Html.HiddenFor(x => Model.FormId)
+            @Html.HiddenFor(x => Model.RecordId)
+
+          
+            if (Model.ShowValidationSummary)
+            {
+                @Html.ValidationSummary(false)
+            }
+            
+            <div class="contourPage">
+                 <h4 class="contourPageName">@Model.CurrentPage.Caption</h4>
+                @foreach (FieldsetViewModel fs in Model.CurrentPage.Fieldsets)
+                {
+                    <fieldset class="contourFieldSet">
+                        @if (!string.IsNullOrEmpty(fs.Caption))
+                        {   
+                            <legend>
+                                @fs.Caption
+                            </legend>
+                        }
+                        @foreach (FieldViewModel f in fs.Fields)
+                        {
+                            <div class="contourField">
+                                <label for="@f.Id">
+                                    @f.Caption
+
+                                    @if (f.ShowIndicator)
+                                    {
+                                        <span class="contourIndicator">@Model.Indicator</span>
+                                    }
+                                </label>  
+                         
+                                @Html.Partial(FieldViewResolver.GetFieldView(Model.FormId, f.FieldTypeName, f.Caption), f)
+                            
+                                @if (Model.ShowFieldValidaton)
+                                {
+                                    @Html.ValidationMessage(f.Id)
+                                }
+                            </div>
+                        }
+                    
+                    </fieldset>
+                }
+            </div>
+        }
+        <p>
+            <input type="submit" value="Submit"/>
+        </p>
+    </div>
+}

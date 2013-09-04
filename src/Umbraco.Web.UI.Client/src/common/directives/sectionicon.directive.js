@@ -13,12 +13,17 @@
                 element.html("<i class='" + iconHelper.convertFromLegacyIcon(icon) + "'></i>");
             }
             else if (iconHelper.isFileBasedIcon(icon)) {
+                var convert = iconHelper.convertFromLegacyImage(icon);
+                if(convert){
+                    element.html("<i class='icon-section " + convert + "'></i>");
+                }else{
+                    element.html("<img src='images/tray/" + icon + "'>");
+                }
                 //it's a file, normally legacy so look in the icon tray images
-                element.html("<img src='images/tray/" + icon + "'>");
             }
             else {
                 //it's normal
-                element.html("<i class='" + icon + "'></i>");
+                element.html("<i class='icon-section " + icon + "'></i>");
             }
         }
     };

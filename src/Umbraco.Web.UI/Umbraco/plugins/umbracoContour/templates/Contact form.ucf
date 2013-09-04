@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="UmbracoContour">
+  <Name>Contact</Name>
+  <Created>2012-11-19T12:26:50.927</Created>
+  <FieldIndicationType>NoIndicator</FieldIndicationType>
+  <Indicator />
+  <ShowValidationSummary>false</ShowValidationSummary>
+  <HideFieldValidation>false</HideFieldValidation>
+  <RequiredErrorMessage>{0} is mandatory</RequiredErrorMessage>
+  <InvalidErrorMessage>{0} is not valid</InvalidErrorMessage>
+  <MessageOnSubmit>Thank you</MessageOnSubmit>
+  <GoToPageOnSubmit>0</GoToPageOnSubmit>
+  <ManualApproval>false</ManualApproval>
+  <Archived>false</Archived>
+  <StoreRecordsLocally>true</StoreRecordsLocally>
+  <DisableDefaultStylesheet>false</DisableDefaultStylesheet>
+  <Pages>
+    <Page>
+      <FieldSets>
+        <FieldSet>
+          <Fields>
+            <Field>
+              <PreValues />
+              <Caption>Name</Caption>
+              <ToolTip />
+              <SortOrder>0</SortOrder>
+              <PageIndex>0</PageIndex>
+              <FieldsetIndex>0</FieldsetIndex>
+              <Id>00000000-0000-0000-0000-000000000000</Id>
+              <FieldSet>3dce7e6e-6b94-4b4f-9e43-58f1687d980b</FieldSet>
+              <Form>6f2903fc-e27a-4d68-88d7-8d948746a6fe</Form>
+              <FieldTypeId>3f92e01b-29e2-4a30-bf33-9df5580ed52c</FieldTypeId>
+              <Mandatory>true</Mandatory>
+              <RegEx />
+              <RequiredErrorMessage />
+              <InvalidErrorMessage />
+              <PreValueSourceId>00000000-0000-0000-0000-000000000000</PreValueSourceId>
+              <Settings />
+              <Condition>
+                <Id>7eb5cf20-0df9-4b6a-9e9e-0613525aa4dc</Id>
+                <Field>5674fa29-4ae2-4090-a0ce-2a2e70c35dfc</Field>
+                <Enabled>false</Enabled>
+                <ActionType>Show</ActionType>
+                <LogicType>All</LogicType>
+                <Rules />
+              </Condition>
+            </Field>
+            <Field>
+              <PreValues />
+              <Caption>Email</Caption>
+              <ToolTip />
+              <SortOrder>1</SortOrder>
+              <PageIndex>0</PageIndex>
+              <FieldsetIndex>0</FieldsetIndex>
+              <Id>00000000-0000-0000-0000-000000000000</Id>
+              <FieldSet>3dce7e6e-6b94-4b4f-9e43-58f1687d980b</FieldSet>
+              <Form>6f2903fc-e27a-4d68-88d7-8d948746a6fe</Form>
+              <FieldTypeId>3f92e01b-29e2-4a30-bf33-9df5580ed52c</FieldTypeId>
+              <Mandatory>true</Mandatory>
+              <RegEx>^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$</RegEx>
+              <RequiredErrorMessage />
+              <InvalidErrorMessage />
+              <PreValueSourceId>00000000-0000-0000-0000-000000000000</PreValueSourceId>
+              <Settings />
+              <Condition>
+                <Id>102477ed-50a8-4af6-a40b-b315e96fead4</Id>
+                <Field>d222a759-d74e-4d6c-a6d5-23ffc4bda09b</Field>
+                <Enabled>false</Enabled>
+                <ActionType>Show</ActionType>
+                <LogicType>All</LogicType>
+                <Rules />
+              </Condition>
+            </Field>
+            <Field>
+              <PreValues />
+              <Caption>Message</Caption>
+              <ToolTip />
+              <SortOrder>2</SortOrder>
+              <PageIndex>0</PageIndex>
+              <FieldsetIndex>0</FieldsetIndex>
+              <Id>00000000-0000-0000-0000-000000000000</Id>
+              <FieldSet>3dce7e6e-6b94-4b4f-9e43-58f1687d980b</FieldSet>
+              <Form>6f2903fc-e27a-4d68-88d7-8d948746a6fe</Form>
+              <FieldTypeId>023f09ac-1445-4bcb-b8fa-ab49f33bd046</FieldTypeId>
+              <Mandatory>true</Mandatory>
+              <RegEx />
+              <RequiredErrorMessage />
+              <InvalidErrorMessage />
+              <PreValueSourceId>00000000-0000-0000-0000-000000000000</PreValueSourceId>
+              <Settings />
+              <Condition>
+                <Id>4949846c-bc24-49db-9bdd-b7c1eb6179c8</Id>
+                <Field>753ba791-0089-4342-8289-29e987518a35</Field>
+                <Enabled>false</Enabled>
+                <ActionType>Show</ActionType>
+                <LogicType>All</LogicType>
+                <Rules />
+              </Condition>
+            </Field>
+          </Fields>
+          <Caption>Contact</Caption>
+          <SortOrder>0</SortOrder>
+          <Id>00000000-0000-0000-0000-000000000000</Id>
+          <Page>684d6d0a-11ba-4e22-a9fa-4a518c180835</Page>
+        </FieldSet>
+      </FieldSets>
+      <Caption>Contact</Caption>
+      <SortOrder>0</SortOrder>
+      <Id>00000000-0000-0000-0000-000000000000</Id>
+      <Form>6f2903fc-e27a-4d68-88d7-8d948746a6fe</Form>
+    </Page>
+  </Pages>
+  <DataSource>00000000-0000-0000-0000-000000000000</DataSource>
+  <Id>6f2903fc-e27a-4d68-88d7-8d948746a6fe</Id>
+</Form>
