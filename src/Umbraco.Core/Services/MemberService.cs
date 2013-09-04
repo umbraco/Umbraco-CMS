@@ -31,6 +31,26 @@ namespace Umbraco.Core.Services
             _uowProvider = provider;
         }
 
+        public IMember GetById(int id)
+        {
+            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(id);
+            }
+        }
+
+        public IMember GetByKey(Guid id)
+        {
+            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IMember>.Builder.Where(x => x.Key == id);
+                var member = repository.GetByQuery(query).FirstOrDefault();
+                return member;
+            }
+        }
+
+        #region IMembershipMemberService Implementation
+
         public IMember CreateMember(string username, string email, string password, string memberTypeAlias, int userId = 0)
         {
             var uow = _uowProvider.GetUnitOfWork();
@@ -84,24 +104,17 @@ namespace Umbraco.Core.Services
 
         public IMember GetById(object id)
         {
-            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            if (id is int)
             {
-                if (id is int)
-                {
-                    var query = Query<IMember>.Builder.Where(x => x.Id == (int)id);
-                    var member = repository.GetByQuery(query).FirstOrDefault();
-                    return member;
-                }
-
-                if (id is Guid)
-                {
-                    var query = Query<IMember>.Builder.Where(x => x.Key == (Guid)id);
-                    var member = repository.GetByQuery(query).FirstOrDefault();
-                    return member;
-                }
-
-                return null;
+                return GetById((int)id);
             }
+
+            if (id is Guid)
+            {
+                return GetByKey((Guid)id);
+            }
+
+            return null;
         }
 
         public void Delete(IMember member)
@@ -123,5 +136,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
         }
+
+        #endregion
     }
 }

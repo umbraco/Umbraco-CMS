@@ -35,6 +35,13 @@ namespace Umbraco.Web.Security.Providers
 
         #endregion
 
+        private IMembershipMemberService _memberService;
+
+        protected IMembershipMemberService MemberService
+        {
+            get { return _memberService ?? (_memberService = ApplicationContext.Current.Services.MemberService); }
+        }
+
         /// <summary>
         /// The name of the application using the custom membership provider.
         /// </summary>
@@ -153,17 +160,10 @@ namespace Umbraco.Web.Security.Providers
         /// <returns>Member type alias</returns>        
         public string DefaultMemberTypeAlias { get; private set; }
         
-        public string   ProviderName {
+        public string ProviderName {
             get { return "MembersMembershipProvider"; }
         }
-
-        private IMembershipMemberService _memberService;
-
-        protected IMembershipMemberService MemberService
-        {
-            get { return _memberService ?? (_memberService = ApplicationContext.Current.Services.MemberService); }
-        }
-
+        
         /// <summary>
         /// Initializes the provider.
         /// </summary>
@@ -229,7 +229,6 @@ namespace Umbraco.Web.Security.Providers
             DefaultMemberTypeAlias = config["defaultMemberTypeAlias"];
             
             LogHelper.Debug<MembersMembershipProvider>("Finished initialising member ship provider " + GetType().FullName);
-            
         }
 
         public override string ToString()
@@ -405,8 +404,7 @@ namespace Umbraco.Web.Security.Providers
 
             return member.Password;
         }
-
-
+        
         /// <summary>
         /// Processes a request to update the password for a membership user.
         /// </summary>
@@ -477,8 +475,7 @@ namespace Umbraco.Web.Security.Providers
             
             return null;
         }
-
-
+        
         /// <summary>
         /// Updates e-mail and potentially approved status, lock status and comment on a user.
         /// Note: To automatically support lock, approve and comments you'll need to add references to the membertype properties in the 
@@ -564,8 +561,7 @@ namespace Umbraco.Web.Security.Providers
             
             return true;
         }
-
-
+        
         /// <summary>
         /// Gets information from the data source for a user based on the unique identifier for the membership user. Provides an option to update the last-activity date/time stamp for the user.
         /// </summary>
@@ -663,8 +659,7 @@ namespace Umbraco.Web.Security.Providers
         {
             throw new System.NotImplementedException();
         }
-
-
+        
         /// <summary>
         /// Gets a collection of membership users where the user name contains the specified user name to match.
         /// </summary>

@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models;
+﻿using System;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
 {
@@ -7,7 +8,8 @@ namespace Umbraco.Core.Services
     /// </summary>
     internal interface IMemberService : IMembershipMemberService
     {
-         
+        IMember GetById(int id);
+        IMember GetByKey(Guid id);
     }
 
     /// <summary>
