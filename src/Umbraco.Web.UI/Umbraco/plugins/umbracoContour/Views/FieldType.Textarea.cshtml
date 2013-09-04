@@ -1,7 +1,0 @@
-@model Umbraco.Forms.Mvc.Models.FieldViewModel
-<textarea name="@Model.Name" id="@Model.Id" rows="2" cols="20"
-@{if(Model.Mandatory || Model.Validate){<text>data-val="true"</text>}}
-@{if (Model.Mandatory) {<text> data-val-required="@Model.RequiredErrorMessage"</text>}}
-@{if (Model.Validate) {<text> data-val-regex="@Model.InvalidErrorMessage" data-regex="@Model.Regex"</text>}}
->@Model.Value</textarea>
-
