@@ -14,6 +14,7 @@ namespace umbraco
     /// Handles loading the content tree into umbraco's application tree
     /// </summary>
     [Obsolete("This is no longer used and will be removed from the codebase in the future")]
+    //[Tree(Constants.Applications.Content, "content", "Content", silent: true)]
     public class loadContent : BaseContentTree
     {
 

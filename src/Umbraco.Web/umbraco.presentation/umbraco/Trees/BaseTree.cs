@@ -84,6 +84,7 @@ namespace umbraco.cms.presentation.Trees
 
                 return m_treeAlias;
             }
+            internal set { m_treeAlias = value; }
         }
         private string m_treeAlias;
 

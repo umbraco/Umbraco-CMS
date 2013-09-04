@@ -19,12 +19,15 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
+    [LegacyBaseTree(typeof(loadContent))]
     [Tree(Constants.Applications.Content, Constants.Trees.Content, "Content")]
     [PluginController("UmbracoTrees")]
     public class ContentTreeController : ContentTreeControllerBase
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
+            TreeNode node;
+
             //if the user's start node is not default, then return their start node as the root node.
             if (UmbracoUser.StartNodeId != Constants.System.Root)
             {
@@ -35,20 +38,27 @@ namespace Umbraco.Web.Trees
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
 
-                var node = new TreeNode(
+                node = new TreeNode(
                     userRoot.Id.ToInvariantString(),
                     "", //root nodes aren't expandable, no need to lookup the child nodes url
                     Url.GetMenuUrl(GetType(), userRoot.Id.ToInvariantString(), queryStrings))
-                {
-                    HasChildren = true,
-                    RoutePath = currApp,
-                    Title = userRoot.Name
-                };
+                    {
+                        HasChildren = true,
+                        RoutePath = currApp,
+                        Title = userRoot.Name
+                    };
 
-                return node;
+
+            }
+            else
+            {
+                node = base.CreateRootNode(queryStrings);    
             }
 
-            return base.CreateRootNode(queryStrings);
+            //InjectLegacyTreeCompatibility(node, queryStrings);
+
+            return node;
+            
         }
 
         protected override int RecycleBinId
@@ -74,13 +84,16 @@ namespace Umbraco.Web.Trees
                 var allowedUserOptions = GetUserMenuItemsForNode(e);
                 if (CanUserAccessNode(e, allowedUserOptions))
                 {
-                    nodes.Add(
-                    CreateTreeNode(
+                    var node = CreateTreeNode(
                         e.Id.ToInvariantString(),
                         queryStrings,
                         e.Name,
                         e.ContentTypeIcon,
-                        e.HasChildren));
+                        e.HasChildren);
+
+                    //InjectLegacyTreeCompatibility(node, queryStrings);
+
+                    nodes.Add(node);
                 }
             }
             return nodes;
@@ -164,6 +177,23 @@ namespace Umbraco.Web.Trees
             return menu;
         }
 
+        ///// <summary>
+        ///// This is required so that the legacy tree dialog pickers and the legacy TreeControl.ascx stuff works with these new trees.
+        ///// </summary>
+        ///// <param name="node"></param>
+        ///// <param name="queryStrings"></param>
+        ///// <remarks>
+        ///// NOTE: That if developers create brand new trees using webapi controllers then they'll need to manually make it 
+        ///// compatible with the legacy tree pickers, 99.9% of the time devs won't be doing that and once we make the new tree
+        ///// pickers and devs update their apps to be angularized it won't matter
+        ///// </remarks>
+        //private void InjectLegacyTreeCompatibility(TreeNode node, FormDataCollection queryStrings)
+        //{
+        //    if (IsDialog(queryStrings))
+        //    {
+        //        node.AdditionalData["legacyDialogAction"] = "javascript:openContent(" + node.NodeId + ");";
+        //    }
+        //}
         
     }
 }

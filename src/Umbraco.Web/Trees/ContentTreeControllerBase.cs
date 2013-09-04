@@ -58,15 +58,20 @@ namespace Umbraco.Web.Trees
         {
             if (id == Constants.System.Root.ToInvariantString())
             {
-                //we need to append the recycle bin to the end 
+                //we need to append the recycle bin to the end (if not in dialog mode)
                 var nodes = PerformGetTreeNodes(id, queryStrings);
-                nodes.Add(CreateTreeNode(
-                    Constants.System.RecycleBinContent.ToInvariantString(),
-                    queryStrings,
-                    ui.GetText("general", "recycleBin"),
-                    "icon-trash",
-                    RecycleBinSmells,
-                    queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') +  "/recyclebin"));
+
+                if (!IsDialog(queryStrings))
+                {
+                    nodes.Add(CreateTreeNode(
+                        Constants.System.RecycleBinContent.ToInvariantString(),
+                        queryStrings,
+                        ui.GetText("general", "recycleBin"),
+                        "icon-trash",
+                        RecycleBinSmells,
+                        queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/recyclebin"));    
+                }
+
                 return nodes;
             }
 

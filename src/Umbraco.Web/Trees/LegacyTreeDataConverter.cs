@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Formatting;
+using System.Text;
 using System.Web;
 using System.Web.Http.Routing;
 using Umbraco.Core;
@@ -15,12 +17,97 @@ using umbraco.interfaces;
 
 namespace Umbraco.Web.Trees
 {
+    [AttributeUsage(AttributeTargets.Class)]
+    internal sealed class LegacyBaseTreeAttribute : Attribute
+    {
+        public Type BaseTreeType { get; private set; }
+
+        public LegacyBaseTreeAttribute(Type baseTreeType)
+        {
+            if (!TypeHelper.IsTypeAssignableFrom<BaseTree>(baseTreeType))
+            {
+                throw new InvalidOperationException("The type for baseTreeType must be assignable from " + typeof(BaseTree));
+            }
+
+            BaseTreeType = baseTreeType;
+        }
+    }
+
+    internal class LegacyBaseTreeWrapper : BaseTree
+    {
+        
+        private readonly string _treeAlias;
+        private readonly TreeNodeCollection _children;
+        private readonly TreeNode _root;
+
+        public LegacyBaseTreeWrapper(string treeAlias, string application, TreeNode root, TreeNodeCollection children = null)
+            : base(application)
+        {
+            _treeAlias = treeAlias;
+            _root = root;
+            _children = children;
+        }
+        
+        public override void RenderJS(ref StringBuilder javascript)
+        {
+            
+        }
+
+        public override void Render(ref XmlTree tree)
+        {
+            foreach (var c in _children)
+            {
+                var node = XmlTreeNode.Create(this);
+                LegacyTreeDataConverter.ConvertToLegacyNode(node, c, _treeAlias);
+                node.Source = IsDialog == false ? GetTreeServiceUrl(int.Parse(node.NodeID)) : GetTreeDialogUrl(int.Parse(node.NodeID));
+                tree.Add(node);
+            }
+        }
+
+        protected override void CreateRootNode(ref XmlTreeNode rootNode)
+        {
+            rootNode.NodeID = _root.NodeId;
+            rootNode.Icon = _root.IconIsClass ? _root.Icon.EnsureStartsWith('.') : _root.IconFilePath;
+            rootNode.HasChildren = _root.HasChildren;
+            rootNode.NodeID = _root.NodeId;
+            rootNode.Text = _root.Title;
+            rootNode.NodeType = _root.NodeType;
+            rootNode.OpenIcon = _root.IconIsClass ? _root.Icon.EnsureStartsWith('.') : _root.IconFilePath;
+        }
+
+        public override string TreeAlias
+        {
+            get { return _treeAlias; }
+        }
+    }
+
     /// <summary>
     /// Converts the legacy tree data to the new format
     /// </summary>
     internal class LegacyTreeDataConverter
     {
-        
+
+        internal static FormDataCollection ConvertFromLegacyTreeParams(TreeRequestParams treeParams)
+        {
+            return new FormDataCollection(new Dictionary<string, string>
+                {
+                    {TreeQueryStringParameters.Application, treeParams.Application},
+                    {TreeQueryStringParameters.DialogMode, treeParams.IsDialog.ToString()},
+                });
+        }
+
+        internal static void ConvertToLegacyNode(XmlTreeNode legacy, TreeNode node, string treeType)
+        {
+            legacy.Action = node.AdditionalData.ContainsKey("legacyDialogAction") ? node.AdditionalData["legacyDialogAction"].ToString() : "";
+            legacy.HasChildren = node.HasChildren;
+            legacy.Icon = node.IconIsClass ? node.Icon.EnsureStartsWith('.') : node.IconFilePath;
+            legacy.NodeID = node.NodeId;
+            legacy.NodeType = node.NodeType;
+            legacy.OpenIcon = node.IconIsClass ? node.Icon.EnsureStartsWith('.') : node.IconFilePath;
+            legacy.Text = node.Title;
+            legacy.TreeType = treeType;
+        }
+
         /// <summary>
         /// Gets the menu item collection from a legacy tree node based on it's parent node's child collection
         /// </summary>
