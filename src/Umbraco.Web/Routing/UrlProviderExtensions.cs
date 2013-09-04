@@ -27,7 +27,7 @@ namespace Umbraco.Web.Routing
                 var parent = content;
                 do
                 {
-                    parent = parent.ParentId > 0 ? content.Parent() : null;
+                    parent = parent.ParentId > 0 ? parent.Parent() : null;
                 }
                 while (parent != null && parent.Published);
 

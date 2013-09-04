@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Examine;
@@ -20,6 +21,7 @@ namespace UmbracoExamine
     /// XSLT extensions will ONLY work for provider that have a base class of BaseUmbracoIndexer
     /// </remarks>
     [XsltExtension("Examine")]
+    [SecuritySafeCritical]
     public class XsltExtensions
     {
         ///<summary>

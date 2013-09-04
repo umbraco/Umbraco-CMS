@@ -102,9 +102,8 @@ namespace Umbraco.Web.Trees
                 node.AdditionalData.Add("searchable", "true");
             }
 
-            //now update all data based on some of the query strings, like if we are running in dialog mode
-            var isDialog = queryStrings.GetValue<bool>(TreeQueryStringParameters.DialogMode);
-            if (isDialog)
+            //now update all data based on some of the query strings, like if we are running in dialog mode           
+            if (IsDialog(queryStrings))
             {
                 node.RoutePath = "#";
             }
@@ -137,9 +136,8 @@ namespace Umbraco.Web.Trees
                 AddQueryStringsToAdditionalData(node, queryStrings);
             }
 
-            //now update all data based on some of the query strings, like if we are running in dialog mode
-            var isDialog = queryStrings.GetValue<bool>(TreeQueryStringParameters.DialogMode);
-            if (isDialog)
+            //now update all data based on some of the query strings, like if we are running in dialog mode            
+            if (IsDialog((queryStrings)))
             {
                 foreach (var node in nodes)
                 {
@@ -288,17 +286,19 @@ namespace Umbraco.Web.Trees
 
         #endregion
 
-        ///// <summary>
-        ///// The tree name based on the controller type so that everything is based on naming conventions
-        ///// </summary>
-        //public string TreeType
-        //{
-        //    get
-        //    {
-        //        var name = GetType().Name;
-        //        return name.Substring(0, name.LastIndexOf("TreeController", StringComparison.Ordinal));
-        //    }
-        //}
+        #region Query String parameter helpers
+
+        /// <summary>
+        /// If the request is for a dialog mode tree
+        /// </summary>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        protected bool IsDialog(FormDataCollection queryStrings)
+        {
+            return queryStrings.GetValue<bool>(TreeQueryStringParameters.DialogMode);
+        }
+
+        #endregion
 
         public static event EventHandler<TreeNodesRenderingEventArgs> TreeNodesRendering;
 

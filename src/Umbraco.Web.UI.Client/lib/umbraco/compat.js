@@ -14,7 +14,15 @@
             var el = event.target.nodeName;
             var pEl = event.target.parentElement.nodeName;
 
-            if (el != "INPUT" && el != "A" && el != "BUTTON" && pEl != "A" && pEl != "BUTTON") {
+            //first check the simple elements
+            if (el != "INPUT" && el != "A" && el != "BUTTON" &&
+                pEl != "A" && pEl != "BUTTON" && pEl != "LABEL") {
+                            
+                //NOTE: The IMG needs to be added because a ton of buttons in the legacy editors are actually just images with click handlers! 
+                if (el == "IMG" && $(event.target.parentElement).hasClass("btn-group")) {
+                    return;
+                }
+
                 UmbClientMgr.closeModalWindow(undefined);
             }
         });

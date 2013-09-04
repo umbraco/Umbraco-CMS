@@ -8,11 +8,13 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Trees.Menu;
+using umbraco;
 using umbraco.BusinessLogic.Actions;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
+    [LegacyBaseTree(typeof(loadMedia))]
     [Tree(Constants.Applications.Media, Constants.Trees.Media, "Media")]
     [PluginController("UmbracoTrees")]
     public class MediaTreeController : ContentTreeControllerBase

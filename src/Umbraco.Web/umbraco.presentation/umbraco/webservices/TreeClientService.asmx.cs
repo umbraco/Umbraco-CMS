@@ -1,8 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Web;
+using System.Web.Http;
+using System.Web.Http.Controllers;
+using System.Web.Http.Hosting;
+using System.Web.Http.Routing;
+using System.Web.Mvc;
+using System.Web.Routing;
 using System.Web.Services;
+using Umbraco.Core;
+using Umbraco.Web;
+using Umbraco.Web.WebApi;
 using Umbraco.Web.WebServices;
+using umbraco.BusinessLogic;
+using umbraco.businesslogic;
 using umbraco.presentation.umbraco.controls;
 using umbraco.cms.presentation.Trees;
 using System.Web.Script.Services;
@@ -11,29 +25,30 @@ using System.EnterpriseServices;
 using System.IO;
 using System.Web.UI;
 using umbraco.controls.Tree;
+using Umbraco.Web.Trees;
 
 namespace umbraco.presentation.webservices
 {
-	/// <summary>
-	/// Client side ajax utlities for the tree
-	/// </summary>
-	[ScriptService]
-	[WebService]
+    /// <summary>
+    /// Client side ajax utlities for the tree
+    /// </summary>
+    [ScriptService]
+    [WebService]
     public class TreeClientService : UmbracoAuthorizedWebService
-	{
+    {
 
-		/// <summary>
-		/// Returns a key/value object with: json, app, js as the keys
-		/// </summary>	
-		/// <returns></returns>
-		[WebMethod]
+        /// <summary>
+        /// Returns a key/value object with: json, app, js as the keys
+        /// </summary>	
+        /// <returns></returns>
+        [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-		public Dictionary<string, string> GetInitAppTreeData(string app, string treeType, bool showContextMenu, bool isDialog, TreeDialogModes dialogMode, string functionToCall, string nodeKey)
-		{
-		    AuthorizeRequest(app, true);
+        public Dictionary<string, string> GetInitAppTreeData(string app, string treeType, bool showContextMenu, bool isDialog, TreeDialogModes dialogMode, string functionToCall, string nodeKey)
+        {
+            AuthorizeRequest(app, true);
 
-			var treeCtl = new TreeControl()
-			{
+            var treeCtl = new TreeControl()
+            {
                 ShowContextMenu = showContextMenu,
                 IsDialog = isDialog,
                 DialogMode = dialogMode,
@@ -42,9 +57,9 @@ namespace umbraco.presentation.webservices
                 NodeKey = string.IsNullOrEmpty(nodeKey) ? "" : nodeKey,
                 StartNodeID = -1, //TODO: set this based on parameters!
                 FunctionToCall = string.IsNullOrEmpty(functionToCall) ? "" : functionToCall
-			};
+            };
 
-			var returnVal = new Dictionary<string, string>();
+            var returnVal = new Dictionary<string, string>();
 
             if (string.IsNullOrEmpty(treeType))
             {
@@ -54,35 +69,35 @@ namespace umbraco.presentation.webservices
             }
             else
             {
-               
-                //get the tree that we need to render
-                var tree = TreeDefinitionCollection.Instance.FindTree(treeType).CreateInstance();
+                var tree = LegacyTreeDataConverter.GetLegacyTreeForLegacyServices(Services.ApplicationTreeService, treeType);
+                
                 tree.ShowContextMenu = showContextMenu;
                 tree.IsDialog = isDialog;
                 tree.DialogMode = dialogMode;
                 tree.NodeKey = string.IsNullOrEmpty(nodeKey) ? "" : nodeKey;
                 tree.FunctionToCall = string.IsNullOrEmpty(functionToCall) ? "" : functionToCall;
                 //this would be nice to set, but no parameters :( 
-                //tree.StartNodeID =
+                //tree.StartNodeID =    
 
                 //now render it's start node
                 var xTree = new XmlTree();
                 xTree.Add(tree.RootNode);
-                returnVal.Add("json", xTree.ToString());
+
+                returnVal.Add("json", xTree.ToString());    
             }
 
             returnVal.Add("app", app);
-			returnVal.Add("js", treeCtl.JSCurrApp);
+            returnVal.Add("js", treeCtl.JSCurrApp);
 
-			return returnVal;
-		}
+            return returnVal;
+        }
 
         [Obsolete("Use the AuthorizeRequest methods on the base class UmbracoAuthorizedWebService instead")]
-		public static void Authorize()
-		{
-			if (!BasePages.BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
-				throw new Exception("Client authorization failed. User is not logged in");
-		}
+        public static void Authorize()
+        {
+            if (!BasePages.BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
+                throw new Exception("Client authorization failed. User is not logged in");
+        }
 
-	}
+    }
 }

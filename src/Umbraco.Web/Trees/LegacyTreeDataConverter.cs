@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Formatting;
+using System.Text;
 using System.Web;
 using System.Web.Http.Routing;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Web.Trees.Menu;
 using umbraco;
+using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.helpers;
 using umbraco.cms.presentation.Trees;
@@ -16,10 +21,92 @@ using umbraco.interfaces;
 namespace Umbraco.Web.Trees
 {
     /// <summary>
+    /// This attribute is used purely to maintain some compatibility with legacy webform tree pickers
+    /// </summary>
+    /// <remarks>
+    /// This allows us to attribute new trees with their legacy counterparts and when a legacy tree is loaded this will indicate 
+    /// on the new tree which legacy tree to load (it won't actually render using the new tree)
+    /// </remarks>
+    [AttributeUsage(AttributeTargets.Class)]
+    internal sealed class LegacyBaseTreeAttribute : Attribute
+    {
+        public Type BaseTreeType { get; private set; }
+
+        public LegacyBaseTreeAttribute(Type baseTreeType)
+        {
+            if (!TypeHelper.IsTypeAssignableFrom<BaseTree>(baseTreeType))
+            {
+                throw new InvalidOperationException("The type for baseTreeType must be assignable from " + typeof(BaseTree));
+            }
+
+            BaseTreeType = baseTreeType;
+        }
+    }
+    
+    /// <summary>
     /// Converts the legacy tree data to the new format
     /// </summary>
     internal class LegacyTreeDataConverter
     {
+        internal static BaseTree GetLegacyTreeForLegacyServices(Core.Models.ApplicationTree appTree)
+        {
+            if (appTree == null) throw new ArgumentNullException("appTree");
+
+            BaseTree tree;
+
+            var controllerAttempt = appTree.TryGetControllerTree();
+            if (controllerAttempt.Success)
+            {
+                var legacyAtt = controllerAttempt.Result.GetCustomAttribute<LegacyBaseTreeAttribute>(false);
+                if (legacyAtt == null)
+                {
+                    LogHelper.Warn<LegacyTreeDataConverter>("Cannot render tree: " + appTree.Alias + ". Cannot render a " + typeof(TreeApiController) + " tree type with the legacy web services unless attributed with " + typeof(LegacyBaseTreeAttribute));
+                    return null;
+                }
+
+                var treeDef = new TreeDefinition(
+                    legacyAtt.BaseTreeType,
+                    new ApplicationTree(false, true, appTree.SortOrder, appTree.ApplicationAlias, appTree.Alias, appTree.Title, appTree.IconClosed, appTree.IconOpened, "", legacyAtt.BaseTreeType.GetFullNameWithAssembly(), ""),
+                    new Application(appTree.Alias, appTree.Alias, "", 0));
+
+                tree = treeDef.CreateInstance();
+                tree.TreeAlias = appTree.Alias;
+
+            }
+            else
+            {
+                //get the tree that we need to render                    
+                var treeDef = TreeDefinitionCollection.Instance.FindTree(appTree.Alias);
+                if (treeDef == null)
+                {
+                    return null;
+                }
+                tree = treeDef.CreateInstance();
+            }
+
+            return tree;
+        }
+
+        /// <summary>
+        /// This is used by any legacy services that require rendering a BaseTree, if a new controller tree is detected it will try to invoke it's legacy predecessor.
+        /// </summary>
+        /// <param name="appTreeService"></param>
+        /// <param name="treeType"></param>
+        /// <returns></returns>
+        internal static BaseTree GetLegacyTreeForLegacyServices(ApplicationTreeService appTreeService, string treeType)
+        {
+            if (appTreeService == null) throw new ArgumentNullException("appTreeService");
+            if (treeType == null) throw new ArgumentNullException("treeType");
+
+            //first get the app tree definition so we can then figure out if we need to load by legacy or new
+            //now we'll look up that tree
+            var appTree = appTreeService.GetByAlias(treeType);
+            if (appTree == null)
+                throw new InvalidOperationException("No tree found with alias " + treeType);
+
+            return GetLegacyTreeForLegacyServices(appTree);
+        }
+
         /// <summary>
         /// Gets the menu item collection from a legacy tree node based on it's parent node's child collection
         /// </summary>

@@ -11,7 +11,6 @@ namespace Umbraco.Core.Macros
     /// An optional XML namespace can be specified using [XsltExtension("MyNamespace")].
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class)]
-    [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium, Unrestricted = false)]
     public class XsltExtensionAttribute : Attribute
     {
         public XsltExtensionAttribute()
