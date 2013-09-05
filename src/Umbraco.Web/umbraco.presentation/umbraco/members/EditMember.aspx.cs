@@ -71,7 +71,7 @@ namespace umbraco.cms.presentation.members
                 MemberLoginNameExistCheck.ErrorMessage = ui.Text("errorHandling", "errorExistsWithoutTab", "Login Name", BasePages.UmbracoEnsuredPage.CurrentUser);
                 MemberLoginNameExistCheck.EnableClientScript = false;
                 MemberLoginNameExistCheck.ValidateEmptyText = false;
-                MemberLoginNameExistCheck.ControlToValidate = MemberEmail.ID;
+                MemberLoginNameExistCheck.ControlToValidate = MemberLoginNameTxt.ID;
                 MemberLoginNameExistCheck.ServerValidate += MemberLoginNameExistCheck_ServerValidate;
 
                 MemberEmailExistCheck.ErrorMessage = ui.Text("errorHandling", "errorExistsWithoutTab", "E-mail", BasePages.UmbracoEnsuredPage.CurrentUser);
