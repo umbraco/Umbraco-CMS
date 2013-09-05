@@ -9,7 +9,7 @@ using umbraco.cms.businesslogic.datatype;
 namespace umbraco
 {
 	/// <summary>
-	/// Static helper methods, previously this class was UmbracoHelper
+	/// Static helper methods
 	/// </summary>
 	public static partial class uQuery
 	{
