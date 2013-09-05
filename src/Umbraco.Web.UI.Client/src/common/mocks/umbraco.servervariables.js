@@ -14,7 +14,8 @@ Umbraco.Sys.ServerVariables = {
         "authenticationApiBaseUrl": "/umbraco/UmbracoApi/Authentication/",
         //For this we'll just provide a file that exists during the mock session since we don't really have legay js tree stuff
         "legacyTreeJs": "/belle/lib/yepnope/empty.js",
-        "entityApiBaseUrl": "/umbraco/UmbracoApi/Entity/"
+        "entityApiBaseUrl": "/umbraco/UmbracoApi/Entity/",
+        "dashboardApiBaseUrl" : "/umbraco/UmbracoApi/Dashboard/"
     },
     umbracoSettings: {
         "umbracoPath": "/umbraco",

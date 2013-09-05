@@ -90,12 +90,12 @@ tools/NDepend/
 src/Umbraco.Web.UI/App_Plugins/*
 src/*.psess
 src/*.vspx
-src/Umbraco.Web.UI/umbraco/js/routes.js.*
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/routes.js.*
 NDependOut/*
 *.ndproj
 QueryResult.htm
 *.ndproj
-src/Umbraco.Web.UI/umbraco/assets/*
-src/Umbraco.Web.UI/umbraco/lib/*
-src/Umbraco.Web.UI/umbraco/Views/**/*.html
-src/Umbraco.Web.UI/umbraco/Views/**/*.js
+src/Umbraco.Web.UI/[Uu]mbraco/[Aa]ssets/*
+src/Umbraco.Web.UI/[Uu]mbraco/[Ll]ib/*
+src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/**/*.html
+src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/**/*.js
