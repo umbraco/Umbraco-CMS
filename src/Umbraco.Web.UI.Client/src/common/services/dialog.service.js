@@ -48,10 +48,12 @@ angular.module('umbraco.services')
            //if there's arguments passed in then check if there's a callback registered in the current modal then call it.
            //this occurs when the "closeDialogs" event is triggered with arguments.
 
+           /* PP: I've commented this out again, because I dont believe a modal should
+            submit data on exit, only on submit 
            if (args && dialog.data("modalCb") != null && angular.isFunction(dialog.data("modalCb"))) {
                var cb = dialog.data("modalCb");
                cb.apply(dialog, [args]);
-           }
+           }*/
 
            dialog.modal("hide");
 
@@ -290,13 +292,11 @@ angular.module('umbraco.services')
             * @returns {Object} modal object
             */
            mediaPicker: function (options) {
-               return openDialog({
-                   scope: options.scope,  
-                   callback: options.callback,
-                   template: 'views/common/dialogs/mediaPicker.html',
-                   show: true
-               });
+            options.template = 'views/common/dialogs/mediaPicker.html';
+            options.show = true;
+            return openDialog(options);
            },
+
 
            /**
             * @ngdoc method
@@ -312,13 +312,9 @@ angular.module('umbraco.services')
             * @returns {Object} modal object
             */
            contentPicker: function (options) {
-               return openDialog({
-                   scope: options.scope,
-                   callback: options.callback,
-                   multipicker: options.multipicker,
-                   template: 'views/common/dialogs/contentPicker.html',
-                   show: true
-               });
+               options.template = 'views/common/dialogs/contentPicker.html';
+               options.show = true;
+              return openDialog(options);
            },
 
            /**
@@ -334,12 +330,9 @@ angular.module('umbraco.services')
             * @returns {Object} modal object
             */
            macroPicker: function (options) {
-               return openDialog({
-                   scope: options.scope,
-                   callback: options.callback,
-                   template: 'views/common/dialogs/macroPicker.html',
-                   show: true
-               });
+                options.template = 'views/common/dialogs/macroPicker.html';
+                options.show = true;
+                return openDialog(options);
            },
 
            /**
@@ -356,14 +349,11 @@ angular.module('umbraco.services')
             * @param {Object} value value sent to the property editor
             * @returns {Object} modal object
             */
-           propertyDialog: function (options) {
-               return openDialog({
-                   scope: options.scope,
-                   callback: options.callback,
-                   template: 'views/common/dialogs/property.html',
-                   show: true
-               });
-           },
+          propertyDialog: function (options) {
+              options.template = 'views/common/dialogs/property.html';
+              options.show = true;
+              return openDialog(options);
+          },
            
            /**
            * @ngdoc method
