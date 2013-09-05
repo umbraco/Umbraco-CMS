@@ -12,8 +12,8 @@ module.exports = function (grunt) {
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
-  grunt.registerTask('build', ['clean','concat','uglify','recess:build','copy']);
-
+  grunt.registerTask('build', ['clean','concat','recess:build','copy']);
+  
   //utillity tasks
   grunt.registerTask('docs', ['ngdocs']);
   grunt.registerTask('webserver', ['connect:devserver']);
