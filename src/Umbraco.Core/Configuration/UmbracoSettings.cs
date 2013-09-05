@@ -502,8 +502,12 @@ namespace Umbraco.Core.Configuration
 			}
 		}
 
-		//TODO: I"m not sure why we need this, need to ask Gareth what the deal is, pretty sure we can remove it or change it, seems like
-		// massive overkill.
+        // we have that one because we auto-discover when a property is "xml" and should be returned by Razor as
+        // dynamic xml. But, stuff such as "<p>hello</p>" can be parsed into xml and would be returned as xml,
+        // unless <p> has been defined in the exclusion list... this is dirty and not-efficient, we should at least
+        // cache the list somewhere!
+        //
+        // TODO get rid of that whole dynamic xml mess
 
 		/// <summary>
 		/// razor DynamicNode typecasting detects XML and returns DynamicXml - Root elements that won't convert to DynamicXml

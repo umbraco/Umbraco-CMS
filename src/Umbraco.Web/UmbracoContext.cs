@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Services;
@@ -30,7 +31,6 @@ namespace Umbraco.Web
         private static readonly object Locker = new object();
 
         private bool _replacing;
-        private PreviewContent _previewContent;
 
         /// <summary>
         /// Used if not running in a web application (no real HttpContext)
@@ -366,7 +366,6 @@ namespace Umbraco.Web
         {
             Security.DisposeIfDisposable();
             Security = null;
-            _previewContent = null;
             _umbracoContext = null;
             //ensure not to dispose this!
             Application = null;

@@ -12,11 +12,13 @@ using SQLCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Stubs;
@@ -178,6 +180,12 @@ namespace Umbraco.Tests.TestHelpers
 
             MappingResolver.Current = new MappingResolver(
                () => PluginManager.Current.ResolveAssignedMapperTypes());
+
+            if (PropertyValueConvertersResolver.HasCurrent == false)
+                PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver();
+
+            if (PublishedContentModelFactoryResolver.HasCurrent == false)
+                PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
 
             base.FreezeResolution();
         }

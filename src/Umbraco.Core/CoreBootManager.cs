@@ -125,8 +125,9 @@ namespace Umbraco.Core
             {
                 CanResolveBeforeFrozen = true
             };
-            //add custom types here that are internal
-            ApplicationEventsResolver.Current.AddType<PublishedContentHelper>();
+
+            // add custom types here that are internal, if needed
+            //ApplicationEventsResolver.Current.AddType<>();
         }
 
         /// <summary>
@@ -254,15 +255,21 @@ namespace Umbraco.Core
             //the database migration objects
             MigrationResolver.Current = new MigrationResolver(
                 () => PluginManager.Current.ResolveMigrationTypes());
-            
 
-
-			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
+            // fixme - remove that one eventually
+            PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
 				PluginManager.Current.ResolvePropertyEditorValueConverters());
-			//add the internal ones, these are not public currently so need to add them manually
-			PropertyEditorValueConvertersResolver.Current.AddType<DatePickerPropertyEditorValueConverter>();
-			PropertyEditorValueConvertersResolver.Current.AddType<TinyMcePropertyEditorValueConverter>();
-			PropertyEditorValueConvertersResolver.Current.AddType<YesNoPropertyEditorValueConverter>();
+
+            // initialize the new property value converters
+            // fixme - discuss: explicit registration vs. discovery?
+            PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
+                PluginManager.Current.ResolveTypes<IPropertyValueConverter>());
+
+            // add the internal ones
+            // fixme - should be public not internal?
+            PropertyValueConvertersResolver.Current.AddType<YesNoValueConverter>();
+            PropertyValueConvertersResolver.Current.AddType<DatePickerValueConverter>();
+            PropertyValueConvertersResolver.Current.AddType<TinyMceValueConverter>();
 
             // this is how we'd switch over to DefaultShortStringHelper _and_ still use
             // UmbracoSettings UrlReplaceCharacters...

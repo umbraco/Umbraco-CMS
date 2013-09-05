@@ -5,6 +5,7 @@ using System.Xml;
 using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web;
 using Umbraco.Core.Profiling;
 
 namespace umbraco
@@ -68,8 +69,9 @@ namespace umbraco
                     }
                     else
                     {
-                        var recursiveVal = publishedContent.GetRecursiveValue(_fieldName);
-                        _fieldContent = recursiveVal.IsNullOrWhiteSpace() ? _fieldContent : recursiveVal;
+					    var pval = publishedContent.GetPropertyValue(_fieldName, true);
+					    var rval = pval == null ? string.Empty : pval.ToString();
+					    _fieldContent = rval.IsNullOrWhiteSpace() ? _fieldContent : rval;
                     }
                 }
                 else

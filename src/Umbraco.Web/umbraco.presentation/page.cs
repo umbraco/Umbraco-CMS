@@ -275,7 +275,7 @@ namespace umbraco
 			{
 				if (!_elements.ContainsKey(p.Alias))				
 				{
-					_elements[p.Alias] = p.Value;					
+					_elements[p.Alias] = p.Value;
 				}
 			}			
 		}

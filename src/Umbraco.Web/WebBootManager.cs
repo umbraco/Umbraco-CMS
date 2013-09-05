@@ -280,10 +280,10 @@ namespace Umbraco.Web
             UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
                 PluginManager.Current.ResolveUmbracoApiControllers());
 
-            //the base creates the PropertyEditorValueConvertersResolver but we want to modify it in the web app and replace
-            //the TinyMcePropertyEditorValueConverter with the RteMacroRenderingPropertyEditorValueConverter
-            PropertyEditorValueConvertersResolver.Current.RemoveType<TinyMcePropertyEditorValueConverter>();
-            PropertyEditorValueConvertersResolver.Current.AddType<RteMacroRenderingPropertyEditorValueConverter>();
+            // CoreBootManager configures TinyMceValueConverter
+            // we want to replace it with RteMacroRenderingValueConverter, which will convert macros, etc
+            PropertyValueConvertersResolver.Current.RemoveType<TinyMceValueConverter>();
+            PropertyValueConvertersResolver.Current.AddType<RteMacroRenderingValueConverter>();
 
             PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
                 new PublishedCache.XmlPublishedCache.PublishedContentCache(),

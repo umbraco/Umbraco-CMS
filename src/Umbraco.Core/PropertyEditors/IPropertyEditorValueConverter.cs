@@ -1,31 +1,30 @@
 using System;
-using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Core.PropertyEditors
 {
+    /// <summary>
+    /// Maps a property source value to a data object.
+    /// </summary>
+    // fixme - should obsolete, use IPropertyValueConverter instead
 	public interface IPropertyEditorValueConverter
 	{
+		/// <summary>
+		/// Returns a value indicating whether this provider applies to the specified property.
+		/// </summary>
+		/// <param name="datatypeGuid">A Guid identifying the property datatype.</param>
+		/// <param name="contentTypeAlias">The content type alias.</param>
+		/// <param name="propertyTypeAlias">The property alias.</param>
+		/// <returns>True if this provider applies to the specified property.</returns>
+		bool IsConverterFor(Guid datatypeGuid, string contentTypeAlias, string propertyTypeAlias);
 
 		/// <summary>
-		/// Returns true if this converter can perform the value conversion for the specified property editor id
+		/// Attempts to convert a source value specified into a property model.
 		/// </summary>
-		/// <param name="propertyEditorId"></param>
-		/// <param name="docTypeAlias"> </param>
-		/// <param name="propertyTypeAlias"> </param>
-		/// <returns></returns>
-		bool IsConverterFor(Guid propertyEditorId, string docTypeAlias, string propertyTypeAlias);
-
-		/// <summary>
-		/// Attempts to convert the value specified into a useable value on the front-end
-		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		/// <remarks>
-		/// This is used to convert the value stored in the repository into a usable value on the front-end.
-		/// For example, if a 0 or 1 is stored for a boolean, we'd want to convert this to a real boolean.
-		/// 
-		/// Also note that the value might not come in as a 0 or 1 but as a "0" or "1"
-		/// </remarks>
-		Attempt<object> ConvertPropertyValue(object value);
+		/// <param name="sourceValue">The source value.</param>
+		/// <returns>An <c>Attempt</c> representing the result of the conversion.</returns>
+		/// <remarks>The source value is dependent on the content cache. With the Xml content cache it
+		/// is always a string, but with other caches it may be an object (numeric, time...) matching
+		/// what is in the database. Be prepared.</remarks>
+		Attempt<object> ConvertPropertyValue(object sourceValue);
 	}
 }

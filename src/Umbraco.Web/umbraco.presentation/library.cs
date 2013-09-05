@@ -362,9 +362,10 @@ namespace umbraco
 			        return doc.CreatorName;
 	        }
 
+            // the legacy library returns the string value from the xml cache - which means a string
+            // that has not be converted at all -- use RawValue here.
 	        var prop = doc.GetProperty(alias);
-	        return prop == null ? string.Empty : prop.Value.ToString();
-
+	        return prop == null ? string.Empty : prop.RawValue.ToString();
         }
 
         /// <summary>

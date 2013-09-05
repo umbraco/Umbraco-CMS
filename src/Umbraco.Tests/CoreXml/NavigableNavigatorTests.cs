@@ -882,24 +882,37 @@ namespace Umbraco.Tests.CoreXml
 
         public object Value(int id)
         {
-            var fieldType = _type.FieldTypes[id];
+            var fieldType = _type.FieldTypes[id] as TestPropertyType;
+            if (fieldType == null) throw new Exception("Oops");
+
             var value = FieldValues[id];
             var isAttr = id <= _type.Source.LastAttributeIndex;
 
+            // null => return null
             if (value == null) return null;
+
+			// attribute => return string value
             if (isAttr) return value.ToString();
+            
+			// has a converter => use the converter
+            if (fieldType.XmlStringConverter != null) 
+                return fieldType.XmlStringConverter(value);
 
-            if (fieldType.XmlStringConverter != null) return fieldType.XmlStringConverter(value);
+            // not a string => return value as a string
+            var s = value as string;
+            if (s == null) return value.ToString();
 
-            // though in reality we should use the converters, which should
-            // know whether the property is XML or not, instead of guessing.
-            XPathDocument doc;
-            if (XmlHelper.TryCreateXPathDocumentFromPropertyValue(value, out doc))
-                return doc.CreateNavigator();
+            // xml content... try xml
+            if (fieldType.IsXmlContent)
+            {
+                XPathDocument doc;
+                if (XmlHelper.TryCreateXPathDocumentFromPropertyValue(s, out doc))
+                    return doc.CreateNavigator();
+            }
 
-            //var s = value.ToString();
-            //return XmlHelper.IsXmlWhitespace(s) ? null : s;
-            return value.ToString();
+            // return the string
+            // even if it's xml that can't be parsed...
+            return s;
         }
 
         // locals

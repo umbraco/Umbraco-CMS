@@ -6,6 +6,7 @@ using Examine;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
@@ -16,22 +17,15 @@ using umbraco.BusinessLogic;
 namespace Umbraco.Tests.PublishedCache
 {
 	[TestFixture]
-    public class PublishMediaCacheTests : PublishedContentTestBase
+    public class PublishMediaCacheTests : BaseWebTest
 	{
-		public override void Initialize()
-		{
-			base.Initialize();				
-		}
-
-
-		
-
-		public override void TearDown()
-		{
-			base.TearDown();
-		}
-
-		[Test]
+        protected override void FreezeResolution()
+        {
+            PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
+            base.FreezeResolution();
+        }
+        
+        [Test]
 		public void Get_Root_Docs()
 		{
 			var user = new User(0);

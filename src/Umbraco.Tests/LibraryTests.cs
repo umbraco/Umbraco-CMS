@@ -4,6 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
@@ -19,11 +23,30 @@ namespace Umbraco.Tests
 	[TestFixture]
 	public class LibraryTests : BaseRoutingTest
 	{
-		public override void Initialize()
-		{            
-			base.Initialize();
+        public override void Initialize()
+		{
+            // required so we can access property.Value
+            PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver();
+            
+            base.Initialize();
 
-			var routingContext = GetRoutingContext("/test", 1234);
+            // need to specify a custom callback for unit tests
+            // AutoPublishedContentTypes generates properties automatically
+            // when they are requested, but we must declare those that we
+            // explicitely want to be here...
+
+            var propertyTypes = new[]
+                {
+                    // AutoPublishedContentType will auto-generate other properties
+                    new PublishedPropertyType("content", Guid.Empty, 0, 0), 
+                };
+            var type = new AutoPublishedContentType(0, "anything", propertyTypes);
+            PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
+            Console.WriteLine("INIT LIB {0}",
+                PublishedContentType.Get(PublishedItemType.Content, "anything")
+                    .PropertyTypes.Count());
+            
+            var routingContext = GetRoutingContext("/test", 1234);
 			UmbracoContext.Current = routingContext.UmbracoContext;
 		}
 

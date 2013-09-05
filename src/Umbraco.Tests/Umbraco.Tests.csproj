@@ -186,6 +186,8 @@
     <Compile Include="CodeFirst\TypeInheritanceTest.cs" />
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
+    <Compile Include="DynamicsAndReflection\ExtensionMethodFinderTests.cs" />
+    <Compile Include="DynamicsAndReflection\ReflectionTests.cs" />
     <Compile Include="Integration\CreateContent.cs" />
     <Compile Include="Models\ContentExtensionsTests.cs" />
     <Compile Include="Models\DataValueSetterTests.cs" />
@@ -252,9 +254,9 @@
     <Compile Include="PublishedContent\LegacyExamineBackedMediaTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
     <Compile Include="PublishedContent\PublishedContentTestBase.cs" />
+    <Compile Include="PublishedContent\PublishedContentTestElements.cs" />
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
-    <Compile Include="PublishedContent\StronglyTypedQueryTests.cs" />
     <Compile Include="HashCodeCombinerTests.cs" />
     <Compile Include="HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="IO\IOHelperTest.cs" />
@@ -296,6 +298,7 @@
     <Compile Include="Persistence\RepositoryResolverTests.cs" />
     <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\SqlTableByTableTest.cs" />
+    <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Publishing\PublishingStrategyTests.cs" />
     <Compile Include="Resolvers\ActionsResolverTests.cs" />
     <Compile Include="AsynchronousRollingFileAppenderTests.cs" />

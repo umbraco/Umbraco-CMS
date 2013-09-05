@@ -6,6 +6,8 @@ using System.Web;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.PublishedContent
@@ -18,7 +20,36 @@ namespace Umbraco.Tests.PublishedContent
             get { return DatabaseBehavior.NoDatabasePerFixture; }
         }
 
-		protected override string GetXmlContent(int templateId)
+        public override void Initialize()
+        {
+            // required so we can access property.Value
+            //PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver();
+
+            base.Initialize();
+
+            // need to specify a custom callback for unit tests
+            // AutoPublishedContentTypes generates properties automatically
+            // when they are requested, but we must declare those that we
+            // explicitely want to be here...
+
+            var propertyTypes = new[]
+                {
+                    // AutoPublishedContentType will auto-generate other properties
+                    new PublishedPropertyType("umbracoNaviHide", Guid.Empty, 0, 0), 
+                    new PublishedPropertyType("selectedNodes", Guid.Empty, 0, 0), 
+                    new PublishedPropertyType("umbracoUrlAlias", Guid.Empty, 0, 0), 
+                    new PublishedPropertyType("content", Guid.Parse(Constants.PropertyEditors.TinyMCEv3), 0, 0), 
+                    new PublishedPropertyType("testRecursive", Guid.Empty, 0, 0), 
+                    new PublishedPropertyType("siteTitle", Guid.Empty, 0, 0), 
+                    new PublishedPropertyType("creatorName", Guid.Empty, 0, 0), 
+                    new PublishedPropertyType("blah", Guid.Empty, 0, 0), // ugly error when that one is missing...
+                };
+            var type = new AutoPublishedContentType(0, "anything", propertyTypes);
+            PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
+
+        }
+        
+        protected override string GetXmlContent(int templateId)
 		{
 			return @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE root[ 

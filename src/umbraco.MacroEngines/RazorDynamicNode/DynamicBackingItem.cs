@@ -146,7 +146,7 @@ namespace umbraco.MacroEngines
                         }
                         if (result != null)
                         {
-                            return new PropertyResult(alias, string.Format("{0}", result), Guid.Empty) { ContextAlias = content.NodeTypeAlias, ContextId = content.Id };
+                            return new PropertyResult(alias, string.Format("{0}", result)) { ContextAlias = content.NodeTypeAlias, ContextId = content.Id };
                         }
                     }
                 }
@@ -188,7 +188,7 @@ namespace umbraco.MacroEngines
                         }
                         if (result != null)
                         {
-                            return new PropertyResult(alias, string.Format("{0}", result), Guid.Empty) { ContextAlias = content.NodeTypeAlias, ContextId = content.Id };
+                            return new PropertyResult(alias, string.Format("{0}", result)) { ContextAlias = content.NodeTypeAlias, ContextId = content.Id };
                         }
                     }
                 }

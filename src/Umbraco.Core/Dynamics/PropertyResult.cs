@@ -1,65 +1,50 @@
 ﻿using System;
 using Umbraco.Core.Models;
-using umbraco.interfaces;
 using System.Web;
 
 namespace Umbraco.Core.Dynamics
 {
-	internal class PropertyResult : IPublishedContentProperty, IHtmlString
-    {
-		internal PropertyResult(IPublishedContentProperty source, PropertyResultType type)
+	internal class PropertyResult : IPublishedProperty, IHtmlString
+	{
+	    private readonly IPublishedProperty _source;
+	    private readonly string _alias;
+	    private readonly object _value;
+        private readonly PropertyResultType _type;
+
+		internal PropertyResult(IPublishedProperty source, PropertyResultType type)
         {
     		if (source == null) throw new ArgumentNullException("source");
-
-    		Alias = source.Alias;
-			Value = source.Value;
-			Version = source.Version;
-			PropertyType = type;
+            
+            _type = type;
+            _source = source;
         }
-		internal PropertyResult(string alias, object value, Guid version, PropertyResultType type)
+
+        internal PropertyResult(string alias, object value, Guid version, PropertyResultType type)
         {
         	if (alias == null) throw new ArgumentNullException("alias");
         	if (value == null) throw new ArgumentNullException("value");
 
-        	Alias = alias;
-			Value = value;
-            Version = version;
-        	PropertyType = type;
+            _type = type;
+            _alias = alias;
+			_value = value;
         }
 
-		internal PropertyResultType PropertyType { get; private set; }
-		
-    	public string Alias { get; private set; }
+        internal PropertyResultType PropertyType { get { return _type; } }
 
-    	public object Value { get; private set; }
-	
-		/// <summary>
-		/// Returns the value as a string output, this is used in the final rendering process of a property
-		/// </summary>
-		internal string ValueAsString
-		{
-			get
-			{
-				return Value == null ? "" : Convert.ToString(Value);
-			}
-		}
+        public string Alias { get { return _source == null ? _alias : _source.Alias; } }
+        public object RawValue { get { return _source == null ? _value : _source.RawValue; } }
+        public bool HasValue { get { return _source == null || _source.HasValue; } }
+        public object Value { get { return _source == null ? _value : _source.Value; } }
+        public object XPathValue { get { return Value == null ? null : Value.ToString(); } }
 
-    	public Guid Version { get; private set; }
-
-
-		/// <summary>
-		/// The Id of the document for which this property belongs to
-		/// </summary>
-        public int DocumentId { get; set; }
-
-		/// <summary>
-		/// The alias of the document type alias for which this property belongs to
-		/// </summary>
-        public string DocumentTypeAlias { get; set; }
-
+        // implements IHtmlString.ToHtmlString
         public string ToHtmlString()
         {
-			return ValueAsString;
+            // note - use RawValue here, because that's what the original
+            // Razor macro engine seems to do...
+
+            var value = RawValue;
+			return value == null ? string.Empty : value.ToString();
         }
     }
 }
