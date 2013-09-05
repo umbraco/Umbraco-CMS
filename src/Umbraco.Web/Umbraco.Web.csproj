@@ -1793,6 +1793,7 @@
     <Compile Include="WebServices\UmbracoWebService.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="WebViewPageExtensions.cs" />
     <Content Include="umbraco.presentation\umbracobase\readme.txt" />
     <Content Include="umbraco.presentation\umbraco\controls\Tree\CustomTreeService.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx" />

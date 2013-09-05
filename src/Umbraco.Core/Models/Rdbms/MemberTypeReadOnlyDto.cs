@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models.Rdbms
     [TableName("umbracoNode")]
     [PrimaryKey("id")]
     [ExplicitColumns]
-    internal class MemberReadOnlyDto
+    internal class MemberTypeReadOnlyDto
     {
         /* from umbracoNode */
         [Column("id")]
@@ -43,36 +43,36 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("createDate")]
         public DateTime CreateDate { get; set; }
 
-        /* cmsContent */
-        [Column("contentType")]
-        public int ContentTypeId { get; set; }
+        /* cmsContentType */
+        [Column("pk")]
+        public int PrimaryKey { get; set; }
 
-        /* from cmsContentType joined with cmsContent */
-        [Column("ContentTypeAlias")]
-        public string ContentTypeAlias { get; set; }
+        [Column("alias")]
+        public string Alias { get; set; }
 
-        /* cmsContentVersion */
-        [Column("VersionId")]
-        public Guid VersionId { get; set; }
+        [Column("icon")]
+        public string Icon { get; set; }
 
-        [Column("VersionDate")]
-        public DateTime UpdateDate { get; set; }
+        [Column("thumbnail")]
+        public string Thumbnail { get; set; }
 
-        [Column("LanguageLocale")]
-        public string Language { get; set; }
+        [Column("description")]
+        public string Description { get; set; }
 
-        /*  cmsMember */
-        [Column("Email")]
-        public string Email { get; set; }
+        [Column("isContainer")]
+        public bool IsContainer { get; set; }
 
-        [Column("LoginName")]
-        public string LoginName { get; set; }
+        [Column("allowAtRoot")]
+        public bool AllowAtRoot { get; set; }
 
-        [Column("Password")]
-        public string Password { get; set; }
-
-        /* Properties */
+        /* PropertyTypes */
+        //TODO Add PropertyTypeDto (+MemberTypeDto and DataTypeDto as one) ReadOnly list
         [ResultColumn]
-        public List<PropertyDataReadOnlyDto> Properties { get; set; }
+        public List<PropertyTypeReadOnlyDto> PropertyTypes { get; set; }
+
+        /* PropertyTypeGroups */
+        //TODO Add PropertyTypeGroupDto ReadOnly list
+        [ResultColumn]
+        public List<PropertyTypeGroupReadOnlyDto> PropertyTypeGroups { get; set; }
     }
 }
