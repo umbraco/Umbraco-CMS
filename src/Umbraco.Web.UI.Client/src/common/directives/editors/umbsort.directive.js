@@ -21,41 +21,25 @@ angular.module("umbraco.directives")
           return {
             require: '?ngModel',
             link: function(scope, element, attrs, ngModel) {
-              
-
-
-              var adjustment;
-              var current = {};
-                            
-             // if(ngModel){
-
-             //   ngModel.$render = function() {
-
+                var adjustment;
+            
                 $log.log(element);
                 var cfg = scope.$eval(element.attr('umb-sort')) || {};
 
-                scope.opts = {
-                    pullPlaceholder: true,
-                    onDrop: null,
-                    onDragStart:null,
-                    onDrag:null,
-                    group: cfg.group,
-                    handle: ".handle",
-                    containerSelector: cfg.containerSelector || ".umb-" + cfg.group + "-container",
-                    nested: cfg.nested || true,
-                    drop: cfg.drop || true,
-                    drag: cfg.drag || true,
-                    isValidTarget: function(item, container) {
+                scope.model = ngModel;
 
-                        if(container.el.is(".umb-" + cfg.group + "-container")){
-                            $log.log(container);
+                scope.opts = cfg;
+                scope.opts.containerSelector= cfg.containerSelector || ".umb-" + cfg.group + "-container",
+                scope.opts.nested= cfg.nested || true,
+                scope.opts.drop= cfg.drop || true,
+                scope.opts.drag= cfg.drag || true,
+                scope.opts.isValidTarget = function(item, container) {
+                        if(container.el.is(".umb-" + scope.opts.group + "-container")){
                             return true;
                         }
-
                         return false;
-                     },
-                    events:  cfg
-                };
+                     };
+
 
                 element.addClass("umb-sort");
                 element.addClass("umb-" + cfg.group + "-container");
@@ -71,55 +55,75 @@ angular.module("umbraco.directives")
                 scope.opts.onDrop = function (item, targetContainer, _super)  {
                       var children = $("li", targetContainer.el);
                       var targetScope = $(targetContainer.el[0]).scope();
-                      var newIndex = children.index(item);
+                      var targetIndex = children.index(item);
 
-                      if(targetScope.opts.events.onDropHandler){
+                      if(targetScope.opts.onDropHandler){
                           var args = {
-                            sourceScope: umbSortContextInternal.startScope,
-                            startIndex: umbSortContextInternal.startIndex,
-                            startContainer: umbSortContextInternal.startContainer,
+                            sourceScope: umbSortContextInternal.sourceScope,
+                            sourceIndex: umbSortContextInternal.sourceIndex,
+                            sourceContainer: umbSortContextInternal.sourceContainer,
 
                             targetScope: targetScope,
-                            targetIndex: newIndex,
+                            targetIndex: targetIndex,
                             targetContainer: targetContainer
                           };   
 
-                          targetScope.opts.events.onDropHandler.call(this, item, args);
+                          targetScope.opts.onDropHandler.call(this, item, args);
                       }
 
-                      if(umbSortContextInternal.startScope.opts.events.onReleaseHandler){
+                      if(umbSortContextInternal.sourceScope.opts.onReleaseHandler){
                           var _args = {
-                            sourceScope: umbSortContextInternal.startScope,
-                            startIndex: umbSortContextInternal.startIndex,
-                            startContainer: umbSortContextInternal.startContainer,
+                            sourceScope: umbSortContextInternal.sourceScope,
+                            sourceIndex: umbSortContextInternal.sourceIndex,
+                            sourceContainer: umbSortContextInternal.sourceContainer,
 
                             targetScope: targetScope,
-                            targetIndex: newIndex,
+                            targetIndex: targetIndex,
                             targetContainer: targetContainer
                           };
 
-                          umbSortContextInternal.startScope.opts.events.onReleaseHandler.call(this, item, _args);
+                          umbSortContextInternal.sourceScope.opts.onReleaseHandler.call(this, item, _args);
                       }
 
                       var clonedItem = $('<li/>').css({height: 0});
                       item.before(clonedItem);
                       clonedItem.animate({'height': item.height()});
                       
-                      scope.$apply(function(){
+                      
                          item.animate(clonedItem.position(), function  () {
                            clonedItem.detach();
                            _super(item);
                          });
+                };
+
+                scope.changeIndex = function(from, to){
+                    scope.$apply(function(){
+                      var i = ngModel.$modelValue.splice(from, 1)[0];
+                      ngModel.$modelValue.splice(to, 0, i);
+                    });
+                };
+
+                scope.move = function(args){
+                    var from = args.sourceIndex;
+                    var to = args.targetIndex;
+
+                    if(args.sourceContainer === args.targetContainer){
+                        scope.changeIndex(from, to);
+                    }else{
+                      scope.$apply(function(){
+                        var i = args.sourceScope.model.$modelValue.splice(from, 1)[0];
+                        args.targetScope.model.$modelvalue.splice(to,0, i);
                       });
+                    }
                 };
 
                 scope.opts.onDragStart = function (item, container, _super) {
                       var children = $("li", container.el);
                       var offset = item.offset();
                       
-                      umbSortContextInternal.startIndex = children.index(item);
-                      umbSortContextInternal.startScope = $(container.el[0]).scope();
-                      umbSortContextInternal.startContainer = container;
+                      umbSortContextInternal.sourceIndex = children.index(item);
+                      umbSortContextInternal.sourceScope = $(container.el[0]).scope();
+                      umbSortContextInternal.sourceContainer = container;
 
                       //current.item = ngModel.$modelValue.splice(current.index, 1)[0];
 
@@ -131,14 +135,8 @@ angular.module("umbraco.directives")
 
                       _super(item, container);
                 };
-                
-
                   
-                  element.sortable( scope.opts );
-              //  };
-              
-             // }
-                // Create sortable
+                element.sortable( scope.opts );
              }
           };
 
