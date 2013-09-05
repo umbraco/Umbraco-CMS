@@ -109,23 +109,52 @@ namespace Umbraco.Web.Mvc
 
 		/// <summary>
 		/// Checks the request and query strings to see if it matches the definition of having a Surface controller
-		/// posted value, if so, then we return a PostedDataProxyInfo object with the correct information.
+		/// posted/get value, if so, then we return a PostedDataProxyInfo object with the correct information.
 		/// </summary>
 		/// <param name="requestContext"></param>
 		/// <returns></returns>
-		private static PostedDataProxyInfo GetPostedFormInfo(RequestContext requestContext)
-		{
-			if (requestContext.HttpContext.Request.RequestType != "POST")
-				return null;
+		private static PostedDataProxyInfo GetFormInfo(RequestContext requestContext)
+		{			
+			//if it is a POST/GET then a value must be in the request
+		    if ((requestContext.HttpContext.Request.RequestType == "POST" || requestContext.HttpContext.Request.RequestType == "GET")
+                && requestContext.HttpContext.Request["ufprt"].IsNullOrWhiteSpace())
+		    {
+		        return null;
+		    }
 
-			//this field will contain a base64 encoded version of the surface route vals 
-			if (requestContext.HttpContext.Request["uformpostroutevals"].IsNullOrWhiteSpace())
-				return null;
+		    string encodedVal;
+		    
+		    switch (requestContext.HttpContext.Request.RequestType)
+		    {
+                case "POST":
+                    //get the value from the request.
+                    //this field will contain an encrypted version of the surface route vals.
+                    encodedVal = requestContext.HttpContext.Request["ufprt"];
+		            break;
+                case "GET":
+                    //get the value from the cookie based on the id sent as a query string.
+                    var cookieId = "ufprt_" + requestContext.HttpContext.Request["ufprt"];
+                    if (requestContext.HttpContext.Request.Cookies[cookieId] == null || requestContext.HttpContext.Request.Cookies[cookieId].Value.IsNullOrWhiteSpace())
+                    {
+                        LogHelper.Warn<RenderRouteHandler>("Umbraco cannot process the GET form action, could not find the required cookie value for cookie name " + cookieId);
+                        //we cannot continue if there is no cookie value
+                        return null;
+                    }
 
-			var encodedVal = requestContext.HttpContext.Request["uformpostroutevals"];
-			var decryptedString = encodedVal.DecryptWithMachineKey();
-			var parsedQueryString = HttpUtility.ParseQueryString(decryptedString);
+                    //we need to ensure the cookie is gone
+		            var outgoingCookie = requestContext.HttpContext.Request.Cookies[cookieId];
+		            outgoingCookie.Expires = DateTime.Now.AddDays(-1);
+		            requestContext.HttpContext.Response.SetCookie(outgoingCookie);
 
+                    //this field will contain an encrypted version of the surface route vals.
+                    encodedVal = requestContext.HttpContext.Request.Cookies[cookieId].Value;
+		            break;
+                default:
+		            return null;
+		    }
+
+            var decryptedString = encodedVal.DecryptWithMachineKey();
+            var parsedQueryString = HttpUtility.ParseQueryString(decryptedString);
 			var decodedParts = new Dictionary<string, string>();
 
 			foreach (var key in parsedQueryString.AllKeys)
@@ -336,7 +365,7 @@ namespace Umbraco.Web.Mvc
 			var routeDef = GetUmbracoRouteDefinition(requestContext, publishedContentRequest);
             
 			//Need to check for a special case if there is form data being posted back to an Umbraco URL
-			var postedInfo = GetPostedFormInfo(requestContext);
+			var postedInfo = GetFormInfo(requestContext);
 			if (postedInfo != null)
 			{
 				return HandlePostedValues(requestContext, postedInfo);
