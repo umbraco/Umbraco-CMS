@@ -72,6 +72,8 @@ node_modules
 src/Umbraco.Web.UI/[Uu]mbraco/[Ll]ib/*
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/umbraco.*
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/routes.js
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/app.dev.js
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/loader.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/main.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/app.js
 
@@ -99,3 +101,4 @@ src/Umbraco.Web.UI/[Uu]mbraco/[Aa]ssets/*
 src/Umbraco.Web.UI/[Uu]mbraco/[Ll]ib/*
 src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/**/*.html
 src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/**/*.js
+
