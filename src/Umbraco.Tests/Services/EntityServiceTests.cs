@@ -133,7 +133,7 @@ namespace Umbraco.Tests.Services
                 entities.Any(
                     x =>
                     ((UmbracoEntity) x).UmbracoProperties.Any(
-                        y => y.DataTypeControlId == new Guid(Constants.PropertyEditors.UploadField))), Is.True);
+                        y => y.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)), Is.True);
         }
 
         public override void CreateTestData()

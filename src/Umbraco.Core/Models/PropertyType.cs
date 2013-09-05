@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Models
 {
@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models
         private string _description;
         private int _dataTypeDefinitionId;
         private Lazy<int> _propertyGroupId;
-        private Guid _dataTypeId;
+        private string _propertyEditorAlias;
         private DataTypeDatabaseType _dataTypeDatabaseType;
         private bool _mandatory;
         private string _helpText;
@@ -31,13 +31,13 @@ namespace Umbraco.Core.Models
             if(dataTypeDefinition.HasIdentity)
                 DataTypeDefinitionId = dataTypeDefinition.Id;
 
-            DataTypeId = dataTypeDefinition.ControlId;
+            PropertyEditorAlias = dataTypeDefinition.PropertyEditorAlias;
             DataTypeDatabaseType = dataTypeDefinition.DatabaseType;
         }
-
-        internal PropertyType(Guid dataTypeControlId, DataTypeDatabaseType dataTypeDatabaseType)
+        
+        internal PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType)
         {
-            DataTypeId = dataTypeControlId;
+            PropertyEditorAlias = propertyEditorAlias;
             DataTypeDatabaseType = dataTypeDatabaseType;
         }
 
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Alias);
         private static readonly PropertyInfo DescriptionSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Description);
         private static readonly PropertyInfo DataTypeDefinitionIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.DataTypeDefinitionId);
-        private static readonly PropertyInfo DataTypeControlIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, Guid>(x => x.DataTypeId);
+        private static readonly PropertyInfo PropertyEditorAliasSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.PropertyEditorAlias);
         private static readonly PropertyInfo DataTypeDatabaseTypeSelector = ExpressionHelper.GetPropertyInfo<PropertyType, DataTypeDatabaseType>(x => x.DataTypeDatabaseType);
         private static readonly PropertyInfo MandatorySelector = ExpressionHelper.GetPropertyInfo<PropertyType, bool>(x => x.Mandatory);
         private static readonly PropertyInfo HelpTextSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.HelpText);
@@ -122,21 +122,33 @@ namespace Umbraco.Core.Models
             }
         }
 
+        [DataMember]
+        public string PropertyEditorAlias
+        {
+            get { return _propertyEditorAlias; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _propertyEditorAlias = value;
+                    return _propertyEditorAlias;
+                }, _propertyEditorAlias, PropertyEditorAliasSelector);
+            }
+        }
+
         /// <summary>
         /// Gets of Sets the Id of the DataType control
         /// </summary>
         /// <remarks>This is the Id of the actual DataType control</remarks>
         [DataMember]
+        [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the PropertyEditorAlias property instead")]
         public Guid DataTypeId
         {
-            get { return _dataTypeId; }
-            internal set
+            get { return LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(_propertyEditorAlias, true).Value; }
+            set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _dataTypeId = value;
-                    return _dataTypeId;
-                }, _dataTypeId, DataTypeControlIdSelector);
+                var alias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(value, true);
+                PropertyEditorAlias = alias;
             }
         }
 
@@ -319,7 +331,7 @@ namespace Umbraco.Core.Models
                 return argument == type;
             }*/
 
-            if (DataTypeId != Guid.Empty)
+            if (PropertyEditorAlias.IsNullOrWhiteSpace() == false)
             {
                 //Find DataType by Id
                 //IDataType dataType = DataTypesResolver.Current.GetById(DataTypeControlId);
@@ -380,7 +392,7 @@ namespace Umbraco.Core.Models
 
         internal PropertyType Clone()
         {
-            var clone = (PropertyType) this.MemberwiseClone();
+            var clone = (PropertyType) MemberwiseClone();
             clone.ResetIdentity();
             clone.ResetDirtyProperties(false);
             return clone;
@@ -389,10 +401,10 @@ namespace Umbraco.Core.Models
         public bool Equals(PropertyType other)
         {
             //Check whether the compared object is null. 
-            if (Object.ReferenceEquals(other, null)) return false;
+            if (ReferenceEquals(other, null)) return false;
 
             //Check whether the compared object references the same data. 
-            if (Object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(this, other)) return true;
 
             //Check whether the PropertyType's properties are equal. 
             return Alias.Equals(other.Alias) && Name.Equals(other.Name);

@@ -18,8 +18,8 @@ namespace Umbraco.Core.Models.Rdbms
         [Index(IndexTypes.UniqueNonClustered)]
         public int DataTypeId { get; set; }
 
-        [Column("controlId")]
-        public Guid ControlId { get; set; }
+        [Column("propertyEditorAlias")]
+        public string PropertyEditorAlias { get; set; }
 
         [Column("dbType")]
         [Length(50)]

@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var mediaType = repository.Get(1045);
 
             mediaType.Thumbnail = "Doc2.png";
-            mediaType.PropertyGroups["Media"].PropertyTypes.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext)
+            mediaType.PropertyGroups["Media"].PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext)
             {
                 Alias = "subtitle",
                 Name = "Subtitle",

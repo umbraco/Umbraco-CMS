@@ -429,11 +429,11 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override void PersistDeletedItem(IContent entity)
         {
             var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            var uploadFieldId = new Guid(Constants.PropertyEditors.UploadField);
+
             //Loop through properties to check if the content contains images/files that should be deleted
             foreach (var property in entity.Properties)
             {
-                if (property.PropertyType.DataTypeId == uploadFieldId && property.Value != null &&
+                if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias && property.Value != null &&
                     string.IsNullOrEmpty(property.Value.ToString()) == false
                     && fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
                 {

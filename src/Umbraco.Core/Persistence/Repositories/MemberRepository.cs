@@ -72,7 +72,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 "cmsPropertyData.propertytypeid", "cmsPropertyType.Alias", "cmsPropertyType.Description",
                 "cmsPropertyType.Name", "cmsPropertyType.mandatory", "cmsPropertyType.validationRegExp",
                 "cmsPropertyType.helpText", "cmsPropertyType.propertyTypeGroupId", "cmsPropertyType.dataTypeId",
-                "cmsDataType.controlId")
+                "cmsDataType.propertyEditorAlias")
                 .From<NodeDto>()
                 .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                 .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)

@@ -35,15 +35,15 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Issue query to get all trashed content or media that has the Upload field as a property
             //The value for each field is stored in a list: FilesToDelete<string>()
-            //Alias: Constants.Conventions.Media.File and ControlId: Constants.PropertyEditors.UploadField
+            //Alias: Constants.Conventions.Media.File and PropertyEditorAlias: Constants.PropertyEditors.UploadField
             var sql = new Sql();
             sql.Select("DISTINCT(dataNvarchar)")
                 .From<PropertyDataDto>()
                 .InnerJoin<NodeDto>().On<PropertyDataDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                 .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
                 .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
-                .Where("umbracoNode.trashed = '1' AND umbracoNode.nodeObjectType = @NodeObjectType AND dataNvarchar IS NOT NULL AND (cmsPropertyType.Alias = @FileAlias OR cmsDataType.controlId = @ControlId)",
-                    new { FileAlias = Constants.Conventions.Media.File, NodeObjectType = nodeObjectType, ControlId = Constants.PropertyEditors.UploadField });
+                .Where("umbracoNode.trashed = '1' AND umbracoNode.nodeObjectType = @NodeObjectType AND dataNvarchar IS NOT NULL AND (cmsPropertyType.Alias = @FileAlias OR cmsDataType.propertyEditorAlias = @PropertyEditorAlias)",
+                    new { FileAlias = Constants.Conventions.Media.File, NodeObjectType = nodeObjectType, PropertyEditorAlias = Constants.PropertyEditors.UploadFieldAlias });
 
             var files = db.Fetch<string>(sql);
             return files;

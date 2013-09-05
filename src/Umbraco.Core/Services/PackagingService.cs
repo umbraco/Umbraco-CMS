@@ -308,7 +308,7 @@ namespace Umbraco.Core.Services
                     var propertyValue = property.Value;
 
                     var propertyType = contentType.PropertyTypes.FirstOrDefault(pt => pt.Alias == propertyTypeAlias);
-                    if (propertyType != null && propertyType.DataTypeId == new Guid(Constants.PropertyEditors.CheckBoxList))
+                    if (propertyType != null && propertyType.PropertyEditorAlias == Constants.PropertyEditors.CheckBoxListAlias)
                     {
                         var database = ApplicationContext.Current.DatabaseContext.Database;
                         var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNo" + "deId = @Id", new { Id = propertyType.DataTypeDefinitionId });
@@ -591,6 +591,8 @@ namespace Umbraco.Core.Services
             var properties = genericPropertiesElement.Elements("GenericProperty");
             foreach (var property in properties)
             {
+                //TODO: Need to update this whole service to support the PropertyEditorAlias change, but somehow still support the old GUID package format.
+
                 var dataTypeId = new Guid(property.Element("Type").Value);//The DataType's Control Id
                 var dataTypeDefinitionId = new Guid(property.Element("Definition").Value);//Unique Id for a DataTypeDefinition
 

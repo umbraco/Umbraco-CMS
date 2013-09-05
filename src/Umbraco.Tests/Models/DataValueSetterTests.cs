@@ -67,7 +67,7 @@ namespace Umbraco.Tests.Models
         public void SetValue_Is_Called_When_Executing_ToXml_On_A_Property_With_DataType_That_Implements_IDataValueSetter()
         {
             // Arrange            
-            var dataTypeId = Guid.NewGuid();
+            var propEdId = Guid.NewGuid();
             
             var dataTypeData = MockRepository.GenerateMock<IData, IDataValueSetter>();
             
@@ -84,12 +84,12 @@ namespace Umbraco.Tests.Models
             dataType.Stub(type => type.Data).Return(dataTypeData);
 
             var dataTypeSvc = MockRepository.GenerateStub<IDataTypeService>();
-            dataTypeSvc.Stub(service => service.GetDataTypeById(dataTypeId)).Return(dataType);
+            dataTypeSvc.Stub(service => service.GetDataTypeById(Arg<Guid>.Is.Anything)).Return(dataType);
 
             var property = new Property(
                 1234,
                 Guid.NewGuid(),
-                new PropertyType(dataTypeId, DataTypeDatabaseType.Nvarchar)
+                new PropertyType("test", DataTypeDatabaseType.Nvarchar)
                     {
                         Alias = "test"
                     }, "Hello world");                

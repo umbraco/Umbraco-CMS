@@ -438,8 +438,7 @@ namespace Umbraco.Core.Models
                     Resize(fs, fileName, extension, 100, "thumb", originalImage);
 
                     //Look up Prevalues for this upload datatype - if it is an upload datatype
-                    var uploadFieldId = new Guid(Constants.PropertyEditors.UploadField);
-                    if (property.PropertyType.DataTypeId == uploadFieldId)
+                    if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)
                     {
                         //Get Prevalues by the DataType's Id: property.PropertyType.DataTypeId
                         var values = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId);

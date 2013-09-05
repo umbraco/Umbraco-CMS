@@ -76,7 +76,7 @@ namespace Umbraco.Tests.PublishedContent
             var mType = MockedContentTypes.CreateImageMediaType();
             //lets add an RTE to this
             mType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType(new Guid(), DataTypeDatabaseType.Nvarchar)
+                new PropertyType("test", DataTypeDatabaseType.Nvarchar)
                     {
                         Alias = "content", 
                         Name = "Rich Text",

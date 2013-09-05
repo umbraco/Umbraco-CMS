@@ -39,8 +39,8 @@ namespace Umbraco.Core.Persistence.Factories
                 {
                     entity.UmbracoProperties.Add(new UmbracoEntity.UmbracoProperty
                                                       {
-                                                          DataTypeControlId =
-                                                              propertyDto.DataTypeControlId,
+                                                          PropertyEditorAlias =
+                                                              propertyDto.PropertyEditorAlias,
                                                           Value = propertyDto.UmbracoFile
                                                       });
                 }

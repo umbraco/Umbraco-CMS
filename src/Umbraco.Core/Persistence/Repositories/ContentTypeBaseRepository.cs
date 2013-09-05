@@ -161,7 +161,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 //Update the current PropertyType with correct ControlId and DatabaseType
                 var dataTypeDto = Database.FirstOrDefault<DataTypeDto>("WHERE nodeId = @Id", new { Id = propertyTypeDto.DataTypeId });
-                propertyType.DataTypeId = dataTypeDto.ControlId;
+                propertyType.PropertyEditorAlias = dataTypeDto.PropertyEditorAlias;
                 propertyType.DataTypeDatabaseType = dataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true);
             }
         }
@@ -362,7 +362,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var list = (from dto in dtos
                         where (dto.PropertyTypeGroupId > 0) == false
                         select
-                            new PropertyType(dto.DataTypeDto.ControlId,
+                            new PropertyType(dto.DataTypeDto.PropertyEditorAlias,
                                              dto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
                                 {
                                     Alias = dto.Alias,
