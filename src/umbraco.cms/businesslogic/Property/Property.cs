@@ -37,6 +37,8 @@ namespace umbraco.cms.businesslogic.property
 
             _pt = pt;
             _id = Id;
+            if (_pt.DataTypeDefinition.DataType == null)
+                throw new Exception(string.Format("Could not load datatype '{0}'", _pt.DataTypeDefinition.Text));
             _data = _pt.DataTypeDefinition.DataType.Data;
             _data.PropertyId = Id;
         }
@@ -47,6 +49,8 @@ namespace umbraco.cms.businesslogic.property
             _pt = PropertyType.GetPropertyType(
                 SqlHelper.ExecuteScalar<int>("select propertytypeid from cmsPropertyData where id = @id",
                                              SqlHelper.CreateParameter("@id", Id)));
+            if (_pt.DataTypeDefinition.DataType == null)
+                throw new Exception(string.Format("Could not load datatype '{0}'", _pt.DataTypeDefinition.Text));
             _data = _pt.DataTypeDefinition.DataType.Data;
             _data.PropertyId = Id;
         }
@@ -59,6 +63,8 @@ namespace umbraco.cms.businesslogic.property
 
             //Just to ensure that there is a PropertyType available
             _pt = PropertyType.GetPropertyType(property.PropertyTypeId);
+            if (_pt.DataTypeDefinition.DataType == null)
+                throw new Exception(string.Format("Could not load datatype '{0}'", _pt.DataTypeDefinition.Text));
             _data = _pt.DataTypeDefinition.DataType.Data;
             _data.PropertyId = Id;
         }
