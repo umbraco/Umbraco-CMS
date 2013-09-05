@@ -145,19 +145,19 @@ angular.module('umbraco.mocks').
                                 view: "dropdown",
                                 alias: "_umb_template",
                                 config: {
-                                    items: [
-                                        { alias: "", name: "-- Choose template --" },
-                                        { alias: "myTemplate", name: "My Templates" },
-                                        { alias: "home", name: "Home Page" },
-                                        { alias: "news", name: "News Page" }
-                                    ]
+                                    items: {
+                                        "" : "-- Choose template --",
+                                        "myTemplate" : "My Templates",
+                                        "home" : "Home Page",
+                                        "news" : "News Page"
+                                    }
                                 }
                             },
                             {
                                 label: 'Link to document',
                                 value: ["/testing" + id, "http://localhost/testing" + id, "http://mydomain.com/testing" + id].join(),
                                 view: "urllist",
-                                alias: "_umb_template"
+                                alias: "_umb_urllist"
                             },
                             {
                                 alias: "test", label: "Stuff", view: "test", value: "",

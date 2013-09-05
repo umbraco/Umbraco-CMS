@@ -236,9 +236,7 @@ function umbDataFormatter() {
                                 saveModel.releaseDate = prop.value;
                                 break;
                             case "_umb_template":
-                                //this will be a json string
-                                var json = angular.toJson(prop.value);
-                                saveModel.templateAlias = json.alias;
+                                saveModel.templateAlias = prop.value;
                                 break;
                         }
                     }

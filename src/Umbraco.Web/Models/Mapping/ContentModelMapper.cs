@@ -88,8 +88,11 @@ namespace Umbraco.Web.Models.Mapping
         private static void MapGenericCustomProperties(IContent content, ContentItemDisplay display)
         {
             //fill in the template config to be passed to the template drop down.
-            var templateItemConfig = new List<AllowedTemplate> {new AllowedTemplate {Alias = "", Name = "Choose..."}};
-            templateItemConfig.AddRange(content.ContentType.AllowedTemplates.Select(t => new AllowedTemplate {Alias = t.Alias, Name = t.Name}));
+            var templateItemConfig = new Dictionary<string, string> {{"", "Choose..."}};
+            foreach (var t in content.ContentType.AllowedTemplates)
+            {
+                templateItemConfig.Add(t.Alias, t.Name);
+            }
 
             TabsAndPropertiesResolver.MapGenericProperties(
                 content, display,
@@ -125,15 +128,6 @@ namespace Umbraco.Web.Models.Mapping
                         Value = string.Join(",", display.Urls),
                         View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                     });
-        }
-
-        [DataContract(Name = "template", Namespace = "")]
-        private class AllowedTemplate
-        {
-            [DataMember(Name = "alias")]
-            public string Alias { get; set; }
-            [DataMember(Name = "name")]
-            public string Name { get; set; }
         }
 
         /// <summary>
