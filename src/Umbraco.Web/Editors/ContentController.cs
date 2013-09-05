@@ -163,7 +163,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [FileUploadCleanupFilter]
-        [ContentPostValidate]
+        /*[ContentPostValidate]*/
         public ContentItemDisplay PostSave(
             [ModelBinder(typeof(ContentItemBinder))]
                 ContentItemSave<IContent> contentItem)
