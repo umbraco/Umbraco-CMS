@@ -95,3 +95,7 @@ NDependOut/*
 *.ndproj
 QueryResult.htm
 *.ndproj
+src/Umbraco.Web.UI/umbraco/assets/*
+src/Umbraco.Web.UI/umbraco/lib/*
+src/Umbraco.Web.UI/umbraco/Views/**/*.html
+src/Umbraco.Web.UI/umbraco/Views/**/*.js
