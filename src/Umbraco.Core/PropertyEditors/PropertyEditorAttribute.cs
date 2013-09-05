@@ -6,7 +6,7 @@ namespace Umbraco.Core.PropertyEditors
     /// An attribute used to define all of the basic properties of a property editor
     /// on the server side.
     /// </summary>
-    internal sealed class PropertyEditorAttribute : Attribute
+    public sealed class PropertyEditorAttribute : Attribute
     {
         public PropertyEditorAttribute(string id, string name, string editorView)
         {
