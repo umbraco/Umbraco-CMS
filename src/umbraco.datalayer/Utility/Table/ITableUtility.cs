@@ -6,11 +6,14 @@
  * 
  ***********************************************************************************/
 
+using System;
+
 namespace umbraco.DataLayer.Utility.Table
 {
     /// <summary>
     /// Interface for a tool that provides access to the tables of a data source.
     /// </summary>
+    [Obsolete("The legacy installers are no longer used and will be removed from the codebase in the future")]
     public interface ITableUtility
     {
         /// <summary>

@@ -11,6 +11,7 @@ namespace SqlCE4Umbraco
     /// <summary>
     /// SQL Server implementation of <see cref="DefaultTableUtility&lt;S&gt;"/>.
     /// </summary>
+    [Obsolete("The legacy installers are no longer used and will be removed from the codebase in the future")]
     public class SqlCETableUtility : DefaultTableUtility<SqlCEHelper>
     {
         /// <summary>

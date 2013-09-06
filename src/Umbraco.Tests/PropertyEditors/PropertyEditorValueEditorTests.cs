@@ -66,7 +66,7 @@ namespace Umbraco.Tests.PropertyEditors
                 };
 
             var result = valueEditor.FormatDataForEditor(now);
-            Assert.AreEqual(now.ToXmlString<DateTime>(), result);
+            Assert.AreEqual(now.ToIsoString(), result);
         }
     }
 }

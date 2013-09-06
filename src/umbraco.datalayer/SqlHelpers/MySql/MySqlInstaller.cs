@@ -16,6 +16,7 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
     /// <summary>
     /// Database installer for an MySql data source.
     /// </summary>
+    [Obsolete("This is not used and will be removed in future versions")]
     public class MySqlInstaller : DefaultInstallerUtility<MySqlHelper>
     {
         #region Private Constants
@@ -82,7 +83,7 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
         /// </summary>
         protected override string FullInstallSql
         {
-            get { return GetMySqlVersion() >= 5 ? SqlResources.Total : ConvertToMySql4(SqlResources.Total); }
+            get { return string.Empty; }
         }
 
         /// <summary>
@@ -90,11 +91,7 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
         /// </summary>
         protected override string UpgradeSql
         {
-            get
-            {
-                string upgradeFile = string.Format("{0}_Upgrade", CurrentVersion.ToString());
-                return SqlResources.ResourceManager.GetString(upgradeFile);
-            }
+            get { return string.Empty; }
         }
 
         #endregion

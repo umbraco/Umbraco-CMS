@@ -6,6 +6,7 @@
  * 
  ***********************************************************************************/
 
+using System;
 using umbraco.DataLayer.Utility;
 using umbraco.DataLayer.Utility.Installer;
 using umbraco.DataLayer.Utility.Table;
@@ -34,6 +35,7 @@ namespace umbraco.DataLayer.SqlHelpers.SqlServer
         /// Creates an installer.
         /// </summary>
         /// <returns>The SQL Server installer.</returns>
+        [Obsolete("The legacy installers are no longer used and will be removed from the codebase in the future")]
         public override IInstallerUtility CreateInstaller()
         {
             return new SqlServerInstaller(SqlHelper);

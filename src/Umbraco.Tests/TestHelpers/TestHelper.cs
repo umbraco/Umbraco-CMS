@@ -44,25 +44,6 @@ namespace Umbraco.Tests.TestHelpers
         }
 
 		/// <summary>
-		/// Initializes a new database
-		/// </summary>
-		public static void InitializeDatabase()
-		{
-            ConfigurationManager.AppSettings.Set(Core.Configuration.GlobalSettings.UmbracoConnectionName, @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf;Flush Interval=1;File Access Retry Timeout=10");
-
-			ClearDatabase();
-            
-            var databaseSettings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
-            var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false);
-
-			var installer = dataHelper.Utility.CreateInstaller();
-			if (installer.CanConnect)
-			{
-				installer.Install();
-			}
-		}
-
-		/// <summary>
 		/// Gets the current assembly directory.
 		/// </summary>
 		/// <value>The assembly directory.</value>
