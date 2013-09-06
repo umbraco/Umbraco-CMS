@@ -64,8 +64,11 @@ namespace Umbraco.Core.Persistence.Querying
 
         public virtual string EscapeAtArgument(string exp)
         {
-            if (exp.StartsWith("@"))
-                return string.Concat("@", exp);
+            /*if (exp.StartsWith("@"))
+                return string.Concat("@", exp);*/
+
+            if (exp.Contains("@"))
+                return exp.Replace("@", "@@");
 
             return exp;
         }
