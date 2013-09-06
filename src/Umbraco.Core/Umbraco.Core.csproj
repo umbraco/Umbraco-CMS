@@ -805,6 +805,7 @@
     <Compile Include="WriteLock.cs" />
     <Compile Include="XmlExtensions.cs" />
     <Compile Include="XmlHelper.cs" />
+    <Compile Include="Xml\XPath\MacroNavigator.cs" />
     <Compile Include="Xml\XPath\INavigableContentType.cs" />
     <Compile Include="Xml\XPath\NavigableNavigator.cs" />
     <Compile Include="Xml\XPath\INavigableContent.cs" />

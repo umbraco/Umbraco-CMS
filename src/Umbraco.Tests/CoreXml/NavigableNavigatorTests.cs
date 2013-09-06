@@ -594,6 +594,143 @@ namespace Umbraco.Tests.CoreXml
             Assert.IsFalse(nav.MoveToId("2"));
         }
 
+        [TestCase(true, true)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(false, false)]
+        public void XsltDebugModeAndSortOrder(bool native, bool debug)
+        {
+            const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<root>
+    <node id=""1"" isDoc=""1"">
+        <title>title-1</title>
+        <node id=""3"" isDoc=""1"">
+            <title>title-3</title>
+            <node id=""7"" isDoc=""1"">
+                <title>title-7</title>
+            </node>
+            <node id=""8"" isDoc=""1"">
+                <title>title-8</title>
+            </node>
+        </node>
+        <node id=""5"" isDoc=""1"">
+            <title>title-5</title>
+        </node>
+    </node>
+    <node id=""2"" isDoc=""1"">
+        <title>title-2</title>
+        <node id=""4"" isDoc=""1"">
+            <title>title-4</title>
+        </node>
+        <node id=""6"" isDoc=""1"">
+            <title>title-6</title>
+        </node>
+    </node>
+</root>
+";
+
+            const string xslt = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<!DOCTYPE xsl:stylesheet [
+    <!ENTITY nbsp ""&#x00A0;"">
+]>
+<xsl:stylesheet
+  version=""1.0""
+  xmlns:xsl=""http://www.w3.org/1999/XSL/Transform""
+  xmlns:msxml=""urn:schemas-microsoft-com:xslt""
+	xmlns:umbraco.library=""urn:umbraco.library"" xmlns:Exslt.ExsltCommon=""urn:Exslt.ExsltCommon"" xmlns:Exslt.ExsltDatesAndTimes=""urn:Exslt.ExsltDatesAndTimes"" xmlns:Exslt.ExsltMath=""urn:Exslt.ExsltMath"" xmlns:Exslt.ExsltRegularExpressions=""urn:Exslt.ExsltRegularExpressions"" xmlns:Exslt.ExsltStrings=""urn:Exslt.ExsltStrings"" xmlns:Exslt.ExsltSets=""urn:Exslt.ExsltSets"" xmlns:Examine=""urn:Examine"" 
+	exclude-result-prefixes=""msxml umbraco.library Exslt.ExsltCommon Exslt.ExsltDatesAndTimes Exslt.ExsltMath Exslt.ExsltRegularExpressions Exslt.ExsltStrings Exslt.ExsltSets Examine "">
+
+    <xsl:output method=""xml"" omit-xml-declaration=""yes"" />
+    <xsl:param name=""currentPage""/>
+
+    <xsl:template match=""/"">
+		<!-- <xsl:for-each select=""/root/* [@isDoc]""> -->
+        <!-- <xsl:for-each select=""$currentPage/root/* [@isDoc]""> -->
+        <xsl:for-each select=""/macro/nav/root/* [@isDoc]"">
+<xsl:text>! </xsl:text><xsl:value-of select=""title"" /><xsl:text>
+</xsl:text>
+			<xsl:for-each select=""./* [@isDoc]"">
+<xsl:text>!! </xsl:text><xsl:value-of select=""title"" /><xsl:text>
+</xsl:text>
+    			<xsl:for-each select=""./* [@isDoc]"">
+<xsl:text>!!! </xsl:text><xsl:value-of select=""title"" /><xsl:text>
+</xsl:text>
+	    		</xsl:for-each>
+			</xsl:for-each>
+		</xsl:for-each>
+    </xsl:template>
+
+</xsl:stylesheet>
+";
+            const string expected = @"! title-1
+!! title-3
+!!! title-7
+!!! title-8
+!! title-5
+! title-2
+!! title-4
+!! title-6
+";
+
+            // see http://www.onenaught.com/posts/352/xslt-performance-tip-dont-indent-output
+            // why aren't we using an XmlWriter here?
+
+            var transform = new XslCompiledTransform(debug);
+            var xmlReader = new XmlTextReader(new StringReader(xslt))
+                {
+                    EntityHandling = EntityHandling.ExpandEntities
+                };
+            var xslResolver = new XmlUrlResolver
+                {
+                    Credentials = CredentialCache.DefaultCredentials
+                };
+            var args = new XsltArgumentList();
+
+            // .Default is more restrictive than .TrustedXslt
+            transform.Load(xmlReader, XsltSettings.Default, xslResolver);
+
+            XPathNavigator macro;
+            if (!native)
+            {
+                var source = new TestSource7();
+                var nav = new NavigableNavigator(source);
+                //args.AddParam("currentPage", string.Empty, nav.Clone());
+
+                var x = new XmlDocument();
+                x.LoadXml(xml);
+                
+                macro = new MacroNavigator(new[]
+                {
+                    // it even fails like that => macro nav. issue?
+                    new MacroNavigator.MacroParameter("nav", x.CreateNavigator()) // nav.Clone())
+                }
+                );
+            }
+            else
+            {
+                var doc = new XmlDocument();
+                doc.LoadXml("<macro />");
+                var nav = doc.CreateElement("nav");
+                doc.DocumentElement.AppendChild(nav);
+                var x = new XmlDocument();
+                x.LoadXml(xml);
+                nav.AppendChild(doc.ImportNode(x.DocumentElement, true));
+                macro = doc.CreateNavigator();
+            }
+
+            var writer = new StringWriter();
+            transform.Transform(macro, args, writer);
+
+            // this was working with native, debug and non-debug
+            // this was working with macro nav, non-debug
+            // but was NOT working (changing the order of nodes) with macro nav, debug
+            // was due to an issue with macro nav IsSamePosition, fixed
+
+            //Console.WriteLine("--------");
+            //Console.WriteLine(writer.ToString());
+            Assert.AreEqual(expected, writer.ToString());
+        }
+
         [Test]
         public void WhiteSpacesAndEmptyValues()
         {
