@@ -27,30 +27,31 @@ angular.module("umbraco")
                         onclick: function(){
                             dialogService.mediaPicker({scope: $scope, callback: function(img){
                                 
-                                var imagePropVal = imageHelper.getImagePropertyVaue({imageModel: img, scope: $scope});
-                                var data = {
-                                    src: (imagePropVal != null && imagePropVal != "") ? imagePropVal: "nothing.jpg",
-                                    id: '__mcenew'
-                                };
-                                
-                                $log.log(data);
+                                if(img){
+                                    var imagePropVal = imageHelper.getImagePropertyVaue({imageModel: img, scope: $scope});
+                                    var data = {
+                                        src: (imagePropVal != null && imagePropVal != "") ? imagePropVal: "nothing.jpg",
+                                        id: '__mcenew'
+                                    };
+                                    
+                                    $log.log(data);
 
-                                editor.insertContent(editor.dom.createHTML('img', data));
-                                
-                                $timeout(function(){
-                                     var imgElm = editor.dom.get('__mcenew');
-                                     var size = editor.dom.getSize(imgElm);
-                                     $log.log(size);
+                                    editor.insertContent(editor.dom.createHTML('img', data));
+                                    
+                                    $timeout(function(){
+                                         var imgElm = editor.dom.get('__mcenew');
+                                         var size = editor.dom.getSize(imgElm);
+                                         $log.log(size);
 
-                                     var newSize = imageHelper.scaleToMaxSize(500, size.w, size.h);
-                                     var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
-                                     editor.dom.setAttrib(imgElm, 'style', s);
-                                     editor.dom.setAttrib(imgElm, 'rel', newSize.width + "," + newSize.height);
-                                     editor.dom.setAttrib(imgElm, 'id', null);
+                                         var newSize = imageHelper.scaleToMaxSize(500, size.w, size.h);
+                                         var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
+                                         editor.dom.setAttrib(imgElm, 'style', s);
+                                         editor.dom.setAttrib(imgElm, 'rel', newSize.width + "," + newSize.height);
+                                         editor.dom.setAttrib(imgElm, 'id', null);
 
-                                     
-                                }, 500);
-                                
+                                         
+                                    }, 500);
+                                }
                             }});
                         }
                     });

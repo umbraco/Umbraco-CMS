@@ -21,10 +21,10 @@ function ContentTypeEditController($scope, $routeParams, $log, notificationsServ
     $scope.dataTypesOptions ={
     	group: "properties",
     	onDropHandler: function(item, args){
-    		//alert("dropped on datatypes");
+    		args.sourceScope.move(args);
     	},
     	onReleaseHandler: function(item, args){
-    		//alert("released");
+    		var a = args;
     	}
     };
 

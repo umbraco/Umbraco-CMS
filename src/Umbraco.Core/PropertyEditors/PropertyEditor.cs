@@ -21,7 +21,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        internal PropertyEditor()
+        public PropertyEditor()
         {
             //assign properties based on the attribute if it is found
             _attribute = GetType().GetCustomAttribute<PropertyEditorAttribute>(false);

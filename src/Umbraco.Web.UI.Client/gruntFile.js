@@ -5,15 +5,15 @@ module.exports = function (grunt) {
   grunt.registerTask('dev', ['jshint:dev', 'build', 'webserver', 'open:dev', 'watch']);
   
   //run by the watch task
-  grunt.registerTask('watch-js', ['jshint:dev','concat:dev','copy:app','copy:mocks','copy:packages','copy:vs','karma:unit']);
+  grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','copy:vs','karma:unit']);
   grunt.registerTask('watch-less', ['recess:build','copy:assets','copy:vs']);
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
   grunt.registerTask('watch-packages', ['copy:packages']);
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
-  grunt.registerTask('build', ['clean','concat','uglify','recess:build','copy']);
-
+  grunt.registerTask('build', ['clean','concat','recess:build','copy']);
+  
   //utillity tasks
   grunt.registerTask('docs', ['ngdocs']);
   grunt.registerTask('webserver', ['connect:devserver']);
@@ -190,7 +190,7 @@ module.exports = function (grunt) {
 
     uglify: {
       options: {
-        mangle: true
+        mangle: false
       },
       my_target: {
         files: {
