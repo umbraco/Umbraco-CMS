@@ -69,7 +69,7 @@ namespace Umbraco.Core.Persistence.Factories
 
                 if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer)
                 {
-                    if (property.Value is bool || property.PropertyType.DataTypeId == new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a"))
+                    if (property.Value is bool || property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.TrueFalseAlias)
                     {
                         dto.Integer = property.Value != null && string.IsNullOrEmpty(property.Value.ToString())
                                           ? 0

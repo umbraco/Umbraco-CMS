@@ -307,7 +307,6 @@
     <Compile Include="Models\Membership\UserProfile.cs" />
     <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\PropertyExtensions.cs" />
-    <Compile Include="Models\PropertyTypeExtensions.cs" />
     <Compile Include="Models\PublishedItemType.cs" />
     <Compile Include="Models\PublishedState.cs" />
     <Compile Include="Models\Rdbms\ContentType2ContentTypeDto.cs" />

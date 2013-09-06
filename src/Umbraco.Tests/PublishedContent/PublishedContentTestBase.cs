@@ -25,9 +25,9 @@ namespace Umbraco.Tests.PublishedContent
                     if (propertyAlias.InvariantEquals("content"))
                     {
                         //return the rte type id
-                        return Guid.Parse(Constants.PropertyEditors.TinyMCEv3);
+                        return Constants.PropertyEditors.TinyMCEv3Alias;
                     }
-                    return Guid.Empty;
+                    return string.Empty;
                 };
 
             var rCtx = GetRoutingContext("/test", 1234);

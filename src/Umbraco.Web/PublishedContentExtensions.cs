@@ -153,12 +153,12 @@ namespace Umbraco.Web
 
 			//Here we need to put the value through the IPropertyEditorValueConverter's
 			//get the data type id for the current property
-			var dataType = PublishedContentHelper.GetDataType(
+			var propertyEditor = PublishedContentHelper.GetPropertyEditor(
                 ApplicationContext.Current, doc.DocumentTypeAlias, alias, 
                 doc.ItemType);
 
 			//convert the string value to a known type
-			var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, dataType, doc.DocumentTypeAlias, alias);
+			var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, propertyEditor, doc.DocumentTypeAlias, alias);
 			return converted.Success
 					   ? GetValueWithParsedLinks(converted.Result)
 					   : GetValueWithParsedLinks(p.Value);
@@ -190,10 +190,10 @@ namespace Umbraco.Web
 
 			//before we try to convert it manually, lets see if the PropertyEditorValueConverter does this for us
 			//Here we need to put the value through the IPropertyEditorValueConverter's
-			//get the data type id for the current property
-            var dataType = PublishedContentHelper.GetDataType(ApplicationContext.Current, prop.DocumentTypeAlias, alias, prop.ItemType);
+			//get the property editor alias for the current property
+            var propertyEditor = PublishedContentHelper.GetPropertyEditor(ApplicationContext.Current, prop.DocumentTypeAlias, alias, prop.ItemType);
 			//convert the value to a known type
-			var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, dataType, prop.DocumentTypeAlias, alias);
+			var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, propertyEditor, prop.DocumentTypeAlias, alias);
 			object parsedLinksVal;
 			if (converted.Success)
 			{

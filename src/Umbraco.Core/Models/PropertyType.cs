@@ -140,7 +140,6 @@ namespace Umbraco.Core.Models
         /// Gets of Sets the Id of the DataType control
         /// </summary>
         /// <remarks>This is the Id of the actual DataType control</remarks>
-        [DataMember]
         [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the PropertyEditorAlias property instead")]
         public Guid DataTypeId
         {
