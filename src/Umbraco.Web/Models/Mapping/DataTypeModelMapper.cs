@@ -21,8 +21,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             var lazyDataTypeService = new Lazy<IDataTypeService>(() => applicationContext.Services.DataTypeService);
 
-            config.CreateMap<PropertyEditor, PropertyEditorBasic>()
-                  .ForMember(basic => basic.EditorId, expression => expression.MapFrom(editor => editor.Id));
+            config.CreateMap<PropertyEditor, PropertyEditorBasic>();
 
             //just maps the standard properties, does not map the value!
             config.CreateMap<PreValueField, PreValueFieldDisplay>();

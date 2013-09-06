@@ -41,7 +41,7 @@ namespace Umbraco.Core.Models
             //      XML construct from the value returned from the Property Editor.
             // More details discussed here: https://groups.google.com/forum/?fromgroups=#!topic/umbraco-dev/fieWZzHj7oY
 
-            var propertyEditor = PropertyEditorResolver.Current.GetById(property.PropertyType.DataTypeId);
+            var propertyEditor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
             if (propertyEditor != null)
             {
                 var cacheValue = propertyEditor.ValueEditor.FormatValueForCache(property);

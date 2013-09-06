@@ -2255,7 +2255,6 @@
     <Content Include="Umbraco\Dashboard\LatestEdits.ascx" />
     <Content Include="Umbraco\Developer\Macros\assemblyBrowser.aspx" />
     <Content Include="Umbraco\Developer\autoDoc.aspx" />
-    <Content Include="Umbraco\Developer\DataTypes\editDatatype.aspx" />
     <Content Include="Umbraco\Developer\Macros\editMacro.aspx" />
     <Content Include="Umbraco\Developer\Xslt\editXslt.aspx" />
     <Content Include="Umbraco\Developer\Xslt\getXsltStatus.asmx" />
@@ -2632,8 +2631,8 @@
     <Folder Include="MasterPages\" />
     <Folder Include="Media\" />
     <Folder Include="Scripts\" />
-    <Folder Include="Umbraco_client\FolderBrowser\Images\" />
-    <Folder Include="Umbraco_client\Tags\images\" />
+    <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
+    <Folder Include="Umbraco_Client\Tags\images\" />
     <Folder Include="UserControls\" />
     <Folder Include="Views\MacroPartials\" />
     <Folder Include="Views\Partials\" />

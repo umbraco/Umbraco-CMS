@@ -21,7 +21,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <returns></returns>
         protected override T ConvertCore(Property property)
         {
-            var editor = PropertyEditorResolver.Current.GetById(property.PropertyType.DataTypeId);
+            var editor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
             if (editor == null)
             {
                 //TODO: Remove this check as we shouldn't support this at all!

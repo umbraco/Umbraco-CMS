@@ -38,7 +38,7 @@ namespace Umbraco.Web.Models.Mapping
             //store the current props to append to the newly inserted ones
             var currProps = genericProps.Properties.ToArray();
 
-            var labelEditor = PropertyEditorResolver.Current.GetById(new Guid(Constants.PropertyEditors.NoEdit)).ValueEditor.View;
+            var labelEditor = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View;
 
             var contentProps = new List<ContentPropertyDisplay>
                 {
