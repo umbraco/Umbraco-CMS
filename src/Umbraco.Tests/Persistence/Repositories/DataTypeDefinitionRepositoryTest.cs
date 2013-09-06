@@ -97,7 +97,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var repository = new DataTypeDefinitionRepository(unitOfWork, NullCacheProvider.Current);
 
             // Act
-            var query = Query<IDataTypeDefinition>.Builder.Where(x => x.ControlId == new Guid(Constants.PropertyEditors.RadioButtonList));
+            var query = Query<IDataTypeDefinition>.Builder.Where(x => x.PropertyEditorAlias == Constants.PropertyEditors.RadioButtonListAlias);
             var result = repository.GetByQuery(query);
 
             // Assert
@@ -130,7 +130,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             var repository = new DataTypeDefinitionRepository(unitOfWork);
 
-            var dataTypeDefinition = new DataTypeDefinition(-1, new Guid("0FE4B127-D48C-4807-8371-67FC2A0E27D7"))
+            var dataTypeDefinition = new DataTypeDefinition(-1, "Test.TestEditor")
                                          {
                                              DatabaseType = DataTypeDatabaseType.Integer,
                                              Name = "AgeDataType",
@@ -155,7 +155,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             var repository = new DataTypeDefinitionRepository(unitOfWork);
 
-            var dataTypeDefinition = new DataTypeDefinition(-1, new Guid("0FE4B127-D48C-4807-8371-67FC2A0E27D7"))
+            var dataTypeDefinition = new DataTypeDefinition(-1, "Test.blah")
                                          {
                                              DatabaseType = DataTypeDatabaseType.Integer,
                                              Name = "AgeDataType",
@@ -165,10 +165,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             unitOfWork.Commit();
 
             // Act
-            var newId = Guid.NewGuid();
             var definition = repository.Get(dataTypeDefinition.Id);
             definition.Name = "AgeDataType Updated";
-            definition.ControlId = newId;
+            definition.PropertyEditorAlias = "Test.TestEditor"; //change
             repository.AddOrUpdate(definition);
             unitOfWork.Commit();
 
@@ -177,7 +176,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Assert
             Assert.That(definitionUpdated, Is.Not.Null);
             Assert.That(definitionUpdated.Name, Is.EqualTo("AgeDataType Updated"));
-            Assert.That(definitionUpdated.ControlId, Is.EqualTo(newId));
+            Assert.That(definitionUpdated.PropertyEditorAlias, Is.EqualTo("Test.TestEditor"));
         }
 
         [Test]
@@ -188,7 +187,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             var repository = new DataTypeDefinitionRepository(unitOfWork);
 
-            var dataTypeDefinition = new DataTypeDefinition(-1, new Guid("0FE4B127-D48C-4807-8371-67FC2A0E27D7"))
+            var dataTypeDefinition = new DataTypeDefinition(-1, "Test.TestEditor")
                                          {
                                              DatabaseType = DataTypeDatabaseType.Integer,
                                              Name = "AgeDataType",

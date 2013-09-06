@@ -30,10 +30,9 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var dataTypeService = ServiceContext.DataTypeService;
-            var textfieldId = new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea");
 
             // Act
-            var dataTypeDefinition = new DataTypeDefinition(-1, textfieldId) { Name = "Testing Textfield", DatabaseType = DataTypeDatabaseType.Ntext };
+            var dataTypeDefinition = new DataTypeDefinition(-1, "Test.TestEditor") { Name = "Testing Textfield", DatabaseType = DataTypeDatabaseType.Ntext };
             dataTypeService.Save(dataTypeDefinition);
 
             // Assert
@@ -46,8 +45,8 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var dataTypeService = ServiceContext.DataTypeService;
-            var textfieldId = new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea");
-            var dataTypeDefinitions = dataTypeService.GetDataTypeDefinitionByControlId(textfieldId);
+            var textfieldId = "Test.TestEditor";
+            var dataTypeDefinitions = dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(textfieldId);
             
             // Act
             var definition = dataTypeDefinitions.First();
