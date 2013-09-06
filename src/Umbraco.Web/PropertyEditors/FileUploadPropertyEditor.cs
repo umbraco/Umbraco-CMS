@@ -14,7 +14,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.UploadField, "File upload", "fileupload")]
+    [PropertyEditor(Constants.PropertyEditors.UploadFieldAlias, "File upload", "fileupload")]
     public class FileUploadPropertyEditor : PropertyEditor
     {
         /// <summary>
@@ -122,7 +122,9 @@ namespace Umbraco.Web.PropertyEditors
         private static void UpdateContentProperty(XmlNode uploadFieldConfigNode, IContentBase content, string configPropertyAlias, object propertyValue)
         {
             var propertyNode = uploadFieldConfigNode.SelectSingleNode(configPropertyAlias);
-            if (propertyNode != null && string.IsNullOrEmpty(propertyNode.FirstChild.Value) == false)
+            if (propertyNode != null 
+                && string.IsNullOrEmpty(propertyNode.FirstChild.Value) == false
+                && content.Properties.Contains(propertyNode.FirstChild.Value))
             {
                 var property = content.Properties[propertyNode.FirstChild.Value];
                 if (property != null)

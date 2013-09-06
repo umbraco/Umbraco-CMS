@@ -20,7 +20,7 @@ namespace Umbraco.Belle.Tests
 
             var a = JsonConvert.DeserializeObject<JArray>(@"[
     {
-        id: '0EEBB7CE-51BA-4F6B-9D9C-78BB3314366C',
+        alias: 'Test.Test1',
         name: 'Test 1',        
         editor: {
             view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',

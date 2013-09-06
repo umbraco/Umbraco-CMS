@@ -31,11 +31,8 @@ namespace Umbraco.Core.Services
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private Dictionary<string, IContentType> _importedContentTypes;
-
-        //Support recursive locks because some of the methods that require locking call other methods that require locking. 
-        //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
-        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-
+        
+        
         public PackagingService(IContentService contentService, IContentTypeService contentTypeService, IMediaService mediaService, IDataTypeService dataTypeService, IFileService fileService, RepositoryFactory repositoryFactory, IDatabaseUnitOfWorkProvider uowProvider)
         {
             _contentService = contentService;

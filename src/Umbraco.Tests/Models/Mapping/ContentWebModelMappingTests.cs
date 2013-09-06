@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Models.Mapping
     [TestFixture]
     public class ContentWebModelMappingTests : BaseDatabaseFactoryTest
     {
-        [PropertyEditor("00000000-0000-0000-0000-000000000000", "Test", "~/Test.html")]
+        [PropertyEditor("Test.Test", "Test", "~/Test.html")]
         public class TestPropertyEditor : PropertyEditor
         {
             
@@ -123,8 +123,8 @@ namespace Umbraco.Tests.Models.Mapping
             var idSeed = 1;
             var contentType = MockedContentTypes.CreateSimpleContentType();            
             //add non-grouped properties
-            contentType.AddPropertyType(new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "nonGrouped1", Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
-            contentType.AddPropertyType(new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "nonGrouped2", Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext) { Alias = "nonGrouped1", Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext) { Alias = "nonGrouped2", Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
             //set ids or it wont work
             contentType.Id = idSeed;
             foreach (var p in contentType.PropertyTypes)
@@ -186,7 +186,7 @@ namespace Umbraco.Tests.Models.Mapping
         {
             Assert.AreEqual(content.Id, result.Id);
             Assert.AreEqual(0, result.Owner.UserId);
-            Assert.AreEqual("admin", result.Owner.Name);
+            Assert.AreEqual("Administrator", result.Owner.Name);
             Assert.AreEqual(content.ParentId, result.ParentId);
             Assert.AreEqual(content.UpdateDate, result.UpdateDate);
             Assert.AreEqual(content.CreateDate, result.CreateDate);

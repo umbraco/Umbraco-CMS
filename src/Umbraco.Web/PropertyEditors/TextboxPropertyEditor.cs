@@ -10,7 +10,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.Textbox, "Textbox", "textbox")]
+    [PropertyEditor(Constants.PropertyEditors.TextboxAlias, "Textbox", "textbox")]
     public class TextboxPropertyEditor : PropertyEditor
     {        
     }

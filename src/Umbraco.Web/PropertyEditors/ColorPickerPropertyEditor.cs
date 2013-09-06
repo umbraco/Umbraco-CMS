@@ -9,7 +9,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.ColorPicker, "Color Picker", "colorpicker")]
+    [PropertyEditor(Constants.PropertyEditors.ColorPickerAlias, "Color Picker", "colorpicker")]
     public class ColorPickerPropertyEditor : PropertyEditor
     {
         /// <summary>

@@ -327,10 +327,11 @@
     <Compile Include="PropertyEditors\DateTimeValidator.cs" />
     <Compile Include="PropertyEditors\DropDownMultiplePropertyEditor.cs" />
     <Compile Include="PropertyEditors\IntegerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MediaPicker.cs" />
+    <Compile Include="PropertyEditors\MediaPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultipleTextStringPropertyEditor.cs" />
     <Compile Include="PropertyEditors\PublishValuesMultipleValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownMultipleWithKeysPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\RadioButtonsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ValueListPreValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownPropertyEditor.cs" />
     <Compile Include="PropertyEditors\PublishValueValueEditor.cs" />

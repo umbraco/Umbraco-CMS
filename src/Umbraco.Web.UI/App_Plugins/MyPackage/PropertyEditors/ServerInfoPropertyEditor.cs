@@ -8,7 +8,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
 {
-    [PropertyEditor("AD056473-492B-47F8-9613-5A4936666C67", "Server Info")]
+    [PropertyEditor("MyPackage.ServerInfo", "Server Info")]
     public class ServerInfoPropertyEditor : PropertyEditor
     {
         //cache the URL since these values get called numerous times.
