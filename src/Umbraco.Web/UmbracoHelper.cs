@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.templateControls;
+using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace Umbraco.Web
 {
@@ -1304,6 +1305,34 @@ namespace Umbraco.Web
 
 		#endregion
 
+        /// <summary>
+        /// This is used in methods like BeginUmbracoForm and SurfaceAction to generate an encrypted string which gets submitted in a request for which
+        /// Umbraco can decrypt during the routing process in order to delegate the request to a specific MVC Controller.
+        /// </summary>
+        /// <param name="controllerName"></param>
+        /// <param name="controllerAction"></param>
+        /// <param name="area"></param>
+        /// <param name="additionalRouteVals"></param>
+        /// <returns></returns>
+        internal static string CreateEncryptedRouteString(string controllerName, string controllerAction, string area, object additionalRouteVals = null)
+        {
+            Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
+            Mandate.ParameterNotNullOrEmpty(controllerAction, "controllerAction");
+            Mandate.ParameterNotNull(area, "area");
+
+            //need to create a params string as Base64 to put into our hidden field to use during the routes
+            var surfaceRouteParams = string.Format("c={0}&a={1}&ar={2}",
+                                                      HttpUtility.UrlEncode(controllerName),
+                                                      HttpUtility.UrlEncode(controllerAction),
+                                                      area);
+
+            var additionalRouteValsAsQuery = additionalRouteVals != null ? additionalRouteVals.ToDictionary<object>().ToQueryString() : null;
+
+            if (additionalRouteValsAsQuery.IsNullOrWhiteSpace() == false)
+                surfaceRouteParams += "&" + additionalRouteValsAsQuery;
+
+            return surfaceRouteParams.EncryptWithMachineKey();
+        }
 
 	}
 }

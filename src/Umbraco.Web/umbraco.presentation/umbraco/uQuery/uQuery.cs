@@ -13,7 +13,7 @@ using umbraco.DataLayer;
 namespace umbraco
 {
 	/// <summary>
-	/// uQuery - static helper methods, previously this class was UmbracoHelper
+	/// uQuery - static helper methods
 	/// </summary>
 	public static partial class uQuery
 	{

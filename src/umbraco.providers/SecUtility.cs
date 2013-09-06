@@ -1,11 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Collections.Specialized;
 using System.Collections;
 using System.Globalization;
 using System.Web.Hosting;
-using System.Diagnostics;
 using System.Configuration.Provider;
 
 namespace umbraco.providers
@@ -13,6 +10,7 @@ namespace umbraco.providers
     /// <summary>
     /// Security Helper Methods
     /// </summary>
+    [ObsoleteAttribute("This clas is obsolete and wil be removed along with the legacy Membership Provider.", false)] 
     internal class SecUtility
     {
         /// <summary>

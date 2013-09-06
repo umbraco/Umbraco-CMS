@@ -6,7 +6,7 @@ namespace Umbraco.Core.Models.Membership
 {
     internal interface IMembershipUser : IMembershipUserId, IAggregateRoot
     {
-        new object Id { get; set; }
+        /*new object Id { get; set; }*/
         string Username { get; set; }
         string Email { get; set; }
         string Password { get; set; }
@@ -16,10 +16,6 @@ namespace Umbraco.Core.Models.Membership
         bool IsApproved { get; set; }
         bool IsOnline { get; set; }
         bool IsLockedOut { get; set; }
-        //Was CreationDate
-        //DateTime CreateDate { get; set; }
-        //LastActivityDate
-        //DateTime UpdateDate { get; set; }
         DateTime LastLoginDate { get; set; }
         DateTime LastPasswordChangeDate { get; set; }
         DateTime LastLockoutDate { get; set; }

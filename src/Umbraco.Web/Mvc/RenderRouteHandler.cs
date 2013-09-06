@@ -109,23 +109,49 @@ namespace Umbraco.Web.Mvc
 
 		/// <summary>
 		/// Checks the request and query strings to see if it matches the definition of having a Surface controller
-		/// posted value, if so, then we return a PostedDataProxyInfo object with the correct information.
+		/// posted/get value, if so, then we return a PostedDataProxyInfo object with the correct information.
 		/// </summary>
 		/// <param name="requestContext"></param>
 		/// <returns></returns>
-		private static PostedDataProxyInfo GetPostedFormInfo(RequestContext requestContext)
-		{
-			if (requestContext.HttpContext.Request.RequestType != "POST")
-				return null;
+		private static PostedDataProxyInfo GetFormInfo(RequestContext requestContext)
+		{			
+			//if it is a POST/GET then a value must be in the request
+            if (requestContext.HttpContext.Request.QueryString["ufprt"].IsNullOrWhiteSpace() 
+                && requestContext.HttpContext.Request.Form["ufprt"].IsNullOrWhiteSpace())
+		    {
+		        return null;
+		    }
 
-			//this field will contain a base64 encoded version of the surface route vals 
-			if (requestContext.HttpContext.Request["uformpostroutevals"].IsNullOrWhiteSpace())
-				return null;
+		    string encodedVal;
+		    
+		    switch (requestContext.HttpContext.Request.RequestType)
+		    {
+                case "POST":
+                    //get the value from the request.
+                    //this field will contain an encrypted version of the surface route vals.
+                    encodedVal = requestContext.HttpContext.Request.Form["ufprt"];
+		            break;
+                case "GET":
+                    //this field will contain an encrypted version of the surface route vals.
+                    encodedVal = requestContext.HttpContext.Request.QueryString["ufprt"];
+		            break;
+                default:
+		            return null;
+		    }
 
-			var encodedVal = requestContext.HttpContext.Request["uformpostroutevals"];
-			var decryptedString = encodedVal.DecryptWithMachineKey();
-			var parsedQueryString = HttpUtility.ParseQueryString(decryptedString);
+            
+            string decryptedString;
+            try
+            {
+                decryptedString = encodedVal.DecryptWithMachineKey();
+            }
+            catch (FormatException)
+            {
+                LogHelper.Warn<RenderRouteHandler>("A value was detected in the ufprt parameter but Umbraco could not decrypt the string");
+                return null;
+            }
 
+            var parsedQueryString = HttpUtility.ParseQueryString(decryptedString);
 			var decodedParts = new Dictionary<string, string>();
 
 			foreach (var key in parsedQueryString.AllKeys)
@@ -136,31 +162,19 @@ namespace Umbraco.Web.Mvc
 			//validate all required keys exist
 
 			//the controller
-			if (!decodedParts.Any(x => x.Key == ReservedAdditionalKeys.Controller))
+			if (decodedParts.All(x => x.Key != ReservedAdditionalKeys.Controller))
 				return null;
 			//the action
-			if (!decodedParts.Any(x => x.Key == ReservedAdditionalKeys.Action))
+			if (decodedParts.All(x => x.Key != ReservedAdditionalKeys.Action))
 				return null;
 			//the area
-			if (!decodedParts.Any(x => x.Key == ReservedAdditionalKeys.Area))
+			if (decodedParts.All(x => x.Key != ReservedAdditionalKeys.Area))
 				return null;
-
-			////the controller type, if it contains this then it is a plugin controller, not locally declared.
-			//if (decodedParts.Any(x => x.Key == "t"))
-			//{
-			//    return new PostedDataProxyInfo
-			//    {
-			//        ControllerName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "c").Value),
-			//        ActionName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "a").Value),
-			//        Area = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "ar").Value),
-			//        ControllerType = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "t").Value)
-			//    };				
-			//}
-
-			foreach (var item in decodedParts.Where(x => !new string[] { 
-				ReservedAdditionalKeys.Controller, 
-				ReservedAdditionalKeys.Action, 
-				ReservedAdditionalKeys.Area }.Contains(x.Key)))
+            
+			foreach (var item in decodedParts.Where(x => new[] { 
+			    ReservedAdditionalKeys.Controller, 
+			    ReservedAdditionalKeys.Action, 
+			    ReservedAdditionalKeys.Area }.Contains(x.Key) == false))
 			{
 				// Populate route with additional values which aren't reserved values so they eventually to action parameters
 			    requestContext.RouteData.Values[item.Key] = item.Value;
@@ -169,9 +183,9 @@ namespace Umbraco.Web.Mvc
 			//return the proxy info without the surface id... could be a local controller.
 			return new PostedDataProxyInfo
 			{
-				ControllerName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == ReservedAdditionalKeys.Controller).Value),
-				ActionName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == ReservedAdditionalKeys.Action).Value),
-				Area = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == ReservedAdditionalKeys.Area).Value),
+				ControllerName = HttpUtility.UrlDecode(decodedParts.Single(x => x.Key == ReservedAdditionalKeys.Controller).Value),
+                ActionName = HttpUtility.UrlDecode(decodedParts.Single(x => x.Key == ReservedAdditionalKeys.Action).Value),
+                Area = HttpUtility.UrlDecode(decodedParts.Single(x => x.Key == ReservedAdditionalKeys.Area).Value),
 			};
 		}
 
@@ -336,7 +350,7 @@ namespace Umbraco.Web.Mvc
 			var routeDef = GetUmbracoRouteDefinition(requestContext, publishedContentRequest);
             
 			//Need to check for a special case if there is form data being posted back to an Umbraco URL
-			var postedInfo = GetPostedFormInfo(requestContext);
+			var postedInfo = GetFormInfo(requestContext);
 			if (postedInfo != null)
 			{
 				return HandlePostedValues(requestContext, postedInfo);

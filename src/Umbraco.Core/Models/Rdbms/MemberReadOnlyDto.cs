@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models.Rdbms
     [TableName("umbracoNode")]
     [PrimaryKey("id")]
     [ExplicitColumns]
-    public class MemberReadOnlyDto
+    internal class MemberReadOnlyDto
     {
         /* from umbracoNode */
         [Column("id")]
@@ -42,6 +42,10 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("createDate")]
         public DateTime CreateDate { get; set; }
+
+        /* cmsContent */
+        [Column("contentType")]
+        public int ContentTypeId { get; set; }
 
         /* from cmsContentType joined with cmsContent */
         [Column("ContentTypeAlias")]

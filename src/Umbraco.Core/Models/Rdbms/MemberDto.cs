@@ -28,5 +28,8 @@ namespace Umbraco.Core.Models.Rdbms
         [Length(1000)]
         [Constraint(Default = "''")]
         public string Password { get; set; }
+
+        [ResultColumn]
+        public ContentVersionDto ContentVersionDto { get; set; }
     }
 }
