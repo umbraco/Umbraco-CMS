@@ -51,7 +51,7 @@ For cases like this, a helper service is available: `imageHelper`. This utillity
 
 So we get the image page from the selected media item, and return it through the callback: 
 
-	var imagePropVal = imageHelper.getImagePropertyVaue({ imageModel: item, scope: $scope });
+	var imagePropVal = imageHelper.getImagePropertyValue({ imageModel: item, scope: $scope });
 	callback(imagePropVal);
 
 Now when we run the markdown editor and click the image button, we are presented with a native umbraco dialog, listing the standard media archive. 

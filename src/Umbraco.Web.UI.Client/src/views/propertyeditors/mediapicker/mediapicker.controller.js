@@ -21,7 +21,7 @@ angular.module('umbraco').controller("Umbraco.Editors.MediaPickerController",
 
 			//shortcuts
 			//TODO, do something better then this for searching
-			img.src = imageHelper.getImagePropertyVaue({imageModel: media});
+			img.src = imageHelper.getImagePropertyValue({imageModel: media});
 			img.thumbnail = imageHelper.getThumbnailFromPath(img.src); 
 		});
 	});

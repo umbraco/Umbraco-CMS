@@ -28,7 +28,7 @@ angular.module("umbraco")
                             dialogService.mediaPicker({scope: $scope, callback: function(img){
                                 
                                 if(img){
-                                    var imagePropVal = imageHelper.getImagePropertyVaue({imageModel: img, scope: $scope});
+                                    var imagePropVal = imageHelper.getImagePropertyValue({imageModel: img, scope: $scope});
                                     var data = {
                                         src: (imagePropVal != null && imagePropVal != "") ? imagePropVal: "nothing.jpg",
                                         id: '__mcenew'
