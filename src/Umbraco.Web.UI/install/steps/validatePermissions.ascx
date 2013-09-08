@@ -43,16 +43,8 @@ In order to run umbraco, you'll need to update your permission settings.
 
 <asp:Panel Visible="False" Runat="server" ID="howtoResolve">
     <h2>How to Resolve</h2>
-    <p>Watch our <strong>video tutorial</strong> on setting up folder permissions for umbraco or <a href="#" onClick="javascript:document.getElementById('fixPane').style.display = 'block';">read the text version</a>.</p>
-        <table class="single" id="videos">
-        <tr><td><a target="_blank" href="http://umbraco.org/documentation/videos/tags?tag=folder%20permissions">
-        <img src="images/permissionsVid1.png" />
-        <span>Watch: Setting up folder permissions</span>
-        </a></td></tr>
-    </table>
 
-
-    <div id="fixPane" style="display: none;">
+    <div id="fixPane" style="display: block;">
         <asp:Panel id="grant" Visible="True" Runat="server">
             <h2>Affected files and folders</h2>
             <p>
@@ -62,10 +54,6 @@ In order to run umbraco, you'll need to update your permission settings.
             <ul>
             <asp:Literal id="permSummary" Runat="server"></asp:Literal>
             </ul>
-
-            <p>
-            More <a href="http://umbraco.org/documentation/books/setting-umbraco-folder-permissions"
-            target="_blank">information on setting up permissions for umbraco here</a>.</p>
         </asp:Panel>
 
         <asp:Panel id="folderWoes" Visible="False" Runat="server">
