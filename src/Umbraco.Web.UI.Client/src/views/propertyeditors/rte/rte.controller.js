@@ -28,13 +28,12 @@ angular.module("umbraco")
                             dialogService.mediaPicker({scope: $scope, callback: function(img){
                                 
                                 if(img){
-                                    var imagePropVal = imageHelper.getImagePropertyVaue({imageModel: img, scope: $scope});
+                                    var imagePropVal = imageHelper.getImagePropertyValue({imageModel: img, scope: $scope});
                                     var data = {
                                         src: (imagePropVal != null && imagePropVal != "") ? imagePropVal: "nothing.jpg",
                                         id: '__mcenew'
                                     };
                                     
-                                    $log.log(data);
 
                                     editor.insertContent(editor.dom.createHTML('img', data));
                                     
@@ -48,7 +47,6 @@ angular.module("umbraco")
                                          editor.dom.setAttrib(imgElm, 'style', s);
                                          editor.dom.setAttrib(imgElm, 'rel', newSize.width + "," + newSize.height);
                                          editor.dom.setAttrib(imgElm, 'id', null);
-
                                          
                                     }, 500);
                                 }

@@ -10,7 +10,7 @@ describe('keyboard service tests', function () {
    describe('Loading js assets', function () {
         
         it('Loads a javascript file', function () {
-            assetsService.loadJs("lib/umbraco/NamespaceManager.js").then(function(){
+            assetsService.loadJs("base/lib/umbraco/NamespaceManager.js").then(function(){
                 console.log("loaded");
             });
             

@@ -38,7 +38,7 @@ module.exports = function(karma) {
          'src/views/**/*.controller.js',
          'test/unit/**/*.spec.js',
 
-        {pattern: 'lib/umbraco/*.js', watched: true, served: true}       
+        {pattern: 'lib/umbraco/namespacemanager.js', watched: true, served: true}       
     ],
 
     // list of files to exclude
