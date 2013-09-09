@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.PropertyEditors;
 using umbraco.DataLayer;
 using System.Xml;
 using umbraco.cms.businesslogic.media;

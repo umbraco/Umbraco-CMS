@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models
 {

@@ -65,6 +65,9 @@ namespace Umbraco.Core
 
 	        CreateApplicationCache();
 
+            //Create the legacy prop-eds mapping
+            LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
+
 			//create database and service contexts for the app context
 			var dbFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName);
 		    Database.Mapper = new PetaPocoMapper();

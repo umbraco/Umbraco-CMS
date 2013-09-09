@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models
 {

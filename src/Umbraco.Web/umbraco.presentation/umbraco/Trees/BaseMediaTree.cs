@@ -6,6 +6,7 @@ using System.Text;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.PropertyEditors;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;

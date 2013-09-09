@@ -7,6 +7,7 @@ using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Web;
@@ -30,7 +31,10 @@ namespace Umbraco.Tests.TestHelpers
             SettingsForTests.UseLegacyXmlSchema = false;
             SettingsForTests.ForceSafeAliases = true;
             SettingsForTests.UmbracoLibraryCacheDuration = 1800;
-            
+
+            //Create the legacy prop-eds mapping
+            LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
+
             SetupPluginManager();            
             SetupApplicationContext();
             InitializeMappers();
@@ -50,6 +54,7 @@ namespace Umbraco.Tests.TestHelpers
             ApplicationContext.Current.DisposeIfDisposable();
             ApplicationContext.Current = null;
             ResetPluginManager();
+            LegacyPropertyEditorIdToAliasConverter.Reset();
         }
         
         private void InitializeMappers()
