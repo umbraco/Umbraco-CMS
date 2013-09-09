@@ -269,7 +269,6 @@
     <Compile Include="LegacyApi\MediaTypeTests.cs" />
     <Compile Include="Macros\MacroTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
-    <Compile Include="Migrations\TargetVersionSixthOneZeroMigrationsTest.cs" />
     <Compile Include="Migrations\Upgrades\BaseUpgradeTest.cs" />
     <Compile Include="Migrations\FindingMigrationsTest.cs" />
     <Compile Include="Migrations\SqlScripts\SqlResources.Designer.cs">
