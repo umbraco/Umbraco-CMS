@@ -284,7 +284,7 @@ namespace Umbraco.Web
             //the base creates the PropertyEditorValueConvertersResolver but we want to modify it in the web app and remove
             //the TinyMcePropertyEditorValueConverter since when the web app is loaded the RteMacroRenderingPropertyEditorValueConverter
             //is found and we'll use that instead.
-            PropertyEditorValueConvertersResolver.Current.RemoveType<TinyMcePropertyEditorValueConverter>();            
+            PropertyValueConvertersResolver.Current.RemoveType<TinyMcePropertyValueConverter>();            
 
             PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
                 new PublishedCache.XmlPublishedCache.PublishedContentCache(),

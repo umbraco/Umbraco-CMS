@@ -243,7 +243,8 @@ namespace Umbraco.Web.Models
                 ItemType);
 
 			//convert the string value to a known type
-			var converted = Umbraco.Core.PublishedContentHelper.ConvertPropertyValue(result, propertyEditor, userProperty.DocumentTypeAlias, userProperty.Alias);
+		    var def = new PublishedPropertyDefinition(userProperty.Alias, userProperty.DocumentTypeAlias, propertyEditor);
+			var converted = PublishedContentHelper.ConvertPropertyValue(result, def);
 			if (converted.Success)
 			{
 				result = converted.Result;

@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var dataTypeService = ServiceContext.DataTypeService;
-            var textfieldId = "Test.TestEditor";
+            var textfieldId = "Umbraco.Textbox";
             var dataTypeDefinitions = dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(textfieldId);
             
             // Act

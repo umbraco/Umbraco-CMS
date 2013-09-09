@@ -463,6 +463,15 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Returns all available PropertyValueConverter
+        /// </summary>
+        /// <returns></returns>
+        internal IEnumerable<Type> ResolvePropertyValueConverters()
+        {
+            return ResolveTypes<PropertyValueConverter>();
+        }
+
+        /// <summary>
         /// Returns all available IDataType in application
         /// </summary>
         /// <returns></returns>

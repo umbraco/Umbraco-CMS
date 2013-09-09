@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using log4net.Util.TypeConverters;
 
 namespace Umbraco.Core
 {
@@ -84,33 +85,53 @@ namespace Umbraco.Core
                 });
 		}
 
-		/// <summary>
-		/// Converts the currentValue to a correctly typed value based on known registered converters, then based on known standards.
-		/// </summary>
-		/// <param name="currentValue"></param>
-		/// <param name="propertyEditor"></param>
-		/// <param name="docTypeAlias"></param>
-		/// <param name="propertyTypeAlias"></param>
-		/// <returns></returns>
-		internal static Attempt<object> ConvertPropertyValue(object currentValue, string propertyEditor, string docTypeAlias, string propertyTypeAlias)
+        /// <summary>
+        /// Converts the currentValue to a correctly typed value based on known registered converters, then based on known standards.
+        /// </summary>
+        /// <param name="currentValue"></param>
+        /// <param name="propertyDefinition"></param>
+        /// <returns></returns>
+        internal static Attempt<object> ConvertPropertyValue(object currentValue, PublishedPropertyDefinition propertyDefinition)
 		{
 			if (currentValue == null) return Attempt<object>.False;
 
+            //First, we need to check the v7+ PropertyValueConverters
+		    var converters = PropertyValueConvertersResolver.Current.Converters
+                                                            .Where(x => x.AssociatedPropertyEditorAlias == propertyDefinition.PropertyEditorAlias)
+		                                                    .ToArray();
+            if (converters.Any())
+            {
+                if (converters.Count() > 1)
+                {
+                    throw new NotSupportedException("Only one " + typeof(PropertyValueConverter) + " can be registered for the property editor: " + propertyDefinition.PropertyEditorAlias);
+                }
+                var result = converters.Single().ConvertSourceToObject(
+                    currentValue,
+                    propertyDefinition, 
+                    false);
+
+                //if it is good return it, otherwise we'll continue processing the legacy stuff below.
+                if (result.Success)
+                {
+                    return new Attempt<object>(true, result.Result);
+                }
+            }
+
             //In order to maintain backwards compatibility here with IPropertyEditorValueConverter we need to attempt to lookup the 
             // legacy GUID for the current property editor. If one doesn't exist then we will abort the conversion.
-		    var legacyId = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(propertyEditor);
+            var legacyId = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(propertyDefinition.PropertyEditorAlias);
             if (legacyId.HasValue == false)
             {
                 return Attempt<object>.False;
             }
 
 			//First lets check all registered converters for this data type.			
-			var converters = PropertyEditorValueConvertersResolver.Current.Converters
-                .Where(x => x.IsConverterFor(legacyId.Value, docTypeAlias, propertyTypeAlias))
+			var legacyConverters = PropertyEditorValueConvertersResolver.Current.Converters
+                .Where(x => x.IsConverterFor(legacyId.Value, propertyDefinition.DocumentTypeAlias, propertyDefinition.PropertyTypeAlias))
 				.ToArray();
 
 			//try to convert the value with any of the converters:
-			foreach (var converted in converters
+			foreach (var converted in legacyConverters
 				.Select(p => p.ConvertPropertyValue(currentValue))
 				.Where(converted => converted.Success))
 			{

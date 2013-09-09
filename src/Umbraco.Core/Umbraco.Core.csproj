@@ -285,6 +285,7 @@
     <Compile Include="Models\Membership\UmbracoMembershipUser.cs" />
     <Compile Include="Models\PreValue.cs" />
     <Compile Include="Models\PreValueCollection.cs" />
+    <Compile Include="Models\PublishedPropertyDefinition.cs" />
     <Compile Include="Models\Rdbms\MemberReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\PropertyDataReadOnlyDto.cs" />
     <Compile Include="Models\ServerRegistration.cs" />
@@ -638,6 +639,7 @@
     <Compile Include="Profiling\ProfilerExtensions.cs" />
     <Compile Include="Profiling\ProfilerResolver.cs" />
     <Compile Include="Profiling\WebProfiler.cs" />
+    <Compile Include="PropertyEditors\DateTimePickerPropertyValueConverter.cs" />
     <Compile Include="PropertyEditors\DelimitedManifestValueValidator.cs" />
     <Compile Include="PropertyEditors\IntegerValidator.cs" />
     <Compile Include="PropertyEditors\ManifestPropertyValidator.cs" />
@@ -648,6 +650,8 @@
     <Compile Include="PropertyEditors\PropertyEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorAttribute.cs" />
     <Compile Include="PropertyEditors\PropertyEditorResolver.cs" />
+    <Compile Include="PropertyEditors\PropertyValueConverter.cs" />
+    <Compile Include="PropertyEditors\PropertyValueConvertersResolver.cs" />
     <Compile Include="PropertyEditors\RegexValidator.cs" />
     <Compile Include="PropertyEditors\RequiredManifestValueValidator.cs" />
     <Compile Include="PropertyEditors\IPropertyValidator.cs" />
@@ -739,7 +743,7 @@
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="ObjectResolution\WeightedPluginAttribute.cs" />
     <Compile Include="Persistence\PetaPoco.cs" />
-    <Compile Include="PropertyEditors\DatePickerPropertyEditorValueConverter.cs" />
+    <Compile Include="PropertyEditors\DatePickerPropertyValueConverter.cs" />
     <Compile Include="PropertyEditors\IPropertyEditorValueConverter.cs" />
     <Compile Include="Dynamics\ParseException.cs" />
     <Compile Include="Dynamics\PropertyResult.cs" />
@@ -769,8 +773,8 @@
     <Compile Include="Macros\PersistableMacroProperty.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueConvertersResolver.cs" />
-    <Compile Include="PropertyEditors\TinyMcePropertyEditorValueConverter.cs" />
-    <Compile Include="PropertyEditors\YesNoPropertyEditorValueConverter.cs" />
+    <Compile Include="PropertyEditors\TinyMcePropertyValueConverter.cs" />
+    <Compile Include="PropertyEditors\YesNoPropertyValueConverter.cs" />
     <Compile Include="ObjectResolution\ManyObjectsResolverBase.cs" />
     <Compile Include="ObjectResolution\ObjectLifetimeScope.cs" />
     <Compile Include="ObjectResolution\Resolution.cs" />

@@ -3,17 +3,6 @@ using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Core.PropertyEditors
 {
-
-    public abstract class PropertyValueConverter
-    {
-        /// <summary>
-        /// Returns the alias of the PropertyEditor that this converter is for
-        /// </summary>
-        public abstract string AssociatedPropertyEditorAlias { get; }
-
-        public abstract object ConvertSourceToObject(object valueToConvert, bool isPreviewing);
-    }
-
     [Obsolete("Use PropertyConverter instead since we no longer reference property editors by a GUID and instead by a string alias")]
 	public interface IPropertyEditorValueConverter
 	{

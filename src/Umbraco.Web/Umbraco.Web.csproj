@@ -603,7 +603,7 @@
     <Compile Include="Mvc\SurfaceControllerFactory.cs" />
     <Compile Include="Mvc\PluginControllerMetadata.cs" />
     <Compile Include="Mvc\UmbracoPageResult.cs" />
-    <Compile Include="PropertyEditors\RteMacroRenderingPropertyEditorValueConverter.cs" />
+    <Compile Include="PropertyEditors\RteMacroRenderingPropertyValueConverter.cs" />
     <Compile Include="RenderFieldCaseType.cs" />
     <Compile Include="RenderFieldEncodingType.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />

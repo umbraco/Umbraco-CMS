@@ -306,10 +306,12 @@ namespace Umbraco.Core
             MigrationResolver.Current = new MigrationResolver(
                 () => PluginManager.Current.ResolveMigrationTypes());
             
-
-
+            //NOTE: These are legacy in v7+ and will eventually need to be removed.
 			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
 				PluginManager.Current.ResolvePropertyEditorValueConverters());
+
+            PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
+                PluginManager.Current.ResolvePropertyValueConverters());
 
             // this is how we'd switch over to DefaultShortStringHelper _and_ still use
             // UmbracoSettings UrlReplaceCharacters...

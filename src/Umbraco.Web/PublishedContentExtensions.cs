@@ -157,8 +157,10 @@ namespace Umbraco.Web
                 ApplicationContext.Current, doc.DocumentTypeAlias, alias, 
                 doc.ItemType);
 
+            var def = new PublishedPropertyDefinition(alias, doc.DocumentTypeAlias, propertyEditor);
+
 			//convert the string value to a known type
-			var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, propertyEditor, doc.DocumentTypeAlias, alias);
+            var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, def);
 			return converted.Success
 					   ? GetValueWithParsedLinks(converted.Result)
 					   : GetValueWithParsedLinks(p.Value);
@@ -193,7 +195,8 @@ namespace Umbraco.Web
 			//get the property editor alias for the current property
             var propertyEditor = PublishedContentHelper.GetPropertyEditor(ApplicationContext.Current, prop.DocumentTypeAlias, alias, prop.ItemType);
 			//convert the value to a known type
-			var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, propertyEditor, prop.DocumentTypeAlias, alias);
+            var def = new PublishedPropertyDefinition(alias, prop.DocumentTypeAlias, propertyEditor);
+            var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, def);
 			object parsedLinksVal;
 			if (converted.Success)
 			{
