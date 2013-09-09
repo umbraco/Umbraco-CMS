@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Dynamic;
 using Umbraco.Core;
-using Umbraco.Core.Dynamics;
 using umbraco.interfaces;
 using System.Collections;
 using System.Reflection;
