@@ -22,7 +22,6 @@ angular.module('umbraco.services')
     //TODO: would be nicer to set all of the options here first instead of implicitly below!
     var ui = {};
     $rootScope.$on("closeDialogs", function(){
-        
     });
 
     function setMode(mode) {
@@ -33,7 +32,7 @@ angular.module('umbraco.services')
                 ui.showContextMenuDialog = false;
                 ui.stickyNavigation = false;
 
-                $("#search-form input").focus();    
+                //$("#search-form input").focus();    
                 break;
             case 'menu':
                 ui.showNavigation = true;
@@ -239,6 +238,7 @@ angular.module('umbraco.services')
             var selectedId = $routeParams.id;
             this.ui.currentNode = undefined;
             this.ui.actions = [];
+
             setMode("tree");
         },
 
@@ -392,14 +392,10 @@ angular.module('umbraco.services')
           * hides any open navigation panes and resets the tree, actions and the currently selected node
           */
         hideNavigation: function () {
-
-            if(!service.active){
-                this.ui.currentSection = "";
-                this.ui.actions = [];
-                this.ui.currentNode = undefined;
-
-                setMode("default");
-            }
+            this.ui.currentSection = "";
+            this.ui.actions = [];
+            this.ui.currentNode = undefined;
+            setMode("default");
         }
     };
 
