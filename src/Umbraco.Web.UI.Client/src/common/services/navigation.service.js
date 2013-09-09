@@ -66,6 +66,7 @@ angular.module('umbraco.services')
     var service = {
         active: false,
         mode: "default",
+        touchDevice: false,
         ui: ui,
 
         /**
@@ -142,12 +143,15 @@ angular.module('umbraco.services')
          * Hides navigation tree, with a short delay, is cancelled if the user moves the mouse over the tree again
          */
         leaveTree: function () {
-            service.active = false;
+           if(!service.touchDevice){
+                service.active = false;
+
                 $timeout(function(){
                     if(!service.active){
                         service.hideTree();
                     }
                 }, 300);
+            }
         },
 
         /**
@@ -379,7 +383,7 @@ angular.module('umbraco.services')
           *
           * @description
           * hides the search pane
-          */
+        */
         hideSearch: function () {
             setMode("default-hidesearch");
         },
@@ -392,7 +396,7 @@ angular.module('umbraco.services')
           * hides any open navigation panes and resets the tree, actions and the currently selected node
           */
         hideNavigation: function () {
-            this.ui.currentSection = "";
+           this.ui.currentSection = "";
             this.ui.actions = [];
             this.ui.currentNode = undefined;
             setMode("default");
