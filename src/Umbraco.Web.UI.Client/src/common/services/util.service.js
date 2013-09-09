@@ -120,7 +120,7 @@ function imageHelper() {
                 throw "The options objet does not contain the required parameters: imageModel";
             }
 
-            var imagePropVal = this.getImagePropertyVaue(options);
+            var imagePropVal = this.getImagePropertyValue(options);
             if (imagePropVal !== "") {
                 return this.getThumbnailFromPath(imagePropVal);
             }
