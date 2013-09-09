@@ -45,11 +45,9 @@
 	background: #2e8aea;
 	border-color: #2e8aea;
 }
-
 .umb-tree li.root div {
 	padding-left: 20px
 }
-
 .umb-tree * {
 	white-space: nowrap
 }
@@ -80,6 +78,7 @@
 	padding: 5px 0 5px 0;
 	position: relative;
 }
+
 .umb-tree a.noSpr {
 	background-position: 0
 }
@@ -161,6 +160,9 @@ li.root > div > a.umb-options {
 
 .hide-options a.umb-options{display: none !important}
 .hide-header h5{display: none !important}
+
+
+
 
 .umb-icon-item {
 	padding: 2px;
@@ -294,13 +296,10 @@ li.root > div > a.umb-options {
 .umb-actions-child li a:hover .menuLabel small {
 	text-decoration: none !important
 }
-
-
 .umb-actions-child i {
 	font-size: 32px;
 	vertical-align: top;
 }
-
 .umb-actions-child li.add {
 	margin-top: 20px;
 	border-top: 1px solid #e9e9e9;
@@ -331,12 +330,16 @@ li.root > div > a.umb-options {
 }
 
 
+
+
+// Loading Animation 
+// ------------------------
+
 .umb-tree li div.l{
 width:100%;
 height:1px;
 overflow:hidden;
 }
-
 .umb-tree li div.l div, div.umb-loader{
 background-color: @blue;
 margin-top:0;
@@ -443,3 +446,13 @@ height:1px;
 	padding: 0px;
 	border-bottom: 1px solid #efefef
 }
+
+body.touch .umb-tree .icon{font-size: 17px;}
+body.touch .umb-tree ins{font-size: 20px; visibility: visible; padding: 7px;}
+body.touch .umb-tree li div {
+	padding-top: 8px;
+	padding-bottom: 8px;
+	font-size: 110%;
+}
+
+
