@@ -23,7 +23,7 @@ module.exports = function(karma) {
          
 
          'lib/underscore/underscore.js',
-         'lib/umbraco/Extensions.js',  
+         'lib/umbraco/Extensions.js', 
          'lib/yepnope/yepnope.min.js',
 
          'test/config/app.unit.js',
@@ -38,7 +38,7 @@ module.exports = function(karma) {
          'src/views/**/*.controller.js',
          'test/unit/**/*.spec.js',
 
-        {pattern: 'lib/umbraco/*.js', watched: true, served: true}       
+         {pattern: 'lib/umbraco/NamespaceManager.js', watched: true, served: true}     
     ],
 
     // list of files to exclude
