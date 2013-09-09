@@ -1,4 +1,5 @@
-<div id="leftcolumn" ng-controller="Umbraco.NavigationController" ng-mouseleave="nav.leaveTree()" ng-mouseenter="nav.enterTree()" >
+<div id="leftcolumn" ng-controller="Umbraco.NavigationController" 
+    ng-mouseleave="nav.leaveTree()" ng-mouseenter="nav.enterTree()" >
     <div id="applications" ng-class="{faded:nav.ui.stickyNavigation}">
         <ul class="sections">
             
@@ -32,7 +33,7 @@
             ng-show="nav.ui.showNavigation" 
             ng-animate="'slide'">
 
-        <div class="navigation-inner-container span6">
+        <div ng-swipe-left="nav.hideNavigation()" class="navigation-inner-container span6">
             <!-- the search -->
             <div id="search-form" ng-animate="'slide'">
                 <div class="umb-panel-header">
@@ -63,7 +64,6 @@
                     </li>
 
                 </ul>
-
             </div>
             
 
@@ -71,7 +71,6 @@
             <div id="tree" class="umb-panel fill" ng-animate="'slide'">
                 <umb-tree eventhandler="treeEventHandler" section="{{nav.ui.currentSection}}" ></umb-tree>
             </div>
-
         </div>
 
         <div class="offset6">
@@ -80,6 +79,7 @@
             
             <!-- Tree dialogs -->
             <div id="dialog" class='umb-modalcolumn fill shadow umb-panel'
+                ng-swipe-left="nav.hideDialog()"
                 ng-show="nav.ui.showContextMenuDialog" ng-animate="'slide'">
                 <div class='umb-panel-header'>
                     <h1>{{nav.ui.dialogTitle}}</h1>
