@@ -81,16 +81,16 @@ angular.module('umbraco.services')
            var callback = options.callback;
 
            //Modal dom obj and unique id
-           var $modal = $('<div data-backdrop="false"></div>');
+           var $modal = $('<div ng-swipe-left="hide()" ng-swipe-right="hide()"  data-backdrop="false"></div>');
            var id = templateUrl.replace('.html', '').replace('.aspx', '').replace(/[\/|\.|:\&\?\=]/g, "-") + '-' + scope.$id;
            
-           if(options.inline){
+          if(options.inline){
               animationClass = "";
               modalClass = "";
-           }else{
-               $modal.addClass("modal");
-               $modal.addClass("hide");
-           }
+          }else{
+                $modal.addClass("modal");
+                $modal.addClass("hide");
+          }
 
            //set the id and add classes
            $modal

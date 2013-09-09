@@ -6,6 +6,7 @@ var app = angular.module('umbraco', [
 	'umbraco.httpbackend',
     'ngCookies',
     'ngMobile',
+    
     /*'ui.sortable',*/
     'blueimp.fileupload'
 ]);

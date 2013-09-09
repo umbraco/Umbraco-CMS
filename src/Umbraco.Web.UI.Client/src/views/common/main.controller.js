@@ -9,11 +9,9 @@
  * 
  */
 function MainController($scope, $routeParams, $rootScope, $timeout, $http, $log, notificationsService, userService, navigationService, legacyJsLoader) {
-    //debugmode so I can easily turn on/off json output of property models:
-    //TODO: find a better way
-    $scope.$umbdebugmode = true;
 
-    //set default properties
+    //detect if the current device is touch-enabled
+    $scope.touchDevice = (true === ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch));
     
     //the null is important because we do an explicit bool check on this in the view
     //the avatar is by default the umbraco logo    
