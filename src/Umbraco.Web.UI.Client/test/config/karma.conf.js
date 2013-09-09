@@ -23,7 +23,7 @@ module.exports = function(karma) {
          
 
          'lib/underscore/underscore.js',
-         'lib/umbraco/Extensions.js',  
+         'lib/umbraco/Extensions.js', 
          'lib/yepnope/yepnope.min.js',
 
          'test/config/app.unit.js',
@@ -37,7 +37,6 @@ module.exports = function(karma) {
          'src/common/mocks/resources/*.js',
          'src/views/**/*.controller.js',
          'test/unit/**/*.spec.js',
-
         {pattern: 'lib/umbraco/namespacemanager.js', watched: true, served: true}       
     ],
 
