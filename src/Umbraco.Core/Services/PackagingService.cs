@@ -764,7 +764,10 @@ namespace Umbraco.Core.Services
             foreach (var dataTypeElement in dataTypeElements)
             {
                 var dataTypeDefinitionName = dataTypeElement.Attribute("Name").Value;
-                var dataTypeId = new Guid(dataTypeElement.Attribute("Id").Value);
+
+                var legacyPropertyEditorId = Guid.Empty;
+                Guid.TryParse(dataTypeElement.Attribute("Id").Value, out legacyPropertyEditorId);
+
                 var dataTypeDefinitionId = new Guid(dataTypeElement.Attribute("Definition").Value);
                 var databaseTypeAttribute = dataTypeElement.Attribute("DatabaseType");
 
@@ -775,13 +778,30 @@ namespace Umbraco.Core.Services
                     var databaseType = databaseTypeAttribute != null
                                            ? databaseTypeAttribute.Value.EnumParse<DataTypeDatabaseType>(true)
                                            : DataTypeDatabaseType.Ntext;
-                    var dataTypeDefinition = new DataTypeDefinition(-1, dataTypeId)
-                                                 {
-                                                     Key = dataTypeDefinitionId,
-                                                     Name = dataTypeDefinitionName,
-                                                     DatabaseType = databaseType
-                                                 };
-                    dataTypes.Add(dataTypeDefinitionName, dataTypeDefinition);
+                
+                    //check if the Id was a GUID, that means it is referenced using the legacy property editor GUID id
+                    if (legacyPropertyEditorId != Guid.Empty)
+                    {
+                        var dataTypeDefinition = new DataTypeDefinition(-1, legacyPropertyEditorId)
+                            {
+                                Key = dataTypeDefinitionId,
+                                Name = dataTypeDefinitionName,
+                                DatabaseType = databaseType
+                            };
+                        dataTypes.Add(dataTypeDefinitionName, dataTypeDefinition);
+                    }
+                    else
+                    {
+                        //the Id field is actually the string property editor Alias
+                        var dataTypeDefinition = new DataTypeDefinition(-1, dataTypeElement.Attribute("Id").Value.Trim())
+                        {
+                            Key = dataTypeDefinitionId,
+                            Name = dataTypeDefinitionName,
+                            DatabaseType = databaseType
+                        };
+                        dataTypes.Add(dataTypeDefinitionName, dataTypeDefinition);
+                    }
+                    
                 }
             }
 
