@@ -46,7 +46,7 @@
         <GenericProperty>
           <Name>testList</Name>
           <Alias>testList</Alias>
-          <Type>b4471851-82b6-4c75-afa4-39fa9c6a75e9</Type>
+          <Type>Umbraco.CheckBoxList</Type>
           <Definition>8dacee1a-1bbd-46c0-b07f-8ffd49fcca7c</Definition>
           <Tab>
           </Tab>
@@ -65,7 +65,7 @@
   <DictionaryItems />
   <Languages />
   <DataTypes>
-    <DataType Name="NewCheckBox" Id="b4471851-82b6-4c75-afa4-39fa9c6a75e9" Definition="8dacee1a-1bbd-46c0-b07f-8ffd49fcca7c" DatabaseType="Nvarchar">
+    <DataType Name="NewCheckBox" Id="Umbraco.CheckBoxList" Definition="8dacee1a-1bbd-46c0-b07f-8ffd49fcca7c" DatabaseType="Nvarchar">
       <PreValues>
         <PreValue Id="59" Value="test" />
         <PreValue Id="60" Value="test3" />

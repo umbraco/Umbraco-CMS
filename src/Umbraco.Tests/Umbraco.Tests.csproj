@@ -584,6 +584,9 @@
     <Content Include="Migrations\SqlScripts\SqlCe-SchemaAndData-4110.sql" />
     <Content Include="Migrations\SqlScripts\SqlCeTotal-480.sql" />
     <Content Include="Migrations\SqlScripts\SqlServerTotal-480.sql" />
+    <Content Include="Services\Importing\CheckboxList-Content-Package-LegacyIds.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Services\Importing\CheckboxList-Content-Package.xml">
       <SubType>Designer</SubType>
     </Content>
