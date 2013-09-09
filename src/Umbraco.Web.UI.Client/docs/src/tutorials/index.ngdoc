@@ -31,6 +31,10 @@ How we make the editor configurable so it becomes flexible and reusable
 ###{@link Intergrating-Services-With-PropertyEditor Intergrating services}
 How you can get access to all the standard services inside of Umbraco from your editor
 
+###{@link Add-ServerSide-Data Adding serverside data}
+How you can return your own custom data from the server to a property editor
+through a ApiController 
+
 ##Start developing
 
 ###{@link Source-Code-Structure how the source code is structured}
