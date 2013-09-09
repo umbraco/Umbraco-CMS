@@ -376,7 +376,7 @@ namespace Umbraco.Core.Services
                 var genericProperty = new XElement("GenericProperty",
                                                    new XElement("Name", propertyType.Name),
                                                    new XElement("Alias", propertyType.Alias),
-                                                   new XElement("Type", propertyType.DataTypeId.ToString()),
+                                                   new XElement("Type", propertyType.PropertyEditorAlias),
                                                    new XElement("Definition", definition.Key),
                                                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
@@ -588,29 +588,52 @@ namespace Umbraco.Core.Services
             var properties = genericPropertiesElement.Elements("GenericProperty");
             foreach (var property in properties)
             {
-                //TODO: Need to update this whole service to support the PropertyEditorAlias change, but somehow still support the old GUID package format.
-
-                var dataTypeId = new Guid(property.Element("Type").Value);//The DataType's Control Id
                 var dataTypeDefinitionId = new Guid(property.Element("Definition").Value);//Unique Id for a DataTypeDefinition
 
                 var dataTypeDefinition = _dataTypeService.GetDataTypeDefinitionById(dataTypeDefinitionId);
+                
                 //If no DataTypeDefinition with the guid from the xml wasn't found OR the ControlId on the DataTypeDefinition didn't match the DataType Id
                 //We look up a DataTypeDefinition that matches
-                if (dataTypeDefinition == null || dataTypeDefinition.ControlId != dataTypeId)
+                if (dataTypeDefinition == null)
                 {
-                    var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByControlId(dataTypeId);
-                    if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
+                    //we'll check if it is a GUID (legacy id for a property editor)
+                    Guid legacyPropertyEditorId;
+                    if (Guid.TryParse(property.Element("Type").Value, out legacyPropertyEditorId))
                     {
-                        dataTypeDefinition = dataTypeDefinitions.First();
+                        if (dataTypeDefinition.ControlId != legacyPropertyEditorId)
+                        {
+                            var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByControlId(legacyPropertyEditorId);
+                            if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
+                            {
+                                dataTypeDefinition = dataTypeDefinitions.First();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //check against the property editor string alias
+                        var propertyEditorAlias = property.Element("Type").Value.Trim();
+                        if (dataTypeDefinition.PropertyEditorAlias != propertyEditorAlias)
+                        {
+                            var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(propertyEditorAlias);
+                            if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
+                            {
+                                dataTypeDefinition = dataTypeDefinitions.First();
+                            }
+                        }
                     }
                 }
+                
 
                 // For backwards compatibility, if no datatype with that ID can be found, we're letting this fail silently.
                 // This means that the property will not be created.
                 if (dataTypeDefinition == null)
                 {
-                    LogHelper.Warn<PackagingService>(string.Format("Packager: Error handling creation of PropertyType '{0}'. Could not find DataTypeDefintion with unique id '{1}' nor one referencing the DataType with control id '{2}'. Did the package creator forget to package up custom datatypes?",
-                                                        property.Element("Name").Value, dataTypeDefinitionId, dataTypeId));
+                    LogHelper.Warn<PackagingService>(
+                        string.Format("Packager: Error handling creation of PropertyType '{0}'. Could not find DataTypeDefintion with unique id '{1}' nor one referencing the DataType with a property editor alias (or legacy control id) '{2}'. Did the package creator forget to package up custom datatypes?",
+                                      property.Element("Name").Value,
+                                      dataTypeDefinitionId,
+                                      property.Element("Type").Value.Trim()));
                     continue;
                 }
 
@@ -891,7 +914,7 @@ namespace Umbraco.Core.Services
                 var genericProperty = new XElement("GenericProperty",
                                                    new XElement("Name", propertyType.Name),
                                                    new XElement("Alias", propertyType.Alias),
-                                                   new XElement("Type", propertyType.DataTypeId.ToString()),
+                                                   new XElement("Type", propertyType.PropertyEditorAlias),
                                                    new XElement("Definition", definition.Key),
                                                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
