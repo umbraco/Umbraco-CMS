@@ -29,7 +29,7 @@ namespace umbraco.cms.presentation.developer
 
         }
 
-        protected MenuIconI SaveButton;
+        protected MenuButton SaveButton;
 
         private readonly List<string> _allowedExtensions = new List<string>();
         protected PlaceHolder buttons;
@@ -69,10 +69,21 @@ namespace umbraco.cms.presentation.developer
         {
             base.OnInit(e);
 
-            SaveButton = UmbracoPanel1.Menu.NewIcon();
-            SaveButton.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
-            SaveButton.AltText = "Save scripting File";
+            SaveButton = UmbracoPanel1.Menu.NewButton();
+           
+            SaveButton.ToolTip = "Save scripting File";
+            SaveButton.Text = ui.Text("save");
+            SaveButton.OnClientClick = "return false;";
             SaveButton.ID = "save";
+            SaveButton.ButtonType = MenuButtonType.Primary;
+
+
+            var code = UmbracoPanel1.NewTabPage("code");
+            code.Controls.Add(Pane1);
+
+            var props = UmbracoPanel1.NewTabPage("properties");
+            props.Controls.Add(Pane2);
+
 
             // Add source and filename
             String file = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + Request.QueryString["file"]);
@@ -107,7 +118,7 @@ namespace umbraco.cms.presentation.developer
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.UmbracoPanel UmbracoPanel1;
+        protected global::umbraco.uicontrols.TabView UmbracoPanel1;
 
         /// <summary>
         /// Pane1 control.
@@ -117,6 +128,7 @@ namespace umbraco.cms.presentation.developer
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::umbraco.uicontrols.Pane Pane1;
+        protected global::umbraco.uicontrols.Pane Pane2;
 
         /// <summary>
         /// pp_filename control.

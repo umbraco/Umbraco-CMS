@@ -46,9 +46,7 @@
 
         submitSucces: function(t) {
             if (t != 'true') {
-                top.UmbSpeechBubble.ShowMessage('error', 'Saving scripting file failed', '');
-                jQuery('#errorDiv').html('<p><a href="#" style="position: absolute; right: 10px; top: 10px;" onclick=\'closeErrorDiv()\'>Hide Errors</a><strong>Error occured</strong></p><p>' + t + '</p>');
-                jQuery('#errorDiv').slideDown('fast');
+                top.UmbSpeechBubble.ShowMessage('error', 'Saving scripting file failed', t);
             }
             else {
                 top.UmbSpeechBubble.ShowMessage('save', 'Scripting file saved', '');
