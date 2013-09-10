@@ -30,7 +30,7 @@ namespace Umbraco.Web.Trees
                                                               .ToArray();
 
             //find the one we're looking for
-            var foundControllerTree = controllerTrees.FirstOrDefault(x => x.GetFullNameWithAssembly() == appTree.Type);
+            var foundControllerTree = controllerTrees.FirstOrDefault(x => x == appTree.GetRuntimeType());
             if (foundControllerTree == null)
             {
                 return new Attempt<Type>(new InstanceNotFoundException("Could not find tree of type " + appTree.Type + " in any loaded DLLs"));
