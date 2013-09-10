@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
+using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic.Actions;
 
 namespace Umbraco.Web.Editors
@@ -86,7 +87,7 @@ namespace Umbraco.Web.Editors
                 permissionToCheck,
                 contentToCheck) == false)
             {
-                actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized);
+                actionContext.Response = actionContext.Request.CreateUserNoAccessResponse();
                 return;
             }
         }

@@ -12,6 +12,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors
 {
@@ -113,7 +114,7 @@ namespace Umbraco.Web.Editors
             if (actionContext.ModelState.IsValid == false)
             {
                 //if it is not valid, do not continue and return the model state
-                actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.Forbidden, actionContext.ModelState);
+                actionContext.Response = actionContext.Request.CreateValidationErrorResponse(actionContext.ModelState);
                 return;
             }
 

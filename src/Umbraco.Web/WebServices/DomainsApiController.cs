@@ -7,6 +7,7 @@ using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Web.WebApi;
 //using umbraco.cms.businesslogic.language;
+using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Web.WebServices
@@ -30,7 +31,7 @@ namespace Umbraco.Web.WebServices
                     ReasonPhrase = "Node Not Found."
                 });
 
-            if (!UmbracoUser.GetPermissions(node.Path).Contains(global::umbraco.BusinessLogic.Actions.ActionAssignDomain.Instance.Letter))
+            if (UmbracoUser.GetPermissions(node.Path).Contains(ActionAssignDomain.Instance.Letter) == false)
                 throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Unauthorized)
                     {
                         Content = new StringContent("You do not have permission to assign domains on that node."),

@@ -74,8 +74,8 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
          * @function
          *
          * @description
-         * A function to handle the validation (modelState) errors collection which will happen on a 403 error indicating validation errors
-         *  It's worth noting that when a 403 occurs, the data is still saved just never published, though this depends on if the entity is a new
+         * A function to handle the validation (modelState) errors collection which will happen on a 400 error indicating validation errors
+         *  It's worth noting that when a 400 occurs, the data is still saved just never published, though this depends on if the entity is a new
          *  entity and whether or not the data fulfils the absolute basic requirements like having a mandatory Name.
          */
         handleValidationErrors: function (allProps, modelState) {
@@ -131,7 +131,7 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
          * A function to handle what happens when we have validation issues from the server side
          */
         handleSaveError: function (args) {
-            
+             
             if (!args.err) {
                 throw "args.err cannot be null";
             }
@@ -139,10 +139,10 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
                 throw "args.allNewProps must be a valid array";
             }
             
-            //When the status is a 403 status, we have validation errors.
+            //When the status is a 400 status with a custom header: X-Status-Reason: Validation failed, we have validation errors.
             //Otherwise the error is probably due to invalid data (i.e. someone mucking around with the ids or something).
             //Or, some strange server error
-            if (args.err.status === 403) {
+            if (args.err.status === 400) {
                 //now we need to look through all the validation errors
                 if (args.err.data && (args.err.data.ModelState)) {
                     

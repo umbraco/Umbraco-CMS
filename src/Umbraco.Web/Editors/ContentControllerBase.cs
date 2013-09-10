@@ -11,6 +11,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
@@ -122,7 +123,7 @@ namespace Umbraco.Web.Editors
             if (!ModelState.IsValid)
             {
                 display.Errors = ModelState.ToErrorDictionary();
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Forbidden, display));
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(display));
             }
         }
 

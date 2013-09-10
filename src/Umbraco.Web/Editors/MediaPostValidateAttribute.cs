@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
@@ -8,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors
 {
@@ -60,7 +62,7 @@ namespace Umbraco.Web.Editors
                 case ContentSaveAction.PublishNew:
                 default:
                     //we don't support this for media
-                    actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized);
+                    actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.NotFound);
                     return;
             }
 
@@ -71,8 +73,7 @@ namespace Umbraco.Web.Editors
                 contentToCheck.Id,
                 contentToCheck) == false)
             {
-                actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized);
-                return;
+                throw new HttpResponseException(actionContext.Request.CreateUserNoAccessResponse());
             }
         }
     }
