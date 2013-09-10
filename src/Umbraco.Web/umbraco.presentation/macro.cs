@@ -239,13 +239,11 @@ namespace umbraco
                 OnMacroRendering(this, e);
         }
 
-
         public Control renderMacro(Hashtable pageElements, int pageId)
         {
             // Event to allow manipulation of Macro Model
             var rea = new EventArgs();
             FireOnMacroRendering(rea);
-
 
             var macroInfo = (Model.MacroType == MacroTypes.Script && Model.Name.IsNullOrWhiteSpace())
                                 ? string.Format("Render Inline Macro, Cache: {0})", Model.CacheDuration)
