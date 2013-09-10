@@ -140,8 +140,8 @@ namespace Umbraco.Tests.PublishedContent
 					Properties = new Collection<IPublishedContentProperty>(
 						new List<IPublishedContentProperty>()
 							{
-								new PropertyResult("property1", "value" + indexVals, Guid.NewGuid(), PropertyResultType.UserProperty),
-								new PropertyResult("property2", "value" + (indexVals + 1), Guid.NewGuid(), PropertyResultType.UserProperty)
+								new PropertyResult("property1", "value" + indexVals, PropertyResultType.UserProperty),
+								new PropertyResult("property2", "value" + (indexVals + 1), PropertyResultType.UserProperty)
 							}),
 					Children = new List<IPublishedContent>()
 				};
@@ -157,11 +157,11 @@ namespace Umbraco.Tests.PublishedContent
 			if (!createChildren)
 			{
 				//create additional columns, used to test the different columns for child nodes
-				d.Properties.Add(new PropertyResult("property4", "value" + (indexVals + 2), Guid.NewGuid(), PropertyResultType.UserProperty));
+				d.Properties.Add(new PropertyResult("property4", "value" + (indexVals + 2), PropertyResultType.UserProperty));
 			}
 			else
 			{
-				d.Properties.Add(new PropertyResult("property3", "value" + (indexVals + 2), Guid.NewGuid(), PropertyResultType.UserProperty));
+				d.Properties.Add(new PropertyResult("property3", "value" + (indexVals + 2), PropertyResultType.UserProperty));
 			}
 			return d;
 		}

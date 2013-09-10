@@ -13,17 +13,15 @@ namespace Umbraco.Core.Dynamics
 
     		Alias = source.Alias;
 			Value = source.Value;
-			Version = source.Version;
 			PropertyType = type;
         }
-		internal PropertyResult(string alias, object value, Guid version, PropertyResultType type)
+		internal PropertyResult(string alias, object value, PropertyResultType type)
         {
         	if (alias == null) throw new ArgumentNullException("alias");
         	if (value == null) throw new ArgumentNullException("value");
 
         	Alias = alias;
 			Value = value;
-            Version = version;
         	PropertyType = type;
         }
 
@@ -43,9 +41,6 @@ namespace Umbraco.Core.Dynamics
 				return Value == null ? "" : Convert.ToString(Value);
 			}
 		}
-
-    	public Guid Version { get; private set; }
-
 
 		/// <summary>
 		/// The Id of the document for which this property belongs to

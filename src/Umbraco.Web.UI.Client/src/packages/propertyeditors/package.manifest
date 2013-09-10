@@ -7,7 +7,7 @@
 				view: "~/App_Plugins/propertyeditors/mntp/mntp.html"
 			},
 
-			preValueEditor: {
+			prevalues: {
 							fields: [
 								{
 									label: "Multipicker",

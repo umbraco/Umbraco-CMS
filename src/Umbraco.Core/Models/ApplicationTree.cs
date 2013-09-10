@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace Umbraco.Core.Models
 {
@@ -81,6 +82,18 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <value>The type.</value>
         public string Type { get; set; }
+
+        private Type _runtimeType;
+
+        /// <summary>
+        /// Returns the CLR type based on it's assembly name stored in the config
+        /// </summary>
+        /// <returns></returns>
+        public Type GetRuntimeType()
+        {
+            return _runtimeType ?? (_runtimeType = System.Type.GetType(Type));
+        }
+            
 
     }
 }

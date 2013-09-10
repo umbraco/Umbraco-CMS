@@ -141,7 +141,7 @@ namespace umbraco.MacroEngines
                             }
                             Values.Add(result.Current.Name, value);
                             propertyExists = true;
-                            return new PropertyResult(alias, value, Guid.Empty);
+                            return new PropertyResult(alias, value);
                         }
                     }
                 }
@@ -376,7 +376,7 @@ namespace umbraco.MacroEngines
                 return Values
                     .Where(kvp => !internalProperties.Contains(kvp.Key))
                     .ToList()
-                    .ConvertAll(kvp => new PropertyResult(kvp.Key, kvp.Value, Guid.Empty))
+                    .ConvertAll(kvp => new PropertyResult(kvp.Key, kvp.Value))
                     .Cast<IProperty>()
                     .ToList();
             }
@@ -473,7 +473,7 @@ namespace umbraco.MacroEngines
                 || Values.TryGetValue(alias, out value))
             {
                 propertyExists = true;
-                return new PropertyResult(alias, value, Guid.Empty);
+                return new PropertyResult(alias, value);
             }
 
             propertyExists = false;

@@ -8,17 +8,12 @@
 			},
 			editor: {
 				view: "~/App_Plugins/MyPackage/PropertyEditors/Views/RegexEditor.html",
-				validation: [
-					{
-						type: "Required" 
-					},
-					{
-						type: "Regex",
-						config: "^\\d*$"
-					}
-				]
+				validation: {
+					required : true,
+					regex : "^\\d*$"					
+				}
 			},
-			preValueEditor: {
+			prevalues: {
 				fields: [
 					{
 						label: "Regular expression",
@@ -39,31 +34,19 @@
 			name: "CSV Editor",
 			editor: {
 				view: "~/App_Plugins/MyPackage/PropertyEditors/Views/CsvEditor.html",
-				validation: [
-					{
-						type: "Delimited",
-						config: {
-							delimiter: ",",
-							pattern: "^[a-zA-Z]*$"
-						}
-					},
-				]				
+				validation: {
+					delimited : {
+						delimiter: ",",
+						pattern: "^[a-zA-Z]*$"
+					}
+				}				
 			}
-		},
-		{
-			id: "48B0DA8C-3492-4693-96DB-5C5099C680F3",
-			name: "Custom editor",
-			editor: {
-				view: "~/App_Plugins/MyPackage/PropertyEditors/Views/CustomJson.html"				
-			}
-		}
+		}		
 	],    
     javascript: [
         '~/App_Plugins/MyPackage/Common/Js/MyPackage.js',
 		'~/App_Plugins/MyPackage/PropertyEditors/Js/CsvEditor.js',
 		'~/App_Plugins/MyPackage/PropertyEditors/Js/PostcodeEditor.js',
 		'~/App_Plugins/MyPackage/PropertyEditors/Js/RegexEditor.js'
-		/*
-		'~/App_Plugins/MyPackage/PropertyEditors/Js/CustomJsonEditor.js'*/
     ]
 }

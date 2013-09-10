@@ -6,7 +6,7 @@
 			editor: {
 				view: "~/App_Plugins/MarkDownEditor/markdowneditor.html"
 			},
-			preValueEditor: {
+			prevalues: {
 							fields: [
 								{
 									label: "Preview",

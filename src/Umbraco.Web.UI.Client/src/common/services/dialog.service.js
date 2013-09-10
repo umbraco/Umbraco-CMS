@@ -34,26 +34,16 @@ angular.module('umbraco.services')
        var dialogs = [];
        
        /** Internal method that removes all dialogs */
-       function removeAllDialogs(args) {
+       function removeAllDialogs() {
            for (var i = 0; i < dialogs.length; i++) {
                var dialog = dialogs[i];
-               removeDialog(dialog, args);
+               removeDialog(dialog);
                dialogs.splice(i, 1);
            }
        }
 
        /** Internal method that handles closing a specific dialog */
-       function removeDialog(dialog, args) {
-
-           //if there's arguments passed in then check if there's a callback registered in the current modal then call it.
-           //this occurs when the "closeDialogs" event is triggered with arguments.
-
-           /* PP: I've commented this out again, because I dont believe a modal should
-            submit data on exit, only on submit 
-           if (args && dialog.data("modalCb") != null && angular.isFunction(dialog.data("modalCb"))) {
-               var cb = dialog.data("modalCb");
-               cb.apply(dialog, [args]);
-           }*/
+       function removeDialog(dialog) {
 
            dialog.modal("hide");
 
@@ -123,10 +113,7 @@ angular.module('umbraco.services')
                if (options.show) {
                    $modal.modal('show');
                }
-
-               //store the callback in the modal jquery data
-               $modal.data("modalCb", callback);
-
+               
                return $modal;
            }
            else {
@@ -144,10 +131,7 @@ angular.module('umbraco.services')
 
                        //append to body or other container element	
                        container.append($modal);
-
-                       //store the callback in the modal jquery data
-                       $modal.data("modalCb", callback);
-
+                       
                        // Compile modal content
                        $timeout(function() {
                            $compile($modal)(scope);
@@ -223,7 +207,7 @@ angular.module('umbraco.services')
 
        /** Handles the closeDialogs event */
        $rootScope.$on("closeDialogs", function (evt, args) {
-           removeAllDialogs(args);
+           removeAllDialogs();
        });
 
        return {
@@ -260,10 +244,9 @@ angular.module('umbraco.services')
             * @description
             * Closes a specific dialog
             * @param {Object} dialog the dialog object to close
-            * @param {Object} args if specified this object will be sent to any callbacks registered on the dialogs.
             */
-           close: function (dialog, args) {
-               removeDialog(dialog, args);
+           close: function (dialog) {
+               removeDialog(dialog);
            },
            
            /**
@@ -273,10 +256,9 @@ angular.module('umbraco.services')
             *
             * @description
             * Closes all dialogs
-            * @param {Object} args if specified this object will be sent to any callbacks registered on the dialogs.
             */
-           closeAll: function(args) {
-               removeAllDialogs(args);
+           closeAll: function() {
+               removeAllDialogs();
            },
 
            /**

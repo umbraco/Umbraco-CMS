@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Core.Serialization
 {
+
     internal abstract class JsonCreationConverter<T> : JsonConverter
     {
         /// <summary>
