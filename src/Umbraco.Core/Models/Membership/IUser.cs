@@ -19,7 +19,14 @@ namespace Umbraco.Core.Models.Membership
         
         bool NoConsole { get; set; }
         IUserType UserType { get; }
-        string DefaultPermissions { get; set; }
+
+        /// <summary>
+        /// The default permissions for the user
+        /// </summary>
+        /// <remarks>
+        /// The default permissions are assigned to the user object based on the user type's default permissions
+        /// </remarks> 
+        string DefaultPermissions { get; }
     }
 
     internal interface IUserProfile : IProfile

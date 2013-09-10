@@ -9,6 +9,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
@@ -55,6 +56,17 @@ namespace Umbraco.Core.Services
 	        _uowProvider = provider;
 	        _publishingStrategy = publishingStrategy;
             _repositoryFactory = repositoryFactory;
+        }
+
+        //TODO: There are various ways to expose permission setting on this service, we just need to list out the different ways we'll need to 
+        // be able to acheive this for the core, for now this is here so I can run a unit test.
+        internal void AssignContentPermissions(IContent entity, char permission, IEnumerable<object> userIds)
+        {            
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                repository.AssignEntityPermissions(entity, permission, userIds);
+            }
         }
 
         /// <summary>

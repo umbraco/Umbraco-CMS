@@ -12,12 +12,13 @@
             AssignedPermissions = assignedPermissions;
         }
 
-        public object UserId { get; set; }
-        public int EntityId { get; set; }
+        public object UserId { get; private set; }
+        public int EntityId { get; private set; }
 
         /// <summary>
         /// The assigned permissions for the user/entity combo
         /// </summary>
-        public string[] AssignedPermissions { get; set; }
+        public string[] AssignedPermissions { get; private set; }
     }
+
 }

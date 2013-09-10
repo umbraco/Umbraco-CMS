@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             unitOfWork.Commit();
 
             // Act
-            repository.AssignEntityPermissions(parentPage, "A", new object[] {0});
+            repository.AssignEntityPermissions(parentPage, 'A', new object[] {0});
             var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
             repository.AddOrUpdate(childPage);
             unitOfWork.Commit();

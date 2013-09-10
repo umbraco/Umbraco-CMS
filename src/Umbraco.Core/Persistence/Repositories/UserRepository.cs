@@ -223,6 +223,12 @@ namespace Umbraco.Core.Persistence.Repositories
             return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql));
         }
 
+        /// <summary>
+        /// Returns permissions for a given user for any number of nodes
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="entityIds"></param>
+        /// <returns></returns>        
         public IEnumerable<EntityPermission> GetUserPermissionsForEntities(object userId, params int[] entityIds)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork);

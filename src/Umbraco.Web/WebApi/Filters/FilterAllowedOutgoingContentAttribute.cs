@@ -34,6 +34,7 @@ namespace Umbraco.Web.WebApi.Filters
         public FilterAllowedOutgoingContentAttribute(Type outgoingType, string propertyName)
             : base(outgoingType, propertyName)
         {
+            _permissionToCheck = ActionBrowse.Instance.Letter;
         }
 
         protected override void FilterItems(IUser user, IList items)
@@ -57,9 +58,12 @@ namespace Umbraco.Web.WebApi.Filters
             foreach(dynamic item in items)
             {
                 var nodePermission = permissions.Where(x => x.EntityId == item.Id).ToArray();
-                //if there are no permissions for this id, then remove the item
+                //if there are no permissions for this id then we need to check what the user's default
+                // permissions are.
                 if (nodePermission.Any() == false)
                 {
+                    //var defaultP = user.DefaultPermissions
+
                     toRemove.Add(item);                    
                 }
                 else

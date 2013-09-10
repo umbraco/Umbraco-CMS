@@ -234,6 +234,7 @@
     <Compile Include="Configurations\UmbracoSettings\ViewstateMoverModuleElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementTests.cs" />
     <Compile Include="Controllers\WebApiEditors\ContentControllerUnitTests.cs" />
+    <Compile Include="Controllers\WebApiEditors\FilterAllowedOutgoingContentAttributeTests.cs" />
     <Compile Include="Controllers\WebApiEditors\MediaControllerUnitTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
     <Compile Include="Integration\CreateContent.cs" />
