@@ -231,20 +231,20 @@ namespace umbraco
             return renderMacro(pageElements, pageId);
         }
 
-        public delegate void RenderEventHandler(MacroModel sender, RenderEventArgs e);
-        public new static event RenderEventHandler BeforeRender;
-        protected virtual void FireBeforeRender(RenderEventArgs e)
+        public delegate void OnMacroRenderingEventHandler(macro sender, EventArgs e);
+        public static event OnMacroRenderingEventHandler OnMacroRendering;
+        protected void FireOnMacroRendering(EventArgs e)
         {
-            if (BeforeRender != null)
-                BeforeRender(Model, e);
+            if (OnMacroRendering != null)
+                OnMacroRendering(this, e);
         }
 
 
         public Control renderMacro(Hashtable pageElements, int pageId)
         {
             // Event to allow manipulation of Macro Model
-            var rea = new RenderEventArgs();
-            FireBeforeRender(rea);
+            var rea = new EventArgs();
+            FireOnMacroRendering(rea);
 
 
             var macroInfo = (Model.MacroType == MacroTypes.Script && Model.Name.IsNullOrWhiteSpace())
@@ -1966,6 +1966,6 @@ namespace umbraco
 
         #endregion
     }
-    public class RenderEventArgs : System.ComponentModel.CancelEventArgs { }
+    public class MacroRenderingEventArgs : System.EventArgs { }
 
 }
