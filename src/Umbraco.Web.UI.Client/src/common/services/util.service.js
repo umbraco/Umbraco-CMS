@@ -258,26 +258,26 @@ angular.module('umbraco.services').factory('umbDataFormatter', umbDataFormatter)
 function iconHelper() {
 
     var converter = [
-        { oldIcon: ".sprNew", newIcon: "plus" },
+        { oldIcon: ".sprNew", newIcon: "add" },
         { oldIcon: ".sprDelete", newIcon: "remove" },
-        { oldIcon: ".sprMove", newIcon: "move" },
-        { oldIcon: ".sprCopy", newIcon: "copy" },
-        { oldIcon: ".sprSort", newIcon: "sort" },
+        { oldIcon: ".sprMove", newIcon: "enter" },
+        { oldIcon: ".sprCopy", newIcon: "documents" },
+        { oldIcon: ".sprSort", newIcon: "navigation-vertical" },
         { oldIcon: ".sprPublish", newIcon: "globe" },
         { oldIcon: ".sprRollback", newIcon: "undo" },
         { oldIcon: ".sprProtect", newIcon: "lock" },
         { oldIcon: ".sprAudit", newIcon: "time" },
         { oldIcon: ".sprNotify", newIcon: "envelope" },
         { oldIcon: ".sprDomain", newIcon: "home" },
-        { oldIcon: ".sprPermission", newIcon: "group" },
+        { oldIcon: ".sprPermission", newIcon: "lock" },
         { oldIcon: ".sprRefresh", newIcon: "refresh" },
         { oldIcon: ".sprBinEmpty", newIcon: "trash" },
         { oldIcon: ".sprExportDocumentType", newIcon: "download-alt" },
-        { oldIcon: ".sprImportDocumentType", newIcon: "upload-alt" },
+        { oldIcon: ".sprImportDocumentType", newIcon: "page-up" },
         { oldIcon: ".sprLiveEdit", newIcon: "edit" },
-        { oldIcon: ".sprCreateFolder", newIcon: "plus-sign-alt" },
-        { oldIcon: ".sprPackage2", newIcon: "gift" },
-        { oldIcon: ".sprLogout", newIcon: "signout" },
+        { oldIcon: ".sprCreateFolder", newIcon: "add" },
+        { oldIcon: ".sprPackage2", newIcon: "box" },
+        { oldIcon: ".sprLogout", newIcon: "logout" },
         { oldIcon: ".sprSave", newIcon: "save" },
         { oldIcon: ".sprSendToTranslate", newIcon: "envelope-alt" },
         { oldIcon: ".sprToPublish", newIcon: "mail-forward" },
@@ -285,27 +285,28 @@ function iconHelper() {
         { oldIcon: ".sprUpdate", newIcon: "save" },
         
         { oldIcon: ".sprTreeSettingDomain", newIcon: "icon-home" },
-        { oldIcon: ".sprTreeDoc", newIcon: "icon-file-alt" },
-        { oldIcon: ".sprTreeDoc2", newIcon: "icon-file" },
-        { oldIcon: ".sprTreeDoc3", newIcon: "icon-file-text" },
-        { oldIcon: ".sprTreeDoc4", newIcon: "icon-file-text-alt" },
-        { oldIcon: ".sprTreeDoc5", newIcon: "icon-book" },        
+        { oldIcon: ".sprTreeDoc", newIcon: "icon-document" },
+        { oldIcon: ".sprTreeDoc2", newIcon: "icon-diploma-alt" },
+        { oldIcon: ".sprTreeDoc3", newIcon: "icon-notepad" },
+        { oldIcon: ".sprTreeDoc4", newIcon: "icon-newspaper-alt" },
+        { oldIcon: ".sprTreeDoc5", newIcon: "icon-notepad-alt" },
+
         { oldIcon: ".sprTreeDocPic", newIcon: "icon-picture" },        
         { oldIcon: ".sprTreeFolder", newIcon: "icon-folder" },
-        { oldIcon: ".sprTreeFolder_o", newIcon: "icon-folder-open" },
+        { oldIcon: ".sprTreeFolder_o", newIcon: "icon-folder" },
         { oldIcon: ".sprTreeMediaFile", newIcon: "icon-music" },
         { oldIcon: ".sprTreeMediaMovie", newIcon: "icon-movie" },
         { oldIcon: ".sprTreeMediaPhoto", newIcon: "icon-picture" },
         
-        { oldIcon: ".sprTreeMember", newIcon: "icon-mail" },
-        { oldIcon: ".sprTreeMemberGroup", newIcon: "icon-group" },
-        { oldIcon: ".sprTreeMemberType", newIcon: "icon-group" },
+        { oldIcon: ".sprTreeMember", newIcon: "icon-user" },
+        { oldIcon: ".sprTreeMemberGroup", newIcon: "icon-users" },
+        { oldIcon: ".sprTreeMemberType", newIcon: "icon-users" },
         
         { oldIcon: ".sprTreeNewsletter", newIcon: "icon-file-text-alt" },
-        { oldIcon: ".sprTreePackage", newIcon: "icon-dropbox" },
-        { oldIcon: ".sprTreeRepository", newIcon: "icon-github" },
+        { oldIcon: ".sprTreePackage", newIcon: "icon-box" },
+        { oldIcon: ".sprTreeRepository", newIcon: "icon-server-alt" },
         
-        { oldIcon: ".sprTreeSettingDataType", newIcon: "icon-tasks" },
+        { oldIcon: ".sprTreeSettingDataType", newIcon: "icon-autofill" },
 
         //TODO:
         /*
@@ -330,8 +331,7 @@ function iconHelper() {
         { oldIcon: ".sprTreeDeveloperCacheTypes", newIcon: "icon-box" },
         { oldIcon: ".sprTreeDeveloperMacro", newIcon: "icon-cogs" },
         { oldIcon: ".sprTreeDeveloperRegistry", newIcon: "icon-windows" },
-        { oldIcon: ".sprTreeDeveloperPython", newIcon: "icon-linux" },
-        { oldIcon: "images/tray/contour.png", newIcon: "icon-umb-contour" }
+        { oldIcon: ".sprTreeDeveloperPython", newIcon: "icon-linux" }
     ];
 
     var imageConverter = [
