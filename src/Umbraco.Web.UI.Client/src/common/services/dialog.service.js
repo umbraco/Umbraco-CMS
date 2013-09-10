@@ -8,7 +8,7 @@
  * @requires $log
  * @requires $q
  * @requires $templateCache
- *	
+ *  
  * @description
  * Application-wide service for handling modals, overlays and dialogs
  * By default it injects the passed template url into a div to body of the document
@@ -20,11 +20,11 @@
  * sure the umbraco.services module is accesible - which it should be by default.
  *
  * <pre>
- *		var dialog = dialogService.open({template: 'path/to/page.html', show: true, callback: done});
- *		functon done(data){
- *			//The dialog has been submitted	
+ *    var dialog = dialogService.open({template: 'path/to/page.html', show: true, callback: done});
+ *    functon done(data){
+ *      //The dialog has been submitted 
  *      //data contains whatever the dialog has selected / attached
- *		}			
+ *    }     
  * </pre> 
  */
 
@@ -34,180 +34,193 @@ angular.module('umbraco.services')
        var dialogs = [];
        
        /** Internal method that removes all dialogs */
-       function removeAllDialogs() {
+       function removeAllDialogs(args) {
            for (var i = 0; i < dialogs.length; i++) {
                var dialog = dialogs[i];
-               removeDialog(dialog);
+               dialog.scope.close(args);
+
+               //removeDialog(dialog, args);
                dialogs.splice(i, 1);
            }
-       }
-
-       /** Internal method that handles closing a specific dialog */
-       function removeDialog(dialog) {
-
-           dialog.modal("hide");
-
-           $timeout(function () {
-               dialog.remove();
-           }, 250);
        }
 
        /** Internal method that handles opening all dialogs */
        function openDialog(options) {
 
-     
-           if (!options) {
-               options = {};
-           }
-           //configation and defaults
-           var scope = options.scope || $rootScope.$new(),
-               container = options.container || $("body"),
-               animationClass = options.animation || "fade",
-               modalClass = options.modalClass || "umb-modal",
-               width = options.width || "100%",
-               templateUrl = options.template || "views/common/notfound.html";
-
-           //if a callback is available
-           var callback = options.callback;
+           var defaults = {
+              container: $("body"),
+              animation: "fade",
+              modalClass: "umb-modal",
+              width: "100%",
+              inline: false,
+              iframe: false,
+              show: true,
+              template: "views/common/notfound.html",
+              callback: undefined,
+              closeCallback: undefined,
+              element: undefined
+           };
+           
+           var dialog = angular.extend(defaults, options);
+           var scope = options.scope || $rootScope.$new();
+           delete dialog.scope;
 
            //Modal dom obj and unique id
-           var $modal = $('<div ng-swipe-left="hide()" ng-swipe-right="hide()"  data-backdrop="false"></div>');
-           var id = templateUrl.replace('.html', '').replace('.aspx', '').replace(/[\/|\.|:\&\?\=]/g, "-") + '-' + scope.$id;
+           dialog.element = $('<div ng-swipe-left="hide()" ng-swipe-right="hide()"  data-backdrop="false"></div>');
+           var id = dialog.template.replace('.html', '').replace('.aspx', '').replace(/[\/|\.|:\&\?\=]/g, "-") + '-' + scope.$id;
            
           if(options.inline){
-              animationClass = "";
-              modalClass = "";
+              dialog.animation = "";
+              dialog.modalClass = "";
           }else{
-                $modal.addClass("modal");
-                $modal.addClass("hide");
+                dialog.element.addClass("modal");
+                dialog.element.addClass("hide");
           }
-
            //set the id and add classes
-           $modal
+           dialog.element
                .attr('id', id)
-               .addClass(animationClass)
-               .addClass(modalClass);
+               .addClass(dialog.animation)
+               .addClass(dialog.modalClass);
 
            //push the modal into the global modal collection
            //we halt the .push because a link click will trigger a closeAll right away
            $timeout(function () {
-               dialogs.push($modal);
-           }, 250);
+               dialogs.push(dialog);
+           }, 500);
            
-           //if iframe is enabled, inject that instead of a template
-           if (options.iframe) {
-               var html = $("<iframe auto-scale='0' src='" + templateUrl + "' style='width: 100%; height: 100%;'></iframe>");
 
-               $modal.html(html);
+           //basic events for submitting and closing
+           scope.submit = function(data) {
+               if (dialog.callback) {
+                   dialog.callback(data);
+               }
+
+               dialog.element.modal('hide');
+               dialog.element.remove();
+               $("#" + dialog.element.attr("id")).remove();
+           };
+
+           scope.close = function(data) {
+               if (dialog.closeCallback) {
+                   dialog.closeCallback(data);
+               }
+
+               dialog.element.modal('hide');
+               dialog.element.remove();
+               $("#" + dialog.element.attr("id")).remove();
+           };
+
+           //if iframe is enabled, inject that instead of a template
+           if (dialog.iframe) {
+               var html = $("<iframe auto-scale='0' src='" + dialog.template + "' style='width: 100%; height: 100%;'></iframe>");
+               dialog.element.html(html);
+  
                //append to body or whatever element is passed in as options.containerElement
-               container.append($modal);
+               dialog.container.append(dialog.element);
 
                // Compile modal content
                $timeout(function () {
-                   $compile($modal)(scope);
+                   $compile(dialog.element)(dialog.scope);
                });
 
-               $modal.css("width", width);
+               dialog.element.css("width", dialog.width);
 
-               //Autoshow	
-               if (options.show) {
-                   $modal.modal('show');
+               //Autoshow 
+               if (dialog.show) {
+                   dialog.element.modal('show');
                }
-               
-               return $modal;
+
+               //store the callback in the modal jquery data
+               //dialog.element.data("modalCb", dialog.callback);
+               dialog.scope = scope;
+               return dialog;
            }
            else {
                
-               //We need to load the template with an httpget and once it's loaded we'll compile and assign the result to the container
-               // object. However since the result could be a promise or just data we need to use a $q.when. We still need to return the 
-               // $modal object so we'll actually return the modal object synchronously without waiting for the promise. Otherwise this openDialog
-               // method will always need to return a promise which gets nasty because of promises in promises plus the result just needs a reference
-               // to the $modal object which will not change (only it's contents will change).
-               $q.when($templateCache.get(templateUrl) || $http.get(templateUrl, { cache: true }).then(function(res) { return res.data; }))
-                   .then(function onSuccess(template) {
+             //We need to load the template with an httpget and once it's loaded we'll compile and assign the result to the container
+             // object. However since the result could be a promise or just data we need to use a $q.when. We still need to return the 
+             // $modal object so we'll actually return the modal object synchronously without waiting for the promise. Otherwise this openDialog
+             // method will always need to return a promise which gets nasty because of promises in promises plus the result just needs a reference
+             // to the $modal object which will not change (only it's contents will change).
+             $q.when($templateCache.get(dialog.template) || $http.get(dialog.template, { cache: true }).then(function(res) { return res.data; }))
+                 .then(function onSuccess(template) {
 
-                       // Build modal object
-                       $modal.html(template);
+                     // Build modal object
+                     dialog.element.html(template);
 
-                       //append to body or other container element	
-                       container.append($modal);
-                       
-                       // Compile modal content
-                       $timeout(function() {
-                           $compile($modal)(scope);
-                       });
+                     //append to body or other container element  
+                     dialog.container.append(dialog.element);
 
-                       scope.dialogOptions = options;
+                     //store the callback in the modal jquery data
+                     dialog.element.data("modalCb", dialog.callback);
 
-                       //Scope to handle data from the modal form
-                       scope.dialogData = {};
-                       scope.dialogData.selection = [];
+                     // Compile modal content
+                     $timeout(function() {
+                         $compile(dialog.element)(scope);
+                     });
 
-                       // Provide scope display functions
-                       //this passes the modal to the current scope
-                       scope.$modal = function(name) {
-                           $modal.modal(name);
-                       };
+                     scope.dialogOptions = dialog;
+                     
+                     //Scope to handle data from the modal form
+                     scope.dialogData = {};
+                     scope.dialogData.selection = [];
 
-                       scope.hide = function() {
-                           $modal.modal('hide');
+                     // Provide scope display functions
+                     //this passes the modal to the current scope
+                     scope.$modal = function(name) {
+                         dialog.element.modal(name);
+                     };
 
-                           $modal.remove();
-                           $("#" + $modal.attr("id")).remove();
-                       };
+                     scope.hide = function() {
+                         dialog.element.modal('hide');
 
-                       scope.show = function() {
-                           $modal.modal('show');
-                       };
+                         dialog.element.remove();
+                         $("#" + dialog.element.attr("id")).remove();
+                     };
 
-                       scope.submit = function(data) {
-                           if (callback) {
-                               callback(data);
-                           }
+                     scope.show = function() {
+                         dialog.element.modal('show');
+                     };
 
-                           $modal.modal('hide');
+                     scope.select = function(item) {
+                        var i = scope.dialogData.selection.indexOf(item);
+                         if (i < 0) {
+                             scope.dialogData.selection.push(item);
+                         }else{
+                            scope.dialogData.selection.splice(i, 1);
+                         }
+                     };
 
-                           $modal.remove();
-                           $("#" + $modal.attr("id")).remove();
-                       };
+                     scope.dismiss = scope.hide;
 
-                       scope.select = function(item) {
-                          var i = scope.dialogData.selection.indexOf(item);
-                           if (i < 0) {
-                               scope.dialogData.selection.push(item);
-                           }else{
-                              scope.dialogData.selection.splice(i, 1);
-                           }
-                       };
+                     // Emit modal events
+                     angular.forEach(['show', 'shown', 'hide', 'hidden'], function(name) {
+                         dialog.element.on(name, function(ev) {
+                             scope.$emit('modal-' + name, ev);
+                         });
+                     });
 
-                       scope.dismiss = scope.hide;
+                     // Support autofocus attribute
+                     dialog.element.on('shown', function(event) {
+                         $('input[autofocus]', dialog.element).first().trigger('focus');
+                     });
 
-                       // Emit modal events
-                       angular.forEach(['show', 'shown', 'hide', 'hidden'], function(name) {
-                           $modal.on(name, function(ev) {
-                               scope.$emit('modal-' + name, ev);
-                           });
-                       });
+                     //Autoshow 
+                     if (dialog.show) {
+                         dialog.element.modal('show');
+                     }
 
-                       // Support autofocus attribute
-                       $modal.on('shown', function(event) {
-                           $('input[autofocus]', $modal).first().trigger('focus');
-                       });
-
-                       //Autoshow	
-                       if (options.show) {
-                           $modal.modal('show');
-                       }
-                   });
+                     dialog.scope = scope;
+               });
                
                //Return the modal object outside of the promise!
-               return $modal;
+               return dialog;
            }
        }
 
        /** Handles the closeDialogs event */
        $rootScope.$on("closeDialogs", function (evt, args) {
-           removeAllDialogs();
+           removeAllDialogs(args);
        });
 
        return {
@@ -244,9 +257,12 @@ angular.module('umbraco.services')
             * @description
             * Closes a specific dialog
             * @param {Object} dialog the dialog object to close
+            * @param {Object} args if specified this object will be sent to any callbacks registered on the dialogs.
             */
-           close: function (dialog) {
-               removeDialog(dialog);
+           close: function (dialog, args) {
+               dialog.scope.close();
+
+               //removeDialog(dialog, args);
            },
            
            /**
@@ -256,9 +272,10 @@ angular.module('umbraco.services')
             *
             * @description
             * Closes all dialogs
+            * @param {Object} args if specified this object will be sent to any callbacks registered on the dialogs.
             */
-           closeAll: function() {
-               removeAllDialogs();
+           closeAll: function(args) {
+               removeAllDialogs(args);
            },
 
            /**

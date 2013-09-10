@@ -3,8 +3,8 @@
 
 //TEST to mock iframe, this intercepts calls directly
 //to the old iframe, and funnels requests to angular directly
-var right = {document: {location: {}}};
-Object.defineProperty(right.document.location, "href", {
+//var right = {document: {location: {}}};
+/*Object.defineProperty(right.document.location, "href", {
     get: function() {
         return this._href ? this._href : "";
     },
@@ -12,7 +12,7 @@ Object.defineProperty(right.document.location, "href", {
         this._href = value;
         UmbClientMgr.contentFrame(value);
     },
-});
+});*/
 
 Umbraco.Sys.registerNamespace("Umbraco.Application");
 
@@ -191,7 +191,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 });
 
                 //add the callback to the jquery data for the modal so we can call it on close to support the legacy way dialogs worked.
-                dialog.data("modalCb", onCloseCallback);
+                dialog.element.data("modalCb", onCloseCallback);
                 //add the close triggers
                 for (var i = 0; i < closeTriggers.length; i++) {
                     var e = dialog.find(closeTriggers[i]);
@@ -201,10 +201,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                         });
                     }
                 }
-                
 
                 this._modal.push(dialog);
-
                 return dialog;
             },
             closeModalWindow: function(rVal) {
@@ -221,12 +219,14 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
 
                     //if we've stored a callback on this modal call it before we close.
                     var self = this;
-                    var onCloseCallback = lastModal.data("modalCb");
+                    //get the compat callback from the modal element
+                    var onCloseCallback = lastModal.element.data("modalCb");
                     if (typeof onCloseCallback == "function") {
                         onCloseCallback.apply(self, [{ outVal: rVal }]);
                     }
 
-                    dialogService.close(lastModal);
+                    //just call the native dialog close() method to remove the dialog
+                    lastModal.scope.close();
                 }
                 else {
                     dialogService.closeAll(rVal);
