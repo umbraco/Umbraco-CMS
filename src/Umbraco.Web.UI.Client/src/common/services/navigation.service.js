@@ -19,10 +19,10 @@
 angular.module('umbraco.services')
 .factory('navigationService', function ($rootScope, $routeParams, $log, $location, $q, $timeout, dialogService, treeService, notificationsService) {
 
+
     //TODO: would be nicer to set all of the options here first instead of implicitly below!
     var ui = {};
-    $rootScope.$on("closeDialogs", function(){
-    });
+    $rootScope.$on("closeDialogs", function(){});
 
     function setMode(mode) {
         switch (mode) {
@@ -130,7 +130,7 @@ angular.module('umbraco.services')
          * Sets a service variable as soon as the user hovers the navigation with the mouse
          * used by the leaveTree method to delay hiding
          */
-        enterTree: function () {
+        enterTree: function (event) {
             service.active = true;
         },
 
@@ -142,16 +142,22 @@ angular.module('umbraco.services')
          * @description
          * Hides navigation tree, with a short delay, is cancelled if the user moves the mouse over the tree again
          */
-        leaveTree: function () {
-           if(!service.touchDevice){
-                service.active = false;
-
-                $timeout(function(){
-                    if(!service.active){
-                        service.hideTree();
-                    }
-                }, 300);
+        leaveTree: function (event) {
+            //this is a hack to handle IE touch events
+            //which freaks out due to no mouse events
+            //so the tree instantly shuts down
+            if(!event){
+                return;
             }
+
+
+            service.active = false;
+
+            $timeout(function(){
+                if(!service.active){
+                    service.hideTree();
+                }
+            }, 300);
         },
 
         /**
