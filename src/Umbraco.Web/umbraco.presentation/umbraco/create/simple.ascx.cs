@@ -20,6 +20,8 @@ namespace umbraco.cms.presentation.create.controls
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 			sbmt.Text = ui.Text("create");
+            rename.Text = ui.Text("name");
+
 			// Put user code to initialize the page here
 		}
 
@@ -63,8 +65,6 @@ namespace umbraco.cms.presentation.create.controls
 					.ChangeContentFrameUrl(returnUrl)
 					.ChildNodeCreated()
 					.CloseModalWindow();
-
-                
             }
 		
 		}

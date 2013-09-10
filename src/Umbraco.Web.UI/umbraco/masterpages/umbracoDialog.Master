@@ -24,7 +24,7 @@
     <asp:ContentPlaceHolder ID="head" runat="server"></asp:ContentPlaceHolder>
 </head>
 
-<body class="umbracoDialog">
+<body class="umbracoDialog umb-dialog">
     <form id="form1" runat="server">
         <asp:ScriptManager ID="ScriptManager1" EnablePartialRendering="true" runat="server"></asp:ScriptManager>
         <asp:ContentPlaceHolder ID="body" runat="server">
