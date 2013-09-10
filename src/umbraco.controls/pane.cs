@@ -66,7 +66,7 @@ namespace umbraco.uicontrols
                 styleString += key + ":" + this.Style[key] + ";";
             }
 
-            writer.WriteLine("<div class=\"umb-pane\" style='" + styleString + "'>");
+            writer.WriteLine("<div class=\"umb-pane " + this.CssClass +  "\" style='" + styleString + "'>");
             writer.WriteLine("<div class=\"control-group umb-control-group\" style='" + styleString + "'>");
 
             if (!string.IsNullOrEmpty(m_Text))
