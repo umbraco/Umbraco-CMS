@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="../umbraco_client/tree/treeicons.css" />
 
 </head>
-<body ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
+<body ng-class="{touch:touchDevice}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
     <div ng-cloak id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
 
         <umb-navigation></umb-navigation>
