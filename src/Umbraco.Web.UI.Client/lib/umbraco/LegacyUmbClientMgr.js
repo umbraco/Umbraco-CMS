@@ -179,9 +179,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 //get our angular navigation service
                 var injector = getRootInjector();
                 var dialogService = injector.get("dialogService");
-
-                var self = this;
-
+                
                 //TODO: need to get the closeTriggers working for compatibility too somehow.
 
                 var dialog = dialogService.open({
@@ -189,16 +187,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     width: width,
                     height: height,
                     iframe: true,
-                    show: true,
-                    callback: function (result) {
-                        
-                        if (typeof onCloseCallback == "function") {
-                            onCloseCallback.apply(self, [result]);
-                        }
-                        
-                        dialog.hide();
-                    }
+                    show: true
                 });
+
+                //add the callback to the jquery data for the modal so we can call it on close to support the legacy way dialogs worked.
+                dialog.data("modalCb", onCloseCallback);
 
                 this._modal.push(dialog);
 
@@ -213,7 +206,17 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 // all legacy calls to closeModalWindow are expecting to just close the last opened one so we'll ensure
                 // that this is still the case.
                 if (this._modal != null && this._modal.length > 0) {
-                    dialogService.close(this._modal.pop(), { outVal: rVal });
+
+                    var lastModal = this._modal.pop();
+
+                    //if we've stored a callback on this modal call it before we close.
+                    var self = this;
+                    var onCloseCallback = lastModal.data("modalCb");
+                    if (typeof onCloseCallback == "function") {
+                        onCloseCallback.apply(self, [{ outVal: rVal }]);
+                    }
+
+                    dialogService.close(lastModal);
                 }
                 else {
                     dialogService.closeAll(rVal);
