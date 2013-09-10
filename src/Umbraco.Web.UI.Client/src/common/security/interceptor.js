@@ -13,7 +13,7 @@ angular.module('umbraco.security.interceptor', ['umbraco.security.retryQueue'])
                     return $injector.get('$http')(originalResponse.config);
                 });
             }
-            else if (originalResponse.status === 401) {
+            else if (originalResponse.status === 403) {
                 //if the status was a 403 it means the user didn't have permission to do what the request was trying to do.
                 //How do we deal with this now, need to tell the user somehow that they don't have permission to do the thing that was 
                 //requested. We can either deal with this globally here, or we can deal with it globally for individual requests on the umbRequestHelper,
