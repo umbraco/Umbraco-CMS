@@ -15,7 +15,7 @@ So an editor can be used several times, with different configurations, and that 
 ##package.manifest
 So to add configuration options to our markdown editor, open the package.manifest file. rigth below the editor definition, paste in the following: 
 
-	preValueEditor: {
+	prevalues: {
 		fields: [
 			{
 				label: "Preview",

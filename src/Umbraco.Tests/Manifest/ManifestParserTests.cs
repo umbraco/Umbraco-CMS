@@ -1,14 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Manifest;
+using Umbraco.Core.PropertyEditors;
 
-namespace Umbraco.Belle.Tests
+namespace Umbraco.Tests.Manifest
 {    
     [TestFixture]
     public class ManifestParserTests
@@ -25,27 +24,20 @@ namespace Umbraco.Belle.Tests
         editor: {
             view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
             valueType: 'int',
-            validation: [
-                {
-                    type: 'Required'
-                },
-                {
-                    type: 'Regex',
-                    value: '\\d*'
-                },
-            ]
+            validation: {
+                'required': true,               
+                'Regex': '\\d*'
+            }
         },
-        preValueEditor: {
+        prevalues: {
 				fields: [
 					{
                         label: 'Some config 1',
 						key: 'key1',
 						view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val1.html',
-						validation: [
-							{
-								type: 'Required' 
-							}						
-						]
+						validation: {
+                            required: true
+                        }
 					},
                     {
                         label: 'Some config 2',
@@ -64,7 +56,7 @@ namespace Umbraco.Belle.Tests
             Assert.AreEqual("Some config 1", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(0).Name);
             Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/Views/pre-val1.html", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(0).View);
             Assert.AreEqual(1, parser.ElementAt(0).PreValueEditor.Fields.ElementAt(0).Validators.Count());
-
+            
             Assert.AreEqual("key2", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(1).Key);
             Assert.AreEqual("Some config 2", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(1).Name);
             Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/Views/pre-val2.html", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(1).View);
@@ -82,15 +74,10 @@ namespace Umbraco.Belle.Tests
         editor: {
             view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
             valueType: 'int',
-            validation: [
-                {
-                    type: 'Required'
-                },
-                {
-                    type: 'Regex',
-                    value: '\\d*'
-                },
-            ]
+            validation: {
+                required : true,
+                regex : '\\d*'
+            }
         }
     },
     {
@@ -110,6 +97,12 @@ namespace Umbraco.Belle.Tests
             Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/MyEditor.html", parser.ElementAt(0).ValueEditor.View);
             Assert.AreEqual("int", parser.ElementAt(0).ValueEditor.ValueType);
             Assert.AreEqual(2, parser.ElementAt(0).ValueEditor.Validators.Count());
+            var manifestValidator1 = parser.ElementAt(0).ValueEditor.Validators.ElementAt(0) as ManifestPropertyValidator;
+            Assert.IsNotNull(manifestValidator1);
+            Assert.AreEqual("required", manifestValidator1.Type);
+            var manifestValidator2 = parser.ElementAt(0).ValueEditor.Validators.ElementAt(1) as ManifestPropertyValidator;
+            Assert.IsNotNull(manifestValidator2);
+            Assert.AreEqual("regex", manifestValidator2.Type);
 
             Assert.AreEqual(new Guid("1FCF5C39-5FC7-4BCE-AFBE-6500D9EBA261"), parser.ElementAt(1).Id);
             Assert.AreEqual("Test 2", parser.ElementAt(1).Name);
