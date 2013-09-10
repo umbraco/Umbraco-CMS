@@ -289,7 +289,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //assign the db context
                 new DatabaseContext(dbFactory),
                 //assign the service context
-                new ServiceContext(UnitOfWorkProvider, new FileUnitOfWorkProvider(), new PublishingStrategy()),
+                new ServiceContext(UnitOfWorkProvider, new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),
                 //disable cache
                 cacheHelper)
             {
