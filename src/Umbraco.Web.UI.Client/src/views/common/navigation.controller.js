@@ -91,6 +91,8 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
             //not legacy, lets just set the route value and clear the query string if there is one.
             $location.path(n.routePath).search("");
         }
+
+        navigationService.hideNavigation();
     });
 
     /** Opens a dialog but passes in this scope instance to be used for the dialog */
