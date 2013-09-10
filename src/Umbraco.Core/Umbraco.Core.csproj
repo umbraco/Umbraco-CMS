@@ -282,11 +282,20 @@
     <Compile Include="Models\Mapping\IMapperConfiguration.cs" />
     <Compile Include="Models\Mapping\MapperConfiguration.cs" />
     <Compile Include="Models\Membership\EntityPermission.cs" />
+    <Compile Include="Models\IMember.cs" />
+    <Compile Include="Models\IMemberType.cs" />
+    <Compile Include="Models\Member.cs" />
+    <Compile Include="Models\Membership\MembershipExtensions.cs" />
+    <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipUser.cs" />
     <Compile Include="Models\PreValue.cs" />
+    <Compile Include="Models\MemberType.cs" />
     <Compile Include="Models\PreValueCollection.cs" />
     <Compile Include="Models\Rdbms\MemberReadOnlyDto.cs" />
+    <Compile Include="Models\Rdbms\MemberTypeReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\PropertyDataReadOnlyDto.cs" />
+    <Compile Include="Models\Rdbms\PropertyTypeGroupReadOnlyDto.cs" />
+    <Compile Include="Models\Rdbms\PropertyTypeReadOnlyDto.cs" />
     <Compile Include="Models\ServerRegistration.cs" />
     <Compile Include="Models\ITemplate.cs" />
     <Compile Include="Models\Language.cs" />
@@ -297,10 +306,6 @@
     <Compile Include="Models\Membership\IProfile.cs" />
     <Compile Include="Models\Membership\IUser.cs" />
     <Compile Include="Models\Membership\IUserType.cs" />
-    <Compile Include="Models\Membership\Member.cs" />
-    <Compile Include="Models\Membership\MemberGroup.cs" />
-    <Compile Include="Models\Membership\MemberProfile.cs" />
-    <Compile Include="Models\Membership\MemberType.cs" />
     <Compile Include="Models\Membership\Profile.cs" />
     <Compile Include="Models\Membership\User.cs" />
     <Compile Include="Models\Membership\UserGroup.cs" />
@@ -334,6 +339,10 @@
     <Compile Include="Persistence\Caching\NullCacheProvider.cs" />
     <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
     <Compile Include="Persistence\Factories\ModelFactoryConfiguration.cs" />
+    <Compile Include="Persistence\Factories\MemberFactory.cs" />
+    <Compile Include="Persistence\Factories\MemberReadOnlyFactory.cs" />
+    <Compile Include="Persistence\Factories\MemberTypeFactory.cs" />
+    <Compile Include="Persistence\Factories\MemberTypeReadOnlyFactory.cs" />
     <Compile Include="Persistence\Factories\ServerRegistrationFactory.cs" />
     <Compile Include="Persistence\Factories\UmbracoEntityFactory.cs" />
     <Compile Include="Persistence\Factories\UserSectionFactory.cs" />
@@ -350,6 +359,8 @@
     <Compile Include="Persistence\FaultHandling\Strategies\SqlAzureTransientErrorDetectionStrategy.cs" />
     <Compile Include="Persistence\FaultHandling\ThrottlingCondition.cs" />
     <Compile Include="Persistence\Mappers\MapperForAttribute.cs" />
+    <Compile Include="Persistence\Mappers\MemberMapper.cs" />
+    <Compile Include="Persistence\Mappers\MemberTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\PetaPocoMapper.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ConstraintAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\SpecialDbTypeAttribute.cs" />
@@ -560,6 +571,7 @@
     <Compile Include="Persistence\Querying\SqlTranslator.cs" />
     <Compile Include="Persistence\Relators\DictionaryLanguageTextRelator.cs" />
     <Compile Include="Persistence\Relators\PropertyDataRelator.cs" />
+    <Compile Include="Persistence\Relators\PropertyTypePropertyGroupRelator.cs" />
     <Compile Include="Persistence\Relators\UserSectionRelator.cs" />
     <Compile Include="Persistence\Repositories\ContentRepository.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeBaseRepository.cs" />
@@ -577,6 +589,7 @@
     <Compile Include="Persistence\Repositories\Interfaces\IMediaRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IMediaTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IMemberRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IMemberTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRelationRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRelationTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRepositoryQueryable.cs" />

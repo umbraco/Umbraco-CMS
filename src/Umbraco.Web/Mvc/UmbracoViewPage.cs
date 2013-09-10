@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Web.Mvc;
+using System.Web.WebPages;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -97,24 +98,24 @@ namespace Umbraco.Web.Mvc
             get { return _helper ?? (_helper = new UmbracoHelper(UmbracoContext)); }
         }
 
-		/// <summary>
-		/// Ensure that the current view context is added to the route data tokens so we can extract it if we like
-		/// </summary>
-		/// <remarks>
-		/// Currently this is required by mvc macro engines
-		/// </remarks>
-		protected override void InitializePage()
-		{
-			base.InitializePage();
-			if (!ViewContext.IsChildAction)
-			{
-				if (!ViewContext.RouteData.DataTokens.ContainsKey(Constants.DataTokenCurrentViewContext))
-				{
-					ViewContext.RouteData.DataTokens.Add(Constants.DataTokenCurrentViewContext, this.ViewContext);		
-				}
-			}
-			
-		}
+        /// <summary>
+        /// Ensure that the current view context is added to the route data tokens so we can extract it if we like
+        /// </summary>
+        /// <remarks>
+        /// Currently this is required by mvc macro engines
+        /// </remarks>
+        protected override void InitializePage()
+        {
+            base.InitializePage();
+            if (!ViewContext.IsChildAction)
+            {
+                if (!ViewContext.RouteData.DataTokens.ContainsKey(Constants.DataTokenCurrentViewContext))
+                {
+                    ViewContext.RouteData.DataTokens.Add(Constants.DataTokenCurrentViewContext, this.ViewContext);
+                }
+            }
+
+        }
 
         /// <summary>
         /// This will detect the end /body tag and insert the preview badge if in preview mode
@@ -129,7 +130,7 @@ namespace Umbraco.Web.Mvc
                 {
                     var text = value.ToString().ToLowerInvariant();
                     var pos = text.IndexOf("</body>", StringComparison.InvariantCultureIgnoreCase);
-                    
+
                     if (pos > -1)
                     {
                         string markupToInject;
@@ -159,6 +160,23 @@ namespace Umbraco.Web.Mvc
             }
 
             base.WriteLiteral(value);
+
+
+        }
+
+        public HelperResult RenderSection(string name, Func<dynamic, HelperResult> defaultContents)
+        {
+            return WebViewPageExtensions.RenderSection(this, name, defaultContents);
+        }
+
+        public HelperResult RenderSection(string name, HelperResult defaultContents)
+        {
+            return WebViewPageExtensions.RenderSection(this, name, defaultContents);
+        }
+
+        public HelperResult RenderSection(string name, string defaultContents)
+        {
+            return WebViewPageExtensions.RenderSection(this, name, defaultContents);
         }
     }
 }

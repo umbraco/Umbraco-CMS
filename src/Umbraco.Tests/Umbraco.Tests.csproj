@@ -251,6 +251,11 @@
     <Compile Include="PropertyEditors\DropDownPropertyPreValueEditorTests.cs" />
     <Compile Include="PropertyEditors\EnsureUniqueValuesValidatorTest.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueEditorTests.cs" />
+    <Compile Include="PublishedContent\StronglyTypedModels\CallingMethodTests.cs" />
+    <Compile Include="PublishedContent\StronglyTypedModels\TextpageModel.cs" />
+    <Compile Include="PublishedContent\StronglyTypedModels\TypedModelBase.cs" />
+    <Compile Include="PublishedContent\StronglyTypedModels\UmbracoTemplatePage`T.cs" />
+    <Compile Include="Services\LocalizationServiceTests.cs" />
     <Compile Include="Resolvers\XsltExtensionsResolverTests.cs" />
     <Compile Include="Services\PackagingServiceTests.cs" />
     <Compile Include="Services\PerformanceTests.cs" />

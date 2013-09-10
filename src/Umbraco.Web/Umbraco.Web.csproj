@@ -542,6 +542,7 @@
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="Editors\MediaController.cs" />
+    <Compile Include="UrlHelperRenderExtensions.cs" />
     <Compile Include="WebApi\Binders\ContentItemBaseBinder.cs" />
     <Compile Include="WebApi\Binders\ContentItemBinder.cs" />
     <Compile Include="WebApi\Binders\MediaItemBinder.cs" />
@@ -1922,6 +1923,7 @@
     <Compile Include="WebServices\UmbracoWebService.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="WebViewPageExtensions.cs" />
     <EmbeddedResource Include="UI\JavaScript\Main.js" />
     <EmbeddedResource Include="UI\JavaScript\JsInitialize.js" />
     <EmbeddedResource Include="UI\JavaScript\ServerVariables.js" />

@@ -32,7 +32,7 @@ function umbracoCheckKeys(e) {
 }
 
 function shortcutCheckKeysPressFirefox(e) {
-	    if (ctrlDown && keycode == 83)
+	    if (ctrlDown && keycode == 83 && !e.altKey)
 	        e.preventDefault();
 }
 
@@ -71,20 +71,22 @@ function runShortCuts() {
 				}
 			}
 			if (ctrlDown) {
-				if (keycode == 83)
-					doSubmit();
-				else if (keycode == 85)
-					document.getElementById('TabView1_tab01layer_publish').click();
-				else if (!shiftDown && keycode == 9) {
-					functionsFrame.tabSwitch(1);
-					return false;
-				}
-				else
-					if (shiftDown && keycode == 9) {
-						functionsFrame.tabSwitch(-1);
-						return false;
-					}
-					
+			    try {
+			        if (keycode == 83)
+			            doSubmit();
+			        else if (keycode == 85)
+			            document.getElementById('TabView1_tab01layer_publish').click();
+			        else if (!shiftDown && keycode == 9) {
+			            functionsFrame.tabSwitch(1);
+			            return false;
+			        }
+			        else
+			            if (shiftDown && keycode == 9) {
+			                functionsFrame.tabSwitch(-1);
+			                return false;
+			            }
+			    } catch(e) {
+			    } 
 			}
 		}
 	

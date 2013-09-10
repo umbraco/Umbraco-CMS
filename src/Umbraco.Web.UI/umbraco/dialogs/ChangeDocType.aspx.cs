@@ -21,7 +21,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
         }
 
         private IContent _content;
- 
+
         protected void Page_Load(object sender, EventArgs e)
         {
             var contentNodeId = int.Parse(Request.QueryString["id"]);
@@ -42,14 +42,14 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                 {
                     DisplayNotAvailable();
                 }
-            }            
+            }
         }
 
         private void LocalizeTexts()
         {
             ChangeDocTypePane.Text = global::umbraco.ui.Text("changeDocType", "selectNewDocType");
             ContentNamePropertyPanel.Text = global::umbraco.ui.Text("changeDocType", "selectedContent");
-            CurrentTypePropertyPanel.Text = global::umbraco.ui.Text("changeDocType", "currentType");            
+            CurrentTypePropertyPanel.Text = global::umbraco.ui.Text("changeDocType", "currentType");
             NewTypePropertyPanel.Text = global::umbraco.ui.Text("changeDocType", "newType");
             NewTemplatePropertyPanel.Text = global::umbraco.ui.Text("changeDocType", "newTemplate");
             ChangeDocTypePropertyMappingPane.Text = global::umbraco.ui.Text("changeDocType", "mapProperties");
@@ -67,17 +67,13 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
             // Get all content types
             var documentTypes = ApplicationContext.Current.Services.ContentTypeService.GetAllContentTypes();
 
-            // Save a flag if the allowed at root option has been set for any document types (if not, then all are allowed there)
-            var haveTypesAllowedAtRootBeenDefined = documentTypes.Any(x => x.AllowedAsRoot);
-
             // Remove current one
             documentTypes = documentTypes.Where(x => x.Id != _content.ContentType.Id);
 
             // Remove any not valid for current location
-            if (_content.ParentId == -1 && haveTypesAllowedAtRootBeenDefined)
+            if (_content.ParentId == -1)
             {
-                // Root content, and at least one type has been defined as allowed at root, so only include those that have
-                // been selected as allowed
+                // Root content, only include those that have been selected as allowed at root
                 documentTypes = documentTypes.Where(x => x.AllowedAsRoot);
             }
             else
@@ -90,7 +86,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
             }
 
             // If we have at least one, bind to list and return true
-            if (documentTypes.Any()) 
+            if (documentTypes.Any())
             {
                 NewDocumentTypeList.DataSource = documentTypes.OrderBy(x => x.Name);
                 NewDocumentTypeList.DataValueField = "Id";
@@ -138,7 +134,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 
             // Get properties of new document type (including any from parent types)
             var properties = GetPropertiesOfContentType(contentType);
-            
+
             // Loop through list of source properties and populate destination options with all those of same property type
             foreach (RepeaterItem ri in PropertyMappingRepeater.Items)
             {
@@ -146,10 +142,10 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                 {
                     // Get data type from hidden field
                     var dataTypeId = Guid.Parse(((HiddenField)ri.FindControl("DataTypeId")).Value);
-                                        
+
                     // Bind destination list with properties that match data type
                     var ddl = (DropDownList)ri.FindControl("DestinationProperty");
-                    ddl.DataSource = properties.Where(x => x.DataTypeId == dataTypeId);                    
+                    ddl.DataSource = properties.Where(x => x.DataTypeId == dataTypeId);
                     ddl.DataValueField = "Alias";
                     ddl.DataTextField = "Name";
                     ddl.DataBind();
@@ -162,7 +158,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                     {
                         item.Selected = true;
                     }
-                }                
+                }
             }
         }
 
@@ -207,7 +203,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 
                 // Get flag for if content already published
                 var wasPublished = _content.Published;
-                
+
                 // Change the document type passing flag to clear the properties
                 var newContentType = GetSelectedDocumentType();
                 _content.ChangeContentType(newContentType, true);
@@ -226,7 +222,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                 var propertiesMappedMessageBuilder = new StringBuilder("<ul>");
                 foreach (var propertyMapping in propertyMappings)
                 {
-                    propertiesMappedMessageBuilder.AppendFormat("<li>{0} {1} {2}</li>", 
+                    propertiesMappedMessageBuilder.AppendFormat("<li>{0} {1} {2}</li>",
                         propertyMapping.FromName, global::umbraco.ui.Text("changeDocType", "to"), propertyMapping.ToName);
                     _content.SetValue(propertyMapping.ToAlias, propertyMapping.Value);
                 }
@@ -284,9 +280,9 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                     var mappedPropertyAlias = ddl.SelectedItem.Value;
                     if (!string.IsNullOrEmpty(mappedPropertyAlias))
                     {
-                        if (mappedPropertyAliases.Contains(mappedPropertyAlias)) 
+                        if (mappedPropertyAliases.Contains(mappedPropertyAlias))
                         {
-                            ValidationError.Text = global::umbraco.ui.Text("changeDocType", "validationErrorPropertyWithMoreThanOneMapping"); 
+                            ValidationError.Text = global::umbraco.ui.Text("changeDocType", "validationErrorPropertyWithMoreThanOneMapping");
                             return false;
                         }
 

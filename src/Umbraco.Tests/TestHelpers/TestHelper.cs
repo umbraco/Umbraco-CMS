@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -116,12 +117,18 @@ namespace Umbraco.Tests.TestHelpers
         }
 
 	    public static void CleanDirectories(string[] directories)
-        {
+	    {
+	        var preserves = new Dictionary<string, string[]>
+	        {
+	            { SystemDirectories.Masterpages, new[] {"dummy.txt"} },
+	            { SystemDirectories.MvcViews, new[] {"dummy.txt"} }
+	        };
             foreach (var directory in directories)
             {
                 var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
+                var preserve = preserves.ContainsKey(directory) ? preserves[directory] : null;
                 if (directoryInfo.Exists)
-                    directoryInfo.GetFiles().ForEach(x => x.Delete());
+                    directoryInfo.GetFiles().Where(x => preserve == null || preserve.Contains(x.Name) == false).ForEach(x => x.Delete());
             }
         }
 
