@@ -30,8 +30,11 @@ angular.module('umbraco.services')
 	    angularHelper.safeApply($rootScope, function () {
 	        
 	        //add a colon after the headline if there is a message as well
-	        if (item.messsage) {
+	        if (item.message) {
 	            item.headline += ":";
+	            if(item.message.length > 200){
+	            	item.sticky = true;
+	            }
 	        }
 
 	        //we need to ID the item, going by index isn't good enough because people can remove at different indexes 
@@ -41,17 +44,19 @@ angular.module('umbraco.services')
 	        
 	        nArray.push(item);
             
-	        $timeout(function () {
+            if(!item.sticky){
+		        $timeout(function () {
+		            var found = _.find(nArray, function(i) {
+		                return i.id === item.id;
+		            });
 
-	            var found = _.find(nArray, function(i) {
-	                return i.id === item.id;
-	            });
-                if (found) {
-                    var index = nArray.indexOf(found);
-                    nArray.splice(index, 1);
-                }
-	            
-	        }, 7000);
+	                if (found) {
+	                    var index = nArray.indexOf(found);
+	                    nArray.splice(index, 1);
+	                }
+		            
+		        }, 7000);
+	    	}
 
 	        return item;
 	    });
@@ -154,6 +159,24 @@ angular.module('umbraco.services')
 		 */
 	    warning: function (headline, message) {
 	        return add({ headline: headline, message: message, type: 'warning', time: new Date() });
+		},
+
+		/**
+		 * @ngdoc method
+		 * @name umbraco.services.notificationsService#warning
+		 * @methodOf umbraco.services.notificationsService
+		 *
+		 * @description
+		 * Adds a yellow warning notication to the notications collection
+		 * This should be used when an operations *completes* but something was not as expected
+		 * 
+		 *
+		 * @param {String} headline Headline of the notification
+		 * @param {String} message longer text for the notication, trimmed after 200 characters, which can then be exanded
+		 * @returns {Object} notification object
+		 */
+	    info: function (headline, message) {
+	        return add({ headline: headline, message: message, type: 'info', time: new Date() });
 		},
 
 		/**
