@@ -31,12 +31,18 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                         }
                         else
                         {
+
                             /* what do do ?
                              *      throw an exception? -> I can actually ensure that all GUIDs in the table currently have a valid entry in the map before running the upgrade and if not then the upgrade will just fail?
                              *      ignore it, just leave the legacy GUID entry in there -> this will mean that the editor will not render for that property and there will probably be YSODs generated elsewhere.
                              *      delete the entry -> of course this could lead to data loss
                              *      change it to a text field -> no data loss and they are able to then change it to a different property editor later in the data type editor
                              */
+
+                            //NOTE: I'm going to just set this to a text field, I think this is the 'safest' way without data loss and still allows an upgrade, still
+                            // waiting on feedback from the core team.
+
+                            Update.Table("cmsDataType").Set(new { propertyEditorAlias = Constants.PropertyEditors.TextboxAlias }).Where(new { item.pk });
                         }
                     }
                 }
