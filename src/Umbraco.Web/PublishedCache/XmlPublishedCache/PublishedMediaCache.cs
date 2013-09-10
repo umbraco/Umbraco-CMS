@@ -514,8 +514,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				{
 					//this is taken from examine
 					_properties.Add(i.Key.InvariantStartsWith("__") 
-					               	? new PropertyResult(i.Key, i.Value, Guid.Empty, PropertyResultType.CustomProperty) 
-					               	: new PropertyResult(i.Key, i.Value, Guid.Empty, PropertyResultType.UserProperty));
+					               	? new PropertyResult(i.Key, i.Value, PropertyResultType.CustomProperty) 
+					               	: new PropertyResult(i.Key, i.Value, PropertyResultType.UserProperty));
 				}
 			}
 

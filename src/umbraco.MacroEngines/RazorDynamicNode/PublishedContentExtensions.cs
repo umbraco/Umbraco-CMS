@@ -20,7 +20,7 @@ namespace umbraco.MacroEngines.Library
 		
 		internal static IProperty ConvertToNodeProperty(this IPublishedContentProperty prop)
 		{
-			return new PropertyResult(prop.Alias, prop.Value.ToString(), prop.Version);
+			return new PropertyResult(prop.Alias, prop.Value.ToString());
 		}
 
 		internal static INode ConvertToNode(this IPublishedContent doc)

@@ -112,7 +112,7 @@ namespace Umbraco.Core
 			}
 
 			//cache this lookup in a new custom (hidden) property
-			publishedContent.Properties.Add(new PropertyResult("__recursive__" + fieldname, contentValue, Guid.Empty, PropertyResultType.CustomProperty));
+			publishedContent.Properties.Add(new PropertyResult("__recursive__" + fieldname, contentValue, PropertyResultType.CustomProperty));
 
 			return contentValue;
 		}

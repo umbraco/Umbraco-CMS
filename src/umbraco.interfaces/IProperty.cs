@@ -6,7 +6,6 @@ namespace umbraco.interfaces
 	{
 		string Alias { get; }
 		string Value { get; }
-		Guid Version { get; }
 		string ToString();
 	}
 }
