@@ -17,6 +17,7 @@ namespace SqlCE4Umbraco
     /// <summary>
     /// Database installer for an SQL Server data source.
     /// </summary>
+    [Obsolete("The legacy installers are no longer used and will be removed from the codebase in the future")]
     public class SqlCEInstaller : DefaultInstallerUtility<SqlCEHelper>
     {
         #region Private Constants

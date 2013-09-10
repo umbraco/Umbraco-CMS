@@ -5,6 +5,7 @@ namespace umbraco.DataLayer.Utility.Table
     /// <summary>
     /// Interface for classes that represent a table field.
     /// </summary>
+    [Obsolete("The legacy installers are no longer used and will be removed from the codebase in the future")]
     public interface IField
     {
         /// <summary>

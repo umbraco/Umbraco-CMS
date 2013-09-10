@@ -5,6 +5,7 @@ namespace umbraco.DataLayer.Utility.Table
     /// <summary>
     /// Default implementation of the <see cref="IField"/> interface.
     /// </summary>
+    [Obsolete("The legacy installers are no longer used and will be removed from the codebase in the future")]
     public class DefaultField : IField
     {
         #region Public Constructors

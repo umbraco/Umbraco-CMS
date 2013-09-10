@@ -6,11 +6,14 @@
  * 
  ***********************************************************************************/
 
+using System;
+
 namespace umbraco.DataLayer.Utility.Installer
 {
     /// <summary>
     /// Version number of an Umbraco database.
     /// </summary>
+    [Obsolete("The legacy installers are no longer used and will be removed from the codebase in the future")]
     public enum DatabaseVersion
     {
         /// <summary>Database connection unsuccessful.</summary>

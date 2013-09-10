@@ -15,6 +15,7 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
     /// <summary>
     /// Utility for an MySql data source.
     /// </summary>
+    [Obsolete("The legacy installers are no longer used and will be removed from the codebase in the future")]
     public class MySqlUtility : DefaultUtility<MySqlHelper>
     {
         #region Public Constructors

@@ -8,6 +8,7 @@ namespace umbraco.DataLayer.Utility.Table
     /// Properties for a table field.
     /// </summary>
     [Flags]
+    [Obsolete("The legacy installers are no longer used and will be removed from the codebase in the future")]
     public enum FieldProperties
     {
         /// <summary>

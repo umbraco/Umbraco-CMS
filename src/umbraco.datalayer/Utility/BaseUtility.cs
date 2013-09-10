@@ -6,12 +6,15 @@
  * 
  ***********************************************************************************/
 
+using System;
+
 namespace umbraco.DataLayer.Utility
 {
     /// <summary>
     /// Base class for utilities that use an ISqlHelper as data source.
     /// </summary>
     /// <typeparam name="S">The SQL helper type.</typeparam>
+    [Obsolete("The legacy installers are no longer used and will be removed from the codebase in the future")]
     public abstract class BaseUtility<S> where S : ISqlHelper
     {
         #region Private Fields

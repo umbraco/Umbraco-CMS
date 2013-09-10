@@ -6,6 +6,7 @@ namespace umbraco.DataLayer.Utility.Table
     /// <summary>
     /// Interface for classes that represent a data source table.
     /// </summary>
+    [Obsolete("The legacy installers are no longer used and will be removed from the codebase in the future")]
     public interface ITable : IEnumerable<IField>
     {
         /// <summary>

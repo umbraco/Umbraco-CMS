@@ -6,6 +6,7 @@
  * 
  ***********************************************************************************/
 
+using System;
 using umbraco.DataLayer.SqlHelpers.SqlServer;
 using umbraco.DataLayer.Utility;
 using umbraco.DataLayer.Utility.Installer;
@@ -16,6 +17,7 @@ namespace SqlCE4Umbraco
     /// <summary>
     /// Utility for an SQL Server data source.
     /// </summary>
+    [Obsolete("The legacy installers are no longer used and will be removed from the codebase in the future")]
     public class SqlCEUtility : DefaultUtility<SqlCEHelper>
     {
         #region Public Constructors
