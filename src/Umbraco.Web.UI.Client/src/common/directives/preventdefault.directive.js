@@ -6,7 +6,11 @@ angular.module("umbraco.directives")
 	.directive('preventDefault', function () {
 		return function (scope, element, attrs) {
 		    $(element).click(function (event) {
-		       event.preventDefault();
+				if(event.metaKey || event.ctrlKey){
+					return;
+				}else{
+					event.preventDefault();
+				}		
 			});
 		};
 	});
