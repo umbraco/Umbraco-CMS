@@ -29,6 +29,12 @@ namespace umbraco.uicontrols
             set { m_Text = value; }
         }
 
+        private string m_title = string.Empty;
+        public string Title
+        {
+            get { return m_title; }
+            set { m_title = value; }
+        }
 
         public void addProperty(string Caption, Control C)
         {
@@ -66,7 +72,10 @@ namespace umbraco.uicontrols
                 styleString += key + ":" + this.Style[key] + ";";
             }
 
+            
             writer.WriteLine("<div class=\"umb-pane " + this.CssClass +  "\" style='" + styleString + "'>");
+            if (!string.IsNullOrEmpty(m_title))
+                writer.WriteLine("<h5 class='umb-pane-title'>" + m_title + "</h5>");
             writer.WriteLine("<div class=\"control-group umb-control-group\" style='" + styleString + "'>");
 
             if (!string.IsNullOrEmpty(m_Text))
