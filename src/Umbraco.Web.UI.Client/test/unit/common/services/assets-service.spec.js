@@ -7,12 +7,10 @@ describe('keyboard service tests', function () {
         $rootScope = $injector.get('$rootScope');
    }));
 
-
-
    describe('Loading js assets', function () {
         
         it('Loads a javascript file', function () {
-            assetsService.loadJs("NamespaceManager.js").then(function(){
+            assetsService.loadJs("base/lib/umbraco/NamespaceManager.js").then(function(){
                 console.log("loaded");
             });
             

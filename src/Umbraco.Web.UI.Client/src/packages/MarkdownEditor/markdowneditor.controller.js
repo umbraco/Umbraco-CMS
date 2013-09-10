@@ -29,7 +29,7 @@ function ($scope, assetsService, dialogService, $log, imageHelper) {
 
 		        dialogService.mediaPicker({ callback: function (data) {
 		            $(data.selection).each(function (i, item) {
-		                var imagePropVal = imageHelper.getImagePropertyVaue({ imageModel: item, scope: $scope });
+		                var imagePropVal = imageHelper.getImagePropertyValue({ imageModel: item, scope: $scope });
 		                callback(imagePropVal);
 		            });
 		        }

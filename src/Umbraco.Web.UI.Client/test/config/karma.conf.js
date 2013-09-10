@@ -7,37 +7,37 @@ module.exports = function(karma) {
 
     // list of files / patterns to load in the browser
     files: [
-       'lib/jquery/jquery-2.0.3.min.js',
+        'lib/jquery/jquery-2.0.3.min.js',
+        'lib/angular/1.1.5/angular.js',
+        'lib/angular/1.1.5/angular-cookies.min.js',
+        'lib/angular/1.1.5/angular-mocks.js',
 
-       'lib/angular/1.1.5/angular.js',
-       'lib/angular/1.1.5/angular-cookies.min.js',
-       'lib/angular/1.1.5/angular-mocks.js',
+        /*
+        For angular 1.2:
+         'lib/angular/1.2/angular.js',
+         'lib/angular/1.2/angular-route.min.js',
+         'lib/angular/1.2/angular-touch.min.js',
+         'lib/angular/1.2/angular-cookies.min.js',
+         'lib/angular/1.2/angular-animate.min.js',
+         'lib/angular/1.2/angular-mocks.js',*/
+         
 
-       /*
-       For angular 1.2:
-        'lib/angular/1.2/angular.js',
-        'lib/angular/1.2/angular-route.min.js',
-        'lib/angular/1.2/angular-touch.min.js',
-        'lib/angular/1.2/angular-cookies.min.js',
-        'lib/angular/1.2/angular-animate.min.js',
-        'lib/angular/1.2/angular-mocks.js',
-        */
+         'lib/underscore/underscore.js',
+         'lib/umbraco/Extensions.js', 
+         'lib/yepnope/yepnope.min.js',
 
-        'lib/underscore/underscore.js',
-        'lib/umbraco/Extensions.js',  
-        'lib/yepnope/yepnope.min.js',
+         'test/config/app.unit.js',
+         'src/common/mocks/umbraco.servervariables.js',
 
-        'test/config/app.unit.js',
-        'src/common/mocks/umbraco.servervariables.js',
-
-        'src/common/directives/*.js',
-        'src/common/filters/*.js',
-        'src/common/services/*.js',
-        'src/common/security/*.js',
-        'src/common/resources/*.js',
-        'src/common/mocks/resources/*.js',
-        'src/views/**/*.controller.js',
-        'test/unit/**/*.spec.js'
+         'src/common/directives/*.js',
+         'src/common/filters/*.js',
+         'src/common/services/*.js',
+         'src/common/security/*.js',
+         'src/common/resources/*.js',
+         'src/common/mocks/resources/*.js',
+         'src/views/**/*.controller.js',
+         'test/unit/**/*.spec.js',
+        {pattern: 'lib/umbraco/namespacemanager.js', watched: true, served: true}       
     ],
 
     // list of files to exclude
@@ -63,7 +63,7 @@ module.exports = function(karma) {
     // level of logging
     // possible values: karma.LOG_DISABLE || karma.LOG_ERROR || karma.LOG_WARN || karma.LOG_INFO || karma.LOG_DEBUG
     // CLI --log-level debug
-    logLevel: karma.LOG_INFO,
+    logLevel: karma.LOG_DEBUG,
 
     // enable / disable watching file and executing tests whenever any file changes
     // CLI --auto-watch --no-auto-watch

@@ -77,7 +77,7 @@ angular.module('umbraco.services').factory('umbPropEditorHelper', umbPropEditorH
 function imageHelper() {
     return {
         /** Returns the actual image path associated with the image property if there is one */
-        getImagePropertyVaue: function(options) {
+        getImagePropertyValue: function(options) {
             if (!options && !options.imageModel) {
                 throw "The options objet does not contain the required parameters: imageModel";
             }
@@ -120,7 +120,7 @@ function imageHelper() {
                 throw "The options objet does not contain the required parameters: imageModel";
             }
 
-            var imagePropVal = this.getImagePropertyVaue(options);
+            var imagePropVal = this.getImagePropertyValue(options);
             if (imagePropVal !== "") {
                 return this.getThumbnailFromPath(imagePropVal);
             }
