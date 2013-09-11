@@ -224,8 +224,8 @@
     <key alias="stylesNoStylesOnPage">Der er ingen aktive styles eller formatteringer på denne side</key>
     <key alias="tableColMergeLeft">Du skal stå til venstre for de 2 celler du ønsker at samle!</key>
     <key alias="tableSplitNotSplittable">Du kan ikke opdele en celle, som ikke allerede er delt.</key>
-    <key alias="xsltErrorHeader">Fejl i xslt kode</key>
-    <key alias="xsltErrorText">Din xslt er ikke opdateret, da det indeholdt en fejl</key>
+    <key alias="xsltErrorHeader">Fejl i XSLT kode</key>
+    <key alias="xsltErrorText">Din XSLT er ikke opdateret, da det indeholdt en fejl</key>
   </area>
   <area alias="general">
     <key alias="about">Om</key>
@@ -602,8 +602,8 @@ Mange hilsner fra umbraco robotten
     <key alias="xsltErrorHeader">XSLT'en blev ikke gemt</key>
     <key alias="xsltErrorText">XSLT'en indeholdt fejl</key>
     <key alias="xsltPermissionErrorText">XSLT kunne ikke gemmes, check filrettigheder</key>
-    <key alias="xsltSavedHeader">Xslt gemt</key>
-    <key alias="xsltSavedText">Der var ingen fejl i din xslt!</key>
+    <key alias="xsltSavedHeader">XSLT gemt</key>
+    <key alias="xsltSavedText">Der var ingen fejl i din XSLT!</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Bruger CSS-syntax f.eks. h1, .redheader, .blueTex</key>
