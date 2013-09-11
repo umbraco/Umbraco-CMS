@@ -2608,8 +2608,8 @@
     <Folder Include="MasterPages\" />
     <Folder Include="Media\" />
     <Folder Include="Scripts\" />
-    <Folder Include="Umbraco_client\FolderBrowser\Images\" />
-    <Folder Include="Umbraco_client\Tags\images\" />
+    <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
+    <Folder Include="Umbraco_Client\Tags\images\" />
     <Folder Include="UserControls\" />
     <Folder Include="Views\MacroPartials\" />
     <Folder Include="Views\Partials\" />
