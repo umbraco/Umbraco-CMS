@@ -21,13 +21,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 
         public override string ToString()
         {
-            string columnNameFormat = string.Format("{0} {1}",
-                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(Column.Name),
-                SqlSyntaxContext.SqlSyntaxProvider.Format(Column));
-
             return string.Format(SqlSyntaxContext.SqlSyntaxProvider.AlterColumn, 
                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(TableName),
-                                columnNameFormat);
+                                SqlSyntaxContext.SqlSyntaxProvider.Format(Column));
         }
     }
 }
