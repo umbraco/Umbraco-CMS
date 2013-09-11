@@ -140,6 +140,9 @@
     <Reference Include="System.Web.Extensions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
@@ -182,6 +185,11 @@
     <Compile Include="AbstractJsonPrevalueEditor.cs" />
     <Compile Include="AbstractOptions.cs" />
     <Compile Include="AbstractPrevalueEditor.cs" />
+    <Compile Include="MultiUrlPicker\Dto\MultiUrlPickerSettings.cs" />
+    <Compile Include="MultiUrlPicker\Dto\MultiUrlPickerState.cs" />
+    <Compile Include="MultiUrlPicker\MultiUrlPickerDataEditor.cs" />
+    <Compile Include="MultiUrlPicker\MultiUrlPickerDataType.cs" />
+    <Compile Include="MultiUrlPicker\MultiUrlPickerPreValueEditor.cs" />
     <Compile Include="PickerRelations\PickerRelationsDataEditor.cs" />
     <Compile Include="PickerRelations\PickerRelationsDataType.cs" />
     <Compile Include="PickerRelations\PickerRelationsEventHandler.cs" />
@@ -389,6 +397,17 @@
     <Compile Include="tinymce\TinyMCELegacyControl.cs" />
     <Compile Include="tinymce\tinyMCEImageHelper.cs" />
     <Compile Include="tinymce\tinyMCEPreValueConfigurator.cs" />
+    <Compile Include="UrlPicker\AjaxUpload\AjaxUploadHandler.cs" />
+    <Compile Include="UrlPicker\AjaxUpload\AjaxUploadHandlerResource.Designer.cs" />
+    <Compile Include="UrlPicker\Dto\UrlPickerSettings.cs" />
+    <Compile Include="UrlPicker\Dto\UrlPickerState.cs" />
+    <Compile Include="UrlPicker\Services\UrlPickerService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UrlPicker\Services\UrlPickerServiceResource.Designer.cs" />
+    <Compile Include="UrlPicker\UrlPickerDataEditor.cs" />
+    <Compile Include="UrlPicker\UrlPickerDataType.cs" />
+    <Compile Include="UrlPicker\UrlPickerPreValueEditor.cs" />
     <Compile Include="userControlWrapper\SerializationHelper.cs" />
     <Compile Include="userControlWrapper\usercontrolData.cs" />
     <Compile Include="wysiwyg\editorButton.cs" />
@@ -445,6 +464,10 @@
       <DependentUpon>textFieldDataEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="UrlPicker\AjaxUpload\AjaxUploadHandlerResource.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UrlPicker\Services\UrlPickerServiceResource.resx" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -474,6 +497,12 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="UrlPicker\AjaxUpload\AjaxUploadHandler.ashx.txt" />
+    <EmbeddedResource Include="MultiUrlPicker\MultiUrlPickerScripts.js" />
+    <EmbeddedResource Include="MultiUrlPicker\MultiUrlPickerStyles.css" />
+    <EmbeddedResource Include="UrlPicker\Services\UrlPickerService.asmx" />
+    <EmbeddedResource Include="UrlPicker\UrlPickerScripts.js" />
+    <EmbeddedResource Include="UrlPicker\UrlPickerStyles.css" />
     <EmbeddedResource Include="MultiNodeTreePicker\MultiNodePickerScripts.js" />
     <EmbeddedResource Include="MultiNodeTreePicker\MultiNodePickerStyles.css" />
     <EmbeddedResource Include="MultipleTextstring\MultipleTextstring.css" />

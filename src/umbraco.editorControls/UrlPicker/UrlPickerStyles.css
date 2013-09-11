@@ -1,0 +1,146 @@
+﻿/* 
+Description: Styles for the uComponents URL Picker data type for Umbraco 4
+Author: James Diacono (jd@thefarmdigital.com.au)
+Codeplex username: diachedelic
+Date created: 25th of November, 2010
+*/
+
+.ucomponents-url-picker
+{
+    padding:1em 0;
+}
+
+.ucomponents-url-picker .disabled
+{
+    display:none !important;
+}
+
+.ucomponents-url-picker > .title
+{
+    display:block;
+    margin:0 0 0.5em;
+}
+.ucomponents-url-picker > .title > input
+{
+    width:300px;
+}
+.ucomponents-url-picker > .new-window
+{
+    display:block;
+    margin:0 0 1em;
+}
+.ucomponents-url-picker > ul.mode-chooser
+{
+    margin: 0;
+    padding: 0;
+    list-style: none none outside;
+    height: 19px;
+    position:relative;
+    z-index:1;
+}
+.ucomponents-url-picker > ul.mode-chooser > li
+{
+    display: block;
+    float: left;
+    border: 1px solid #CAC9C9;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    background: #F0F0F0;
+    padding: 2px 9px 0;
+    line-height: 16px;
+    cursor: pointer;
+    
+    /* background gradient */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#fff0f0f0'); /* for IE */
+    background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#f0f0f0)); /* for webkit browsers */
+    background: -moz-linear-gradient(top,  #fff,  #f0f0f0); /* for firefox 3.6+ */ 
+}
+.ucomponents-url-picker > ul.mode-chooser > li:hover
+{
+    text-decoration:underline;
+}
+.ucomponents-url-picker > ul.mode-chooser > li.active
+{
+    font-weight: bold;
+    border-bottom: 0 none;
+    padding-bottom: 1px;
+}
+.ucomponents-url-picker > ul.mode-chooser > li:hover,
+.ucomponents-url-picker > ul.mode-chooser > li.active
+{
+    padding-top:4px;
+    margin-top:-2px;
+}
+.ucomponents-url-picker > ul.mode-views
+{
+    margin: 0;
+    padding: 1em 1.2em;
+    border: 1px solid #CAC9C9;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    min-width: 200px;
+    list-style: none none outside;
+    
+    background-color: #F0F0F0;
+    -webkit-transition: background-color 0.2s ease-in;
+    -moz-transition: background-color 0.2s ease-in;
+    transition: background-color 0.2s ease-in;
+    
+}
+.ucomponents-url-picker.loading > ul.mode-views
+{
+    background:white url('/umbraco/images/throbber.gif') no-repeat center center;
+    -moz-transition-timing-function: ease-out;
+}
+.ucomponents-url-picker.loading > ul.mode-views > li
+{
+    visibility:hidden;
+}
+.ucomponents-url-picker > ul.mode-views > li
+{
+    display:none;
+}
+.ucomponents-url-picker > ul.mode-views > li.active
+{
+    display:block;
+}
+.ucomponents-url-picker > ul.mode-views > li.url
+{
+    position:relative;
+    height:2em;
+    min-width:300px;
+}
+.ucomponents-url-picker > ul.mode-views > li.url > input
+{
+    position:absolute;
+    left:0;
+    right:0;
+    display:block;
+    min-width:300px;
+}
+.ucomponents-url-picker > ul.mode-views > li.upload > .upload-view,
+.ucomponents-url-picker > ul.mode-views > li.upload.done > .status-view
+{
+    display:block;
+}
+.ucomponents-url-picker > ul.mode-views > li.upload > .status-view,
+.ucomponents-url-picker > ul.mode-views > li.upload.done > .upload-view
+{
+    display:none;
+}
+.ucomponents-url-picker > ul.mode-views > li.upload .upload-button
+{
+    /* IE8 and below */
+    display:inline;
+}
+.ucomponents-url-picker > ul.mode-views > li.upload .upload-button:last-of-type
+{
+    /* Every good browser */
+    display:none;
+}
+.ucomponents-url-picker > ul.mode-views > li.upload .delete-button
+{
+    margin-left:1em;
+}
+

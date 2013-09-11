@@ -1,0 +1,140 @@
+﻿/* 
+Description: Styles for the uComponents Multi-URL Picker data type for Umbraco 4
+Author: James Diacono (jd@thefarmdigital.com.au)
+Codeplex username: diachedelic
+Date created: 18th of March, 2011
+Date edited: 21st of March, 2011
+*/
+
+.ucomponents-multi-url-picker
+{
+    padding-bottom:25px;
+    min-width: 420px;
+    *width:420px;
+}
+.ucomponents-multi-url-picker > ul.items
+{
+    list-style: none none outside;
+    padding: 0 0.5em;
+    margin: 0;
+    background: white;
+    border: 1px solid #CAC9C9;
+    min-height: 1em;
+    *zoom:1;
+    *padding-top:0.5em;
+    *padding-bottom:0.1em;
+}
+.ucomponents-multi-url-picker > ul.items > li
+{
+    display: block;
+    background: #FAFAFA;
+    border: 1px solid #CAC9C9;
+    padding: 0;
+    margin: 0.5em 0;
+    border-radius: 4px;
+    -moz-box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+}
+.ucomponents-multi-url-picker > ul.items > li.active
+{
+}
+
+.ucomponents-multi-url-picker > ul.items > li > .controls
+{
+    padding:0.3em 0 0.3em 10px;
+    border-radius: 4px;
+    cursor:move;
+    position:relative;
+    
+    background: #fafafa;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffEEEDF5', endColorstr='#fffafafa'); /* for IE */
+    background: -webkit-gradient(linear, left top, left bottom, from(#EEEDF5), to(#fafafa)); /* for webkit browsers */
+    background: -moz-linear-gradient(top,  #EEEDF5,  #fafafa); /* for firefox 3.6+ */
+    *white-space: nowrap;
+}
+.ucomponents-multi-url-picker > ul.items > li > .controls:hover,
+.ucomponents-multi-url-picker > ul.items > li.active > .controls
+{
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffeece3', endColorstr='#fffafafa'); /* for IE */
+    background: -webkit-gradient(linear, left top, left bottom, from(#feece3), to(#fafafa)); /* for webkit browsers */
+    background: -moz-linear-gradient(top,  #feece3,  #fafafa); /* for firefox 3.6+ */
+}
+.ucomponents-multi-url-picker > ul.items > li > .controls > .drag-handle
+{
+    position:absolute;
+    top:1px;
+    left:1px;
+    bottom:1px;
+    width:10px;
+    background-color:#CAC9C9;
+    border-radius: 2px;
+}
+.ucomponents-multi-url-picker > ul.items > li > .controls > .button
+{
+    line-height: 1.6em;
+    display: inline-block;
+    padding: 0 0.5em;
+    margin: 0 0 0 0.5em;
+    color: black;
+    text-decoration: none;
+}
+.ucomponents-multi-url-picker > ul.items > li > .controls > .button:hover
+{
+    text-decoration: underline;
+}
+.ucomponents-multi-url-picker > ul.items > li > .controls > .button.close
+{
+    display: none;
+}
+.ucomponents-multi-url-picker > ul.items > li > .controls > .button.delete
+{
+    color:#e00;
+}
+.ucomponents-multi-url-picker > ul.items > li > .controls > .button.url
+{
+    color: #1541A9;
+    text-decoration:underline;
+}
+.ucomponents-multi-url-picker > ul.items > li.active > .controls > .button.close
+{
+    display: inline-block;
+}
+.ucomponents-multi-url-picker > ul.items > li.active > .controls > .button.edit
+{
+    display: none;
+}
+
+.ucomponents-multi-url-picker > .add
+{
+    border: 1px solid #CAC9C9;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-top: 0 none;
+    padding: 2px 9px;
+    line-height: 16px;
+    cursor: pointer;
+    float:right;
+    margin-top:-1px;
+    color: Black;
+    text-decoration: none;
+    background: #F0F0F0;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#fff0f0f0'); /* for IE */
+    background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#f0f0f0)); /* for webkit browsers */
+    background: -moz-linear-gradient(top,  #fff,  #f0f0f0); /* for firefox 3.6+ */
+}
+.ucomponents-multi-url-picker > .add:hover
+{
+    text-decoration: underline;
+    padding-bottom:4px;
+}
+
+.ucomponents-multi-url-picker .ucomponents-url-picker
+{
+    display: none;
+    padding: 1em;
+}
+.ucomponents-multi-url-picker .active .ucomponents-url-picker
+{
+    display: block;
+}
