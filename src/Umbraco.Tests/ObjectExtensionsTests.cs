@@ -115,7 +115,16 @@ namespace Umbraco.Tests
 			}
 		}
 
-		/// <summary>
+	    [Test]
+	    public virtual void CanConvertObjectToString_Using_ToString_Overload()
+	    {
+	        var result = new MyTestObject().TryConvertTo<string>();
+
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual("Hello world", result.Result);
+	    }
+
+	    /// <summary>
 		/// Run once before each test in derived test fixtures.
 		/// </summary>
 		public override void TestSetup()
@@ -130,5 +139,13 @@ namespace Umbraco.Tests
 		{
 			return;
 		}
+
+        private class MyTestObject
+        {
+            public override string ToString()
+            {
+                return "Hello world";
+            }
+        }
 	}
 }
