@@ -96,7 +96,7 @@
     <key alias="noDate">Ingen dato valgt</key>
     <key alias="nodeName">Sidetitel</key>
     <key alias="otherElements">Egenskaber</key>
-    <key alias="parentNotPublished">Dette dokument er udgivet, men ikke synligt da den ovenliggende side '%0%' ikke er udgivet!</key>
+    <key alias="parentNotPublished">Dette dokument er udgivet, men ikke synligt da den overliggende side '%0%' ikke er udgivet!</key>
     <key alias="publish">Udgivet</key>
     <key alias="publishStatus">Udgivelses status</key>
     <key alias="releaseDate">Udgivelsesdato</key>
@@ -495,10 +495,10 @@ Mange hilsner fra umbraco robotten
   <area alias="publish">
     <key alias="contentPublishedFailedByEvent">%0% kunne ikke udgives, fordi et 3. parts modul annullerede handlingen</key>
     <key alias="includeUnpublished">Medtag ikke-udgivede undersider</key>
-    <key alias="inProgress">Publiserer - vent venligst...</key>
+    <key alias="inProgress">Publicerer - vent venligst...</key>
     <key alias="inProgressCounter">%0% ud af %1% sider er blevet udgivet...</key>
-    <key alias="nodePublish">%0% er nu publiseret</key>
-    <key alias="nodePublishAll">%0% og alle undersider er nu publiseret</key>
+    <key alias="nodePublish">%0% er nu publiceret</key>
+    <key alias="nodePublishAll">%0% og alle undersider er nu publiceret</key>
     <key alias="publishAll">Publisér alle undersider</key>
     <key alias="publishHelp"><![CDATA[Klik <em>ok</em> for at udgive <strong>%0%</strong> og derved gøre indholdet offentligt tilgængeligt..<br/><br /> Du kan udgive denne side og dens undersider ved at klikke <em>Udgiv alle undersider</em> forneden]]></key>
   </area>
@@ -574,10 +574,10 @@ Mange hilsner fra umbraco robotten
     <key alias="dataTypeSaved">Datatype gemt</key>
     <key alias="dictionaryItemSaved">Ordbogsnøgle gemt</key>
     <key alias="editContentPublishedFailedByParent">Udgivelsen fejlede fordi en overordnet side ikke er publiceret</key>
-    <key alias="editContentPublishedHeader">Indhold publiseret</key>
+    <key alias="editContentPublishedHeader">Indhold publiceret</key>
     <key alias="editContentPublishedText">og nu synligt for besøgende</key>
     <key alias="editContentSavedHeader">Indhold gemt</key>
-    <key alias="editContentSavedText">Husk at publisere for at gøre det synligt for besøgende</key>
+    <key alias="editContentSavedText">Husk at publicere for at gøre det synligt for besøgende</key>
     <key alias="editContentSendToPublish">Send til Godkendelse</key>
     <key alias="editContentSendToPublishText">Rettelser er blevet sendt til godkendelse</key>
     <key alias="editMemberSaved">Medlem gemt</key>
