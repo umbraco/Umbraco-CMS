@@ -3,6 +3,12 @@ using Umbraco.Web.Mvc;
 
 namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 {
+    /// <summary>
+    /// Represents a basic extension of the UmbracoTemplatePage, which allows you to specify
+    /// the type of a strongly typed model that inherits from TypedModelBase.
+    /// The model is exposed as TypedModel.
+    /// </summary>
+    /// <typeparam name="T">Type of the model to create/expose</typeparam>
     public abstract class UmbracoTemplatePage<T> : UmbracoTemplatePage where T : TypedModelBase
     {
         protected override void InitializePage()
