@@ -61,7 +61,7 @@
     <key alias="justifyLeft">Venstrestil afsnit</key>
     <key alias="justifyRight">Højrestil afsnit</key>
     <key alias="linkInsert">Indsæt link</key>
-    <key alias="linkLocal">Indsæt lokaltlink (anker)</key>
+    <key alias="linkLocal">Indsæt lokalt link (anker)</key>
     <key alias="listBullet">Punktopstilling</key>
     <key alias="listNumeric">Nummerorden</key>
     <key alias="macroInsert">Indsæt makro</key>
@@ -78,7 +78,7 @@
   <area alias="content">
     <key alias="about">Om siden</key>
     <key alias="alias">Alternativ link</key>
-    <key alias="alternativeTextHelp">(hvordan ville du f.eks beskrive billedet via telefonen)</key>
+    <key alias="alternativeTextHelp">(hvordan ville du f.eks. beskrive billedet via telefonen?)</key>
     <key alias="alternativeUrls">Alternative links</key>
     <key alias="clickToEdit">Klik på musen for at redigere dette punkt</key>
     <key alias="createBy">Oprettet af</key>
