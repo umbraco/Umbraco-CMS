@@ -59,7 +59,7 @@ namespace umbraco.presentation.umbraco.Search
             }
             else
             {
-                var operation = criteria.Field("__nodeName", txt.MultipleCharacterWildcard());
+                var operation = criteria.Field("__nodeName", txt);
 
                 // ensure the user can only find nodes they are allowed to see
                 if (UmbracoContext.Current.UmbracoUser.StartNodeId > 0)
