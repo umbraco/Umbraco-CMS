@@ -10,7 +10,7 @@ namespace umbraco.editorControls.MultiUrlPicker
 {
     /// <summary>
     /// Description here:
-    /// http://ucomponents.codeplex.com/wikipage?title=MultiUrlPicker
+    /// http://ucomponents.org/data-types/multi-url-picker/
     /// </summary>
     public class MultiUrlPickerDataType : AbstractDataEditor
     {

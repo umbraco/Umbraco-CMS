@@ -9,7 +9,7 @@ namespace umbraco.editorControls.UrlPicker
 {
     /// <summary>
     /// Description here:
-    /// http://ucomponents.codeplex.com/wikipage?title=UrlPicker
+    /// http://ucomponents.org/data-types/url-picker/
     /// </summary>
     public class UrlPickerDataType : AbstractDataEditor
     {
