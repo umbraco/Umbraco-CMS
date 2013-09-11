@@ -155,17 +155,17 @@ namespace Umbraco.Core.Persistence.Repositories
             foreach (var propertyType in entity.PropertyTypes)
             {
                 var tabId = propertyType.PropertyGroupId != null ? propertyType.PropertyGroupId.Value : default(int);
-                //If the Id of the DataType is not set, we resolve it from the db by its ControlId
+                //If the Id of the DataType is not set, we resolve it from the db by its PropertyEditorAlias
                 if (propertyType.DataTypeDefinitionId == 0 || propertyType.DataTypeDefinitionId == default(int))
                 {
-                    var datatype = Database.FirstOrDefault<DataTypeDto>("WHERE controlId = @Id", new { Id = propertyType.DataTypeId });
+                    var datatype = Database.FirstOrDefault<DataTypeDto>("WHERE propertyEditorAlias = @alias", new { alias = propertyType.PropertyEditorAlias });
                     propertyType.DataTypeDefinitionId = datatype.DataTypeId;
                 }
                 var propertyTypeDto = propertyFactory.BuildPropertyTypeDto(tabId, propertyType);
                 int typePrimaryKey = Convert.ToInt32(Database.Insert(propertyTypeDto));
                 propertyType.Id = typePrimaryKey; //Set Id on new PropertyType
 
-                //Update the current PropertyType with correct ControlId and DatabaseType
+                //Update the current PropertyType with correct PropertyEditorAlias and DatabaseType
                 var dataTypeDto = Database.FirstOrDefault<DataTypeDto>("WHERE nodeId = @Id", new { Id = propertyTypeDto.DataTypeId });
                 propertyType.PropertyEditorAlias = dataTypeDto.PropertyEditorAlias;
                 propertyType.DataTypeDatabaseType = dataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true);
@@ -312,10 +312,10 @@ namespace Umbraco.Core.Persistence.Repositories
             foreach (var propertyType in entity.PropertyTypes)
             {
                 var tabId = propertyType.PropertyGroupId != null ? propertyType.PropertyGroupId.Value : default(int);
-                //If the Id of the DataType is not set, we resolve it from the db by its ControlId
+                //If the Id of the DataType is not set, we resolve it from the db by its PropertyEditorAlias
                 if (propertyType.DataTypeDefinitionId == 0 || propertyType.DataTypeDefinitionId == default(int))
                 {
-                    var datatype = Database.FirstOrDefault<DataTypeDto>("WHERE controlId = @Id", new { Id = propertyType.DataTypeId });
+                    var datatype = Database.FirstOrDefault<DataTypeDto>("WHERE propertyEditorAlias = @alias", new { alias = propertyType.PropertyEditorAlias });
                     propertyType.DataTypeDefinitionId = datatype.DataTypeId;
                 }
                 var propertyTypeDto = propertyGroupFactory.BuildPropertyTypeDto(tabId, propertyType);

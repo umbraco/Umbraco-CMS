@@ -49,8 +49,8 @@ namespace Umbraco.Core.Models.Rdbms
         public bool ViewOnProfile { get; set; }
 
         /* cmsDataType */
-        [Column("controlId")]
-        public Guid ControlId { get; set; }
+        [Column("propertyEditorAlias")]
+        public string PropertyEditorAlias { get; set; }
 
         [Column("dbType")]
         public string DbType { get; set; }

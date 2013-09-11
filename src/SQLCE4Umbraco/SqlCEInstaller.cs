@@ -98,7 +98,7 @@ namespace SqlCE4Umbraco
 		/// </summary>
 		protected override string FullInstallSql
 		{
-			get { return SqlCEResources.Total; }
+			get { return string.Empty; }
 		}
 
 
@@ -107,11 +107,7 @@ namespace SqlCE4Umbraco
 		/// </summary>
 		protected override string UpgradeSql
 		{
-			get
-			{
-				string upgradeFile = string.Format("{0}_Upgrade", CurrentVersion.ToString());
-				return SqlCEResources.ResourceManager.GetString(upgradeFile);
-			}
+			get { return string.Empty; }
 		}
 
         // We need to override this as the default way of detection a db connection checks for systables that doesn't exist

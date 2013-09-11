@@ -167,10 +167,9 @@ namespace Umbraco.Core
 		                                        {
 		                                            {
 		                                                Comments,
-		                                                new PropertyType(
-		                                                new Guid(
+		                                                new PropertyType(		                                                
 		                                                PropertyEditors
-		                                                .TextboxMultiple),
+		                                                .TextboxMultipleAlias,
 		                                                DataTypeDatabaseType
 		                                                .Ntext)
 		                                                {
@@ -181,10 +180,9 @@ namespace Umbraco.Core
 		                                            },
 		                                            {
 		                                                FailedPasswordAttempts,
-		                                                new PropertyType(
-		                                                new Guid(
+		                                                new PropertyType(		                                                
 		                                                PropertyEditors
-		                                                .Integer),
+		                                                .IntegerAlias,
 		                                                DataTypeDatabaseType
 		                                                .Integer)
 		                                                {
@@ -196,10 +194,9 @@ namespace Umbraco.Core
 		                                            },
 		                                            {
 		                                                IsApproved,
-		                                                new PropertyType(
-		                                                new Guid(
+		                                                new PropertyType(		                                                
 		                                                PropertyEditors
-		                                                .TrueFalse),
+		                                                .TrueFalseAlias,
 		                                                DataTypeDatabaseType
 		                                                .Integer)
 		                                                {
@@ -211,9 +208,8 @@ namespace Umbraco.Core
 		                                            {
 		                                                IsLockedOut,
 		                                                new PropertyType(
-		                                                new Guid(
 		                                                PropertyEditors
-		                                                .TrueFalse),
+		                                                .TrueFalseAlias,
 		                                                DataTypeDatabaseType
 		                                                .Integer)
 		                                                {
@@ -226,8 +222,7 @@ namespace Umbraco.Core
 		                                            {
 		                                                LastLockoutDate,
 		                                                new PropertyType(
-		                                                new Guid(
-		                                                PropertyEditors.Date),
+		                                                PropertyEditors.DateAlias,
 		                                                DataTypeDatabaseType
 		                                                .Date)
 		                                                {
@@ -240,8 +235,7 @@ namespace Umbraco.Core
 		                                            {
 		                                                LastLoginDate,
 		                                                new PropertyType(
-		                                                new Guid(
-		                                                PropertyEditors.Date),
+		                                                PropertyEditors.DateAlias,
 		                                                DataTypeDatabaseType
 		                                                .Date)
 		                                                {
@@ -254,8 +248,7 @@ namespace Umbraco.Core
 		                                            {
 		                                                LastPasswordChangeDate,
 		                                                new PropertyType(
-		                                                new Guid(
-		                                                PropertyEditors.Date),
+		                                                PropertyEditors.DateAlias,
 		                                                DataTypeDatabaseType
 		                                                .Date)
 		                                                {
@@ -268,9 +261,8 @@ namespace Umbraco.Core
 		                                            {
 		                                                PasswordAnswer,
 		                                                new PropertyType(
-		                                                new Guid(
 		                                                PropertyEditors
-		                                                .Textbox),
+		                                                .TextboxAlias,
 		                                                DataTypeDatabaseType
 		                                                .Nvarchar)
 		                                                {
@@ -283,9 +275,8 @@ namespace Umbraco.Core
 		                                            {
 		                                                PasswordQuestion,
 		                                                new PropertyType(
-		                                                new Guid(
 		                                                PropertyEditors
-		                                                .Textbox),
+		                                                .TextboxAlias,
 		                                                DataTypeDatabaseType
 		                                                .Nvarchar)
 		                                                {
