@@ -84,7 +84,7 @@ namespace Umbraco.Core
 			if (input.GetType() == destinationType) return Attempt.Succeed(input);
 
             //check for string so that overloaders of ToString() can take advantage of the conversion.
-            if (destinationType == typeof(string)) return new Attempt<object>(true, input.ToString());
+            if (destinationType == typeof(string)) return Attempt<object>.Succeed(input.ToString());
 
 			if (!destinationType.IsGenericType || destinationType.GetGenericTypeDefinition() != typeof(Nullable<>))
 			{
