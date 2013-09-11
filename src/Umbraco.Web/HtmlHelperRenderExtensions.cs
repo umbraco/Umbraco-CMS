@@ -188,21 +188,19 @@ namespace Umbraco.Web
 		/// </summary>
 		internal class UmbracoForm : MvcForm
 		{
-		    
-
 		    /// <summary>
 		    /// Creates an UmbracoForm
 		    /// </summary>
 		    /// <param name="viewContext"></param>
-		    /// <param name="surfaceController"></param>
-		    /// <param name="surfaceAction"></param>
+		    /// <param name="controllerName"></param>
+		    /// <param name="controllerAction"></param>
 		    /// <param name="area"></param>
 		    /// <param name="method"></param>
 		    /// <param name="additionalRouteVals"></param>
 		    public UmbracoForm(
 				ViewContext viewContext,
-				string surfaceController,
-				string surfaceAction,
+				string controllerName,
+				string controllerAction,
 				string area,
                 FormMethod method,
 				object additionalRouteVals = null)
@@ -210,21 +208,7 @@ namespace Umbraco.Web
 			{
 		        _viewContext = viewContext;
 		        _method = method;
-		        //need to create a params string as Base64 to put into our hidden field to use during the routes
-				var surfaceRouteParams = string.Format("c={0}&a={1}&ar={2}",
-														  viewContext.HttpContext.Server.UrlEncode(surfaceController),
-														  viewContext.HttpContext.Server.UrlEncode(surfaceAction),
-														  area);
-
-				var additionalRouteValsAsQuery = additionalRouteVals != null ? additionalRouteVals.ToDictionary<object>().ToQueryString() : null;
-
-				if (additionalRouteValsAsQuery.IsNullOrWhiteSpace() == false)
-					surfaceRouteParams += "&" + additionalRouteValsAsQuery;
-
-				if (string.IsNullOrWhiteSpace(surfaceRouteParams) == false)
-				{
-					_encryptedString = surfaceRouteParams.EncryptWithMachineKey();
-				}
+                _encryptedString = UmbracoHelper.CreateEncryptedRouteString(controllerName, controllerAction, area, additionalRouteVals);
 			}
 
 		    private readonly ViewContext _viewContext;
@@ -238,29 +222,8 @@ namespace Umbraco.Web
 					return;
 				this._disposed = true;
 
-                //Need to ensure any stale GET cookies are cleared before continuing
-                foreach (var c in _viewContext.HttpContext.Request.Cookies.AllKeys.Where(x => x.StartsWith("ufprt_")))
-                {
-                    _viewContext.HttpContext.Request.Cookies[c].Expires = DateTime.Now.AddDays(-1);
-                    _viewContext.HttpContext.Response.SetCookie(_viewContext.HttpContext.Request.Cookies[c]);
-                }
-
-                if (_method == FormMethod.Post)
-                {
-                    //write out the hidden surface form routes
-                    _viewContext.Writer.Write("<input name='ufprt' type='hidden' value='" + _encryptedString + "' />");
-                }
-                else
-                {
-                    //since we are getting and we don't want this ugly value in the query string, we'll chuck it into a cookie with an id so we can retreive
-                    //it on the server side with the same id and then remove it.
-                    var id = Guid.NewGuid().ToString("N");
-                    var cookie = new HttpCookie("ufprt_" + id, _encryptedString);
-                    _viewContext.HttpContext.Response.SetCookie(cookie);
-
-                    _viewContext.Writer.Write("<input name='ufprt' type='hidden' value='" + id + "' />");
-                }
-				
+                //write out the hidden surface form routes
+                _viewContext.Writer.Write("<input name='ufprt' type='hidden' value='" + _encryptedString + "' />");
 
 				base.Dispose(disposing);
 			}
@@ -544,6 +507,7 @@ namespace Umbraco.Web
         /// <param name="action"></param>
         /// <param name="additionalRouteVals"></param>
         /// <param name="htmlAttributes"></param>
+        /// <param name="method"></param>
         /// <returns></returns>
         public static MvcForm BeginUmbracoForm<T>(this HtmlHelper html, string action,
                                                   object additionalRouteVals,

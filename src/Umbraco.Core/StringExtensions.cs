@@ -28,6 +28,17 @@ namespace Umbraco.Core
         [UmbracoWillObsolete("Do not use this constants. See IShortStringHelper.CleanStringForSafeAliasJavaScriptCode.")]
         public const string UmbracoInvalidFirstCharacters = "01234567890";
 
+        private static readonly char[] ToCSharpHexDigitLower = "0123456789abcdef".ToCharArray();
+        private static readonly char[] ToCSharpEscapeChars;
+        
+        static StringExtensions()
+        {
+            var escapes = new[] { "\aa", "\bb", "\ff", "\nn", "\rr", "\tt", "\vv", "\"\"", "\\\\", "??", "\00" };
+            ToCSharpEscapeChars = new char[escapes.Max(e => e[0]) + 1];
+            foreach (var escape in escapes)
+                ToCSharpEscapeChars[escape[0]] = escape[1];
+        }
+
         internal static string ReplaceNonAlphanumericChars(this string input, char replacement)
         {
             //any character that is not alphanumeric, convert to a hyphen
@@ -1085,5 +1096,46 @@ namespace Umbraco.Core
 
             return source;
         }
+
+        /// <summary>
+        /// Converts a literal string into a C# expression.
+        /// </summary>
+        /// <param name="s">Current instance of the string.</param>
+        /// <returns>The string in a C# format.</returns>
+        public static string ToCSharpString(this string s)
+        {
+            if (s == null) return "<null>";
+
+            // http://stackoverflow.com/questions/323640/can-i-convert-a-c-sharp-string-value-to-an-escaped-string-literal
+
+            var sb = new StringBuilder(s.Length + 2);
+            for (var rp = 0; rp < s.Length; rp++)
+            {
+                var c = s[rp];
+                if (c < ToCSharpEscapeChars.Length && '\0' != ToCSharpEscapeChars[c])
+                    sb.Append('\\').Append(ToCSharpEscapeChars[c]);
+                else if ('~' >= c && c >= ' ')
+                    sb.Append(c);
+                else
+                    sb.Append(@"\x")
+                      .Append(ToCSharpHexDigitLower[c >> 12 & 0x0F])
+                      .Append(ToCSharpHexDigitLower[c >> 8 & 0x0F])
+                      .Append(ToCSharpHexDigitLower[c >> 4 & 0x0F])
+                      .Append(ToCSharpHexDigitLower[c & 0x0F]);
+            }
+
+            return sb.ToString();
+
+            // requires full trust
+            /*
+            using (var writer = new StringWriter())
+            using (var provider = CodeDomProvider.CreateProvider("CSharp"))
+            {
+                provider.GenerateCodeFromExpression(new CodePrimitiveExpression(s), writer, null);
+                return writer.ToString().Replace(string.Format("\" +{0}\t\"", Environment.NewLine), "");
+            }
+            */
+        }
+
     }
 }

@@ -83,6 +83,9 @@ namespace Umbraco.Core
 
 			if (input.GetType() == destinationType) return new Attempt<object>(true, input);
 
+            //check for string so that overloaders of ToString() can take advantage of the conversion.
+            if (destinationType == typeof(string)) return new Attempt<object>(true, input.ToString());
+
 			if (!destinationType.IsGenericType || destinationType.GetGenericTypeDefinition() != typeof(Nullable<>))
 			{
                 //TODO: Do a check for destination type being IEnumerable<T> and source type implementing IEnumerable<T> with
