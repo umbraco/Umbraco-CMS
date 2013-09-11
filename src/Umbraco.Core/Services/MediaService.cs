@@ -479,16 +479,22 @@ namespace Umbraco.Core.Services
 		        if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, parentId), this))
 		            return;
 
-		        media.ParentId = parentId;
+                //If we aren't moving to recycle bin, we must be moving from recycle bin -> #U4-2842
+                media.ChangeTrashedState(false, parentId);
 		        Save(media, userId);
 
 		        //Ensure that Path and Level is updated on children
-		        var children = GetChildren(media.Id);
+		        var children = GetChildren(media.Id).ToList(); //No need to enumerate twice?
 		        if (children.Any())
 		        {
 		            var parentPath = media.Path;
 		            var parentLevel = media.Level;
-		            var updatedDescendents = UpdatePathAndLevelOnChildren(children, parentPath, parentLevel);
+		            var updatedDescendents = UpdatePathAndLevelOnChildren(children, parentPath, parentLevel).ToList();
+                    //Update trashed state for descendants -> #U4-2842
+                    foreach (var descendant in updatedDescendents)
+		            {
+		                descendant.ChangeTrashedState(false, descendant.ParentId);
+		            }
 		            Save(updatedDescendents, userId);
 		        }
 
@@ -910,7 +916,7 @@ namespace Umbraco.Core.Services
                 child.Level = parentLevel + 1;
                 list.Add(child);
 
-                var grandkids = GetChildren(child.Id);
+                var grandkids = GetChildren(child.Id).ToList(); //No need to enumerate twice?
                 if (grandkids.Any())
                 {
                     list.AddRange(UpdatePathAndLevelOnChildren(grandkids, child.Path, child.Level));
