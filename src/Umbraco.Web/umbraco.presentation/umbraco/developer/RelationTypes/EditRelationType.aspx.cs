@@ -194,25 +194,26 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 			relationTypeTabPage.Controls.Add(this.directionPane);
 			relationTypeTabPage.Controls.Add(this.objectTypePane);
 
-			var saveMenuImageButton = relationTypeTabPage.Menu.NewImageButton();
-			saveMenuImageButton.AlternateText = "save relation type";
-			saveMenuImageButton.Click += this.SaveMenuImageButton_Click;
-			saveMenuImageButton.ImageURL = "/umbraco/images/editor/save.gif";
+			var saveMenuImageButton =  tabControl.Menu.NewButton();
+			saveMenuImageButton.ToolTip = "save relation type";
+			saveMenuImageButton.Click +=saveMenuImageButton_Click;
 			saveMenuImageButton.CausesValidation = true;
+            saveMenuImageButton.Text = ui.Text("save");
 			saveMenuImageButton.ValidationGroup = "RelationType";
 
 			var relationsTabPage = this.tabControl.NewTabPage("Relations");
 			relationsTabPage.Controls.Add(this.relationsCountPane);
 			relationsTabPage.Controls.Add(this.relationsPane);
 
+            /*
 			var refreshMenuImageButton = relationsTabPage.Menu.NewImageButton();
 			refreshMenuImageButton.AlternateText = "refresh relations";
 			refreshMenuImageButton.Click += this.RefreshMenuImageButton_Click;
 			refreshMenuImageButton.ImageUrl = "/umbraco/developer/RelationTypes/Images/Refresh.gif";
-			refreshMenuImageButton.CausesValidation = false;
+			refreshMenuImageButton.CausesValidation = false;*/
 		}
 
-		/// <summary>
+       /// <summary>
 		/// check that alias hasn't been changed to clash with another (except itself)
 		/// </summary>
 		/// <param name="source">the aliasCustomValidator control</param>
@@ -237,7 +238,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// </summary>
 		/// <param name="sender">expects saveMenuImageButton object</param>
 		/// <param name="e">expects ImageClickEventArgs</param>
-		private void SaveMenuImageButton_Click(object sender, ImageClickEventArgs e)
+        void saveMenuImageButton_Click(object sender, EventArgs e)
 		{
 			if (this.Page.IsValid)
 			{

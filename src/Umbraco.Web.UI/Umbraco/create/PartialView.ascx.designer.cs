@@ -13,15 +13,6 @@ namespace Umbraco.Web.UI.Umbraco.Create {
     public partial class PartialView {
         
         /// <summary>
-        /// RequiredFieldValidator1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
-        
-        /// <summary>
         /// FileName control.
         /// </summary>
         /// <remarks>
@@ -29,6 +20,15 @@ namespace Umbraco.Web.UI.Umbraco.Create {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox FileName;
+        
+        /// <summary>
+        /// RequiredFieldValidator1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
         
         /// <summary>
         /// PartialViewTemplate control.
@@ -49,12 +49,21 @@ namespace Umbraco.Web.UI.Umbraco.Create {
         protected global::System.Web.UI.WebControls.CheckBox CreateMacroCheckBox;
         
         /// <summary>
-        /// SubmitButton control.
+        /// Textbox1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button SubmitButton;
+        protected global::System.Web.UI.WebControls.TextBox Textbox1;
+        
+        /// <summary>
+        /// sbmt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button sbmt;
     }
 }
