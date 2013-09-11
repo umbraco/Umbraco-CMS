@@ -105,7 +105,7 @@ namespace Umbraco.Core
 				.Select(p => p.ConvertPropertyValue(currentValue))
 				.Where(converted => converted.Success))
 			{
-				return Attempt.Succ(converted.Result);
+				return Attempt.Succeed(converted.Result);
 			}
 
 			//if none of the converters worked, then we'll process this from what we know
@@ -118,17 +118,17 @@ namespace Umbraco.Core
 				decimal dResult;
 				if (decimal.TryParse(sResult, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out dResult))
 				{
-					return Attempt<object>.Succ(dResult);
+					return Attempt<object>.Succeed(dResult);
 				}
 			}
 			//process string booleans as booleans
 			if (sResult.InvariantEquals("true"))
 			{
-				return Attempt<object>.Succ(true);
+				return Attempt<object>.Succeed(true);
 			}
 			if (sResult.InvariantEquals("false"))
 			{
-				return Attempt<object>.Succ(false);
+				return Attempt<object>.Succeed(false);
 			}
 
 			//a really rough check to see if this may be valid xml
@@ -147,7 +147,7 @@ namespace Umbraco.Core
 					if (!UmbracoSettings.NotDynamicXmlDocumentElements.Any(
 						tag => string.Equals(tag, documentElement, StringComparison.CurrentCultureIgnoreCase)))
 					{
-						return Attempt<object>.Succ(new DynamicXml(e));
+						return Attempt<object>.Succeed(new DynamicXml(e));
 					}
 					return Attempt<object>.Fail();
 				}

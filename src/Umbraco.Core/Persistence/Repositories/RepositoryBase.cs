@@ -117,7 +117,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var rEntity = _cache.GetById(typeof(TEntity), key);
             if (rEntity != null)
             {
-                return Attempt.Succ((TEntity) rEntity);
+                return Attempt.Succeed((TEntity) rEntity);
             }
             return Attempt<TEntity>.Fail();
         } 

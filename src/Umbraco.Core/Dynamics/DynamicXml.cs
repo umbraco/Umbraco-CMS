@@ -261,7 +261,7 @@ namespace Umbraco.Core.Dynamics
             var attributes = xmlElement.Attributes(name).Select(attr => attr.Value).ToArray();
             if (attributes.Any())
             {
-                return Attempt<IEnumerable<string>>.Succ(attributes);
+                return Attempt<IEnumerable<string>>.Succeed(attributes);
             }
 
             if (!attributes.Any() && xmlElement.Name == "root" && xmlElement.Elements().Count() == 1)
@@ -271,7 +271,7 @@ namespace Umbraco.Core.Dynamics
                 if (childElements.Any())
                 {
                     //we've found a match by the first child of an element called 'root' (strange, but sure)
-                    return Attempt<IEnumerable<string>>.Succ(childElements);
+                    return Attempt<IEnumerable<string>>.Succeed(childElements);
                 }
             }            
 
@@ -293,7 +293,7 @@ namespace Umbraco.Core.Dynamics
             //Check if we've got any matches, if so then return true
             if (elements.Any())
             {
-                return Attempt<IEnumerable<XElement>>.Succ(elements);
+                return Attempt<IEnumerable<XElement>>.Succeed(elements);
             }
 
             if (!elements.Any() && xmlElement.Name == "root" && xmlElement.Elements().Count() == 1)
@@ -303,7 +303,7 @@ namespace Umbraco.Core.Dynamics
                 if (childElements.Any())
                 {
                     //we've found a match by the first child of an element called 'root' (strange, but sure)
-                    return Attempt<IEnumerable<XElement>>.Succ(childElements);
+                    return Attempt<IEnumerable<XElement>>.Succeed(childElements);
                 }
             }
             

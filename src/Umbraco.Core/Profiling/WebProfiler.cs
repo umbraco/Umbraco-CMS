@@ -148,7 +148,7 @@ namespace Umbraco.Core.Profiling
             try
             {
                 var req = app.Request;
-                return Attempt<HttpRequestBase>.Succ(new HttpRequestWrapper(req));
+                return Attempt<HttpRequestBase>.Succeed(new HttpRequestWrapper(req));
             }
             catch (HttpException ex)
             {

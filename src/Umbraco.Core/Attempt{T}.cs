@@ -52,7 +52,7 @@ namespace Umbraco.Core
         [Obsolete(".Failed is obsolete, you should use Attempt<T>.Fail() instead.", false)]
         public static readonly Attempt<T> False = Failed; 
 
-        // private - use Succ() or Fail() methods to create attempts
+        // private - use Succeed() or Fail() methods to create attempts
         private Attempt(bool success, T result, Exception exception)
         {
             _success = success;
@@ -66,7 +66,7 @@ namespace Umbraco.Core
         /// <param name="success">A value indicating whether the attempt is successful.</param>
         /// <param name="result">The result of the attempt.</param>
         /// <remarks>Keep it for backward compatibility sake.</remarks>
-        [Obsolete("Attempt ctors are obsolete, you should use Attempt<T>.Succ(), Attempt<T>.Fail() or Attempt<T>.If() instead.", false)]
+        [Obsolete("Attempt ctors are obsolete, you should use Attempt<T>.Succeed(), Attempt<T>.Fail() or Attempt<T>.If() instead.", false)]
         public Attempt(bool success, T result)
             : this(success, result, null)
         { }
@@ -76,7 +76,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="exception">The exception causing the failure of the attempt.</param>
         /// <remarks>Keep it for backward compatibility sake.</remarks>
-        [Obsolete("Attempt ctors are obsolete, you should use Attempt<T>.Succ(), Attempt<T>.Fail() or Attempt<T>.If() instead.", false)]
+        [Obsolete("Attempt ctors are obsolete, you should use Attempt<T>.Succeed(), Attempt<T>.Fail() or Attempt<T>.If() instead.", false)]
         public Attempt(Exception exception)
             : this(false, default(T), exception)
         { }
@@ -85,7 +85,7 @@ namespace Umbraco.Core
         /// Creates a successful attempt.
         /// </summary>
         /// <returns>The successful attempt.</returns>
-        public static Attempt<T> Succ()
+        public static Attempt<T> Succeed()
         {
             return new Attempt<T>(true, default(T), null);
         }
@@ -95,7 +95,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="result">The result of the attempt.</param>
         /// <returns>The successful attempt.</returns>
-        public static Attempt<T> Succ(T result)
+        public static Attempt<T> Succeed(T result)
         {
             return new Attempt<T>(true, result, null);
         }
@@ -143,22 +143,22 @@ namespace Umbraco.Core
         /// <summary>
         /// Creates a successful or a failed attempt.
         /// </summary>
-        /// <param name="success">A value indicating whether the attempt is successful.</param>
+        /// <param name="condition">A value indicating whether the attempt is successful.</param>
         /// <returns>The attempt.</returns>
-        public static Attempt<T> If(bool success)
+        public static Attempt<T> SucceedIf(bool condition)
         {
-            return success ? new Attempt<T>(true, default(T), null) : Failed;
+            return condition ? new Attempt<T>(true, default(T), null) : Failed;
         }
 
         /// <summary>
         /// Creates a successful or a failed attempt, with a result.
         /// </summary>
-        /// <param name="success">A value indicating whether the attempt is successful.</param>
+        /// <param name="condition">A value indicating whether the attempt is successful.</param>
         /// <param name="result">The result of the attempt.</param>
         /// <returns>The attempt.</returns>
-        public static Attempt<T> If(bool success, T result)
+        public static Attempt<T> SucceedIf(bool condition, T result)
         {
-            return new Attempt<T>(success, result, null);
+            return new Attempt<T>(condition, result, null);
         }
     }
 }

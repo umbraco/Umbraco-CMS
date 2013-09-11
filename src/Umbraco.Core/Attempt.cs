@@ -13,9 +13,9 @@ namespace Umbraco.Core
         /// <typeparam name="T">The type of the attempted operation result.</typeparam>
         /// <param name="result">The result of the attempt.</param>
         /// <returns>The successful attempt.</returns>
-        public static Attempt<T> Succ<T>(T result)
+        public static Attempt<T> Succeed<T>(T result)
         {
-            return Attempt<T>.Succ(result);
+            return Attempt<T>.Succeed(result);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Umbraco.Core
         /// <returns>The attempt.</returns>
         public static Attempt<T> If<T>(bool success, T result)
         {
-            return Attempt<T>.If(success, result);
+            return Attempt<T>.SucceedIf(success, result);
         }
     }
 }

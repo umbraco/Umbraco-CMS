@@ -82,7 +82,7 @@ namespace Umbraco.Core.Dynamics
 				                                null,
 				                                thisObject,
 				                                args);
-				return Attempt.Succ(new TryInvokeMemberResult(result, TryInvokeMemberSuccessReason.FoundProperty));
+				return Attempt.Succeed(new TryInvokeMemberResult(result, TryInvokeMemberSuccessReason.FoundProperty));
 			}
 			catch (MissingMethodException)
 			{
@@ -97,7 +97,7 @@ namespace Umbraco.Core.Dynamics
 					                                null,
 					                                thisObject,
 					                                args);
-					return Attempt.Succ(new TryInvokeMemberResult(result, TryInvokeMemberSuccessReason.FoundMethod));
+					return Attempt.Succeed(new TryInvokeMemberResult(result, TryInvokeMemberSuccessReason.FoundMethod));
 				}
 				catch (MissingMethodException)
 				{
@@ -106,7 +106,7 @@ namespace Umbraco.Core.Dynamics
 						try
 						{
 							result = FindAndExecuteExtensionMethod(thisObject, args, binder.Name, findExtensionMethodsOnTypes);
-							return Attempt.Succ(new TryInvokeMemberResult(result, TryInvokeMemberSuccessReason.FoundExtensionMethod));
+							return Attempt.Succeed(new TryInvokeMemberResult(result, TryInvokeMemberSuccessReason.FoundExtensionMethod));
 						}
 						catch (TargetInvocationException ext)
 						{

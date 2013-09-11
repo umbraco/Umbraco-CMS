@@ -150,7 +150,7 @@ namespace Umbraco.Web.Models
 		{
 			if (binder.Name.InvariantEquals("ChildrenAsList") || binder.Name.InvariantEquals("Children"))
 			{
-				return Attempt<object>.Succ(Children);
+				return Attempt<object>.Succeed(Children);
 			}
 
 			if (binder.Name.InvariantEquals("parentId"))
@@ -160,7 +160,7 @@ namespace Umbraco.Web.Models
 				{
 					throw new InvalidOperationException(string.Format("The node {0} does not have a parent", Id));
 				}
-				return Attempt<object>.Succ(parent.Id);
+				return Attempt<object>.Succeed(parent.Id);
 			}
 			return Attempt<object>.Fail();
 		}
@@ -182,7 +182,7 @@ namespace Umbraco.Web.Models
 				.ToArray();
 			if (filteredTypeChildren.Any())
 			{
-				return Attempt<object>.Succ(
+				return Attempt<object>.Succeed(
 				                           new DynamicPublishedContentList(filteredTypeChildren.Select(x => new DynamicPublishedContent(x))));
 			}
 			return Attempt<object>.Fail();
@@ -247,7 +247,7 @@ namespace Umbraco.Web.Models
 				result = converted.Result;
 			}
 
-			return Attempt<object>.Succ(result);
+			return Attempt<object>.Succeed(result);
 
 		}
 
@@ -382,7 +382,7 @@ namespace Umbraco.Web.Models
 				{
 					try
 					{
-						return Attempt<object>.Succ(
+						return Attempt<object>.Succeed(
 												   content.GetType().InvokeMember(memberAlias,
 																				  System.Reflection.BindingFlags.GetProperty |
 																				  System.Reflection.BindingFlags.Instance |

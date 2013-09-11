@@ -62,7 +62,7 @@ namespace Umbraco.Core.Publishing
                 string.Format("Content '{0}' with Id '{1}' has been published.",
                               content.Name, content.Id));
 
-            return Attempt.Succ(new PublishStatus(content));
+            return Attempt.Succeed(new PublishStatus(content));
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace Umbraco.Core.Publishing
             //We're going to populate the statuses with all content that is already published because below we are only going to iterate over
             // content that is not published. We'll set the status to "AlreadyPublished"
             statuses.AddRange(fetchedContent.Where(x => x.Published)
-                .Select(x => Attempt.Succ(new PublishStatus(x, PublishStatusType.SuccessAlreadyPublished))));
+                .Select(x => Attempt.Succeed(new PublishStatus(x, PublishStatusType.SuccessAlreadyPublished))));
 
             int? firstLevel = null;
 
@@ -239,7 +239,7 @@ namespace Umbraco.Core.Publishing
                         string.Format("Content '{0}' with Id '{1}' has been published.",
                                       item.Name, item.Id));
 
-                    statuses.Add(Attempt.Succ(new PublishStatus(item)));
+                    statuses.Add(Attempt.Succeed(new PublishStatus(item)));
                 }
     
             }
@@ -370,7 +370,7 @@ namespace Umbraco.Core.Publishing
                     string.Format("Content '{0}' with Id '{1}' has been unpublished.",
                                   item.Name, item.Id));
 
-                result.Add(Attempt.Succ(new PublishStatus(item)));
+                result.Add(Attempt.Succeed(new PublishStatus(item)));
             }
 
             return result;

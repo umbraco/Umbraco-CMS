@@ -73,7 +73,7 @@ namespace Umbraco.Core.Persistence.Mappers
             {
                 var instance = Activator.CreateInstance(mapper) as BaseMapper;
                 return instance != null 
-                    ? Attempt<BaseMapper>.Succ(instance) 
+                    ? Attempt<BaseMapper>.Succeed(instance) 
                     : Attempt<BaseMapper>.Fail();
             }
             catch (Exception ex)

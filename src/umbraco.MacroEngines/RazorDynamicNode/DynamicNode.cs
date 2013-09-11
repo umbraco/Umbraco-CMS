@@ -649,7 +649,7 @@ namespace umbraco.MacroEngines
                     {
                         try
                         {
-                            return Attempt<object>.Succ(
+                            return Attempt<object>.Succeed(
                                                        n.GetType().InvokeMember(memberAlias,
                                                                                 System.Reflection.BindingFlags.GetProperty |
                                                                                 System.Reflection.BindingFlags.Instance |

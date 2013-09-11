@@ -35,7 +35,7 @@ namespace Umbraco.Web.PropertyEditors
 					//needs to be explicitly casted to Dictionary<string, object>
 					macroAttributes.ConvertTo(x => (string)x, x => (object)x)).ToString()));
 
-			return Attempt<object>.Succ(new HtmlString(sb.ToString()));
+			return Attempt<object>.Succeed(new HtmlString(sb.ToString()));
 		}
 	}
 }

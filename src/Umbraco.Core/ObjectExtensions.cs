@@ -58,14 +58,14 @@ namespace Umbraco.Core
                 try
                 {
                     var converted = (T) input;
-                    return Attempt<T>.Succ(converted);
+                    return Attempt<T>.Succeed(converted);
                 }
                 catch (Exception e)
                 {
                     return Attempt<T>.Fail(e);
                 }
             }
-			return !result.Success ? Attempt<T>.Fail() : Attempt<T>.Succ((T)result.Result);
+			return !result.Success ? Attempt<T>.Fail() : Attempt<T>.Succeed((T)result.Result);
 		}
 
 		/// <summary>
@@ -79,9 +79,9 @@ namespace Umbraco.Core
 		{
 			if (input == null) return Attempt<object>.Fail();
 
-			if (destinationType == typeof(object)) return Attempt.Succ(input);
+			if (destinationType == typeof(object)) return Attempt.Succeed(input);
 
-			if (input.GetType() == destinationType) return Attempt.Succ(input);
+			if (input.GetType() == destinationType) return Attempt.Succeed(input);
 
 			if (!destinationType.IsGenericType || destinationType.GetGenericTypeDefinition() != typeof(Nullable<>))
 			{
@@ -94,7 +94,7 @@ namespace Umbraco.Core
                     try
                     {
                         var casted = Convert.ChangeType(input, destinationType);
-                        return Attempt.Succ(casted);
+                        return Attempt.Succeed(casted);
                     }
                     catch (Exception e)
                     {
@@ -109,7 +109,7 @@ namespace Umbraco.Core
 				try
 				{
 					var converted = inputConverter.ConvertTo(input, destinationType);
-					return Attempt.Succ(converted);
+					return Attempt.Succeed(converted);
 				}
 				catch (Exception e)
 				{
@@ -125,7 +125,7 @@ namespace Umbraco.Core
 					try
 					{
 						var converted = boolConverter.ConvertFrom(input);
-						return Attempt.Succ(converted);
+						return Attempt.Succeed(converted);
 					}
 					catch (Exception e)
 					{
@@ -140,7 +140,7 @@ namespace Umbraco.Core
 				try
 				{
 					var converted = outputConverter.ConvertFrom(input);
-					return Attempt.Succ(converted);
+					return Attempt.Succeed(converted);
 				}
 				catch (Exception e)
 				{
@@ -154,7 +154,7 @@ namespace Umbraco.Core
 				try
 				{
 					var casted = Convert.ChangeType(input, destinationType);
-					return Attempt.Succ(casted);
+					return Attempt.Succeed(casted);
 				}
 				catch (Exception e)
 				{
@@ -351,7 +351,7 @@ namespace Umbraco.Core
 			try
 			{
 				var output = value.ToXmlString(type);
-				return Attempt.Succ(output);
+				return Attempt.Succeed(output);
 			}
 			catch (NotSupportedException ex)
 			{

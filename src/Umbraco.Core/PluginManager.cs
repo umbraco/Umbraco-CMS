@@ -275,7 +275,7 @@ namespace Umbraco.Core
                     return Attempt<IEnumerable<string>>.Fail(new CachedPluginNotFoundInFile());
 
                 //return success
-                return Attempt.Succ(typeElement.Elements("add")
+                return Attempt.Succeed(typeElement.Elements("add")
                         .Select(x => (string)x.Attribute("type")));
             }
             catch (Exception ex)
