@@ -94,14 +94,14 @@ namespace umbraco.uicontrols
             header.Controls.Add(row);
 
             leftcol.TagName = "span";
-            leftcol.Attributes.Add("class", "span4 umb-panel-header-meta");
+            leftcol.Attributes.Add("class", "span8 umb-panel-header-meta");
             title.TagName = "h1";
             leftcol.Controls.Add(title);
             
             row.Controls.Add(leftcol);
 
             rightcol.TagName = "span";
-            rightcol.Attributes.Add("class", "span8 umb-panel-header-meta");
+            rightcol.Attributes.Add("class", "span4 umb-panel-header-meta");
             rightcol.Controls.Add(Menu);
             row.Controls.Add(rightcol);
 
