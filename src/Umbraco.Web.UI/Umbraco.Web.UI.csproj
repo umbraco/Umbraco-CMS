@@ -2251,7 +2251,6 @@
     <Content Include="Umbraco\Developer\Macros\editMacro.aspx" />
     <Content Include="Umbraco\Developer\Xslt\editXslt.aspx" />
     <Content Include="Umbraco\Developer\Xslt\getXsltStatus.asmx" />
-    <Content Include="Umbraco\Developer\Cache\viewCacheItem.aspx" />
     <Content Include="Umbraco\Developer\Xslt\xsltChooseExtension.aspx" />
     <Content Include="Umbraco\Developer\Xslt\xsltInsertValueOf.aspx" />
     <Content Include="Umbraco\editContent.aspx" />

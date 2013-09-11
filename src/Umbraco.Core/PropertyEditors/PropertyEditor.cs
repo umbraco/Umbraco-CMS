@@ -63,7 +63,7 @@ namespace Umbraco.Core.PropertyEditors
             get { return CreateValueEditor(); }
         }
 
-        [JsonProperty("preValueEditor")]
+        [JsonProperty("prevalues")]
         public PreValueEditor PreValueEditor
         {
             get { return CreatePreValueEditor(); }

@@ -1,5 +1,5 @@
 <div id="leftcolumn" ng-controller="Umbraco.NavigationController" 
-    ng-mouseleave="nav.leaveTree()" ng-mouseenter="nav.enterTree()" >
+    ng-mouseleave="nav.leaveTree($event)" ng-mouseenter="nav.enterTree($event)" >
     <div id="applications" ng-class="{faded:nav.ui.stickyNavigation}">
         <ul class="sections">
             

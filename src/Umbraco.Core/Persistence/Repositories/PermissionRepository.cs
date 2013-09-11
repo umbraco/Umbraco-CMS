@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.Models;
@@ -32,7 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="entityIds"></param>
-        /// <returns></returns>
+        /// <returns></returns>        
         internal IEnumerable<EntityPermission> GetUserPermissionsForEntities(object userId, params int[] entityIds)
         {            
             var whereBuilder = new StringBuilder();
@@ -108,12 +109,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         /// <param name="permission"></param>
         /// <param name="userIds"></param>
-        internal void AssignEntityPermissions(TEntity entity, string permission, IEnumerable<object> userIds)
+        internal void AssignEntityPermissions(TEntity entity, char permission, IEnumerable<object> userIds)
         {
             var actions = userIds.Select(id => new User2NodePermissionDto
                 {
                     NodeId = entity.Id,
-                    Permission = permission,
+                    Permission = permission.ToString(CultureInfo.InvariantCulture),
                     UserId = (int)id
                 });
 
@@ -127,13 +128,13 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="userPermissions">
         /// A key/value pair list containing a userId and a permission to assign
         /// </param>
-        internal void AssignEntityPermissions(TEntity entity, IEnumerable<KeyValuePair<object, string>> userPermissions)
+        internal void AssignEntityPermissions(TEntity entity, IEnumerable<Tuple<object, string>> userPermissions)
         {
             var actions = userPermissions.Select(p => new User2NodePermissionDto
             {
                 NodeId = entity.Id,
-                Permission = p.Value,
-                UserId = (int)p.Key
+                Permission = p.Item2,
+                UserId = (int)p.Item1
             });
 
             _unitOfWork.Database.BulkInsertRecords(actions);

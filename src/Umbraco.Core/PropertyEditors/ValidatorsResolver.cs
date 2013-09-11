@@ -30,7 +30,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         public ManifestValueValidator GetValidator(string name)
         {
-            return Values.FirstOrDefault(x => x.TypeName == name);
+            return Values.FirstOrDefault(x => x.TypeName.InvariantEquals(name));
         } 
     }
 }

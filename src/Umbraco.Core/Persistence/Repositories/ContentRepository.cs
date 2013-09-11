@@ -251,7 +251,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var userPermissions = (
                     from perm in parentPermissions 
                     from p in perm.AssignedPermissions 
-                    select new KeyValuePair<object, string>(perm.UserId, p)).ToList();
+                    select new Tuple<object, string>(perm.UserId, p)).ToList();
 
                 permissionsRepo.AssignEntityPermissions(entity, userPermissions);
                 //flag the entity's permissions changed flag so we can track those changes.
@@ -505,7 +505,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return GetByVersion(dto.ContentVersionDto.VersionId);
         }
         
-        public void AssignEntityPermissions(IContent entity, string permission, IEnumerable<object> userIds)
+        public void AssignEntityPermissions(IContent entity, char permission, IEnumerable<object> userIds)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork);
             repo.AssignEntityPermissions(entity, permission, userIds);

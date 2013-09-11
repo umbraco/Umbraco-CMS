@@ -61,6 +61,7 @@ namespace Umbraco.Web.WebApi.Filters
         {
             if (UmbracoContext.Current.Security.CurrentUser == null)
             {
+                //not logged in
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
             }
 
@@ -105,7 +106,7 @@ namespace Umbraco.Web.WebApi.Filters
             }
             else
             {
-                throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
+                throw new HttpResponseException(actionContext.Request.CreateUserNoAccessResponse());
             }
             
         }

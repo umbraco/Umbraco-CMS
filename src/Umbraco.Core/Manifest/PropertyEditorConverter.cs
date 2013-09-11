@@ -28,14 +28,63 @@ namespace Umbraco.Core.Manifest
                     {
                         View = jObject["editor"]["view"].ToString()
                     };
-                
+
+                //the manifest JSON is a simplified json for the validators which is actually a dictionary, however, the
+                //c# model requires an array of validators not a dictionary so we need to change the json to an array 
+                //to deserialize properly.
+                JArray converted;
+                if (TryConvertValidatorDictionaryToArray(jObject["editor"]["validation"] as JObject, out converted))
+                {
+                    jObject["editor"]["validation"] = converted;
+                }
+
             }
-            if (jObject["preValueEditor"] != null)
+            if (jObject["prevalues"] != null)
             {
                 target.ManifestDefinedPreValueEditor = new PreValueEditor();
+
+                //the manifest JSON is a simplified json for the validators which is actually a dictionary, however, the
+                //c# model requires an array of validators not a dictionary so we need to change the json to an array 
+                //to deserialize properly.
+                var fields = jObject["prevalues"]["fields"] as JArray;
+                if (fields != null)
+                {
+                    foreach (var f in fields)
+                    {
+                        JArray converted;
+                        if (TryConvertValidatorDictionaryToArray(f["validation"] as JObject, out converted))
+                        {
+                            f["validation"] = converted;
+                        }
+                    }
+                }
             }
 
             base.Deserialize(jObject, target, serializer);
+        }
+
+        private bool TryConvertValidatorDictionaryToArray(JObject validation, out JArray result)
+        {
+            if (validation == null)
+            {
+                result = null;
+                return false;
+            }
+
+            result = new JArray();
+            foreach (var entry in validation)
+            {
+                //in a special case if the value is simply 'true' (boolean) this just indicates that the 
+                // validator is enabled, the config should just be empty.
+                var formattedItem = JObject.FromObject(new { type = entry.Key, config = entry.Value });
+                if (entry.Value.Type == JTokenType.Boolean)
+                {
+                    formattedItem["config"] = "";
+                }
+
+                result.Add(formattedItem);
+            }
+            return true;
         }
     }
 }

@@ -3,8 +3,8 @@
 
 //TEST to mock iframe, this intercepts calls directly
 //to the old iframe, and funnels requests to angular directly
-var right = {document: {location: {}}};
-Object.defineProperty(right.document.location, "href", {
+//var right = {document: {location: {}}};
+/*Object.defineProperty(right.document.location, "href", {
     get: function() {
         return this._href ? this._href : "";
     },
@@ -12,7 +12,7 @@ Object.defineProperty(right.document.location, "href", {
         this._href = value;
         UmbClientMgr.contentFrame(value);
     },
-});
+});*/
 
 Umbraco.Sys.registerNamespace("Umbraco.Application");
 
@@ -182,26 +182,27 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
 
                 var self = this;
 
-                //TODO: need to get the closeTriggers working for compatibility too somehow.
-
                 var dialog = dialogService.open({
                     template: url,
                     width: width,
                     height: height,
                     iframe: true,
-                    show: true,
-                    callback: function (result) {
-                        
-                        if (typeof onCloseCallback == "function") {
-                            onCloseCallback.apply(self, [result]);
-                        }
-                        
-                        dialog.hide();
-                    }
+                    show: true
                 });
 
-                this._modal.push(dialog);
+                //add the callback to the jquery data for the modal so we can call it on close to support the legacy way dialogs worked.
+                dialog.element.data("modalCb", onCloseCallback);
+                //add the close triggers
+                for (var i = 0; i < closeTriggers.length; i++) {
+                    var e = dialog.find(closeTriggers[i]);
+                    if (e.length > 0) {
+                        e.click(function() {
+                            self.closeModalWindow();
+                        });
+                    }
+                }
 
+                this._modal.push(dialog);
                 return dialog;
             },
             closeModalWindow: function(rVal) {
@@ -213,7 +214,19 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 // all legacy calls to closeModalWindow are expecting to just close the last opened one so we'll ensure
                 // that this is still the case.
                 if (this._modal != null && this._modal.length > 0) {
-                    dialogService.close(this._modal.pop(), { outVal: rVal });
+
+                    var lastModal = this._modal.pop();
+
+                    //if we've stored a callback on this modal call it before we close.
+                    var self = this;
+                    //get the compat callback from the modal element
+                    var onCloseCallback = lastModal.element.data("modalCb");
+                    if (typeof onCloseCallback == "function") {
+                        onCloseCallback.apply(self, [{ outVal: rVal }]);
+                    }
+
+                    //just call the native dialog close() method to remove the dialog
+                    lastModal.scope.close();
                 }
                 else {
                     dialogService.closeAll(rVal);

@@ -51,9 +51,9 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     }
                 }
                 else {
-                    treeNodes[i].style = "background-image: url('" + treeNodes[i].iconFilePath + "');height:16px; background-position:2px 0px; background-repeat: no-repeat";
+                    treeNodes[i].style = "background-image: url('" + treeNodes[i].iconFilePath + "');";
                     //we need an 'icon-' class in there for certain styles to work so if it is image based we'll add this
-                    treeNodes[i].cssClass = standardCssClass + " icon-custom-file";
+                    treeNodes[i].cssClass = standardCssClass + " legacy-custom-file";
                 }
             }
         },

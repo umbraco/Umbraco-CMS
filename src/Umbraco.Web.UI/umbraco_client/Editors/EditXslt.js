@@ -29,8 +29,6 @@
         doSubmit: function () {
             var self = this;
 
-            $('#errorDiv').hide();
-
             var fileName = this._opts.nameTxtBox.val();
             var codeVal = this._opts.editorSourceElement.val();
             //if CodeMirror is not defined, then the code editor is disabled.
@@ -46,9 +44,7 @@
 
         submitSucces: function (t) {
             if (t != 'true') {
-                top.UmbSpeechBubble.ShowMessage('error', 'Saving Xslt file failed', '');
-                jQuery('#errorDiv').html('<p><a href="#" onclick=\'closeErrorDiv()\'>Hide Errors</a><strong>Error occured</strong></p><p>' + t + '</p>');
-                jQuery('#errorDiv').slideDown('fast');
+                top.UmbSpeechBubble.ShowMessage('error', 'Saving Xslt file failed',"<pre>" + t + "</pre>");
             }
             else {
                 top.UmbSpeechBubble.ShowMessage('save', 'Xslt file saved', '');
@@ -62,7 +58,8 @@
             this._opts.originalFileName = newFilePath;
         },
 
-        submitFailure: function(t) {
+        submitFailure: function (t) {
+            alert(t);
             top.UmbSpeechBubble.ShowMessage('warning', 'Xslt file could not be saved', '');
         }
     });

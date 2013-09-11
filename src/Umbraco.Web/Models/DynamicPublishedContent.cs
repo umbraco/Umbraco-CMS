@@ -412,7 +412,7 @@ namespace Umbraco.Web.Models
 
 			return !attempt.Success
 					? null
-					: new PropertyResult(alias, attempt.Result, Guid.Empty, PropertyResultType.ReflectedProperty)
+					: new PropertyResult(alias, attempt.Result, PropertyResultType.ReflectedProperty)
 					{
 						DocumentTypeAlias = content.DocumentTypeAlias,
 						DocumentId = content.Id

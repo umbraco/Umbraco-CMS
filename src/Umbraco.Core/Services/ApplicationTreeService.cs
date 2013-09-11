@@ -6,6 +6,7 @@ using System.Xml.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using File = System.IO.File;
 
@@ -66,10 +67,16 @@ namespace Umbraco.Core.Services
                                     var type = (string) addElement.Attribute("type");
                                     var assembly = (string) addElement.Attribute("assembly");
 
+                                    var clrType = Type.GetType(type);
+                                    if (clrType == null)
+                                    {
+                                        LogHelper.Warn<ApplicationTreeService>("The tree definition: " + addElement.ToString() + " could not be resolved to a .Net object type");
+                                        continue;
+                                    }
+
                                     //check if the tree definition (applicationAlias + type + assembly) is already in the list
 
-                                    if (list.Any(tree => tree.ApplicationAlias.InvariantEquals(applicationAlias)
-                                                         && tree.Type.InvariantEquals(type)) == false)
+                                    if (list.Any(tree => tree.ApplicationAlias.InvariantEquals(applicationAlias) && tree.GetRuntimeType() == clrType) == false)
                                     {
                                         list.Add(new ApplicationTree(
                                                      addElement.Attribute("initialize") == null || Convert.ToBoolean(addElement.Attribute("initialize").Value),

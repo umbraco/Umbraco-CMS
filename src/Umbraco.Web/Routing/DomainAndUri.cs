@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core;
 using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Web.Routing
@@ -20,7 +21,16 @@ namespace Umbraco.Web.Routing
         public DomainAndUri(Domain domain, string scheme)
         {
             Domain = domain;
-            Uri = new Uri(UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(domain.Name, scheme)));
+            try
+            {
+                Uri = new Uri(UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(domain.Name, scheme)));
+            }
+            catch (UriFormatException)
+            {
+                var name = domain.Name.ToCSharpString();
+                throw new ArgumentException(string.Format("Failed to parse invalid domain: node id={0}, hostname=\"{1}\"."
+                    + " Hostname should be a valid uri.", domain.RootNodeId, name), "domain");
+            }
         }
 
         /// <summary>

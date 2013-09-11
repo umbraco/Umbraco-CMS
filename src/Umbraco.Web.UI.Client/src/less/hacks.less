@@ -1,16 +1,17 @@
 // Hacks
 // -------------------------
 
-/* CONTAINS ALL HACKS AND OTHER QUICK-FIXES THAT WE MUST HANDLE BEFORE A RELEASE */
+/* CONTAINS ALL HACKS AND OTHER QUICK-FIXES */
 
 /*wft ms?*/
 *{ -ms-touch-action: none;}
 
+/*we will always make sure to wrap iframe dialogs in proper padding*/
 .umbracoDialog{
 	width: auto !Important;
 	height: auto !Important;
-	margin: 20px
 }
+
 
 /*ensures dialogs doesnt have side-by-side labels */
 .umbracoDialog .controls-row{margin-left: 0px !important;}
@@ -38,7 +39,6 @@ iframe, .content-column-body {
 }
 
 /* JQUERY FILEUPLOAD TEMP STYLES */
-
 .fileinput-button {
   position: relative;
   overflow: hidden;
@@ -76,12 +76,14 @@ iframe, .content-column-body {
   display: block;
 }
 
-
+/*tree legacy icon*/
+.legacy-custom-file{
+  width: 16px; height: 16px; margin-right: 11px; display: inline-block;
+  background-position: center center;
+}
 
 /* TINYMCE OVERRIDES */
-
 .mce-tinymce{border: 1px solid @grayLight !important; }
 .mce-panel{background: @grayLighter !important; border-color: @grayLight !important;}
-
 .mce-btn-group, .mce-btn{border: none !important; background: none !important;}
 .mce-ico{font-size: 12px !important; color: @blackLight !important;}

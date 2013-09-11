@@ -163,7 +163,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [FileUploadCleanupFilter]
-        /*[ContentPostValidate]*/
+        [ContentPostValidate]
         public ContentItemDisplay PostSave(
             [ModelBinder(typeof(ContentItemBinder))]
                 ContentItemSave<IContent> contentItem)
@@ -215,10 +215,10 @@ namespace Umbraco.Web.Editors
                     && (contentItem.Action == ContentSaveAction.SaveNew || contentItem.Action == ContentSaveAction.PublishNew))
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
-                    // add the modelstate to the outgoing object and throw a 403
+                    // add the modelstate to the outgoing object and throw a validation message
                     var forDisplay = Mapper.Map<IContent, ContentItemDisplay>(contentItem.PersistedContent);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
-                    throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Forbidden, forDisplay));
+                    throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
                     
                 }
 
@@ -352,7 +352,7 @@ namespace Umbraco.Web.Editors
                 if (contentService.Sort(sortedContent) == false)
                 {
                     LogHelper.Warn<MediaController>("Content sorting failed, this was probably caused by an event being cancelled");
-                    return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Content sorting failed, this was probably caused by an event being cancelled");
+                    return Request.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
                 }
                 return Request.CreateResponse(HttpStatusCode.OK);
             }

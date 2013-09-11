@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Services
 {
@@ -9,6 +10,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentService : IService
     {
+
         /// <summary>
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
         /// that this Content should based on.

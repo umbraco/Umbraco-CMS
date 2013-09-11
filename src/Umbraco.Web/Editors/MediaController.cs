@@ -159,10 +159,10 @@ namespace Umbraco.Web.Editors
                     && (contentItem.Action == ContentSaveAction.SaveNew))
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
-                    // add the modelstate to the outgoing object and throw a 403
+                    // add the modelstate to the outgoing object and throw validation response
                     var forDisplay = Mapper.Map<IMedia, MediaItemDisplay>(contentItem.PersistedContent);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
-                    throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Forbidden, forDisplay));
+                    throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
                 }
             }
 
@@ -216,7 +216,7 @@ namespace Umbraco.Web.Editors
                 if (mediaService.Sort(sortedMedia) == false)
                 {
                     LogHelper.Warn<MediaController>("Media sorting failed, this was probably caused by an event being cancelled");
-                    return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Media sorting failed, this was probably caused by an event being cancelled");
+                    return Request.CreateValidationErrorResponse("Media sorting failed, this was probably caused by an event being cancelled");
                 }
                 return Request.CreateResponse(HttpStatusCode.OK);
             }

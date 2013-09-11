@@ -12,11 +12,11 @@ namespace umbraco.editorControls.tinymce
     {
         private static bool _init = false;
 
-        private static Hashtable _commands = new Hashtable();
+        private static Hashtable _commands = new Hashtable(StringComparer.InvariantCultureIgnoreCase);
 
         private static string _validElements;
 
-        private static Hashtable _configOptions = new Hashtable();
+        private static Hashtable _configOptions = new Hashtable(StringComparer.InvariantCultureIgnoreCase);
 
         public static Hashtable ConfigOptions
         {
@@ -59,7 +59,7 @@ namespace umbraco.editorControls.tinymce
             set { _invalidElements = value; }
         }
 
-        private static Hashtable _plugins = new Hashtable();
+        private static Hashtable _plugins = new Hashtable(StringComparer.InvariantCultureIgnoreCase);
 
         public static Hashtable Plugins
         {
@@ -103,7 +103,7 @@ namespace umbraco.editorControls.tinymce
         {
             // Load config
             XmlDocument xd = new XmlDocument();
-            xd.Load( IOHelper.MapPath( SystemFiles.TinyMceConfig ) );
+            xd.Load(IOHelper.MapPath( SystemFiles.TinyMceConfig ));
 
             foreach (XmlNode n in xd.DocumentElement.SelectNodes("//command"))
             {
@@ -146,11 +146,15 @@ namespace umbraco.editorControls.tinymce
 
             foreach (XmlNode n in xd.DocumentElement.SelectNodes("//config"))
             {
-                if (!_configOptions.ContainsKey(n.FirstChild.Value))
+                if (!_configOptions.ContainsKey(n.Attributes["key"].FirstChild.Value))
                 {
+                    var value = "";
+                    if (n.FirstChild != null)
+                        value = n.FirstChild.Value;
+
                     _configOptions.Add(
                         n.Attributes["key"].FirstChild.Value.ToLower(),
-                        n.FirstChild.Value);
+                        value);
                 }
             }
 

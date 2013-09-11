@@ -543,6 +543,7 @@
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="Editors\MediaController.cs" />
+    <Compile Include="UrlHelperRenderExtensions.cs" />
     <Compile Include="WebApi\Binders\ContentItemBaseBinder.cs" />
     <Compile Include="WebApi\Binders\ContentItemBinder.cs" />
     <Compile Include="WebApi\Binders\MediaItemBinder.cs" />
@@ -555,6 +556,7 @@
     <Compile Include="WebApi\Filters\HttpQueryStringFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\OutgoingDateTimeFormatAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoApplicationAuthorizeAttribute.cs" />
+    <Compile Include="WebApi\HttpRequestMessageExtensions.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerResolver.cs" />
@@ -1341,13 +1343,6 @@
       <DependentUpon>getXsltStatus.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Cache\viewCacheItem.aspx.cs">
-      <DependentUpon>viewCacheItem.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Cache\viewCacheItem.aspx.designer.cs">
-      <DependentUpon>viewCacheItem.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx.cs">
       <DependentUpon>xsltChooseExtension.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1916,6 +1911,7 @@
     <Compile Include="WebServices\UmbracoWebService.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="WebViewPageExtensions.cs" />
     <EmbeddedResource Include="UI\JavaScript\Main.js" />
     <EmbeddedResource Include="UI\JavaScript\JsInitialize.js" />
     <EmbeddedResource Include="UI\JavaScript\ServerVariables.js" />
@@ -2093,7 +2089,6 @@
     <Content Include="umbraco.presentation\umbraco\developer\Macros\assemblyBrowser.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\autoDoc.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\getXsltStatus.asmx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Cache\viewCacheItem.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltInsertValueOf.aspx" />
     <Content Include="umbraco.presentation\umbraco\js\language.aspx" />

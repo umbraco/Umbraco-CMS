@@ -115,7 +115,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var resolved = repository.Get((int)user.Id);
             
             resolved.Name = "New Name";
-            resolved.DefaultPermissions = "ZYX";
+            //the db column is not used, default permissions are taken from the user type's permissions, this is a getter only
+            //resolved.DefaultPermissions = "ZYX";
             resolved.Language = "fr";
             resolved.IsApproved = false;
             resolved.Password = "new";
@@ -134,7 +135,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Assert
             Assert.That(updatedItem.Id, Is.EqualTo(resolved.Id));
             Assert.That(updatedItem.Name, Is.EqualTo(resolved.Name));
-            Assert.That(updatedItem.DefaultPermissions, Is.EqualTo(resolved.DefaultPermissions));
+            //Assert.That(updatedItem.DefaultPermissions, Is.EqualTo(resolved.DefaultPermissions));
             Assert.That(updatedItem.Language, Is.EqualTo(resolved.Language));
             Assert.That(updatedItem.IsApproved, Is.EqualTo(resolved.IsApproved));
             Assert.That(updatedItem.Password, Is.EqualTo(resolved.Password));
@@ -425,6 +426,24 @@ namespace Umbraco.Tests.Persistence.Repositories
             var names = users.Select(x => x.Username).ToArray();
             Assert.IsTrue(names.Contains("TestUser1"));
             Assert.IsTrue(names.Contains("TestUser3"));
+        }
+
+        [Test]
+        public void Default_User_Permissions_Based_On_User_Type()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
+            
+
+            // Act
+            var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1", "test", "media");
+            repository.AddOrUpdate(user1);
+            unitOfWork.Commit();
+
+            // Assert
+            Assert.AreEqual("ABC", user1.DefaultPermissions);
         }
 
         private void AssertPropertyValues(IUser updatedItem, IUser originalUser)

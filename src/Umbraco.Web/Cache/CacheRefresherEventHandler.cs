@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic.web;
 using Content = Umbraco.Core.Models.Content;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
+using Member = umbraco.cms.businesslogic.member.Member;
 using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace Umbraco.Web.Cache

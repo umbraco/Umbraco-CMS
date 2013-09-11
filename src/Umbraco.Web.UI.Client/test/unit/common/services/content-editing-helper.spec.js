@@ -18,13 +18,13 @@ describe('contentEditingHelper tests', function () {
 
     describe('handles http validation errors', function () {
 
-        it('handles validation errors for 403 results', function () {
+        it('handles validation errors for 400 results', function () {
 
             //arrange
             var content = mocksUtils.getMockContent(1234);
             var err = {
                 data: content,
-                status: 403
+                status: 400
             };
             err.data.ModelState = {};
 
@@ -39,11 +39,11 @@ describe('contentEditingHelper tests', function () {
             expect(handled).toBe(true);
         });
         
-        it('does not handle validation errors that are not 403', function () {
+        it('does not handle validation errors that are not 400', function () {
 
             //arrange
             var err = {
-                status: 400
+                status: 410
             };
             
             //act
@@ -57,13 +57,13 @@ describe('contentEditingHelper tests', function () {
             expect(handled).toBe(false);
         });
         
-        it('does not handle validation errors that are 403 without model state', function () {
+        it('does not handle validation errors that are 400 without model state', function () {
 
             //arrange
             var content = mocksUtils.getMockContent(1234);
             var err = {
                 data: content,
-                status: 403
+                status: 400
             };
 
             //act

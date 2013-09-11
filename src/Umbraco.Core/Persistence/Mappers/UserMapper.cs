@@ -33,7 +33,8 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<User, UserDto>(src => src.Username, dto => dto.Login);
             CacheMap<User, UserDto>(src => src.Password, dto => dto.Password);
             CacheMap<User, UserDto>(src => src.Name, dto => dto.UserName);
-            CacheMap<User, UserDto>(src => src.DefaultPermissions, dto => dto.DefaultPermissions);
+            //NOTE: This column in the db is *not* used!
+            //CacheMap<User, UserDto>(src => src.DefaultPermissions, dto => dto.DefaultPermissions);
             CacheMap<User, UserDto>(src => src.StartMediaId, dto => dto.MediaStartId);
             CacheMap<User, UserDto>(src => src.StartContentId, dto => dto.ContentStartId);
             CacheMap<User, UserDto>(src => src.DefaultToLiveEditing, dto => dto.DefaultToLiveEditing);

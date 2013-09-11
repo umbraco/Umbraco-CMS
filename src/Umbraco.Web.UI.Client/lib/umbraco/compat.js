@@ -1,7 +1,6 @@
 /* contains random bits and pieces we neede to make the U6 UI behave */
 
 (function ($) {
-    
 
     $(document).ready(function () {
         scaleScrollables("body");
@@ -12,19 +11,22 @@
 
         $("body").click(function (event) {
             var el = event.target.nodeName;
-            var pEl = event.target.parentElement.nodeName;
+            var els = ["INPUT","A","BUTTON"];
 
-            //first check the simple elements
-            if (el != "INPUT" && el != "A" && el != "BUTTON" &&
-                pEl != "A" && pEl != "BUTTON" && pEl != "LABEL") {
-                            
-                //NOTE: The IMG needs to be added because a ton of buttons in the legacy editors are actually just images with click handlers! 
-                if (el == "IMG" && $(event.target.parentElement).hasClass("btn-group")) {
-                    return;
-                }
+            if(els.indexOf(el) >= 0){return;}
 
-                UmbClientMgr.closeModalWindow(undefined);
+            var parents = $(event.target).parents("a,button");
+            if(parents.length > 0){
+                return;
             }
+
+            var click = $(event.target).attr('onClick');
+            if(click){
+                return;
+            }
+
+
+            UmbClientMgr.closeModalWindow(undefined);
         });
     });     
 

@@ -28,18 +28,27 @@ namespace Umbraco.Core.Services
         private readonly IMediaService _mediaService;
         private readonly IDataTypeService _dataTypeService;
         private readonly IFileService _fileService;
+        private readonly ILocalizationService _localizationService;
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private Dictionary<string, IContentType> _importedContentTypes;
         
         
-        public PackagingService(IContentService contentService, IContentTypeService contentTypeService, IMediaService mediaService, IDataTypeService dataTypeService, IFileService fileService, RepositoryFactory repositoryFactory, IDatabaseUnitOfWorkProvider uowProvider)
+        public PackagingService(IContentService contentService, 
+            IContentTypeService contentTypeService, 
+            IMediaService mediaService, 
+            IDataTypeService dataTypeService, 
+            IFileService fileService, 
+            ILocalizationService localizationService,
+            RepositoryFactory repositoryFactory, 
+            IDatabaseUnitOfWorkProvider uowProvider)
         {
             _contentService = contentService;
             _contentTypeService = contentTypeService;
             _mediaService = mediaService;
             _dataTypeService = dataTypeService;
             _fileService = fileService;
+            _localizationService = localizationService;
             _repositoryFactory = repositoryFactory;
             _uowProvider = uowProvider;
 
@@ -325,8 +334,6 @@ namespace Umbraco.Core.Services
 
             return content;
         }
-
-
 
         #endregion
 

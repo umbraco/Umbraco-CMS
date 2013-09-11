@@ -48,7 +48,25 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 //get our angular navigation service
                 var injector = getRootInjector();
                 var notifyService = injector.get("notificationsService");
-                notifyService.success(header, message);
+
+                switch(icon){
+                    case "save":
+                        notifyService.success(header, message);
+                        break;
+                    case "success":
+                        notifyService.success(header, message);
+                        break;    
+                    case "warning":
+                        notifyService.warning(header, message);
+                        break;
+                    case "error":
+                        notifyService.error(header, message);
+                        break;
+                    default:
+                        notifyService.info(header, message);
+                }
+
+                
             }
         };
     };

@@ -30,7 +30,7 @@ namespace Umbraco.Web
 				var doc = cache.GetById(result.Id);
 				if (doc == null) continue; //skip if this doesn't exist in the cache				
 				doc.Properties.Add(
-					new PropertyResult("examineScore", result.Score.ToString(), Guid.Empty, PropertyResultType.CustomProperty));				
+					new PropertyResult("examineScore", result.Score.ToString(), PropertyResultType.CustomProperty));				
 				list.Add(doc);
 			}
 			return list;

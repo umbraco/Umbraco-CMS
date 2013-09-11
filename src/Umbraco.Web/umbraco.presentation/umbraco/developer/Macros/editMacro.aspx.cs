@@ -347,13 +347,10 @@ namespace umbraco.cms.presentation.developer
 			Parameters = TabView1.NewTabPage("Parameters");
 			Parameters.Controls.Add(Panel2);
 
-			ImageButton save = InfoTabPage.Menu.NewImageButton();
-			save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
-			save.ID = "save";
-
-			ImageButton save2 = Parameters.Menu.NewImageButton();
-			save2.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
-
+            MenuButton save = TabView1.Menu.NewButton();
+            save.ButtonType = MenuButtonType.Primary;
+            save.Text = ui.Text("save");
+            save.ID = "save";
 			base.OnInit(e);
 		}
 

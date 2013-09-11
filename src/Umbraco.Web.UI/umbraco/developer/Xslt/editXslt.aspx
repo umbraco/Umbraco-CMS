@@ -43,33 +43,29 @@
                 xsltSnippet = UmbEditor.IsSimpleEditor
                 ? jQuery("#<%= editorSource.ClientID %>").val()
                     : UmbEditor.GetCode();
-                //                alert('Please select the xslt to visualize');
             }
 
             UmbClientMgr.openModalWindow('<%= umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/developer/xslt/xsltVisualize.aspx', 'Visualize XSLT', true, 550, 650);
-        }
-		  
+        } 
     </script>
     <umb:JsInclude ID="JsInclude1" runat="server" FilePath="Application/jQuery/jquery-fieldselection.js"
         PathNameAlias="UmbracoClient" />
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server" ID="cp1">
-    <cc1:UmbracoPanel ID="UmbracoPanel1" runat="server" Text="Edit xsl" hasMenu="true"
-        Height="300" Width="600">
-        <cc1:Pane ID="Pane1" runat="server" Style="margin-bottom: 10px;">
-            <cc1:PropertyPanel ID="pp_filename" runat="server" Text="Filename">
-                <asp:TextBox ID="xsltFileName" runat="server" Width="300" CssClass="guiInputText"></asp:TextBox>
-            </cc1:PropertyPanel>
-            <cc1:PropertyPanel ID="pp_testing" runat="server" Text="Skip testing (ignore errors)">
-                <asp:CheckBox ID="SkipTesting" runat="server"></asp:CheckBox>
-            </cc1:PropertyPanel>
-            <cc1:PropertyPanel ID="pp_errorMsg" runat="server">
-                <div id="errorDiv" style="display: none;" class="error">
-                    test</div>
-            </cc1:PropertyPanel>
-            <cc1:CodeArea ID="editorSource" CodeBase="XML" runat="server" AutoResize="true" OffSetX="47" OffSetY="55" />
-        </cc1:Pane>
-    </cc1:UmbracoPanel>
+    <cc1:TabView ID="UmbracoPanel1" runat="server" Text="Edit xsl" hasMenu="true">
+            <cc1:Pane runat="server" ID="pane1">
+                <cc1:CodeArea ID="editorSource" CodeBase="XML" runat="server" AutoResize="true" OffSetX="47" OffSetY="55" />
+            </cc1:Pane>
+            
+            <cc1:Pane runat="server" ID="pane2">
+                 <cc1:PropertyPanel ID="pp_filename" runat="server" Text="Filename">
+                    <asp:TextBox ID="xsltFileName" runat="server" Width="300" CssClass="guiInputText"></asp:TextBox>
+                </cc1:PropertyPanel>
+                <cc1:PropertyPanel ID="pp_testing" runat="server" Text="Skip testing (ignore errors)">
+                    <asp:CheckBox ID="SkipTesting" runat="server"></asp:CheckBox>
+                </cc1:PropertyPanel>
+            </cc1:Pane>
+    </cc1:TabView>
 </asp:Content>
 <asp:Content ContentPlaceHolderID="footer" runat="server">
     <asp:Literal ID="editorJs" runat="server"></asp:Literal>

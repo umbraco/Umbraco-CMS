@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             unitOfWork.Commit();
 
             // Act
-            repository.AssignEntityPermissions(parentPage, "A", new object[] {0});
+            repository.AssignEntityPermissions(parentPage, 'A', new object[] {0});
             var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
             repository.AddOrUpdate(childPage);
             unitOfWork.Commit();
@@ -104,6 +104,37 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Assert
             Assert.That(contentType.HasIdentity, Is.True);
             Assert.That(textpage.HasIdentity, Is.True);
+        }
+
+        //Covers issue U4-2791 and U4-2607
+        [Test]
+        public void Can_Save_Content_With_AtSign_In_Name_On_ContentRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var contentTypeRepository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+
+            ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+            Content textpage = MockedContent.CreateSimpleContent(contentType, "test@umbraco.org", -1);
+            Content anotherTextpage = MockedContent.CreateSimpleContent(contentType, "@lightgiants", -1);
+
+            // Act
+            contentTypeRepository.AddOrUpdate(contentType);
+            repository.AddOrUpdate(textpage);
+            repository.AddOrUpdate(anotherTextpage);
+            unitOfWork.Commit();
+
+            // Assert
+            Assert.That(contentType.HasIdentity, Is.True);
+            Assert.That(textpage.HasIdentity, Is.True);
+
+            var content = repository.Get(textpage.Id);
+            Assert.That(content.Name, Is.EqualTo(textpage.Name));
+
+            var content2 = repository.Get(anotherTextpage.Id);
+            Assert.That(content2.Name, Is.EqualTo(anotherTextpage.Name));
         }
 
         [Test]

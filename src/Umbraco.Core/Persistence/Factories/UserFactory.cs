@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 
@@ -32,7 +33,9 @@ namespace Umbraco.Core.Persistence.Factories
                            Language = dto.UserLanguage,
                            DefaultToLiveEditing = dto.DefaultToLiveEditing,
                            NoConsole = dto.NoConsole,
-                           DefaultPermissions = dto.DefaultPermissions
+                           
+                           //NOTE: The umbracoUser.DefaultPermissions column is never used, the default permission come from the user type's default permissions
+                           DefaultPermissions = _userType.Permissions
                        };
 
             foreach (var app in dto.User2AppDtos)
@@ -61,8 +64,9 @@ namespace Umbraco.Core.Persistence.Factories
                               Password = entity.Password,
                               UserLanguage = entity.Language,
                               UserName = entity.Name,
-                              Type = short.Parse(entity.UserType.Id.ToString()),
-                              DefaultPermissions = entity.DefaultPermissions,
+                              Type = short.Parse(entity.UserType.Id.ToString(CultureInfo.InvariantCulture)),
+                              //NOTE: This column in the db is *not* used so we'll just let it remain null
+                              DefaultPermissions = null,
                               User2AppDtos = new List<User2AppDto>()
                           };
 

@@ -12,7 +12,6 @@ namespace umbraco.MacroEngines
     {
         private string _alias;
         private string _value;
-        private Guid _version;
 
         public PropertyResult(IProperty source)
         {
@@ -20,20 +19,17 @@ namespace umbraco.MacroEngines
             {
                 this._alias = source.Alias;
                 this._value = source.Value;
-                this._version = source.Version;
             }
         }
-        public PropertyResult(string alias, string value, Guid version)
+        public PropertyResult(string alias, string value)
         {
             this._alias = alias;
             this._value = value;
-            this._version = version;
         }
         public PropertyResult(Property source)
         {
             this._alias = source.PropertyType.Alias;
             this._value = string.Format("{0}", source.Value);
-            this._version = source.VersionId;
         }
         public string Alias
         {
@@ -44,12 +40,7 @@ namespace umbraco.MacroEngines
         {
             get { return _value; }
         }
-
-        public Guid Version
-        {
-            get { return _version; }
-        }
-
+        
         public bool IsNull()
         {
             return Value == null;
