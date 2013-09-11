@@ -1,5 +1,4 @@
-﻿using System;
-using Umbraco.Core.IO;
+﻿using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Install.Steps
 {

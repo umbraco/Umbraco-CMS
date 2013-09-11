@@ -23,12 +23,11 @@ namespace Umbraco.Web.Install.Steps
             get { return SystemDirectories.Install + "/steps/validatepermissions.ascx"; }
         }
 
-        public override bool HideFromNavigation {
-          get {
-            return true;
-          }
+        public override bool HideFromNavigation
+        {
+            get { return true; }
         }
-        
+
         public override bool Completed()
         {
             return FilePermissionHelper.RunFilePermissionTestSuite();

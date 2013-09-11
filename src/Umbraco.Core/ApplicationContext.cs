@@ -94,7 +94,7 @@ namespace Umbraco.Core
         //   the system is configured if they match
         //   if they don't, install runs, updates web.config (presumably) and updates GlobalSettings.ConfiguredStatus
         //
-        //   then there is Application["umbracoNeedConfiguration"] which makes no sense... getting rid of it...
+        //   then there is Application["umbracoNeedConfiguration"] which makes no sense... getting rid of it... SD: I have actually remove that now!
         //
         public bool IsConfigured
         {
