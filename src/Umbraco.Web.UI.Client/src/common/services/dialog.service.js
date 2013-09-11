@@ -101,13 +101,15 @@ angular.module('umbraco.services')
            };
 
            scope.close = function(data) {
-               if (dialog.closeCallback) {
+              if (dialog.closeCallback) {
                    dialog.closeCallback(data);
-               }
+              }
 
-               dialog.element.modal('hide');
-               dialog.element.remove();
-               $("#" + dialog.element.attr("id")).remove();
+              if(dialog.element){
+                 dialog.element.modal('hide');
+                 dialog.element.remove();
+                 $("#" + dialog.element.attr("id")).remove();
+               }
            };
 
            //if iframe is enabled, inject that instead of a template
@@ -260,8 +262,10 @@ angular.module('umbraco.services')
             * @param {Object} args if specified this object will be sent to any callbacks registered on the dialogs.
             */
            close: function (dialog, args) {
-               dialog.scope.close();
-
+              if(dialog && dialog.scope){
+                  dialog.scope.close();
+              }
+              
                //removeDialog(dialog, args);
            },
            
