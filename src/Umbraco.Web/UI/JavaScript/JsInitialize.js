@@ -15,6 +15,7 @@
     'lib/angular/1.1.5/angular.min.js',
     'lib/angular/1.1.5/angular-cookies.min.js',
     'lib/angular/1.1.5/angular-mobile.min.js',
+    'lib/angular/1.1.5/angular-sanitize.min.js',
     
     /* 1.2 RC1
     'lib/angular/1.2/angular.min.js',
@@ -22,6 +23,7 @@
     'lib/angular/1.2/angular-touch.min.js',
     'lib/angular/1.2/angular-cookies.min.js',
 	'lib/angular/1.2/angular-animate.min.js',
+    'lib/angular/1.2/angular-sanitize.min.js',
     */
 
     /* temporary sorter lib, should be updated

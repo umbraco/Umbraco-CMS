@@ -5,8 +5,7 @@
             <a class='close' ng-click="removeNotification($index)" prevent-default href='#'>&times;</a>
 
             <strong>{{notification.headline}}</strong>
-            {{notification.message}}
-            
+            <span ng-bind-html="notification.message"></span>            
            
         </li>
     </ul>

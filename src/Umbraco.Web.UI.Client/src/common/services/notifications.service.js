@@ -32,8 +32,8 @@ angular.module('umbraco.services')
 	        //add a colon after the headline if there is a message as well
 	        if (item.message) {
 	            item.headline += ":";
-	            if(item.message.length > 200){
-	            	item.sticky = true;
+	            if(item.message.length > 200) {
+	                item.sticky = true;
 	            }
 	        }
 
@@ -44,19 +44,19 @@ angular.module('umbraco.services')
 	        
 	        nArray.push(item);
             
-            if(!item.sticky){
-		        $timeout(function () {
-		            var found = _.find(nArray, function(i) {
-		                return i.id === item.id;
-		            });
+            if(!item.sticky) {
+                $timeout(function() {
+                    var found = _.find(nArray, function(i) {
+                        return i.id === item.id;
+                    });
 
-	                if (found) {
-	                    var index = nArray.indexOf(found);
-	                    nArray.splice(index, 1);
-	                }
-		            
-		        }, 7000);
-	    	}
+                    if (found) {
+                        var index = nArray.indexOf(found);
+                        nArray.splice(index, 1);
+                    }
+
+                }, 7000);
+            }
 
 	        return item;
 	    });

@@ -1,7 +1,7 @@
 angular.module('umbraco.security.interceptor', ['umbraco.security.retryQueue'])
 
 // This http interceptor listens for authentication failures
-.factory('securityInterceptor', ['$injector', 'securityRetryQueue', function ($injector, queue) {
+.factory('securityInterceptor', ['$injector', 'securityRetryQueue', 'notificationsService', function ($injector, queue, notifications) {
     return function (promise) {
         // Intercept failed requests
         return promise.then(null, function (originalResponse) {
@@ -21,8 +21,10 @@ angular.module('umbraco.security.interceptor', ['umbraco.security.retryQueue'])
                 
                 //http://issues.umbraco.org/issue/U4-2749
                 
-                //For now, I'm just going to do an alert!
-                alert("Unauthorized access to URL \r\n" + originalResponse.config.url + "\r\n with data \r\n" + angular.toJson(originalResponse.config.data));
+                //It was decided to just put these messages into the normal status messages. 
+                notifications.error(
+                    "Authorization error", 
+                    "Unauthorized access to URL: <br/><i>" + originalResponse.config.url + "</i><br/> with data: <br/><i>" + angular.toJson(originalResponse.config.data) + "</i><br/>Contact your administrator for information.");
             }
             return promise;
         });
