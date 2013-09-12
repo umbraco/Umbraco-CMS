@@ -56,12 +56,8 @@
   <cc2:Pane runat="server">  
     <cc2:PropertyPanel ID="pp_icon" runat="server" Text="Icon">
         <div class="umbIconDropdownList">
-          <asp:DropDownList ID="ddlIcons"  CssClass="guiInputText guiInputStandardSize" runat="server"/>
-        </div>
-    </cc2:PropertyPanel>
-    <cc2:PropertyPanel ID="pp_thumbnail" runat="server" Text="Thumbnail">
-        <div class="umbThumbnailDropdownList">
-          <asp:DropDownList ID="ddlThumbnails" CssClass="guiInputText guiInputStandardSize" runat="server"/>
+          <a href="#">Choose...</a>
+          <asp:TextBox ID="tb_icon" runat="server" />        
         </div>
     </cc2:PropertyPanel>
     <cc2:PropertyPanel ID="pp_description" runat="server" Text="Description">
