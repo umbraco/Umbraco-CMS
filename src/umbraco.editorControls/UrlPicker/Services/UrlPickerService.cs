@@ -78,7 +78,7 @@ namespace umbraco.editorControls.UrlPicker.Services
         /// <summary>
         /// File locker
         /// </summary>
-        private static readonly object m_Locker = new object();
+        private static readonly object _locker = new object();
 
         /// <summary>
         /// Ensures that the web service is available on the file system of the
@@ -86,11 +86,11 @@ namespace umbraco.editorControls.UrlPicker.Services
         /// </summary>
         internal static void Ensure()
         {
-            var serviceFile = Path.Combine(IOHelper.MapPath(SystemDirectories.Umbraco), "plugins/UrlPicker/UrlPickerService.asmx");
+            var serviceFile = Path.Combine(IOHelper.MapPath(SystemDirectories.WebServices), "UrlPickerService.asmx");
 
             if (!File.Exists(serviceFile))
             {
-                lock (m_Locker)
+                lock (_locker)
                 {
                     // double check locking
                     if (!File.Exists(serviceFile))

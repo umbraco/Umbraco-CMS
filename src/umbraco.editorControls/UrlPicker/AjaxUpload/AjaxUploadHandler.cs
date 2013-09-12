@@ -39,15 +39,15 @@ namespace umbraco.editorControls.UrlPicker.AjaxUpload
         /// <summary>
         /// Used to filter out form fields which do no apply to this handler
         /// </summary>
-        public static readonly string Guid = "84194AD4-24A9-483A-BA44-8F916E469A9B";
+        internal const string Guid = "84194AD4-24A9-483A-BA44-8F916E469A9B";
 
         /// <summary>
         /// An object to temporarily lock writing to disk.
         /// </summary>
-        private static readonly object m_Locker = new object();
+        private static readonly object _locker = new object();
 
         // Constants
-        private string m_SavePath
+        private string SavePath
         {
             get
             {
@@ -56,7 +56,7 @@ namespace umbraco.editorControls.UrlPicker.AjaxUpload
             }
         }
 
-        private static readonly string m_IdParam = Guid + "_Id";
+        private static readonly string _idParam = Guid + "_Id";
 
         /// <summary>
         /// 
@@ -67,15 +67,15 @@ namespace umbraco.editorControls.UrlPicker.AjaxUpload
             Authorize();
 
             int id;
-            if (!int.TryParse(context.Request[m_IdParam], out id) || id < 0)
+            if (!int.TryParse(context.Request[_idParam], out id) || id < 0)
             {
                 context.Response.StatusCode = 400;
-                context.Response.StatusDescription = string.Format("You must include a parameter named '{0}', which is a non-negative integer describing the subfolder under '{1}/' to save to.", m_IdParam, m_SavePath);
+                context.Response.StatusDescription = string.Format("You must include a parameter named '{0}', which is a non-negative integer describing the subfolder under '{1}/' to save to.", _idParam, SavePath);
                 WriteResponseBody(context);
                 return;
             }
 
-            var path = string.Format("{0}/{1}/", m_SavePath, id.ToString());
+            var path = string.Format("{0}/{1}/", SavePath, id.ToString());
 
             // Save all relevant files which are posted
             var savedFiles = new List<string>();
@@ -95,14 +95,14 @@ namespace umbraco.editorControls.UrlPicker.AjaxUpload
                     var fullFileName = directory + shortFileName;
 
                     // Save file
-                    lock (m_Locker)
+                    lock (_locker)
                     {
                         Directory.CreateDirectory(directory);
 
                         //if (File.Exists(fullFileName))
                         //{
                         //    context.Response.StatusCode = 500;
-                        //    context.Response.StatusDescription = string.Format("File '{0}/{1}/{2}' already exists", m_SavePath, id, shortFileName);
+                        //    context.Response.StatusDescription = string.Format("File '{0}/{1}/{2}' already exists", SavePath, id, shortFileName);
                         //    WriteResponseBody(context);
                         //    return;
                         //}
@@ -114,13 +114,13 @@ namespace umbraco.editorControls.UrlPicker.AjaxUpload
                         catch (Exception)
                         {
                             context.Response.StatusCode = 500;
-                            context.Response.StatusDescription = string.Format("File '{0}/{1}/{2}' could not be saved", m_SavePath, id, shortFileName);
+                            context.Response.StatusDescription = string.Format("File '{0}/{1}/{2}' could not be saved", SavePath, id, shortFileName);
                             WriteResponseBody(context);
                             return;
                         }
 
                         // Log file
-                        savedFiles.Add(string.Format("{0}/{1}/{2}", m_SavePath.TrimStart('~'), id, shortFileName));
+                        savedFiles.Add(string.Format("{0}/{1}/{2}", SavePath.TrimStart('~'), id, shortFileName));
                     }
                 }
             }
@@ -179,11 +179,11 @@ namespace umbraco.editorControls.UrlPicker.AjaxUpload
         /// </summary>
         internal static void Ensure()
         {
-            var handlerFile = Path.Combine(IOHelper.MapPath(SystemDirectories.Umbraco), "plugins/UrlPicker/AjaxUploadHandler.ashx");
+            var handlerFile = Path.Combine(IOHelper.MapPath(SystemDirectories.WebServices), "UrlPickerAjaxUploadHandler.ashx");
 
             if (!File.Exists(handlerFile))
             {
-                lock (m_Locker)
+                lock (_locker)
                 {
                     // double check locking
                     if (!File.Exists(handlerFile))

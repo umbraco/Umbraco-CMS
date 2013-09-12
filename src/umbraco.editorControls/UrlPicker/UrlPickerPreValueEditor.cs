@@ -20,13 +20,11 @@ namespace umbraco.editorControls.UrlPicker
         /// <summary>
         /// The underlying base data-type.
         /// </summary>
-        protected readonly umbraco.cms.businesslogic.datatype.BaseDataType DataType;
+        protected umbraco.cms.businesslogic.datatype.BaseDataType DataType { get; private set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        protected SortedList PreValues;
-        private object m_Locker = new object();
+        protected SortedList PreValues { get; set; }
+
+        private static readonly object _locker = new object();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UrlPickerPreValueEditor"/> class.
@@ -42,27 +40,21 @@ namespace umbraco.editorControls.UrlPicker
         /// <summary>
         /// Select one or more modes
         /// </summary>
-        protected ListBox ModeSelector;
+        protected ListBox ModeSelector { get; set; }
 
         /// <summary>
         /// Selects the default mode
         /// </summary>
-        protected DropDownList DefaultModeDropDown;
+        protected DropDownList DefaultModeDropDown { get; set; }
 
         /// <summary>
         /// Lists the different data formats available
         /// </summary>
-        protected DropDownList DataFormatDropDown;
+        protected DropDownList DataFormatDropDown { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        protected CheckBox EnableTitleCheckbox;
+        protected CheckBox EnableTitleCheckbox { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        protected CheckBox EnableNewWindowCheckbox;
+        protected CheckBox EnableNewWindowCheckbox { get; set; }
 
         #endregion
 
@@ -317,24 +309,23 @@ namespace umbraco.editorControls.UrlPicker
             writer.RenderEndTag();
         }
 
-
         #region IDataPrevalue Members
 
-		/// <summary>
-		/// Gets the editor.
-		/// </summary>
-		/// <value>The editor.</value>
-		public Control Editor
-		{
-			get
-			{
-				return this;
-			}
-		}
+        /// <summary>
+        /// Gets the editor.
+        /// </summary>
+        /// <value>The editor.</value>
+        public Control Editor
+        {
+            get
+            {
+                return this;
+            }
+        }
 
-		/// <summary>
-		/// Saves this instance.
-		/// </summary>
+        /// <summary>
+        /// Saves this instance.
+        /// </summary>
         public void Save()
         {
             if (this.Page.IsValid)
@@ -380,7 +371,7 @@ namespace umbraco.editorControls.UrlPicker
                 }
 
                 // I guess I'd better lock this? or something? should I? better safe than sorry.
-                lock (m_Locker)
+                lock (_locker)
                 {
                     var vals = GetPreValues();
 

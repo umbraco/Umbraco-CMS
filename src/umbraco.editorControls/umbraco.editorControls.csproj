@@ -406,7 +406,9 @@
     </Compile>
     <Compile Include="UrlPicker\Services\UrlPickerServiceResource.Designer.cs" />
     <Compile Include="UrlPicker\UrlPickerDataEditor.cs" />
+    <Compile Include="UrlPicker\UrlPickerDataFormat.cs" />
     <Compile Include="UrlPicker\UrlPickerDataType.cs" />
+    <Compile Include="UrlPicker\UrlPickerMode.cs" />
     <Compile Include="UrlPicker\UrlPickerPreValueEditor.cs" />
     <Compile Include="userControlWrapper\SerializationHelper.cs" />
     <Compile Include="userControlWrapper\usercontrolData.cs" />

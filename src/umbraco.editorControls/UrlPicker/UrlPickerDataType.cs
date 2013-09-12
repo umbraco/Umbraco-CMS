@@ -16,17 +16,17 @@ namespace umbraco.editorControls.UrlPicker
         /// <summary>
         /// 
         /// </summary>
-        private UrlPickerDataEditor m_DataEditor;
+        private UrlPickerDataEditor _dataEditor;
 
         /// <summary>
         /// 
         /// </summary>
-        private UrlPickerPreValueEditor m_PreValueEditor;
+        private UrlPickerPreValueEditor _preValueEditor;
 
         /// <summary>
         /// 
         /// </summary>
-        private IData m_Data;
+        private IData _data;
 
         /// <summary>
         /// Gets the content editor.
@@ -36,7 +36,7 @@ namespace umbraco.editorControls.UrlPicker
         {
             get
             {
-                return m_DataEditor ?? (m_DataEditor = new UrlPickerDataEditor());
+                return _dataEditor ?? (_dataEditor = new UrlPickerDataEditor());
             }
         }
 
@@ -72,19 +72,19 @@ namespace umbraco.editorControls.UrlPicker
         {
             get
             {
-                if (this.m_Data == null)
+                if (this._data == null)
                 {
                     if (Settings.DataFormat == UrlPickerDataFormat.Xml)
                     {
-                        this.m_Data = new XmlData(this);
+                        this._data = new XmlData(this);
                     }
                     else
                     {
-                        this.m_Data = new umbraco.cms.businesslogic.datatype.DefaultData(this);
+                        this._data = new umbraco.cms.businesslogic.datatype.DefaultData(this);
                     }
                 }
 
-                return this.m_Data;
+                return this._data;
             }
         }
 
@@ -96,9 +96,10 @@ namespace umbraco.editorControls.UrlPicker
         {
             get
             {
-                if (m_PreValueEditor == null)
-                    m_PreValueEditor = new UrlPickerPreValueEditor(this);
-                return m_PreValueEditor;
+                if (_preValueEditor == null)
+                    _preValueEditor = new UrlPickerPreValueEditor(this);
+
+                return _preValueEditor;
             }
         }
 
@@ -121,17 +122,17 @@ namespace umbraco.editorControls.UrlPicker
             RenderControl = this.ContentEditor;
 
             // Events
-            this.ContentEditor.Init += new EventHandler(m_DataEditor_Init);
-            this.ContentEditor.Load += new EventHandler(m_DataEditor_Load);
+            this.ContentEditor.Init += new EventHandler(DataEditor_Init);
+            this.ContentEditor.Load += new EventHandler(DataEditor_Load);
             DataEditorControl.OnSave += new AbstractDataEditorControl.SaveEventHandler(DataEditorControl_OnSave);
         }
 
         /// <summary>
-        /// Handles the Load event of the m_DataEditor control.
+        /// Handles the Load event of the _dataEditor control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void m_DataEditor_Load(object sender, EventArgs e)
+        void DataEditor_Load(object sender, EventArgs e)
         {
             if (!this.ContentEditor.Page.IsPostBack && !string.IsNullOrEmpty((string)this.Data.Value))
             {
@@ -140,11 +141,11 @@ namespace umbraco.editorControls.UrlPicker
         }
 
         /// <summary>
-        /// Handles the Init event of the m_DataEditor control.
+        /// Handles the Init event of the _dataEditor control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void m_DataEditor_Init(object sender, EventArgs e)
+        void DataEditor_Init(object sender, EventArgs e)
         {
             // Fill DataEditor with the prevalue settings and a unique ID
             var settings = Settings;
@@ -166,47 +167,5 @@ namespace umbraco.editorControls.UrlPicker
                 ? null 
                 : state.Serialize(Settings.DataFormat);
         }
-    }
-
-    /// <summary>
-    /// The modes this datatype can implement - they refer to how the local/external content is referred.
-    /// </summary>
-    public enum UrlPickerMode : int
-    {
-        /// <summary>
-        /// URL string
-        /// </summary>
-        URL = 1,
-        /// <summary>
-        /// Content node
-        /// </summary>
-        Content = 2,
-        /// <summary>
-        /// Media node
-        /// </summary>
-        Media = 3,
-        /// <summary>
-        /// Upload a file
-        /// </summary>
-        Upload = 4
-    }
-
-    /// <summary>
-    /// Determines in which serialized format the the data is saved to the database
-    /// </summary>
-    public enum UrlPickerDataFormat
-    {
-        /// <summary>
-        /// Store as XML
-        /// </summary>
-        Xml,
-        /// <summary>
-        /// Store as comma delimited (CSV, single line)
-        /// </summary>
-        Csv,
-        /// <summary>
-        /// Store as a JSON object, which can be deserialized by .NET or JavaScript
-        /// </summary>
-        Json
     }
 }

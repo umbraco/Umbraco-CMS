@@ -66,7 +66,7 @@ namespace umbraco.editorControls.UrlPicker.Dto
         public string MediaNodeUrlMethod { get; set; }
 
         /// <summary>
-        /// URL to AjaxUploadHandler.ashx
+        /// URL to UrlPickerAjaxUploadHandler.ashx
         /// </summary>
         public string AjaxUploadHandlerUrl { get; set; }
 
@@ -91,14 +91,14 @@ namespace umbraco.editorControls.UrlPicker.Dto
             Standalone = true;
             
             // Add service method URLs
-            var urlPickerServiceUrl = IOHelper.ResolveUrl(SystemDirectories.Umbraco) + @"/plugins/UrlPicker/UrlPickerService.asmx/";
+            var urlPickerServiceUrl = IOHelper.ResolveUrl(SystemDirectories.WebServices) + @"/UrlPickerService.asmx/";
 
             ContentNodeUrlMethod = urlPickerServiceUrl + "ContentNodeUrl";
             MediaNodeUrlMethod = urlPickerServiceUrl + "MediaNodeUrl";
 
             // Add ajax upload handler URL & GUID
             AjaxUploadHandlerGuid = AjaxUploadHandler.Guid;
-            AjaxUploadHandlerUrl = IOHelper.ResolveUrl(SystemDirectories.Umbraco) + @"/plugins/UrlPicker/AjaxUploadHandler.ashx";
+            AjaxUploadHandlerUrl = IOHelper.ResolveUrl(SystemDirectories.WebServices) + @"/UrlPickerAjaxUploadHandler.ashx";
         }
 
         /// <summary>

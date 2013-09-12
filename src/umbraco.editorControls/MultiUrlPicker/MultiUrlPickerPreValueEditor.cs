@@ -12,8 +12,6 @@ namespace umbraco.editorControls.MultiUrlPicker
     /// </summary>
     public class MultiUrlPickerPreValueEditor : UrlPickerPreValueEditor
     {
-        private object m_Locker = new object();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiUrlPickerPreValueEditor"/> class.
         /// </summary>

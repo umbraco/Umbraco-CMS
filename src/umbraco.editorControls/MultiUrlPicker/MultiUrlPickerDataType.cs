@@ -14,20 +14,11 @@ namespace umbraco.editorControls.MultiUrlPicker
     /// </summary>
     public class MultiUrlPickerDataType : AbstractDataEditor
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        private MultiUrlPickerDataEditor m_DataEditor = new MultiUrlPickerDataEditor();
+        private MultiUrlPickerDataEditor _dataEditor = new MultiUrlPickerDataEditor();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        private MultiUrlPickerPreValueEditor m_PreValueEditor;
+        private MultiUrlPickerPreValueEditor _preValueEditor;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        private IData m_Data;
+        private IData _data;
 
         /// <summary>
         /// Gets the id.
@@ -61,19 +52,19 @@ namespace umbraco.editorControls.MultiUrlPicker
         {
             get
             {
-                if (this.m_Data == null)
+                if (this._data == null)
                 {
                     if (Settings.DataFormat == UrlPickerDataFormat.Xml)
                     {
-                        this.m_Data = new XmlData(this);
+                        this._data = new XmlData(this);
                     }
                     else
                     {
-                        this.m_Data = new umbraco.cms.businesslogic.datatype.DefaultData(this);
+                        this._data = new umbraco.cms.businesslogic.datatype.DefaultData(this);
                     }
                 }
 
-                return this.m_Data;
+                return this._data;
             }
         }
 
@@ -85,9 +76,10 @@ namespace umbraco.editorControls.MultiUrlPicker
         {
             get
             {
-                if (m_PreValueEditor == null)
-                    m_PreValueEditor = new MultiUrlPickerPreValueEditor(this);
-                return m_PreValueEditor;
+                if (_preValueEditor == null)
+                    _preValueEditor = new MultiUrlPickerPreValueEditor(this);
+
+                return _preValueEditor;
             }
         }
 
@@ -109,40 +101,40 @@ namespace umbraco.editorControls.MultiUrlPicker
         public MultiUrlPickerDataType()
             : base()
         {
-            RenderControl = m_DataEditor;
+            RenderControl = _dataEditor;
 
             // Events
-            m_DataEditor.Init += new EventHandler(m_DataEditor_Init);
-            m_DataEditor.Load += new EventHandler(m_DataEditor_Load);
+            _dataEditor.Init += new EventHandler(DataEditor_Init);
+            _dataEditor.Load += new EventHandler(DataEditor_Load);
             DataEditorControl.OnSave += new AbstractDataEditorControl.SaveEventHandler(DataEditorControl_OnSave);
         }
 
         /// <summary>
-        /// Handles the Load event of the m_DataEditor control.
+        /// Handles the Load event of the _dataEditor control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void m_DataEditor_Load(object sender, EventArgs e)
+        void DataEditor_Load(object sender, EventArgs e)
         {
-            if (!m_DataEditor.Page.IsPostBack && !string.IsNullOrEmpty((string)this.Data.Value))
+            if (!_dataEditor.Page.IsPostBack && !string.IsNullOrEmpty((string)this.Data.Value))
             {
-                m_DataEditor.State = MultiUrlPickerState.Deserialize((string)this.Data.Value);
+                _dataEditor.State = MultiUrlPickerState.Deserialize((string)this.Data.Value);
             }
         }
 
         /// <summary>
-        /// Handles the Init event of the m_DataEditor control.
+        /// Handles the Init event of the _dataEditor control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void m_DataEditor_Init(object sender, EventArgs e)
+        void DataEditor_Init(object sender, EventArgs e)
         {
             // Fill DataEditor with the prevalue settings and a unique ID
             var settings = Settings;
             settings.UniquePropertyId = ((umbraco.cms.businesslogic.datatype.DefaultData)this.Data).PropertyId;
             settings.UrlPickerSettings.UniquePropertyId = settings.UniquePropertyId;
             settings.Standalone = false;
-            m_DataEditor.Settings = settings;
+            _dataEditor.Settings = settings;
         }
 
         /// <summary>
@@ -151,7 +143,7 @@ namespace umbraco.editorControls.MultiUrlPicker
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         void DataEditorControl_OnSave(EventArgs e)
         {
-            var state = m_DataEditor.State;
+            var state = _dataEditor.State;
             
             // Check the state validates
             this.Data.Value = (state == null || !Settings.ValidateState(state))
