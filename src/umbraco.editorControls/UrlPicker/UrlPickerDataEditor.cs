@@ -19,7 +19,7 @@ namespace umbraco.editorControls.UrlPicker
     /// The DataEditor for the UrlPicker.
     /// </summary>
     [ClientDependency(ClientDependencyType.Javascript, "ui/json2.js", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Javascript, "ui/jquery.form.js", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Javascript, "Application/JQuery/jquery.form.js", "UmbracoClient")]
     [ValidationProperty("Url")]
     public class UrlPickerDataEditor : Panel
     {
