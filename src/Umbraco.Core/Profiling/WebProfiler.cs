@@ -143,16 +143,16 @@ namespace Umbraco.Core.Profiling
         private Attempt<HttpRequestBase> TryGetRequest(object sender)
         {
             var app = sender as HttpApplication;
-            if (app == null) return Attempt<HttpRequestBase>.False;
+            if (app == null) return Attempt<HttpRequestBase>.Fail();
 
             try
             {
                 var req = app.Request;
-                return new Attempt<HttpRequestBase>(true, new HttpRequestWrapper(req));
+                return Attempt<HttpRequestBase>.Succeed(new HttpRequestWrapper(req));
             }
             catch (HttpException ex)
             {
-                return new Attempt<HttpRequestBase>(ex);
+                return Attempt<HttpRequestBase>.Fail(ex);
             }
         }
     }

@@ -273,7 +273,7 @@ namespace Umbraco.Web.Models
 
 			//this is the result of an extension method execution gone wrong so we return dynamic null
 			if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod
-				&& attempt.Error != null && attempt.Error is TargetInvocationException)
+				&& attempt.Exception != null && attempt.Exception is TargetInvocationException)
 			{
 				result = new DynamicNull();
 				return true;

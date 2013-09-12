@@ -95,11 +95,11 @@ namespace Umbraco.Core
 	    {
 	        if (types.Length == 0)
 	        {
-	            return Attempt<Type>.False;
+	            return Attempt<Type>.Fail();
 	        }
 	        if (types.Length == 1)
 	        {
-                return new Attempt<Type>(true, types[0]);
+                return Attempt.Succeed(types[0]);
 	        }
 
 	        foreach (var curr in types)
@@ -112,11 +112,11 @@ namespace Umbraco.Core
 	            //if this type is the base for all others
 	            if (isBase)
 	            {
-	                return new Attempt<Type>(true, curr);
+	                return Attempt.Succeed(curr);
 	            }
 	        }
 
-	        return Attempt<Type>.False;
+	        return Attempt<Type>.Fail();
 	    }
 
 		/// <summary>
