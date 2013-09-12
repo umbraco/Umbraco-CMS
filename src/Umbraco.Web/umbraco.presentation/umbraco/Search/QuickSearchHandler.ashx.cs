@@ -60,7 +60,11 @@ namespace umbraco.presentation.umbraco.Search
             }
             else
             {
-                var operation = criteria.Field("__nodeName", txt.MultipleCharacterWildcard());
+				var words = txt.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(w => w.ToLower().MultipleCharacterWildcard()).ToList();
+				var operation = criteria.GroupedOr(new[] { "__nodeName" }, new[] { words[0] });
+				words.RemoveAt(0);
+				foreach (var word in words)
+					operation = operation.And().GroupedOr(new[] { "__nodeName" }, new[] { word });
 
                 // ensure the user can only find nodes they are allowed to see
                 if (UmbracoContext.Current.UmbracoUser.StartNodeId > 0)

@@ -104,12 +104,6 @@ namespace Umbraco.Web.Macros
             if (currentPage == null) throw new ArgumentNullException("currentPage");
 			if (macro.ScriptName.IsNullOrWhiteSpace()) throw new ArgumentException("The ScriptName property of the macro object cannot be null or empty");
 		
-            if (!macro.ScriptName.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
-                && (!Regex.IsMatch(macro.ScriptName, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled)))
-            {
-                throw new InvalidOperationException("Cannot render the Partial View Macro with file: " + macro.ScriptName + ". All Partial View Macros must exist in the " + SystemDirectories.MvcViews + "/MacroPartials/ folder");
-            }
-
             var http = _getHttpContext();
             var umbCtx = _getUmbracoContext();
             var routeVals = new RouteData();
