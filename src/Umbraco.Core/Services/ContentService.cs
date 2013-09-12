@@ -1483,7 +1483,7 @@ namespace Umbraco.Core.Services
                         string.Format(
                             "Content '{0}' with Id '{1}' could not be published because its parent or one of its ancestors is not published.",
                             content.Name, content.Id));
-                    result.Add(new Attempt<PublishStatus>(false, new PublishStatus(content, PublishStatusType.FailedPathNotPublished)));
+                    result.Add(Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedPathNotPublished)));
                     return result;
                 }
 
@@ -1494,7 +1494,7 @@ namespace Umbraco.Core.Services
                         string.Format("Content '{0}' with Id '{1}' could not be published because of invalid properties.",
                                       content.Name, content.Id));
                     result.Add(
-                        new Attempt<PublishStatus>(false, 
+                        Attempt.Fail(
                             new PublishStatus(content, PublishStatusType.FailedContentInvalid)
                                 {
                                     InvalidProperties = ((ContentBase) content).LastInvalidProperties
@@ -1600,7 +1600,7 @@ namespace Umbraco.Core.Services
             {
                 if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
                 {
-                    return new Attempt<PublishStatus>(false, new PublishStatus(content, PublishStatusType.FailedCancelledByEvent));
+                    return Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedCancelledByEvent));
                 }
             }
 
@@ -1670,7 +1670,7 @@ namespace Umbraco.Core.Services
 
                 Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId, content.Id);
 
-                return new Attempt<PublishStatus>(publishStatus.StatusType == PublishStatusType.Success, publishStatus);
+                return Attempt.If(publishStatus.StatusType == PublishStatusType.Success, publishStatus);
 	        }	        	        
         }
 

@@ -153,10 +153,10 @@ namespace Umbraco.Web.Trees
 
                     //First try to get a URL/title from the legacy action,
                     // if that doesn't work, try to get the legacy confirm view
-                    Attempt<LegacyUrlAction>
+                    Attempt
                         .Try(GetUrlAndTitleFromLegacyAction(currentAction, xmlTreeNode.NodeID, xmlTreeNode.NodeType, xmlTreeNode.Text, currentSection),
                              action => menuItem.LaunchDialogUrl(action.Url, action.DialogTitle))
-                        .IfFailed(() => GetLegacyConfirmView(currentAction, currentSection),
+                        .OnFailure(() => GetLegacyConfirmView(currentAction, currentSection),
                                   view => menuItem.LaunchDialogView(
                                       view, 
                                       ui.GetText("defaultdialogs", "confirmdelete") + " '" + xmlTreeNode.Text + "' ?"));

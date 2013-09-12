@@ -16,8 +16,9 @@ namespace Umbraco.Web.Standalone
     /// </summary>
     internal class StandaloneBootManager : CoreBootManager
     {
-        // fixme - could we inherit from WebBootManager?
-        // fixme - highly experimental, probably not complete!
+        // TODO
+        // this is highly experimental and probably not complete - not for production usage!
+        // also, could we inherit from WebBootManager?
 
         private readonly IEnumerable<Type> _handlersToAdd;
         private readonly IEnumerable<Type> _handlersToRemove;
@@ -36,7 +37,7 @@ namespace Umbraco.Web.Standalone
             // the DataTypesResolver otherwise they won't be loaded into the AppDomain.
             var interfacesAssemblyName = typeof(IDataType).Assembly.FullName;
 
-            // fixme - there's also that one... but we don't use it in standalone?
+            // TODO there's also that one... but we don't use it in standalone?
             //using umbraco.editorControls;
             //var editorControlsAssemblyName = typeof(uploadField).Assembly.FullName;
         }
@@ -71,7 +72,7 @@ namespace Umbraco.Web.Standalone
                 typeof (ContentFinderByNotFoundHandlers)
             );
 
-            // fixme - what else?
+            // TODO what else?
         }
 
         // can't create context before resolution is frozen!

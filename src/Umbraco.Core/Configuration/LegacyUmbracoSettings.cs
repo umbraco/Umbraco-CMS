@@ -514,12 +514,10 @@ namespace Umbraco.Core.Configuration
 			{
 				try
 				{
-					List<string> items = new List<string>();
-					XmlNode root = GetKeyAsNode("/settings/scripting/razor/notDynamicXmlDocumentElements");
-					foreach (XmlNode element in root.SelectNodes(".//element"))
-					{
-						items.Add(element.InnerText);
-					}
+					var items = new List<string>();
+					var root = GetKeyAsNode("/settings/scripting/razor/notDynamicXmlDocumentElements");
+                    if (root != null)
+                        items.AddRange(root.SelectNodes(".//element").Cast<XmlNode>().Select(n => n.InnerText));
 					return items;
 				}
 				catch

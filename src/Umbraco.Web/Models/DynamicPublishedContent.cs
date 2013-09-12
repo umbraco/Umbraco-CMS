@@ -131,7 +131,7 @@ namespace Umbraco.Web.Models
 			
 			//this is the result of an extension method execution gone wrong so we return dynamic null
 			if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod
-				&& attempt.Error != null && attempt.Error is TargetInvocationException) 				
+				&& attempt.Exception != null && attempt.Exception is TargetInvocationException) 				
 			{
 				result = new DynamicNull();
 				return true;	
@@ -150,7 +150,7 @@ namespace Umbraco.Web.Models
 		{
 			if (binder.Name.InvariantEquals("ChildrenAsList") || binder.Name.InvariantEquals("Children"))
 			{
-				return new Attempt<object>(true, Children);
+				return Attempt<object>.Succeed(Children);
 			}
 
 			if (binder.Name.InvariantEquals("parentId"))
@@ -160,9 +160,9 @@ namespace Umbraco.Web.Models
 				{
 					throw new InvalidOperationException(string.Format("The node {0} does not have a parent", Id));
 				}
-				return new Attempt<object>(true, parent.Id);
+				return Attempt<object>.Succeed(parent.Id);
 			}
-			return Attempt<object>.False;
+			return Attempt<object>.Fail();
 		}
 
 		/// <summary>
@@ -182,10 +182,10 @@ namespace Umbraco.Web.Models
 				.ToArray();
 			if (filteredTypeChildren.Any())
 			{
-				return new Attempt<object>(true,
+				return Attempt<object>.Succeed(
 				                           new DynamicPublishedContentList(filteredTypeChildren.Select(x => new DynamicPublishedContent(x))));
 			}
-			return Attempt<object>.False;
+			return Attempt<object>.Fail();
 		}
 
 		/// <summary>
@@ -201,9 +201,7 @@ namespace Umbraco.Web.Models
 				? reflectedProperty.Value
 				: null;
 
-			return result == null
-			       	? Attempt<object>.False
-			       	: new Attempt<object>(true, result);			
+		    return Attempt.If(result != null, result);
 		}
 
 		/// <summary>
@@ -225,7 +223,7 @@ namespace Umbraco.Web.Models
 
 			if (userProperty == null)
 			{
-				return Attempt<object>.False;
+				return Attempt<object>.Fail();
 			}
 
 			var result = userProperty.Value;
@@ -249,7 +247,7 @@ namespace Umbraco.Web.Models
 				result = converted.Result;
 			}
 
-			return new Attempt<object>(true, result);
+			return Attempt<object>.Succeed(result);
 
 		}
 
@@ -384,7 +382,7 @@ namespace Umbraco.Web.Models
 				{
 					try
 					{
-						return new Attempt<object>(true,
+						return Attempt<object>.Succeed(
 												   content.GetType().InvokeMember(memberAlias,
 																				  System.Reflection.BindingFlags.GetProperty |
 																				  System.Reflection.BindingFlags.Instance |
@@ -395,7 +393,7 @@ namespace Umbraco.Web.Models
 					}
 					catch (MissingMethodException ex)
 					{
-						return new Attempt<object>(ex);
+						return Attempt<object>.Fail(ex);
 					}
 				};
 

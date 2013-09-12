@@ -50,7 +50,7 @@ namespace Umbraco.Core
         {
             try
             {
-                doc = new XPathDocument(new XmlTextReader(new StringReader(xml)));
+                doc = CreateXPathDocument(xml);
                 return true;
             }
             catch (Exception)
@@ -63,23 +63,68 @@ namespace Umbraco.Core
         /// <summary>
         /// Tries to create a new <c>XPathDocument</c> from a property value.
         /// </summary>
-        /// <param name="alias">The alias of the property.</param>
         /// <param name="value">The value of the property.</param>
         /// <param name="doc">The XPath document.</param>
         /// <returns>A value indicating whether it has been possible to create the document.</returns>
-        public static bool TryCreateXPathDocumentFromPropertyValue(string alias, object value, out XPathDocument doc)
+        /// <remarks>The value can be anything... Performance-wise, this is bad.</remarks>
+        public static bool TryCreateXPathDocumentFromPropertyValue(object value, out XPathDocument doc)
         {
-            // In addition, DynamicNode strips dashes in elements or attributes
-            // names but really, this is ugly enough, and using dashes should be
-            // illegal in content type or property aliases anyway.
+            // DynamicNode.ConvertPropertyValueByDataType first cleans the value by calling
+            // XmlHelper.StripDashesInElementOrAttributeName - this is because the XML is
+            // to be returned as a DynamicXml and element names such as "value-item" are
+            // invalid and must be converted to "valueitem". But we don't have that sort of
+            // problem here - and we don't need to bother with dashes nor dots, etc.
 
             doc = null;
             var xml = value as string;
-            if (xml == null) return false;
-            xml = xml.Trim();
-            if (xml.StartsWith("<") == false || xml.EndsWith(">") == false || xml.Contains('/') == false) return false;
-            if (LegacyUmbracoSettings.NotDynamicXmlDocumentElements.Any(x => x.InvariantEquals(alias))) return false;
-            return TryCreateXPathDocument(xml, out doc);
+            if (xml == null) return false; // no a string
+            if (CouldItBeXml(xml) == false) return false; // string does not look like it's xml
+            if (IsXmlWhitespace(xml)) return false; // string is whitespace, xml-wise
+            if (TryCreateXPathDocument(xml, out doc) == false) return false; // string can't be parsed into xml
+
+            var nav = doc.CreateNavigator();
+            if (nav.MoveToFirstChild())
+            {
+                var name = nav.LocalName; // must not match an excluded tag
+                if (LegacyUmbracoSettings.NotDynamicXmlDocumentElements.All(x => x.InvariantEquals(name) == false)) return true;
+            }
+
+            doc = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Tries to create a new <c>XElement</c> from a property value.
+        /// </summary>
+        /// <param name="value">The value of the property.</param>
+        /// <param name="elt">The Xml element.</param>
+        /// <returns>A value indicating whether it has been possible to create the element.</returns>
+        /// <remarks>The value can be anything... Performance-wise, this is bad.</remarks>
+        public static bool TryCreateXElementFromPropertyValue(object value, out XElement elt)
+        {
+            // see note above in TryCreateXPathDocumentFromPropertyValue...
+
+            elt = null;
+            var xml = value as string;
+            if (xml == null) return false; // not a string
+            if (CouldItBeXml(xml) == false) return false; // string does not look like it's xml
+            if (IsXmlWhitespace(xml)) return false; // string is whitespace, xml-wise
+
+            try
+            {
+                elt = XElement.Parse(xml, LoadOptions.None);
+            }
+            catch
+            {
+                elt = null;
+                return false; // string can't be parsed into xml
+            }
+
+            var name = elt.Name.LocalName; // must not match an excluded tag
+            if (LegacyUmbracoSettings.NotDynamicXmlDocumentElements.All(x => x.InvariantEquals(name) == false)) return true;
+
+            elt = null;
+            return false;
         }
         
         /// <summary>
@@ -137,8 +182,8 @@ namespace Umbraco.Core
                 }
             }
         }
-        
 
+        // used by DynamicNode only, see note in TryCreateXPathDocumentFromPropertyValue
         public static string StripDashesInElementOrAttributeNames(string xml)
         {
             using (var outputms = new MemoryStream())
@@ -289,17 +334,10 @@ namespace Umbraco.Core
         /// </returns>
 		public static bool CouldItBeXml(string xml)
         {
-            if (string.IsNullOrEmpty(xml) == false)
-            {
-                xml = xml.Trim();
+            if (string.IsNullOrEmpty(xml)) return false;
 
-                if (xml.StartsWith("<") && xml.EndsWith(">") && xml.Contains("/"))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            xml = xml.Trim();
+            return xml.StartsWith("<") && xml.EndsWith(">") && xml.Contains('/');
         }
 
         /// <summary>
