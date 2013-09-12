@@ -231,8 +231,20 @@ namespace umbraco
             return renderMacro(pageElements, pageId);
         }
 
+        public delegate void OnMacroRenderingEventHandler(macro sender, EventArgs e);
+        public static event OnMacroRenderingEventHandler OnMacroRendering;
+        protected void FireOnMacroRendering(EventArgs e)
+        {
+            if (OnMacroRendering != null)
+                OnMacroRendering(this, e);
+        }
+
         public Control renderMacro(Hashtable pageElements, int pageId)
         {
+            // Event to allow manipulation of Macro Model
+            var rea = new EventArgs();
+            FireOnMacroRendering(rea);
+
             var macroInfo = (Model.MacroType == MacroTypes.Script && Model.Name.IsNullOrWhiteSpace())
                                 ? string.Format("Render Inline Macro, Cache: {0})", Model.CacheDuration)
                                 : string.Format("Render Macro: {0}, type: {1}, cache: {2})", Name, Model.MacroType, Model.CacheDuration);
@@ -1952,4 +1964,6 @@ namespace umbraco
 
         #endregion
     }
+    public class MacroRenderingEventArgs : System.EventArgs { }
+
 }
