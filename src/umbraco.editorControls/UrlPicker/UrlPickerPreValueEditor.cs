@@ -326,7 +326,7 @@ namespace umbraco.editorControls.UrlPicker
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        public void Save()
+        public virtual void Save()
         {
             if (this.Page.IsValid)
             {

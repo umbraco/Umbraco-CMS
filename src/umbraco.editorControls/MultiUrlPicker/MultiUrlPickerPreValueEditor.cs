@@ -78,7 +78,7 @@ namespace umbraco.editorControls.MultiUrlPicker
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        public new void Save()
+        public override void Save()
         {
             base.Save();
 
