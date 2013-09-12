@@ -58,14 +58,14 @@ namespace Umbraco.Core
                 try
                 {
                     var converted = (T) input;
-                    return new Attempt<T>(true, converted);
+                    return Attempt<T>.Succeed(converted);
                 }
                 catch (Exception e)
                 {
-                    return new Attempt<T>(e);
+                    return Attempt<T>.Fail(e);
                 }
             }
-			return !result.Success ? Attempt<T>.False : new Attempt<T>(true, (T)result.Result);
+			return !result.Success ? Attempt<T>.Fail() : Attempt<T>.Succeed((T)result.Result);
 		}
 
 		/// <summary>
@@ -77,14 +77,14 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		public static Attempt<object> TryConvertTo(this object input, Type destinationType)
 		{
-			if (input == null) return Attempt<object>.False;
+			if (input == null) return Attempt<object>.Fail();
 
-			if (destinationType == typeof(object)) return new Attempt<object>(true, input);
+			if (destinationType == typeof(object)) return Attempt.Succeed(input);
 
-			if (input.GetType() == destinationType) return new Attempt<object>(true, input);
+			if (input.GetType() == destinationType) return Attempt.Succeed(input);
 
             //check for string so that overloaders of ToString() can take advantage of the conversion.
-            if (destinationType == typeof(string)) return new Attempt<object>(true, input.ToString());
+            if (destinationType == typeof(string)) return Attempt<object>.Succeed(input.ToString());
 
 			if (!destinationType.IsGenericType || destinationType.GetGenericTypeDefinition() != typeof(Nullable<>))
 			{
@@ -97,11 +97,11 @@ namespace Umbraco.Core
                     try
                     {
                         var casted = Convert.ChangeType(input, destinationType);
-                        return new Attempt<object>(true, casted);
+                        return Attempt.Succeed(casted);
                     }
                     catch (Exception e)
                     {
-                        return new Attempt<object>(e);
+                        return Attempt<object>.Fail(e);
                     }
 				}
 			}
@@ -112,11 +112,11 @@ namespace Umbraco.Core
 				try
 				{
 					var converted = inputConverter.ConvertTo(input, destinationType);
-					return new Attempt<object>(true, converted);
+					return Attempt.Succeed(converted);
 				}
 				catch (Exception e)
 				{
-					return new Attempt<object>(e);
+					return Attempt<object>.Fail(e);
 				}
 			}
 
@@ -128,11 +128,11 @@ namespace Umbraco.Core
 					try
 					{
 						var converted = boolConverter.ConvertFrom(input);
-						return new Attempt<object>(true, converted);
+						return Attempt.Succeed(converted);
 					}
 					catch (Exception e)
 					{
-						return new Attempt<object>(e);
+						return Attempt<object>.Fail(e);
 					}
 				}
 			}
@@ -143,11 +143,11 @@ namespace Umbraco.Core
 				try
 				{
 					var converted = outputConverter.ConvertFrom(input);
-					return new Attempt<object>(true, converted);
+					return Attempt.Succeed(converted);
 				}
 				catch (Exception e)
 				{
-					return new Attempt<object>(e);
+					return Attempt<object>.Fail(e);
 				}
 			}
 
@@ -157,15 +157,15 @@ namespace Umbraco.Core
 				try
 				{
 					var casted = Convert.ChangeType(input, destinationType);
-					return new Attempt<object>(true, casted);
+					return Attempt.Succeed(casted);
 				}
 				catch (Exception e)
 				{
-					return new Attempt<object>(e);
+					return Attempt<object>.Fail(e);
 				}
 			}
 
-			return Attempt<object>.False;
+			return Attempt<object>.Fail();
 		}
 
 		internal static void CheckThrowObjectDisposed(this IDisposable disposable, bool isDisposed, string objectname)
@@ -354,11 +354,11 @@ namespace Umbraco.Core
 			try
 			{
 				var output = value.ToXmlString(type);
-				return new Attempt<string>(true, output);
+				return Attempt.Succeed(output);
 			}
 			catch (NotSupportedException ex)
 			{
-				return new Attempt<string>(ex);
+				return Attempt<string>.Fail(ex);
 			}
 		}
 
