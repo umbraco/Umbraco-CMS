@@ -231,19 +231,31 @@ namespace umbraco
             return renderMacro(pageElements, pageId);
         }
 
-        public delegate void OnMacroRenderingEventHandler(macro sender, EventArgs e);
-        public static event OnMacroRenderingEventHandler OnMacroRendering;
-        protected void FireOnMacroRendering(EventArgs e)
+        /// <summary>
+        /// An event that is raised just before the macro is rendered allowing developers to modify the macro before it executes.
+        /// </summary>
+        public static event TypedEventHandler<macro, MacroRenderingEventArgs> MacroRendering;
+        
+        /// <summary>
+        /// Raises the MacroRendering event
+        /// </summary>
+        /// <param name="e"></param>
+        protected void OnMacroRendering(MacroRenderingEventArgs e)
         {
-            if (OnMacroRendering != null)
-                OnMacroRendering(this, e);
+            if (MacroRendering != null)
+                MacroRendering(this, e);
         }
 
+        /// <summary>
+        /// Renders the macro
+        /// </summary>
+        /// <param name="pageElements"></param>
+        /// <param name="pageId"></param>
+        /// <returns></returns>
         public Control renderMacro(Hashtable pageElements, int pageId)
         {
             // Event to allow manipulation of Macro Model
-            var rea = new EventArgs();
-            FireOnMacroRendering(rea);
+            OnMacroRendering(new MacroRenderingEventArgs(pageElements, pageId));
 
             var macroInfo = (Model.MacroType == MacroTypes.Script && Model.Name.IsNullOrWhiteSpace())
                                 ? string.Format("Render Inline Macro, Cache: {0})", Model.CacheDuration)
@@ -1964,6 +1976,20 @@ namespace umbraco
 
         #endregion
     }
-    public class MacroRenderingEventArgs : System.EventArgs { }
+
+    /// <summary>
+    /// Event arguments used for the MacroRendering event
+    /// </summary>
+    public class MacroRenderingEventArgs : EventArgs
+    {
+        public Hashtable PageElements { get; private set; }
+        public int PageId { get; private set; }
+
+        public MacroRenderingEventArgs(Hashtable pageElements, int pageId)
+        {
+            PageElements = pageElements;
+            PageId = pageId;
+        }
+    }
 
 }
