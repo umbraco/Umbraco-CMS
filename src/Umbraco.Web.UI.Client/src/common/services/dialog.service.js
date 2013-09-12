@@ -327,13 +327,31 @@ angular.module('umbraco.services')
             *
             * @description
             * Opens a mcaro picker in a modal, the callback returns a object representing the macro and it's parameters
-            * @param {Object} options mediapicker dialog options object
+            * @param {Object} options macropicker dialog options object
             * @param {$scope} options.scope dialog scope
             * @param {Function} options.callback callback function
             * @returns {Object} modal object
             */
            macroPicker: function (options) {
                 options.template = 'views/common/dialogs/macroPicker.html';
+                options.show = true;
+                return openDialog(options);
+           },
+
+           /**
+            * @ngdoc method
+            * @name umbraco.services.dialogService#iconPicker
+            * @methodOf umbraco.services.dialogService
+            *
+            * @description
+            * Opens a icon picker in a modal, the callback returns a object representing the selected icon
+            * @param {Object} options iconpicker dialog options object
+            * @param {$scope} options.scope dialog scope
+            * @param {Function} options.callback callback function
+            * @returns {Object} modal object
+            */
+           iconPicker: function (options) {
+                options.template = 'views/common/dialogs/iconPicker.html';
                 options.show = true;
                 return openDialog(options);
            },

@@ -1,15 +1,30 @@
 // Panel
 // -------------------------
-.umb-panel{background: white;}
+.umb-panel{
+          background: white;
+          position: absolute; 
+          top: 0px; bottom: 0px; left: 0px; right: 0px;}
+
+.umb-panel-nobody{padding-top: 100px;}
 
 .umb-panel-header {
-  height: 79px;
-  padding: 20px 20px 0px 20px;
   background: @grayLighter;
   border-bottom: 1px solid @grayLight;
-  height: 79px; 
+  position: absolute;
+  height: 99px;
+  top: 0px;
+  right: 0px;
+  left: 0px;
 }
 
+.umb-panel-body {
+    top: 101px;
+    left: 0px;
+    right: 0px;
+    bottom: 20px;
+    position: relative;
+    clear: both;
+}
 
 .umb-panel-header h1.umb-headline-editor {
   cursor: text;
@@ -18,19 +33,31 @@
 .umb-panel-header h1.umb-headline-editor {
   cursor: text;
 }
-.umb-headline-editor-wrapper,  .umb-panel-header-meta{height: 40px; padding-top: 10px;}
+.umb-headline-editor-wrapper, 
+h1.headline{height: 40px; padding: 30px 0 0 20px;}
+
 .umb-headline-editor-wrapper h1, h1.headline {
   margin: 0;
   font-size: @fontSizeLarge;
   font-weight: 400;
+  text-align: left;
 }
 
+.umb-headline-editor-wrapper .help-inline{display: none !Important;}
+.umb-headline-editor-wrapper.error h1{
+  border-bottom: 1px dashed @red; color: @red; cursor: pointer;
+};
+
+.umb-panel-header .umb-nav-tabs{
+  bottom: -1px;
+  position: absolute;
+  padding: 0px 0px 0px 20px;
+}
 .umb-panel-header h1, {
   margin: 0;
   font-size: @fontSizeLarge;
   font-weight: 400;
   color: @gray;
-  padding: 4px 0px 4px 6px;
   line-height: 22px;
   width: 100%;
 }
@@ -60,11 +87,10 @@
 
 .umb-panel-header .umb-btn-toolbar {
     float: right;
+    padding: 20px 20px 0 0;
 }
 
-.umb-panel-body {
-    clear: both;
-}
+
 
 .umb-panel-footer {
   margin: 0;

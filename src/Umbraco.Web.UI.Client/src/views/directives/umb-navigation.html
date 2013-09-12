@@ -29,14 +29,15 @@
     </div>
 
     <!-- navigation container -->
-    <div id="navigation" class="fill shadow umb-panel umb-modalcolumn"
+    <div id="navigation" class="fill shadow umb-modalcolumn"
             ng-show="nav.ui.showNavigation" 
             ng-animate="'slide'">
 
-        <div ng-swipe-left="nav.hideNavigation()" class="navigation-inner-container span6">
+        <div ng-swipe-left="nav.hideNavigation()" class="navigation-inner-container span6" style="z-index: 100">
+
             <!-- the search -->
-            <div id="search-form" ng-animate="'slide'">
-                <div class="umb-panel-header">
+            <div id="search-form">
+                <div class="umb-modalcolumn-header">
                     <form class="form-search" ng-controller="Umbraco.SearchController" novalidate>
                         <i class="icon-search"></i>
                         <input type="text"
@@ -50,7 +51,8 @@
             </div>
 
             <!-- Search results -->
-            <div id="search-results" class="umb-panel fill" ng-show="nav.ui.showSearchResults" ng-animate="'slide'">
+            <div id="search-results" class="umb-modalcolumn-body" 
+                ng-show="nav.ui.showSearchResults">
 
                 <h5 class="umb-tree-header">Search results</h5>
                 <ul class="umb-item-list" ng-repeat="resultGroup in nav.ui.searchResults">
@@ -68,23 +70,23 @@
             
 
             <!-- the tree -->
-            <div id="tree" class="umb-panel fill" ng-animate="'slide'">
+            <div id="tree" class="umb-modalcolumn-body">
                 <umb-tree eventhandler="treeEventHandler" section="{{nav.ui.currentSection}}" ></umb-tree>
             </div>
         </div>
 
-        <div class="offset6">
+        <div class="offset6" style="z-index: 10">
             <!-- The context menu -->
             <umb-context-menu></umb-context-menu>
             
             <!-- Tree dialogs -->
-            <div id="dialog" class='umb-modalcolumn fill shadow umb-panel'
+            <div id="dialog" class='umb-modalcolumn fill shadow'
                 ng-swipe-left="nav.hideDialog()"
                 ng-show="nav.ui.showContextMenuDialog" ng-animate="'slide'">
-                <div class='umb-panel-header'>
-                    <h1 class="umb-panel-header-meta">{{nav.ui.dialogTitle}}</h1>
+                <div class='umb-modalcolumn-header'>
+                    <h1>{{nav.ui.dialogTitle}}</h1>
                 </div>
-                <div class='umb-panel-body'>
+                <div class='umb-modalcolumn-body'>
                 </div>
             </div>
         </div>
