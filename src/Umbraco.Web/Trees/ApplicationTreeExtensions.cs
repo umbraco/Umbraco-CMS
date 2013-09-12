@@ -33,9 +33,9 @@ namespace Umbraco.Web.Trees
             var foundControllerTree = controllerTrees.FirstOrDefault(x => x == appTree.GetRuntimeType());
             if (foundControllerTree == null)
             {
-                return new Attempt<Type>(new InstanceNotFoundException("Could not find tree of type " + appTree.Type + " in any loaded DLLs"));
+                return Attempt<Type>.Fail(new InstanceNotFoundException("Could not find tree of type " + appTree.Type + " in any loaded DLLs"));
             }
-            return new Attempt<Type>(true, foundControllerTree);
+            return Attempt.Succeed(foundControllerTree);
         }
 
         internal static Attempt<TreeNode> TryGetRootNodeFromControllerTree(this ApplicationTree appTree, FormDataCollection formCollection, HttpControllerContext controllerContext)
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Trees
             var foundControllerTreeAttempt = appTree.TryGetControllerTree();
             if (foundControllerTreeAttempt.Success == false)
             {
-                return new Attempt<TreeNode>(foundControllerTreeAttempt.Error);
+                return Attempt<TreeNode>.Fail(foundControllerTreeAttempt.Exception);
             }
             var foundControllerTree = foundControllerTreeAttempt.Result;
             //instantiate it, since we are proxying, we need to setup the instance with our current context
@@ -53,8 +53,8 @@ namespace Umbraco.Web.Trees
             //return the root
             var node = instance.GetRootNode(formCollection);
             return node == null
-                ? new Attempt<TreeNode>(new InvalidOperationException("Could not return a root node for tree " + appTree.Type)) 
-                : new Attempt<TreeNode>(true, node);
+                ? Attempt<TreeNode>.Fail(new InvalidOperationException("Could not return a root node for tree " + appTree.Type)) 
+                : Attempt<TreeNode>.Succeed(node);
         }
 
         internal static  Attempt<TreeNodeCollection> TryLoadFromControllerTree(this ApplicationTree appTree, string id, FormDataCollection formCollection, HttpControllerContext controllerContext)
@@ -62,7 +62,7 @@ namespace Umbraco.Web.Trees
             var foundControllerTreeAttempt = appTree.TryGetControllerTree();
             if (foundControllerTreeAttempt.Success == false)
             {
-                return new Attempt<TreeNodeCollection>(foundControllerTreeAttempt.Error);
+                return Attempt<TreeNodeCollection>.Fail(foundControllerTreeAttempt.Exception);
             }
             var foundControllerTree = foundControllerTreeAttempt.Result;
 
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Trees
             instance.ControllerContext = controllerContext;
             instance.Request = controllerContext.Request;
             //return it's data
-            return new Attempt<TreeNodeCollection>(true, instance.GetNodes(id, formCollection));
+            return Attempt.Succeed(instance.GetNodes(id, formCollection));
         }
 
         internal static Attempt<TreeNode> TryGetRootNodeFromLegacyTree(this ApplicationTree appTree, FormDataCollection formCollection, UrlHelper urlHelper, string currentSection)
@@ -79,9 +79,9 @@ namespace Umbraco.Web.Trees
             var xmlTreeNodeAttempt = TryGetRootXmlNodeFromLegacyTree(appTree, formCollection, urlHelper);
             if (xmlTreeNodeAttempt.Success == false)
             {
-                return new Attempt<TreeNode>(xmlTreeNodeAttempt.Error);
+                return Attempt<TreeNode>.Fail(xmlTreeNodeAttempt.Exception);
             }
-            return new Attempt<TreeNode>(true,
+            return Attempt.Succeed(
                 LegacyTreeDataConverter.ConvertFromLegacy(xmlTreeNodeAttempt.Result.NodeID, xmlTreeNodeAttempt.Result, urlHelper, currentSection, isRoot: true));
         }
 
@@ -90,13 +90,13 @@ namespace Umbraco.Web.Trees
             var treeDefAttempt = appTree.TryGetLegacyTreeDef();
             if (treeDefAttempt.Success == false)
             {
-                return new Attempt<XmlTreeNode>(treeDefAttempt.Error);
+                return Attempt<XmlTreeNode>.Fail(treeDefAttempt.Exception);
             }
             var treeDef = treeDefAttempt.Result;
             var bTree = treeDef.CreateInstance();
             var treeParams = new LegacyTreeParams(formCollection);
             bTree.SetTreeParameters(treeParams);
-            return new Attempt<XmlTreeNode>(true, bTree.RootNode);
+            return Attempt.Succeed(bTree.RootNode);
         }
 
         internal static Attempt<TreeDefinition> TryGetLegacyTreeDef(this ApplicationTree appTree)
@@ -104,8 +104,8 @@ namespace Umbraco.Web.Trees
             //This is how the legacy trees worked....
             var treeDef = TreeDefinitionCollection.Instance.FindTree(appTree.Alias);
             return treeDef == null 
-                ? new Attempt<TreeDefinition>(new InstanceNotFoundException("Could not find tree of type " + appTree.Alias)) 
-                : new Attempt<TreeDefinition>(true, treeDef);
+                ? Attempt<TreeDefinition>.Fail(new InstanceNotFoundException("Could not find tree of type " + appTree.Alias)) 
+                : Attempt<TreeDefinition>.Succeed(treeDef);
         }
 
         internal static Attempt<TreeNodeCollection> TryLoadFromLegacyTree(this ApplicationTree appTree, string id, FormDataCollection formCollection, UrlHelper urlHelper, string currentSection)
@@ -113,9 +113,9 @@ namespace Umbraco.Web.Trees
             var xTreeAttempt = appTree.TryGetXmlTree(id, formCollection);
             if (xTreeAttempt.Success == false)
             {
-                return new Attempt<TreeNodeCollection>(xTreeAttempt.Error);
+                return Attempt<TreeNodeCollection>.Fail(xTreeAttempt.Exception);
             }
-            return new Attempt<TreeNodeCollection>(true, LegacyTreeDataConverter.ConvertFromLegacy(id, xTreeAttempt.Result, urlHelper, currentSection));
+            return Attempt.Succeed(LegacyTreeDataConverter.ConvertFromLegacy(id, xTreeAttempt.Result, urlHelper, currentSection));
         }
 
         internal static Attempt<MenuItemCollection> TryGetMenuFromLegacyTreeRootNode(this ApplicationTree appTree, FormDataCollection formCollection, UrlHelper urlHelper)
@@ -123,13 +123,13 @@ namespace Umbraco.Web.Trees
             var rootAttempt = appTree.TryGetRootXmlNodeFromLegacyTree(formCollection, urlHelper);
             if (rootAttempt.Success == false)
             {
-                return new Attempt<MenuItemCollection>(rootAttempt.Error);
+                return Attempt<MenuItemCollection>.Fail(rootAttempt.Exception);
             }
 
             var currentSection = formCollection.GetRequiredString("section");
 
             var result = LegacyTreeDataConverter.ConvertFromLegacyMenu(rootAttempt.Result, currentSection);            
-            return new Attempt<MenuItemCollection>(true, result);
+            return Attempt.Succeed(result);
         }
 
         internal static Attempt<MenuItemCollection> TryGetMenuFromLegacyTreeNode(this ApplicationTree appTree, string parentId, string nodeId, FormDataCollection formCollection, UrlHelper urlHelper)
@@ -137,7 +137,7 @@ namespace Umbraco.Web.Trees
             var xTreeAttempt = appTree.TryGetXmlTree(parentId, formCollection);
             if (xTreeAttempt.Success == false)
             {
-                return new Attempt<MenuItemCollection>(xTreeAttempt.Error);
+                return Attempt<MenuItemCollection>.Fail(xTreeAttempt.Exception);
             }
 
             var currentSection = formCollection.GetRequiredString("section");
@@ -145,9 +145,9 @@ namespace Umbraco.Web.Trees
             var result = LegacyTreeDataConverter.ConvertFromLegacyMenu(nodeId, xTreeAttempt.Result, currentSection);
             if (result == null)
             {
-                return new Attempt<MenuItemCollection>(new ApplicationException("Could not find the node with id " + nodeId + " in the collection of nodes contained with parent id " + parentId));
+                return Attempt<MenuItemCollection>.Fail(new ApplicationException("Could not find the node with id " + nodeId + " in the collection of nodes contained with parent id " + parentId));
             }
-            return new Attempt<MenuItemCollection>(true, result);
+            return Attempt.Succeed(result);
         }
 
         private static Attempt<XmlTree> TryGetXmlTree(this ApplicationTree appTree, string id, FormDataCollection formCollection)
@@ -155,7 +155,7 @@ namespace Umbraco.Web.Trees
             var treeDefAttempt = appTree.TryGetLegacyTreeDef();
             if (treeDefAttempt.Success == false)
             {
-                return new Attempt<XmlTree>(treeDefAttempt.Error);
+                return Attempt<XmlTree>.Fail(treeDefAttempt.Exception);
             }
             var treeDef = treeDefAttempt.Result;
             //This is how the legacy trees worked....
@@ -176,7 +176,7 @@ namespace Umbraco.Web.Trees
             var xTree = new XmlTree();
             bTree.SetTreeParameters(treeParams);
             bTree.Render(ref xTree);
-            return new Attempt<XmlTree>(true, xTree);
+            return Attempt.Succeed(xTree);
         }
 
     }

@@ -33,7 +33,7 @@ namespace Umbraco.Web.Trees
             if (attempt.Success == false)
             {
                 var msg = "Could not render tree " + queryStrings.GetRequiredString("treeType") + " for node id " + id;
-                LogHelper.Error<LegacyTreeController>(msg, attempt.Error);
+                LogHelper.Error<LegacyTreeController>(msg, attempt.Exception);
                 throw new ApplicationException(msg);
             }
 
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Trees
                 if (attempt.Success == false)
                 {
                     var msg = "Could not render menu for root node for treeType " + queryStrings.GetRequiredString("treeType");
-                    LogHelper.Error<LegacyTreeController>(msg, attempt.Error);
+                    LogHelper.Error<LegacyTreeController>(msg, attempt.Exception);
                     throw new ApplicationException(msg);
                 }
                 return attempt.Result;
@@ -82,7 +82,7 @@ namespace Umbraco.Web.Trees
                 if (attempt.Success == false)
                 {
                     var msg = "Could not render menu for treeType " + queryStrings.GetRequiredString("treeType") + " for node id " + parentId;
-                    LogHelper.Error<LegacyTreeController>(msg, attempt.Error);
+                    LogHelper.Error<LegacyTreeController>(msg, attempt.Exception);
                     throw new ApplicationException(msg);
                 }
                 return attempt.Result;

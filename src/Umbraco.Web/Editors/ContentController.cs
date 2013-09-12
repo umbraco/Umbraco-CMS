@@ -235,7 +235,7 @@ namespace Umbraco.Web.Editors
             }
 
             //initialize this to successful
-            var publishStatus = new Attempt<PublishStatus>(true, null);
+            var publishStatus = Attempt<PublishStatus>.Succeed();
 
             if (contentItem.Action == ContentSaveAction.Save || contentItem.Action == ContentSaveAction.SaveNew)
             {
