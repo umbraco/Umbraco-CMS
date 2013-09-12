@@ -5,6 +5,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class CharCollection : ConfigurationElementCollection, IEnumerable<CharElement>
     {
+        internal void Add(CharElement c)
+        {
+            BaseAdd(c);
+        }
+
         protected override ConfigurationElement CreateNewElement()
         {
             return new CharElement();

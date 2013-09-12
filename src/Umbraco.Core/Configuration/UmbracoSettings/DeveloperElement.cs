@@ -4,11 +4,18 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class DeveloperElement : ConfigurationElement
     {
+        private AppCodeFileExtensionsElement _default;
+
         [ConfigurationProperty("appCodeFileExtensions")]
         internal AppCodeFileExtensionsElement AppCodeFileExtensions
         {
             get
             {
+                if (_default != null)
+                {
+                    return _default;
+                }
+
                 //here we need to check if this element is defined, if it is not then we'll setup the defaults
                 var prop = Properties["appCodeFileExtensions"];
                 var autoFill = this[prop] as ConfigurationElement;
@@ -19,12 +26,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                             new FileExtensionElement {RawValue = "cs"},
                             new FileExtensionElement {RawValue = "vb"}
                         };
-                    var element = new AppCodeFileExtensionsElement
+                    _default = new AppCodeFileExtensionsElement
                         {
                             AppCodeFileExtensionsCollection = collection
                         };
 
-                    return element;
+                    return _default;
                 }
 
                 return (AppCodeFileExtensionsElement)base["appCodeFileExtensions"];

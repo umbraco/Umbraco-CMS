@@ -5,6 +5,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class RepositoriesCollection : ConfigurationElementCollection, IEnumerable<RepositoryElement>
     {
+        internal void Add(RepositoryElement item)
+        {
+            BaseAdd(item);
+        }
+
         protected override ConfigurationElement CreateNewElement()
         {
             return new RepositoryElement();

@@ -31,7 +31,13 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("defaultRenderingEngine", IsRequired = true)]
         internal InnerTextConfigurationElement<RenderingEngine> DefaultRenderingEngine
         {
-            get { return (InnerTextConfigurationElement<RenderingEngine>)this["defaultRenderingEngine"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<RenderingEngine>(
+                    (InnerTextConfigurationElement<RenderingEngine>)this["defaultRenderingEngine"],
+                    //set the default
+                    RenderingEngine.Mvc);
+            }
         }
 
         [ConfigurationProperty("enableTemplateFolders")]

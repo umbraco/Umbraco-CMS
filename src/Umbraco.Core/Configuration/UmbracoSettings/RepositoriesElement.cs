@@ -1,14 +1,17 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class RepositoriesElement : ConfigurationElement
     {
+
         [ConfigurationCollection(typeof(RepositoriesCollection), AddItemName = "repository")]
         [ConfigurationProperty("", IsDefaultCollection = true)]
         public RepositoriesCollection Repositories
         {
-            get { return (RepositoriesCollection)base[""]; }
+            get { return (RepositoriesCollection) base[""]; }
+            set { base[""] = value; }
         }
     }
 }

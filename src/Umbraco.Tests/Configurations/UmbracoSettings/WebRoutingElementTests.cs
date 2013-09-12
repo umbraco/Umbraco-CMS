@@ -17,4 +17,15 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(Section.WebRouting.TrySkipIisCustomErrors == false);
         }
     }
+
+    [TestFixture]
+    public class WebRoutingElementDefaultTests : WebRoutingElementTests
+    {
+
+        protected override bool TestingDefaults
+        {
+            get { return true; }
+        }
+
+    }
 }

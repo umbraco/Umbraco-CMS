@@ -4,7 +4,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class DistributedCallElement : ConfigurationElement
     {
-        [ConfigurationProperty("enable")]
+        [ConfigurationProperty("enable", DefaultValue = false)]
         public bool Enabled
         {
             get { return (bool)base["enable"]; }
@@ -13,7 +13,13 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("user")]
         internal InnerTextConfigurationElement<int> UserId
         {
-            get { return (InnerTextConfigurationElement<int>)this["user"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<int>(
+                       (InnerTextConfigurationElement<int>)this["user"],
+                    //set the default
+                       0);
+            }
         }
 
         [ConfigurationCollection(typeof(ServerCollection), AddItemName = "server")]

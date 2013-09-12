@@ -7,7 +7,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
     public class DistributedCallElementTests : UmbracoSettingsTests
     {
         [Test]
-        public void Enabled()
+        public virtual void Enabled()
         {
             Assert.IsTrue(Section.DistributedCall.Enabled == true);
            
@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
 
         }
         [Test]
-        public void Servers()
+        public virtual void Servers()
         {
             Assert.IsTrue(Section.DistributedCall.Servers.Count == 2);
             Assert.IsTrue(Section.DistributedCall.Servers.ElementAt(0).Value == "127.0.0.1");
@@ -27,5 +27,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(Section.DistributedCall.Servers.ElementAt(1).ForceProtocol == "https");
             Assert.IsTrue(Section.DistributedCall.Servers.ElementAt(1).ForcePortnumber == "443");
         }
+
     }
 }

@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         }
 
         [Test]
-        public void Links()
+        public virtual void Links()
         {
             Assert.IsTrue(Section.Help.Links.Count == 2);
             Assert.IsTrue(Section.Help.Links.ElementAt(0).Application == "content");

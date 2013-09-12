@@ -28,23 +28,32 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
+        private ContentImagingAutoFillPropertiesCollection _defaultImageAutoFill;
+
         [ConfigurationCollection(typeof(ContentImagingAutoFillPropertiesCollection), AddItemName = "uploadField")]
         [ConfigurationProperty("autoFillImageProperties", IsDefaultCollection = true)]        
         public ContentImagingAutoFillPropertiesCollection ImageAutoFillProperties
         {
             get
             {
+                if (_defaultImageAutoFill != null)
+                {
+                    return _defaultImageAutoFill;
+                }
+
                 //here we need to check if this element is defined, if it is not then we'll setup the defaults
                 var prop = Properties["autoFillImageProperties"];
                 var autoFill = this[prop] as ConfigurationElement;
                 if (autoFill != null && autoFill.ElementInformation.IsPresent == false)
                 {
-                    var collection = new ContentImagingAutoFillPropertiesCollection();
-                    collection.Add(new ContentImagingAutoFillUploadFieldElement
+                    _defaultImageAutoFill = new ContentImagingAutoFillPropertiesCollection
                         {
-                            Alias = "umbracoFile"
-                        });
-                    base["autoFillImageProperties"] = collection;
+                            new ContentImagingAutoFillUploadFieldElement
+                                {
+                                    Alias = "umbracoFile"
+                                }
+                        };
+                    return _defaultImageAutoFill;
                 }
                 
                 return (ContentImagingAutoFillPropertiesCollection) base["autoFillImageProperties"];

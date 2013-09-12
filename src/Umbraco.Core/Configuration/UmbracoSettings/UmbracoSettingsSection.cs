@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
@@ -67,11 +68,41 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return (DistributedCallElement)this["distributedCall"]; }
         }
-        
+
+        private RepositoriesElement _defaultRepositories;
+
         [ConfigurationProperty("repositories")]
         internal RepositoriesElement PackageRepositories
         {
-            get { return (RepositoriesElement)this["repositories"]; }
+            get
+            {
+
+                if (_defaultRepositories != null)
+                {
+                    return _defaultRepositories;
+                }
+
+                //here we need to check if this element is defined, if it is not then we'll setup the defaults
+                var prop = Properties["repositories"];
+                var repos = this[prop] as ConfigurationElement;
+                if (repos != null && repos.ElementInformation.IsPresent == false)
+                {
+                    var collection = new RepositoriesCollection
+                        {
+                            new RepositoryElement() {Name = "Umbraco package Repository", Id = new Guid("65194810-1f85-11dd-bd0b-0800200c9a66")}
+                        };
+
+                    
+                    _defaultRepositories = new RepositoriesElement()
+                        {
+                            Repositories = collection
+                        };
+
+                    return _defaultRepositories;
+                }
+
+                return (RepositoriesElement)base["repositories"];
+            }
         }
 
         [ConfigurationProperty("providers")]

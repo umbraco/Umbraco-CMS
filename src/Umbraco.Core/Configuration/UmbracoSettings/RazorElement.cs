@@ -4,18 +4,25 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class RazorElement : ConfigurationElement
     {
+        private NotDynamicXmlDocumentElementCollection _defaultCollection;
+
         [ConfigurationCollection(typeof (NotDynamicXmlDocumentElementCollection), AddItemName = "element")]
         [ConfigurationProperty("notDynamicXmlDocumentElements", IsDefaultCollection = true)]
         public NotDynamicXmlDocumentElementCollection NotDynamicXmlDocumentElements
         {
             get
             {
+                if (_defaultCollection != null)
+                {
+                    return _defaultCollection;
+                }
+
                 //here we need to check if this element is defined, if it is not then we'll setup the defaults
                 var prop = Properties["notDynamicXmlDocumentElements"];
-                var autoFill = this[prop] as ConfigurationElement;
+                var autoFill = this[prop] as ConfigurationElementCollection;
                 if (autoFill != null && autoFill.ElementInformation.IsPresent == false)
                 {
-                    var collection = new NotDynamicXmlDocumentElementCollection
+                    _defaultCollection = new NotDynamicXmlDocumentElementCollection
                         {
                             new NotDynamicXmlDocumentElement {RawValue = "p"},
                             new NotDynamicXmlDocumentElement {RawValue = "div"},
@@ -23,7 +30,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                             new NotDynamicXmlDocumentElement {RawValue = "span"}
                         };
 
-                    return collection;
+                    //must return the collection directly
+                    return _defaultCollection;
                 }
 
                 return (NotDynamicXmlDocumentElementCollection)base["notDynamicXmlDocumentElements"];

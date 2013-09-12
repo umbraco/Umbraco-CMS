@@ -215,11 +215,14 @@
     <Compile Include="Configurations\UmbracoSettings\ContentScriptEditorElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\DeveloperElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\DeveloperElementTests.cs" />
+    <Compile Include="Configurations\UmbracoSettings\DistributedCallElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\DistributedCallElementTests.cs" />
+    <Compile Include="Configurations\UmbracoSettings\HelpElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\HelpElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\PackageRepositoriesElementTests.cs" />
+    <Compile Include="Configurations\UmbracoSettings\ProvidersElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ProvidersElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\RequestHandlerElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ScheduledTasksElementDefaultTests.cs" />

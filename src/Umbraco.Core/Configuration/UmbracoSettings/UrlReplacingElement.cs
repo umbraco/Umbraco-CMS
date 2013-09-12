@@ -15,6 +15,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         public CharCollection CharCollection
         {
             get { return (CharCollection)base[""]; }
+            set { base[""] = value; }
         }
 
     }
