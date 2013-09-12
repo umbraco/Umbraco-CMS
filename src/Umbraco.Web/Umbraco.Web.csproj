@@ -1848,13 +1848,6 @@
     <Compile Include="umbraco.presentation\umbraco\Web\UI\ContentPage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltCommon.cs" />
-    <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltDatesAndTimes.cs" />
-    <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltMath.cs" />
-    <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltNodeList.cs" />
-    <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltRegularExpressions.cs" />
-    <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltSets.cs" />
-    <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltStrings.cs" />
     <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery.cs" />
     <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-Content.cs">
       <DependentUpon>uQuery.cs</DependentUpon>
