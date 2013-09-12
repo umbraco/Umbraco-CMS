@@ -114,7 +114,7 @@ angular.module('umbraco.services')
 		 * @param {string} sectionAlias The alias of the section the tree should load data from
 		 */
         showTree: function (sectionAlias) {
-            if (!this.ui.stickyNavigation && sectionAlias !== this.ui.currentSection) {
+            if (sectionAlias !== this.ui.currentSection) {
                 this.ui.currentSection = sectionAlias;
                 setMode("tree");
             }
@@ -346,7 +346,7 @@ angular.module('umbraco.services')
 
             var dialog = dialogService.open(
                 {
-                    container: $("#dialog div.umb-panel-body"),
+                    container: $("#dialog div.umb-modalcolumn-body"),
                     scope: scope,
                     inline: true,
                     show: true,
