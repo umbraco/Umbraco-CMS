@@ -304,6 +304,7 @@
     <Compile Include="Editors\DashboardController.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
+    <Compile Include="Editors\EmbedController.cs" />
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Editors\MediaPostValidateAttribute.cs" />
     <Compile Include="Editors\UserController.cs" />

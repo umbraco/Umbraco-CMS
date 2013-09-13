@@ -382,6 +382,19 @@ angular.module('umbraco.services')
            * @methodOf umbraco.services.dialogService
            *
            * @description
+           * Opens a dialog to an embed dialog 
+           */
+          embedDialog: function (options) {
+              options.template = 'views/common/dialogs/embed.html';
+              options.show = true;
+              return openDialog(options);
+          },
+           /**
+           * @ngdoc method
+           * @name umbraco.services.dialogService#ysodDialog
+           * @methodOf umbraco.services.dialogService
+           *
+           * @description
            * Opens a dialog to show a custom YSOD
            */
            ysodDialog: function (ysodError) {
