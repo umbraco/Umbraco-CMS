@@ -23,12 +23,24 @@ namespace Umbraco.Tests.PublishedContent
             get { return DatabaseBehavior.NoDatabasePerFixture; }
         }
 
+        private PluginManager _pluginManager;
+
         public override void Initialize()
         {
             // required so we can access property.Value
             //PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver();
 
             base.Initialize();
+
+            // this is so the model factory looks into the test assembly
+            _pluginManager = PluginManager.Current;
+            PluginManager.Current = new PluginManager(false)
+            {
+                AssembliesToScan = _pluginManager.AssembliesToScan
+                    .Union(new[] { typeof(PublishedContentTests).Assembly })
+            };
+
+            ApplicationContext.Current = new ApplicationContext(false) { IsReady = true };
 
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
@@ -47,6 +59,20 @@ namespace Umbraco.Tests.PublishedContent
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
             PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
         }
+
+        public override void TearDown()
+        {
+            PluginManager.Current = _pluginManager;
+            ApplicationContext.Current.DisposeIfDisposable();
+            ApplicationContext.Current = null;
+        }
+
+	    protected override void FreezeResolution()
+	    {
+            PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver(
+                new PublishedContentModelFactoryImpl());
+	        base.FreezeResolution();
+	    }
 
 	    protected override string GetXmlContent(int templateId)
 		{
@@ -177,6 +203,47 @@ namespace Umbraco.Tests.PublishedContent
                         break;
                     case 1178:
                         Assert.IsFalse(d.IsFirst());
+                        Assert.IsTrue(d.IsLast());
+                        break;
+                    default:
+                        Assert.Fail("Invalid id.");
+                        break;
+                }
+            }
+        }
+
+        [PublishedContentModel("Home")]
+        public class Home : PublishedContentModel
+        {
+            public Home(IPublishedContent content) 
+                : base(content) 
+            {}
+        }
+
+        [Test]
+        public void Is_Last_From_Where_Filter2()
+        {
+            var doc = GetNode(1173);
+
+            var items = doc.Children
+                .Select(PublishedContentModelFactory.CreateModel) // linq, returns IEnumerable<IPublishedContent>
+
+                // only way around this is to make sure every IEnumerable<T> extension
+                // explicitely returns a PublishedContentSet, not an IEnumerable<T>
+
+                .OfType<Home>() // ours, return IEnumerable<Home> (actually a PublishedContentSet<Home>)
+                .Where(x => x.IsVisible()) // so, here it's linq again :-(
+                .ToContentSet() // so, we need that one for the test to pass
+                .ToArray();
+
+            Assert.AreEqual(1, items.Count());
+
+            foreach (var d in items)
+            {
+                switch (d.Id)
+                {
+                    case 1174:
+                        Assert.IsTrue(d.IsFirst());
                         Assert.IsTrue(d.IsLast());
                         break;
                     default:

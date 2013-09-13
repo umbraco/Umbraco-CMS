@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
@@ -282,6 +283,9 @@ namespace Umbraco.Core
 
 		    UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(
 		        typeof (DefaultUrlSegmentProvider));
+
+		    PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver(
+		        new PublishedContentModelFactoryImpl());
 		}
 	}
 }

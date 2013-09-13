@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Collections.ObjectModel;
-using Lucene.Net.Documents;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -36,7 +35,7 @@ namespace Umbraco.Tests.PublishedContent
             PropertyValueConvertersResolver.Current =
                 new PropertyValueConvertersResolver();
             PublishedContentModelFactoryResolver.Current = 
-                new PublishedContentModelFactoryResolver();
+                new PublishedContentModelFactoryResolver(new PublishedContentModelFactoryImpl());
             Resolution.Freeze();
 
             var caches = CreatePublishedContent();
@@ -123,6 +122,44 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
+        public void OfType1()
+        {
+            var content = UmbracoContext.Current.ContentCache.GetAtRoot()
+                .OfType<ContentType2>()
+                .Distinct()
+                .ToArray();
+            Assert.AreEqual(2, content.Count());
+            Assert.IsInstanceOf<ContentType2>(content.First());
+            var set = content.ToContentSet();
+            Assert.IsInstanceOf<ContentType2>(set.First());
+            Assert.AreSame(set, set.First().ContentSet);
+            Assert.IsInstanceOf<ContentType2Sub>(set.First().Next());
+        }
+
+        [Test]
+        public void OfType2()
+        {
+            var content = UmbracoContext.Current.ContentCache.GetAtRoot()
+                .OfType<ContentType2Sub>()
+                .Distinct()
+                .ToArray();
+            Assert.AreEqual(1, content.Count());
+            Assert.IsInstanceOf<ContentType2Sub>(content.First());
+            var set = content.ToContentSet();
+            Assert.IsInstanceOf<ContentType2Sub>(set.First());
+        }
+
+        [Test]
+        public void OfType()
+        {
+            var content = UmbracoContext.Current.ContentCache.GetAtRoot()
+                .OfType<ContentType2>()
+                .First(x => x.Prop1 == 1234);
+            Assert.AreEqual("Content 2", content.Name);
+            Assert.AreEqual(1234, content.Prop1);
+        }
+
+        [Test]
         public void Position()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot()
@@ -136,6 +173,28 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsFalse(content.First().Next().IsLast());
             Assert.IsFalse(content.First().Next().Next().IsFirst());
             Assert.IsTrue(content.First().Next().Next().IsLast());
+        }
+
+        [Test]
+        public void Issue()
+        {
+            var content = UmbracoContext.Current.ContentCache.GetAtRoot()
+                .Distinct()
+                .OfType<ContentType2>();
+
+            var where = content.Where(x => x.Prop1 == 1234);
+            var first = where.First();
+            Assert.AreEqual(1234, first.Prop1);
+
+            var content2 = UmbracoContext.Current.ContentCache.GetAtRoot()
+                .OfType<ContentType2>()
+                .First(x => x.Prop1 == 1234);
+            Assert.AreEqual(1234, content2.Prop1);
+
+            var content3 = UmbracoContext.Current.ContentCache.GetAtRoot()
+                .OfType<ContentType2>()
+                .First();
+            Assert.AreEqual(1234, content3.Prop1);
         }
 
         static SolidPublishedCaches CreatePublishedContent()

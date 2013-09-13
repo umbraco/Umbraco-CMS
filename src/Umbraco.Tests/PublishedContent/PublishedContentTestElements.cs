@@ -227,6 +227,36 @@ namespace Umbraco.Tests.PublishedContent
         public object XPathValue { get; set; }
     }
 
+    [PublishedContentModel("ContentType2")]
+    public class ContentType2 : PublishedContentModel
+    {
+        #region Plumbing
+
+        public ContentType2(IPublishedContent content)
+            : base(content)
+        { }
+
+        #endregion
+
+        // fast, if you know that the appropriate IPropertyEditorValueConverter is wired
+        public int Prop1 { get { return (int)this["prop1"]; } }
+
+        // almost as fast, not sure I like it as much, though
+        //public int Prop1 { get { return this.GetPropertyValue<int>("prop1"); } }
+    }
+
+    [PublishedContentModel("ContentType2Sub")]
+    public class ContentType2Sub : ContentType2
+    {
+        #region Plumbing
+
+        public ContentType2Sub(IPublishedContent content)
+            : base(content)
+        { }
+
+        #endregion
+    }
+
     class PublishedContentStrong1 : PublishedContentExtended
     {
         public PublishedContentStrong1(IPublishedContent content)
