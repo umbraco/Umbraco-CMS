@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class RequestHandlerElement : ConfigurationElement
+    internal class RequestHandlerElement : ConfigurationElement, IRequestHandler
     {
         [ConfigurationProperty("useDomainPrefixes")]
-        internal InnerTextConfigurationElement<bool> UseDomainPrefixes
+        public InnerTextConfigurationElement<bool> UseDomainPrefixes
         {
             get
             {
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("addTrailingSlash")]
-        internal InnerTextConfigurationElement<bool> AddTrailingSlash
+        public InnerTextConfigurationElement<bool> AddTrailingSlash
         {
             get
             {
@@ -33,7 +33,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         private UrlReplacingElement _defaultUrlReplacing;
         [ConfigurationProperty("urlReplacing")]
-        internal UrlReplacingElement UrlReplacing
+        public UrlReplacingElement UrlReplacing
         {
             get
             {
@@ -99,6 +99,21 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 
                 return (UrlReplacingElement)this["urlReplacing"];
             }
+        }
+
+        bool IRequestHandler.UseDomainPrefixes
+        {
+            get { return UseDomainPrefixes; }
+        }
+
+        bool IRequestHandler.AddTrailingSlash
+        {
+            get { return AddTrailingSlash; }
+        }
+
+        IUrlReplacing IRequestHandler.UrlReplacing
+        {
+            get { return UrlReplacing; }
         }
     }
 }

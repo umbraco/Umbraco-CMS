@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class NotificationsElement : ConfigurationElement
+    internal class NotificationsElement : ConfigurationElement, INotifications
     {
         [ConfigurationProperty("email")]
         internal InnerTextConfigurationElement<string> EmailAddress
@@ -20,6 +20,16 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                     //set the default
                     false);
             }
+        }
+
+        string INotifications.EmailAddress
+        {
+            get { return EmailAddress; }
+        }
+
+        bool INotifications.DisableHtmlEmail
+        {
+            get { return DisableHtmlEmail; }
         }
     }
 }

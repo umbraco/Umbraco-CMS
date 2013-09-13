@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class DisabledLogTypesCollection : ConfigurationElementCollection, IEnumerable<LogTypeElement>
+    internal class DisabledLogTypesCollection : ConfigurationElementCollection, IEnumerable<ILogType>
     {
         protected override ConfigurationElement CreateNewElement()
         {
@@ -15,11 +15,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             return ((LogTypeElement)element).Value;
         }
 
-        IEnumerator<LogTypeElement> IEnumerable<LogTypeElement>.GetEnumerator()
+        IEnumerator<ILogType> IEnumerable<ILogType>.GetEnumerator()
         {
             for (var i = 0; i < Count; i++)
             {
-                yield return BaseGet(i) as LogTypeElement;
+                yield return BaseGet(i) as ILogType;
             }
         }
 

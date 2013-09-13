@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ContentImagingAutoFillPropertiesCollection : ConfigurationElementCollection, IEnumerable<ContentImagingAutoFillUploadFieldElement>
+    internal class ContentImagingAutoFillPropertiesCollection : ConfigurationElementCollection, IEnumerable<IContentImagingAutoFillUploadField>
     {
 
         protected override ConfigurationElement CreateNewElement()
@@ -21,11 +21,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             BaseAdd(item);
         }
 
-        IEnumerator<ContentImagingAutoFillUploadFieldElement> IEnumerable<ContentImagingAutoFillUploadFieldElement>.GetEnumerator()
+        IEnumerator<IContentImagingAutoFillUploadField> IEnumerable<IContentImagingAutoFillUploadField>.GetEnumerator()
         {
             for (var i = 0; i < Count; i++)
             {
-                yield return BaseGet(i) as ContentImagingAutoFillUploadFieldElement;
+                yield return BaseGet(i) as IContentImagingAutoFillUploadField;
             }
         }
 

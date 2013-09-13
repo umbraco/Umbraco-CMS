@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public override void ImageAutoFillProperties()
         {
-            Assert.IsTrue(Section.Content.Imaging.ImageAutoFillProperties.Count == 1);
+            Assert.IsTrue(Section.Content.Imaging.ImageAutoFillProperties.Count() == 1);
             Assert.IsTrue(Section.Content.Imaging.ImageAutoFillProperties.ElementAt(0).Alias == "umbracoFile");
             Assert.IsTrue(Section.Content.Imaging.ImageAutoFillProperties.ElementAt(0).WidthFieldAlias == "umbracoWidth");
             Assert.IsTrue(Section.Content.Imaging.ImageAutoFillProperties.ElementAt(0).HeightFieldAlias == "umbracoHeight");

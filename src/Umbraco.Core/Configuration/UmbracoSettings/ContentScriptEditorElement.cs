@@ -1,8 +1,9 @@
-﻿using System.Configuration;
+﻿using System.Collections.Generic;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ContentScriptEditorElement : ConfigurationElement
+    internal class ContentScriptEditorElement : ConfigurationElement, IContentScriptEditor
     {
         [ConfigurationProperty("scriptFolderPath")]
         internal InnerTextConfigurationElement<string> ScriptFolderPath
@@ -38,6 +39,21 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                     //set the default
                     false);
             }
+        }
+
+        string IContentScriptEditor.ScriptFolderPath
+        {
+            get { return ScriptFolderPath; }
+        }
+
+        IEnumerable<string> IContentScriptEditor.ScriptFileTypes
+        {
+            get { return ScriptFileTypes; }
+        }
+
+        bool IContentScriptEditor.DisableScriptEditor
+        {
+            get { return DisableScriptEditor; }
         }
     }
 }

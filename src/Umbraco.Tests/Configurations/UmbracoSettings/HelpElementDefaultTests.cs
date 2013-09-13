@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using NUnit.Framework;
 
 namespace Umbraco.Tests.Configurations.UmbracoSettings
 {
@@ -13,7 +14,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public override void Links()
         {
-            Assert.IsTrue(Section.Help.Links.Count == 0);
+            Assert.IsTrue(Section.Help.Links.Count() == 0);
         }
     }
 }

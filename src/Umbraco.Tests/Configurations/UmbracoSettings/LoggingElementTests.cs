@@ -25,9 +25,9 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public virtual void DisabledLogTypes()
         {
-            Assert.IsTrue(Section.Logging.DisabledLogTypes.Count == 2);
-            Assert.IsTrue(Section.Logging.DisabledLogTypes.ElementAt(0) == "[alias-of-log-type-in-lowercase]");
-            Assert.IsTrue(Section.Logging.DisabledLogTypes.ElementAt(1) == "anotherlogalias");
+            Assert.IsTrue(Section.Logging.DisabledLogTypes.Count() == 2);
+            Assert.IsTrue(Section.Logging.DisabledLogTypes.ElementAt(0).LogTypeAlias == "[alias-of-log-type-in-lowercase]");
+            Assert.IsTrue(Section.Logging.DisabledLogTypes.ElementAt(1).LogTypeAlias == "anotherlogalias");
         }
         [Test]
         public virtual void ExternalLogger_Assembly()

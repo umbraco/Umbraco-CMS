@@ -2,13 +2,18 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ScriptingElement : ConfigurationElement
+    internal class ScriptingElement : ConfigurationElement, IScripting
     {
         [ConfigurationProperty("razor")]
-        public RazorElement Razor
+        internal RazorElement Razor
         {
             get { return (RazorElement) base["razor"]; }
         }
 
+
+        IRazor IScripting.Razor
+        {
+            get { return Razor; }
+        }
     }
 }

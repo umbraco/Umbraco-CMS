@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class RazorStaticMappingCollection : ConfigurationElementCollection, IEnumerable<RazorStaticMappingElement>
+    internal class RazorStaticMappingCollection : ConfigurationElementCollection, IEnumerable<IRazorStaticMapping>
     {
         protected override ConfigurationElement CreateNewElement()
         {
@@ -18,11 +18,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
 
-        IEnumerator<RazorStaticMappingElement> IEnumerable<RazorStaticMappingElement>.GetEnumerator()
+        IEnumerator<IRazorStaticMapping> IEnumerable<IRazorStaticMapping>.GetEnumerator()
         {
             for (var i = 0; i < Count; i++)
             {
-                yield return BaseGet(i) as RazorStaticMappingElement;
+                yield return BaseGet(i) as IRazorStaticMapping;
             }
         }
 

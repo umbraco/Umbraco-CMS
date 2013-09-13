@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using NUnit.Framework;
 
 namespace Umbraco.Tests.Configurations.UmbracoSettings
 {
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public override void DisabledLogTypes()
         {
-            Assert.IsTrue(Section.Logging.DisabledLogTypes.Count == 0);
+            Assert.IsTrue(Section.Logging.DisabledLogTypes.Count() == 0);
         }
         [Test]
         public override void CleaningMiliseconds()

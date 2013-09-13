@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class AppCodeFileExtensionsCollection : ConfigurationElementCollection, IEnumerable<FileExtensionElement>
+    internal class AppCodeFileExtensionsCollection : ConfigurationElementCollection, IEnumerable<IFileExtension>
     {
         internal void Add(FileExtensionElement element)
         {
@@ -20,11 +20,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             return ((FileExtensionElement)element).Value;
         }
 
-        IEnumerator<FileExtensionElement> IEnumerable<FileExtensionElement>.GetEnumerator()
+        IEnumerator<IFileExtension> IEnumerable<IFileExtension>.GetEnumerator()
         {
             for (var i = 0; i < Count; i++)
             {
-                yield return BaseGet(i) as FileExtensionElement;
+                yield return BaseGet(i) as IFileExtension;
             }
         }
 

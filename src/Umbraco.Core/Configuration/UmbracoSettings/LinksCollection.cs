@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class LinksCollection : ConfigurationElementCollection, IEnumerable<LinkElement>
+    internal class LinksCollection : ConfigurationElementCollection, IEnumerable<ILink>
     {
         protected override ConfigurationElement CreateNewElement()
         {
@@ -18,11 +18,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                    + ((LinkElement)element).UserType;
         }
 
-        IEnumerator<LinkElement> IEnumerable<LinkElement>.GetEnumerator()
+        IEnumerator<ILink> IEnumerable<ILink>.GetEnumerator()
         {
             for (var i = 0; i < Count; i++)
             {
-                yield return BaseGet(i) as LinkElement;
+                yield return BaseGet(i) as ILink;
             }
         }
 

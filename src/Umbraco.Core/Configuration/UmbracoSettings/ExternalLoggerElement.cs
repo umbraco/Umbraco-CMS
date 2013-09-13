@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ExternalLoggerElement : ConfigurationElement
+    internal class ExternalLoggerElement : ConfigurationElement, IExternalLogger
     {
         [ConfigurationProperty("assembly")]
         internal string Assembly
@@ -20,6 +20,21 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         internal bool LogAuditTrail
         {
             get { return (bool)base["logAuditTrail"]; }
+        }
+
+        string IExternalLogger.Assembly
+        {
+            get { return Assembly; }
+        }
+
+        string IExternalLogger.Type
+        {
+            get { return Type; }
+        }
+
+        bool IExternalLogger.LogAuditTrail
+        {
+            get { return LogAuditTrail; }
         }
     }
 }

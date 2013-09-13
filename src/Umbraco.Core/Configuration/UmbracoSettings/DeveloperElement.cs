@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class DeveloperElement : ConfigurationElement
+    internal class DeveloperElement : ConfigurationElement, IDeveloper
     {
         private AppCodeFileExtensionsElement _default;
 
@@ -36,6 +36,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
                 return (AppCodeFileExtensionsElement)base["appCodeFileExtensions"];
             }
+        }
+
+        IAppCodeFileExtensions IDeveloper.AppCodeFileExtensions
+        {
+            get { return AppCodeFileExtensions; }
         }
     }
 }

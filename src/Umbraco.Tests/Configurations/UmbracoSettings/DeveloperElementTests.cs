@@ -9,9 +9,9 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void AppCodeFileExtensions()
         {
-            Assert.IsTrue(Section.Developer.AppCodeFileExtensions.AppCodeFileExtensionsCollection.Count == 2);
-            Assert.IsTrue(Section.Developer.AppCodeFileExtensions.AppCodeFileExtensionsCollection.All(
-                x => "cs,vb".Split(',').Contains(x.Value)));
+            Assert.IsTrue(Section.Developer.AppCodeFileExtensions.AppCodeFileExtensions.Count() == 2);
+            Assert.IsTrue(Section.Developer.AppCodeFileExtensions.AppCodeFileExtensions.All(
+                x => "cs,vb".Split(',').Contains(x.Extension)));
         }
     }
 }

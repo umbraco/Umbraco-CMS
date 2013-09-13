@@ -1,14 +1,15 @@
-﻿using System.Configuration;
+﻿using System.Collections.Generic;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class RazorElement : ConfigurationElement
+    internal class RazorElement : ConfigurationElement, IRazor
     {
         private NotDynamicXmlDocumentElementCollection _defaultCollection;
 
         [ConfigurationCollection(typeof (NotDynamicXmlDocumentElementCollection), AddItemName = "element")]
         [ConfigurationProperty("notDynamicXmlDocumentElements", IsDefaultCollection = true)]
-        public NotDynamicXmlDocumentElementCollection NotDynamicXmlDocumentElements
+        internal NotDynamicXmlDocumentElementCollection NotDynamicXmlDocumentElements
         {
             get
             {
@@ -40,9 +41,19 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         [ConfigurationCollection(typeof (RazorStaticMappingCollection), AddItemName = "mapping")]
         [ConfigurationProperty("dataTypeModelStaticMappings", IsDefaultCollection = true)]
-        public RazorStaticMappingCollection DataTypeModelStaticMappings
+        internal RazorStaticMappingCollection DataTypeModelStaticMappings
         {
             get { return (RazorStaticMappingCollection) base["dataTypeModelStaticMappings"]; }
+        }
+
+        IEnumerable<INotDynamicXmlDocument> IRazor.NotDynamicXmlDocumentElements
+        {
+            get { return NotDynamicXmlDocumentElements; }
+        }
+
+        IEnumerable<IRazorStaticMapping> IRazor.DataTypeModelStaticMappings
+        {
+            get { return DataTypeModelStaticMappings; }
         }
     }
 }

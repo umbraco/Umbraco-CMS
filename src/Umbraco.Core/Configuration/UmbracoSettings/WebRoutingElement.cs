@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class WebRoutingElement : ConfigurationElement
+    internal class WebRoutingElement : ConfigurationElement, IWebRouting
     {
         [ConfigurationProperty("trySkipIisCustomErrors", DefaultValue = "false")]
         public bool TrySkipIisCustomErrors

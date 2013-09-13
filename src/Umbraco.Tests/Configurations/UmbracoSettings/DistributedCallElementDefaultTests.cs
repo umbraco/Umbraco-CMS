@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using NUnit.Framework;
 
 namespace Umbraco.Tests.Configurations.UmbracoSettings
 {
@@ -20,7 +21,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public override void Servers()
         {
-            Assert.IsTrue(Section.DistributedCall.Servers.Count == 0);
+            Assert.IsTrue(Section.DistributedCall.Servers.Count() == 0);
         }
     }
 }

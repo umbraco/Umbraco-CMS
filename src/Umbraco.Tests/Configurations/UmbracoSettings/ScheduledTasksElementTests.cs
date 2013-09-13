@@ -9,7 +9,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public virtual void Tasks()
         {
-            Assert.IsTrue(Section.ScheduledTasks.Tasks.Count == 2);
+            Assert.IsTrue(Section.ScheduledTasks.Tasks.Count() == 2);
             Assert.IsTrue(Section.ScheduledTasks.Tasks.ElementAt(0).Alias == "test60");
             Assert.IsTrue(Section.ScheduledTasks.Tasks.ElementAt(0).Log == true);
             Assert.IsTrue(Section.ScheduledTasks.Tasks.ElementAt(0).Interval == 60);

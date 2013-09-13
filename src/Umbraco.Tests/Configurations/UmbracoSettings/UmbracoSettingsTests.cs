@@ -36,6 +36,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsNotNull(Section);
         }
 
-        protected UmbracoSettingsSection Section { get; private set; }
+        protected IUmbracoSettings Section { get; private set; }
     }
 }

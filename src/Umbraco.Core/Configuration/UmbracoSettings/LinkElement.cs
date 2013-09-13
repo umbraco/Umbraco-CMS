@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class LinkElement : ConfigurationElement
+    internal class LinkElement : ConfigurationElement, ILink
     {
         [ConfigurationProperty("application")]
         internal string Application
@@ -32,6 +32,31 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         internal string HelpUrl
         {
             get { return (string)base["helpUrl"]; }
+        }
+
+        string ILink.Application
+        {
+            get { return Application; }
+        }
+
+        string ILink.ApplicationUrl
+        {
+            get { return ApplicationUrl; }
+        }
+
+        string ILink.Language
+        {
+            get { return Language; }
+        }
+
+        string ILink.UserType
+        {
+            get { return UserType; }
+        }
+
+        string ILink.HelpUrl
+        {
+            get { return HelpUrl; }
         }
     }
 }

@@ -2,13 +2,13 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ContentImagingAutoFillUploadFieldElement : ConfigurationElement
+    internal class ContentImagingAutoFillUploadFieldElement : ConfigurationElement, IContentImagingAutoFillUploadField
     {
         /// <summary>
         /// Allow setting internally so we can create a default
         /// </summary>
         [ConfigurationProperty("alias", IsKey = true, IsRequired = true)]
-        internal string Alias
+        public string Alias
         {
             get { return (string)this["alias"]; }
             set { this["alias"] = value; }
@@ -60,6 +60,32 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                     //set the default
                        "umbracoExtension");
             }
+        }
+
+        string IContentImagingAutoFillUploadField.Alias
+        {
+            get { return Alias; }
+            
+        }
+
+        string IContentImagingAutoFillUploadField.WidthFieldAlias
+        {
+            get { return WidthFieldAlias; }
+        }
+
+        string IContentImagingAutoFillUploadField.HeightFieldAlias
+        {
+            get { return HeightFieldAlias; }
+        }
+
+        string IContentImagingAutoFillUploadField.LengthFieldAlias
+        {
+            get { return LengthFieldAlias; }
+        }
+
+        string IContentImagingAutoFillUploadField.ExtensionFieldAlias
+        {
+            get { return ExtensionFieldAlias; }
         }
     }
 }

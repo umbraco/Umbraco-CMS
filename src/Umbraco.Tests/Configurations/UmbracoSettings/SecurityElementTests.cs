@@ -18,12 +18,12 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void AuthCookieDomain()
         {
-            Assert.IsTrue(Section.Security.AuthCookieDomain.Value == null);
+            Assert.IsTrue(Section.Security.AuthCookieDomain == null);
         }
         [Test]
         public void AuthCookieName()
         {
-            Assert.IsTrue(Section.Security.AuthCookieName.Value == "UMB_UCONTEXT");
+            Assert.IsTrue(Section.Security.AuthCookieName == "UMB_UCONTEXT");
         }
     }
 }

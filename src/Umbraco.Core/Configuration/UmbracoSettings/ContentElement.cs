@@ -1,8 +1,9 @@
-﻿using System.Configuration;
+﻿using System.Collections.Generic;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ContentElement : ConfigurationElement
+    internal class ContentElement : ConfigurationElement, IContent
     {
         [ConfigurationProperty("imaging")]
         internal ContentImagingElement Imaging
@@ -53,19 +54,19 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("errors", IsRequired = true)]
-        public ContentErrorsElement Errors
+        internal ContentErrorsElement Errors
         {
             get { return (ContentErrorsElement) base["errors"]; }
         }
 
         [ConfigurationProperty("notifications", IsRequired = true)]
-        public NotificationsElement Notifications
+        internal NotificationsElement Notifications
         {
             get { return (NotificationsElement)base["notifications"]; }
         }
 
         [ConfigurationProperty("ensureUniqueNaming")]
-        public InnerTextConfigurationElement<bool> EnsureUniqueNaming
+        internal InnerTextConfigurationElement<bool> EnsureUniqueNaming
         {
             get
             {
@@ -77,7 +78,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("TidyEditorContent")]
-        public InnerTextConfigurationElement<bool> TidyEditorContent
+        internal InnerTextConfigurationElement<bool> TidyEditorContent
         {
             get
             {
@@ -89,7 +90,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("TidyCharEncoding")]
-        public InnerTextConfigurationElement<string> TidyCharEncoding
+        internal InnerTextConfigurationElement<string> TidyCharEncoding
         {
             get
             {
@@ -101,7 +102,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("XmlCacheEnabled")]
-        public InnerTextConfigurationElement<bool> XmlCacheEnabled
+        internal InnerTextConfigurationElement<bool> XmlCacheEnabled
         {
             get
             {
@@ -113,7 +114,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("ContinouslyUpdateXmlDiskCache")]
-        public InnerTextConfigurationElement<bool> ContinouslyUpdateXmlDiskCache
+        internal InnerTextConfigurationElement<bool> ContinouslyUpdateXmlDiskCache
         {
             get
             {
@@ -125,7 +126,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("XmlContentCheckForDiskChanges")]
-        public InnerTextConfigurationElement<bool> XmlContentCheckForDiskChanges
+        internal InnerTextConfigurationElement<bool> XmlContentCheckForDiskChanges
         {
             get
             {
@@ -137,7 +138,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("EnableSplashWhileLoading")]
-        public InnerTextConfigurationElement<bool> EnableSplashWhileLoading
+        internal InnerTextConfigurationElement<bool> EnableSplashWhileLoading
         {
             get
             {
@@ -149,7 +150,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("PropertyContextHelpOption")]
-        public InnerTextConfigurationElement<string> PropertyContextHelpOption
+        internal InnerTextConfigurationElement<string> PropertyContextHelpOption
         {
             get
             {
@@ -161,7 +162,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("UseLegacyXmlSchema")]
-        public InnerTextConfigurationElement<bool> UseLegacyXmlSchema
+        internal InnerTextConfigurationElement<bool> UseLegacyXmlSchema
         {
             get
             {
@@ -173,7 +174,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
         
         [ConfigurationProperty("ForceSafeAliases")]
-        public InnerTextConfigurationElement<bool> ForceSafeAliases
+        internal InnerTextConfigurationElement<bool> ForceSafeAliases
         {
             get
             {
@@ -185,7 +186,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("PreviewBadge")]
-        public InnerTextConfigurationElement<string> PreviewBadge
+        internal InnerTextConfigurationElement<string> PreviewBadge
         {
             get
             {
@@ -197,7 +198,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("UmbracoLibraryCacheDuration")]
-        public InnerTextConfigurationElement<int> UmbracoLibraryCacheDuration
+        internal InnerTextConfigurationElement<int> UmbracoLibraryCacheDuration
         {
             get
             {
@@ -210,7 +211,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("MacroErrors")]
-        public InnerTextConfigurationElement<MacroErrorBehaviour> MacroErrors
+        internal InnerTextConfigurationElement<MacroErrorBehaviour> MacroErrors
         {
             get
             {
@@ -223,7 +224,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("DocumentTypeIconList")]
-        public InnerTextConfigurationElement<IconPickerBehaviour> DocumentTypeIconList
+        internal InnerTextConfigurationElement<IconPickerBehaviour> DocumentTypeIconList
         {
             get
             {
@@ -235,7 +236,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("disallowedUploadFiles")]
-        public OptionalCommaDelimitedConfigurationElement DisallowedUploadFiles
+        internal CommaDelimitedConfigurationElement DisallowedUploadFiles
         {
             get
             {
@@ -281,6 +282,131 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                     //set the default
                     "Textstring");
             }
+        }
+
+        IContentImaging IContent.Imaging
+        {
+            get { return Imaging; }
+        }
+
+        IContentScriptEditor IContent.ScriptEditor
+        {
+            get { return ScriptEditor; }
+        }
+
+        bool IContent.EnableCanvasEditing
+        {
+            get { return EnableCanvasEditing; }
+        }
+
+        bool IContent.ResolveUrlsFromTextString
+        {
+            get { return ResolveUrlsFromTextString; }
+        }
+
+        bool IContent.UploadAllowDirectories
+        {
+            get { return UploadAllowDirectories; }
+        }
+
+        IContentErrors IContent.Errors
+        {
+            get { return Errors; }
+        }
+
+        INotifications IContent.Notifications
+        {
+            get { return Notifications; }
+        }
+
+        bool IContent.EnsureUniqueNaming
+        {
+            get { return EnsureUniqueNaming; }
+        }
+
+        bool IContent.TidyEditorContent
+        {
+            get { return TidyEditorContent; }
+        }
+
+        string IContent.TidyCharEncoding
+        {
+            get { return TidyCharEncoding; }
+        }
+
+        bool IContent.XmlCacheEnabled
+        {
+            get { return XmlCacheEnabled; }
+        }
+
+        bool IContent.ContinouslyUpdateXmlDiskCache
+        {
+            get { return ContinouslyUpdateXmlDiskCache; }
+        }
+
+        bool IContent.XmlContentCheckForDiskChanges
+        {
+            get { return XmlContentCheckForDiskChanges; }
+        }
+
+        bool IContent.EnableSplashWhileLoading
+        {
+            get { return EnableSplashWhileLoading; }
+        }
+
+        string IContent.PropertyContextHelpOption
+        {
+            get { return PropertyContextHelpOption; }
+        }
+
+        bool IContent.UseLegacyXmlSchema
+        {
+            get { return UseLegacyXmlSchema; }
+        }
+
+        bool IContent.ForceSafeAliases
+        {
+            get { return ForceSafeAliases; }
+        }
+
+        string IContent.PreviewBadge
+        {
+            get { return PreviewBadge; }
+        }
+
+        int IContent.UmbracoLibraryCacheDuration
+        {
+            get { return UmbracoLibraryCacheDuration; }
+        }
+
+        MacroErrorBehaviour IContent.MacroErrors
+        {
+            get { return MacroErrors; }
+        }
+
+        IconPickerBehaviour IContent.DocumentTypeIconList
+        {
+            get { return DocumentTypeIconList; }
+        }
+
+        IEnumerable<string> IContent.DisallowedUploadFiles
+        {
+            get { return DisallowedUploadFiles; }
+        }
+
+        bool IContent.CloneXmlContent
+        {
+            get { return CloneXmlContent; }
+        }
+
+        bool IContent.GlobalPreviewStorageEnabled
+        {
+            get { return GlobalPreviewStorageEnabled; }
+        }
+
+        string IContent.DefaultDocumentTypeProperty
+        {
+            get { return DefaultDocumentTypeProperty; }
         }
     }
 }

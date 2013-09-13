@@ -3,17 +3,17 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class RepositoryElement : ConfigurationElement
+    internal class RepositoryElement : ConfigurationElement, IRepository
     {
         [ConfigurationProperty("name")]
-        internal string Name
+        public string Name
         {
             get { return (string)base["name"]; }
             set { base["name"] = value; }
         }
 
         [ConfigurationProperty("guid")]
-        internal Guid Id
+        public Guid Id
         {
             get { return (Guid)base["guid"]; }
             set { base["guid"] = value; }

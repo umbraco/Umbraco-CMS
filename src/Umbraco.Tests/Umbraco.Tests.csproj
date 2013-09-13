@@ -221,12 +221,15 @@
     <Compile Include="Configurations\UmbracoSettings\HelpElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementTests.cs" />
+    <Compile Include="Configurations\UmbracoSettings\PackageRepositoriesElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\PackageRepositoriesElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ProvidersElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ProvidersElementTests.cs" />
+    <Compile Include="Configurations\UmbracoSettings\RequestHandlerElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\RequestHandlerElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ScheduledTasksElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ScheduledTasksElementTests.cs" />
+    <Compile Include="Configurations\UmbracoSettings\ScriptingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ScriptingElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\SecurityElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\SecurityElementTests.cs" />
@@ -235,6 +238,7 @@
     <Compile Include="Configurations\UmbracoSettings\UmbracoSettingsTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ViewstateMoverModuleElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ViewstateMoverModuleElementTests.cs" />
+    <Compile Include="Configurations\UmbracoSettings\WebRoutingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementTests.cs" />
     <Compile Include="Controllers\WebApiEditors\ContentControllerUnitTests.cs" />
     <Compile Include="Controllers\WebApiEditors\FilterAllowedOutgoingContentAttributeTests.cs" />

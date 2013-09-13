@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public virtual void Links()
         {
-            Assert.IsTrue(Section.Help.Links.Count == 2);
+            Assert.IsTrue(Section.Help.Links.Count() == 2);
             Assert.IsTrue(Section.Help.Links.ElementAt(0).Application == "content");
             Assert.IsTrue(Section.Help.Links.ElementAt(0).ApplicationUrl == "dashboard.aspx");
             Assert.IsTrue(Section.Help.Links.ElementAt(0).Language == "en");

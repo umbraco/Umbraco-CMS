@@ -1,8 +1,9 @@
-﻿using System.Configuration;
+﻿using System.Collections.Generic;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class LoggingElement : ConfigurationElement
+    internal class LoggingElement : ConfigurationElement, ILogging
     {
         
         [ConfigurationProperty("autoCleanLogs")]
@@ -67,7 +68,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         [ConfigurationCollection(typeof(DisabledLogTypesCollection), AddItemName = "logTypeAlias")]
         [ConfigurationProperty("disabledLogTypes", IsDefaultCollection = true)]
-        public DisabledLogTypesCollection DisabledLogTypes
+        internal DisabledLogTypesCollection DisabledLogTypes
         {
             get { return (DisabledLogTypesCollection)base["disabledLogTypes"]; }
         }
@@ -78,7 +79,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (ExternalLoggerElement) base["externalLogger"]; }
         }
 
-        internal bool ExternalLoggerIsConfigured
+        public bool ExternalLoggerIsConfigured
         {
             get
             {
@@ -90,6 +91,42 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 }
                 return false;
             }
+        }
+
+
+        bool ILogging.AutoCleanLogs
+        {
+            get { return AutoCleanLogs; }
+        }
+
+        bool ILogging.EnableLogging
+        {
+            get { return EnableLogging; }
+        }
+
+        bool ILogging.EnableAsyncLogging
+        {
+            get { return EnableAsyncLogging; }
+        }
+
+        int ILogging.CleaningMiliseconds
+        {
+            get { return CleaningMiliseconds; }
+        }
+
+        int ILogging.MaxLogAge
+        {
+            get { return MaxLogAge; }
+        }
+
+        IEnumerable<ILogType> ILogging.DisabledLogTypes
+        {
+            get { return DisabledLogTypes; }
+        }
+
+        IExternalLogger ILogging.ExternalLogger
+        {
+            get { return ExternalLogger; }
         }
 
     }

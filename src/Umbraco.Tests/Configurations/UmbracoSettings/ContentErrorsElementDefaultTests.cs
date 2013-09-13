@@ -14,9 +14,9 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public override void Can_Set_Multiple()
         {
-            Assert.IsTrue(Section.Content.Errors.Error404Collection.Count == 1);
+            Assert.IsTrue(Section.Content.Errors.Error404Collection.Count() == 1);
             Assert.IsTrue(Section.Content.Errors.Error404Collection.ElementAt(0).Culture == null);
-            Assert.IsTrue(Section.Content.Errors.Error404Collection.ElementAt(0).Value == 1);
+            Assert.IsTrue(Section.Content.Errors.Error404Collection.ElementAt(0).ContentId == 1);
         }
     }
 }

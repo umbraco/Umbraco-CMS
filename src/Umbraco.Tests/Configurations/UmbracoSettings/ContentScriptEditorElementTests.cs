@@ -9,7 +9,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void ScriptFolderPath()
         {
-            Assert.IsTrue(Section.Content.ScriptEditor.ScriptFolderPath.Value == "/scripts");
+            Assert.IsTrue(Section.Content.ScriptEditor.ScriptFolderPath == "/scripts");
         }
         [Test]
         public void ScriptFileTypes()
@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void DisableScriptEditor()
         {
-            Assert.IsTrue(Section.Content.ScriptEditor.DisableScriptEditor.Value == false);
+            Assert.IsTrue(Section.Content.ScriptEditor.DisableScriptEditor == false);
         }
     }
 }

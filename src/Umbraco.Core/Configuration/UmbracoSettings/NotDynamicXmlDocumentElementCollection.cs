@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class NotDynamicXmlDocumentElementCollection : ConfigurationElementCollection, IEnumerable<NotDynamicXmlDocumentElement>
+    internal class NotDynamicXmlDocumentElementCollection : ConfigurationElementCollection, IEnumerable<INotDynamicXmlDocument>
     {
         internal void Add(NotDynamicXmlDocumentElement element)
         {
@@ -20,11 +20,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             return ((NotDynamicXmlDocumentElement) element).Value;
         }
 
-        IEnumerator<NotDynamicXmlDocumentElement> IEnumerable<NotDynamicXmlDocumentElement>.GetEnumerator()
+        IEnumerator<INotDynamicXmlDocument> IEnumerable<INotDynamicXmlDocument>.GetEnumerator()
         {
             for (var i = 0; i < Count; i++)
             {
-                yield return BaseGet(i) as NotDynamicXmlDocumentElement;
+                yield return BaseGet(i) as INotDynamicXmlDocument;
             }
         }
 

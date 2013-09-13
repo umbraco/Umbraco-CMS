@@ -1,8 +1,9 @@
-﻿using System.Configuration;
+﻿using System.Collections.Generic;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ContentImagingElement : ConfigurationElement
+    internal class ContentImagingElement : ConfigurationElement, IContentImaging
     {
         [ConfigurationProperty("imageFileTypes")]
         internal CommaDelimitedConfigurationElement ImageFileTypes
@@ -31,8 +32,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         private ContentImagingAutoFillPropertiesCollection _defaultImageAutoFill;
 
         [ConfigurationCollection(typeof(ContentImagingAutoFillPropertiesCollection), AddItemName = "uploadField")]
-        [ConfigurationProperty("autoFillImageProperties", IsDefaultCollection = true)]        
-        public ContentImagingAutoFillPropertiesCollection ImageAutoFillProperties
+        [ConfigurationProperty("autoFillImageProperties", IsDefaultCollection = true)]
+        internal ContentImagingAutoFillPropertiesCollection ImageAutoFillProperties
         {
             get
             {
@@ -60,5 +61,20 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
+
+        IEnumerable<string> IContentImaging.ImageFileTypes
+        {
+            get { return ImageFileTypes; }
+        }
+
+        IEnumerable<string> IContentImaging.AllowedAttributes
+        {
+            get { return AllowedAttributes; }
+        }
+
+        IEnumerable<IContentImagingAutoFillUploadField> IContentImaging.ImageAutoFillProperties
+        {
+            get { return ImageAutoFillProperties; }
+        }
     }
 }

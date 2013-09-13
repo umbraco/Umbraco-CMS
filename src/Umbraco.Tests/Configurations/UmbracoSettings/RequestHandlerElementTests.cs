@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {            
             var chars = @" ,"",',%,.,;,/,\,:,#,+,*,&,?,æ,ø,å,ä,ö,ü,ß,Ä,Ö,|,<,>";
             var items = chars.Split(',');
-            Assert.AreEqual(items.Length, Section.RequestHandler.UrlReplacing.CharCollection.Count);
+            Assert.AreEqual(items.Length, Section.RequestHandler.UrlReplacing.CharCollection.Count());
             Assert.IsTrue(Section.RequestHandler.UrlReplacing.CharCollection
                                  .All(x => items.Contains(x.Char)));
 
@@ -40,14 +40,5 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
                                  .All(x => string.IsNullOrEmpty(x.Replacement) || vals.Split(',').Contains(x.Replacement)));
         }
         
-    }
-
-    [TestFixture]
-    public class RequestHandlerElementDefaultTests : RequestHandlerElementTests
-    {
-        protected override bool TestingDefaults
-        {
-            get { return true; }
-        }
     }
 }

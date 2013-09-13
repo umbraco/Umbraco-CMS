@@ -3,7 +3,38 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public class UmbracoSettingsSection : ConfigurationSection
+    public interface IUmbracoSettings
+    {
+        IContent Content { get; }
+
+        ISecurity Security { get; }
+
+        IRequestHandler RequestHandler { get; }
+
+        ITemplates Templates { get; }
+
+        IDeveloper Developer { get; }
+
+        IViewstateMoverModule ViewstateMoverModule { get; }
+
+        ILogging Logging { get; }
+
+        IScheduledTasks ScheduledTasks { get; }
+
+        IDistributedCall DistributedCall { get; }
+
+        IRepositories PackageRepositories { get; }
+
+        IProviders Providers { get; }
+
+        IHelp Help { get; }
+
+        IWebRouting WebRouting { get; }
+
+        IScripting Scripting { get; }
+    }
+
+    public class UmbracoSettingsSection : ConfigurationSection, IUmbracoSettings
     {
 
         ///// <summary>
@@ -128,26 +159,75 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return (ScriptingElement)this["scripting"]; }
         }
+        
+        IContent IUmbracoSettings.Content
+        {
+            get { return Content; }
+        }
 
-        ///// <summary>
-        ///// This ensures that any element that is not defined will get replaced with a Null value
-        ///// </summary>
-        ///// <remarks>
-        ///// This is a work around because setting defaultValue on the attribute to null doesn't work.
-        ///// </remarks>
-        //protected override void PostDeserialize()
-        //{
-        //    //ensure externalLogger is null when it is not defined
-        //    var loggingProperty = Properties["logging"];
-        //    var logging = this[loggingProperty] as ConfigurationElement;
-        //    if (logging != null && logging.ElementInformation.IsPresent == false)
-        //    {
-        //        this[loggingProperty] = new ;
-        //    }
+        ISecurity IUmbracoSettings.Security
+        {
+            get { return Security; }
+        }
 
+        IRequestHandler IUmbracoSettings.RequestHandler
+        {
+            get { return RequestHandler; }
+        }
 
-        //    base.PostDeserialize();
-        //}
+        ITemplates IUmbracoSettings.Templates
+        {
+            get { return Templates; }
+        }
 
+        IDeveloper IUmbracoSettings.Developer
+        {
+            get { return Developer; }
+        }
+
+        IViewstateMoverModule IUmbracoSettings.ViewstateMoverModule
+        {
+            get { return ViewstateMoverModule; }
+        }
+
+        ILogging IUmbracoSettings.Logging
+        {
+            get { return Logging; }
+        }
+
+        IScheduledTasks IUmbracoSettings.ScheduledTasks
+        {
+            get { return ScheduledTasks; }
+        }
+
+        IDistributedCall IUmbracoSettings.DistributedCall
+        {
+            get { return DistributedCall; }
+        }
+
+        IRepositories IUmbracoSettings.PackageRepositories
+        {
+            get { return PackageRepositories; }
+        }
+
+        IProviders IUmbracoSettings.Providers
+        {
+            get { return Providers; }
+        }
+
+        IHelp IUmbracoSettings.Help
+        {
+            get { return Help; }
+        }
+
+        IWebRouting IUmbracoSettings.WebRouting
+        {
+            get { return WebRouting; }
+        }
+
+        IScripting IUmbracoSettings.Scripting
+        {
+            get { return Scripting; }
+        }
     }
 }
