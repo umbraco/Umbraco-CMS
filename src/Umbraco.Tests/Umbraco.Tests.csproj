@@ -143,6 +143,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AttemptTests.cs" />
     <Compile Include="Auditing\AuditTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />
     <Compile Include="BusinessLogic\DictionaryTest.cs" />
