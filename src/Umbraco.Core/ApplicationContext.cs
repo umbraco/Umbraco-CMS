@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Caching;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Services;
@@ -67,6 +68,7 @@ namespace Umbraco.Core
 		readonly System.Threading.ManualResetEventSlim _isReadyEvent = new System.Threading.ManualResetEventSlim(false);
 		private DatabaseContext _databaseContext;
 		private ServiceContext _services;
+	    private UmbracoConfiguration _umbracoConfiguration;
 
 		public bool IsReady
         {
@@ -105,7 +107,26 @@ namespace Umbraco.Core
             }
         }
 
-        /// <summary>
+	    public UmbracoConfiguration UmbracoConfiguration
+	    {
+	        get
+	        {
+	            if (_umbracoConfiguration == null)
+	            {
+	                var umbracoSettings = ConfigurationManager.GetSection("umbracoConfiguration/settings") as IUmbracoSettings;
+	                if (umbracoSettings == null)
+	                {
+	                    throw new InvalidOperationException("Could not find configuration section 'umbracoConfiguration/settings' or it does not cast to " + typeof (IUmbracoSettings));
+	                }
+
+	                //create a new one if it is null
+	                _umbracoConfiguration = new UmbracoConfiguration(umbracoSettings);
+	            }
+	            return _umbracoConfiguration;
+	        }
+	    }
+
+	    /// <summary>
         /// The original/first url that the web application executes
         /// </summary>
         /// <remarks>

@@ -150,6 +150,7 @@
     <Compile Include="Configuration\FileSystemProviderElement.cs" />
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
+    <Compile Include="Configuration\UmbracoConfiguration.cs" />
     <Compile Include="Configuration\UmbracoConfigurationSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsElement.cs" />
@@ -202,6 +203,7 @@
     <Compile Include="Configuration\UmbracoSettings\ISecurity.cs" />
     <Compile Include="Configuration\UmbracoSettings\IServerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ITemplates.cs" />
+    <Compile Include="Configuration\UmbracoSettings\IUmbracoSettings.cs" />
     <Compile Include="Configuration\UmbracoSettings\IUrlReplacing.cs" />
     <Compile Include="Configuration\UmbracoSettings\IUserProvider.cs" />
     <Compile Include="Configuration\UmbracoSettings\IViewstateMoverModule.cs" />
