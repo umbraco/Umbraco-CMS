@@ -479,23 +479,22 @@ namespace Umbraco.Core.Services
 		        if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, parentId), this))
 		            return;
 
-                //If we aren't moving to recycle bin, we must be moving from recycle bin -> #U4-2842
-                media.ChangeTrashedState(false, parentId);
+                media.ParentId = parentId;
+                if (media.Trashed)
+                {
+                    media.ChangeTrashedState(false, parentId);
+                }
 		        Save(media, userId);
 
-		        //Ensure that Path and Level is updated on children
-		        var children = GetChildren(media.Id).ToList(); //No need to enumerate twice?
+		        //Ensure that relevant properties are updated on children
+		        var children = GetChildren(media.Id);
 		        if (children.Any())
 		        {
 		            var parentPath = media.Path;
 		            var parentLevel = media.Level;
-		            var updatedDescendents = UpdatePathAndLevelOnChildren(children, parentPath, parentLevel).ToList();
-                    //Update trashed state for descendants -> #U4-2842
-                    foreach (var descendant in updatedDescendents)
-		            {
-		                descendant.ChangeTrashedState(false, descendant.ParentId);
-		            }
-		            Save(updatedDescendents, userId);
+		            var parentTrashed = media.Trashed;
+		            var updatedDescendants = UpdatePropertiesOnChildren(children, parentPath, parentLevel, parentTrashed);
+		            Save(updatedDescendants, userId);
 		        }
 
 		        Moved.RaiseEvent(new MoveEventArgs<IMedia>(media, false, parentId), this);
@@ -901,25 +900,31 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Updates the Path and Level on a collection of <see cref="IMedia"/> objects
-        /// based on the Parent's Path and Level.
+        /// based on the Parent's Path and Level. Also change the trashed state if relevant.
         /// </summary>
         /// <param name="children">Collection of <see cref="IMedia"/> objects to update</param>
         /// <param name="parentPath">Path of the Parent media</param>
         /// <param name="parentLevel">Level of the Parent media</param>
+        /// <param name="parentTrashed">Indicates whether the Parent is trashed or not</param>
         /// <returns>Collection of updated <see cref="IMedia"/> objects</returns>
-        private IEnumerable<IMedia> UpdatePathAndLevelOnChildren(IEnumerable<IMedia> children, string parentPath, int parentLevel)
+        private IEnumerable<IMedia> UpdatePropertiesOnChildren(IEnumerable<IMedia> children, string parentPath, int parentLevel, bool parentTrashed)
         {
             var list = new List<IMedia>();
             foreach (var child in children)
             {
                 child.Path = string.Concat(parentPath, ",", child.Id);
                 child.Level = parentLevel + 1;
+                if (parentTrashed != child.Trashed)
+                {
+                    child.ChangeTrashedState(parentTrashed, child.ParentId);
+                }
+                
                 list.Add(child);
 
                 var grandkids = GetChildren(child.Id).ToList(); //No need to enumerate twice?
                 if (grandkids.Any())
                 {
-                    list.AddRange(UpdatePathAndLevelOnChildren(grandkids, child.Path, child.Level));
+                    list.AddRange(UpdatePropertiesOnChildren(grandkids, child.Path, child.Level, child.Trashed));
                 }
             }
             return list;
