@@ -14,6 +14,9 @@ using System.IO;
 
 namespace Umbraco.Web.Editors
 {
+    /// <summary>
+    /// A controller used for the embed dialog
+    /// </summary>
     [PluginController("UmbracoApi")]
     public class EmbedController : UmbracoAuthorizedJsonController
     {
