@@ -8,6 +8,7 @@ using System.Web;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Rdbms;
 using umbraco.cms.businesslogic.cache;
 using umbraco.BusinessLogic;
@@ -681,7 +682,7 @@ namespace umbraco.cms.businesslogic.member
                 XmlGenerate(xd);
 
                 // generate preview for blame history?
-                if (UmbracoSettings.EnableGlobalPreviewStorage)
+                if (UmbracoConfiguration.Current.UmbracoSettings.Content.GlobalPreviewStorageEnabled)
                 {
                     // Version as new guid to ensure different versions are generated as members are not versioned currently!
                     SavePreviewXml(generateXmlWithoutSaving(xd), Guid.NewGuid());

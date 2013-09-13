@@ -409,12 +409,12 @@ namespace umbraco.cms.businesslogic.packager
                             // The code below that imports the templates should suffice because it's actually importing 
                             // template data not just blank data.
 
-                            //if (UmbracoSettings.UseAspNetMasterPages)
+                            //if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
                             //	t.SaveMasterPageFile(t.Design);
                         }
                     }
                     // Master templates can only be generated when their master is known
-                    if (UmbracoSettings.UseAspNetMasterPages)
+                    if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
                     {
                         t.ImportDesign(xmlHelper.GetNodeValue(n.SelectSingleNode("Design")));
                         t.SaveMasterPageFile(t.Design);
@@ -685,12 +685,12 @@ namespace umbraco.cms.businesslogic.packager
                     if (masterTemplate != null)
                     {
                         t.MasterTemplate = Template.GetByAlias(master).Id;
-                        if (UmbracoSettings.UseAspNetMasterPages)
+                        if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
                             t.SaveMasterPageFile(t.Design);
                     }
                 }
                 // Master templates can only be generated when their master is known
-                if (UmbracoSettings.UseAspNetMasterPages)
+                if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
                 {
                     t.ImportDesign(xmlHelper.GetNodeValue(n.SelectSingleNode("Design")));
                     t.SaveMasterPageFile(t.Design);

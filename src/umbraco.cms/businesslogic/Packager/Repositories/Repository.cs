@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml;
 using System.IO;
 using System.Net;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using umbraco.IO;
 
@@ -187,7 +188,7 @@ namespace umbraco.cms.businesslogic.packager.repositories {
             byte[] fileByteArray = new byte[0];
 
             if (key == string.Empty) {
-                if (UmbracoSettings.UseLegacyXmlSchema)
+                if (UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
                     fileByteArray = this.Webservice.fetchPackage(packageGuid);
                 else
                     fileByteArray = this.Webservice.fetchPackageByVersion(packageGuid, Version.Version41);

@@ -5,7 +5,7 @@ using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-
+using Umbraco.Core.Configuration;
 using umbraco.cms.businesslogic.macro;
 using System.Reflection;
 using System.Collections;
@@ -74,7 +74,7 @@ namespace umbraco.controls
         /// <returns>The correct syntax for the macro including all parameters</returns>
         public string GetMacroTag() {
             string tag = "";
-            if (UmbracoSettings.UseAspNetMasterPages)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
             {
                 tag = "<umbraco:Macro runat=\"server\"";
             }

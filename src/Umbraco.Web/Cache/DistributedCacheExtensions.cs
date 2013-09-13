@@ -526,7 +526,7 @@ namespace Umbraco.Web.Cache
 
         public static void ClearXsltCacheOnCurrentServer(this DistributedCache dc)
         {
-            if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.UmbracoLibraryCacheDuration > 0)
             {
                 ApplicationContext.Current.ApplicationCache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
             }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web;
+using Umbraco.Core.Configuration;
 using umbraco.presentation.LiveEditing;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.web;
@@ -111,7 +112,7 @@ namespace umbraco.presentation
         {
             get
             {
-                return !UmbracoSettings.UseLegacyXmlSchema;
+                return !UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema;
             }
         }
 

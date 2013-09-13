@@ -272,7 +272,7 @@ namespace umbraco.cms.businesslogic.template
 					MasterPageHelper.RemoveMasterPageFile(_oldAlias);
 					_design = ViewHelper.UpdateViewFile(this, _oldAlias);
 				}
-				else if (UmbracoSettings.UseAspNetMasterPages)
+				else if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
 				{
 					ViewHelper.RemoveViewFile(this.Alias);
 					ViewHelper.RemoveViewFile(_oldAlias);

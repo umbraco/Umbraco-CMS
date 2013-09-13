@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml;
 using System.Xml.XPath;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -14,6 +15,7 @@ using umbraco;
 using System.Linq;
 using umbraco.BusinessLogic;
 using umbraco.presentation.preview;
+using GlobalSettings = umbraco.GlobalSettings;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
@@ -224,7 +226,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				// that switch schemas fail - so cache and refresh when needed,
 				// ie never when running the actual site
 
-				var version = UmbracoSettings.UseLegacyXmlSchema ? 0 : 1;
+				var version = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? 0 : 1;
 				if (_xPathStringsValue == null || _xPathStringsValue.Version != version)
 					_xPathStringsValue = new XPathStringsDefinition(version);
 				return _xPathStringsValue;

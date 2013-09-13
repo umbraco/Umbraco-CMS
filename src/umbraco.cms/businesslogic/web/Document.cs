@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
@@ -1316,11 +1317,11 @@ namespace umbraco.cms.businesslogic.web
             x.Attributes.Append(addAttribute(xd, "urlName", urlName));
             x.Attributes.Append(addAttribute(xd, "writerName", Writer.Name));
             x.Attributes.Append(addAttribute(xd, "creatorName", Creator.Name.ToString()));
-            if (ContentType != null && UmbracoSettings.UseLegacyXmlSchema)
+            if (ContentType != null && UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
                 x.Attributes.Append(addAttribute(xd, "nodeTypeAlias", ContentType.Alias));
             x.Attributes.Append(addAttribute(xd, "path", Path));
 
-            if (!UmbracoSettings.UseLegacyXmlSchema)
+            if (!UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
             {
                 x.Attributes.Append(addAttribute(xd, "isDoc", ""));
             }

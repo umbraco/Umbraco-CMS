@@ -54,8 +54,8 @@ namespace Umbraco.Web
 			int interval = 24 * 60 * 60; //24 hours
 			try
 			{
-				if (global::umbraco.UmbracoSettings.CleaningMiliseconds > -1)
-					interval = global::umbraco.UmbracoSettings.CleaningMiliseconds;
+				if (global::umbraco.UmbracoConfiguration.Current.UmbracoSettings.Logging.CleaningMiliseconds > -1)
+					interval = global::umbraco.UmbracoConfiguration.Current.UmbracoSettings.Logging.CleaningMiliseconds;
 			}
 			catch (Exception e)
 			{
@@ -69,8 +69,8 @@ namespace Umbraco.Web
 			int maximumAge = 24 * 60 * 60;
 			try
 			{
-				if (global::umbraco.UmbracoSettings.MaxLogAge > -1)
-					maximumAge = global::umbraco.UmbracoSettings.MaxLogAge;
+				if (global::umbraco.UmbracoConfiguration.Current.UmbracoSettings.Logging.MaxLogAge > -1)
+					maximumAge = global::umbraco.UmbracoConfiguration.Current.UmbracoSettings.Logging.MaxLogAge;
 			}
 			catch (Exception e)
 			{

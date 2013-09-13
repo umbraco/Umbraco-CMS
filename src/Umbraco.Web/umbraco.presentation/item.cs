@@ -4,6 +4,7 @@ using System.Web;
 using System.Xml;
 using StackExchange.Profiling;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Profiling;
 
@@ -113,7 +114,7 @@ namespace umbraco
                     if (element == null)
                         continue;
 
-                    var xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data [@alias = '{0}']" : "./{0}";
+                    var xpath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "./data [@alias = '{0}']" : "./{0}";
                     var currentNode = element.SelectSingleNode(string.Format(xpath, _fieldName));
 
                     //continue if all is null
@@ -183,7 +184,7 @@ namespace umbraco
 
                 // OTHER FORMATTING FUNCTIONS
                 // If we use masterpages, this is moved to the ItemRenderer to add support for before/after in inline XSLT
-                if (!UmbracoSettings.UseAspNetMasterPages)
+                if (!UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
                 {
                     if (_fieldContent != "" && helper.FindAttribute(attributes, "insertTextBefore") != "")
                         _fieldContent = HttpContext.Current.Server.HtmlDecode(helper.FindAttribute(attributes, "insertTextBefore")) +

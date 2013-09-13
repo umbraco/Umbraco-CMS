@@ -8,6 +8,7 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core.Configuration;
 using umbraco.cms.businesslogic.propertytype;
 
 namespace umbraco.developer
@@ -37,7 +38,7 @@ namespace umbraco.developer
             foreach (PropertyType pt in PropertyType.GetAll())
                 if (!existingGenProps.Contains("," + pt.Alias + ","))
                 {
-                    if(UmbracoSettings.UseLegacyXmlSchema)
+                    if(UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
                         preValuesSource.Add(string.Format("data [@alias = '{0}']", pt.Alias));
                     else
                         preValuesSource.Add(pt.Alias);

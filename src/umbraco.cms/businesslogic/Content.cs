@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -533,7 +534,7 @@ namespace umbraco.cms.businesslogic
 
         protected virtual XmlNode generateXmlWithoutSaving(XmlDocument xd)
         {
-            string nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : Casing.SafeAliasWithForcingCheck(ContentType.Alias);
+            string nodeName = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "node" : Casing.SafeAliasWithForcingCheck(ContentType.Alias);
             XmlNode x = xd.CreateNode(XmlNodeType.Element, nodeName, "");
             XmlPopulate(xd, ref x, false);
             return x;
@@ -594,7 +595,7 @@ namespace umbraco.cms.businesslogic
                     var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);
 
                     // don't want to delete the media folder if not using directories.
-                    if (UmbracoSettings.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
+                    if (UmbracoConfiguration.Current.UmbracoSettings.Content.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
                     {
                         //issue U4-771: if there is a parent directory the recursive parameter should be true
                         fs.DeleteDirectory(parentDirectory, String.IsNullOrEmpty(parentDirectory) == false);

@@ -3,6 +3,7 @@ using System.Data;
 using System.IO;
 using System.Text;
 using System.Xml;
+using Umbraco.Core.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
@@ -187,7 +188,7 @@ namespace umbraco.presentation.translation
 
                 foreach (XmlNode taskXml in tasks)
                 {
-                    string xpath = UmbracoSettings.UseLegacyXmlSchema ? "node" : "* [@isDoc]";
+                    string xpath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "node" : "* [@isDoc]";
                     XmlNode taskNode = taskXml.SelectSingleNode(xpath);
 
                     // validate file

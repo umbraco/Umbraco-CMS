@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core;
@@ -123,7 +124,7 @@ namespace Umbraco.Web.Routing
 				// that switch schemas fail - so cache and refresh when needed,
 				// ie never when running the actual site
 
-				var version = global::umbraco.UmbracoSettings.UseLegacyXmlSchema ? 0 : 1;
+				var version = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? 0 : 1;
 				if (_xPathStringsValue == null || _xPathStringsValue.Version != version)
 					_xPathStringsValue = new XPathStringsDefinition(version);
 				return _xPathStringsValue;

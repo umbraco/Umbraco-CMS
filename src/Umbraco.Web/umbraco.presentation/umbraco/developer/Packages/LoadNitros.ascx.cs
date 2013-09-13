@@ -10,6 +10,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls.WebParts;
 using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 
@@ -166,7 +167,7 @@ namespace umbraco.presentation.developer.packages {
 				try
 				{
 
-					if (UmbracoSettings.UseLegacyXmlSchema)
+					if (UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
 						rep_nitros.DataSource = repo.Webservice.NitrosCategorizedByVersion(cms.businesslogic.packager.repositories.Version.Version4);
 					else
 						rep_nitros.DataSource = repo.Webservice.NitrosCategorizedByVersion(cms.businesslogic.packager.repositories.Version.Version41);

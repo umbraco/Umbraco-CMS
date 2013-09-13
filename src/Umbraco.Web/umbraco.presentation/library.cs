@@ -11,6 +11,7 @@ using System.Xml;
 using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
@@ -452,12 +453,12 @@ namespace umbraco
         {
             try
             {
-                if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
+                if (UmbracoConfiguration.Current.UmbracoSettings.Content.UmbracoLibraryCacheDuration > 0)
                 {
                     XPathNodeIterator retVal = ApplicationContext.Current.ApplicationCache.GetCacheItem(
                         string.Format(
                             "{0}_{1}_{2}", CacheKeys.MediaCacheKey, MediaId, Deep),
-                        TimeSpan.FromSeconds(UmbracoSettings.UmbracoLibraryCacheDuration),
+                        TimeSpan.FromSeconds(UmbracoConfiguration.Current.UmbracoSettings.Content.UmbracoLibraryCacheDuration),
                         () => getMediaDo(MediaId, Deep));
 
                     if (retVal != null)
@@ -486,7 +487,7 @@ namespace umbraco
                 XmlDocument mXml = new XmlDocument();
                 mXml.LoadXml(m.ToXml(mXml, Deep).OuterXml);
                 XPathNavigator xp = mXml.CreateNavigator();
-                string xpath = UmbracoSettings.UseLegacyXmlSchema ? "/node" : String.Format("/{0}", Casing.SafeAliasWithForcingCheck(m.ContentType.Alias));
+                string xpath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "/node" : String.Format("/{0}", Casing.SafeAliasWithForcingCheck(m.ContentType.Alias));
                 return xp.Select(xpath);
             }
             return null;
@@ -503,12 +504,12 @@ namespace umbraco
         {
             try
             {
-                if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
+                if (UmbracoConfiguration.Current.UmbracoSettings.Content.UmbracoLibraryCacheDuration > 0)
                 {
                     var retVal = ApplicationContext.Current.ApplicationCache.GetCacheItem(
                         string.Format(
                             "{0}_{1}", CacheKeys.MemberLibraryCacheKey, MemberId),
-                        TimeSpan.FromSeconds(UmbracoSettings.UmbracoLibraryCacheDuration),
+                        TimeSpan.FromSeconds(UmbracoConfiguration.Current.UmbracoSettings.Content.UmbracoLibraryCacheDuration),
                         () => getMemberDo(MemberId));
 
                     if (retVal != null)
@@ -977,7 +978,7 @@ namespace umbraco
         /// <returns>The rendered template as a string</returns>
         public static string RenderTemplate(int PageId, int TemplateId)
         {
-            if (UmbracoSettings.UseAspNetMasterPages)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
             {
                 if (!UmbracoContext.Current.LiveEditingContext.Enabled)
                 {										

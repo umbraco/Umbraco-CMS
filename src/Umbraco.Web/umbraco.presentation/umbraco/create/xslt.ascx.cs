@@ -6,6 +6,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.IO;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.UI;
 using Umbraco.Core.IO;
 using umbraco.cms.helpers;
@@ -59,7 +60,7 @@ namespace umbraco.presentation.create
 
         private static string getXsltTemplatePath()
         {
-            if (UmbracoSettings.UseLegacyXmlSchema) {
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema) {
                 return "/xslt/templates";
             } else {
                 return "/xslt/templates/schema2";
@@ -74,7 +75,7 @@ namespace umbraco.presentation.create
                 if (createMacro.Checked)
                     createMacroVal = 1;
 
-                var xsltName = UmbracoSettings.UseLegacyXmlSchema ? xsltTemplate.SelectedValue :
+                var xsltName = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? xsltTemplate.SelectedValue :
                     Path.Combine("schema2", xsltTemplate.SelectedValue);
 
                 var returnUrl = LegacyDialogHandler.Create(

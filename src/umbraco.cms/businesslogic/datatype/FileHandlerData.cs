@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Web;
 using System.Xml;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
 using umbraco.cms.businesslogic.Files;
@@ -63,7 +64,7 @@ namespace umbraco.cms.businesslogic.datatype
                     {
                         var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
-                        var subfolder = UmbracoSettings.UploadAllowDirectories
+                        var subfolder = UmbracoConfiguration.Current.UmbracoSettings.Content.UploadAllowDirectories
                             ? currentValue.Replace(fs.GetUrl("/"), "").Split('/')[0]
                             : currentValue.Substring(currentValue.LastIndexOf("/", StringComparison.Ordinal) + 1).Split('-')[0];
                         
@@ -72,7 +73,7 @@ namespace umbraco.cms.businesslogic.datatype
                             ? subfolderId.ToString(CultureInfo.InvariantCulture)
                             : MediaSubfolderCounter.Current.Increment().ToString(CultureInfo.InvariantCulture);
 
-                        var fileName = UmbracoSettings.UploadAllowDirectories 
+                        var fileName = UmbracoConfiguration.Current.UmbracoSettings.Content.UploadAllowDirectories 
                             ? Path.Combine(numberedFolder, name) 
                             : numberedFolder + "-" + name;
                         

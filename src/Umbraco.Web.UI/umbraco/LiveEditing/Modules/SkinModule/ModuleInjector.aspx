@@ -34,7 +34,7 @@
 		var macroAliases = new Array();
 		var macroAlias = '<%= _macroAlias %>';
 			
-		<%if (umbraco.UmbracoSettings.UseAspNetMasterPages) { %>
+		<%if (umbraco.UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages) { %>
 		var macroElement = "umbraco:Macro";
 		<%}else{ %>
 		var macroElement = "?UMBRACO_MACRO";
@@ -95,11 +95,11 @@
 			if (macroString.length > 1)
 				macroString = macroString.substr(0, macroString.length-1);
 		
-			<%if (!umbraco.UmbracoSettings.UseAspNetMasterPages){ %>
+			<%if (!umbraco.UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages){ %>
 			macroString += " macroAlias=\"" + macroAlias + "\"";
 			<%} %>				
 				
-			<%if (umbraco.UmbracoSettings.UseAspNetMasterPages){ %>
+			<%if (umbraco.UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages){ %>
 			  macroString += " Alias=\"" + macroAlias + "\" runat=\"server\"></" + macroElement + ">";
 			<%} else { %>
 			  macroString += "></" + macroElement + ">";

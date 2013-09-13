@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
@@ -91,7 +92,7 @@ namespace umbraco.cms.businesslogic.media
                         int subfolderId;
                         var currentValue = prop.Value.ToString();
 
-                        var subfolder = UmbracoSettings.UploadAllowDirectories
+                        var subfolder = UmbracoConfiguration.Current.UmbracoSettings.Content.UploadAllowDirectories
                             ? currentValue.Replace(FileSystem.GetUrl("/"), "").Split('/')[0]
                             : currentValue.Substring(currentValue.LastIndexOf("/", StringComparison.Ordinal) + 1).Split('-')[0];
                         
