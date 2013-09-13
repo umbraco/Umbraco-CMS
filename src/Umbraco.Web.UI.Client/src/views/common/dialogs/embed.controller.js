@@ -5,7 +5,7 @@
     $scope.constrain = true;
     $scope.preview = "";
 
-    $scope.showPreview = function () {
+    $scope.preview = function () {
 
         $http({ method: 'POST', url: '/umbraco/UmbracoApi/Embed/Embed', params: { url: $scope.url, width: $scope.width, height: $scope.height } })
             .success(function (data) {
