@@ -8,6 +8,7 @@ using System.Xml.XPath;
 using Umbraco.Core.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Routing;
 using umbraco;
@@ -17,7 +18,6 @@ using umbraco.presentation.preview;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
-    // fixme - does not implement the content model factory
     internal class PublishedContentCache : IPublishedContentCache
     {
         #region Routes cache
@@ -238,12 +238,15 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         private static IPublishedContent ConvertToDocument(XmlNode xmlNode, bool isPreviewing)
 		{
-		    return xmlNode == null ? null : new XmlPublishedContent(xmlNode, isPreviewing);
+		    return xmlNode == null 
+                ? null 
+                : PublishedContentModelFactory.CreateModel(new XmlPublishedContent(xmlNode, isPreviewing));
 		}
 
         private static IEnumerable<IPublishedContent> ConvertToDocuments(XmlNodeList xmlNodes, bool isPreviewing)
         {
-            return xmlNodes.Cast<XmlNode>().Select(xmlNode => new XmlPublishedContent(xmlNode, isPreviewing));
+            return xmlNodes.Cast<XmlNode>()
+                .Select(xmlNode => PublishedContentModelFactory.CreateModel(new XmlPublishedContent(xmlNode, isPreviewing)));
         }
 
         #endregion

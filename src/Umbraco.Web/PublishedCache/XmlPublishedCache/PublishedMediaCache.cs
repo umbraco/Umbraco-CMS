@@ -241,7 +241,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			}
 
 
-			return new DictionaryPublishedContent(values,
+			var content = new DictionaryPublishedContent(values,
 			                                      d => d.ParentId != -1 //parent should be null if -1
 				                                           ? GetUmbracoMedia(d.ParentId)
 				                                           : null,
@@ -249,6 +249,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			                                      d => GetChildrenMedia(d.Id),
 			                                      GetProperty,
 			                                      true);
+		    return PublishedContentModelFactory.CreateModel(content);
 		}
 
 		internal IPublishedContent ConvertFromXPathNavigator(XPathNavigator xpath)
@@ -299,7 +300,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				}
 			}
 
-			return new DictionaryPublishedContent(values, 
+			var content = new DictionaryPublishedContent(values, 
 				d => d.ParentId != -1 //parent should be null if -1
 					? GetUmbracoMedia(d.ParentId) 
 					: null,
@@ -307,6 +308,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				d => GetChildrenMedia(d.Id, xpath),
 				GetProperty,
 				false);
+		    return PublishedContentModelFactory.CreateModel(content);
 		}
 
 		/// <summary>
