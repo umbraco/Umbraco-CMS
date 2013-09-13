@@ -7,6 +7,8 @@ using System.Xml;
 using System.IO;
 
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.BaseRest;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.member;
 
@@ -87,7 +89,7 @@ namespace Umbraco.Web.BaseRest
 		//
 		static RestExtensionMethodInfo GetFromConfiguration(string extensionAlias, string methodName, int paramsCount)
 		{
-		    var config = Core.Configuration.LegacyUmbracoSettings.For<Configuration.BaseRestSection>();
+            var config = UmbracoConfiguration.Current.BaseRestExtensions;
 
 			var configExtension = config.Items[extensionAlias];
 			if (configExtension == null)

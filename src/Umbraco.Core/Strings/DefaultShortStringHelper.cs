@@ -57,17 +57,10 @@ namespace Umbraco.Core.Strings
 
         static void InitializeLegacyUrlReplaceCharacters()
         {
-            var replaceChars = LegacyUmbracoSettings.UrlReplaceCharacters;
-            if (replaceChars == null) return;
-            var nodes = replaceChars.SelectNodes("char");
-            if (nodes == null) return;
-            foreach (var node in nodes.Cast<System.Xml.XmlNode>())
+            foreach (var node in UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.UrlReplacing.CharCollection)
             {
-                var attributes = node.Attributes;
-                if (attributes == null) continue;
-                var org = attributes.GetNamedItem("org");
-                if (org != null && org.Value != "")
-                    UrlReplaceCharacters[org.Value] = XmlHelper.GetNodeValue(node);
+                if (node.Char.IsNullOrWhiteSpace() == false)
+                    UrlReplaceCharacters[node.Char] = node.Replacement;
             }
         }
 
@@ -234,7 +227,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         public string GetShortStringServicesJavaScript(string controllerPath)
         {
                 return string.Format(SssjsFormat,
-                    LegacyUmbracoSettings.ForceSafeAliases ? "true" : "false", controllerPath);
+                    UmbracoConfiguration.Current.UmbracoSettings.Content.ForceSafeAliases ? "true" : "false", controllerPath);
         }
 
         #endregion

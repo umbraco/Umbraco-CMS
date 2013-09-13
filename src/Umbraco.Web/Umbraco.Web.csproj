@@ -295,7 +295,6 @@
     <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Cache\UserPermissionsCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
-    <Compile Include="Configuration\WebRouting.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Editors\ContentController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
@@ -481,11 +480,7 @@
     <Compile Include="Models\PartialViewMacroModel.cs" />
     <Compile Include="Models\PublishedContentBase.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
-    <Compile Include="BaseRest\Configuration\BaseRestSection.cs" />
     <Compile Include="BaseRest\BaseRestHandler.cs" />
-    <Compile Include="BaseRest\Configuration\ExtensionElement.cs" />
-    <Compile Include="BaseRest\Configuration\ExtensionElementCollection.cs" />
-    <Compile Include="BaseRest\Configuration\MethodElement.cs" />
     <Compile Include="BaseRest\MemberRest.cs" />
     <Compile Include="BaseRest\RestExtensionAttribute.cs" />
     <Compile Include="BaseRest\RestExtensionMethodAttribute.cs" />

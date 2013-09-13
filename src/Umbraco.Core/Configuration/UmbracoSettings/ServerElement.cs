@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ServerElement : InnerTextConfigurationElement<string>, IServerElement
+    internal class ServerElement : InnerTextConfigurationElement<string>, IServer
     {
         public string ForcePortnumber
         {
@@ -22,7 +22,7 @@
             }
         }  
 
-        string IServerElement.ServerAddress
+        string IServer.ServerAddress
         {
             get { return Value; }
         }

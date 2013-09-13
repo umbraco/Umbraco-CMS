@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public virtual void ExternalLogger_Type()
         {
-            Assert.IsTrue(Section.Logging.ExternalLogger.Type == "fully.qualified.namespace.and.type");
+            Assert.IsTrue(Section.Logging.ExternalLogger.ExternalLoggerType == "fully.qualified.namespace.and.type");
         }
         [Test]
         public virtual void ExternalLogger_LogAuditTrail()

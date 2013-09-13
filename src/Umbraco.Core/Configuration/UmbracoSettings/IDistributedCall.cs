@@ -8,6 +8,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         int UserId { get; }
 
-        IEnumerable<IServerElement> Servers { get; }
+        IEnumerable<IServer> Servers { get; }
     }
 }

@@ -6,7 +6,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
     {
         string Assembly { get; }
 
-        string Type { get; }
+        string ExternalLoggerType { get; }
 
         bool LogAuditTrail { get; }
     }

@@ -24,13 +24,13 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        public string DocumentTypeAlias
+        public string PropertyTypeAlias
         {
             get
             {
-                return RawXml.Attribute("documentTypeAlias") == null
+                return RawXml.Attribute("propertyTypeAlias") == null
                            ? null
-                           : RawXml.Attribute("documentTypeAlias").Value;
+                           : RawXml.Attribute("propertyTypeAlias").Value;
             }
         }
 

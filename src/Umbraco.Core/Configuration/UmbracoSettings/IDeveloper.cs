@@ -1,7 +1,9 @@
-﻿namespace Umbraco.Core.Configuration.UmbracoSettings
+﻿using System.Collections.Generic;
+
+namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     public interface IDeveloper
     {
-        IAppCodeFileExtensions AppCodeFileExtensions { get; }
+        IEnumerable<IFileExtension> AppCodeFileExtensions { get; }
     }
 }

@@ -6,7 +6,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
     {
         Guid DataTypeGuid { get; }
         string NodeTypeAlias { get; }
-        string DocumentTypeAlias { get; }
+        string PropertyTypeAlias { get; }
         string MappingName { get; }
     }
 }

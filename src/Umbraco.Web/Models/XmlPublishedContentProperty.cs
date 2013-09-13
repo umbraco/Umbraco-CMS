@@ -66,7 +66,7 @@ namespace Umbraco.Web.Models
 				// For backward compatibility with 2.x (the version attribute has been removed from 3.0 data nodes)
 				if (propertyXmlData.Attributes.GetNamedItem("versionID") != null)
 					_version = new Guid(propertyXmlData.Attributes.GetNamedItem("versionID").Value);
-				_alias = LegacyUmbracoSettings.UseLegacyXmlSchema ?
+                _alias = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ?
 				                                            	propertyXmlData.Attributes.GetNamedItem("alias").Value :
 				                                            	                                                       	propertyXmlData.Name;
 				_value = XmlHelper.GetNodeValue(propertyXmlData);

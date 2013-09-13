@@ -14,7 +14,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             return ((RazorStaticMappingElement) element).DataTypeGuid
                    + ((RazorStaticMappingElement) element).NodeTypeAlias
-                   + ((RazorStaticMappingElement) element).DocumentTypeAlias;
+                   + ((RazorStaticMappingElement) element).PropertyTypeAlias;
         }
 
 

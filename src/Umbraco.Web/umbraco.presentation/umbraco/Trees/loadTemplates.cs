@@ -8,6 +8,7 @@ using System.Web;
 using System.Xml;
 using System.Configuration;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic;
@@ -193,8 +194,8 @@ namespace umbraco
                 xNode.Text = t.Text;
                 xNode.Source = GetTreeServiceUrl(t.Id);
                 xNode.HasChildren = t.HasChildren;
-                
-                if (Umbraco.Core.Configuration.LegacyUmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(t))
+
+                if (UmbracoConfiguration.Current.UmbracoSettings.Templates.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(t))
                 {
                     xNode.Action = "javascript:openView(" + t.Id + ");";
                     xNode.Icon = "icon-newspaper-alt";

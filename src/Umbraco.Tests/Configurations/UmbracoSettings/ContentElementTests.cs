@@ -104,12 +104,12 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void MacroErrors()
         {
-            Assert.IsTrue(Section.Content.MacroErrors == MacroErrorBehaviour.Inline);
+            Assert.IsTrue(Section.Content.MacroErrorBehaviour == MacroErrorBehaviour.Inline);
         }
         [Test]
         public void DocumentTypeIconList()
         {
-            Assert.IsTrue(Section.Content.DocumentTypeIconList == IconPickerBehaviour.HideFileDuplicates);
+            Assert.IsTrue(Section.Content.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates);
         }
         [Test]
         public void DisallowedUploadFiles()

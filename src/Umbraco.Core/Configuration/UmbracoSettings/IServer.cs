@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface IServerElement
+    public interface IServer
     {
         string ForcePortnumber { get; }
         string ForceProtocol { get; }

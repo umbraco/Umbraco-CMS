@@ -27,7 +27,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return Assembly; }
         }
 
-        string IExternalLogger.Type
+        string IExternalLogger.ExternalLoggerType
         {
             get { return Type; }
         }

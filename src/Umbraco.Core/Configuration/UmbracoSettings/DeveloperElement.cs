@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System.Collections.Generic;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
@@ -38,9 +39,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        IAppCodeFileExtensions IDeveloper.AppCodeFileExtensions
+        IEnumerable<IFileExtension> IDeveloper.AppCodeFileExtensions
         {
-            get { return AppCodeFileExtensions; }
+            get { return AppCodeFileExtensions.AppCodeFileExtensionsCollection; }
         }
     }
 }

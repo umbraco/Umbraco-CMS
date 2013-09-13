@@ -42,9 +42,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         int UmbracoLibraryCacheDuration { get; }
 
-        MacroErrorBehaviour MacroErrors { get; }
+        MacroErrorBehaviour MacroErrorBehaviour { get; }
 
-        IconPickerBehaviour DocumentTypeIconList { get; }
+        IconPickerBehaviour IconPickerBehaviour { get; }
 
         IEnumerable<string> DisallowedUploadFiles { get; }
 

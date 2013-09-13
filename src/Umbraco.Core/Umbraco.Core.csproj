@@ -144,9 +144,16 @@
     <Compile Include="CodeAnnotations\UmbracoExperimentalFeatureAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoProposedPublicAttribute.cs" />
     <Compile Include="ConcurrentHashSet.cs" />
+    <Compile Include="Configuration\BaseRest\IBaseRest.cs" />
+    <Compile Include="Configuration\BaseRest\IExtension.cs" />
+    <Compile Include="Configuration\BaseRest\IMethod.cs" />
     <Compile Include="Configuration\CaseInsensitiveEnumConfigConverter.cs" />
     <Compile Include="Configuration\ClientDependencyConfiguration.cs" />
     <Compile Include="Configuration\ConfigurationKeyAttribute.cs" />
+    <Compile Include="Configuration\BaseRest\BaseRestSection.cs" />
+    <Compile Include="Configuration\BaseRest\ExtensionElement.cs" />
+    <Compile Include="Configuration\BaseRest\ExtensionElementCollection.cs" />
+    <Compile Include="Configuration\BaseRest\MethodElement.cs" />
     <Compile Include="Configuration\FileSystemProviderElement.cs" />
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
@@ -172,7 +179,6 @@
     <Compile Include="Configuration\UmbracoSettings\ExternalLoggerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\FileExtensionElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\HelpElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IAppCodeFileExtensions.cs" />
     <Compile Include="Configuration\UmbracoSettings\IChar.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContent.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentErrorPage.cs" />
@@ -201,7 +207,7 @@
     <Compile Include="Configuration\UmbracoSettings\IScheduledTasks.cs" />
     <Compile Include="Configuration\UmbracoSettings\IScripting.cs" />
     <Compile Include="Configuration\UmbracoSettings\ISecurity.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IServerElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\IServer.cs" />
     <Compile Include="Configuration\UmbracoSettings\ITemplates.cs" />
     <Compile Include="Configuration\UmbracoSettings\IUmbracoSettings.cs" />
     <Compile Include="Configuration\UmbracoSettings\IUrlReplacing.cs" />
@@ -804,7 +810,6 @@
     <Compile Include="ActionsResolver.cs" />
     <Compile Include="CacheRefreshersResolver.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
-    <Compile Include="Configuration\LegacyUmbracoSettings.cs" />
     <Compile Include="CustomBooleanTypeConverter.cs" />
     <Compile Include="DataTypesResolver.cs" />
     <Compile Include="DisposableObject.cs" />

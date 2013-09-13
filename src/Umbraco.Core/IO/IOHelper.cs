@@ -54,7 +54,7 @@ namespace Umbraco.Core.IO
 		[Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ResolveUrlsFromTextString instead, this method on this class will be removed in future versions")]
         internal static string ResolveUrlsFromTextString(string text)
         {
-            if (LegacyUmbracoSettings.ResolveUrlsFromTextString)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.ResolveUrlsFromTextString)
             {				
 				using (var timer = DisposableTimer.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
 				{

@@ -16,5 +16,11 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {
             Assert.IsTrue(Section.WebRouting.TrySkipIisCustomErrors == false);
         }
+
+        [Test]
+        public void UrlProviderMode()
+        {
+            Assert.IsTrue(Section.WebRouting.UrlProviderMode == "Auto");
+        }
     }
 }

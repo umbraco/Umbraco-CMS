@@ -5,5 +5,8 @@
         bool TrySkipIisCustomErrors { get; }
 
         bool InternalRedirectPreservesTemplate { get; }
+
+        string UrlProviderMode { get; }
     }
+
 }

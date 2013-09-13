@@ -40,7 +40,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return UserId; }
         }
 
-        IEnumerable<IServerElement> IDistributedCall.Servers
+        IEnumerable<IServer> IDistributedCall.Servers
         {
             get { return Servers; }
         }

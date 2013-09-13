@@ -6,6 +6,7 @@ using System.Xml;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -65,73 +66,65 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         static void AutoFillProperties(IContentBase model)
-        {
-            if (LegacyUmbracoSettings.ImageAutoFillImageProperties != null)
+        {            
+            foreach (var p in model.Properties)
             {
-                foreach (var p in model.Properties)
-                {
-                    var uploadFieldConfigNode =
-                        LegacyUmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
-                            string.Format("uploadField [@alias = \"{0}\"]", p.Alias));
+                var uploadFieldConfigNode =
+                    UmbracoConfiguration.Current.UmbracoSettings.Content.Imaging.ImageAutoFillProperties
+                                        .FirstOrDefault(x => x.Alias == p.Alias);
 
-                    if (uploadFieldConfigNode != null)
+                if (uploadFieldConfigNode != null)
+                {
+                    //now we need to check if there is a value
+                    if (p.Value is string && ((string) p.Value).IsNullOrWhiteSpace() == false)
                     {
-                        //now we need to check if there is a value
-                        if (p.Value is string && ((string) p.Value).IsNullOrWhiteSpace() == false)
+                        //there might be multiple, we can only process the first one!
+                        var split = ((string) p.Value).Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+                        if (split.Any())
                         {
-                            //there might be multiple, we can only process the first one!
-                            var split = ((string) p.Value).Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
-                            if (split.Any())
-                            {
-                                var umbracoFile = new UmbracoMediaFile(IOHelper.MapPath(split[0]));
-                                FillProperties(uploadFieldConfigNode, model, umbracoFile);
-                            }
-                        }
-                        else
-                        {
-                            //there's no value so need to reset to zero
-                            ResetProperties(uploadFieldConfigNode, model);
+                            var umbracoFile = new UmbracoMediaFile(IOHelper.MapPath(split[0]));
+                            FillProperties(uploadFieldConfigNode, model, umbracoFile);
                         }
                     }
+                    else
+                    {
+                        //there's no value so need to reset to zero
+                        ResetProperties(uploadFieldConfigNode, model);
+                    }
                 }
-            }
+            }            
         }
 
-        private static void ResetProperties(XmlNode uploadFieldConfigNode, IContentBase content)
+        private static void ResetProperties(IContentImagingAutoFillUploadField uploadFieldConfigNode, IContentBase content)
         {
-            // only add dimensions to web images
-            UpdateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias", string.Empty);
-            UpdateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias", string.Empty);
+            if (content.Properties[uploadFieldConfigNode.WidthFieldAlias] != null)
+                content.Properties[uploadFieldConfigNode.WidthFieldAlias].Value = string.Empty;
+            
+            if (content.Properties[uploadFieldConfigNode.HeightFieldAlias] != null)
+                content.Properties[uploadFieldConfigNode.HeightFieldAlias].Value = string.Empty;
 
-            UpdateContentProperty(uploadFieldConfigNode, content, "lengthFieldAlias", string.Empty);
-            UpdateContentProperty(uploadFieldConfigNode, content, "extensionFieldAlias", string.Empty);
+            if (content.Properties[uploadFieldConfigNode.LengthFieldAlias] != null)
+                content.Properties[uploadFieldConfigNode.LengthFieldAlias].Value = string.Empty;
+
+            if (content.Properties[uploadFieldConfigNode.ExtensionFieldAlias] != null)
+                content.Properties[uploadFieldConfigNode.ExtensionFieldAlias].Value = string.Empty;
         }
 
-        private static void FillProperties(XmlNode uploadFieldConfigNode, IContentBase content, UmbracoMediaFile um)
+        private static void FillProperties(IContentImagingAutoFillUploadField uploadFieldConfigNode, IContentBase content, UmbracoMediaFile um)
         {
             var size = um.SupportsResizing ? (Size?)um.GetDimensions() : null;
 
-            // only add dimensions to web images
-            UpdateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias", size.HasValue ? size.Value.Width.ToInvariantString() : string.Empty);
-            UpdateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias", size.HasValue ? size.Value.Height.ToInvariantString() : string.Empty);
+            if (content.Properties[uploadFieldConfigNode.WidthFieldAlias] != null)
+                content.Properties[uploadFieldConfigNode.WidthFieldAlias].Value = size.HasValue ? size.Value.Width.ToInvariantString() : string.Empty;
 
-            UpdateContentProperty(uploadFieldConfigNode, content, "lengthFieldAlias", um.Length);
-            UpdateContentProperty(uploadFieldConfigNode, content, "extensionFieldAlias", um.Extension);
-        }
+            if (content.Properties[uploadFieldConfigNode.HeightFieldAlias] != null)
+                content.Properties[uploadFieldConfigNode.HeightFieldAlias].Value = size.HasValue ? size.Value.Height.ToInvariantString() : string.Empty;
 
-        private static void UpdateContentProperty(XmlNode uploadFieldConfigNode, IContentBase content, string configPropertyAlias, object propertyValue)
-        {
-            var propertyNode = uploadFieldConfigNode.SelectSingleNode(configPropertyAlias);
-            if (propertyNode != null 
-                && string.IsNullOrEmpty(propertyNode.FirstChild.Value) == false
-                && content.Properties.Contains(propertyNode.FirstChild.Value))
-            {
-                var property = content.Properties[propertyNode.FirstChild.Value];
-                if (property != null)
-                {
-                    property.Value = propertyValue;
-                }
-            }
+            if (content.Properties[uploadFieldConfigNode.LengthFieldAlias] != null)
+                content.Properties[uploadFieldConfigNode.LengthFieldAlias].Value = um.Length;
+
+            if (content.Properties[uploadFieldConfigNode.ExtensionFieldAlias] != null)
+                content.Properties[uploadFieldConfigNode.ExtensionFieldAlias].Value = um.Extension;
         }
 
         /// <summary>

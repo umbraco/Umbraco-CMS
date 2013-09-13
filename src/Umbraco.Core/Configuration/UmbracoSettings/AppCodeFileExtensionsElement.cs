@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class AppCodeFileExtensionsElement : ConfigurationElement, IAppCodeFileExtensions
+    internal class AppCodeFileExtensionsElement : ConfigurationElement
     {
         [ConfigurationCollection(typeof(AppCodeFileExtensionsCollection), AddItemName = "ext")]
         [ConfigurationProperty("", IsDefaultCollection = true)]
@@ -13,9 +13,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             set { base[""] = value; }
         }
 
-        IEnumerable<IFileExtension> IAppCodeFileExtensions.AppCodeFileExtensions
-        {
-            get { return AppCodeFileExtensionsCollection; }
-        }
     }
 }

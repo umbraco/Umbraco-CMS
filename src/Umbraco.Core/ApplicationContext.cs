@@ -107,25 +107,6 @@ namespace Umbraco.Core
             }
         }
 
-	    public UmbracoConfiguration UmbracoConfiguration
-	    {
-	        get
-	        {
-	            if (_umbracoConfiguration == null)
-	            {
-	                var umbracoSettings = ConfigurationManager.GetSection("umbracoConfiguration/settings") as IUmbracoSettings;
-	                if (umbracoSettings == null)
-	                {
-	                    throw new InvalidOperationException("Could not find configuration section 'umbracoConfiguration/settings' or it does not cast to " + typeof (IUmbracoSettings));
-	                }
-
-	                //create a new one if it is null
-	                _umbracoConfiguration = new UmbracoConfiguration(umbracoSettings);
-	            }
-	            return _umbracoConfiguration;
-	        }
-	    }
-
 	    /// <summary>
         /// The original/first url that the web application executes
         /// </summary>

@@ -379,12 +379,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return UmbracoLibraryCacheDuration; }
         }
 
-        MacroErrorBehaviour IContent.MacroErrors
+        MacroErrorBehaviour IContent.MacroErrorBehaviour
         {
             get { return MacroErrors; }
         }
 
-        IconPickerBehaviour IContent.DocumentTypeIconList
+        IconPickerBehaviour IContent.IconPickerBehaviour
         {
             get { return DocumentTypeIconList; }
         }
