@@ -453,22 +453,19 @@ namespace umbraco.controls
 
             foreach (var file in fileInfo)
             {
-                if (file.Name.ToLowerInvariant() != "thumbs.db".ToLowerInvariant())
-                {
-                    // NH: don't show the sprite file
-                    if (file.Name.ToLowerInvariant() == "sprites.png".ToLowerInvariant() || file.Name.ToLowerInvariant() == "sprites_ie6.gif".ToLowerInvariant())
-                        continue;
+                // NH: don't show the sprite file
+                if (file.Name.ToLowerInvariant() == "sprites.png".ToLowerInvariant() || file.Name.ToLowerInvariant() == "sprites_ie6.gif".ToLowerInvariant() || file.Name.ToLowerInvariant() != "thumbs.db".ToLowerInvariant())
+                    continue;
 
-                    // Still shows the selected even if we tell it to hide file duplicates so as not to break an existing selection
-                    if (_contentType.IconUrl.Equals(file.Name, StringComparison.InvariantCultureIgnoreCase) == false
-                        && UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates
-                        && spriteFileNames.Contains(FileNameToIconFileName(file)))
-                        continue;
+                // Still shows the selected even if we tell it to hide file duplicates so as not to break an existing selection
+                if (_contentType.IconUrl.Equals(file.Name, StringComparison.InvariantCultureIgnoreCase) == false
+                    && UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates
+                    && spriteFileNames.Contains(FileNameToIconFileName(file)))
+                    continue;
 
-                    var listItemValue = ResolveClientUrl(SystemDirectories.Umbraco + "/images/umbraco/" + file.Name);
+                var listItemValue = ResolveClientUrl(SystemDirectories.Umbraco + "/images/umbraco/" + file.Name);
 
-                    AddFileListItem(file.Name, listItemValue, listOfIcons);
-                }
+                AddFileListItem(file.Name, listItemValue, listOfIcons);
             }
 
             ddlIcons.Items.AddRange(listOfIcons.OrderBy(o => o.Text).ToArray());

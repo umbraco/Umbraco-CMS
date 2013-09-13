@@ -47,7 +47,7 @@ namespace umbraco.cms.presentation.create.controls
 		}
 
         protected void validationDoctypeName(object sender, ServerValidateEventArgs e) {
-            if (DocumentType.GetByAlias(Regex.Replace(rename.Text, "[^a-zA-Z]+", "")) != null)
+            if (DocumentType.GetByAlias(Regex.Replace(rename.Text, "[^a-zA-Z0-9]+", "")) != null)
                 e.IsValid = false;
         }
 
