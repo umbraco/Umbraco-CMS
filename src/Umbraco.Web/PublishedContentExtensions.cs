@@ -943,6 +943,18 @@ namespace Umbraco.Web
             return content.AncestorsOrSelf(false, n => n.DocumentTypeAlias == contentTypeAlias);
         }
 
+        public static IEnumerable<T> Ancestors<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content.Ancestors().OfType<T>();
+        }
+
+        public static IEnumerable<T> Ancestors<T>(this IPublishedContent content, int level)
+            where T : class, IPublishedContent
+        {
+            return content.Ancestors(level).OfType<T>();
+        }
+
         public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content)
         {
             return content.AncestorsOrSelf(true, null);
@@ -956,6 +968,18 @@ namespace Umbraco.Web
         public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, string contentTypeAlias)
         {
             return content.AncestorsOrSelf(true, n => n.DocumentTypeAlias == contentTypeAlias);
+        }
+
+        public static IEnumerable<T> AncestorsOrSelf<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content.AncestorsOrSelf().OfType<T>();
+        }
+
+        public static IEnumerable<T> AncestorsOrSelf<T>(this IPublishedContent content, int level)
+            where T : class, IPublishedContent
+        {
+            return content.AncestorsOrSelf(level).OfType<T>();
         }
 
         public static IPublishedContent Ancestor(this IPublishedContent content)
@@ -973,6 +997,18 @@ namespace Umbraco.Web
             return content.EnumerateAncestors(false).FirstOrDefault(x => x.DocumentTypeAlias == contentTypeAlias);
         }
 
+        public static T Ancestor<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content.Ancestor() as T;
+        }
+
+        public static T Ancestor<T>(this IPublishedContent content, int level)
+            where T : class, IPublishedContent
+        {
+            return content.Ancestor(level) as T;
+        }
+        
         // note: that one makes no sense and should return self  -- but fixing that
         // would be a breaking change. Defining FIX_AXES would fix the situation.
         public static IPublishedContent AncestorOrSelf(this IPublishedContent content)
@@ -994,6 +1030,18 @@ namespace Umbraco.Web
             return content.EnumerateAncestors(true).FirstOrDefault(x => x.DocumentTypeAlias == contentTypeAlias);
         }
 
+        public static T AncestorOrSelf<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content.AncestorOrSelf() as T;
+        }
+
+        public static T AncestorOrSelf<T>(this IPublishedContent content, int level)
+            where T : class, IPublishedContent
+        {
+            return content.AncestorOrSelf(level) as T;
+        }
+        
         // broken until we defined FIX_AXES
         internal static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool> func)
         {
@@ -1067,6 +1115,18 @@ namespace Umbraco.Web
 			return content.DescendantsOrSelf(false, p => p.DocumentTypeAlias == contentTypeAlias);
 		}
 
+        public static IEnumerable<T> Descendants<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content.Descendants().OfType<T>();
+        }
+
+        public static IEnumerable<T> Descendants<T>(this IPublishedContent content, int level)
+            where T : class, IPublishedContent
+        {
+            return content.Descendants(level).OfType<T>();
+        }
+        
         public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content)
         {
             return content.DescendantsOrSelf(true, null);
@@ -1082,6 +1142,18 @@ namespace Umbraco.Web
 			return content.DescendantsOrSelf(true, p => p.DocumentTypeAlias == contentTypeAlias);
 		}
 
+        public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content.DescendantsOrSelf().OfType<T>();
+        }
+
+        public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content, int level)
+            where T : class, IPublishedContent
+        {
+            return content.DescendantsOrSelf(level).OfType<T>();
+        }
+
         public static IPublishedContent Descendant(this IPublishedContent content)
         {
             return content.Children.FirstOrDefault();
@@ -1095,6 +1167,18 @@ namespace Umbraco.Web
         public static IPublishedContent Descendant(this IPublishedContent content, string contentTypeAlias)
         {
             return content.EnumerateDescendants(false).FirstOrDefault(x => x.DocumentTypeAlias == contentTypeAlias);
+        }
+
+        public static T Descendant<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content.EnumerateDescendants(false).FirstOrDefault(x => x is T) as T;
+        }
+
+        public static T Descendant<T>(this IPublishedContent content, int level)
+            where T : class, IPublishedContent
+        {
+            return content.Descendant(level) as T;
         }
 
         public static IPublishedContent DescendantOrSelf(this IPublishedContent content)
@@ -1112,6 +1196,18 @@ namespace Umbraco.Web
             return content.EnumerateDescendants(true).FirstOrDefault(x => x.DocumentTypeAlias == contentTypeAlias);
         }
 
+        public static T DescendantOrSelf<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content.EnumerateDescendants(true).FirstOrDefault(x => x is T) as T;
+        }
+
+        public static T DescendantOrSelf<T>(this IPublishedContent content, int level)
+            where T : class, IPublishedContent
+        {
+            return content.DescendantOrSelf(level) as T;
+        }
+        
         // broken until we defined FIX_AXES
         internal static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool> func)
         {
@@ -1449,15 +1545,33 @@ namespace Umbraco.Web
             return siblings.ToArray();
         }
 
+        public static IEnumerable<T> Siblings<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content.Siblings().OfType<T>();
+        }
+
         #endregion
 
         #region Axes: parent
 
         // Parent is native
 
+        /// <summary>
+        /// Gets the parent of the content, of a given content type.
+        /// </summary>
+        /// <typeparam name="T">The content type.</typeparam>
+        /// <param name="content">The content.</param>
+        /// <returns>The parent of content, of the given content type, else null.</returns>
+        public static T Parent<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content.Parent as T;
+        }
+
         #endregion
 
-        #region Axes: child
+        #region Axes: children
 
         /// <summary>
 		/// Gets the children of the content.
@@ -1496,7 +1610,8 @@ namespace Umbraco.Web
         /// <remarks>
         /// <para>Children are sorted by their sortOrder.</para>
         /// </remarks>
-        public static IEnumerable<T> ChildrenOfType<T>(this IPublishedContent content)
+        public static IEnumerable<T> Children<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
         {
             return content.Children().OfType<T>();
         }
@@ -1573,6 +1688,24 @@ namespace Umbraco.Web
 				);
 			return dt;
 		}
+
+        #endregion
+
+        #region OfTypes
+
+        // the .OfType<T>() filter is nice when there's only one type
+        // this is to support filtering with multiple types
+
+        public static IEnumerable<IPublishedContent> OfTypes(this IEnumerable<IPublishedContent> contents, params Type[] types)
+        {
+            return contents.Where(x => types.Contains(x.GetType()));
+        }
+
+        public static IEnumerable<IPublishedContent> OfTypes(this IEnumerable<IPublishedContent> contents, params string[] types)
+        {
+            types = types.Select(x => x.ToLowerInvariant()).ToArray();
+            return contents.Where(x => types.Contains(x.DocumentTypeAlias.ToLowerInvariant()));
+        }
 
         #endregion
 
