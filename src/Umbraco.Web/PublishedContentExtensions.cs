@@ -1251,6 +1251,8 @@ namespace Umbraco.Web
 		#region Axes: following-sibling, preceding-sibling, following, preceding + pseudo-axes up, down, next, previous
 
         // up pseudo-axe ~ ancestors
+        // bogus, kept for backward compatibility but we should get rid of it
+        // better use ancestors
 
 		public static IPublishedContent Up(this IPublishedContent content)
 		{
@@ -1275,6 +1277,8 @@ namespace Umbraco.Web
 		}
 
         // down pseudo-axe ~ children (not descendants)
+        // bogus, kept for backward compatibility but we should get rid of it
+        // better use descendants
 
 		public static IPublishedContent Down(this IPublishedContent content)
 		{
@@ -1308,10 +1312,11 @@ namespace Umbraco.Web
 		}
 
         // next pseudo-axe ~ following within the content set
+        // bogus, kept for backward compatibility but we should get rid of it
 
 		public static IPublishedContent Next(this IPublishedContent content)
 		{
-            return content.Move(+1);
+            return content.ContentSet.ElementAtOrDefault(content.GetIndex() + 1);
         }
 
         public static IPublishedContent Next(this IPublishedContent content, int number)
@@ -1321,30 +1326,58 @@ namespace Umbraco.Web
 #if (!FIX_AXES)
             number += 1; // legacy is zero-based ie zero == next, whereas zero should be current
 #endif
-            return number == 0 ? content : content.Move(+number);
+            return number == 0 ? content : content.ContentSet.ElementAtOrDefault(content.GetIndex() + number);
         }
 
         public static IPublishedContent Next(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.Move(+1, contentTypeAlias);
+            return content.Next(contentTypeAlias, false);
         }
 
         public static IPublishedContent Next(this IPublishedContent content, string contentTypeAlias, bool wrap)
         {
-            var axis = content.ContentSet.ToArray();
-            var currentIndex = content.GetIndex();
-            var nextIndex = axis.Skip(currentIndex).FindIndex(x => x.DocumentTypeAlias.InvariantEquals(contentTypeAlias));
-            if (nextIndex >= 0 && nextIndex < axis.Length) return axis.ElementAt(currentIndex + nextIndex);
-            if (wrap == false) return null;
-            nextIndex = axis.Take(currentIndex).FindIndex(x => x.DocumentTypeAlias.InvariantEquals(contentTypeAlias));
-            return axis.ElementAtOrDefault(nextIndex);
+            return content.Next(content.ContentSet, x => x.DocumentTypeAlias.InvariantEquals(contentTypeAlias), wrap);
+        }
+
+        public static T Next<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content.Next<T>(false);
+        }
+
+        public static T Next<T>(this IPublishedContent content, bool wrap)
+            where T : class, IPublishedContent
+        {
+            return content.Next(content.ContentSet, x => x is T, wrap) as T;
+        }
+
+        static IPublishedContent Next(this IPublishedContent content, IEnumerable<IPublishedContent> axis, Func<IPublishedContent, bool> predicate, bool wrap)
+        {
+            var b4 = true;
+            IPublishedContent wrapped = null;
+            foreach (var c in axis)
+            {
+                if (b4)
+                {
+                    if (c == content)
+                        b4 = false;
+                    else if (wrap && wrapped == null && predicate(c))
+                        wrapped = c;
+                    continue;
+                }
+                if (predicate(c))
+                    return c;
+            }
+
+            return wrapped;
         }
 
         // previous pseudo-axe ~ preceding within the content set
+        // bogus, kept for backward compatibility but we should get rid of it
 
         public static IPublishedContent Previous(this IPublishedContent content)
 		{
-            return content.Move(-1);
+            return content.ContentSet.ElementAtOrDefault(content.GetIndex() - 1);
         }
 
 		public static IPublishedContent Previous(this IPublishedContent content, int number)
@@ -1355,26 +1388,32 @@ namespace Umbraco.Web
 		    number = -number; // legacy wants negative numbers, should be positive
             number += 1; // legacy is zero-based ie zero == previous, whereas zero should be current
 #endif
-            return content.Move(-number);
+            return number == 0 ? content : content.ContentSet.ElementAtOrDefault(content.GetIndex() - number);
         }
 
 		public static IPublishedContent Previous(this IPublishedContent content, string contentTypeAlias)
 		{
-		    return content.Move(-1, contentTypeAlias);
-        }
+		    return content.Previous(contentTypeAlias, false);
+		}
 
         public static IPublishedContent Previous(this IPublishedContent content, string contentTypeAlias, bool wrap)
         {
-            var axis = content.ContentSet.ToArray();
-            var currentIndex = content.GetIndex();
-            var reversed = axis.Reverse().ToArray();
-            var revIndex = reversed.Length - currentIndex;
-            var prevIndex = reversed.Skip(revIndex).FindIndex(x => x.DocumentTypeAlias.InvariantEquals(contentTypeAlias));
-            if (prevIndex >= 0 && prevIndex < reversed.Length) return reversed.ElementAt(prevIndex);
-            if (wrap == false) return null;
-            prevIndex = reversed.Take(revIndex).FindIndex(x => x.DocumentTypeAlias.InvariantEquals(contentTypeAlias));
-            return reversed.ElementAtOrDefault(prevIndex);
+            return content.Next(content.ContentSet.Reverse(), x => x.DocumentTypeAlias.InvariantEquals(contentTypeAlias), wrap);
         }
+
+        public static T Previous<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content.Previous<T>(false);
+        }
+
+        public static T Previous<T>(this IPublishedContent content, bool wrap)
+            where T : class, IPublishedContent
+        {
+            return content.Next(content.ContentSet.Reverse(), x => x is T, wrap) as T;
+        }
+
+        //
 
         [Obsolete("Obsolete, use FollowingSibling or PrecedingSibling instead.")]
 		public static IPublishedContent Sibling(this IPublishedContent content, int number)
@@ -1382,7 +1421,7 @@ namespace Umbraco.Web
             if (number < 0)
                 throw new ArgumentOutOfRangeException("number", "Must be greater than, or equal to, zero.");
             number += 1; // legacy is zero-based
-		    return content.Move(content.Siblings(), +number);
+            return content.FollowingSibling(number);
 		}
 
         // contentTypeAlias is case-insensitive
@@ -1391,139 +1430,91 @@ namespace Umbraco.Web
         {
             // note: the original implementation seems to loop on all siblings
             // ie if it reaches the end of the set, it starts again at the beginning.
-            var siblings = content.Siblings().ToArray();
-            var index = content.GetIndex(siblings);
+            // so here we wrap, although it's not consistent... but anyway those
+            // methods should be obsoleted.
 
-            var nextIndex = siblings.Skip(index).FindIndex(x => x.DocumentTypeAlias.InvariantEquals(contentTypeAlias));
-            var c = siblings.ElementAtOrDefault(nextIndex);
-            if (c != null) return c;
-            nextIndex = siblings.Take(index).FindIndex(x => x.DocumentTypeAlias.InvariantEquals(contentTypeAlias));
-            return siblings.ElementAtOrDefault(nextIndex);
-            
-            // but that is not consistent with the previous method, which does
-            // not loop if number is greater than the number of siblings. so really
-            // we should fix with the following code, although that's a breaking
-            // change
-            //return content.Move(content.Siblings(), +1, contentTypeAlias);
+            return content.FollowingSibling(contentTypeAlias, true);
         }
 
         // following-sibling, preceding-sibling axes
 
         public static IPublishedContent FollowingSibling(this IPublishedContent content)
         {
-            return content.Move(content.Siblings(), +1);
+            return content.Siblings().ElementAtOrDefault(content.GetIndex(content.Siblings()) + 1);
         }
 
         public static IPublishedContent FollowingSibling(this IPublishedContent content, int number)
         {
             if (number < 0)
                 throw new ArgumentOutOfRangeException("number", "Must be greater than, or equal to, zero.");
-            return content.Move(content.Siblings(), +number);
+            return number == 0 ? content : content.Siblings().ElementAtOrDefault(content.GetIndex(content.Siblings()) + number);
         }
 
         // contentTypeAlias is case-insensitive
         public static IPublishedContent FollowingSibling(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.Move(content.Siblings(), +1, contentTypeAlias);
+            return content.FollowingSibling(contentTypeAlias, false);
         }
 
         // contentTypeAlias is case-insensitive
         // note: not sure that one makes a lot of sense but it is here for backward compatibility
         public static IPublishedContent FollowingSibling(this IPublishedContent content, string contentTypeAlias, bool wrap)
         {
-            var axis = content.Siblings().ToArray();
-            var currentIndex = content.GetIndex(axis);
-            var nextIndex = axis.Skip(currentIndex).FindIndex(x => x.DocumentTypeAlias.InvariantEquals(contentTypeAlias));
-            if (nextIndex >= 0 && nextIndex < axis.Length) return axis.ElementAt(currentIndex + nextIndex);
-            if (wrap == false) return null;
-            nextIndex = axis.Take(currentIndex).FindIndex(x => x.DocumentTypeAlias.InvariantEquals(contentTypeAlias));
-            return axis.ElementAtOrDefault(nextIndex);
+            return content.Next(content.Siblings(), x => x.DocumentTypeAlias.InvariantEquals(contentTypeAlias), wrap);
+        }
+
+        public static T FollowingSibling<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content.FollowingSibling<T>(false);
+        }
+
+        public static T FollowingSibling<T>(this IPublishedContent content, bool wrap)
+            where T : class, IPublishedContent
+        {
+            return content.Next(content.Siblings(), x => x is T, wrap) as T;
         }
 
         public static IPublishedContent PrecedingSibling(this IPublishedContent content)
         {
-            return content.Move(content.Siblings(), -1);
+            return content.Siblings().ElementAtOrDefault(content.GetIndex(content.Siblings()) - 1);
         }
 
         public static IPublishedContent PrecedingSibling(this IPublishedContent content, int number)
         {
             if (number < 0)
                 throw new ArgumentOutOfRangeException("number", "Must be greater than, or equal to, zero.");
-            return content.Move(content.Siblings(), -number);
+            return number == 0 ? content : content.Siblings().ElementAtOrDefault(content.GetIndex(content.Siblings()) - number);
         }
 
         // contentTypeAlias is case-insensitive
         public static IPublishedContent PrecedingSibling(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.Move(content.Siblings(), -1, contentTypeAlias);
+            return content.PrecedingSibling(contentTypeAlias, false);
         }
 
         // contentTypeAlias is case-insensitive
         // note: not sure that one makes a lot of sense but it is here for backward compatibility
         public static IPublishedContent PrecedingSibling(this IPublishedContent content, string contentTypeAlias, bool wrap)
         {
-            var axis = content.Siblings().ToArray();
-            var currentIndex = content.GetIndex(axis);
-            var reversed = axis.Reverse().ToArray();
-            var revIndex = reversed.Length - currentIndex;
-            var prevIndex = reversed.Skip(revIndex).FindIndex(x => x.DocumentTypeAlias.InvariantEquals(contentTypeAlias));
-            if (prevIndex >= 0 && prevIndex < reversed.Length) return reversed.ElementAt(prevIndex);
-            if (wrap == false) return null;
-            prevIndex = reversed.Take(revIndex).FindIndex(x => x.DocumentTypeAlias.InvariantEquals(contentTypeAlias));
-            return reversed.ElementAtOrDefault(prevIndex);
+            return content.Next(content.Siblings().Reverse(), x => x.DocumentTypeAlias.InvariantEquals(contentTypeAlias), wrap);
+        }
+
+        public static T PrecedingSibling<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content.PrecedingSibling<T>(false);
+        }
+
+        public static T PrecedingSibling<T>(this IPublishedContent content, bool wrap)
+            where T : class, IPublishedContent
+        {
+            return content.Next(content.Siblings().Reverse(), x => x is T, wrap) as T;
         }
 
         // following, preceding axes - NOT IMPLEMENTED
 
         // utilities
-
-        static IPublishedContent Move(this IPublishedContent content, int number)
-        {
-            return number == 0 
-                ? content 
-                : content.ContentSet.ElementAtOrDefault(content.GetIndex() + number);
-        }
-
-        static IPublishedContent Move(this IPublishedContent content, IEnumerable<IPublishedContent> axis, int number)
-        {
-            if (number == 0) return content;
-
-            var set = axis.ToArray();
-            return set.ElementAtOrDefault(content.GetIndex(set) + number);
-        }
-
-        // contentTypeAlias is case-insensitive
-        static IPublishedContent Move(this IPublishedContent content, int number, string contentTypeAlias)
-        {
-            if (number == 0) return content.DocumentTypeAlias.InvariantEquals(contentTypeAlias) ? content : null;
-
-            return Move(content.ContentSet.ToArray(), content.GetIndex(), number, contentTypeAlias);
-        }
-
-        // contentTypeAlias is case-insensitive
-        static IPublishedContent Move(this IPublishedContent content, IEnumerable<IPublishedContent> axis, int number, string contentTypeAlias)
-        {
-            if (number == 0) return content.DocumentTypeAlias.InvariantEquals(contentTypeAlias) ? content : null;
-
-            var set = axis.ToArray();
-            return Move(set, content.GetIndex(set), number, contentTypeAlias);
-        }
-
-        // contentTypeAlias is case-insensitive
-        static IPublishedContent Move(IPublishedContent[] axis, int currentIndex, int number, string contentTypeAlias)
-        {
-            if (number >= 0)
-            {
-                // forward
-                var nextIndex = axis.Skip(currentIndex).FindIndex(x => x.DocumentTypeAlias.InvariantEquals(contentTypeAlias));
-                return axis.ElementAtOrDefault(currentIndex + nextIndex);
-            }
-
-            // backward
-            var prev = axis.Take(currentIndex).Reverse().ToArray();
-            var prevIndex = prev.FindIndex(x => x.DocumentTypeAlias.InvariantEquals(contentTypeAlias));
-            return prev.ElementAtOrDefault(prevIndex);
-        }
 
         public static IEnumerable<IPublishedContent> Siblings(this IPublishedContent content)
         {
