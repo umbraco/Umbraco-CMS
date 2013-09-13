@@ -7,7 +7,11 @@
     $scope.success = false;
     
     $scope.preview = function () {
+
         if ($scope.url != "") {
+            
+            $scope.preview = "<div class=\"umb-loader\">";
+            
             $scope.success = false;
 
             $http({ method: 'POST', url: '/umbraco/UmbracoApi/Embed/Embed', params: { url: $scope.url, width: $scope.width, height: $scope.height } })
@@ -16,7 +20,7 @@
                     $scope.success = true;
                 })
                 .error(function() {
-
+                    $scope.preview = "";
                 });
 
         }
