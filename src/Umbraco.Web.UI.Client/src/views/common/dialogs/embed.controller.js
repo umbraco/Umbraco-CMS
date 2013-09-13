@@ -4,16 +4,22 @@
     $scope.height = 300;
     $scope.constrain = true;
     $scope.preview = "";
-
+    $scope.success = false;
+    
     $scope.preview = function () {
+        if ($scope.url != "") {
+            $scope.success = false;
 
-        $http({ method: 'POST', url: '/umbraco/UmbracoApi/Embed/Embed', params: { url: $scope.url, width: $scope.width, height: $scope.height } })
-            .success(function (data) {
-                $scope.preview = data.Markup;
-            })
-            .error(function () {
+            $http({ method: 'POST', url: '/umbraco/UmbracoApi/Embed/Embed', params: { url: $scope.url, width: $scope.width, height: $scope.height } })
+                .success(function(data) {
+                    $scope.preview = data.Markup;
+                    $scope.success = true;
+                })
+                .error(function() {
 
-            });
+                });
+
+        }
 
     };
 
