@@ -921,7 +921,7 @@ namespace Umbraco.Core.Services
                 
                 list.Add(child);
 
-                var grandkids = GetChildren(child.Id).ToList(); //No need to enumerate twice?
+                var grandkids = GetChildren(child.Id);
                 if (grandkids.Any())
                 {
                     list.AddRange(UpdatePropertiesOnChildren(grandkids, child.Path, child.Level, child.Trashed));
