@@ -224,7 +224,7 @@
     <key alias="stylesNoStylesOnPage">Nenhum estilo ativo disponível</key>
     <key alias="tableColMergeLeft">Favor colocar o cursos à esquerda das duas células que deseja mesclar</key>
     <key alias="tableSplitNotSplittable">Você não pode dividir uma célula que não foi mesclada.</key>
-    <key alias="xsltErrorHeader">Erro na fonta xslt</key>
+    <key alias="xsltErrorHeader">Erro na fonta XSLT</key>
     <key alias="xsltErrorText">O XSLT não foi salvo porque contém erro(s)</key>
   </area>
   <area alias="general">
@@ -666,11 +666,11 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="templateErrorText">Favor confirmar que não existem 2 modelos com o mesmo apelido</key>
     <key alias="templateSavedHeader">Modelo salvo</key>
     <key alias="templateSavedText">Modelo salvo sem nenhum erro!</key>
-    <key alias="xsltErrorHeader">Xslt não salvo</key>
-    <key alias="xsltErrorText">Xslt continha um erro</key>
-    <key alias="xsltPermissionErrorText">Xslt não pode ser salvo, cheque as permissões do arquivo</key>
-    <key alias="xsltSavedHeader">Xslt salvo</key>
-    <key alias="xsltSavedText">Nenhum erro no xslt</key>
+    <key alias="xsltErrorHeader">XSLT não salvo</key>
+    <key alias="xsltErrorText">XSLT continha um erro</key>
+    <key alias="xsltPermissionErrorText">XSLT não pode ser salvo, cheque as permissões do arquivo</key>
+    <key alias="xsltSavedHeader">XSLT salvo</key>
+    <key alias="xsltSavedText">Nenhum erro no XSLT</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Use sintaxe CSS ex: h1, .redHeader, .blueTex</key>

@@ -226,7 +226,7 @@
     <key alias="stylesNoStylesOnPage"><![CDATA[Nessuno stile attivo disponibile]]></key>
     <key alias="tableColMergeLeft"><![CDATA[Per favore posiziona il cursore a sinistra delle due celle che desideri unire ]]></key>
     <key alias="tableSplitNotSplittable"><![CDATA[Non puoi dividere una cella che non è stata unita.]]></key>
-    <key alias="xsltErrorHeader"><![CDATA[Errore nel file sorgente xslt]]></key>
+    <key alias="xsltErrorHeader"><![CDATA[Errore nel file sorgente XSLT]]></key>
     <key alias="xsltErrorText"><![CDATA[Il file XSLT non è stato salvato, perchè conteneva degli errori]]></key>
   </area>
   <area alias="general">
@@ -671,11 +671,11 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="templateErrorText"><![CDATA[Per favore controlla di non avere due templates con lo stesso alias]]></key>
     <key alias="templateSavedHeader"><![CDATA[Template salvato]]></key>
     <key alias="templateSavedText"><![CDATA[Template salvato con successo!]]></key>
-    <key alias="xsltErrorHeader"><![CDATA[Xslt non salvato]]></key>
-    <key alias="xsltErrorText"><![CDATA[L'xslt contiene uno o più errori]]></key>
-    <key alias="xsltPermissionErrorText"><![CDATA[L'xslt non può essere salvato, controlla i permessi sui file]]></key>
-    <key alias="xsltSavedHeader"><![CDATA[Xslt salvato]]></key>
-    <key alias="xsltSavedText"><![CDATA[Non ci sono errori in xslt!]]></key>
+    <key alias="xsltErrorHeader"><![CDATA[XSLT non salvato]]></key>
+    <key alias="xsltErrorText"><![CDATA[L'XSLT contiene uno o più errori]]></key>
+    <key alias="xsltPermissionErrorText"><![CDATA[L'XSLT non può essere salvato, controlla i permessi sui file]]></key>
+    <key alias="xsltSavedHeader"><![CDATA[XSLT salvato]]></key>
+    <key alias="xsltSavedText"><![CDATA[Non ci sono errori in XSLT!]]></key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp"><![CDATA[Usa la sintassi CSS standard es: h1, .redHeader, .blueTex]]></key>
