@@ -226,8 +226,8 @@
     <key alias="stylesNoStylesOnPage">Geen actieve stijlen beschikbaar</key>
     <key alias="tableColMergeLeft">Plaats de cursor links van de twee cellen die je wilt samenvoegen</key>
     <key alias="tableSplitNotSplittable">Je kunt een cel die is samengevoegd niet delen</key>
-    <key alias="xsltErrorHeader">Fout in de xslt bron</key>
-    <key alias="xsltErrorText">De xslt is niet opgeslagen omdat deze fout(en) bevat</key>
+    <key alias="xsltErrorHeader">Fout in de XSLT bron</key>
+    <key alias="xsltErrorText">De XSLT is niet opgeslagen omdat deze fout(en) bevat</key>
   </area>
   <area alias="general">
     <key alias="about">Over</key>
@@ -645,11 +645,11 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="templateErrorText">Controleer dat je geen 2 tamplates met dezelfde naam hebt</key>
     <key alias="templateSavedHeader">Template opgeslagen</key>
     <key alias="templateSavedText">Template opgeslagen zonder fouten!</key>
-    <key alias="xsltErrorHeader">Xslt niet opgeslagen</key>
-    <key alias="xsltErrorText">Xslt bevat een fout</key>
-    <key alias="xsltPermissionErrorText">Xslt kon niet worden opgeslagen, controleer de bestandsbeveiliging</key>
-    <key alias="xsltSavedHeader">Xslt opgeslagen</key>
-    <key alias="xsltSavedText">Geen fouten in de xslt!</key>
+    <key alias="xsltErrorHeader">XSLT niet opgeslagen</key>
+    <key alias="xsltErrorText">XSLT bevat een fout</key>
+    <key alias="xsltPermissionErrorText">XSLT kon niet worden opgeslagen, controleer de bestandsbeveiliging</key>
+    <key alias="xsltSavedHeader">XSLT opgeslagen</key>
+    <key alias="xsltSavedText">Geen fouten in de XSLT!</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Gebruik CSS syntax bijv: h1, .redHeader, .blueTex</key>

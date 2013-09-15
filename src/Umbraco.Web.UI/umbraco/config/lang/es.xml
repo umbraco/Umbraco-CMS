@@ -232,7 +232,7 @@
 ]]></key>
     <key alias="tableSplitNotSplittable"><![CDATA[Usted no puede dividir una celda que no ha sido combinada.
 ]]></key>
-    <key alias="xsltErrorHeader"><![CDATA[Error en la fuente xslt
+    <key alias="xsltErrorHeader"><![CDATA[Error en la fuente XSLT
 ]]></key>
     <key alias="xsltErrorText">El XSLT no se ha guardado, porque contenía un error (s)</key>
   </area>
@@ -596,11 +596,11 @@ However, Runway offers an easy foundation based on best practices to get you sta
     <key alias="templateErrorText">Por favor, asegúrate de que no hay 2 plantillas con el mismo alias</key>
     <key alias="templateSavedHeader">Plantilla guardada</key>
     <key alias="templateSavedText">Plantilla guardada sin errores</key>
-    <key alias="xsltErrorHeader">El Xslt no se ha guardado</key>
-    <key alias="xsltErrorText">El Xslt tenía un error</key>
-    <key alias="xsltPermissionErrorText">El Xslt no se ha podido guardar, comprueba los permisos de los ficheros</key>
-    <key alias="xsltSavedHeader">Xslt guardado</key>
-    <key alias="xsltSavedText">No hay errores en el Xslt</key>
+    <key alias="xsltErrorHeader">El XSLT no se ha guardado</key>
+    <key alias="xsltErrorText">El XSLT tenía un error</key>
+    <key alias="xsltPermissionErrorText">El XSLT no se ha podido guardar, comprueba los permisos de los ficheros</key>
+    <key alias="xsltSavedHeader">XSLT guardado</key>
+    <key alias="xsltSavedText">No hay errores en el XSLT</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Usa sintaxis CSS, p.ej.: h1, .redHeader, .blueTex</key>
