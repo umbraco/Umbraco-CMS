@@ -314,7 +314,11 @@ namespace umbraco.cms.businesslogic.skinning
                     }
 
 
-                    packager.repositories.Repository repo = packager.repositories.Repository.getByGuid(skinRepoGuid);
+                    var repo = packager.repositories.Repository.getByGuid(skinRepoGuid);
+                    if (repo == null)
+                    {
+                        return false;
+                    }
 
                     r = repo.Webservice.Skins(g.ToString()).Length > 0;
                 }

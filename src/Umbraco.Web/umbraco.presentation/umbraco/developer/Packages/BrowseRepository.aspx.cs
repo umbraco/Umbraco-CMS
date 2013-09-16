@@ -34,7 +34,12 @@ namespace umbraco.presentation.developer.packages {
             string category = Request.QueryString["category"];
             string repoGuid = Request.QueryString["repoGuid"];
 
-            cms.businesslogic.packager.repositories.Repository repo = cms.businesslogic.packager.repositories.Repository.getByGuid(repoGuid);
+            var repo = cms.businesslogic.packager.repositories.Repository.getByGuid(repoGuid);
+            if (repo == null)
+            {
+                throw new InvalidOperationException("Could not find repository with id " + repoGuid);
+            }
+
             string url = repo.RepositoryUrl;
 
             Panel1.Text = "Browse repository: " + repo.Name;

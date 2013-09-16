@@ -20,6 +20,11 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
         public ModuleSelector()
         {
             this.repo = cms.businesslogic.packager.repositories.Repository.getByGuid(this.repoGuid);
+
+            if (repo == null)
+            {
+                throw new InvalidOperationException("Could not find repository with id " + this.repoGuid);
+            }
         }
 
         protected void Page_Load(object sender, EventArgs e)

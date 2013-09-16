@@ -6,5 +6,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
     {
         string Name { get; }
         Guid Id { get;  }
+        string RepositoryUrl { get; }
+        string WebServiceUrl { get; }
+        bool HasCustomWebServiceUrl { get; }
     }
 }

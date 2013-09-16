@@ -26,8 +26,13 @@ namespace umbraco.presentation.developer.packages {
 
             string repoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66"; //Hardcoded official package repo key.
 
-            cms.businesslogic.packager.Installer p = new cms.businesslogic.packager.Installer();
-            cms.businesslogic.packager.repositories.Repository repo = cms.businesslogic.packager.repositories.Repository.getByGuid(repoGuid);
+            var p = new cms.businesslogic.packager.Installer();
+            var repo = cms.businesslogic.packager.repositories.Repository.getByGuid(repoGuid);
+
+            if (repo == null)
+            {
+                throw new InvalidOperationException("Could not find repository with id " + repoGuid);
+            }
 
             foreach (CheckBox cb in _nitroList) {
                 if (cb.Checked) {
@@ -155,9 +160,14 @@ namespace umbraco.presentation.developer.packages {
             base.OnInit(e);
 
             string repoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
-            cms.businesslogic.packager.repositories.Repository repo = cms.businesslogic.packager.repositories.Repository.getByGuid(repoGuid);
+            var repo = cms.businesslogic.packager.repositories.Repository.getByGuid(repoGuid);
 
-            uicontrols.Feedback fb = new global::umbraco.uicontrols.Feedback();
+            if (repo == null)
+            {
+                throw new InvalidOperationException("Could not find repository with id " + repoGuid);
+            }
+
+            var fb = new global::umbraco.uicontrols.Feedback();
             fb.type = global::umbraco.uicontrols.Feedback.feedbacktype.error;
             fb.Text = "<strong>No connection to repository.</strong> Modules could not be fetched from the repository as there was no connection to: '" + repo.RepositoryUrl + "'";
 

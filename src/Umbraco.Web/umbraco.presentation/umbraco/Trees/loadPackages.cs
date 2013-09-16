@@ -121,7 +121,7 @@ namespace umbraco
                 case "repository":
 
                     m_repoGuid = HttpContext.Current.Request.QueryString["repoGuid"];
-                    cms.businesslogic.packager.repositories.Repository currentRepo = cms.businesslogic.packager.repositories.Repository.getByGuid(m_repoGuid);
+                    var currentRepo = cms.businesslogic.packager.repositories.Repository.getByGuid(m_repoGuid);
                     if (currentRepo != null)
                     {
 
@@ -233,7 +233,7 @@ namespace umbraco
                 case "repository":
 
                     m_repoGuid = HttpContext.Current.Request.QueryString["repoGuid"];
-                    cms.businesslogic.packager.repositories.Repository currentRepo = cms.businesslogic.packager.repositories.Repository.getByGuid(m_repoGuid);
+                    var currentRepo = cms.businesslogic.packager.repositories.Repository.getByGuid(m_repoGuid);
                     if (currentRepo != null)
                     {
 

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Web;
 using System.Web.Caching;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using global::umbraco.BusinessLogic;
 
@@ -54,8 +55,8 @@ namespace Umbraco.Web
 			int interval = 24 * 60 * 60; //24 hours
 			try
 			{
-				if (global::umbraco.UmbracoConfiguration.Current.UmbracoSettings.Logging.CleaningMiliseconds > -1)
-					interval = global::umbraco.UmbracoConfiguration.Current.UmbracoSettings.Logging.CleaningMiliseconds;
+				if (UmbracoConfiguration.Current.UmbracoSettings.Logging.CleaningMiliseconds > -1)
+					interval = UmbracoConfiguration.Current.UmbracoSettings.Logging.CleaningMiliseconds;
 			}
 			catch (Exception e)
 			{
@@ -69,8 +70,8 @@ namespace Umbraco.Web
 			int maximumAge = 24 * 60 * 60;
 			try
 			{
-				if (global::umbraco.UmbracoConfiguration.Current.UmbracoSettings.Logging.MaxLogAge > -1)
-					maximumAge = global::umbraco.UmbracoConfiguration.Current.UmbracoSettings.Logging.MaxLogAge;
+				if (UmbracoConfiguration.Current.UmbracoSettings.Logging.MaxLogAge > -1)
+					maximumAge = UmbracoConfiguration.Current.UmbracoSettings.Logging.MaxLogAge;
 			}
 			catch (Exception e)
 			{

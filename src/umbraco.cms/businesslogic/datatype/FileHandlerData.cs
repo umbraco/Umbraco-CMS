@@ -2,9 +2,11 @@
 using System.Configuration;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Web;
 using System.Xml;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
 using umbraco.cms.businesslogic.Files;
@@ -101,11 +103,10 @@ namespace umbraco.cms.businesslogic.datatype
                         }
 
                         // check for auto fill of other properties (width, height, extension and filesize)
-                        if (UmbracoSettings.ImageAutoFillImageProperties != null)
+                        if (UmbracoConfiguration.Current.UmbracoSettings.Content.Imaging.ImageAutoFillProperties.Any())
                         {
                             var uploadFieldConfigNode =
-                                UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
-                                    string.Format("uploadField [@alias = \"{0}\"]", PropertyTypeAlias));
+                                UmbracoConfiguration.Current.UmbracoSettings.Content.Imaging.ImageAutoFillProperties.FirstOrDefault(x => x.Alias == PropertyTypeAlias);
 
                             if (uploadFieldConfigNode != null)
                             {
@@ -138,47 +139,53 @@ namespace umbraco.cms.businesslogic.datatype
             if (PropertyId == default(int))
                 return;
 
-            if (UmbracoSettings.ImageAutoFillImageProperties != null)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.Imaging.ImageAutoFillProperties.Any())
             {
-                XmlNode uploadFieldConfigNode =
-                    UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
-                        string.Format("uploadField [@alias = \"{0}\"]", PropertyTypeAlias));
+                var uploadFieldConfigNode =
+                    UmbracoConfiguration.Current.UmbracoSettings.Content.Imaging.ImageAutoFillProperties.FirstOrDefault(x => x.Alias == PropertyTypeAlias);
                 if (uploadFieldConfigNode != null)
                 {
                     // get the current document
                     //Content legacy = Content.GetContentFromVersion(Version);
                     EnsureLoadedContentItem(Version);
-                    // only add dimensions to web images
-                    UpdateContentProperty(uploadFieldConfigNode, LoadedContentItem, "widthFieldAlias", String.Empty);
-                    UpdateContentProperty(uploadFieldConfigNode, LoadedContentItem, "heightFieldAlias", String.Empty);
-                    UpdateContentProperty(uploadFieldConfigNode, LoadedContentItem, "lengthFieldAlias", String.Empty);
-                    UpdateContentProperty(uploadFieldConfigNode, LoadedContentItem, "extensionFieldAlias", String.Empty);
+
+                    var prop = LoadedContentItem.getProperty(uploadFieldConfigNode.WidthFieldAlias);
+                    if (prop != null)
+                        prop.Value = String.Empty;
+
+                    prop = LoadedContentItem.getProperty(uploadFieldConfigNode.HeightFieldAlias);
+                    if (prop != null)
+                        prop.Value = String.Empty;
+
+                    prop = LoadedContentItem.getProperty(uploadFieldConfigNode.LengthFieldAlias);
+                    if (prop != null)
+                        prop.Value = String.Empty;
+
+                    prop = LoadedContentItem.getProperty(uploadFieldConfigNode.ExtensionFieldAlias);
+                    if (prop != null)
+                        prop.Value = String.Empty;
                 }
             }
         }
 
-        private void FillProperties(XmlNode uploadFieldConfigNode, Content content, UmbracoFile um)
+        private void FillProperties(IContentImagingAutoFillUploadField uploadFieldConfigNode, Content content, UmbracoFile um)
         {
-            // only add dimensions to web images
-            UpdateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias", um.SupportsResizing ? um.GetDimensions().Item1.ToString() : string.Empty);
-            UpdateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias", um.SupportsResizing ? um.GetDimensions().Item2.ToString() : string.Empty);
+            var prop = content.getProperty(uploadFieldConfigNode.WidthFieldAlias);
+            if (prop != null)
+                prop.Value = um.SupportsResizing ? um.GetDimensions().Item1.ToString() : string.Empty;
 
-            UpdateContentProperty(uploadFieldConfigNode, content, "lengthFieldAlias", um.Length);
-            UpdateContentProperty(uploadFieldConfigNode, content, "extensionFieldAlias", um.Extension);
+            prop = content.getProperty(uploadFieldConfigNode.HeightFieldAlias);
+            if (prop != null)
+                prop.Value = um.SupportsResizing ? um.GetDimensions().Item2.ToString() : string.Empty;
+
+            prop = content.getProperty(uploadFieldConfigNode.LengthFieldAlias);
+            if (prop != null)
+                prop.Value = um.Length;
+
+            prop = content.getProperty(uploadFieldConfigNode.ExtensionFieldAlias);
+            if (prop != null)
+                prop.Value = um.Extension;
         }
 
-        private static void UpdateContentProperty(XmlNode uploadFieldConfigNode, Content content, string propertyAlias,
-                                           object propertyValue)
-        {
-            XmlNode propertyNode = uploadFieldConfigNode.SelectSingleNode(propertyAlias);
-            if (propertyNode != null && !string.IsNullOrEmpty(propertyNode.FirstChild.Value))
-            {
-                var prop = content.getProperty(propertyNode.FirstChild.Value);
-                if (prop != null)
-                {
-                    prop.Value = propertyValue;
-                }
-            }
-        }
     }
 }
