@@ -306,11 +306,13 @@
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Editors\MediaPostValidateAttribute.cs" />
+    <Compile Include="Editors\MemberController.cs" />
     <Compile Include="Editors\UserController.cs" />
     <Compile Include="Models\ContentEditing\Control.cs" />
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\DataTypeSave.cs" />
     <Compile Include="Models\ContentEditing\EntityBasic.cs" />
+    <Compile Include="Models\ContentEditing\MemberEntityBasic.cs" />
     <Compile Include="Models\ContentEditing\PreValueFieldDisplay.cs" />
     <Compile Include="Models\ContentEditing\PreValueFieldSave.cs" />
     <Compile Include="Models\ContentEditing\PropertyEditorBasic.cs" />
@@ -1929,8 +1931,12 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dashboard\MediaDashboardVideos.ascx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\MembersDashboardIntro.ascx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\MembersDashboardVideos.ascx" />
+    <Content Include="umbraco.presentation\umbraco\dashboard\MembersDashboardIntro.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="umbraco.presentation\umbraco\dashboard\MembersDashboardVideos.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dashboard\SettingsDashboardIntro.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\SettingsDashboardVideos.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\Settings\Applyskin.ascx" />
@@ -1948,7 +1954,9 @@
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInstaller.aspx" />
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx" />
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx" />
-    <Content Include="umbraco.presentation\umbraco\members\MemberSearch.ascx" />
+    <Content Include="umbraco.presentation\umbraco\members\MemberSearch.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\Preview.aspx" />
     <Content Include="umbraco.presentation\umbraco\controls\passwordChanger.ascx" />
     <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx">

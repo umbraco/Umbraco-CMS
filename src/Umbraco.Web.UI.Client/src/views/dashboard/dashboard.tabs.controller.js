@@ -16,5 +16,20 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
     	});
    });
 }
-
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
+
+function ChangePasswordDashboardController($scope, xmlhelper, $log, userService) {
+    //this is the model we will pass to the service
+    $scope.profile = {};
+    $scope.changePassword = function (p) {
+        userService.changePassword(p.oldPassword, p.newPassword).then(function () {
+            //changed
+        }, function () {
+            //this only happens if there is a wrong oldPassword sent along
+            $scope.passwordForm.oldPass.$setValidity("oldPassword", false);
+        });
+
+    }
+}
+
+angular.module("umbraco").controller("Umbraco.Dashboard.StartupChangePasswordController", ChangePasswordDashboardController);
