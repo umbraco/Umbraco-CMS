@@ -68,6 +68,36 @@ function userResource($q, $http, umbRequestHelper) {
                        "userApiBaseUrl",
                        "GetAll")),
                'Failed to retreive all users');
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.userResource#changePassword
+         * @methodOf umbraco.resources.userResource
+         *
+         * @description
+         * Changes the current users password
+         *
+         * ##usage
+         * <pre>
+         * contentResource.getAll()
+         *    .then(function(userArray) {
+         *        var myUsers = userArray; 
+         *        alert('they are here!');
+         *    });
+         * </pre> 
+         * 
+         * @returns {Promise} resourcePromise object containing the user array.
+         *
+         */
+        changePassword: function (oldPassword, newPassword) {
+            return umbRequestHelper.resourcePromise(
+               $http.post(
+                   umbRequestHelper.getApiUrl(
+                       "userApiBaseUrl",
+                       "PostChangePassword"),
+                       { oldPassword: oldPassword, newPassword: newPassword }),
+               'Failed to change password');
         }
     };
 }

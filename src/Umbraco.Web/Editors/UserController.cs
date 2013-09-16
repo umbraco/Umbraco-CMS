@@ -12,6 +12,7 @@ using Umbraco.Web.Mvc;
 
 using legacyUser = umbraco.BusinessLogic.User;
 using System.Net.Http;
+using System.Collections.Specialized;
 
 
 namespace Umbraco.Web.Editors
@@ -43,16 +44,16 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public HttpResponseMessage PostChangePassword(string oldPassword, string newPassword)
-        {
+        public HttpResponseMessage PostChangePassword(UserPasswordChange data)
+        {   
+         
             var u = UmbracoContext.Security.CurrentUser;
-            if(!System.Web.Security.Membership.ValidateUser(u.Username, oldPassword))
-                return new HttpResponseMessage(HttpStatusCode.Unauthorized);
+            if (!UmbracoContext.Security.ValidateBackOfficeCredentials(u.Username, data.OldPassword))
+                return new HttpResponseMessage(HttpStatusCode.Forbidden);
 
-            u.Password = newPassword;
-            Services.UserService.SaveUser(u);
-
-
+            if(!UmbracoContext.Security.ChangePassword(data.OldPassword, data.NewPassword))
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+            
             return new HttpResponseMessage(HttpStatusCode.OK);
         }
 

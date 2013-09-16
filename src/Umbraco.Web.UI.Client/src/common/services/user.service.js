@@ -72,7 +72,6 @@ angular.module('umbraco.services')
         },
 
         logout: function () {
-            
             return authResource.performLogout()
                 .then(function (data) {                   
                     currentUser = null;

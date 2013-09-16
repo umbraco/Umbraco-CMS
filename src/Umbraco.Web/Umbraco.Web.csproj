@@ -317,6 +317,7 @@
     <Compile Include="Models\ContentEditing\PreValueFieldDisplay.cs" />
     <Compile Include="Models\ContentEditing\PreValueFieldSave.cs" />
     <Compile Include="Models\ContentEditing\PropertyEditorBasic.cs" />
+    <Compile Include="Models\ContentEditing\UserPasswordChange.cs" />
     <Compile Include="Models\Mapping\AvailablePropertyEditorsResolver.cs" />
     <Compile Include="Models\Mapping\DatabaseTypeResolver.cs" />
     <Compile Include="Models\Mapping\DataTypeModelMapper.cs" />
@@ -329,6 +330,7 @@
     <Compile Include="PropertyEditors\DateTimePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimeValidator.cs" />
     <Compile Include="PropertyEditors\DropDownMultiplePropertyEditor.cs" />
+    <Compile Include="PropertyEditors\FolderBrowserPropertyEditor.cs" />
     <Compile Include="PropertyEditors\IntegerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MediaPicker.cs" />
     <Compile Include="PropertyEditors\MultipleTextStringPropertyEditor.cs" />
