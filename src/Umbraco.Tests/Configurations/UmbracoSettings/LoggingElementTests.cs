@@ -32,17 +32,17 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public virtual void ExternalLogger_Assembly()
         {
-            Assert.IsTrue(Section.Logging.ExternalLogger.Assembly == "~/bin/assemblyFileName.dll");
+            Assert.IsTrue(Section.Logging.ExternalLoggerAssembly == "~/bin/assemblyFileName.dll");
         }
         [Test]
         public virtual void ExternalLogger_Type()
         {
-            Assert.IsTrue(Section.Logging.ExternalLogger.ExternalLoggerType == "fully.qualified.namespace.and.type");
+            Assert.IsTrue(Section.Logging.ExternalLoggerType == "fully.qualified.namespace.and.type");
         }
         [Test]
         public virtual void ExternalLogger_LogAuditTrail()
         {
-            Assert.IsTrue(Section.Logging.ExternalLogger.LogAuditTrail == false);
+            Assert.IsTrue(Section.Logging.ExternalLoggerEnableAuditTrail == false);
         }
         [Test]
         public void AutoCleanLogs()

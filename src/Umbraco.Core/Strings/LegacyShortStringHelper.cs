@@ -205,7 +205,7 @@ function isValidAlias(alias) {{
             var ext = filePath.Substring(filePath.LastIndexOf('.'));
 
             //Because the file usually is downloadable as well we check characters against 'UmbracoSettings.UrlReplaceCharacters'
-            foreach (var n in UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.UrlReplacing.CharCollection)
+            foreach (var n in UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.CharCollection)
             {
                 if (n.Char.IsNullOrWhiteSpace() == false)
                     fileNamePart = fileNamePart.Replace(n.Char, n.Replacement);
@@ -468,14 +468,14 @@ function isValidAlias(alias) {{
         public string LegacyFormatUrl(string url)
         {
             var newUrl = url.ToLowerInvariant();
-            foreach (var n in UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.UrlReplacing.CharCollection)
+            foreach (var n in UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.CharCollection)
             {
                 if (n.Char.IsNullOrWhiteSpace() == false)
                     newUrl = newUrl.Replace(n.Char, n.Replacement);
             }
 
             // check for double dashes
-            if (UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.UrlReplacing.RemoveDoubleDashes)
+            if (UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.RemoveDoubleDashes)
             {
                 newUrl = Regex.Replace(newUrl, @"[-]{2,}", "-");
             }

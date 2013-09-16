@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public override void DataTypeModelStaticMappings()
         {
-            Assert.AreEqual(0, Section.Scripting.Razor.DataTypeModelStaticMappings.Count());
+            Assert.AreEqual(0, Section.Scripting.DataTypeModelStaticMappings.Count());
         }
 
     }

@@ -57,7 +57,7 @@ namespace Umbraco.Core.Strings
 
         static void InitializeLegacyUrlReplaceCharacters()
         {
-            foreach (var node in UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.UrlReplacing.CharCollection)
+            foreach (var node in UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.CharCollection)
             {
                 if (node.Char.IsNullOrWhiteSpace() == false)
                     UrlReplaceCharacters[node.Char] = node.Replacement;

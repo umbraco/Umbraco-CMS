@@ -16,7 +16,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         IEnumerable<ILogType> DisabledLogTypes { get; }
 
-        IExternalLogger ExternalLogger { get; }
+        string ExternalLoggerAssembly { get; }
+
+        string ExternalLoggerType { get; }
+
+        bool ExternalLoggerEnableAuditTrail { get; }
 
         bool ExternalLoggerIsConfigured { get; }
     }

@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class RazorElement : ConfigurationElement, IRazor
+    internal class RazorElement : ConfigurationElement
     {
         private NotDynamicXmlDocumentElementCollection _defaultCollection;
 
@@ -46,14 +46,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (RazorStaticMappingCollection) base["dataTypeModelStaticMappings"]; }
         }
 
-        IEnumerable<INotDynamicXmlDocument> IRazor.NotDynamicXmlDocumentElements
-        {
-            get { return NotDynamicXmlDocumentElements; }
-        }
-
-        IEnumerable<IRazorStaticMapping> IRazor.DataTypeModelStaticMappings
-        {
-            get { return DataTypeModelStaticMappings; }
-        }
     }
 }

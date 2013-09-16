@@ -111,9 +111,14 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return AddTrailingSlash; }
         }
 
-        IUrlReplacing IRequestHandler.UrlReplacing
+        bool IRequestHandler.RemoveDoubleDashes
         {
-            get { return UrlReplacing; }
+            get { return UrlReplacing.RemoveDoubleDashes; }
+        }
+
+        IEnumerable<IChar> IRequestHandler.CharCollection
+        {
+            get { return UrlReplacing.CharCollection; }
         }
     }
 }

@@ -312,7 +312,7 @@ namespace umbraco.cms.presentation.user
 
             if (!IsPostBack)
             {
-                MembershipUser user = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].GetUser(u.LoginName, true);
+                MembershipUser user = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider].GetUser(u.LoginName, true);
                 uname.Text = u.Name;
                 lname.Text = (user == null) ? u.LoginName : user.UserName;
                 email.Text = (user == null) ? u.Email : user.Email;
@@ -377,7 +377,7 @@ namespace umbraco.cms.presentation.user
             {
                 try
                 {
-                    MembershipUser user = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].GetUser(u.LoginName, true);
+                    MembershipUser user = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider].GetUser(u.LoginName, true);
 
 
                     string tempPassword = ((controls.passwordChanger)passw.Controls[0]).Password;
@@ -389,14 +389,14 @@ namespace umbraco.cms.presentation.user
                     }
 
                     // Is it using the default membership provider
-                    if (Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider] is UsersMembershipProvider)
+                    if (Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider] is UsersMembershipProvider)
                     {
                         // Save user in membership provider
                         UsersMembershipUser umbracoUser = user as UsersMembershipUser;
                         umbracoUser.FullName = uname.Text.Trim();
                         umbracoUser.Language = userLanguage.SelectedValue;
                         umbracoUser.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
-                        Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].UpdateUser(umbracoUser);
+                        Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider].UpdateUser(umbracoUser);
 
                         // Save user details
                         u.Email = email.Text.Trim();
@@ -407,7 +407,7 @@ namespace umbraco.cms.presentation.user
                         u.Name = uname.Text.Trim();
                         u.Language = userLanguage.SelectedValue;
                         u.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
-                        if (!(Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider] is ActiveDirectoryMembershipProvider)) Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].UpdateUser(user);
+                        if (!(Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider] is ActiveDirectoryMembershipProvider)) Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider].UpdateUser(user);
                     }
 
 

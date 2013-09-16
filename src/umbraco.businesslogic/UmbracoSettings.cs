@@ -68,14 +68,14 @@ namespace umbraco
         /// </summary>
         public static string ExternalLoggerAssembly
         {
-            get { return UmbracoConfiguration.Current.UmbracoSettings.Logging.ExternalLogger.Assembly; }
+            get { return UmbracoConfiguration.Current.UmbracoSettings.Logging.ExternalLoggerAssembly; }
         }
         /// <summary>
         /// Gets the type of an external logger that can be used to store log items in 3rd party systems
         /// </summary>
         public static string ExternalLoggerType
         {
-            get { return UmbracoConfiguration.Current.UmbracoSettings.Logging.ExternalLogger.ExternalLoggerType; }
+            get { return UmbracoConfiguration.Current.UmbracoSettings.Logging.ExternalLoggerType; }
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace umbraco
         /// </summary>
         public static bool ExternalLoggerLogAuditTrail
         {
-            get { return UmbracoConfiguration.Current.UmbracoSettings.Logging.ExternalLogger.LogAuditTrail; }
+            get { return UmbracoConfiguration.Current.UmbracoSettings.Logging.ExternalLoggerEnableAuditTrail; }
         }
 
         /// <summary>
@@ -192,14 +192,14 @@ namespace umbraco
         /// </summary>
         public static List<string> NotDynamicXmlDocumentElements
         {
-            get { return UmbracoConfiguration.Current.UmbracoSettings.Scripting.Razor.NotDynamicXmlDocumentElements.Select(x => x.Element).ToList(); }
+            get { return UmbracoConfiguration.Current.UmbracoSettings.Scripting.NotDynamicXmlDocumentElements.Select(x => x.Element).ToList(); }
         }
 
         public static List<RazorDataTypeModelStaticMappingItem> RazorDataTypeModelStaticMapping
         {
 			get
 			{
-			    var mapping = UmbracoConfiguration.Current.UmbracoSettings.Scripting.Razor.DataTypeModelStaticMappings;
+			    var mapping = UmbracoConfiguration.Current.UmbracoSettings.Scripting.DataTypeModelStaticMappings;
 				
 				//now we need to map to the old object until we can clean all this nonsense up
 				return mapping.Select(x => new RazorDataTypeModelStaticMappingItem()
@@ -253,7 +253,7 @@ namespace umbraco
 
         public static string DefaultBackofficeProvider
         {
-            get { return UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider; }
+            get { return UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider; }
         }
 
         /// <summary>
@@ -384,7 +384,7 @@ namespace umbraco
         /// </summary>
         public static bool RemoveDoubleDashesFromUrlReplacing
         {
-            get { return UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.UrlReplacing.RemoveDoubleDashes; }
+            get { return UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.RemoveDoubleDashes; }
         }
 
         /// <summary>

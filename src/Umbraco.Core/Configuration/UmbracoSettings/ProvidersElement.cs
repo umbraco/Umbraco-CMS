@@ -10,9 +10,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (UserProviderElement)base["users"]; }
         }
 
-        IUserProvider IProviders.Users
+        public string DefaultBackOfficeUserProvider
         {
-            get { return Users; }
+            get { return Users.DefaultBackOfficeProvider; }
         }
     }
 }

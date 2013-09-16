@@ -78,7 +78,7 @@ namespace Umbraco.Core
             if (xml == null) return false;
             xml = xml.Trim();
             if (xml.StartsWith("<") == false || xml.EndsWith(">") == false || xml.Contains('/') == false) return false;
-            if (UmbracoConfiguration.Current.UmbracoSettings.Scripting.Razor.NotDynamicXmlDocumentElements.Any(x => x.Element.InvariantEquals(alias))) return false;
+            if (UmbracoConfiguration.Current.UmbracoSettings.Scripting.NotDynamicXmlDocumentElements.Any(x => x.Element.InvariantEquals(alias))) return false;
             return TryCreateXPathDocument(xml, out doc);
         }
         

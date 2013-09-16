@@ -517,7 +517,7 @@ namespace umbraco.presentation.channels
         private static bool validateUser(string username, string password)
         {
             
-            return Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].ValidateUser(username, password);
+            return Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider].ValidateUser(username, password);
         }
 
         [XmlRpcMethod("blogger.getUsersBlogs",

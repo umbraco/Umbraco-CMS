@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System.Collections.Generic;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
@@ -10,10 +11,14 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (RazorElement) base["razor"]; }
         }
 
-
-        IRazor IScripting.Razor
+        IEnumerable<INotDynamicXmlDocument> IScripting.NotDynamicXmlDocumentElements
         {
-            get { return Razor; }
+            get { return Razor.NotDynamicXmlDocumentElements; }
+        }
+
+        IEnumerable<IRazorStaticMapping> IScripting.DataTypeModelStaticMappings
+        {
+            get { return Razor.DataTypeModelStaticMappings; }
         }
     }
 }

@@ -22,16 +22,16 @@ namespace Umbraco.Web.UI.Install.Steps
             if (Page.IsValid)
             {
                 var u = User.GetUser(0);
-                var user = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].GetUser(0, true);
+                var user = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider].GetUser(0, true);
                 user.ChangePassword(u.GetPassword(), tb_password.Text.Trim());
 
                 // Is it using the default membership provider
-                if (Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider] is UsersMembershipProvider)
+                if (Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider] is UsersMembershipProvider)
                 {
                     // Save user in membership provider
                     var umbracoUser = user as UsersMembershipUser;
                     umbracoUser.FullName = tb_name.Text.Trim();
-                    Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].UpdateUser(umbracoUser);
+                    Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider].UpdateUser(umbracoUser);
 
                     // Save user details
                     u.Email = tb_email.Text.Trim();
@@ -39,7 +39,7 @@ namespace Umbraco.Web.UI.Install.Steps
                 else
                 {
                     u.Name = tb_name.Text.Trim();
-                    if (!(Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider] is ActiveDirectoryMembershipProvider)) Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].UpdateUser(user);
+                    if (!(Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider] is ActiveDirectoryMembershipProvider)) Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider].UpdateUser(user);
                 }
 
                 // we need to update the login name here as it's set to the old name when saving the user via the membership provider!

@@ -3,7 +3,7 @@
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     public interface IProviders
-    {
-        IUserProvider Users { get; }
+    {        
+        string DefaultBackOfficeUserProvider { get; }
     }
 }

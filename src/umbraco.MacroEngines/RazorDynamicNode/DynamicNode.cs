@@ -486,7 +486,7 @@ namespace umbraco.MacroEngines
             var dataType = GetDataType(propResult.ContextAlias, propResult.Alias);
             
             //now we need to map to the old object until we can clean all this nonsense up
-            var configMapping = UmbracoConfiguration.Current.UmbracoSettings.Scripting.Razor.DataTypeModelStaticMappings
+            var configMapping = UmbracoConfiguration.Current.UmbracoSettings.Scripting.DataTypeModelStaticMappings
                                                     .Select(x => new RazorDataTypeModelStaticMappingItem()
                                                         {
                                                             DataTypeGuid = x.DataTypeGuid,
@@ -812,7 +812,7 @@ namespace umbraco.MacroEngines
                             //check that the document element is not one of the disallowed elements
                             //allows RTE to still return as html if it's valid xhtml
                             string documentElement = e.Name.LocalName;
-                            if (UmbracoConfiguration.Current.UmbracoSettings.Scripting.Razor.NotDynamicXmlDocumentElements.Any(tag =>
+                            if (UmbracoConfiguration.Current.UmbracoSettings.Scripting.NotDynamicXmlDocumentElements.Any(tag =>
                                                                                   string.Equals(tag.Element, documentElement, StringComparison.CurrentCultureIgnoreCase)) == false)
                             {
                                 result = new DynamicXml(e);

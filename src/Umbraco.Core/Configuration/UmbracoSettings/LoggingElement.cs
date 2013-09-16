@@ -93,6 +93,20 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
+        string ILogging.ExternalLoggerAssembly
+        {
+            get { return ExternalLogger.Assembly; }
+        }
+
+        string ILogging.ExternalLoggerType
+        {
+            get { return ExternalLogger.Type; }
+        }
+
+        bool ILogging.ExternalLoggerEnableAuditTrail
+        {
+            get { return ExternalLogger.LogAuditTrail; }
+        }
 
         bool ILogging.AutoCleanLogs
         {
@@ -122,11 +136,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IEnumerable<ILogType> ILogging.DisabledLogTypes
         {
             get { return DisabledLogTypes; }
-        }
-
-        IExternalLogger ILogging.ExternalLogger
-        {
-            get { return ExternalLogger; }
         }
 
     }

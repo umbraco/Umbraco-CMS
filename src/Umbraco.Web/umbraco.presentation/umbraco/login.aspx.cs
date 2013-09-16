@@ -70,10 +70,10 @@ namespace umbraco.cms.presentation
         protected void Button1_Click(object sender, System.EventArgs e)
         {
             // Authenticate users by using the provider specified in umbracoSettings.config
-            if (Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].ValidateUser(lname.Text, passw.Text))
+            if (Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider].ValidateUser(lname.Text, passw.Text))
             {
-                if (Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider] is ActiveDirectoryMembershipProvider)
-                    ActiveDirectoryMapping(lname.Text, Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].GetUser(lname.Text, false).Email);
+                if (Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider] is ActiveDirectoryMembershipProvider)
+                    ActiveDirectoryMapping(lname.Text, Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider].GetUser(lname.Text, false).Email);
 
                 BusinessLogic.User u = new User(lname.Text);
                 doLogin(u);

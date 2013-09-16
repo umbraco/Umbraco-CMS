@@ -1,7 +1,11 @@
-﻿namespace Umbraco.Core.Configuration.UmbracoSettings
+﻿using System.Collections.Generic;
+
+namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     public interface IScripting
     {
-        IRazor Razor { get; }
+        IEnumerable<INotDynamicXmlDocument> NotDynamicXmlDocumentElements { get; }
+
+        IEnumerable<IRazorStaticMapping> DataTypeModelStaticMappings { get; }
     }
 }

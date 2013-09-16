@@ -20,7 +20,7 @@ namespace umbraco.presentation.umbraco.dashboard
         protected void changePassword_Click(object sender, EventArgs e)
         {
             User u = User.GetCurrent();
-            MembershipProvider provider = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider];
+            MembershipProvider provider = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider];
             MembershipUser user = provider.GetUser(u.LoginName, true);
 
 
