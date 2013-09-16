@@ -28,11 +28,6 @@ namespace Umbraco.Web.Routing
             var provider = UrlProviderMode.Auto;
             Mode = provider;
 
-            //if (Enum<UrlProviderMode>.TryParse(UmbracoConfiguration.For<IWebRouting>(), out provider))
-            //{
-                
-            //}
-
             if (Enum<UrlProviderMode>.TryParse(UmbracoConfiguration.Current.UmbracoSettings.WebRouting.UrlProviderMode, out provider))
             {
                 Mode = provider;

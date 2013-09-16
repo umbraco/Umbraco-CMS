@@ -24,83 +24,59 @@ namespace Umbraco.Tests.TestHelpers
             UmbracoConfiguration.Current.UmbracoSettings = settings;
         }
 
-        ///// <summary>
-        ///// Returns generated settings which can be stubbed to return whatever values necessary
-        ///// </summary>
-        ///// <returns></returns>
-        //public static IUmbracoSettings GetMockSettings()
-        //{
-        //    var settings = MockRepository.GenerateMock<IUmbracoSettings>();
+        /// <summary>
+        /// Returns generated settings which can be stubbed to return whatever values necessary
+        /// </summary>
+        /// <returns></returns>
+        public static IUmbracoSettingsSection GetMockSettings()
+        {
+            var settings = MockRepository.GenerateStub<IUmbracoSettingsSection>();
 
-        //    var content = MockRepository.GenerateMock<IContent>();
-        //    var security = MockRepository.GenerateMock<ISecurity>();
-        //    var requestHandler = MockRepository.GenerateMock<IRequestHandler>();
-        //    var templates = MockRepository.GenerateMock<ITemplates>();
-        //    var dev = MockRepository.GenerateMock<IDeveloper>();
-        //    var viewStateMover = MockRepository.GenerateMock<IViewstateMoverModule>();
-        //    var logging = MockRepository.GenerateMock<ILogging>();
-        //    var tasks = MockRepository.GenerateMock<IScheduledTasks>();
-        //    var distCall = MockRepository.GenerateMock<IDistributedCall>();
-        //    var repos = MockRepository.GenerateMock<IRepositories>();
-        //    var providers = MockRepository.GenerateMock<IProviders>();
-        //    var help = MockRepository.GenerateMock<IHelp>();
-        //    var routing = MockRepository.GenerateMock<IWebRouting>();
-        //    var scripting = MockRepository.GenerateMock<IScripting>();
+            var content = MockRepository.GenerateStub<IContentSection>();
+            var security = MockRepository.GenerateStub<ISecuritySection>();
+            var requestHandler = MockRepository.GenerateStub<IRequestHandlerSection>();
+            var templates = MockRepository.GenerateStub<ITemplatesSection>();
+            var dev = MockRepository.GenerateStub<IDeveloperSection>();
+            var viewStateMover = MockRepository.GenerateStub<IViewStateMoverModuleSection>();
+            var logging = MockRepository.GenerateStub<ILoggingSection>();
+            var tasks = MockRepository.GenerateStub<IScheduledTasksSection>();
+            var distCall = MockRepository.GenerateStub<IDistributedCallSection>();
+            var repos = MockRepository.GenerateStub<IRepositoriesSection>();
+            var providers = MockRepository.GenerateStub<IProvidersSection>();
+            var help = MockRepository.GenerateStub<IHelpSection>();
+            var routing = MockRepository.GenerateStub<IWebRoutingSection>();
+            var scripting = MockRepository.GenerateStub<IScriptingSection>();
 
-        //    settings.Stub(x => x.Content).Return(content);
-        //    settings.Stub(x => x.Security).Return(security);
-        //    settings.Stub(x => x.RequestHandler).Return(requestHandler);
-        //    settings.Stub(x => x.Templates).Return(templates);
-        //    settings.Stub(x => x.Developer).Return(dev);
-        //    settings.Stub(x => x.ViewstateMoverModule).Return(viewStateMover);
-        //    settings.Stub(x => x.Logging).Return(logging);
-        //    settings.Stub(x => x.ScheduledTasks).Return(tasks);
-        //    settings.Stub(x => x.DistributedCall).Return(distCall);
-        //    settings.Stub(x => x.PackageRepositories).Return(repos);
-        //    settings.Stub(x => x.Providers).Return(providers);
-        //    settings.Stub(x => x.Help).Return(help);
-        //    settings.Stub(x => x.WebRouting).Return(routing);
-        //    settings.Stub(x => x.Scripting).Return(scripting);
+            settings.Stub(x => x.Content).Return(content);
+            settings.Stub(x => x.Security).Return(security);
+            settings.Stub(x => x.RequestHandler).Return(requestHandler);
+            settings.Stub(x => x.Templates).Return(templates);
+            settings.Stub(x => x.Developer).Return(dev);
+            settings.Stub(x => x.ViewStateMoverModule).Return(viewStateMover);
+            settings.Stub(x => x.Logging).Return(logging);
+            settings.Stub(x => x.ScheduledTasks).Return(tasks);
+            settings.Stub(x => x.DistributedCall).Return(distCall);
+            settings.Stub(x => x.PackageRepositories).Return(repos);
+            settings.Stub(x => x.Providers).Return(providers);
+            settings.Stub(x => x.Help).Return(help);
+            settings.Stub(x => x.WebRouting).Return(routing);
+            settings.Stub(x => x.Scripting).Return(scripting);
 
-        //    return settings;
-        //}
+            //Now configure some defaults - the defaults in the config section classes do NOT pertain to the mocked data!!
+            settings.Content.Stub(x => x.UseLegacyXmlSchema).Return(false);
+            settings.Content.Stub(x => x.ForceSafeAliases).Return(true);
+            settings.Content.Stub(x => x.ImageAutoFillProperties).Return(ContentImagingElement.GetDefaultImageAutoFillProperties());
+            settings.Content.Stub(x => x.ImageFileTypes).Return(ContentImagingElement.GetDefaultImageFileTypes());
+            settings.RequestHandler.Stub(x => x.AddTrailingSlash).Return(true);
+            settings.RequestHandler.Stub(x => x.UseDomainPrefixes).Return(false);
+            settings.RequestHandler.Stub(x => x.CharCollection).Return(RequestHandlerElement.GetDefaultCharReplacements());
+            settings.Content.Stub(x => x.UmbracoLibraryCacheDuration).Return(1800);
+            settings.WebRouting.Stub(x => x.UrlProviderMode).Return("Auto");
 
+            
 
-        //public static int UmbracoLibraryCacheDuration
-        //{
-        //    get { return LegacyUmbracoSettings.UmbracoLibraryCacheDuration; }
-        //    set { LegacyUmbracoSettings.UmbracoLibraryCacheDuration = value; }
-        //}
-
-        //public static bool UseLegacyXmlSchema
-        //{
-        //    get { return LegacyUmbracoSettings.UseLegacyXmlSchema; }
-        //    set { LegacyUmbracoSettings.UseLegacyXmlSchema = value; }
-        //}
-
-        //public static bool AddTrailingSlash
-        //{
-        //    get { return LegacyUmbracoSettings.AddTrailingSlash; }
-        //    set { LegacyUmbracoSettings.AddTrailingSlash = value; }
-        //}
-
-        //public static bool UseDomainPrefixes
-        //{
-        //    get { return LegacyUmbracoSettings.UseDomainPrefixes; }
-        //    set { LegacyUmbracoSettings.UseDomainPrefixes = value; }
-        //}
-
-        //public static string SettingsFilePath
-        //{
-        //    get { return LegacyUmbracoSettings.SettingsFilePath; }
-        //    set { LegacyUmbracoSettings.SettingsFilePath = value; }
-        //}
-
-        //public static bool ForceSafeAliases
-        //{
-        //    get { return LegacyUmbracoSettings.ForceSafeAliases; }
-        //    set { LegacyUmbracoSettings.ForceSafeAliases = value; }
-        //}
+            return settings;
+        }
 
         // from appSettings
 

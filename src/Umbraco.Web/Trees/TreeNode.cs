@@ -53,6 +53,7 @@ namespace Umbraco.Web.Trees
         [DataMember(Name = "name")]
         public string Title { get; set; }
 
+        //TODO: This doesn't seem to be used by anything!
         /// <summary>
         /// Gets or sets the node path.
         /// </summary>

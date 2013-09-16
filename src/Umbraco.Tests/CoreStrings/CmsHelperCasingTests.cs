@@ -3,15 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Rhino.Mocks;
 using Umbraco.Core;
 using Umbraco.Core.Strings;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.CoreStrings
 {
     [TestFixture]
     public class CmsHelperCasingTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            //set default config
+            var config = SettingsForTests.GetDefault();
+            SettingsForTests.ConfigureSettings(config);
+
+        }
+
         [TestCase("thisIsTheEnd", "This Is The End")]
         [TestCase("th", "Th")]
         [TestCase("t", "t")]

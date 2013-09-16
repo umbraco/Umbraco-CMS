@@ -11,7 +11,7 @@ namespace Umbraco.Tests.Configurations
         [Test]
         public void Can_Get_Media_Provider()
         {
-            var config = (FileSystemProvidersSection)ConfigurationManager.GetSection("FileSystemProviders");
+            var config = (FileSystemProvidersSection)ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
             var providerConfig = config.Providers["media"];
 
             Assert.That(providerConfig, Is.Not.Null);

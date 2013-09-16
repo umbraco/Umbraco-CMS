@@ -47,7 +47,21 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 var urls = this[prop] as ConfigurationElement;
                 if (urls != null && urls.ElementInformation.IsPresent == false)
                 {
-                    var dictionary = new Dictionary<char, string>()
+                    _defaultUrlReplacing = new UrlReplacingElement()
+                        {
+                            CharCollection = GetDefaultCharReplacements()
+                        };
+
+                    return _defaultUrlReplacing;
+                }
+                
+                return (UrlReplacingElement)this["urlReplacing"];
+            }
+        }
+        
+        internal static CharCollection GetDefaultCharReplacements()
+        {
+            var dictionary = new Dictionary<char, string>()
                         {
                             {' ',"-"},
                             {'\"',""},
@@ -77,28 +91,19 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                             {'>',""}
                         };
 
-                    //const string chars = @" ,"",',%,.,;,/,\,:,#,+,*,&,?,æ,ø,å,ä,ö,ü,ß,Ä,Ö,|,<,>";
+            //const string chars = @" ,"",',%,.,;,/,\,:,#,+,*,&,?,æ,ø,å,ä,ö,ü,ß,Ä,Ö,|,<,>";
 
-                    var collection = new CharCollection();
-                    foreach (var c in dictionary)
-                    {
-                        collection.Add(new CharElement
-                        {
-                            Char = c.Key.ToString(CultureInfo.InvariantCulture),
-                            Replacement = c.Value.ToString(CultureInfo.InvariantCulture)
-                        });
-                    }
-
-                    _defaultUrlReplacing = new UrlReplacingElement()
-                        {
-                            CharCollection = collection
-                        };
-
-                    return _defaultUrlReplacing;
-                }
-                
-                return (UrlReplacingElement)this["urlReplacing"];
+            var collection = new CharCollection();
+            foreach (var c in dictionary)
+            {
+                collection.Add(new CharElement
+                {
+                    Char = c.Key.ToString(CultureInfo.InvariantCulture),
+                    Replacement = c.Value.ToString(CultureInfo.InvariantCulture)
+                });
             }
+
+            return collection;
         }
 
         bool IRequestHandlerSection.UseDomainPrefixes

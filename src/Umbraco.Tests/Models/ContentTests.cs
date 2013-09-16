@@ -17,13 +17,14 @@ namespace Umbraco.Tests.Models
         [SetUp]
         public void Init()
         {
-            TestHelper.EnsureUmbracoSettingsConfig();
+            var config = SettingsForTests.GetDefault();
+            SettingsForTests.ConfigureSettings(config);
         }
 
         [TearDown]
         public void Dispose()
         {
-            TestHelper.CleanUmbracoSettingsConfig();
+            
         }
 
         [TestCase("-1,-20,12,34,56", false)]

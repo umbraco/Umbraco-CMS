@@ -7,6 +7,7 @@ using Umbraco.Tests.CodeFirst.TestModels;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Rhino.Mocks;
 
 namespace Umbraco.Tests.CodeFirst
 {
@@ -57,10 +58,8 @@ namespace Umbraco.Tests.CodeFirst
 
         #region Test setup
         public override void Initialize()
-        {
-            TestHelper.EnsureUmbracoSettingsConfig();
-            
-            base.Initialize();
+        {   
+            base.Initialize();            
         }
 
         public override void TearDown()

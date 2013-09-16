@@ -425,7 +425,7 @@ namespace Umbraco.Core.Models
             if (UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties != null)
             {
                 uploadFieldConfigNode = UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties
-                                    .Single(x => x.Alias == propertyTypeAlias);
+                                    .FirstOrDefault(x => x.Alias == propertyTypeAlias);
 
             }
 

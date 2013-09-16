@@ -619,12 +619,11 @@ namespace umbraco
         private static string _path;
 
         /// <summary>
-        /// Gets/sets the settings file path, the setter can be used in unit tests
+        /// Gets the settings file path
         /// </summary>
         internal static string SettingsFilePath
         {
             get { return _path ?? (_path = GlobalSettings.FullpathToRoot + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar); }
-            set { _path = value; }
         }
 
         internal const string Filename = "umbracoSettings.config";

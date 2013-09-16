@@ -29,7 +29,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             }
             else
             {
-                //Section = configuration.GetSection("umbracoConfiguration/settings") as UmbracoSettingsSection;    
                 SettingsSection = UmbracoConfiguration.For<IUmbracoSettingsSection>(configuration);
             }
 

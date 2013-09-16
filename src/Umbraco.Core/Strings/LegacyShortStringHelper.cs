@@ -470,7 +470,7 @@ function isValidAlias(alias) {{
             var newUrl = url.ToLowerInvariant();
             foreach (var n in UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.CharCollection)
             {
-                if (n.Char.IsNullOrWhiteSpace() == false)
+                if (n.Char != "")
                     newUrl = newUrl.Replace(n.Char, n.Replacement);
             }
 

@@ -13,8 +13,13 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 return new OptionalCommaDelimitedConfigurationElement(
                        (CommaDelimitedConfigurationElement)this["imageFileTypes"],
                         //set the default
-                       new[] { "jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif" });
+                       GetDefaultImageFileTypes());
             }
+        }
+
+        internal static string[] GetDefaultImageFileTypes()
+        {
+            return new[] {"jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif"};
         }
 
         [ConfigurationProperty("allowedAttributes")]
@@ -59,6 +64,17 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 
                 return (ImagingAutoFillPropertiesCollection) base["autoFillImageProperties"];
             }
+        }
+
+        internal static ImagingAutoFillPropertiesCollection GetDefaultImageAutoFillProperties()
+        {
+            return new ImagingAutoFillPropertiesCollection
+                        {
+                            new ImagingAutoFillUploadFieldElement
+                                {
+                                    Alias = "umbracoFile"
+                                }
+                        };
         }
 
     }
