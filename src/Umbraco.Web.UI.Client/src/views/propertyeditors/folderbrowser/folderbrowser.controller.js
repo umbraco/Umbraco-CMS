@@ -1,6 +1,6 @@
 angular.module("umbraco")
 .controller("Umbraco.Editors.FolderBrowserController",
-    function ($rootScope, $scope, $routeParams, umbRequestHelper, mediaResource, imageHelper) {
+    function ($rootScope, $scope, assetsService, $routeParams, umbRequestHelper, mediaResource, imageHelper) {
         var dialogOptions = $scope.$parent.dialogOptions;
         $scope.options = {
             url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
