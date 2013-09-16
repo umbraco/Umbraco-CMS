@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface IDeveloper
+    public interface IDeveloperSection : IUmbracoConfigurationSection
     {
         IEnumerable<IFileExtension> AppCodeFileExtensions { get; }
     }

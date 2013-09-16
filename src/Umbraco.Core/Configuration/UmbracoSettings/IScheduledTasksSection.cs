@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface IScheduledTasks
+    public interface IScheduledTasksSection : IUmbracoConfigurationSection
     {
         IEnumerable<IScheduledTask> Tasks { get; }
     }

@@ -3,7 +3,7 @@
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
 
-    public interface IRepositories
+    public interface IRepositoriesSection : IUmbracoConfigurationSection
     {
         IEnumerable<IRepository> Repositories { get; }
     }

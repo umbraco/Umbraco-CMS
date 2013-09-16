@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface IContentImagingAutoFillUploadField
+    public interface IImagingAutoFillUploadField
     {
         /// <summary>
         /// Allow setting internally so we can create a default

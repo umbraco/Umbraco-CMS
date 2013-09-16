@@ -29,11 +29,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        private ContentImagingAutoFillPropertiesCollection _defaultImageAutoFill;
+        private ImagingAutoFillPropertiesCollection _defaultImageAutoFill;
 
-        [ConfigurationCollection(typeof(ContentImagingAutoFillPropertiesCollection), AddItemName = "uploadField")]
+        [ConfigurationCollection(typeof(ImagingAutoFillPropertiesCollection), AddItemName = "uploadField")]
         [ConfigurationProperty("autoFillImageProperties", IsDefaultCollection = true)]
-        internal ContentImagingAutoFillPropertiesCollection ImageAutoFillProperties
+        internal ImagingAutoFillPropertiesCollection ImageAutoFillProperties
         {
             get
             {
@@ -47,9 +47,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 var autoFill = this[prop] as ConfigurationElement;
                 if (autoFill != null && autoFill.ElementInformation.IsPresent == false)
                 {
-                    _defaultImageAutoFill = new ContentImagingAutoFillPropertiesCollection
+                    _defaultImageAutoFill = new ImagingAutoFillPropertiesCollection
                         {
-                            new ContentImagingAutoFillUploadFieldElement
+                            new ImagingAutoFillUploadFieldElement
                                 {
                                     Alias = "umbracoFile"
                                 }
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                     return _defaultImageAutoFill;
                 }
                 
-                return (ContentImagingAutoFillPropertiesCollection) base["autoFillImageProperties"];
+                return (ImagingAutoFillPropertiesCollection) base["autoFillImageProperties"];
             }
         }
 

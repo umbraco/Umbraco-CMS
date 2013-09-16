@@ -206,7 +206,7 @@ namespace Umbraco.Tests.Routing
 		    SettingsForTests.UseDirectoryUrls = true;
 		    SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
             //mock the Umbraco settings that we need
-            var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+            var settings = MockRepository.GenerateStub<IUmbracoSettingsSection>();
             settings.Stub(x => x.RequestHandler.UseDomainPrefixes).Return(false);
             SettingsForTests.ConfigureSettings(settings);
 
@@ -238,7 +238,7 @@ namespace Umbraco.Tests.Routing
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
             //mock the Umbraco settings that we need
-            var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+            var settings = MockRepository.GenerateStub<IUmbracoSettingsSection>();
             settings.Stub(x => x.RequestHandler.UseDomainPrefixes).Return(false);
             SettingsForTests.ConfigureSettings(settings);
 
@@ -262,7 +262,7 @@ namespace Umbraco.Tests.Routing
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
             //mock the Umbraco settings that we need
-            var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+            var settings = MockRepository.GenerateStub<IUmbracoSettingsSection>();
             settings.Stub(x => x.RequestHandler.UseDomainPrefixes).Return(false);
             SettingsForTests.ConfigureSettings(settings);
 
@@ -292,7 +292,7 @@ namespace Umbraco.Tests.Routing
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
             //mock the Umbraco settings that we need
-            var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+            var settings = MockRepository.GenerateStub<IUmbracoSettingsSection>();
             settings.Stub(x => x.RequestHandler.UseDomainPrefixes).Return(false);
             SettingsForTests.ConfigureSettings(settings);
             
@@ -312,7 +312,7 @@ namespace Umbraco.Tests.Routing
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
             //mock the Umbraco settings that we need
-            var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+            var settings = MockRepository.GenerateStub<IUmbracoSettingsSection>();
             settings.Stub(x => x.RequestHandler.UseDomainPrefixes).Return(false);
             SettingsForTests.ConfigureSettings(settings);
 
@@ -380,7 +380,7 @@ namespace Umbraco.Tests.Routing
 			SetDomains4();
 
             //mock the Umbraco settings that we need
-            var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+            var settings = MockRepository.GenerateStub<IUmbracoSettingsSection>();
             settings.Stub(x => x.RequestHandler.UseDomainPrefixes).Return(false);
             SettingsForTests.ConfigureSettings(settings);
             

@@ -10,14 +10,14 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void NotDynamicXmlDocumentElements()
         {
-            Assert.IsTrue(Section.Scripting.NotDynamicXmlDocumentElements
+            Assert.IsTrue(SettingsSection.Scripting.NotDynamicXmlDocumentElements
                                  .All(x => "p,div,ul,span".Split(',').Contains(x.Element)));
         }
 
         [Test]
         public virtual void DataTypeModelStaticMappings()
         {
-            var mappings = Section.Scripting.DataTypeModelStaticMappings.ToArray();
+            var mappings = SettingsSection.Scripting.DataTypeModelStaticMappings.ToArray();
             Assert.IsTrue(mappings[0].DataTypeGuid == Guid.Parse("A3DB4034-BCB0-4E69-B3EE-DD4E6ECA74C2"));
             Assert.IsTrue(mappings[0].MappingName == "MyName.1");
 

@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface ILogging
+    public interface ILoggingSection : IUmbracoConfigurationSection
     {
         bool AutoCleanLogs { get; }
 

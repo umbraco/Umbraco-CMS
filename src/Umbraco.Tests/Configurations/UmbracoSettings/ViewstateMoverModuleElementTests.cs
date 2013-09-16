@@ -8,7 +8,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void Enable()
         {
-            Assert.IsTrue(Section.ViewstateMoverModule.Enable == false);
+            Assert.IsTrue(SettingsSection.ViewStateMoverModule.Enable == false);
         }
     }
 }

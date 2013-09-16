@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ScriptingElement : ConfigurationElement, IScripting
+    internal class ScriptingElement : ConfigurationElement, IScriptingSection
     {
         [ConfigurationProperty("razor")]
         internal RazorElement Razor
@@ -11,12 +11,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (RazorElement) base["razor"]; }
         }
 
-        IEnumerable<INotDynamicXmlDocument> IScripting.NotDynamicXmlDocumentElements
+        IEnumerable<INotDynamicXmlDocument> IScriptingSection.NotDynamicXmlDocumentElements
         {
             get { return Razor.NotDynamicXmlDocumentElements; }
         }
 
-        IEnumerable<IRazorStaticMapping> IScripting.DataTypeModelStaticMappings
+        IEnumerable<IRazorStaticMapping> IScriptingSection.DataTypeModelStaticMappings
         {
             get { return Razor.DataTypeModelStaticMappings; }
         }

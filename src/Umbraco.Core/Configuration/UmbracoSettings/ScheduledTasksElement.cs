@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ScheduledTasksElement : ConfigurationElement, IScheduledTasks
+    internal class ScheduledTasksElement : ConfigurationElement, IScheduledTasksSection
     {
         [ConfigurationCollection(typeof(ScheduledTasksCollection), AddItemName = "task")]
         [ConfigurationProperty("", IsDefaultCollection = true)]
@@ -12,7 +12,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (ScheduledTasksCollection)base[""]; }
         }
 
-        IEnumerable<IScheduledTask> IScheduledTasks.Tasks
+        IEnumerable<IScheduledTask> IScheduledTasksSection.Tasks
         {
             get { return Tasks; }
         }

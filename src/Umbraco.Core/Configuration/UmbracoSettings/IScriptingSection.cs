@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface IScripting
+    public interface IScriptingSection : IUmbracoConfigurationSection
     {
         IEnumerable<INotDynamicXmlDocument> NotDynamicXmlDocumentElements { get; }
 

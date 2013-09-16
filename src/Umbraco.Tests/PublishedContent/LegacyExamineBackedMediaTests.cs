@@ -19,7 +19,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.TestSetup();
 
-            var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+            var settings = MockRepository.GenerateStub<IUmbracoSettingsSection>();
             settings.Stub(x => x.Content.ForceSafeAliases).Return(true);
             settings.Stub(x => x.Content.UmbracoLibraryCacheDuration).Return(1800);
             SettingsForTests.ConfigureSettings(settings);

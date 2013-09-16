@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface IWebRouting
+    public interface IWebRoutingSection : IUmbracoConfigurationSection
     {
         bool TrySkipIisCustomErrors { get; }
 

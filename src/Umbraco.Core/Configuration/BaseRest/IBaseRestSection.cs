@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.BaseRest
 {
-    public interface IBaseRest
+    public interface IBaseRestSection
     {
         IExtensionsCollection Items { get; }
 

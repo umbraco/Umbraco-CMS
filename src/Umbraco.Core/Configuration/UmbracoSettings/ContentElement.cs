@@ -3,6 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
+    [ConfigurationKey("umbracoConfiguration/settings/content")]
     internal class ContentElement : ConfigurationElement, IContentSection
     {
         [ConfigurationProperty("imaging")]
@@ -309,7 +310,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return Imaging.ImageTagAllowedAttributes; }
         }
 
-        IEnumerable<IContentImagingAutoFillUploadField> IContentSection.ImageAutoFillProperties
+        IEnumerable<IImagingAutoFillUploadField> IContentSection.ImageAutoFillProperties
         {
             get { return Imaging.ImageAutoFillProperties; }
         }

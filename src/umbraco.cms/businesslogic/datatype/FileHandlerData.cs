@@ -168,7 +168,7 @@ namespace umbraco.cms.businesslogic.datatype
             }
         }
 
-        private void FillProperties(IContentImagingAutoFillUploadField uploadFieldConfigNode, Content content, UmbracoFile um)
+        private void FillProperties(IImagingAutoFillUploadField uploadFieldConfigNode, Content content, UmbracoFile um)
         {
             var prop = content.getProperty(uploadFieldConfigNode.WidthFieldAlias);
             if (prop != null)

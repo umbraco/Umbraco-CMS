@@ -113,6 +113,7 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
+        //TODO: With the new config updates, I'm pretty sure this isn't needed?
         public static void EnsureUmbracoSettingsConfig()
         {
             var currDir = new DirectoryInfo(CurrentAssemblyDirectory);

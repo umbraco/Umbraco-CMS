@@ -14,14 +14,14 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public override void Enabled()
         {
-            Assert.IsTrue(Section.DistributedCall.Enabled == false);
+            Assert.IsTrue(SettingsSection.DistributedCall.Enabled == false);
 
         }
 
         [Test]
         public override void Servers()
         {
-            Assert.IsTrue(Section.DistributedCall.Servers.Count() == 0);
+            Assert.IsTrue(SettingsSection.DistributedCall.Servers.Count() == 0);
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class LoggingElement : ConfigurationElement, ILogging
+    internal class LoggingElement : ConfigurationElement, ILoggingSection
     {
         
         [ConfigurationProperty("autoCleanLogs")]
@@ -93,47 +93,47 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        string ILogging.ExternalLoggerAssembly
+        string ILoggingSection.ExternalLoggerAssembly
         {
             get { return ExternalLogger.Assembly; }
         }
 
-        string ILogging.ExternalLoggerType
+        string ILoggingSection.ExternalLoggerType
         {
             get { return ExternalLogger.Type; }
         }
 
-        bool ILogging.ExternalLoggerEnableAuditTrail
+        bool ILoggingSection.ExternalLoggerEnableAuditTrail
         {
             get { return ExternalLogger.LogAuditTrail; }
         }
 
-        bool ILogging.AutoCleanLogs
+        bool ILoggingSection.AutoCleanLogs
         {
             get { return AutoCleanLogs; }
         }
 
-        bool ILogging.EnableLogging
+        bool ILoggingSection.EnableLogging
         {
             get { return EnableLogging; }
         }
 
-        bool ILogging.EnableAsyncLogging
+        bool ILoggingSection.EnableAsyncLogging
         {
             get { return EnableAsyncLogging; }
         }
 
-        int ILogging.CleaningMiliseconds
+        int ILoggingSection.CleaningMiliseconds
         {
             get { return CleaningMiliseconds; }
         }
 
-        int ILogging.MaxLogAge
+        int ILoggingSection.MaxLogAge
         {
             get { return MaxLogAge; }
         }
 
-        IEnumerable<ILogType> ILogging.DisabledLogTypes
+        IEnumerable<ILogType> ILoggingSection.DisabledLogTypes
         {
             get { return DisabledLogTypes; }
         }

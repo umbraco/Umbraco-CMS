@@ -87,7 +87,7 @@ namespace Umbraco.Tests
 		{
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", directoryUrls ? "true" : "false");
 
-            var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+            var settings = MockRepository.GenerateStub<IUmbracoSettingsSection>();
             settings.Stub(x => x.RequestHandler.AddTrailingSlash).Return(trailingSlash);
             SettingsForTests.ConfigureSettings(settings);
 			

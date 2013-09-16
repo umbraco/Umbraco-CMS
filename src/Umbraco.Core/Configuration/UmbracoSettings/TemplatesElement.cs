@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class TemplatesElement : ConfigurationElement, ITemplates
+    internal class TemplatesElement : ConfigurationElement, ITemplatesSection
     {
         [ConfigurationProperty("useAspNetMasterPages")]
         internal InnerTextConfigurationElement<bool> UseAspNetMasterPages
@@ -52,22 +52,22 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        bool ITemplates.UseAspNetMasterPages
+        bool ITemplatesSection.UseAspNetMasterPages
         {
             get { return UseAspNetMasterPages; }
         }
 
-        bool ITemplates.EnableSkinSupport
+        bool ITemplatesSection.EnableSkinSupport
         {
             get { return EnableSkinSupport; }
         }
 
-        RenderingEngine ITemplates.DefaultRenderingEngine
+        RenderingEngine ITemplatesSection.DefaultRenderingEngine
         {
             get { return DefaultRenderingEngine; }
         }
 
-        bool ITemplates.EnableTemplateFolders
+        bool ITemplatesSection.EnableTemplateFolders
         {
             get { return EnableTemplateFolders; }
         }

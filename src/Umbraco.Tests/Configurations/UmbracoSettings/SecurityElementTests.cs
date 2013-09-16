@@ -8,22 +8,22 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void KeepUserLoggedIn()
         {
-            Assert.IsTrue(Section.Security.KeepUserLoggedIn == true);
+            Assert.IsTrue(SettingsSection.Security.KeepUserLoggedIn == true);
         }
         [Test]
         public void HideDisabledUsersInBackoffice()
         {
-            Assert.IsTrue(Section.Security.HideDisabledUsersInBackoffice == false);
+            Assert.IsTrue(SettingsSection.Security.HideDisabledUsersInBackoffice == false);
         }
         [Test]
         public void AuthCookieDomain()
         {
-            Assert.IsTrue(Section.Security.AuthCookieDomain == null);
+            Assert.IsTrue(SettingsSection.Security.AuthCookieDomain == null);
         }
         [Test]
         public void AuthCookieName()
         {
-            Assert.IsTrue(Section.Security.AuthCookieName == "UMB_UCONTEXT");
+            Assert.IsTrue(SettingsSection.Security.AuthCookieName == "UMB_UCONTEXT");
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         IEnumerable<string> ImageTagAllowedAttributes { get; }
 
-        IEnumerable<IContentImagingAutoFillUploadField> ImageAutoFillProperties { get; }
+        IEnumerable<IImagingAutoFillUploadField> ImageAutoFillProperties { get; }
 
         string ScriptFolderPath { get; }
 

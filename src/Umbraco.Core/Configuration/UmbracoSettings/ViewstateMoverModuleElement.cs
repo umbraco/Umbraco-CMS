@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ViewstateMoverModuleElement : ConfigurationElement, IViewstateMoverModule
+    internal class ViewstateMoverModuleElement : ConfigurationElement, IViewStateMoverModuleSection
     {
         [ConfigurationProperty("enable", DefaultValue = false)]
         public bool Enable

@@ -8,19 +8,19 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void TrySkipIisCustomErrors()
         {
-            Assert.IsTrue(Section.WebRouting.TrySkipIisCustomErrors == false);
+            Assert.IsTrue(SettingsSection.WebRouting.TrySkipIisCustomErrors == false);
         }
 
         [Test]
         public void InternalRedirectPreservesTemplate()
         {
-            Assert.IsTrue(Section.WebRouting.TrySkipIisCustomErrors == false);
+            Assert.IsTrue(SettingsSection.WebRouting.TrySkipIisCustomErrors == false);
         }
 
         [Test]
         public void UrlProviderMode()
         {
-            Assert.IsTrue(Section.WebRouting.UrlProviderMode == "Auto");
+            Assert.IsTrue(SettingsSection.WebRouting.UrlProviderMode == "Auto");
         }
     }
 }

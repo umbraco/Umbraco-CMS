@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.Threading;
 using Umbraco.Core.Configuration.BaseRest;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -24,57 +26,63 @@ namespace Umbraco.Core.Configuration
 
         #endregion
 
-        //#region Extensible settings
+        #region Extensible settings
         
-        //TODO: Need to think about this... it seems nicer to do this than having giant nested access to the configuration
-        // sections, BUT we don't want to attribute the interfaces. We can make IUmbracoConfigurationSection plugins and then search for the matching
-        // one based on the specified interface ?
+        private static readonly ConcurrentDictionary<Type, IUmbracoConfigurationSection> Sections = new ConcurrentDictionary<Type, IUmbracoConfigurationSection>();
 
-        //private static readonly ConcurrentDictionary<Type, IUmbracoConfigurationSection> Sections = new ConcurrentDictionary<Type, IUmbracoConfigurationSection>();
+        /// <summary>
+        /// Gets the specified UmbracoConfigurationSection.
+        /// </summary>
+        /// <typeparam name="T">The type of the UmbracoConfigurationSectiont.</typeparam>
+        /// <returns>The UmbracoConfigurationSection of the specified type.</returns>
+        public static T For<T>(System.Configuration.Configuration config = null)
+            where T : IUmbracoConfigurationSection
+        {
+            var sectionType = typeof(T);
+            return (T)Sections.GetOrAdd(sectionType, type =>
+                {
+                    //if there is no entry for this type 
+                    var configurationSections = PluginManager.Current.ResolveUmbracoConfigurationSections();
+                    var implementationType = configurationSections.FirstOrDefault(TypeHelper.IsTypeAssignableFrom<T>);
+                    if (implementationType == null)
+                    {
+                        throw new InvalidOperationException("Could not find an implementation for " + typeof(T));
+                    }
 
-        ///// <summary>
-        ///// Gets the specified UmbracoConfigurationSection.
-        ///// </summary>
-        ///// <typeparam name="T">The type of the UmbracoConfigurationSectiont.</typeparam>
-        ///// <returns>The UmbracoConfigurationSection of the specified type.</returns>
-        //public static T For<T>()
-        //    where T : IUmbracoConfigurationSection
-        //{
-        //    var sectionType = typeof(T);
-        //    return (T)Sections.GetOrAdd(sectionType, type =>
-        //        {
-        //            var attr = sectionType.GetCustomAttribute<ConfigurationKeyAttribute>(false);
-        //            if (attr == null)
-        //                throw new InvalidOperationException(string.Format("Type \"{0}\" is missing attribute ConfigurationKeyAttribute.", sectionType.FullName));
+                    var attr = implementationType.GetCustomAttribute<ConfigurationKeyAttribute>(false);
+                    if (attr == null)
+                        throw new InvalidOperationException(string.Format("Type \"{0}\" is missing attribute ConfigurationKeyAttribute.", sectionType.FullName));
 
-        //            var sectionKey = attr.ConfigurationKey;
-        //            if (string.IsNullOrWhiteSpace(sectionKey))
-        //                throw new InvalidOperationException(string.Format("Type \"{0}\" ConfigurationKeyAttribute value is null or empty.", sectionType.FullName));
+                    var sectionKey = attr.ConfigurationKey;
+                    if (string.IsNullOrWhiteSpace(sectionKey))
+                        throw new InvalidOperationException(string.Format("Type \"{0}\" {1} value is null or empty.", sectionType.FullName, typeof(ConfigurationKeyAttribute)));
 
-        //            var section = GetSection(sectionType, sectionKey);
+                    var section = GetSection(sectionType, sectionKey, config);
 
-        //            return (T)section;        
-        //        });
-        //}
+                    return (T)section;        
+                });
+        }
 
-        //private static IUmbracoConfigurationSection GetSection(Type sectionType, string key)
-        //{
-        //    if (TypeHelper.IsTypeAssignableFrom<IUmbracoConfigurationSection>(sectionType) == false)
-        //    {
-        //        throw new ArgumentException(string.Format(
-        //           "Type \"{0}\" does not inherit from UmbracoConfigurationSection.", sectionType.FullName), "sectionType");
-        //    }                
+        private static IUmbracoConfigurationSection GetSection(Type sectionType, string key, System.Configuration.Configuration config = null)
+        {
+            var section = config == null
+                              ? ConfigurationManager.GetSection(key)
+                              : config.GetSection(key);
 
-        //    var section = ConfigurationManager.GetSection(key);
+            if (section == null)
+            {
+                throw new KeyNotFoundException("Could not find/load config section: " + key);
+            }
 
-        //    if (section != null && section.GetType() != sectionType)
-        //        throw new InvalidCastException(string.Format("Section at key \"{0}\" is of type \"{1}\" and not \"{2}\".",
-        //            key, section.GetType().FullName, sectionType.FullName));
+            var result = section as IUmbracoConfigurationSection;
+            if (result == null)
+            {
+                throw new InvalidOperationException(string.Format("The section type requested '{0}' does not match the resulting section type '{1}", sectionType, section.GetType()));
+            }
+            return result;
+        }
 
-        //    return section as IUmbracoConfigurationSection;
-        //}
-
-        //#endregion
+        #endregion
 
         /// <summary>
         /// Default constructor 
@@ -83,12 +91,22 @@ namespace Umbraco.Core.Configuration
         {
             if (UmbracoSettings == null)
             {
-                var umbracoSettings = ConfigurationManager.GetSection("umbracoConfiguration/settings") as IUmbracoSettings;
+                var umbracoSettings = ConfigurationManager.GetSection("umbracoConfiguration/settings") as IUmbracoSettingsSection;
                 if (umbracoSettings == null)
                 {
-                    LogHelper.Warn<UmbracoConfiguration>("Could not load the IUmbracoSettings from config file!");
+                    LogHelper.Warn<UmbracoConfiguration>("Could not load the " + typeof(IUmbracoSettingsSection) + " from config file!");
                 }
                 UmbracoSettings = umbracoSettings;
+            }
+
+            if (BaseRestExtensions == null)
+            {
+                var baseRestExtensions = ConfigurationManager.GetSection("umbracoConfiguration/BaseRestExtensions") as IBaseRestSection;
+                if (baseRestExtensions == null)
+                {
+                    LogHelper.Warn<UmbracoConfiguration>("Could not load the " + typeof(IBaseRestSection) + " from config file!");
+                }
+                BaseRestExtensions = baseRestExtensions;
             }
         }
 
@@ -97,7 +115,7 @@ namespace Umbraco.Core.Configuration
         /// </summary>
         /// <param name="umbracoSettings"></param>
         /// <param name="baseRestSettings"></param>
-        public UmbracoConfiguration(IUmbracoSettings umbracoSettings, IBaseRest baseRestSettings)
+        public UmbracoConfiguration(IUmbracoSettingsSection umbracoSettings, IBaseRestSection baseRestSettings)
         {
             UmbracoSettings = umbracoSettings;
             BaseRestExtensions = baseRestSettings;
@@ -106,14 +124,14 @@ namespace Umbraco.Core.Configuration
         /// <summary>
         /// Gets the IUmbracoSettings
         /// </summary>
-        public IUmbracoSettings UmbracoSettings
+        public IUmbracoSettingsSection UmbracoSettings
         {
             get; 
             //This is purely for setting for Unit tests ONLY
             internal set;
         }
 
-        public IBaseRest BaseRestExtensions { get; private set; }
+        public IBaseRestSection BaseRestExtensions { get; private set; }
 
         //TODO: Add other configurations here !
     }

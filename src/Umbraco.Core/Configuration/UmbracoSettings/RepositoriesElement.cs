@@ -4,7 +4,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class RepositoriesElement : ConfigurationElement, IRepositories
+    internal class RepositoriesElement : ConfigurationElement, IRepositoriesSection
     {
 
         [ConfigurationCollection(typeof(RepositoriesCollection), AddItemName = "repository")]
@@ -15,7 +15,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             set { base[""] = value; }
         }
 
-        IEnumerable<IRepository> IRepositories.Repositories
+        IEnumerable<IRepository> IRepositoriesSection.Repositories
         {
             get { return Repositories; }
         }

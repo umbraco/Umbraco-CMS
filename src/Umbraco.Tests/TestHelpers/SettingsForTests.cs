@@ -19,7 +19,7 @@ namespace Umbraco.Tests.TestHelpers
         /// Sets the umbraco settings singleton to the object specified
         /// </summary>
         /// <param name="settings"></param>
-        public static void ConfigureSettings(IUmbracoSettings settings)
+        public static void ConfigureSettings(IUmbracoSettingsSection settings)
         {
             UmbracoConfiguration.Current.UmbracoSettings = settings;
         }
@@ -185,7 +185,7 @@ namespace Umbraco.Tests.TestHelpers
             ConfigureSettings(GetDefault());
         }
 
-        internal static IUmbracoSettings GetDefault()
+        internal static IUmbracoSettingsSection GetDefault()
         {
             var config = new FileInfo(TestHelper.MapPathForTest("~/Configurations/UmbracoSettings/web.config"));
 

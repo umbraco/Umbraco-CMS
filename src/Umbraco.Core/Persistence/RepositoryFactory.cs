@@ -11,9 +11,9 @@ namespace Umbraco.Core.Persistence
     /// </summary>
     public class RepositoryFactory
     {
-        private readonly IUmbracoSettings _settings;
+        private readonly IUmbracoSettingsSection _settings;
 
-        public RepositoryFactory(IUmbracoSettings settings)
+        public RepositoryFactory(IUmbracoSettingsSection settings)
         {
             _settings = settings;
         }

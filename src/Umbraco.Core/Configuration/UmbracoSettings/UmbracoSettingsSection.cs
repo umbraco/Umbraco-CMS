@@ -3,18 +3,9 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public class UmbracoSettingsSection : ConfigurationSection, IUmbracoSettings
+    [ConfigurationKey("umbracoConfiguration/settings")]
+    public class UmbracoSettingsSection : ConfigurationSection, IUmbracoSettingsSection
     {
-
-        ///// <summary>
-        ///// Get the current settings
-        ///// </summary>
-        //public static UmbracoSettings Current
-        //{
-        //    get { return (UmbracoSettings) ConfigurationManager.GetSection("umbracoConfiguration/settings"); }
-            
-        //}
-
         [ConfigurationProperty("content")]
         internal ContentElement Content
         {
@@ -129,72 +120,72 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (ScriptingElement)this["scripting"]; }
         }
         
-        IContentSection IUmbracoSettings.Content
+        IContentSection IUmbracoSettingsSection.Content
         {
             get { return Content; }
         }
 
-        ISecurity IUmbracoSettings.Security
+        ISecuritySection IUmbracoSettingsSection.Security
         {
             get { return Security; }
         }
 
-        IRequestHandler IUmbracoSettings.RequestHandler
+        IRequestHandlerSection IUmbracoSettingsSection.RequestHandler
         {
             get { return RequestHandler; }
         }
 
-        ITemplates IUmbracoSettings.Templates
+        ITemplatesSection IUmbracoSettingsSection.Templates
         {
             get { return Templates; }
         }
 
-        IDeveloper IUmbracoSettings.Developer
+        IDeveloperSection IUmbracoSettingsSection.Developer
         {
             get { return Developer; }
         }
 
-        IViewstateMoverModule IUmbracoSettings.ViewstateMoverModule
+        IViewStateMoverModuleSection IUmbracoSettingsSection.ViewStateMoverModule
         {
             get { return ViewstateMoverModule; }
         }
 
-        ILogging IUmbracoSettings.Logging
+        ILoggingSection IUmbracoSettingsSection.Logging
         {
             get { return Logging; }
         }
 
-        IScheduledTasks IUmbracoSettings.ScheduledTasks
+        IScheduledTasksSection IUmbracoSettingsSection.ScheduledTasks
         {
             get { return ScheduledTasks; }
         }
 
-        IDistributedCall IUmbracoSettings.DistributedCall
+        IDistributedCallSection IUmbracoSettingsSection.DistributedCall
         {
             get { return DistributedCall; }
         }
 
-        IRepositories IUmbracoSettings.PackageRepositories
+        IRepositoriesSection IUmbracoSettingsSection.PackageRepositories
         {
             get { return PackageRepositories; }
         }
 
-        IProviders IUmbracoSettings.Providers
+        IProvidersSection IUmbracoSettingsSection.Providers
         {
             get { return Providers; }
         }
 
-        IHelp IUmbracoSettings.Help
+        IHelpSection IUmbracoSettingsSection.Help
         {
             get { return Help; }
         }
 
-        IWebRouting IUmbracoSettings.WebRouting
+        IWebRoutingSection IUmbracoSettingsSection.WebRouting
         {
             get { return WebRouting; }
         }
 
-        IScripting IUmbracoSettings.Scripting
+        IScriptingSection IUmbracoSettingsSection.Scripting
         {
             get { return Scripting; }
         }

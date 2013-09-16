@@ -81,7 +81,7 @@ namespace Umbraco.Tests.PublishedCache
 			//ensure the StateHelper is using our custom context
 			StateHelper.HttpContext = _httpContextFactory.HttpContext;
 
-		    var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+		    var settings = MockRepository.GenerateStub<IUmbracoSettingsSection>();
 		    settings.Stub(x => x.Content.UseLegacyXmlSchema).Return(false);
 		    SettingsForTests.ConfigureSettings(settings);
 
@@ -106,7 +106,7 @@ namespace Umbraco.Tests.PublishedCache
 
 		private void SetupForLegacy()
 		{
-            var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+            var settings = MockRepository.GenerateStub<IUmbracoSettingsSection>();
             settings.Stub(x => x.Content.UseLegacyXmlSchema).Return(true);
             SettingsForTests.ConfigureSettings(settings);
 

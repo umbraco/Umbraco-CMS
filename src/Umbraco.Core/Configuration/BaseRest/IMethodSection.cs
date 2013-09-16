@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Configuration.BaseRest
 {
-    public interface IMethod
+    public interface IMethodSection
     {
         string Name { get; }
 

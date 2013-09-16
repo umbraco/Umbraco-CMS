@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class DistributedCallElement : ConfigurationElement, IDistributedCall
+    internal class DistributedCallElement : ConfigurationElement, IDistributedCallSection
     {
         [ConfigurationProperty("enable", DefaultValue = false)]
         internal bool Enabled
@@ -30,17 +30,17 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (ServerCollection)base["servers"]; }
         }
 
-        bool IDistributedCall.Enabled
+        bool IDistributedCallSection.Enabled
         {
             get { return Enabled; }
         }
 
-        int IDistributedCall.UserId
+        int IDistributedCallSection.UserId
         {
             get { return UserId; }
         }
 
-        IEnumerable<IServer> IDistributedCall.Servers
+        IEnumerable<IServer> IDistributedCallSection.Servers
         {
             get { return Servers; }
         }

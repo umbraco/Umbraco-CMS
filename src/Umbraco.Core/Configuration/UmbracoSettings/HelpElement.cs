@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class HelpElement : ConfigurationElement, IHelp
+    internal class HelpElement : ConfigurationElement, IHelpSection
     {
         [ConfigurationProperty("defaultUrl", DefaultValue = "http://our.umbraco.org/wiki/umbraco-help/{0}/{1}")]
         public string DefaultUrl
@@ -18,12 +18,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (LinksCollection) base[""]; }
         }
 
-        string IHelp.DefaultUrl
+        string IHelpSection.DefaultUrl
         {
             get { return DefaultUrl; }
         }
 
-        IEnumerable<ILink> IHelp.Links
+        IEnumerable<ILink> IHelpSection.Links
         {
             get { return Links; }
         }

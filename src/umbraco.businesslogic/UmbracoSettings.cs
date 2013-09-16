@@ -489,7 +489,7 @@ namespace umbraco
         /// </value>
         public static bool UseViewstateMoverModule
         {
-            get { return UmbracoConfiguration.Current.UmbracoSettings.ViewstateMoverModule.Enable; }
+            get { return UmbracoConfiguration.Current.UmbracoSettings.ViewStateMoverModule.Enable; }
         }
 
 

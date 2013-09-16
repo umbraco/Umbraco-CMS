@@ -4,19 +4,12 @@ using System.Configuration;
 namespace Umbraco.Core.Configuration.BaseRest
 {
     [ConfigurationKey("BaseRestExtensions")]
-    internal class BaseRestSection : UmbracoConfigurationSection, IBaseRest
+    internal class BaseRestSection : UmbracoConfigurationSection, IBaseRestSection
     {
         private const string KeyEnabled = "enabled";
 
         private bool? _enabled;
-
-        //internal protected override void ResetSection()
-        //{
-        //    base.ResetSection();
-
-        //    _enabled = null;
-        //}
-
+        
         [ConfigurationProperty("", IsKey = false, IsRequired = false, IsDefaultCollection = true)]
 		public ExtensionElementCollection Items
 		{
@@ -36,7 +29,7 @@ namespace Umbraco.Core.Configuration.BaseRest
             internal set { _enabled = value; }
         }
 
-        IExtensionsCollection IBaseRest.Items
+        IExtensionsCollection IBaseRestSection.Items
         {
             get { return Items; }
         }

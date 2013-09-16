@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class DeveloperElement : ConfigurationElement, IDeveloper
+    internal class DeveloperElement : ConfigurationElement, IDeveloperSection
     {
         private AppCodeFileExtensionsElement _default;
 
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        IEnumerable<IFileExtension> IDeveloper.AppCodeFileExtensions
+        IEnumerable<IFileExtension> IDeveloperSection.AppCodeFileExtensions
         {
             get { return AppCodeFileExtensions.AppCodeFileExtensionsCollection; }
         }

@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface IRequestHandler
+    public interface IRequestHandlerSection : IUmbracoConfigurationSection
     {
         bool UseDomainPrefixes { get; }
 

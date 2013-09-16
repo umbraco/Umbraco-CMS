@@ -6,7 +6,7 @@ namespace Umbraco.Core.Configuration.BaseRest
 {
 
     [ConfigurationCollection(typeof(ExtensionElement), CollectionType = ConfigurationElementCollectionType.BasicMapAlternate)]
-    internal class ExtensionElement : ConfigurationElementCollection, IEnumerable<IMethod>, IExtension
+    internal class ExtensionElement : ConfigurationElementCollection, IEnumerable<IMethodSection>, IExtension
     {
 		const string KeyAlias = "alias";
 		const string KeyType = "type";
@@ -59,11 +59,11 @@ namespace Umbraco.Core.Configuration.BaseRest
 			get { return (MethodElement)BaseGet(index); }
 		}
 
-        IEnumerator<IMethod> IEnumerable<IMethod>.GetEnumerator()
+        IEnumerator<IMethodSection> IEnumerable<IMethodSection>.GetEnumerator()
         {
             for (var i = 0; i < Count; i++)
             {
-                yield return BaseGet(i) as IMethod;
+                yield return BaseGet(i) as IMethodSection;
             }
         }
 
@@ -72,7 +72,7 @@ namespace Umbraco.Core.Configuration.BaseRest
             return GetEnumerator();
         }
 
-        IMethod IExtension.this[string index]
+        IMethodSection IExtension.this[string index]
         {
             get { return this[index]; }
         }

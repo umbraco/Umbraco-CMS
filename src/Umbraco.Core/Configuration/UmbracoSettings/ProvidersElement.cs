@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ProvidersElement : ConfigurationElement, IProviders
+    internal class ProvidersElement : ConfigurationElement, IProvidersSection
     {
         [ConfigurationProperty("users")]
         public UserProviderElement Users

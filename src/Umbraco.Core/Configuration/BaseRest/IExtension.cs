@@ -6,6 +6,6 @@
 
         string Type { get; }
 
-        IMethod this[string index] { get; }
+        IMethodSection this[string index] { get; }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.BaseRest
 {
-    internal class MethodElement : ConfigurationElement, IMethod
+    internal class MethodElement : ConfigurationElement, IMethodSection
     {
 		const string KeyName = "name";
 		const string KeyAllowAll = "allowAll";

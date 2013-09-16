@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface IDistributedCall
+    public interface IDistributedCallSection : IUmbracoConfigurationSection
     {
         bool Enabled { get; }
 

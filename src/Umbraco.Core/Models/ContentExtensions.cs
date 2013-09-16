@@ -419,7 +419,7 @@ namespace Umbraco.Core.Models
             var supportsResizing = UmbracoConfiguration.Current.UmbracoSettings.Content.ImageFileTypes.InvariantContains(extension);
 
             //the config section used to auto-fill properties
-            IContentImagingAutoFillUploadField uploadFieldConfigNode = null;
+            IImagingAutoFillUploadField uploadFieldConfigNode = null;
 
             //Check for auto fill of additional properties
             if (UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties != null)

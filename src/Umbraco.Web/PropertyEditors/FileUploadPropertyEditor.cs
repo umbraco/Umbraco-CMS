@@ -95,7 +95,7 @@ namespace Umbraco.Web.PropertyEditors
             }            
         }
 
-        private static void ResetProperties(IContentImagingAutoFillUploadField uploadFieldConfigNode, IContentBase content)
+        private static void ResetProperties(IImagingAutoFillUploadField uploadFieldConfigNode, IContentBase content)
         {
             if (content.Properties[uploadFieldConfigNode.WidthFieldAlias] != null)
                 content.Properties[uploadFieldConfigNode.WidthFieldAlias].Value = string.Empty;
@@ -110,7 +110,7 @@ namespace Umbraco.Web.PropertyEditors
                 content.Properties[uploadFieldConfigNode.ExtensionFieldAlias].Value = string.Empty;
         }
 
-        private static void FillProperties(IContentImagingAutoFillUploadField uploadFieldConfigNode, IContentBase content, UmbracoMediaFile um)
+        private static void FillProperties(IImagingAutoFillUploadField uploadFieldConfigNode, IContentBase content, UmbracoMediaFile um)
         {
             var size = um.SupportsResizing ? (Size?)um.GetDimensions() : null;
 

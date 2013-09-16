@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface ISecurity
+    public interface ISecuritySection : IUmbracoConfigurationSection
     {
         bool KeepUserLoggedIn { get; }
 

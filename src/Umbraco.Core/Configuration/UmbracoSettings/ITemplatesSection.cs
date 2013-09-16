@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface ITemplates
+    public interface ITemplatesSection : IUmbracoConfigurationSection
     {
         bool UseAspNetMasterPages { get; }
 

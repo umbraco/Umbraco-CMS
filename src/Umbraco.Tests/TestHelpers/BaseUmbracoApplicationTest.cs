@@ -30,12 +30,15 @@ namespace Umbraco.Tests.TestHelpers
             TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
             TestHelper.EnsureUmbracoSettingsConfig();
+            
             //mock the Umbraco settings that we need
-            var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+            //var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+            var settings = SettingsForTests.GetDefault();
             settings.Stub(x => x.Content.UseLegacyXmlSchema).Return(false);
             settings.Stub(x => x.Content.ForceSafeAliases).Return(true);
             settings.Stub(x => x.Content.UmbracoLibraryCacheDuration).Return(1800);
             SettingsForTests.ConfigureSettings(settings);
+            
 
             //Create the legacy prop-eds mapping
             LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();

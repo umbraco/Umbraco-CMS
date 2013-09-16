@@ -9,22 +9,22 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void UseAspNetMasterPages()
         {
-            Assert.IsTrue(Section.Templates.UseAspNetMasterPages == true);
+            Assert.IsTrue(SettingsSection.Templates.UseAspNetMasterPages == true);
         }
         [Test]
         public void EnableSkinSupport()
         {
-            Assert.IsTrue(Section.Templates.EnableSkinSupport);
+            Assert.IsTrue(SettingsSection.Templates.EnableSkinSupport);
         }
         [Test]
         public void DefaultRenderingEngine()
         {        
-            Assert.IsTrue(Section.Templates.DefaultRenderingEngine == RenderingEngine.Mvc);
+            Assert.IsTrue(SettingsSection.Templates.DefaultRenderingEngine == RenderingEngine.Mvc);
         }
         [Test]
         public void EnableTemplateFolders()
         {            
-            Assert.IsTrue(Section.Templates.EnableTemplateFolders == false);
+            Assert.IsTrue(SettingsSection.Templates.EnableTemplateFolders == false);
         }
     }
 }

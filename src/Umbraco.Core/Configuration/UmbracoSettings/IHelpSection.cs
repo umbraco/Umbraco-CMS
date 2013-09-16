@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface IHelp
+    public interface IHelpSection : IUmbracoConfigurationSection
     {
         string DefaultUrl { get; }
 

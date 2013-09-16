@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class RequestHandlerElement : ConfigurationElement, IRequestHandler
+    internal class RequestHandlerElement : ConfigurationElement, IRequestHandlerSection
     {
         [ConfigurationProperty("useDomainPrefixes")]
         public InnerTextConfigurationElement<bool> UseDomainPrefixes
@@ -101,22 +101,22 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        bool IRequestHandler.UseDomainPrefixes
+        bool IRequestHandlerSection.UseDomainPrefixes
         {
             get { return UseDomainPrefixes; }
         }
 
-        bool IRequestHandler.AddTrailingSlash
+        bool IRequestHandlerSection.AddTrailingSlash
         {
             get { return AddTrailingSlash; }
         }
 
-        bool IRequestHandler.RemoveDoubleDashes
+        bool IRequestHandlerSection.RemoveDoubleDashes
         {
             get { return UrlReplacing.RemoveDoubleDashes; }
         }
 
-        IEnumerable<IChar> IRequestHandler.CharCollection
+        IEnumerable<IChar> IRequestHandlerSection.CharCollection
         {
             get { return UrlReplacing.CharCollection; }
         }
