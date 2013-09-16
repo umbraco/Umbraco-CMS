@@ -2,11 +2,23 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public interface IContent
+    public interface IContentSection : IUmbracoConfigurationSection
     {
-        IContentImaging Imaging { get; }
+        string NotificationEmailAddress { get; }
 
-        IContentScriptEditor ScriptEditor { get; }
+        bool DisableHtmlEmail { get; }
+
+        IEnumerable<string> ImageFileTypes { get; }
+
+        IEnumerable<string> ImageTagAllowedAttributes { get; }
+
+        IEnumerable<IContentImagingAutoFillUploadField> ImageAutoFillProperties { get; }
+
+        string ScriptFolderPath { get; }
+
+        IEnumerable<string> ScriptFileTypes { get; }
+
+        bool ScriptEditorDisable { get; }
 
         bool EnableCanvasEditing { get; }
 
@@ -14,9 +26,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         bool UploadAllowDirectories { get; }
 
-        IContentErrors Errors { get; }
-
-        INotifications Notifications { get; }
+        IEnumerable<IContentErrorPage> Error404Collection { get; }
 
         bool EnsureUniqueNaming { get; }
 

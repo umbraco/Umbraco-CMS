@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ContentErrorsElement : RawXmlConfigurationElement, IContentErrors
+    internal class ContentErrorsElement : RawXmlConfigurationElement
     {
         
         public IEnumerable<IContentErrorPage> Error404Collection

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Rhino.Mocks;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Tests.Stubs;
 using Umbraco.Tests.TestHelpers;
 using System.Configuration;
@@ -63,7 +65,10 @@ namespace Umbraco.Tests.Routing
 		{
 		    SettingsForTests.UseDirectoryUrls = true;
 		    SettingsForTests.HideTopLevelNodeFromPath = false;
-		    SettingsForTests.UseDomainPrefixes = false;
+            //mock the Umbraco settings that we need
+            var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+            settings.Stub(x => x.RequestHandler.UseDomainPrefixes).Return(false);
+            SettingsForTests.ConfigureSettings(settings);
 
 			Assert.AreEqual(nodeId, global::umbraco.uQuery.GetNodeIdByUrl("http://example.com" + url));
 		}
@@ -81,7 +86,10 @@ namespace Umbraco.Tests.Routing
 		{
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false;
-            SettingsForTests.UseDomainPrefixes = false;
+            //mock the Umbraco settings that we need
+            var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+            settings.Stub(x => x.RequestHandler.UseDomainPrefixes).Return(false);
+            SettingsForTests.ConfigureSettings(settings);
 
 			Assert.AreEqual(nodeId, global::umbraco.uQuery.GetNodeIdByUrl(url));
 		}

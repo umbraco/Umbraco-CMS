@@ -2,7 +2,7 @@
 {
     public interface IUmbracoSettings
     {
-        IContent Content { get; }
+        IContentSection Content { get; }
 
         ISecurity Security { get; }
 

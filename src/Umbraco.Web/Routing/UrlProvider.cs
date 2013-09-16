@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core;
 
@@ -26,6 +27,12 @@ namespace Umbraco.Web.Routing
 
             var provider = UrlProviderMode.Auto;
             Mode = provider;
+
+            //if (Enum<UrlProviderMode>.TryParse(UmbracoConfiguration.For<IWebRouting>(), out provider))
+            //{
+                
+            //}
+
             if (Enum<UrlProviderMode>.TryParse(UmbracoConfiguration.Current.UmbracoSettings.WebRouting.UrlProviderMode, out provider))
             {
                 Mode = provider;

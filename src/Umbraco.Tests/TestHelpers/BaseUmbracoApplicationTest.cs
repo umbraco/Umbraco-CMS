@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using NUnit.Framework;
+using Rhino.Mocks;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
@@ -11,6 +13,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Web;
+using ObjectExtensions = Umbraco.Core.ObjectExtensions;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -27,10 +30,12 @@ namespace Umbraco.Tests.TestHelpers
             TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
             TestHelper.EnsureUmbracoSettingsConfig();
-
-            SettingsForTests.UseLegacyXmlSchema = false;
-            SettingsForTests.ForceSafeAliases = true;
-            SettingsForTests.UmbracoLibraryCacheDuration = 1800;
+            //mock the Umbraco settings that we need
+            var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+            settings.Stub(x => x.Content.UseLegacyXmlSchema).Return(false);
+            settings.Stub(x => x.Content.ForceSafeAliases).Return(true);
+            settings.Stub(x => x.Content.UmbracoLibraryCacheDuration).Return(1800);
+            SettingsForTests.ConfigureSettings(settings);
 
             //Create the legacy prop-eds mapping
             LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
@@ -51,7 +56,7 @@ namespace Umbraco.Tests.TestHelpers
             TestHelper.CleanContentDirectories();
             TestHelper.CleanUmbracoSettingsConfig();
             //reset the app context, this should reset most things that require resetting like ALL resolvers
-            ApplicationContext.Current.DisposeIfDisposable();
+            ObjectExtensions.DisposeIfDisposable(ApplicationContext.Current);
             ApplicationContext.Current = null;
             ResetPluginManager();
             LegacyPropertyEditorIdToAliasConverter.Reset();

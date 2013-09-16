@@ -135,7 +135,7 @@ namespace Umbraco.Core.IO
         {
             get
             {
-                return UmbracoConfiguration.Current.UmbracoSettings.Content.Imaging.ImageFileTypes.InvariantContains(Extension);
+                return UmbracoConfiguration.Current.UmbracoSettings.Content.ImageFileTypes.InvariantContains(Extension);
             }
         }
 

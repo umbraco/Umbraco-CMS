@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using umbraco;
 

@@ -180,12 +180,9 @@
     <Compile Include="Configuration\UmbracoSettings\FileExtensionElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\HelpElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\IChar.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IContent.cs" />
+    <Compile Include="Configuration\UmbracoSettings\IContentSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentErrorPage.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IContentErrors.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IContentImaging.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentImagingAutoFillUploadField.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IContentScriptEditor.cs" />
     <Compile Include="Configuration\UmbracoSettings\IDeveloper.cs" />
     <Compile Include="Configuration\UmbracoSettings\IDistributedCall.cs" />
     <Compile Include="Configuration\UmbracoSettings\IExternalLogger.cs" />
@@ -196,7 +193,6 @@
     <Compile Include="Configuration\UmbracoSettings\ILogType.cs" />
     <Compile Include="Configuration\UmbracoSettings\InnerTextConfigurationElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\INotDynamicXmlDocument.cs" />
-    <Compile Include="Configuration\UmbracoSettings\INotifications.cs" />
     <Compile Include="Configuration\UmbracoSettings\IProviders.cs" />
     <Compile Include="Configuration\UmbracoSettings\IRazor.cs" />
     <Compile Include="Configuration\UmbracoSettings\IRazorStaticMapping.cs" />

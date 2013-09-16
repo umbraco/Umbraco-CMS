@@ -10,12 +10,12 @@ namespace Umbraco.Core.Configuration.BaseRest
 
         private bool? _enabled;
 
-        internal protected override void ResetSection()
-        {
-            base.ResetSection();
+        //internal protected override void ResetSection()
+        //{
+        //    base.ResetSection();
 
-            _enabled = null;
-        }
+        //    _enabled = null;
+        //}
 
         [ConfigurationProperty("", IsKey = false, IsRequired = false, IsDefaultCollection = true)]
 		public ExtensionElementCollection Items

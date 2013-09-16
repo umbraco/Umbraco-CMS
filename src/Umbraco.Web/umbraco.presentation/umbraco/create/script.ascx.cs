@@ -75,7 +75,7 @@ namespace umbraco.presentation.umbraco.create
 			this.sbmt.Click += new System.EventHandler(this.sbmt_Click);
 			this.Load += new System.EventHandler(this.Page_Load);
 
-            string[] fileTypes = UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptEditor.ScriptFileTypes.ToArray();
+            string[] fileTypes = UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptFileTypes.ToArray();
 
             scriptType.Items.Add(new ListItem(ui.Text("folder"), ""));
 		    scriptType.Items.FindByText(ui.Text("folder")).Selected = true;

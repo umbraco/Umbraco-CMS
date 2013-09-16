@@ -13,14 +13,14 @@ namespace Umbraco.Core.IO
 	[FileSystemProvider("media")]
 	public class MediaFileSystem : FileSystemWrapper
 	{
-	    private readonly IContent _contentConfig;
+	    private readonly IContentSection _contentConfig;
 
 	    public MediaFileSystem(IFileSystem wrapped)
 			: this(wrapped, UmbracoConfiguration.Current.UmbracoSettings.Content)
 		{
 		}
 
-        public MediaFileSystem(IFileSystem wrapped, IContent contentConfig) : base(wrapped)
+        public MediaFileSystem(IFileSystem wrapped, IContentSection contentConfig) : base(wrapped)
         {
             _contentConfig = contentConfig;
         }

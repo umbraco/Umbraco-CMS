@@ -1867,7 +1867,7 @@ namespace umbraco
         internal static string GetCurrentNotFoundPageId()
         {
             //XmlNode error404Node = UmbracoSettings.GetKeyAsNode("/settings/content/errors/error404");
-            if (UmbracoConfiguration.Current.UmbracoSettings.Content.Errors.Error404Collection.Count() > 1)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.Error404Collection.Count() > 1)
             {
                 // try to get the 404 based on current culture (via domain)
                 IContentErrorPage cultureErr;
@@ -1876,7 +1876,7 @@ namespace umbraco
                     var d = Domain.GetDomain(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]);
 
                     // test if a 404 page exists with current culture
-                    cultureErr = UmbracoConfiguration.Current.UmbracoSettings.Content.Errors.Error404Collection
+                    cultureErr = UmbracoConfiguration.Current.UmbracoSettings.Content.Error404Collection
                                                      .FirstOrDefault(x => x.Culture == d.Language.CultureAlias);
 
                     if (cultureErr != null)
@@ -1887,7 +1887,7 @@ namespace umbraco
                 }
 
                 // test if a 404 page exists with current culture thread
-                cultureErr = UmbracoConfiguration.Current.UmbracoSettings.Content.Errors.Error404Collection
+                cultureErr = UmbracoConfiguration.Current.UmbracoSettings.Content.Error404Collection
                                                  .FirstOrDefault(x => x.Culture == System.Threading.Thread.CurrentThread.CurrentUICulture.Name);
                 if (cultureErr != null)
                 {
@@ -1895,7 +1895,7 @@ namespace umbraco
                 }
 
                 // there should be a default one!
-                cultureErr = UmbracoConfiguration.Current.UmbracoSettings.Content.Errors.Error404Collection
+                cultureErr = UmbracoConfiguration.Current.UmbracoSettings.Content.Error404Collection
                                                  .FirstOrDefault(x => x.Culture == "default");
                 if (cultureErr != null)
                 {
@@ -1905,7 +1905,7 @@ namespace umbraco
             else
             {
 
-                return UmbracoConfiguration.Current.UmbracoSettings.Content.Errors.Error404Collection.First().ContentId.ToInvariantString();                
+                return UmbracoConfiguration.Current.UmbracoSettings.Content.Error404Collection.First().ContentId.ToInvariantString();                
             }
 
             return "";

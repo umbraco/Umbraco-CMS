@@ -57,7 +57,7 @@ namespace umbraco.cms.presentation.settings.scripts
 
             lttPath.Text = "<a target='_blank' href='" + path + "'>" + path + "</a>";
 
-            var exts = UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptEditor.ScriptFileTypes.ToList();
+            var exts = UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptFileTypes.ToList();
             if (UmbracoConfiguration.Current.UmbracoSettings.Templates.DefaultRenderingEngine == RenderingEngine.Mvc)
             {
                 exts.Add("cshtml");

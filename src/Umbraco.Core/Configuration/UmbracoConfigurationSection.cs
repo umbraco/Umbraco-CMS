@@ -2,8 +2,11 @@
 
 namespace Umbraco.Core.Configuration
 {
-    // note - still must work on how to support read-only and ResetSection for collections
-    // note - still must work on how to spread config over files (aka DeepConfig in v5)
+    
+    public interface IUmbracoConfigurationSection
+    {
+        
+    }
 
     /// <summary>
     /// Represents an Umbraco section within the configuration file.
@@ -23,11 +26,5 @@ namespace Umbraco.Core.Configuration
         /// </summary>
         protected bool IsPresent { get { return ElementInformation.IsPresent; } }
 
-        /// <summary>
-        /// Resets settings that were set programmatically, to their initial values.
-        /// </summary>
-        /// <remarks>>To be used in unit tests.</remarks>
-        internal protected virtual void ResetSection()
-        { }
     }
 }

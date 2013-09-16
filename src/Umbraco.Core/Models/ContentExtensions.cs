@@ -416,15 +416,15 @@ namespace Umbraco.Core.Models
             fs.AddFile(fileName, fileStream);
             
             //Check if file supports resizing and create thumbnails
-            var supportsResizing = UmbracoConfiguration.Current.UmbracoSettings.Content.Imaging.ImageFileTypes.InvariantContains(extension);
+            var supportsResizing = UmbracoConfiguration.Current.UmbracoSettings.Content.ImageFileTypes.InvariantContains(extension);
 
             //the config section used to auto-fill properties
             IContentImagingAutoFillUploadField uploadFieldConfigNode = null;
 
             //Check for auto fill of additional properties
-            if (UmbracoConfiguration.Current.UmbracoSettings.Content.Imaging.ImageAutoFillProperties != null)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties != null)
             {
-                uploadFieldConfigNode = UmbracoConfiguration.Current.UmbracoSettings.Content.Imaging.ImageAutoFillProperties
+                uploadFieldConfigNode = UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties
                                     .Single(x => x.Alias == propertyTypeAlias);
 
             }

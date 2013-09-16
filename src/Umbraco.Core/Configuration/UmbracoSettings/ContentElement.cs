@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ContentElement : ConfigurationElement, IContent
+    internal class ContentElement : ConfigurationElement, IContentSection
     {
         [ConfigurationProperty("imaging")]
         internal ContentImagingElement Imaging
@@ -51,6 +51,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                     //set the default
                        true);
             }
+        }
+
+        public IEnumerable<IContentErrorPage> Error404Collection
+        {
+            get { return Errors.Error404Collection; }
         }
 
         [ConfigurationProperty("errors", IsRequired = true)]
@@ -284,127 +289,147 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        IContentImaging IContent.Imaging
+        string IContentSection.NotificationEmailAddress
         {
-            get { return Imaging; }
+            get { return Notifications.NotificationEmailAddress; }
         }
 
-        IContentScriptEditor IContent.ScriptEditor
+        bool IContentSection.DisableHtmlEmail
         {
-            get { return ScriptEditor; }
+            get { return Notifications.DisableHtmlEmail; }
         }
 
-        bool IContent.EnableCanvasEditing
+        IEnumerable<string> IContentSection.ImageFileTypes
+        {
+            get { return Imaging.ImageFileTypes; }
+        }
+
+        IEnumerable<string> IContentSection.ImageTagAllowedAttributes
+        {
+            get { return Imaging.ImageTagAllowedAttributes; }
+        }
+
+        IEnumerable<IContentImagingAutoFillUploadField> IContentSection.ImageAutoFillProperties
+        {
+            get { return Imaging.ImageAutoFillProperties; }
+        }
+
+        bool IContentSection.ScriptEditorDisable
+        {
+            get { return ScriptEditor.ScriptEditorDisable; }
+        }
+
+        string IContentSection.ScriptFolderPath
+        {
+            get { return ScriptEditor.ScriptFolderPath; }
+        }
+
+        IEnumerable<string> IContentSection.ScriptFileTypes
+        {
+            get { return ScriptEditor.ScriptFileTypes; }
+        }
+
+        bool IContentSection.EnableCanvasEditing
         {
             get { return EnableCanvasEditing; }
         }
 
-        bool IContent.ResolveUrlsFromTextString
+        bool IContentSection.ResolveUrlsFromTextString
         {
             get { return ResolveUrlsFromTextString; }
         }
 
-        bool IContent.UploadAllowDirectories
+        bool IContentSection.UploadAllowDirectories
         {
             get { return UploadAllowDirectories; }
-        }
+        }        
 
-        IContentErrors IContent.Errors
-        {
-            get { return Errors; }
-        }
-
-        INotifications IContent.Notifications
-        {
-            get { return Notifications; }
-        }
-
-        bool IContent.EnsureUniqueNaming
+        bool IContentSection.EnsureUniqueNaming
         {
             get { return EnsureUniqueNaming; }
         }
 
-        bool IContent.TidyEditorContent
+        bool IContentSection.TidyEditorContent
         {
             get { return TidyEditorContent; }
         }
 
-        string IContent.TidyCharEncoding
+        string IContentSection.TidyCharEncoding
         {
             get { return TidyCharEncoding; }
         }
 
-        bool IContent.XmlCacheEnabled
+        bool IContentSection.XmlCacheEnabled
         {
             get { return XmlCacheEnabled; }
         }
 
-        bool IContent.ContinouslyUpdateXmlDiskCache
+        bool IContentSection.ContinouslyUpdateXmlDiskCache
         {
             get { return ContinouslyUpdateXmlDiskCache; }
         }
 
-        bool IContent.XmlContentCheckForDiskChanges
+        bool IContentSection.XmlContentCheckForDiskChanges
         {
             get { return XmlContentCheckForDiskChanges; }
         }
 
-        bool IContent.EnableSplashWhileLoading
+        bool IContentSection.EnableSplashWhileLoading
         {
             get { return EnableSplashWhileLoading; }
         }
 
-        string IContent.PropertyContextHelpOption
+        string IContentSection.PropertyContextHelpOption
         {
             get { return PropertyContextHelpOption; }
         }
 
-        bool IContent.UseLegacyXmlSchema
+        bool IContentSection.UseLegacyXmlSchema
         {
             get { return UseLegacyXmlSchema; }
         }
 
-        bool IContent.ForceSafeAliases
+        bool IContentSection.ForceSafeAliases
         {
             get { return ForceSafeAliases; }
         }
 
-        string IContent.PreviewBadge
+        string IContentSection.PreviewBadge
         {
             get { return PreviewBadge; }
         }
 
-        int IContent.UmbracoLibraryCacheDuration
+        int IContentSection.UmbracoLibraryCacheDuration
         {
             get { return UmbracoLibraryCacheDuration; }
         }
 
-        MacroErrorBehaviour IContent.MacroErrorBehaviour
+        MacroErrorBehaviour IContentSection.MacroErrorBehaviour
         {
             get { return MacroErrors; }
         }
 
-        IconPickerBehaviour IContent.IconPickerBehaviour
+        IconPickerBehaviour IContentSection.IconPickerBehaviour
         {
             get { return DocumentTypeIconList; }
         }
 
-        IEnumerable<string> IContent.DisallowedUploadFiles
+        IEnumerable<string> IContentSection.DisallowedUploadFiles
         {
             get { return DisallowedUploadFiles; }
         }
 
-        bool IContent.CloneXmlContent
+        bool IContentSection.CloneXmlContent
         {
             get { return CloneXmlContent; }
         }
 
-        bool IContent.GlobalPreviewStorageEnabled
+        bool IContentSection.GlobalPreviewStorageEnabled
         {
             get { return GlobalPreviewStorageEnabled; }
         }
 
-        string IContent.DefaultDocumentTypeProperty
+        string IContentSection.DefaultDocumentTypeProperty
         {
             get { return DefaultDocumentTypeProperty; }
         }

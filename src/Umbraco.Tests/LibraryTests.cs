@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;

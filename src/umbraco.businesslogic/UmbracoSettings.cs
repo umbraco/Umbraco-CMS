@@ -278,7 +278,7 @@ namespace umbraco
         /// <value>The allowed image file types.</value>
         public static string ImageFileTypes
         {
-            get { return string.Join(",", UmbracoConfiguration.Current.UmbracoSettings.Content.Imaging.ImageFileTypes.Select(x => x.ToLowerInvariant())); }
+            get { return string.Join(",", UmbracoConfiguration.Current.UmbracoSettings.Content.ImageFileTypes.Select(x => x.ToLowerInvariant())); }
         }
 
         /// <summary>
@@ -287,7 +287,7 @@ namespace umbraco
         /// <value>The allowed script file types.</value>
         public static string ScriptFileTypes
         {
-            get { return string.Join(",", UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptEditor.ScriptFileTypes); }
+            get { return string.Join(",", UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptFileTypes); }
         }
 
         /// <summary>
@@ -305,7 +305,7 @@ namespace umbraco
         /// <value>The script folder path.</value>
         public static string ScriptFolderPath
         {
-            get { return UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptEditor.ScriptFolderPath; }
+            get { return UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptFolderPath; }
         }
 
         /// <summary>
@@ -313,7 +313,7 @@ namespace umbraco
         /// </summary>
         public static bool ScriptDisableEditor
         {
-            get { return UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptEditor.DisableScriptEditor; }
+            get { return UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptEditorDisable; }
         }
         
         /// <summary>
@@ -333,7 +333,7 @@ namespace umbraco
         /// <value>The notification email sender.</value>
         public static string NotificationEmailSender
         {
-            get { return UmbracoConfiguration.Current.UmbracoSettings.Content.Notifications.EmailAddress; }
+            get { return UmbracoConfiguration.Current.UmbracoSettings.Content.NotificationEmailAddress; }
         }
 
         /// <summary>
@@ -344,7 +344,7 @@ namespace umbraco
         /// </value>
         public static bool NotificationDisableHtmlEmail
         {
-            get { return UmbracoConfiguration.Current.UmbracoSettings.Content.Notifications.DisableHtmlEmail; }
+            get { return UmbracoConfiguration.Current.UmbracoSettings.Content.DisableHtmlEmail; }
         }
 
         /// <summary>
@@ -353,7 +353,7 @@ namespace umbraco
         /// <value>The allowed attributes on images.</value>
         public static string ImageAllowedAttributes
         {
-            get { return string.Join(",", UmbracoConfiguration.Current.UmbracoSettings.Content.Imaging.AllowedAttributes); }
+            get { return string.Join(",", UmbracoConfiguration.Current.UmbracoSettings.Content.ImageTagAllowedAttributes); }
         }
 
         public static XmlNode ImageAutoFillImageProperties

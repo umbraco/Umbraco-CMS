@@ -4,7 +4,9 @@ using System.Linq;
 using Lucene.Net.Documents;
 using Lucene.Net.Store;
 using NUnit.Framework;
+using Rhino.Mocks;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.UmbracoExamine;
 using umbraco.MacroEngines;
@@ -16,8 +18,11 @@ namespace Umbraco.Tests.PublishedContent
         public override void TestSetup()
         {
             base.TestSetup();
-            SettingsForTests.ForceSafeAliases = true;
-            SettingsForTests.UmbracoLibraryCacheDuration = 1800;
+
+            var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+            settings.Stub(x => x.Content.ForceSafeAliases).Return(true);
+            settings.Stub(x => x.Content.UmbracoLibraryCacheDuration).Return(1800);
+            SettingsForTests.ConfigureSettings(settings);
         }
 
         public override void TestTearDown()

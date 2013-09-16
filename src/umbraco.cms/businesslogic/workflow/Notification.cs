@@ -158,11 +158,11 @@ namespace umbraco.cms.businesslogic.workflow
                                 };
 
             // create the mail message 
-            var mail = new MailMessage(UmbracoConfiguration.Current.UmbracoSettings.Content.Notifications.EmailAddress, mailingUser.Email);
+            var mail = new MailMessage(UmbracoConfiguration.Current.UmbracoSettings.Content.NotificationEmailAddress, mailingUser.Email);
 
             // populate the message
             mail.Subject = ui.Text("notifications", "mailSubject", subjectVars, mailingUser);
-            if (UmbracoConfiguration.Current.UmbracoSettings.Content.Notifications.DisableHtmlEmail)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.DisableHtmlEmail)
             {
                 mail.IsBodyHtml = false;
                 mail.Body = ui.Text("notifications", "mailBody", bodyVars, mailingUser);

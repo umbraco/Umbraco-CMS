@@ -14,18 +14,18 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Script : File
     {
-        private readonly IContentScriptEditor _scriptEditorConfig;
+        private readonly IContentSection _contentConfig;
 
         public Script(string path)
-            : this(path, UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptEditor)
+            : this(path, UmbracoConfiguration.Current.UmbracoSettings.Content)
         {
             
         }
 
-        public Script(string path, IContentScriptEditor scriptEditorConfig)
+        public Script(string path, IContentSection contentConfig)
             : base(path)
         {
-            _scriptEditorConfig = scriptEditorConfig;
+            _contentConfig = contentConfig;
             base.Path = path;
         }
 
@@ -44,7 +44,7 @@ namespace Umbraco.Core.Models
             //into 4 private methods.
             //See codeEditorSave.asmx.cs for reference.
 
-            var exts = _scriptEditorConfig.ScriptFileTypes.ToList();
+            var exts = _contentConfig.ScriptFileTypes.ToList();
             /*if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
             {
                 exts.Add("cshtml");

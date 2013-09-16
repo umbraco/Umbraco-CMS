@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Rhino.Mocks;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using umbraco.cms.businesslogic.web;
@@ -25,7 +27,10 @@ namespace Umbraco.Tests.Routing
 		{
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
-            SettingsForTests.UseDomainPrefixes = false;
+            //mock the Umbraco settings that we need
+            var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+            settings.Stub(x => x.RequestHandler.UseDomainPrefixes).Return(true);
+            SettingsForTests.ConfigureSettings(settings);
 
 			InitializeLanguagesAndDomains();
 			SetDomains1();

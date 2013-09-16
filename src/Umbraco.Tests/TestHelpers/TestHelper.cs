@@ -113,8 +113,7 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-
-	    public static void EnsureUmbracoSettingsConfig()
+        public static void EnsureUmbracoSettingsConfig()
         {
             var currDir = new DirectoryInfo(CurrentAssemblyDirectory);
 
@@ -131,8 +130,8 @@ namespace Umbraco.Tests.TestHelpers
                         .GetFiles("umbracoSettings.Release.config").First().FullName,
                     Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
                     true);
-            
-            Core.Configuration.LegacyUmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
+
+            //Core.Configuration.LegacyUmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
         }
 
 	    public static void CleanUmbracoSettingsConfig()

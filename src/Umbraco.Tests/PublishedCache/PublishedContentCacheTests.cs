@@ -2,8 +2,10 @@ using System;
 using System.Linq;
 using System.Xml;
 using NUnit.Framework;
+using Rhino.Mocks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
@@ -79,7 +81,10 @@ namespace Umbraco.Tests.PublishedCache
 			//ensure the StateHelper is using our custom context
 			StateHelper.HttpContext = _httpContextFactory.HttpContext;
 
-			LegacyUmbracoSettings.UseLegacyXmlSchema = false;
+		    var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+		    settings.Stub(x => x.Content.UseLegacyXmlSchema).Return(false);
+		    SettingsForTests.ConfigureSettings(settings);
+
             var cache = new PublishedContentCache
                 {
                     GetXmlDelegate = (context, preview) =>
@@ -101,7 +106,9 @@ namespace Umbraco.Tests.PublishedCache
 
 		private void SetupForLegacy()
 		{
-			Umbraco.Core.Configuration.LegacyUmbracoSettings.UseLegacyXmlSchema = true;
+            var settings = MockRepository.GenerateStub<IUmbracoSettings>();
+            settings.Stub(x => x.Content.UseLegacyXmlSchema).Return(true);
+            SettingsForTests.ConfigureSettings(settings);
 
             var cache = _umbracoContext.ContentCache.InnerCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
@@ -117,7 +124,7 @@ namespace Umbraco.Tests.PublishedCache
 		[TearDown]
 		public void TearDown()
 		{
-			LegacyUmbracoSettings.Reset();
+			SettingsForTests.Reset();
 		}
 
 		[Test]

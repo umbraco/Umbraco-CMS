@@ -12,6 +12,71 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
     public class ContentElementTests : UmbracoSettingsTests
     {
         [Test]
+        public void EmailAddress()
+        {
+            Assert.IsTrue(Section.Content.NotificationEmailAddress == "robot@umbraco.dk");
+        }
+        [Test]
+        public virtual void DisableHtmlEmail()
+        {
+            Assert.IsTrue(Section.Content.DisableHtmlEmail == true);
+        }
+
+        [Test]
+        public virtual void Can_Set_Multiple()
+        {
+            Assert.IsTrue(Section.Content.Error404Collection.Count() == 3);
+            Assert.IsTrue(Section.Content.Error404Collection.ElementAt(0).Culture == "default");
+            Assert.IsTrue(Section.Content.Error404Collection.ElementAt(0).ContentId == 1047);
+            Assert.IsTrue(Section.Content.Error404Collection.ElementAt(1).Culture == "en-US");
+            Assert.IsTrue(Section.Content.Error404Collection.ElementAt(1).ContentId == 1048);
+            Assert.IsTrue(Section.Content.Error404Collection.ElementAt(2).Culture == "en-UK");
+            Assert.IsTrue(Section.Content.Error404Collection.ElementAt(2).ContentId == 1049);
+        }    
+
+        [Test]
+        public void ScriptFolderPath()
+        {
+            Assert.IsTrue(Section.Content.ScriptFolderPath == "/scripts");
+        }
+        [Test]
+        public void ScriptFileTypes()
+        {
+            Assert.IsTrue(Section.Content.ScriptFileTypes.All(x => "js,xml".Split(',').Contains(x)));
+        }
+        [Test]
+        public void DisableScriptEditor()
+        {
+            Assert.IsTrue(Section.Content.ScriptEditorDisable == false);
+        }
+
+        [Test]
+        public void ImageFileTypes()
+        {
+            Assert.IsTrue(Section.Content.ImageFileTypes.All(x => "jpeg,jpg,gif,bmp,png,tiff,tif".Split(',').Contains(x)));
+        }
+        [Test]
+        public void AllowedAttributes()
+        {
+            Assert.IsTrue(Section.Content.ImageTagAllowedAttributes.All(x => "src,alt,border,class,style,align,id,name,onclick,usemap".Split(',').Contains(x)));
+        }
+        [Test]
+        public virtual void ImageAutoFillProperties()
+        {
+            Assert.IsTrue(Section.Content.ImageAutoFillProperties.Count() == 2);
+            Assert.IsTrue(Section.Content.ImageAutoFillProperties.ElementAt(0).Alias == "umbracoFile");
+            Assert.IsTrue(Section.Content.ImageAutoFillProperties.ElementAt(0).WidthFieldAlias == "umbracoWidth");
+            Assert.IsTrue(Section.Content.ImageAutoFillProperties.ElementAt(0).HeightFieldAlias == "umbracoHeight");
+            Assert.IsTrue(Section.Content.ImageAutoFillProperties.ElementAt(0).LengthFieldAlias == "umbracoBytes");
+            Assert.IsTrue(Section.Content.ImageAutoFillProperties.ElementAt(0).ExtensionFieldAlias == "umbracoExtension");
+            Assert.IsTrue(Section.Content.ImageAutoFillProperties.ElementAt(1).Alias == "umbracoFile2");
+            Assert.IsTrue(Section.Content.ImageAutoFillProperties.ElementAt(1).WidthFieldAlias == "umbracoWidth2");
+            Assert.IsTrue(Section.Content.ImageAutoFillProperties.ElementAt(1).HeightFieldAlias == "umbracoHeight2");
+            Assert.IsTrue(Section.Content.ImageAutoFillProperties.ElementAt(1).LengthFieldAlias == "umbracoBytes2");
+            Assert.IsTrue(Section.Content.ImageAutoFillProperties.ElementAt(1).ExtensionFieldAlias == "umbracoExtension2");
+        }
+
+        [Test]
         public void UploadAllowDirectories()
         {
             Assert.IsTrue(Section.Content.UploadAllowDirectories == true);

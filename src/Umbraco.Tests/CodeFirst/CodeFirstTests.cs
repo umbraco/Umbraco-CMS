@@ -20,7 +20,8 @@ namespace Umbraco.Tests.CodeFirst
         [SetUp]
         public override void Initialize()
         {
-            LegacyUmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
+            
+            //LegacyUmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
            
             base.Initialize();
 
@@ -212,7 +213,7 @@ namespace Umbraco.Tests.CodeFirst
         public override void TearDown()
         {
 			base.TearDown();
-
+            
             SerializationService = null;
         }
     }

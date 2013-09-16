@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ContentScriptEditorElement : ConfigurationElement, IContentScriptEditor
+    internal class ContentScriptEditorElement : ConfigurationElement
     {
         [ConfigurationProperty("scriptFolderPath")]
         internal InnerTextConfigurationElement<string> ScriptFolderPath
@@ -30,7 +30,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("scriptDisableEditor")]
-        internal InnerTextConfigurationElement<bool> DisableScriptEditor
+        internal InnerTextConfigurationElement<bool> ScriptEditorDisable
         {
             get
             {
@@ -41,19 +41,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        string IContentScriptEditor.ScriptFolderPath
-        {
-            get { return ScriptFolderPath; }
-        }
-
-        IEnumerable<string> IContentScriptEditor.ScriptFileTypes
-        {
-            get { return ScriptFileTypes; }
-        }
-
-        bool IContentScriptEditor.DisableScriptEditor
-        {
-            get { return DisableScriptEditor; }
-        }
     }
 }

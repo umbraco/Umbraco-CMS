@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ContentImagingElement : ConfigurationElement, IContentImaging
+    internal class ContentImagingElement : ConfigurationElement
     {
         [ConfigurationProperty("imageFileTypes")]
         internal CommaDelimitedConfigurationElement ImageFileTypes
@@ -18,7 +18,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("allowedAttributes")]
-        internal CommaDelimitedConfigurationElement AllowedAttributes
+        internal CommaDelimitedConfigurationElement ImageTagAllowedAttributes
         {
             get
             {
@@ -61,20 +61,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-
-        IEnumerable<string> IContentImaging.ImageFileTypes
-        {
-            get { return ImageFileTypes; }
-        }
-
-        IEnumerable<string> IContentImaging.AllowedAttributes
-        {
-            get { return AllowedAttributes; }
-        }
-
-        IEnumerable<IContentImagingAutoFillUploadField> IContentImaging.ImageAutoFillProperties
-        {
-            get { return ImageAutoFillProperties; }
-        }
     }
 }

@@ -58,7 +58,7 @@ namespace umbraco.uicontrols
         {
             get
             {
-                return UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptEditor.DisableScriptEditor == false;
+                return UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptEditorDisable == false;
             }
         }
 

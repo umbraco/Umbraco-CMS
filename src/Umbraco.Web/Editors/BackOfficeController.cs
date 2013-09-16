@@ -72,7 +72,7 @@ namespace Umbraco.Web.Editors
                             {
                                 {"umbracoPath", GlobalSettings.Path},
                                 {"imageFileTypes", 
-                                    string.Join(",",UmbracoConfiguration.Current.UmbracoSettings.Content.Imaging.ImageFileTypes)},
+                                    string.Join(",",UmbracoConfiguration.Current.UmbracoSettings.Content.ImageFileTypes)},
                             }
                     },
                     { "isDebuggingEnabled", HttpContext.IsDebuggingEnabled }

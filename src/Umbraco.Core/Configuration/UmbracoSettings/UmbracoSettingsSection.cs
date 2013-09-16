@@ -129,7 +129,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (ScriptingElement)this["scripting"]; }
         }
         
-        IContent IUmbracoSettings.Content
+        IContentSection IUmbracoSettings.Content
         {
             get { return Content; }
         }

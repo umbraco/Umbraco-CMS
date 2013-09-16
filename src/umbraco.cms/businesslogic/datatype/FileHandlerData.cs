@@ -103,10 +103,10 @@ namespace umbraco.cms.businesslogic.datatype
                         }
 
                         // check for auto fill of other properties (width, height, extension and filesize)
-                        if (UmbracoConfiguration.Current.UmbracoSettings.Content.Imaging.ImageAutoFillProperties.Any())
+                        if (UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties.Any())
                         {
                             var uploadFieldConfigNode =
-                                UmbracoConfiguration.Current.UmbracoSettings.Content.Imaging.ImageAutoFillProperties.FirstOrDefault(x => x.Alias == PropertyTypeAlias);
+                                UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties.FirstOrDefault(x => x.Alias == PropertyTypeAlias);
 
                             if (uploadFieldConfigNode != null)
                             {
@@ -139,10 +139,10 @@ namespace umbraco.cms.businesslogic.datatype
             if (PropertyId == default(int))
                 return;
 
-            if (UmbracoConfiguration.Current.UmbracoSettings.Content.Imaging.ImageAutoFillProperties.Any())
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties.Any())
             {
                 var uploadFieldConfigNode =
-                    UmbracoConfiguration.Current.UmbracoSettings.Content.Imaging.ImageAutoFillProperties.FirstOrDefault(x => x.Alias == PropertyTypeAlias);
+                    UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties.FirstOrDefault(x => x.Alias == PropertyTypeAlias);
                 if (uploadFieldConfigNode != null)
                 {
                     // get the current document
