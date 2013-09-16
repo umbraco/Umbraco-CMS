@@ -1,0 +1,27 @@
+<form ng-controller="Umbraco.Editors.FolderBrowserController" id="fileupload" 
+method="POST" enctype="multipart/form-data" 
+data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
+
+        <div style="height: 10px; margin: 10px 0px 10px 0px" class="umb-loader" 
+        	ng-hide="active() == 0"></div>
+
+        <ul class="umb-thumbnails thumbnails">
+	        <li class="span2 folder" ng-repeat="image in images | orderBy:'contentTypeAlias' | filter:searchTerm">
+			    <a href="#/media/media/edit/{{image.id}}" class="thumbnail">
+					<img ng-src="{{image.thumbnail}}" ng-switch-when="Image" alt="{{image.name}}"/>	
+                    <div ng-switch on="!!image.thumbnail" >
+                        <img ng-src="{{image.thumbnail}}" class="image" ng-switch-when="true" alt="{{image.name}}"/>
+
+                        <div ng-switch-default>
+                        	<i class="icon-folder large"></i>
+                        	{{image.name}}
+                        </div>
+                    </div>
+	            </a>
+	        </li>
+	    </ul>
+	</div>
+
+</div>
+
+</form>
