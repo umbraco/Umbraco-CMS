@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Linq;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
@@ -92,7 +93,14 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                     return _defaultRepositories;
                 }
 
-                return (RepositoriesElement)base["repositories"];
+                //now we need to ensure there is *always* our umbraco repo! its hard coded in the codebase!
+                var reposElement = (RepositoriesElement)base["repositories"];
+                if (reposElement.Repositories.All(x => x.Id != new Guid("65194810-1f85-11dd-bd0b-0800200c9a66")))
+                {
+                    reposElement.Repositories.Add(new RepositoryElement() { Name = "Umbraco package Repository", Id = new Guid("65194810-1f85-11dd-bd0b-0800200c9a66") });                    
+                }
+
+                return reposElement;
             }
         }
 

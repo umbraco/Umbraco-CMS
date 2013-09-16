@@ -3,17 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Tests.PartialTrust;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests
 {
 	[TestFixture]
-	public class ObjectExtensionsTests : AbstractPartialTrustFixture<ObjectExtensionsTests>
+	public class ObjectExtensionsTests
 	{
-		protected override void FixtureSetup()
+        [TestFixtureSetUp]
+		public void FixtureSetup()
 		{
-			base.FixtureSetup();
 			TestHelper.SetupLog4NetForTests();
 		}
 
@@ -113,22 +112,6 @@ namespace Umbraco.Tests
 				Assert.IsTrue(result.Success);
 				Assert.AreEqual(DateTime.Equals(dateTime.Date, result.Result.Date), testCase.Value);
 			}
-		}
-
-		/// <summary>
-		/// Run once before each test in derived test fixtures.
-		/// </summary>
-		public override void TestSetup()
-		{
-			return;
-		}
-
-		/// <summary>
-		/// Run once after each test in derived test fixtures.
-		/// </summary>
-		public override void TestTearDown()
-		{
-			return;
 		}
 	}
 }

@@ -3,12 +3,11 @@ using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Dynamics;
-using Umbraco.Tests.PartialTrust;
 
 namespace Umbraco.Tests.PublishedContent
 {
     [TestFixture]
-    public class DynamicXmlConverterTests : AbstractPartialTrustFixture<DynamicXmlConverterTests>
+    public class DynamicXmlConverterTests 
     {
         [Test]
         public void Convert_To_Raw_String()
@@ -96,15 +95,6 @@ namespace Umbraco.Tests.PublishedContent
             var result = dXml.TryConvertTo<XmlDocument>();
             Assert.IsTrue(result.Success);
             Assert.AreEqual(xml, result.Result.InnerXml);
-        }
-
-        public override void TestSetup()
-        {
-			
-        }
-
-        public override void TestTearDown()
-        {
         }
     }
 }

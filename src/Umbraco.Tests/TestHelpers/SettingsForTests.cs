@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Configuration;
-using Rhino.Mocks;
+using Moq;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Tests.Configurations.UmbracoSettings;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -30,52 +27,51 @@ namespace Umbraco.Tests.TestHelpers
         /// <returns></returns>
         public static IUmbracoSettingsSection GetMockSettings()
         {
-            var settings = MockRepository.GenerateStub<IUmbracoSettingsSection>();
+            var settings = new Mock<IUmbracoSettingsSection>();
 
-            var content = MockRepository.GenerateStub<IContentSection>();
-            var security = MockRepository.GenerateStub<ISecuritySection>();
-            var requestHandler = MockRepository.GenerateStub<IRequestHandlerSection>();
-            var templates = MockRepository.GenerateStub<ITemplatesSection>();
-            var dev = MockRepository.GenerateStub<IDeveloperSection>();
-            var viewStateMover = MockRepository.GenerateStub<IViewStateMoverModuleSection>();
-            var logging = MockRepository.GenerateStub<ILoggingSection>();
-            var tasks = MockRepository.GenerateStub<IScheduledTasksSection>();
-            var distCall = MockRepository.GenerateStub<IDistributedCallSection>();
-            var repos = MockRepository.GenerateStub<IRepositoriesSection>();
-            var providers = MockRepository.GenerateStub<IProvidersSection>();
-            var help = MockRepository.GenerateStub<IHelpSection>();
-            var routing = MockRepository.GenerateStub<IWebRoutingSection>();
-            var scripting = MockRepository.GenerateStub<IScriptingSection>();
+            var content = new Mock<IContentSection>();
+            var security = new Mock<ISecuritySection>();
+            var requestHandler = new Mock<IRequestHandlerSection>();
+            var templates = new Mock<ITemplatesSection>();
+            var dev = new Mock<IDeveloperSection>();
+            var viewStateMover = new Mock<IViewStateMoverModuleSection>();
+            var logging = new Mock<ILoggingSection>();
+            var tasks = new Mock<IScheduledTasksSection>();
+            var distCall = new Mock<IDistributedCallSection>();
+            var repos = new Mock<IRepositoriesSection>();
+            var providers = new Mock<IProvidersSection>();
+            var help = new Mock<IHelpSection>();
+            var routing = new Mock<IWebRoutingSection>();
+            var scripting = new Mock<IScriptingSection>();
 
-            settings.Stub(x => x.Content).Return(content);
-            settings.Stub(x => x.Security).Return(security);
-            settings.Stub(x => x.RequestHandler).Return(requestHandler);
-            settings.Stub(x => x.Templates).Return(templates);
-            settings.Stub(x => x.Developer).Return(dev);
-            settings.Stub(x => x.ViewStateMoverModule).Return(viewStateMover);
-            settings.Stub(x => x.Logging).Return(logging);
-            settings.Stub(x => x.ScheduledTasks).Return(tasks);
-            settings.Stub(x => x.DistributedCall).Return(distCall);
-            settings.Stub(x => x.PackageRepositories).Return(repos);
-            settings.Stub(x => x.Providers).Return(providers);
-            settings.Stub(x => x.Help).Return(help);
-            settings.Stub(x => x.WebRouting).Return(routing);
-            settings.Stub(x => x.Scripting).Return(scripting);
+            settings.Setup(x => x.Content).Returns(content.Object);
+            settings.Setup(x => x.Security).Returns(security.Object);
+            settings.Setup(x => x.RequestHandler).Returns(requestHandler.Object);
+            settings.Setup(x => x.Templates).Returns(templates.Object);
+            settings.Setup(x => x.Developer).Returns(dev.Object);
+            settings.Setup(x => x.ViewStateMoverModule).Returns(viewStateMover.Object);
+            settings.Setup(x => x.Logging).Returns(logging.Object);
+            settings.Setup(x => x.ScheduledTasks).Returns(tasks.Object);
+            settings.Setup(x => x.DistributedCall).Returns(distCall.Object);
+            settings.Setup(x => x.PackageRepositories).Returns(repos.Object);
+            settings.Setup(x => x.Providers).Returns(providers.Object);
+            settings.Setup(x => x.Help).Returns(help.Object);
+            settings.Setup(x => x.WebRouting).Returns(routing.Object);
+            settings.Setup(x => x.Scripting).Returns(scripting.Object);
 
             //Now configure some defaults - the defaults in the config section classes do NOT pertain to the mocked data!!
-            settings.Content.Stub(x => x.UseLegacyXmlSchema).Return(false);
-            settings.Content.Stub(x => x.ForceSafeAliases).Return(true);
-            settings.Content.Stub(x => x.ImageAutoFillProperties).Return(ContentImagingElement.GetDefaultImageAutoFillProperties());
-            settings.Content.Stub(x => x.ImageFileTypes).Return(ContentImagingElement.GetDefaultImageFileTypes());
-            settings.RequestHandler.Stub(x => x.AddTrailingSlash).Return(true);
-            settings.RequestHandler.Stub(x => x.UseDomainPrefixes).Return(false);
-            settings.RequestHandler.Stub(x => x.CharCollection).Return(RequestHandlerElement.GetDefaultCharReplacements());
-            settings.Content.Stub(x => x.UmbracoLibraryCacheDuration).Return(1800);
-            settings.WebRouting.Stub(x => x.UrlProviderMode).Return("Auto");
-
+            settings.Setup(x => x.Content.UseLegacyXmlSchema).Returns(false);
+            settings.Setup(x => x.Content.ForceSafeAliases).Returns(true);
+            settings.Setup(x => x.Content.ImageAutoFillProperties).Returns(ContentImagingElement.GetDefaultImageAutoFillProperties());
+            settings.Setup(x => x.Content.ImageFileTypes).Returns(ContentImagingElement.GetDefaultImageFileTypes());
+            settings.Setup(x => x.RequestHandler.AddTrailingSlash).Returns(true);
+            settings.Setup(x => x.RequestHandler.UseDomainPrefixes).Returns(false);
+            settings.Setup(x => x.RequestHandler.CharCollection).Returns(RequestHandlerElement.GetDefaultCharReplacements());
+            settings.Setup(x => x.Content.UmbracoLibraryCacheDuration).Returns(1800);
+            settings.Setup(x => x.WebRouting.UrlProviderMode).Returns("Auto");
+            settings.Setup(x => x.Templates.DefaultRenderingEngine).Returns(RenderingEngine.Mvc);
             
-
-            return settings;
+            return settings.Object;
         }
 
         // from appSettings

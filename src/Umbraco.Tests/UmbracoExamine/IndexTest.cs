@@ -10,7 +10,6 @@ using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using NUnit.Framework;
-using Umbraco.Tests.PartialTrust;
 using UmbracoExamine;
 
 namespace Umbraco.Tests.UmbracoExamine
@@ -20,7 +19,7 @@ namespace Umbraco.Tests.UmbracoExamine
 	/// Tests the standard indexing capabilities
 	/// </summary>
 	[TestFixture, RequiresSTA]
-    public class IndexTest : ExamineBaseTest<IndexTest>
+    public class IndexTest : ExamineBaseTest
 	{
 
 		///// <summary>

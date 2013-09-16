@@ -1,17 +1,20 @@
-﻿using Umbraco.Tests.PartialTrust;
+﻿using NUnit.Framework;
 using UmbracoExamine;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
-    public abstract class ExamineBaseTest<T> : AbstractPartialTrustFixture<T> where T : class, IPartialTrustFixture, new()
+    [TestFixture]
+    public abstract class ExamineBaseTest
     {
-        public override void TestSetup()
+        [SetUp]
+        public virtual void TestSetup()
         {
             UmbracoExamineSearcher.DisableInitializationCheck = true;
             BaseUmbracoIndexer.DisableInitializationCheck = true;
         }
 
-        public override void TestTearDown()
+        [TearDown]
+        public virtual void TestTearDown()
         {
             UmbracoExamineSearcher.DisableInitializationCheck = null;
             BaseUmbracoIndexer.DisableInitializationCheck = null;

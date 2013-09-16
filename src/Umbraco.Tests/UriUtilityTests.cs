@@ -1,9 +1,7 @@
 using System;
 using System.Configuration;
+using Moq;
 using NUnit.Framework;
-using Rhino.Mocks;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 
@@ -87,8 +85,9 @@ namespace Umbraco.Tests
 		{
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", directoryUrls ? "true" : "false");
 
-            var settings = MockRepository.GenerateStub<IUmbracoSettingsSection>();
-            settings.Stub(x => x.RequestHandler.AddTrailingSlash).Return(trailingSlash);
+		    var settings = SettingsForTests.GetMockSettings();
+            var requestMock = Mock.Get(settings.RequestHandler);
+            requestMock.Setup(x => x.AddTrailingSlash).Returns(trailingSlash);
             SettingsForTests.ConfigureSettings(settings);
 			
             UriUtility.SetAppDomainAppVirtualPath("/");

@@ -23,13 +23,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 var autoFill = this[prop] as ConfigurationElementCollection;
                 if (autoFill != null && autoFill.ElementInformation.IsPresent == false)
                 {
-                    _defaultCollection = new NotDynamicXmlDocumentElementCollection
-                        {
-                            new NotDynamicXmlDocumentElement {RawValue = "p"},
-                            new NotDynamicXmlDocumentElement {RawValue = "div"},
-                            new NotDynamicXmlDocumentElement {RawValue = "ul"},
-                            new NotDynamicXmlDocumentElement {RawValue = "span"}
-                        };
+                    _defaultCollection = GetDefaultNotDynamicXmlDocuments();
 
                     //must return the collection directly
                     return _defaultCollection;
@@ -37,6 +31,17 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
                 return (NotDynamicXmlDocumentElementCollection)base["notDynamicXmlDocumentElements"];
             }
+        }
+
+        internal static NotDynamicXmlDocumentElementCollection GetDefaultNotDynamicXmlDocuments()
+        {
+            return new NotDynamicXmlDocumentElementCollection
+                        {
+                            new NotDynamicXmlDocumentElement {RawValue = "p"},
+                            new NotDynamicXmlDocumentElement {RawValue = "div"},
+                            new NotDynamicXmlDocumentElement {RawValue = "ul"},
+                            new NotDynamicXmlDocumentElement {RawValue = "span"}
+                        };
         }
 
         [ConfigurationCollection(typeof (RazorStaticMappingCollection), AddItemName = "mapping")]

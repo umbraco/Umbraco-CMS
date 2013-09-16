@@ -1,17 +1,13 @@
 using System;
 using System.Linq;
 using System.Xml;
+using Moq;
 using NUnit.Framework;
-using Rhino.Mocks;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
 
@@ -81,8 +77,9 @@ namespace Umbraco.Tests.PublishedCache
 			//ensure the StateHelper is using our custom context
 			StateHelper.HttpContext = _httpContextFactory.HttpContext;
 
-		    var settings = MockRepository.GenerateStub<IUmbracoSettingsSection>();
-		    settings.Stub(x => x.Content.UseLegacyXmlSchema).Return(false);
+		    var settings = SettingsForTests.GetMockSettings();
+		    var contentMock = Mock.Get(settings.Content);
+            contentMock.Setup(x => x.UseLegacyXmlSchema).Returns(false);
 		    SettingsForTests.ConfigureSettings(settings);
 
             var cache = new PublishedContentCache
@@ -106,8 +103,9 @@ namespace Umbraco.Tests.PublishedCache
 
 		private void SetupForLegacy()
 		{
-            var settings = MockRepository.GenerateStub<IUmbracoSettingsSection>();
-            settings.Stub(x => x.Content.UseLegacyXmlSchema).Return(true);
+            var settings = SettingsForTests.GetMockSettings();
+		    var contentMock = Mock.Get(settings.Content);
+            contentMock.Setup(x => x.UseLegacyXmlSchema).Returns(true);
             SettingsForTests.ConfigureSettings(settings);
 
             var cache = _umbracoContext.ContentCache.InnerCache as PublishedContentCache;

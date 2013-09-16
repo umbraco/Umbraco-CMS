@@ -2,8 +2,6 @@ using NUnit.Framework;
 using Rhino.Mocks;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Tests.Routing
 {

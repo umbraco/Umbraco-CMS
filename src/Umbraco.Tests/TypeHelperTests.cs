@@ -6,7 +6,6 @@ using System.Data.OleDb;
 using System.Data.SqlClient;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Tests.PartialTrust;
 using Umbraco.Web;
 using UmbracoExamine;
 using UmbracoExamine.DataServices;
@@ -21,7 +20,7 @@ namespace Umbraco.Tests
     /// Tests for TypeHelper
     /// </summary>
     [TestFixture]
-    public class TypeHelperTests : AbstractPartialTrustFixture<TypeHelperTests>
+    public class TypeHelperTests
     {
 
         [Test]
@@ -74,12 +73,5 @@ namespace Umbraco.Tests
 
         }
 
-        public override void TestSetup()
-        {
-        }
-
-        public override void TestTearDown()
-        {
-        }
     }
 }

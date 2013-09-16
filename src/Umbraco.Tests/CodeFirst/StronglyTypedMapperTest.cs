@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -7,7 +6,6 @@ using Umbraco.Tests.CodeFirst.TestModels;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
-using Rhino.Mocks;
 
 namespace Umbraco.Tests.CodeFirst
 {

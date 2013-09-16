@@ -1,27 +1,25 @@
 using System;
-using System.IO;
 using System.Linq;
 using Lucene.Net.Documents;
 using Lucene.Net.Store;
+using Moq;
 using NUnit.Framework;
-using Rhino.Mocks;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.UmbracoExamine;
 using umbraco.MacroEngines;
 
 namespace Umbraco.Tests.PublishedContent
 {
-    public class LegacyExamineBackedMediaTests : ExamineBaseTest<LegacyExamineBackedMediaTests>
+    public class LegacyExamineBackedMediaTests : ExamineBaseTest
     {
         public override void TestSetup()
         {
             base.TestSetup();
 
-            var settings = MockRepository.GenerateStub<IUmbracoSettingsSection>();
-            settings.Stub(x => x.Content.ForceSafeAliases).Return(true);
-            settings.Stub(x => x.Content.UmbracoLibraryCacheDuration).Return(1800);
+            var settings = SettingsForTests.GetMockSettings();
+            var contentMock = Mock.Get(settings.Content);
+            contentMock.Setup(x => x.ForceSafeAliases).Returns(true);
+            contentMock.Setup(x => x.UmbracoLibraryCacheDuration).Returns(1800);
             SettingsForTests.ConfigureSettings(settings);
         }
 

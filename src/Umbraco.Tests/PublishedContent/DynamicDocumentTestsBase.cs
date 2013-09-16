@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dynamics;
 using Umbraco.Tests.TestHelpers;
 
@@ -13,6 +15,15 @@ namespace Umbraco.Tests.PublishedContent
 	[TestFixture]
     public abstract class DynamicDocumentTestsBase<TDocument, TDocumentList> : PublishedContentTestBase
 	{
+
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            var scriptingMock = Mock.Get(UmbracoSettings.Scripting);
+            scriptingMock.Setup(x => x.DataTypeModelStaticMappings).Returns(new List<IRazorStaticMapping>());
+        }
+
         protected override DatabaseBehavior DatabaseTestBehavior
         {
             get { return DatabaseBehavior.NoDatabasePerFixture; }

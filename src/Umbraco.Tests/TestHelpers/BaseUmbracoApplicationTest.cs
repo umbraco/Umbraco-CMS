@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
 using NUnit.Framework;
-using Rhino.Mocks;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.ObjectResolution;
@@ -33,8 +30,6 @@ namespace Umbraco.Tests.TestHelpers
             
             //mock the Umbraco settings that we need
             var settings = SettingsForTests.GetMockSettings();
-            
-
             //sets the global singleton to use the mocked format
             SettingsForTests.ConfigureSettings(settings);
             //set our local variable for tests to use (preferably)

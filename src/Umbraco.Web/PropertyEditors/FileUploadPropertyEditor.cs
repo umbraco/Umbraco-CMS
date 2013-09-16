@@ -97,16 +97,16 @@ namespace Umbraco.Web.PropertyEditors
 
         private static void ResetProperties(IImagingAutoFillUploadField uploadFieldConfigNode, IContentBase content)
         {
-            if (content.Properties[uploadFieldConfigNode.WidthFieldAlias] != null)
+            if (content.Properties.Contains(uploadFieldConfigNode.WidthFieldAlias))
                 content.Properties[uploadFieldConfigNode.WidthFieldAlias].Value = string.Empty;
             
-            if (content.Properties[uploadFieldConfigNode.HeightFieldAlias] != null)
+            if (content.Properties.Contains(uploadFieldConfigNode.HeightFieldAlias))
                 content.Properties[uploadFieldConfigNode.HeightFieldAlias].Value = string.Empty;
 
-            if (content.Properties[uploadFieldConfigNode.LengthFieldAlias] != null)
+            if (content.Properties.Contains(uploadFieldConfigNode.LengthFieldAlias))
                 content.Properties[uploadFieldConfigNode.LengthFieldAlias].Value = string.Empty;
 
-            if (content.Properties[uploadFieldConfigNode.ExtensionFieldAlias] != null)
+            if (content.Properties.Contains(uploadFieldConfigNode.ExtensionFieldAlias))
                 content.Properties[uploadFieldConfigNode.ExtensionFieldAlias].Value = string.Empty;
         }
 
@@ -114,16 +114,16 @@ namespace Umbraco.Web.PropertyEditors
         {
             var size = um.SupportsResizing ? (Size?)um.GetDimensions() : null;
 
-            if (content.Properties[uploadFieldConfigNode.WidthFieldAlias] != null)
+            if (content.Properties.Contains(uploadFieldConfigNode.WidthFieldAlias))
                 content.Properties[uploadFieldConfigNode.WidthFieldAlias].Value = size.HasValue ? size.Value.Width.ToInvariantString() : string.Empty;
 
-            if (content.Properties[uploadFieldConfigNode.HeightFieldAlias] != null)
+            if (content.Properties.Contains(uploadFieldConfigNode.HeightFieldAlias))
                 content.Properties[uploadFieldConfigNode.HeightFieldAlias].Value = size.HasValue ? size.Value.Height.ToInvariantString() : string.Empty;
 
-            if (content.Properties[uploadFieldConfigNode.LengthFieldAlias] != null)
+            if (content.Properties.Contains(uploadFieldConfigNode.LengthFieldAlias))
                 content.Properties[uploadFieldConfigNode.LengthFieldAlias].Value = um.Length;
 
-            if (content.Properties[uploadFieldConfigNode.ExtensionFieldAlias] != null)
+            if (content.Properties.Contains(uploadFieldConfigNode.ExtensionFieldAlias))
                 content.Properties[uploadFieldConfigNode.ExtensionFieldAlias].Value = um.Extension;
         }
 
