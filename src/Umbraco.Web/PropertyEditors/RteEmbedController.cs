@@ -6,19 +6,20 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using Umbraco.Core.Configuration;
+using Umbraco.Web.Editors;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Media;
 using System.IO;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
     /// A controller used for the embed dialog
     /// </summary>
     [PluginController("UmbracoApi")]
-    public class EmbedController : UmbracoAuthorizedJsonController
+    public class RteEmbedController : UmbracoAuthorizedJsonController
     {
         public Result Embed(string url, int width, int height)
         {

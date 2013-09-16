@@ -1,4 +1,4 @@
-﻿angular.module("umbraco").controller("Umbraco.Dialogs.EmbedController", function ($scope, $http) {
+﻿angular.module("umbraco").controller("Umbraco.Dialogs.RteEmbedController", function ($scope, $http) {
     $scope.url = "";
     $scope.width = 500;
     $scope.height = 300;
@@ -14,7 +14,7 @@
             
             $scope.success = false;
 
-            $http({ method: 'POST', url: '/umbraco/UmbracoApi/Embed/Embed', params: { url: $scope.url, width: $scope.width, height: $scope.height } })
+            $http({ method: 'POST', url: '/umbraco/UmbracoApi/RteEmbed/Embed', params: { url: $scope.url, width: $scope.width, height: $scope.height } })
                 .success(function(data) {
                     $scope.preview = data.Markup;
                     $scope.success = true;
