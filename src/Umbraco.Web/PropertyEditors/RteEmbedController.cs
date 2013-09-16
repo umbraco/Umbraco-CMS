@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web.Http;
 using System.Xml;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Editors;
@@ -21,6 +22,7 @@ namespace Umbraco.Web.PropertyEditors
     [PluginController("UmbracoApi")]
     public class RteEmbedController : UmbracoAuthorizedJsonController
     {
+        [HttpGet]
         public Result Embed(string url, int width, int height)
         {
             var result = new Result();

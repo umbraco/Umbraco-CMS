@@ -14,7 +14,7 @@
             
             $scope.success = false;
 
-            $http({ method: 'POST', url: '/umbraco/UmbracoApi/RteEmbed/Embed', params: { url: $scope.url, width: $scope.width, height: $scope.height } })
+            $http({ method: 'GET', url: '/umbraco/UmbracoApi/RteEmbed/Embed', params: { url: $scope.url, width: $scope.width, height: $scope.height } })
                 .success(function(data) {
                     $scope.preview = data.Markup;
                     $scope.success = true;
