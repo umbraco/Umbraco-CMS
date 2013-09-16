@@ -303,17 +303,21 @@
     <Compile Include="Editors\DashboardController.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
+    <Compile Include="PropertyEditors\RteEmbedController.cs" />
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Editors\MediaPostValidateAttribute.cs" />
+    <Compile Include="Editors\MemberController.cs" />
     <Compile Include="Editors\UserController.cs" />
     <Compile Include="Install\Steps\MajorUpgradeReport.cs" />
     <Compile Include="Models\ContentEditing\Control.cs" />
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\DataTypeSave.cs" />
     <Compile Include="Models\ContentEditing\EntityBasic.cs" />
+    <Compile Include="Models\ContentEditing\MemberEntityBasic.cs" />
     <Compile Include="Models\ContentEditing\PreValueFieldDisplay.cs" />
     <Compile Include="Models\ContentEditing\PreValueFieldSave.cs" />
     <Compile Include="Models\ContentEditing\PropertyEditorBasic.cs" />
+    <Compile Include="Models\ContentEditing\UserPasswordChange.cs" />
     <Compile Include="Models\Mapping\AvailablePropertyEditorsResolver.cs" />
     <Compile Include="Models\Mapping\DatabaseTypeResolver.cs" />
     <Compile Include="Models\Mapping\DataTypeModelMapper.cs" />
@@ -326,12 +330,14 @@
     <Compile Include="PropertyEditors\DateTimePropertyEditor.cs" />
     <Compile Include="PropertyEditors\DateTimeValidator.cs" />
     <Compile Include="PropertyEditors\DropDownMultiplePropertyEditor.cs" />
+    <Compile Include="PropertyEditors\FolderBrowserPropertyEditor.cs" />
     <Compile Include="PropertyEditors\IntegerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MediaPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultipleTextStringPropertyEditor.cs" />
     <Compile Include="PropertyEditors\PublishValuesMultipleValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownMultipleWithKeysPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RadioButtonsPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\UserPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ValueListPreValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownPropertyEditor.cs" />
     <Compile Include="PropertyEditors\PublishValueValueEditor.cs" />
@@ -1919,8 +1925,12 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dashboard\MediaDashboardVideos.ascx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\MembersDashboardIntro.ascx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\MembersDashboardVideos.ascx" />
+    <Content Include="umbraco.presentation\umbraco\dashboard\MembersDashboardIntro.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="umbraco.presentation\umbraco\dashboard\MembersDashboardVideos.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dashboard\SettingsDashboardIntro.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\SettingsDashboardVideos.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\Settings\Applyskin.ascx" />
@@ -1938,7 +1948,9 @@
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInstaller.aspx" />
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx" />
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx" />
-    <Content Include="umbraco.presentation\umbraco\members\MemberSearch.ascx" />
+    <Content Include="umbraco.presentation\umbraco\members\MemberSearch.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\Preview.aspx" />
     <Content Include="umbraco.presentation\umbraco\controls\passwordChanger.ascx" />
     <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx">

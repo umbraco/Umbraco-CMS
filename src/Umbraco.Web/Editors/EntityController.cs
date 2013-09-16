@@ -15,6 +15,9 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
+using Examine;
+using Examine.LuceneEngine.SearchCriteria;
+using Examine.SearchCriteria;
 
 namespace Umbraco.Web.Editors
 {
@@ -47,6 +50,22 @@ namespace Umbraco.Web.Editors
             return GetEntitiesById(ids, UmbracoObjectTypes.Document);
         }
 
+        [FilterAllowedOutgoingContent(typeof(IEnumerable<EntityBasic>))]
+        [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
+        public IEnumerable<EntityBasic> SearchDocuments([FromUri]string query)
+        {
+            var internalSearcher = ExamineManager.Instance.SearchProviderCollection[Constants.Examine.InternalSearcher];
+            var criteria = internalSearcher.CreateSearchCriteria("content", BooleanOperation.Or);
+            var fields = new[] { "id", "__nodeName", "bodyText" };
+            var term = new[] { query.ToLower().Escape() };
+            var operation = criteria.GroupedOr(fields, term).Compile();
+
+            var results = internalSearcher.Search(operation)
+                .Select(x =>  int.Parse(x["id"]));
+
+            return GetDocumentsByIds(results.ToArray());
+        }
+
         /// <summary>
         /// The user must have access to either content or media for this to return data
         /// </summary>
@@ -74,6 +93,31 @@ namespace Umbraco.Web.Editors
         public IEnumerable<EntityBasic> GetMediaChildren(int id)
         {
             return GetChildren(id, UmbracoObjectTypes.Media);
+        }
+
+
+        /// <summary>
+        /// The user must have access to either content or media for this to return data
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [UmbracoApplicationAuthorizeAttribute(
+            Constants.Applications.Media,
+            Constants.Applications.Content)]
+        [EnsureUserPermissionForMedia("id")]
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<EntityBasic>))]
+        public IEnumerable<EntityBasic> SearchMedia([FromUri]string query)
+        {
+            var internalSearcher = ExamineManager.Instance.SearchProviderCollection[Constants.Examine.InternalSearcher];
+            var criteria = internalSearcher.CreateSearchCriteria("media", BooleanOperation.Or);
+            var fields = new[] { "id", "__nodeName"};
+            var term = new[] { query.ToLower().Escape() };
+            var operation = criteria.GroupedOr(fields, term).Compile();
+
+            var results = internalSearcher.Search(operation)
+                .Select(x => int.Parse(x["id"]));
+
+            return GetMediaByIds(results.ToArray());
         }
 
         /// <summary>

@@ -70,7 +70,7 @@
     <umb:Pane ID="directionPane" runat="server" Text="">
 
         <umb:PropertyPanel runat="server" id="dualPropertyPanel" Text="Direction">
-                <asp:RadioButtonList ID="dualRadioButtonList" runat="server" RepeatDirection="Horizontal">
+                <asp:RadioButtonList ID="dualRadioButtonList" runat="server" RepeatDirection="Vertical">
                     <asp:ListItem Enabled="true" Selected="False" Text="Parent to Child" Value="0" /> 
                     <asp:ListItem Enabled="true" Selected="False" Text="Bidirectional" Value="1"/>
                 </asp:RadioButtonList>
@@ -107,7 +107,7 @@
             
             <asp:Repeater ID="relationsRepeater" runat="server">
                 <HeaderTemplate>
-                    <table class="relations">
+                    <table class="table relations">
                         <thead>
                             <tr>
                                 <th class="objectTypeIcon">&nbsp;</th>

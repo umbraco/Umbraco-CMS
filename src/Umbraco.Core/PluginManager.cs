@@ -243,7 +243,7 @@ namespace Umbraco.Core
         {
             var filePath = GetPluginListFilePath();
             if (!File.Exists(filePath))
-                return Attempt<IEnumerable<string>>.False;
+                return Attempt<IEnumerable<string>>.Fail();
 
             try
             {
@@ -263,7 +263,7 @@ namespace Umbraco.Core
 
 
                 if (xml.Root == null)
-                    return Attempt<IEnumerable<string>>.False;
+                    return Attempt<IEnumerable<string>>.Fail();
 
                 var typeElement = xml.Root.Elements()
                     .SingleOrDefault(x =>
@@ -273,18 +273,16 @@ namespace Umbraco.Core
 
                 //return false but specify this exception type so we can detect it
                 if (typeElement == null)
-                    return new Attempt<IEnumerable<string>>(new CachedPluginNotFoundInFile());
+                    return Attempt<IEnumerable<string>>.Fail(new CachedPluginNotFoundInFile());
 
                 //return success
-                return new Attempt<IEnumerable<string>>(
-                    true,
-                    typeElement.Elements("add")
+                return Attempt.Succeed(typeElement.Elements("add")
                         .Select(x => (string)x.Attribute("type")));
             }
             catch (Exception ex)
             {
                 //if the file is corrupted, etc... return false
-                return new Attempt<IEnumerable<string>>(ex);
+                return Attempt<IEnumerable<string>>.Fail(ex);
             }
         }
 
@@ -655,7 +653,7 @@ namespace Umbraco.Core
                             //here we need to identify if the CachedPluginNotFoundInFile was the exception, if it was then we need to re-scan
                             //in some cases the plugin will not have been scanned for on application startup, but the assemblies haven't changed
                             //so in this instance there will never be a result.
-                            if (fileCacheResult.Error != null && fileCacheResult.Error is CachedPluginNotFoundInFile)
+                            if (fileCacheResult.Exception != null && fileCacheResult.Exception is CachedPluginNotFoundInFile)
                             {
                                 //we don't have a cache for this so proceed to look them up by scanning
                                 LoadViaScanningAndUpdateCacheFile<T>(typeList, resolutionType, finder);

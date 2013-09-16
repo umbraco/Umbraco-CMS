@@ -3,44 +3,54 @@
 
 /* Modalcolumn is used for menu panels */
 .umb-modalcolumn {
-	background: #fff;
+	background: white;
 	border-left: #f6f6f6 1px solid;
-}
-.umb-modalcolumn .umb-panel-header {
 	white-space: nowrap
 }
-.umb-modalcolumn .umb-panel-body {
-	padding: 0px
+
+.umb-modalcolumn-header {
+  background: @grayLighter;
+  border-bottom: 1px solid @grayLight;
+  height: 79px;
+  padding: 20px 20px 0px 20px;
 }
-.no-padding .umb-panel-body {
+
+.umb-modalcolumn-header h1{
+  margin: 0;
+  font-size: @fontSizeLarge;
+  font-weight: 400;
+  padding-top: 10px !important;
+  text-transform: capitalize !important;
+}
+
+.umb-modalcolumn-body {
+	padding: 0px;
+	background: white;
+	top: 101px;
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+}
+
+.no-padding .umb-modalcolumn-body {
 	padding: 0px
 }
 
-.umb-modalcolumn .umb-panel-header .btn {
+.umb-modalcolumn .umb-modalcolumn-header .btn {
 	position: absolute;
 	top: 13px;
 	right: 15px
 }
 
-.umb-modalcolumn .umb-modal-close-icon {
-	position: absolute;
-	top: 17px;
-	left: 27px;
-}
-.umb-modalcolumn .umb-modal-close-icon i {
-	background: url(close.png);
-	width: 18px;
-	height: 18px
-}
 .umb-modalcolumn iframe {
 	border: none;
 	padding: 0px;
 	margin: 0px;
 }
-.umb-modalcolumn h1 {
-	padding-top: 10px !important;
-	text-transform: capitalize !important;
-}
+
+
+
 
 
 /* umb.dialog is used for the dialogs on the conent tree*/
@@ -131,7 +141,7 @@
 
 
 
-.umb-modal .thumbnail {
+.umb-thumbnails .thumbnail {
 	padding: 0;
 	border:none;
 }
@@ -140,43 +150,46 @@
 	margin: 0 0 20px 0
 }*/
 
-.umb-modal .thumbnails > li {
+.umb-thumbnails > li {
 	margin: 0 20px 20px 0;
 	text-align: center;
 }
 
-.umb-modal .thumbnail img {
-	/*height: 100px;*/
-}
+.umb-thumbnails i{margin: auto;}
 
-.umb-modal .thumbnails .selected img, .umb-modal .thumbnails img:hover {
+.umb-thumbnails .selected img, .umb-thumbnails img:hover {
 	opacity: 0.5
 }
 
-.umb-modal .thumbnails > li.folder {
+.umb-thumbnails > li.folder {
 	width: 100px;
 	/*height: 100px;*/
 	display: block;
-	background: @grayLighter;
 	text-align: center;
-	font-size: 12px
+	font-size: 12px;
 }
 
-.umb-modal .thumbnails > li.folder .icon-folder{
-	color: @grayLight;
+.umb-thumbnails a{
+	outline: none;
+	border:none !important;
+	box-shadow:none !important;
+}
+
+.umb-thumbnails > li.folder .icon-folder{
 	display: block;
 	font-size: 90px;
 	height: 75px;
     width:100px;
+    color: @grayLight;
 }
 
-.umb-modal .thumbnails > li.folder a {
+.umb-thumbnails > li.folder a {
 	width: 100px;
 	height: 100px;
 	display: block
 }
 
-.umb-modal .thumbnails > li.folder a:hover {
+.umb-thumbnails > li.folder a:hover {
 	text-decoration: none
 }
 

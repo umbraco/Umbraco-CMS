@@ -25,9 +25,6 @@ body {
   padding: 20px
 }
 
-.fill {
-  height: 100%
-}
 
 #layout {
   position: relative;
@@ -42,19 +39,17 @@ body {
   margin: 0;
 }
 
-#contentwrapper {
-  height: 100%;
+#contentwrapper, #contentcolumn {
+  position: absolute;
+  top: 0px; bottom: 0px; right: 0px; left: 80px;
   z-index: 10;
   margin: 0
 }
 
 #contentcolumn {
-  position: relative;
-  margin-left: 80px;
-  z-index: 10;
-  height: 100%;}
+  left: 0px;
+}
 
-.content-column-body{height: 100%;}
 #contentcolumn iframe {
   display: block;
   position: relative;
@@ -121,20 +116,16 @@ body {
 
 #tree {
   padding: 0px;
-  position: relative;
   z-index: 100 !important;
-  height: 100%;
   overflow: auto;
 }
 
 #tree .umb-tree {
-    padding: 15px 0px 20px 0px;
+    padding: 0px 0px 20px 0px;
 }
 
 #search-results {
-  position: relative;
-  z-index: 100;
-  padding: 15px 0px 20px 0px;
+  z-index: 200;
 }
 
 #contextMenu {

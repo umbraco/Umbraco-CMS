@@ -53,9 +53,10 @@ data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupl
 			</ul>
 		</div>
 		
-        <div style="height: 10px; margin: 10px 0px 10px 0px" class="umb-loader" ng-hide="active() == 0"></div>
+        <div style="height: 10px; margin: 10px 0px 10px 0px" class="umb-loader" 
+        	ng-hide="active() == 0"></div>
 
-        <ul class="thumbnails">
+        <ul class="umb-thumbnails thumbnails">
 	        <li class="span2 folder" ng-repeat="image in images | orderBy:'contentTypeAlias' | filter:searchTerm">
 			    <a href="#" class="thumbnail" ng-class="{selected: dialogData.selection.indexOf(image) > -1}" 
 	               ng-click="selectMediaItem(image)" 

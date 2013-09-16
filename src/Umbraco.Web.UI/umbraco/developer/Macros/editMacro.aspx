@@ -162,7 +162,7 @@
                                 </asp:DropDownList>
                             </td>
                             <td>
-                                <asp:Button ID="createNew" Text="Add" runat="server" CssClass="guiInputButton" />
+                                <asp:Button ID="createNew" Text="Add" runat="server" CssClass="btn btn-default" />
                             </td>
                         </tr>
                     </tfooter>

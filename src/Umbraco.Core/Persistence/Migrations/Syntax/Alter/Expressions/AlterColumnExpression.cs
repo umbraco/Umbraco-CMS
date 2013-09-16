@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
             //    SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(Column.Name),
             //    SqlSyntaxContext.SqlSyntaxProvider.Format(Column));
 
-            return string.Format(SqlSyntaxContext.SqlSyntaxProvider.AlterColumn,
+            return string.Format(SqlSyntaxContext.SqlSyntaxProvider.AlterColumn, 
                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(TableName),
                                 SqlSyntaxContext.SqlSyntaxProvider.Format(Column));
 

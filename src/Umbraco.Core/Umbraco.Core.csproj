@@ -114,7 +114,7 @@
     <Compile Include="ApplicationContext.cs" />
     <Compile Include="ApplicationEventHandler.cs" />
     <Compile Include="AssemblyExtensions.cs" />
-    <Compile Include="Attempt.cs" />
+    <Compile Include="Attempt{T}.cs" />
     <Compile Include="Auditing\AuditTrail.cs" />
     <Compile Include="Auditing\Audit.cs" />
     <Compile Include="Auditing\AuditTypes.cs" />
@@ -239,6 +239,8 @@
     <Compile Include="Configuration\UmbracoSettings\ViewstateMoverModuleElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\WebRoutingElement.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
+    <Compile Include="Attempt.cs" />
+    <Compile Include="Constants-Examine.cs" />
     <Compile Include="CoreBootManager.cs" />
     <Compile Include="DatabaseContext.cs" />
     <Compile Include="DataTableExtensions.cs" />

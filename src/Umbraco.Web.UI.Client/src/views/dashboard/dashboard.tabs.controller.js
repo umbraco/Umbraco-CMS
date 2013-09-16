@@ -1,6 +1,4 @@
 function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
-
-
 	//xmlHelper.parseFeed("http://umbraco.org/feeds/videos/getting-started").then(function(feed){
 		
 	//});
@@ -16,5 +14,22 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
     	});
    });
 }
-
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
+
+function ChangePasswordDashboardController($scope, xmlhelper, $log, userResource) {
+    //this is the model we will pass to the service
+    $scope.profile = {};
+
+    $scope.changePassword = function (p) {   
+        userResource.changePassword(p.oldPassword, p.newPassword).then(function () {
+            alert("changed");
+            $scope.passwordForm.$setValidity(true);
+        }, function () {
+          alert("not changed");
+            //this only happens if there is a wrong oldPassword sent along
+            $scope.passwordForm.oldpass.$setValidity("oldPassword", false);
+        });
+    }
+}
+
+angular.module("umbraco").controller("Umbraco.Dashboard.StartupChangePasswordController", ChangePasswordDashboardController);

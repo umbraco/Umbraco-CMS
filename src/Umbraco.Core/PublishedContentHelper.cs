@@ -93,7 +93,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal static Attempt<object> ConvertPropertyValue(object currentValue, PublishedPropertyDefinition propertyDefinition)
 		{
-			if (currentValue == null) return Attempt<object>.False;
+			if (currentValue == null) return Attempt<object>.Fail();
 
             //First, we need to check the v7+ PropertyValueConverters
 		    var converters = PropertyValueConvertersResolver.Current.Converters
@@ -135,7 +135,7 @@ namespace Umbraco.Core
 				.Select(p => p.ConvertPropertyValue(currentValue))
 				.Where(converted => converted.Success))
 			{
-				return new Attempt<object>(true, converted.Result);
+				return Attempt.Succeed(converted.Result);
 			}
 
 			//if none of the converters worked, then we'll process this from what we know
@@ -148,17 +148,17 @@ namespace Umbraco.Core
 				decimal dResult;
 				if (decimal.TryParse(sResult, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out dResult))
 				{
-					return new Attempt<object>(true, dResult);
+					return Attempt<object>.Succeed(dResult);
 				}
 			}
 			//process string booleans as booleans
 			if (sResult.InvariantEquals("true"))
 			{
-				return new Attempt<object>(true, true);
+				return Attempt<object>.Succeed(true);
 			}
 			if (sResult.InvariantEquals("false"))
 			{
-				return new Attempt<object>(true, false);
+				return Attempt<object>.Succeed(false);
 			}
 
 			//a really rough check to see if this may be valid xml
@@ -177,16 +177,16 @@ namespace Umbraco.Core
                     if (UmbracoConfiguration.Current.UmbracoSettings.Scripting.NotDynamicXmlDocumentElements.Any(
                         tag => string.Equals(tag.Element, documentElement, StringComparison.CurrentCultureIgnoreCase)) == false)
 					{
-						return new Attempt<object>(true, new DynamicXml(e));
+						return Attempt<object>.Succeed(new DynamicXml(e));
 					}
-					return Attempt<object>.False;
+					return Attempt<object>.Fail();
 				}
 				catch (Exception)
 				{
-					return Attempt<object>.False;
+					return Attempt<object>.Fail();
 				}
 			}
-			return Attempt<object>.False;
+			return Attempt<object>.Fail();
 		}
 	}
 }

@@ -82,7 +82,8 @@ namespace umbraco.uicontrols
 
         protected override void CreateChildControls()
         {
-            CssClass = "umb-panel form-horizontal";
+            //fucking webforms controls and their rendering..
+            CssClass = "umb-panel form-horizontal umb-panel-nobody";
            ID = base.ClientID + "_container";
 
             header.TagName = "div";
@@ -94,14 +95,16 @@ namespace umbraco.uicontrols
             header.Controls.Add(row);
 
             leftcol.TagName = "span";
-            leftcol.Attributes.Add("class", "span4 umb-panel-header-meta");
+            leftcol.Attributes.Add("class", "span8");
+
             title.TagName = "h1";
+            title.Attributes.Add("class", "headline");
             leftcol.Controls.Add(title);
             
             row.Controls.Add(leftcol);
 
             rightcol.TagName = "span";
-            rightcol.Attributes.Add("class", "span8 umb-panel-header-meta");
+            rightcol.Attributes.Add("class", "span4");
             rightcol.Controls.Add(Menu);
             row.Controls.Add(rightcol);
 
@@ -113,7 +116,7 @@ namespace umbraco.uicontrols
 
             Controls.AddAt(0,header);
             
-            
+
             base.CreateChildControls();
         }
         

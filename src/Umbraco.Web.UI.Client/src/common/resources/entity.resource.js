@@ -265,6 +265,38 @@ function entityResource($q, $http, umbRequestHelper) {
 
         /**
          * @ngdoc method
+         * @name umbraco.resources.entityResource#searchDocuments
+         * @methodOf umbraco.resources.entityResource
+         *
+         * @description
+         * Gets an array of content entities, given a query
+         *
+         * ##usage
+         * <pre>
+         * entityResource.searchDocuments("news")
+         *    .then(function(contentArray) {
+         *        var myDoc = contentArray; 
+         *        alert('they are here!');
+         *    });
+         * </pre> 
+         * 
+         * @param {String} Query search query        
+         * @returns {Promise} resourcePromise object containing the entity array.
+         *
+         */
+        searchDocuments: function (query) {
+            
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "entityApiBaseUrl",
+                       "SearchDocuments",
+                       query)),
+               'Failed to retreive document data for query ' + query);
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.resources.entityResource#getMediaById
          * @methodOf umbraco.resources.entityResource
          *
@@ -329,8 +361,40 @@ function entityResource($q, $http, umbRequestHelper) {
                        "GetMediaByIds",
                        idQuery)),
                'Failed to retreive media data for ids ' + idQuery);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.entityResource#searchMedia
+         * @methodOf umbraco.resources.entityResource
+         *
+         * @description
+         * Gets an array of medoa entities, given a query
+         *
+         * ##usage
+         * <pre>
+         * entityResource.searchMedia("news")
+         *    .then(function(mediaArray) {
+         *        var myDoc = mediaArray; 
+         *        alert('they are here!');
+         *    });
+         * </pre> 
+         * 
+         * @param {String} Query search query        
+         * @returns {Promise} resourcePromise object containing the entity array.
+         *
+         */
+        searchMedia: function (query) {
+            
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "entityApiBaseUrl",
+                       "SearchMedia",
+                       query)),
+               'Failed to retreive media data for query ' + query);
         }
-        
+            
     };
 }
 

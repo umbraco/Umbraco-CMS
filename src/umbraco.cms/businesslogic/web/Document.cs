@@ -901,10 +901,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Don't use! Only used internally to support the legacy events", false)]
         internal Attempt<PublishStatus> SaveAndPublish(int userId)
         {
-            var result = new Attempt<PublishStatus>(false,
-                                                    new PublishStatus(Content,
-                                                                      PublishStatusType
-                                                                          .FailedCancelledByEvent));
+            var result = Attempt.Fail(new PublishStatus(Content, PublishStatusType.FailedCancelledByEvent));
             foreach (var property in GenericProperties)
             {
                 Content.SetValue(property.PropertyType.Alias, property.Value);
@@ -1029,10 +1026,10 @@ namespace umbraco.cms.businesslogic.web
                     return result;
                 }
 
-                return Attempt<PublishStatus>.False;
+                return Attempt<PublishStatus>.Fail();
             }
 
-            return Attempt<PublishStatus>.False;
+            return Attempt<PublishStatus>.Fail();
         }
 
         /// <summary>

@@ -11,7 +11,7 @@ angular.module("umbraco")
             menubar : false,
             statusbar: false,
             height: 340,
-            toolbar: "bold italic | styleselect | alignleft aligncenter alignright | bullist numlist | outdent indent | link image mediapicker iconpicker",
+            toolbar: "bold italic | styleselect | alignleft aligncenter alignright | bullist numlist | outdent indent | link image mediapicker iconpicker embeddialog",
             setup : function(editor) {
                     
 
@@ -69,7 +69,20 @@ angular.module("umbraco")
                                 editor.insertContent(i);
                             }});
                         }
-                    });    
+                    });
+                
+
+                    editor.addButton('embeddialog', {
+                        icon: 'media',
+                        tooltip: 'Embed',
+                        onclick: function () {
+                            dialogService.embedDialog({
+                                scope: $scope, callback: function (data) {
+                                    editor.insertContent(data);
+                                }
+                            });
+                        }
+                    });
               }
         });
 

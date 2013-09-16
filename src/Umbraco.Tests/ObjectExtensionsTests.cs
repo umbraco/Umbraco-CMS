@@ -113,5 +113,22 @@ namespace Umbraco.Tests
 				Assert.AreEqual(DateTime.Equals(dateTime.Date, result.Result.Date), testCase.Value);
 			}
 		}
+	    [Test]
+	    public virtual void CanConvertObjectToString_Using_ToString_Overload()
+	    {
+	        var result = new MyTestObject().TryConvertTo<string>();
+
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual("Hello world", result.Result);
+	    }
+
+
+        private class MyTestObject
+        {
+            public override string ToString()
+            {
+                return "Hello world";
+            }
+        }
 	}
 }

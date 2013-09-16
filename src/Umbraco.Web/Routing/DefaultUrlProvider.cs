@@ -111,13 +111,6 @@ namespace Umbraco.Web.Routing
                     : UrlProviderMode.Auto;
             }
 
-            if (mode == UrlProviderMode.AutoLegacy)
-            {
-                mode = UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.UseDomainPrefixes
-                    ? UrlProviderMode.Absolute
-                    : UrlProviderMode.Auto;
-            }
-
             if (domainUri == null) // no domain was found
             {
                 if (current == null)

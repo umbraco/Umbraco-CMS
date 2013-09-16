@@ -36,8 +36,6 @@ namespace umbraco.controls
     [ClientDependency(ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "ui/jquery.dd.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Css, "ui/dd.css", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Css, "Tree/treeIcons.css", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Css, "Tree/Themes/umbraco/style.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Css, "GenericProperty/genericproperty.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "GenericProperty/genericproperty.js", "UmbracoClient")]
     public partial class ContentTypeControlNew : UmbracoUserControl
@@ -104,7 +102,7 @@ namespace umbraco.controls
             pp_allowedChildren.Text = ui.Text("allowedchildnodetypes", Security.CurrentUser);
             pp_description.Text = ui.Text("editcontenttype", "description", Security.CurrentUser);
             pp_icon.Text = ui.Text("icon", Security.CurrentUser);
-            pp_thumbnail.Text = ui.Text("editcontenttype", "thumbnail", Security.CurrentUser);
+            //pp_thumbnail.Text = ui.Text("editcontenttype", "thumbnail", Security.CurrentUser);
 
 
             // we'll disable this...
@@ -268,7 +266,7 @@ namespace umbraco.controls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        protected void save_click(object sender, ImageClickEventArgs e)
+        protected void save_click(object sender, EventArgs e)
         {
 
             var state = new SaveAsyncState(
@@ -297,9 +295,9 @@ namespace umbraco.controls
                     {
                         _contentType.ContentTypeItem.Name = txtName.Text;
                         _contentType.ContentTypeItem.Alias = txtAlias.Text;
-                        _contentType.ContentTypeItem.Icon = ddlIcons.SelectedValue;
+                        _contentType.ContentTypeItem.Icon = tb_icon.Text;
                         _contentType.ContentTypeItem.Description = description.Text;
-                        _contentType.ContentTypeItem.Thumbnail = ddlThumbnails.SelectedValue;
+                        //_contentType.ContentTypeItem.Thumbnail = ddlThumbnails.SelectedValue;
                         _contentType.ContentTypeItem.AllowedAsRoot = allowAtRoot.Checked;
 
                         int i = 0;
@@ -341,9 +339,9 @@ namespace umbraco.controls
                         if (asyncState.HasAliasChanged())
                             _contentType.Alias = txtAlias.Text;
 
-                        _contentType.IconUrl = ddlIcons.SelectedValue;
+                        _contentType.IconUrl = tb_icon.Text;
                         _contentType.Description = description.Text;
-                        _contentType.Thumbnail = ddlThumbnails.SelectedValue;
+                        //_contentType.Thumbnail = ddlThumbnails.SelectedValue;
 
                         SavePropertyTypesLegacy(asyncState.SaveArgs);
 
@@ -422,24 +420,24 @@ namespace umbraco.controls
             InfoTabPage = TabView1.NewTabPage("Info");
             InfoTabPage.Controls.Add(pnlInfo);
 
-            InfoTabPage.Style.Add("text-align", "center");
-
-            ImageButton Save = InfoTabPage.Menu.NewImageButton();
+            var Save = TabView1.Menu.NewButton();
             Save.Click += save_click;
-
-            Save.ImageUrl = UmbracoPath + "/images/editor/save.gif";
-            Save.AlternateText = ui.Text("save", Security.CurrentUser);
+            Save.Text = ui.Text("save", Security.CurrentUser);
             Save.ID = "save";
-            
+
+            txtName.Text = _contentType.GetRawText();
+            txtAlias.Text = _contentType.Alias;
+            description.Text = _contentType.GetRawDescription();
+            tb_icon.Text = _contentType.IconUrl;
+
+
+            /*
             var dirInfo = new DirectoryInfo(Server.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
             var fileInfo = dirInfo.GetFiles();
 
             var spriteFileNames = CMSNode.DefaultIconClasses.Select(IconClassToIconFileName).ToList();
-
             var diskFileNames = fileInfo.Select(FileNameToIconFileName).ToList();
-            
             var listOfIcons = new List<ListItem>();
-
             // .sprNew was never intended to be in the document type editor
             foreach (var iconClass in CMSNode.DefaultIconClasses.Where(iconClass => iconClass.Equals(".sprNew", StringComparison.InvariantCultureIgnoreCase) == false))
             {
@@ -471,6 +469,7 @@ namespace umbraco.controls
 
             ddlIcons.Items.AddRange(listOfIcons.OrderBy(o => o.Text).ToArray());
 
+            
             // Get thumbnails
             dirInfo = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Umbraco + "/images/thumbnails"));
             fileInfo = dirInfo.GetFiles();
@@ -483,9 +482,10 @@ namespace umbraco.controls
                 if (this.Page.IsPostBack == false && li.Value == _contentType.Thumbnail) 
                     li.Selected = true;
 
-                ddlThumbnails.Items.Add(li);
+               // ddlThumbnails.Items.Add(li);
             }
 
+            
             Page.ClientScript.RegisterStartupScript(this.GetType(), "thumbnailsDropDown", string.Format(@"
 function refreshDropDowns() {{
     jQuery('#{1}').msDropDown({{ showIcon: true, style: 'width:250px;' }});
@@ -496,7 +496,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             txtName.Text = _contentType.GetRawText();
             txtAlias.Text = _contentType.Alias;
             description.Text = _contentType.GetRawDescription();
-
+            */
         }
 
         private void AddSpriteListItem(string iconClass, ICollection<ListItem> listOfIcons)
@@ -550,11 +550,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
             uicontrols.TabPage tp = TabView1.NewTabPage("Structure");
             tp.Controls.Add(pnlStructure);
-            tp.Style.Add("text-align", "center");
-            ImageButton Save = tp.Menu.NewImageButton();
-            Save.Click += new System.Web.UI.ImageClickEventHandler(save_click);
-            Save.ImageUrl = UmbracoPath + "/images/editor/save.gif";
-
+            
             int[] allowedIds = _contentType.AllowedChildContentTypeIDs;
             if (!Page.IsPostBack)
             {
@@ -601,13 +597,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         private void SetupGenericPropertiesPane()
         {
             GenericPropertiesTabPage = TabView1.NewTabPage("Generic properties");
-            GenericPropertiesTabPage.Style.Add("text-align", "center");
             GenericPropertiesTabPage.Controls.Add(pnlProperties);
-
-            ImageButton Save = GenericPropertiesTabPage.Menu.NewImageButton();
-            Save.Click += new System.Web.UI.ImageClickEventHandler(save_click);
-            Save.ImageUrl = UmbracoPath + "/images/editor/save.gif";
-
             BindDataGenericProperties(false);
         }
 
@@ -1158,15 +1148,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         private void SetupTabPane()
         {
             uicontrols.TabPage tp = TabView1.NewTabPage("Tabs");
-
-            pnlTab.Style.Add("text-align", "center");
             tp.Controls.Add(pnlTab);
-
-            ImageButton Save = tp.Menu.NewImageButton();
-            Save.Click += new System.Web.UI.ImageClickEventHandler(save_click);
-            Save.ID = "SaveButton";
-            Save.ImageUrl = UmbracoPath + "/images/editor/save.gif";
-
             BindTabs();
         }
 
@@ -1544,26 +1526,9 @@ Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlIcons;
+        protected global::System.Web.UI.WebControls.TextBox tb_icon;
 
-        /// <summary>
-        /// pp_thumbnail control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_thumbnail;
-
-        /// <summary>
-        /// ddlThumbnails control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlThumbnails;
-
+        
         /// <summary>
         /// pp_description control.
         /// </summary>

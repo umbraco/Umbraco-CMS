@@ -153,10 +153,10 @@ namespace Umbraco.Web.Trees
 
                     //First try to get a URL/title from the legacy action,
                     // if that doesn't work, try to get the legacy confirm view
-                    Attempt<LegacyUrlAction>
+                    Attempt
                         .Try(GetUrlAndTitleFromLegacyAction(currentAction, xmlTreeNode.NodeID, xmlTreeNode.NodeType, xmlTreeNode.Text, currentSection),
                              action => menuItem.LaunchDialogUrl(action.Url, action.DialogTitle))
-                        .IfFailed(() => GetLegacyConfirmView(currentAction, currentSection),
+                        .OnFailure(() => GetLegacyConfirmView(currentAction, currentSection),
                                   view => menuItem.LaunchDialogView(
                                       view, 
                                       ui.GetText("defaultdialogs", "confirmdelete") + " '" + xmlTreeNode.Text + "' ?"));
@@ -188,18 +188,17 @@ namespace Umbraco.Web.Trees
         {
             if (action.JsFunctionName.IsNullOrWhiteSpace())
             {
-                return Attempt<string>.False;
+                return Attempt<string>.Fail();
             }
 
             switch (action.JsFunctionName)
             {
                 case "UmbClientMgr.appActions().actionDelete()":
-                    return new Attempt<string>(
-                        true,
+                    return Attempt.Succeed(
                         Core.Configuration.GlobalSettings.Path.EnsureEndsWith('/') + "views/common/dialogs/legacydelete.html");
             }
 
-            return Attempt<string>.False;
+            return Attempt<string>.Fail();
         }
 
         /// <summary>
@@ -214,128 +213,109 @@ namespace Umbraco.Web.Trees
         {
             if (action.JsFunctionName.IsNullOrWhiteSpace())
             {
-                return Attempt<LegacyUrlAction>.False;
+                return Attempt<LegacyUrlAction>.Fail();
             }
 
             switch (action.JsFunctionName)
             {
                 case "UmbClientMgr.appActions().actionNew()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "create.aspx?nodeId=" + nodeId + "&nodeType=" + nodeType + "&nodeName=" + nodeName + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "create")));
                 case "UmbClientMgr.appActions().actionNewFolder()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "createFolder.aspx?nodeId=" + nodeId + "&nodeType=" + nodeType + "&nodeName=" + nodeName + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "create")));
                 case "UmbClientMgr.appActions().actionSort()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/sort.aspx?id=" + nodeId + "&nodeType=" + nodeType + "&app=" + currentSection + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "sort")));
                 case "UmbClientMgr.appActions().actionRights()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/cruds.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "rights")));
                 case "UmbClientMgr.appActions().actionProtect()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/protectPage.aspx?mode=cut&nodeId=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "protect")));
                 case "UmbClientMgr.appActions().actionRollback()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/rollback.aspx?nodeId=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "rollback")));
                 case "UmbClientMgr.appActions().actionNotify()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/notifications.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "notify")));
                 case "UmbClientMgr.appActions().actionPublish()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/publish.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "publish")));
                 case "UmbClientMgr.appActions().actionToPublish()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/SendPublish.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "sendtopublish")));
                 case "UmbClientMgr.appActions().actionRePublish()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/republish.aspx?rnd=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             "Republishing entire site"));
                 case "UmbClientMgr.appActions().actionAssignDomain()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/assignDomain2.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "assignDomain")));
                 case "UmbClientMgr.appActions().actionLiveEdit()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "canvas.aspx?redir=/" + nodeId + ".aspx",
                             "",
                             ActionUrlMethod.BlankWindow));
                 case "UmbClientMgr.appActions().actionSendToTranslate()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/sendToTranslation.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "sendToTranslate")));
                 case "UmbClientMgr.appActions().actionEmptyTranscan()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/emptyTrashcan.aspx?type=" + currentSection,
                             ui.GetText("actions", "emptyTrashcan")));
                 case "UmbClientMgr.appActions().actionImport()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/importDocumentType.aspx",
                             ui.GetText("actions", "importDocumentType")));
                 case "UmbClientMgr.appActions().actionExport()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/exportDocumentType.aspx?nodeId=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             ""));
                 case "UmbClientMgr.appActions().actionAudit()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/viewAuditTrail.aspx?nodeId=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "auditTrail")));
                 case "UmbClientMgr.appActions().actionMove()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/moveOrCopy.aspx?app=" + currentSection + "&mode=cut&id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "move")));
                 case "UmbClientMgr.appActions().actionCopy()":
-                    return new Attempt<LegacyUrlAction>(
-                        true,
+                    return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/moveOrCopy.aspx?app=" + currentSection + "&mode=copy&id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "copy")));
             }
-            return Attempt<LegacyUrlAction>.False;
+            return Attempt<LegacyUrlAction>.Fail();
         }
 
         internal static TreeNode ConvertFromLegacy(string parentId, XmlTreeNode xmlTreeNode, UrlHelper urlHelper, string currentSection, bool isRoot = false)

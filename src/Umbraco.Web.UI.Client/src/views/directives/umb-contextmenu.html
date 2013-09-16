@@ -1,12 +1,12 @@
-<div id='contextMenu' class="umb-modalcolumn fill shadow umb-panel"
+<div id='contextMenu' class="umb-modalcolumn fill shadow"
     ng-swipe-left="nav.hideMenu()"
     ng-show="nav.ui.showContextMenu" ng-animate="'slide'">
 
-    <div class='umb-panel-header'>
+    <div class='umb-modalcolumn-header'>
         <h1>{{nav.ui.dialogTitle}}</h1>
     </div>
 
-    <div class='umb-panel-body'>
+    <div class='umb-modalcolumn-body'>
         <ul class="umb-actions">
             <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in nav.ui.actions">
                 <a prevent-default

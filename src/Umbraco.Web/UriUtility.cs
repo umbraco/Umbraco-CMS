@@ -40,7 +40,6 @@ namespace Umbraco.Web
 
 		// adds the virtual directory if any
 		// see also VirtualPathUtility.ToAbsolute
-		// FIXME
 		public static string ToAbsolute(string url)
         {
 			//return ResolveUrl(url);

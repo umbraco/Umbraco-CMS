@@ -1,8 +1,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 
@@ -75,6 +73,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal static bool IsClientSideRequest(this Uri url)
         {
+            // fixme - but really, is this OK? we should accept either no url, or .aspx, and everything else is out
             var toIgnore = new[] { ".js", ".css", ".ico", ".png", ".jpg", ".jpeg", ".gif", ".html", ".svg" };
             return toIgnore.Any(x => Path.GetExtension(url.LocalPath).InvariantEquals(x));
         }
@@ -88,7 +87,7 @@ namespace Umbraco.Core
         /// <remarks>Everything else remains unchanged, except for the fragment which is removed.</remarks>
         public static Uri Rewrite(this Uri uri, string path)
         {
-            if (!path.StartsWith("/"))
+            if (path.StartsWith("/") == false)
                 throw new ArgumentException("Path must start with a slash.", "path");
 
             return uri.IsAbsoluteUri
@@ -106,9 +105,9 @@ namespace Umbraco.Core
         /// <remarks>Everything else remains unchanged, except for the fragment which is removed.</remarks>
         public static Uri Rewrite(this Uri uri, string path, string query)
         {
-            if (!path.StartsWith("/"))
+            if (path.StartsWith("/") == false)
                 throw new ArgumentException("Path must start with a slash.", "path");
-            if (query.Length > 0 && !query.StartsWith("?"))
+            if (query.Length > 0 && query.StartsWith("?") == false)
                 throw new ArgumentException("Query must start with a question mark.", "query");
             if (query == "?")
                 query = "";
@@ -171,15 +170,14 @@ namespace Umbraco.Core
             var path = uri.GetSafeAbsolutePath();
             if (uri.IsAbsoluteUri)
             {
-                if (path != "/" && !path.EndsWith("/"))
+				if (path != "/" && path.EndsWith("/") == false)
                     uri = new Uri(uri.GetLeftPart(UriPartial.Authority) + path + "/" + uri.Query);
                 return uri;
             }
-            else
-            {
-                if (path != "/" && !path.EndsWith("/"))
-                    uri = new Uri(path + "/" + uri.Query, UriKind.Relative);
-            }
+		    
+            if (path != "/" && path.EndsWith("/") == false)
+					uri = new Uri(path + "/" + uri.Query, UriKind.Relative);
+		    
             return uri;
         }
 

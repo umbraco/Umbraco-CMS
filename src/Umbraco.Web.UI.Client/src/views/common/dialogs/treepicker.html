@@ -1,0 +1,23 @@
+<div class="umb-panel" ng-controller="Umbraco.Dialogs.TreePickerController">
+	<div class="umb-panel-header">
+		<div class="umb-el-wrap umb-panel-buttons">
+	        <div class="btn-toolbar umb-btn-toolbar">
+	         	<input type="button" ng-click="submit(dialogData)" class="btn btn-primary" value="select" />
+	        </div>
+		</div>
+	</div>
+	
+	<div class="umb-panel-body umb-scrollable">
+		<div class="tab-content umb-control-group">
+			<div class="umb-pane">
+				<umb-tree 
+					section="{{section}}" 
+					cachekey="contentpickerDialog" 
+					showheader="false" 
+					showoptions="false"
+					eventhandler="dialogTreeEventHandler">
+				</umb-tree>
+			</div>
+		</div>
+	</div>
+</div>

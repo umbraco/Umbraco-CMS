@@ -101,13 +101,15 @@ angular.module('umbraco.services')
            };
 
            scope.close = function(data) {
-               if (dialog.closeCallback) {
+              if (dialog.closeCallback) {
                    dialog.closeCallback(data);
-               }
+              }
 
-               dialog.element.modal('hide');
-               dialog.element.remove();
-               $("#" + dialog.element.attr("id")).remove();
+              if(dialog.element){
+                 dialog.element.modal('hide');
+                 dialog.element.remove();
+                 $("#" + dialog.element.attr("id")).remove();
+               }
            };
 
            //if iframe is enabled, inject that instead of a template
@@ -260,8 +262,10 @@ angular.module('umbraco.services')
             * @param {Object} args if specified this object will be sent to any callbacks registered on the dialogs.
             */
            close: function (dialog, args) {
-               dialog.scope.close();
-
+              if(dialog && dialog.scope){
+                  dialog.scope.close();
+              }
+              
                //removeDialog(dialog, args);
            },
            
@@ -323,13 +327,51 @@ angular.module('umbraco.services')
             *
             * @description
             * Opens a mcaro picker in a modal, the callback returns a object representing the macro and it's parameters
-            * @param {Object} options mediapicker dialog options object
+            * @param {Object} options macropicker dialog options object
             * @param {$scope} options.scope dialog scope
             * @param {Function} options.callback callback function
             * @returns {Object} modal object
             */
            macroPicker: function (options) {
                 options.template = 'views/common/dialogs/macroPicker.html';
+                options.show = true;
+                return openDialog(options);
+           },
+
+           /**
+            * @ngdoc method
+            * @name umbraco.services.dialogService#iconPicker
+            * @methodOf umbraco.services.dialogService
+            *
+            * @description
+            * Opens a icon picker in a modal, the callback returns a object representing the selected icon
+            * @param {Object} options iconpicker dialog options object
+            * @param {$scope} options.scope dialog scope
+            * @param {Function} options.callback callback function
+            * @returns {Object} modal object
+            */
+           iconPicker: function (options) {
+                options.template = 'views/common/dialogs/iconPicker.html';
+                options.show = true;
+                return openDialog(options);
+           },
+
+           /**
+            * @ngdoc method
+            * @name umbraco.services.dialogService#treePicker
+            * @methodOf umbraco.services.dialogService
+            *
+            * @description
+            * Opens a tree picker in a modal, the callback returns a object representing the selected tree item
+            * @param {Object} options iconpicker dialog options object
+            * @param {$scope} options.scope dialog scope
+            * @param {$scope} options.section tree section to display
+            * @param {$scope} options.multiPicker should the tree pick one or multiple items before returning
+            * @param {Function} options.callback callback function
+            * @returns {Object} modal object
+            */
+           treePicker: function (options) {
+                options.template = 'views/common/dialogs/treePicker.html';
                 options.show = true;
                 return openDialog(options);
            },
@@ -354,6 +396,19 @@ angular.module('umbraco.services')
               return openDialog(options);
           },
            
+           /**
+           * @ngdoc method
+           * @name umbraco.services.dialogService#ysodDialog
+           * @methodOf umbraco.services.dialogService
+           *
+           * @description
+           * Opens a dialog to an embed dialog 
+           */
+          embedDialog: function (options) {
+              options.template = 'views/common/dialogs/rteembed.html';
+              options.show = true;
+              return openDialog(options);
+          },
            /**
            * @ngdoc method
            * @name umbraco.services.dialogService#ysodDialog

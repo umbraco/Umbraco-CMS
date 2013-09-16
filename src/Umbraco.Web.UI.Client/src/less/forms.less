@@ -11,6 +11,19 @@
     margin-left: 0px !Important;
 }
 
+small.umb-detail,
+label small {
+  color: #b3b3b3 !important;
+  text-decoration: none;
+  display: block;
+  font-weight: normal
+}
+label.control-label {
+  padding-top: 8px !important;
+}
+
+.controls-row label{padding: 0px 10px 0px 10px; vertical-align: center}
+
 //utill styll to hide child untill hover
 .hover-show{visibility: hidden;}
 *:hover > .hover-show{visibility: visible;}
@@ -436,10 +449,13 @@ input[type="checkbox"][readonly] {
   }
 }
 
-
+//non-html5 states, pp: added default ng-invalid class
 input.highlight-error,
 select.highlight-error,
-textarea.highlight-error {
+textarea.highlight-error,
+input.ng-dirty.ng-invalid,
+select.ng-dirty.ng-invalid,
+textarea.ng-dirty.ng-invalid{
   border-color: #953b39 !important;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;
      -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;

@@ -305,8 +305,9 @@ namespace Umbraco.Web.Mvc
 		                () => controllerType.FullName,
                         () => typeof(IRenderMvcController).FullName,
                         () => typeof(ControllerBase).FullName);
-		            //exit as we cannnot route to the custom controller, just route to the standard one.
-		            return def;
+		            
+                    //we cannot route to this custom controller since it is not of the correct type so we'll continue with the defaults
+                    // that have already been set above.
 		        }
 		    }
 
