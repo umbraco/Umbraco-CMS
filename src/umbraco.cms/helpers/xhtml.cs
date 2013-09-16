@@ -3,6 +3,7 @@ using System.Collections;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
+using Umbraco.Core.Configuration;
 
 
 namespace umbraco.cms.helpers
@@ -39,7 +40,7 @@ namespace umbraco.cms.helpers
             tidy.Options.TidyMark = false;
 
             // To avoid entity encoding
-            tidy.Options.CharEncoding = (TidyNet.CharEncoding)Enum.Parse(typeof(TidyNet.CharEncoding), UmbracoSettings.TidyCharEncoding);
+            tidy.Options.CharEncoding = (TidyNet.CharEncoding)Enum.Parse(typeof(TidyNet.CharEncoding), UmbracoConfiguration.Current.UmbracoSettings.Content.TidyCharEncoding);
 
 
             /* Declare the parameters that is needed */

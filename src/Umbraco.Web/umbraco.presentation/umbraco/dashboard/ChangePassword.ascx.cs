@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.Security;
+using Umbraco.Core.Configuration;
 using umbraco.BusinessLogic;
 
 namespace umbraco.presentation.umbraco.dashboard
@@ -19,7 +20,7 @@ namespace umbraco.presentation.umbraco.dashboard
         protected void changePassword_Click(object sender, EventArgs e)
         {
             User u = User.GetCurrent();
-            MembershipProvider provider = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider];
+            MembershipProvider provider = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider];
             MembershipUser user = provider.GetUser(u.LoginName, true);
 
 

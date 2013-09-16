@@ -6,6 +6,7 @@ using System.Web;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections;
+using Umbraco.Core.Configuration;
 
 #endregion
 
@@ -26,7 +27,7 @@ namespace umbraco.presentation
 
         void IHttpModule.Init(HttpApplication context)
         {
-            if (UmbracoSettings.UseViewstateMoverModule)
+            if (UmbracoConfiguration.Current.UmbracoSettings.ViewstateMoverModule.Enable)
             {
                 context.BeginRequest += new EventHandler(context_BeginRequest);
             }

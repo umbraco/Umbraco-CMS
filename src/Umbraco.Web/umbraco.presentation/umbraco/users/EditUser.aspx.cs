@@ -7,6 +7,7 @@ using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Xml;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
@@ -79,7 +80,7 @@ namespace umbraco.cms.presentation.user
             }
 
             // check if canvas editing is enabled
-            DefaultToLiveEditing.Visible = UmbracoSettings.EnableCanvasEditing;
+            DefaultToLiveEditing.Visible = UmbracoConfiguration.Current.UmbracoSettings.Content.EnableCanvasEditing;
 
             // Populate usertype list
             foreach (UserType ut in UserType.getAll)
@@ -156,7 +157,7 @@ namespace umbraco.cms.presentation.user
 
             //Generel umrbaco access
             Pane ppAccess = new Pane();
-            if (UmbracoSettings.EnableCanvasEditing)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.EnableCanvasEditing)
             {
                 ppAccess.addProperty(ui.Text("user", "defaultToLiveEditing", base.getUser()), DefaultToLiveEditing);
             }
@@ -311,7 +312,7 @@ namespace umbraco.cms.presentation.user
 
             if (!IsPostBack)
             {
-                MembershipUser user = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(u.LoginName, true);
+                MembershipUser user = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].GetUser(u.LoginName, true);
                 uname.Text = u.Name;
                 lname.Text = (user == null) ? u.LoginName : user.UserName;
                 email.Text = (user == null) ? u.Email : user.Email;
@@ -376,7 +377,7 @@ namespace umbraco.cms.presentation.user
             {
                 try
                 {
-                    MembershipUser user = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(u.LoginName, true);
+                    MembershipUser user = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].GetUser(u.LoginName, true);
 
 
                     string tempPassword = ((controls.passwordChanger)passw.Controls[0]).Password;
@@ -388,14 +389,14 @@ namespace umbraco.cms.presentation.user
                     }
 
                     // Is it using the default membership provider
-                    if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is UsersMembershipProvider)
+                    if (Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider] is UsersMembershipProvider)
                     {
                         // Save user in membership provider
                         UsersMembershipUser umbracoUser = user as UsersMembershipUser;
                         umbracoUser.FullName = uname.Text.Trim();
                         umbracoUser.Language = userLanguage.SelectedValue;
                         umbracoUser.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
-                        Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].UpdateUser(umbracoUser);
+                        Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].UpdateUser(umbracoUser);
 
                         // Save user details
                         u.Email = email.Text.Trim();
@@ -406,7 +407,7 @@ namespace umbraco.cms.presentation.user
                         u.Name = uname.Text.Trim();
                         u.Language = userLanguage.SelectedValue;
                         u.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
-                        if (!(Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is ActiveDirectoryMembershipProvider)) Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].UpdateUser(user);
+                        if (!(Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider] is ActiveDirectoryMembershipProvider)) Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].UpdateUser(user);
                     }
 
 

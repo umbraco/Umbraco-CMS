@@ -156,7 +156,7 @@ namespace umbraco
                         if (pos > -1)
                         {
                             string htmlBadge =
-                                String.Format(UmbracoSettings.PreviewBadge,
+                                String.Format(UmbracoConfiguration.Current.UmbracoSettings.Content.PreviewBadge,
                                               IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                                               IOHelper.ResolveUrl(SystemDirectories.UmbracoClient),
                                               Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));

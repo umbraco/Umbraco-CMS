@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
 using Umbraco.Core.Profiling;
@@ -65,7 +66,7 @@ namespace Umbraco.Web
             if (UmbracoContext.Current.InPreviewMode)
             {
                 var htmlBadge =
-                    String.Format(UmbracoSettings.PreviewBadge,
+                    String.Format(UmbracoConfiguration.Current.UmbracoSettings.Content.PreviewBadge,
                                   IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                                   IOHelper.ResolveUrl(SystemDirectories.UmbracoClient),
                                   UmbracoContext.Current.HttpContext.Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));

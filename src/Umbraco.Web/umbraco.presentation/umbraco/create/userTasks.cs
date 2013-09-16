@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
@@ -36,10 +37,10 @@ namespace umbraco
             try
             {
                 // Password is auto-generated. They are they required to change the password by editing the user information.
-                var u = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].CreateUser(Alias,
+                var u = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].CreateUser(Alias,
                     Membership.GeneratePassword(
-                    Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].MinRequiredPasswordLength,
-                    Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].MinRequiredNonAlphanumericCharacters),
+                    Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].MinRequiredPasswordLength,
+                    Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].MinRequiredNonAlphanumericCharacters),
                     "", "", "", true, null, out status);
 
                 _returnUrl = string.Format("users/EditUser.aspx?id={0}", u.ProviderUserKey);

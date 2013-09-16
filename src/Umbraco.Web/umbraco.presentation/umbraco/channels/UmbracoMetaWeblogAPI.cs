@@ -6,6 +6,7 @@ using System.Web;
 using CookComputing.Blogger;
 using CookComputing.MetaWeblog;
 using CookComputing.XmlRpc;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
@@ -74,7 +75,8 @@ namespace umbraco.presentation.channels
                 if (userChannel.FieldExcerptAlias != null && userChannel.FieldExcerptAlias != "")
                     doc.getProperty(userChannel.FieldExcerptAlias).Value = removeLeftUrl(post.mt_excerpt);
 
-                if (UmbracoSettings.TidyEditorContent)
+                
+                if (UmbracoConfiguration.Current.UmbracoSettings.Content.TidyEditorContent)
                     doc.getProperty(userChannel.FieldDescriptionAlias).Value = library.Tidy(removeLeftUrl(post.description), false);
                 else
                     doc.getProperty(userChannel.FieldDescriptionAlias).Value = removeLeftUrl(post.description);
@@ -385,7 +387,7 @@ namespace umbraco.presentation.channels
 
 
                 // Description
-                if (UmbracoSettings.TidyEditorContent)
+                if (UmbracoConfiguration.Current.UmbracoSettings.Content.TidyEditorContent)
                     doc.getProperty(userChannel.FieldDescriptionAlias).Value = library.Tidy(removeLeftUrl(post.description), false);
                 else
                     doc.getProperty(userChannel.FieldDescriptionAlias).Value = removeLeftUrl(post.description);
@@ -514,7 +516,8 @@ namespace umbraco.presentation.channels
 
         private static bool validateUser(string username, string password)
         {
-            return Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].ValidateUser(username, password);
+            
+            return Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].ValidateUser(username, password);
         }
 
         [XmlRpcMethod("blogger.getUsersBlogs",

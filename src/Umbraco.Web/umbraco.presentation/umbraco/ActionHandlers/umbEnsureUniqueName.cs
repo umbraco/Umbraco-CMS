@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic.Actions;
@@ -36,7 +37,8 @@ namespace umbraco.ActionHandlers
         /// <returns>Returns true if successfull, otherwise false</returns>
         public bool Execute(umbraco.cms.businesslogic.web.Document documentObject, interfaces.IAction action)
         {
-            if (UmbracoSettings.EnsureUniqueNaming)
+            
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.EnsureUniqueNaming)
             {
                 string currentName = documentObject.Text;
                 int uniqueNumber = 1;

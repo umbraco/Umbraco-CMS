@@ -187,7 +187,7 @@ namespace umbraco
         /// <returns>Returns true of the XML was not populated, returns false if it was already populated</returns>
         private bool CheckXmlContentPopulation()
         {
-            if (UmbracoSettings.XmlContentCheckForDiskChanges)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.XmlContentCheckForDiskChanges)
                 CheckDiskCacheForUpdate();
 
             if (_xmlContent == null)
@@ -510,7 +510,7 @@ namespace umbraco
                 {
 					// modify a clone of the cache because even though we're into the write-lock
 					// we may have threads reading at the same time. why is this an option?
-					XmlDocument wip = UmbracoSettings.CloneXmlCacheOnPublish
+                    XmlDocument wip = UmbracoConfiguration.Current.UmbracoSettings.Content.CloneXmlContent
 						? CloneXmlDoc(XmlContentInternal)
 						: XmlContentInternal;
 
@@ -1320,7 +1320,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             else
             {
                 //// Save copy of content
-                if (UmbracoSettings.CloneXmlCacheOnPublish)
+                if (UmbracoConfiguration.Current.UmbracoSettings.Content.CloneXmlContent)
                 {
                     XmlDocument xmlContentCopy = CloneXmlDoc(_xmlContent);
 

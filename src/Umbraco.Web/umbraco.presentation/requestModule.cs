@@ -157,7 +157,7 @@ namespace umbraco.presentation
 					}
 
 					// show splash?
-					else if (UmbracoSettings.EnableSplashWhileLoading && content.Instance.isInitializing)
+                    else if (UmbracoConfiguration.Current.UmbracoSettings.Content.EnableSplashWhileLoading && content.Instance.isInitializing)
 						context.RewritePath(string.Format("{0}/splashes/booting.aspx", SystemDirectories.Config));
 					// rewrite page path
 					else
@@ -361,7 +361,7 @@ namespace umbraco.presentation
 				{
                     LogHelper.Info<requestModule>(string.Format("Application started at {0}", DateTime.Now));
 
-					if (UmbracoSettings.AutoCleanLogs)
+                    if (UmbracoConfiguration.Current.UmbracoSettings.Logging.AutoCleanLogs)
 					{
 						AddTask(LOG_SCRUBBER_TASK_NAME, GetLogScrubbingInterval());
 					}

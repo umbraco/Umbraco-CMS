@@ -14,6 +14,7 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.UI.Controls;
@@ -444,7 +445,7 @@ namespace umbraco.controls
             {
                 // Still shows the selected even if we tell it to hide sprite duplicates so as not to break an existing selection
                 if (_contentType.IconUrl.Equals(iconClass, StringComparison.InvariantCultureIgnoreCase) == false
-                    && UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideSpriteDuplicates
+                    && UmbracoConfiguration.Current.UmbracoSettings.Content.IconPickerBehaviour == IconPickerBehaviour.HideSpriteDuplicates
                     && diskFileNames.Contains(IconClassToIconFileName(iconClass)))
                     continue;
                 
@@ -459,7 +460,7 @@ namespace umbraco.controls
 
                 // Still shows the selected even if we tell it to hide file duplicates so as not to break an existing selection
                 if (_contentType.IconUrl.Equals(file.Name, StringComparison.InvariantCultureIgnoreCase) == false
-                    && UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates
+                    && UmbracoConfiguration.Current.UmbracoSettings.Content.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates
                     && spriteFileNames.Contains(FileNameToIconFileName(file)))
                     continue;
 

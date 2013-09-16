@@ -11,6 +11,7 @@ using System.Web.UI.HtmlControls;
 using ClientDependency.Core;
 using System.Linq;
 using ClientDependency.Core.Controls;
+using Umbraco.Core.Configuration;
 using umbraco.IO;
 
 namespace umbraco.uicontrols
@@ -57,7 +58,7 @@ namespace umbraco.uicontrols
         {
             get
             {
-                return UmbracoSettings.ScriptDisableEditor == false;
+                return UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptEditor.DisableScriptEditor == false;
             }
         }
 

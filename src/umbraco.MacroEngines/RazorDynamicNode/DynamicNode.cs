@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Logging;
 using umbraco.interfaces;
@@ -483,8 +484,19 @@ namespace umbraco.MacroEngines
             //contextAlias is the node which the property data was returned from
             //Guid dataType = ContentType.GetDataType(data.ContextAlias, data.Alias);					
             var dataType = GetDataType(propResult.ContextAlias, propResult.Alias);
-
-            var staticMapping = UmbracoSettings.RazorDataTypeModelStaticMapping
+            
+            //now we need to map to the old object until we can clean all this nonsense up
+            var configMapping = UmbracoConfiguration.Current.UmbracoSettings.Scripting.Razor.DataTypeModelStaticMappings
+                                                    .Select(x => new RazorDataTypeModelStaticMappingItem()
+                                                        {
+                                                            DataTypeGuid = x.DataTypeGuid,
+                                                            NodeTypeAlias = x.NodeTypeAlias,
+                                                            PropertyTypeAlias = x.PropertyTypeAlias,
+                                                            Raw = string.Empty,
+                                                            TypeName = x.MappingName
+                                                        }).ToList();
+            
+            var staticMapping = configMapping
                 .FirstOrDefault(mapping => mapping.Applies(dataType, propResult.ContextAlias, propResult.Alias));
             
             if (staticMapping != null)
@@ -800,8 +812,8 @@ namespace umbraco.MacroEngines
                             //check that the document element is not one of the disallowed elements
                             //allows RTE to still return as html if it's valid xhtml
                             string documentElement = e.Name.LocalName;
-                            if (UmbracoSettings.NotDynamicXmlDocumentElements.Any(tag =>
-                                                                                  string.Equals(tag, documentElement, StringComparison.CurrentCultureIgnoreCase)) == false)
+                            if (UmbracoConfiguration.Current.UmbracoSettings.Scripting.Razor.NotDynamicXmlDocumentElements.Any(tag =>
+                                                                                  string.Equals(tag.Element, documentElement, StringComparison.CurrentCultureIgnoreCase)) == false)
                             {
                                 result = new DynamicXml(e);
                                 return true;

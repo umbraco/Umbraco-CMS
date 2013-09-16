@@ -18,6 +18,7 @@ namespace umbraco
     [Obsolete("Use UmbracoConfiguration.Current.UmbracoSettings instead, it offers all settings in strongly typed formats. This class will be removed in future versions.")]
     public class UmbracoSettings
     {
+        [Obsolete("This hasn't been used since 4.1!")]
         public const string TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME = ""; // "children";
 
         /// <summary>

@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Data;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
@@ -27,7 +28,7 @@ namespace umbraco
             contentType.CreatorId = User.Id;
             contentType.Alias = Alias.Replace("'", "''");
             contentType.Name = Alias.Replace("'", "''");
-            contentType.Icon = UmbracoSettings.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates
+            contentType.Icon = UmbracoConfiguration.Current.UmbracoSettings.Content.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates
                                    ? ".sprTreeFolder"
                                    : "folder.gif";
 

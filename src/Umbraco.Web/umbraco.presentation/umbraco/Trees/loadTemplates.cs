@@ -72,7 +72,7 @@ namespace umbraco
                 RenderTemplateFolderItems(folder, folderPath, ref tree);
             else
             {
-                if(UmbracoSettings.EnableTemplateFolders)
+                if (UmbracoConfiguration.Current.UmbracoSettings.Templates.EnableTemplateFolders)
                     RenderTemplateFolders(ref tree);
                 
                 RenderTemplates(ref tree);

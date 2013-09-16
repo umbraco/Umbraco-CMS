@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using umbraco.BasePages;
@@ -526,7 +527,7 @@ namespace umbraco.controls
             {
                 string caption = p.PropertyType.Name;
                 if (p.PropertyType.Description != null && p.PropertyType.Description != String.Empty)
-                    switch (UmbracoSettings.PropertyContextHelpOption)
+                    switch (UmbracoConfiguration.Current.UmbracoSettings.Content.PropertyContextHelpOption)
                     {
                         case "icon":
                             caption += " <img src=\"" + this.ResolveUrl(SystemDirectories.Umbraco) + "/images/help.png\" class=\"umbPropertyContextHelp\" alt=\"" + p.PropertyType.Description + "\" title=\"" + p.PropertyType.Description + "\" />";

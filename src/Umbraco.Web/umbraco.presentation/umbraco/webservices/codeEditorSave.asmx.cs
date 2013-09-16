@@ -380,7 +380,7 @@ namespace umbraco.presentation.webservices
                                           SystemDirectories.Scripts);
                 // validate extension
                 IOHelper.ValidateFileExtension(IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename),
-                                               UmbracoSettings.ScriptFileTypes.Split(',').ToList());
+                                               UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptEditor.ScriptFileTypes.ToList());
 
 
                 var val = contents;

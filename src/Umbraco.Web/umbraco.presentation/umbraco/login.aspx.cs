@@ -10,6 +10,7 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using System.Web.Security;
@@ -69,16 +70,16 @@ namespace umbraco.cms.presentation
         protected void Button1_Click(object sender, System.EventArgs e)
         {
             // Authenticate users by using the provider specified in umbracoSettings.config
-            if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].ValidateUser(lname.Text, passw.Text))
+            if (Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].ValidateUser(lname.Text, passw.Text))
             {
-                if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is ActiveDirectoryMembershipProvider)
-                    ActiveDirectoryMapping(lname.Text, Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(lname.Text, false).Email);
+                if (Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider] is ActiveDirectoryMembershipProvider)
+                    ActiveDirectoryMapping(lname.Text, Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.Users.DefaultBackOfficeProvider].GetUser(lname.Text, false).Email);
 
                 BusinessLogic.User u = new User(lname.Text);
                 doLogin(u);
 
                 // Check if the user should be redirected to live editing
-                if (UmbracoSettings.EnableCanvasEditing && u.DefaultToLiveEditing)
+                if (UmbracoConfiguration.Current.UmbracoSettings.Content.EnableCanvasEditing && u.DefaultToLiveEditing)
                 {
                     int startNode = u.StartNodeId;
                     // If the startnode is -1 (access to all content), we'll redirect to the top root node

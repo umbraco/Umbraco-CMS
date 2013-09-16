@@ -8,6 +8,7 @@ using System.Linq;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
@@ -247,7 +248,8 @@ namespace umbraco.controls.GenericProperties
 
         private void SetDefaultDocumentTypeProperty()
         {
-            var itemToSelect = ddlTypes.Items.Cast<ListItem>().FirstOrDefault(item => item.Text.ToLowerInvariant() == UmbracoSettings.DefaultDocumentTypeProperty.ToLowerInvariant());
+            var itemToSelect = ddlTypes.Items.Cast<ListItem>()
+                .FirstOrDefault(item => item.Text.ToLowerInvariant() == UmbracoConfiguration.Current.UmbracoSettings.Content.DefaultDocumentTypeProperty.ToLowerInvariant());
             
             if (itemToSelect != null)
             {

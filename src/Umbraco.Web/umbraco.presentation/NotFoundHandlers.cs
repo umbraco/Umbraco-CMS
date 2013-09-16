@@ -75,7 +75,7 @@ namespace umbraco {
                     string langXpath = CreateXPathQuery(domainUrl + "/" + url, false);
                     if (content.Instance.XmlContent.DocumentElement.SelectSingleNode(langXpath) != null)
                         return langXpath;
-                    else if (UmbracoSettings.UseDomainPrefixes)
+                    else if (UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.UseDomainPrefixes)
                         return "/domainprefixes-are-used-so-i-do-not-work";
                 }
             }

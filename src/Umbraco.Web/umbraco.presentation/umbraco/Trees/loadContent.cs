@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Configuration;
 using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic.web;
@@ -114,7 +115,7 @@ namespace umbraco
         {
             actions.Clear();
             actions.Add(ActionNew.Instance);
-            if (UmbracoSettings.EnableCanvasEditing)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.EnableCanvasEditing)
             {
                 actions.Add(ActionLiveEdit.Instance);
             }
