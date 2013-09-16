@@ -22,8 +22,8 @@ namespace Umbraco.Web.PropertyEditors
     [PluginController("UmbracoApi")]
     public class RteEmbedController : UmbracoAuthorizedJsonController
     {
-        [HttpGet]
-        public Result Embed(string url, int width, int height)
+
+        public Result GetEmbed(string url, int width, int height)
         {
             var result = new Result();
 

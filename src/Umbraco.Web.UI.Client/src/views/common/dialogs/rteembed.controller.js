@@ -6,7 +6,7 @@
     $scope.preview = "";
     $scope.success = false;
     
-    $scope.preview = function () {
+    $scope.preview = function(){
 
         if ($scope.url != "") {
             
@@ -14,7 +14,7 @@
             
             $scope.success = false;
 
-            $http({ method: 'GET', url: '/umbraco/UmbracoApi/RteEmbed/Embed', params: { url: $scope.url, width: $scope.width, height: $scope.height } })
+            $http({ method: 'GET', url: '/umbraco/UmbracoApi/RteEmbed/GetEmbed', params: { url: $scope.url, width: $scope.width, height: $scope.height } })
                 .success(function(data) {
                     $scope.preview = data.Markup;
                     $scope.success = true;
@@ -27,7 +27,7 @@
 
     };
 
-    $scope.insert = function () {
+    $scope.insert = function(){
         $scope.submit($scope.preview);
     };
 });

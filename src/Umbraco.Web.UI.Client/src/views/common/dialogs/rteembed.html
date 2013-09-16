@@ -1,6 +1,5 @@
 ﻿<div class="umb-panel" ng-controller="Umbraco.Dialogs.RteEmbedController">
  
-    
     <div class="umb-panel-header">
         <div class="umb-el-wrap umb-panel-buttons">
             <div class="btn-toolbar umb-btn-toolbar">
@@ -9,7 +8,6 @@
         </div>
     </div>
        
-    
     <div class="umb-panel-body umb-scrollable" auto-scale="1">
         <div class="umb-panel">
             <div class="umb-control-group">
@@ -17,13 +15,10 @@
                 <label for="url">Url</label> 
                 <input id="url" type="text" ng-model="url" ng-change="preview()"/>
 
-            
-    
                 <label>Size:</label> 
                 <input type="text" ng-model="width"/> x <input type="text" ng-model="height" />
                 <label for="constrain">Constrain:</label> 
                 <input id="constrain" type="checkbox" ng-model="constrain"/>
-    
     
                 <div ng-bind-html-unsafe="preview">
              

@@ -385,7 +385,7 @@ angular.module('umbraco.services')
            * Opens a dialog to an embed dialog 
            */
           embedDialog: function (options) {
-              options.template = 'views/common/dialogs/embed.html';
+              options.template = 'views/common/dialogs/rteembed.html';
               options.show = true;
               return openDialog(options);
           },
