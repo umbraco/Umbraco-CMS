@@ -358,6 +358,26 @@ angular.module('umbraco.services')
 
            /**
             * @ngdoc method
+            * @name umbraco.services.dialogService#treePicker
+            * @methodOf umbraco.services.dialogService
+            *
+            * @description
+            * Opens a tree picker in a modal, the callback returns a object representing the selected tree item
+            * @param {Object} options iconpicker dialog options object
+            * @param {$scope} options.scope dialog scope
+            * @param {$scope} options.section tree section to display
+            * @param {$scope} options.multiPicker should the tree pick one or multiple items before returning
+            * @param {Function} options.callback callback function
+            * @returns {Object} modal object
+            */
+           treePicker: function (options) {
+                options.template = 'views/common/dialogs/treePicker.html';
+                options.show = true;
+                return openDialog(options);
+           },
+
+           /**
+            * @ngdoc method
             * @name umbraco.services.dialogService#propertyDialog
             * @methodOf umbraco.services.dialogService
             *
