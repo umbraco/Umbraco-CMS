@@ -11,6 +11,7 @@ using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
 
 using legacyUser = umbraco.BusinessLogic.User;
+using System.Net.Http;
 
 
 namespace Umbraco.Web.Editors
@@ -35,6 +36,24 @@ namespace Umbraco.Web.Editors
             }
 
             return Mapper.Map<UserDetail>(user);
+        }
+
+        /// <summary>
+        /// Changes the users password
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PostChangePassword(string oldPassword, string newPassword)
+        {
+            var u = UmbracoContext.Security.CurrentUser;
+            if(!System.Web.Security.Membership.ValidateUser(u.Username, oldPassword))
+                return new HttpResponseMessage(HttpStatusCode.Unauthorized);
+
+            u.Password = newPassword;
+            Services.UserService.SaveUser(u);
+
+
+            return new HttpResponseMessage(HttpStatusCode.OK);
         }
 
         /// <summary>
