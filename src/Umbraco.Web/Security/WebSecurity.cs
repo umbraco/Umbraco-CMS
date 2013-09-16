@@ -184,12 +184,12 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Changes password for a back office user
         /// </summary>
-        /// <param name="username"></param>
-        /// <param name="password"></param>
+        /// <param name="oldpassword"></param>
+        /// <param name="newpassword"></param>
         /// <returns></returns>
         internal bool ChangePassword(string oldpassword, string newpassword)
         {
-            var membershipProvider = Membership.Providers[LegacyUmbracoSettings.DefaultBackofficeProvider];
+            var membershipProvider = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider];
             return membershipProvider.GetUser(CurrentUser.Username, true).ChangePassword(oldpassword, newpassword);
         }
 
