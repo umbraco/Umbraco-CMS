@@ -48,26 +48,20 @@ namespace Umbraco.Core.Models.PublishedContent
         // wrap an item, ie create the actual clone for this set
         private T MapContentAsT(T t)
         {
-            // fixme - cleanup
-            return MapContent(t) /*.Content*/ as T;
+            return MapContent(t) as T;
         }
 
-        // fixme - cleanup
-        internal IPublishedContentExtended /*Handle*/ MapContent(T t)
+        internal IPublishedContentExtended MapContent(T t)
         {
             IPublishedContentExtended extend;
-            if (_xContent.TryGetValue(t, out extend) == false)
-            {
-                // fixme - cleanup
-                extend = PublishedContentExtended.Extend(t, this);
-                //extend = t.Extend(this);
-                var asT = extend as T;
-                //var asT = extend.Content as T;
-                if (asT == null)
-                    throw new InvalidOperationException(string.Format("Failed extend a published content of type {0}."
-                        + "Got {1} when expecting {2}.", t.GetType().FullName, extend /*.Content*/ .GetType().FullName, typeof(T).FullName));
-                _xContent[t] = extend;
-            }
+            if (_xContent.TryGetValue(t, out extend)) return extend;
+
+            extend = PublishedContentExtended.Extend(t, this);
+            var asT = extend as T;
+            if (asT == null)
+                throw new InvalidOperationException(string.Format("Failed extend a published content of type {0}."
+                                                                  + "Got {1} when expecting {2}.", t.GetType().FullName, extend.GetType().FullName, typeof(T).FullName));
+            _xContent[t] = extend;
             return extend;
         }
 
@@ -82,7 +76,7 @@ namespace Umbraco.Core.Models.PublishedContent
                     {
                         var extend = MapContent(t);
                         extend.SetIndex(index++);
-                        return extend /*.Content*/ as T; // fixme - cleanup
+                        return extend as T;
                     }).ToArray());
             }
         }

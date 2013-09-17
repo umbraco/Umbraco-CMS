@@ -1,4 +1,4 @@
-﻿// TODO in v7, #define FIX_GET_PROPERTY_VALUE (see GetPropertyValue region)
+﻿// fixme - should #define
 #undef FIX_GET_PROPERTY_VALUE
 
 using System;

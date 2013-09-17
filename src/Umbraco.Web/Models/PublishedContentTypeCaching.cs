@@ -16,7 +16,7 @@ namespace Umbraco.Web.Models
     // TODO refactor this when the refresher is ready
     // FIXME should use the right syntax NOW
 
-    class PublishedContentTypeCaching2 : ApplicationEventHandler
+    class PublishedContentTypeCaching : ApplicationEventHandler
     {
         protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {

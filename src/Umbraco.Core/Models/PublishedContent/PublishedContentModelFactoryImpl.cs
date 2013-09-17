@@ -34,14 +34,13 @@ namespace Umbraco.Core.Models.PublishedContent
                 if (_constructors.ContainsKey(typeName))
                     throw new InvalidOperationException(string.Format("More that one type want to be a model for content type {0}.", typeName));
 
-                // should work everywhere, potentially slow?
+                // should work everywhere, but slow
                 //_constructors[typeName] = constructor;
 
-                // note: would it be even faster with a dynamic method?
+                // much faster with a dynamic method but potential MediumTrust issues
                 // here http://stackoverflow.com/questions/16363838/how-do-you-call-a-constructor-via-an-expression-tree-on-an-existing-object
-                // but MediumTrust issue?
 
-                // fixme - must make sure that works in medium trust
+                // fast enough and works in MediumTrust
                 // read http://boxbinary.com/2011/10/how-to-run-a-unit-test-in-medium-trust-with-nunitpart-three-umbraco-framework-testing/
                 var exprArg = Expression.Parameter(typeof(IPublishedContent), "content");
                 var exprNew = Expression.New(constructor, exprArg);

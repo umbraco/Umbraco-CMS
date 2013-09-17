@@ -28,7 +28,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	/// <remarks>
 	/// NOTE: In the future if we want to properly cache all media this class can be extended or replaced when these classes/interfaces are exposed publicly.
 	/// </remarks>
-    // fixme - does not implement the content model factory
     internal class PublishedMediaCache : IPublishedMediaCache
 	{
 		public PublishedMediaCache()

@@ -32,20 +32,28 @@ namespace Umbraco.Core.Dynamics
                 .ToArray();
 	    }
 
+        // ORIGINAL CODE IS NOT COMPLETE, DOES NOT HANDLE GENERICS, ETC...
+
+        // so this is an attempt at fixing things, but it's not done yet
+        // and do we really want to do this? extension methods are not supported on dynamics, period
+        // we should use strongly typed content instead of dynamics.
+
+        /*
+
         // get all extension methods for type thisType, with name name,
         // accepting argsCount arguments (not counting the instance of thisType).
         private static IEnumerable<MethodInfo> GetExtensionMethods(Type thisType, string name, int argsCount)
         {
             var key = string.Format("{0}.{1}::{2}", thisType.FullName, name, argsCount);
 
-            var types = thisType.GetBaseTypes(true); // either do this OR have MatchFirstParameter handle the stuff... FIXME?
+            var types = thisType.GetBaseTypes(true); // either do this OR have MatchFirstParameter handle the stuff... F*XME
 
             var methods = AllExtensionMethods
                 .Where(m => m.Name == name)
                 .Where(m => m.GetParameters().Length == argsCount)
                 .Where(m => MatchFirstParameter(thisType, m.GetParameters()[0].ParameterType));
 
-            // fixme - is this what we should cache?
+            // f*xme - is this what we should cache?
             return methods;
         }
 
@@ -88,8 +96,10 @@ namespace Umbraco.Core.Dynamics
         {
             // public static int DoSomething<T>(Foo foo, T t1, T t2)
             // DoSomething(foo, t1, t2) => how can we match?!
-            return parameterType == argumentType; // fixme of course!
+            return parameterType == argumentType; // f*xme of course!
         }
+         * 
+        */
 
         // BELOW IS THE ORIGINAL CODE...
 
@@ -106,6 +116,10 @@ namespace Umbraco.Core.Dynamics
 		/// </remarks>
         private static IEnumerable<MethodInfo> GetAllExtensionMethods(Type thisType, string name, int argumentCount, bool argsContainsThis)
         {
+            // at *least* we can cache the extension methods discovery
+		    var candidates = AllExtensionMethods;
+
+            /*
 			//only scan assemblies we know to contain extension methods (user assemblies)
         	var assembliesToScan = TypeFinder.GetAssembliesWithKnownExclusions();        	
 
@@ -124,6 +138,7 @@ namespace Umbraco.Core.Dynamics
 
             //add the extension methods defined in IEnumerable
             candidates = candidates.Concat(typeof(Enumerable).GetMethods(BindingFlags.Static | BindingFlags.Public));            
+            */
 
             //filter by name	
             var methodsByName = candidates.Where(m => m.Name == name);

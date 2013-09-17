@@ -1,4 +1,4 @@
-// fixme - should define - ok for now
+// fixme - should #define
 // axes navigation is broken in many ways... but fixes would not be 100%
 // backward compatible... so keep them for v7 or whenever appropriate.
 #undef FIX_AXES
@@ -13,7 +13,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Models;
 using Umbraco.Core;
-using Umbraco.Web.PropertyEditors;
 using ContentType = umbraco.cms.businesslogic.ContentType;
 
 namespace Umbraco.Web
@@ -120,9 +119,7 @@ namespace Umbraco.Web
         /// <remarks>The content may have a property, and that property may not have a value.</remarks>
         public static bool HasProperty(this IPublishedContent content, string alias)
         {
-            // FIXME that is very wrong, we want the TYPE that was used when creating the IPublishedContent else caching issues!!!!
-            var contentType = PublishedContentType.Get(content.ItemType, content.DocumentTypeAlias);
-            return contentType.GetPropertyType(alias) != null;
+            return content.ContentType.GetPropertyType(alias) != null;
         }
 
         #endregion
@@ -294,28 +291,6 @@ namespace Umbraco.Web
         #endregion
 
         #region GetPropertyValue<T>
-
-        /// <summary>
-        /// Provides a shortcut to <c>GetPropertyValue{T}</c>.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <returns>The value of the content's property identified by the alias.</returns>
-        public static T V<T>(this IPublishedContent content, string alias)
-        {
-            return content.GetPropertyValue<T>(alias);
-        }
-
-        /// <summary>
-        /// Provides a shortcut to <c>GetPropertyValue{T}</c> with recursion.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <returns>The value of the content's property identified by the alias.</returns>
-        public static T Vr<T>(this IPublishedContent content, string alias)
-        {
-            return content.GetPropertyValue<T>(alias, true);
-        }
 
         /// <summary>
         /// Gets the value of a content's property identified by its alias, converted to a specified type.
@@ -584,27 +559,6 @@ namespace Umbraco.Web
             return index;
         }
 
-        // fixme - remove - now IPublishedContent.Index() is native
-        //public static int Index(this IPublishedContent content)
-        //{
-        //    // fast: check if content knows its index
-        //    var withIndex = content as IPublishedContentWithIndex;
-        //    if (withIndex != null && withIndex.Index.HasValue) return withIndex.Index.Value;
-
-        //    // slow: find content in the content set
-        //    var index = content.Index(content.ContentSet);
-        //    if (withIndex != null) withIndex.Index = index;
-        //    return index;
-        //}
-
-        //private static int Index(this IPublishedContent content, IEnumerable<IPublishedContent> set)
-        //{
-        //    var index = set.FindIndex(n => n.Id == content.Id);
-        //    if (index >= 0) return index;
-
-        //    throw new IndexOutOfRangeException("Could not find content in the content set.");
-        //}
-
 		#endregion
 
 		#region IsSomething: misc.
@@ -621,11 +575,9 @@ namespace Umbraco.Web
             // note: would be better to ensure we have an IPropertyEditorValueConverter for booleans
             // and then treat the umbracoNaviHide property as a boolean - vs. the hard-coded "1".
 
-            var umbracoNaviHide = content.GetProperty(Constants.Conventions.Content.NaviHide);
-
-            // fixme - works but not using the proper converters?
-            if (umbracoNaviHide == null || umbracoNaviHide.HasValue == false) return true;
-            return umbracoNaviHide.GetValue<bool>() == false;
+            // rely on the property converter - will return default bool value, ie false, if property
+            // is not defined, or has no value, else will return its value.
+            return content.GetPropertyValue<bool>(Constants.Conventions.Content.NaviHide) == false;
         }
 
 		public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias)

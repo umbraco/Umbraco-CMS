@@ -15,7 +15,7 @@ namespace Umbraco.Core.Dynamics
     // returned when TryGetMember fails on a DynamicPublishedContent
     //
     // so if user does @CurrentPage.TextPages it will get something that is enumerable (but empty)
-    // fixme - not sure I understand the stuff about .Where, though
+    // note - not sure I understand the stuff about .Where, though
 
     public class DynamicNull : DynamicObject, IEnumerable, IHtmlString
     {
