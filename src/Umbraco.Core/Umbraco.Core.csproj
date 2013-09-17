@@ -315,6 +315,14 @@
     <Compile Include="Models\IDictionaryTranslation.cs" />
     <Compile Include="Models\IFile.cs" />
     <Compile Include="Models\ILanguage.cs" />
+    <Compile Include="Models\IMacro.cs" />
+    <Compile Include="Models\IMacroProperty.cs" />
+    <Compile Include="Models\IMacroPropertyType.cs" />
+    <Compile Include="Models\Macro.cs" />
+    <Compile Include="Models\MacroProperty.cs" />
+    <Compile Include="Models\MacroPropertyCollection.cs" />
+    <Compile Include="Models\MacroPropertyTypeBaseTypes.cs" />
+    <Compile Include="Models\MacroTypes.cs" />
     <Compile Include="Models\Mapping\IMapperConfiguration.cs" />
     <Compile Include="Models\Mapping\MapperConfiguration.cs" />
     <Compile Include="Models\Membership\EntityPermission.cs" />
@@ -370,6 +378,7 @@
     <Compile Include="Models\Validation\RequiredForPersistenceAttribute.cs" />
     <Compile Include="ObjectResolution\ApplicationEventsResolver.cs" />
     <Compile Include="ObjectResolution\ResolverCollection.cs" />
+    <Compile Include="ObservableDictionary.cs" />
     <Compile Include="Persistence\Caching\InMemoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\IRepositoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\NullCacheProvider.cs" />
@@ -398,6 +407,7 @@
     <Compile Include="Persistence\Mappers\MacroMapper.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\RemoveDefaultPermissionUserColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\UpdateControlIdToPropertyEditorAlias.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IMacroRepository.cs" />
     <Compile Include="Persistence\Repositories\MacroRepository.cs" />
     <Compile Include="PropertyEditors\LegacyPropertyEditorIdToAliasConverter.cs" />
     <Compile Include="Persistence\Mappers\MapperForAttribute.cs" />

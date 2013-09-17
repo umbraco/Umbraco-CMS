@@ -4,11 +4,11 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class MacroFactory : IEntityFactory<Macro, MacroDto>
+    internal class MacroFactory : IEntityFactory<IMacro, MacroDto>
     {
         #region Implementation of IEntityFactory<Language,LanguageDto>
 
-        public Macro BuildEntity(MacroDto dto)
+        public IMacro BuildEntity(MacroDto dto)
         {
             var model = new Macro(dto.Id, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.ScriptType, dto.ScriptAssembly, dto.Xslt, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.Python);
             //on initial construction we don't want to have dirty properties tracked
@@ -17,17 +17,17 @@ namespace Umbraco.Core.Persistence.Factories
             return model;
         }
 
-        public MacroDto BuildDto(Macro entity)
+        public MacroDto BuildDto(IMacro entity)
         {
             var dto = new MacroDto()
                 {
                     Alias = entity.Alias,
                     CacheByPage = entity.CacheByPage,
-                    CachePersonalized = entity.CachePersonalized,
+                    CachePersonalized = entity.CacheByMember,
                     DontRender = entity.DontRender,
                     Name = entity.Name,
                     Python = entity.ScriptPath,
-                    RefreshRate = entity.RefreshRate,
+                    RefreshRate = entity.CacheDuration,
                     ScriptAssembly = entity.ControlAssembly,
                     ScriptType = entity.ControlType,
                     UseInEditor = entity.UseInEditor,

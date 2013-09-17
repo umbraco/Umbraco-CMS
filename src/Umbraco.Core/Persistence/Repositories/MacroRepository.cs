@@ -7,11 +7,12 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class MacroRepository : PetaPocoRepositoryBase<int, Macro>
+    internal class MacroRepository : PetaPocoRepositoryBase<int, IMacro>, IMacroRepository
     {
         public MacroRepository(IDatabaseUnitOfWork work) : base(work)
         {
@@ -21,7 +22,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
         }
 
-        protected override Macro PerformGet(int id)
+        protected override IMacro PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
@@ -35,12 +36,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
-            entity.ResetDirtyProperties(false);
+            ((TracksChangesEntityBase)entity).ResetDirtyProperties(false);
 
             return entity;
         }
 
-        protected override IEnumerable<Macro> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IMacro> PerformGetAll(params int[] ids)
         {
             if (ids.Any())
             {
@@ -59,10 +60,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        protected override IEnumerable<Macro> PerformGetByQuery(IQuery<Macro> query)
+        protected override IEnumerable<IMacro> PerformGetByQuery(IQuery<IMacro> query)
         {
             var sqlClause = GetBaseQuery(false);
-            var translator = new SqlTranslator<Macro>(sqlClause, query);
+            var translator = new SqlTranslator<IMacro>(sqlClause, query);
             var sql = translator.Translate();
 
             var dtos = Database.Fetch<Macro>(sql);
@@ -76,8 +77,24 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<MacroDto>();
+            if (isCount)
+            {
+                sql.Select("COUNT(*)").From<MacroDto>();
+            }
+            else
+            {
+                return GetBaseQuery("*");
+            }
+            return sql;
+        }
+
+        private static Sql GetBaseQuery(string columns)
+        {
+            var sql = new Sql();
+            sql.Select(columns)
+                      .From<MacroDto>()
+                      .LeftJoin<MacroPropertyDto>()
+                      .On<MacroDto, MacroPropertyDto>(left => left.Id, right => right.Macro);
             return sql;
         }
 
@@ -100,7 +117,7 @@ namespace Umbraco.Core.Persistence.Repositories
             get { throw new NotImplementedException(); }
         }
 
-        protected override void PersistNewItem(Macro entity)
+        protected override void PersistNewItem(IMacro entity)
         {
             ((Entity)entity).AddingEntity();
 
@@ -110,10 +127,17 @@ namespace Umbraco.Core.Persistence.Repositories
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
 
+            foreach (var propDto in dto.MacroPropertyDtos)
+            {
+                //need to set the id explicitly here
+                propDto.Macro = id;
+                Database.Insert(propDto);
+            }
+
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
-        protected override void PersistUpdatedItem(Macro entity)
+        protected override void PersistUpdatedItem(IMacro entity)
         {
             ((Entity)entity).UpdatingEntity();
 
@@ -121,6 +145,33 @@ namespace Umbraco.Core.Persistence.Repositories
             var dto = factory.BuildDto(entity);
 
             Database.Update(dto);
+
+            //update the sections if they've changed
+            var macro = (Macro)entity;
+            if (macro.IsPropertyDirty("Properties"))
+            {
+                //for any that exist on the object, we need to determine if we need to update or insert
+                foreach (var propDto in dto.MacroPropertyDtos)
+                {
+                    if (macro.AddedProperties.Contains(propDto.Alias))
+                    {
+                        //we need to insert since this was added  
+                        Database.Insert(propDto);
+                    }
+                    else
+                    {
+                        Database.Update(propDto);
+                    }
+                }
+
+                //now we need to delete any props that have been removed
+                foreach (var propAlias in macro.RemovedProperties)
+                {
+                    //delete the property
+                    Database.Delete<MacroPropertyDto>("WHERE macro=@macroId AND macroPropertyAlias=@propAlias",
+                        new { macroId = macro.Id, propAlias = propAlias });
+                }
+            }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }

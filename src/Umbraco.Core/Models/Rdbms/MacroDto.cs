@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence;
+﻿using System.Collections.Generic;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
@@ -54,5 +55,8 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("macroPython")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Python { get; set; }
+
+        [ResultColumn]
+        public List<MacroPropertyDto> MacroPropertyDtos { get; set; }
     }
 }

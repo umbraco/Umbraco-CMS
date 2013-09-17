@@ -88,12 +88,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(macro.HasIdentity, Is.True);
                 Assert.That(macro.Alias, Is.EqualTo("test1"));
                 Assert.That(macro.CacheByPage, Is.EqualTo(false));
-                Assert.That(macro.CachePersonalized, Is.EqualTo(false));
+                Assert.That(macro.CacheByMember, Is.EqualTo(false));
                 Assert.That(macro.ControlAssembly, Is.EqualTo("MyAssembly1"));
                 Assert.That(macro.ControlType, Is.EqualTo("~/usercontrol/test1.ascx"));
                 Assert.That(macro.DontRender, Is.EqualTo(true));
                 Assert.That(macro.Name, Is.EqualTo("Test1"));
-                Assert.That(macro.RefreshRate, Is.EqualTo(0));
+                Assert.That(macro.CacheDuration, Is.EqualTo(0));
                 Assert.That(macro.ScriptPath, Is.EqualTo("~/views/macropartials/test1.cshtml"));
                 Assert.That(macro.UseInEditor, Is.EqualTo(false));
                 Assert.That(macro.XsltPath, Is.EqualTo("test1.xslt"));
@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = new MacroRepository(unitOfWork))
             {
                 // Act
-                var query = Query<Macro>.Builder.Where(x => x.Alias.ToUpper() == "TEST1");
+                var query = Query<IMacro>.Builder.Where(x => x.Alias.ToUpper() == "TEST1");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -145,7 +145,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = new MacroRepository(unitOfWork))
             {
                 // Act
-                var query = Query<Macro>.Builder.Where(x => x.Name.StartsWith("Test"));
+                var query = Query<IMacro>.Builder.Where(x => x.Name.StartsWith("Test"));
                 int count = repository.Count(query);
 
                 // Assert
@@ -183,9 +183,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var macro = repository.Get(2);
                 macro.Name = "Hello";
-                macro.RefreshRate = 1234;
+                macro.CacheDuration = 1234;
                 macro.CacheByPage = true;
-                macro.CachePersonalized = true;
+                macro.CacheByMember = true;
                 macro.ControlAssembly = "";
                 macro.ControlType = "";
                 macro.DontRender = false;
@@ -201,9 +201,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(macroUpdated, Is.Not.Null);
                 Assert.That(macroUpdated.Name, Is.EqualTo("Hello"));
-                Assert.That(macroUpdated.RefreshRate, Is.EqualTo(1234));
+                Assert.That(macroUpdated.CacheDuration, Is.EqualTo(1234));
                 Assert.That(macroUpdated.CacheByPage, Is.EqualTo(true));
-                Assert.That(macroUpdated.CachePersonalized, Is.EqualTo(true));
+                Assert.That(macroUpdated.CacheByMember, Is.EqualTo(true));
                 Assert.That(macroUpdated.ControlAssembly, Is.EqualTo(""));
                 Assert.That(macroUpdated.ControlType, Is.EqualTo(""));
                 Assert.That(macroUpdated.DontRender, Is.EqualTo(false));
@@ -266,7 +266,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 repository.AddOrUpdate(new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml"));
                 repository.AddOrUpdate(new Macro("test2", "Test2", "~/usercontrol/test2.ascx", "MyAssembly2", "test2.xslt", "~/views/macropartials/test2.cshtml"));
-                repository.AddOrUpdate(new Macro("test3", "Test3", "~/usercontrol/test3.ascx", "MyAssembly3", "test3.xslt", "~/views/macropartials/test3.cshtml"));
+                repository.AddOrUpdate(new Macro("test3", "Tet3", "~/usercontrol/test3.ascx", "MyAssembly3", "test3.xslt", "~/views/macropartials/test3.cshtml"));
                 unitOfWork.Commit();
             }
 
