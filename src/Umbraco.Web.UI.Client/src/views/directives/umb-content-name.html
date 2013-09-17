@@ -1,12 +1,15 @@
 <div class="umb-headline-editor-wrapper" ng-class="{error: contentNameForm.name.$invalid}">
+    
     <ng-form name="contentNameForm">        
         
-    	<h1>{{model}}</h1>
+        <h1>{{model}}</h1>
         <input name="name" type="text" placeholder="{{placeholder}}" ng-model="model" 
-            required   
-            val-server-field="Name" />
+               required   
+               val-server-field="Name" />
 
         <span class="help-inline" val-msg-for="name" val-toggle-msg="required">Required</span>
         <span class="help-inline" val-msg-for="name" val-toggle-msg="valServerField">{{contentNameForm.name.errorMsg}}</span>
+
     </ng-form>
+
 </div> 

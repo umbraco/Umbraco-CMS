@@ -11,6 +11,7 @@ namespace Umbraco.Web.Install
                 new Steps.Welcome(),
                 new Steps.License(),
                 new Steps.FilePermissions(),
+                new Steps.MajorUpgradeReport(),
                 new Steps.Database(),
                 new Steps.DefaultUser(),
                 //new Steps.RenderingEngine(),

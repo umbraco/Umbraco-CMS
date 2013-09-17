@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using NUnit.Framework;
 
 namespace Umbraco.Tests.Configurations.UmbracoSettings
 {
@@ -13,7 +14,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public override void Tasks()
         {
-            Assert.IsTrue(Section.ScheduledTasks.Tasks.Count == 0);
+            Assert.IsTrue(SettingsSection.ScheduledTasks.Tasks.Count() == 0);
         }
     }
 }

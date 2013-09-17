@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Sync
@@ -13,17 +14,17 @@ namespace Umbraco.Core.Sync
     /// </summary>
     internal class ConfigServerRegistrar : IServerRegistrar
     {
-        private readonly XmlNode _xmlServers;
+        private readonly IEnumerable<IServer> _servers;
 
         public ConfigServerRegistrar()
-            : this(LegacyUmbracoSettings.DistributionServers)
+            : this(UmbracoConfiguration.Current.UmbracoSettings.DistributedCall.Servers)
         {
             
         }
 
-        internal ConfigServerRegistrar(XmlNode xmlServers)
+        internal ConfigServerRegistrar(IEnumerable<IServer> servers)
         {
-            _xmlServers = xmlServers;
+            _servers = servers;
         }
 
         private List<IServerAddress> _addresses;
@@ -36,16 +37,12 @@ namespace Umbraco.Core.Sync
                 {
                     _addresses = new List<IServerAddress>();
                     
-                    if (_xmlServers != null)
+                    if (_servers != null)
                     {
-                        var nodes = _xmlServers.SelectNodes("./server");
-                        if (nodes != null)
+                        foreach (var n in _servers)
                         {
-                            foreach (XmlNode n in nodes)
-                            {
-                                _addresses.Add(new ConfigServerAddress(n));
-                            }
-                        }    
+                            _addresses.Add(new ConfigServerAddress(n));
+                        } 
                     }
                 }
 

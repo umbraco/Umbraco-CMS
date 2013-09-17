@@ -6,11 +6,14 @@
  * 
  ***********************************************************************************/
 
+using System;
+
 namespace umbraco.DataLayer.Utility.Installer
 {
     /// <summary>
     /// Interface for a utility that helps installing an Umbraco data source.
     /// </summary>
+    [Obsolete("This is not used and will be removed in future versions")]
     public interface IInstallerUtility
     {
         /// <summary>

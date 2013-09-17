@@ -42,7 +42,7 @@ namespace Umbraco.Core.Persistence.Mappers
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.Name, dto => dto.Name);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.SortOrder, dto => dto.SortOrder);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.ValidationRegExp, dto => dto.ValidationRegExp);
-                CacheMap<PropertyType, DataTypeDto>(src => src.DataTypeId, dto => dto.ControlId);
+                CacheMap<PropertyType, DataTypeDto>(src => src.PropertyEditorAlias, dto => dto.PropertyEditorAlias);
                 CacheMap<PropertyType, DataTypeDto>(src => src.DataTypeDatabaseType, dto => dto.DbType);
             }
         }

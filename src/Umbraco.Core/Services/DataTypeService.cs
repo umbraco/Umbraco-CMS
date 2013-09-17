@@ -9,6 +9,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.PropertyEditors;
 using umbraco.interfaces;
 
 namespace Umbraco.Core.Services
@@ -76,11 +77,23 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="id">Id of the DataType control</param>
         /// <returns>Collection of <see cref="IDataTypeDefinition"/> objects with a matching contorl id</returns>
+        [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the overload GetDataTypeDefinitionByPropertyEditorAlias instead")]
         public IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByControlId(Guid id)
+        {
+            var alias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(id, true);
+            return GetDataTypeDefinitionByPropertyEditorAlias(alias);
+        }
+
+        /// <summary>
+        /// Gets a <see cref="IDataTypeDefinition"/> by its control Id
+        /// </summary>
+        /// <param name="propertyEditorAlias">Alias of the property editor</param>
+        /// <returns>Collection of <see cref="IDataTypeDefinition"/> objects with a matching contorl id</returns>
+        public IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByPropertyEditorAlias(string propertyEditorAlias)
         {
             using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IDataTypeDefinition>.Builder.Where(x => x.ControlId == id);
+                var query = Query<IDataTypeDefinition>.Builder.Where(x => x.PropertyEditorAlias == propertyEditorAlias);
                 var definitions = repository.GetByQuery(query);
 
                 return definitions;

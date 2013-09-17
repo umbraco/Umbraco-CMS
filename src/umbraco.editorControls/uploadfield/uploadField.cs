@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.interfaces;
 using Umbraco.Core;
@@ -88,8 +89,8 @@ namespace umbraco.editorControls
             
             //now check the file type
             var extension = Path.GetExtension(postedFile.FileName).TrimStart(".");
-            
-            return UmbracoSettings.DisallowedUploadFiles.Any(x => x.InvariantEquals(extension)) == false;
+
+            return UmbracoConfiguration.Current.UmbracoSettings.Content.DisallowedUploadFiles.Any(x => x.InvariantEquals(extension)) == false;
         }
 
         public string Text

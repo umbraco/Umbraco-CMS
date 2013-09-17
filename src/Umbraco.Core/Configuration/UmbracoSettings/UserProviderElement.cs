@@ -7,7 +7,15 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("DefaultBackofficeProvider")]
         internal InnerTextConfigurationElement<string> DefaultBackOfficeProvider
         {
-            get { return (InnerTextConfigurationElement<string>)this["DefaultBackofficeProvider"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<string>(
+                      (InnerTextConfigurationElement<string>)this["DefaultBackofficeProvider"],
+                    //set the default
+                      "UsersMembershipProvider");
+            }
         }
+
+      
     }
 }

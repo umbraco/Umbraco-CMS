@@ -53,6 +53,10 @@ namespace Umbraco.Web.Install
 		public JsonResult DownloadPackageFiles(Guid kitGuid)
 		{
 			var repo = global::umbraco.cms.businesslogic.packager.repositories.Repository.getByGuid(RepoGuid);
+            if (repo == null)
+            {
+                return Json(new { success = false, error = "No repository found with id " + RepoGuid });
+            }
 			if (!repo.HasConnection())
 			{
 				return Json(new {success = false, error = "cannot_connect"});

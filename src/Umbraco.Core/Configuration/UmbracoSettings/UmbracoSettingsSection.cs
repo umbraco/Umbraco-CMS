@@ -1,19 +1,12 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
+using System.Linq;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public class UmbracoSettingsSection : ConfigurationSection
+    [ConfigurationKey("umbracoConfiguration/settings")]
+    public class UmbracoSettingsSection : ConfigurationSection, IUmbracoSettingsSection
     {
-
-        ///// <summary>
-        ///// Get the current settings
-        ///// </summary>
-        //public static UmbracoSettings Current
-        //{
-        //    get { return (UmbracoSettings) ConfigurationManager.GetSection("umbracoConfiguration/settings"); }
-            
-        //}
-
         [ConfigurationProperty("content")]
         internal ContentElement Content
         {
@@ -67,11 +60,48 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return (DistributedCallElement)this["distributedCall"]; }
         }
-        
+
+        private RepositoriesElement _defaultRepositories;
+
         [ConfigurationProperty("repositories")]
         internal RepositoriesElement PackageRepositories
         {
-            get { return (RepositoriesElement)this["repositories"]; }
+            get
+            {
+
+                if (_defaultRepositories != null)
+                {
+                    return _defaultRepositories;
+                }
+
+                //here we need to check if this element is defined, if it is not then we'll setup the defaults
+                var prop = Properties["repositories"];
+                var repos = this[prop] as ConfigurationElement;
+                if (repos != null && repos.ElementInformation.IsPresent == false)
+                {
+                    var collection = new RepositoriesCollection
+                        {
+                            new RepositoryElement() {Name = "Umbraco package Repository", Id = new Guid("65194810-1f85-11dd-bd0b-0800200c9a66")}
+                        };
+
+                    
+                    _defaultRepositories = new RepositoriesElement()
+                        {
+                            Repositories = collection
+                        };
+
+                    return _defaultRepositories;
+                }
+
+                //now we need to ensure there is *always* our umbraco repo! its hard coded in the codebase!
+                var reposElement = (RepositoriesElement)base["repositories"];
+                if (reposElement.Repositories.All(x => x.Id != new Guid("65194810-1f85-11dd-bd0b-0800200c9a66")))
+                {
+                    reposElement.Repositories.Add(new RepositoryElement() { Name = "Umbraco package Repository", Id = new Guid("65194810-1f85-11dd-bd0b-0800200c9a66") });                    
+                }
+
+                return reposElement;
+            }
         }
 
         [ConfigurationProperty("providers")]
@@ -97,26 +127,75 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return (ScriptingElement)this["scripting"]; }
         }
+        
+        IContentSection IUmbracoSettingsSection.Content
+        {
+            get { return Content; }
+        }
 
-        ///// <summary>
-        ///// This ensures that any element that is not defined will get replaced with a Null value
-        ///// </summary>
-        ///// <remarks>
-        ///// This is a work around because setting defaultValue on the attribute to null doesn't work.
-        ///// </remarks>
-        //protected override void PostDeserialize()
-        //{
-        //    //ensure externalLogger is null when it is not defined
-        //    var loggingProperty = Properties["logging"];
-        //    var logging = this[loggingProperty] as ConfigurationElement;
-        //    if (logging != null && logging.ElementInformation.IsPresent == false)
-        //    {
-        //        this[loggingProperty] = new ;
-        //    }
+        ISecuritySection IUmbracoSettingsSection.Security
+        {
+            get { return Security; }
+        }
 
+        IRequestHandlerSection IUmbracoSettingsSection.RequestHandler
+        {
+            get { return RequestHandler; }
+        }
 
-        //    base.PostDeserialize();
-        //}
+        ITemplatesSection IUmbracoSettingsSection.Templates
+        {
+            get { return Templates; }
+        }
 
+        IDeveloperSection IUmbracoSettingsSection.Developer
+        {
+            get { return Developer; }
+        }
+
+        IViewStateMoverModuleSection IUmbracoSettingsSection.ViewStateMoverModule
+        {
+            get { return ViewstateMoverModule; }
+        }
+
+        ILoggingSection IUmbracoSettingsSection.Logging
+        {
+            get { return Logging; }
+        }
+
+        IScheduledTasksSection IUmbracoSettingsSection.ScheduledTasks
+        {
+            get { return ScheduledTasks; }
+        }
+
+        IDistributedCallSection IUmbracoSettingsSection.DistributedCall
+        {
+            get { return DistributedCall; }
+        }
+
+        IRepositoriesSection IUmbracoSettingsSection.PackageRepositories
+        {
+            get { return PackageRepositories; }
+        }
+
+        IProvidersSection IUmbracoSettingsSection.Providers
+        {
+            get { return Providers; }
+        }
+
+        IHelpSection IUmbracoSettingsSection.Help
+        {
+            get { return Help; }
+        }
+
+        IWebRoutingSection IUmbracoSettingsSection.WebRouting
+        {
+            get { return WebRouting; }
+        }
+
+        IScriptingSection IUmbracoSettingsSection.Scripting
+        {
+            get { return Scripting; }
+        }
     }
 }

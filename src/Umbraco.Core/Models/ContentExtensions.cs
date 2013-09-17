@@ -10,6 +10,7 @@ using System.Web;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models.EntityBase;
@@ -402,7 +403,7 @@ namespace Umbraco.Core.Models
                 return;
 
             var numberedFolder = MediaSubfolderCounter.Current.Increment();
-            var fileName = LegacyUmbracoSettings.UploadAllowDirectories
+            var fileName = UmbracoConfiguration.Current.UmbracoSettings.Content.UploadAllowDirectories
                                               ? Path.Combine(numberedFolder.ToString(CultureInfo.InvariantCulture), name)
                                               : numberedFolder + "-" + name;
 
@@ -415,17 +416,17 @@ namespace Umbraco.Core.Models
             fs.AddFile(fileName, fileStream);
             
             //Check if file supports resizing and create thumbnails
-            var supportsResizing = ("," + LegacyUmbracoSettings.ImageFileTypes + ",").Contains(string.Format(",{0},", extension));
+            var supportsResizing = UmbracoConfiguration.Current.UmbracoSettings.Content.ImageFileTypes.InvariantContains(extension);
 
             //the config section used to auto-fill properties
-            XmlNode uploadFieldConfigNode = null;
+            IImagingAutoFillUploadField uploadFieldConfigNode = null;
 
             //Check for auto fill of additional properties
-            if (LegacyUmbracoSettings.ImageAutoFillImageProperties != null)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties != null)
             {
-                uploadFieldConfigNode =
-                    LegacyUmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
-                        string.Format("uploadField [@alias = \"{0}\"]", propertyTypeAlias));
+                uploadFieldConfigNode = UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties
+                                    .FirstOrDefault(x => x.Alias == propertyTypeAlias);
+
             }
 
             if (supportsResizing)
@@ -438,8 +439,7 @@ namespace Umbraco.Core.Models
                     Resize(fs, fileName, extension, 100, "thumb", originalImage);
 
                     //Look up Prevalues for this upload datatype - if it is an upload datatype
-                    var uploadFieldId = new Guid(Constants.PropertyEditors.UploadField);
-                    if (property.PropertyType.DataTypeId == uploadFieldId)
+                    if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)
                     {
                         //Get Prevalues by the DataType's Id: property.PropertyType.DataTypeId
                         var values = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId);
@@ -463,8 +463,8 @@ namespace Umbraco.Core.Models
                     //while the image is still open, we'll check if we need to auto-populate the image properties
                     if (uploadFieldConfigNode != null)
                     {
-                        SetPropertyValue(content, uploadFieldConfigNode, "widthFieldAlias", originalImage.Width.ToString(CultureInfo.InvariantCulture));
-                        SetPropertyValue(content, uploadFieldConfigNode, "heightFieldAlias", originalImage.Height.ToString(CultureInfo.InvariantCulture));
+                        content.SetValue(uploadFieldConfigNode.WidthFieldAlias, originalImage.Width.ToString(CultureInfo.InvariantCulture));
+                        content.SetValue(uploadFieldConfigNode.HeightFieldAlias, originalImage.Height.ToString(CultureInfo.InvariantCulture));
                     }
    
                 }
@@ -473,21 +473,12 @@ namespace Umbraco.Core.Models
             //if auto-fill is true, then fill the remaining, non-image properties
             if (uploadFieldConfigNode != null)
             {
-                SetPropertyValue(content, uploadFieldConfigNode, "lengthFieldAlias", fileSize.ToString(CultureInfo.InvariantCulture));
-                SetPropertyValue(content, uploadFieldConfigNode, "extensionFieldAlias", extension);
+                content.SetValue(uploadFieldConfigNode.LengthFieldAlias, fileSize.ToString(CultureInfo.InvariantCulture));
+                content.SetValue(uploadFieldConfigNode.ExtensionFieldAlias, extension);
             }
 
             //Set the value of the property to that of the uploaded file's url
             property.Value = fs.GetUrl(fileName);
-        }
-
-        private static void SetPropertyValue(IContentBase content, XmlNode uploadFieldConfigNode, string propertyAlias, string propertyValue)
-        {
-            XmlNode propertyNode = uploadFieldConfigNode.SelectSingleNode(propertyAlias);
-            if (propertyNode != null && string.IsNullOrEmpty(propertyNode.FirstChild.Value) == false && content.HasProperty(propertyNode.FirstChild.Value))
-            {
-                content.SetValue(propertyNode.FirstChild.Value, propertyValue);
-            }
         }
 
         private static ResizedImage Resize(MediaFileSystem fileSystem, string path, string extension, int maxWidthHeight, string fileNameAddition, Image originalImage)

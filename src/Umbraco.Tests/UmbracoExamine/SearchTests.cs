@@ -12,7 +12,7 @@ using Examine.LuceneEngine.SearchCriteria;
 namespace Umbraco.Tests.UmbracoExamine
 {
     [TestFixture]
-    public class SearchTests : ExamineBaseTest<SearchTests>
+    public class SearchTests : ExamineBaseTest
     {
 
         [Test]

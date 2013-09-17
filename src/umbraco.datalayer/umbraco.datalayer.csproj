@@ -106,19 +106,9 @@
     <Compile Include="SqlHelperException.cs" />
     <Compile Include="SqlHelpers\MySql\MySqlInstaller.cs" />
     <Compile Include="SqlHelpers\MySql\MySqlParser.cs" />
-    <Compile Include="SqlHelpers\MySql\SqlResources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>SqlResources.resx</DependentUpon>
-    </Compile>
     <Compile Include="SqlHelpers\MySql\MySqlUtility.cs" />
     <Compile Include="SqlHelpers\SqlServer\SqlServerTableUtility.cs" />
     <Compile Include="SqlParser.cs" />
-    <Compile Include="SqlHelpers\SqlServer\SqlResources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>SqlResources.resx</DependentUpon>
-    </Compile>
     <Compile Include="SqlHelpers\SqlServer\SqlServerInstaller.cs" />
     <Compile Include="SqlHelpers\SqlServer\SqlServerUtility.cs" />
     <Compile Include="StringExtensions.cs" />
@@ -153,27 +143,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="SqlHelpers\SqlServer\Sql\Total.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="SqlHelpers\MySql\SqlResources.resx">
-      <SubType>Designer</SubType>
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>SqlResources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SqlHelpers\SqlServer\SqlResources.resx">
-      <SubType>Designer</SubType>
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>SqlResources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="SqlHelpers\MySql\Sql\KeysIndexesAndConstraints.sql" />
-    <None Include="SqlHelpers\MySql\Sql\Total.sql" />
-    <None Include="SqlHelpers\MySql\Sql\Version4_Upgrade.sql" />
-    <None Include="SqlHelpers\SqlServer\Sql\KeysIndexesAndConstraints.sql" />
-    <None Include="SqlHelpers\SqlServer\Sql\Version3_Upgrade.sql" />
-    <None Include="SqlHelpers\SqlServer\Sql\Version4_1_Upgrade.sql" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -191,15 +160,6 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="SqlHelpers\SqlServer\Sql\Version4_Upgrade.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="SqlHelpers\MySql\Sql\Version4_1_Upgrade.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="SqlHelpers\SqlAzure\Sql\InstallSqlAzure.sql" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">

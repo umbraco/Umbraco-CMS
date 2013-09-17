@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class SecurityElement : ConfigurationElement
+    internal class SecurityElement : ConfigurationElement, ISecuritySection
     {
         [ConfigurationProperty("keepUserLoggedIn")]
         internal InnerTextConfigurationElement<bool> KeepUserLoggedIn
@@ -50,6 +50,26 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                     //set the default
                     null);                    
             }
+        }
+
+        bool ISecuritySection.KeepUserLoggedIn
+        {
+            get { return KeepUserLoggedIn; }
+        }
+
+        bool ISecuritySection.HideDisabledUsersInBackoffice
+        {
+            get { return HideDisabledUsersInBackoffice; }
+        }
+
+        string ISecuritySection.AuthCookieName
+        {
+            get { return AuthCookieName; }
+        }
+
+        string ISecuritySection.AuthCookieDomain
+        {
+            get { return AuthCookieDomain; }
         }
     }
 }

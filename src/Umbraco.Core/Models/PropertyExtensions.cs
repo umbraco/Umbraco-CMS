@@ -22,26 +22,24 @@ namespace Umbraco.Core.Models
 
         internal static XElement ToXml(this Property property, IDataTypeService dataTypeService)
         {
-            var nodeName = LegacyUmbracoSettings.UseLegacyXmlSchema ? "data" : property.Alias.ToSafeAlias();
+            var nodeName = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "data" : property.Alias.ToSafeAlias();
 
             var xd = new XmlDocument();
             var xmlNode = xd.CreateNode(XmlNodeType.Element, nodeName, "");
 
             //Add the property alias to the legacy schema
-            if (LegacyUmbracoSettings.UseLegacyXmlSchema)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
             {
                 var alias = xd.CreateAttribute("alias");
                 alias.Value = property.Alias.ToSafeAlias();
                 xmlNode.Attributes.Append(alias);
             }
 
-            //TODO: We'll need to clean this up eventually but for now here's what we're doing:
-            // * Check if the property's DataType is assigned from a Property Editor or a legacy IDataType
-            // * Get the XML result from the IDataType if there is one, otherwise just construct a simple
+            // * Get the XML result from the property editor if there is one, otherwise just construct a simple
             //      XML construct from the value returned from the Property Editor.
             // More details discussed here: https://groups.google.com/forum/?fromgroups=#!topic/umbraco-dev/fieWZzHj7oY
 
-            var propertyEditor = PropertyEditorResolver.Current.GetById(property.PropertyType.DataTypeId);
+            var propertyEditor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
             if (propertyEditor != null)
             {
                 var cacheValue = propertyEditor.ValueEditor.FormatValueForCache(property);
@@ -61,21 +59,7 @@ namespace Umbraco.Core.Models
                         throw new ArgumentOutOfRangeException();
                 }
             }
-            else
-            {
-                //NOTE: An exception will be thrown if this doesn't exist
-                var legacyDataType = property.PropertyType.DataType(property.Id, dataTypeService);
-
-                //We've already got the value for the property so we're going to give it to the 
-                // data type's data property so it doesn't go re-look up the value from the db again.
-                var defaultData = legacyDataType.Data as IDataValueSetter;
-                if (defaultData != null)
-                {
-                    defaultData.SetValue(property.Value, property.PropertyType.DataTypeDatabaseType.ToString());
-                }
-                xmlNode.AppendChild(legacyDataType.Data.ToXMl(xd));
-            }
-
+           
             var element = xmlNode.GetXElement();
             return element;
         }

@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Linq;
 using ICSharpCode.SharpZipLib.Zip;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.propertytype;
@@ -16,7 +17,6 @@ using umbraco.DataLayer;
 using System.Diagnostics;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.template;
-using umbraco.IO;
 
 namespace umbraco.cms.businesslogic.packager
 {
@@ -35,6 +35,8 @@ namespace umbraco.cms.businesslogic.packager
     /// </remarks>
     public class Installer
     {
+        private const string PackageServer = "packages.umbraco.org";
+
         private string _name;
         private string _version;
         private string _url;
@@ -409,12 +411,12 @@ namespace umbraco.cms.businesslogic.packager
                             // The code below that imports the templates should suffice because it's actually importing 
                             // template data not just blank data.
 
-                            //if (UmbracoSettings.UseAspNetMasterPages)
+                            //if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
                             //	t.SaveMasterPageFile(t.Design);
                         }
                     }
                     // Master templates can only be generated when their master is known
-                    if (UmbracoSettings.UseAspNetMasterPages)
+                    if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
                     {
                         t.ImportDesign(xmlHelper.GetNodeValue(n.SelectSingleNode("Design")));
                         t.SaveMasterPageFile(t.Design);
@@ -685,12 +687,12 @@ namespace umbraco.cms.businesslogic.packager
                     if (masterTemplate != null)
                     {
                         t.MasterTemplate = Template.GetByAlias(master).Id;
-                        if (UmbracoSettings.UseAspNetMasterPages)
+                        if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
                             t.SaveMasterPageFile(t.Design);
                     }
                 }
                 // Master templates can only be generated when their master is known
-                if (UmbracoSettings.UseAspNetMasterPages)
+                if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
                 {
                     t.ImportDesign(xmlHelper.GetNodeValue(n.SelectSingleNode("Design")));
                     t.SaveMasterPageFile(t.Design);
@@ -918,7 +920,7 @@ namespace umbraco.cms.businesslogic.packager
             var wc = new System.Net.WebClient();
 
             wc.DownloadFile(
-                "http://" + UmbracoSettings.PackageServer + "/fetch?package=" + Package.ToString(),
+                "http://" + PackageServer + "/fetch?package=" + Package.ToString(),
                 IOHelper.MapPath(SystemDirectories.Packages + "/" + Package.ToString() + ".umb"));
 
             return "packages\\" + Package.ToString() + ".umb";

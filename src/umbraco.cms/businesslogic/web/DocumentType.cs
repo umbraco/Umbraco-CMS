@@ -3,6 +3,7 @@ using System.Collections;
 using System.Text;
 using System.Xml;
 using System.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Caching;
@@ -86,7 +87,7 @@ namespace umbraco.cms.businesslogic.web
         public static string GenerateXmlDocumentType()
         {
             StringBuilder dtd = new StringBuilder();
-            if (UmbracoSettings.UseLegacyXmlSchema)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
             {
                 dtd.AppendLine("<!ELEMENT node ANY> <!ATTLIST node id ID #REQUIRED>  <!ELEMENT data ANY>");
             }

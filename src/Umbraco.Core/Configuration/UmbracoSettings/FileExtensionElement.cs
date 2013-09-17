@@ -2,14 +2,20 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class FileExtensionElement : InnerTextConfigurationElement<string>
+    internal class FileExtensionElement : InnerTextConfigurationElement<string>, IFileExtension
     {
         public FileExtensionElement()
         {
         }
 
-        public FileExtensionElement(XElement rawXml) : base(rawXml)
+        internal FileExtensionElement(XElement rawXml)
+            : base(rawXml)
         {
+        }
+        
+        string IFileExtension.Extension
+        {
+            get { return Value; }
         }
     }
 }

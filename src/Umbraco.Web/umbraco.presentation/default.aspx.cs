@@ -57,7 +57,7 @@ namespace umbraco
                 _upage = _docRequest.UmbracoPage;
 
                 //we need to check this for backwards compatibility in case people still arent' using master pages
-                if (UmbracoSettings.UseAspNetMasterPages)
+                if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
                 {
                     var args = new RequestInitEventArgs()
                     {
@@ -90,7 +90,7 @@ namespace umbraco
 
                 //This is only here for legacy if people arent' using master pages... 
                 //TODO: We need to test that this still works!! Or do we ??
-                if (!UmbracoSettings.UseAspNetMasterPages)
+                if (!UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
                 {
                     var args = new RequestInitEventArgs()
                                    {
@@ -156,7 +156,7 @@ namespace umbraco
                         if (pos > -1)
                         {
                             string htmlBadge =
-                                String.Format(UmbracoSettings.PreviewBadge,
+                                String.Format(UmbracoConfiguration.Current.UmbracoSettings.Content.PreviewBadge,
                                               IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                                               IOHelper.ResolveUrl(SystemDirectories.UmbracoClient),
                                               Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));

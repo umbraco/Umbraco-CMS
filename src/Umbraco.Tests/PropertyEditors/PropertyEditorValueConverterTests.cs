@@ -20,9 +20,9 @@ namespace Umbraco.Tests.PropertyEditors
 		[TestCase("", false)]
 		public void CanConvertDatePickerPropertyEditor(string date, bool expected)
 		{
-			var converter = new DatePickerPropertyEditorValueConverter();
+			var converter = new DatePickerPropertyValueConverter();
 			var dateTime = new DateTime(2012, 11, 10, 13, 14, 15);
-			var result = converter.ConvertPropertyValue(date);
+			var result = converter.ConvertSourceToObject(date, null, false);
 
 			Assert.IsTrue(result.Success);
 			Assert.AreEqual(DateTime.Equals(dateTime.Date, ((DateTime) result.Result).Date), expected);
@@ -39,8 +39,8 @@ namespace Umbraco.Tests.PropertyEditors
 		[TestCase("", false)]
 		public void CanConvertYesNoPropertyEditor(string value, bool expected)
 		{
-			var converter = new YesNoPropertyEditorValueConverter();
-			var result = converter.ConvertPropertyValue(value);
+			var converter = new YesNoPropertyValueConverter();
+            var result = converter.ConvertSourceToObject(value, null, false);
 
 			Assert.IsTrue(result.Success);
 			Assert.AreEqual(expected, result.Result);

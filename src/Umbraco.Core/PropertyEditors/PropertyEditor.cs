@@ -28,7 +28,7 @@ namespace Umbraco.Core.PropertyEditors
             if (_attribute != null)
             {
                 //set the id/name from the attribute
-                Id = Guid.Parse(_attribute.Id);
+                Alias = _attribute.Alias;
                 Name = _attribute.Name;                
             }
         }
@@ -48,8 +48,8 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// The id  of the property editor
         /// </summary>
-        [JsonProperty("id", Required = Required.Always)]
-        public Guid Id { get; internal set; }
+        [JsonProperty("alias", Required = Required.Always)]
+        public string Alias { get; internal set; }
         
         /// <summary>
         /// The name of the property editor
@@ -125,23 +125,23 @@ namespace Umbraco.Core.PropertyEditors
             //There's no manifest, just return an empty one
             return new PreValueEditor();
         }
-        
+
         protected bool Equals(PropertyEditor other)
         {
-            return Id.Equals(other.Id);
+            return string.Equals(Alias, other.Alias);
         }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            var other = obj as PropertyEditor;
-            return other != null && Equals(other);
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((PropertyEditor) obj);
         }
 
         public override int GetHashCode()
         {
-            return Id.GetHashCode();
+            return Alias.GetHashCode();
         }
     }
 }

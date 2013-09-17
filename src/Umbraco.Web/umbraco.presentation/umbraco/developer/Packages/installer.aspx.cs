@@ -68,8 +68,8 @@ namespace umbraco.presentation.developer.packages
             {
                 //we'll fetch the local information we have about our repo, to find out what webservice to query.
 				_repo = cms.businesslogic.packager.repositories.Repository.getByGuid(Request.GetItemAsString("repoGuid"));
-
-                if (_repo.HasConnection())
+                
+                if (_repo != null && _repo.HasConnection())
                 {
                     //from the webservice we'll fetch some info about the package.
 					cms.businesslogic.packager.repositories.Package pack = _repo.Webservice.PackageByGuid(Request.GetItemAsString("guid"));

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.XPath;
+using Umbraco.Core.Configuration;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.interfaces;
@@ -488,7 +489,7 @@ namespace umbraco.NodeFactory
 					if (_pageXmlNode.Attributes.GetNamedItem("writerID") != null)
 						_writerID = int.Parse(_pageXmlNode.Attributes.GetNamedItem("writerID").Value);
 
-					if (UmbracoSettings.UseLegacyXmlSchema)
+					if (UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
 					{
 						if (_pageXmlNode.Attributes.GetNamedItem("nodeTypeAlias") != null)
 							_nodeTypeAlias = _pageXmlNode.Attributes.GetNamedItem("nodeTypeAlias").Value;
@@ -512,12 +513,12 @@ namespace umbraco.NodeFactory
 				}
 
 				// load data
-				string dataXPath = UmbracoSettings.UseLegacyXmlSchema ? "data" : "* [not(@isDoc)]";
+				string dataXPath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "data" : "* [not(@isDoc)]";
 				foreach (XmlNode n in _pageXmlNode.SelectNodes(dataXPath))
 					_properties.Add(new Property(n));
 
 				// load children
-				string childXPath = UmbracoSettings.UseLegacyXmlSchema ? "node" : "* [@isDoc]";
+				string childXPath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "node" : "* [@isDoc]";
 				XPathNavigator nav = _pageXmlNode.CreateNavigator();
 				XPathExpression expr = nav.Compile(childXPath);
 				expr.AddSort("@sortOrder", XmlSortOrder.Ascending, XmlCaseOrder.None, "", XmlDataType.Number);

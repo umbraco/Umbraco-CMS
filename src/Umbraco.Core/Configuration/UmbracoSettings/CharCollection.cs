@@ -3,8 +3,13 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class CharCollection : ConfigurationElementCollection, IEnumerable<CharElement>
+    internal class CharCollection : ConfigurationElementCollection, IEnumerable<IChar>
     {
+        internal void Add(CharElement c)
+        {
+            BaseAdd(c);
+        }
+
         protected override ConfigurationElement CreateNewElement()
         {
             return new CharElement();
@@ -15,11 +20,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             return ((CharElement)element).Char;
         }
 
-        IEnumerator<CharElement> IEnumerable<CharElement>.GetEnumerator()
+        IEnumerator<IChar> IEnumerable<IChar>.GetEnumerator()
         {
             for (var i = 0; i < Count; i++)
             {
-                yield return BaseGet(i) as CharElement;
+                yield return BaseGet(i) as IChar;
             }
         }
 

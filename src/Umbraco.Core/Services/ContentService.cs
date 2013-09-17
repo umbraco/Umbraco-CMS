@@ -1100,14 +1100,14 @@ namespace Umbraco.Core.Services
 
                     //Special case for the Upload DataType
                     //TODO: Should we handle this with events?
-                    var uploadDataTypeId = new Guid(Constants.PropertyEditors.UploadField);
-                    if (content.Properties.Any(x => x.PropertyType.DataTypeId == uploadDataTypeId))
+
+                    if (content.Properties.Any(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias))
                     {
                         bool isUpdated = false;
                         var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
                         //Loop through properties to check if the content contains media that should be deleted
-                        foreach (var property in content.Properties.Where(x => x.PropertyType.DataTypeId == uploadDataTypeId
+                        foreach (var property in content.Properties.Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias
                                                                                && string.IsNullOrEmpty(x.Value.ToString()) == false))
                         {
                             if (fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
@@ -1137,8 +1137,7 @@ namespace Umbraco.Core.Services
                     }
 
                     //Special case for the Tags DataType
-                    var tagsDataTypeId = new Guid(Constants.PropertyEditors.Tags);
-                    if (content.Properties.Any(x => x.PropertyType.DataTypeId == tagsDataTypeId))
+                    if (content.Properties.Any(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.TagsAlias))
                     {
                         var tags = uow.Database.Fetch<TagRelationshipDto>("WHERE nodeId = @Id", new { Id = content.Id });
                         foreach (var tag in tags)

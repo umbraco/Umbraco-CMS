@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -57,10 +56,8 @@ namespace Umbraco.Tests.CodeFirst
 
         #region Test setup
         public override void Initialize()
-        {
-            TestHelper.EnsureUmbracoSettingsConfig();
-            
-            base.Initialize();
+        {   
+            base.Initialize();            
         }
 
         public override void TearDown()

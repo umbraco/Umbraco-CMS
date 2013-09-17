@@ -9,8 +9,8 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "propertyEditor", Namespace = "")]
     public class PropertyEditorBasic
     {
-        [DataMember(Name = "editorId")]
-        public Guid EditorId { get; set; }
+        [DataMember(Name = "alias")]
+        public string Alias { get; set; }
 
         [DataMember(Name = "name")]
         public string Name { get; set; }

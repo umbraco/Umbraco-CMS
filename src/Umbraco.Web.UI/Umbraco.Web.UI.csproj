@@ -122,6 +122,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\log4net-mediumtrust.2.0.0\lib\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Web.Helpers">
       <HintPath>..\packages\Microsoft.Web.Helpers.1.0.0\lib\Microsoft.Web.Helpers.dll</HintPath>
     </Reference>
@@ -382,6 +383,13 @@
     <Compile Include="Install\Steps\TheEnd.ascx.designer.cs">
       <DependentUpon>theend.ascx</DependentUpon>
     </Compile>
+    <Compile Include="Install\Steps\UpgradeReport.ascx.cs">
+      <DependentUpon>UpgradeReport.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Install\Steps\UpgradeReport.ascx.designer.cs">
+      <DependentUpon>UpgradeReport.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Install\Steps\ValidatePermissions.ascx.cs">
       <DependentUpon>validatePermissions.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -601,6 +609,7 @@
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\RegexEditor.html" />
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
+    <Content Include="Install\Steps\UpgradeReport.ascx" />
     <Content Include="Umbraco\Dashboard\UserControlProxy.aspx" />
     <Content Include="Umbraco\Create\PartialView.ascx" />
     <Content Include="Umbraco\Images\PinnedIcons\task_content.ico" />
@@ -880,13 +889,6 @@
     <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xml\index.html" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xml\xml.js" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\Test\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\Test\testBase.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\Test\testEmptySequenceKeyword.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\Test\testMultiAttr.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\Test\testNamespaces.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\Test\testProcessingInstructions.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\Test\testQuotes.js" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\xquery.js" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Yaml\index.html" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Yaml\yaml.js" />

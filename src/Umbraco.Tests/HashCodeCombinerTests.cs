@@ -7,7 +7,7 @@ using Umbraco.Core;
 namespace Umbraco.Tests
 {
 	[TestFixture]
-	public class HashCodeCombinerTests : PartialTrust.AbstractPartialTrustFixture<HashCodeCombinerTests>
+	public class HashCodeCombinerTests 
 	{
 
 		private DirectoryInfo PrepareFolder()
@@ -141,14 +141,5 @@ namespace Umbraco.Tests
 			Assert.AreNotEqual(combiner1.GetCombinedHashCode(), combiner3.GetCombinedHashCode());
 		}
 
-		public override void TestSetup()
-		{
-			
-		}
-
-		public override void TestTearDown()
-		{
-			
-		}
 	}
 }

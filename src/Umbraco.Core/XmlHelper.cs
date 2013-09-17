@@ -86,7 +86,7 @@ namespace Umbraco.Core
             if (nav.MoveToFirstChild())
             {
                 var name = nav.LocalName; // must not match an excluded tag
-                if (LegacyUmbracoSettings.NotDynamicXmlDocumentElements.All(x => x.InvariantEquals(name) == false)) return true;
+                if (UmbracoConfiguration.Current.UmbracoSettings.Scripting.NotDynamicXmlDocumentElements.All(x => x.Element.InvariantEquals(name) == false)) return true;
             }
 
             doc = null;
@@ -121,7 +121,7 @@ namespace Umbraco.Core
             }
 
             var name = elt.Name.LocalName; // must not match an excluded tag
-            if (LegacyUmbracoSettings.NotDynamicXmlDocumentElements.All(x => x.InvariantEquals(name) == false)) return true;
+            if (UmbracoConfiguration.Current.UmbracoSettings.Scripting.NotDynamicXmlDocumentElements.All(x => x.Element.InvariantEquals(name) == false)) return true;
 
             elt = null;
             return false;

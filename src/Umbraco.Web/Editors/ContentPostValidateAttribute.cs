@@ -63,7 +63,7 @@ namespace Umbraco.Web.Editors
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
-                    permissionToCheck = ActionSave.Instance.Letter;
+                    permissionToCheck = ActionUpdate.Instance.Letter;
                     contentToCheck = contentItem.PersistedContent;
                     break;
                 case ContentSaveAction.Publish:

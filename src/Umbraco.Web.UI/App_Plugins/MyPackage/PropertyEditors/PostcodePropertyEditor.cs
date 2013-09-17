@@ -3,7 +3,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
 {
-    [PropertyEditor("E96E24E5-7124-4FA8-A7D7-C3D3695E100D", "Postal Code",
+    [PropertyEditor("MyPackage.PostalCode", "Postal Code",
         "~/App_Plugins/MyPackage/PropertyEditors/Views/PostcodeEditor.html")]
     public class PostcodePropertyEditor : PropertyEditor
     {

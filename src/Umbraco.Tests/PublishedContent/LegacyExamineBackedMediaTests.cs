@@ -1,23 +1,26 @@
 using System;
-using System.IO;
 using System.Linq;
 using Lucene.Net.Documents;
 using Lucene.Net.Store;
+using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.UmbracoExamine;
 using umbraco.MacroEngines;
 
 namespace Umbraco.Tests.PublishedContent
 {
-    public class LegacyExamineBackedMediaTests : ExamineBaseTest<LegacyExamineBackedMediaTests>
+    public class LegacyExamineBackedMediaTests : ExamineBaseTest
     {
         public override void TestSetup()
         {
             base.TestSetup();
-            SettingsForTests.ForceSafeAliases = true;
-            SettingsForTests.UmbracoLibraryCacheDuration = 1800;
+
+            var settings = SettingsForTests.GetMockSettings();
+            var contentMock = Mock.Get(settings.Content);
+            contentMock.Setup(x => x.ForceSafeAliases).Returns(true);
+            contentMock.Setup(x => x.UmbracoLibraryCacheDuration).Returns(1800);
+            SettingsForTests.ConfigureSettings(settings);
         }
 
         public override void TestTearDown()

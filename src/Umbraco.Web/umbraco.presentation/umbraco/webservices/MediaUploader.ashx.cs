@@ -9,6 +9,7 @@ using System.Web.Security;
 using System.Web.UI;
 using System.Xml;
 using System.Xml.Serialization;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
@@ -222,7 +223,7 @@ namespace umbraco.presentation.umbraco.webservices
 
             if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
             {
-                var mp = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider];
+                var mp = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider];
                 if (mp != null && mp.ValidateUser(username, password))
                 {
                     var user = new User(username);

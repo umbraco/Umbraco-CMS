@@ -15,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors
     /// as INT and we have logic in here to ensure it is formatted correctly including ensuring that the string value is published
     /// in cache and not the int ID.
     /// </remarks>
-    [PropertyEditor(Constants.PropertyEditors.DropDownList, "Dropdown list", "dropdown", ValueType = "INT")]
+    [PropertyEditor(Constants.PropertyEditors.DropDownListAlias, "Dropdown list", "dropdown", ValueType = "INT")]
     public class DropDownPropertyEditor : DropDownWithKeysPropertyEditor
     {
 
@@ -27,20 +27,6 @@ namespace Umbraco.Web.PropertyEditors
         {
             return new PublishValueValueEditor(base.CreateValueEditor());
         }
-
-    }
-
-    /// <summary>
-    /// A property editor to allow the individual selection of pre-defined items.
-    /// </summary>
-    /// <remarks>
-    /// Due to remaining backwards compatible, this stores the id of the item in the database which is why it is marked
-    /// as INT and we have logic in here to ensure it is formatted correctly including ensuring that the INT ID value is published
-    /// in cache and not the string value.
-    /// </remarks>
-    [PropertyEditor(Constants.PropertyEditors.RadioButtonList, "Radio button list", "radiobuttons", ValueType = "INT")]
-    public class RadioButtonsPropertyEditor : DropDownWithKeysPropertyEditor
-    {
 
     }
 }

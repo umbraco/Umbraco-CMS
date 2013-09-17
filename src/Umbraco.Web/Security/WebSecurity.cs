@@ -177,19 +177,19 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         internal bool ValidateBackOfficeCredentials(string username, string password)
         {
-            var membershipProvider = Membership.Providers[LegacyUmbracoSettings.DefaultBackofficeProvider];
+            var membershipProvider = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider];
             return membershipProvider != null && membershipProvider.ValidateUser(username, password);
         }
 
         /// <summary>
         /// Changes password for a back office user
         /// </summary>
-        /// <param name="username"></param>
-        /// <param name="password"></param>
+        /// <param name="oldpassword"></param>
+        /// <param name="newpassword"></param>
         /// <returns></returns>
         internal bool ChangePassword(string oldpassword, string newpassword)
         {
-            var membershipProvider = Membership.Providers[LegacyUmbracoSettings.DefaultBackofficeProvider];
+            var membershipProvider = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider];
             return membershipProvider.GetUser(CurrentUser.Username, true).ChangePassword(oldpassword, newpassword);
         }
 

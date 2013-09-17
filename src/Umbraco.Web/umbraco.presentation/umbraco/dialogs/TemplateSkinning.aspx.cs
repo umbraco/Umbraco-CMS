@@ -23,6 +23,11 @@ namespace umbraco.presentation.umbraco.dialogs
         {
             CurrentApp = DefaultApps.settings.ToString();
             _repo = cms.businesslogic.packager.repositories.Repository.getByGuid(RepoGuid);
+
+            if (_repo == null)
+            {
+                throw new InvalidOperationException("Could not find repository with id " + RepoGuid);
+            }
         }
 
         protected void Page_Load(object sender, EventArgs e)

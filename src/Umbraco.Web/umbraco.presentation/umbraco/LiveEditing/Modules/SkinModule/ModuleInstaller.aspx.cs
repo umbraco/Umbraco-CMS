@@ -17,6 +17,12 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
         public ModuleInstaller()
         {
             _repo = cms.businesslogic.packager.repositories.Repository.getByGuid(RepoGuid);
+
+            if (_repo == null)
+            {
+                throw new InvalidOperationException("Could not find repository with id " + RepoGuid);
+            }
+
             //for skinning, you need to be a developer
             CurrentApp = DefaultApps.developer.ToString();
         }

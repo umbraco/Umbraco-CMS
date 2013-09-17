@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Linq;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.PropertyEditors;
 using umbraco.DataLayer;
 using System.Xml;
 using umbraco.cms.businesslogic.media;
@@ -23,7 +25,7 @@ namespace umbraco.cms.businesslogic.datatype
     public class DataTypeDefinition : CMSNode
     {
         #region Private fields
-        private Guid _controlId;
+        private string _propertyEditorAlias;
 
         private static Guid _objectType = new Guid(Constants.ObjectTypes.DataType);
 	    private string _dbType;
@@ -54,10 +56,12 @@ namespace umbraco.cms.businesslogic.datatype
         {
             get
             {
-                if (_controlId == Guid.Empty) 
+                if (_propertyEditorAlias.IsNullOrWhiteSpace()) 
                     return null;
 
-                var dt = DataTypesResolver.Current.GetById(_controlId);
+                var controlId = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(_propertyEditorAlias, true);
+
+                var dt = DataTypesResolver.Current.GetById(controlId.Value);
 
                 if (dt != null)
                     dt.DataTypeDefinitionId = Id;
@@ -73,7 +77,10 @@ namespace umbraco.cms.businesslogic.datatype
 
                 SqlHelper.ExecuteNonQuery("update cmsDataType set controlId = @id where nodeID = " + this.Id.ToString(),
                     SqlHelper.CreateParameter("@id", value.Id));
-                _controlId = value.Id;
+
+                var alias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(value.Id, true);
+
+                _propertyEditorAlias = alias;
             }
         } 
 	    internal string DbType
@@ -311,7 +318,7 @@ namespace umbraco.cms.businesslogic.datatype
             {
                 if (dr.Read())
                 {
-                    _controlId = dr.GetGuid("controlId");
+                    _propertyEditorAlias = dr.GetString("propertyEditorAlias");
                     _dbType = dr.GetString("dbType");
                 }
                 else

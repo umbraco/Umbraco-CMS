@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Xml.XPath;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Media;
 using umbraco;
 using Umbraco.Core;
@@ -77,7 +78,7 @@ namespace Umbraco.Web.Media.ImageUrlProviders
 
         private static string GetProperty(XPathNodeIterator nodeIterator, string fileProp)
         {
-            var xpath = UmbracoSettings.UseLegacyXmlSchema
+            var xpath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema
                                ? string.Format(".//data[@alias = '{0}']", fileProp)
                                : string.Format(".//{0}", fileProp);
 

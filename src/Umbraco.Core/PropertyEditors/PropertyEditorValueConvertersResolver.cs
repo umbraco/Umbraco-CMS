@@ -5,7 +5,7 @@ using Umbraco.Core.ObjectResolution;
 namespace Umbraco.Core.PropertyEditors
 {
 	/// <summary>
-	/// Manages the list of IPropertyEditorValueConverter's
+	/// Manages the list of legacy IPropertyEditorValueConverter's
 	/// </summary>
 	internal sealed class PropertyEditorValueConvertersResolver : ManyObjectsResolverBase<PropertyEditorValueConvertersResolver, IPropertyEditorValueConverter>
 	{

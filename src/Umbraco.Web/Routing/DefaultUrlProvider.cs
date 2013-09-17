@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web.PublishedCache;
 using umbraco.cms.businesslogic.web;
@@ -105,7 +106,7 @@ namespace Umbraco.Web.Routing
 
             if (mode == UrlProviderMode.AutoLegacy)
             {
-                mode = Core.Configuration.LegacyUmbracoSettings.UseDomainPrefixes
+                mode = UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.UseDomainPrefixes
                     ? UrlProviderMode.Absolute
                     : UrlProviderMode.Auto;
             }

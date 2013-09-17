@@ -10,6 +10,7 @@ namespace Umbraco.Core.Configuration
 
     internal class RazorDataTypeModelStaticMappingItem
     {
+        [Obsolete("This is not used whatsoever")]
 		public string Raw { get; set; }
         //if all of the set (non null) properties match the property data currently being evaluated
 		public string PropertyTypeAlias { get; set; }

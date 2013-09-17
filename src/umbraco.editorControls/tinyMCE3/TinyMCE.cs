@@ -3,6 +3,7 @@ using System.Collections;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
@@ -328,7 +329,7 @@ namespace umbraco.editorControls.tinyMCE3
                 parsedString = replaceMacroTags(parsedString).Trim();
 
                 // tidy html - refactored, see #30534
-                if (UmbracoSettings.TidyEditorContent)
+                if (UmbracoConfiguration.Current.UmbracoSettings.Content.TidyEditorContent)
                 {
                     // always wrap in a <div> - using <p> was a bad idea
                     parsedString = "<div>" + parsedString + "</div>";

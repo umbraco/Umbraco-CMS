@@ -8,7 +8,7 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
-
+using Umbraco.Core.Configuration;
 using umbraco.DataLayer;
 
 namespace umbraco.dialogs
@@ -43,7 +43,7 @@ namespace umbraco.dialogs
 			pp_removePTags.Text = ui.Text("templateEditor", "removeParagraph");
 
 
-			if (UmbracoSettings.UseAspNetMasterPages)
+			if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
 			{
 				tagName.Value = "umbraco:Item";
 			}

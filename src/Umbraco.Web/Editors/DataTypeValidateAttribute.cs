@@ -43,7 +43,7 @@ namespace Umbraco.Web.Editors
             var dataType = (DataTypeSave)actionContext.ActionArguments["dataType"];
 
             //Validate that the property editor exists
-            var propertyEditor = PropertyEditorResolver.Current.GetById(dataType.SelectedEditor);
+            var propertyEditor = PropertyEditorResolver.Current.GetByAlias(dataType.SelectedEditor);
             if (propertyEditor == null)
             {
                 var message = string.Format("Property editor with id: {0} was not found", dataType.SelectedEditor);

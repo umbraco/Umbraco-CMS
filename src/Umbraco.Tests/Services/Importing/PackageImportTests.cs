@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Xml.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models.Rdbms;
 using umbraco.editorControls.MultiNodeTreePicker;
 
@@ -216,11 +217,22 @@ namespace Umbraco.Tests.Services.Importing
             Assert.That(contents.Count(), Is.EqualTo(numberOfDocs));
         }
 
+
         [Test]
-        public void PackagingService_Can_Import_CheckboxList_Content_Package_Xml()
+        public void PackagingService_Can_Import_CheckboxList_Content_Package_Xml_With_Property_Editor_Aliases()
+        {
+            AssertCheckBoxListTests(ImportResources.CheckboxList_Content_Package);
+        }
+
+        [Test]
+        public void PackagingService_Can_Import_CheckboxList_Content_Package_Xml_With_Legacy_Property_Editor_Ids()
+        {
+            AssertCheckBoxListTests(ImportResources.CheckboxList_Content_Package_LegacyIds);
+        }
+
+        private void AssertCheckBoxListTests(string strXml)
         {
             // Arrange
-            string strXml = ImportResources.CheckboxList_Content_Package;
             var xml = XElement.Parse(strXml);
             var dataTypeElement = xml.Descendants("DataTypes").First();
             var docTypesElement = xml.Descendants("DocumentTypes").First();
@@ -232,7 +244,7 @@ namespace Umbraco.Tests.Services.Importing
             var contentTypes = packagingService.ImportContentTypes(docTypesElement);
             var contents = packagingService.ImportContent(element);
             var numberOfDocs = (from doc in element.Descendants()
-                                where (string) doc.Attribute("isDoc") == ""
+                                where (string)doc.Attribute("isDoc") == ""
                                 select doc).Count();
 
             var database = ApplicationContext.DatabaseContext.Database;
@@ -244,6 +256,7 @@ namespace Umbraco.Tests.Services.Importing
             // Assert
             Assert.That(dataTypeDefinitions, Is.Not.Null);
             Assert.That(dataTypeDefinitions.Any(), Is.True);
+            Assert.AreEqual(Constants.PropertyEditors.CheckBoxListAlias, dataTypeDefinitions.First().PropertyEditorAlias);
             Assert.That(contents, Is.Not.Null);
             Assert.That(contentTypes.Any(), Is.True);
             Assert.That(contents.Any(), Is.True);

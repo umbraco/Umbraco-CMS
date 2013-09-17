@@ -23,12 +23,12 @@ namespace Umbraco.Web.Models.Mapping
         internal IEnumerable<PreValueFieldDisplay> Convert(IDataTypeDefinition source)
         {
             PropertyEditor propEd = null;
-            if (source.ControlId != Guid.Empty)
+            if (source.PropertyEditorAlias.IsNullOrWhiteSpace() == false)
             {
-                propEd = PropertyEditorResolver.Current.GetById(source.ControlId);
+                propEd = PropertyEditorResolver.Current.GetByAlias(source.PropertyEditorAlias);
                 if (propEd == null)
                 {
-                    throw new InvalidOperationException("Could not find property editor with id " + source.ControlId);
+                    throw new InvalidOperationException("Could not find property editor with alias " + source.PropertyEditorAlias);
                 }
             }
 

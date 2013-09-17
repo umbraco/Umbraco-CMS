@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic.Exceptions;
@@ -14,7 +15,7 @@ namespace umbraco.presentation
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if ((UmbracoSettings.EnableCanvasEditing || !String.IsNullOrEmpty(Request["umbSkinning"]) ) && getUser() != null)
+            if ((UmbracoConfiguration.Current.UmbracoSettings.Content.EnableCanvasEditing || !String.IsNullOrEmpty(Request["umbSkinning"])) && getUser() != null)
             {
                 UmbracoContext.Current.LiveEditingContext.Enabled = true;
 
@@ -27,7 +28,7 @@ namespace umbraco.presentation
                 Response.Redirect(redirUrl +
                     (string.IsNullOrEmpty(Request["umbSkinning"]) ? "" : "?umbSkinning=true") + (string.IsNullOrEmpty(Request["umbSkinningConfigurator"]) ? "" : "&umbSkinningConfigurator=true"), true);
             }
-            else if (!UmbracoSettings.EnableCanvasEditing)
+            else if (!UmbracoConfiguration.Current.UmbracoSettings.Content.EnableCanvasEditing)
             {
                 throw new UserAuthorizationException(
                     "Canvas editing isn't enabled. It can be enabled via the UmbracoSettings.config");

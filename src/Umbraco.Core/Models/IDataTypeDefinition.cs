@@ -6,8 +6,14 @@ namespace Umbraco.Core.Models
     public interface IDataTypeDefinition : IUmbracoEntity
     {
         /// <summary>
+        /// The Property editor alias assigned to the data type
+        /// </summary>
+        string PropertyEditorAlias { get; set; }
+
+        /// <summary>
         /// Id of the DataType control
         /// </summary>
+        [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the PropertyEditorAlias property instead")]
         Guid ControlId { get; set; }
 
         /// <summary>

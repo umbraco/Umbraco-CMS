@@ -2,6 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
@@ -109,11 +110,11 @@ namespace umbraco.cms.businesslogic.property
         }
         public XmlNode ToXml(XmlDocument xd)
         {
-            string nodeName = UmbracoSettings.UseLegacyXmlSchema ? "data" : helpers.Casing.SafeAlias(PropertyType.Alias);
+            string nodeName = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "data" : helpers.Casing.SafeAlias(PropertyType.Alias);
             XmlNode x = xd.CreateNode(XmlNodeType.Element, nodeName, "");
 
             // Alias
-            if (UmbracoSettings.UseLegacyXmlSchema)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
             {
                 XmlAttribute alias = xd.CreateAttribute("alias");
                 alias.Value = this.PropertyType.Alias;

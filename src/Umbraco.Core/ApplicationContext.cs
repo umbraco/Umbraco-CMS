@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Caching;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Services;
@@ -67,6 +68,7 @@ namespace Umbraco.Core
 		readonly System.Threading.ManualResetEventSlim _isReadyEvent = new System.Threading.ManualResetEventSlim(false);
 		private DatabaseContext _databaseContext;
 		private ServiceContext _services;
+	    private UmbracoConfiguration _umbracoConfiguration;
 
 		public bool IsReady
         {
@@ -94,7 +96,7 @@ namespace Umbraco.Core
         //   the system is configured if they match
         //   if they don't, install runs, updates web.config (presumably) and updates GlobalSettings.ConfiguredStatus
         //
-        //   then there is Application["umbracoNeedConfiguration"] which makes no sense... getting rid of it...
+        //   then there is Application["umbracoNeedConfiguration"] which makes no sense... getting rid of it... SD: I have actually remove that now!
         //
         public bool IsConfigured
         {
@@ -105,7 +107,7 @@ namespace Umbraco.Core
             }
         }
 
-        /// <summary>
+	    /// <summary>
         /// The original/first url that the web application executes
         /// </summary>
         /// <remarks>

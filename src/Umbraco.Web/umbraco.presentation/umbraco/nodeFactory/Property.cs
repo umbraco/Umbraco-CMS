@@ -1,6 +1,7 @@
 using System;
 using System.Xml;
 using System.Xml.Serialization;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.Templates;
 using umbraco.interfaces;
 
@@ -47,7 +48,7 @@ namespace umbraco.NodeFactory
 				// For backward compatibility with 2.x (the version attribute has been removed from 3.0 data nodes)
 				if (PropertyXmlData.Attributes.GetNamedItem("versionID") != null)
 					_version = new Guid(PropertyXmlData.Attributes.GetNamedItem("versionID").Value);
-				_alias = UmbracoSettings.UseLegacyXmlSchema ?
+				_alias = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ?
 				                                            	PropertyXmlData.Attributes.GetNamedItem("alias").Value :
 				                                            	                                                       	PropertyXmlData.Name;
 				_value = xmlHelper.GetNodeValue(PropertyXmlData);

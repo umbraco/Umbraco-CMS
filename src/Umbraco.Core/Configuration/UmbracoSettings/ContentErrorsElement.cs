@@ -1,11 +1,12 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class ContentErrorsElement : RawXmlConfigurationElement
     {
         
-        public ContentError404Collection Error404Collection
+        public IEnumerable<IContentErrorPage> Error404Collection
         {
             get
             {

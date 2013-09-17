@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class TemplatesElement : ConfigurationElement
+    internal class TemplatesElement : ConfigurationElement, ITemplatesSection
     {
         [ConfigurationProperty("useAspNetMasterPages")]
         internal InnerTextConfigurationElement<bool> UseAspNetMasterPages
@@ -31,7 +31,13 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("defaultRenderingEngine", IsRequired = true)]
         internal InnerTextConfigurationElement<RenderingEngine> DefaultRenderingEngine
         {
-            get { return (InnerTextConfigurationElement<RenderingEngine>)this["defaultRenderingEngine"]; }
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<RenderingEngine>(
+                    (InnerTextConfigurationElement<RenderingEngine>)this["defaultRenderingEngine"],
+                    //set the default
+                    RenderingEngine.Mvc);
+            }
         }
 
         [ConfigurationProperty("enableTemplateFolders")]
@@ -44,6 +50,26 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                     //set the default
                     false);
             }
+        }
+
+        bool ITemplatesSection.UseAspNetMasterPages
+        {
+            get { return UseAspNetMasterPages; }
+        }
+
+        bool ITemplatesSection.EnableSkinSupport
+        {
+            get { return EnableSkinSupport; }
+        }
+
+        RenderingEngine ITemplatesSection.DefaultRenderingEngine
+        {
+            get { return DefaultRenderingEngine; }
+        }
+
+        bool ITemplatesSection.EnableTemplateFolders
+        {
+            get { return EnableTemplateFolders; }
         }
     }
 }

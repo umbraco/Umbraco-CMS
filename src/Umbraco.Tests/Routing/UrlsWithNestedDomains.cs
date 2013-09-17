@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.language;
 using Umbraco.Web.Routing;
-using System.Configuration;
 
 namespace Umbraco.Tests.Routing
 {
@@ -24,8 +22,9 @@ namespace Umbraco.Tests.Routing
 		public void DoNotPolluteCache()
 		{
             SettingsForTests.UseDirectoryUrls = true;
-            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
-            SettingsForTests.UseDomainPrefixes = false;
+            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains            
+            var requestMock = Mock.Get(UmbracoSettings.RequestHandler);
+            requestMock.Setup(x => x.UseDomainPrefixes).Returns(true);
 
 			InitializeLanguagesAndDomains();
 			SetDomains1();

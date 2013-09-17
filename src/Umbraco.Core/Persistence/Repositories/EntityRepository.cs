@@ -169,7 +169,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (isMedia)
             {
                 columns.Add("property.dataNvarchar as umbracoFile");
-                columns.Add("property.controlId");
+                columns.Add("property.propertyEditorAlias");
             }
 
             var sql = new Sql()
@@ -193,7 +193,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (isMedia)
             {
                 sql.LeftJoin(
-                    "(SELECT contentNodeId, versionId, dataNvarchar, controlId FROM cmsPropertyData " +
+                    "(SELECT contentNodeId, versionId, dataNvarchar, propertyEditorAlias FROM cmsPropertyData " +
                     "INNER JOIN umbracoNode ON cmsPropertyData.contentNodeId = umbracoNode.id " +
                     "INNER JOIN cmsPropertyType ON cmsPropertyType.id = cmsPropertyData.propertytypeid " +
                     "INNER JOIN cmsDataType ON cmsPropertyType.dataTypeId = cmsDataType.nodeId "+
@@ -256,7 +256,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (isMedia)
             {
                 columns.Add("property.dataNvarchar");
-                columns.Add("property.controlId");
+                columns.Add("property.propertyEditorAlias");
             }
 
             var sql = new Sql()
@@ -309,8 +309,8 @@ namespace Umbraco.Core.Persistence.Repositories
         [ExplicitColumns]
         internal class UmbracoPropertyDto
         {
-            [Column("controlId")]
-            public Guid DataTypeControlId { get; set; }
+            [Column("propertyEditorAlias")]
+            public string PropertyEditorAlias { get; set; }
 
             [Column("umbracoFile")]
             public string UmbracoFile { get; set; }

@@ -8,7 +8,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void Users()
         {
-            Assert.IsTrue(Section.Providers.Users.DefaultBackOfficeProvider == "UsersMembershipProvider");
+            Assert.IsTrue(SettingsSection.Providers.DefaultBackOfficeUserProvider == "UsersMembershipProvider");
         }
     }
 }

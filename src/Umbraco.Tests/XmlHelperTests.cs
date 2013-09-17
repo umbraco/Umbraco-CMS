@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using umbraco;
 
@@ -151,7 +152,7 @@ namespace Umbraco.Tests
             XmlNode n = parentNode.CloneNode(true);
 
             // remove all children from original node
-            string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./node" : "./* [@id]";
+            string xpath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "./node" : "./* [@id]";
             foreach (XmlNode child in parentNode.SelectNodes(xpath))
                 parentNode.RemoveChild(child);
 

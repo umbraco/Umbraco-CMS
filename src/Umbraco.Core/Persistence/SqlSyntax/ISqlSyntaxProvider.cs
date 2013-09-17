@@ -5,6 +5,21 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
+    internal static class SqlSyntaxProviderExtensions
+    {
+        /// <summary>
+        /// Returns the quotes tableName.columnName combo
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="tableName"></param>
+        /// <param name="columnName"></param>
+        /// <returns></returns>
+        public static string GetQuotedColumn(this ISqlSyntaxProvider sql, string tableName, string columnName)
+        {
+            return sql.GetQuotedTableName(tableName) + "." + sql.GetQuotedColumnName(columnName);
+        }
+    }
+
     /// <summary>
     /// Defines an SqlSyntaxProvider
     /// </summary>

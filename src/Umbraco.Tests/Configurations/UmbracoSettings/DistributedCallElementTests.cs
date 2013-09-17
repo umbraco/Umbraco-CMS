@@ -7,25 +7,26 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
     public class DistributedCallElementTests : UmbracoSettingsTests
     {
         [Test]
-        public void Enabled()
+        public virtual void Enabled()
         {
-            Assert.IsTrue(Section.DistributedCall.Enabled == true);
+            Assert.IsTrue(SettingsSection.DistributedCall.Enabled == true);
            
         }
         [Test]
         public void UserId()
         {
-            Assert.IsTrue(Section.DistributedCall.UserId == 0);
+            Assert.IsTrue(SettingsSection.DistributedCall.UserId == 0);
 
         }
         [Test]
-        public void Servers()
+        public virtual void Servers()
         {
-            Assert.IsTrue(Section.DistributedCall.Servers.Count == 2);
-            Assert.IsTrue(Section.DistributedCall.Servers.ElementAt(0).Value == "127.0.0.1");
-            Assert.IsTrue(Section.DistributedCall.Servers.ElementAt(1).Value == "127.0.0.2");
-            Assert.IsTrue(Section.DistributedCall.Servers.ElementAt(1).ForceProtocol == "https");
-            Assert.IsTrue(Section.DistributedCall.Servers.ElementAt(1).ForcePortnumber == "443");
+            Assert.IsTrue(SettingsSection.DistributedCall.Servers.Count() == 2);
+            Assert.IsTrue(SettingsSection.DistributedCall.Servers.ElementAt(0).ServerAddress == "127.0.0.1");
+            Assert.IsTrue(SettingsSection.DistributedCall.Servers.ElementAt(1).ServerAddress == "127.0.0.2");
+            Assert.IsTrue(SettingsSection.DistributedCall.Servers.ElementAt(1).ForceProtocol == "https");
+            Assert.IsTrue(SettingsSection.DistributedCall.Servers.ElementAt(1).ForcePortnumber == "443");
         }
+
     }
 }

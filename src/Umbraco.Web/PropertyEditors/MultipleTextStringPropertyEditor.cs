@@ -13,7 +13,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MultipleTextstring, "Multiple Textbox", "multipletextbox", ValueType = "TEXT")]
+    [PropertyEditor(Constants.PropertyEditors.MultipleTextstringAlias, "Multiple Textbox", "multipletextbox", ValueType = "TEXT")]
     public class MultipleTextStringPropertyEditor : PropertyEditor
     {
         protected override ValueEditor CreateValueEditor()

@@ -1,6 +1,6 @@
 namespace Umbraco.Core.Models
 {
-	/// <summary>
+    /// <summary>
 	/// The type of published item
 	/// </summary>
 	public enum PublishedItemType

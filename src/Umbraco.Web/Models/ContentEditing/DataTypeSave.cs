@@ -23,7 +23,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "selectedEditor", IsRequired = true)]
         [Required]
-        public Guid SelectedEditor { get; set; }
+        public string SelectedEditor { get; set; }
 
         [DataMember(Name = "preValues")]
         public IEnumerable<PreValueFieldSave> PreValues { get; set; }

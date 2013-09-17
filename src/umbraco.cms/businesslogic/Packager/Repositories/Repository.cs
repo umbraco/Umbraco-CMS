@@ -1,56 +1,44 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using System.IO;
 using System.Net;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using umbraco.IO;
 
-namespace umbraco.cms.businesslogic.packager.repositories {
-    public class Repository {
+namespace umbraco.cms.businesslogic.packager.repositories
+{
+    public class Repository
+    {        
+        public string Guid { get; private set; }
 
-        private string m_guid;
-        private string m_name;
+        public string Name { get; private set; }
 
-        //this is our standard urls.
-        private string m_repositoryUrl = "http://packages.umbraco.org";
-        private string m_webserviceUrl = "/umbraco/webservices/api/repository.asmx";
+        public string RepositoryUrl { get; private set; }
 
-
-        private static XmlNode m_repositories = UmbracoSettings.Repositories;
-
-        public string Guid {
-            get { return m_guid; }
-        }
-
-        public string Name {
-            get { return m_name; }
-        }
-
-        public string RepositoryUrl {
-            get { return m_repositoryUrl; }
-        }
-
-        public string WebserviceUrl {
-            get { return m_webserviceUrl; }
-            set { m_webserviceUrl = value; }
-        }
+        public string WebserviceUrl { get; private set; }
 
 
-        public RepositoryWebservice Webservice {
-            get {
+        public RepositoryWebservice Webservice
+        {
+            get
+            {
 
-                if (!m_webserviceUrl.Contains("://")) {
-                    m_webserviceUrl = m_repositoryUrl.Trim('/') + "/" + m_webserviceUrl.Trim('/');
+                if (!WebserviceUrl.Contains("://"))
+                {
+                    WebserviceUrl = RepositoryUrl.Trim('/') + "/" + WebserviceUrl.Trim('/');
                 }
 
-                RepositoryWebservice repo = new RepositoryWebservice(m_webserviceUrl);
+                var repo = new RepositoryWebservice(WebserviceUrl);
                 return repo;
             }
         }
 
-        public SubmitStatus SubmitPackage(string authorGuid, PackageInstance package, byte[] doc) {
+        public SubmitStatus SubmitPackage(string authorGuid, PackageInstance package, byte[] doc)
+        {
 
             string packageName = package.Name;
             string packageGuid = package.PackageGuid;
@@ -60,50 +48,54 @@ namespace umbraco.cms.businesslogic.packager.repositories {
 
             System.IO.FileStream fs1 = null;
 
-            try {
+            try
+            {
 
                 byte[] pack = new byte[0];
                 fs1 = System.IO.File.Open(IOHelper.MapPath(packageFile), FileMode.Open, FileAccess.Read);
                 pack = new byte[fs1.Length];
-                fs1.Read(pack, 0, (int)fs1.Length);
+                fs1.Read(pack, 0, (int) fs1.Length);
                 fs1.Close();
                 fs1 = null;
 
                 byte[] thumb = new byte[0]; //todo upload thumbnail... 
 
-                return Webservice.SubmitPackage(m_guid, authorGuid, packageGuid, pack, doc, thumb, packageName, "", "", description);
-            } 
-			catch (Exception ex) 
-			{
-				LogHelper.Error<Repository>("An error occurred in SubmitPackage", ex);
+                return Webservice.SubmitPackage(Guid, authorGuid, packageGuid, pack, doc, thumb, packageName, "", "", description);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<Repository>("An error occurred in SubmitPackage", ex);
 
                 return SubmitStatus.Error;
             }
         }
 
-        public static List<Repository> getAll() {
+        public static List<Repository> getAll()
+        {
 
-            List<Repository> repositories = new List<Repository>();
+            var repositories = new List<Repository>();
 
-            XmlNodeList repositoriesXml = m_repositories.SelectNodes("./repository");
+            foreach (var r in UmbracoConfiguration.Current.UmbracoSettings.PackageRepositories.Repositories)
+            {
+                var repository = new Repository
+                {
+                    Guid = r.Id.ToString(),
+                    Name = r.Name
+                };
 
-            foreach (XmlNode repositoryXml in repositoriesXml) {
-                Repository repository = new Repository();
-                repository.m_guid = repositoryXml.Attributes["guid"].Value;
-                repository.m_name = repositoryXml.Attributes["name"].Value;
+                repository.RepositoryUrl = r.RepositoryUrl;
+                repository.WebserviceUrl = repository.RepositoryUrl.Trim('/') + "/" + repository.WebserviceUrl.Trim('/');
+                if (r.HasCustomWebServiceUrl)
+                {
+                    string wsUrl = r.WebServiceUrl;
 
-                if (repositoryXml.Attributes["repositoryurl"] != null) {
-                    repository.m_repositoryUrl = repositoryXml.Attributes["repositoryurl"].Value;
-                    repository.m_webserviceUrl = repository.m_repositoryUrl.Trim('/') + "/" + repository.m_webserviceUrl.Trim('/');
-                }
-
-                if (repositoryXml.Attributes["webserviceurl"] != null) {
-                    string wsUrl = repositoryXml.Attributes["webserviceurl"].Value;
-
-                    if (wsUrl.Contains("://")) {
-                        repository.m_webserviceUrl = repositoryXml.Attributes["webserviceurl"].Value;
-                    } else {
-                        repository.m_webserviceUrl = repository.m_repositoryUrl.Trim('/') + "/" + wsUrl.Trim('/');
+                    if (wsUrl.Contains("://"))
+                    {
+                        repository.WebserviceUrl = r.WebServiceUrl;
+                    }
+                    else
+                    {
+                        repository.WebserviceUrl = repository.RepositoryUrl.Trim('/') + "/" + wsUrl.Trim('/');
                     }
                 }
 
@@ -113,27 +105,40 @@ namespace umbraco.cms.businesslogic.packager.repositories {
             return repositories;
         }
 
-        public static Repository getByGuid(string repositoryGuid) {
-            Repository repository = new Repository();
+        public static Repository getByGuid(string repositoryGuid)
+        {
+            Guid id;
+            if (System.Guid.TryParse(repositoryGuid, out id) == false)
+            {
+                throw new FormatException("The repositoryGuid is not a valid GUID");
+            }
 
-            XmlNode repositoryXml = m_repositories.SelectSingleNode("./repository [@guid = '" + repositoryGuid + "']");
-            if (repositoryXml != null) {
-                repository.m_guid = repositoryXml.Attributes["guid"].Value;
-                repository.m_name = repositoryXml.Attributes["name"].Value;
+            var found = UmbracoConfiguration.Current.UmbracoSettings.PackageRepositories.Repositories.FirstOrDefault(x => x.Id == id);
+            if (found == null)
+            {
+                return null;
+            }
+            
+            var repository = new Repository
+            {
+                Guid = found.Id.ToString(),
+                Name = found.Name
+            };
 
-                if (repositoryXml.Attributes["repositoryurl"] != null) {
-                    repository.m_repositoryUrl = repositoryXml.Attributes["repositoryurl"].Value;
-                    repository.m_webserviceUrl = repository.m_repositoryUrl.Trim('/') + "/" + repository.m_webserviceUrl.Trim('/');
+            repository.RepositoryUrl = found.RepositoryUrl;
+            repository.WebserviceUrl = repository.RepositoryUrl.Trim('/') + "/" + repository.WebserviceUrl.Trim('/');
+
+            if (found.HasCustomWebServiceUrl)
+            {
+                string wsUrl = found.WebServiceUrl;
+
+                if (wsUrl.Contains("://"))
+                {
+                    repository.WebserviceUrl = found.WebServiceUrl;
                 }
-
-                if (repositoryXml.Attributes["webserviceurl"] != null) {
-                    string wsUrl = repositoryXml.Attributes["webserviceurl"].Value;
-
-                    if (wsUrl.Contains("://")) {
-                        repository.m_webserviceUrl = repositoryXml.Attributes["webserviceurl"].Value;
-                    } else {
-                        repository.m_webserviceUrl = repository.m_repositoryUrl.Trim('/') + "/" + wsUrl.Trim('/');
-                    }
+                else
+                {
+                    repository.WebserviceUrl = repository.RepositoryUrl.Trim('/') + "/" + wsUrl.Trim('/');
                 }
             }
 
@@ -141,29 +146,35 @@ namespace umbraco.cms.businesslogic.packager.repositories {
         }
 
         //shortcut method to download pack from repo and place it on the server...
-        public string fetch(string packageGuid) {
+        public string fetch(string packageGuid)
+        {
 
             return fetch(packageGuid, string.Empty);
 
         }
 
-        public bool HasConnection() {
-            
+        public bool HasConnection()
+        {
+
             string strServer = this.RepositoryUrl;
 
-            try {
+            try
+            {
 
-                HttpWebRequest reqFP = (HttpWebRequest)HttpWebRequest.Create(strServer);
-                HttpWebResponse rspFP = (HttpWebResponse)reqFP.GetResponse();
+                HttpWebRequest reqFP = (HttpWebRequest) HttpWebRequest.Create(strServer);
+                HttpWebResponse rspFP = (HttpWebResponse) reqFP.GetResponse();
 
-                if (HttpStatusCode.OK == rspFP.StatusCode) {
+                if (HttpStatusCode.OK == rspFP.StatusCode)
+                {
 
                     // HTTP = 200 - Internet connection available, server online
                     rspFP.Close();
 
                     return true;
 
-                } else {
+                }
+                else
+                {
 
                     // Other status - Server or connection not available
 
@@ -173,7 +184,9 @@ namespace umbraco.cms.businesslogic.packager.repositories {
 
                 }
 
-            } catch (WebException) {
+            }
+            catch (WebException)
+            {
 
                 // Exception - connection not available
 
@@ -181,22 +194,27 @@ namespace umbraco.cms.businesslogic.packager.repositories {
 
             }
         }
-        
-        public string fetch(string packageGuid, string key) {
+
+        public string fetch(string packageGuid, string key)
+        {
 
             byte[] fileByteArray = new byte[0];
 
-            if (key == string.Empty) {
-                if (UmbracoSettings.UseLegacyXmlSchema)
+            if (key == string.Empty)
+            {
+                if (UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
                     fileByteArray = this.Webservice.fetchPackage(packageGuid);
                 else
                     fileByteArray = this.Webservice.fetchPackageByVersion(packageGuid, Version.Version41);
-            } else {
+            }
+            else
+            {
                 fileByteArray = this.Webservice.fetchProtectedPackage(packageGuid, key);
             }
 
             //successfull 
-            if (fileByteArray.Length > 0) {
+            if (fileByteArray.Length > 0)
+            {
 
                 // Check for package directory
                 if (!System.IO.Directory.Exists(IOHelper.MapPath(packager.Settings.PackagerRoot)))
@@ -211,13 +229,13 @@ namespace umbraco.cms.businesslogic.packager.repositories {
 
                 return "packages\\" + packageGuid + ".umb";
 
-            } else {
+            }
+            else
+            {
 
                 return "";
             }
         }
-
-
-
+        
     }
 }

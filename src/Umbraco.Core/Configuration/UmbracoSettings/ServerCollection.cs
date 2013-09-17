@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ServerCollection : ConfigurationElementCollection, IEnumerable<ServerElement>
+    internal class ServerCollection : ConfigurationElementCollection, IEnumerable<IServer>
     {
         protected override ConfigurationElement CreateNewElement()
         {
@@ -15,11 +15,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             return ((ServerElement)element).Value;
         }
 
-        IEnumerator<ServerElement> IEnumerable<ServerElement>.GetEnumerator()
+        IEnumerator<IServer> IEnumerable<IServer>.GetEnumerator()
         {
             for (var i = 0; i < Count; i++)
             {
-                yield return BaseGet(i) as ServerElement;
+                yield return BaseGet(i) as IServer;
             }
         }
 

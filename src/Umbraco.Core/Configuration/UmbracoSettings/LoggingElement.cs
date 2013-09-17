@@ -1,8 +1,9 @@
-﻿using System.Configuration;
+﻿using System.Collections.Generic;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class LoggingElement : ConfigurationElement
+    internal class LoggingElement : ConfigurationElement, ILoggingSection
     {
         
         [ConfigurationProperty("autoCleanLogs")]
@@ -67,7 +68,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         [ConfigurationCollection(typeof(DisabledLogTypesCollection), AddItemName = "logTypeAlias")]
         [ConfigurationProperty("disabledLogTypes", IsDefaultCollection = true)]
-        public DisabledLogTypesCollection DisabledLogTypes
+        internal DisabledLogTypesCollection DisabledLogTypes
         {
             get { return (DisabledLogTypesCollection)base["disabledLogTypes"]; }
         }
@@ -78,7 +79,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (ExternalLoggerElement) base["externalLogger"]; }
         }
 
-        internal bool ExternalLoggerIsConfigured
+        public bool ExternalLoggerIsConfigured
         {
             get
             {
@@ -90,6 +91,51 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 }
                 return false;
             }
+        }
+
+        string ILoggingSection.ExternalLoggerAssembly
+        {
+            get { return ExternalLogger.Assembly; }
+        }
+
+        string ILoggingSection.ExternalLoggerType
+        {
+            get { return ExternalLogger.Type; }
+        }
+
+        bool ILoggingSection.ExternalLoggerEnableAuditTrail
+        {
+            get { return ExternalLogger.LogAuditTrail; }
+        }
+
+        bool ILoggingSection.AutoCleanLogs
+        {
+            get { return AutoCleanLogs; }
+        }
+
+        bool ILoggingSection.EnableLogging
+        {
+            get { return EnableLogging; }
+        }
+
+        bool ILoggingSection.EnableAsyncLogging
+        {
+            get { return EnableAsyncLogging; }
+        }
+
+        int ILoggingSection.CleaningMiliseconds
+        {
+            get { return CleaningMiliseconds; }
+        }
+
+        int ILoggingSection.MaxLogAge
+        {
+            get { return MaxLogAge; }
+        }
+
+        IEnumerable<ILogType> ILoggingSection.DisabledLogTypes
+        {
+            get { return DisabledLogTypes; }
         }
 
     }

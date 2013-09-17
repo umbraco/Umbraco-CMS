@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using umbraco;
 using umbraco.cms.businesslogic.web;
@@ -526,7 +527,7 @@ namespace Umbraco.Web.Cache
 
         public static void ClearXsltCacheOnCurrentServer(this DistributedCache dc)
         {
-            if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.UmbracoLibraryCacheDuration > 0)
             {
                 ApplicationContext.Current.ApplicationCache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
             }

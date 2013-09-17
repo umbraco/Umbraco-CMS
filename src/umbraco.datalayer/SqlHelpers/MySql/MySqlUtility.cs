@@ -6,6 +6,7 @@
  * 
  ***********************************************************************************/
 
+using System;
 using umbraco.DataLayer.Utility;
 using umbraco.DataLayer.Utility.Installer;
 
@@ -14,6 +15,7 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
     /// <summary>
     /// Utility for an MySql data source.
     /// </summary>
+    [Obsolete("The legacy installers are no longer used and will be removed from the codebase in the future")]
     public class MySqlUtility : DefaultUtility<MySqlHelper>
     {
         #region Public Constructors
@@ -33,6 +35,7 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
         /// Creates an installer.
         /// </summary>
         /// <returns>The MySql installer.</returns>
+        [Obsolete("The legacy installers are no longer used and will be removed from the codebase in the future")]
         public override IInstallerUtility CreateInstaller()
         {
             return new MySqlInstaller(SqlHelper);

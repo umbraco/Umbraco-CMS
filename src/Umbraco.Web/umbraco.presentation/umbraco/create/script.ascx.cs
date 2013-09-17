@@ -2,12 +2,14 @@ using System;
 using System.Data;
 using System.Configuration;
 using System.Collections;
+using System.Linq;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.UI;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
@@ -73,7 +75,7 @@ namespace umbraco.presentation.umbraco.create
 			this.sbmt.Click += new System.EventHandler(this.sbmt_Click);
 			this.Load += new System.EventHandler(this.Page_Load);
 
-			string[] fileTypes = UmbracoSettings.ScriptFileTypes.Split(',');
+            string[] fileTypes = UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptFileTypes.ToArray();
 
             scriptType.Items.Add(new ListItem(ui.Text("folder"), ""));
 		    scriptType.Items.FindByText(ui.Text("folder")).Selected = true;

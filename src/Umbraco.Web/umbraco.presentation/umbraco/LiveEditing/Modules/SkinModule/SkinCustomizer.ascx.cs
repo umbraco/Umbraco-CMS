@@ -4,12 +4,12 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.skinning;
 using System.Xml;
 using System.Text;
 using umbraco.interfaces.skinning;
-using umbraco.IO;
 using umbraco.cms.businesslogic.template;
 using umbraco.BusinessLogic;
 using umbraco.NodeFactory;
@@ -157,12 +157,12 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
 
         protected void LoadSkins()
         {
-            List<string> skinNames = new List<string>();
+            var skinNames = new List<string>();
 
-            Guid? nullable = Skinning.StarterKitGuid(Node.GetCurrent().template);
+            var nullable = Skinning.StarterKitGuid(Node.GetCurrent().template);
 
             if(nullable.HasValue){
-                InstalledPackage p = InstalledPackage.GetByGuid(nullable.Value.ToString());
+                var p = InstalledPackage.GetByGuid(nullable.Value.ToString());
                 if(p.Data.SkinRepoGuid != null && p.Data.SkinRepoGuid != Guid.Empty  && p.Data.SkinRepoGuid.ToString() != repoGuid)
                     this.repo = cms.businesslogic.packager.repositories.Repository.getByGuid(p.Data.SkinRepoGuid.ToString());
             }

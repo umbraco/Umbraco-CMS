@@ -3,13 +3,12 @@ using System.Linq;
 using Examine;
 using Lucene.Net.Store;
 using NUnit.Framework;
-using Umbraco.Tests.PartialTrust;
 using UmbracoExamine;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
 	[TestFixture]
-	public class EventsTest : ExamineBaseTest<EventsTest>
+	public class EventsTest : ExamineBaseTest
 	{
 		[Test]
 		public void Events_Ignoring_Node()

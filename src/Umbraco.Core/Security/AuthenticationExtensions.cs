@@ -26,7 +26,7 @@ namespace Umbraco.Core.Security
         /// </summary>
         public static void UmbracoLogout(this HttpContextBase http)
         {
-            Logout(http, LegacyUmbracoSettings.AuthCookieName);
+            Logout(http, UmbracoConfiguration.Current.UmbracoSettings.Security.AuthCookieName);
         }
 
         internal static void UmbracoLogout(this HttpContext http)
@@ -42,7 +42,10 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         public static bool RenewUmbracoAuthTicket(this HttpContextBase http, int timeoutInMinutes = 60)
         {
-            return RenewAuthTicket(http, LegacyUmbracoSettings.AuthCookieName, LegacyUmbracoSettings.AuthCookieDomain, timeoutInMinutes);
+            return RenewAuthTicket(http,
+                UmbracoConfiguration.Current.UmbracoSettings.Security.AuthCookieName,
+                UmbracoConfiguration.Current.UmbracoSettings.Security.AuthCookieDomain, 
+                timeoutInMinutes);
         }
 
         internal static bool RenewUmbracoAuthTicket(this HttpContext http, int timeoutInMinutes = 60)
@@ -65,9 +68,9 @@ namespace Umbraco.Core.Security
                 GlobalSettings.TimeOutInMinutes, 
                 //Umbraco has always persisted it's original cookie for 1 day so we'll keep it that way
                 1440, 
-                "/", 
-                LegacyUmbracoSettings.AuthCookieName, 
-                LegacyUmbracoSettings.AuthCookieDomain);
+                "/",
+                UmbracoConfiguration.Current.UmbracoSettings.Security.AuthCookieName,
+                UmbracoConfiguration.Current.UmbracoSettings.Security.AuthCookieDomain);
         }
 
         internal static void CreateUmbracoAuthTicket(this HttpContext http, UserData userdata)
@@ -82,7 +85,7 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         public static FormsAuthenticationTicket GetUmbracoAuthTicket(this HttpContextBase http)
         {
-            return GetAuthTicket(http, LegacyUmbracoSettings.AuthCookieName);
+            return GetAuthTicket(http, UmbracoConfiguration.Current.UmbracoSettings.Security.AuthCookieName);
         }
 
         internal static FormsAuthenticationTicket GetUmbracoAuthTicket(this HttpContext http)

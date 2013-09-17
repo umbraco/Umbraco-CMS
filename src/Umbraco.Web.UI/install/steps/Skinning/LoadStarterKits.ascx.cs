@@ -64,6 +64,11 @@ namespace Umbraco.Web.UI.Install.Steps.Skinning
 		{
 			base.OnInit(e);
 
+            if (_repo == null)
+            {
+                throw new InvalidOperationException("Could not find repository with id " + RepoGuid);
+            }
+
 			//clear progressbar cache
             InstallHelper.ClearProgress();
 

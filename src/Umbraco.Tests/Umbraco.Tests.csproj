@@ -75,6 +75,9 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
+    <Reference Include="Moq">
+      <HintPath>..\packages\Moq.4.1.1309.0919\lib\net40\Moq.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -206,25 +209,23 @@
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ContentElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ContentElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\ContentErrorsElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\ContentErrorsElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\ContentImagingElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\ContentImagingElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\ContentNotificationsElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\ContentNotificationsElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\ContentScriptEditorElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\ContentScriptEditorElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\DeveloperElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\DeveloperElementTests.cs" />
+    <Compile Include="Configurations\UmbracoSettings\DistributedCallElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\DistributedCallElementTests.cs" />
+    <Compile Include="Configurations\UmbracoSettings\HelpElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\HelpElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementTests.cs" />
+    <Compile Include="Configurations\UmbracoSettings\PackageRepositoriesElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\PackageRepositoriesElementTests.cs" />
+    <Compile Include="Configurations\UmbracoSettings\ProvidersElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ProvidersElementTests.cs" />
+    <Compile Include="Configurations\UmbracoSettings\RequestHandlerElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\RequestHandlerElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ScheduledTasksElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ScheduledTasksElementTests.cs" />
+    <Compile Include="Configurations\UmbracoSettings\ScriptingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ScriptingElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\SecurityElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\SecurityElementTests.cs" />
@@ -233,6 +234,7 @@
     <Compile Include="Configurations\UmbracoSettings\UmbracoSettingsTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ViewstateMoverModuleElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ViewstateMoverModuleElementTests.cs" />
+    <Compile Include="Configurations\UmbracoSettings\WebRoutingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementTests.cs" />
     <Compile Include="Controllers\WebApiEditors\ContentControllerUnitTests.cs" />
     <Compile Include="Controllers\WebApiEditors\FilterAllowedOutgoingContentAttributeTests.cs" />
@@ -240,7 +242,6 @@
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
     <Compile Include="Integration\CreateContent.cs" />
     <Compile Include="Models\ContentExtensionsTests.cs" />
-    <Compile Include="Models\DataValueSetterTests.cs" />
     <Compile Include="Models\UserExtensionsTests.cs" />
     <Compile Include="Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensionTests.cs" />
@@ -252,6 +253,7 @@
     <Compile Include="PropertyEditors\ColorListValidatorTest.cs" />
     <Compile Include="PropertyEditors\DropDownPropertyPreValueEditorTests.cs" />
     <Compile Include="PropertyEditors\EnsureUniqueValuesValidatorTest.cs" />
+    <Compile Include="PropertyEditors\LegacyPropertyEditorIdToAliasConverterTests.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueEditorTests.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\CallingMethodTests.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\Subpage.cs" />
@@ -277,7 +279,6 @@
     <Compile Include="LegacyApi\MediaTypeTests.cs" />
     <Compile Include="Macros\MacroTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
-    <Compile Include="Migrations\TargetVersionSixthOneZeroMigrationsTest.cs" />
     <Compile Include="Migrations\Upgrades\BaseUpgradeTest.cs" />
     <Compile Include="Migrations\FindingMigrationsTest.cs" />
     <Compile Include="Migrations\SqlScripts\SqlResources.Designer.cs">
@@ -394,7 +395,6 @@
     </Compile>
     <Compile Include="Services\ThreadSafetyServiceTest.cs" />
     <Compile Include="Surface\PluginControllerAreaTests.cs" />
-    <Compile Include="Sync\ConfigServerRegistrarTests.cs" />
     <Compile Include="Sync\DistributedCacheTests.cs" />
     <Compile Include="Templates\MasterPageHelperTests.cs" />
     <Compile Include="TestHelpers\BaseDatabaseFactoryTest.cs" />
@@ -452,13 +452,6 @@
     <Compile Include="IO\AbstractFileSystemTests.cs" />
     <Compile Include="IO\FileSystemProviderManagerTests.cs" />
     <Compile Include="IO\PhysicalFileSystemTests.cs" />
-    <Compile Include="PartialTrust\AbstractPartialTrustFixture.cs" />
-    <Compile Include="PartialTrust\IPartialTrustFixture.cs" />
-    <Compile Include="PartialTrust\PartialTrustFixtureFixture.cs" />
-    <Compile Include="PartialTrust\PartialTrustHelper.cs" />
-    <Compile Include="PartialTrust\PartialTrustHelperFixture.cs" />
-    <Compile Include="PartialTrust\PartialTrustTestException.cs" />
-    <Compile Include="PartialTrust\TestOnlyInFullTrustAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CoreStrings\StringExtensionsTests.cs" />
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
@@ -592,6 +585,9 @@
     <Content Include="Migrations\SqlScripts\SqlCe-SchemaAndData-4110.sql" />
     <Content Include="Migrations\SqlScripts\SqlCeTotal-480.sql" />
     <Content Include="Migrations\SqlScripts\SqlServerTotal-480.sql" />
+    <Content Include="Services\Importing\CheckboxList-Content-Package-LegacyIds.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Services\Importing\CheckboxList-Content-Package.xml">
       <SubType>Designer</SubType>
     </Content>

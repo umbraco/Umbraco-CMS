@@ -18,14 +18,14 @@ namespace Umbraco.Tests.CoreStrings
         [SetUp]
         public void Setup()
         {
-            TestHelper.EnsureUmbracoSettingsConfig();
+            var config = SettingsForTests.GetDefault();
+            SettingsForTests.ConfigureSettings(config);
             _helper = new LegacyShortStringHelper();
         }
 
         [TearDown]
         public void TearDown()
         {
-            TestHelper.CleanUmbracoSettingsConfig();
         }
 
 

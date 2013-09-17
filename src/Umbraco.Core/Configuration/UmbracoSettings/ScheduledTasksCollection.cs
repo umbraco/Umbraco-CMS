@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ScheduledTasksCollection : ConfigurationElementCollection, IEnumerable<ScheduledTaskElement>
+    internal class ScheduledTasksCollection : ConfigurationElementCollection, IEnumerable<IScheduledTask>
     {
         protected override ConfigurationElement CreateNewElement()
         {
@@ -15,11 +15,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             return ((ScheduledTaskElement)element).Alias;
         }
 
-        IEnumerator<ScheduledTaskElement> IEnumerable<ScheduledTaskElement>.GetEnumerator()
+        IEnumerator<IScheduledTask> IEnumerable<IScheduledTask>.GetEnumerator()
         {
             for (var i = 0; i < Count; i++)
             {
-                yield return BaseGet(i) as ScheduledTaskElement;
+                yield return BaseGet(i) as IScheduledTask;
             }
         }
 

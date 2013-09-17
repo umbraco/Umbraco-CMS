@@ -60,16 +60,16 @@ namespace Umbraco.Tests.Persistence.Mappers
         }
 
         [Test]
-        public void Can_Map_DataTypeControlId_Property()
+        public void Can_Map_PropertyEditorAlias_Property()
         {
             // Arrange
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = new PropertyTypeMapper().Map("DataTypeId");
+            string column = new PropertyTypeMapper().Map("PropertyEditorAlias");
 
             // Assert
-            Assert.That(column, Is.EqualTo("[cmsDataType].[controlId]"));
+            Assert.That(column, Is.EqualTo("[cmsDataType].[propertyEditorAlias]"));
         }
 
         [Test]

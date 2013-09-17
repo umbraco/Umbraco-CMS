@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Models
@@ -13,8 +14,18 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Script : File
     {
-        public Script(string path) : base(path)
+        private readonly IContentSection _contentConfig;
+
+        public Script(string path)
+            : this(path, UmbracoConfiguration.Current.UmbracoSettings.Content)
         {
+            
+        }
+
+        public Script(string path, IContentSection contentConfig)
+            : base(path)
+        {
+            _contentConfig = contentConfig;
             base.Path = path;
         }
 
@@ -33,7 +44,7 @@ namespace Umbraco.Core.Models
             //into 4 private methods.
             //See codeEditorSave.asmx.cs for reference.
 
-            var exts = LegacyUmbracoSettings.ScriptFileTypes.Split(',').ToList();
+            var exts = _contentConfig.ScriptFileTypes.ToList();
             /*if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
             {
                 exts.Add("cshtml");

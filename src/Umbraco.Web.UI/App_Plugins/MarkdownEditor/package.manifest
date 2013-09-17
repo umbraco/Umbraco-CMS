@@ -1,7 +1,7 @@
 {   
 	propertyEditors: [		
 		{
-			id: "7e062c13-7c41-4ad9-b389-41d99aeef87c",
+			alias: "MyPackage.MarkdownEditor",
 			name: "Markdown editor",
 			editor: {
 				view: "~/App_Plugins/MarkDownEditor/markdowneditor.html"

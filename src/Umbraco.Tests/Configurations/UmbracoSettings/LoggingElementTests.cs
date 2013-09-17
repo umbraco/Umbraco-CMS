@@ -9,57 +9,57 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public virtual void ExternalLoggerConfigured()
         {
-            Assert.IsTrue(Section.Logging.ExternalLoggerIsConfigured == true);
+            Assert.IsTrue(SettingsSection.Logging.ExternalLoggerIsConfigured == true);
         }
 
         [Test]
         public void EnableLogging()
         {
-            Assert.IsTrue(Section.Logging.EnableLogging == true);
+            Assert.IsTrue(SettingsSection.Logging.EnableLogging == true);
         }
         [Test]
         public void EnableAsyncLogging()
         {
-            Assert.IsTrue(Section.Logging.EnableAsyncLogging == true);
+            Assert.IsTrue(SettingsSection.Logging.EnableAsyncLogging == true);
         }
         [Test]
         public virtual void DisabledLogTypes()
         {
-            Assert.IsTrue(Section.Logging.DisabledLogTypes.Count == 2);
-            Assert.IsTrue(Section.Logging.DisabledLogTypes.ElementAt(0) == "[alias-of-log-type-in-lowercase]");
-            Assert.IsTrue(Section.Logging.DisabledLogTypes.ElementAt(1) == "anotherlogalias");
+            Assert.IsTrue(SettingsSection.Logging.DisabledLogTypes.Count() == 2);
+            Assert.IsTrue(SettingsSection.Logging.DisabledLogTypes.ElementAt(0).LogTypeAlias == "[alias-of-log-type-in-lowercase]");
+            Assert.IsTrue(SettingsSection.Logging.DisabledLogTypes.ElementAt(1).LogTypeAlias == "anotherlogalias");
         }
         [Test]
         public virtual void ExternalLogger_Assembly()
         {
-            Assert.IsTrue(Section.Logging.ExternalLogger.Assembly == "~/bin/assemblyFileName.dll");
+            Assert.IsTrue(SettingsSection.Logging.ExternalLoggerAssembly == "~/bin/assemblyFileName.dll");
         }
         [Test]
         public virtual void ExternalLogger_Type()
         {
-            Assert.IsTrue(Section.Logging.ExternalLogger.Type == "fully.qualified.namespace.and.type");
+            Assert.IsTrue(SettingsSection.Logging.ExternalLoggerType == "fully.qualified.namespace.and.type");
         }
         [Test]
         public virtual void ExternalLogger_LogAuditTrail()
         {
-            Assert.IsTrue(Section.Logging.ExternalLogger.LogAuditTrail == false);
+            Assert.IsTrue(SettingsSection.Logging.ExternalLoggerEnableAuditTrail == false);
         }
         [Test]
         public void AutoCleanLogs()
         {
-            Assert.IsTrue(Section.Logging.AutoCleanLogs == false);
+            Assert.IsTrue(SettingsSection.Logging.AutoCleanLogs == false);
         }
 
         [Test]
         public virtual void CleaningMiliseconds()
         {
-            Assert.IsTrue(Section.Logging.CleaningMiliseconds == 86400);
+            Assert.IsTrue(SettingsSection.Logging.CleaningMiliseconds == 86400);
 
         }
         [Test]
         public virtual void MaxLogAge()
         {
-            Assert.IsTrue(Section.Logging.MaxLogAge == 1440);
+            Assert.IsTrue(SettingsSection.Logging.MaxLogAge == 1440);
 
         }
 

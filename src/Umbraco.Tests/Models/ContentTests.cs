@@ -17,13 +17,14 @@ namespace Umbraco.Tests.Models
         [SetUp]
         public void Init()
         {
-            TestHelper.EnsureUmbracoSettingsConfig();
+            var config = SettingsForTests.GetDefault();
+            SettingsForTests.ConfigureSettings(config);
         }
 
         [TearDown]
         public void Dispose()
         {
-            TestHelper.CleanUmbracoSettingsConfig();
+            
         }
 
         [TestCase("-1,-20,12,34,56", false)]
@@ -57,8 +58,8 @@ namespace Umbraco.Tests.Models
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             //add non-grouped properties
-            contentType.AddPropertyType(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) {Alias = "nonGrouped1", Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88});
-            contentType.AddPropertyType(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "nonGrouped2", Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            contentType.AddPropertyType(new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "nonGrouped1", Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            contentType.AddPropertyType(new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "nonGrouped2", Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
             
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
@@ -269,7 +270,7 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
-            contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext)
+            contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext)
                                                                         {
                                                                             Alias = "subtitle",
                                                                             Name = "Subtitle",
@@ -293,7 +294,7 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
-            var propertyType = new PropertyType(new Guid(), DataTypeDatabaseType.Ntext)
+            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext)
                                    {
                                        Alias = "subtitle", Name = "Subtitle", Description = "Optional subtitle", HelpText = "", Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -88
                                    };
@@ -313,7 +314,7 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
-            var propertyType = new PropertyType(new Guid(), DataTypeDatabaseType.Ntext)
+            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext)
                                    {
                                        Alias = "subtitle",
                                        Name = "Subtitle",
@@ -344,7 +345,7 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act - note that the PropertyType's properties like SortOrder is not updated through the Content object
-            var propertyType = new PropertyType(new Guid(), DataTypeDatabaseType.Ntext)
+            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext)
                                    {
                                        Alias = "title", Name = "Title", Description = "Title description added", HelpText = "", Mandatory = false, SortOrder = 10, DataTypeDefinitionId = -88
                                    };
@@ -532,7 +533,7 @@ namespace Umbraco.Tests.Models
             contentType.ResetDirtyProperties();
 
             // Act
-            var propertyType = new PropertyType(new Guid(), DataTypeDatabaseType.Ntext)
+            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext)
                                    {
                                        Alias = "subtitle",
                                        Name = "Subtitle",
@@ -559,7 +560,7 @@ namespace Umbraco.Tests.Models
                                                                                 new PropertyTypeCollection(
                                                                                     new List<PropertyType>
                                                                                         {
-                                                                                            new PropertyType(new Guid(), DataTypeDatabaseType.Ntext)
+                                                                                            new PropertyType("test", DataTypeDatabaseType.Ntext)
                                                                                                 {
                                                                                                     Alias = "coauthor",
                                                                                                     Name = "Co-Author",
@@ -592,7 +593,7 @@ namespace Umbraco.Tests.Models
                                                                                 new PropertyTypeCollection(
                                                                                     new List<PropertyType>
                                                                                         {
-                                                                                            new PropertyType(new Guid(), DataTypeDatabaseType.Ntext)
+                                                                                            new PropertyType("test", DataTypeDatabaseType.Ntext)
                                                                                                 {
                                                                                                     Alias = "coauthor",
                                                                                                     Name = "Co-Author",
@@ -627,7 +628,7 @@ namespace Umbraco.Tests.Models
             var mixin1 = MockedContentTypes.CreateSimpleContentType("mixin1", "Mixin1", new PropertyTypeCollection(
                                                                                     new List<PropertyType>
                                                                                         {
-                                                                                            new PropertyType(new Guid(), DataTypeDatabaseType.Ntext)
+                                                                                            new PropertyType("test", DataTypeDatabaseType.Ntext)
                                                                                                 {
                                                                                                     Alias = "coauthor",
                                                                                                     Name = "Co-Author",
@@ -641,7 +642,7 @@ namespace Umbraco.Tests.Models
             var mixin2 = MockedContentTypes.CreateSimpleContentType("mixin2", "Mixin2", new PropertyTypeCollection(
                                                                                     new List<PropertyType>
                                                                                         {
-                                                                                            new PropertyType(new Guid(), DataTypeDatabaseType.Ntext)
+                                                                                            new PropertyType("test", DataTypeDatabaseType.Ntext)
                                                                                                 {
                                                                                                     Alias = "author",
                                                                                                     Name = "Author",

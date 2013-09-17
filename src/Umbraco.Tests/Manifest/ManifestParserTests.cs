@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Manifest
 
             var a = JsonConvert.DeserializeObject<JArray>(@"[
     {
-        id: '0EEBB7CE-51BA-4F6B-9D9C-78BB3314366C',
+        alias: 'Test.Test1',
         name: 'Test 1',        
         editor: {
             view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Manifest
 
             var a = JsonConvert.DeserializeObject<JArray>(@"[
     {
-        id: '0EEBB7CE-51BA-4F6B-9D9C-78BB3314366C',
+        alias: 'Test.Test1',
         name: 'Test 1',        
         editor: {
             view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
@@ -81,7 +81,7 @@ namespace Umbraco.Tests.Manifest
         }
     },
     {
-        id: '1FCF5C39-5FC7-4BCE-AFBE-6500D9EBA261',
+        alias: 'Test.Test2',
         name: 'Test 2',
         defaultConfig: { key1: 'some default pre val' },
         editor: {
@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Manifest
             var parser = ManifestParser.GetPropertyEditors(a);
 
             Assert.AreEqual(2, parser.Count());
-            Assert.AreEqual(new Guid("0EEBB7CE-51BA-4F6B-9D9C-78BB3314366C"), parser.ElementAt(0).Id);
+            Assert.AreEqual("Test.Test1", parser.ElementAt(0).Alias);
             Assert.AreEqual("Test 1", parser.ElementAt(0).Name);
             Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/MyEditor.html", parser.ElementAt(0).ValueEditor.View);
             Assert.AreEqual("int", parser.ElementAt(0).ValueEditor.ValueType);
@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Manifest
             Assert.IsNotNull(manifestValidator2);
             Assert.AreEqual("regex", manifestValidator2.Type);
 
-            Assert.AreEqual(new Guid("1FCF5C39-5FC7-4BCE-AFBE-6500D9EBA261"), parser.ElementAt(1).Id);
+            Assert.AreEqual("Test.Test2", parser.ElementAt(1).Alias);
             Assert.AreEqual("Test 2", parser.ElementAt(1).Name);
             Assert.IsTrue(parser.ElementAt(1).DefaultPreValues.ContainsKey("key1"));
             Assert.AreEqual("some default pre val", parser.ElementAt(1).DefaultPreValues["key1"]);

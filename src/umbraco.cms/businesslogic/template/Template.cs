@@ -4,6 +4,7 @@ using System.Collections;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.DataLayer;
@@ -154,7 +155,7 @@ namespace umbraco.cms.businesslogic.template
             }
             dr.Close();
 
-			if (Umbraco.Core.Configuration.LegacyUmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(this))
+			if (UmbracoConfiguration.Current.UmbracoSettings.Templates.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(this))
                 _design = ViewHelper.GetFileContents(this);
             else
                 _design = MasterPageHelper.GetFileContents(this);
@@ -265,13 +266,13 @@ namespace umbraco.cms.businesslogic.template
                 _design = value.Trim(NewLineChars);
 
                 //we only switch to MVC View editing if the template has a view file, and MVC editing is enabled
-				if (Umbraco.Core.Configuration.LegacyUmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && !MasterPageHelper.IsMasterPageSyntax(_design))
+                if (UmbracoConfiguration.Current.UmbracoSettings.Templates.DefaultRenderingEngine == RenderingEngine.Mvc && !MasterPageHelper.IsMasterPageSyntax(_design))
 				{
 					MasterPageHelper.RemoveMasterPageFile(this.Alias);
 					MasterPageHelper.RemoveMasterPageFile(_oldAlias);
 					_design = ViewHelper.UpdateViewFile(this, _oldAlias);
 				}
-				else if (UmbracoSettings.UseAspNetMasterPages)
+				else if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
 				{
 					ViewHelper.RemoveViewFile(this.Alias);
 					ViewHelper.RemoveViewFile(_oldAlias);
@@ -351,7 +352,7 @@ namespace umbraco.cms.businesslogic.template
 	    /// </remarks>
 	    private static RenderingEngine DetermineRenderingEngine(Template t, string design = null)
 		{
-			var engine = Umbraco.Core.Configuration.LegacyUmbracoSettings.DefaultRenderingEngine;
+            var engine = UmbracoConfiguration.Current.UmbracoSettings.Templates.DefaultRenderingEngine;
 
 			if (!design.IsNullOrWhiteSpace() && MasterPageHelper.IsMasterPageSyntax(design))
 			{

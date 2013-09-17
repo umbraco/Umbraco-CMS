@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System.Collections.Generic;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
@@ -12,12 +13,17 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 return new OptionalCommaDelimitedConfigurationElement(
                        (CommaDelimitedConfigurationElement)this["imageFileTypes"],
                         //set the default
-                       new[] { "jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif" });
+                       GetDefaultImageFileTypes());
             }
         }
 
+        internal static string[] GetDefaultImageFileTypes()
+        {
+            return new[] {"jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif"};
+        }
+
         [ConfigurationProperty("allowedAttributes")]
-        internal CommaDelimitedConfigurationElement AllowedAttributes
+        internal CommaDelimitedConfigurationElement ImageTagAllowedAttributes
         {
             get
             {
@@ -28,27 +34,47 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        [ConfigurationCollection(typeof(ContentImagingAutoFillPropertiesCollection), AddItemName = "uploadField")]
-        [ConfigurationProperty("autoFillImageProperties", IsDefaultCollection = true)]        
-        public ContentImagingAutoFillPropertiesCollection ImageAutoFillProperties
+        private ImagingAutoFillPropertiesCollection _defaultImageAutoFill;
+
+        [ConfigurationCollection(typeof(ImagingAutoFillPropertiesCollection), AddItemName = "uploadField")]
+        [ConfigurationProperty("autoFillImageProperties", IsDefaultCollection = true)]
+        internal ImagingAutoFillPropertiesCollection ImageAutoFillProperties
         {
             get
             {
+                if (_defaultImageAutoFill != null)
+                {
+                    return _defaultImageAutoFill;
+                }
+
                 //here we need to check if this element is defined, if it is not then we'll setup the defaults
                 var prop = Properties["autoFillImageProperties"];
                 var autoFill = this[prop] as ConfigurationElement;
                 if (autoFill != null && autoFill.ElementInformation.IsPresent == false)
                 {
-                    var collection = new ContentImagingAutoFillPropertiesCollection();
-                    collection.Add(new ContentImagingAutoFillUploadFieldElement
+                    _defaultImageAutoFill = new ImagingAutoFillPropertiesCollection
                         {
-                            Alias = "umbracoFile"
-                        });
-                    base["autoFillImageProperties"] = collection;
+                            new ImagingAutoFillUploadFieldElement
+                                {
+                                    Alias = "umbracoFile"
+                                }
+                        };
+                    return _defaultImageAutoFill;
                 }
                 
-                return (ContentImagingAutoFillPropertiesCollection) base["autoFillImageProperties"];
+                return (ImagingAutoFillPropertiesCollection) base["autoFillImageProperties"];
             }
+        }
+
+        internal static ImagingAutoFillPropertiesCollection GetDefaultImageAutoFillProperties()
+        {
+            return new ImagingAutoFillPropertiesCollection
+                        {
+                            new ImagingAutoFillUploadFieldElement
+                                {
+                                    Alias = "umbracoFile"
+                                }
+                        };
         }
 
     }

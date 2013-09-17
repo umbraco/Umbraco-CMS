@@ -1,50 +1,88 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Configuration;
+using Moq;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Tests.TestHelpers
 {
-    class SettingsForTests
+    public class SettingsForTests
     {
         // umbracoSettings
 
-        public static int UmbracoLibraryCacheDuration
+        /// <summary>
+        /// Sets the umbraco settings singleton to the object specified
+        /// </summary>
+        /// <param name="settings"></param>
+        public static void ConfigureSettings(IUmbracoSettingsSection settings)
         {
-            get { return LegacyUmbracoSettings.UmbracoLibraryCacheDuration; }
-            set { LegacyUmbracoSettings.UmbracoLibraryCacheDuration = value; }
+            UmbracoConfiguration.Current.UmbracoSettings = settings;
         }
 
-        public static bool UseLegacyXmlSchema
+        /// <summary>
+        /// Used for unit tests to explicitly associate an IUmbracoConfigurationSection to an implementation
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="implementation"></param>
+        public static void SetSetting<T>(T implementation)
+            where T : IUmbracoConfigurationSection
         {
-            get { return LegacyUmbracoSettings.UseLegacyXmlSchema; }
-            set { LegacyUmbracoSettings.UseLegacyXmlSchema = value; }
+            UmbracoConfiguration.Set<T>(implementation);
         }
 
-        public static bool AddTrailingSlash
+        /// <summary>
+        /// Returns generated settings which can be stubbed to return whatever values necessary
+        /// </summary>
+        /// <returns></returns>
+        public static IUmbracoSettingsSection GetMockSettings()
         {
-            get { return LegacyUmbracoSettings.AddTrailingSlash; }
-            set { LegacyUmbracoSettings.AddTrailingSlash = value; }
-        }
+            var settings = new Mock<IUmbracoSettingsSection>();
 
-        public static bool UseDomainPrefixes
-        {
-            get { return LegacyUmbracoSettings.UseDomainPrefixes; }
-            set { LegacyUmbracoSettings.UseDomainPrefixes = value; }
-        }
+            var content = new Mock<IContentSection>();
+            var security = new Mock<ISecuritySection>();
+            var requestHandler = new Mock<IRequestHandlerSection>();
+            var templates = new Mock<ITemplatesSection>();
+            var dev = new Mock<IDeveloperSection>();
+            var viewStateMover = new Mock<IViewStateMoverModuleSection>();
+            var logging = new Mock<ILoggingSection>();
+            var tasks = new Mock<IScheduledTasksSection>();
+            var distCall = new Mock<IDistributedCallSection>();
+            var repos = new Mock<IRepositoriesSection>();
+            var providers = new Mock<IProvidersSection>();
+            var help = new Mock<IHelpSection>();
+            var routing = new Mock<IWebRoutingSection>();
+            var scripting = new Mock<IScriptingSection>();
 
-        public static string SettingsFilePath
-        {
-            get { return LegacyUmbracoSettings.SettingsFilePath; }
-            set { LegacyUmbracoSettings.SettingsFilePath = value; }
-        }
+            settings.Setup(x => x.Content).Returns(content.Object);
+            settings.Setup(x => x.Security).Returns(security.Object);
+            settings.Setup(x => x.RequestHandler).Returns(requestHandler.Object);
+            settings.Setup(x => x.Templates).Returns(templates.Object);
+            settings.Setup(x => x.Developer).Returns(dev.Object);
+            settings.Setup(x => x.ViewStateMoverModule).Returns(viewStateMover.Object);
+            settings.Setup(x => x.Logging).Returns(logging.Object);
+            settings.Setup(x => x.ScheduledTasks).Returns(tasks.Object);
+            settings.Setup(x => x.DistributedCall).Returns(distCall.Object);
+            settings.Setup(x => x.PackageRepositories).Returns(repos.Object);
+            settings.Setup(x => x.Providers).Returns(providers.Object);
+            settings.Setup(x => x.Help).Returns(help.Object);
+            settings.Setup(x => x.WebRouting).Returns(routing.Object);
+            settings.Setup(x => x.Scripting).Returns(scripting.Object);
 
-        public static bool ForceSafeAliases
-        {
-            get { return LegacyUmbracoSettings.ForceSafeAliases; }
-            set { LegacyUmbracoSettings.ForceSafeAliases = value; }
+            //Now configure some defaults - the defaults in the config section classes do NOT pertain to the mocked data!!
+            settings.Setup(x => x.Content.UseLegacyXmlSchema).Returns(false);
+            settings.Setup(x => x.Content.ForceSafeAliases).Returns(true);
+            settings.Setup(x => x.Content.ImageAutoFillProperties).Returns(ContentImagingElement.GetDefaultImageAutoFillProperties());
+            settings.Setup(x => x.Content.ImageFileTypes).Returns(ContentImagingElement.GetDefaultImageFileTypes());
+            settings.Setup(x => x.RequestHandler.AddTrailingSlash).Returns(true);
+            settings.Setup(x => x.RequestHandler.UseDomainPrefixes).Returns(false);
+            settings.Setup(x => x.RequestHandler.CharCollection).Returns(RequestHandlerElement.GetDefaultCharReplacements());
+            settings.Setup(x => x.Content.UmbracoLibraryCacheDuration).Returns(1800);
+            settings.Setup(x => x.WebRouting.UrlProviderMode).Returns("AutoLegacy");
+            settings.Setup(x => x.Templates.DefaultRenderingEngine).Returns(RenderingEngine.Mvc);
+            
+            return settings.Object;
         }
 
         // from appSettings
@@ -111,7 +149,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static void Reset()
         {
-            LegacyUmbracoSettings.Reset();
+            ResetUmbracoSettings();
             GlobalSettings.Reset();
 
             foreach (var kvp in SavedAppSettings)
@@ -120,6 +158,24 @@ namespace Umbraco.Tests.TestHelpers
             // set some defaults that are wrong in the config file?!
             // this is annoying, really
             HideTopLevelNodeFromPath = false;
+        }
+
+        /// <summary>
+        /// This sets all settings back to default settings
+        /// </summary>
+        private static void ResetUmbracoSettings()
+        {
+            ConfigureSettings(GetDefault());
+        }
+
+        internal static IUmbracoSettingsSection GetDefault()
+        {
+            var config = new FileInfo(TestHelper.MapPathForTest("~/Configurations/UmbracoSettings/web.config"));
+
+            var fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = config.FullName };
+            var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
+
+            return configuration.GetSection("umbracoConfiguration/defaultSettings") as UmbracoSettingsSection;
         }
     }
 }

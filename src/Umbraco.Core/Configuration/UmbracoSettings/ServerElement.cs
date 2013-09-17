@@ -1,8 +1,8 @@
 ﻿namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ServerElement : InnerTextConfigurationElement<string>
+    internal class ServerElement : InnerTextConfigurationElement<string>, IServer
     {
-        internal string ForcePortnumber
+        public string ForcePortnumber
         {
             get
             {
@@ -12,7 +12,7 @@
             }
         }
 
-        internal string ForceProtocol
+        public string ForceProtocol
         {
             get
             {
@@ -20,6 +20,11 @@
                            ? null
                            : RawXml.Attribute("forceProtocol").Value;
             }
+        }  
+
+        string IServer.ServerAddress
+        {
+            get { return Value; }
         }
     }
 }

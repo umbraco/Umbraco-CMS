@@ -3,8 +3,13 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class RepositoriesCollection : ConfigurationElementCollection, IEnumerable<RepositoryElement>
+    internal class RepositoriesCollection : ConfigurationElementCollection, IEnumerable<IRepository>
     {
+        internal void Add(RepositoryElement item)
+        {
+            BaseAdd(item);
+        }
+
         protected override ConfigurationElement CreateNewElement()
         {
             return new RepositoryElement();
@@ -15,11 +20,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             return ((RepositoryElement)element).Id;
         }
 
-        IEnumerator<RepositoryElement> IEnumerable<RepositoryElement>.GetEnumerator()
+        IEnumerator<IRepository> IEnumerable<IRepository>.GetEnumerator()
         {
             for (var i = 0; i < Count; i++)
             {
-                yield return BaseGet(i) as RepositoryElement;
+                yield return BaseGet(i) as IRepository;
             }
         }
 

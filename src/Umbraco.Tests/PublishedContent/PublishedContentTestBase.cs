@@ -25,9 +25,9 @@ namespace Umbraco.Tests.PublishedContent
                     if (propertyAlias.InvariantEquals("content"))
                     {
                         //return the rte type id
-                        return Guid.Parse(Constants.PropertyEditors.TinyMCEv3);
+                        return Constants.PropertyEditors.TinyMCEv3Alias;
                     }
-                    return Guid.Empty;
+                    return string.Empty;
                 };
 
             var rCtx = GetRoutingContext("/test", 1234);
@@ -37,12 +37,12 @@ namespace Umbraco.Tests.PublishedContent
 
         protected override void FreezeResolution()
         {
-            PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
+            PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
                 new[]
                     {
-                        typeof(DatePickerPropertyEditorValueConverter),
-                        typeof(TinyMcePropertyEditorValueConverter),
-                        typeof(YesNoPropertyEditorValueConverter)
+                        typeof(DatePickerPropertyValueConverter),
+                        typeof(TinyMcePropertyValueConverter),
+                        typeof(YesNoPropertyValueConverter)
                     });    
 
             PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(

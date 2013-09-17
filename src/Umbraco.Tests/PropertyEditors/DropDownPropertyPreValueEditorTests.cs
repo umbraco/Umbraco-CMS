@@ -26,7 +26,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             var result = editor.FormatValueForCache(
                 new Property(1, Guid.NewGuid(),
-                             new PropertyType(new DataTypeDefinition(1, Guid.NewGuid())),
+                             new PropertyType(new DataTypeDefinition(1, "Test.TestEditor")),
                              "1234,4567,8910"));
 
             Assert.AreEqual("1234,4567,8910", result);
@@ -48,7 +48,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             var result = editor.FormatValueForCache(
                 new Property(1, Guid.NewGuid(),
-                             new PropertyType(new DataTypeDefinition(1, Guid.NewGuid())),
+                             new PropertyType(new DataTypeDefinition(1, "Test.TestEditor")),
                              "1234,4567,8910"));
 
             Assert.AreEqual("Value 1,Value 2,Value 3", result);
@@ -70,7 +70,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             var result = editor.FormatValueForCache(
                 new Property(1, Guid.NewGuid(),
-                             new PropertyType(new DataTypeDefinition(1, Guid.NewGuid())),
+                             new PropertyType(new DataTypeDefinition(1, "Test.TestEditor")),
                              "1234"));
 
             Assert.AreEqual("Value 2", result);

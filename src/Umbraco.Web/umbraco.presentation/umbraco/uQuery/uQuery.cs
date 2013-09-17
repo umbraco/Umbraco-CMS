@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Xml;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
 using umbraco;
@@ -106,7 +107,7 @@ namespace umbraco
 
 			try
 			{
-				isLegacyXmlSchema = UmbracoSettings.UseLegacyXmlSchema;
+				isLegacyXmlSchema = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema;
 			}
 			catch (MissingMethodException)
 			{

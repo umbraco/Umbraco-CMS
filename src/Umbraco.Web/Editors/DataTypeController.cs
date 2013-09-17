@@ -47,22 +47,22 @@ namespace Umbraco.Web.Editors
 
         public DataTypeDisplay GetEmpty()
         {
-            var dt = new DataTypeDefinition(-1, Guid.Empty);
+            var dt = new DataTypeDefinition(-1, "");
             return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dt);
         }
 
         /// <summary>
         /// Returns the pre-values for the specified property editor
         /// </summary>
-        /// <param name="editorId"></param>
+        /// <param name="editorAlias"></param>
         /// <param name="dataTypeId">The data type id for the pre-values, -1 if it is a new data type</param>
         /// <returns></returns>
-        public IEnumerable<PreValueFieldDisplay> GetPreValues(Guid editorId, int dataTypeId = -1)
+        public IEnumerable<PreValueFieldDisplay> GetPreValues(string editorAlias, int dataTypeId = -1)
         {
-            var propEd = PropertyEditorResolver.Current.GetById(editorId);
+            var propEd = PropertyEditorResolver.Current.GetByAlias(editorAlias);
             if (propEd == null)
             {
-                throw new InvalidOperationException("Could not find property editor with id " + editorId);
+                throw new InvalidOperationException("Could not find property editor with alias " + editorAlias);
             }
 
             if (dataTypeId == -1)
@@ -81,7 +81,7 @@ namespace Umbraco.Web.Editors
             //now, lets check if the data type has the current editor selected, if that is true
             //we will need to wire up it's saved values. Otherwise it's an existing data type
             //that is changing it's underlying property editor, in which case there's no values.
-            if (dataType.ControlId == editorId)
+            if (dataType.PropertyEditorAlias == editorAlias)
             {
                 //this is the currently assigned pre-value editor, return with values.
                 return Mapper.Map<IDataTypeDefinition, IEnumerable<PreValueFieldDisplay>>(dataType);

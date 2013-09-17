@@ -6,12 +6,11 @@
     $scope.preview = "";
     $scope.success = false;
     
-    $scope.preview = function(){
+    $scope.showPreview = function(){
 
         if ($scope.url != "") {
             
             $scope.preview = "<div class=\"umb-loader\">";
-            
             $scope.success = false;
 
             $http({ method: 'GET', url: '/umbraco/UmbracoApi/RteEmbed/GetEmbed', params: { url: $scope.url, width: $scope.width, height: $scope.height } })

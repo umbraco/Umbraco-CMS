@@ -4,6 +4,7 @@ using System.Data;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.XPath;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.Templates;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.propertytype;
@@ -464,7 +465,7 @@ namespace umbraco.presentation.nodeFactory
                     if (_pageXmlNode.Attributes.GetNamedItem("writerID") != null)
                         _writerID = int.Parse(_pageXmlNode.Attributes.GetNamedItem("writerID").Value);
 
-                    if (UmbracoSettings.UseLegacyXmlSchema)
+                    if (UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
                     {
                         if (_pageXmlNode.Attributes.GetNamedItem("nodeTypeAlias") != null)
                             _nodeTypeAlias = _pageXmlNode.Attributes.GetNamedItem("nodeTypeAlias").Value;
@@ -485,12 +486,12 @@ namespace umbraco.presentation.nodeFactory
                 }
 
                 // load data
-                string dataXPath = UmbracoSettings.UseLegacyXmlSchema ? "data" : "* [not(@isDoc)]";
+                string dataXPath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "data" : "* [not(@isDoc)]";
                 foreach (XmlNode n in _pageXmlNode.SelectNodes(dataXPath))
                     _properties.Add(new Property(n));
 
                 // load children
-                string childXPath = UmbracoSettings.UseLegacyXmlSchema ? "node" : "* [@isDoc]";
+                string childXPath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "node" : "* [@isDoc]";
                 XPathNavigator nav = _pageXmlNode.CreateNavigator();
                 XPathExpression expr = nav.Compile(childXPath);
                 expr.AddSort("@sortOrder", XmlSortOrder.Ascending, XmlCaseOrder.None, "", XmlDataType.Number);
@@ -568,7 +569,7 @@ namespace umbraco.presentation.nodeFactory
                 // For backward compatibility with 2.x (the version attribute has been removed from 3.0 data nodes)
                 if (PropertyXmlData.Attributes.GetNamedItem("versionID") != null)
                     _version = new Guid(PropertyXmlData.Attributes.GetNamedItem("versionID").Value);
-                _alias = UmbracoSettings.UseLegacyXmlSchema ?
+                _alias = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ?
                     PropertyXmlData.Attributes.GetNamedItem("alias").Value :
                     PropertyXmlData.Name;
                 _value = xmlHelper.GetNodeValue(PropertyXmlData);

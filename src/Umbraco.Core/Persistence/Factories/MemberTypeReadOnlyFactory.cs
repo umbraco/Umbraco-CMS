@@ -71,7 +71,7 @@ namespace Umbraco.Core.Persistence.Factories
                     memberType.MemberTypePropertyTypes.Add(propTypeDto.Alias,
                         new Tuple<bool, bool, int>(propTypeDto.CanEdit, propTypeDto.ViewOnProfile, propTypeDto.Id.Value));
                     //PropertyType Collection
-                    propertyTypeCollection.Add(new PropertyType(propTypeDto.ControlId,
+                    propertyTypeCollection.Add(new PropertyType(propTypeDto.PropertyEditorAlias,
                         propTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
                                                {
                                                    Alias = propTypeDto.Alias,
@@ -105,7 +105,7 @@ namespace Umbraco.Core.Persistence.Factories
                 memberType.MemberTypePropertyTypes.Add(propertyType.Alias,
                     new Tuple<bool, bool, int>(propertyType.CanEdit, propertyType.ViewOnProfile, propertyType.Id.Value));
                 //PropertyType Collection
-                propertyTypes.Add(new PropertyType(propertyType.ControlId,
+                propertyTypes.Add(new PropertyType(propertyType.PropertyEditorAlias,
                     propertyType.DbType.EnumParse<DataTypeDatabaseType>(true))
                                   {
                                       Alias = propertyType.Alias,

@@ -21,23 +21,10 @@ namespace Umbraco.Web.Models.Mapping
         /// <returns></returns>
         protected override T ConvertCore(Property property)
         {
-            var editor = PropertyEditorResolver.Current.GetById(property.PropertyType.DataTypeId);
+            var editor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
             if (editor == null)
             {
-                //TODO: Remove this check as we shouldn't support this at all!
-                var legacyEditor = DataTypesResolver.Current.GetById(property.PropertyType.DataTypeId);
-                if (legacyEditor == null)
-                {
-                    throw new NullReferenceException("The property editor with id " + property.PropertyType.DataTypeId + " does not exist");
-                }
-
-                var legacyResult = new T
-                    {
-                        Id = property.Id,
-                        Value = property.Value == null ? "" : property.Value.ToString(),
-                        Alias = property.Alias
-                    };
-                return legacyResult;
+                throw new NullReferenceException("The property editor with alias " + property.PropertyType.PropertyEditorAlias + " does not exist");
             }
             var result = new T
                 {

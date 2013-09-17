@@ -77,8 +77,14 @@ namespace umbraco.presentation.developer.packages {
             if (Page.IsValid) {
 
                 try {
-                    cms.businesslogic.packager.repositories.Repository repo = cms.businesslogic.packager.repositories.Repository.getByGuid(dd_repositories.SelectedValue);
-                    string memberKey = repo.Webservice.authenticate(tb_email.Text, library.md5(tb_password.Text));
+                    var repo = cms.businesslogic.packager.repositories.Repository.getByGuid(dd_repositories.SelectedValue);
+
+                    if (repo == null)
+                    {
+                        throw new InvalidOperationException("Could not find repository with id " + dd_repositories.SelectedValue);
+                    }
+                    
+                    var memberKey = repo.Webservice.authenticate(tb_email.Text, library.md5(tb_password.Text));
 
                     byte[] doc = new byte[0];
 

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.PropertyEditors;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
@@ -168,9 +170,14 @@ function openMedia(id) {
         {
             foreach (var property in entity.UmbracoProperties)
             {
-                if (LinkableMediaDataTypes.Contains(property.DataTypeControlId) &&
-                    string.IsNullOrEmpty(property.Value) == false)
-                    return property.Value;
+                //required for backwards compatibility with v7 with changing the GUID -> alias
+                var controlId = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(property.PropertyEditorAlias);
+                if (controlId != null)
+                {
+                    if (LinkableMediaDataTypes.Contains(controlId.Value) &&
+                       string.IsNullOrEmpty(property.Value) == false)
+                        return property.Value;   
+                }                
             }
             return "";
         }

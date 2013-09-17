@@ -8,7 +8,6 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Configuration;
 
 using umbraco;
 using umbraco.cms.businesslogic.web;
@@ -533,7 +532,7 @@ namespace Umbraco.Web.Routing
 			// does not apply
             // + optionnally, apply the alternate template on internal redirects
             var useAltTemplate = _pcr.IsInitialPublishedContent
-                || (LegacyUmbracoSettings.For<WebRouting>().InternalRedirectPreservesTemplate && _pcr.IsInternalRedirectPublishedContent);
+                || (UmbracoConfiguration.Current.UmbracoSettings.WebRouting.InternalRedirectPreservesTemplate && _pcr.IsInternalRedirectPublishedContent);
             string altTemplate = useAltTemplate
                 ? _routingContext.UmbracoContext.HttpContext.Request[Constants.Conventions.Url.AltTemplate]
 				: null;

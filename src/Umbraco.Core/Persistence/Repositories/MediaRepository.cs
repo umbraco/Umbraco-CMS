@@ -330,11 +330,11 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override void PersistDeletedItem(IMedia entity)
         {
             var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            var uploadFieldId = new Guid(Constants.PropertyEditors.UploadField);
+            
             //Loop through properties to check if the media item contains images/file that should be deleted
             foreach (var property in entity.Properties)
             {
-                if (property.PropertyType.DataTypeId == uploadFieldId &&
+                if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias &&
                     string.IsNullOrEmpty(property.Value.ToString()) == false
                     && fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
                 {
@@ -342,7 +342,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);
 
                     // don't want to delete the media folder if not using directories.
-                    if (LegacyUmbracoSettings.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
+                    if (UmbracoConfiguration.Current.UmbracoSettings.Content.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
                     {
                         //issue U4-771: if there is a parent directory the recursive parameter should be true
                         fs.DeleteDirectory(parentDirectory, String.IsNullOrEmpty(parentDirectory) == false);

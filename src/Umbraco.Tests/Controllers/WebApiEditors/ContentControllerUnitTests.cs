@@ -1,23 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Web.Http;
-using System.Web.Http.Controllers;
-using System.Web.Http.SelfHost;
 using NUnit.Framework;
 using Rhino.Mocks;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
 using Umbraco.Web.Editors;
-using Umbraco.Web.WebApi;
-using Umbraco.Web.WebApi.Filters;
-using umbraco.presentation.channels.businesslogic;
 
 namespace Umbraco.Tests.Controllers.WebApiEditors
 {

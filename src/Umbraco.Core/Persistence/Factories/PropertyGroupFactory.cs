@@ -55,7 +55,7 @@ namespace Umbraco.Core.Persistence.Factories
                 foreach (var typeDto in typeDtos)
                 {
                     var tempGroupDto = groupDto;
-                    var propertyType = new PropertyType(typeDto.DataTypeDto.ControlId,
+                    var propertyType = new PropertyType(typeDto.DataTypeDto.PropertyEditorAlias,
                                                              typeDto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
                                                 {
                                                     Alias = typeDto.Alias,

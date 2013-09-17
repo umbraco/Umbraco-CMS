@@ -295,7 +295,6 @@
     <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Cache\UserPermissionsCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
-    <Compile Include="Configuration\WebRouting.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Editors\ContentController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
@@ -309,6 +308,7 @@
     <Compile Include="Editors\MediaPostValidateAttribute.cs" />
     <Compile Include="Editors\MemberController.cs" />
     <Compile Include="Editors\UserController.cs" />
+    <Compile Include="Install\Steps\MajorUpgradeReport.cs" />
     <Compile Include="Models\ContentEditing\Control.cs" />
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\DataTypeSave.cs" />
@@ -332,10 +332,11 @@
     <Compile Include="PropertyEditors\DropDownMultiplePropertyEditor.cs" />
     <Compile Include="PropertyEditors\FolderBrowserPropertyEditor.cs" />
     <Compile Include="PropertyEditors\IntegerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MediaPicker.cs" />
+    <Compile Include="PropertyEditors\MediaPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultipleTextStringPropertyEditor.cs" />
     <Compile Include="PropertyEditors\PublishValuesMultipleValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownMultipleWithKeysPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\RadioButtonsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\UserPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ValueListPreValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownPropertyEditor.cs" />
@@ -485,11 +486,7 @@
     <Compile Include="Models\PartialViewMacroModel.cs" />
     <Compile Include="Models\PublishedContentBase.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
-    <Compile Include="BaseRest\Configuration\BaseRestSection.cs" />
     <Compile Include="BaseRest\BaseRestHandler.cs" />
-    <Compile Include="BaseRest\Configuration\ExtensionElement.cs" />
-    <Compile Include="BaseRest\Configuration\ExtensionElementCollection.cs" />
-    <Compile Include="BaseRest\Configuration\MethodElement.cs" />
     <Compile Include="BaseRest\MemberRest.cs" />
     <Compile Include="BaseRest\RestExtensionAttribute.cs" />
     <Compile Include="BaseRest\RestExtensionMethodAttribute.cs" />
@@ -610,7 +607,7 @@
     <Compile Include="Mvc\SurfaceControllerFactory.cs" />
     <Compile Include="Mvc\PluginControllerMetadata.cs" />
     <Compile Include="Mvc\UmbracoPageResult.cs" />
-    <Compile Include="PropertyEditors\RteMacroRenderingPropertyEditorValueConverter.cs" />
+    <Compile Include="PropertyEditors\RteMacroRenderingPropertyValueConverter.cs" />
     <Compile Include="RenderFieldCaseType.cs" />
     <Compile Include="RenderFieldEncodingType.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
@@ -1852,13 +1849,6 @@
     <Compile Include="umbraco.presentation\umbraco\Web\UI\ContentPage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltCommon.cs" />
-    <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltDatesAndTimes.cs" />
-    <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltMath.cs" />
-    <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltNodeList.cs" />
-    <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltRegularExpressions.cs" />
-    <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltSets.cs" />
-    <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltStrings.cs" />
     <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery.cs" />
     <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-Content.cs">
       <DependentUpon>uQuery.cs</DependentUpon>

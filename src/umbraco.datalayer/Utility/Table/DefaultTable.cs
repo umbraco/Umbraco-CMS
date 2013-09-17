@@ -7,6 +7,7 @@ namespace umbraco.DataLayer.Utility.Table
     /// <summary>
     /// Default implementation of the <see cref="DefaultTable"/> interface.
     /// </summary>
+    [Obsolete("The legacy installers are no longer used and will be removed from the codebase in the future")]
     public class DefaultTable : ITable
     {
         #region Private Fields

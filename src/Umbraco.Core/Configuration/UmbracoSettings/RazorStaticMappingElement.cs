@@ -2,9 +2,9 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class RazorStaticMappingElement : InnerTextConfigurationElement<string>
-    {     
-        internal Guid DataTypeGuid
+    internal class RazorStaticMappingElement : InnerTextConfigurationElement<string>, IRazorStaticMapping
+    {
+        public Guid DataTypeGuid
         {
             get
             {
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        internal string NodeTypeAlias
+        public string NodeTypeAlias
         {
             get
             {
@@ -24,15 +24,19 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        internal string DocumentTypeAlias
+        public string PropertyTypeAlias
         {
             get
             {
-                return RawXml.Attribute("documentTypeAlias") == null
+                return RawXml.Attribute("propertyTypeAlias") == null
                            ? null
-                           : RawXml.Attribute("documentTypeAlias").Value;
+                           : RawXml.Attribute("propertyTypeAlias").Value;
             }
         }
 
+        string IRazorStaticMapping.MappingName
+        {
+            get { return Value; }
+        }
     }
 }

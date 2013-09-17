@@ -2,28 +2,28 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ScheduledTaskElement : ConfigurationElement
+    internal class ScheduledTaskElement : ConfigurationElement, IScheduledTask
     {
         [ConfigurationProperty("alias")]
-        internal string Alias
+        public string Alias
         {
             get { return (string)base["alias"]; }
         }
 
         [ConfigurationProperty("log")]
-        internal bool Log
+        public bool Log
         {
             get { return (bool)base["log"]; }
         }
 
         [ConfigurationProperty("interval")]
-        internal int Interval
+        public int Interval
         {
             get { return (int)base["interval"]; }
         }
 
         [ConfigurationProperty("url")]
-        internal string Url
+        public string Url
         {
             get { return (string)base["url"]; }
         }

@@ -38,6 +38,11 @@ namespace Umbraco.Web.UI.Install.Steps.Skinning
 		{
 			base.OnInit(e);
 
+            if (_repo == null)
+            {
+                throw new InvalidOperationException("Could not find repository with id " + RepoGuid);
+            }
+
 			if (_repo.HasConnection())
 			{
 				try
@@ -130,7 +135,6 @@ namespace Umbraco.Web.UI.Install.Steps.Skinning
 						if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus))
 						{
                             GlobalSettings.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
-							Application["umbracoNeedConfiguration"] = false;
 						}
 					}
 					catch

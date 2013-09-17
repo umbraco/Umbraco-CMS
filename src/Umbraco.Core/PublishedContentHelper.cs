@@ -6,8 +6,10 @@ using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using log4net.Util.TypeConverters;
 
 namespace Umbraco.Core
 {
@@ -34,9 +36,9 @@ namespace Umbraco.Core
         /// <summary>
         /// This callback is used only for unit tests which enables us to return any data we want and not rely on having the data in a database
         /// </summary>
-        internal static Func<string, string, Guid> GetDataTypeCallback = null;
+        internal static Func<string, string, string> GetDataTypeCallback = null;
 
-        private static readonly ConcurrentDictionary<Tuple<string, string, PublishedItemType>, Guid> PropertyTypeCache = new ConcurrentDictionary<Tuple<string, string, PublishedItemType>, Guid>();
+        private static readonly ConcurrentDictionary<Tuple<string, string, PublishedItemType>, string> PropertyTypeCache = new ConcurrentDictionary<Tuple<string, string, PublishedItemType>, string>();
 
         /// <summary>
         /// Return the GUID Id for the data type assigned to the document type with the property alias
@@ -46,7 +48,7 @@ namespace Umbraco.Core
         /// <param name="propertyAlias"></param>
         /// <param name="itemType"></param>
         /// <returns></returns>
-        internal static Guid GetDataType(ApplicationContext applicationContext, string docTypeAlias, string propertyAlias, PublishedItemType itemType)
+        internal static string GetPropertyEditor(ApplicationContext applicationContext, string docTypeAlias, string propertyAlias, PublishedItemType itemType)
         {
             if (GetDataTypeCallback != null)
                 return GetDataTypeCallback(docTypeAlias, propertyAlias);
@@ -67,41 +69,69 @@ namespace Umbraco.Core
                             throw new ArgumentOutOfRangeException("itemType");
                     }
                     
-                    if (result == null) return Guid.Empty;
+                    if (result == null) return string.Empty;
                     
                     //SD: we need to check for 'any' here because the collection is backed by KeyValuePair which is a struct
                     // and can never be null so FirstOrDefault doesn't actually work. Have told Seb and Morten about thsi 
                     // issue.
                     if (!result.CompositionPropertyTypes.Any(x => x.Alias.InvariantEquals(propertyAlias)))
                     {
-                        return Guid.Empty;
+                        return string.Empty;
                     }
                     var property = result.CompositionPropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyAlias));
                     //as per above, this will never be null but we'll keep the check here anyways.
-                    if (property == null) return Guid.Empty;
-                    return property.DataTypeId;
+                    if (property == null) return string.Empty;
+                    return property.PropertyEditorAlias;
                 });
 		}
 
-		/// <summary>
-		/// Converts the currentValue to a correctly typed value based on known registered converters, then based on known standards.
-		/// </summary>
-		/// <param name="currentValue"></param>
-		/// <param name="dataType"></param>
-		/// <param name="docTypeAlias"></param>
-		/// <param name="propertyTypeAlias"></param>
-		/// <returns></returns>
-		internal static Attempt<object> ConvertPropertyValue(object currentValue, Guid dataType, string docTypeAlias, string propertyTypeAlias)
+        /// <summary>
+        /// Converts the currentValue to a correctly typed value based on known registered converters, then based on known standards.
+        /// </summary>
+        /// <param name="currentValue"></param>
+        /// <param name="propertyDefinition"></param>
+        /// <returns></returns>
+        internal static Attempt<object> ConvertPropertyValue(object currentValue, PublishedPropertyDefinition propertyDefinition)
 		{
 			if (currentValue == null) return Attempt<object>.Fail();
 
+            //First, we need to check the v7+ PropertyValueConverters
+		    var converters = PropertyValueConvertersResolver.Current.Converters
+                                                            .Where(x => x.AssociatedPropertyEditorAlias == propertyDefinition.PropertyEditorAlias)
+		                                                    .ToArray();
+            if (converters.Any())
+            {
+                if (converters.Count() > 1)
+                {
+                    throw new NotSupportedException("Only one " + typeof(PropertyValueConverter) + " can be registered for the property editor: " + propertyDefinition.PropertyEditorAlias);
+                }
+                var result = converters.Single().ConvertSourceToObject(
+                    currentValue,
+                    propertyDefinition, 
+                    false);
+
+                //if it is good return it, otherwise we'll continue processing the legacy stuff below.
+                if (result.Success)
+                {
+                    return new Attempt<object>(true, result.Result);
+                }
+            }
+
+            //In order to maintain backwards compatibility here with IPropertyEditorValueConverter we need to attempt to lookup the 
+            // legacy GUID for the current property editor. If one doesn't exist then we will abort the conversion.
+            var legacyId = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(propertyDefinition.PropertyEditorAlias);
+            if (legacyId.HasValue == false)
+            {
+                return Attempt<object>.False;
+            }
+
 			//First lets check all registered converters for this data type.			
-			var converters = PropertyEditorValueConvertersResolver.Current.Converters
-				.Where(x => x.IsConverterFor(dataType, docTypeAlias, propertyTypeAlias))
+			var legacyConverters = PropertyEditorValueConvertersResolver.Current.Converters
+                .Where(x => x.IsConverterFor(legacyId.Value, propertyDefinition.DocumentTypeAlias, propertyDefinition.PropertyTypeAlias))
 				.ToArray();
 
 			//try to convert the value with any of the converters:
-			foreach (var converted in converters
+			foreach (var converted in legacyConverters
 				.Select(p => p.ConvertPropertyValue(currentValue))
 				.Where(converted => converted.Success))
 			{
@@ -144,8 +174,8 @@ namespace Umbraco.Core
 					var documentElement = e.Name.LocalName;
 
 					//TODO: See note against this setting, pretty sure we don't need this
-					if (!LegacyUmbracoSettings.NotDynamicXmlDocumentElements.Any(
-						tag => string.Equals(tag, documentElement, StringComparison.CurrentCultureIgnoreCase)))
+                    if (UmbracoConfiguration.Current.UmbracoSettings.Scripting.NotDynamicXmlDocumentElements.Any(
+                        tag => string.Equals(tag.Element, documentElement, StringComparison.CurrentCultureIgnoreCase)) == false)
 					{
 						return Attempt<object>.Succeed(new DynamicXml(e));
 					}

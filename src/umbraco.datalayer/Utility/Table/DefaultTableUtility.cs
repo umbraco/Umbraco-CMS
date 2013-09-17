@@ -16,6 +16,7 @@ namespace umbraco.DataLayer.Utility.Table
     /// Default implementation of the <see cref="ITableUtility"/> interface.
     /// </summary>
     /// <typeparam name="S">The type of SQL helper.</typeparam>
+    [Obsolete("The legacy installers are no longer used and will be removed from the codebase in the future")]
     public class DefaultTableUtility<S> : BaseUtility<S>, ITableUtility where S : ISqlHelper
     {
         /// <summary>

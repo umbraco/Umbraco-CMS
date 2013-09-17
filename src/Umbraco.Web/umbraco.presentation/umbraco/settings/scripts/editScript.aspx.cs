@@ -11,6 +11,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.IO;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.cms.presentation.Trees;
 using System.Linq;
@@ -49,34 +50,34 @@ namespace umbraco.cms.presentation.settings.scripts
 
             string path = "";
             if (file.StartsWith("~/"))
-                path = Umbraco.Core.IO.IOHelper.ResolveUrl(file);
+                path = IOHelper.ResolveUrl(file);
             else
-                path = Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Scripts + "/" + file);
+                path = IOHelper.ResolveUrl(SystemDirectories.Scripts + "/" + file);
 
 
             lttPath.Text = "<a target='_blank' href='" + path + "'>" + path + "</a>";
 
-            var exts = UmbracoSettings.ScriptFileTypes.Split(',').ToList();
-            if (Umbraco.Core.Configuration.LegacyUmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
+            var exts = UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptFileTypes.ToList();
+            if (UmbracoConfiguration.Current.UmbracoSettings.Templates.DefaultRenderingEngine == RenderingEngine.Mvc)
             {
                 exts.Add("cshtml");
                 exts.Add("vbhtml");
             }
 
-            var dirs = Umbraco.Core.IO.SystemDirectories.Scripts;
-            if (Umbraco.Core.Configuration.LegacyUmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
-                dirs += "," + Umbraco.Core.IO.SystemDirectories.MvcViews;
+            var dirs = SystemDirectories.Scripts;
+            if (UmbracoConfiguration.Current.UmbracoSettings.Templates.DefaultRenderingEngine == RenderingEngine.Mvc)
+                dirs += "," + SystemDirectories.MvcViews;
 
             // validate file
-            Umbraco.Core.IO.IOHelper.ValidateEditPath(Umbraco.Core.IO.IOHelper.MapPath(path), dirs.Split(','));
+            IOHelper.ValidateEditPath(IOHelper.MapPath(path), dirs.Split(','));
 
             // validate extension
-            Umbraco.Core.IO.IOHelper.ValidateFileExtension(Umbraco.Core.IO.IOHelper.MapPath(path), exts);
+            IOHelper.ValidateFileExtension(IOHelper.MapPath(path), exts);
 
 
             StreamReader SR;
             string S;
-            SR = File.OpenText(Umbraco.Core.IO.IOHelper.MapPath(path));
+            SR = File.OpenText(IOHelper.MapPath(path));
             S = SR.ReadToEnd();
             SR.Close();
 

@@ -9,6 +9,7 @@ using Examine.LuceneEngine.SearchCriteria;
 using Examine.Providers;
 using Lucene.Net.Documents;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -252,7 +253,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			if (xpath == null) throw new ArgumentNullException("xpath");
 
 			var values = new Dictionary<string, string> {{"nodeName", xpath.GetAttribute("nodeName", "")}};
-			if (!UmbracoSettings.UseLegacyXmlSchema)
+			if (!UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
 			{
 				values.Add("nodeTypeAlias", xpath.Name);
 			}

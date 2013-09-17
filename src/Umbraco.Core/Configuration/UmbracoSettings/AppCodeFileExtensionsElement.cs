@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System.Collections.Generic;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
@@ -6,10 +7,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
     {
         [ConfigurationCollection(typeof(AppCodeFileExtensionsCollection), AddItemName = "ext")]
         [ConfigurationProperty("", IsDefaultCollection = true)]
-        public AppCodeFileExtensionsCollection AppCodeFileExtensionsCollection
+        internal AppCodeFileExtensionsCollection AppCodeFileExtensionsCollection
         {
             get { return (AppCodeFileExtensionsCollection)base[""]; }
             set { base[""] = value; }
         }
+
     }
 }

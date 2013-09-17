@@ -18,6 +18,11 @@ namespace Umbraco.Web.Install
                 return false;
             }
         }
+
+        /// <summary>
+        /// Determine if the installer should skip this step, if it returns true then it is assumed this step is already complete.
+        /// </summary>
+        /// <returns></returns>
         public abstract bool Completed();
 
 

@@ -45,25 +45,6 @@ namespace Umbraco.Tests.TestHelpers
         }
 
 		/// <summary>
-		/// Initializes a new database
-		/// </summary>
-		public static void InitializeDatabase()
-		{
-            ConfigurationManager.AppSettings.Set(Core.Configuration.GlobalSettings.UmbracoConnectionName, @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf;Flush Interval=1;File Access Retry Timeout=10");
-
-			ClearDatabase();
-            
-            var databaseSettings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
-            var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false);
-
-			var installer = dataHelper.Utility.CreateInstaller();
-			if (installer.CanConnect)
-			{
-				installer.Install();
-			}
-		}
-
-		/// <summary>
 		/// Gets the current assembly directory.
 		/// </summary>
 		/// <value>The assembly directory.</value>
@@ -132,8 +113,8 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-
-	    public static void EnsureUmbracoSettingsConfig()
+        //TODO: With the new config updates, I'm pretty sure this isn't needed?
+        public static void EnsureUmbracoSettingsConfig()
         {
             var currDir = new DirectoryInfo(CurrentAssemblyDirectory);
 
@@ -150,8 +131,8 @@ namespace Umbraco.Tests.TestHelpers
                         .GetFiles("umbracoSettings.Release.config").First().FullName,
                     Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
                     true);
-            
-            Core.Configuration.LegacyUmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
+
+            //Core.Configuration.LegacyUmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
         }
 
 	    public static void CleanUmbracoSettingsConfig()

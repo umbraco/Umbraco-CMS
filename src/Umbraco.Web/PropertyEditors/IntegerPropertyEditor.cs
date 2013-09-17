@@ -3,7 +3,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.Integer, "Numeric", "integer")]
+    [PropertyEditor(Constants.PropertyEditors.IntegerAlias, "Numeric", "integer")]
     public class IntegerPropertyEditor : PropertyEditor
     {
         /// <summary>

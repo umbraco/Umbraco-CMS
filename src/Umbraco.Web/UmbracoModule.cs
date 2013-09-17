@@ -17,7 +17,6 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using umbraco;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
-using Umbraco.Web.Configuration;
 using ObjectExtensions = Umbraco.Core.ObjectExtensions;
 using RenderingEngine = Umbraco.Core.RenderingEngine;
 
@@ -321,7 +320,7 @@ namespace Umbraco.Web
 			{
 				LogHelper.Warn<UmbracoModule>("Umbraco is not ready");
 
-				if (!LegacyUmbracoSettings.EnableSplashWhileLoading)
+                if (UmbracoConfiguration.Current.UmbracoSettings.Content.EnableSplashWhileLoading == false)
 				{
 					// let requests pile up and wait for 10s then show the splash anyway
 					ready = ApplicationContext.Current.WaitForReady(10 * 1000);
@@ -331,9 +330,8 @@ namespace Umbraco.Web
 				{
 					httpContext.Response.StatusCode = 503;
 
-					var bootUrl = LegacyUmbracoSettings.BootSplashPage;
-					if (string.IsNullOrWhiteSpace(bootUrl))
-						bootUrl = "~/config/splashes/booting.aspx";
+                    var bootUrl = "~/config/splashes/booting.aspx";
+					
 					httpContext.RewritePath(UriUtility.ToAbsolute(bootUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
 
 					return false;
@@ -400,7 +398,7 @@ namespace Umbraco.Web
             else if (pcr.Is404)
             {
                 response.StatusCode = 404;
-                response.TrySkipIisCustomErrors = LegacyUmbracoSettings.For<WebRouting>().TrySkipIisCustomErrors;
+                response.TrySkipIisCustomErrors = UmbracoConfiguration.Current.UmbracoSettings.WebRouting.TrySkipIisCustomErrors;
             }
 
             if (pcr.ResponseStatusCode > 0)

@@ -1,7 +1,7 @@
 ﻿{    	
 	propertyEditors: [		
 		{
-			id: "0BA0F832-D759-4526-9B3E-94BBFC98F92E",
+			alias: "MyPackage.Regex",
 			name: "Regex",
 			defaultConfig: {
 				regex: "^\\d*$"
@@ -30,7 +30,7 @@
 			}
 		},
 		{
-			id: "A24C4A00-29BF-4A57-BDE6-B1E305A96A4C",
+			alias: "MyPackage.Csv",
 			name: "CSV Editor",
 			editor: {
 				view: "~/App_Plugins/MyPackage/PropertyEditors/Views/CsvEditor.html",

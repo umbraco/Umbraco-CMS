@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
 using System.IO;
 using NUnit.Framework;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Tests.TestHelpers;
 
@@ -24,18 +25,18 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
 
             if (TestingDefaults)
             {
-                Section = configuration.GetSection("umbracoConfiguration/defaultSettings") as UmbracoSettingsSection;
+                SettingsSection = configuration.GetSection("umbracoConfiguration/defaultSettings") as UmbracoSettingsSection;
             }
             else
             {
-                Section = configuration.GetSection("umbracoConfiguration/settings") as UmbracoSettingsSection;    
+                SettingsSection = UmbracoConfiguration.For<IUmbracoSettingsSection>(configuration);
             }
 
             
 
-            Assert.IsNotNull(Section);
+            Assert.IsNotNull(SettingsSection);
         }
 
-        protected UmbracoSettingsSection Section { get; private set; }
+        protected IUmbracoSettingsSection SettingsSection { get; private set; }
     }
 }

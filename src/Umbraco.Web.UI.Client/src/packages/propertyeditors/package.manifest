@@ -1,7 +1,7 @@
 {    	
 	propertyEditors: [		
 		{
-			id: "7e062c13-7c41-4ad9-b389-41d88aeef87c",
+			alias: "MyPackage.MNTP",
 			name: "Multinode treepicker",
 			editor: {
 				view: "~/App_Plugins/propertyeditors/mntp/mntp.html"
@@ -18,14 +18,14 @@
 						}
 		},
 		{
-			id: "71b8ad1a-8dc2-425c-b6b8-faa158075e63",
+			alias: "MyPackage.RelatedLinks",
 			name: "Related links",
 			editor: {
 				view: "~/App_Plugins/propertyeditors/relatedlinks/relatedlinks.html"
 			}
 		},
 		{
-			id: "71b8ad1a-8dc2-425c-b6b8-faa158075e63",
+			alias: "MyPackage.Boolean",
 			name: "Boolean",
 			editor: {
 				view: "~/Umbraco/views/propertyeditors/boolean/boolean.html"

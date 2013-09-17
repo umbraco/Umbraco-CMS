@@ -3,6 +3,7 @@ using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Core.PropertyEditors
 {
+    [Obsolete("Use PropertyConverter instead since we no longer reference property editors by a GUID and instead by a string alias")]
 	public interface IPropertyEditorValueConverter
 	{
 
@@ -13,7 +14,7 @@ namespace Umbraco.Core.PropertyEditors
 		/// <param name="docTypeAlias"> </param>
 		/// <param name="propertyTypeAlias"> </param>
 		/// <returns></returns>
-		bool IsConverterFor(Guid propertyEditorId, string docTypeAlias, string propertyTypeAlias);
+        bool IsConverterFor(Guid propertyEditorId, string docTypeAlias, string propertyTypeAlias);
 
 		/// <summary>
 		/// Attempts to convert the value specified into a useable value on the front-end

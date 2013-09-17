@@ -233,15 +233,16 @@ namespace Umbraco.Web.Models
 				throw new InvalidOperationException("No node alias or property alias available. Unable to look up the datatype of the property you are trying to fetch.");
 			}
 
-			//get the data type id for the current property
-			var dataType = PublishedContentHelper.GetDataType(
+			//get the property editor alias for the current property
+			var propertyEditor = PublishedContentHelper.GetPropertyEditor(
                 ApplicationContext.Current,
                 userProperty.DocumentTypeAlias, 
                 userProperty.Alias,
                 ItemType);
 
 			//convert the string value to a known type
-			var converted = Umbraco.Core.PublishedContentHelper.ConvertPropertyValue(result, dataType, userProperty.DocumentTypeAlias, userProperty.Alias);
+		    var def = new PublishedPropertyDefinition(userProperty.Alias, userProperty.DocumentTypeAlias, propertyEditor);
+			var converted = PublishedContentHelper.ConvertPropertyValue(result, def);
 			if (converted.Success)
 			{
 				result = converted.Result;

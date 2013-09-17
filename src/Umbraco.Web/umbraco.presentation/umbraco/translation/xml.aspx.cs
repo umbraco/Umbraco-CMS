@@ -12,6 +12,7 @@ using System.Web.UI.HtmlControls;
 using System.Xml;
 using System.Xml.Schema;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.web;
@@ -68,7 +69,7 @@ namespace umbraco.presentation.translation
                 while (ide.MoveNext())
                 {
                     var x = (XmlElement)ide.Value;
-                    var parentXpath = UmbracoSettings.UseLegacyXmlSchema ? "//node [@id = '" + x.SelectSingleNode("//node").Attributes.GetNamedItem("parentID").Value + "']" :
+                    var parentXpath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "//node [@id = '" + x.SelectSingleNode("//node").Attributes.GetNamedItem("parentID").Value + "']" :
                         "//* [@isDoc and @id = '" + x.SelectSingleNode("//* [@isDoc]").Attributes.GetNamedItem("parentID").Value + "']";
                     var parent = _xd.SelectSingleNode(parentXpath);
 

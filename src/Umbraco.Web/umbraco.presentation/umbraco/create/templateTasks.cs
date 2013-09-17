@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -19,7 +20,7 @@ namespace umbraco
             var masterId = ParentID;
             
             var editor = "settings/editTemplate.aspx";
-            if(Umbraco.Core.Configuration.LegacyUmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Templates.DefaultRenderingEngine == RenderingEngine.Mvc)
                 editor = "settings/views/editView.aspx";
 
             if (masterId > 0)

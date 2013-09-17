@@ -1,3 +1,5 @@
+using System;
+
 namespace umbraco.DataLayer.Utility.Installer
 {
     /// <summary>
@@ -8,6 +10,7 @@ namespace umbraco.DataLayer.Utility.Installer
     /// <remarks>
     /// This also supports checking for a value in a table.
     /// </remarks>
+    [Obsolete("The legacy installers are no longer used and will be removed from the codebase in the future")]
     public struct VersionSpecs
     {
         /// <summary>The SQL statament to execute in order to test for the specified version</summary>

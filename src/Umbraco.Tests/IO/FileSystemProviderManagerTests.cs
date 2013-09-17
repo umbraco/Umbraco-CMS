@@ -5,12 +5,21 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Core.IO;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.IO
 {
     [TestFixture]
     public class FileSystemProviderManagerTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            //init the config singleton
+            var config = SettingsForTests.GetDefault();
+            SettingsForTests.ConfigureSettings(config);
+        }
+
         [Test]
         public void Can_Get_Base_File_System()
         {
@@ -33,7 +42,6 @@ namespace Umbraco.Tests.IO
 			Assert.Throws<InvalidOperationException>(() => FileSystemProviderManager.Current.GetFileSystemProvider<InvalidTypedFileSystem>());
 		}
 
-		#region
 
 	    /// <summary>
 	    /// Used in unit tests, for a typed file system we need to inherit from FileSystemWrapper and they MUST have a ctor
@@ -46,6 +54,5 @@ namespace Umbraco.Tests.IO
 		    }
 	    }
 
-	    #endregion
 	}
 }

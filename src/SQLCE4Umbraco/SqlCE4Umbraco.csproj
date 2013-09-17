@@ -73,25 +73,11 @@
     <Compile Include="SqlCEInstaller.cs" />
     <Compile Include="SqlCEParameter.cs" />
     <Compile Include="SqlCeProviderException.cs" />
-    <Compile Include="SqlCEResources1.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>SqlCEResources.resx</DependentUpon>
-    </Compile>
     <Compile Include="SqlCETableUtility.cs" />
     <Compile Include="SqlCEUtility.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Sql\Total.sql" />
     <None Include="packages.config" />
-    <None Include="Sql\Version4_1_Upgrade.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="SqlCEResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>SqlCEResources1.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\umbraco.datalayer\umbraco.datalayer.csproj">

@@ -7,6 +7,7 @@ using System.Text;
 using System.Web;
 using System.Xml;
 using System.Configuration;
+using Umbraco.Core.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic;
@@ -71,7 +72,8 @@ function openUser(id) {
             bool currUserIsAdmin = currUser.IsAdmin();
             foreach (User u in users.OrderBy(x => x.Disabled))
             {
-                if (!UmbracoSettings.HideDisabledUsersInBackoffice || (UmbracoSettings.HideDisabledUsersInBackoffice && !u.Disabled))
+                if (!UmbracoConfiguration.Current.UmbracoSettings.Security.HideDisabledUsersInBackoffice
+                    || (UmbracoConfiguration.Current.UmbracoSettings.Security.HideDisabledUsersInBackoffice && !u.Disabled))
                 {
 
                     XmlTreeNode xNode = XmlTreeNode.Create(this);

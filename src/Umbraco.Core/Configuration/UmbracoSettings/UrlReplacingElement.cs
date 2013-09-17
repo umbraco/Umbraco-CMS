@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System.Collections.Generic;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
@@ -12,10 +13,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         [ConfigurationCollection(typeof(CharCollection), AddItemName = "char")]
         [ConfigurationProperty("", IsDefaultCollection = true)]
-        public CharCollection CharCollection
+        internal CharCollection CharCollection
         {
             get { return (CharCollection)base[""]; }
+            set { base[""] = value; }
         }
-
+        
     }
 }

@@ -28,13 +28,13 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         /// <summary>
-        /// Returns a property editor by id
+        /// Returns a property editor by alias
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="alias"></param>
         /// <returns></returns>
-        public PropertyEditor GetById(Guid id)
+        public PropertyEditor GetByAlias(string alias)
         {
-            return PropertyEditors.SingleOrDefault(x => x.Id == id);
+            return PropertyEditors.SingleOrDefault(x => x.Alias == alias);
         }
     }
 }

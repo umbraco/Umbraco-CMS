@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ContentErrorPageElement : InnerTextConfigurationElement<int>
+    internal class ContentErrorPageElement : InnerTextConfigurationElement<int>, IContentErrorPage
     {
         public ContentErrorPageElement(XElement rawXml)
             : base(rawXml)
@@ -14,7 +14,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             
         }
 
-        internal string Culture
+        public int ContentId
+        {
+            get { return Value; }
+        }
+
+        public string Culture
         {
             get { return (string) RawXml.Attribute("culture"); }
             set { RawXml.Attribute("culture").Value = value; }

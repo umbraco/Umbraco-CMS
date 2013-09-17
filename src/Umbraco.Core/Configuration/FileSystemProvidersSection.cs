@@ -8,7 +8,6 @@ namespace Umbraco.Core.Configuration
 {
     public class FileSystemProvidersSection : ConfigurationSection
     {
-        private const string PROVIDERS_KEY = "providers";
 
         [ConfigurationProperty("", IsDefaultCollection = true, IsRequired = true)]
         public FileSystemProviderElementCollection Providers

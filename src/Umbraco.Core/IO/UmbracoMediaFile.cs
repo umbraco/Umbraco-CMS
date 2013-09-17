@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
 {
@@ -88,7 +89,14 @@ namespace Umbraco.Core.IO
                 ? _fs.GetExtension(Path).Substring(1).ToLowerInvariant()
                 : "";
             Url = _fs.GetUrl(Path);
+            Exists = _fs.FileExists(Path);
+            if (Exists == false)
+            {
+                LogHelper.Warn<UmbracoMediaFile>("The media file doesn't exist: " + Path);
+            }
         }
+
+        public bool Exists { get; private set; }
 
         public string Filename { get; private set; }
 
@@ -110,7 +118,14 @@ namespace Umbraco.Core.IO
             {
                 if (_length == null)
                 {
-                    _length = _fs.GetSize(Path);
+                    if (Exists)
+                    {
+                        _length = _fs.GetSize(Path);
+                    }
+                    else
+                    {
+                        _length = -1;
+                    }
                 }
                 return _length.Value;
             }
@@ -120,7 +135,7 @@ namespace Umbraco.Core.IO
         {
             get
             {
-                return ("," + LegacyUmbracoSettings.ImageFileTypes + ",").Contains(string.Format(",{0},", Extension));
+                return UmbracoConfiguration.Current.UmbracoSettings.Content.ImageFileTypes.InvariantContains(Extension);
             }
         }
 
@@ -133,37 +148,52 @@ namespace Umbraco.Core.IO
         {
             if (_size == null)
             {
-                EnsureFileSupportsResizing();
-
-                using (var fs = _fs.OpenFile(Path))
+                if (_fs.FileExists(Path))
                 {
-                    using (var image = Image.FromStream(fs))
+                    EnsureFileSupportsResizing();
+
+                    using (var fs = _fs.OpenFile(Path))
                     {
-                        var fileWidth = image.Width;
-                        var fileHeight = image.Height;                     
-                        _size = new Size(fileWidth, fileHeight);            
+                        using (var image = Image.FromStream(fs))
+                        {
+                            var fileWidth = image.Width;
+                            var fileHeight = image.Height;
+                            _size = new Size(fileWidth, fileHeight);
+                        }
                     }
                 }
+                else
+                {
+                    _size = new Size(-1, -1);
+                }                
             }
             return _size.Value;
         }
 
         public string Resize(int width, int height)
         {
-            EnsureFileSupportsResizing();
+            if (Exists)
+            {
+                EnsureFileSupportsResizing();
 
-            var fileNameThumb = DoResize(width, height, 0, string.Empty);
+                var fileNameThumb = DoResize(width, height, 0, string.Empty);
 
-            return _fs.GetUrl(fileNameThumb);
+                return _fs.GetUrl(fileNameThumb);    
+            }
+            return string.Empty;
         }
 
         public string Resize(int maxWidthHeight, string fileNameAddition)
         {
-            EnsureFileSupportsResizing();
+            if (Exists)
+            {
+                EnsureFileSupportsResizing();
 
-            var fileNameThumb = DoResize(GetDimensions().Width, GetDimensions().Height, maxWidthHeight, fileNameAddition);
+                var fileNameThumb = DoResize(GetDimensions().Width, GetDimensions().Height, maxWidthHeight, fileNameAddition);
 
-            return _fs.GetUrl(fileNameThumb);
+                return _fs.GetUrl(fileNameThumb);    
+            }
+            return string.Empty;
         }
 
         private string DoResize(int width, int height, int maxWidthHeight, string fileNameAddition)
@@ -180,7 +210,7 @@ namespace Umbraco.Core.IO
 
                     return thumbnail.FileName;
                 }
-            }
+            }    
         }
 
         private void EnsureFileSupportsResizing()

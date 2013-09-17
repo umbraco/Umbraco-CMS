@@ -10,9 +10,7 @@ namespace Umbraco.Web.UI.Install.Steps
             // Update configurationStatus
             try
             {
-
                 GlobalSettings.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
-                Application["umbracoNeedConfiguration"] = false;
             }
             catch (Exception)
             {

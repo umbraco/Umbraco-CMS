@@ -32,11 +32,8 @@ namespace Umbraco.Core.Services
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private Dictionary<string, IContentType> _importedContentTypes;
-
-        //Support recursive locks because some of the methods that require locking call other methods that require locking. 
-        //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
-        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-
+        
+        
         public PackagingService(IContentService contentService, 
             IContentTypeService contentTypeService, 
             IMediaService mediaService, 
@@ -111,7 +108,7 @@ namespace Umbraco.Core.Services
         internal XElement Export(IContent content, bool deep = false)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = LegacyUmbracoSettings.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             var xml = Export(content, nodeName);
             xml.Add(new XAttribute("nodeType", content.ContentType.Id));
@@ -317,7 +314,7 @@ namespace Umbraco.Core.Services
                     var propertyValue = property.Value;
 
                     var propertyType = contentType.PropertyTypes.FirstOrDefault(pt => pt.Alias == propertyTypeAlias);
-                    if (propertyType != null && propertyType.DataTypeId == new Guid(Constants.PropertyEditors.CheckBoxList))
+                    if (propertyType != null && propertyType.PropertyEditorAlias == Constants.PropertyEditors.CheckBoxListAlias)
                     {
                         var database = ApplicationContext.Current.DatabaseContext.Database;
                         var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNo" + "deId = @Id", new { Id = propertyType.DataTypeDefinitionId });
@@ -386,7 +383,7 @@ namespace Umbraco.Core.Services
                 var genericProperty = new XElement("GenericProperty",
                                                    new XElement("Name", propertyType.Name),
                                                    new XElement("Alias", propertyType.Alias),
-                                                   new XElement("Type", propertyType.DataTypeId.ToString()),
+                                                   new XElement("Type", propertyType.PropertyEditorAlias),
                                                    new XElement("Definition", definition.Key),
                                                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
@@ -598,27 +595,52 @@ namespace Umbraco.Core.Services
             var properties = genericPropertiesElement.Elements("GenericProperty");
             foreach (var property in properties)
             {
-                var dataTypeId = new Guid(property.Element("Type").Value);//The DataType's Control Id
                 var dataTypeDefinitionId = new Guid(property.Element("Definition").Value);//Unique Id for a DataTypeDefinition
 
                 var dataTypeDefinition = _dataTypeService.GetDataTypeDefinitionById(dataTypeDefinitionId);
+                
                 //If no DataTypeDefinition with the guid from the xml wasn't found OR the ControlId on the DataTypeDefinition didn't match the DataType Id
                 //We look up a DataTypeDefinition that matches
-                if (dataTypeDefinition == null || dataTypeDefinition.ControlId != dataTypeId)
+                if (dataTypeDefinition == null)
                 {
-                    var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByControlId(dataTypeId);
-                    if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
+                    //we'll check if it is a GUID (legacy id for a property editor)
+                    Guid legacyPropertyEditorId;
+                    if (Guid.TryParse(property.Element("Type").Value, out legacyPropertyEditorId))
                     {
-                        dataTypeDefinition = dataTypeDefinitions.First();
+                        if (dataTypeDefinition.ControlId != legacyPropertyEditorId)
+                        {
+                            var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByControlId(legacyPropertyEditorId);
+                            if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
+                            {
+                                dataTypeDefinition = dataTypeDefinitions.First();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //check against the property editor string alias
+                        var propertyEditorAlias = property.Element("Type").Value.Trim();
+                        if (dataTypeDefinition.PropertyEditorAlias != propertyEditorAlias)
+                        {
+                            var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(propertyEditorAlias);
+                            if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
+                            {
+                                dataTypeDefinition = dataTypeDefinitions.First();
+                            }
+                        }
                     }
                 }
+                
 
                 // For backwards compatibility, if no datatype with that ID can be found, we're letting this fail silently.
                 // This means that the property will not be created.
                 if (dataTypeDefinition == null)
                 {
-                    LogHelper.Warn<PackagingService>(string.Format("Packager: Error handling creation of PropertyType '{0}'. Could not find DataTypeDefintion with unique id '{1}' nor one referencing the DataType with control id '{2}'. Did the package creator forget to package up custom datatypes?",
-                                                        property.Element("Name").Value, dataTypeDefinitionId, dataTypeId));
+                    LogHelper.Warn<PackagingService>(
+                        string.Format("Packager: Error handling creation of PropertyType '{0}'. Could not find DataTypeDefintion with unique id '{1}' nor one referencing the DataType with a property editor alias (or legacy control id) '{2}'. Did the package creator forget to package up custom datatypes?",
+                                      property.Element("Name").Value,
+                                      dataTypeDefinitionId,
+                                      property.Element("Type").Value.Trim()));
                     continue;
                 }
 
@@ -749,7 +771,10 @@ namespace Umbraco.Core.Services
             foreach (var dataTypeElement in dataTypeElements)
             {
                 var dataTypeDefinitionName = dataTypeElement.Attribute("Name").Value;
-                var dataTypeId = new Guid(dataTypeElement.Attribute("Id").Value);
+
+                var legacyPropertyEditorId = Guid.Empty;
+                Guid.TryParse(dataTypeElement.Attribute("Id").Value, out legacyPropertyEditorId);
+
                 var dataTypeDefinitionId = new Guid(dataTypeElement.Attribute("Definition").Value);
                 var databaseTypeAttribute = dataTypeElement.Attribute("DatabaseType");
 
@@ -760,13 +785,30 @@ namespace Umbraco.Core.Services
                     var databaseType = databaseTypeAttribute != null
                                            ? databaseTypeAttribute.Value.EnumParse<DataTypeDatabaseType>(true)
                                            : DataTypeDatabaseType.Ntext;
-                    var dataTypeDefinition = new DataTypeDefinition(-1, dataTypeId)
-                                                 {
-                                                     Key = dataTypeDefinitionId,
-                                                     Name = dataTypeDefinitionName,
-                                                     DatabaseType = databaseType
-                                                 };
-                    dataTypes.Add(dataTypeDefinitionName, dataTypeDefinition);
+                
+                    //check if the Id was a GUID, that means it is referenced using the legacy property editor GUID id
+                    if (legacyPropertyEditorId != Guid.Empty)
+                    {
+                        var dataTypeDefinition = new DataTypeDefinition(-1, legacyPropertyEditorId)
+                            {
+                                Key = dataTypeDefinitionId,
+                                Name = dataTypeDefinitionName,
+                                DatabaseType = databaseType
+                            };
+                        dataTypes.Add(dataTypeDefinitionName, dataTypeDefinition);
+                    }
+                    else
+                    {
+                        //the Id field is actually the string property editor Alias
+                        var dataTypeDefinition = new DataTypeDefinition(-1, dataTypeElement.Attribute("Id").Value.Trim())
+                        {
+                            Key = dataTypeDefinitionId,
+                            Name = dataTypeDefinitionName,
+                            DatabaseType = databaseType
+                        };
+                        dataTypes.Add(dataTypeDefinitionName, dataTypeDefinition);
+                    }
+                    
                 }
             }
 
@@ -820,7 +862,7 @@ namespace Umbraco.Core.Services
         internal XElement Export(IMedia media, bool deep = false)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = LegacyUmbracoSettings.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             var xml = Export(media, nodeName);
             xml.Add(new XAttribute("nodeType", media.ContentType.Id));
@@ -899,7 +941,7 @@ namespace Umbraco.Core.Services
                 var genericProperty = new XElement("GenericProperty",
                                                    new XElement("Name", propertyType.Name),
                                                    new XElement("Alias", propertyType.Alias),
-                                                   new XElement("Type", propertyType.DataTypeId.ToString()),
+                                                   new XElement("Type", propertyType.PropertyEditorAlias),
                                                    new XElement("Definition", definition.Key),
                                                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),

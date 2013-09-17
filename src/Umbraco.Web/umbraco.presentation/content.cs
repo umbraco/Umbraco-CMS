@@ -10,6 +10,7 @@ using System.Xml;
 using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
@@ -142,7 +143,7 @@ namespace umbraco
                 {                    
                     _xmlContent = value;
 
-                    if (!UmbracoSettings.isXmlContentCacheDisabled && UmbracoSettings.continouslyUpdateXmlDiskCache)
+                    if (!UmbracoConfiguration.Current.UmbracoSettings.Content.XmlCacheEnabled && UmbracoConfiguration.Current.UmbracoSettings.Content.ContinouslyUpdateXmlDiskCache)
                         QueueXmlForPersistence();
                     else
                         // Clear cache...
@@ -159,7 +160,7 @@ namespace umbraco
         /// </remarks>
         private void CheckDiskCacheForUpdate()
         {
-            if (UmbracoSettings.isXmlContentCacheDisabled)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.XmlCacheEnabled)
                 return;
 
             lock (TimestampSyncLock)
@@ -186,7 +187,7 @@ namespace umbraco
         /// <returns>Returns true of the XML was not populated, returns false if it was already populated</returns>
         private bool CheckXmlContentPopulation()
         {
-            if (UmbracoSettings.XmlContentCheckForDiskChanges)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Content.XmlContentCheckForDiskChanges)
                 CheckDiskCacheForUpdate();
 
             if (_xmlContent == null)
@@ -207,7 +208,7 @@ namespace umbraco
 
                         // Only save new XML cache to disk if we just repopulated it
                         // TODO: Re-architect this so that a call to this method doesn't invoke a new thread for saving disk cache
-                        if (!UmbracoSettings.isXmlContentCacheDisabled && !IsValidDiskCachePresent())
+                        if (!UmbracoConfiguration.Current.UmbracoSettings.Content.XmlCacheEnabled && !IsValidDiskCachePresent())
                         {
                             QueueXmlForPersistence();
                         }
@@ -309,7 +310,7 @@ namespace umbraco
                         // queues this up, because this delegate is executing on a different thread and may complete
                         // after the request which invoked it (which would normally persist the file on completion)
                         // So we are responsible for ensuring the content is persisted in this case.
-                        if (!UmbracoSettings.isXmlContentCacheDisabled && UmbracoSettings.continouslyUpdateXmlDiskCache)
+                        if (!UmbracoConfiguration.Current.UmbracoSettings.Content.XmlCacheEnabled && UmbracoConfiguration.Current.UmbracoSettings.Content.ContinouslyUpdateXmlDiskCache)
                             PersistXmlToFile(xmlDoc);
                     });
 
@@ -321,7 +322,7 @@ namespace umbraco
         {
             // Remove all attributes and data nodes from the published node
             PublishedNode.Attributes.RemoveAll();
-            string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data" : "./* [not(@id)]";
+            string xpath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "./data" : "./* [not(@id)]";
             foreach (XmlNode n in PublishedNode.SelectNodes(xpath))
                 PublishedNode.RemoveChild(n);
 
@@ -385,7 +386,7 @@ namespace umbraco
 			// if the document is not there already then it's a new document
 			// we must make sure that its document type exists in the schema
             var xmlContentCopy2 = xmlContentCopy;
-			if (currentNode == null && UmbracoSettings.UseLegacyXmlSchema == false)
+			if (currentNode == null && UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema == false)
 			{
 				xmlContentCopy = ValidateSchema(docNode.Name, xmlContentCopy);
 				if (xmlContentCopy != xmlContentCopy2)
@@ -427,7 +428,7 @@ namespace umbraco
                 }
 
                 // TODO: Update with new schema!
-                var xpath = UmbracoSettings.UseLegacyXmlSchema
+                var xpath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema
                                 ? "./node"
                                 : "./* [@id]";
 
@@ -470,7 +471,7 @@ namespace umbraco
         /// <param name="parentNode">The parent node.</param>
         public static void SortNodes(ref XmlNode parentNode)
         {
-            var xpath = UmbracoSettings.UseLegacyXmlSchema
+            var xpath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema
                             ? "./node"
                             : "./* [@id]";
 
@@ -509,7 +510,7 @@ namespace umbraco
                 {
 					// modify a clone of the cache because even though we're into the write-lock
 					// we may have threads reading at the same time. why is this an option?
-					XmlDocument wip = UmbracoSettings.CloneXmlCacheOnPublish
+                    XmlDocument wip = UmbracoConfiguration.Current.UmbracoSettings.Content.CloneXmlContent
 						? CloneXmlDoc(XmlContentInternal)
 						: XmlContentInternal;
 
@@ -992,7 +993,7 @@ namespace umbraco
         /// <returns></returns>
         private XmlDocument LoadContent()
         {
-            if (!UmbracoSettings.isXmlContentCacheDisabled && IsValidDiskCachePresent())
+            if (!UmbracoConfiguration.Current.UmbracoSettings.Content.XmlCacheEnabled && IsValidDiskCachePresent())
             {
                 try
                 {
@@ -1194,13 +1195,13 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
             if (hierarchy.TryGetValue(parentId, out children))
             {
-                XmlNode childContainer = UmbracoSettings.UseLegacyXmlSchema ||
+                XmlNode childContainer = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ||
                                          String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME)
                                              ? parentNode
                                              : parentNode.SelectSingleNode(
                                                  UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME);
 
-                if (!UmbracoSettings.UseLegacyXmlSchema &&
+                if (!UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema &&
                     !String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME))
                 {
                     if (childContainer == null)
@@ -1216,7 +1217,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                 {
                     XmlNode childNode = nodeIndex[childId];
 
-                    if (UmbracoSettings.UseLegacyXmlSchema ||
+                    if (UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ||
                         String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME))
                     {
                         parentNode.AppendChild(childNode);
@@ -1319,7 +1320,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             else
             {
                 //// Save copy of content
-                if (UmbracoSettings.CloneXmlCacheOnPublish)
+                if (UmbracoConfiguration.Current.UmbracoSettings.Content.CloneXmlContent)
                 {
                     XmlDocument xmlContentCopy = CloneXmlDoc(_xmlContent);
 

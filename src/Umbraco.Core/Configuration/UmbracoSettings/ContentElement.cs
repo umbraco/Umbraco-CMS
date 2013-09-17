@@ -1,8 +1,10 @@
-﻿using System.Configuration;
+﻿using System.Collections.Generic;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ContentElement : ConfigurationElement
+    [ConfigurationKey("umbracoConfiguration/settings/content")]
+    internal class ContentElement : ConfigurationElement, IContentSection
     {
         [ConfigurationProperty("imaging")]
         internal ContentImagingElement Imaging
@@ -52,20 +54,25 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
+        public IEnumerable<IContentErrorPage> Error404Collection
+        {
+            get { return Errors.Error404Collection; }
+        }
+
         [ConfigurationProperty("errors", IsRequired = true)]
-        public ContentErrorsElement Errors
+        internal ContentErrorsElement Errors
         {
             get { return (ContentErrorsElement) base["errors"]; }
         }
 
         [ConfigurationProperty("notifications", IsRequired = true)]
-        public NotificationsElement Notifications
+        internal NotificationsElement Notifications
         {
             get { return (NotificationsElement)base["notifications"]; }
         }
 
         [ConfigurationProperty("ensureUniqueNaming")]
-        public InnerTextConfigurationElement<bool> EnsureUniqueNaming
+        internal InnerTextConfigurationElement<bool> EnsureUniqueNaming
         {
             get
             {
@@ -77,7 +84,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("TidyEditorContent")]
-        public InnerTextConfigurationElement<bool> TidyEditorContent
+        internal InnerTextConfigurationElement<bool> TidyEditorContent
         {
             get
             {
@@ -89,7 +96,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("TidyCharEncoding")]
-        public InnerTextConfigurationElement<string> TidyCharEncoding
+        internal InnerTextConfigurationElement<string> TidyCharEncoding
         {
             get
             {
@@ -101,7 +108,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("XmlCacheEnabled")]
-        public InnerTextConfigurationElement<bool> XmlCacheEnabled
+        internal InnerTextConfigurationElement<bool> XmlCacheEnabled
         {
             get
             {
@@ -113,7 +120,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("ContinouslyUpdateXmlDiskCache")]
-        public InnerTextConfigurationElement<bool> ContinouslyUpdateXmlDiskCache
+        internal InnerTextConfigurationElement<bool> ContinouslyUpdateXmlDiskCache
         {
             get
             {
@@ -125,7 +132,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("XmlContentCheckForDiskChanges")]
-        public InnerTextConfigurationElement<bool> XmlContentCheckForDiskChanges
+        internal InnerTextConfigurationElement<bool> XmlContentCheckForDiskChanges
         {
             get
             {
@@ -137,7 +144,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("EnableSplashWhileLoading")]
-        public InnerTextConfigurationElement<bool> EnableSplashWhileLoading
+        internal InnerTextConfigurationElement<bool> EnableSplashWhileLoading
         {
             get
             {
@@ -149,7 +156,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("PropertyContextHelpOption")]
-        public InnerTextConfigurationElement<string> PropertyContextHelpOption
+        internal InnerTextConfigurationElement<string> PropertyContextHelpOption
         {
             get
             {
@@ -161,7 +168,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("UseLegacyXmlSchema")]
-        public InnerTextConfigurationElement<bool> UseLegacyXmlSchema
+        internal InnerTextConfigurationElement<bool> UseLegacyXmlSchema
         {
             get
             {
@@ -173,7 +180,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
         
         [ConfigurationProperty("ForceSafeAliases")]
-        public InnerTextConfigurationElement<bool> ForceSafeAliases
+        internal InnerTextConfigurationElement<bool> ForceSafeAliases
         {
             get
             {
@@ -185,7 +192,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("PreviewBadge")]
-        public InnerTextConfigurationElement<string> PreviewBadge
+        internal InnerTextConfigurationElement<string> PreviewBadge
         {
             get
             {
@@ -197,7 +204,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("UmbracoLibraryCacheDuration")]
-        public InnerTextConfigurationElement<int> UmbracoLibraryCacheDuration
+        internal InnerTextConfigurationElement<int> UmbracoLibraryCacheDuration
         {
             get
             {
@@ -210,7 +217,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("MacroErrors")]
-        public InnerTextConfigurationElement<MacroErrorBehaviour> MacroErrors
+        internal InnerTextConfigurationElement<MacroErrorBehaviour> MacroErrors
         {
             get
             {
@@ -223,7 +230,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("DocumentTypeIconList")]
-        public InnerTextConfigurationElement<IconPickerBehaviour> DocumentTypeIconList
+        internal InnerTextConfigurationElement<IconPickerBehaviour> DocumentTypeIconList
         {
             get
             {
@@ -235,7 +242,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("disallowedUploadFiles")]
-        public OptionalCommaDelimitedConfigurationElement DisallowedUploadFiles
+        internal CommaDelimitedConfigurationElement DisallowedUploadFiles
         {
             get
             {
@@ -281,6 +288,151 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                     //set the default
                     "Textstring");
             }
+        }
+
+        string IContentSection.NotificationEmailAddress
+        {
+            get { return Notifications.NotificationEmailAddress; }
+        }
+
+        bool IContentSection.DisableHtmlEmail
+        {
+            get { return Notifications.DisableHtmlEmail; }
+        }
+
+        IEnumerable<string> IContentSection.ImageFileTypes
+        {
+            get { return Imaging.ImageFileTypes; }
+        }
+
+        IEnumerable<string> IContentSection.ImageTagAllowedAttributes
+        {
+            get { return Imaging.ImageTagAllowedAttributes; }
+        }
+
+        IEnumerable<IImagingAutoFillUploadField> IContentSection.ImageAutoFillProperties
+        {
+            get { return Imaging.ImageAutoFillProperties; }
+        }
+
+        bool IContentSection.ScriptEditorDisable
+        {
+            get { return ScriptEditor.ScriptEditorDisable; }
+        }
+
+        string IContentSection.ScriptFolderPath
+        {
+            get { return ScriptEditor.ScriptFolderPath; }
+        }
+
+        IEnumerable<string> IContentSection.ScriptFileTypes
+        {
+            get { return ScriptEditor.ScriptFileTypes; }
+        }
+
+        bool IContentSection.EnableCanvasEditing
+        {
+            get { return EnableCanvasEditing; }
+        }
+
+        bool IContentSection.ResolveUrlsFromTextString
+        {
+            get { return ResolveUrlsFromTextString; }
+        }
+
+        bool IContentSection.UploadAllowDirectories
+        {
+            get { return UploadAllowDirectories; }
+        }        
+
+        bool IContentSection.EnsureUniqueNaming
+        {
+            get { return EnsureUniqueNaming; }
+        }
+
+        bool IContentSection.TidyEditorContent
+        {
+            get { return TidyEditorContent; }
+        }
+
+        string IContentSection.TidyCharEncoding
+        {
+            get { return TidyCharEncoding; }
+        }
+
+        bool IContentSection.XmlCacheEnabled
+        {
+            get { return XmlCacheEnabled; }
+        }
+
+        bool IContentSection.ContinouslyUpdateXmlDiskCache
+        {
+            get { return ContinouslyUpdateXmlDiskCache; }
+        }
+
+        bool IContentSection.XmlContentCheckForDiskChanges
+        {
+            get { return XmlContentCheckForDiskChanges; }
+        }
+
+        bool IContentSection.EnableSplashWhileLoading
+        {
+            get { return EnableSplashWhileLoading; }
+        }
+
+        string IContentSection.PropertyContextHelpOption
+        {
+            get { return PropertyContextHelpOption; }
+        }
+
+        bool IContentSection.UseLegacyXmlSchema
+        {
+            get { return UseLegacyXmlSchema; }
+        }
+
+        bool IContentSection.ForceSafeAliases
+        {
+            get { return ForceSafeAliases; }
+        }
+
+        string IContentSection.PreviewBadge
+        {
+            get { return PreviewBadge; }
+        }
+
+        int IContentSection.UmbracoLibraryCacheDuration
+        {
+            get { return UmbracoLibraryCacheDuration; }
+        }
+
+        MacroErrorBehaviour IContentSection.MacroErrorBehaviour
+        {
+            get { return MacroErrors; }
+        }
+
+        IconPickerBehaviour IContentSection.IconPickerBehaviour
+        {
+            get { return DocumentTypeIconList; }
+        }
+
+        IEnumerable<string> IContentSection.DisallowedUploadFiles
+        {
+            get { return DisallowedUploadFiles; }
+        }
+
+        bool IContentSection.CloneXmlContent
+        {
+            get { return CloneXmlContent; }
+        }
+
+        bool IContentSection.GlobalPreviewStorageEnabled
+        {
+            get { return GlobalPreviewStorageEnabled; }
+        }
+
+        string IContentSection.DefaultDocumentTypeProperty
+        {
+            get { return DefaultDocumentTypeProperty; }
         }
     }
 }

@@ -282,7 +282,7 @@ namespace Umbraco.Tests
         public void Resolves_Attributed_Trees()
         {
             var trees = PluginManager.Current.ResolveAttributedTrees();
-            Assert.AreEqual(27, trees.Count());
+            Assert.AreEqual(20, trees.Count());
         }
 
         [Test]

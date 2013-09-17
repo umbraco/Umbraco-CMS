@@ -1,8 +1,10 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -26,15 +28,16 @@ namespace umbraco.BusinessLogic
         {
             get
             {
-                if (!_externalLoggerInitiated)
+                if (_externalLoggerInitiated == false)
                 {
                     _externalLoggerInitiated = true;
-                    if (!string.IsNullOrEmpty(UmbracoSettings.ExternalLoggerAssembly) && !string.IsNullOrEmpty(UmbracoSettings.ExternalLoggerType))
+                    if (string.IsNullOrEmpty(UmbracoConfiguration.Current.UmbracoSettings.Logging.ExternalLoggerAssembly) == false
+                        && string.IsNullOrEmpty(UmbracoConfiguration.Current.UmbracoSettings.Logging.ExternalLoggerType) == false)
                     {
                         try
                         {
-                            var assemblyPath = IOHelper.MapPath(UmbracoSettings.ExternalLoggerAssembly);
-                            _externalLogger = Assembly.LoadFrom(assemblyPath).CreateInstance(UmbracoSettings.ExternalLoggerType) as Interfaces.ILog;
+                            var assemblyPath = IOHelper.MapPath(UmbracoConfiguration.Current.UmbracoSettings.Logging.ExternalLoggerAssembly);
+                            _externalLogger = Assembly.LoadFrom(assemblyPath).CreateInstance(UmbracoConfiguration.Current.UmbracoSettings.Logging.ExternalLoggerType) as Interfaces.ILog;
                         }
                         catch (Exception ee)
                         {
@@ -75,22 +78,21 @@ namespace umbraco.BusinessLogic
             {
                 Instance.ExternalLogger.Add(type, user, nodeId, comment);
 
-                if (!UmbracoSettings.ExternalLoggerLogAuditTrail)
+                if (UmbracoConfiguration.Current.UmbracoSettings.Logging.ExternalLoggerEnableAuditTrail == false)
                 {
                     AddLocally(type, user, nodeId, comment);
                 }
             }
             else
             {
-                if (!UmbracoSettings.EnableLogging) return;
+                if (UmbracoConfiguration.Current.UmbracoSettings.Logging.EnableLogging == false) return;
 
-                if (UmbracoSettings.DisabledLogTypes != null &&
-                    UmbracoSettings.DisabledLogTypes.SelectSingleNode(String.Format("//logTypeAlias [. = '{0}']", type.ToString().ToLower())) == null)
+                if (UmbracoConfiguration.Current.UmbracoSettings.Logging.DisabledLogTypes.Any(x => x.LogTypeAlias.InvariantEquals(type.ToString())) == false)
                 {
                     if (comment != null && comment.Length > 3999)
                         comment = comment.Substring(0, 3955) + "...";
 
-                    if (UmbracoSettings.EnableAsyncLogging)
+                    if (UmbracoConfiguration.Current.UmbracoSettings.Logging.EnableAsyncLogging)
                     {
                         ThreadPool.QueueUserWorkItem(
                             delegate { AddSynced(type, user == null ? 0 : user.Id, nodeId, comment); });
@@ -99,6 +101,7 @@ namespace umbraco.BusinessLogic
 
                     AddSynced(type, user == null ? 0 : user.Id, nodeId, comment);
                 }
+
             }
         }
 
@@ -132,7 +135,7 @@ namespace umbraco.BusinessLogic
             if (comment.Length > 3999)
                 comment = comment.Substring(0, 3955) + "...";
 
-            if (UmbracoSettings.EnableAsyncLogging)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Logging.EnableAsyncLogging)
             {
                 ThreadPool.QueueUserWorkItem(
                     delegate { AddSynced(type, user == null ? 0 : user.Id, nodeId, comment); });
@@ -196,7 +199,7 @@ namespace umbraco.BusinessLogic
 
         public List<LogItem> GetAuditLogItems(int NodeId)
         {
-            if (UmbracoSettings.ExternalLoggerLogAuditTrail && ExternalLogger != null)
+            if (UmbracoConfiguration.Current.UmbracoSettings.Logging.ExternalLoggerEnableAuditTrail && ExternalLogger != null)
                 return ExternalLogger.GetAuditLogReader(NodeId);
             
             return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(

@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System.Collections.Generic;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
@@ -29,7 +30,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         }
 
         [ConfigurationProperty("scriptDisableEditor")]
-        internal InnerTextConfigurationElement<bool> DisableScriptEditor
+        internal InnerTextConfigurationElement<bool> ScriptEditorDisable
         {
             get
             {
@@ -39,5 +40,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                     false);
             }
         }
+
     }
 }

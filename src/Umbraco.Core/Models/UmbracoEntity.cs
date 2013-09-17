@@ -250,7 +250,7 @@ namespace Umbraco.Core.Models
 
         internal class UmbracoProperty
         {
-            public Guid DataTypeControlId { get; set; }
+            public string PropertyEditorAlias { get; set; }
             public string Value { get; set; }
         }
     }

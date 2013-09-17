@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Tests.Stubs;
 using Umbraco.Tests.TestHelpers;
-using System.Configuration;
-using Umbraco.Web;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.template;
@@ -63,7 +57,8 @@ namespace Umbraco.Tests.Routing
 		{
 		    SettingsForTests.UseDirectoryUrls = true;
 		    SettingsForTests.HideTopLevelNodeFromPath = false;
-		    SettingsForTests.UseDomainPrefixes = false;
+            var requestMock = Mock.Get(UmbracoSettings.RequestHandler);
+            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
 			Assert.AreEqual(nodeId, global::umbraco.uQuery.GetNodeIdByUrl("http://example.com" + url));
 		}
@@ -81,7 +76,8 @@ namespace Umbraco.Tests.Routing
 		{
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false;
-            SettingsForTests.UseDomainPrefixes = false;
+            var requestMock = Mock.Get(UmbracoSettings.RequestHandler);
+            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
 			Assert.AreEqual(nodeId, global::umbraco.uQuery.GetNodeIdByUrl(url));
 		}
