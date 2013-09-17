@@ -12,6 +12,19 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     internal class MacroProperty : TracksChangesEntityBase, IMacroProperty, IRememberBeingDirty
     {
+        public MacroProperty()
+        {
+            
+        }
+
+        public MacroProperty(string @alias, string name, int sortOrder, IMacroPropertyType propertyType)
+        {
+            _alias = alias;
+            _name = name;
+            _sortOrder = sortOrder;
+            _propertyType = propertyType;
+        }
+
         private string _alias;
         private string _name;
         private int _sortOrder;

@@ -152,6 +152,17 @@ namespace Umbraco.Core.Models
                 _removedProperties.Add(alias);
             }
         }
+        
+        internal override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+        {
+            _addedProperties.Clear();
+            _removedProperties.Clear();
+            base.ResetDirtyProperties(rememberPreviouslyChangedProperties);
+            foreach (var prop in Properties)
+            {
+                ((TracksChangesEntityBase)prop).ResetDirtyProperties(rememberPreviouslyChangedProperties);
+            }
+        }
 
         /// <summary>
         /// Used internally to check if we need to add a section in the repository to the db

@@ -12,6 +12,7 @@ namespace Umbraco.Core.Models.Rdbms
         [PrimaryKeyColumn]
         public int Id { get; set; }
 
+        //NOTE: This column is not used, we always show the properties
         [Column("macroPropertyHidden")]
         [Constraint(Default = "0")]
         public bool Hidden { get; set; }
