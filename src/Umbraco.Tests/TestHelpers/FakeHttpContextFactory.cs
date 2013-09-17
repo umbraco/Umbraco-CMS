@@ -54,7 +54,9 @@ namespace Umbraco.Tests.TestHelpers
 			//Request context
 
             var requestContextMock = new Mock<RequestContext>();
-		    
+
+            RequestContext = requestContextMock.Object;
+
             //Cookie collection
 		    var cookieCollection = new HttpCookieCollection();
             cookieCollection.Add(new HttpCookie("UMB_UCONTEXT", "FBA996E7-D6BE-489B-B199-2B0F3D2DD826"));
@@ -105,7 +107,7 @@ namespace Umbraco.Tests.TestHelpers
                 requestContextMock.Setup(x => x.RouteData).Returns(routeData);
 			}
 		    
-            RequestContext = requestContextMock.Object;
+            
 		}
 
 	}
