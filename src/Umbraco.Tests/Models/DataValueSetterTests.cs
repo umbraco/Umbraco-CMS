@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Xml;
+using Moq;
 using NUnit.Framework;
-using Rhino.Mocks;
-using Rhino.Mocks.Interfaces;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -26,37 +25,35 @@ namespace Umbraco.Tests.Models
         public void LoadValueFromDatabase_Is_Not_Called_When_SetValue_Is_Used()
         {
             // Arrange            
-            var baseDataType = MockRepository.GenerateStub<BaseDataType>();
-            var dataTypeData = MockRepository.GenerateMock<DefaultData>(baseDataType);
-            dataTypeData.Stub(x => x.Value).CallOriginalMethod(OriginalCallOptions.NoExpectation);
+            var dataTypeMock = new Mock<BaseDataType>();
+            var dataTypeDataMock = new Mock<DefaultData>(dataTypeMock.Object);
 
             // Act
 
-            ((IDataValueSetter)dataTypeData).SetValue("Hello world", DataTypeDatabaseType.Nvarchar.ToString());
-            var val = dataTypeData.Value;
+            ((IDataValueSetter)dataTypeDataMock.Object).SetValue("Hello world", DataTypeDatabaseType.Nvarchar.ToString());
+            var val = dataTypeDataMock.Object.Value;
 
             // Assert
 
-            dataTypeData.AssertWasNotCalled(data => data.LoadValueFromDatabase());
+            dataTypeDataMock.Verify(data => data.LoadValueFromDatabase(), Times.Never());
         }
 
         [Test]
         public void LoadValueFromDatabase_Is_Called_When_SetValue_Is_Not_Used()
         {
             // Arrange            
-            var baseDataType = MockRepository.GenerateStub<BaseDataType>();
-            var dataTypeData = MockRepository.GenerateMock<DefaultData>(baseDataType);
-            dataTypeData
-                .Stub(data => data.LoadValueFromDatabase()).WhenCalled(invocation => Debug.WriteLine("asdf"));
-            dataTypeData.Stub(x => x.Value).CallOriginalMethod(OriginalCallOptions.NoExpectation);
+            var dataTypeMock = new Mock<BaseDataType>();
+            var dataTypeDataMock = new Mock<DefaultData>(dataTypeMock.Object) {CallBase = true};
+            dataTypeDataMock
+                .Setup(data => data.LoadValueFromDatabase()).Callback(() => Debug.WriteLine("asdf"));
 
             // Act
 
-            var val = dataTypeData.Value;
+            var val = dataTypeDataMock.Object.Value;
 
             // Assert
 
-            dataTypeData.AssertWasCalled(data => data.LoadValueFromDatabase());
+            dataTypeDataMock.Verify(data => data.LoadValueFromDatabase());
         }
 
         [Test]
@@ -65,22 +62,18 @@ namespace Umbraco.Tests.Models
             // Arrange            
             var dataTypeId = Guid.NewGuid();
             
-            var dataTypeData = MockRepository.GenerateMock<IData, IDataValueSetter>();
-            
-            dataTypeData
-                .Stub(data => data.ToXMl(Arg<XmlDocument>.Is.Anything))
-                .Return(null) // you have to call Return() even though we're about to override it
-                .WhenCalled(invocation =>
-                    {
-                        var xmlDoc = (XmlDocument) invocation.Arguments[0];
-                        invocation.ReturnValue = xmlDoc.CreateElement("test");
-                    });
+            var dataTypeDataMock = new Mock<IData>();
+            var dataValueSetterMock = dataTypeDataMock.As<IDataValueSetter>();
 
-            var dataType = MockRepository.GenerateStub<IDataType>();
-            dataType.Stub(type => type.Data).Return(dataTypeData);
+            dataTypeDataMock
+                .Setup(data => data.ToXMl(It.IsAny<XmlDocument>()))
+                .Returns((XmlDocument xdoc) => xdoc.CreateElement("test"));
 
-            var dataTypeSvc = MockRepository.GenerateStub<IDataTypeService>();
-            dataTypeSvc.Stub(service => service.GetDataTypeById(dataTypeId)).Return(dataType);
+            var dataTypeMock = new Mock<IDataType>();
+            dataTypeMock.Setup(type => type.Data).Returns(dataTypeDataMock.Object);
+
+            var dataTypeSvcMock = new Mock<IDataTypeService>();
+            dataTypeSvcMock.Setup(service => service.GetDataTypeById(dataTypeId)).Returns(dataTypeMock.Object);
 
             var property = new Property(
                 1234,
@@ -92,11 +85,11 @@ namespace Umbraco.Tests.Models
 
             // Act
 
-            var xml = property.ToXml(dataTypeSvc);
+            var xml = property.ToXml(dataTypeSvcMock.Object);
 
             // Assert
 
-            ((IDataValueSetter)dataTypeData).AssertWasCalled(setter => setter.SetValue("Hello world", DataTypeDatabaseType.Nvarchar.ToString()));
+            dataValueSetterMock.Verify(setter => setter.SetValue("Hello world", DataTypeDatabaseType.Nvarchar.ToString()));
         }
 
         [TestCase(DataTypeDatabaseType.Nvarchar)]
@@ -105,7 +98,7 @@ namespace Umbraco.Tests.Models
         [TestCase(DataTypeDatabaseType.Ntext)]
         public void DefaultData_SetValue_Ensures_Empty_String_When_Null_Value_Any_Data_Type(DataTypeDatabaseType type)
         {
-            var defaultData = new DefaultData(MockRepository.GenerateMock<BaseDataType>());
+            var defaultData = new DefaultData(new Mock<BaseDataType>().Object);
 
             ((IDataValueSetter)defaultData).SetValue(null, type.ToString());
 
