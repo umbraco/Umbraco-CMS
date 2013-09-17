@@ -6,7 +6,7 @@
  * @description
  * The controller for the media editor
  */
-function mediaEditController($scope, $routeParams, mediaResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager) {
+function mediaEditController($scope, $routeParams, mediaResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, editorContextService) {
 
     //initialize the file manager
     fileManager.clearFiles();
@@ -17,6 +17,8 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
             .then(function (data) {
                 $scope.loaded = true;
                 $scope.content = data;
+
+                editorContextService.setContext($scope.content);
             });
     }
     else {
@@ -24,6 +26,8 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
             .then(function (data) {
                 $scope.loaded = true;
                 $scope.content = data;
+                
+                editorContextService.setContext($scope.content);
                 
                 //in one particular special case, after we've created a new item we redirect back to the edit
                 // route but there might be server validation errors in the collection which we need to display
