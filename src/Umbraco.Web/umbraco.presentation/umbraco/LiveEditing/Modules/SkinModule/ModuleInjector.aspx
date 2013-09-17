@@ -1,5 +1,6 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ModuleInjector.aspx.cs" Inherits="umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule.ModuleInjector" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Import Namespace="Umbraco.Core.Configuration" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -34,7 +35,7 @@
 		var macroAliases = new Array();
 		var macroAlias = '<%= _macroAlias %>';
 			
-		<%if (umbraco.UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages) { %>
+		<%if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages) { %>
 		var macroElement = "umbraco:Macro";
 		<%}else{ %>
 		var macroElement = "?UMBRACO_MACRO";
@@ -95,11 +96,11 @@
 			if (macroString.length > 1)
 				macroString = macroString.substr(0, macroString.length-1);
 		
-			<%if (!umbraco.UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages){ %>
+			<%if (!UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages){ %>
 			macroString += " macroAlias=\"" + macroAlias + "\"";
 			<%} %>				
 				
-			<%if (umbraco.UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages){ %>
+			<%if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages){ %>
 			  macroString += " Alias=\"" + macroAlias + "\" runat=\"server\"></" + macroElement + ">";
 			<%} else { %>
 			  macroString += "></" + macroElement + ">";
