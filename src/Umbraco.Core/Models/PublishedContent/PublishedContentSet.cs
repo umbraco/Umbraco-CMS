@@ -83,7 +83,8 @@ namespace Umbraco.Core.Models.PublishedContent
 
         // indicates that the source has changed
         // so the set can clear its inner caches
-        public void SourceChanged()
+        // should only be used by DynamicPublishedContentList
+        internal void SourceChanged()
         {
             // reset the cached enumeration so it's enumerated again
             if (_enumerated == null) return;

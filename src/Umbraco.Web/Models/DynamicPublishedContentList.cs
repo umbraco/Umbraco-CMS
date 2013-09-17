@@ -34,14 +34,24 @@ namespace Umbraco.Web.Models
         {
             _content = items.ToList();
             _contentSet = new PublishedContentSet<IPublishedContent>(_content);
-            Items = _contentSet.Select(x => new DynamicPublishedContent(x)).ToList();
+            Items = _contentSet.Select(x => new DynamicPublishedContent(x, this)).ToList();
         }
 
         public DynamicPublishedContentList(IEnumerable<DynamicPublishedContent> items)
         {
             _content = items.Select(x => x.PublishedContent).ToList();
             _contentSet = new PublishedContentSet<IPublishedContent>(_content);
-            Items = _contentSet.Select(x => new DynamicPublishedContent(x)).ToList();
+            Items = _contentSet.Select(x => new DynamicPublishedContent(x, this)).ToList();
+        }
+
+        #endregion
+
+        #region ContentSet
+
+        // so we are ~compatible with strongly typed syntax
+        public DynamicPublishedContentList ToContentSet()
+        {
+            return this;
         }
 
         #endregion
@@ -59,7 +69,7 @@ namespace Umbraco.Web.Models
             _contentSet.SourceChanged();
 
             var setContent = _contentSet.MapContent(content);
-            Items.Add(new DynamicPublishedContent(setContent));
+            Items.Add(new DynamicPublishedContent(setContent, this));
         }
 
         /// <summary>

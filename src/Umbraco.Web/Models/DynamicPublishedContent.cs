@@ -1,4 +1,4 @@
-﻿// fixme - should #define
+﻿// fixme - should #define - but when will it be OK?
 #undef FIX_GET_PROPERTY_VALUE
 
 using System;
@@ -26,26 +26,13 @@ namespace Umbraco.Web.Models
     public class DynamicPublishedContent : DynamicObject, IPublishedContent
 	{
 		protected internal IPublishedContent PublishedContent { get; private set; }
+	    private DynamicPublishedContentList _contentList;
 
+        // must implement that one if we implement IPublishedContent
 	    public IEnumerable<IPublishedContent> ContentSet
 	    {
-	        get
-	        {
-                // fixme - what's this?
-                throw new NotImplementedException("What shall we do?");
-                /*
-	            if (_contentSet != null) return _contentSet;
-
-                // siblings = parent.Children
-	            var parent = PublishedContent.Parent;
-	            var dynamicParent = parent == null ? null : parent.AsDynamicOrNull();
-	            if (dynamicParent != null) return dynamicParent.Children;
-
-                // silbings = content at root
-	            var atRoot = new DynamicPublishedContentList(UmbracoContext.Current.ContentCache.GetAtRoot());
-	            return atRoot;
-                */
-	        }
+            // that is a definitively non-efficient way of doing it, though it should work
+	        get { return _contentList ?? (_contentList = new DynamicPublishedContentList(PublishedContent.ContentSet)); }
 	    }
 
         public PublishedContentType ContentType { get { return PublishedContent.ContentType; } }
@@ -56,13 +43,13 @@ namespace Umbraco.Web.Models
 		{
 			if (content == null) throw new ArgumentNullException("content");
 			PublishedContent = content;
-		}		
+		}
 
-        //internal DynamicPublishedContent(IPublishedContent content, IEnumerable<IPublishedContent> contentSet)
-        //{
-        //    PublishedContent = content;
-        //    _contentSet = contentSet;
-        //}
+        internal DynamicPublishedContent(IPublishedContent content, DynamicPublishedContentList contentList)
+        {
+            PublishedContent = content;
+            _contentList = contentList;
+        }
 		
 		#endregion
 
@@ -73,7 +60,6 @@ namespace Umbraco.Web.Models
 
         #region DynamicObject
 
-        // fixme - so everywhere else we use a basic dictionary but here we use a concurrent one? why?
         private readonly ConcurrentDictionary<string, object> _cachedMemberOutput = new ConcurrentDictionary<string, object>();
 
         /// <summary>
@@ -118,9 +104,9 @@ namespace Umbraco.Web.Models
 			}
 			
 			//this is the result of an extension method execution gone wrong so we return dynamic null
-            //fixme - throws a NullRef, wrong order of checks?!
-			if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod
-				&& attempt.Exception != null && attempt.Exception is TargetInvocationException) 				
+			if (attempt.Result != null
+                && attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod
+				&& attempt.Exception is TargetInvocationException) 				
 			{
 			    result = DynamicNull.Null;
 				return true;	
@@ -137,9 +123,9 @@ namespace Umbraco.Web.Models
 		/// <returns></returns>
 		protected virtual Attempt<object> TryGetCustomMember(GetMemberBinder binder)
 		{
-            // FIXME that one makes NO SENSE
-            // why not let the NORMAL BINDER do the work?!
-            // see below, that should be enough!
+            // as of 4.5 the CLR is case-sensitive which means that the default binder
+            // will handle those methods only when using the proper casing. So what
+            // this method does is ensure that any casing is supported.
 
 			if (binder.Name.InvariantEquals("ChildrenAsList") || binder.Name.InvariantEquals("Children"))
 			{
@@ -155,6 +141,7 @@ namespace Umbraco.Web.Models
 				}
 				return Attempt<object>.Succeed(parent.Id);
 			}
+
 			return Attempt<object>.Fail();
 		}
 
@@ -190,7 +177,7 @@ namespace Umbraco.Web.Models
 		{
 			var reflectedProperty = GetReflectedProperty(binder.Name);
 			var result = reflectedProperty != null
-				? reflectedProperty.RawValue // fixme - why use the raw value?
+				? reflectedProperty.Value
 				: null;
 
 		    return Attempt.If(result != null, result);
@@ -337,8 +324,9 @@ namespace Umbraco.Web.Models
 
 			//reflect
 
-            // FIXME but if it exists here, then the original BINDER should have found it ALREADY?
-            // and if it's just a casing issue then there's BindingFlags.IgnoreCase ?!!
+            // as of 4.5 the CLR is case-sensitive which means that the default binder
+            // can handle properties only when using the proper casing. So what this
+            // does is ensure that any casing is supported.
 
 			Func<string, Attempt<object>> getMember =
 				memberAlias =>
@@ -790,11 +778,6 @@ namespace Umbraco.Web.Models
 
         #endregion
 
-        // fixme 
-        #region IPublishedContent extension methods - ToContentSet
-        #endregion
-
-        // fixme
         #region IPublishedContent extension methods - AsDynamic
 
         public dynamic AsDynamic()
@@ -1300,7 +1283,7 @@ namespace Umbraco.Web.Models
         
         #endregion
 
-        // fixme - cleanup
+        // should probably cleanup what's below
 
         #region Where
 

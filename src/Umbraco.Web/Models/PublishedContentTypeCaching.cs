@@ -13,8 +13,7 @@ namespace Umbraco.Web.Models
     // events from the ContentTypeCacheRefresher - however as of may 1st, 2013 that eventing system is not
     // fully operational and Shannon prefers that the refresh code is hard-wired into the refresher. so this
     // is commented out and the refresher calls PublishedContentType.Clear() directly.
-    // TODO refactor this when the refresher is ready
-    // FIXME should use the right syntax NOW
+    // FIXME - must refactor this class to use proper cache refresher
 
     class PublishedContentTypeCaching : ApplicationEventHandler
     {

@@ -1,4 +1,4 @@
-// fixme - should #define
+// fixme - should #define - but when will it be OK?
 // axes navigation is broken in many ways... but fixes would not be 100%
 // backward compatible... so keep them for v7 or whenever appropriate.
 #undef FIX_AXES
@@ -467,7 +467,7 @@ namespace Umbraco.Web
 
         #region Dynamic Linq Extensions
 
-        // TODO cleanup... do we really want dynamics here?
+        // todo - we should keep this file clean and remove dynamic linq stuff from it
 
         public static IQueryable<IPublishedContent> OrderBy(this IEnumerable<IPublishedContent> source, string predicate)
 		{
@@ -477,13 +477,13 @@ namespace Umbraco.Web
 
 		public static IQueryable<IPublishedContent> Where(this IEnumerable<IPublishedContent> list, string predicate)
 		{
-            // fixme - but wait... ?!
-			var dList = new DynamicPublishedContentList(list);
-            //we have to wrap the result in another DynamicPublishedContentList so that the OwnersList get's set on 
-            //the individual items. See: http://issues.umbraco.org/issue/U4-1797
-		    return new DynamicPublishedContentList(
-		        dList.Where<DynamicPublishedContent>(predicate))
-		        .AsQueryable<IPublishedContent>();
+            // wrap in DynamicPublishedContentList so that the ContentSet is correct
+            // though that code is somewhat ugly.
+
+		    var dlist = new DynamicPublishedContentList(new DynamicPublishedContentList(list)
+		                                                    .Where<DynamicPublishedContent>(predicate));
+
+		    return dlist.AsQueryable<IPublishedContent>();
 		}
 
 		public static IEnumerable<IGrouping<object, IPublishedContent>> GroupBy(this IEnumerable<IPublishedContent> list, string predicate)

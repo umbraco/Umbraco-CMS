@@ -257,17 +257,17 @@ namespace Umbraco.Core
             MigrationResolver.Current = new MigrationResolver(
                 () => PluginManager.Current.ResolveMigrationTypes());
 
-            // fixme - remove that one eventually
+            // fixme - remove support for obsolete PropertyEditorValueConverter
             PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
 				PluginManager.Current.ResolvePropertyEditorValueConverters());
 
             // initialize the new property value converters
-            // fixme - discuss: explicit registration vs. discovery?
+            // fixme - discuss property converters explicit registration vs. discovery
             PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
                 PluginManager.Current.ResolveTypes<IPropertyValueConverter>());
 
             // add the internal ones
-            // fixme - should be public not internal?
+            // fixme - property converters should be public, not internal, and auto-discovered
             PropertyValueConvertersResolver.Current.AddType<YesNoValueConverter>();
             PropertyValueConvertersResolver.Current.AddType<DatePickerValueConverter>();
             PropertyValueConvertersResolver.Current.AddType<TinyMceValueConverter>();

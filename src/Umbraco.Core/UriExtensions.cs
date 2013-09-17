@@ -56,7 +56,8 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal static bool IsClientSideRequest(this Uri url)
         {
-            // fixme - but really, is this OK? we should accept either no url, or .aspx, and everything else is out
+            // fixme - IsClientSideRequest should not use an hard-coded list of extensions
+            // a client-side request is anything that has an extension that is not .aspx?
             var toIgnore = new[] { ".js", ".css", ".ico", ".png", ".jpg", ".jpeg", ".gif", ".html", ".svg" };
             return toIgnore.Any(x => Path.GetExtension(url.LocalPath).InvariantEquals(x));
         }

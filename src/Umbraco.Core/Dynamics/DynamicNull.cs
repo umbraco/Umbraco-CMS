@@ -38,6 +38,11 @@ namespace Umbraco.Core.Dynamics
             return this;
         }
 
+        public DynamicNull ToContentSet()
+        {
+            return this;
+        }
+
         public int Count()
         {
             return 0;

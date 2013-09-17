@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Macros;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -22,10 +23,15 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Request)]
     internal class RteMacroRenderingValueConverter : TinyMceValueConverter
 	{
-        string RenderRteMacros(string source)
+        // NOT thread-safe over a request because it modifies the
+        // global UmbracoContext.Current.InPreviewMode status. So it
+        // should never execute in // over the same UmbracoContext with
+        // different preview modes.
+	    static string RenderRteMacros(string source, bool preview)
         {
-            // fixme - not taking 'preview' into account here
-            // but we should, when running the macros... how?!
+            // save and set for macro rendering
+            var inPreviewMode = UmbracoContext.Current.InPreviewMode;
+	        UmbracoContext.Current.InPreviewMode = preview;
 
             var sb = new StringBuilder();
             var umbracoHelper = new UmbracoHelper(UmbracoContext.Current);
@@ -37,7 +43,11 @@ namespace Umbraco.Web.PropertyEditors
                 (macroAlias, macroAttributes) => sb.Append(umbracoHelper.RenderMacro(
                     macroAlias,
                     //needs to be explicitly casted to Dictionary<string, object>
-                    macroAttributes.ConvertTo(x => (string)x, x => (object)x)).ToString()));
+                    macroAttributes.ConvertTo(x => (string)x, x => x)).ToString()));
+
+            // restore
+	        UmbracoContext.Current.InPreviewMode = inPreviewMode;
+
             return sb.ToString();
         }
 
@@ -46,8 +56,11 @@ namespace Umbraco.Web.PropertyEditors
 	        if (source == null) return null;
 	        var sourceString = source.ToString();
 
-            sourceString = TextValueConverterHelper.ParseStringValueSource(sourceString); // fixme - must handle preview
-            sourceString = RenderRteMacros(sourceString); // fixme - must handle preview
+            // ensures string is parsed for {localLink} and urls are resolved correctly
+            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview);
+	        sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
+            // ensure string is parsed for macros and macros are executed correctly
+            sourceString = RenderRteMacros(sourceString, preview);
 
 	        return sourceString;
 	    }

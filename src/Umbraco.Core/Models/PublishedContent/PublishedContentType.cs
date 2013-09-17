@@ -99,22 +99,18 @@ namespace Umbraco.Core.Models.PublishedContent
         // and not the alias. Also, we cannot hook into the cache refresher event here, because it belongs
         // to Umbraco.Web, so we do it in Umbraco.Web.Models.PublishedContentTypeCaching.
         
-        // fixme
-        // how do we know a content type has changed? if just the property has changed, do we trigger an event?
-        // must run in debug mode to figure out... what happens when a DATATYPE changes? how do I get the type
-        // of a content right with the content and be sure it's OK?
-        // ******** HERE IS THE REAL ISSUE *******
+        // fixme - must refactor PublishedContentType cache refresh
 
         static readonly ConcurrentDictionary<string, PublishedContentType> ContentTypes = new ConcurrentDictionary<string, PublishedContentType>();
         
-        // fixme - should not be public
+        // internal, called by PublishedContentTypeCaching
         internal static void ClearAll()
         {
             Logging.LogHelper.Debug<PublishedContentType>("Clear all.");
             ContentTypes.Clear();
         }
 
-        // fixme - should not be public
+        // internal, called by PublishedContentTypeCaching
         internal static void ClearContentType(int id)
         {
             Logging.LogHelper.Debug<PublishedContentType>("Clear content type w/id {0}.", () => id);
@@ -124,7 +120,7 @@ namespace Umbraco.Core.Models.PublishedContent
             ContentTypes.RemoveAll(kvp => kvp.Value.Id == id);
         }
 
-        // fixme
+        // internal, called by PublishedContentTypeCaching
         internal static void ClearDataType(int id)
         {
             Logging.LogHelper.Debug<PublishedContentType>("Clear data type w/id {0}.", () => id);
