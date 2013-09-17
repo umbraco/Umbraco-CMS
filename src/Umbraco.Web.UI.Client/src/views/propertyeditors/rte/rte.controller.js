@@ -71,7 +71,6 @@ angular.module("umbraco")
                         }
                     });
                 
-
                     editor.addButton('embeddialog', {
                         icon: 'media',
                         tooltip: 'Embed',
