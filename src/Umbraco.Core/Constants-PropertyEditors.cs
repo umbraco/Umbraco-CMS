@@ -362,9 +362,21 @@ namespace Umbraco.Core
             public const string UploadField = "5032A6E6-69E3-491D-BB28-CD31CD11086C";
 
             /// <summary>
+            /// Alias for the User picker datatype.
+            /// </summary>
+            public const string UserPickerAlias = "Umbraco.UserPicker";
+
+            /// <summary>
+            /// Guid for the User picker datatype.
+            /// </summary>
+            [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
+            public const string UserPicker = "e66af4a0-e8b4-11de-8a39-0800200c9a66";
+
+            /// <summary>
             /// Alias for the Upload field datatype.
             /// </summary>
             public const string UploadFieldAlias = "Umbraco.UploadField";
+
 
             /// <summary>
             /// Guid for the XPath CheckBoxList datatype.
