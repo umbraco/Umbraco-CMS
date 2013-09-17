@@ -4,12 +4,10 @@ using Umbraco.Core.Models;
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// Defines the ContentService, which is an easy access to operations involving <see cref="IMacro"/>
+    /// Defines the MacroService, which is an easy access to operations involving <see cref="IMacro"/>
     /// </summary>
     internal interface IMacroService : IService
     {
-        //TODO Possibly create import macro method and ToXml?
-
         /// <summary>
         /// Gets an <see cref="IMacro"/> object by its alias
         /// </summary>
@@ -38,17 +36,17 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the macro</param>
         void Save(IMacro macro, int userId = 0);
 
-        /// <summary>
-        /// Gets a list all available <see cref="IMacroPropertyType"/> plugins
-        /// </summary>
-        /// <returns>An enumerable list of <see cref="IMacroPropertyType"/> objects</returns>
-        IEnumerable<IMacroPropertyType> GetMacroPropertyTypes();
+        ///// <summary>
+        ///// Gets a list all available <see cref="IMacroPropertyType"/> plugins
+        ///// </summary>
+        ///// <returns>An enumerable list of <see cref="IMacroPropertyType"/> objects</returns>
+        //IEnumerable<IMacroPropertyType> GetMacroPropertyTypes();
 
-        /// <summary>
-        /// Gets an <see cref="IMacroPropertyType"/> by its alias
-        /// </summary>
-        /// <param name="alias">Alias to retrieve an <see cref="IMacroPropertyType"/> for</param>
-        /// <returns>An <see cref="IMacroPropertyType"/> object</returns>
-        IMacroPropertyType GetMacroPropertyTypeByAlias(string alias);
+        ///// <summary>
+        ///// Gets an <see cref="IMacroPropertyType"/> by its alias
+        ///// </summary>
+        ///// <param name="alias">Alias to retrieve an <see cref="IMacroPropertyType"/> for</param>
+        ///// <returns>An <see cref="IMacroPropertyType"/> object</returns>
+        //IMacroPropertyType GetMacroPropertyTypeByAlias(string alias);
     }
 }

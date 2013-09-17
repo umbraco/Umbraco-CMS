@@ -7,6 +7,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -27,7 +28,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var macroDto = Database.First<MacroDto>(sql);
+            var macroDto = Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql).FirstOrDefault();
             if (macroDto == null)
                 return null;
 
@@ -45,18 +46,33 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (ids.Any())
             {
-                foreach (var id in ids)
-                {
-                    yield return Get(id);
-                }
+                return PerformGetAllOnIds(ids);
             }
-            else
+
+            var sql = GetBaseQuery(false);
+
+            return ConvertFromDtos(Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql));
+        }
+
+        private IEnumerable<IMacro> PerformGetAllOnIds(params int[] ids)
+        {
+            if (ids.Any() == false) yield break;
+            foreach (var id in ids)
             {
-                var macroDtos = Database.Fetch<MacroDto>("WHERE id > 0");
-                foreach (var macroDto in macroDtos)
-                {
-                    yield return Get(macroDto.Id);
-                }
+                yield return Get(id);
+            }
+        }
+
+        private IEnumerable<IMacro> ConvertFromDtos(IEnumerable<MacroDto> dtos)
+        {
+            var factory = new MacroFactory();
+            foreach (var entity in dtos.Select(factory.BuildEntity))
+            {
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                ((TracksChangesEntityBase)entity).ResetDirtyProperties(false);
+
+                yield return entity;
             }
         }
 
@@ -66,7 +82,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IMacro>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.Fetch<Macro>(sql);
+            var dtos = Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql);
 
             foreach (var dto in dtos)
             {
@@ -83,24 +99,24 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                return GetBaseQuery("*");
+                return GetBaseQuery();
             }
             return sql;
         }
 
-        private static Sql GetBaseQuery(string columns)
+        private static Sql GetBaseQuery()
         {
             var sql = new Sql();
-            sql.Select(columns)
-                      .From<MacroDto>()
-                      .LeftJoin<MacroPropertyDto>()
-                      .On<MacroDto, MacroPropertyDto>(left => left.Id, right => right.Macro);
+            sql.Select("*")
+               .From<MacroDto>()
+               .LeftJoin<MacroPropertyDto>()
+               .On<MacroDto, MacroPropertyDto>(left => left.Id, right => right.Macro);
             return sql;
         }
 
         protected override string GetBaseWhereClause()
         {
-            return "id = @Id";
+            return "cmsMacro.id = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -175,5 +191,24 @@ namespace Umbraco.Core.Persistence.Repositories
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }
+
+        //public IEnumerable<IMacro> GetAll(params string[] aliases)
+        //{
+        //    if (aliases.Any())
+        //    {
+        //        var q = new Query<IMacro>();
+        //        foreach (var alias in aliases)
+        //        {
+        //            q.Where(macro => macro.Alias == alias);
+        //        }
+
+        //        var wheres = string.Join(" OR ", q.WhereClauses());
+        //    }
+        //    else
+        //    {
+        //        return GetAll(new int[] {});
+        //    }
+            
+        //}
     }
 }

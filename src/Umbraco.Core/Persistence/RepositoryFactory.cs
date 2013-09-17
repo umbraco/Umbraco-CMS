@@ -130,6 +130,11 @@ namespace Umbraco.Core.Persistence
                 CreateUserTypeRepository(uow));
         }
 
+        internal virtual IMacroRepository CreateMacroRepository(IDatabaseUnitOfWork uow)
+        {
+            return new MacroRepository(uow, RuntimeCacheProvider.Current);
+        }
+
         internal virtual IMemberRepository CreateMemberRepository(IDatabaseUnitOfWork uow)
         {
             return new MemberRepository(uow, RuntimeCacheProvider.Current, CreateMemberTypeRepository(uow));

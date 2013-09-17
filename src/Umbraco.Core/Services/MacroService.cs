@@ -5,6 +5,7 @@ using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -15,44 +16,24 @@ namespace Umbraco.Core.Services
     internal class MacroService : IMacroService
     {
 	    private readonly RepositoryFactory _repositoryFactory;
-        private readonly IUnitOfWorkProvider _uowProvider;
+        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 
         public MacroService()
-            : this(new RepositoryFactory())
+            : this(new PetaPocoUnitOfWorkProvider(), new RepositoryFactory())
         {
         }
-
-        public MacroService(RepositoryFactory repositoryFactory)
-            : this(new FileUnitOfWorkProvider(), repositoryFactory)
-        {
-        }
-
-        public MacroService(IUnitOfWorkProvider provider)
+        
+        public MacroService(IDatabaseUnitOfWorkProvider provider)
             : this(provider, new RepositoryFactory())
         {
         }
 
-		public MacroService(IUnitOfWorkProvider provider, RepositoryFactory repositoryFactory) : this(provider, repositoryFactory, false)
-        {
-        }
-
-        public MacroService(IUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, bool ensureCachedMacros)
+        public MacroService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
         {
             _uowProvider = provider;
             _repositoryFactory = repositoryFactory;
-
-            if(ensureCachedMacros)
-                EnsureMacroCache();
         }
 
-        /// <summary>
-        /// Ensures the macro cache by getting all macros
-        /// from the repository and thus caching them.
-        /// </summary>
-        private void EnsureMacroCache()
-        {
-            IEnumerable<IMacro> macros = GetAll();
-        }
 
         /// <summary>
         /// Gets an <see cref="IMacro"/> object by its alias
@@ -63,7 +44,9 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateMacroRepository(_uowProvider.GetUnitOfWork()))
             {
-                return repository.Get(alias);
+                var q = new Query<IMacro>();
+                q.Where(macro => macro.Alias == alias);
+                return repository.GetByQuery(q).FirstOrDefault();
             }
         }
 
@@ -76,7 +59,18 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateMacroRepository(_uowProvider.GetUnitOfWork()))
             {
-                return repository.GetAll(aliases);
+                if (aliases.Any())
+                {
+                    var q = new Query<IMacro>();
+                    foreach (var alias in aliases)
+                    {
+                        q.Where(macro => macro.Alias == alias);
+                    }
+
+                    return repository.GetByQuery(q);
+                }
+
+                return repository.GetAll();
             }
         }
 
@@ -124,24 +118,24 @@ namespace Umbraco.Core.Services
 	        Audit.Add(AuditTypes.Save, "Save Macro performed by user", userId, -1);
         }
 
-        /// <summary>
-        /// Gets a list all available <see cref="IMacroPropertyType"/> plugins
-        /// </summary>
-        /// <returns>An enumerable list of <see cref="IMacroPropertyType"/> objects</returns>
-        public IEnumerable<IMacroPropertyType> GetMacroPropertyTypes()
-        {
-            return MacroPropertyTypeResolver.Current.MacroPropertyTypes;
-        }
+        ///// <summary>
+        ///// Gets a list all available <see cref="IMacroPropertyType"/> plugins
+        ///// </summary>
+        ///// <returns>An enumerable list of <see cref="IMacroPropertyType"/> objects</returns>
+        //public IEnumerable<IMacroPropertyType> GetMacroPropertyTypes()
+        //{
+        //    return MacroPropertyTypeResolver.Current.MacroPropertyTypes;
+        //}
 
-        /// <summary>
-        /// Gets an <see cref="IMacroPropertyType"/> by its alias
-        /// </summary>
-        /// <param name="alias">Alias to retrieve an <see cref="IMacroPropertyType"/> for</param>
-        /// <returns>An <see cref="IMacroPropertyType"/> object</returns>
-        public IMacroPropertyType GetMacroPropertyTypeByAlias(string alias)
-        {
-            return MacroPropertyTypeResolver.Current.MacroPropertyTypes.FirstOrDefault(x => x.Alias == alias);
-        }
+        ///// <summary>
+        ///// Gets an <see cref="IMacroPropertyType"/> by its alias
+        ///// </summary>
+        ///// <param name="alias">Alias to retrieve an <see cref="IMacroPropertyType"/> for</param>
+        ///// <returns>An <see cref="IMacroPropertyType"/> object</returns>
+        //public IMacroPropertyType GetMacroPropertyTypeByAlias(string alias)
+        //{
+        //    return MacroPropertyTypeResolver.Current.MacroPropertyTypes.FirstOrDefault(x => x.Alias == alias);
+        //}
 
         #region Event Handlers
         /// <summary>

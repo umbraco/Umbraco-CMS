@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -29,7 +30,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            using (var repository = new MacroRepository(unitOfWork))
+            using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
                 var macro = new Macro("test", "Test", "~/usercontrol/blah.ascx", "MyAssembly", "test.xslt", "~/views/macropartials/test.cshtml");
                 repository.AddOrUpdate(macro);
@@ -47,7 +48,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            using (var repository = new MacroRepository(unitOfWork))
+            using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
                 var macro = repository.Get(1);
                 macro.Alias = "test1";
@@ -65,7 +66,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            using (var repository = new MacroRepository(unitOfWork))
+            using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
                 // Assert
                 Assert.That(repository, Is.Not.Null);
@@ -78,7 +79,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork))
+            using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
                 // Act
                 var macro = repository.Get(1);
@@ -108,7 +109,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork))
+            using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
                 // Act
                 var macros = repository.GetAll();
@@ -125,7 +126,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork))
+            using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
                 // Act
                 var query = Query<IMacro>.Builder.Where(x => x.Alias.ToUpper() == "TEST1");
@@ -142,7 +143,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork))
+            using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
                 // Act
                 var query = Query<IMacro>.Builder.Where(x => x.Name.StartsWith("Test"));
@@ -159,7 +160,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork))
+            using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
                 // Act
                 var macro = new Macro("test", "Test", "~/usercontrol/blah.ascx", "MyAssembly", "test.xslt", "~/views/macropartials/test.cshtml");
@@ -178,7 +179,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork))
+            using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
                 // Act
                 var macro = repository.Get(2);
@@ -219,7 +220,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork))
+            using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
                 // Act
                 var macro = repository.Get(3);
@@ -240,7 +241,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork))
+            using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
                 // Act
                 var exists = repository.Exists(3);
@@ -258,7 +259,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork))
+            using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
                 var macro = repository.Get(1);
                 macro.Properties.Add(new MacroProperty("new1", "New1", 3, null));
@@ -283,7 +284,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork))
+            using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
                 var macro = new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml");
                 macro.Properties.Add(new MacroProperty("blah1", "New1", 4, null));
@@ -308,7 +309,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork))
+            using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
                 var macro = new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml");
                 macro.Properties.Add(new MacroProperty("blah1", "New1", 4, null));
@@ -317,7 +318,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var result = repository.Get(macro.Id);
                 result.Properties.Remove("blah1");
-                repository.AddOrUpdate(macro);
+                repository.AddOrUpdate(result);
                 unitOfWork.Commit();
 
                 // Assert
@@ -333,7 +334,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork))
+            using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
                 var macro = new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml");
                 var prop1 = new MacroProperty("blah1", "New1", 4, null);
