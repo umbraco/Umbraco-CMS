@@ -11,5 +11,11 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             get { return true; }
         }
 
+        [Test]
+        public override void UrlProviderMode()
+        {
+            Assert.IsTrue(SettingsSection.WebRouting.UrlProviderMode == "AutoLegacy");
+        }
+
     }
 }

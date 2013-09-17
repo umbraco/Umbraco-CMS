@@ -8,7 +8,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Tests.TestHelpers
 {
-    class SettingsForTests
+    public class SettingsForTests
     {
         // umbracoSettings
 
@@ -19,6 +19,17 @@ namespace Umbraco.Tests.TestHelpers
         public static void ConfigureSettings(IUmbracoSettingsSection settings)
         {
             UmbracoConfiguration.Current.UmbracoSettings = settings;
+        }
+
+        /// <summary>
+        /// Used for unit tests to explicitly associate an IUmbracoConfigurationSection to an implementation
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="implementation"></param>
+        public static void SetSetting<T>(T implementation)
+            where T : IUmbracoConfigurationSection
+        {
+            UmbracoConfiguration.Set<T>(implementation);
         }
 
         /// <summary>
@@ -68,7 +79,7 @@ namespace Umbraco.Tests.TestHelpers
             settings.Setup(x => x.RequestHandler.UseDomainPrefixes).Returns(false);
             settings.Setup(x => x.RequestHandler.CharCollection).Returns(RequestHandlerElement.GetDefaultCharReplacements());
             settings.Setup(x => x.Content.UmbracoLibraryCacheDuration).Returns(1800);
-            settings.Setup(x => x.WebRouting.UrlProviderMode).Returns("Auto");
+            settings.Setup(x => x.WebRouting.UrlProviderMode).Returns("AutoLegacy");
             settings.Setup(x => x.Templates.DefaultRenderingEngine).Returns(RenderingEngine.Mvc);
             
             return settings.Object;

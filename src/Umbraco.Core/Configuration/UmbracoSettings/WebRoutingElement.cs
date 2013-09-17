@@ -16,7 +16,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (bool) base["internalRedirectPreservesTemplate"]; }
         }
 
-        [ConfigurationProperty("urlProviderMode", DefaultValue = "Auto")]
+        [ConfigurationProperty("urlProviderMode", DefaultValue = "AutoLegacy")]
         public string UrlProviderMode
         {
             get { return (string)base["urlProviderMode"]; }

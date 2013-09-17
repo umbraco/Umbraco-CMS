@@ -30,6 +30,26 @@ namespace Umbraco.Core.Configuration
         
         private static readonly ConcurrentDictionary<Type, IUmbracoConfigurationSection> Sections = new ConcurrentDictionary<Type, IUmbracoConfigurationSection>();
 
+        
+        /// <summary>
+        /// Used for unit tests to explicitly associate an IUmbracoConfigurationSection to an implementation
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="implementation"></param>
+        internal static void Set<T>(T implementation)
+            where T : IUmbracoConfigurationSection
+        {
+            Sections.AddOrUpdate(typeof (T), type => implementation, (type, section) => implementation);
+        }
+
+        /// <summary>
+        /// Used for unit tests to reset the resolved sections
+        /// </summary>
+        internal static void Reset()
+        {
+            Sections.Clear();
+        }
+
         /// <summary>
         /// Gets the specified UmbracoConfigurationSection.
         /// </summary>

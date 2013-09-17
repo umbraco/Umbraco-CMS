@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         }
 
         [Test]
-        public void UrlProviderMode()
+        public virtual void UrlProviderMode()
         {
             Assert.IsTrue(SettingsSection.WebRouting.UrlProviderMode == "Auto");
         }
