@@ -314,7 +314,7 @@ namespace umbraco.cms.businesslogic.datatype
         {
             base.setupNode();
 
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select dbType, controlId from cmsDataType where nodeId = '" + this.Id.ToString() + "'"))
+            using (IRecordsReader dr = SqlHelper.ExecuteReader("select dbType, propertyEditorAlias from cmsDataType where nodeId = '" + this.Id.ToString() + "'"))
             {
                 if (dr.Read())
                 {
