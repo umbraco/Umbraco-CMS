@@ -6,7 +6,7 @@ using System.Security;
 using System.Text;
 using System.Web;
 using System.Web.Routing;
-using Rhino.Mocks;
+using Moq;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -53,55 +53,59 @@ namespace Umbraco.Tests.TestHelpers
 		{
 			//Request context
 
-			RequestContext = MockRepository.GenerateMock<RequestContext>();
-
+            var requestContextMock = new Mock<RequestContext>();
+		    
             //Cookie collection
 		    var cookieCollection = new HttpCookieCollection();
             cookieCollection.Add(new HttpCookie("UMB_UCONTEXT", "FBA996E7-D6BE-489B-B199-2B0F3D2DD826"));
 
 		    //Request
-			var request = MockRepository.GenerateMock<HttpRequestBase>();
-			request.Stub(x => x.AppRelativeCurrentExecutionFilePath).Return("~" + fullUrl.AbsolutePath);
-			request.Stub(x => x.PathInfo).Return(string.Empty);
-			request.Stub(x => x.RawUrl).Return(VirtualPathUtility.ToAbsolute("~" + fullUrl.AbsolutePath, "/"));
-			request.Stub(x => x.RequestContext).Return(RequestContext);
-			request.Stub(x => x.Url).Return(fullUrl);
-			request.Stub(x => x.ApplicationPath).Return("/");
-            request.Stub(x => x.Cookies).Return(cookieCollection);
-			request.Stub(x => x.ServerVariables).Return(new NameValueCollection());
+            var requestMock = new Mock<HttpRequestBase>();
+            requestMock.Setup(x => x.AppRelativeCurrentExecutionFilePath).Returns("~" + fullUrl.AbsolutePath);
+			requestMock.Setup(x => x.PathInfo).Returns(string.Empty);
+            requestMock.Setup(x => x.RawUrl).Returns(VirtualPathUtility.ToAbsolute("~" + fullUrl.AbsolutePath, "/"));
+            requestMock.Setup(x => x.RequestContext).Returns(RequestContext);
+            requestMock.Setup(x => x.Url).Returns(fullUrl);
+            requestMock.Setup(x => x.ApplicationPath).Returns("/");
+            requestMock.Setup(x => x.Cookies).Returns(cookieCollection);
+            requestMock.Setup(x => x.ServerVariables).Returns(new NameValueCollection());
 			var queryStrings = HttpUtility.ParseQueryString(fullUrl.Query);
-			request.Stub(x => x.QueryString).Return(queryStrings);
-			request.Stub(x => x.Form).Return(new NameValueCollection());
+            requestMock.Setup(x => x.QueryString).Returns(queryStrings);
+            requestMock.Setup(x => x.Form).Returns(new NameValueCollection());
 
 			//Cache
-			var cache = MockRepository.GenerateMock<HttpCachePolicyBase>();
+            var cacheMock = new Mock<HttpCachePolicyBase>();
 
 			//Response 
 			//var response = new FakeHttpResponse();
-			var response = MockRepository.GenerateMock<HttpResponseBase>();
-			response.Stub(x => x.ApplyAppPathModifier(null)).IgnoreArguments().Do(new Func<string, string>(appPath => appPath));
-			response.Stub(x => x.Cache).Return(cache);
+            var responseMock = new Mock<HttpResponseBase>();
+            responseMock.Setup(x => x.ApplyAppPathModifier(It.IsAny<string>())).Returns((string s) => s);
+            responseMock.Setup(x => x.Cache).Returns(cacheMock.Object);
 
 			//Server
 
-			var server = MockRepository.GenerateStub<HttpServerUtilityBase>();
-			server.Stub(x => x.MapPath(Arg<string>.Is.Anything)).Return(Environment.CurrentDirectory);
+			var serverMock = new Mock<HttpServerUtilityBase>();
+			serverMock.Setup(x => x.MapPath(It.IsAny<string>())).Returns(Environment.CurrentDirectory);
 
 			//HTTP Context
 
-			HttpContext = MockRepository.GenerateMock<HttpContextBase>();
-			HttpContext.Stub(x => x.Cache).Return(HttpRuntime.Cache);
-			HttpContext.Stub(x => x.Items).Return(new Dictionary<object, object>());
-			HttpContext.Stub(x => x.Request).Return(request);
-			HttpContext.Stub(x => x.Server).Return(server);
-			HttpContext.Stub(x => x.Response).Return(response);
+            var httpContextMock = new Mock<HttpContextBase>();
+            httpContextMock.Setup(x => x.Cache).Returns(HttpRuntime.Cache);
+            httpContextMock.Setup(x => x.Items).Returns(new Dictionary<object, object>());
+            httpContextMock.Setup(x => x.Request).Returns(requestMock.Object);
+            httpContextMock.Setup(x => x.Server).Returns(serverMock.Object);
+            httpContextMock.Setup(x => x.Response).Returns(responseMock.Object);
 
-			RequestContext.Stub(x => x.HttpContext).Return(HttpContext);
+            HttpContext = httpContextMock.Object;
+
+            requestContextMock.Setup(x => x.HttpContext).Returns(httpContextMock.Object);
 
 			if (routeData != null)
 			{
-				RequestContext.Stub(x => x.RouteData).Return(routeData);
+                requestContextMock.Setup(x => x.RouteData).Returns(routeData);
 			}
+		    
+            RequestContext = requestContextMock.Object;
 		}
 
 	}
