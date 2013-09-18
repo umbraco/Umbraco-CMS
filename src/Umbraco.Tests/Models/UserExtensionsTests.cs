@@ -1,5 +1,5 @@
-﻿using NUnit.Framework;
-using Rhino.Mocks;
+﻿using Moq;
+using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 
@@ -16,9 +16,11 @@ namespace Umbraco.Tests.Models
         [TestCase(1, "-1,-20,1,2,3,4,5", false)]
         public void Determines_Path_Based_Access_To_Content(int userId, string contentPath, bool outcome)
         {
-            var user = MockRepository.GenerateStub<IUser>();
+            var userMock = new Mock<IUser>();
+            var user = userMock.Object;
             user.StartContentId = userId;
-            var content = MockRepository.GenerateStub<IContent>();
+            var contentMock = new Mock<IContent>();
+            var content = contentMock.Object;
             content.Path = contentPath;
 
             Assert.AreEqual(outcome, user.HasPathAccess(content));

@@ -89,7 +89,7 @@ namespace Umbraco.Tests.TestHelpers
 			serverMock.Setup(x => x.MapPath(It.IsAny<string>())).Returns(Environment.CurrentDirectory);
 
             //User
-            var user = MockRepository.GenerateStub<IPrincipal>();
+		    var user = new Mock<IPrincipal>().Object;
 
 			//HTTP Context
 
@@ -99,7 +99,7 @@ namespace Umbraco.Tests.TestHelpers
             httpContextMock.Setup(x => x.Request).Returns(requestMock.Object);
             httpContextMock.Setup(x => x.Server).Returns(serverMock.Object);
             httpContextMock.Setup(x => x.Response).Returns(responseMock.Object);
-            HttpContext.Stub(x => x.User).Return(user);
+            httpContextMock.Setup(x => x.User).Returns(user);
 
             HttpContext = httpContextMock.Object;
 

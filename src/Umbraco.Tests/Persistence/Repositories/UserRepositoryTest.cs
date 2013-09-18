@@ -482,6 +482,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var names = users.Select(x => x.Username).ToArray();
                 Assert.IsTrue(names.Contains("TestUser1"));
                 Assert.IsTrue(names.Contains("TestUser3"));
+            }
         }
 
         [Test]
@@ -500,7 +501,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             // Assert
             Assert.AreEqual("ABC", user1.DefaultPermissions);
-            }
+            
         }
 
         private void AssertPropertyValues(IUser updatedItem, IUser originalUser)

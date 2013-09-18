@@ -3,8 +3,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
+using Moq;
 using NUnit.Framework;
-using Rhino.Mocks;
 using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -79,8 +79,8 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
                 }
                 path += i.ToInvariantString();
                 list.Add(new ContentItemBasic { Id = i, Name = "Test" + i, ParentId = i, Path = path });
-            }            
-            var user = MockRepository.GenerateStub<IUser>();
+            }
+            var user = new Mock<IUser>().Object;
             user.Id = 9;
             user.StartContentId = 5;
             
@@ -100,10 +100,10 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
                 list.Add(new ContentItemBasic{Id = i, Name = "Test" + i, ParentId = -1});
             }
             var ids = list.Select(x => (int)x.Id).ToArray();
-            var user = MockRepository.GenerateStub<IUser>();
+            var user = new Mock<IUser>().Object;
             user.Id = 9;
             user.StartContentId = -1;
-            var userService = MockRepository.GenerateStub<IUserService>();
+            var userServiceMock = new Mock<IUserService>();
             //we're only assigning 3 nodes browse permissions so that is what we expect as a result
             var permissions = new List<EntityPermission>
                 {
@@ -112,7 +112,8 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
                     new EntityPermission(9, 3, new string[]{ "F" }),
                     new EntityPermission(9, 4, new string[]{ "A" })
                 };
-            userService.Stub(x => x.GetPermissions(user, ids)).Return(permissions);
+            userServiceMock.Setup(x => x.GetPermissions(user, ids)).Returns(permissions);
+            var userService = userServiceMock.Object;
 
             att.FilterBasedOnPermissions(list, user, userService);
 

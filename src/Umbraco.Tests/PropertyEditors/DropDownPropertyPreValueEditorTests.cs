@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Moq;
 using NUnit.Framework;
-using Rhino.Mocks;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -21,7 +21,8 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void DropDownMultipleValueEditor_With_Keys_Format_Data_For_Cache()
         {
-            var dataTypeService = MockRepository.GenerateStub<IDataTypeService>();
+            var dataTypeServiceMock = new Mock<IDataTypeService>();
+            var dataTypeService = dataTypeServiceMock.Object;
             var editor = new PublishValuesMultipleValueEditor(true, dataTypeService, new ValueEditor());
 
             var result = editor.FormatValueForCache(
@@ -35,15 +36,18 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void DropDownMultipleValueEditor_No_Keys_Format_Data_For_Cache()
         {
-            var dataTypeService = MockRepository.GenerateStub<IDataTypeService>();
-            dataTypeService
-                .Stub(x => x.GetPreValuesCollectionByDataTypeId(Arg<int>.Is.Anything))
-                           .Return(new PreValueCollection(new Dictionary<string, PreValue>
+            var dataTypeServiceMock = new Mock<IDataTypeService>();
+
+            dataTypeServiceMock
+                .Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>()))
+                           .Returns(new PreValueCollection(new Dictionary<string, PreValue>
                                {
                                    {"key0", new PreValue(4567, "Value 1")},
                                    {"key1", new PreValue(1234, "Value 2")},
                                    {"key2", new PreValue(8910, "Value 3")}
                                }));
+
+            var dataTypeService = dataTypeServiceMock.Object;
             var editor = new PublishValuesMultipleValueEditor(false, dataTypeService, new ValueEditor());
 
             var result = editor.FormatValueForCache(
@@ -57,15 +61,17 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void DropDownValueEditor_Format_Data_For_Cache()
         {
-            var dataTypeService = MockRepository.GenerateStub<IDataTypeService>();
-            dataTypeService
-                .Stub(x => x.GetPreValuesCollectionByDataTypeId(Arg<int>.Is.Anything))
-                           .Return(new PreValueCollection(new Dictionary<string, PreValue>
+            var dataTypeServiceMock = new Mock<IDataTypeService>();
+            dataTypeServiceMock
+                .Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>()))
+                           .Returns(new PreValueCollection(new Dictionary<string, PreValue>
                                {
                                    {"key0", new PreValue(10, "Value 1")},
                                    {"key1", new PreValue(1234, "Value 2")},
                                    {"key2", new PreValue(11, "Value 3")}
                                }));
+
+            var dataTypeService = dataTypeServiceMock.Object;
             var editor = new PublishValueValueEditor(dataTypeService, new ValueEditor());
 
             var result = editor.FormatValueForCache(
