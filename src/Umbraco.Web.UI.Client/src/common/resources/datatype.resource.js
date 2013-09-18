@@ -18,7 +18,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "dataTypeApiBaseUrl",
                        "GetPreValues",
-                       [{ editorId: editorId }, { dataTypeId: dataTypeId }])),
+                       [{ editorAlias: editorId }, { dataTypeId: dataTypeId }])),
                'Failed to retreive pre values for editor id ' + editorId);
         },
 

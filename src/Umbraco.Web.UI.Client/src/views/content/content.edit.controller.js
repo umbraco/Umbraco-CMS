@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $location, contentResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager) {
+function ContentEditController($scope, $routeParams, contentResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, editorContextService) {
        
     //initialize the file manager
     fileManager.clearFiles();
@@ -17,6 +17,7 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
             .then(function(data) {
                 $scope.loaded = true;
                 $scope.content = data;
+                editorContextService.setContext($scope.content);
             });
     }
     else {
@@ -25,7 +26,8 @@ function ContentEditController($scope, $routeParams, $location, contentResource,
             .then(function(data) {
                 $scope.loaded = true;
                 $scope.content = data;
-                
+                editorContextService.setContext($scope.content);
+
                 //in one particular special case, after we've created a new item we redirect back to the edit
                 // route but there might be server validation errors in the collection which we need to display
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors

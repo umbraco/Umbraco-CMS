@@ -1,1 +1,1 @@
-tinymce.PluginManager.add("print",function(e){e.addCommand("mcePrint",function(){e.getWin().print()}),e.addButton("print",{title:"Print",cmd:"mcePrint"}),e.addMenuItem("print",{text:"Print",cmd:"mcePrint",icon:"print",shortcut:"Ctrl+P",context:"file"})});
+tinymce.PluginManager.add("print",function(t){t.addCommand("mcePrint",function(){t.getWin().print()}),t.addButton("print",{title:"Print",cmd:"mcePrint"}),t.addShortcut("Ctrl+P","","mcePrint"),t.addMenuItem("print",{text:"Print",cmd:"mcePrint",icon:"print",shortcut:"Ctrl+P",context:"file"})});
