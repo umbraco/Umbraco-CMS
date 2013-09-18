@@ -23,6 +23,10 @@ namespace Umbraco.Core.Cache
         {
         }
 
+        public override void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
+        {
+        }
+
         public override void ClearCacheByKeySearch(string keyStartsWith)
         {
         }
