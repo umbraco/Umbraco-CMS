@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Web.PublishedCache;
@@ -130,6 +131,11 @@ namespace Umbraco.Web.Cache
             //clear static object cache
             global::umbraco.cms.businesslogic.ContentType.RemoveAllDataTypeCache();
 
+            // see PublishedContentType for details
+            // can do by object types - noone else should cache published content type
+            //ApplicationContext.Current.ApplicationCache.ClearStaticCacheByKeySearch("PublishedContentType_");
+            ApplicationContext.Current.ApplicationCache.ClearStaticCacheObjectTypes<PublishedContentType>();
+
             base.RefreshAll();
         }
 
@@ -249,6 +255,10 @@ namespace Umbraco.Web.Cache
             
             //clears the dictionary object cache of the legacy ContentType
             global::umbraco.cms.businesslogic.ContentType.RemoveFromDataTypeCache(payload.Alias);
+
+            // see PublishedContentType for details
+            ApplicationContext.Current.ApplicationCache.ClearStaticCacheObjectTypes<PublishedContentType>(
+                (key, value) => value.Id == payload.Id); // faster than key strings comparisons
 
             //need to recursively clear the cache for each child content type
             foreach (var descendant in payload.DescendantPayloads)

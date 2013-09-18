@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using System.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Cache
 {
@@ -121,6 +122,10 @@ namespace Umbraco.Web.Cache
                     string.Format("{0}{1}", CacheKeys.DataTypeCacheKey, payload.Id));
                 ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
                     string.Format("{0}{1}", CacheKeys.DataTypeCacheKey, payload.UniqueId));
+
+                // see PublishedContentType for details
+                ApplicationContext.Current.ApplicationCache.ClearStaticCacheObjectTypes<PublishedContentType>(
+                    (key, value) => value.PropertyTypes.Any(x => x.DataTypeId == payload.Id));
             });
 
             base.Refresh(jsonPayload);

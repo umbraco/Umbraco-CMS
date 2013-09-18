@@ -94,45 +94,42 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region Cache
 
-        // note
-        // default cache refresher events will contain the ID of the refreshed / removed IContentType
-        // and not the alias. Also, we cannot hook into the cache refresher event here, because it belongs
-        // to Umbraco.Web, so we do it in Umbraco.Web.Models.PublishedContentTypeCaching.
-        
-        // fixme - must refactor PublishedContentType cache refresh
+        // these methods are NOT called anymore
+        // instead, ContentTypeCacheRefresher and DataTypeCacheRefresher directly handle the ApplicationCache
 
-        static readonly ConcurrentDictionary<string, PublishedContentType> ContentTypes = new ConcurrentDictionary<string, PublishedContentType>();
-        
-        // internal, called by PublishedContentTypeCaching
-        internal static void ClearAll()
-        {
-            Logging.LogHelper.Debug<PublishedContentType>("Clear all.");
-            ContentTypes.Clear();
-        }
+        //// internal, called by ContentTypeCacheRefresher
+        //internal static void ClearAll()
+        //{
+        //    Logging.LogHelper.Debug<PublishedContentType>("Clear all.");
+        //    ApplicationContext.Current.ApplicationCache.ClearStaticCacheByKeySearch("PublishedContentType_");
+        //}
 
-        // internal, called by PublishedContentTypeCaching
-        internal static void ClearContentType(int id)
-        {
-            Logging.LogHelper.Debug<PublishedContentType>("Clear content type w/id {0}.", () => id);
+        //// internal, called by ContentTypeCacheRefresher
+        //internal static void ClearContentType(int id)
+        //{
+        //    Logging.LogHelper.Debug<PublishedContentType>("Clear content type w/id {0}.", () => id);
+        //    // requires a predicate because the key does not contain the ID
+        //    ApplicationContext.Current.ApplicationCache.ClearStaticCacheObjectTypes<PublishedContentType>(
+        //        (key, value) => value.Id == id);
+        //}
 
-            // see http://blogs.msdn.com/b/pfxteam/archive/2011/04/02/10149222.aspx
-            // that should be race-cond safe
-            ContentTypes.RemoveAll(kvp => kvp.Value.Id == id);
-        }
-
-        // internal, called by PublishedContentTypeCaching
-        internal static void ClearDataType(int id)
-        {
-            Logging.LogHelper.Debug<PublishedContentType>("Clear data type w/id {0}.", () => id);
-
-            // see note in ClearContentType()
-            ContentTypes.RemoveAll(kvp => kvp.Value.PropertyTypes.Any(x => x.DataTypeId == id));
-        }
+        //// internal, called by DataTypeCacheRefresher
+        //internal static void ClearDataType(int id)
+        //{
+        //    Logging.LogHelper.Debug<PublishedContentType>("Clear data type w/id {0}.", () => id);
+        //    ApplicationContext.Current.ApplicationCache.ClearStaticCacheObjectTypes<PublishedContentType>(
+        //        (key, value) => value.PropertyTypes.Any(x => x.DataTypeId == id));
+        //}
 
         public static PublishedContentType Get(PublishedItemType itemType, string alias)
         {
-            var key = (itemType == PublishedItemType.Content ? "content" : "media") + "::" + alias.ToLowerInvariant();
-            return ContentTypes.GetOrAdd(key, k => CreatePublishedContentType(itemType, alias));
+            var key = string.Format("PublishedContentType_{0}_{1}",
+                itemType == PublishedItemType.Content ? "content" : "media", alias.ToLowerInvariant());
+
+            var type = ApplicationContext.Current.ApplicationCache.GetStaticCacheItem(key,
+                () => CreatePublishedContentType(itemType, alias));
+
+            return type;
         }
 
         private static PublishedContentType CreatePublishedContentType(PublishedItemType itemType, string alias)
@@ -154,7 +151,10 @@ namespace Umbraco.Core.Models.PublishedContent
             get { return _getPublishedContentTypeCallBack; }
             set
             {
-                ClearAll();
+                // see note above
+                //ClearAll();
+                ApplicationContext.Current.ApplicationCache.ClearStaticCacheByKeySearch("PublishedContentType_");
+
                 _getPublishedContentTypeCallBack = value;
             }
         }
