@@ -842,6 +842,7 @@ namespace Umbraco.Tests.Services
             Assert.That(sut.GetValue<string>("multilineText"), Is.EqualTo("Multiple lines \n in one box"));
             Assert.That(sut.GetValue<string>("upload"), Is.EqualTo("/media/1234/koala.jpg"));
             Assert.That(sut.GetValue<string>("label"), Is.EqualTo("Non-editable label"));
+            //SD: This is failing because the 'content' call to GetValue<DateTime> always has empty milliseconds
             Assert.That(sut.GetValue<DateTime>("dateTime"), Is.EqualTo(content.GetValue<DateTime>("dateTime")));
             Assert.That(sut.GetValue<string>("colorPicker"), Is.EqualTo("black"));
 	        Assert.That(sut.GetValue<string>("folderBrowser"), Is.Empty);
