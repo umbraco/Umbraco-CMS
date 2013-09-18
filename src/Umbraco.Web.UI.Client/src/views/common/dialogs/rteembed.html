@@ -14,12 +14,15 @@
 
                 <label for="url">Url</label> 
                 <input id="url" type="text" ng-model="url" ng-change="showPreview()"/>
+                
+                <div ng-show="supportsDimensions">
+                    <label>Size:</label> 
+                    <input type="text" ng-model="width" on-blur="changeSize('width')"/> x <input type="text" ng-model="height" on-blur="changeSize('height')"/>
+                    <label for="constrain">Constrain:</label> 
+                    <input id="constrain" type="checkbox" ng-model="constrain"/>
+                </div>
 
-                <label>Size:</label> 
-                <input type="text" ng-model="width"/> x <input type="text" ng-model="height" />
-                <label for="constrain">Constrain:</label> 
-                <input id="constrain" type="checkbox" ng-model="constrain"/>
-    
+                <p ng-bind="info"></p>
                 <div ng-bind-html-unsafe="preview">
                 </div>
             </div>
