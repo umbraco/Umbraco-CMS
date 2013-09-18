@@ -5,7 +5,9 @@
     $scope.constrain = true;
     $scope.preview = "";
     $scope.success = false;
-    
+
+    var origWidth = 500;
+    var origHeight = 300;
     $scope.showPreview = function(){
 
         if ($scope.url != "") {
@@ -26,6 +28,26 @@
 
     };
 
+    $scope.changeSize = function (type) {
+        var width, height;
+        
+        if ($scope.constrain) {
+            width = parseInt($scope.width, 10);
+            height = parseInt($scope.height, 10);
+            if (type == 'width') {
+                origHeight = Math.round((width / origWidth) * height);
+                $scope.height = origHeight;
+            } else {
+                origWidth = Math.round((height / origHeight) * width);
+                $scope.width = origWidth;
+            }
+        }
+        if ($scope.url != "") {
+            $scope.showPreview();
+        }
+
+    };
+    
     $scope.insert = function(){
         $scope.submit($scope.preview);
     };
