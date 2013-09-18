@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -25,8 +26,13 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
+        private UserTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        {
+            return  new UserTypeRepository(unitOfWork, NullCacheProvider.Current);            
+        }
+
         [Test]
-        public void Can_Instantiate_Repository()
+        public void Can_Instantiate_Repository_From_Resolver()
         {
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
@@ -45,16 +51,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserTypeRepository>(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            var userType = MockedUserType.CreateUserType();
+                var userType = MockedUserType.CreateUserType();
 
-            // Act
-            repository.AddOrUpdate(userType);
-            unitOfWork.Commit();
+                // Act
+                repository.AddOrUpdate(userType);
+                unitOfWork.Commit();
 
-            // Assert
-            Assert.That(userType.HasIdentity, Is.True);
+                // Assert
+                Assert.That(userType.HasIdentity, Is.True);
+            }
         }
 
         [Test]
@@ -63,20 +71,22 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserTypeRepository>(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            var userType1 = MockedUserType.CreateUserType("1");
-            var userType2 = MockedUserType.CreateUserType("2");
+                var userType1 = MockedUserType.CreateUserType("1");
+                var userType2 = MockedUserType.CreateUserType("2");
 
-            // Act
-            repository.AddOrUpdate(userType1);
-            unitOfWork.Commit();
-            repository.AddOrUpdate(userType2);
-            unitOfWork.Commit();
+                // Act
+                repository.AddOrUpdate(userType1);
+                unitOfWork.Commit();
+                repository.AddOrUpdate(userType2);
+                unitOfWork.Commit();
 
-            // Assert
-            Assert.That(userType1.HasIdentity, Is.True);
-            Assert.That(userType2.HasIdentity, Is.True);
+                // Assert
+                Assert.That(userType1.HasIdentity, Is.True);
+                Assert.That(userType2.HasIdentity, Is.True);
+            }
         }
 
         [Test]
@@ -85,17 +95,19 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserTypeRepository>(unitOfWork);
-            var userType = MockedUserType.CreateUserType();
-            repository.AddOrUpdate(userType);
-            unitOfWork.Commit();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var userType = MockedUserType.CreateUserType();
+                repository.AddOrUpdate(userType);
+                unitOfWork.Commit();
 
-            // Act
-            var resolved = repository.Get(userType.Id);
-            bool dirty = ((UserType)resolved).IsDirty();
+                // Act
+                var resolved = repository.Get(userType.Id);
+                bool dirty = ((UserType) resolved).IsDirty();
 
-            // Assert
-            Assert.That(dirty, Is.False);
+                // Assert
+                Assert.That(dirty, Is.False);
+            }
         }
 
         [Test]
@@ -104,23 +116,25 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserTypeRepository>(unitOfWork);
-            var userType = MockedUserType.CreateUserType();
-            repository.AddOrUpdate(userType);
-            unitOfWork.Commit();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var userType = MockedUserType.CreateUserType();
+                repository.AddOrUpdate(userType);
+                unitOfWork.Commit();
 
-            // Act
-            var resolved = repository.Get(userType.Id);
-            resolved.Name = "New Name";
-            resolved.Permissions = "ZYX";
-            repository.AddOrUpdate(resolved);
-            unitOfWork.Commit();
-            var updatedItem = repository.Get(userType.Id);
+                // Act
+                var resolved = repository.Get(userType.Id);
+                resolved.Name = "New Name";
+                resolved.Permissions = "ZYX";
+                repository.AddOrUpdate(resolved);
+                unitOfWork.Commit();
+                var updatedItem = repository.Get(userType.Id);
 
-            // Assert
-            Assert.That(updatedItem.Id, Is.EqualTo(resolved.Id));
-            Assert.That(updatedItem.Name, Is.EqualTo(resolved.Name));
-            Assert.That(updatedItem.Permissions, Is.EqualTo(resolved.Permissions));
+                // Assert
+                Assert.That(updatedItem.Id, Is.EqualTo(resolved.Id));
+                Assert.That(updatedItem.Name, Is.EqualTo(resolved.Name));
+                Assert.That(updatedItem.Permissions, Is.EqualTo(resolved.Permissions));
+            }
         }
 
         [Test]
@@ -129,23 +143,25 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserTypeRepository>(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            var userType = MockedUserType.CreateUserType();
-            
-            // Act
-            repository.AddOrUpdate(userType);
-            unitOfWork.Commit();
-            var id = userType.Id;
+                var userType = MockedUserType.CreateUserType();
 
-            var repository2 = RepositoryResolver.Current.ResolveByType<IUserTypeRepository>(unitOfWork);
-            repository2.Delete(userType);
-            unitOfWork.Commit();
+                // Act
+                repository.AddOrUpdate(userType);
+                unitOfWork.Commit();
+                var id = userType.Id;
 
-            var resolved = repository2.Get(id);
+                var repository2 = RepositoryResolver.Current.ResolveByType<IUserTypeRepository>(unitOfWork);
+                repository2.Delete(userType);
+                unitOfWork.Commit();
 
-            // Assert
-            Assert.That(resolved, Is.Null);
+                var resolved = repository2.Get(id);
+
+                // Assert
+                Assert.That(resolved, Is.Null);
+            }
         }
 
         [Test]
@@ -154,21 +170,23 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserTypeRepository>(unitOfWork);
-            var userType = MockedUserType.CreateUserType();
-            repository.AddOrUpdate(userType);
-            unitOfWork.Commit();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var userType = MockedUserType.CreateUserType();
+                repository.AddOrUpdate(userType);
+                unitOfWork.Commit();
 
-            // Act
-            var resolved = repository.Get(userType.Id);
+                // Act
+                var resolved = repository.Get(userType.Id);
 
-            // Assert
-            Assert.That(resolved.Id, Is.EqualTo(userType.Id));
-            //Assert.That(resolved.CreateDate, Is.GreaterThan(DateTime.MinValue));
-            //Assert.That(resolved.UpdateDate, Is.GreaterThan(DateTime.MinValue));
-            Assert.That(resolved.Name, Is.EqualTo(userType.Name));
-            Assert.That(resolved.Alias, Is.EqualTo(userType.Alias));
-            Assert.That(resolved.Permissions, Is.EqualTo(userType.Permissions));           
+                // Assert
+                Assert.That(resolved.Id, Is.EqualTo(userType.Id));
+                //Assert.That(resolved.CreateDate, Is.GreaterThan(DateTime.MinValue));
+                //Assert.That(resolved.UpdateDate, Is.GreaterThan(DateTime.MinValue));
+                Assert.That(resolved.Name, Is.EqualTo(userType.Name));
+                Assert.That(resolved.Alias, Is.EqualTo(userType.Alias));
+                Assert.That(resolved.Permissions, Is.EqualTo(userType.Permissions));
+            }
         }
 
         [Test]
@@ -177,15 +195,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserTypeRepository>(unitOfWork);
-            CreateAndCommitMultipleUserTypes(repository, unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                CreateAndCommitMultipleUserTypes(repository, unitOfWork);
 
-            // Act
-            var query = Query<IUserType>.Builder.Where(x => x.Alias == "testUserType1");
-            var result = repository.GetByQuery(query);
+                // Act
+                var query = Query<IUserType>.Builder.Where(x => x.Alias == "testUserType1");
+                var result = repository.GetByQuery(query);
 
-            // Assert
-            Assert.That(result.Count(), Is.GreaterThanOrEqualTo(1));
+                // Assert
+                Assert.That(result.Count(), Is.GreaterThanOrEqualTo(1));
+            }
         }
 
         [Test]
@@ -194,16 +214,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserTypeRepository>(unitOfWork);
-            var userTypes = CreateAndCommitMultipleUserTypes(repository, unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var userTypes = CreateAndCommitMultipleUserTypes(repository, unitOfWork);
 
-            // Act
-            var result = repository.GetAll(userTypes[0].Id, userTypes[1].Id);
+                // Act
+                var result = repository.GetAll(userTypes[0].Id, userTypes[1].Id);
 
-            // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Any(), Is.True);
-            Assert.That(result.Count(), Is.EqualTo(2));
+                // Assert
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Any(), Is.True);
+                Assert.That(result.Count(), Is.EqualTo(2));
+            }
         }
 
         [Test]
@@ -212,16 +234,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserTypeRepository>(unitOfWork);
-            CreateAndCommitMultipleUserTypes(repository, unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                CreateAndCommitMultipleUserTypes(repository, unitOfWork);
 
-            // Act
-            var result = repository.GetAll();
+                // Act
+                var result = repository.GetAll();
 
-            // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Any(), Is.True);
-            Assert.That(result.Count(), Is.GreaterThanOrEqualTo(3));
+                // Assert
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Any(), Is.True);
+                Assert.That(result.Count(), Is.GreaterThanOrEqualTo(3));
+            }
         }
 
         [Test]
@@ -230,14 +254,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserTypeRepository>(unitOfWork);
-            var userTypes = CreateAndCommitMultipleUserTypes(repository, unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var userTypes = CreateAndCommitMultipleUserTypes(repository, unitOfWork);
 
-            // Act
-            var exists = repository.Exists(userTypes[0].Id);
+                // Act
+                var exists = repository.Exists(userTypes[0].Id);
 
-            // Assert
-            Assert.That(exists, Is.True);
+                // Assert
+                Assert.That(exists, Is.True);
+            }
         }
 
         [Test]
@@ -246,15 +272,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IUserTypeRepository>(unitOfWork);
-            var userTypes = CreateAndCommitMultipleUserTypes(repository, unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var userTypes = CreateAndCommitMultipleUserTypes(repository, unitOfWork);
 
-            // Act
-            var query = Query<IUserType>.Builder.Where(x => x.Alias == "testUserType1" || x.Alias == "testUserType2");
-            var result = repository.Count(query);
+                // Act
+                var query = Query<IUserType>.Builder.Where(x => x.Alias == "testUserType1" || x.Alias == "testUserType2");
+                var result = repository.Count(query);
 
-            // Assert
-            Assert.That(result, Is.GreaterThanOrEqualTo(2));
+                // Assert
+                Assert.That(result, Is.GreaterThanOrEqualTo(2));
+            }
         }
 
         private IUserType[] CreateAndCommitMultipleUserTypes(IUserTypeRepository repository, IUnitOfWork unitOfWork)

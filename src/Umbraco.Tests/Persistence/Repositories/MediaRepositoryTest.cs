@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -26,8 +27,15 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData();
         }
 
+        private MediaRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MediaTypeRepository mediaTypeRepository)
+        {
+            mediaTypeRepository = new MediaTypeRepository(unitOfWork, NullCacheProvider.Current);
+            var repository = new MediaRepository(unitOfWork, NullCacheProvider.Current, mediaTypeRepository);
+            return repository;
+        }
+
         [Test]
-        public void Can_Instantiate_Repository()
+        public void Can_Instantiate_Repository_From_Resolver()
         {
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
@@ -46,20 +54,22 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var mediaTypeRepository = RepositoryResolver.Current.ResolveByType<IMediaTypeRepository>(unitOfWork);
-            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
 
-            var mediaType = mediaTypeRepository.Get(1032);
-            var image = MockedMedia.CreateMediaImage(mediaType, -1);
+                var mediaType = mediaTypeRepository.Get(1032);
+                var image = MockedMedia.CreateMediaImage(mediaType, -1);
 
-            // Act
-            mediaTypeRepository.AddOrUpdate(mediaType);
-            repository.AddOrUpdate(image);
-            unitOfWork.Commit();
+                // Act
+                mediaTypeRepository.AddOrUpdate(mediaType);
+                repository.AddOrUpdate(image);
+                unitOfWork.Commit();
 
-            // Assert
-            Assert.That(mediaType.HasIdentity, Is.True);
-            Assert.That(image.HasIdentity, Is.True);
+                // Assert
+                Assert.That(mediaType.HasIdentity, Is.True);
+                Assert.That(image.HasIdentity, Is.True);
+            }
         }
 
         [Test]
@@ -68,27 +78,29 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var mediaTypeRepository = RepositoryResolver.Current.ResolveByType<IMediaTypeRepository>(unitOfWork);
-            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
 
-            var mediaType = mediaTypeRepository.Get(1032);
-            var file = MockedMedia.CreateMediaFile(mediaType, -1);
+                var mediaType = mediaTypeRepository.Get(1032);
+                var file = MockedMedia.CreateMediaFile(mediaType, -1);
 
-            // Act
-            repository.AddOrUpdate(file);
-            unitOfWork.Commit();
+                // Act
+                repository.AddOrUpdate(file);
+                unitOfWork.Commit();
 
-            var image = MockedMedia.CreateMediaImage(mediaType, -1);
-            repository.AddOrUpdate(image);
-            unitOfWork.Commit();
+                var image = MockedMedia.CreateMediaImage(mediaType, -1);
+                repository.AddOrUpdate(image);
+                unitOfWork.Commit();
 
-            // Assert
-            Assert.That(file.HasIdentity, Is.True);
-            Assert.That(image.HasIdentity, Is.True);
-            Assert.That(file.Name, Is.EqualTo("Test File"));
-            Assert.That(image.Name, Is.EqualTo("Test Image"));
-            Assert.That(file.ContentTypeId, Is.EqualTo(mediaType.Id));
-            Assert.That(image.ContentTypeId, Is.EqualTo(mediaType.Id));
+                // Assert
+                Assert.That(file.HasIdentity, Is.True);
+                Assert.That(image.HasIdentity, Is.True);
+                Assert.That(file.Name, Is.EqualTo("Test File"));
+                Assert.That(image.Name, Is.EqualTo("Test Image"));
+                Assert.That(file.ContentTypeId, Is.EqualTo(mediaType.Id));
+                Assert.That(image.ContentTypeId, Is.EqualTo(mediaType.Id));
+            }
         }
 
         [Test]
@@ -97,27 +109,29 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var mediaTypeRepository = RepositoryResolver.Current.ResolveByType<IMediaTypeRepository>(unitOfWork);
-            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
 
-            var mediaType = mediaTypeRepository.Get(1032);
-            var file = MockedMedia.CreateMediaFile(mediaType, -1);
+                var mediaType = mediaTypeRepository.Get(1032);
+                var file = MockedMedia.CreateMediaFile(mediaType, -1);
 
-            // Act
-            repository.AddOrUpdate(file);
-            unitOfWork.Commit();
+                // Act
+                repository.AddOrUpdate(file);
+                unitOfWork.Commit();
 
-            var image = MockedMedia.CreateMediaImage(mediaType, -1);
-            repository.AddOrUpdate(image);
-            unitOfWork.Commit();
+                var image = MockedMedia.CreateMediaImage(mediaType, -1);
+                repository.AddOrUpdate(image);
+                unitOfWork.Commit();
 
-            // Assert
-            Assert.That(file.HasIdentity, Is.True);
-            Assert.That(image.HasIdentity, Is.True);
-            Assert.That(file.Name, Is.EqualTo("Test File"));
-            Assert.That(image.Name, Is.EqualTo("Test Image"));
-            Assert.That(file.ContentTypeId, Is.EqualTo(mediaType.Id));
-            Assert.That(image.ContentTypeId, Is.EqualTo(mediaType.Id));
+                // Assert
+                Assert.That(file.HasIdentity, Is.True);
+                Assert.That(image.HasIdentity, Is.True);
+                Assert.That(file.Name, Is.EqualTo("Test File"));
+                Assert.That(image.Name, Is.EqualTo("Test Image"));
+                Assert.That(file.ContentTypeId, Is.EqualTo(mediaType.Id));
+                Assert.That(image.ContentTypeId, Is.EqualTo(mediaType.Id));
+            }
         }
 
         [Test]
@@ -126,14 +140,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
 
-            // Act
-            var media = repository.Get(1046);
-            bool dirty = ((ICanBeDirty)media).IsDirty();
+                // Act
+                var media = repository.Get(1046);
+                bool dirty = ((ICanBeDirty) media).IsDirty();
 
-            // Assert
-            Assert.That(dirty, Is.False);
+                // Assert
+                Assert.That(dirty, Is.False);
+            }
         }
 
         [Test]
@@ -142,19 +159,22 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
 
-            // Act
-            var content = repository.Get(1047);
-            content.Name = "Test File Updated";
-            repository.AddOrUpdate(content);
-            unitOfWork.Commit();
+                // Act
+                var content = repository.Get(1047);
+                content.Name = "Test File Updated";
+                repository.AddOrUpdate(content);
+                unitOfWork.Commit();
 
-            var updatedContent = repository.Get(1047);
+                var updatedContent = repository.Get(1047);
 
-            // Assert
-            Assert.That(updatedContent.Id, Is.EqualTo(content.Id));
-            Assert.That(updatedContent.Name, Is.EqualTo(content.Name));
+                // Assert
+                Assert.That(updatedContent.Id, Is.EqualTo(content.Id));
+                Assert.That(updatedContent.Name, Is.EqualTo(content.Name));
+            }
         }
 
         [Test]
@@ -163,19 +183,22 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
 
-            // Act
-            var media = repository.Get(1047);
-            repository.Delete(media);
-            unitOfWork.Commit();
+                // Act
+                var media = repository.Get(1047);
+                repository.Delete(media);
+                unitOfWork.Commit();
 
-            var deleted = repository.Get(1047);
-            var exists = repository.Exists(1047);
+                var deleted = repository.Get(1047);
+                var exists = repository.Exists(1047);
 
-            // Assert
-            Assert.That(deleted, Is.Null);
-            Assert.That(exists, Is.False);
+                // Assert
+                Assert.That(deleted, Is.Null);
+                Assert.That(exists, Is.False);
+            }
         }
 
         [Test]
@@ -184,22 +207,25 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
 
-            // Act
-            var media = repository.Get(1046);
+                // Act
+                var media = repository.Get(1046);
 
-            // Assert
-            Assert.That(media.Id, Is.EqualTo(1046));
-            Assert.That(media.CreateDate, Is.GreaterThan(DateTime.MinValue));
-            Assert.That(media.UpdateDate, Is.GreaterThan(DateTime.MinValue));
-            Assert.That(media.ParentId, Is.Not.EqualTo(0));
-            Assert.That(media.Name, Is.EqualTo("Test Image"));
-            Assert.That(media.SortOrder, Is.EqualTo(0));
-            Assert.That(media.Version, Is.Not.EqualTo(Guid.Empty));
-            Assert.That(media.ContentTypeId, Is.EqualTo(1032));
-            Assert.That(media.Path, Is.Not.Empty);
-            Assert.That(media.Properties.Any(), Is.True);
+                // Assert
+                Assert.That(media.Id, Is.EqualTo(1046));
+                Assert.That(media.CreateDate, Is.GreaterThan(DateTime.MinValue));
+                Assert.That(media.UpdateDate, Is.GreaterThan(DateTime.MinValue));
+                Assert.That(media.ParentId, Is.Not.EqualTo(0));
+                Assert.That(media.Name, Is.EqualTo("Test Image"));
+                Assert.That(media.SortOrder, Is.EqualTo(0));
+                Assert.That(media.Version, Is.Not.EqualTo(Guid.Empty));
+                Assert.That(media.ContentTypeId, Is.EqualTo(1032));
+                Assert.That(media.Path, Is.Not.Empty);
+                Assert.That(media.Properties.Any(), Is.True);
+            }
         }
 
         [Test]
@@ -208,14 +234,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
 
-            // Act
-            var query = Query<IMedia>.Builder.Where(x => x.Level == 2);
-            var result = repository.GetByQuery(query);
+                // Act
+                var query = Query<IMedia>.Builder.Where(x => x.Level == 2);
+                var result = repository.GetByQuery(query);
 
-            // Assert
-            Assert.That(result.Count(), Is.GreaterThanOrEqualTo(2));//There should be two entities on level 2: File and Media
+                // Assert
+                Assert.That(result.Count(), Is.GreaterThanOrEqualTo(2)); //There should be two entities on level 2: File and Media
+            }
         }
 
         [Test]
@@ -224,15 +253,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
 
-            // Act
-            var medias = repository.GetAll(1046, 1047);
+                // Act
+                var medias = repository.GetAll(1046, 1047);
 
-            // Assert
-            Assert.That(medias, Is.Not.Null);
-            Assert.That(medias.Any(), Is.True);
-            Assert.That(medias.Count(), Is.EqualTo(2));
+                // Assert
+                Assert.That(medias, Is.Not.Null);
+                Assert.That(medias.Any(), Is.True);
+                Assert.That(medias.Count(), Is.EqualTo(2));
+            }
         }
 
         [Test]
@@ -241,15 +273,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
 
-            // Act
-            var medias = repository.GetAll();
+                // Act
+                var medias = repository.GetAll();
 
-            // Assert
-            Assert.That(medias, Is.Not.Null);
-            Assert.That(medias.Any(), Is.True);
-            Assert.That(medias.Count(), Is.GreaterThanOrEqualTo(3));
+                // Assert
+                Assert.That(medias, Is.Not.Null);
+                Assert.That(medias.Any(), Is.True);
+                Assert.That(medias.Count(), Is.GreaterThanOrEqualTo(3));
+            }
         }
 
         [Test]
@@ -258,17 +293,20 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
 
-            // Act
-            var exists = repository.Exists(1046);
-            var existsToo = repository.Exists(1046);
-            var doesntExists = repository.Exists(1050);
+                // Act
+                var exists = repository.Exists(1046);
+                var existsToo = repository.Exists(1046);
+                var doesntExists = repository.Exists(1050);
 
-            // Assert
-            Assert.That(exists, Is.True);
-            Assert.That(existsToo, Is.True);
-            Assert.That(doesntExists, Is.False);
+                // Assert
+                Assert.That(exists, Is.True);
+                Assert.That(existsToo, Is.True);
+                Assert.That(doesntExists, Is.False);
+            }
         }
 
         [Test]
@@ -277,15 +315,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
+            MediaTypeRepository mediaTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository))
+            {
 
-            // Act
-            int level = 2;
-            var query = Query<IMedia>.Builder.Where(x => x.Level == level);
-            var result = repository.Count(query);
+                // Act
+                int level = 2;
+                var query = Query<IMedia>.Builder.Where(x => x.Level == level);
+                var result = repository.Count(query);
 
-            // Assert
-            Assert.That(result, Is.GreaterThanOrEqualTo(2));
+                // Assert
+                Assert.That(result, Is.GreaterThanOrEqualTo(2));
+            }
         }
 
         [TearDown]

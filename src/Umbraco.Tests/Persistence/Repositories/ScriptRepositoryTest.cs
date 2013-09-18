@@ -4,6 +4,7 @@ using System.Text;
 using NUnit.Framework;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -23,14 +24,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Instantiate_Repository()
+        public void Can_Instantiate_Repository_From_Resolver()
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-			var repository = new ScriptRepository(unitOfWork, _fileSystem);
+            var repository = RepositoryResolver.Current.ResolveByType<IScriptRepository>(unitOfWork);  
 
             // Assert
             Assert.That(repository, Is.Not.Null);

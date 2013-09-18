@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
@@ -34,17 +35,26 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
+        private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
+        {
+            var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);
+            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository);
+            return repository;
+        }
+
         [Test]
         public void Ensures_Permissions_Are_Set_If_Parent_Entity_Permissions_Exist()
-        {
+        {           
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
-            var repository = (ContentRepository)RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
 
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
-            contentType.AllowedContentTypes = new List<ContentTypeSort>
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                contentType.AllowedContentTypes = new List<ContentTypeSort>
                 {
                     new ContentTypeSort
                         {
@@ -53,25 +63,27 @@ namespace Umbraco.Tests.Persistence.Repositories
                             SortOrder = 0
                         }
                 };
-            var parentPage = MockedContent.CreateSimpleContent(contentType);                        
-            contentTypeRepository.AddOrUpdate(contentType);
-            repository.AddOrUpdate(parentPage);
-            unitOfWork.Commit();
+                var parentPage = MockedContent.CreateSimpleContent(contentType);
+                contentTypeRepository.AddOrUpdate(contentType);
+                repository.AddOrUpdate(parentPage);
+                unitOfWork.Commit();
 
-            // Act
-            repository.AssignEntityPermissions(parentPage, "A", new object[] {0});
-            var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
-            repository.AddOrUpdate(childPage);
-            unitOfWork.Commit();
+                // Act
+                repository.AssignEntityPermissions(parentPage, "A", new object[] { 0 });
+                var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
+                repository.AddOrUpdate(childPage);
+                unitOfWork.Commit();
 
-            // Assert
-            var permissions = repository.GetPermissionsForEntity(childPage.Id);
-            Assert.AreEqual(1, permissions.Count());
-            Assert.AreEqual("A", permissions.Single().Permission);
+                // Assert
+                var permissions = repository.GetPermissionsForEntity(childPage.Id);
+                Assert.AreEqual(1, permissions.Count());
+                Assert.AreEqual("A", permissions.Single().Permission);
+            }
+            
         }
 
         [Test]
-        public void Can_Instantiate_Repository()
+        public void Can_Instantiate_Repository_From_Resolver()
         {
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
@@ -90,20 +102,21 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                Content textpage = MockedContent.CreateSimpleContent(contentType);
 
-            ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
-            Content textpage = MockedContent.CreateSimpleContent(contentType);
+                // Act
+                contentTypeRepository.AddOrUpdate(contentType);
+                repository.AddOrUpdate(textpage);
+                unitOfWork.Commit();
 
-            // Act
-            contentTypeRepository.AddOrUpdate(contentType);
-            repository.AddOrUpdate(textpage);
-            unitOfWork.Commit();
-
-            // Assert
-            Assert.That(contentType.HasIdentity, Is.True);
-            Assert.That(textpage.HasIdentity, Is.True);
+                // Assert
+                Assert.That(contentType.HasIdentity, Is.True);
+                Assert.That(textpage.HasIdentity, Is.True);
+            }
         }
 
         //Covers issue U4-2791 and U4-2607
@@ -113,28 +126,29 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                Content textpage = MockedContent.CreateSimpleContent(contentType, "test@umbraco.org", -1);
+                Content anotherTextpage = MockedContent.CreateSimpleContent(contentType, "@lightgiants", -1);
 
-            ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
-            Content textpage = MockedContent.CreateSimpleContent(contentType, "test@umbraco.org", -1);
-            Content anotherTextpage = MockedContent.CreateSimpleContent(contentType, "@lightgiants", -1);
+                // Act
+                contentTypeRepository.AddOrUpdate(contentType);
+                repository.AddOrUpdate(textpage);
+                repository.AddOrUpdate(anotherTextpage);
+                unitOfWork.Commit();
 
-            // Act
-            contentTypeRepository.AddOrUpdate(contentType);
-            repository.AddOrUpdate(textpage);
-            repository.AddOrUpdate(anotherTextpage);
-            unitOfWork.Commit();
+                // Assert
+                Assert.That(contentType.HasIdentity, Is.True);
+                Assert.That(textpage.HasIdentity, Is.True);
 
-            // Assert
-            Assert.That(contentType.HasIdentity, Is.True);
-            Assert.That(textpage.HasIdentity, Is.True);
+                var content = repository.Get(textpage.Id);
+                Assert.That(content.Name, Is.EqualTo(textpage.Name));
 
-            var content = repository.Get(textpage.Id);
-            Assert.That(content.Name, Is.EqualTo(textpage.Name));
-
-            var content2 = repository.Get(anotherTextpage.Id);
-            Assert.That(content2.Name, Is.EqualTo(anotherTextpage.Name));
+                var content2 = repository.Get(anotherTextpage.Id);
+                Assert.That(content2.Name, Is.EqualTo(anotherTextpage.Name));
+            }
         }
 
         [Test]
@@ -143,26 +157,28 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                Content textpage = MockedContent.CreateSimpleContent(contentType);
 
-            ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
-            Content textpage = MockedContent.CreateSimpleContent(contentType);
-            
-            // Act
-            contentTypeRepository.AddOrUpdate(contentType);
-            repository.AddOrUpdate(textpage);
-            unitOfWork.Commit();
-            
-            Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
-            repository.AddOrUpdate(subpage);
-            unitOfWork.Commit();
+                // Act
+                contentTypeRepository.AddOrUpdate(contentType);
+                repository.AddOrUpdate(textpage);
+                unitOfWork.Commit();
 
-            // Assert
-            Assert.That(contentType.HasIdentity, Is.True);
-            Assert.That(textpage.HasIdentity, Is.True);
-            Assert.That(subpage.HasIdentity, Is.True);
-            Assert.That(textpage.Id, Is.EqualTo(subpage.ParentId));
+                Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
+                repository.AddOrUpdate(subpage);
+                unitOfWork.Commit();
+
+                // Assert
+                Assert.That(contentType.HasIdentity, Is.True);
+                Assert.That(textpage.HasIdentity, Is.True);
+                Assert.That(subpage.HasIdentity, Is.True);
+                Assert.That(textpage.Id, Is.EqualTo(subpage.ParentId));
+            }
+            
         }
 
         [Test]
@@ -171,27 +187,28 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                Content textpage = MockedContent.CreateSimpleContent(contentType);
 
-            ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
-            Content textpage = MockedContent.CreateSimpleContent(contentType);
+                // Act
+                contentTypeRepository.AddOrUpdate(contentType);
+                repository.AddOrUpdate(textpage);
+                unitOfWork.Commit();
 
-            // Act
-            contentTypeRepository.AddOrUpdate(contentType);
-            repository.AddOrUpdate(textpage);
-            unitOfWork.Commit();
+                var repository2 = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+                Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
+                repository2.AddOrUpdate(subpage);
+                unitOfWork.Commit();
 
-            var repository2 = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
-            Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
-            repository2.AddOrUpdate(subpage);
-            unitOfWork.Commit();
-
-            // Assert
-            Assert.That(contentType.HasIdentity, Is.True);
-            Assert.That(textpage.HasIdentity, Is.True);
-            Assert.That(subpage.HasIdentity, Is.True);
-            Assert.That(textpage.Id, Is.EqualTo(subpage.ParentId));
+                // Assert
+                Assert.That(contentType.HasIdentity, Is.True);
+                Assert.That(textpage.HasIdentity, Is.True);
+                Assert.That(subpage.HasIdentity, Is.True);
+                Assert.That(textpage.Id, Is.EqualTo(subpage.ParentId));
+            }
         }
 
         [Test]
@@ -200,14 +217,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var content = repository.Get(1048);
+                bool dirty = ((Content)content).IsDirty();
 
-            // Act
-            var content = repository.Get(1048);
-            bool dirty = ((Content) content).IsDirty();
-
-            // Assert
-            Assert.That(dirty, Is.False);
+                // Assert
+                Assert.That(dirty, Is.False);
+            }
         }
 
         [Test]
@@ -216,18 +235,21 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var content = repository.Get(1047);
+                content.Name = "About 2";
+                repository.AddOrUpdate(content);
+                unitOfWork.Commit();
+                var updatedContent = repository.Get(1047);
 
-            // Act
-            var content = repository.Get(1047);
-            content.Name = "About 2";
-            repository.AddOrUpdate(content);
-            unitOfWork.Commit();
-            var updatedContent = repository.Get(1047);
-
-            // Assert
-            Assert.That(updatedContent.Id, Is.EqualTo(content.Id));
-            Assert.That(updatedContent.Name, Is.EqualTo(content.Name));
+                // Assert
+                Assert.That(updatedContent.Id, Is.EqualTo(content.Id));
+                Assert.That(updatedContent.Name, Is.EqualTo(content.Name));
+            }
+            
         }
 
         [Test]
@@ -236,27 +258,28 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                var contentType = contentTypeRepository.Get(1045);
+                var content = new Content("Textpage 2 Child Node", 1048, contentType);
+                content.CreatorId = 0;
+                content.WriterId = 0;
 
-            var contentType = contentTypeRepository.Get(1045);
-            var content = new Content("Textpage 2 Child Node", 1048, contentType);
-            content.CreatorId = 0;
-            content.WriterId = 0;
+                // Act
+                repository.AddOrUpdate(content);
+                unitOfWork.Commit();
+                var id = content.Id;
 
-            // Act
-            repository.AddOrUpdate(content);
-            unitOfWork.Commit();
-            var id = content.Id;
+                var repository2 = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+                repository2.Delete(content);
+                unitOfWork.Commit();
 
-            var repository2 = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
-            repository2.Delete(content);
-            unitOfWork.Commit();
+                var content1 = repository2.Get(id);
 
-            var content1 = repository2.Get(id);
-
-            // Assert
-            Assert.That(content1, Is.Null);
+                // Assert
+                Assert.That(content1, Is.Null);
+            }            
         }
 
         [Test]
@@ -265,22 +288,24 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var content = repository.Get(1048);
 
-            // Act
-            var content = repository.Get(1048);
-
-            // Assert
-            Assert.That(content.Id, Is.EqualTo(1048));
-            Assert.That(content.CreateDate, Is.GreaterThan(DateTime.MinValue));
-            Assert.That(content.UpdateDate, Is.GreaterThan(DateTime.MinValue));
-            Assert.That(content.ParentId, Is.Not.EqualTo(0));
-            Assert.That(content.Name, Is.EqualTo("Text Page 2"));
-            Assert.That(content.SortOrder, Is.EqualTo(1));
-            Assert.That(content.Version, Is.Not.EqualTo(Guid.Empty));
-            Assert.That(content.ContentTypeId, Is.EqualTo(1045));
-            Assert.That(content.Path, Is.Not.Empty);
-            Assert.That(content.Properties.Any(), Is.True);
+                // Assert
+                Assert.That(content.Id, Is.EqualTo(1048));
+                Assert.That(content.CreateDate, Is.GreaterThan(DateTime.MinValue));
+                Assert.That(content.UpdateDate, Is.GreaterThan(DateTime.MinValue));
+                Assert.That(content.ParentId, Is.Not.EqualTo(0));
+                Assert.That(content.Name, Is.EqualTo("Text Page 2"));
+                Assert.That(content.SortOrder, Is.EqualTo(1));
+                Assert.That(content.Version, Is.Not.EqualTo(Guid.Empty));
+                Assert.That(content.ContentTypeId, Is.EqualTo(1045));
+                Assert.That(content.Path, Is.Not.Empty);
+                Assert.That(content.Properties.Any(), Is.True);
+            }
         }
 
         [Test]
@@ -289,14 +314,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Level == 2);
+                var result = repository.GetByQuery(query);
 
-            // Act
-            var query = Query<IContent>.Builder.Where(x => x.Level == 2);
-            var result = repository.GetByQuery(query);
-
-            // Assert
-            Assert.That(result.Count(), Is.GreaterThanOrEqualTo(2));
+                // Assert
+                Assert.That(result.Count(), Is.GreaterThanOrEqualTo(2));
+            }            
         }
 
         [Test]
@@ -305,15 +332,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var contents = repository.GetAll(1047, 1048);
 
-            // Act
-            var contents = repository.GetAll(1047, 1048);
-
-            // Assert
-            Assert.That(contents, Is.Not.Null);
-            Assert.That(contents.Any(), Is.True);
-            Assert.That(contents.Count(), Is.EqualTo(2));
+                // Assert
+                Assert.That(contents, Is.Not.Null);
+                Assert.That(contents.Any(), Is.True);
+                Assert.That(contents.Count(), Is.EqualTo(2));
+            }            
         }
 
         [Test]
@@ -322,15 +351,19 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var contents = repository.GetAll();
 
-            // Act
-            var contents = repository.GetAll();
+                // Assert
+                Assert.That(contents, Is.Not.Null);
+                Assert.That(contents.Any(), Is.True);
+                Assert.That(contents.Count(), Is.GreaterThanOrEqualTo(4));
+            }
 
-            // Assert
-            Assert.That(contents, Is.Not.Null);
-            Assert.That(contents.Any(), Is.True);
-            Assert.That(contents.Count(), Is.GreaterThanOrEqualTo(4));
+            
         }
 
         [Test]
@@ -339,13 +372,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var exists = repository.Exists(1046);
 
-            // Act
-            var exists = repository.Exists(1046);
+                // Assert
+                Assert.That(exists, Is.True);
+            }
 
-            // Assert
-            Assert.That(exists, Is.True);
+            
         }
 
         [Test]
@@ -354,15 +391,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                int level = 2;
+                var query = Query<IContent>.Builder.Where(x => x.Level == level);
+                var result = repository.Count(query);
 
-            // Act
-            int level = 2;
-            var query = Query<IContent>.Builder.Where(x => x.Level == level);
-            var result = repository.Count(query);
-
-            // Assert
-            Assert.That(result, Is.GreaterThanOrEqualTo(2));
+                // Assert
+                Assert.That(result, Is.GreaterThanOrEqualTo(2));
+            }
         }
 
         [Test]
@@ -371,17 +410,19 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var textpage = repository.Get(1046);
+                var subpage = repository.Get(1047);
+                var trashed = repository.Get(1049);
 
-            // Act
-            var textpage = repository.Get(1046);
-            var subpage = repository.Get(1047);
-            var trashed = repository.Get(1049);
-
-            // Assert
-            Assert.That(textpage.Key.ToString().ToUpper(), Is.EqualTo("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
-            Assert.That(subpage.Key.ToString().ToUpper(), Is.EqualTo("FF11402B-7E53-4654-81A7-462AC2108059"));
-            Assert.That(trashed.Key, Is.Not.EqualTo(Guid.Empty));
+                // Assert
+                Assert.That(textpage.Key.ToString().ToUpper(), Is.EqualTo("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+                Assert.That(subpage.Key.ToString().ToUpper(), Is.EqualTo("FF11402B-7E53-4654-81A7-462AC2108059"));
+                Assert.That(trashed.Key, Is.Not.EqualTo(Guid.Empty));
+            }            
         }
 
         [Test]
@@ -390,15 +431,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var query = Query<IContent>.Builder.Where(x => x.Key == new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+                var content = repository.GetByQuery(query).SingleOrDefault();
 
-            // Act
-            var query = Query<IContent>.Builder.Where(x => x.Key == new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
-            var content = repository.GetByQuery(query).SingleOrDefault();
-
-            // Assert
-            Assert.That(content, Is.Not.Null);
-            Assert.That(content.Id, Is.EqualTo(1046));
+                // Assert
+                Assert.That(content, Is.Not.Null);
+                Assert.That(content.Id, Is.EqualTo(1046));
+            }           
 
         }
 
@@ -408,23 +451,26 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
-            var content = repository.Get(1047);
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                var content = repository.Get(1047);
 
-            // Act
-            content.Language = "da-DK";
-            content.Name = "Tekst Side 1";
-            repository.AddOrUpdate(content);
-            unitOfWork.Commit();
+                // Act
+                content.Language = "da-DK";
+                content.Name = "Tekst Side 1";
+                repository.AddOrUpdate(content);
+                unitOfWork.Commit();
 
-            var latest = repository.Get(1047);
-            var english = repository.GetByLanguage(1047, "en-US");
-            var danish = repository.GetByLanguage(1047, "da-DK");
+                var latest = repository.Get(1047);
+                var english = repository.GetByLanguage(1047, "en-US");
+                var danish = repository.GetByLanguage(1047, "da-DK");
 
-            // Assert
-            Assert.That(latest.Name, Is.EqualTo("Tekst Side 1"));
-            Assert.That(english.Name, Is.EqualTo("Text Page 1"));
-            Assert.That(danish.Name, Is.EqualTo("Tekst Side 1"));
+                // Assert
+                Assert.That(latest.Name, Is.EqualTo("Tekst Side 1"));
+                Assert.That(english.Name, Is.EqualTo("Text Page 1"));
+                Assert.That(danish.Name, Is.EqualTo("Tekst Side 1"));
+            }            
         }
 
         public void CreateTestData()

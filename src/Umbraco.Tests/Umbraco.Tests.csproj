@@ -193,6 +193,7 @@
     <Compile Include="Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\PetaPocoExtensionsTest.cs" />
     <Compile Include="Persistence\Repositories\MemberRepositoryTest.cs" />
+    <Compile Include="Persistence\Repositories\MemberTypeRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserTypeRepositoryTest.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\CallingMethodTests.cs" />
