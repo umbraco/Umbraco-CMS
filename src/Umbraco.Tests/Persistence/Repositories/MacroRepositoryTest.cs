@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Act
             using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
-                var macro = new Macro("test", "Test", "~/usercontrol/blah.ascx", "MyAssembly", "test.xslt", "~/views/macropartials/test.cshtml");
+                var macro = new Macro("test1", "Test", "~/usercontrol/blah.ascx", "MyAssembly", "test.xslt", "~/views/macropartials/test.cshtml");
                 repository.AddOrUpdate(macro);
 
                 Assert.Throws<SqlCeException>(unitOfWork.Commit);
@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
                 var macro = repository.Get(1);
-                macro.Alias = "test1";
+                macro.Alias = "test2";
                 repository.AddOrUpdate(macro);
                 Assert.Throws<SqlCeException>(unitOfWork.Commit);
             }

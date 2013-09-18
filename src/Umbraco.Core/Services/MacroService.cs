@@ -51,23 +51,23 @@ namespace Umbraco.Core.Services
             }
         }
 
-        /// <summary>
-        /// Gets a list all available <see cref="IMacro"/> objects
-        /// </summary>
-        /// <param name="aliases">Optional array of aliases to limit the results</param>
-        /// <returns>An enumerable list of <see cref="IMacro"/> objects</returns>
-        public IEnumerable<IMacro> GetAll(params string[] aliases)
-        {
-            using (var repository = _repositoryFactory.CreateMacroRepository(_uowProvider.GetUnitOfWork()))
-            {
-                if (aliases.Any())
-                {
-                    return GetAllByAliases(repository, aliases);
-                }
+        ///// <summary>
+        ///// Gets a list all available <see cref="IMacro"/> objects
+        ///// </summary>
+        ///// <param name="aliases">Optional array of aliases to limit the results</param>
+        ///// <returns>An enumerable list of <see cref="IMacro"/> objects</returns>
+        //public IEnumerable<IMacro> GetAll(params string[] aliases)
+        //{
+        //    using (var repository = _repositoryFactory.CreateMacroRepository(_uowProvider.GetUnitOfWork()))
+        //    {
+        //        if (aliases.Any())
+        //        {
+        //            return GetAllByAliases(repository, aliases);
+        //        }
 
-                return repository.GetAll();
-            }
-        }
+        //        return repository.GetAll();
+        //    }
+        //}
 
         public IEnumerable<IMacro> GetAll(params int[] ids)
         {
@@ -85,15 +85,15 @@ namespace Umbraco.Core.Services
             }
         }
 
-        private IEnumerable<IMacro> GetAllByAliases(IMacroRepository repo, IEnumerable<string> aliases)
-        {
-            foreach (var alias in aliases)
-            {
-                var q = new Query<IMacro>();
-                q.Where(macro => macro.Alias == alias);
-                yield return repo.GetByQuery(q).FirstOrDefault();
-            }
-        }
+        //private IEnumerable<IMacro> GetAllByAliases(IMacroRepository repo, IEnumerable<string> aliases)
+        //{
+        //    foreach (var alias in aliases)
+        //    {
+        //        var q = new Query<IMacro>();
+        //        q.Where(macro => macro.Alias == alias);
+        //        yield return repo.GetByQuery(q).FirstOrDefault();
+        //    }
+        //}
 
         /// <summary>
         /// Deletes an <see cref="IMacro"/>

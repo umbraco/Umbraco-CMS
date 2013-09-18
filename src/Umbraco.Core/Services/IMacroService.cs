@@ -15,12 +15,12 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IMacro"/> object</returns>
         IMacro GetByAlias(string alias);
         
-        /// <summary>
-        /// Gets a list all available <see cref="IMacro"/> objects
-        /// </summary>
-        /// <param name="aliases">Optional array of aliases to limit the results</param>
-        /// <returns>An enumerable list of <see cref="IMacro"/> objects</returns>
-        IEnumerable<IMacro> GetAll(params string[] aliases);
+        ///// <summary>
+        ///// Gets a list all available <see cref="IMacro"/> objects
+        ///// </summary>
+        ///// <param name="aliases">Optional array of aliases to limit the results</param>
+        ///// <returns>An enumerable list of <see cref="IMacro"/> objects</returns>
+        //IEnumerable<IMacro> GetAll(params string[] aliases);
 
         IEnumerable<IMacro> GetAll(params int[] ids);
 

@@ -22,6 +22,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int RefreshRate { get; set; }
 
         [Column("macroAlias")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsMacroPropertyAlias")]
         public string Alias { get; set; }
 
         [Column("macroName")]

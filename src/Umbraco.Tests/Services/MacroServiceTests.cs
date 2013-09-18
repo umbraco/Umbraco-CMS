@@ -63,18 +63,18 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(3, result.Count());
         }
 
-        [Test]
-        public void Can_Get_Many_By_Alias()
-        {
-            // Arrange
-            var macroService = ServiceContext.MacroService;
+        //[Test]
+        //public void Can_Get_Many_By_Alias()
+        //{
+        //    // Arrange
+        //    var macroService = ServiceContext.MacroService;
 
-            // Act
-            var result = macroService.GetAll("test1", "test2");
+        //    // Act
+        //    var result = macroService.GetAll("test1", "test2");
 
-            //assert
-            Assert.AreEqual(2, result.Count());
-        }
+        //    //assert
+        //    Assert.AreEqual(2, result.Count());
+        //}
 
     }
 }
