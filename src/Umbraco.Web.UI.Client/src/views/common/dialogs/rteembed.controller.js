@@ -15,7 +15,7 @@
 
         if ($scope.url != "") {
             
-            $scope.preview = "<div class=\"umb-loader\">";
+            $scope.preview = "<div class=\"umb-loader\" style=\"height: 10px; margin: 10px 0px;\"></div>";
             $scope.info = "";
             $scope.success = false;
 
