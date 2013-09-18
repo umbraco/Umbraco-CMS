@@ -32,12 +32,14 @@ namespace Umbraco.Core.Cache
 
         public override void ClearCacheObjectTypes<T>()
         {
-            _staticCache.RemoveAll(kvp => kvp.Value is T);
+            var typeOfT = typeof (T);
+            _staticCache.RemoveAll(kvp => kvp.Value.GetType() == typeOfT);
         }
 
         public override void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
         {
-            _staticCache.RemoveAll(kvp => kvp.Value is T && predicate(kvp.Key, (T)kvp.Value));
+            var typeOfT = typeof(T);
+            _staticCache.RemoveAll(kvp => kvp.Value.GetType() == typeOfT && predicate(kvp.Key, (T)kvp.Value));
         }
 
         public override void ClearCacheByKeySearch(string keyStartsWith)
