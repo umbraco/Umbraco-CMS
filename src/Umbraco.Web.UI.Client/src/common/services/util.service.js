@@ -255,7 +255,7 @@ angular.module('umbraco.services').factory('umbDataFormatter', umbDataFormatter)
 * @name umbraco.services.iconHelper
 * @description A helper service for dealing with icons, mostly dealing with legacy tree icons
 **/
-function iconHelper() {
+function iconHelper($q) {
 
     var converter = [
         { oldIcon: ".sprNew", newIcon: "add" },
@@ -338,6 +338,8 @@ function iconHelper() {
             {oldImage: "contour.png", newIcon: "icon-umb-contour"}
             ];
 
+    var collectedIcons;
+            
     return {
         
         /** Used by the create dialogs for content/media types to format the data so that the thumbnails are styled properly */
@@ -387,8 +389,13 @@ function iconHelper() {
         /** It fetches them directly from the active stylesheet in the browser */
         getIcons: function(filter){
 
+            var deferred = $q.defer();
+            if(collectedIcons){
+                deferred.resolve(collectedIcons);
+            }
+
             var classes = document.styleSheets[0].rules || document.styleSheets[0].cssRules;
-            var result = [];
+            collectedIcons = [];
             var f = filter || "";
             var c = ".icon-" + f;
 
@@ -398,13 +405,13 @@ function iconHelper() {
                     var s = cur.selectorText;
                     s = cur.selectorText.substring(1, s.indexOf(":"));
                     
-                    if(result.indexOf(s) < 0){
-                        result.push(s);   
+                    if(collectedIcons.indexOf(s) < 0){
+                        collectedIcons.push(s);
                     }
                 }
             }
-
-            return result;
+            deferred.resolve(collectedIcons);
+            return deferred.promise;
         },
 
         /** Converts the icon from legacy to a new one if an old one is detected */
