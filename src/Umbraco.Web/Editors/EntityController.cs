@@ -22,8 +22,20 @@ using Examine.SearchCriteria;
 namespace Umbraco.Web.Editors
 {
     /// <summary>
-    /// The API controller used for getting entity objects, basic name, icon, id representation of any umbraco object
+    /// API controller to deal with Macro data
     /// </summary>
+    [PluginController("UmbracoApi")]
+    public class MacroController : UmbracoAuthorizedJsonController
+    {
+
+    }
+
+    /// <summary>
+    /// The API controller used for getting entity objects, basic name, icon, id representation of umbraco objects that are based on CMSNode
+    /// </summary>
+    /// <remarks>
+    /// Some objects such as macros are not based on CMSNode
+    /// </remarks>
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
     {

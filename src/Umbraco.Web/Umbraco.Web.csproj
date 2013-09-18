@@ -1944,7 +1944,9 @@
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\CssParser.aspx" />
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ImageUploader.aspx" />
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInjectionMacroRenderer.aspx" />
-    <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInjector.aspx" />
+    <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInjector.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInstaller.aspx" />
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx" />
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx" />
