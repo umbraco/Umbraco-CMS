@@ -33,21 +33,24 @@ function MainController($scope, $routeParams, $rootScope, $timeout, $http, $log,
     };
 
     $scope.closeDialogs = function (event) {
-        //only close dialogs if non-lin and non-buttons are clicked
+        //only close dialogs if non-link and non-buttons are clicked
         var el = event.target.nodeName;
-        var pEl = event.target.parentElement.nodeName;
-        var close = $(event.target).closest("#navigation");
-        var parents = $(event.target).parents("#navigation");
+        var els = ["INPUT","A","BUTTON"];
 
-        //SD: I've updated this so that we don't close the dialog when clicking inside of the dialog
-        if (parents.length === 1) {
+        if(els.indexOf(el) >= 0){return;}
+
+        var parents = $(event.target).parents("a,button");
+        if(parents.length > 0){
             return;
         }
 
-        //SD: I've added a check for INPUT elements too
-        if(el != "I" && el != "A" && el != "BUTTON" && pEl != "A" && pEl != "BUTTON" && el != "INPUT" && pEl != "INPUT"){
-            $rootScope.$emit("closeDialogs", event);
+        //SD: I've updated this so that we don't close the dialog when clicking inside of the dialog
+        var nav = $(event.target).parents("#navigation");
+        if (nav.length === 1) {
+            return;
         }
+
+        $rootScope.$emit("closeDialogs", event);
     };
 
     //fetch the authorized status         
