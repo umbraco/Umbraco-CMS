@@ -129,12 +129,15 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
-                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
-                Content textpage = MockedContent.CreateSimpleContent(contentType, "test@umbraco.org", -1);
-                Content anotherTextpage = MockedContent.CreateSimpleContent(contentType, "@lightgiants", -1);
+                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+
+                var textpage = MockedContent.CreateSimpleContent(contentType, "test@umbraco.org", -1);
+                var anotherTextpage = MockedContent.CreateSimpleContent(contentType, "@lightgiants", -1);
 
                 // Act
-                contentTypeRepository.AddOrUpdate(contentType);
+                
                 repository.AddOrUpdate(textpage);
                 repository.AddOrUpdate(anotherTextpage);
                 unitOfWork.Commit();
