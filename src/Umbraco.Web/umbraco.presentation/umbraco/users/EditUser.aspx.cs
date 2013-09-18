@@ -179,9 +179,12 @@ namespace umbraco.cms.presentation.user
 
             userInfo.HasMenu = true;
 
-            ImageButton save = userInfo.Menu.NewImageButton();
-            save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
-            save.Click += new ImageClickEventHandler(saveUser_Click);
+            var save = userInfo.Menu.NewButton();
+            save.Click += saveUser_Click;
+            save.ID = "save";
+            save.ToolTip = ui.Text("save");
+            save.Text = ui.Text("save");
+            save.ButtonType = MenuButtonType.Primary;
 
             sectionValidator.ServerValidate += new ServerValidateEventHandler(sectionValidator_ServerValidate);
             sectionValidator.ControlToValidate = lapps.ID;
@@ -288,11 +291,7 @@ namespace umbraco.cms.presentation.user
             channelInfo.Controls.Add(ppInfo);
             channelInfo.Controls.Add(ppFields);
 
-            channelInfo.HasMenu = true;
-            ImageButton save = channelInfo.Menu.NewImageButton();
-            save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
-            save.Click += new ImageClickEventHandler(saveUser_Click);
-            save.ID = "save";
+
             if (!IsPostBack)
             {
                 cName.Text = userChannel.Name;
@@ -371,7 +370,7 @@ namespace umbraco.cms.presentation.user
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.Web.UI.ImageClickEventArgs"/> instance containing the event data.</param>
-        private void saveUser_Click(object sender, ImageClickEventArgs e)
+        private void saveUser_Click(object sender, EventArgs e)
         {
             if (base.IsValid)
             {

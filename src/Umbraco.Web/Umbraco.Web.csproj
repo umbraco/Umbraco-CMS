@@ -2054,10 +2054,14 @@
     <Content Include="umbraco.presentation\umbraco\Search\QuickSearchHandler.ashx" />
     <None Include="umbraco.presentation\umbraco\templateControls\InlineXslt.xsltTemplate" />
     <Content Include="umbraco.presentation\umbraco\users\NodePermissions.ascx" />
-    <Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />
+    <Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\users\PermissionsHandler.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\CheckForUpgrade.asmx" />
-    <Content Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx" />
+    <Content Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\settings\scripts\editScript.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -2105,12 +2109,16 @@
     <Content Include="umbraco.presentation\umbraco\schemas\umbraco.xsd">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx" />
+    <Content Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\settings\editLanguage.aspx" />
     <Content Include="umbraco.presentation\umbraco\settings\EditMediaType.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\users\EditUser.aspx" />
+    <Content Include="umbraco.presentation\umbraco\users\EditUser.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\users\EditUserType.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
