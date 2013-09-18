@@ -264,7 +264,7 @@
     <Compile Include="Services\PackagingServiceTests.cs" />
     <Compile Include="Services\PerformanceTests.cs" />
     <Compile Include="Services\PreValueConverterTests.cs" />
-    <Compile Include="Services\RepositoryServiceTests.cs" />
+    <Compile Include="Services\MacroServiceTests.cs" />
     <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="Manifest\ManifestParserTests.cs" />
     <Compile Include="TestHelpers\BaseSeleniumTest.cs" />

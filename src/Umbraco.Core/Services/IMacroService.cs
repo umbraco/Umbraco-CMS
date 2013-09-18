@@ -22,6 +22,10 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IMacro"/> objects</returns>
         IEnumerable<IMacro> GetAll(params string[] aliases);
 
+        IEnumerable<IMacro> GetAll(params int[] ids);
+
+        IMacro GetById(int id);
+
         /// <summary>
         /// Deletes an <see cref="IMacro"/>
         /// </summary>

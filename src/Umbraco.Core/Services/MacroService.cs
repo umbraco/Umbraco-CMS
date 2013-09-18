@@ -6,6 +6,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -61,16 +62,36 @@ namespace Umbraco.Core.Services
             {
                 if (aliases.Any())
                 {
-                    var q = new Query<IMacro>();
-                    foreach (var alias in aliases)
-                    {
-                        q.Where(macro => macro.Alias == alias);
-                    }
-
-                    return repository.GetByQuery(q);
+                    return GetAllByAliases(repository, aliases);
                 }
 
                 return repository.GetAll();
+            }
+        }
+
+        public IEnumerable<IMacro> GetAll(params int[] ids)
+        {
+            using (var repository = _repositoryFactory.CreateMacroRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(ids);
+            }
+        }
+
+        public IMacro GetById(int id)
+        {
+            using (var repository = _repositoryFactory.CreateMacroRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(id);
+            }
+        }
+
+        private IEnumerable<IMacro> GetAllByAliases(IMacroRepository repo, IEnumerable<string> aliases)
+        {
+            foreach (var alias in aliases)
+            {
+                var q = new Query<IMacro>();
+                q.Where(macro => macro.Alias == alias);
+                yield return repo.GetByQuery(q).FirstOrDefault();
             }
         }
 

@@ -7,14 +7,12 @@ using Umbraco.Core.Persistence.UnitOfWork;
 namespace Umbraco.Tests.Services
 {
     [TestFixture, RequiresSTA]
-    public class RepositoryServiceTests : BaseServiceTest
+    public class MacroServiceTests : BaseServiceTest
     {
         [SetUp]
         public override void Initialize()
         {
             base.Initialize();
-
-            CreateTestData();
         }
 
         public override void CreateTestData()
