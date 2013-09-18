@@ -29,10 +29,12 @@ namespace umbraco.cms.presentation.user
         {
             pnlUmbraco.Text = umbraco.ui.Text("usertype", base.getUser());
 
-            ImageButton save = pnlUmbraco.Menu.NewImageButton();
-            save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
-            save.Click += new ImageClickEventHandler(save_Click);
+            var save = pnlUmbraco.Menu.NewButton();
+            save.Click += save_Click;
             save.ID = "save";
+            save.ToolTip = ui.Text("save");
+            save.Text = ui.Text("save");
+
             pp_alias.Text = umbraco.ui.Text("usertype", base.getUser()) + " " + umbraco.ui.Text("alias", base.getUser());
             pp_name.Text = umbraco.ui.Text("usertype", base.getUser()) + " " + umbraco.ui.Text("name", base.getUser());
 
@@ -56,7 +58,7 @@ namespace umbraco.cms.presentation.user
 
         }
 
-        void save_Click(object sender, ImageClickEventArgs e)
+        void save_Click(object sender, EventArgs e)
         {
             UserType userType = CurrentUserType;
             userType.Name = txtUserTypeName.Text;

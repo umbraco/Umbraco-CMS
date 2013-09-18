@@ -15,7 +15,7 @@
   
   <cc2:Pane ID="Pane2" runat="server">
     <cc2:PropertyPanel runat="server" id="pp_newTab" Text="New tab">
-      <asp:TextBox ID="txtNewTab" runat="server"/> &nbsp; <asp:Button ID="btnNewTab" runat="server" Text="New tab" OnClick="btnNewTab_Click"/>
+      <asp:TextBox ID="txtNewTab" runat="server"/> &nbsp; <asp:Button ID="btnNewTab" CssClass="btn" runat="server" Text="New tab" OnClick="btnNewTab_Click"/>
     </cc2:PropertyPanel>
   </cc2:Pane>
     
@@ -25,8 +25,9 @@
       HeaderStyle-Font-Bold="True" AutoGenerateColumns="False" CssClass="tabs-table">
       <Columns>
         <asp:BoundColumn DataField="id" Visible="False"></asp:BoundColumn>
-        <asp:TemplateColumn HeaderText="Name (drag to re-order)">
+        <asp:TemplateColumn HeaderText="Name">
           <ItemTemplate>
+            <i class="icon-navigation handle"></i>
             <asp:TextBox ID="txtTab" runat="server" Value='<%#DataBinder.Eval(Container.DataItem,"name")%>'></asp:TextBox>
             <asp:TextBox ID="txtSortOrder" runat="server" CssClass="sort-order" Value='<%#DataBinder.Eval(Container.DataItem,"order") %>'></asp:TextBox>
           </ItemTemplate>

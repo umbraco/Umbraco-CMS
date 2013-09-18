@@ -50,10 +50,12 @@ namespace umbraco.cms.presentation.user
 
             CheckUser(Request.QueryString["id"]);
 
-            ImageButton save = pnlUmbraco.Menu.NewImageButton();
+            var save = pnlUmbraco.Menu.NewButton();
             save.ID = "btnSave";
-            save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
-			save.OnClientClick = "SavePermissions(); return false;";
+            save.OnClientClick = "SavePermissions(); return false;";
+            save.Text = ui.Text("save");
+            save.ToolTip = ui.Text("save");
+
 
             nodePermissions.UserID = Convert.ToInt32(Request.QueryString["id"]);
             pnlUmbraco.Text = ui.Text("user", "userPermissions");

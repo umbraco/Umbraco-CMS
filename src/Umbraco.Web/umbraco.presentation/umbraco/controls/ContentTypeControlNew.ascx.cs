@@ -424,6 +424,7 @@ namespace umbraco.controls
             Save.Click += save_click;
             Save.Text = ui.Text("save", Security.CurrentUser);
             Save.ID = "save";
+            Save.ButtonType = uicontrols.MenuButtonType.Primary;
 
             txtName.Text = _contentType.GetRawText();
             txtAlias.Text = _contentType.Alias;

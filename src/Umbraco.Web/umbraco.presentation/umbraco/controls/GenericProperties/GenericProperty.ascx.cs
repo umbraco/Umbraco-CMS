@@ -171,12 +171,10 @@ namespace umbraco.controls.GenericProperties
 				FullHeader.Text = _pt.GetRawName() + " (" + _pt.Alias + "), Type: " + _pt.DataTypeDefinition.Text;;
 				Header.Text = _pt.GetRawName();
 				DeleteButton.Visible = true;
-				DeleteButton.ImageUrl = SystemDirectories.Umbraco + "/images/delete_button.png";
-				DeleteButton.Attributes.Add("style", "float: right; cursor: hand;");
+                DeleteButton.CssClass = "delete-button";
                 DeleteButton.Attributes.Add("onclick", "return confirm('" + ui.Text("areyousure", CurrentUser) + "');");
 				DeleteButton2.Visible = true;
-                DeleteButton2.ImageUrl = SystemDirectories.Umbraco + "/images/delete_button.png";
-				DeleteButton2.Attributes.Add("style", "float: right; cursor: hand;");
+                DeleteButton2.CssClass = "delete-button";
                 DeleteButton2.Attributes.Add("onclick", "return confirm('" + ui.Text("areyousure", CurrentUser) + "');");
 			} 
 			else 
@@ -289,20 +287,21 @@ namespace umbraco.controls.GenericProperties
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.DeleteButton.Click += new System.Web.UI.ImageClickEventHandler(this.DeleteButton_Click);
-			this.DeleteButton2.Click += new System.Web.UI.ImageClickEventHandler(this.DeleteButton2_Click);
+			this.DeleteButton.Click +=DeleteButton_Click;
+            this.DeleteButton2.Click += DeleteButton2_Click;
 
 		}
+
+        void DeleteButton2_Click(object sender, EventArgs e)
+        {
+            Delete(this, new System.EventArgs());
+        }
+
+        void DeleteButton_Click(object sender, EventArgs e)
+        {
+            Delete(this, new System.EventArgs());
+        }
 		#endregion
 
-		private void DeleteButton_Click(object sender, System.Web.UI.ImageClickEventArgs e)
-		{
-			Delete(this,new System.EventArgs());
-		}
-
-		private void DeleteButton2_Click(object sender, System.Web.UI.ImageClickEventArgs e)
-		{
-			Delete(this,new System.EventArgs());
-		}
 	}
 }

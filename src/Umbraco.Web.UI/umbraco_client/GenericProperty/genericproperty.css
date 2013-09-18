@@ -1,42 +1,64 @@
 
 .genericPropertyForm {
-  padding: 5px;
+ 
 }
 .genericPropertyForm h2 {
-  font-size: 15px;
-  margin-bottom: 0px;
-  padding-bottom: 2px;
+    font-size: 16px;
+    line-height: 20px;
+    margin-bottom: 2px;
+}
+
+.genericPropertyList .header{
+    padding: 4px;
+}
+.genericPropertyList .umb-pane{
+    margin: 10px;
 }
 
 .genericPropertyList {
-  padding: 10px;
-  margin: 0px;
+  margin: 0px 0px 30px 0px;
   list-style: none;
 }
 
+.genericPropertyList .delete-button, .genericPropertyList .toggle-button{
+  float: right;
+  margin-left: 3px;
+  border: none;
+  background: none;
+  text-decoration: none;
+}
+
+.genericPropertyList .delete-button i {
+    background: none;
+    border: none;
+}
+
+.handle{
+    color: #ccc;
+    font-size: 12px;
+}
+
+.addNewProperty .handle {
+    display: none;
+}
+
 .genericPropertyList li {
-  padding: 7px;
   display: block;
   position: relative;
-  background: url(../tabView/images/background.gif) #EEEEEE repeat-x bottom;
-  border: 1px solid #ccc;
+  border-bottom: 1px solid #eee;
   margin-bottom: 3px;
   cursor: move;
 }
+
+.genericPropertyList li .delete-button i {
+    color: #b94a48;
+}
+
 .addNewProperty li {
   cursor: default;
 }
 
-.genericPropertyList li div.propertypane{
-  background-image: none !Important;
-}
-.genericPropertyList li h3 {
-  font-size: 11px;
-  padding-left: 10px;
-}
-
 .genericPropertyList li table {
-  border-top: 1px solid #ccc;
   display: block;
   margin-top: 10px;
 }
@@ -50,14 +72,16 @@
   width: 300px;
   z-index: 9999;
 }
+
 .propertyForm SELECT {
   width: 300px;
 }
 
-
 .propertyForm h3 a {
   color: #000;
   text-decoration: none;
+  font-size: 14px;
+  font-weight: normal;
 }
 
 

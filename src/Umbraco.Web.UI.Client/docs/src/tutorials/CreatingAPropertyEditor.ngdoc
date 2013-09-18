@@ -41,11 +41,11 @@ Inside this package manifest we add a bit of json to describe the property edito
 		//you can define multiple editors 	
 		propertyEditors: [		
 			{
-				//this must be a unique guid	
-				id: "7e062c13-7c41-4ad9-b389-41d88aeef87c",
-				//the name
+				/*this must be a unique alias*/	
+				alias: "My.MarkdownEditor",
+				/*the name*/
 				name: "Markdown editor",
-				//the html file we will load for the editor
+				/*the html file we will load for the editor*/
 				editor: {
 					view: "~/App_Plugins/MarkDownEditor/markdowneditor.html"
 				}

@@ -5,7 +5,7 @@
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
 
-    <cc1:UmbracoPanel ID="Panel1" runat="server" Text="Dictionary overview" Width="408px" Height="264px">
+    <cc1:UmbracoPanel ID="Panel1" runat="server" Text="Dictionary overview">
     <cc1:Pane ID="pane1" runat="server">
       <table id="dictionaryItems" style="width: 100%;">
         <asp:Literal ID="lt_table" runat="server" />
