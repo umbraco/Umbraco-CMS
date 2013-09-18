@@ -53,10 +53,10 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             
 
-            ImageButton bt = Panel1.Menu.NewImageButton();
+            var bt = Panel1.Menu.NewButton();
             bt.Click += SaveClick;
-            bt.ImageUrl = UmbracoPath + "/images/editor/save.gif";
-            bt.AlternateText = ui.Text("save");
+            bt.Text = ui.Text("save");
+            bt.ToolTip = ui.Text("save");
             bt.ID = "save";
             SetupPreView();
         }
@@ -73,7 +73,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
             prStyles.Attributes["style"] = _stylesheetproperty.value;
         }
 
-        private void SaveClick(object sender, ImageClickEventArgs e)
+        private void SaveClick(object sender, EventArgs e)
         {
             _stylesheetproperty.value = Content.Text;
             _stylesheetproperty.Text = NameTxt.Text;
