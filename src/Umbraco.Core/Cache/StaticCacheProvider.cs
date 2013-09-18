@@ -27,19 +27,19 @@ namespace Umbraco.Core.Cache
 
         public override void ClearCacheObjectTypes(string typeName)
         {
-            _staticCache.RemoveAll(kvp => kvp.Value.GetType().ToString().InvariantEquals(typeName));
+            _staticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType().ToString().InvariantEquals(typeName));
         }
 
         public override void ClearCacheObjectTypes<T>()
         {
             var typeOfT = typeof (T);
-            _staticCache.RemoveAll(kvp => kvp.Value.GetType() == typeOfT);
+            _staticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT);
         }
 
         public override void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
         {
             var typeOfT = typeof(T);
-            _staticCache.RemoveAll(kvp => kvp.Value.GetType() == typeOfT && predicate(kvp.Key, (T)kvp.Value));
+            _staticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT && predicate(kvp.Key, (T)kvp.Value));
         }
 
         public override void ClearCacheByKeySearch(string keyStartsWith)
