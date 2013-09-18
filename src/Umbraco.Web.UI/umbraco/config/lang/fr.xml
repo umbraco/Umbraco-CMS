@@ -243,7 +243,7 @@ Exemple: 'email', 'url']]></key>
     <key alias="stylesNoStylesOnPage">Aucun style actif disponible</key>
     <key alias="tableColMergeLeft">Placez le curseur à gauche des deux cellules que vous voulez fusionner</key>
     <key alias="tableSplitNotSplittable">Vous ne pouvez pas diviser une cellule qui n'a pas été fusionnée.</key>
-    <key alias="xsltErrorHeader">Erreur dans la source xslt</key>
+    <key alias="xsltErrorHeader">Erreur dans la source XSLT</key>
     <key alias="xsltErrorText">Le fichier XSLT n'a pas été sauvé car il contient une ou des erreurs</key>
   </area>
   <area alias="general">
@@ -762,11 +762,11 @@ Pour gerer votre site, accéder simplement au back office et commencez à contri
     <key alias="templateErrorText">Veuillez vous assurer que vous n'avez pas 2 templates avec le même alias</key>
     <key alias="templateSavedHeader">Template enregistré</key>
     <key alias="templateSavedText">Le template a été enregistré avec succès!</key>
-    <key alias="xsltErrorHeader">Une erreur est survenue lors de l'enregistrement du fichier Xslt</key>
-    <key alias="xsltErrorText">Le fichier Xslt contient des erreurs</key>
-    <key alias="xsltPermissionErrorText">Le fichier Xslt  n'a pas pu être enregistré, vérifier les permissions de fichiers</key>
-    <key alias="xsltSavedHeader">Fichier Xslt enregistré</key>
-    <key alias="xsltSavedText">Aucune erreur dans le fichier xslt!</key>
+    <key alias="xsltErrorHeader">Une erreur est survenue lors de l'enregistrement du fichier XSLT</key>
+    <key alias="xsltErrorText">Le fichier XSLT contient des erreurs</key>
+    <key alias="xsltPermissionErrorText">Le fichier XSLT  n'a pas pu être enregistré, vérifier les permissions de fichiers</key>
+    <key alias="xsltSavedHeader">Fichier XSLT enregistré</key>
+    <key alias="xsltSavedText">Aucune erreur dans le fichier XSLT!</key>
     <key alias="contentUnpublished">Contenu non publié</key>
     <key alias="partialViewSavedHeader">Vue partielle enregistrée</key>
     <key alias="partialViewSavedText">Vue partielle enregistrée avec succès!</key>

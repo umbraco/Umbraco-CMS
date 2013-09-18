@@ -272,7 +272,7 @@
     <key alias="stylesNoStylesOnPage">No active styles available</key>
     <key alias="tableColMergeLeft">Please place cursor at the left of the two cells you wish to merge</key>
     <key alias="tableSplitNotSplittable">You cannot split a cell that hasn't been merged.</key>
-    <key alias="xsltErrorHeader">Error in xslt source</key>
+    <key alias="xsltErrorHeader">Error in XSLT source</key>
     <key alias="xsltErrorText">The XSLT has not been saved, because it contained error(s)</key>
   </area>
   <area alias="general">
@@ -760,11 +760,11 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="templateErrorText">Please make sure that you do not have 2 templates with the same alias</key>
     <key alias="templateSavedHeader">Template saved</key>
     <key alias="templateSavedText">Template saved without any errors!</key>
-    <key alias="xsltErrorHeader">Xslt not saved</key>
-    <key alias="xsltErrorText">Xslt contained an error</key>
-    <key alias="xsltPermissionErrorText">Xslt could not be saved, check file permissions</key>
-    <key alias="xsltSavedHeader">Xslt saved</key>
-    <key alias="xsltSavedText">No errors in xslt</key>
+    <key alias="xsltErrorHeader">XSLT not saved</key>
+    <key alias="xsltErrorText">XSLT contained an error</key>
+    <key alias="xsltPermissionErrorText">XSLT could not be saved, check file permissions</key>
+    <key alias="xsltSavedHeader">XSLT saved</key>
+    <key alias="xsltSavedText">No errors in XSLT</key>
     <key alias="contentUnpublished">Content unpublished</key>
     <key alias="partialViewSavedHeader">Partial view saved</key>
     <key alias="partialViewSavedText">Partial view saved without any errors!</key>

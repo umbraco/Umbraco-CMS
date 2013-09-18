@@ -103,19 +103,24 @@ namespace Umbraco.Web.Mvc
 
         private void UpdateRouteDataForRequest(RenderModel renderModel, RequestContext requestContext)
         {
+            if (renderModel == null) throw new ArgumentNullException("renderModel");
+            if (requestContext == null) throw new ArgumentNullException("requestContext");
+
             requestContext.RouteData.DataTokens["umbraco"] = renderModel;
             // the rest should not change -- it's only the published content that has changed
         }
 
-		/// <summary>
+	    /// <summary>
 		/// Checks the request and query strings to see if it matches the definition of having a Surface controller
 		/// posted/get value, if so, then we return a PostedDataProxyInfo object with the correct information.
 		/// </summary>
 		/// <param name="requestContext"></param>
 		/// <returns></returns>
 		private static PostedDataProxyInfo GetFormInfo(RequestContext requestContext)
-		{			
-			//if it is a POST/GET then a value must be in the request
+		{
+		    if (requestContext == null) throw new ArgumentNullException("requestContext");
+
+		    //if it is a POST/GET then a value must be in the request
             if (requestContext.HttpContext.Request.QueryString["ufprt"].IsNullOrWhiteSpace() 
                 && requestContext.HttpContext.Request.Form["ufprt"].IsNullOrWhiteSpace())
 		    {
@@ -197,7 +202,10 @@ namespace Umbraco.Web.Mvc
 		/// <param name="postedInfo"></param>
 		private IHttpHandler HandlePostedValues(RequestContext requestContext, PostedDataProxyInfo postedInfo)
 		{
-			//set the standard route values/tokens
+		    if (requestContext == null) throw new ArgumentNullException("requestContext");
+		    if (postedInfo == null) throw new ArgumentNullException("postedInfo");
+
+		    //set the standard route values/tokens
 			requestContext.RouteData.Values["controller"] = postedInfo.ControllerName;
 			requestContext.RouteData.Values["action"] = postedInfo.ActionName;
 
@@ -256,6 +264,9 @@ namespace Umbraco.Web.Mvc
 		/// <returns></returns>
 		internal virtual RouteDefinition GetUmbracoRouteDefinition(RequestContext requestContext, PublishedContentRequest publishedContentRequest)
 		{
+		    if (requestContext == null) throw new ArgumentNullException("requestContext");
+		    if (publishedContentRequest == null) throw new ArgumentNullException("publishedContentRequest");
+
 		    var defaultControllerType = DefaultRenderMvcControllerResolver.Current.GetDefaultControllerType();
             var defaultControllerName = ControllerExtensions.GetControllerName(defaultControllerType);
 			//creates the default route definition which maps to the 'UmbracoController' controller
@@ -319,7 +330,9 @@ namespace Umbraco.Web.Mvc
 
 		internal IHttpHandler GetHandlerOnMissingTemplate(PublishedContentRequest pcr)
 		{
-            // missing template, so we're in a 404 here
+		    if (pcr == null) throw new ArgumentNullException("pcr");
+
+		    // missing template, so we're in a 404 here
             // so the content, if any, is a custom 404 page of some sort
 
 			if (!pcr.HasPublishedContent)
@@ -348,7 +361,10 @@ namespace Umbraco.Web.Mvc
 		/// <param name="publishedContentRequest"></param>
 		internal IHttpHandler GetHandlerForRoute(RequestContext requestContext, PublishedContentRequest publishedContentRequest)
 		{
-			var routeDef = GetUmbracoRouteDefinition(requestContext, publishedContentRequest);
+		    if (requestContext == null) throw new ArgumentNullException("requestContext");
+		    if (publishedContentRequest == null) throw new ArgumentNullException("publishedContentRequest");
+
+		    var routeDef = GetUmbracoRouteDefinition(requestContext, publishedContentRequest);
             
 			//Need to check for a special case if there is form data being posted back to an Umbraco URL
 			var postedInfo = GetFormInfo(requestContext);

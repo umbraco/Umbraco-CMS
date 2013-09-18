@@ -6,8 +6,10 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
@@ -47,41 +49,71 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         #endregion
 
+        private MemberRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MemberTypeRepository memberTypeRepository)
+        {
+            memberTypeRepository = new MemberTypeRepository(unitOfWork, NullCacheProvider.Current);
+            var repository = new MemberRepository(unitOfWork, NullCacheProvider.Current, memberTypeRepository);
+            return repository;
+        }
+
+        [Test]
+        public void Can_Instantiate_Repository_From_Resolver()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+
+            // Act
+            var repository = RepositoryResolver.Current.ResolveByType<IMemberRepository>(unitOfWork);
+
+            // Assert
+            Assert.That(repository, Is.Not.Null);
+        }
+
         [Test]
         public void MemberRepository_Can_Get_Member_By_Id()
         {
             var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.Factory.CreateMemberRepository(unitOfWork);
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
 
-            var member = repository.Get(1341);
+                var member = repository.Get(1341);
 
-            Assert.That(member, Is.Not.Null);
+                Assert.That(member, Is.Not.Null);
+            }
         }
 
         [Test]
         public void MemberRepository_Can_Get_Specific_Members()
         {
             var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.Factory.CreateMemberRepository(unitOfWork);
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
 
-            var members = repository.GetAll(1341, 1383);
+                var members = repository.GetAll(1341, 1383);
 
-            Assert.That(members, Is.Not.Null);
-            Assert.That(members.Any(x => x == null), Is.False);
-            Assert.That(members.Count(), Is.EqualTo(2));
+                Assert.That(members, Is.Not.Null);
+                Assert.That(members.Any(x => x == null), Is.False);
+                Assert.That(members.Count(), Is.EqualTo(2));
+            }
         }
 
         [Test]
         public void MemberRepository_Can_Get_All_Members()
         {
             var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.Factory.CreateMemberRepository(unitOfWork);
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
 
-            var members = repository.GetAll();
+                var members = repository.GetAll();
 
-            Assert.That(members, Is.Not.Null);
-            Assert.That(members.Any(x => x == null), Is.False);
-            Assert.That(members.Count(), Is.EqualTo(6));
+                Assert.That(members, Is.Not.Null);
+                Assert.That(members.Any(x => x == null), Is.False);
+                Assert.That(members.Count(), Is.EqualTo(6));
+            }
         }
 
         [Test]
@@ -89,15 +121,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.Factory.CreateMemberRepository(unitOfWork);
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
 
-            // Act
-            var query = Query<IMember>.Builder.Where(x => x.Key == new Guid("A6B9CA6B-0615-42CA-B5F5-338417EC76BE"));
-            var result = repository.GetByQuery(query);
+                // Act
+                var query = Query<IMember>.Builder.Where(x => x.Key == new Guid("A6B9CA6B-0615-42CA-B5F5-338417EC76BE"));
+                var result = repository.GetByQuery(query);
 
-            // Assert
-            Assert.That(result.Count(), Is.EqualTo(1));
-            Assert.That(result.First().Id, Is.EqualTo(1341));
+                // Assert
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Id, Is.EqualTo(1341));
+            }
         }
 
         [Test]
@@ -105,16 +140,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.Factory.CreateMemberRepository(unitOfWork);
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
 
-            // Act
-            var query = Query<IMember>.Builder.Where(x => ((Member)x).ShortStringPropertyValue.EndsWith("piquet_h"));
-            var result = repository.GetByQuery(query);
+                // Act
+                var query = Query<IMember>.Builder.Where(x => ((Member) x).ShortStringPropertyValue.EndsWith("piquet_h"));
+                var result = repository.GetByQuery(query);
 
-            // Assert
-            Assert.That(result.Any(x => x == null), Is.False);
-            Assert.That(result.Count(), Is.EqualTo(1));
-            Assert.That(result.First().Id, Is.EqualTo(1341));
+                // Assert
+                Assert.That(result.Any(x => x == null), Is.False);
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Id, Is.EqualTo(1341));
+            }
         }
 
         [Test]
@@ -122,15 +160,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.Factory.CreateMemberRepository(unitOfWork);
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
 
-            // Act
-            var query = Query<IMember>.Builder.Where(x => ((Member)x).LongStringPropertyValue.Contains("1095") && ((Member)x).PropertyTypeAlias == "headshot");
-            var result = repository.GetByQuery(query);
+                // Act
+                var query = Query<IMember>.Builder.Where(x => ((Member) x).LongStringPropertyValue.Contains("1095") && ((Member) x).PropertyTypeAlias == "headshot");
+                var result = repository.GetByQuery(query);
 
-            // Assert
-            Assert.That(result.Any(x => x == null), Is.False);
-            Assert.That(result.Count(), Is.EqualTo(5));
+                // Assert
+                Assert.That(result.Any(x => x == null), Is.False);
+                Assert.That(result.Count(), Is.EqualTo(5));
+            }
         }
 
         [Test]
@@ -209,55 +250,6 @@ namespace Umbraco.Tests.Persistence.Repositories
         private Guid NodeObjectTypeId
         {
             get { return new Guid(Constants.ObjectTypes.Member); }
-        }
-    }
-
-    [TestFixture, NUnit.Framework.Ignore]
-    public class MemberTypeRepositoryTest : MemberRepositoryBaseTest
-    {
-        #region Overrides of MemberRepositoryBaseTest
-
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-
-            SqlSyntaxContext.SqlSyntaxProvider = SqlServerSyntax.Provider;
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
-        public override string ConnectionString
-        {
-            get { return @"server=.\SQLEXPRESS;database=Kloud-Website-Production;user id=umbraco;password=umbraco"; }
-        }
-
-        public override string ProviderName
-        {
-            get { return "System.Data.SqlClient"; }
-        }
-
-        #endregion
-
-        [Test]
-        public void MemberTypeRepository_Can_Get_MemberType_By_Id()
-        {
-            var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.Factory.CreateMemberTypeRepository(unitOfWork);
-
-            var memberType = repository.Get(1340);
-
-            Assert.That(memberType, Is.Not.Null);
-            Assert.That(memberType.PropertyTypes.Count(), Is.EqualTo(13));
-            Assert.That(memberType.PropertyGroups.Any(), Is.False);
-
-            repository.AddOrUpdate(memberType);
-            unitOfWork.Commit();
-            Assert.That(memberType.PropertyTypes.Any(x => x.HasIdentity == false), Is.False);
         }
     }
 

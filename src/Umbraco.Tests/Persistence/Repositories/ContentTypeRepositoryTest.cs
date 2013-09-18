@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
@@ -30,10 +31,25 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
+        private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
+        {
+            var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);
+            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository);
+            return repository;
+        }
+
+        private ContentTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        {
+            var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);
+            var contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);
+            return contentTypeRepository;
+        }
+
         //TODO Add test to verify SetDefaultTemplates updates both AllowedTemplates and DefaultTemplate(id).
 
         [Test]
-        public void Can_Instantiate_Repository()
+        public void Can_Instantiate_Repository_From_Resolver()
         {
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
@@ -52,18 +68,20 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                // Act
+                var contentType = MockedContentTypes.CreateSimpleContentType();
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
 
-            // Act
-            var contentType = MockedContentTypes.CreateSimpleContentType();
-            repository.AddOrUpdate(contentType);
-            unitOfWork.Commit();
-
-            // Assert
-            Assert.That(contentType.HasIdentity, Is.True);
-            Assert.That(contentType.PropertyGroups.All(x => x.HasIdentity), Is.True);
-            Assert.That(contentType.Path.Contains(","), Is.True);
-            Assert.That(contentType.SortOrder, Is.GreaterThan(0));
+                // Assert
+                Assert.That(contentType.HasIdentity, Is.True);
+                Assert.That(contentType.PropertyGroups.All(x => x.HasIdentity), Is.True);
+                Assert.That(contentType.Path.Contains(","), Is.True);
+                Assert.That(contentType.SortOrder, Is.GreaterThan(0));    
+            }
+            
         }
 
         [Test]
@@ -72,32 +90,35 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
-
-            // Act
-            var contentType = repository.Get(1046);
-
-            contentType.Thumbnail = "Doc2.png";
-            contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext)
+            using (var repository = CreateRepository(unitOfWork))
             {
-                Alias = "subtitle",
-                Name = "Subtitle",
-                Description = "Optional Subtitle",
-                HelpText = "",
-                Mandatory = false,
-                SortOrder = 1,
-                DataTypeDefinitionId = -88
-            });
-            repository.AddOrUpdate(contentType);
-            unitOfWork.Commit();
+                // Act
+                var contentType = repository.Get(1046);
 
-            var dirty = ((ICanBeDirty) contentType).IsDirty();
+                contentType.Thumbnail = "Doc2.png";
+            contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext)
+                {
+                    Alias = "subtitle",
+                    Name = "Subtitle",
+                    Description = "Optional Subtitle",
+                    HelpText = "",
+                    Mandatory = false,
+                    SortOrder = 1,
+                    DataTypeDefinitionId = -88
+                });
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
 
-            // Assert
-            Assert.That(contentType.HasIdentity, Is.True);
-            Assert.That(dirty, Is.False);
-            Assert.That(contentType.Thumbnail, Is.EqualTo("Doc2.png"));
-            Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "subtitle"), Is.True);
+                var dirty = ((ICanBeDirty)contentType).IsDirty();
+
+                // Assert
+                Assert.That(contentType.HasIdentity, Is.True);
+                Assert.That(dirty, Is.False);
+                Assert.That(contentType.Thumbnail, Is.EqualTo("Doc2.png"));
+                Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "subtitle"), Is.True);
+            }
+
+            
         }
 
         [Test]
@@ -106,21 +127,22 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                // Act
+                var contentType = MockedContentTypes.CreateSimpleContentType();
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
 
-            // Act
-            var contentType = MockedContentTypes.CreateSimpleContentType();
-            repository.AddOrUpdate(contentType);
-            unitOfWork.Commit();
+                var contentType2 = repository.Get(contentType.Id);
+                repository.Delete(contentType2);
+                unitOfWork.Commit();
 
-            var contentType2 = repository.Get(contentType.Id);
-            repository.Delete(contentType2);
-            unitOfWork.Commit();
+                var exists = repository.Exists(contentType.Id);
 
-            var exists = repository.Exists(contentType.Id);
-
-            // Assert
-            Assert.That(exists, Is.False);
+                // Assert
+                Assert.That(exists, Is.False);
+            }
         }
 
         [Test]
@@ -129,14 +151,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            // Act
-            var contentType = repository.Get(1046);
+                // Act
+                var contentType = repository.Get(1046);
 
-            // Assert
-            Assert.That(contentType, Is.Not.Null);
-            Assert.That(contentType.Id, Is.EqualTo(1046));
+                // Assert
+                Assert.That(contentType, Is.Not.Null);
+                Assert.That(contentType.Id, Is.EqualTo(1046));
+            }
         }
 
         [Test]
@@ -145,18 +169,20 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            // Act
-            var contentTypes = repository.GetAll();
-            int count =
-                DatabaseContext.Database.ExecuteScalar<int>(
-                    "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
-                    new { NodeObjectType = new Guid(Constants.ObjectTypes.DocumentType) });
+                // Act
+                var contentTypes = repository.GetAll();
+                int count =
+                    DatabaseContext.Database.ExecuteScalar<int>(
+                        "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
+                        new {NodeObjectType = new Guid(Constants.ObjectTypes.DocumentType)});
 
-            // Assert
-            Assert.That(contentTypes.Any(), Is.True);
-            Assert.That(contentTypes.Count(), Is.EqualTo(count));
+                // Assert
+                Assert.That(contentTypes.Any(), Is.True);
+                Assert.That(contentTypes.Count(), Is.EqualTo(count));
+            }
         }
 
         [Test]
@@ -165,13 +191,15 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            // Act
-            var exists = repository.Exists(1045);
+                // Act
+                var exists = repository.Exists(1045);
 
-            // Assert
-            Assert.That(exists, Is.True);
+                // Assert
+                Assert.That(exists, Is.True);
+            }
         }
 
         [Test]
@@ -180,21 +208,22 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
-            var contentType = repository.Get(1046);
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var contentType = repository.Get(1046);
 
-            // Act
-            var contentType2 = repository.Get(1046);
-            contentType2.PropertyGroups["Meta"].PropertyTypes.Remove("metaDescription");
-            repository.AddOrUpdate(contentType2);
-            unitOfWork.Commit();
+                // Act                
+                contentType.PropertyGroups["Meta"].PropertyTypes.Remove("metaDescription");
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
 
-            var contentType3 = repository.Get(1046);
+                var result = repository.Get(1046);
 
-            // Assert
-            Assert.That(contentType3.PropertyTypes.Any(x => x.Alias == "metaDescription"), Is.False);
-            Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(contentType3.PropertyGroups.Count));
-            Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(contentType3.PropertyTypes.Count()));
+                // Assert
+                Assert.That(result.PropertyTypes.Any(x => x.Alias == "metaDescription"), Is.False);
+                Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(result.PropertyGroups.Count));
+                Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(result.PropertyTypes.Count()));
+            }
         }
 
         [Test]
@@ -203,14 +232,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            // Act
-            var contentType = repository.Get(1045);
+                // Act
+                var contentType = repository.Get(1045);
 
-            // Assert
-            Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(3));
-            Assert.That(contentType.PropertyGroups.Count(), Is.EqualTo(1));
+                // Assert
+                Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(3));
+                Assert.That(contentType.PropertyGroups.Count(), Is.EqualTo(1));
+            }
         }
 
         [Test]
@@ -219,14 +250,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            // Act
-            var contentType = repository.Get(1046);
+                // Act
+                var contentType = repository.Get(1046);
 
-            // Assert
-            Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
-            Assert.That(contentType.PropertyGroups.Count(), Is.EqualTo(2));
+                // Assert
+                Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
+                Assert.That(contentType.PropertyGroups.Count(), Is.EqualTo(2));
+            }
         }
 
         [Test]
@@ -235,32 +268,34 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
-            var contentType = repository.Get(1046);
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var contentType = repository.Get(1046);
 
-            // Act
+                // Act
             var urlAlias = new PropertyType("test", DataTypeDatabaseType.Nvarchar)
-                               {
-                                   Alias = "urlAlias",
-                                   Name = "Url Alias",
-                                   Description = "",
-                                   HelpText = "",
-                                   Mandatory = false,
-                                   SortOrder = 1,
-                                   DataTypeDefinitionId = -88
-                               };
-            
-            var addedPropertyType = contentType.AddPropertyType(urlAlias);
-            repository.AddOrUpdate(contentType);
-            unitOfWork.Commit();
+                    {
+                        Alias = "urlAlias",
+                        Name = "Url Alias",
+                        Description = "",
+                        HelpText = "",
+                        Mandatory = false,
+                        SortOrder = 1,
+                        DataTypeDefinitionId = -88
+                    };
 
-            // Assert
-            var updated = repository.Get(1046);
-            Assert.That(addedPropertyType, Is.True);
-            Assert.That(updated.PropertyGroups.Count(), Is.EqualTo(2));
-            Assert.That(updated.PropertyTypes.Count(), Is.EqualTo(5));
-            Assert.That(updated.PropertyTypes.Any(x => x.Alias == "urlAlias"), Is.True);
-            Assert.That(updated.PropertyTypes.First(x => x.Alias == "urlAlias").PropertyGroupId, Is.Null);
+                var addedPropertyType = contentType.AddPropertyType(urlAlias);
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+
+                // Assert
+                var updated = repository.Get(1046);
+                Assert.That(addedPropertyType, Is.True);
+                Assert.That(updated.PropertyGroups.Count(), Is.EqualTo(2));
+                Assert.That(updated.PropertyTypes.Count(), Is.EqualTo(5));
+                Assert.That(updated.PropertyTypes.Any(x => x.Alias == "urlAlias"), Is.True);
+                Assert.That(updated.PropertyTypes.First(x => x.Alias == "urlAlias").PropertyGroupId, Is.Null);
+            }
         }
 
         [Test]
@@ -269,40 +304,42 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            var subpageContentType = MockedContentTypes.CreateSimpleContentType("umbSubpage", "Subpage");
-            var simpleSubpageContentType = MockedContentTypes.CreateSimpleContentType("umbSimpleSubpage", "Simple Subpage");
-            repository.AddOrUpdate(subpageContentType);
-            repository.AddOrUpdate(simpleSubpageContentType);
-            unitOfWork.Commit();
+                var subpageContentType = MockedContentTypes.CreateSimpleContentType("umbSubpage", "Subpage");
+                var simpleSubpageContentType = MockedContentTypes.CreateSimpleContentType("umbSimpleSubpage", "Simple Subpage");
+                repository.AddOrUpdate(subpageContentType);
+                repository.AddOrUpdate(simpleSubpageContentType);
+                unitOfWork.Commit();
 
-            // Act
-            var contentType = repository.Get(1045);
-            contentType.AllowedContentTypes = new List<ContentTypeSort>
-                                                  {
-                                                      new ContentTypeSort
-                                                          {
-                                                              Alias = subpageContentType.Alias,
-                                                              Id = new Lazy<int>(() => subpageContentType.Id),
-                                                              SortOrder = 0
-                                                          },
-                                                      new ContentTypeSort
-                                                          {
-                                                              Alias = simpleSubpageContentType.Alias,
-                                                              Id = new Lazy<int>(() => simpleSubpageContentType.Id),
-                                                              SortOrder = 1
-                                                          }
-                                                  };
-            repository.AddOrUpdate(contentType);
-            unitOfWork.Commit();
+                // Act
+                var contentType = repository.Get(1045);
+                contentType.AllowedContentTypes = new List<ContentTypeSort>
+                    {
+                        new ContentTypeSort
+                            {
+                                Alias = subpageContentType.Alias,
+                                Id = new Lazy<int>(() => subpageContentType.Id),
+                                SortOrder = 0
+                            },
+                        new ContentTypeSort
+                            {
+                                Alias = simpleSubpageContentType.Alias,
+                                Id = new Lazy<int>(() => simpleSubpageContentType.Id),
+                                SortOrder = 1
+                            }
+                    };
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
 
-            //Assert
-            var updated = repository.Get(1045);
+                //Assert
+                var updated = repository.Get(1045);
 
-            Assert.That(updated.AllowedContentTypes.Any(), Is.True);
-            Assert.That(updated.AllowedContentTypes.Any(x => x.Alias == subpageContentType.Alias), Is.True);
-            Assert.That(updated.AllowedContentTypes.Any(x => x.Alias == simpleSubpageContentType.Alias), Is.True);
+                Assert.That(updated.AllowedContentTypes.Any(), Is.True);
+                Assert.That(updated.AllowedContentTypes.Any(x => x.Alias == subpageContentType.Alias), Is.True);
+                Assert.That(updated.AllowedContentTypes.Any(x => x.Alias == simpleSubpageContentType.Alias), Is.True);
+            }
         }
 
         [Test]
@@ -311,23 +348,25 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
-            var contentRepository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
-            var contentType = repository.Get(1046);
+            ContentTypeRepository repository;
+            using (var contentRepository = CreateRepository(unitOfWork, out repository))
+            {
+                var contentType = repository.Get(1046);
 
-            var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
-            contentRepository.AddOrUpdate(subpage);
-            unitOfWork.Commit();
+                var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
+                contentRepository.AddOrUpdate(subpage);
+                unitOfWork.Commit();
 
-            // Act
-            contentType.RemovePropertyType("keywords");
-            repository.AddOrUpdate(contentType);
-            unitOfWork.Commit();
+                // Act
+                contentType.RemovePropertyType("keywords");
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
 
-            // Assert
-            Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(3));
-            Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "keywords"), Is.False);
-            Assert.That(subpage.Properties.First(x => x.Alias == "metaDescription").Value, Is.EqualTo("This is the meta description for a textpage"));
+                // Assert
+                Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(3));
+                Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "keywords"), Is.False);
+                Assert.That(subpage.Properties.First(x => x.Alias == "metaDescription").Value, Is.EqualTo("This is the meta description for a textpage"));
+            }
         }
 
         [Test]
@@ -336,23 +375,26 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
-            var contentRepository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
-            var contentType = repository.Get(1046);
+            ContentTypeRepository repository;
+            using (var contentRepository = CreateRepository(unitOfWork, out repository))
+            {
+                var contentType = repository.Get(1046);
 
-            var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
-            contentRepository.AddOrUpdate(subpage);
-            unitOfWork.Commit();
+                var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
+                contentRepository.AddOrUpdate(subpage);
+                unitOfWork.Commit();
 
-            // Act
-            var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
+                // Act
+                var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
             propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "metaAuthor", Name = "Meta Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
-            repository.AddOrUpdate(contentType);
-            unitOfWork.Commit();
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
 
-            // Assert
-            Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(5));
-            Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);
+                // Assert
+                Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(5));
+                Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);
+            }
+            
         }
 
         [Test]
@@ -361,30 +403,32 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
-            var contentRepository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
-            var contentType = repository.Get(1046);
+            ContentTypeRepository repository;
+            using (var contentRepository = CreateRepository(unitOfWork, out repository))
+            {
+                var contentType = repository.Get(1046);
 
-            var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
-            contentRepository.AddOrUpdate(subpage);
-            unitOfWork.Commit();
+                var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
+                contentRepository.AddOrUpdate(subpage);
+                unitOfWork.Commit();
 
-            var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
+                var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
             propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "metaAuthor", Name = "Meta Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
-            repository.AddOrUpdate(contentType);
-            unitOfWork.Commit();
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
 
-            // Act
-            var content = contentRepository.Get(subpage.Id);
-            content.SetValue("metaAuthor", "John Doe");
-            contentRepository.AddOrUpdate(content);
-            unitOfWork.Commit();
+                // Act
+                var content = contentRepository.Get(subpage.Id);
+                content.SetValue("metaAuthor", "John Doe");
+                contentRepository.AddOrUpdate(content);
+                unitOfWork.Commit();
 
-            //Assert
-            var updated = contentRepository.Get(subpage.Id);
-            Assert.That(updated.GetValue("metaAuthor").ToString(), Is.EqualTo("John Doe"));
-            Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(5));
-            Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);
+                //Assert
+                var updated = contentRepository.Get(subpage.Id);
+                Assert.That(updated.GetValue("metaAuthor").ToString(), Is.EqualTo("John Doe"));
+                Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(5));
+                Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);
+            }
         }
 
         [Test]
@@ -395,36 +439,38 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
-            var contentRepository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
-            var contentType = repository.Get(1046);
+            ContentTypeRepository repository;
+            using (var contentRepository = CreateRepository(unitOfWork, out repository))
+            {
+                var contentType = repository.Get(1046);
 
-            var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
-            contentRepository.AddOrUpdate(subpage);
-            unitOfWork.Commit();
+                var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
+                contentRepository.AddOrUpdate(subpage);
+                unitOfWork.Commit();
 
-            //Remove PropertyType
-            contentType.RemovePropertyType("keywords");
-            //Add PropertyType
-            var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
+                //Remove PropertyType
+                contentType.RemovePropertyType("keywords");
+                //Add PropertyType
+                var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
             propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "metaAuthor", Name = "Meta Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
-            repository.AddOrUpdate(contentType);
-            unitOfWork.Commit();
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
 
-            // Act
-            var content = contentRepository.Get(subpage.Id);
-            content.SetValue("metaAuthor", "John Doe");
-            contentRepository.AddOrUpdate(content);
-            unitOfWork.Commit();
+                // Act
+                var content = contentRepository.Get(subpage.Id);
+                content.SetValue("metaAuthor", "John Doe");
+                contentRepository.AddOrUpdate(content);
+                unitOfWork.Commit();
 
-            //Assert
-            var updated = contentRepository.Get(subpage.Id);
-            Assert.That(updated.GetValue("metaAuthor").ToString(), Is.EqualTo("John Doe"));
-            Assert.That(updated.Properties.First(x => x.Alias == "metaDescription").Value, Is.EqualTo("This is the meta description for a textpage"));
+                //Assert
+                var updated = contentRepository.Get(subpage.Id);
+                Assert.That(updated.GetValue("metaAuthor").ToString(), Is.EqualTo("John Doe"));
+                Assert.That(updated.Properties.First(x => x.Alias == "metaDescription").Value, Is.EqualTo("This is the meta description for a textpage"));
 
-            Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
-            Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);
-            Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "keywords"), Is.False);
+                Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
+                Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);
+                Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "keywords"), Is.False);
+            }
         }
 
         public void CreateTestData()
