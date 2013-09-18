@@ -102,8 +102,8 @@ function openUser(id) {
                     xNode.NodeID = u.Id.ToString();
                     xNode.Text = u.Name;
                     xNode.Action = "javascript:openUser(" + u.Id + ");";
-                    xNode.Icon = "user.gif";
-                    xNode.OpenIcon = "user.gif";
+                    xNode.Icon = "icon-user";
+                    xNode.OpenIcon = "icon-user";
 
                     if (u.Disabled) {
                         xNode.Style.DimNode();

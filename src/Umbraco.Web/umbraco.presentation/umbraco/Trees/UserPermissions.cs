@@ -52,7 +52,7 @@ namespace umbraco.cms.presentation.Trees
                     node.NodeID = user.Id.ToString();
                     node.Text = user.Name;
                     node.Action = "javascript:openUserPermissions('" + user.Id.ToString() + "');";
-                    node.Icon = "user.gif";
+                    node.Icon = "icon-users";
 
                     OnBeforeNodeRender(ref tree, ref node, EventArgs.Empty);
                     if (node != null)
