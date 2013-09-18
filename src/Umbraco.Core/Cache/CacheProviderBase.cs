@@ -15,6 +15,7 @@ namespace Umbraco.Core.Cache
         public abstract void ClearCacheItem(string key);
         public abstract void ClearCacheObjectTypes(string typeName);
         public abstract void ClearCacheObjectTypes<T>();
+        public abstract void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate);
         public abstract void ClearCacheByKeySearch(string keyStartsWith);
         public abstract void ClearCacheByKeyExpression(string regexString);
         public abstract IEnumerable<T> GetCacheItemsByKeySearch<T>(string keyStartsWith);
