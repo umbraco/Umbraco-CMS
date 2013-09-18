@@ -238,6 +238,7 @@
     <Compile Include="Controllers\WebApiEditors\MediaControllerUnitTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
     <Compile Include="Integration\CreateContent.cs" />
+    <Compile Include="Migrations\Upgrades\ValidateV7UpgradeTest.cs" />
     <Compile Include="Models\ContentExtensionsTests.cs" />
     <Compile Include="Models\UserExtensionsTests.cs" />
     <Compile Include="Mvc\MergeParentContextViewDataAttributeTests.cs" />

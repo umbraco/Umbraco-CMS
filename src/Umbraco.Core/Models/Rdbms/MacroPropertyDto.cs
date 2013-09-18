@@ -23,6 +23,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("macro")]
         [ForeignKey(typeof(MacroDto))]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsMacroProperty_Alias", ForColumns = "macro, macroPropertyAlias")]
         public int Macro { get; set; }
 
         [Column("macroPropertySortOrder")]
