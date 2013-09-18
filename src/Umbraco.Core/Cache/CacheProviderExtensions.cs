@@ -35,11 +35,6 @@ namespace Umbraco.Core.Cache
             provider.InsertCacheItem(cacheKey, () => getCacheItem(), timeout, isSliding, priority, removedCallback, dependentFiles);
         }
 
-        public static void ClearCacheObjectTypes<T>(this ICacheProvider provider)
-        {
-            provider.ClearCacheObjectTypes(typeof(T).ToString());
-        }
-
         public static IEnumerable<T> GetCacheItemsByKeySearch<T>(this ICacheProvider provider, string keyStartsWith)
         {
             var result = provider.GetCacheItemsByKeySearch(keyStartsWith);

@@ -46,11 +46,40 @@ namespace Umbraco.Core.Cache
         {
             using (new WriteLock(Locker))
             {
-                var keysToRemove = (from c in MemoryCache where c.Value.GetType().ToString().InvariantEquals(typeName) select c.Key).ToList();
+                var keysToRemove = MemoryCache
+                    .Where(c => c.Value != null && c.Value.GetType().ToString().InvariantEquals(typeName))
+                    .Select(c => c.Key)
+                    .ToArray();
                 foreach (var k in keysToRemove)
-                {
                     MemoryCache.Remove(k);
-                }
+            }
+        }
+
+        public virtual void ClearCacheObjectTypes<T>()
+        {
+            using (new WriteLock(Locker))
+            {
+                var typeOfT = typeof (T);
+                var keysToRemove = MemoryCache
+                    .Where(c => c.Value != null && c.Value.GetType() == typeOfT)
+                    .Select(c => c.Key)
+                    .ToArray();
+                foreach (var k in keysToRemove)
+                    MemoryCache.Remove(k);
+            }
+        }
+
+        public virtual void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
+        {
+            using (new WriteLock(Locker))
+            {
+                var typeOfT = typeof(T);
+                var keysToRemove = MemoryCache
+                    .Where(c => c.Value != null && c.Value.GetType() == typeOfT && predicate(c.Key, (T)c.Value))
+                    .Select(c => c.Key)
+                    .ToArray();
+                foreach (var k in keysToRemove)
+                    MemoryCache.Remove(k);
             }
         }
 

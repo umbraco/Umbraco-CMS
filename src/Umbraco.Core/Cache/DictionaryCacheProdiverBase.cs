@@ -56,19 +56,67 @@ namespace Umbraco.Core.Cache
         {
             using (new WriteLock(Locker))
             {
-                var keysToRemove = DictionaryCache.Cast<object>()
-                                                  .Select(item => new DictionaryItemWrapper(item))
-                                                  .Where(c => DictionaryCache[c.Key.ToString()] != null && DictionaryCache[c.Key.ToString()].GetType().ToString().InvariantEquals(typeName))
-                                                  .Select(c => c.Key)
-                                                  .ToList();
+                var keysToRemove = DictionaryCache
+                    .Cast<object>()
+                    .Select(item => new DictionaryItemWrapper(item))
+                    .Where(c =>
+                    {
+                        var k = c.Key.ToString();
+                        var v = DictionaryCache[k];
+                        return v != null && v.GetType().ToString().InvariantEquals(typeName);
+                    })
+                    .Select(c => c.Key)
+                    .ToList();
 
                 foreach (var k in keysToRemove)
-                {
                     DictionaryCache.Remove(k);
-                }
             }
         }
-        
+
+        public virtual void ClearCacheObjectTypes<T>()
+        {
+            using (new WriteLock(Locker))
+            {
+                var typeOfT = typeof(T);
+                var keysToRemove = DictionaryCache
+                    .Cast<object>()
+                    .Select(item => new DictionaryItemWrapper(item))
+                    .Where(c =>
+                    {
+                        var k = c.Key.ToString();
+                        var v = DictionaryCache[k];
+                        return v != null && v.GetType() == typeOfT;
+                    })
+                    .Select(c => c.Key)
+                    .ToList();
+
+                foreach (var k in keysToRemove)
+                    DictionaryCache.Remove(k);
+            }
+        }
+
+        public virtual void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
+        {
+            using (new WriteLock(Locker))
+            {
+                var typeOfT = typeof(T);
+                var keysToRemove = DictionaryCache
+                    .Cast<object>()
+                    .Select(item => new DictionaryItemWrapper(item))
+                    .Where(c =>
+                    {
+                        var k = c.Key.ToString();
+                        var v = DictionaryCache[k];
+                        return v != null && v.GetType() == typeOfT && predicate(k, (T)v);
+                    })
+                    .Select(c => c.Key)
+                    .ToList();
+
+                foreach (var k in keysToRemove)
+                    DictionaryCache.Remove(k);
+            }
+        }
+
         /// <summary>
         /// Clears all cache items that starts with the key passed.
         /// </summary>

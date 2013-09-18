@@ -27,37 +27,29 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheObjectTypes(string typeName)
         {
-            foreach (var key in StaticCache.Keys)
-            {
-                if (StaticCache[key] != null
-                    && StaticCache[key].GetType().ToString().InvariantEquals(typeName))
-                {
-                    object val;
-                    StaticCache.TryRemove(key, out val);
-                }
-            }
-        }        
+            StaticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType().ToString().InvariantEquals(typeName));
+        }
+
+        public virtual void ClearCacheObjectTypes<T>()
+        {
+            var typeOfT = typeof(T);
+            StaticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT);
+        }
+
+        public virtual void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
+        {
+            var typeOfT = typeof(T);
+            StaticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT && predicate(kvp.Key, (T)kvp.Value));
+        }
 
         public virtual void ClearCacheByKeySearch(string keyStartsWith)
         {
-            foreach (var key in StaticCache.Keys)
-            {
-                if (key.InvariantStartsWith(keyStartsWith))
-                {
-                    ClearCacheItem(key);
-                }
-            }
+            StaticCache.RemoveAll(kvp => kvp.Key.InvariantStartsWith(keyStartsWith));
         }
 
         public virtual void ClearCacheByKeyExpression(string regexString)
         {
-            foreach (var key in StaticCache.Keys)
-            {
-                if (Regex.IsMatch(key, regexString))
-                {
-                    ClearCacheItem(key);
-                }
-            }
+            StaticCache.RemoveAll(kvp => Regex.IsMatch(kvp.Key, regexString)); 
         }
 
         public virtual IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
@@ -75,7 +67,7 @@ namespace Umbraco.Core.Cache
 
         public virtual object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
-            return StaticCache.GetOrAdd(cacheKey, getCacheItem());
+            return StaticCache.GetOrAdd(cacheKey, key => getCacheItem());
         }
         
     }
