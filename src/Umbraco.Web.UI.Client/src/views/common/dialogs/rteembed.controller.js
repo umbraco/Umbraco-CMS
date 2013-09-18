@@ -36,6 +36,7 @@
                         case 2:
                             $scope.preview = data.Markup;
                             $scope.supportsDimensions = data.SupportsDimensions;
+                            $scope.success = true;
                             break;
                     }
                 })
