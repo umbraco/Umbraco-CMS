@@ -304,6 +304,7 @@
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Models\ContentEditing\UmbracoEntityTypes.cs" />
+    <Compile Include="Models\Mapping\MacroModelMapper.cs" />
     <Compile Include="PropertyEditors\RteEmbedController.cs" />
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Editors\MediaPostValidateAttribute.cs" />
@@ -389,7 +390,7 @@
     <Compile Include="Models\Mapping\ContentPropertyDtoConverter.cs" />
     <Compile Include="Models\Mapping\ContentPropertyModelMapper.cs" />
     <Compile Include="Models\Mapping\CreatorResolver.cs" />
-    <Compile Include="Models\Mapping\NewMediaModelMapper.cs" />
+    <Compile Include="Models\Mapping\MediaModelMapper.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMapper.cs" />
     <Compile Include="Models\Mapping\ContentModelMapper.cs" />
     <Compile Include="Models\Mapping\OwnerResolver.cs" />

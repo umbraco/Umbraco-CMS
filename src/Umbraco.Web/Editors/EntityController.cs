@@ -167,13 +167,14 @@ namespace Umbraco.Web.Editors
             //now we need to convert the unknown ones
             switch (entityType)
             {
+                case UmbracoEntityTypes.Macro:                    
+                    //Get all macros from the macro service
+                    return Services.MacroService.GetAll().OrderBy(x => x.Name).Select(Mapper.Map<EntityBasic>);
                 case UmbracoEntityTypes.Domain:
 
                 case UmbracoEntityTypes.Language:
 
                 case UmbracoEntityTypes.User:
-
-                case UmbracoEntityTypes.Macro:
 
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + entityType);

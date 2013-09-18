@@ -51,7 +51,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var sql = GetBaseQuery(false);
 
-            return ConvertFromDtos(Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql));
+            return ConvertFromDtos(Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql))
+                .ToArray();// we don't want to re-iterate again!
         }
 
         private IEnumerable<IMacro> PerformGetAllOnIds(params int[] ids)

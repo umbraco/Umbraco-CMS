@@ -122,11 +122,11 @@ namespace Umbraco.Web.Cache
         public override void RefreshAll()
         {
             //all property type cache
-            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.PropertyTypeCacheKey);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.PropertyTypeCacheKey);
             //all content type property cache
-            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.ContentTypePropertiesCacheKey);     
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.ContentTypePropertiesCacheKey);     
             //all content type cache
-            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.ContentTypeCacheKey);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.ContentTypeCacheKey);
             //clear static object cache
             global::umbraco.cms.businesslogic.ContentType.RemoveAllDataTypeCache();
             PublishedContentHelper.ClearPropertyTypeCache();
@@ -241,12 +241,13 @@ namespace Umbraco.Web.Cache
             //clears the cache for each property type associated with the content type
             foreach (var pid in payload.PropertyTypeIds)
             {
-                ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.PropertyTypeCacheKey + pid);
+                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.PropertyTypeCacheKey + pid);
             }
+
             //clears the cache associated with the Content type itself
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, payload.Id));
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, payload.Id));
             //clears the cache associated with the content type properties collection
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.ContentTypePropertiesCacheKey + payload.Id);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.ContentTypePropertiesCacheKey + payload.Id);
             
             //clears the dictionary object cache of the legacy ContentType
             global::umbraco.cms.businesslogic.ContentType.RemoveFromDataTypeCache(payload.Alias);
