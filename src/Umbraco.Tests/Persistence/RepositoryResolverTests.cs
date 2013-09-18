@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Persistence
 		public void Setup()
 		{
 			RepositoryResolver.Current = new RepositoryResolver(
-				new RepositoryFactory());
+                new RepositoryFactory(true));  //disable all repo caches for tests!
 
             Resolution.Freeze();
 		}

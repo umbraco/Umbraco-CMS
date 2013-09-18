@@ -72,7 +72,7 @@ namespace Umbraco.Core.Cache
 
         public override T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem)
         {
-            return (T)_staticCache.GetOrAdd(cacheKey, getCacheItem);
+            return (T)_staticCache.GetOrAdd(cacheKey, key => getCacheItem());
         }
         
     }
