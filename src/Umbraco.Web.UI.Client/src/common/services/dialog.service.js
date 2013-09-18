@@ -37,7 +37,7 @@ angular.module('umbraco.services')
        function removeAllDialogs(args) {
            for (var i = 0; i < dialogs.length; i++) {
                var dialog = dialogs[i];
-               dialog.scope.close(args);
+               dialog.close(args);
 
                //removeDialog(dialog, args);
                dialogs.splice(i, 1);
@@ -93,18 +93,7 @@ angular.module('umbraco.services')
            }, 500);
            
 
-           //basic events for submitting and closing
-           scope.submit = function(data) {
-               if (dialog.callback) {
-                   dialog.callback(data);
-               }
-
-               dialog.element.modal('hide');
-               dialog.element.remove();
-               $("#" + dialog.element.attr("id")).remove();
-           };
-
-           scope.close = function(data) {
+           dialog.close = function(data) {
               if (dialog.closeCallback) {
                    dialog.closeCallback(data);
               }
@@ -118,7 +107,7 @@ angular.module('umbraco.services')
 
            //if iframe is enabled, inject that instead of a template
            if (dialog.iframe) {
-               var html = $("<iframe auto-scale='0' src='" + dialog.template + "' style='width: 100%; height: 100%;'></iframe>");
+               var html = $("<iframe auto-scale='0' src='" + dialog.template + "' style='border: none; width: 100%; height: 100%;'></iframe>");
                dialog.element.html(html);
   
                //append to body or whatever element is passed in as options.containerElement
@@ -177,6 +166,21 @@ angular.module('umbraco.services')
 
                          dialog.element.remove();
                          $("#" + dialog.element.attr("id")).remove();
+                     };
+
+                     //basic events for submitting and closing
+                     scope.submit = function(data) {
+                         if (dialog.callback) {
+                             dialog.callback(data);
+                         }
+
+                         dialog.element.modal('hide');
+                         dialog.element.remove();
+                         $("#" + dialog.element.attr("id")).remove();
+                     };
+
+                     scope.close = function(data) {
+                        dialog.close(data);
                      };
 
                      scope.show = function() {
@@ -261,8 +265,8 @@ angular.module('umbraco.services')
             * @param {Object} args if specified this object will be sent to any callbacks registered on the dialogs.
             */
            close: function (dialog, args) {
-              if(dialog && dialog.scope){
-                  dialog.scope.close();
+              if(dialog){
+                  dialog.close();
               }
               
                //removeDialog(dialog, args);

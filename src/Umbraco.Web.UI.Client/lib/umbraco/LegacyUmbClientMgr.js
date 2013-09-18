@@ -243,10 +243,14 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     }
 
                     //just call the native dialog close() method to remove the dialog
-                    lastModal.scope.close();
+                    lastModal.close();
                 }
                 else {
-                    dialogService.closeAll(rVal);
+                    //instead of calling just the dialog service we funnel it through the global 
+                    //event emitter
+                    getRootScope().$emit("closeDialogs", event);
+
+                    //dialogService.closeAll(rVal);
                 }                
             },
             _debug: function(strMsg) {
