@@ -177,7 +177,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .From<DocumentDto>()
                 .InnerJoin<ContentVersionDto>().On<ContentVersionDto, DocumentDto>(left => left.VersionId, right => right.VersionId)
                 .Where<ContentVersionDto>(x => x.VersionId == versionId)
-                .Where<DocumentDto>(x => x.Newest == true);
+                .Where<DocumentDto>(x => x.Newest != true);
             var dto = Database.Fetch<DocumentDto, ContentVersionDto>(sql).FirstOrDefault();
 
             if(dto == null) return;
@@ -185,6 +185,29 @@ namespace Umbraco.Core.Persistence.Repositories
             using (var transaction = Database.GetTransaction())
             {
                 PerformDeleteVersion(dto.NodeId, versionId);
+
+                transaction.Complete();
+            }
+        }
+
+        public override void DeleteVersions(int id, DateTime versionDate)
+        {
+            var sql = new Sql()
+                .Select("*")
+                .From<DocumentDto>()
+                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, DocumentDto>(left => left.VersionId, right => right.VersionId)
+                .Where<ContentVersionDto>(x => x.NodeId == id)
+                .Where<ContentVersionDto>(x => x.VersionDate < versionDate)
+                .Where<DocumentDto>(x => x.Newest != true);
+            var list = Database.Fetch<DocumentDto, ContentVersionDto>(sql);
+            if (list.Any() == false) return;
+
+            using (var transaction = Database.GetTransaction())
+            {
+                foreach (var dto in list)
+                {
+                    PerformDeleteVersion(id, dto.VersionId);
+                }
 
                 transaction.Complete();
             }

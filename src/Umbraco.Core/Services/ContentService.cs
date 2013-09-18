@@ -800,15 +800,13 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Permanently deletes versions from an <see cref="IContent"/> object prior to a specific date.
+        /// This method will never delete the latest version of a content item.
         /// </summary>
         /// <param name="id">Id of the <see cref="IContent"/> object to delete versions from</param>
         /// <param name="versionDate">Latest version date</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
         public void DeleteVersions(int id, DateTime versionDate, int userId = 0)
         {
-            //TODO: We should check if we are going to delete the most recent version because if that happens it means the 
-            // entity is completely deleted and we should raise the normal Deleting/Deleted event
-
             if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, dateToRetain: versionDate), this))
                 return;
 
@@ -826,6 +824,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Permanently deletes specific version(s) from an <see cref="IContent"/> object.
+        /// This method will never delete the latest version of a content item.
         /// </summary>
         /// <param name="id">Id of the <see cref="IContent"/> object to delete a version from</param>
         /// <param name="versionId">Id of the version to delete</param>
@@ -835,17 +834,14 @@ namespace Umbraco.Core.Services
         {
             using (new WriteLock(Locker))
             {
-                //TODO: We should check if we are going to delete the most recent version because if that happens it means the 
-                // entity is completely deleted and we should raise the normal Deleting/Deleted event
+                if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion: versionId), this))
+                    return;
 
                 if (deletePriorVersions)
                 {
                     var content = GetByVersion(versionId);
                     DeleteVersions(id, content.UpdateDate, userId);
                 }
-
-                if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion: versionId), this))
-                    return;
 
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentRepository(uow))
