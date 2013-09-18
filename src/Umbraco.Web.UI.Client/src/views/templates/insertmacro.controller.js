@@ -7,21 +7,36 @@
  * The controller for the custom insert macro dialog. Until we upgrade the template editor to be angular this 
  * is actually loaded into an iframe with full html.
  */
-function InsertMacroController($scope, userService) {
- 
-    //fetch the authorized status         
-    userService.isAuthenticated()
-        .then(function (data) {
-            
-            $scope.authenticated = data.authenticated;
-            $scope.user = data.user;
+function InsertMacroController($scope, entityResource, macroResource) {
 
-        }, function (reason) {
-            alert("An error occurred checking authentication.");
-            //TODO: We'd need to proxy this call to the main window
-            //notificationsService.error("An error occurred checking authentication.");
-            $scope.authenticated = false;
-            $scope.user = null;
+    $scope.macros = [];
+    $scope.selectedMacro = null;
+    $scope.submitForm = function () {
+        //ensure the drop down is dirty so the styles validate
+        $scope.insertMacroForm.$setDirty(true);
+        if ($scope.insertMacroForm.$invalid) {
+            return;
+        }
+
+        macroResource.getMacroParameters($scope.selectedMacro)
+            .then(function (data) {
+                
+                //go to next page if there are params otherwise we can just exit
+                if (!angular.isArray(data) || data.length === 0) {
+                    //we can just exist!
+                    alert("no params");
+                }
+                else {
+                    $scope.macroParams = data;
+                }
+            });
+        
+    };
+
+    //fetch the authorized status         
+    entityResource.getAll("Macro")
+        .then(function (data) {            
+            $scope.macros = data;
         });
 
 }

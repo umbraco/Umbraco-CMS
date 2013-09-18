@@ -10,7 +10,8 @@ Umbraco.Sys.ServerVariables = {
         "sectionApiBaseUrl": "/umbraco/UmbracoApi/Section/",
         "treeApplicationApiBaseUrl": "/umbraco/UmbracoTrees/ApplicationTreeApi/",
         "contentTypeApiBaseUrl": "/umbraco/Api/ContentType/",
-        "mediaTypeApiBaseUrl": "/umbraco/Api/MediaTypeApi/",
+        "mediaTypeApiBaseUrl": "/umbraco/Api/MediaType/",
+        "macroApiBaseUrl": "/umbraco/Api/Macro/",
         "authenticationApiBaseUrl": "/umbraco/UmbracoApi/Authentication/",
         //For this we'll just provide a file that exists during the mock session since we don't really have legay js tree stuff
         "legacyTreeJs": "/belle/lib/yepnope/empty.js",

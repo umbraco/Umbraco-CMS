@@ -1,24 +1,27 @@
 <div class="umb-panel" ng-controller="Umbraco.Editors.Templates.InsertMacroController">
-    <div class="umb-panel-header">
-        <div class="umb-el-wrap umb-panel-buttons">
-            <div class="btn-toolbar umb-btn-toolbar">
-                <button type="button" ng-click="submit(dialogData)" class="btn btn-primary">Ok</button>
+
+    <form novalidate name="insertMacroForm" ng-submit="submitForm()">
+        
+        <div class="umb-panel-header">
+            <div class="umb-el-wrap umb-panel-buttons">
+                <div class="btn-toolbar umb-btn-toolbar">
+                    <button type="submit" class="btn btn-primary">Ok</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="umb-panel-body umb-scrollable" auto-scale="1">
-        <div class="tab-content umb-control-group">
-            <div class="umb-pane">
-
-                <form>
+        <div class="umb-panel-body umb-scrollable" auto-scale="1">
+            <div class="tab-content umb-control-group">
+                <div class="umb-pane">
+                    
                     <label>Choose a macro</label>
-                    <select>
-                        <option>Hello</option>
+                    <select name="selectedMacro" ng-model="selectedMacro" ng-options="m.id as m.name for m in macros" required>
+                        <option value="">-- Choose macro --</option>
                     </select>
-                </form>
-
+                    
+                </div>
             </div>
         </div>
-    </div>
+
+    </form>
 </div>
