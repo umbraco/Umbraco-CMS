@@ -3,7 +3,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	function ($scope, eventsService, $log) {	
 	var dialogOptions = $scope.$parent.dialogOptions;
 	$scope.dialogTreeEventHandler = $({});
-	$scope.section = dialogOptions.section | "content";
+	$scope.section = dialogOptions.section;
+
 
 	$scope.dialogTreeEventHandler.bind("treeNodeSelect", function(ev, args){
 		args.event.preventDefault();

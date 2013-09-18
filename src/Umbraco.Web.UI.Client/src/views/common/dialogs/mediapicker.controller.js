@@ -28,7 +28,7 @@ angular.module("umbraco")
             $scope.gotoFolder = function(folderId){
 
                 if(folderId > 0){
-                    entityResource.getAncestors(folderId)
+                    entityResource.getAncestors(folderId, "media")
                         .then(function(anc){
                             anc.splice(0,1);  
                             $scope.path = anc;

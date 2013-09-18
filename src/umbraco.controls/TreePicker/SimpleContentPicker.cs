@@ -12,7 +12,7 @@ namespace umbraco.uicontrols.TreePicker
         {
             get
             {
-                return TreeUrlGenerator.GetPickerUrl(Constants.Applications.Content, "content");
+                return Constants.Applications.Content;
             }
         }
 

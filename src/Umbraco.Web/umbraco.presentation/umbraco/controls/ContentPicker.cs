@@ -44,7 +44,7 @@ namespace umbraco.controls
         {
             get
             {
-                return TreeService.GetPickerUrl(AppAlias, TreeAlias);
+                return AppAlias;
             }
         }
 

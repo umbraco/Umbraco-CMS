@@ -9,11 +9,13 @@ using umbraco.cms.businesslogic;
 namespace umbraco.uicontrols.TreePicker
 {
 
+    /*
     [ClientDependency(0, ClientDependencyType.Javascript, "Application/NamespaceManager.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Css, "modal/style.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "modal/modal.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "Application/UmbracoClientManager.js", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Javascript, "Application/UmbracoUtils.js", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Javascript, "Application/UmbracoUtils.js", "UmbracoClient")]*/
+
     [ValidationProperty("Value")]
     public abstract class BaseTreePicker : Control, INamingContainer
     {
@@ -23,7 +25,8 @@ namespace umbraco.uicontrols.TreePicker
         protected HtmlAnchor ChooseLink;
         protected HtmlGenericControl ItemTitle;
         protected HtmlGenericControl ButtonContainer;
-        
+        protected HtmlGenericControl RootContainer;
+
         public BaseTreePicker()
         {
             ShowDelete = true;
@@ -177,11 +180,16 @@ namespace umbraco.uicontrols.TreePicker
         {
             base.CreateChildControls();
 
+            RootContainer = new HtmlGenericControl("span");
+            RootContainer.Attributes.Add("class", "umb-tree-picker");
+            this.Controls.Add(RootContainer);
+
             //create the hidden field
             ItemIdValue = new HiddenField();
             ItemIdValue.ID = "ContentIdValue";
-            this.Controls.Add(ItemIdValue);
+            RootContainer.Controls.Add(ItemIdValue);
 
+            
             ButtonContainer = new HtmlGenericControl("span");
             ButtonContainer.ID = "btns";
 
@@ -200,6 +208,8 @@ namespace umbraco.uicontrols.TreePicker
             DeleteLink.Style.Add(HtmlTextWriterStyle.Color, "red");
             DeleteLink.Title = ui.GetText("delete");
             DeleteLink.InnerText = ui.GetText("delete");
+            DeleteLink.Attributes.Add("class", "clear");
+
             ButtonContainer.Controls.Add(DeleteLink);
             ButtonContainer.Controls.Add(new LiteralControl("&nbsp;"));
             ButtonContainer.Controls.Add(new LiteralControl("&nbsp;"));
@@ -208,14 +218,16 @@ namespace umbraco.uicontrols.TreePicker
                 DeleteLink.Style.Add(HtmlTextWriterStyle.Display, "none");
             }
 
-            this.Controls.Add(ButtonContainer);
+            RootContainer.Controls.Add(ButtonContainer);
 
             //add choose link with padding
             ChooseLink = new HtmlAnchor();
             ChooseLink.HRef = "#"; //filled in on pre-render
             ChooseLink.InnerText = ui.GetText("choose") + "...";
-            this.Controls.Add(ChooseLink);
+            ChooseLink.Attributes.Add("data-section", this.TreePickerUrl);
+            ChooseLink.Attributes.Add("class", "choose");
 
+            RootContainer.Controls.Add(ChooseLink);
         }
 
         /// <summary>
@@ -236,12 +248,14 @@ namespace umbraco.uicontrols.TreePicker
                 ItemTitle.InnerText = GetItemTitle();
                 ItemTitle.Attributes.Add("title", GetItemBreadcrumbs());   // Adding full path/meta info (Issue U4-192)
             }  
-
+            /*
             ChooseLink.HRef = string.Format("javascript:mc_{0}.LaunchPicker();", this.ClientID);
             DeleteLink.HRef = string.Format("javascript:mc_{0}.ClearSelection();", this.ClientID);
+            */
 
             RenderJSComponents();
 
+            /*
             if (ScriptManager.GetCurrent(Page).IsInAsyncPostBack)
             {
                 ScriptManager.RegisterStartupScript(this, this.GetType(), this.ClientID + "TreePicker", GetJSScript(), true);
@@ -249,7 +263,7 @@ namespace umbraco.uicontrols.TreePicker
             else
             {
                 Page.ClientScript.RegisterStartupScript(this.GetType(), this.ClientID + "TreePicker", GetJSScript(), true);
-            }
+            }*/
 
         }
 
