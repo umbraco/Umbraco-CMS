@@ -8,7 +8,7 @@ namespace Umbraco.Core.PropertyEditors
 {
     [PropertyValueType(typeof(DateTime))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
-    internal class DatePickerValueConverter : IPropertyValueConverter
+    internal class DatePickerValueConverter : PropertyValueConverterBase
 	{
 	    private static readonly Guid[] DataTypeGuids = new[]
 	        {
@@ -16,12 +16,12 @@ namespace Umbraco.Core.PropertyEditors
 	            Guid.Parse(Constants.PropertyEditors.Date)
 	        };
 
-        public bool IsDataToSourceConverter(PublishedPropertyType propertyType)
+        public override bool IsDataToSourceConverter(PublishedPropertyType propertyType)
         {
-            return DataTypeGuids.Contains(propertyType.EditorGuid);
+            return DataTypeGuids.Contains(propertyType.PropertyEditorGuid);
         }
 
-        public object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return DateTime.MinValue;
 
@@ -42,23 +42,19 @@ namespace Umbraco.Core.PropertyEditors
                 : DateTime.MinValue;
         }
 
-        public bool IsSourceToObjectConverter(PublishedPropertyType propertyType)
+        public override bool IsSourceToObjectConverter(PublishedPropertyType propertyType)
         {
             return IsDataToSourceConverter(propertyType);
         }
 
-        public object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
-        {
-            // source should come from ConvertSource and be a DateTime already
-            return source;
-        }
+        // default ConvertSourceToObject just returns source ie a DateTime value
 
-        public bool IsSourceToXPathConverter(PublishedPropertyType propertyType)
+        public override bool IsSourceToXPathConverter(PublishedPropertyType propertyType)
         {
             return IsDataToSourceConverter(propertyType);
         }
 
-        public object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
         {
             // source should come from ConvertSource and be a DateTime already
             return XmlConvert.ToString((DateTime) source, "yyyy-MM-ddTHH:mm:ss");

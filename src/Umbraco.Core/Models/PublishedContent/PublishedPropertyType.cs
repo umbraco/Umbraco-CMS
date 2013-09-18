@@ -27,20 +27,20 @@ namespace Umbraco.Core.Models.PublishedContent
             Alias = propertyType.Alias;
 
             DataTypeId = propertyType.DataTypeDefinitionId;
-            EditorGuid = propertyType.DataTypeId;
+            PropertyEditorGuid = propertyType.DataTypeId;
 
             InitializeConverters();
         }
 
         // for unit tests
-        internal PublishedPropertyType(string alias, Guid dataTypeGuid, int propertyTypeId, int dataTypeDefinitionId)
+        internal PublishedPropertyType(string alias, Guid propertyEditorGuid, int propertyTypeId, int dataTypeDefinitionId)
         {
             // ContentType to be set by PublishedContentType when creating it
             Id = propertyTypeId;
             Alias = alias;
 
             DataTypeId = dataTypeDefinitionId;
-            EditorGuid = dataTypeGuid;
+            PropertyEditorGuid = propertyEditorGuid;
 
             InitializeConverters();
         }
@@ -59,7 +59,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
         public int DataTypeId { get; private set; }
 
-        public Guid EditorGuid { get; private set; }
+        public Guid PropertyEditorGuid { get; private set; }
 
         #endregion
 
@@ -124,7 +124,7 @@ namespace Umbraco.Core.Models.PublishedContent
             // use the converter else use dark (& performance-wise expensive) magic
             return _sourceConverter != null 
                 ? _sourceConverter.ConvertDataToSource(this, source, preview) 
-                : ConvertSourceUsingDarkMagic(source);
+                : ConvertUsingDarkMagic(source);
         }
 
         // gets the source cache level
@@ -168,7 +168,7 @@ namespace Umbraco.Core.Models.PublishedContent
         // gets the xpath cache level
         public PropertyCacheLevel XPathCacheLevel { get { return _xpathCacheLevel; } }
 
-        private static object ConvertSourceUsingDarkMagic(object source)
+        internal static object ConvertUsingDarkMagic(object source)
         {
             // convert to string
             var stringSource = source as string;
@@ -192,7 +192,7 @@ namespace Umbraco.Core.Models.PublishedContent
             // try xml - that is expensive, performance-wise
             XElement elt;
             if (XmlHelper.TryCreateXElementFromPropertyValue(stringSource, out elt))
-                return Attempt<object>.Succeed(new DynamicXml(elt)); // xml => return DynamicXml for compatiblity's sake
+                return new DynamicXml(elt); // xml => return DynamicXml for compatiblity's sake
 
             return source;
         }
@@ -207,7 +207,7 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             return PropertyEditorValueConvertersResolver.HasCurrent
                 ? PropertyEditorValueConvertersResolver.Current.Converters
-                    .Where(x => x.IsConverterFor(EditorGuid, ContentType.Alias, Alias))
+                    .Where(x => x.IsConverterFor(PropertyEditorGuid, ContentType.Alias, Alias))
                     .Select(x => new CompatConverter(x))
                 : Enumerable.Empty<IPropertyValueConverter>();
         }

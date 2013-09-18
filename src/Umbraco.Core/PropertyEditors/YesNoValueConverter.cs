@@ -5,14 +5,14 @@ namespace Umbraco.Core.PropertyEditors
 {
     [PropertyValueType(typeof(bool))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
-    class YesNoValueConverter : IPropertyValueConverter
+    class YesNoValueConverter : PropertyValueConverterBase
     {
-        public bool IsDataToSourceConverter(PublishedPropertyType propertyType)
+        public override bool IsDataToSourceConverter(PublishedPropertyType propertyType)
         {
-            return Guid.Parse(Constants.PropertyEditors.TrueFalse).Equals(propertyType.EditorGuid);
+            return Guid.Parse(Constants.PropertyEditors.TrueFalse).Equals(propertyType.PropertyEditorGuid);
         }
 
-        public object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
             // in xml a boolean is: string
             // in the database a boolean is: string "1" or "0" or empty
@@ -24,23 +24,19 @@ namespace Umbraco.Core.PropertyEditors
             return sourceString == "1";
         }
 
-        public bool IsSourceToObjectConverter(PublishedPropertyType propertyType)
+        public override bool IsSourceToObjectConverter(PublishedPropertyType propertyType)
         {
             return IsDataToSourceConverter(propertyType);
         }
 
-        public object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
-        {
-            // source should come from ConvertSource and be a boolean already
-            return source;
-        }
+        // default ConvertSourceToObject just returns source ie a boolean value
 
-        public bool IsSourceToXPathConverter(PublishedPropertyType propertyType)
+        public override bool IsSourceToXPathConverter(PublishedPropertyType propertyType)
         {
             return IsDataToSourceConverter(propertyType);
         }
 
-        public object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
         {
             // source should come from ConvertSource and be a boolean already
             return (bool) source ? "1" : "0";

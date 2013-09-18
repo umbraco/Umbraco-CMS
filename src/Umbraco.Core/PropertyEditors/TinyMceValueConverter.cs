@@ -10,14 +10,14 @@ namespace Umbraco.Core.PropertyEditors
     // PropertyCacheLevel.Content is ok here because that version of RTE converter does not parse {locallink} nor executes macros
     [PropertyValueType(typeof(IHtmlString))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
-    internal class TinyMceValueConverter : IPropertyValueConverter
+    internal class TinyMceValueConverter : PropertyValueConverterBase
 	{
-        public bool IsDataToSourceConverter(PublishedPropertyType propertyType)
+        public override bool IsDataToSourceConverter(PublishedPropertyType propertyType)
         {
-            return Guid.Parse(Constants.PropertyEditors.TinyMCEv3).Equals(propertyType.EditorGuid);
+            return Guid.Parse(Constants.PropertyEditors.TinyMCEv3).Equals(propertyType.PropertyEditorGuid);
         }
 
-        public virtual object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
             // in xml a string is: string
             // in the database a string is: string
@@ -25,25 +25,25 @@ namespace Umbraco.Core.PropertyEditors
             return source;
         }
 
-        public bool IsSourceToObjectConverter(PublishedPropertyType propertyType)
+        public override bool IsSourceToObjectConverter(PublishedPropertyType propertyType)
         {
             return IsDataToSourceConverter(propertyType);
         }
 
-        public virtual object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
         {
-            // source should come from ConvertSource and be a string already
-            return new HtmlString((string)source);
+            // source should come from ConvertSource and be a string (or null) already
+            return new HtmlString(source == null ? string.Empty : (string)source);
         }
 
-        public bool IsSourceToXPathConverter(PublishedPropertyType propertyType)
+        public override bool IsSourceToXPathConverter(PublishedPropertyType propertyType)
         {
             return IsDataToSourceConverter(propertyType);
         }
 
-        public virtual object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
         {
-            // source should come from ConvertSource and be a string already
+            // source should come from ConvertSource and be a string (or null) already
             return source;
         }
     }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -10,34 +7,34 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     class PropertyValueConverterBase : IPropertyValueConverter
     {
-        public virtual bool IsSourceToObjectConverter(Models.PublishedContent.PublishedPropertyType propertyType)
+        public virtual bool IsDataToSourceConverter(PublishedPropertyType propertyType)
         {
             return false;
         }
 
-        public virtual object ConvertSourceToObject(Models.PublishedContent.PublishedPropertyType propertyType, object source, bool preview)
+        public virtual object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
-            return null;
+            return PublishedPropertyType.ConvertUsingDarkMagic(source);
         }
 
-        public virtual bool IsDataToSourceConverter(Models.PublishedContent.PublishedPropertyType propertyType)
+        public virtual bool IsSourceToObjectConverter(PublishedPropertyType propertyType)
         {
             return false;
         }
 
-        public virtual object ConvertDataToSource(Models.PublishedContent.PublishedPropertyType propertyType, object source, bool preview)
+        public virtual object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
         {
-            return null;
+            return source;
         }
 
-        public virtual bool IsSourceToXPathConverter(Models.PublishedContent.PublishedPropertyType propertyType)
+        public virtual bool IsSourceToXPathConverter(PublishedPropertyType propertyType)
         {
             return false;
         }
 
-        public virtual object ConvertSourceToXPath(Models.PublishedContent.PublishedPropertyType propertyType, object source, bool preview)
+        public virtual object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
         {
-            return null;
+            return source.ToString();
         }
     }
 }
