@@ -2,5 +2,7 @@
 angular.module("umbraco")
     .controller("Umbraco.Dialogs.IconPickerController",
         function ($scope, iconHelper) {
-            $scope.icons = iconHelper.getIcons("");
+            iconHelper.getIcons("").then(function(icons){
+            	$scope.icons = icons;
+            });
 });
