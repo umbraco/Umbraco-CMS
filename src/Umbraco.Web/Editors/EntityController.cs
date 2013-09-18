@@ -6,6 +6,7 @@ using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
 using Newtonsoft.Json;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -39,114 +40,19 @@ namespace Umbraco.Web.Editors
     /// </remarks>
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
-    {
-        //[EnsureUserPermissionForContent("id")]
-        //[UmbracoApplicationAuthorize(Constants.Applications.Content)]
-        //public EntityBasic GetDocumentById(int id)
-        //{
-        //    return Mapper.Map<EntityBasic>(Services.EntityService.Get(id, UmbracoObjectTypes.Document));
-        //}
-
-        //[EnsureUserPermissionForContent("id")]
-        //[UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
-        //[FilterAllowedOutgoingContent(typeof(IEnumerable<EntityBasic>))]
-        //public IEnumerable<EntityBasic> GetDocumentChildren(int id)
-        //{
-        //    return GetChildren(id, UmbracoObjectTypes.Document);
-        //}
-
-        //[FilterAllowedOutgoingContent(typeof(IEnumerable<EntityBasic>))]
-        //[UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
-        //public IEnumerable<EntityBasic> GetDocumentsByIds([FromUri]int[] ids)
-        //{
-        //    if (ids == null) throw new ArgumentNullException("ids");
-        //    return GetEntitiesById(ids, UmbracoObjectTypes.Document);
-        //}
-
-        //[FilterAllowedOutgoingContent(typeof(IEnumerable<EntityBasic>))]
-        //[UmbracoApplicationAuthorizeAttribute(Constants.Applications.Content)]
-        //public IEnumerable<EntityBasic> SearchDocuments([FromUri]string query)
-        //{
-        //    var internalSearcher = ExamineManager.Instance.SearchProviderCollection[Constants.Examine.InternalSearcher];
-        //    var criteria = internalSearcher.CreateSearchCriteria("content", BooleanOperation.Or);
-        //    var fields = new[] { "id", "__nodeName", "bodyText" };
-        //    var term = new[] { query.ToLower().Escape() };
-        //    var operation = criteria.GroupedOr(fields, term).Compile();
-
-        //    var results = internalSearcher.Search(operation)
-        //        .Select(x =>  int.Parse(x["id"]));
-
-        //    return GetDocumentsByIds(results.ToArray());
-        //}
-
-        ///// <summary>
-        ///// The user must have access to either content or media for this to return data
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //[UmbracoApplicationAuthorizeAttribute(
-        //    Constants.Applications.Media, 
-        //    Constants.Applications.Content)]
-        //[EnsureUserPermissionForMedia("id")]
-        //public EntityBasic GetMediaById(int id)
-        //{
-        //    return GetEntityById(id, UmbracoObjectTypes.Media);
-        //}
-
-        ///// <summary>
-        ///// The user must have access to either content or media for this to return data
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //[UmbracoApplicationAuthorizeAttribute(
-        //    Constants.Applications.Media,
-        //    Constants.Applications.Content)]
-        //[EnsureUserPermissionForMedia("id")]
-        //[FilterAllowedOutgoingMedia(typeof(IEnumerable<EntityBasic>))]
-        //public IEnumerable<EntityBasic> GetMediaChildren(int id)
-        //{
-        //    return GetChildren(id, UmbracoObjectTypes.Media);
-        //}
-
-
-        ///// <summary>
-        ///// The user must have access to either content or media for this to return data
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //[UmbracoApplicationAuthorizeAttribute(
-        //    Constants.Applications.Media,
-        //    Constants.Applications.Content)]
-        //[EnsureUserPermissionForMedia("id")]
-        //[FilterAllowedOutgoingMedia(typeof(IEnumerable<EntityBasic>))]
-        //public IEnumerable<EntityBasic> SearchMedia([FromUri]string query)
-        //{
-        //    var internalSearcher = ExamineManager.Instance.SearchProviderCollection[Constants.Examine.InternalSearcher];
-        //    var criteria = internalSearcher.CreateSearchCriteria("media", BooleanOperation.Or);
-        //    var fields = new[] { "id", "__nodeName"};
-        //    var term = new[] { query.ToLower().Escape() };
-        //    var operation = criteria.GroupedOr(fields, term).Compile();
-
-        //    var results = internalSearcher.Search(operation)
-        //        .Select(x => int.Parse(x["id"]));
-
-        //    return GetMediaByIds(results.ToArray());
-        //}
-
-        ///// <summary>
-        ///// The user must have access to either content or media for this to return data
-        ///// </summary>
-        ///// <param name="ids"></param>
-        ///// <returns></returns>
-        //[UmbracoApplicationAuthorizeAttribute(
-        //    Constants.Applications.Media,
-        //    Constants.Applications.Content)]
-        //[FilterAllowedOutgoingMedia(typeof(IEnumerable<EntityBasic>))]
-        //public IEnumerable<EntityBasic> GetMediaByIds([FromUri]int[] ids)
-        //{
-        //    if (ids == null) throw new ArgumentNullException("ids");
-        //    return GetEntitiesById(ids, UmbracoObjectTypes.Media);
-        //}
+    {       
+        public IEnumerable<EntityBasic> Search([FromUri] string query, UmbracoEntityTypes type)
+        {
+            switch (type)
+            {
+                case UmbracoEntityTypes.Document:
+                    return ExamineSearch(query, true);
+                case UmbracoEntityTypes.Media:
+                    return ExamineSearch(query, false);
+                default:
+                    throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + type);
+            }
+        } 
 
         public EntityBasic GetById(int id, UmbracoEntityTypes type)
         {
@@ -176,6 +82,26 @@ namespace Umbraco.Web.Editors
         {
             return GetResultForAll(type);
         }
+        
+        private IEnumerable<EntityBasic> ExamineSearch(string query, bool isContent)
+        {
+            //TODO: WE should really just allow passing in a lucene raw query
+            
+            var internalSearcher = ExamineManager.Instance.SearchProviderCollection[Constants.Examine.InternalSearcher];
+            var criteria = internalSearcher.CreateSearchCriteria(isContent ? "content" : "media", BooleanOperation.Or);
+            var fields = new[] { "id", "__nodeName", "bodyText" };
+            
+            var term = new[] { query.ToLower().Escape() };
+            var operation = criteria.GroupedOr(fields, term).Compile();
+
+            var results = internalSearcher.Search(operation)
+                .Select(x =>  int.Parse(x["id"]));
+
+            //TODO: Just create a basic entity from the results!! why double handling and going to the database... this will be ultra slow.
+
+            return GetResultForIds(results.ToArray(), isContent ? UmbracoEntityTypes.Document : UmbracoEntityTypes.Media)
+                .WhereNotNull();
+        }
 
         private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)
         {
@@ -184,7 +110,8 @@ namespace Umbraco.Web.Editors
             {
                 //TODO: Need to check for Object types that support heirarchy here, some might not.
 
-                return Services.EntityService.GetChildren(id).Select(Mapper.Map<EntityBasic>);
+                return Services.EntityService.GetChildren(id, objectType.Value).Select(Mapper.Map<EntityBasic>)
+                    .WhereNotNull();
             }
             //now we need to convert the unknown ones
             switch (entityType)
@@ -210,7 +137,8 @@ namespace Umbraco.Web.Editors
                 //TODO: Need to check for Object types that support heirarchy here, some might not.
 
                 var ids = Services.EntityService.Get(id).Path.Split(',').Select(int.Parse);
-                return ids.Select(m => Mapper.Map<EntityBasic>(Services.EntityService.Get(m)));
+                return ids.Select(m => Mapper.Map<EntityBasic>(Services.EntityService.Get(m, objectType.Value)))
+                    .WhereNotNull();
             }
             //now we need to convert the unknown ones
             switch (entityType)
@@ -233,7 +161,8 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                return Services.EntityService.GetAll(objectType.Value).Select(Mapper.Map<EntityBasic>);
+                return Services.EntityService.GetAll(objectType.Value).Select(Mapper.Map<EntityBasic>)
+                    .WhereNotNull();
             }
             //now we need to convert the unknown ones
             switch (entityType)
@@ -256,7 +185,8 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                return ids.Select(id => Mapper.Map<EntityBasic>(Services.EntityService.Get(id)));
+                return ids.Select(id => Mapper.Map<EntityBasic>(Services.EntityService.Get(id, objectType.Value)))
+                          .WhereNotNull();
             }
             //now we need to convert the unknown ones
             switch (entityType)

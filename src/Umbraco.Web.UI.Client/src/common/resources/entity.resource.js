@@ -34,7 +34,7 @@ function entityResource($q, $http, umbRequestHelper) {
         
         /**
          * @ngdoc method
-         * @name umbraco.resources.entityResource#getEntityById
+         * @name umbraco.resources.entityResource#getById
          * @methodOf umbraco.resources.entityResource
          *
          * @description
@@ -42,14 +42,8 @@ function entityResource($q, $http, umbRequestHelper) {
          *
          * ##usage
          * <pre>
-         * entityResource.getEntityById(1234)
-         *    .then(function(ent) {
-         *        var myDoc = ent; 
-         *        alert('its here!');
-         *    });
-         *
-         * //Only return users
-         * entityResource.getEntityById(0, "User")
+         * //get media by id
+         * entityResource.getEntityById(0, "Media")
          *    .then(function(ent) {
          *        var myDoc = ent; 
          *        alert('its here!');
@@ -73,7 +67,7 @@ function entityResource($q, $http, umbRequestHelper) {
         
         /**
          * @ngdoc method
-         * @name umbraco.resources.entityResource#getEntitiesByIds
+         * @name umbraco.resources.entityResource#getByIds
          * @methodOf umbraco.resources.entityResource
          *
          * @description
@@ -81,13 +75,7 @@ function entityResource($q, $http, umbRequestHelper) {
          *
          * ##usage
          * <pre>
-         * entityResource.getEntitiesByIds( [1234,2526,28262])
-         *    .then(function(contentArray) {
-         *        var myDoc = contentArray; 
-         *        alert('they are here!');
-         *    });
-         * 
-         * //Only return templates
+         * //Get templates for ids
          * entityResource.getEntitiesByIds( [1234,2526,28262], "Template")
          *    .then(function(templateArray) {
          *        var myDoc = contentArray; 
@@ -100,20 +88,21 @@ function entityResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the entity array.
          *
          */
-        getByIds: function (ids) {
+        getByIds: function (ids, type) {
             
-            var idQuery = "";
+            var query = "";
             _.each(ids, function(item) {
-                idQuery += "ids=" + item + "&";
+                query += "ids=" + item + "&";
             });
+            query += "type=" + type;
 
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetByIds",
-                       idQuery)),
-               'Failed to retreive entity data for ids ' + idQuery);
+                       query)),
+               'Failed to retreive entity data for ids ' + ids);
         },
 
         /**
@@ -126,15 +115,9 @@ function entityResource($q, $http, umbRequestHelper) {
          *
          * ##usage
          * <pre>
-         * //returns all entities, you should NEVER do that
-         * entityResource.getAll()
-         *    .then(function(ent) {
-         *        var myDoc = ent; 
-         *        alert('its here!');
-         *    });
          *
-         * //Only return users
-         * entityResource.getAll("User")
+         * //Only return media
+         * entityResource.getAll("Media")
          *    .then(function(ent) {
          *        var myDoc = ent; 
          *        alert('its here!');
@@ -157,223 +140,61 @@ function entityResource($q, $http, umbRequestHelper) {
 
         /**
          * @ngdoc method
-         * @name umbraco.resources.entityResource#getEntityById
+         * @name umbraco.resources.entityResource#getAncestors
          * @methodOf umbraco.resources.entityResource
          *
          * @description
-         * Gets an entity with a given id
-         *
-         * ##usage
-         * <pre>
-         * //returns all entities, you should NEVER do that
-         * entityResource.getAll()
-         *    .then(function(ent) {
-         *        var myDoc = ent; 
-         *        alert('its here!');
-         *    });
-         *
-         * //Only return users
-         * entityResource.getAll("User")
-         *    .then(function(ent) {
-         *        var myDoc = ent; 
-         *        alert('its here!');
-         *    });
-         * </pre> 
+         * Gets ancestor entities for a given item
+         *        
          * 
          * @param {string} type Object type name        
          * @returns {Promise} resourcePromise object containing the entity.
          *
          */
-        getAncestors: function (id) {            
+        getAncestors: function (id, type) {            
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetAncestors",
-                       [{id: id}])),
-               'Failed to retreive entity data for id ' + id);
-        },
-
-
-        /**
-         * @ngdoc method
-         * @name umbraco.resources.entityResource#getDocumentById
-         * @methodOf umbraco.resources.entityResource
-         *
-         * @description
-         * Gets a content entity with a given id
-         *
-         * ##usage
-         * <pre>
-         * entityResource.getDocumentById(1234)
-         *    .then(function(ent) {
-         *        var myDoc = ent; 
-         *        alert('its here!');
-         *    });
-         * </pre> 
-         * 
-         * @param {Int} id id of document to return        
-         * @returns {Promise} resourcePromise object containing the document.
-         *
-         */
-        getDocumentById: function (id) {            
-            return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "entityApiBaseUrl",
-                       "GetDocumentById",
-                       [{ id: id }])),
-               'Failed to retreive entity data for id ' + id);
+                       [{id: id}, {type: type}])),
+               'Failed to retreive ancestor data for id ' + id);
         },
         
         /**
          * @ngdoc method
-         * @name umbraco.resources.entityResource#getDocumentsByIds
+         * @name umbraco.resources.entityResource#getAncestors
          * @methodOf umbraco.resources.entityResource
          *
          * @description
-         * Gets an array of content entities, given a collection of ids
-         *
-         * ##usage
-         * <pre>
-         * entityResource.getDocumentsByIds( [1234,2526,28262])
-         *    .then(function(contentArray) {
-         *        var myDoc = contentArray; 
-         *        alert('they are here!');
-         *    });
-         * </pre> 
+         * Gets children entities for a given item
+         *        
          * 
-         * @param {Array} ids ids of entities to return as an array        
-         * @returns {Promise} resourcePromise object containing the entity array.
+         * @param {string} type Object type name        
+         * @returns {Promise} resourcePromise object containing the entity.
          *
          */
-        getDocumentsByIds: function (ids) {
-            
-            var idQuery = "";
-            _.each(ids, function(item) {
-                idQuery += "ids=" + item + "&";
-            });
-
+        getChildren: function (id, type) {
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
-                       "GetDocumentsByIds",
-                       idQuery)),
-               'Failed to retreive document data for ids ' + idQuery);
+                       "GetChildren",
+                       [{ id: id }, { type: type }])),
+               'Failed to retreive child data for id ' + id);
         },
-
-        /**
-         * @ngdoc method
-         * @name umbraco.resources.entityResource#searchDocuments
-         * @methodOf umbraco.resources.entityResource
-         *
-         * @description
-         * Gets an array of content entities, given a query
-         *
-         * ##usage
-         * <pre>
-         * entityResource.searchDocuments("news")
-         *    .then(function(contentArray) {
-         *        var myDoc = contentArray; 
-         *        alert('they are here!');
-         *    });
-         * </pre> 
-         * 
-         * @param {String} Query search query        
-         * @returns {Promise} resourcePromise object containing the entity array.
-         *
-         */
-        searchDocuments: function (query) {
-            
-            return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "entityApiBaseUrl",
-                       "SearchDocuments",
-                       query)),
-               'Failed to retreive document data for query ' + query);
-        },
-
-        /**
-         * @ngdoc method
-         * @name umbraco.resources.entityResource#getMediaById
-         * @methodOf umbraco.resources.entityResource
-         *
-         * @description
-         * Gets a media entity with a given id
-         *
-         * ##usage
-         * <pre>
-         * entityResource.getMediaById(1234)
-         *    .then(function(ent) {
-         *        var myDoc = ent; 
-         *        alert('its here!');
-         *    });
-         * </pre> 
-         * 
-         * @param {Int} id id of media to return        
-         * @returns {Promise} resourcePromise object containing the media.
-         *
-         */
-        getMediaById: function (id) {            
-            return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "entityApiBaseUrl",
-                       "GetMediaById",
-                       [{ id: id }])),
-               'Failed to retreive media data for id ' + id);
-        },
-        
-        /**
-         * @ngdoc method
-         * @name umbraco.resources.entityResource#getMediaByIds
-         * @methodOf umbraco.resources.entityResource
-         *
-         * @description
-         * Gets an array of media entities, given a collection of ids
-         *
-         * ##usage
-         * <pre>
-         * entityResource.getMediaByIds( [1234,2526,28262])
-         *    .then(function(mediaArray) {
-         *        var myDoc = contentArray; 
-         *        alert('they are here!');
-         *    });
-         * </pre> 
-         * 
-         * @param {Array} ids ids of entities to return as an array        
-         * @returns {Promise} resourcePromise object containing the entity array.
-         *
-         */
-        getMediaByIds: function (ids) {
-            
-            var idQuery = "";
-            _.each(ids, function(item) {
-                idQuery += "ids=" + item + "&";
-            });
-
-            return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "entityApiBaseUrl",
-                       "GetMediaByIds",
-                       idQuery)),
-               'Failed to retreive media data for ids ' + idQuery);
-        },
-
+     
         /**
          * @ngdoc method
          * @name umbraco.resources.entityResource#searchMedia
          * @methodOf umbraco.resources.entityResource
          *
          * @description
-         * Gets an array of medoa entities, given a query
+         * Gets an array of entities, given a lucene query
          *
          * ##usage
          * <pre>
-         * entityResource.searchMedia("news")
+         * entityResource.search("news")
          *    .then(function(mediaArray) {
          *        var myDoc = mediaArray; 
          *        alert('they are here!');
@@ -384,15 +205,15 @@ function entityResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the entity array.
          *
          */
-        searchMedia: function (query) {
+        search: function (query, type) {
             
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "SearchMedia",
-                       query)),
-               'Failed to retreive media data for query ' + query);
+                       [{ query: query }, {type: type}])),
+               'Failed to retreive entity data for query ' + query);
         }
             
     };

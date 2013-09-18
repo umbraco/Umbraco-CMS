@@ -36,20 +36,13 @@ angular.module('umbraco.mocks').
 
       return {
           register: function () {
+
               $httpBackend
-                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetEntitiesByIds'))
+                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetByIds'))
                   .respond(returnEntitybyIds);
 
               $httpBackend
-                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetEntityById?'))
-                  .respond(returnEntitybyId);
-
-              $httpBackend
-                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetDocumentsByIds'))
-                  .respond(returnEntitybyIds);
-
-              $httpBackend
-                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetDocumentById?'))
+                  .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetById?'))
                   .respond(returnEntitybyId);   
           }
       };
