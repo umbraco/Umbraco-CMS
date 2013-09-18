@@ -24,14 +24,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Instantiate_Repository_From_Resolver()
+        public void Can_Instantiate_Repository()
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.Current.ResolveByType<IStylesheetRepository>(unitOfWork);  
+            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
+
 
             // Assert
             Assert.That(repository, Is.Not.Null);

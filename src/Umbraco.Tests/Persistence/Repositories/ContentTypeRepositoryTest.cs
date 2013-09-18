@@ -212,18 +212,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var contentType = repository.Get(1046);
 
-                // Act
-                var contentType2 = repository.Get(1046);
-                contentType2.PropertyGroups["Meta"].PropertyTypes.Remove("metaDescription");
-                repository.AddOrUpdate(contentType2);
+                // Act                
+                contentType.PropertyGroups["Meta"].PropertyTypes.Remove("metaDescription");
+                repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
 
-                var contentType3 = repository.Get(1046);
+                var result = repository.Get(1046);
 
                 // Assert
-                Assert.That(contentType3.PropertyTypes.Any(x => x.Alias == "metaDescription"), Is.False);
-                Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(contentType3.PropertyGroups.Count));
-                Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(contentType3.PropertyTypes.Count()));
+                Assert.That(result.PropertyTypes.Any(x => x.Alias == "metaDescription"), Is.False);
+                Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(result.PropertyGroups.Count));
+                Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(result.PropertyTypes.Count()));
             }
         }
 
