@@ -12,7 +12,9 @@ namespace umbraco.presentation.umbraco.dialogs {
             CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
         }
         protected void Page_Load(object sender, EventArgs e) {
-
+            //labels
+            pp_placeholder.Text = ui.Text("placeHolderID");
+           
         }
     }
 }

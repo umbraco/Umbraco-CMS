@@ -3,6 +3,8 @@
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="cc2" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
+
+
 <cc1:TabView ID="TabView1" Height="392px" Width="552px" runat="server"></cc1:TabView>
 
 <asp:Panel ID="pnlGeneral" runat="server"></asp:Panel>
@@ -57,8 +59,8 @@
   <cc2:Pane runat="server">  
     <cc2:PropertyPanel ID="pp_icon" runat="server" Text="Icon">
         <div class="umbIconDropdownList">
-          <a href="#">Choose...</a>
-          <asp:TextBox ID="tb_icon" runat="server" />        
+          <a href="#" class="icon-picker"> <i class="<asp:Literal runat="server" ID="lt_icon" />"></i> Choose...</a>
+          <asp:HiddenField ID="tb_icon" runat="server" />
         </div>
     </cc2:PropertyPanel>
     <cc2:PropertyPanel ID="pp_description" runat="server" Text="Description">
@@ -102,7 +104,21 @@
         <asp:Literal runat="server" ID="checkTxtAliasJs" />
     });
 
+
+
     jQuery(document).ready(function () {
+
+        jQuery(".icon-picker").click(function(){
+            var that = this;
+            UmbClientMgr.openAngularModalWindow({
+                template: 'views/common/dialogs/iconpicker.html', 
+                callback: function(data){
+                    jQuery(that).next().val("." + data);
+                    jQuery(that).find("i").attr("class", data);
+                }}); 
+            
+            return false;
+        });
 
         // Make each tr of the tabs table sortable (prevent dragging of header row, and set up a callback for when row dragged)
         jQuery("table.tabs-table tbody").sortable({

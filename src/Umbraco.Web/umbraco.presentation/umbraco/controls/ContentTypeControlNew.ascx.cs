@@ -295,7 +295,7 @@ namespace umbraco.controls
                     {
                         _contentType.ContentTypeItem.Name = txtName.Text;
                         _contentType.ContentTypeItem.Alias = txtAlias.Text;
-                        _contentType.ContentTypeItem.Icon = tb_icon.Text;
+                        _contentType.ContentTypeItem.Icon = tb_icon.Value;
                         _contentType.ContentTypeItem.Description = description.Text;
                         //_contentType.ContentTypeItem.Thumbnail = ddlThumbnails.SelectedValue;
                         _contentType.ContentTypeItem.AllowedAsRoot = allowAtRoot.Checked;
@@ -339,7 +339,7 @@ namespace umbraco.controls
                         if (asyncState.HasAliasChanged())
                             _contentType.Alias = txtAlias.Text;
 
-                        _contentType.IconUrl = tb_icon.Text;
+                        _contentType.IconUrl = tb_icon.Value;
                         _contentType.Description = description.Text;
                         //_contentType.Thumbnail = ddlThumbnails.SelectedValue;
 
@@ -429,8 +429,13 @@ namespace umbraco.controls
             txtName.Text = _contentType.GetRawText();
             txtAlias.Text = _contentType.Alias;
             description.Text = _contentType.GetRawDescription();
-            tb_icon.Text = _contentType.IconUrl;
 
+            tb_icon.Value = _contentType.IconUrl;
+            
+            if(string.IsNullOrEmpty(_contentType.IconUrl))
+                lt_icon.Text = "icon-document";
+            else
+                lt_icon.Text = _contentType.IconUrl.TrimStart('.');
 
             /*
             var dirInfo = new DirectoryInfo(Server.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
@@ -1527,9 +1532,10 @@ Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox tb_icon;
+        protected global::System.Web.UI.WebControls.HiddenField tb_icon;
+        protected global::System.Web.UI.WebControls.Literal lt_icon;
 
-        
+            
         /// <summary>
         /// pp_description control.
         /// </summary>

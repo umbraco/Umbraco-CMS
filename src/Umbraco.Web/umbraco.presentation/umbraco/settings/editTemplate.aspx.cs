@@ -131,12 +131,7 @@ namespace umbraco.cms.presentation.settings
 					640, 550);
 			umbDictionary.AltText = "Insert umbraco dictionary item";
 
-			//uicontrols.MenuIconI umbMacro = Panel1.Menu.NewIcon();
-			//umbMacro.ImageURL = UmbracoPath + "/images/editor/insMacro.gif";
-			//umbMacro.AltText = ui.Text("template", "insertMacro");
-			//umbMacro.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/editMacro.aspx?objectId=" + editorSource.ClientID, ui.Text("template", "insertMacro"), 470, 530);
-
-            editorSource.Menu.NewElement("div", "splitButtonMacroPlaceHolder", "sbPlaceHolder", 40);
+		    editorSource.Menu.NewElement("div", "splitButtonMacroPlaceHolder", "sbPlaceHolder", 40);
 
 			if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
 			{
@@ -162,18 +157,6 @@ namespace umbraco.cms.presentation.settings
 			//Spit button
             editorSource.Menu.InsertSplitter();
             editorSource.Menu.NewElement("div", "splitButtonPlaceHolder", "sbPlaceHolder", 40);
-
-			if (Skinning.StarterKitGuid(_template.Id).HasValue)
-			{
-                editorSource.Menu.InsertSplitter();
-                MenuIconI umbContainer = editorSource.Menu.NewIcon();
-				umbContainer.ImageURL = UmbracoPath + "/images/editor/skin.gif";
-				umbContainer.AltText = ui.Text("template", "modifyTemplateSkin");
-				//umbContainer.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/TemplateSkinning.aspx?&id=" + _template.Id.ToString(), ui.Text("template", "modifyTemplateSkin"), 570, 420);
-				umbContainer.OnClickCommand = "window.open('" + GlobalSettings.Path + "/canvas.aspx?redir=" +
-											  ResolveUrl("~/") + "&umbSkinning=true&umbSkinningConfigurator=true" +
-											  "','canvas')";
-			}
 
 			// Help
             editorSource.Menu.InsertSplitter();

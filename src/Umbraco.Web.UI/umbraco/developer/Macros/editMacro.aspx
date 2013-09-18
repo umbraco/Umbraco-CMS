@@ -147,8 +147,6 @@
                 </tr>
             </ItemTemplate>
             <FooterTemplate>
-                </tbody>
-                    <tfooter>
                         <tr>
                             <td>
                                 <asp:TextBox runat="server" ID="macroPropertyAliasNew" Text='New Alias' OnTextChanged="macroPropertyCreate" />
@@ -165,7 +163,7 @@
                                 <asp:Button ID="createNew" Text="Add" runat="server" CssClass="btn btn-default" />
                             </td>
                         </tr>
-                    </tfooter>
+                </tbody>
                 </table>
             </FooterTemplate>
         </asp:Repeater>

@@ -18,6 +18,8 @@ namespace umbraco.presentation.umbraco.dialogs
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            //labels
+            pp_placeholder.Text = ui.Text("placeHolderID");
 
             //Add a default Item
             var li = new ListItem("Choose ID...");
@@ -38,37 +40,8 @@ namespace umbraco.presentation.umbraco.dialogs
                 dd_detectedAlias.Items.Add(cpId);
             }
 
-            //string mp = System.IO.File.ReadAllText(masterPageFile);
-
-            //string pat = "<asp:ContentPlaceHolder+(\\s+[a-zA-Z]+\\s*=\\s*(\"([^\"]*)\"|'([^']*)'))*\\s*/?>";
-
-            /* Instantiate the regular expression object.
-            Regex r = new Regex(pat, RegexOptions.IgnoreCase);
-     
-            // Match the regular expression pattern against a text string.
-            Match m = r.Match(mp);
-            
-            while (m.Success) {
-                
-                CaptureCollection cc = m.Groups[3].Captures;
-
-                foreach (Capture c in cc) {
-                    if(c.Value != "server")
-                        dd_detectedAlias.Items.Add(c.Value);
-                }
-
-                m = m.NextMatch();
-            }
-            
-            //just to be sure that they have something to select, we will add the default placeholder....
-            
-             * 
-             */
-
             if (dd_detectedAlias.Items.Count == 1)
                 dd_detectedAlias.Items.Add("ContentPlaceHolderDefault");
-
-
 
         }
 
