@@ -42,7 +42,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Changes the users password
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="data"></param>
         /// <returns></returns>
         public HttpResponseMessage PostChangePassword(UserPasswordChange data)
         {   

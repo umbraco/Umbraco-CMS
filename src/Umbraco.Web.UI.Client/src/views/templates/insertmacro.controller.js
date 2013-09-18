@@ -7,7 +7,7 @@
  * The controller for the custom insert macro dialog. Until we upgrade the template editor to be angular this 
  * is actually loaded into an iframe with full html.
  */
-function InsertMacroController($scope, entityResource) {
+function InsertMacroController($scope, entityResource, macroResource) {
 
     $scope.macros = [];
     $scope.selectedMacro = null;
@@ -17,7 +17,20 @@ function InsertMacroController($scope, entityResource) {
         if ($scope.insertMacroForm.$invalid) {
             return;
         }
-        //go to next page!
+
+        macroResource.getMacroParameters($scope.selectedMacro)
+            .then(function (data) {
+                
+                //go to next page if there are params otherwise we can just exit
+                if (!angular.isArray(data) || data.length === 0) {
+                    //we can just exist!
+                    alert("no params");
+                }
+                else {
+                    $scope.macroParams = data;
+                }
+            });
+        
     };
 
     //fetch the authorized status         

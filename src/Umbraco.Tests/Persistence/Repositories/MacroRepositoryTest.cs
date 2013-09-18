@@ -254,6 +254,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Cannot_Add_Property_For_Macro_With_Duplicate_Alias()
+        {
+            Assert.Fail();
+        }
+
+        [Test]
         public void Can_Add_Property_For_Macro()
         {
             // Arrange

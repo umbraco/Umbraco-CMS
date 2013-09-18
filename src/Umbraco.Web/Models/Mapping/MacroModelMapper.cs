@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using System.Linq;
+using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
@@ -18,6 +20,11 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(entityBasic => entityBasic.Icon, expression => expression.UseValue("icon-settings-alt"))
                   .ForMember(dto => dto.ParentId, expression => expression.UseValue(-1))
                   .ForMember(dto => dto.Path, expression => expression.ResolveUsing(macro => "-1," + macro.Id));
+
+            config.CreateMap<IMacro, IEnumerable<MacroParameter>>()
+                    .ConvertUsing(macro => macro.Properties.Select(Mapper.Map<MacroParameter>).ToList());
+
+            config.CreateMap<IMacroProperty, MacroParameter>();
 
         }
 
