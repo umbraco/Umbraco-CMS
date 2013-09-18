@@ -7,15 +7,14 @@
     * An entity is a basic **read-only** representation of an Umbraco node. It contains only the most
     * basic properties used to display the item in trees, lists and navigation. 
     *
-    * ##What is the difference between get entity and get content?
+    * ##What is the difference between entity and content/media/etc...?
     * the entity only contains the basic node data, name, id and guid, whereas content
-    * nodes fetched through the entity service also contains additional meta data such
-    * as icon, document type, path and so on.
+    * nodes fetched through the content service also contains additional all of the content property data, etc..
+    * This is the same principal for all entity types. Any user that is logged in to the back office will have access
+    * to view the basic entity information for all entities since the basic entity information does not contain sensitive information.
     *
     * ##Entity object types?
-    * As an optional parameter, you can pass in the specific type name. So if you know you
-    * are looking for a specific type, you should pass in the object name, to make lookup faster
-    * and to return more data.
+    * You need to specify the type of object you want returned.
     * 
     * The core object types are:
     *
@@ -26,6 +25,10 @@
     * - DocumentType
     * - MediaType
     * - MemberType
+    * - Macro
+    * - User
+    * - Language
+    * - Domain
     **/
 function entityResource($q, $http, umbRequestHelper) {
 
