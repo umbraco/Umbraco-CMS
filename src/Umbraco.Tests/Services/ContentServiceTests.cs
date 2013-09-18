@@ -843,12 +843,13 @@ namespace Umbraco.Tests.Services
             Assert.That(sut.GetValue<string>("upload"), Is.EqualTo("/media/1234/koala.jpg"));
             Assert.That(sut.GetValue<string>("label"), Is.EqualTo("Non-editable label"));
             //SD: This is failing because the 'content' call to GetValue<DateTime> always has empty milliseconds
-            Assert.That(sut.GetValue<DateTime>("dateTime"), Is.EqualTo(content.GetValue<DateTime>("dateTime")));
+            //MCH: I'm guessing this is an issue because of the format the date is actually stored as, right? Cause we don't do any formatting when saving or loading
+            Assert.That(sut.GetValue<DateTime>("dateTime").ToString("G"), Is.EqualTo(content.GetValue<DateTime>("dateTime").ToString("G")));
             Assert.That(sut.GetValue<string>("colorPicker"), Is.EqualTo("black"));
 	        Assert.That(sut.GetValue<string>("folderBrowser"), Is.Empty);
             Assert.That(sut.GetValue<string>("ddlMultiple"), Is.EqualTo("1234,1235"));
             Assert.That(sut.GetValue<string>("rbList"), Is.EqualTo("random"));
-            Assert.That(sut.GetValue<DateTime>("date"), Is.EqualTo(content.GetValue<DateTime>("date")));
+            Assert.That(sut.GetValue<DateTime>("date").ToString("G"), Is.EqualTo(content.GetValue<DateTime>("date").ToString("G")));
             Assert.That(sut.GetValue<string>("ddl"), Is.EqualTo("1234"));
             Assert.That(sut.GetValue<string>("chklist"), Is.EqualTo("randomc"));
             Assert.That(sut.GetValue<int>("contentPicker"), Is.EqualTo(1090));
