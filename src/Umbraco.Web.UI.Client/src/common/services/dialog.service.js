@@ -58,7 +58,10 @@ angular.module('umbraco.services')
               template: "views/common/notfound.html",
               callback: undefined,
               closeCallback: undefined,
-              element: undefined
+              element: undefined,
+              //this allows us to pass in data to the dialog if required which can be used to configure the dialog
+              //and re-use it for different purposes. It will set on to the $scope.dialogData if it is defined.
+              dialogData: undefined
            };
            
            var dialog = angular.extend(defaults, options);
@@ -68,14 +71,15 @@ angular.module('umbraco.services')
            //Modal dom obj and unique id
            dialog.element = $('<div ng-swipe-left="hide()" ng-swipe-right="hide()"  data-backdrop="false"></div>');
            var id = dialog.template.replace('.html', '').replace('.aspx', '').replace(/[\/|\.|:\&\?\=]/g, "-") + '-' + scope.$id;
-           
-          if(options.inline){
-              dialog.animation = "";
-              dialog.modalClass = "";
-          }else{
-                dialog.element.addClass("modal");
-                dialog.element.addClass("hide");
-          }
+
+           if (options.inline) {
+               dialog.animation = "";
+               dialog.modalClass = "";
+           }
+           else {
+               dialog.element.addClass("modal");
+               dialog.element.addClass("hide");
+           }
            //set the id and add classes
            dialog.element
                .attr('id', id)
@@ -132,8 +136,6 @@ angular.module('umbraco.services')
                    dialog.element.modal('show');
                }
 
-               //store the callback in the modal jquery data
-               //dialog.element.data("modalCb", dialog.callback);
                dialog.scope = scope;
                return dialog;
            }
@@ -152,10 +154,7 @@ angular.module('umbraco.services')
 
                      //append to body or other container element  
                      dialog.container.append(dialog.element);
-
-                     //store the callback in the modal jquery data
-                     dialog.element.data("modalCb", dialog.callback);
-
+                     
                      // Compile modal content
                      $timeout(function() {
                          $compile(dialog.element)(scope);
@@ -164,7 +163,7 @@ angular.module('umbraco.services')
                      scope.dialogOptions = dialog;
                      
                      //Scope to handle data from the modal form
-                     scope.dialogData = {};
+                     scope.dialogData = dialog.dialogData ? dialog.dialogData : {};
                      scope.dialogData.selection = [];
 
                      // Provide scope display functions

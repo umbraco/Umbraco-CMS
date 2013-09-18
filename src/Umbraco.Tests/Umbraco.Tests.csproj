@@ -86,9 +86,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="Rhino.Mocks">
-      <HintPath>..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
@@ -246,7 +243,9 @@
     <Compile Include="Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\PetaPocoExtensionsTest.cs" />
+    <Compile Include="Persistence\Repositories\MacroRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MemberRepositoryTest.cs" />
+    <Compile Include="Persistence\Repositories\MemberTypeRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserTypeRepositoryTest.cs" />
     <Compile Include="Models\Mapping\ContentWebModelMappingTests.cs" />
@@ -265,6 +264,7 @@
     <Compile Include="Services\PackagingServiceTests.cs" />
     <Compile Include="Services\PerformanceTests.cs" />
     <Compile Include="Services\PreValueConverterTests.cs" />
+    <Compile Include="Services\MacroServiceTests.cs" />
     <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="Manifest\ManifestParserTests.cs" />
     <Compile Include="TestHelpers\BaseSeleniumTest.cs" />

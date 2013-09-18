@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
+using Moq;
 using NUnit.Framework;
-using Rhino.Mocks;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -16,16 +16,18 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         public void Does_Not_Throw_Exception_When_Access_Allowed_By_Path()
         {
             //arrange
-            var user = MockRepository.GenerateStub<IUser>();
+            var user = new Mock<IUser>().Object;
             user.Id = 9;
             user.StartContentId = -1;
-            var content = MockRepository.GenerateStub<IContent>();
+            var content = new Mock<IContent>().Object;
             content.Path = "-1,1234,5678";
-            var contentService = MockRepository.GenerateStub<IContentService>();
-            contentService.Stub(x => x.GetById(1234)).Return(content);
-            var userService = MockRepository.GenerateStub<IUserService>();
+            var contentServiceMock = new Mock<IContentService>();
+            contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
+            var contentService = contentServiceMock.Object;
+            var userServiceMock = new Mock<IUserService>();            
             var permissions = new List<EntityPermission>();
-            userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
+            userServiceMock.Setup(x => x.GetPermissions(user, 1234)).Returns(permissions);
+            var userService = userServiceMock.Object;
 
             //act
             var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
@@ -38,16 +40,18 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         public void Throws_Exception_When_No_Content_Found()
         {
             //arrange
-            var user = MockRepository.GenerateStub<IUser>();
+            var user = new Mock<IUser>().Object;
             user.Id = 9;
             user.StartContentId = -1;
-            var content = MockRepository.GenerateStub<IContent>();
+            var content = new Mock<IContent>().Object;
             content.Path = "-1,1234,5678";
-            var contentService = MockRepository.GenerateStub<IContentService>();
-            contentService.Stub(x => x.GetById(0)).Return(content);
-            var userService = MockRepository.GenerateStub<IUserService>();
+            var contentServiceMock = new Mock<IContentService>();
+            contentServiceMock.Setup(x => x.GetById(0)).Returns(content);
+            var contentService = contentServiceMock.Object;
+            var userServiceMock = new Mock<IUserService>();    
             var permissions = new List<EntityPermission>();
-            userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
+            userServiceMock.Setup(x => x.GetPermissions(user, 1234)).Returns(permissions);
+            var userService = userServiceMock.Object;
             
             //act/assert
             Assert.Throws<HttpResponseException>(() => ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F'));
@@ -57,16 +61,18 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         public void Throws_Exception_When_No_Access_By_Path()
         {
             //arrange
-            var user = MockRepository.GenerateStub<IUser>();
+            var user = new Mock<IUser>().Object;
             user.Id = 9;
             user.StartContentId = 9876;
-            var content = MockRepository.GenerateStub<IContent>();
+            var content = new Mock<IContent>().Object;
             content.Path = "-1,1234,5678";
-            var contentService = MockRepository.GenerateStub<IContentService>();
-            contentService.Stub(x => x.GetById(1234)).Return(content);
-            var userService = MockRepository.GenerateStub<IUserService>();
+            var contentServiceMock = new Mock<IContentService>();
+            contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
+            var contentService = contentServiceMock.Object;
+            var userServiceMock = new Mock<IUserService>();    
             var permissions = new List<EntityPermission>();
-            userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
+            userServiceMock.Setup(x => x.GetPermissions(user, 1234)).Returns(permissions);
+            var userService = userServiceMock.Object;
 
             //act
             var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
@@ -79,19 +85,21 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         public void Throws_Exception_When_No_Access_By_Permission()
         {
             //arrange
-            var user = MockRepository.GenerateStub<IUser>();
+            var user = new Mock<IUser>().Object;
             user.Id = 9;
             user.StartContentId = -1;
-            var content = MockRepository.GenerateStub<IContent>();
+            var content = new Mock<IContent>().Object;
             content.Path = "-1,1234,5678";
-            var contentService = MockRepository.GenerateStub<IContentService>();
-            contentService.Stub(x => x.GetById(1234)).Return(content);
-            var userService = MockRepository.GenerateStub<IUserService>();
+            var contentServiceMock = new Mock<IContentService>();
+            contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
+            var contentService = contentServiceMock.Object;
+            var userServiceMock = new Mock<IUserService>();    
             var permissions = new List<EntityPermission>
                 {
                     new EntityPermission(9, 1234, new string[]{ "A", "B", "C" })
                 };
-            userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
+            userServiceMock.Setup(x => x.GetPermissions(user, 1234)).Returns(permissions);
+            var userService = userServiceMock.Object;
 
             //act
             var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
@@ -104,19 +112,21 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         public void Does_Not_Throw_Exception_When_Access_Allowed_By_Permission()
         {
             //arrange
-            var user = MockRepository.GenerateStub<IUser>();
+            var user = new Mock<IUser>().Object;
             user.Id = 9;
             user.StartContentId = -1;
-            var content = MockRepository.GenerateStub<IContent>();
+            var content = new Mock<IContent>().Object;
             content.Path = "-1,1234,5678";
-            var contentService = MockRepository.GenerateStub<IContentService>();
-            contentService.Stub(x => x.GetById(1234)).Return(content);
-            var userService = MockRepository.GenerateStub<IUserService>();
+            var contentServiceMock = new Mock<IContentService>();
+            contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
+            var contentService = contentServiceMock.Object;
+            var userServiceMock = new Mock<IUserService>();    
             var permissions = new List<EntityPermission>
                 {
                     new EntityPermission(9, 1234, new string[]{ "A", "F", "C" })
                 };
-            userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
+            userServiceMock.Setup(x => x.GetPermissions(user, 1234)).Returns(permissions);
+            var userService = userServiceMock.Object;
 
             //act
             var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
@@ -129,16 +139,18 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         public void Does_Not_Throw_Exception_When_No_Permissions_Assigned()
         {
             //arrange
-            var user = MockRepository.GenerateStub<IUser>();
+            var user = new Mock<IUser>().Object;
             user.Id = 9;
             user.StartContentId = -1;
-            var content = MockRepository.GenerateStub<IContent>();
+            var content = new Mock<IContent>().Object;
             content.Path = "-1,1234,5678";
-            var contentService = MockRepository.GenerateStub<IContentService>();
-            contentService.Stub(x => x.GetById(1234)).Return(content);
-            var userService = MockRepository.GenerateStub<IUserService>();
+            var contentServiceMock = new Mock<IContentService>();
+            contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
+            var contentService = contentServiceMock.Object;
+            var userServiceMock = new Mock<IUserService>();    
             var permissions = new List<EntityPermission>();
-            userService.Stub(x => x.GetPermissions(user, 1234)).Return(permissions);
+            userServiceMock.Setup(x => x.GetPermissions(user, 1234)).Returns(permissions);
+            var userService = userServiceMock.Object;
 
             //act
             var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');

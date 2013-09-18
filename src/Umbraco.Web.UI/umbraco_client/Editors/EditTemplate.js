@@ -11,7 +11,13 @@
             if (alias != null && alias != "") {
                 t = "&alias=" + alias;
             }
-            UmbClientMgr.openModalWindow(this._opts.umbracoPath + '/dialogs/editMacro.aspx?renderingEngine=Webforms&objectId=' + this._opts.editorClientId + t, 'Insert Macro', true, 470, 530, 0, 0, '', '');
+            UmbClientMgr.openAngularModalWindow({
+                template: "views/templates/insertmacro.html",
+                dialogData: {
+                    renderingEngine: "Webforms",
+                    objectId: this._opts.editorClientId + t
+                }
+            });
         },
 
         _insertMacro: function(alias) {

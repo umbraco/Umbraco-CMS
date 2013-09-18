@@ -8,7 +8,7 @@ angular.module('umbraco')
 		$scope.renderModel = [];
 		$scope.multipicker = true;
 
-		entityResource.getDocumentsByIds($scope.ids).then(function(data){
+		entityResource.getByIds($scope.ids, "Document").then(function(data){
 			$(data).each(function(i, item){
 				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
 				$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
@@ -34,11 +34,11 @@ angular.module('umbraco')
 			}	
 		};
 
-		$scope.clear = function(){
-			$scope.ids = [];
-			$scope.model.value = "";
-			$scope.renderModel = [];
-		}
+	    $scope.clear = function() {
+	        $scope.ids = [];
+	        $scope.model.value = "";
+	        $scope.renderModel = [];
+	    };
 
 		function trim(str, chr) {
 			var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^'+chr+'+|'+chr+'+$', 'g');

@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence;
+﻿using System.Collections.Generic;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
@@ -21,6 +22,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int RefreshRate { get; set; }
 
         [Column("macroAlias")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsMacroPropertyAlias")]
         public string Alias { get; set; }
 
         [Column("macroName")]
@@ -54,5 +56,8 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("macroPython")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Python { get; set; }
+
+        [ResultColumn]
+        public List<MacroPropertyDto> MacroPropertyDtos { get; set; }
     }
 }

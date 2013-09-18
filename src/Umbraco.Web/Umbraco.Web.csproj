@@ -303,6 +303,7 @@
     <Compile Include="Editors\DashboardController.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
+    <Compile Include="Models\ContentEditing\UmbracoEntityTypes.cs" />
     <Compile Include="PropertyEditors\RteEmbedController.cs" />
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Editors\MediaPostValidateAttribute.cs" />
@@ -1944,7 +1945,9 @@
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\CssParser.aspx" />
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ImageUploader.aspx" />
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInjectionMacroRenderer.aspx" />
-    <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInjector.aspx" />
+    <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInjector.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInstaller.aspx" />
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx" />
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx" />

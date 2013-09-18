@@ -1,6 +1,6 @@
 using System.Web;
 using System.Web.Routing;
-using Rhino.Mocks;
+using Moq;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Routing
@@ -31,7 +31,8 @@ namespace Umbraco.Tests.Routing
 			var data = routes.GetRouteData(httpContext);
 
 			//set the route data on the request context
-			httpContext.Request.RequestContext.Stub(x => x.RouteData).Return(data);
+		    var requestMock = Mock.Get(httpContext.Request.RequestContext);
+            requestMock.Setup(x => x.RouteData).Returns(data);
 
 			return data;
 		}

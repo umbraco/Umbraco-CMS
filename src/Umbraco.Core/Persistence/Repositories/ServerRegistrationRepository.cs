@@ -11,7 +11,6 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    
     internal class ServerRegistrationRepository : PetaPocoRepositoryBase<int, ServerRegistration>
     {
         public ServerRegistrationRepository(IDatabaseUnitOfWork work)

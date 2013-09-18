@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
+using Moq;
 using NUnit.Framework;
-using Rhino.Mocks;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -16,14 +16,17 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         public void Does_Not_Throw_Exception_When_Access_Allowed_By_Path()
         {
             //arrange
-            var user = MockRepository.GenerateStub<IUser>();
+            var userMock = new Mock<IUser>();
+            var user = userMock.Object;
             user.Id = 9;
             user.StartMediaId = -1;
-            var media = MockRepository.GenerateStub<IMedia>();
+            var mediaMock = new Mock<IMedia>();
+            var media = mediaMock.Object;
             media.Path = "-1,1234,5678";
-            var mediaService = MockRepository.GenerateStub<IMediaService>();
-            mediaService.Stub(x => x.GetById(1234)).Return(media);
-            
+            var mediaServiceMock = new Mock<IMediaService>();            
+            mediaServiceMock.Setup(x => x.GetById(1234)).Returns(media);
+            var mediaService = mediaServiceMock.Object;
+
             //act
             var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, 1234);
 
@@ -35,13 +38,16 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         public void Throws_Exception_When_No_Media_Found()
         {
             //arrange
-            var user = MockRepository.GenerateStub<IUser>();
+            var userMock = new Mock<IUser>();
+            var user = userMock.Object;
             user.Id = 9;
             user.StartMediaId = -1;
-            var media = MockRepository.GenerateStub<IMedia>();
+            var mediaMock = new Mock<IMedia>();
+            var media = mediaMock.Object;
             media.Path = "-1,1234,5678";
-            var mediaService = MockRepository.GenerateStub<IMediaService>();
-            mediaService.Stub(x => x.GetById(0)).Return(media);
+            var mediaServiceMock = new Mock<IMediaService>();
+            mediaServiceMock.Setup(x => x.GetById(0)).Returns(media);
+            var mediaService = mediaServiceMock.Object;
             
             //act/assert
             Assert.Throws<HttpResponseException>(() => MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, 1234));
@@ -51,13 +57,16 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         public void Throws_Exception_When_No_Access_By_Path()
         {
             //arrange
-            var user = MockRepository.GenerateStub<IUser>();
+            var userMock = new Mock<IUser>();
+            var user = userMock.Object;
             user.Id = 9;
             user.StartMediaId = 9876;
-            var media = MockRepository.GenerateStub<IMedia>();
+            var mediaMock = new Mock<IMedia>();
+            var media = mediaMock.Object;
             media.Path = "-1,1234,5678";
-            var mediaService = MockRepository.GenerateStub<IMediaService>();
-            mediaService.Stub(x => x.GetById(1234)).Return(media);
+            var mediaServiceMock = new Mock<IMediaService>();
+            mediaServiceMock.Setup(x => x.GetById(0)).Returns(media);
+            var mediaService = mediaServiceMock.Object;
             
             //act
             var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, 1234);

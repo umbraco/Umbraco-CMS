@@ -225,7 +225,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="stylesNoStylesOnPage">Brak dostępnych aktywnych stylów</key>
     <key alias="tableColMergeLeft">Proszę ustaw kursor po lewej stronie dwóch cel które chcesz połączyć</key>
     <key alias="tableSplitNotSplittable">Nie możesz podzielić komórki, która nie była wcześniej połączona.</key>
-    <key alias="xsltErrorHeader">Błąd w źródle xslt</key>
+    <key alias="xsltErrorHeader">Błąd w źródle XSLT</key>
     <key alias="xsltErrorText">Plik XSLT nie został zapisany, ponieważ wystąpiły błędy</key>
   </area>
   <area alias="general">

@@ -20,18 +20,4 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             throw new NotSupportedException("Cannot downgrade from a version 7 database to a prior version");
         }
     }
-
-    //[Migration("7.0.0", 0, GlobalSettings.UmbracoMigrationName)]
-    //public class RemoveDefaultPermissionUserColumn : MigrationBase
-    //{
-    //    public override void Up()
-    //    {
-    //        Alter.Table("").AlterColumn()
-    //    }
-
-    //    public override void Down()
-    //    {
-    //        throw new NotSupportedException("Cannot downgrade from a version 7 database to a prior version");
-    //    }
-    //}
 }

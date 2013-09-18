@@ -26,6 +26,7 @@ namespace Umbraco.Core.Services
         private Lazy<RelationService> _relationService;
         private Lazy<ApplicationTreeService> _treeService;
         private Lazy<SectionService> _sectionService;
+        private Lazy<MacroService> _macroService;
 
 		/// <summary>
 		/// Constructor
@@ -95,6 +96,9 @@ namespace Umbraco.Core.Services
 
             if (_sectionService == null)
                 _sectionService = new Lazy<SectionService>(() => new SectionService(_userService.Value, _treeService.Value, cache));
+
+            if (_macroService == null)
+                _macroService = new Lazy<MacroService>(() => new MacroService(provider, repositoryFactory.Value));
         }
 
         /// <summary>
@@ -103,6 +107,14 @@ namespace Umbraco.Core.Services
         internal ServerRegistrationService ServerRegistrationService
         {
             get { return _serverRegistrationService.Value; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="EntityService"/>
+        /// </summary>
+        internal MacroService MacroService
+        {
+            get { return _macroService.Value; }
         }
 
         /// <summary>

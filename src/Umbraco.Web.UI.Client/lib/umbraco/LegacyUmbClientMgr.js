@@ -173,6 +173,23 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 navService.loadLegacyIFrame(strLocation);
 
             },
+            
+            /** This is used to launch an angular based modal window instead of the legacy window */
+            openAngularModalWindow: function (options, onCloseCallback) {
+
+                //get our angular navigation service
+                var injector = getRootInjector();
+                var dialogService = injector.get("dialogService");
+
+                var dialog = dialogService.open(options);
+
+                ////add the callback to the jquery data for the modal so we can call it on close to support the legacy way dialogs worked.
+                //dialog.element.data("modalCb", onCloseCallback);
+               
+                //this._modal.push(dialog);
+                //return dialog;
+            },
+
             openModalWindow: function(url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback) {
                 //need to create the modal on the top window if the top window has a client manager, if not, create it on the current window                
                 
