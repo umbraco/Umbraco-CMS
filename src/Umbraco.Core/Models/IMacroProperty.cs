@@ -27,13 +27,9 @@ namespace Umbraco.Core.Models
         int SortOrder { get; set; }
 
         /// <summary>
-        /// Gets or sets the Type for this Property
-        /// </summary>
-        /// <remarks>
-        /// The MacroPropertyTypes acts as a plugin for Macros.
-        /// All types was previously contained in the database, but has been ported to code.
-        /// </remarks>
+        /// Gets or sets the parameter editor alias
+        /// </summary>        
         [DataMember]
-        IMacroPropertyType PropertyType { get; set; }
+        string EditorAlias { get; set; }
     }
 }

@@ -17,23 +17,23 @@ namespace Umbraco.Core.Models
             
         }
 
-        public MacroProperty(string @alias, string name, int sortOrder, IMacroPropertyType propertyType)
+        public MacroProperty(string @alias, string name, int sortOrder, string editorAlias)
         {
             _alias = alias;
             _name = name;
             _sortOrder = sortOrder;
-            _propertyType = propertyType;
+            _editorAlias = editorAlias;
         }
 
         private string _alias;
         private string _name;
         private int _sortOrder;
-        private IMacroPropertyType _propertyType;
+        private string _editorAlias;
 
         private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Alias);
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Name);
         private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, int>(x => x.SortOrder);
-        private static readonly PropertyInfo PropertyTypeSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, IMacroPropertyType>(x => x.PropertyType);
+        private static readonly PropertyInfo PropertyTypeSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.EditorAlias);
 
         /// <summary>
         /// Gets or sets the Alias of the Property
@@ -94,17 +94,17 @@ namespace Umbraco.Core.Models
         /// All types was previously contained in the database, but has been ported to code.
         /// </remarks>
         [DataMember]
-        public IMacroPropertyType PropertyType
+        public string EditorAlias
 
         {
-            get { return _propertyType; }
+            get { return _editorAlias; }
             set
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _propertyType = value;
-                    return _propertyType;
-                }, _propertyType, PropertyTypeSelector);
+                    _editorAlias = value;
+                    return _editorAlias;
+                }, _editorAlias, PropertyTypeSelector);
             }
         }
     }

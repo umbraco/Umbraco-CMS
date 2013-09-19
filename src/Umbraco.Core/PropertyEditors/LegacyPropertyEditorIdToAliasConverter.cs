@@ -6,7 +6,6 @@ using System.Linq;
 
 namespace Umbraco.Core.PropertyEditors
 {
-
     /// <summary>
     /// This is used to map old legacy property editor GUID's to the new Property Editor alias (string) format.
     /// </summary>

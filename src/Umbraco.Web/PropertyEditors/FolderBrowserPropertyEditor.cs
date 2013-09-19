@@ -5,7 +5,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.FolderBrowser, "Folder Browser", "folderbrowser")]
+    [PropertyEditor(Constants.PropertyEditors.FolderBrowserAlias, "Folder Browser", "folderbrowser")]
     public class FolderBrowserPropertyEditor : PropertyEditor
     {
 

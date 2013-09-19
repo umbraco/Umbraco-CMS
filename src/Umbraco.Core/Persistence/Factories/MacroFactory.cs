@@ -60,8 +60,7 @@ namespace Umbraco.Core.Persistence.Factories
                     Name = p.Name,
                     Macro = entity.Id,
                     SortOrder = (byte)p.SortOrder,
-                    //TODO: WE need to change this column to store an alias!!!! for now I'm just hard coding this until we go to that part.
-                    Type = 16
+                    EditorAlias = p.EditorAlias
                 };
 
                 list.Add(text);
