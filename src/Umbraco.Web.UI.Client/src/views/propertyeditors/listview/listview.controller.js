@@ -16,13 +16,13 @@ angular.module("umbraco")
         $scope.next = function(){
             if ($scope.options.pageNumber < $scope.listViewResultSet.totalPages) {
                 $scope.options.pageNumber++;
-                $scope.reloadView();   
+                $scope.reloadView($scope.content.id);
             }
         };
 
         $scope.goToPage = function (pageNumber) {
             $scope.options.pageNumber = pageNumber + 1;
-            $scope.reloadView();
+            $scope.reloadView($scope.content.id);
         };
 
         $scope.sort = function (field) {
@@ -43,7 +43,7 @@ angular.module("umbraco")
         $scope.prev = function(){
             if ($scope.options.pageNumber > 1) {
                 $scope.options.pageNumber--;
-                $scope.reloadView();
+                $scope.reloadView($scope.content.id);
             }
         };
 
