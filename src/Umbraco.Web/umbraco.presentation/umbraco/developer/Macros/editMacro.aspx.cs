@@ -79,6 +79,8 @@ namespace umbraco.cms.presentation.developer
 			}
 			else
 			{
+                Page.Validate();
+
 			    ClientTools
                     .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadMacros>().Tree.Alias)
                     .SyncTree("-1,init," + _macro.Id.ToInvariantString(), true); //true forces the reload
@@ -102,7 +104,7 @@ namespace umbraco.cms.presentation.developer
 					var macroElementAlias = (TextBox)item.FindControl("macroPropertyAlias");
 					var macroElementType = (DropDownList)item.FindControl("macroPropertyType");
 
-                    var prop = _macro.Properties[int.Parse(macroPropertyId.Value)];
+				    var prop = _macro.Properties.Single(x => x.Id == int.Parse(macroPropertyId.Value));
                     prop.Alias = macroElementAlias.Text.Trim();
                     prop.Name = macroElementName.Text.Trim();
                     prop.EditorAlias = macroElementType.SelectedValue;
@@ -229,8 +231,12 @@ namespace umbraco.cms.presentation.developer
 
 		public void deleteMacroProperty(object sender, EventArgs e)
 		{
-			HtmlInputHidden macroPropertyID = (HtmlInputHidden)((Control)sender).Parent.FindControl("macroPropertyID");
-			SqlHelper.ExecuteNonQuery("delete from cmsMacroProperty where id = @id", SqlHelper.CreateParameter("@id", macroPropertyID.Value));
+			var macroPropertyId = (HtmlInputHidden)((Control)sender).Parent.FindControl("macroPropertyID");
+
+		    var property = _macro.Properties.Single(x => x.Id == int.Parse(macroPropertyId.Value));
+		    _macro.Properties.Remove(property);
+
+		    Services.MacroService.Save(_macro);
 
 			macroPropertyBind();
 		}
@@ -261,11 +267,16 @@ namespace umbraco.cms.presentation.developer
         }
 
 		public void macroPropertyCreate(object sender, EventArgs e)
-		{
+		{            
+            if (Page.IsValid == false)
+            {
+                return;
+            }
+
 			var macroPropertyAliasNew = (TextBox)((Control)sender).Parent.FindControl("macroPropertyAliasNew");
 			var macroPropertyNameNew = (TextBox)((Control)sender).Parent.FindControl("macroPropertyNameNew");
 			var macroPropertyTypeNew = (DropDownList)((Control)sender).Parent.FindControl("macroPropertyTypeNew");
-			var goAhead = true;
+			
 			if (macroPropertyAliasNew.Text != ui.Text("general", "new", UmbracoUser) + " " + ui.Text("general", "alias", UmbracoUser))
 			{
                 if (_macro.Properties.ContainsKey(macroPropertyAliasNew.Text.Trim()))

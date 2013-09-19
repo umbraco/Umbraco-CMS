@@ -25,7 +25,20 @@
                     $(".fileChooser input[type='text']").not(txt).val("");
                     //reset other drop downs
                     $(".fileChooser select").not($(this)).val("");
-                });                
+                });
+                
+                //disable 'add macro property validators' when save or delete is clicked
+                $("#body_save,.delete-button").click(function (evt) {
+                    $(".add-validator").each(function() {
+                        ValidatorEnable($(this).get(0), false);
+                    });
+                });
+                //enable the addmacro property validators when the add button is clicked
+                $(".add-button").click(function(evt) {
+                    $(".add-validator").each(function () {
+                        ValidatorEnable($(this).get(0), true);
+                    });
+                });
             });
         })(jQuery);
         
@@ -127,15 +140,18 @@
             </HeaderTemplate>
             <ItemTemplate>
                 <tr>
-                    <td>
+                    <td>                        
                         <input type="hidden" id="macroPropertyID" runat="server" value='<%#Eval("Id")%>'
                             name="macroPropertyID" />
+                        <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="macroPropertyAlias" Display="Dynamic"  ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
                         <asp:TextBox runat="server" ID="macroPropertyAlias" Text='<%#Eval("Alias")%>' />
                     </td>
                     <td>
+                        <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ControlToValidate="macroPropertyName" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
                         <asp:TextBox runat="server" ID="macroPropertyName" Text='<%#Eval("Name")%>' />
                     </td>
                     <td>
+                        <asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="server" ControlToValidate="macroPropertyType" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
                         <asp:DropDownList OnPreRender="AddChooseList" runat="server" ID="macroPropertyType"
                             DataTextFormatString="" DataTextField='Name' DataValueField="Alias"
                             DataSource='<%# GetMacroParameterEditors()%>' 
@@ -143,19 +159,22 @@
                         </asp:DropDownList>
                     </td>
                     <td>
-                        <asp:Button OnClick="deleteMacroProperty" ID="delete" Text="Delete" runat="server" CssClass="btn btn-default" />
+                        <asp:Button OnClick="deleteMacroProperty" ID="delete" Text="Delete" runat="server" CssClass="btn btn-default delete-button" />
                     </td>
                 </tr>
             </ItemTemplate>
             <FooterTemplate>
                         <tr>
                             <td>
+                                <asp:RequiredFieldValidator ID="RequiredFieldValidator1" CssClass="add-validator" runat="server" ControlToValidate="macroPropertyAliasNew" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
                                 <asp:TextBox runat="server" ID="macroPropertyAliasNew" Text='New Alias' OnTextChanged="macroPropertyCreate" />
                             </td>
                             <td>
+                                <asp:RequiredFieldValidator ID="RequiredFieldValidator4" CssClass="add-validator" runat="server" ControlToValidate="macroPropertyNameNew" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
                                 <asp:TextBox runat="server" ID="macroPropertyNameNew" Text='New Name' />
                             </td>
                             <td>
+                                <asp:RequiredFieldValidator ID="RequiredFieldValidator5" CssClass="add-validator" runat="server" ControlToValidate="macroPropertyTypeNew" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
                                 <asp:DropDownList OnPreRender="AddChooseList" runat="server" ID="macroPropertyTypeNew"
                                     DataTextField="Name" 
                                     DataValueField="Alias" 
@@ -163,7 +182,7 @@
                                 </asp:DropDownList>
                             </td>
                             <td>
-                                <asp:Button ID="createNew" Text="Add" runat="server" CssClass="btn btn-default" />
+                                <asp:Button ID="createNew" Text="Add" runat="server" CssClass="btn btn-default add-button" />
                             </td>
                         </tr>
                 </tbody>

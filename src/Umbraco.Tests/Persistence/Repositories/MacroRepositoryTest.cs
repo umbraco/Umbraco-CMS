@@ -262,14 +262,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
                 var macro = repository.Get(1);
-                macro.Properties.Add(new MacroProperty("new1", "New1", 3, null));
+                macro.Properties.Add(new MacroProperty("new1", "New1", 3, "test"));
                 
                 repository.AddOrUpdate(macro);
 
                 unitOfWork.Commit();
 
                 // Assert
+                Assert.Greater(macro.Properties.First().Id, 0); //ensure id is returned
                 var result = repository.Get(1);
+                Assert.Greater(result.Properties.First().Id, 0);
                 Assert.AreEqual(1, result.Properties.Count());
                 Assert.AreEqual("new1", result.Properties.First().Alias);
                 Assert.AreEqual("New1", result.Properties.First().Name);

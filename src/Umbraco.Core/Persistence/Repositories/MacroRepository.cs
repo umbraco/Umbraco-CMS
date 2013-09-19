@@ -172,8 +172,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     if (macro.AddedProperties.Contains(propDto.Alias))
                     {
-                        //we need to insert since this was added  
+                        //we need to insert since this was added  and re-assign the new id
                         Database.Insert(propDto);
+                        macro.Properties[propDto.Alias].Id = propDto.Id;
                     }
                     else
                     {

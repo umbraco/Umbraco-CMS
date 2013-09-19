@@ -2,12 +2,6 @@
 
 namespace Umbraco.Core.PropertyEditors
 {
-    [ParameterEditor("text", "Text", "textbox")]
-    public class TextParameterEditor : ParameterEditor
-    {
-        
-    }
-
     /// <summary>
     /// Represents the value editor for the parameter editor during macro parameter editing
     /// </summary>
