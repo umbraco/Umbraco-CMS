@@ -112,14 +112,17 @@ angular.module("umbraco")
         };
 
         $scope.delete = function () {
+            $scope.bulkStatus = "Starting with delete";
             var current = 1;
             var total = $scope.selected.length;
             for (var i = 0; i < $scope.selected.length; i++) {
                 contentResource.deleteById($scope.selected[i]).then(function (data) {
-                    current++;
+                    $scope.bulkStatus = "Deleted doc" + i + " out of "+ total +"documents";
                     if (current == total) {
+                        $scope.bulkStatus = "Deleting done";
                         $scope.reloadView($scope.content.id);
                     }
+                    current++;
                 });
             }
             

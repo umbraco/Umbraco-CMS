@@ -25,7 +25,7 @@
 		    <div class="btn-group" ng-show="isAnythingSelected()">
 		        <a class="btn btn-danger" ng-click="delete()" prevent-default>Delete</a>
 		    </div>
-            
+		    <span ng-bind="bulkStatus" ng-show="isAnythingSelected()"></span>
 		</div>
 
 		<table class="table table-striped">
