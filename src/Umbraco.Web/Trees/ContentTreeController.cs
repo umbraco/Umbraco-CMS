@@ -80,16 +80,24 @@ namespace Umbraco.Web.Trees
             foreach (var entity in entities)
             {
                 var e = (UmbracoEntity)entity;
-                
+               
                 var allowedUserOptions = GetUserMenuItemsForNode(e);
                 if (CanUserAccessNode(e, allowedUserOptions))
                 {
+                    //TODO: if the node is of a specific type, don't list its children
+                    //this is to enable the list view on the editor
+
+                    //for WIP I'm just checking against a hardcoded value
+                    var hasChildren = e.HasChildren;
+                    if (e.ContentTypeAlias == "umbNewsArea")
+                        hasChildren = false;
+
                     var node = CreateTreeNode(
                         e.Id.ToInvariantString(),
                         queryStrings,
                         e.Name,
                         e.ContentTypeIcon,
-                        e.HasChildren);
+                        hasChildren);
 
                     //InjectLegacyTreeCompatibility(node, queryStrings);
 
