@@ -113,24 +113,27 @@ angular.module("umbraco")
         };
 
         $scope.delete = function () {
-            $scope.actionInProgress = true;
-            $scope.bulkStatus = "Starting with delete";
-            var current = 1;
-            var total = $scope.selected.length;
-            for (var i = 0; i < $scope.selected.length; i++) {
-                $scope.bulkStatus = "Deleted doc " + current + " out of " + total + " documents";
-                contentResource.deleteById($scope.selected[i]).then(function (data) {
-                    if (current == total) {
-                        notificationsService.success("Bulk action", "Deleted " + total + "documents");
-                        $scope.bulkStatus = "";
-                        $scope.selected = [];
-                        $scope.reloadView($scope.content.id);
-                        $scope.actionInProgress = false;
-                    }
-                    current++;
-                });
+
+            if (confirm("Sure you want to delete?") == true) {
+                $scope.actionInProgress = true;
+                $scope.bulkStatus = "Starting with delete";
+                var current = 1;
+                var total = $scope.selected.length;
+                for (var i = 0; i < $scope.selected.length; i++) {
+                    $scope.bulkStatus = "Deleted doc " + current + " out of " + total + " documents";
+                    contentResource.deleteById($scope.selected[i]).then(function(data) {
+                        if (current == total) {
+                            notificationsService.success("Bulk action", "Deleted " + total + "documents");
+                            $scope.bulkStatus = "";
+                            $scope.selected = [];
+                            $scope.reloadView($scope.content.id);
+                            $scope.actionInProgress = false;
+                        }
+                        current++;
+                    });
+                }
             }
-            
+
         };
 
         $scope.publish = function () {
