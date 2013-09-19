@@ -85,7 +85,10 @@ namespace Umbraco.Web.Editors
                 HandleContentNotFound(id);
             }
             
-            return Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+            var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+            return content;
+
+//            content.Tabs.ElementAt(0).Properties.
         }
 
         /// <summary>

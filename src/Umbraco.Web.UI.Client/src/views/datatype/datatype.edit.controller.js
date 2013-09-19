@@ -32,7 +32,7 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
         },
         selectedEditorId: {
             alias: "selectedEditorId",
-            label: "Property editor GUID"
+            label: "Property editor alias"
         }
     };
     

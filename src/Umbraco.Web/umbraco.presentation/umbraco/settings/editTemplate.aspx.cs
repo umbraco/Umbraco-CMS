@@ -99,8 +99,7 @@ namespace umbraco.cms.presentation.settings
 
             
 			var save = Panel1.Menu.NewButton();
-		    save.Icon = "save";
-            save.OnClientClick = "doSubmit()";
+		    save.OnClientClick = "doSubmit()";
             save.Text = ui.Text("save");
             save.ButtonType = MenuButtonType.Primary;
             save.ID = "save";

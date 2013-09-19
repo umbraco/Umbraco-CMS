@@ -99,6 +99,7 @@ namespace Umbraco.Core.PropertyEditors
             CreateMap(Guid.Parse(Constants.PropertyEditors.FolderBrowser), Constants.PropertyEditors.FolderBrowserAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.ImageCropper), Constants.PropertyEditors.ImageCropperAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.Integer), Constants.PropertyEditors.IntegerAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.ListView), Constants.PropertyEditors.ListViewAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.MacroContainer), Constants.PropertyEditors.MacroContainerAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.MediaPicker), Constants.PropertyEditors.MediaPickerAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.MemberPicker), Constants.PropertyEditors.MemberPickerAlias);

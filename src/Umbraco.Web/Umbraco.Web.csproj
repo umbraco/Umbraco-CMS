@@ -308,6 +308,7 @@
     <Compile Include="Models\ContentEditing\UmbracoEntityTypes.cs" />
     <Compile Include="Models\Mapping\MacroModelMapper.cs" />
     <Compile Include="PropertyEditors\ColorListPreValueEditor.cs" />
+    <Compile Include="PropertyEditors\ListViewPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\TextAreaParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\TextParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\TrueFalseParameterEditor.cs" />

@@ -1,12 +1,15 @@
 angular.module("umbraco")
     .controller("Umbraco.Editors.ListViewController", 
-        function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource) {
-        
+        function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource, editorContextService, notificationsService) {
+
+        $scope.selected = [];
+        $scope.actionInProgress = false;
+            
         $scope.options = {
             pageSize: 10,
             pageNumber: 1,
             filter: '',
-            orderBy: 'id',
+            orderBy: 'Id',
             orderDirection: "desc"
         };
 
@@ -14,32 +17,34 @@ angular.module("umbraco")
         $scope.next = function(){
             if ($scope.options.pageNumber < $scope.listViewResultSet.totalPages) {
                 $scope.options.pageNumber++;
-                $scope.reloadView();   
+                $scope.reloadView($scope.content.id);
             }
         };
 
         $scope.goToPage = function (pageNumber) {
             $scope.options.pageNumber = pageNumber + 1;
-            $scope.reloadView();
+            $scope.reloadView($scope.content.id);
         };
 
-        $scope.sort = function(field){
-            $scope.options.sortby = field;
+        $scope.sort = function (field) {
+        
+            $scope.options.orderBy = field;
             
-            if(field !== $scope.options.sortby){
-                if($scope.options.order === "desc"){
-                    $scope.options.order = "asc";
-                }else{
-                    $scope.options.order = "desc";
-                }
+          
+            if ($scope.options.orderDirection === "desc") {
+                $scope.options.orderDirection = "asc";
+            }else{
+                $scope.options.orderDirection = "desc";
             }
-            $scope.reloadView();
+            
+           
+            $scope.reloadView($scope.content.id);
         };
 
         $scope.prev = function(){
             if ($scope.options.pageNumber > 1) {
                 $scope.options.pageNumber--;
-                $scope.reloadView();
+                $scope.reloadView($scope.content.id);
             }
         };
 
@@ -64,11 +69,107 @@ angular.module("umbraco")
             });
         };
 
+        var updateSelected = function (action, id) {
+            if (action === 'add' && $scope.selected.indexOf(id) === -1) {
+                $scope.selected.push(id);
+            }
+            if (action === 'remove' && $scope.selected.indexOf(id) !== -1) {
+                $scope.selected.splice($scope.selected.indexOf(id), 1);
+            }
+        };
 
+        $scope.updateSelection = function ($event, id) {
+            var checkbox = $event.target;
+            var action = (checkbox.checked ? 'add' : 'remove');
+            updateSelected(action, id);
+        };
+
+        $scope.selectAll = function ($event) {
+            var checkbox = $event.target;
+            var action = (checkbox.checked ? 'add' : 'remove');
+            for (var i = 0; i < $scope.listViewResultSet.items.length; i++) {
+                var entity = $scope.listViewResultSet.items[i];
+                updateSelected(action, entity.id);
+            }
+        };
+
+        $scope.getSelectedClass = function (entity) {
+            return $scope.isSelected(entity.id) ? 'selected' : '';
+        };
+
+        $scope.isSelected = function (id) {
+            return $scope.selected.indexOf(id) >= 0;
+        };
+
+        $scope.isSelectedAll = function () {
+            if ($scope.listViewResultSet != null)
+                return $scope.selected.length === $scope.listViewResultSet.items.length;
+            else
+                return false;
+        };
+
+        $scope.isAnythingSelected = function() {
+            return $scope.selected.length > 0;
+        };
+
+        $scope.delete = function () {
+
+            if (confirm("Sure you want to delete?") == true) {
+                $scope.actionInProgress = true;
+                $scope.bulkStatus = "Starting with delete";
+                var current = 1;
+                var total = $scope.selected.length;
+                for (var i = 0; i < $scope.selected.length; i++) {
+                    $scope.bulkStatus = "Deleted doc " + current + " out of " + total + " documents";
+                    contentResource.deleteById($scope.selected[i]).then(function(data) {
+                        if (current == total) {
+                            notificationsService.success("Bulk action", "Deleted " + total + "documents");
+                            $scope.bulkStatus = "";
+                            $scope.selected = [];
+                            $scope.reloadView($scope.content.id);
+                            $scope.actionInProgress = false;
+                        }
+                        current++;
+                    });
+                }
+            }
+
+        };
+
+        $scope.publish = function () {
+            $scope.actionInProgress = true;
+            $scope.bulkStatus = "Starting with publish";
+            var current = 1;
+            var total = $scope.selected.length;
+            for (var i = 0; i < $scope.selected.length; i++) {
+                $scope.bulkStatus = "Publishing doc " + current + " out of " + total + " documents";
+                
+                contentResource.getById($scope.selected[i]).then(function(content) {
+                    contentResource.publish(content, false)
+                        .then(function(content){
+                            if (current == total) {
+                                notificationsService.success("Bulk action", "Published " + total + "documents");
+                                $scope.bulkStatus = "";
+                                $scope.reloadView($scope.content.id);
+                                $scope.actionInProgress = false;
+                            }
+                            current++;
+                        });
+                });
+            }
+        };
+ 
+        $scope.unpublish = function () {
+
+        };
+            
         if($routeParams.id){
             $scope.pagination = new Array(100);
             $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
             $scope.reloadView($routeParams.id);
+
+            $scope.content = editorContextService.getContext();
+            
         }
         
 });
