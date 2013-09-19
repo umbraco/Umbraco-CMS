@@ -8,7 +8,7 @@ angular.module("umbraco")
             pageSize: 10,
             pageNumber: 1,
             filter: '',
-            orderBy: 'id',
+            orderBy: 'Id',
             orderDirection: "desc"
         };
 
