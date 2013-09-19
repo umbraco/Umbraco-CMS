@@ -10,21 +10,35 @@ namespace Umbraco.Core.PropertyEditors
     /// A resolver to resolve all parameter editors
     /// </summary>
     /// <remarks>
-    /// This resolver will contain any property editors defined in manifests as well!
+    /// This resolver will contain any parameter editors defined in manifests as well as any property editors defined in manifests
+    /// that have the IsParameterEditorFlag = true and any PropertyEditors found in c# that have this flag as well. 
     /// </remarks>
-    internal class ParameterEditorResolver : LazyManyObjectsResolverBase<ParameterEditorResolver, ParameterEditor>
+    internal class ParameterEditorResolver : LazyManyObjectsResolverBase<ParameterEditorResolver, IParameterEditor>
     {
         public ParameterEditorResolver(Func<IEnumerable<Type>> typeListProducerList)
             : base(typeListProducerList, ObjectLifetimeScope.Application)
         {
         }
-
+        
         /// <summary>
-        /// Returns the property editors
+        /// Returns the parameter editors
         /// </summary>
-        public IEnumerable<ParameterEditor> ParameterEditors
+        public IEnumerable<IParameterEditor> ParameterEditors
         {
-            get { return Values.Union(ManifestBuilder.ParameterEditors); }
+            get
+            {
+                //This will by default include all property editors and parameter editors but we need to filter this
+                //list to ensure that none of the property editors that do not have the IsParameterEditor flag set to true 
+                //are filtered.
+                var filtered = Values.Select(x => x as PropertyEditor)
+                                     .WhereNotNull()
+                                     .Where(x => x.IsParameterEditor == false)
+                                     .ToArray();
+
+                //now we need to get all manifest property editors in here that are parameter editors!~
+
+                return Values.Except(filtered).Union(ManifestBuilder.ParameterEditors);
+            }
         }
 
         /// <summary>
@@ -32,7 +46,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <param name="alias"></param>
         /// <returns></returns>
-        public ParameterEditor GetByAlias(string alias)
+        public IParameterEditor GetByAlias(string alias)
         {
             return ParameterEditors.SingleOrDefault(x => x.Alias == alias);
         }

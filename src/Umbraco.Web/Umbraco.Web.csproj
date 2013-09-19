@@ -308,6 +308,9 @@
     <Compile Include="Models\ContentEditing\UmbracoEntityTypes.cs" />
     <Compile Include="Models\Mapping\MacroModelMapper.cs" />
     <Compile Include="PropertyEditors\ColorListPreValueEditor.cs" />
+    <Compile Include="PropertyEditors\ParameterEditors\TextAreaParameterEditor.cs" />
+    <Compile Include="PropertyEditors\ParameterEditors\TextParameterEditor.cs" />
+    <Compile Include="PropertyEditors\ParameterEditors\TrueFalseParameterEditor.cs" />
     <Compile Include="PropertyEditors\RteEmbedController.cs" />
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Editors\MediaPostValidateAttribute.cs" />
@@ -342,9 +345,6 @@
     <Compile Include="PropertyEditors\PublishValuesMultipleValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownMultipleWithKeysPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RadioButtonsPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\TextAreaParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\TextParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\TrueFalseParameterEditor.cs" />
     <Compile Include="PropertyEditors\UserPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ValueListPreValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownPropertyEditor.cs" />

@@ -5,10 +5,30 @@ using Umbraco.Core.IO;
 
 namespace Umbraco.Core.PropertyEditors
 {
+    public interface IParameterEditor
+    {
+        /// <summary>
+        /// The id  of the property editor
+        /// </summary>
+        string Alias { get; }
+
+        /// <summary>
+        /// The name of the property editor
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
+        /// Allows a parameter editor to be re-used based on the configuration specified.
+        /// </summary>
+        IDictionary<string, object> Configuration { get; }
+
+        IValueEditor ValueEditor { get; }
+    }
+
     /// <summary>
     /// Basic definition of a macro parameter editor
     /// </summary>
-    public class ParameterEditor
+    public class ParameterEditor : IParameterEditor
     {
 
         private readonly ParameterEditorAttribute _attribute;
@@ -56,6 +76,12 @@ namespace Umbraco.Core.PropertyEditors
         public ParameterValueEditor ValueEditor
         {
             get { return CreateValueEditor(); }
+        }
+
+        [JsonIgnore]
+        IValueEditor IParameterEditor.ValueEditor 
+        {
+            get { return ValueEditor; }
         }
 
         /// <summary>

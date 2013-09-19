@@ -6,6 +6,7 @@ namespace Umbraco.Core.PropertyEditors
     /// An attribute used to define all of the basic properties of a parameter editor
     /// on the server side.
     /// </summary>
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public sealed class ParameterEditorAttribute : Attribute
     {
         public ParameterEditorAttribute(string alias, string name, string editorView)

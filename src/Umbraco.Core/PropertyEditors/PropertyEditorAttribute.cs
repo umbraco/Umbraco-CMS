@@ -51,5 +51,6 @@ namespace Umbraco.Core.PropertyEditors
         public string Name { get; private set; }
         public string EditorView { get; private set; }
         public string ValueType { get; set; }
+        public bool IsParameterEditor { get; set; }
     }
 }

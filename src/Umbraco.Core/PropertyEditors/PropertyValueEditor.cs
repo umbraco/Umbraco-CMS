@@ -14,7 +14,7 @@ namespace Umbraco.Core.PropertyEditors
     /// <remarks>
     /// The Json serialization attributes are required for manifest property editors to work
     /// </remarks>
-    public class PropertyValueEditor
+    public class PropertyValueEditor : IValueEditor
     {
         /// <summary>
         /// assign defaults

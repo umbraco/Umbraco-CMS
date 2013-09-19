@@ -261,7 +261,7 @@ namespace umbraco.cms.presentation.developer
             return null;
         }
 
-        protected IEnumerable<ParameterEditor> GetMacroParameterEditors()
+        protected IEnumerable<IParameterEditor> GetMacroParameterEditors()
         {
             return ParameterEditorResolver.Current.ParameterEditors;
         }

@@ -43,7 +43,7 @@ namespace Umbraco.Core.Manifest
         }
 
         /// <summary>
-        /// Returns all parameter editors found in the manfifests
+        /// Returns all parameter editors found in the manfifests and all property editors that are flagged to be parameter editors
         /// </summary>
         internal static IEnumerable<ParameterEditor> ParameterEditors
         {

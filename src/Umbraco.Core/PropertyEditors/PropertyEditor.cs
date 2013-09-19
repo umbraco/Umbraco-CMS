@@ -13,7 +13,7 @@ namespace Umbraco.Core.PropertyEditors
     /// <remarks>
     /// The Json serialization attributes are required for manifest property editors to work
     /// </remarks>
-    public class PropertyEditor
+    public class PropertyEditor : IParameterEditor
     {
         private readonly PropertyEditorAttribute _attribute;
 
@@ -29,6 +29,7 @@ namespace Umbraco.Core.PropertyEditors
                 //set the id/name from the attribute
                 Alias = _attribute.Alias;
                 Name = _attribute.Name;
+                IsParameterEditor = _attribute.IsParameterEditor;
             }
         }
 
@@ -43,6 +44,12 @@ namespace Umbraco.Core.PropertyEditors
         /// developers have the chance to override CreatePreValueEditor if they don't want to use the pre-defined instance
         /// </summary>
         internal PreValueEditor ManifestDefinedPreValueEditor = null;
+
+        /// <summary>
+        /// Boolean flag determining if this can be used as a parameter editor
+        /// </summary>
+        [JsonProperty("isParameterEditor")]
+        public bool IsParameterEditor { get; internal set; }
 
         /// <summary>
         /// The id  of the property editor
@@ -62,6 +69,12 @@ namespace Umbraco.Core.PropertyEditors
             get { return CreateValueEditor(); }
         }
 
+        [JsonIgnore]
+        IValueEditor IParameterEditor.ValueEditor
+        {
+            get { return ValueEditor; }
+        }
+
         [JsonProperty("prevalues")]
         public PreValueEditor PreValueEditor
         {
@@ -70,6 +83,12 @@ namespace Umbraco.Core.PropertyEditors
 
         [JsonProperty("defaultConfig")]
         public virtual IDictionary<string, object> DefaultPreValues { get; set; }
+
+        [JsonIgnore]
+        IDictionary<string, object> IParameterEditor.Configuration
+        {
+            get { return DefaultPreValues; }
+        }
 
         /// <summary>
         /// Creates a value editor instance
