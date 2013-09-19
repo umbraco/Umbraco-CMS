@@ -25,17 +25,19 @@ angular.module("umbraco")
             $scope.reloadView();
         };
 
-        $scope.sort = function(field){
-            $scope.options.sortby = field;
+        $scope.sort = function (field) {
+        
+            $scope.options.orderBy = field;
             
-            if(field !== $scope.options.sortby){
-                if($scope.options.order === "desc"){
-                    $scope.options.order = "asc";
-                }else{
-                    $scope.options.order = "desc";
-                }
+          
+            if ($scope.options.orderDirection === "desc") {
+                $scope.options.orderDirection = "asc";
+            }else{
+                $scope.options.orderDirection = "desc";
             }
-            $scope.reloadView();
+            
+           
+            $scope.reloadView($scope.content.id);
         };
 
         $scope.prev = function(){
