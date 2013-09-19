@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.Editors.ListViewController", 
-        function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource, editorContextService) {
+        function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource, editorContextService, notificationsService) {
 
         $scope.selected = [];
             
@@ -119,7 +119,8 @@ angular.module("umbraco")
                 contentResource.deleteById($scope.selected[i]).then(function (data) {
                     $scope.bulkStatus = "Deleted doc" + i + " out of "+ total +"documents";
                     if (current == total) {
-                        $scope.bulkStatus = "Deleting done";
+                        notificationsService.success("Bulk action", "Deleted " + total + "documents");
+                        $scope.bulkStatus = "";
                         $scope.selected = [];
                         $scope.reloadView($scope.content.id);
                     }
@@ -139,7 +140,8 @@ angular.module("umbraco")
                         .then(function(content){
                             $scope.bulkStatus = "Publishing doc" + i + " out of " + total + "documents";
                             if (current == total) {
-                                $scope.bulkStatus = "Publish done";
+                                notificationsService.success("Bulk action", "Published " + total + "documents");
+                                $scope.bulkStatus = "";
                                 $scope.reloadView($scope.content.id);
                             }
                             current++;
