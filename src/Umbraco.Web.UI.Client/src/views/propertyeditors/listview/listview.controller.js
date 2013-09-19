@@ -3,6 +3,7 @@ angular.module("umbraco")
         function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource, editorContextService, notificationsService) {
 
         $scope.selected = [];
+        $scope.actionInProgress = false;
             
         $scope.options = {
             pageSize: 10,
@@ -112,6 +113,7 @@ angular.module("umbraco")
         };
 
         $scope.delete = function () {
+            $scope.actionInProgress = true;
             $scope.bulkStatus = "Starting with delete";
             var current = 1;
             var total = $scope.selected.length;
@@ -123,6 +125,7 @@ angular.module("umbraco")
                         $scope.bulkStatus = "";
                         $scope.selected = [];
                         $scope.reloadView($scope.content.id);
+                        $scope.actionInProgress = false;
                     }
                     current++;
                 });
@@ -131,6 +134,7 @@ angular.module("umbraco")
         };
 
         $scope.publish = function () {
+            $scope.actionInProgress = true;
             $scope.bulkStatus = "Starting with publish";
             var current = 1;
             var total = $scope.selected.length;
@@ -144,6 +148,7 @@ angular.module("umbraco")
                                 notificationsService.success("Bulk action", "Published " + total + "documents");
                                 $scope.bulkStatus = "";
                                 $scope.reloadView($scope.content.id);
+                                $scope.actionInProgress = false;
                             }
                             current++;
                         });

@@ -17,13 +17,13 @@
 		    
            
 		    <div class="btn-group" ng-show="isAnythingSelected()">
-		        <a class="btn btn-success" ng-click="publish()" prevent-default>Publish</a>
+		        <a class="btn btn-success" ng-disabled="actionInProgress" ng-click="publish()" prevent-default>Publish</a>
 		    </div>
 		    <div class="btn-group" ng-show="isAnythingSelected()">
-		        <a class="btn btn-warning" ng-click="unpublish()" prevent-default>Unpublish</a>
+		        <a class="btn btn-warning" ng-disabled="actionInProgress" ng-click="unpublish()" prevent-default>Unpublish</a>
 		    </div>
 		    <div class="btn-group" ng-show="isAnythingSelected()">
-		        <a class="btn btn-danger" ng-click="delete()" prevent-default>Delete</a>
+		        <a class="btn btn-danger" ng-disabled="actionInProgress" ng-click="delete()" prevent-default>Delete</a>
 		    </div>
 		    <span ng-bind="bulkStatus" ng-show="isAnythingSelected()"></span>
 		</div>
