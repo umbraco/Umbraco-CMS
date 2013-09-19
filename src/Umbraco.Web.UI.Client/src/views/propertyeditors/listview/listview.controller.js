@@ -129,7 +129,22 @@ angular.module("umbraco")
         };
 
         $scope.publish = function () {
-
+            $scope.bulkStatus = "Starting with publish";
+            var current = 1;
+            var total = $scope.selected.length;
+            for (var i = 0; i < $scope.selected.length; i++) {
+                contentResource.getById($scope.selected[i]).then(function(content) {
+                    contentResource.publish(content, false)
+                        .then(function(content){
+                            $scope.bulkStatus = "Publishing doc" + i + " out of " + total + "documents";
+                            if (current == total) {
+                                $scope.bulkStatus = "Publish done";
+                                $scope.reloadView($scope.content.id);
+                            }
+                            current++;
+                        });
+                });
+            }
         };
  
         $scope.unpublish = function () {
