@@ -52,7 +52,7 @@
 							<ul>
 								<li><a href="#" ng-click="prev()" prevent-default>Prev</a></li>
 
-								<li ng-repeat="pgn in pagination" 
+								<li ng-repeat="pgn in pagination track by $index" 
 									ng-class="{active:$index==options.offset}">
 									<a href="#" ng-click="goToPage($index)"  prevent-default>{{$index + 1}}</a>
 								</li>
