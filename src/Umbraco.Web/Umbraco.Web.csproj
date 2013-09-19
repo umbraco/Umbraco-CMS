@@ -347,8 +347,8 @@
     <Compile Include="PropertyEditors\PublishValueValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownWithKeysPropertyEditor.cs" />
     <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\LabelValueEditor.cs" />
-    <Compile Include="PropertyEditors\ValueEditorWrapper.cs" />
+    <Compile Include="PropertyEditors\LabelPropertyValueEditor.cs" />
+    <Compile Include="PropertyEditors\PropertyValueEditorWrapper.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
     <Compile Include="Trees\Menu\CreateChildEntity.cs" />
@@ -401,7 +401,7 @@
     <Compile Include="Models\Mapping\UserModelMapper.cs" />
     <Compile Include="PropertyEditors\ContentPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\FileUploadPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\FileUploadValueEditor.cs" />
+    <Compile Include="PropertyEditors\FileUploadPropertyValueEditor.cs" />
     <Compile Include="PropertyEditors\RichTextPropertyEditor.cs" />
     <Compile Include="PropertyEditors\TextAreaPropertyEditor.cs" />
     <Compile Include="PropertyEditors\TextboxPropertyEditor.cs" />

@@ -16,7 +16,7 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase("DATETIME", "", null)] //test empty string for date
         public void Value_Editor_Can_Convert_To_Clr_Type(string valueType, string val, object expected)
         {
-            var valueEditor = new ValueEditor
+            var valueEditor = new PropertyValueEditor
                 {
                     ValueType = valueType
                 };
@@ -29,7 +29,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void Value_Editor_Can_Convert_To_Date_Clr_Type()
         {
-            var valueEditor = new ValueEditor
+            var valueEditor = new PropertyValueEditor
                 {
                     ValueType = "DATE"
                 };
@@ -47,7 +47,7 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase("DATETIME", "", "")] //test empty string for date
         public void Value_Editor_Can_Serialize_Value(string valueType, object val, string expected)
         {
-            var valueEditor = new ValueEditor
+            var valueEditor = new PropertyValueEditor
                 {
                     ValueType = valueType
                 };
@@ -60,7 +60,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void Value_Editor_Can_Serialize_Date_Value()
         {
             var now = DateTime.Now;
-            var valueEditor = new ValueEditor
+            var valueEditor = new PropertyValueEditor
                 {
                     ValueType = "DATE"
                 };

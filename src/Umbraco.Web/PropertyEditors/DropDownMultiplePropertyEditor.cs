@@ -15,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.DropDownListMultipleAlias, "Dropdown list multiple", "dropdown")]
     public class DropDownMultiplePropertyEditor : DropDownMultipleWithKeysPropertyEditor
     {
-        protected override ValueEditor CreateValueEditor()
+        protected override PropertyValueEditor CreateValueEditor()
         {
             return new PublishValuesMultipleValueEditor(false, base.CreateValueEditor());
         }

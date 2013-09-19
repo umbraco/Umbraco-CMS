@@ -7,7 +7,6 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
 {
-
     /// <summary>
     /// Basic definition of a property editor
     /// </summary>
@@ -21,7 +20,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public PropertyEditor()
+        public PropertyEditor()             
         {
             //assign properties based on the attribute if it is found
             _attribute = GetType().GetCustomAttribute<PropertyEditorAttribute>(false);
@@ -29,7 +28,7 @@ namespace Umbraco.Core.PropertyEditors
             {
                 //set the id/name from the attribute
                 Alias = _attribute.Alias;
-                Name = _attribute.Name;                
+                Name = _attribute.Name;
             }
         }
 
@@ -37,7 +36,7 @@ namespace Umbraco.Core.PropertyEditors
         /// These are assigned by default normally based on property editor attributes or manifest definitions,
         /// developers have the chance to override CreateValueEditor if they don't want to use the pre-defined instance
         /// </summary>
-        internal ValueEditor ManifestDefinedValueEditor = null;
+        internal PropertyValueEditor ManifestDefinedPropertyValueEditor = null;
 
         /// <summary>
         /// These are assigned by default normally based on property editor attributes or manifest definitions,
@@ -50,7 +49,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         [JsonProperty("alias", Required = Required.Always)]
         public string Alias { get; internal set; }
-        
+
         /// <summary>
         /// The name of the property editor
         /// </summary>
@@ -58,7 +57,7 @@ namespace Umbraco.Core.PropertyEditors
         public string Name { get; internal set; }
 
         [JsonProperty("editor", Required = Required.Always)]        
-        public ValueEditor ValueEditor
+        public PropertyValueEditor ValueEditor
         {
             get { return CreateValueEditor(); }
         }
@@ -76,20 +75,20 @@ namespace Umbraco.Core.PropertyEditors
         /// Creates a value editor instance
         /// </summary>
         /// <returns></returns>
-        protected virtual ValueEditor CreateValueEditor()
+        protected virtual PropertyValueEditor CreateValueEditor()
         {
-            if (ManifestDefinedValueEditor != null)
+            if (ManifestDefinedPropertyValueEditor != null)
             {
                 //detect if the view is a virtual path (in most cases, yes) then convert it
-                if (ManifestDefinedValueEditor.View.StartsWith("~/"))
+                if (ManifestDefinedPropertyValueEditor.View.StartsWith("~/"))
                 {
-                    ManifestDefinedValueEditor.View = IOHelper.ResolveUrl(ManifestDefinedValueEditor.View);
+                    ManifestDefinedPropertyValueEditor.View = IOHelper.ResolveUrl(ManifestDefinedPropertyValueEditor.View);
                 }
-                return ManifestDefinedValueEditor;
+                return ManifestDefinedPropertyValueEditor;
             }
 
             //create a new editor
-            var editor = new ValueEditor();
+            var editor = new PropertyValueEditor();
 
             if (_attribute.EditorView.IsNullOrWhiteSpace())
             {

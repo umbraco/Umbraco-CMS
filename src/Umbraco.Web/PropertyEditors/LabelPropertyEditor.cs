@@ -9,9 +9,9 @@ namespace Umbraco.Web.PropertyEditors
     public class LabelPropertyEditor : PropertyEditor
     {
 
-        protected override ValueEditor CreateValueEditor()
+        protected override PropertyValueEditor CreateValueEditor()
         {
-            return new LabelValueEditor(base.CreateValueEditor());
+            return new LabelPropertyValueEditor(base.CreateValueEditor());
         }
 
     }

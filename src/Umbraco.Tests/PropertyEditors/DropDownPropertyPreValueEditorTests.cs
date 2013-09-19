@@ -23,7 +23,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataTypeService = dataTypeServiceMock.Object;
-            var editor = new PublishValuesMultipleValueEditor(true, dataTypeService, new ValueEditor());
+            var editor = new PublishValuesMultipleValueEditor(true, dataTypeService, new PropertyValueEditor());
 
             var result = editor.FormatValueForCache(
                 new Property(1, Guid.NewGuid(),
@@ -48,7 +48,7 @@ namespace Umbraco.Tests.PropertyEditors
                                }));
 
             var dataTypeService = dataTypeServiceMock.Object;
-            var editor = new PublishValuesMultipleValueEditor(false, dataTypeService, new ValueEditor());
+            var editor = new PublishValuesMultipleValueEditor(false, dataTypeService, new PropertyValueEditor());
 
             var result = editor.FormatValueForCache(
                 new Property(1, Guid.NewGuid(),
@@ -72,7 +72,7 @@ namespace Umbraco.Tests.PropertyEditors
                                }));
 
             var dataTypeService = dataTypeServiceMock.Object;
-            var editor = new PublishValueValueEditor(dataTypeService, new ValueEditor());
+            var editor = new PublishValueValueEditor(dataTypeService, new PropertyValueEditor());
 
             var result = editor.FormatValueForCache(
                 new Property(1, Guid.NewGuid(),

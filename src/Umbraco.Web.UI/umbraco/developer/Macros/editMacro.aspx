@@ -137,8 +137,9 @@
                     </td>
                     <td>
                         <asp:DropDownList OnPreRender="AddChooseList" runat="server" ID="macroPropertyType"
-                            DataTextFormatString="" DataTextField='macroPropertyTypeAlias' DataValueField="id"
-                            DataSource='<%# GetMacroPropertyTypes()%>' SelectedValue='<%# ((umbraco.cms.businesslogic.macro.MacroPropertyType) DataBinder.Eval(Container.DataItem,"Type")).Id %>'>
+                            DataTextFormatString="" DataTextField='Name' DataValueField="Alias"
+                            DataSource='<%# GetMacroParameterEditors()%>' 
+                            SelectedValue='<%# Eval("Alias") %>'>
                         </asp:DropDownList>
                     </td>
                     <td>

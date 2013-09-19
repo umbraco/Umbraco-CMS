@@ -19,13 +19,13 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly bool _publishIds;
 
-        internal PublishValuesMultipleValueEditor(bool publishIds, IDataTypeService dataTypeService, ValueEditor wrapped)
+        internal PublishValuesMultipleValueEditor(bool publishIds, IDataTypeService dataTypeService, PropertyValueEditor wrapped)
             : base(dataTypeService, wrapped)
         {
             _publishIds = publishIds;
         }
 
-        public PublishValuesMultipleValueEditor(bool publishIds, ValueEditor wrapped)
+        public PublishValuesMultipleValueEditor(bool publishIds, PropertyValueEditor wrapped)
             : this(publishIds, ApplicationContext.Current.Services.DataTypeService, wrapped)
         {
         }

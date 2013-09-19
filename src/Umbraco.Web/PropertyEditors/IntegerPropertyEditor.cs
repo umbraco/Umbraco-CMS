@@ -10,7 +10,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override ValueEditor CreateValueEditor()
+        protected override PropertyValueEditor CreateValueEditor()
         {
             var editor = base.CreateValueEditor();
             editor.Validators.Add(new IntegerValidator());

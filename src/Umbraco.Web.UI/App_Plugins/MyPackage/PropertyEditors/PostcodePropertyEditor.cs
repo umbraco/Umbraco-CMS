@@ -11,7 +11,7 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
         /// Creates the value editor with custom validators
         /// </summary>
         /// <returns></returns>
-        protected override ValueEditor CreateValueEditor()
+        protected override PropertyValueEditor CreateValueEditor()
         {
             var editor = base.CreateValueEditor();
 

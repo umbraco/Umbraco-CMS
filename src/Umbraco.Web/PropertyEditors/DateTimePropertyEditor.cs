@@ -27,7 +27,7 @@ namespace Umbraco.Web.PropertyEditors
             set { _defaultPreVals = value; }
         }
 
-        protected override ValueEditor CreateValueEditor()
+        protected override PropertyValueEditor CreateValueEditor()
         {
             var editor = base.CreateValueEditor();
 

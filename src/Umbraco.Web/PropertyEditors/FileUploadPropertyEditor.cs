@@ -35,13 +35,13 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates our custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override ValueEditor CreateValueEditor()
+        protected override PropertyValueEditor CreateValueEditor()
         {
             //TODO: Ensure we assign custom validation for uploaded file types!
             
             var baseEditor = base.CreateValueEditor();
 
-            return new FileUploadValueEditor
+            return new FileUploadPropertyValueEditor
                 {
                     View = baseEditor.View
                 };

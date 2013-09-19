@@ -16,9 +16,9 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.MultipleTextstringAlias, "Multiple Textbox", "multipletextbox", ValueType = "TEXT")]
     public class MultipleTextStringPropertyEditor : PropertyEditor
     {
-        protected override ValueEditor CreateValueEditor()
+        protected override PropertyValueEditor CreateValueEditor()
         {
-            return new MultipleTextStringValueEditor(base.CreateValueEditor());
+            return new MultipleTextStringPropertyValueEditor(base.CreateValueEditor());
         }
 
         protected override PreValueEditor CreatePreValueEditor()
@@ -108,9 +108,9 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Custom value editor so we can format the value for the editor and the database
         /// </summary>
-        internal class MultipleTextStringValueEditor : ValueEditorWrapper
+        internal class MultipleTextStringPropertyValueEditor : PropertyValueEditorWrapper
         {
-            public MultipleTextStringValueEditor(ValueEditor wrapped) : base(wrapped)
+            public MultipleTextStringPropertyValueEditor(PropertyValueEditor wrapped) : base(wrapped)
             {
             }
             

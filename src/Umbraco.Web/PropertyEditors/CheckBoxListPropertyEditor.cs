@@ -31,7 +31,7 @@ namespace Umbraco.Web.PropertyEditors
         /// We need to override the value editor so that we can ensure the string value is published in cache and not the integer ID value.
         /// </summary>
         /// <returns></returns>
-        protected override ValueEditor CreateValueEditor()
+        protected override PropertyValueEditor CreateValueEditor()
         {
             return new PublishValuesMultipleValueEditor(false, base.CreateValueEditor());
         }

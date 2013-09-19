@@ -714,6 +714,9 @@
     <Compile Include="PropertyEditors\DelimitedManifestValueValidator.cs" />
     <Compile Include="PropertyEditors\IntegerValidator.cs" />
     <Compile Include="PropertyEditors\ManifestPropertyValidator.cs" />
+    <Compile Include="PropertyEditors\ParameterEditor.cs" />
+    <Compile Include="PropertyEditors\ParameterEditorAttribute.cs" />
+    <Compile Include="PropertyEditors\ParameterValueEditor.cs" />
     <Compile Include="PropertyEditors\PreValueField.cs" />
     <Compile Include="PropertyEditors\PreValueFieldAttribute.cs" />
     <Compile Include="PropertyEditors\ManifestValueValidator.cs" />
@@ -727,7 +730,7 @@
     <Compile Include="PropertyEditors\RequiredManifestValueValidator.cs" />
     <Compile Include="PropertyEditors\IPropertyValidator.cs" />
     <Compile Include="PropertyEditors\ValidatorsResolver.cs" />
-    <Compile Include="PropertyEditors\ValueEditor.cs" />
+    <Compile Include="PropertyEditors\PropertyValueEditor.cs" />
     <Compile Include="PropertyEditors\ValueValidatorAttribute.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />

@@ -24,7 +24,7 @@ namespace Umbraco.Core.Manifest
             {
                 //since it's a manifest editor, we need to create it's instance.
                 //we need to specify the view value for the editor here otherwise we'll get an exception.
-                target.ManifestDefinedValueEditor = new ValueEditor
+                target.ManifestDefinedPropertyValueEditor = new PropertyValueEditor
                     {
                         View = jObject["editor"]["view"].ToString()
                     };

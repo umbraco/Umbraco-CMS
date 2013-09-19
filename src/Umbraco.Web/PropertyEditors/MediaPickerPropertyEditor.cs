@@ -12,7 +12,7 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.MediaPickerAlias, "Media Picker", "mediapicker")]
     public class MediaPickerPropertyEditor : PropertyEditor
     {
-        protected override ValueEditor CreateValueEditor()
+        protected override PropertyValueEditor CreateValueEditor()
         {
             //TODO: Need to add some validation to the ValueEditor to ensure that any media chosen actually exists!
 

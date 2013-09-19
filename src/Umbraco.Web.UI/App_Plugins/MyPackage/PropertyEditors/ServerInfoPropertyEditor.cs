@@ -15,7 +15,7 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
         private static string _viewPath;
         private static ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
 
-        protected override ValueEditor CreateValueEditor()
+        protected override PropertyValueEditor CreateValueEditor()
         {
             if (UmbracoContext.Current == null || UmbracoContext.Current.HttpContext == null)
             {
@@ -30,7 +30,7 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.PropertyEditors
                     var urlHelper = new UrlHelper(new RequestContext(UmbracoContext.Current.HttpContext, new RouteData()));
                     _viewPath = urlHelper.Action("ServerEnvironment", "ServerSidePropertyEditors", new { area = "MyPackage" });
                 }
-                return new ValueEditor(_viewPath);    
+                return new PropertyValueEditor(_viewPath);    
             }
 
             
