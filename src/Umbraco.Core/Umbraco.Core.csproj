@@ -788,7 +788,6 @@
     <Compile Include="Models\Rdbms\LogDto.cs" />
     <Compile Include="Models\Rdbms\MacroDto.cs" />
     <Compile Include="Models\Rdbms\MacroPropertyDto.cs" />
-    <Compile Include="Models\Rdbms\MacroPropertyTypeDto.cs" />
     <Compile Include="Models\Rdbms\Member2MemberGroupDto.cs" />
     <Compile Include="Models\Rdbms\MemberDto.cs" />
     <Compile Include="Models\Rdbms\MemberTypeDto.cs" />

@@ -50,11 +50,6 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 CreateUmbracoUser2AppData();
             }
 
-            if (tableName.Equals("cmsMacroPropertyType"))
-            {
-                CreateCmsMacroPropertyTypeData();
-            }
-
             if (tableName.Equals("cmsPropertyTypeGroup"))
             {
                 CreateCmsPropertyTypeGroupData();
@@ -163,27 +158,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database.Insert("umbracoUser2app", "user", false, new User2AppDto { UserId = 0, AppAlias = Constants.Applications.Settings });
             _database.Insert("umbracoUser2app", "user", false, new User2AppDto { UserId = 0, AppAlias = Constants.Applications.Users });
         }
-
-        private void CreateCmsMacroPropertyTypeData()
-        {
-            _database.Insert("cmsMacroPropertyType", "id", false, new MacroPropertyTypeDto { Id = 3, Alias = "mediaCurrent", RenderAssembly = "umbraco.macroRenderings", RenderType = "media", BaseType = "Int32" });
-            _database.Insert("cmsMacroPropertyType", "id", false, new MacroPropertyTypeDto { Id = 4, Alias = "contentSubs", RenderAssembly = "umbraco.macroRenderings", RenderType = "content", BaseType = "Int32" });
-            _database.Insert("cmsMacroPropertyType", "id", false, new MacroPropertyTypeDto { Id = 5, Alias = "contentRandom", RenderAssembly = "umbraco.macroRenderings", RenderType = "content", BaseType = "Int32" });
-            _database.Insert("cmsMacroPropertyType", "id", false, new MacroPropertyTypeDto { Id = 6, Alias = "contentPicker", RenderAssembly = "umbraco.macroRenderings", RenderType = "content", BaseType = "Int32" });
-            _database.Insert("cmsMacroPropertyType", "id", false, new MacroPropertyTypeDto { Id = 13, Alias = "number", RenderAssembly = "umbraco.macroRenderings", RenderType = "numeric", BaseType = "Int32" });
-            _database.Insert("cmsMacroPropertyType", "id", false, new MacroPropertyTypeDto { Id = 14, Alias = "bool", RenderAssembly = "umbraco.macroRenderings", RenderType = "yesNo", BaseType = "Boolean" });
-            _database.Insert("cmsMacroPropertyType", "id", false, new MacroPropertyTypeDto { Id = 16, Alias = "text", RenderAssembly = "umbraco.macroRenderings", RenderType = "text", BaseType = "String" });
-            _database.Insert("cmsMacroPropertyType", "id", false, new MacroPropertyTypeDto { Id = 17, Alias = "contentTree", RenderAssembly = "umbraco.macroRenderings", RenderType = "content", BaseType = "Int32" });
-            _database.Insert("cmsMacroPropertyType", "id", false, new MacroPropertyTypeDto { Id = 18, Alias = "contentType", RenderAssembly = "umbraco.macroRenderings", RenderType = "contentTypeSingle", BaseType = "Int32" });
-            _database.Insert("cmsMacroPropertyType", "id", false, new MacroPropertyTypeDto { Id = 19, Alias = "contentTypeMultiple", RenderAssembly = "umbraco.macroRenderings", RenderType = "contentTypeMultiple", BaseType = "Int32" });
-            _database.Insert("cmsMacroPropertyType", "id", false, new MacroPropertyTypeDto { Id = 20, Alias = "contentAll", RenderAssembly = "umbraco.macroRenderings", RenderType = "content", BaseType = "Int32" });
-            _database.Insert("cmsMacroPropertyType", "id", false, new MacroPropertyTypeDto { Id = 21, Alias = "tabPicker", RenderAssembly = "umbraco.macroRenderings", RenderType = "tabPicker", BaseType = "String" });
-            _database.Insert("cmsMacroPropertyType", "id", false, new MacroPropertyTypeDto { Id = 22, Alias = "tabPickerMultiple", RenderAssembly = "umbraco.macroRenderings", RenderType = "tabPickerMultiple", BaseType = "String" });
-            _database.Insert("cmsMacroPropertyType", "id", false, new MacroPropertyTypeDto { Id = 23, Alias = "propertyTypePicker", RenderAssembly = "umbraco.macroRenderings", RenderType = "propertyTypePicker", BaseType = "String" });
-            _database.Insert("cmsMacroPropertyType", "id", false, new MacroPropertyTypeDto { Id = 24, Alias = "propertyTypePickerMultiple", RenderAssembly = "umbraco.macroRenderings", RenderType = "propertyTypePickerMultiple", BaseType = "String" });
-            _database.Insert("cmsMacroPropertyType", "id", false, new MacroPropertyTypeDto { Id = 25, Alias = "textMultiLine", RenderAssembly = "umbraco.macroRenderings", RenderType = "textMultiple", BaseType = "String" });
-        }
-
+        
         private void CreateCmsPropertyTypeGroupData()
         {          
             _database.Insert("cmsPropertyTypeGroup", "id", false, new PropertyTypeGroupDto { Id = 3, ContentTypeNodeId = 1032, Text = "Image", SortOrder = 1 });

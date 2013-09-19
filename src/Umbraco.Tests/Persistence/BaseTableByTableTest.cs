@@ -304,33 +304,7 @@ namespace Umbraco.Tests.Persistence
                 //transaction.Complete();
             }
         }
-
-        [Test]
-        public void Can_Create_cmsMacroPropertyType_Table()
-        {
-            
-            using (Transaction transaction = Database.GetTransaction())
-            {
-                Database.CreateTable<MacroPropertyTypeDto>();
-
-                //transaction.Complete();
-            }
-        }
-
-        [Test]
-        public void Can_Create_cmsMacroProperty_Table()
-        {
-            
-            using (Transaction transaction = Database.GetTransaction())
-            {
-                Database.CreateTable<MacroDto>();
-                Database.CreateTable<MacroPropertyTypeDto>();
-                Database.CreateTable<MacroPropertyDto>();
-
-                //transaction.Complete();
-            }
-        }
-
+        
         [Test]
         public void Can_Create_cmsMember_Table()
         {
