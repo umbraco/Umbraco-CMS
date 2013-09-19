@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
@@ -35,6 +37,34 @@ namespace Umbraco.Core.Services
             _repositoryFactory = repositoryFactory;
         }
 
+        /// <summary>
+        /// Returns an enum <see cref="MacroTypes"/> based on the properties on the Macro
+        /// </summary>
+        /// <returns><see cref="MacroTypes"/></returns>
+        internal static MacroTypes GetMacroType(IMacro macro)
+        {
+            if (string.IsNullOrEmpty(macro.XsltPath) == false)
+                return MacroTypes.Xslt;
+
+            if (string.IsNullOrEmpty(macro.ScriptPath) == false)
+            {
+                //we need to check if the file path saved is a virtual path starting with ~/Views/MacroPartials, if so then this is 
+                //a partial view macro, not a script macro
+                //we also check if the file exists in ~/App_Plugins/[Packagename]/Views/MacroPartials, if so then it is also a partial view.
+                return (macro.ScriptPath.InvariantStartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
+                        || (Regex.IsMatch(macro.ScriptPath, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled | RegexOptions.IgnoreCase)))
+                           ? MacroTypes.PartialView
+                           : MacroTypes.Script;
+            }
+
+            if (string.IsNullOrEmpty(macro.ControlType) == false && macro.ControlType.InvariantContains(".ascx"))
+                return MacroTypes.UserControl;
+
+            if (string.IsNullOrEmpty(macro.ControlType) == false && string.IsNullOrEmpty(macro.ControlAssembly) == false)
+                return MacroTypes.CustomControl;
+
+            return MacroTypes.Unknown;
+        }
 
         /// <summary>
         /// Gets an <see cref="IMacro"/> object by its alias

@@ -6,8 +6,11 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Defines a Property for a Macro
     /// </summary>
-    internal interface IMacroProperty : IValueObject
+    public interface IMacroProperty : IValueObject
     {
+        [DataMember]
+        int Id { get; set; }
+
         /// <summary>
         /// Gets or sets the Alias of the Property
         /// </summary>

@@ -5,13 +5,15 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.IO;
+using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using umbraco.BasePages;
 using umbraco.uicontrols;
 using umbraco.DataLayer;
 using umbraco.cms.presentation.Trees;
-using umbraco.cms.businesslogic.macro;
+using System.Linq;
 
 namespace umbraco.cms.presentation.developer
 {
@@ -27,37 +29,38 @@ namespace umbraco.cms.presentation.developer
 
 		protected PlaceHolder buttons;
 		protected Table macroElements;
-		protected Macro m_macro;
 
 		public TabPage InfoTabPage;
 		public TabPage Parameters;
 
+	    private IMacro _macro;
+
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			m_macro = new Macro(Convert.ToInt32(Request.QueryString["macroID"]));
+		    _macro = Services.MacroService.GetById(Convert.ToInt32(Request.QueryString["macroID"]));
 
 			if (!IsPostBack)
 			{
 
 				ClientTools
 					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadMacros>().Tree.Alias)
-					.SyncTree("-1,init," + m_macro.Id.ToString(), false);
+                    .SyncTree("-1,init," + _macro.Id.ToString(), false);
 
-				string tempMacroAssembly = m_macro.Assembly ?? "";
-				string tempMacroType = m_macro.Type ?? "";
+                string tempMacroAssembly = _macro.ControlAssembly ?? "";
+                string tempMacroType = _macro.ControlType ?? "";
 
-				PopulateFieldsOnLoad(m_macro, tempMacroAssembly, tempMacroType);
+                PopulateFieldsOnLoad(_macro, tempMacroAssembly, tempMacroType);
 
 				// Check for assemblyBrowser
 				if (tempMacroType.IndexOf(".ascx") > 0)
 					assemblyBrowserUserControl.Controls.Add(
 						new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('" + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/developer/macros/assemblyBrowser.aspx?fileName=" + macroUserControl.Text +
-										   "&macroID=" + m_macro.Id.ToString() +
+                                           "&macroID=" + _macro.Id.ToInvariantString() +
 										   "', 'Browse Properties', true, 475,500); return false;\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
 				else if (tempMacroType != string.Empty && tempMacroAssembly != string.Empty)
 					assemblyBrowser.Controls.Add(
 						new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('" + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/developer/macros/assemblyBrowser.aspx?fileName=" + macroAssembly.Text +
-										   "&macroID=" + m_macro.Id.ToString() + "&type=" + macroType.Text +
+                                           "&macroID=" + _macro.Id.ToInvariantString() + "&type=" + macroType.Text +
 										   "', 'Browse Properties', true, 475,500); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
 
 				// Load elements from macro
@@ -78,41 +81,41 @@ namespace umbraco.cms.presentation.developer
 			{
 			    ClientTools
                     .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadMacros>().Tree.Alias)
-                    .SyncTree("-1,init," + m_macro.Id.ToString(), true); //true forces the reload
+                    .SyncTree("-1,init," + _macro.Id.ToInvariantString(), true); //true forces the reload
 
-				string tempMacroAssembly = macroAssembly.Text;
-				string tempMacroType = macroType.Text;
-				string tempCachePeriod = cachePeriod.Text;
+				var tempMacroAssembly = macroAssembly.Text;
+				var tempMacroType = macroType.Text;
+				var tempCachePeriod = cachePeriod.Text;
 				if (tempCachePeriod == string.Empty)
 					tempCachePeriod = "0";
 				if (tempMacroAssembly == string.Empty && macroUserControl.Text != string.Empty)
 					tempMacroType = macroUserControl.Text;
 
-				SetMacroValuesFromPostBack(m_macro, Convert.ToInt32(tempCachePeriod), tempMacroAssembly, tempMacroType);
-				
-				m_macro.Save();				
+				SetMacroValuesFromPostBack(_macro, Convert.ToInt32(tempCachePeriod), tempMacroAssembly, tempMacroType);
 				
 				// Save elements
+			    var sort = 0;
 				foreach (RepeaterItem item in macroProperties.Items)
 				{
-					HtmlInputHidden macroPropertyID = (HtmlInputHidden)item.FindControl("macroPropertyID");
-					TextBox macroElementName = (TextBox)item.FindControl("macroPropertyName");
-					TextBox macroElementAlias = (TextBox)item.FindControl("macroPropertyAlias");
-					DropDownList macroElementType = (DropDownList)item.FindControl("macroPropertyType");
+					var macroPropertyId = (HtmlInputHidden)item.FindControl("macroPropertyID");
+					var macroElementName = (TextBox)item.FindControl("macroPropertyName");
+					var macroElementAlias = (TextBox)item.FindControl("macroPropertyAlias");
+					var macroElementType = (DropDownList)item.FindControl("macroPropertyType");
 
-					MacroProperty mp = new MacroProperty(int.Parse(macroPropertyID.Value));
-					mp.Type = new MacroPropertyType(int.Parse(macroElementType.SelectedValue));
-					mp.Alias = macroElementAlias.Text;
-					mp.Name = macroElementName.Text;
-					mp.Save();
-
+                    var prop = _macro.Properties[int.Parse(macroPropertyId.Value)];
+                    prop.Alias = macroElementAlias.Text.Trim();
+                    prop.Name = macroElementName.Text.Trim();
+                    prop.EditorAlias = macroElementType.SelectedValue;
+                    prop.SortOrder = sort;
+				    sort++;
 				}
 
+			    Services.MacroService.Save(_macro);
+
                 ClientTools.ShowSpeechBubble(speechBubbleIcon.save, "Macro saved", "");
-
-
+                
 				// Check for assemblyBrowser
-				if (tempMacroType.IndexOf(".ascx") > 0)
+				if (tempMacroType.IndexOf(".ascx", StringComparison.Ordinal) > 0)
 					assemblyBrowserUserControl.Controls.Add(
 						new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('developer/macros/assemblyBrowser.aspx?fileName=" + macroUserControl.Text +
 							"&macroID=" + Request.QueryString["macroID"] +
@@ -131,17 +134,17 @@ namespace umbraco.cms.presentation.developer
 		/// <param name="macro"></param>
 		/// <param name="macroAssemblyValue"></param>
 		/// <param name="macroTypeValue"></param>
-		protected virtual void PopulateFieldsOnLoad(Macro macro, string macroAssemblyValue, string macroTypeValue)
+		protected virtual void PopulateFieldsOnLoad(IMacro macro, string macroAssemblyValue, string macroTypeValue)
 		{
 			macroName.Text = macro.Name;
 			macroAlias.Text = macro.Alias;
-			macroXslt.Text = macro.Xslt;
-			macroPython.Text = macro.ScriptingFile;
-			cachePeriod.Text = macro.RefreshRate.ToString();
-			macroRenderContent.Checked = macro.RenderContent;
+			macroXslt.Text = macro.XsltPath;
+			macroPython.Text = macro.ScriptPath;
+		    cachePeriod.Text = macro.CacheDuration.ToInvariantString();
+			macroRenderContent.Checked = macro.DontRender == false;
 			macroEditor.Checked = macro.UseInEditor;
 			cacheByPage.Checked = macro.CacheByPage;
-			cachePersonalized.Checked = macro.CachePersonalized;
+			cachePersonalized.Checked = macro.CacheByMember;
 
 			// Populate either user control or custom control
 			if (macroTypeValue != string.Empty && macroAssemblyValue != string.Empty)
@@ -158,54 +161,54 @@ namespace umbraco.cms.presentation.developer
 		/// <summary>
 		/// Sets the values on the Macro object from the values posted back before saving the macro
 		/// </summary>
-		protected virtual void SetMacroValuesFromPostBack(Macro macro, int macroCachePeriod, string macroAssemblyValue, string macroTypeValue)
+		protected virtual void SetMacroValuesFromPostBack(IMacro macro, int macroCachePeriod, string macroAssemblyValue, string macroTypeValue)
 		{
 			macro.UseInEditor = macroEditor.Checked;
-			macro.RenderContent = macroRenderContent.Checked;
+			macro.DontRender = macroRenderContent.Checked == false;
 			macro.CacheByPage = cacheByPage.Checked;
-			macro.CachePersonalized = cachePersonalized.Checked;
-			macro.RefreshRate = macroCachePeriod;
+			macro.CacheByMember = cachePersonalized.Checked;
+			macro.CacheDuration = macroCachePeriod;
 			macro.Alias = macroAlias.Text;
 			macro.Name = macroName.Text;
-			macro.Assembly = macroAssemblyValue;
-			macro.Type = macroTypeValue;
-			macro.Xslt = macroXslt.Text;
-			macro.ScriptingFile = macroPython.Text;
+			macro.ControlAssembly = macroAssemblyValue;
+			macro.ControlType = macroTypeValue;
+			macro.XsltPath = macroXslt.Text;
+			macro.ScriptPath = macroPython.Text;
 		}
 
-		private void GetXsltFilesFromDir(string orgPath, string path, ArrayList files)
+		private static void GetXsltFilesFromDir(string orgPath, string path, ArrayList files)
 		{
-			DirectoryInfo dirInfo = new DirectoryInfo(path);
+			var dirInfo = new DirectoryInfo(path);
 
 			// Populate subdirectories
-			DirectoryInfo[] dirInfos = dirInfo.GetDirectories();
-			foreach (DirectoryInfo dir in dirInfos)
+			var dirInfos = dirInfo.GetDirectories();
+			foreach (var dir in dirInfos)
 				GetXsltFilesFromDir(orgPath, path + "/" + dir.Name, files);
 
-			FileInfo[] fileInfo = dirInfo.GetFiles("*.xsl*");
+			var fileInfo = dirInfo.GetFiles("*.xsl*");
 
-			foreach (FileInfo file in fileInfo)
+			foreach (var file in fileInfo)
 				files.Add((path.Replace(orgPath, string.Empty).Trim('/') + "/" + file.Name).Trim('/'));
 		}
 
 		private void PopulateXsltFiles()
 		{
-			ArrayList xslts = new ArrayList();
-			string xsltDir = IOHelper.MapPath(SystemDirectories.Xslt + "/");
+			var xslts = new ArrayList();
+			var xsltDir = IOHelper.MapPath(SystemDirectories.Xslt + "/");
 			GetXsltFilesFromDir(xsltDir, xsltDir, xslts);
 			xsltFiles.DataSource = xslts;
 			xsltFiles.DataBind();
 			xsltFiles.Items.Insert(0, new ListItem("Browse xslt files on server...", string.Empty));
 		}
 
-		private void GetPythonFilesFromDir(string orgPath, string path, ArrayList files)
+		private static void GetPythonFilesFromDir(string orgPath, string path, ArrayList files)
 		{
 			var dirInfo = new DirectoryInfo(path);
 			if (!dirInfo.Exists)
 				return;
 
-			FileInfo[] fileInfo = dirInfo.GetFiles("*.*");
-			foreach (FileInfo file in fileInfo)
+			var fileInfo = dirInfo.GetFiles("*.*");
+			foreach (var file in fileInfo)
 				files.Add(path.Replace(orgPath, string.Empty) + file.Name);
 
 			// Populate subdirectories
@@ -216,8 +219,8 @@ namespace umbraco.cms.presentation.developer
 
 		private void PopulatePythonFiles()
 		{
-			ArrayList pythons = new ArrayList();
-			string pythonDir = IOHelper.MapPath(SystemDirectories.MacroScripts + "/");
+			var pythons = new ArrayList();
+			var pythonDir = IOHelper.MapPath(SystemDirectories.MacroScripts + "/");
 			GetPythonFilesFromDir(pythonDir, pythonDir, pythons);
 			pythonFiles.DataSource = pythons;
 			pythonFiles.DataBind();
@@ -234,7 +237,7 @@ namespace umbraco.cms.presentation.developer
 
 		public void macroPropertyBind()
 		{
-			macroProperties.DataSource = m_macro.Properties;
+			macroProperties.DataSource = _macro.Properties;
 			macroProperties.DataBind();
 		}
 
@@ -259,65 +262,54 @@ namespace umbraco.cms.presentation.developer
 
 		public void macroPropertyCreate(object sender, EventArgs e)
 		{
-			TextBox macroPropertyAliasNew = (TextBox)((Control)sender).Parent.FindControl("macroPropertyAliasNew");
-			TextBox macroPropertyNameNew = (TextBox)((Control)sender).Parent.FindControl("macroPropertyNameNew");
-			DropDownList macroPropertyTypeNew = (DropDownList)((Control)sender).Parent.FindControl("macroPropertyTypeNew");
-			bool _goAhead = true;
-			if (macroPropertyAliasNew.Text !=
-				ui.Text("general", "new", this.getUser()) + " " + ui.Text("general", "alias", this.getUser()))
+			var macroPropertyAliasNew = (TextBox)((Control)sender).Parent.FindControl("macroPropertyAliasNew");
+			var macroPropertyNameNew = (TextBox)((Control)sender).Parent.FindControl("macroPropertyNameNew");
+			var macroPropertyTypeNew = (DropDownList)((Control)sender).Parent.FindControl("macroPropertyTypeNew");
+			var goAhead = true;
+			if (macroPropertyAliasNew.Text != ui.Text("general", "new", UmbracoUser) + " " + ui.Text("general", "alias", UmbracoUser))
 			{
+                if (_macro.Properties.ContainsKey(macroPropertyAliasNew.Text.Trim()))
+                {
+                    //don't continue
+                    return;
+                }
 
+			    _macro.Properties.Add(new MacroProperty(
+			                              macroPropertyAliasNew.Text.Trim(),
+			                              macroPropertyNameNew.Text.Trim(),
+                                          _macro.Properties.Any() ? _macro.Properties.Max(x => x.SortOrder) + 1  : 0,
+			                              macroPropertyTypeNew.SelectedValue));
 
-				foreach (cms.businesslogic.macro.MacroProperty mp in m_macro.Properties)
-				{
-					if (mp.Alias == macroPropertyAliasNew.Text)
-					{
-						_goAhead = false;
-						break;
+			    Services.MacroService.Save(_macro);
 
-					}
-				}
-
-				if (_goAhead)
-				{
-					MacroProperty mp = new MacroProperty();
-					mp.Macro = m_macro;
-					mp.Public = true;
-					mp.Type = new MacroPropertyType(int.Parse(macroPropertyTypeNew.SelectedValue));
-					mp.Alias = macroPropertyAliasNew.Text;
-					mp.Name = macroPropertyNameNew.Text;
-					mp.Save();
-
-					m_macro.RefreshProperties();
-					macroPropertyBind();
-				}
+                macroPropertyBind();
 			}
 		}
 
-		public bool macroIsVisible(object IsChecked)
+		public bool macroIsVisible(object isChecked)
 		{
-			if (Convert.ToBoolean(IsChecked))
+			if (Convert.ToBoolean(isChecked))
 				return true;
 			else
 				return false;
 		}
 
-		public void AddChooseList(Object Sender, EventArgs e)
+		public void AddChooseList(Object sender, EventArgs e)
 		{
 			if (!IsPostBack)
 			{
-				DropDownList dropDown = (DropDownList)Sender;
+				var dropDown = (DropDownList)sender;
 				dropDown.Items.Insert(0, new ListItem("Choose...", string.Empty));
 			}
 		}
 
 		private void PopulateUserControls(string path)
 		{
-			DirectoryInfo di = new DirectoryInfo(path);
+			var di = new DirectoryInfo(path);
 
 			string rootDir = IOHelper.MapPath(SystemDirectories.UserControls);
 
-			foreach (FileInfo uc in di.GetFiles("*.ascx"))
+			foreach (var uc in di.GetFiles("*.ascx"))
 			{
 				userControlList.Items.Add(
 					new ListItem(SystemDirectories.UserControls +
@@ -328,19 +320,12 @@ namespace umbraco.cms.presentation.developer
 				*/
 
 			}
-			foreach (DirectoryInfo dir in di.GetDirectories())
+			foreach (var dir in di.GetDirectories())
 				PopulateUserControls(dir.FullName);
 		}
 
-		#region Web Form Designer generated code
-
 		protected override void OnInit(EventArgs e)
 		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-
 			// Tab setup
 			InfoTabPage = TabView1.NewTabPage("Macro Properties");
 			InfoTabPage.Controls.Add(Pane1);
@@ -357,16 +342,6 @@ namespace umbraco.cms.presentation.developer
             save.ID = "save";
 			base.OnInit(e);
 		}
-
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
-		}
-
-		#endregion
 
 		/// <summary>
 		/// TabView1 control.

@@ -31,7 +31,11 @@ namespace Umbraco.Core.Manifest
                             var editors = new List<PropertyEditor>();
                             foreach (var manifest in GetManifests())
                             {
-                                editors.AddRange(ManifestParser.GetPropertyEditors(manifest.PropertyEditors));
+                                if (manifest.PropertyEditors != null)
+                                {
+                                    editors.AddRange(ManifestParser.GetPropertyEditors(manifest.PropertyEditors));    
+                                }
+                                
                             }
                             return editors;
                         });
@@ -52,7 +56,10 @@ namespace Umbraco.Core.Manifest
                         var editors = new List<ParameterEditor>();
                         foreach (var manifest in GetManifests())
                         {
-                            editors.AddRange(ManifestParser.GetParameterEditors(manifest.ParameterEditors));
+                            if (manifest.ParameterEditors != null)
+                            {
+                                editors.AddRange(ManifestParser.GetParameterEditors(manifest.ParameterEditors));    
+                            }
                         }
                         return editors;
                     });

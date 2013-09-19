@@ -26,6 +26,7 @@ namespace umbraco.cms.businesslogic.macro
 	/// A macro can have a variety of properties which are used to transfer userinput to either the usercontrol/custom control or the xsl
 	/// 
 	/// </summary>
+    [Obsolete("This is no longer used, use the IMacroService and related models instead")]
 	public class Macro		
 	{
         

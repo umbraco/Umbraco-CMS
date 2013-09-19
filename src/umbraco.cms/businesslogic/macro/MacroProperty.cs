@@ -3,6 +3,7 @@ using System.Data;
 using System.Xml;
 using System.Runtime.CompilerServices;
 using Umbraco.Core;
+using Umbraco.Core.PropertyEditors;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ namespace umbraco.cms.businesslogic.macro
     /// A MacroProperty uses it's MacroPropertyType to define which underlaying component should be used when
     /// rendering the MacroProperty editor aswell as which datatype its containing.
     /// </summary>
+    [Obsolete("This is no longer used, use the IMacroService and related models instead")]
     public class MacroProperty
     {
         protected static ISqlHelper SqlHelper
@@ -75,11 +77,38 @@ namespace umbraco.cms.businesslogic.macro
         /// <value>The macro.</value>
         public Macro Macro { get; set; }
 
+        private MacroPropertyType _type;
+
         /// <summary>
         /// The basetype which defines which component is used in the UI for editing content
         /// </summary>
-        [Obsolete("This no longer does anything and will be removed in future versions")]
-        public MacroPropertyType Type { get; set; }
+        [Obsolete("This is no longer used and will be removed in future versions")]
+        public MacroPropertyType Type
+        {
+            get
+            {
+                if (_type == null)
+                {
+                    //we'll try to create one based on the resolved new parameter editors
+                    var found = ParameterEditorResolver.Current.GetByAlias(ParameterEditorAlias);
+                    if (found == null)
+                    {
+                        return null;
+                    }
+                    var type = new MacroPropertyType
+                        {
+                            Alias = ParameterEditorAlias,
+                            Id = 0,
+                            Assembly = found.GetType().Namespace,
+                            BaseType = found.GetType().Name,
+                            Type = "String"
+                        };
+                    _type = type;
+                }
+                return _type;
+            }
+            set { _type = Type; }
+        }
 
         /// <summary>
         /// The macro parameter editor alias used to render the editor
@@ -118,8 +147,7 @@ namespace umbraco.cms.businesslogic.macro
         {
             if (Id == 0)
             {
-                MacroProperty mp =
-                    MakeNew(Macro, Public, Alias, Name, Type);
+                MacroProperty mp = MakeNew(Macro, Alias, Name, ParameterEditorAlias);
                 Id = mp.Id;
 
             }

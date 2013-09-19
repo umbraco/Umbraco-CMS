@@ -8,6 +8,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     internal interface IMacroService : IService
     {
+
         /// <summary>
         /// Gets an <see cref="IMacro"/> object by its alias
         /// </summary>

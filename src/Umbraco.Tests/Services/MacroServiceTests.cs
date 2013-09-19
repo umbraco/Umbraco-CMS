@@ -63,6 +63,91 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(3, result.Count());
         }
 
+        [Test]
+        public void Can_Create()
+        {
+            // Arrange
+            var macroService = ServiceContext.MacroService;
+
+            // Act
+            var macro = new Macro("test", "Test", scriptPath: "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
+            macroService.Save(macro);
+
+            //assert
+            Assert.IsTrue(macro.HasIdentity);
+            Assert.Greater(macro.Id, 0);
+            var result = macroService.GetById(macro.Id);
+            Assert.AreEqual("test", result.Alias);
+            Assert.AreEqual("Test", result.Name);
+            Assert.AreEqual("~/Views/MacroPartials/Test.cshtml", result.ScriptPath);
+            Assert.AreEqual(1234, result.CacheDuration);
+        }
+
+        [Test]
+        public void Can_Delete()
+        {
+            // Arrange
+            var macroService = ServiceContext.MacroService;
+            var macro = new Macro("test", "Test", scriptPath: "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
+            macroService.Save(macro);
+
+            // Act
+            macroService.Delete(macro);
+
+            //assert
+            var result = macroService.GetById(macro.Id);
+            Assert.IsNull(result);
+        }
+
+        [Test]
+        public void Can_Update()
+        {
+            // Arrange
+            var macroService = ServiceContext.MacroService;
+            IMacro macro = new Macro("test", "Test", scriptPath: "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
+            macroService.Save(macro);
+
+            // Act
+            macro.Name = "New name";
+            macro.Alias = "NewAlias";
+            macroService.Save(macro);
+
+
+            macro = macroService.GetById(macro.Id);
+
+            //assert
+            Assert.AreEqual("New name", macro.Name);
+            Assert.AreEqual("NewAlias", macro.Alias);
+
+        }
+
+        [Test]
+        public void Can_Update_Property()
+        {
+            // Arrange
+            var macroService = ServiceContext.MacroService;
+            IMacro macro = new Macro("test", "Test", scriptPath: "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
+            macro.Properties.Add(new MacroProperty("blah", "Blah", 0, "blah"));
+            macroService.Save(macro);
+
+            // Act
+            macro.Properties.First().Alias = "new Alias";
+            macro.Properties.First().Name = "new Name";
+            macro.Properties.First().SortOrder = 1;
+            macro.Properties.First().EditorAlias = "new";
+            macroService.Save(macro);
+
+            macro = macroService.GetById(macro.Id);
+
+            //assert
+            Assert.AreEqual(1, macro.Properties.Count());
+            Assert.AreEqual("new Alias", macro.Properties.First().Alias);
+            Assert.AreEqual("new Name", macro.Properties.First().Name);
+            Assert.AreEqual(1, macro.Properties.First().SortOrder);
+            Assert.AreEqual("new", macro.Properties.First().EditorAlias);
+
+        }
+
         //[Test]
         //public void Can_Get_Many_By_Alias()
         //{

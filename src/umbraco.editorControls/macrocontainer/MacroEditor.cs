@@ -199,23 +199,19 @@ namespace umbraco.editorControls.macrocontainer
                     }
                     foreach (MacroProperty macroProperty in formMacro.Properties)
                     {
-                        //Only add properties that people may see.
-                        if (macroProperty.Public)
+                        var prop = new PersistableMacroProperty();
+                        prop.Alias = macroProperty.Alias;
+                        prop.Name = macroProperty.Name;
+                        prop.AssemblyName = macroProperty.Type.Assembly;
+                        prop.TypeName = macroProperty.Type.Type;
+
+                        //Assign value if specified
+                        if (DataValues[macroProperty.Alias.ToLower()] != null)
                         {
-                            PersistableMacroProperty prop = new PersistableMacroProperty();
-                            prop.Alias = macroProperty.Alias;
-                            prop.Name = macroProperty.Name;
-                            prop.AssemblyName = macroProperty.Type.Assembly;
-                            prop.TypeName = macroProperty.Type.Type;
-
-                            //Assign value if specified
-                            if (DataValues[macroProperty.Alias.ToLower()] != null)
-                            {
-                                prop.Value = DataValues[macroProperty.Alias.ToLower()].ToString();
-                            }
-
-                            props.Add(prop);
+                            prop.Value = DataValues[macroProperty.Alias.ToLower()].ToString();
                         }
+
+                        props.Add(prop);
                     }
                 }
             }

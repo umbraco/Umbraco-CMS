@@ -26,28 +26,33 @@ namespace umbraco.cms.businesslogic.macro
         /// <summary>
         /// Identifier
         /// </summary>
-        public int Id { get; private set; }
+        public int Id { get; internal set; }
 
         /// <summary>
         /// The alias of the MacroPropertyType
         /// </summary>
-        public string Alias { get; private set; }
+        public string Alias { get; internal set; }
 
         /// <summary>
         /// The assembly (without the .dll extension) used to retrieve the component at runtime
         /// </summary>
-        public string Assembly { get; private set; }
+        public string Assembly { get; internal set; }
 
         /// <summary>
         /// The MacroPropertyType
         /// </summary>
-        public string Type { get; private set; }
+        public string Type { get; internal set; }
 
         /// <summary>
         /// The IMacroGuiRendering component (namespace.namespace.Classname)
         /// </summary>
-        public string BaseType { get; private set; }
+        public string BaseType { get; internal set; }
         
+        internal MacroPropertyType()
+        {
+            
+        }
+
         /// <summary>
         /// Constructor
         /// </summary>

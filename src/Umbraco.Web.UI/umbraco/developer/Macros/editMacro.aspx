@@ -112,13 +112,13 @@
                     <thead>
                         <tr>
                             <th>
-                                <%=umbraco.ui.Text("general", "alias",this.getUser())%>
+                                <%=umbraco.ui.Text("general", "alias",UmbracoUser)%>
                             </th>
                             <th>
-                                <%=umbraco.ui.Text("general", "name",this.getUser())%>
+                                <%=umbraco.ui.Text("general", "name",UmbracoUser)%>
                             </th>
                             <th>
-                                <%=umbraco.ui.Text("general", "type",this.getUser())%>
+                                <%=umbraco.ui.Text("general", "type",UmbracoUser)%>
                             </th>
                             <th></th>
                         </tr>
@@ -128,18 +128,18 @@
             <ItemTemplate>
                 <tr>
                     <td>
-                        <input type="hidden" id="macroPropertyID" runat="server" value='<%#DataBinder.Eval(Container.DataItem, "id")%>'
+                        <input type="hidden" id="macroPropertyID" runat="server" value='<%#Eval("Id")%>'
                             name="macroPropertyID" />
-                        <asp:TextBox runat="server" ID="macroPropertyAlias" Text='<%#DataBinder.Eval(Container.DataItem, "Alias")%>' />
+                        <asp:TextBox runat="server" ID="macroPropertyAlias" Text='<%#Eval("Alias")%>' />
                     </td>
                     <td>
-                        <asp:TextBox runat="server" ID="macroPropertyName" Text='<%#DataBinder.Eval(Container.DataItem, "Name")%>' />
+                        <asp:TextBox runat="server" ID="macroPropertyName" Text='<%#Eval("Name")%>' />
                     </td>
                     <td>
                         <asp:DropDownList OnPreRender="AddChooseList" runat="server" ID="macroPropertyType"
                             DataTextFormatString="" DataTextField='Name' DataValueField="Alias"
                             DataSource='<%# GetMacroParameterEditors()%>' 
-                            SelectedValue='<%# Eval("Alias") %>'>
+                            SelectedValue='<%# Eval("EditorAlias") %>'>
                         </asp:DropDownList>
                     </td>
                     <td>
@@ -157,7 +157,9 @@
                             </td>
                             <td>
                                 <asp:DropDownList OnPreRender="AddChooseList" runat="server" ID="macroPropertyTypeNew"
-                                    DataTextField="macroPropertyTypeAlias" DataValueField="id" DataSource='<%# GetMacroPropertyTypes()%>'>
+                                    DataTextField="Name" 
+                                    DataValueField="Alias" 
+                                    DataSource='<%# GetMacroParameterEditors()%>'>
                                 </asp:DropDownList>
                             </td>
                             <td>

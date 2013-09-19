@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Factories
             var model = new Macro(dto.Id, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.ScriptType, dto.ScriptAssembly, dto.Xslt, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.Python);
             foreach (var p in dto.MacroPropertyDtos)
             {
-                model.Properties.Add(new MacroProperty(p.Alias, p.Name, p.SortOrder, null));
+                model.Properties.Add(new MacroProperty(p.Id, p.Alias, p.Name, p.SortOrder, p.EditorAlias));
             }
             
             //on initial construction we don't want to have dirty properties tracked
@@ -60,7 +60,8 @@ namespace Umbraco.Core.Persistence.Factories
                     Name = p.Name,
                     Macro = entity.Id,
                     SortOrder = (byte)p.SortOrder,
-                    EditorAlias = p.EditorAlias
+                    EditorAlias = p.EditorAlias,
+                    Id = p.Id
                 };
 
                 list.Add(text);

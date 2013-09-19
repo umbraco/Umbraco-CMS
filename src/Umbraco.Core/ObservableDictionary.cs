@@ -16,7 +16,7 @@ namespace Umbraco.Core
     /// </remarks>
     /// <typeparam name="TValue">The type of elements contained in the BindableCollection</typeparam>
     /// <typeparam name="TKey">The type of the indexing key</typeparam>
-    internal class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>
+    public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>
     {
         protected Dictionary<TKey, int> Indecies = new Dictionary<TKey, int>();
         protected Func<TValue, TKey> KeySelector;

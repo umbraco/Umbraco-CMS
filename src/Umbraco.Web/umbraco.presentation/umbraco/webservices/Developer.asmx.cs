@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Web.Services;
 using System.Xml;
 using Umbraco.Core;
@@ -35,7 +36,7 @@ namespace umbraco.webservices
 				foreach (var m in cms.businesslogic.macro.Macro.GetAll()) 
 				{
 					var mXml = xmlDoc.CreateElement("macro");
-					mXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "id", m.Id.ToString()));
+					mXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "id", m.Id.ToString(CultureInfo.InvariantCulture)));
                     mXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "alias", m.Alias));
                     mXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "name", m.Name));
 					macros.AppendChild(mXml);
@@ -54,8 +55,8 @@ namespace umbraco.webservices
 				var xmlDoc = new XmlDocument();
 				var macro = xmlDoc.CreateElement("macro");
 				var m = new cms.businesslogic.macro.Macro(Id);
-                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "id", m.Id.ToString()));
-                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "refreshRate", m.RefreshRate.ToString()));
+                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "id", m.Id.ToString(CultureInfo.InvariantCulture)));
+                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "refreshRate", m.RefreshRate.ToString(CultureInfo.InvariantCulture)));
                 macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "useInEditor", m.UseInEditor.ToString()));
                 macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "alias", m.Alias));
                 macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "name", m.Name));
@@ -68,7 +69,7 @@ namespace umbraco.webservices
 					var pXml = xmlDoc.CreateElement("property");
                     pXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "alias", mp.Alias));
                     pXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "name", mp.Name));
-                    pXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "public", mp.Public.ToString()));
+				    pXml.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "public", true.ToString()));
 					properties.AppendChild(pXml);
 				}
 				macro.AppendChild(properties);

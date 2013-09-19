@@ -17,8 +17,32 @@ namespace Umbraco.Core.Models
             
         }
 
+        /// <summary>
+        /// Ctor for creating a new property
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <param name="name"></param>
+        /// <param name="sortOrder"></param>
+        /// <param name="editorAlias"></param>
         public MacroProperty(string @alias, string name, int sortOrder, string editorAlias)
         {
+            _alias = alias;
+            _name = name;
+            _sortOrder = sortOrder;
+            _editorAlias = editorAlias;
+        }
+
+        /// <summary>
+        /// Ctor for creating an existing property
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="alias"></param>
+        /// <param name="name"></param>
+        /// <param name="sortOrder"></param>
+        /// <param name="editorAlias"></param>
+        internal MacroProperty(int id, string @alias, string name, int sortOrder, string editorAlias)
+        {
+            _id = id;
             _alias = alias;
             _name = name;
             _sortOrder = sortOrder;
@@ -28,12 +52,31 @@ namespace Umbraco.Core.Models
         private string _alias;
         private string _name;
         private int _sortOrder;
+        private int _id;
         private string _editorAlias;
 
         private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Alias);
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Name);
         private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, int>(x => x.SortOrder);
+        private static readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<Entity, int>(x => x.Id);
         private static readonly PropertyInfo PropertyTypeSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.EditorAlias);
+
+        /// <summary>
+        /// Gets or sets the Alias of the Property
+        /// </summary>
+        [DataMember]
+        public int Id
+        {
+            get { return _id; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _id = value;
+                    return _alias;
+                }, _alias, IdSelector);
+            }
+        }
 
         /// <summary>
         /// Gets or sets the Alias of the Property

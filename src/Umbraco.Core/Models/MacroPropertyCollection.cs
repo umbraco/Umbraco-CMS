@@ -8,7 +8,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// A macro's property collection
     /// </summary>
-    internal class MacroPropertyCollection : ObservableDictionary<string, IMacroProperty>
+    public class MacroPropertyCollection : ObservableDictionary<string, IMacroProperty>
     {
         public MacroPropertyCollection() 
             : base(property => property.Alias)

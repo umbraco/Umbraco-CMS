@@ -8,7 +8,7 @@ using System.Web;
 using System.Web.UI.WebControls;
 using Umbraco.Core.IO;
 using Umbraco.Core;
-using umbraco.cms.businesslogic.macro;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.UI.Umbraco.Developer.Macros
 {
@@ -29,16 +29,16 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
 		/// <param name="macro"> </param>
 		/// <param name="macroAssemblyValue"></param>
 		/// <param name="macroTypeValue"></param>
-		protected override void PopulateFieldsOnLoad(Macro macro, string macroAssemblyValue, string macroTypeValue)
+		protected override void PopulateFieldsOnLoad(IMacro macro, string macroAssemblyValue, string macroTypeValue)
 		{
 			base.PopulateFieldsOnLoad(macro, macroAssemblyValue, macroTypeValue);
 			//check if the ScriptingFile property contains the MacroPartials path
-			if (macro.ScriptingFile.IsNullOrWhiteSpace() == false &&
-                (macro.ScriptingFile.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
-				|| (Regex.IsMatch(macro.ScriptingFile, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled))))
+			if (macro.ScriptPath.IsNullOrWhiteSpace() == false &&
+                (macro.ScriptPath.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
+                || (Regex.IsMatch(macro.ScriptPath, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled))))
 			{
 				macroPython.Text = "";
-				SelectedPartialView.Text = macro.ScriptingFile;
+                SelectedPartialView.Text = macro.ScriptPath;
 			}
 		}
 
@@ -50,12 +50,12 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
 		/// <param name="macroCachePeriod"></param>
 		/// <param name="macroAssemblyValue"></param>
 		/// <param name="macroTypeValue"></param>
-		protected override void SetMacroValuesFromPostBack(Macro macro, int macroCachePeriod, string macroAssemblyValue, string macroTypeValue)
+		protected override void SetMacroValuesFromPostBack(IMacro macro, int macroCachePeriod, string macroAssemblyValue, string macroTypeValue)
 		{
 			base.SetMacroValuesFromPostBack(macro, macroCachePeriod, macroAssemblyValue, macroTypeValue);
 			if (!SelectedPartialView.Text.IsNullOrWhiteSpace())
 			{
-				macro.ScriptingFile = SelectedPartialView.Text;
+				macro.ScriptPath = SelectedPartialView.Text;
 			}
 		}
 

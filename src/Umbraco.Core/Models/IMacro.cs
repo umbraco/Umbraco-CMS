@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Defines a Macro
     /// </summary>
-    internal interface IMacro : IAggregateRoot
+    public interface IMacro : IAggregateRoot
     {
         /// <summary>
         /// Gets or sets the alias of the Macro
@@ -84,10 +84,10 @@ namespace Umbraco.Core.Models
         [DataMember]
         MacroPropertyCollection Properties { get; }
 
-        /// <summary>
-        /// Returns an enum <see cref="MacroTypes"/> based on the properties on the Macro
-        /// </summary>
-        /// <returns><see cref="MacroTypes"/></returns>
-        MacroTypes MacroType();
+        ///// <summary>
+        ///// Returns an enum <see cref="MacroTypes"/> based on the properties on the Macro
+        ///// </summary>
+        ///// <returns><see cref="MacroTypes"/></returns>
+        //MacroTypes MacroType();
     }
 }

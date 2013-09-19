@@ -257,9 +257,9 @@ namespace Umbraco.Core
 		/// </summary>
 		protected virtual void InitializeResolvers()
 		{
-
-            //setup custom resolvers... this is only temporary until we move into the umbraco core
             PropertyEditorResolver.Current = new PropertyEditorResolver(() => PluginManager.Current.ResolvePropertyEditors());
+            ParameterEditorResolver.Current = new ParameterEditorResolver(() => PluginManager.Current.ResolveParameterEditors());
+
             //setup the validators resolver with our predefined validators
             ValidatorsResolver.Current = new ValidatorsResolver(new[]
                 {

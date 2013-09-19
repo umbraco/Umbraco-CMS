@@ -338,9 +338,6 @@
     <Compile Include="businesslogic\macro\Macro.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\macro\MacroComment.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="businesslogic\macro\MacroProperty.cs">
       <SubType>Code</SubType>
     </Compile>
