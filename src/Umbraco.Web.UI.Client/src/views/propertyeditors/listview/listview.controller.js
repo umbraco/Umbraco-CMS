@@ -120,6 +120,7 @@ angular.module("umbraco")
                     $scope.bulkStatus = "Deleted doc" + i + " out of "+ total +"documents";
                     if (current == total) {
                         $scope.bulkStatus = "Deleting done";
+                        $scope.selected = [];
                         $scope.reloadView($scope.content.id);
                     }
                     current++;
