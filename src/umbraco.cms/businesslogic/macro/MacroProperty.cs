@@ -88,7 +88,7 @@ namespace umbraco.cms.businesslogic.macro
 
         private void Setup()
         {
-            using (var dr = SqlHelper.ExecuteReader("select macro, macroPropertyHidden, editorAlias, macroPropertySortOrder, macroPropertyAlias, macroPropertyName from cmsMacroProperty where id = @id", SqlHelper.CreateParameter("@id", Id)))
+            using (var dr = SqlHelper.ExecuteReader("select macro, editorAlias, macroPropertySortOrder, macroPropertyAlias, macroPropertyName from cmsMacroProperty where id = @id", SqlHelper.CreateParameter("@id", Id)))
             {
                 if (dr.Read())
                 {
