@@ -16,6 +16,7 @@ namespace Umbraco.Core.Manifest
         
         private const string ManifestKey = "manifests";
         private const string PropertyEditorsKey = "propertyeditors";
+        private const string ParameterEditorsKey = "parametereditors";
 
         /// <summary>
         /// Returns all property editors found in the manfifests
@@ -50,7 +51,7 @@ namespace Umbraco.Core.Manifest
             get
             {
                 return (IEnumerable<ParameterEditor>)StaticCache.GetOrAdd(
-                    PropertyEditorsKey,
+                    ParameterEditorsKey,
                     s =>
                     {
                         var editors = new List<ParameterEditor>();

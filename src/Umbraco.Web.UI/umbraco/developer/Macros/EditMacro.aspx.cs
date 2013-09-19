@@ -118,5 +118,27 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
 			return files;
 		}
 
+        /// <summary>
+        /// Binds the drop down list but ensures that the macro param type exists if it doesn't the drop down will be left blank
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+	    protected void MacroPropertiesOnItemDataBound(object sender, RepeaterItemEventArgs e)
+	    {
+            if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
+            {
+                var propertyTypes = (DropDownList)e.Item.FindControl("macroPropertyType");
+
+                var editors = GetMacroParameterEditors();
+                propertyTypes.DataSource = editors;
+                propertyTypes.DataBind();
+                var macroProp = (IMacroProperty)e.Item.DataItem;
+                if (editors.Any(x => x.Alias == macroProp.EditorAlias))
+                {
+                    propertyTypes.SelectedValue = macroProp.EditorAlias;
+                }    
+            }
+
+	    }
 	}
 }

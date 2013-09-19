@@ -9,13 +9,11 @@
     <CD:CssInclude ID="CssInclude1" runat="server" FilePath="Editors/EditMacro.css" PathNameAlias="UmbracoClient" />
 
     <script type="text/javascript">
-        function doSubmit() {
-            document.forms.aspnetForm.submit();
-        }
-
+        
         //handles the change selection of the drop downs to populate the text box
         (function($) {
             $(document).ready(function () {
+
                 //on drop down change, update the text box and clear other text boxes
                 $(".fileChooser select").change(function () {
                     //update the txt box
@@ -39,6 +37,25 @@
                         ValidatorEnable($(this).get(0), true);
                     });
                 });
+                
+                UmbClientMgr.appActions().bindSaveShortCut();
+
+                // U4-667: Make the "Render content in editor" checkbox dependent on the "Use in editor checkbox"
+                var useInEditorCheckBox = $("#<%= macroEditor.ClientID %>");
+                var renderInEditorCheckBox = $("#<%= macroRenderContent.ClientID %>");
+
+                function toggle() {
+                    var disabled = useInEditorCheckBox.is(":checked") == false;
+                    renderInEditorCheckBox.prop("disabled", disabled);
+                }
+
+                toggle();
+
+                useInEditorCheckBox.on("change", function () {
+                    toggle();
+                });
+
+                
             });
         })(jQuery);
         
@@ -119,7 +136,7 @@
     </cc1:Pane>
 
     <cc1:Pane ID="Panel2" runat="server">
-        <asp:Repeater ID="macroProperties" runat="server">
+        <asp:Repeater ID="macroProperties" runat="server" OnItemDataBound="MacroPropertiesOnItemDataBound">
             <HeaderTemplate>
                 <table class="table">
                     <thead>
@@ -151,11 +168,10 @@
                         <asp:TextBox runat="server" ID="macroPropertyName" Text='<%#Eval("Name")%>' />
                     </td>
                     <td>
+                        
                         <asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="server" ControlToValidate="macroPropertyType" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
                         <asp:DropDownList OnPreRender="AddChooseList" runat="server" ID="macroPropertyType"
-                            DataTextFormatString="" DataTextField='Name' DataValueField="Alias"
-                            DataSource='<%# GetMacroParameterEditors()%>' 
-                            SelectedValue='<%# Eval("EditorAlias") %>'>
+                            DataTextFormatString="" DataTextField='Name' DataValueField="Alias">
                         </asp:DropDownList>
                     </td>
                     <td>
@@ -191,28 +207,4 @@
         </asp:Repeater>
     </cc1:Pane>
 
-    <asp:PlaceHolder runat="server">
-        <script type="text/javascript">
-            jQuery(document).ready(function () {
-                UmbClientMgr.appActions().bindSaveShortCut();
-
-                (function ($) {
-                    // U4-667: Make the "Render content in editor" checkbox dependent on the "Use in editor checkbox"
-                    var useInEditorCheckBox = $("#<%= macroEditor.ClientID %>");
-                    var renderInEditorCheckBox = $("#<%= macroRenderContent.ClientID %>");
-
-                    toggle();
-
-                    useInEditorCheckBox.on("change", function() {
-                        toggle();
-                    });
-                    
-                    function toggle() {
-                        var disabled = useInEditorCheckBox.is(":checked") == false;
-                        renderInEditorCheckBox.prop("disabled", disabled);
-                    }
-                })(jQuery);
-            });
-        </script>
-    </asp:PlaceHolder>
 </asp:Content>

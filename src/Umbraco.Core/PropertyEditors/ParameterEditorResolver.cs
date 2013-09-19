@@ -32,12 +32,15 @@ namespace Umbraco.Core.PropertyEditors
                 //are filtered.
                 var filtered = Values.Select(x => x as PropertyEditor)
                                      .WhereNotNull()
-                                     .Where(x => x.IsParameterEditor == false)
-                                     .ToArray();
-
-                //now we need to get all manifest property editors in here that are parameter editors!~
-
-                return Values.Except(filtered).Union(ManifestBuilder.ParameterEditors);
+                                     .Where(x => x.IsParameterEditor == false);
+                
+                return Values
+                    //exclude the non parameter editor c# property editors
+                    .Except(filtered)
+                    //include the manifest parameter editors
+                    .Union(ManifestBuilder.ParameterEditors)
+                    //include the manifest prop editors that are parameter editors
+                    .Union(ManifestBuilder.PropertyEditors.Where(x => x.IsParameterEditor));
             }
         }
 
