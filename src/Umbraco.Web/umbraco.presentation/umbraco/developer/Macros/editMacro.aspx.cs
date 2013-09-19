@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.IO;
 using Umbraco.Core.IO;
+using Umbraco.Core.PropertyEditors;
 using umbraco.BasePages;
 using umbraco.uicontrols;
 using umbraco.DataLayer;
@@ -74,9 +76,7 @@ namespace umbraco.cms.presentation.developer
 			}
 			else
 			{
-				int macroID = Convert.ToInt32(Request.QueryString["macroID"]);
-
-                ClientTools
+			    ClientTools
                     .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadMacros>().Tree.Alias)
                     .SyncTree("-1,init," + m_macro.Id.ToString(), true); //true forces the reload
 
@@ -98,7 +98,6 @@ namespace umbraco.cms.presentation.developer
 					HtmlInputHidden macroPropertyID = (HtmlInputHidden)item.FindControl("macroPropertyID");
 					TextBox macroElementName = (TextBox)item.FindControl("macroPropertyName");
 					TextBox macroElementAlias = (TextBox)item.FindControl("macroPropertyAlias");
-					CheckBox macroElementShow = (CheckBox)item.FindControl("macroPropertyHidden");
 					DropDownList macroElementType = (DropDownList)item.FindControl("macroPropertyType");
 
 					MacroProperty mp = new MacroProperty(int.Parse(macroPropertyID.Value));
@@ -247,11 +246,16 @@ namespace umbraco.cms.presentation.developer
 				return test;
 		}
 
+        [Obsolete("No longer used and will be removed in the future.")]
 		public IRecordsReader GetMacroPropertyTypes()
-		{
-			// Load dataChildTypes	
-			return SqlHelper.ExecuteReader("select id, macroPropertyTypeAlias from cmsMacroPropertyType order by macroPropertyTypeAlias");
-		}
+        {
+            return null;
+        }
+
+        protected IEnumerable<ParameterEditor> GetMacroParameterEditors()
+        {
+            return ParameterEditorResolver.Current.ParameterEditors;
+        }
 
 		public void macroPropertyCreate(object sender, EventArgs e)
 		{

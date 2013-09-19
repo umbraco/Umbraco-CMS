@@ -16,5 +16,10 @@ namespace Umbraco.Core.Manifest
         /// The json array of property editors
         /// </summary>
         public JArray PropertyEditors { get; set; }
+
+        /// <summary>
+        /// The json array of parameter editors
+        /// </summary>
+        public JArray ParameterEditors { get; set; }
     }
 }

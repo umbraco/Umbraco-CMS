@@ -38,6 +38,18 @@ namespace Umbraco.Core.Manifest
                 new PropertyEditorConverter(),
                 new PreValueFieldConverter());
         }
+
+        /// <summary>
+        /// Parse the property editors from the json array
+        /// </summary>
+        /// <param name="jsonEditors"></param>
+        /// <returns></returns>
+        internal static IEnumerable<ParameterEditor> GetParameterEditors(JArray jsonEditors)
+        {
+            return JsonConvert.DeserializeObject<IEnumerable<ParameterEditor>>(
+                jsonEditors.ToString(),
+                new ParameterEditorConverter());
+        }
         
         /// <summary>
         /// Get all registered manifests
@@ -143,11 +155,11 @@ namespace Umbraco.Core.Manifest
                     }
                 }
                 
-
                 var manifest = new PackageManifest()
                     {
                         JavaScriptInitialize = jConfig,
                         PropertyEditors = propEditors.Any() ? (JArray)deserialized["propertyEditors"] : new JArray(),
+                        ParameterEditors = propEditors.Any() ? (JArray)deserialized["parameterEditors"] : new JArray()
                     };
                 result.Add(manifest);
             }

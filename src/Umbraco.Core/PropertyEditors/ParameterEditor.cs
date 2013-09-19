@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Umbraco.Core.IO;
 
@@ -44,6 +45,18 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         [JsonProperty("name", Required = Required.Always)]
         public string Name { get; internal set; }
+
+        /// <summary>
+        /// Allows a parameter editor to be re-used based on the configuration specified.
+        /// </summary>
+        [JsonProperty("config")]
+        public virtual IDictionary<string, object> Configuration { get; set; }
+
+        [JsonIgnore]
+        public ParameterValueEditor ValueEditor
+        {
+            get { return CreateValueEditor(); }
+        }
 
         /// <summary>
         /// Creates a value editor instance

@@ -1120,6 +1120,9 @@ namespace umbraco
 	        TraceInfo("umbracoMacro",
 	                  "Xslt node adding search start (" + macroPropertyAlias + ",'" +
 	                  macroPropertyValue + "')");
+            
+            //TODO: WE need to fix this so that we give control of this stuff over to the actual parameter editors!
+            
             switch (macroPropertyType)
             {
                 case "contentTree":
@@ -1149,13 +1152,7 @@ namespace umbraco
 
                     macroXmlNode.AppendChild(currentNode);
 
-                    break;
-
-                case "contentSubs": // disable that one, it does not work anyway...
-                    //x.LoadXml("<nodes/>");
-                    //x.FirstChild.AppendChild(x.ImportNode(umbracoXml.GetElementById(contentId), true));
-                    //macroXmlNode.InnerXml = TransformMacroXml(x, "macroGetSubs.xsl");
-                    break;
+                    break;                    
 
                 case "contentAll":
                     macroXmlNode.AppendChild(macroXml.ImportNode(umbracoXml.DocumentElement, true));

@@ -111,6 +111,36 @@ namespace Umbraco.Tests.Manifest
         }
 
         [Test]
+        public void Parse_Parameter_Editors()
+        {
+
+            var a = JsonConvert.DeserializeObject<JArray>(@"[
+    {
+        alias: 'parameter1',
+        name: 'My Parameter',        
+        view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html'
+    },
+    {
+        alias: 'parameter2',
+        name: 'Another parameter',
+        config: { key1: 'some config val' },
+        view: '~/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html'
+    }
+]");
+            var parser = ManifestParser.GetParameterEditors(a);
+
+            Assert.AreEqual(2, parser.Count());
+            Assert.AreEqual("parameter1", parser.ElementAt(0).Alias);
+            Assert.AreEqual("My Parameter", parser.ElementAt(0).Name);
+            Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/MyEditor.html", parser.ElementAt(0).ValueEditor.View);
+
+            Assert.AreEqual("parameter2", parser.ElementAt(1).Alias);
+            Assert.AreEqual("Another parameter", parser.ElementAt(1).Name);
+            Assert.IsTrue(parser.ElementAt(1).Configuration.ContainsKey("key1"));
+            Assert.AreEqual("some config val", parser.ElementAt(1).Configuration["key1"]);
+        }
+
+        [Test]
         public void Merge_JArrays()
         {
             var obj1 = JArray.FromObject(new[] { "test1", "test2", "test3" });
@@ -166,7 +196,6 @@ namespace Umbraco.Tests.Manifest
             Assert.AreEqual(5, obj1.Properties().Count());
             Assert.AreEqual("Value3", obj1.Properties().ElementAt(2).Value.Value<string>());
         }
-
         
 
         [TestCase("C:\\Test", "C:\\Test\\MyFolder\\AnotherFolder", 2)]

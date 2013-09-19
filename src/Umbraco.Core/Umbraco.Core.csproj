@@ -278,6 +278,7 @@
     <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\ManifestValidatorConverter.cs" />
     <Compile Include="Manifest\PackageManifest.cs" />
+    <Compile Include="Manifest\ParameterEditorConverter.cs" />
     <Compile Include="Manifest\PreValueFieldConverter.cs" />
     <Compile Include="Manifest\PropertyEditorConverter.cs" />
     <Compile Include="Media\MediaSubfolderCounter.cs" />
@@ -716,6 +717,7 @@
     <Compile Include="PropertyEditors\ManifestPropertyValidator.cs" />
     <Compile Include="PropertyEditors\ParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditorAttribute.cs" />
+    <Compile Include="PropertyEditors\ParameterEditorResolver.cs" />
     <Compile Include="PropertyEditors\ParameterValueEditor.cs" />
     <Compile Include="PropertyEditors\PreValueField.cs" />
     <Compile Include="PropertyEditors\PreValueFieldAttribute.cs" />

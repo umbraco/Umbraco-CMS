@@ -36,6 +36,27 @@ namespace Umbraco.Core.Manifest
                             return editors;
                         });
             }
+        }
+
+        /// <summary>
+        /// Returns all parameter editors found in the manfifests
+        /// </summary>
+        internal static IEnumerable<ParameterEditor> ParameterEditors
+        {
+            get
+            {
+                return (IEnumerable<ParameterEditor>)StaticCache.GetOrAdd(
+                    PropertyEditorsKey,
+                    s =>
+                    {
+                        var editors = new List<ParameterEditor>();
+                        foreach (var manifest in GetManifests())
+                        {
+                            editors.AddRange(ManifestParser.GetParameterEditors(manifest.ParameterEditors));
+                        }
+                        return editors;
+                    });
+            }
         } 
 
         /// <summary>
