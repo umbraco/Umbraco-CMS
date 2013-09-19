@@ -2,7 +2,7 @@ angular.module("umbraco")
     .controller("Umbraco.Editors.ListViewController", 
         function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource, editorContextService) {
 
-           
+        $scope.selected = [];
             
         $scope.options = {
             pageSize: 10,
@@ -68,6 +68,48 @@ angular.module("umbraco")
             });
         };
 
+        var updateSelected = function (action, id) {
+            if (action === 'add' && $scope.selected.indexOf(id) === -1) {
+                $scope.selected.push(id);
+            }
+            if (action === 'remove' && $scope.selected.indexOf(id) !== -1) {
+                $scope.selected.splice($scope.selected.indexOf(id), 1);
+            }
+        };
+
+        $scope.updateSelection = function ($event, id) {
+            var checkbox = $event.target;
+            var action = (checkbox.checked ? 'add' : 'remove');
+            updateSelected(action, id);
+        };
+
+        $scope.selectAll = function ($event) {
+            var checkbox = $event.target;
+            var action = (checkbox.checked ? 'add' : 'remove');
+            for (var i = 0; i < $scope.listViewResultSet.items.length; i++) {
+                var entity = $scope.listViewResultSet.items[i];
+                updateSelected(action, entity.id);
+            }
+        };
+
+        $scope.getSelectedClass = function (entity) {
+            return $scope.isSelected(entity.id) ? 'selected' : '';
+        };
+
+        $scope.isSelected = function (id) {
+            return $scope.selected.indexOf(id) >= 0;
+        };
+
+        $scope.isSelectedAll = function () {
+            if ($scope.listViewResultSet != null)
+                return $scope.selected.length === $scope.listViewResultSet.items.length;
+            else
+                return false;
+        };
+
+        $scope.isAnythingSelected = function() {
+            return $scope.selected.length > 0;
+        };
 
         if($routeParams.id){
             $scope.pagination = new Array(100);
