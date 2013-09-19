@@ -1,7 +1,9 @@
 angular.module("umbraco")
     .controller("Umbraco.Editors.ListViewController", 
-        function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource) {
-        
+        function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource, editorContextService) {
+
+           
+            
         $scope.options = {
             pageSize: 10,
             pageNumber: 1,
@@ -69,6 +71,9 @@ angular.module("umbraco")
             $scope.pagination = new Array(100);
             $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
             $scope.reloadView($routeParams.id);
+
+            $scope.content = editorContextService.getContext();
+            
         }
         
 });
