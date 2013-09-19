@@ -17,10 +17,10 @@
 		    
            
 		    <div class="btn-group" ng-show="isAnythingSelected()">
-		        <a class="btn btn-success">Publish</a>
+		        <a class="btn btn-success" ng-click="publish()" prevent-default>Publish</a>
 		    </div>
 		    <div class="btn-group" ng-show="isAnythingSelected()">
-		        <a class="btn btn-warning">Unpublish</a>
+		        <a class="btn btn-warning" ng-click="unpublish()" prevent-default>Unpublish</a>
 		    </div>
 		    <div class="btn-group" ng-show="isAnythingSelected()">
 		        <a class="btn btn-danger" ng-click="delete()" prevent-default>Delete</a>
@@ -46,8 +46,8 @@
 				<tr ng-repeat="result in listViewResultSet.items">
 					<td><!--<i class="icon {{result.icon}}"></i>--><input type="checkbox" ng-checked="isSelected(result.id)" ng-click="updateSelection($event, result.id)"></td> 
 					<td><a href="#/content/content/edit/{{result.id}}">{{result.name}}</a></td> 
-					<td>{{result.updateDate|date:'medium'}} 
-						<!--<<span class="label label-success">Publish</span>-->
+				    <td>{{result.updateDate|date:'medium'}} 
+				        <!--<<span class="label label-success">Publish</span>-->
 					</td>
 					<td>{{result.owner.name}} <!--<span class="label">Admin</span>--></td>
 					<td></td>

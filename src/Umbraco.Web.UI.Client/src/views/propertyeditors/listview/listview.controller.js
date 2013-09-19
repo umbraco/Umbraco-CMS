@@ -128,6 +128,14 @@ angular.module("umbraco")
             
         };
 
+        $scope.publish = function () {
+
+        };
+ 
+        $scope.unpublish = function () {
+
+        };
+            
         if($routeParams.id){
             $scope.pagination = new Array(100);
             $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
