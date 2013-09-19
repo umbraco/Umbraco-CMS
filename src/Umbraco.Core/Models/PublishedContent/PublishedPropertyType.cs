@@ -25,18 +25,21 @@ namespace Umbraco.Core.Models.PublishedContent
 
             DataTypeId = propertyType.DataTypeDefinitionId;
             PropertyEditorGuid = propertyType.DataTypeId;
+            //PropertyEditorAlias = propertyType.PropertyEditorAlias;
 
             InitializeConverters();
         }
 
         // for unit tests
         internal PublishedPropertyType(string propertyTypeAlias, int dataTypeDefinitionId, Guid propertyEditorGuid)
+        //internal PublishedPropertyType(string propertyTypeAlias, int dataTypeDefinitionId, Alias propertyEditorAlias)
         {
             // ContentType to be set by PublishedContentType when creating it
             PropertyTypeAlias = propertyTypeAlias;
 
             DataTypeId = dataTypeDefinitionId;
             PropertyEditorGuid = propertyEditorGuid;
+            //PropertyEditorAlias = PropertyEditorAlias;
 
             InitializeConverters();
         }
@@ -59,9 +62,6 @@ namespace Umbraco.Core.Models.PublishedContent
         /// </summary>
         public int DataTypeId { get; private set; }
 
-        // note: in v6 a property editor is uniquely identified by a guid, whereas in v7
-        // it is uniquely identified by a string alias // fixme - compat?
-
         /// <summary>
         /// Gets or sets the guid uniquely identifying the property editor for the property type.
         /// </summary>
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets or sets the alias uniquely identifying the property editor for the property type.
         /// </summary>
-        public string PropertyEditorAlias { get; private set; }
+        //public string PropertyEditorAlias { get; private set; }
 
         #endregion
 

@@ -226,10 +226,10 @@ namespace Umbraco.Tests.PublishedContent
                         {
                             new SolidPublishedProperty
                                 {
-                                    Alias = "prop1",
+                                    PropertyTypeAlias = "prop1",
                                     HasValue = true,
-                                    Value = 1234,
-                                    RawValue = "1234"
+                                    ObjectValue = 1234,
+                                    DataValue = "1234"
                                 }
                         }
                 });
@@ -249,10 +249,10 @@ namespace Umbraco.Tests.PublishedContent
                             {
                                 new SolidPublishedProperty
                                     {
-                                        Alias = "prop1",
+                                        PropertyTypeAlias = "prop1",
                                         HasValue = true,
-                                        Value = 1234,
-                                        RawValue = "1234"
+                                        ObjectValue = 1234,
+                                        DataValue = "1234"
                                     }
                             }
                 });
@@ -272,10 +272,10 @@ namespace Umbraco.Tests.PublishedContent
                             {
                                 new SolidPublishedProperty
                                     {
-                                        Alias = "prop1",
+                                        PropertyTypeAlias = "prop1",
                                         HasValue = true,
-                                        Value = 1234,
-                                        RawValue = "1234"
+                                        ObjectValue = 1234,
+                                        DataValue = "1234"
                                     }
                             }
             });

@@ -214,14 +214,14 @@ namespace Umbraco.Tests.PublishedContent
 
 	        public object this[string propertyAlias]
 	        {
-                get { return GetProperty(propertyAlias).RawValue; } // fixme - why not just .Value?
+                get { return GetProperty(propertyAlias).DataValue; } // fixme - why DataValue here?
 	        }
 
 	        public IEnumerable<IPublishedContent> Children { get; set; }
 
 	        public IPublishedProperty GetProperty(string alias)
 	        {
-	            return Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+	            return Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
 	        }
 
 	        public IPublishedProperty GetProperty(string alias, bool recurse)

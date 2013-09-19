@@ -47,7 +47,7 @@ namespace Umbraco.Web.Models
 						var prop = GetProperty(Constants.Conventions.Media.File);
 						if (prop == null)
 							throw new NotSupportedException("Cannot resolve a Url for a media item when there is no 'umbracoFile' property defined.");
-						_url = prop.Value.ToString();
+						_url = prop.ObjectValue.ToString();
 						break;
 					default:
 						throw new ArgumentOutOfRangeException();
@@ -144,7 +144,7 @@ namespace Umbraco.Web.Models
 			{
                 // no cache here: GetProperty should be fast, and .Value cache should be managed by the property.              
                 var property = GetProperty(alias);
-			    return property == null ? null : property.Value;
+			    return property == null ? null : property.ObjectValue;
 			}
 		}
 

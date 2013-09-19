@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the alias of the property.
         /// </summary>
-		string Alias { get; }
+		string PropertyTypeAlias { get; }
 
         /// <summary>
         /// Gets a value indicating whether the property has a value.
@@ -26,34 +26,34 @@ namespace Umbraco.Core.Models
         bool HasValue { get; }
 
         /// <summary>
-        /// Gets the raw value of the property.
+        /// Gets the data value of the property.
         /// </summary>
         /// <remarks>
-        /// <para>The raw value is whatever was passed to the property when it was instanciated, and it is
+        /// <para>The data value is whatever was passed to the property when it was instanciated, and it is
         /// somewhat implementation-dependent -- depending on how the IPublishedCache is implemented.</para>
         /// <para>The XmlPublishedCache raw values are strings exclusively since they come from the Xml cache.</para>
-        /// <para>For other cachesthat get their raw value from the database, it would be either a string,
+        /// <para>For other caches that get their raw value from the database, it would be either a string,
         /// an integer (Int32), or a date and time (DateTime).</para>
         /// </remarks>
-        object RawValue { get; }
+        object DataValue { get; }
 
         /// <summary>
-        /// Gets the value of the property.
+        /// Gets the object value of the property.
         /// </summary>
         /// <remarks>
         /// <para>The value is what you want to use when rendering content in an MVC view ie in C#.</para>
         /// <para>It can be null, or any type of CLR object.</para>
-        /// <para>It has been fully prepared and processed by the appropriate converters.</para>
+        /// <para>It has been fully prepared and processed by the appropriate converter.</para>
         /// </remarks>
-        object Value { get; }
+        object ObjectValue { get; }
 
         /// <summary>
         /// Gets the XPath value of the property.
         /// </summary>
         /// <remarks>
         /// <para>The XPath value is what you want to use when navigating content via XPath eg in the XSLT engine.</para>
-        /// <para>It must be either null, or a non-empty string, or an XPathNavigator.</para>
-        /// <para>It has been fully prepared and processed by the appropriate converters.</para>
+        /// <para>It must be either null, or a string, or an XPathNavigator.</para>
+        /// <para>It has been fully prepared and processed by the appropriate converter.</para>
         /// </remarks>
         object XPathValue { get; }
 	}

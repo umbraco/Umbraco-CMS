@@ -322,14 +322,15 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			if (dd.LoadedFromExamine)
 			{
 				//if this is from Examine, lets check if the alias does not exist on the document
-				if (dd.Properties.All(x => x.Alias != alias))
+				if (dd.Properties.All(x => x.PropertyTypeAlias != alias))
 				{
 					//ok it doesn't exist, we might assume now that Examine didn't index this property because the index is not set up correctly
 					//so before we go loading this from the database, we can check if the alias exists on the content type at all, this information
 					//is cached so will be quicker to look up.
-					if (dd.Properties.Any(x => x.Alias == UmbracoContentIndexer.NodeTypeAliasFieldName))
+					if (dd.Properties.Any(x => x.PropertyTypeAlias == UmbracoContentIndexer.NodeTypeAliasFieldName))
 					{
-						var aliasesAndNames = ContentType.GetAliasesAndNames(dd.Properties.First(x => x.Alias.InvariantEquals(UmbracoContentIndexer.NodeTypeAliasFieldName)).RawValue.ToString());
+                        // fixme - is it OK to use DataValue here?
+						var aliasesAndNames = ContentType.GetAliasesAndNames(dd.Properties.First(x => x.PropertyTypeAlias.InvariantEquals(UmbracoContentIndexer.NodeTypeAliasFieldName)).DataValue.ToString());
 						if (aliasesAndNames != null)
 						{
 							if (!aliasesAndNames.ContainsKey(alias))
@@ -346,7 +347,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 					{
 						media.MoveNext();
 						var mediaDoc = ConvertFromXPathNavigator(media.Current);
-						return mediaDoc.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+						return mediaDoc.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
 					}					
 				}							
 			}
@@ -354,9 +355,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             //We've made it here which means that the value is stored in the Examine index.
             //We are going to check for a special field however, that is because in some cases we store a 'Raw'
             //value in the index such as for xml/html.
-            var rawValue = dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(UmbracoContentIndexer.RawFieldPrefix + alias));
+            var rawValue = dd.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(UmbracoContentIndexer.RawFieldPrefix + alias));
 		    return rawValue
-		           ?? dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+		           ?? dd.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
 		}
 
 		/// <summary>

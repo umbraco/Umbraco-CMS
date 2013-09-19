@@ -131,8 +131,8 @@ namespace Umbraco.Core.Models.PublishedContent
             {
                 if (_properties != null)
                 {
-                    var property = _properties.FirstOrDefault(prop => prop.Alias.InvariantEquals(alias));
-                    if (property != null) return property.HasValue ? property.Value : null;
+                    var property = _properties.FirstOrDefault(prop => prop.PropertyTypeAlias.InvariantEquals(alias));
+                    if (property != null) return property.HasValue ? property.ObjectValue : null;
                 }
                 return Content[alias];
             }
@@ -142,7 +142,7 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             return _properties == null
                 ? Content.GetProperty(alias)
-                : _properties.FirstOrDefault(prop => prop.Alias.InvariantEquals(alias)) ?? Content.GetProperty(alias);
+                : _properties.FirstOrDefault(prop => prop.PropertyTypeAlias.InvariantEquals(alias)) ?? Content.GetProperty(alias);
         }
 
         #endregion

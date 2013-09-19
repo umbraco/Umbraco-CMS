@@ -18,14 +18,14 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	{
 		private readonly string _xmlValue; // the raw, xml node value
 	    private readonly Lazy<object> _sourceValue;
-        private readonly Lazy<object> _value;
+        private readonly Lazy<object> _objectValue;
         private readonly Lazy<object> _xpathValue;
 	    private readonly bool _isPreviewing;
 
         /// <summary>
         /// Gets the raw value of the property.
         /// </summary>
-        public override object RawValue { get { return _xmlValue; } }
+        public override object DataValue { get { return _xmlValue; } }
 
         // in the Xml cache, everything is a string, and to have a value
         // you want to have a non-null, non-empty string.
@@ -34,7 +34,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	        get { return _xmlValue.Trim().Length > 0; }
 	    }
 
-        public override object Value { get { return _value.Value; } }
+        public override object ObjectValue { get { return _objectValue.Value; } }
         public override object XPathValue { get { return _xpathValue.Value; } }
 
 		public XmlPublishedProperty(PublishedPropertyType propertyType, bool isPreviewing, XmlNode propertyXmlData)
@@ -60,7 +60,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _isPreviewing = isPreviewing;
 
             _sourceValue = new Lazy<object>(() => PropertyType.ConvertDataToSource(_xmlValue, _isPreviewing));
-            _value = new Lazy<object>(() => PropertyType.ConvertSourceToObject(_sourceValue.Value, _isPreviewing));
+            _objectValue = new Lazy<object>(() => PropertyType.ConvertSourceToObject(_sourceValue.Value, _isPreviewing));
             _xpathValue = new Lazy<object>(() => PropertyType.ConvertSourceToXPath(_sourceValue.Value, _isPreviewing));
         }
 	}

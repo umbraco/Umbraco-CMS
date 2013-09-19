@@ -273,9 +273,9 @@ namespace umbraco
 		{
 			foreach(var p in node.Properties)
 			{
-				if (!_elements.ContainsKey(p.Alias))				
+				if (!_elements.ContainsKey(p.PropertyTypeAlias))				
 				{
-					_elements[p.Alias] = p.Value;
+					_elements[p.PropertyTypeAlias] = p.ObjectValue;
 				}
 			}			
 		}

@@ -17,15 +17,15 @@ namespace Umbraco.Core.Models.PublishedContent
             PropertyType = propertyType;
         }
 
-        public string Alias
+        public string PropertyTypeAlias
         {
             get { return PropertyType.PropertyTypeAlias; }
         }
 
         // these have to be provided by the actual implementation
         public abstract bool HasValue { get; }
-        public abstract object RawValue { get; }
-        public abstract object Value { get; }
+        public abstract object DataValue { get; }
+        public abstract object ObjectValue { get; }
         public abstract object XPathValue { get; }
     }
 }

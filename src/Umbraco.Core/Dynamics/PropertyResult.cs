@@ -31,19 +31,20 @@ namespace Umbraco.Core.Dynamics
 
         internal PropertyResultType PropertyType { get { return _type; } }
 
-        public string Alias { get { return _source == null ? _alias : _source.Alias; } }
-        public object RawValue { get { return _source == null ? _value : _source.RawValue; } }
+        public string PropertyTypeAlias { get { return _source == null ? _alias : _source.PropertyTypeAlias; } }
+        public object DataValue { get { return _source == null ? _value : _source.DataValue; } }
         public bool HasValue { get { return _source == null || _source.HasValue; } }
-        public object Value { get { return _source == null ? _value : _source.Value; } }
-        public object XPathValue { get { return Value == null ? null : Value.ToString(); } }
+        public object ObjectValue { get { return _source == null ? _value : _source.ObjectValue; } }
+        // fixme - is it OK to return null here?
+        public object XPathValue { get { return ObjectValue == null ? null : ObjectValue.ToString(); } }
 
         // implements IHtmlString.ToHtmlString
         public string ToHtmlString()
         {
-            // note - use RawValue here, because that's what the original
+            // note - use DataValue here, because that's what the original
             // Razor macro engine seems to do...
 
-            var value = RawValue;
+            var value = DataValue;
 			return value == null ? string.Empty : value.ToString();
         }
     }

@@ -177,7 +177,7 @@ namespace Umbraco.Web.Models
 		{
 			var reflectedProperty = GetReflectedProperty(binder.Name);
 			var result = reflectedProperty != null
-				? reflectedProperty.Value
+				? reflectedProperty.ObjectValue
 				: null;
 
 		    return Attempt.If(result != null, result);
@@ -722,8 +722,8 @@ namespace Umbraco.Web.Models
         public string GetPropertyValue(string alias, bool recursive)
         {
             var property = GetProperty(alias, recursive);
-            if (property == null || property.Value == null) return null;
-            return property.Value.ToString();
+            if (property == null || property.ObjectValue == null) return null;
+            return property.ObjectValue.ToString();
         }
 
 #endif

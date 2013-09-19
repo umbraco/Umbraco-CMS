@@ -28,7 +28,7 @@ namespace Umbraco.Web
             // else we use .Value so we give the converter a chance to handle the default value differently
             // eg for IEnumerable<T> it may return Enumerable<T>.Empty instead of null
 
-            var value = property.Value;
+            var value = property.ObjectValue;
 
             // if value is null (strange but why not) it still is OK to call TryConvertTo
             // because it's an extension method (hence no NullRef) which will return a

@@ -19,7 +19,7 @@ namespace Umbraco.Tests.CodeFirst
 
             foreach (var property in content.Properties)
             {
-                var @alias = property.Alias;
+                var @alias = property.PropertyTypeAlias;
 
                 var propertyInfo = propertyInfos.FirstOrDefault(x => x.Name.ToUmbracoAlias() == @alias);
                 if (propertyInfo == null) continue;
@@ -27,12 +27,12 @@ namespace Umbraco.Tests.CodeFirst
                 object value = null;
                 //TODO Proper mapping of types
                 if (propertyInfo.PropertyType == typeof(string))
-                    value = property.Value;
+                    value = property.ObjectValue;
                 else if (propertyInfo.PropertyType == typeof(DateTime))
-                    value = DateTime.Parse(property.Value.ToString());
+                    value = DateTime.Parse(property.ObjectValue.ToString());
                 else if (propertyInfo.PropertyType == typeof(Boolean))
                 {
-                    if (String.IsNullOrEmpty(property.Value.ToString()) || property.Value == "0")
+                    if (String.IsNullOrEmpty(property.ObjectValue.ToString()) || property.ObjectValue == "0")
                     {
                         value = false;
                     }

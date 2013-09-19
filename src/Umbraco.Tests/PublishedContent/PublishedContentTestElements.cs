@@ -183,7 +183,7 @@ namespace Umbraco.Tests.PublishedContent
 
         public IPublishedProperty GetProperty(string alias)
         {
-            return Properties.FirstOrDefault(p => p.Alias.InvariantEquals(alias));
+            return Properties.FirstOrDefault(p => p.PropertyTypeAlias.InvariantEquals(alias));
         }
 
         public IPublishedProperty GetProperty(string alias, bool recurse)
@@ -206,7 +206,7 @@ namespace Umbraco.Tests.PublishedContent
             get
             {
                 var property = GetProperty(alias);
-                return property == null || property.HasValue == false ? null : property.Value;
+                return property == null || property.HasValue == false ? null : property.ObjectValue;
             }
         }
 
@@ -220,9 +220,9 @@ namespace Umbraco.Tests.PublishedContent
             // initialize boring stuff
         }
 
-        public string Alias { get; set; }
-        public object RawValue { get; set; }
-        public object Value { get; set; }
+        public string PropertyTypeAlias { get; set; }
+        public object DataValue { get; set; }
+        public object ObjectValue { get; set; }
         public bool HasValue { get; set; }
         public object XPathValue { get; set; }
     }
