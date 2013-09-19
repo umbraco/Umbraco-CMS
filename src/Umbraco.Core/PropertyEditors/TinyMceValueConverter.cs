@@ -12,7 +12,7 @@ namespace Umbraco.Core.PropertyEditors
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     internal class TinyMceValueConverter : PropertyValueConverterBase
 	{
-        public override bool IsDataToSourceConverter(PublishedPropertyType propertyType)
+        public override bool IsConverter(PublishedPropertyType propertyType)
         {
             return Guid.Parse(Constants.PropertyEditors.TinyMCEv3).Equals(propertyType.PropertyEditorGuid);
         }
@@ -25,20 +25,10 @@ namespace Umbraco.Core.PropertyEditors
             return source;
         }
 
-        public override bool IsSourceToObjectConverter(PublishedPropertyType propertyType)
-        {
-            return IsDataToSourceConverter(propertyType);
-        }
-
         public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
         {
             // source should come from ConvertSource and be a string (or null) already
             return new HtmlString(source == null ? string.Empty : (string)source);
-        }
-
-        public override bool IsSourceToXPathConverter(PublishedPropertyType propertyType)
-        {
-            return IsDataToSourceConverter(propertyType);
         }
 
         public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)

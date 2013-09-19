@@ -16,7 +16,7 @@ namespace Umbraco.Core.PropertyEditors
 	            Guid.Parse(Constants.PropertyEditors.Date)
 	        };
 
-        public override bool IsDataToSourceConverter(PublishedPropertyType propertyType)
+        public override bool IsConverter(PublishedPropertyType propertyType)
         {
             return DataTypeGuids.Contains(propertyType.PropertyEditorGuid);
         }
@@ -42,17 +42,7 @@ namespace Umbraco.Core.PropertyEditors
                 : DateTime.MinValue;
         }
 
-        public override bool IsSourceToObjectConverter(PublishedPropertyType propertyType)
-        {
-            return IsDataToSourceConverter(propertyType);
-        }
-
         // default ConvertSourceToObject just returns source ie a DateTime value
-
-        public override bool IsSourceToXPathConverter(PublishedPropertyType propertyType)
-        {
-            return IsDataToSourceConverter(propertyType);
-        }
 
         public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
         {

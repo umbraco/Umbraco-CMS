@@ -7,7 +7,7 @@ namespace Umbraco.Core.PropertyEditors
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     class YesNoValueConverter : PropertyValueConverterBase
     {
-        public override bool IsDataToSourceConverter(PublishedPropertyType propertyType)
+        public override bool IsConverter(PublishedPropertyType propertyType)
         {
             return Guid.Parse(Constants.PropertyEditors.TrueFalse).Equals(propertyType.PropertyEditorGuid);
         }
@@ -24,17 +24,7 @@ namespace Umbraco.Core.PropertyEditors
             return sourceString == "1";
         }
 
-        public override bool IsSourceToObjectConverter(PublishedPropertyType propertyType)
-        {
-            return IsDataToSourceConverter(propertyType);
-        }
-
         // default ConvertSourceToObject just returns source ie a boolean value
-
-        public override bool IsSourceToXPathConverter(PublishedPropertyType propertyType)
-        {
-            return IsDataToSourceConverter(propertyType);
-        }
 
         public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
         {

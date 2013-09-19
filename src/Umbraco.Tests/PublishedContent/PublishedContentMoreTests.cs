@@ -204,7 +204,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var props = new[]
                     {
-                        new PublishedPropertyType("prop1", System.Guid.Empty, 1, 1), 
+                        new PublishedPropertyType("prop1", 1, System.Guid.Empty), 
                     };
 
             var contentType1 = new PublishedContentType(1, "ContentType1", props);

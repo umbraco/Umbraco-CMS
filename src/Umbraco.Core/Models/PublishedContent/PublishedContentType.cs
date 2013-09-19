@@ -48,8 +48,8 @@ namespace Umbraco.Core.Models.PublishedContent
             for (var i = 0; i < _propertyTypes.Length; i++)
             {
                 var propertyType = _propertyTypes[i];
-                _indexes[propertyType.Alias] = i;
-                _indexes[propertyType.Alias.ToLowerInvariant()] = i;
+                _indexes[propertyType.PropertyTypeAlias] = i;
+                _indexes[propertyType.PropertyTypeAlias.ToLowerInvariant()] = i;
             }
         }
 

@@ -419,7 +419,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _properties = _contentType.PropertyTypes.Select(p =>
 		        {
                     XmlNode n;
-                    return propertyNodes.TryGetValue(p.Alias.ToLowerInvariant(), out n)
+                    return propertyNodes.TryGetValue(p.PropertyTypeAlias.ToLowerInvariant(), out n)
                         ? new XmlPublishedProperty(p, _isPreviewing, n)
                         : new XmlPublishedProperty(p, _isPreviewing);		        
 		        }).Cast<IPublishedProperty>().ToArray();

@@ -35,14 +35,14 @@ namespace Umbraco.Tests.PublishedContent
             var propertyTypes = new[]
                 {
                     // AutoPublishedContentType will auto-generate other properties
-                    new PublishedPropertyType("umbracoNaviHide", Guid.Empty, 0, 0), 
-                    new PublishedPropertyType("selectedNodes", Guid.Empty, 0, 0), 
-                    new PublishedPropertyType("umbracoUrlAlias", Guid.Empty, 0, 0), 
-                    new PublishedPropertyType("content", Guid.Parse(Constants.PropertyEditors.TinyMCEv3), 0, 0), 
-                    new PublishedPropertyType("testRecursive", Guid.Empty, 0, 0), 
-                    new PublishedPropertyType("siteTitle", Guid.Empty, 0, 0), 
-                    new PublishedPropertyType("creatorName", Guid.Empty, 0, 0), 
-                    new PublishedPropertyType("blah", Guid.Empty, 0, 0), // ugly error when that one is missing...
+                    new PublishedPropertyType("umbracoNaviHide", 0, Guid.Empty), 
+                    new PublishedPropertyType("selectedNodes", 0, Guid.Empty), 
+                    new PublishedPropertyType("umbracoUrlAlias", 0, Guid.Empty), 
+                    new PublishedPropertyType("content", 0, Guid.Parse(Constants.PropertyEditors.TinyMCEv3)), 
+                    new PublishedPropertyType("testRecursive", 0, Guid.Empty), 
+                    new PublishedPropertyType("siteTitle", 0, Guid.Empty), 
+                    new PublishedPropertyType("creatorName", 0, Guid.Empty), 
+                    new PublishedPropertyType("blah", 0, Guid.Empty), // ugly error when that one is missing...
                 };
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
             PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;

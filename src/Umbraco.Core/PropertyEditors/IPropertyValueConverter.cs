@@ -7,14 +7,12 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public interface IPropertyValueConverter
     {
-        #region Data to Source
-
         /// <summary>
-        /// Gets a value indicating whether the converter can convert from Data value to Source value.
+        /// Gets a value indicating whether the converter supports a property type.
         /// </summary>
         /// <param name="propertyType">The property type.</param>
-        /// <returns>A value indicating whether the converter can convert from Data value to Source value.</returns>
-        bool IsDataToSourceConverter(PublishedPropertyType propertyType);
+        /// <returns>A value indicating whether the converter supports a property type.</returns>
+        bool IsConverter(PublishedPropertyType propertyType);
 
         /// <summary>
         /// Converts a property Data value to a Source value.
@@ -36,17 +34,6 @@ namespace Umbraco.Core.PropertyEditors
         /// </remarks>
         object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview);
 
-        #endregion
-
-        #region Source to Object
-
-        /// <summary>
-        /// Gets a value indicating whether the converter can convert from Source value to Object value.
-        /// </summary>
-        /// <param name="propertyType">The property type.</param>
-        /// <returns>A value indicating whether the converter can convert from Source value to Object value.</returns>
-        bool IsSourceToObjectConverter(PublishedPropertyType propertyType);
-
         /// <summary>
         /// Converts a property Source value to an Object value.
         /// </summary>
@@ -58,17 +45,6 @@ namespace Umbraco.Core.PropertyEditors
         /// indicating that no value has been assigned to the property. It is up to the converter to determine
         /// what to return in that case: either <c>null</c>, or the default value...</remarks>
         object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview);
-
-        #endregion
-
-        #region Source to XPath
-
-        /// <summary>
-        /// Gets a value indicating whether the converter can convert from Source value to XPath value.
-        /// </summary>
-        /// <param name="propertyType">The property type.</param>
-        /// <returns>A value indicating whether the converter can convert from Source value to XPath value.</returns>
-        bool IsSourceToXPathConverter(PublishedPropertyType propertyType);
 
         /// <summary>
         /// Converts a property Source value to an XPath value.
@@ -88,7 +64,5 @@ namespace Umbraco.Core.PropertyEditors
         /// but should pay attention not to create infinite loops that would kill XPath and XSLT.</para>
         /// </remarks>
         object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview);
-
-        #endregion
     }
 }

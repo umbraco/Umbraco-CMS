@@ -18,13 +18,10 @@ namespace Umbraco.Core.Models.PublishedContent
     {
         public PublishedPropertyType(PublishedContentType contentType, PropertyType propertyType)
         {
-            // one control identified by its DataTypeGuid
-            // can be used to create several datatypes, identified by their DataTypeDefinitionId and supporting prevalues
-            // which can be used to create several property types, identified by their Id
+            // PropertyEditor [1:n] DataTypeDefinition [1:n] PropertyType
 
             ContentType = contentType;
-            Id = propertyType.Id;
-            Alias = propertyType.Alias;
+            PropertyTypeAlias = propertyType.Alias;
 
             DataTypeId = propertyType.DataTypeDefinitionId;
             PropertyEditorGuid = propertyType.DataTypeId;
@@ -33,11 +30,10 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         // for unit tests
-        internal PublishedPropertyType(string alias, Guid propertyEditorGuid, int propertyTypeId, int dataTypeDefinitionId)
+        internal PublishedPropertyType(string propertyTypeAlias, int dataTypeDefinitionId, Guid propertyEditorGuid)
         {
             // ContentType to be set by PublishedContentType when creating it
-            Id = propertyTypeId;
-            Alias = alias;
+            PropertyTypeAlias = propertyTypeAlias;
 
             DataTypeId = dataTypeDefinitionId;
             PropertyEditorGuid = propertyEditorGuid;
@@ -47,27 +43,40 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region Property type
 
-        // gets the content type
+        /// <summary>
+        /// Gets or sets the published content type containing the property type.
+        /// </summary>
         // internally set by PublishedContentType constructor
         public PublishedContentType ContentType { get; internal set; }
 
-        // gets the property type id
-        public int Id { get; private set; }
+        /// <summary>
+        /// Gets or sets the alias uniquely identifying the property type.
+        /// </summary>
+        public string PropertyTypeAlias { get; private set; }
 
-        // gets the property alias
-        public string Alias { get; private set; }
-
+        /// <summary>
+        /// Gets or sets the identifier uniquely identifying the data type supporting the property type.
+        /// </summary>
         public int DataTypeId { get; private set; }
 
+        // note: in v6 a property editor is uniquely identified by a guid, whereas in v7
+        // it is uniquely identified by a string alias // fixme - compat?
+
+        /// <summary>
+        /// Gets or sets the guid uniquely identifying the property editor for the property type.
+        /// </summary>
         public Guid PropertyEditorGuid { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the alias uniquely identifying the property editor for the property type.
+        /// </summary>
+        public string PropertyEditorAlias { get; private set; }
 
         #endregion
 
         #region Converters
 
-        private IPropertyValueConverter _sourceConverter;
-        private IPropertyValueConverter _objectConverter;
-        private IPropertyValueConverter _xpathConverter;
+        private IPropertyValueConverter _converter;
 
         private PropertyCacheLevel _sourceCacheLevel;
         private PropertyCacheLevel _objectCacheLevel;
@@ -78,30 +87,26 @@ namespace Umbraco.Core.Models.PublishedContent
             var converters = PropertyValueConvertersResolver.Current.Converters.ToArray();
 
             // fixme - get rid of the IPropertyValueEditorConverter support eventually
-            _sourceConverter = GetSingleConverterOrDefault(converters.Union(GetCompatConverters()), x => x.IsDataToSourceConverter(this), "data-to-source");
-            _sourceCacheLevel = GetCacheLevel(_sourceConverter, PropertyCacheValue.Source);
-
-            _objectConverter = GetSingleConverterOrDefault(converters, x => x.IsSourceToObjectConverter(this), "source-to-object");
-            _objectCacheLevel = GetCacheLevel(_objectConverter, PropertyCacheValue.Object);
-            if (_objectCacheLevel < _sourceCacheLevel)
-                _objectCacheLevel = _sourceCacheLevel; // quietely fix the inconsistency, no need to throw
-
-            _xpathConverter = GetSingleConverterOrDefault(converters, x => x.IsSourceToXPathConverter(this), "source-to-xpath");
-            _objectCacheLevel = GetCacheLevel(_objectConverter, PropertyCacheValue.XPath);
-            if (_xpathCacheLevel < _sourceCacheLevel)
-                _xpathCacheLevel = _sourceCacheLevel; // quietely fix the inconsistency, no need to throw
-        }
-
-        static IPropertyValueConverter GetSingleConverterOrDefault(IEnumerable<IPropertyValueConverter> converters,
-            Func<IPropertyValueConverter, bool> predicate, string name)
-        {
-            IPropertyValueConverter result = null;
-            foreach (var converter in converters.Where(predicate))
+            _converter = null;
+            foreach (var converter in converters.Union(GetCompatConverters()).Where(x => x.IsConverter(this)))
             {
-                if (result == null) result = converter;
-                else throw new InvalidOperationException("More than one " + name + " converter.");
+                if (_converter == null)
+                {
+                    _converter = converter;
+                }
+                else
+                {
+                    throw new InvalidOperationException(string.Format("More than one converter for property type {0}.{1}",
+                        ContentType.Alias, PropertyTypeAlias));
+                }
             }
-            return result;
+
+            // get the cache levels, quietely fixing the inconsistencies (no need to throw, really)
+            _sourceCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.Source);
+            _objectCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.Object);
+            _objectCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.XPath);
+            if (_objectCacheLevel < _sourceCacheLevel) _objectCacheLevel = _sourceCacheLevel;
+            if (_xpathCacheLevel < _sourceCacheLevel) _xpathCacheLevel = _sourceCacheLevel;
         }
 
         static PropertyCacheLevel GetCacheLevel(IPropertyValueConverter converter, PropertyCacheValue value)
@@ -122,8 +127,8 @@ namespace Umbraco.Core.Models.PublishedContent
         public object ConvertDataToSource(object source, bool preview)
         {
             // use the converter else use dark (& performance-wise expensive) magic
-            return _sourceConverter != null 
-                ? _sourceConverter.ConvertDataToSource(this, source, preview) 
+            return _converter != null 
+                ? _converter.ConvertDataToSource(this, source, preview) 
                 : ConvertUsingDarkMagic(source);
         }
 
@@ -138,8 +143,8 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             // use the converter if any
             // else just return the source value
-            return _objectConverter != null 
-                ? _objectConverter.ConvertSourceToObject(this, source, preview) 
+            return _converter != null
+                ? _converter.ConvertSourceToObject(this, source, preview) 
                 : source;
         }
 
@@ -154,8 +159,8 @@ namespace Umbraco.Core.Models.PublishedContent
         public object ConvertSourceToXPath(object source, bool preview)
         {
             // use the converter if any
-            if (_xpathConverter != null)
-                return _xpathConverter.ConvertSourceToXPath(this, source, preview);
+            if (_converter != null)
+                return _converter.ConvertSourceToXPath(this, source, preview);
 
             // else just return the source value as a string or an XPathNavigator
             if (source == null) return null;
@@ -207,7 +212,7 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             return PropertyEditorValueConvertersResolver.HasCurrent
                 ? PropertyEditorValueConvertersResolver.Current.Converters
-                    .Where(x => x.IsConverterFor(PropertyEditorGuid, ContentType.Alias, Alias))
+                    .Where(x => x.IsConverterFor(PropertyEditorGuid, ContentType.Alias, PropertyTypeAlias))
                     .Select(x => new CompatConverter(x))
                 : Enumerable.Empty<IPropertyValueConverter>();
         }
@@ -221,7 +226,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 _converter = converter;
             }
 
-            public override bool IsDataToSourceConverter(PublishedPropertyType propertyType)
+            public override bool IsConverter(PublishedPropertyType propertyType)
             {
                 return true;
             }

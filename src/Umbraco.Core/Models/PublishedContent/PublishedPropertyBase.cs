@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
         public string Alias
         {
-            get { return PropertyType.Alias; }
+            get { return PropertyType.PropertyTypeAlias; }
         }
 
         // these have to be provided by the actual implementation
