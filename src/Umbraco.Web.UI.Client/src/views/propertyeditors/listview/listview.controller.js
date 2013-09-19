@@ -111,6 +111,20 @@ angular.module("umbraco")
             return $scope.selected.length > 0;
         };
 
+        $scope.delete = function () {
+            var current = 1;
+            var total = $scope.selected.length;
+            for (var i = 0; i < $scope.selected.length; i++) {
+                contentResource.deleteById($scope.selected[i]).then(function (data) {
+                    current++;
+                    if (current == total) {
+                        $scope.reloadView($scope.content.id);
+                    }
+                });
+            }
+            
+        };
+
         if($routeParams.id){
             $scope.pagination = new Array(100);
             $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
