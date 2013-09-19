@@ -2,18 +2,29 @@
 <div class="umb-listview" ng-controller="Umbraco.Editors.ListViewController">
 	<div class="row-fluid">
 		<div class="umb-sub-header">
-			<div class="btn-group">
-				<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-					Create
-					<span class="caret"></span>
-				</a>
-				<ul class="dropdown-menu">
-				    <li ng-repeat="contentType in listViewAllowedTypes">
-				        <a href="#/content/content/edit/{{content.id}}?doctype={{contentType.alias}}&create=true">
-				            <i class="icon-{{contentType.cssClass}}"></i> {{contentType.name}}</a>
-				    </li>
-				</ul>
-			</div>
+		    <div class="btn-group">
+		        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+		            Create
+		            <span class="caret"></span>
+		        </a>
+		        <ul class="dropdown-menu">
+		            <li ng-repeat="contentType in listViewAllowedTypes">
+		                <a href="#/content/content/edit/{{content.id}}?doctype={{contentType.alias}}&create=true">
+		                    <i class="icon-{{contentType.cssClass}}"></i> {{contentType.name}}</a>
+		            </li>
+		        </ul>
+		    </div>
+		    <!--
+		        <div class="btn-group">
+		            <a class="btn btn-success">Publish</a>
+		        </div>
+		        <div class="btn-group">
+		            <a class="btn btn-warning">Unpublish</a>
+		        </div>
+		        <div class="btn-group">
+		            <a class="btn btn-danger">Delete</a>
+		        </div>
+            -->
 		</div>
 
 		<table class="table table-striped">
@@ -32,7 +43,7 @@
 
 			<tbody>
 				<tr ng-repeat="result in listViewResultSet.items">
-					<td><i class="{{result.icon}}"></i><input type="checkbox"></td> 
+					<td><!--<i class="icon {{result.icon}}"></i>--><input type="checkbox"></td> 
 					<td><a href="#/content/content/edit/{{result.id}}">{{result.name}}</a></td> 
 					<td>{{result.updateDate|date:'medium'}} 
 						<!--<<span class="label label-success">Publish</span>-->
