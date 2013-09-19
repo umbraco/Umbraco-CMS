@@ -25,7 +25,7 @@
 					<td><a href="#" ng-click="sort('Owner')" prevent-default>Editor <i class="icon-sort"></i></a></td> 
 					<td with="20"><form class="pull-right" novalidate>
 					<i class="icon-search"></i>
-					<input type="text" ng-model="options.filter" on-keyup="reloadView()">
+					<input type="text" ng-model="options.filter" on-keyup="reloadView(content.id)">
 				</form></td>
 				</tr>
 			</thead>
