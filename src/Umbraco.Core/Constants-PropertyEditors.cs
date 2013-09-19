@@ -163,6 +163,13 @@ namespace Umbraco.Core
             public const string ListViewAlias = "Umbraco.ListView";
 
             /// <summary>
+            /// Guid for the list view datatype.
+            /// </summary>
+            [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
+            public const string ListView = "474FCFF8-9D2D-12DE-ABC6-AD7A56D89593";
+
+
+            /// <summary>
             /// Guid for the Macro Container datatype.
             /// </summary>
             [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
