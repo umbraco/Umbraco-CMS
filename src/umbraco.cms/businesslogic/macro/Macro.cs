@@ -309,7 +309,7 @@ namespace umbraco.cms.businesslogic.macro
         {
 
             Macro m = null;
-            string alias = xmlHelper.GetNodeValue(n.SelectSingleNode("alias"));
+            string alias = XmlHelper.GetNodeValue(n.SelectSingleNode("alias"));
             try
             {
                 //check to see if the macro alreay exists in the system
@@ -319,27 +319,27 @@ namespace umbraco.cms.businesslogic.macro
             }
             catch (IndexOutOfRangeException)
             {
-                m = MakeNew(xmlHelper.GetNodeValue(n.SelectSingleNode("name")));
+                m = MakeNew(XmlHelper.GetNodeValue(n.SelectSingleNode("name")));
             }
 
             try
             {
                 m.Alias = alias;
-                m.Assembly = xmlHelper.GetNodeValue(n.SelectSingleNode("scriptAssembly"));
-                m.Type = xmlHelper.GetNodeValue(n.SelectSingleNode("scriptType"));
-                m.Xslt = xmlHelper.GetNodeValue(n.SelectSingleNode("xslt"));
-                m.RefreshRate = int.Parse(xmlHelper.GetNodeValue(n.SelectSingleNode("refreshRate")));
+                m.Assembly = XmlHelper.GetNodeValue(n.SelectSingleNode("scriptAssembly"));
+                m.Type = XmlHelper.GetNodeValue(n.SelectSingleNode("scriptType"));
+                m.Xslt = XmlHelper.GetNodeValue(n.SelectSingleNode("xslt"));
+                m.RefreshRate = int.Parse(XmlHelper.GetNodeValue(n.SelectSingleNode("refreshRate")));
 
                 // we need to validate if the usercontrol is missing the tilde prefix requirement introduced in v6
                 if (String.IsNullOrEmpty(m.Assembly) && !String.IsNullOrEmpty(m.Type) && !m.Type.StartsWith("~"))
                     m.Type = "~/" + m.Type;
 
                 if (n.SelectSingleNode("scriptingFile") != null)
-                    m.ScriptingFile = xmlHelper.GetNodeValue(n.SelectSingleNode("scriptingFile"));
+                    m.ScriptingFile = XmlHelper.GetNodeValue(n.SelectSingleNode("scriptingFile"));
 
                 try
                 {
-                    m.UseInEditor = bool.Parse(xmlHelper.GetNodeValue(n.SelectSingleNode("useInEditor")));
+                    m.UseInEditor = bool.Parse(XmlHelper.GetNodeValue(n.SelectSingleNode("useInEditor")));
                 }
                 catch (Exception macroExp)
                 {
@@ -355,9 +355,8 @@ namespace umbraco.cms.businesslogic.macro
                         var property = m.Properties.SingleOrDefault(p => p.Alias == propertyAlias);
                         if (property != null)
                         {
-                            property.Public = bool.Parse(mp.Attributes.GetNamedItem("show").Value);
                             property.Name = mp.Attributes.GetNamedItem("name").Value;
-                            property.Type = new MacroPropertyType(mp.Attributes.GetNamedItem("propertyType").Value);
+                            property.ParameterEditorAlias = mp.Attributes.GetNamedItem("propertyType").Value;
 
                             property.Save();
                         }
@@ -365,10 +364,9 @@ namespace umbraco.cms.businesslogic.macro
                         {
                             MacroProperty.MakeNew(
                                 m,
-                                bool.Parse(mp.Attributes.GetNamedItem("show").Value),
                                 propertyAlias,
                                 mp.Attributes.GetNamedItem("name").Value,
-                                new MacroPropertyType(mp.Attributes.GetNamedItem("propertyType").Value)
+                                mp.Attributes.GetNamedItem("propertyType").Value
                             );
                         }
                     }
@@ -427,14 +425,14 @@ namespace umbraco.cms.businesslogic.macro
             XmlNode doc = xd.CreateElement("macro");
 
 			// info section
-			doc.AppendChild(xmlHelper.addTextNode(xd, "name", this.Name));
-			doc.AppendChild(xmlHelper.addTextNode(xd, "alias", this.Alias));
-			doc.AppendChild(xmlHelper.addTextNode(xd, "scriptType", this.Type));
-			doc.AppendChild(xmlHelper.addTextNode(xd, "scriptAssembly", this.Assembly));
-			doc.AppendChild(xmlHelper.addTextNode(xd, "xslt", this.Xslt));
-			doc.AppendChild(xmlHelper.addTextNode(xd, "useInEditor", this.UseInEditor.ToString()));
-			doc.AppendChild(xmlHelper.addTextNode(xd, "refreshRate", this.RefreshRate.ToString()));
-            doc.AppendChild(xmlHelper.addTextNode(xd, "scriptingFile", this.ScriptingFile));
+			doc.AppendChild(XmlHelper.AddTextNode(xd, "name", this.Name));
+			doc.AppendChild(XmlHelper.AddTextNode(xd, "alias", this.Alias));
+			doc.AppendChild(XmlHelper.AddTextNode(xd, "scriptType", this.Type));
+			doc.AppendChild(XmlHelper.AddTextNode(xd, "scriptAssembly", this.Assembly));
+			doc.AppendChild(XmlHelper.AddTextNode(xd, "xslt", this.Xslt));
+			doc.AppendChild(XmlHelper.AddTextNode(xd, "useInEditor", this.UseInEditor.ToString()));
+			doc.AppendChild(XmlHelper.AddTextNode(xd, "refreshRate", this.RefreshRate.ToString()));
+            doc.AppendChild(XmlHelper.AddTextNode(xd, "scriptingFile", this.ScriptingFile));
 
 			// properties
             XmlNode props = xd.CreateElement("properties");
