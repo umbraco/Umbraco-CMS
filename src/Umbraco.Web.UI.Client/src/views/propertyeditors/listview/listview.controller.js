@@ -116,7 +116,7 @@ angular.module("umbraco")
             var current = 1;
             var total = $scope.selected.length;
             for (var i = 0; i < $scope.selected.length; i++) {
-                $scope.bulkStatus = "Deleted doc " + current + " out of " + total + "documents";
+                $scope.bulkStatus = "Deleted doc " + current + " out of " + total + " documents";
                 contentResource.deleteById($scope.selected[i]).then(function (data) {
                     if (current == total) {
                         notificationsService.success("Bulk action", "Deleted " + total + "documents");
@@ -135,7 +135,7 @@ angular.module("umbraco")
             var current = 1;
             var total = $scope.selected.length;
             for (var i = 0; i < $scope.selected.length; i++) {
-                $scope.bulkStatus = "Publishing doc " + current + " out of " + total + "documents";
+                $scope.bulkStatus = "Publishing doc " + current + " out of " + total + " documents";
                 
                 contentResource.getById($scope.selected[i]).then(function(content) {
                     contentResource.publish(content, false)
