@@ -8,10 +8,10 @@
 					<span class="caret"></span>
 				</a>
 				<ul class="dropdown-menu">
-					<li ng-repeat="contentType in listViewAllowedTypes">
-						<a href="#/content/edit/{{content.id}}?doctype={{contentType.alias}}&create=true">
-							<i class="icon-{{contentType.cssClass}}"></i> {{contentType.name}}</a>
-					</li>
+				    <li ng-repeat="contentType in listViewAllowedTypes">
+				        <a href="#/content/content/edit/{{content.id}}?doctype={{contentType.alias}}&create=true">
+				            <i class="icon-{{contentType.cssClass}}"></i> {{contentType.name}}</a>
+				    </li>
 				</ul>
 			</div>
 		</div>
