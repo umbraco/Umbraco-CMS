@@ -59,22 +59,33 @@ namespace Umbraco.Web.Editors
             //Based on the action we need to check different permissions.
             //Then if it is new, we need to lookup those permissions on the parent!
             char permissionToCheck;
-            IContent contentToCheck;
+            IContent contentToCheck = null;
+            int contentIdToCheck;
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
                     permissionToCheck = ActionUpdate.Instance.Letter;
                     contentToCheck = contentItem.PersistedContent;
+                    contentIdToCheck = contentToCheck.Id;
                     break;
                 case ContentSaveAction.Publish:
                     permissionToCheck = ActionPublish.Instance.Letter;
                     contentToCheck = contentItem.PersistedContent;
+                    contentIdToCheck = contentToCheck.Id;
                     break;
                 case ContentSaveAction.PublishNew:
                 case ContentSaveAction.SaveNew:
                 default:
                     permissionToCheck = ActionNew.Instance.Letter;
-                    contentToCheck = ContentService.GetById(contentItem.ParentId);
+                    if (contentItem.ParentId != Constants.System.Root)
+                    {
+                        contentToCheck = ContentService.GetById(contentItem.ParentId);
+                        contentIdToCheck = contentToCheck.Id;
+                    }
+                    else
+                    {
+                        contentIdToCheck = contentItem.ParentId;
+                    }
                     break;
             }
 
@@ -83,7 +94,7 @@ namespace Umbraco.Web.Editors
                 Security.CurrentUser,
                 UserService,
                 ContentService,
-                contentToCheck.Id,
+                contentIdToCheck,
                 permissionToCheck,
                 contentToCheck) == false)
             {

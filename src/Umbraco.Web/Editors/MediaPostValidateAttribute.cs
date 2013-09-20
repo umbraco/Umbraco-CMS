@@ -49,14 +49,27 @@ namespace Umbraco.Web.Editors
 
             //We now need to validate that the user is allowed to be doing what they are doing.
             //Then if it is new, we need to lookup those permissions on the parent.
-            IMedia contentToCheck;
+            IMedia contentToCheck = null;
+            int contentIdToCheck;
             switch (mediaItem.Action)
             {
                 case ContentSaveAction.Save:
                     contentToCheck = mediaItem.PersistedContent;
+                    contentIdToCheck = contentToCheck.Id;
                     break;                
                 case ContentSaveAction.SaveNew:
                     contentToCheck = MediaService.GetById(mediaItem.ParentId);
+
+                    if (mediaItem.ParentId != Constants.System.Root)
+                    {
+                        contentToCheck = MediaService.GetById(mediaItem.ParentId);
+                        contentIdToCheck = contentToCheck.Id;
+                    }
+                    else
+                    {
+                        contentIdToCheck = mediaItem.ParentId;
+                    }
+
                     break;
                 case ContentSaveAction.Publish:
                 case ContentSaveAction.PublishNew:
@@ -70,7 +83,7 @@ namespace Umbraco.Web.Editors
                 actionContext.Request.Properties,
                 Security.CurrentUser,
                 MediaService,
-                contentToCheck.Id,
+                contentIdToCheck,
                 contentToCheck) == false)
             {
                 throw new HttpResponseException(actionContext.Request.CreateUserNoAccessResponse());

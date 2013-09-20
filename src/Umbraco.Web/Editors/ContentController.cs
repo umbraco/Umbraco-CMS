@@ -428,21 +428,23 @@ namespace Umbraco.Web.Editors
             char permissionToCheck,
             IContent contentItem = null)
         {
-            if (contentItem == null)
+           
+            if (contentItem == null && nodeId != Constants.System.Root)
             {
                 contentItem = contentService.GetById(nodeId);
+                //put the content item into storage so it can be retreived 
+                // in the controller (saves a lookup)
+                storage[typeof(IContent).ToString()] = contentItem;
             }
 
-            if (contentItem == null)
+            if (contentItem == null && nodeId != Constants.System.Root)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            //put the content item into storage so it can be retreived 
-            // in the controller (saves a lookup)
-            storage[typeof(IContent).ToString()] = contentItem;
-
-            var hasPathAccess = user.HasPathAccess(contentItem);
+            var hasPathAccess = (nodeId == Constants.System.Root)
+                                    ? UserExtensions.HasPathAccess("-1", user.StartContentId, Constants.System.RecycleBinContent)
+                                    : user.HasPathAccess(contentItem);
 
             if (hasPathAccess == false)
             {

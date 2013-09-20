@@ -898,7 +898,8 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 propertyType.Mandatory = gpw.GenricPropertyControl.Mandatory;
                 propertyType.DataTypeDatabaseType = dataTypeDefinition.DatabaseType;
                 propertyType.DataTypeDefinitionId = dataTypeDefinition.Id;
-                propertyType.DataTypeId = dataTypeDefinition.ControlId;
+                propertyType.PropertyEditorAlias = dataTypeDefinition.PropertyEditorAlias;
+
                 if (propertyType.PropertyGroupId == null || propertyType.PropertyGroupId.Value != gpw.GenricPropertyControl.Tab)
                 {
                     if (gpw.GenricPropertyControl.Tab == 0)

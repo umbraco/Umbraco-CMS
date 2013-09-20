@@ -310,6 +310,10 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         internal static bool CheckPermissions(IDictionary<string, object> storage, IUser user, IMediaService mediaService, int nodeId, IMedia media = null)
         {
+            if (nodeId != Constants.System.Root)
+            {
+                
+            
             var contentItem = mediaService.GetById(nodeId);
             if (contentItem == null)
             {
