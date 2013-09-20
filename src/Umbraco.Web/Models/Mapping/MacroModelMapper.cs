@@ -27,7 +27,20 @@ namespace Umbraco.Web.Models.Mapping
                     .ConvertUsing(macro => macro.Properties.Select(Mapper.Map<MacroParameter>).ToList());
 
             config.CreateMap<IMacroProperty, MacroParameter>()
-                  .ForMember(parameter => parameter.View, expression => expression.ResolveUsing<ParameterEditorViewResolver>());
+                  .AfterMap((property, parameter) =>
+                      {
+                          //map the view and the config
+
+                          var paramEditor = ParameterEditorResolver.Current.GetByAlias(property.EditorAlias);
+                          if (paramEditor == null)
+                          {
+                              throw new InvalidOperationException("Could not resolve macro parameter editor: " + property.EditorAlias);
+                          }
+                          parameter.View = paramEditor.ValueEditor.View;
+
+                          //set the config
+                          parameter.Configuration = paramEditor.Configuration;
+                      });
 
         }
 

@@ -18,19 +18,28 @@ function valToggleMsg(serverValidationManager) {
                 throw "valToggleMsg cannot find field " + attr.valMsgFor + " on form " + formCtrl.$name;
             }
 
-            //assign the form control to our isolated scope so we can watch it's values
-            scope.formCtrl = formCtrl;
-
             //if there's any remaining errors in the server validation service then we should show them.
             var showValidation = serverValidationManager.items.length > 0;
-            
+            var hasCustomMsg = element.contents().length > 0;
+
             //add a watch to the validator for the value (i.e. myForm.value.$error.required )
-            scope.$watch("formCtrl." + attr.valMsgFor + ".$error." + attr.valToggleMsg, function () {
-                if (formCtrl[attr.valMsgFor].$error[attr.valToggleMsg] && showValidation) {
-                    element.show();
-                }
-                else {
-                    element.hide();
+            scope.$watch(function () {
+                //sometimes if a dialog closes in the middle of digest we can get null references here
+                
+                return (formCtrl && formCtrl[attr.valMsgFor]) ? formCtrl[attr.valMsgFor].$error[attr.valToggleMsg] : null;
+            }, function () {
+                //sometimes if a dialog closes in the middle of digest we can get null references here
+                if ((formCtrl && formCtrl[attr.valMsgFor])) {
+                    if (formCtrl[attr.valMsgFor].$error[attr.valToggleMsg] && showValidation) {                        
+                        element.show();
+                        //display the error message if this element has no contents
+                        if (!hasCustomMsg) {
+                            element.html(formCtrl[attr.valMsgFor].errorMsg);
+                        }
+                    }
+                    else {
+                        element.hide();
+                    }
                 }
             });
             
@@ -38,6 +47,10 @@ function valToggleMsg(serverValidationManager) {
                 showValidation = true;
                 if (formCtrl[attr.valMsgFor].$error[attr.valToggleMsg]) {
                     element.show();
+                    //display the error message if this element has no contents
+                    if (!hasCustomMsg) {
+                        element.html(formCtrl[attr.valMsgFor].errorMsg);
+                    }
                 }
                 else {
                     element.hide();

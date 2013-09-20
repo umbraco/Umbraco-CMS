@@ -21,12 +21,10 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
                     $scope.submit({ selectedMacro: $scope.selectedMacro });
                 } else {
                     $scope.wizardStep = "paramSelect";
-                    //update the view on each editor to be correct
-                    _.each(data, function (item) {
-                        item.view = umbPropEditorHelper.getViewPath(item.view);
-                        //add the 'value' property for the model for editors to bind to
-                        item.value = null;
-                    });
+                    ////update the view on each editor to be correct
+                    //_.each(data, function (item) {
+                    //    item.view = umbPropEditorHelper.getViewPath(item.view);
+                    //});
                     $scope.macroParams = data;
                 }
             });
@@ -63,6 +61,11 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
     $scope.macroParams = [];
     
     $scope.submitForm = function () {
+
+        if ($scope.wizardStep === "paramSelect") {
+            //we need to broadcast the saving event for the toggle validators to work
+            $scope.$broadcast("saving");
+        }
 
         //ensure the drop down is dirty so the styles validate
         $scope.insertMacroForm.$setDirty(true);

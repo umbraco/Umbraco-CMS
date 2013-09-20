@@ -8,10 +8,10 @@
     <input name="regex" id="regex"            
            type="text" ng-model="model.value" 
            required 
-           val-regex="model.config[0]" 
+           val-regex="model.config.regex" 
            val-server="value" />
         
     <span class="help-inline" val-msg-for="regex" val-toggle-msg="required">Required!</span>
-    <span class="help-inline" val-msg-for="regex" val-toggle-msg="valRegex">{{propertyForm.regex.errorMsg}}</span>
-    <span class="help-inline" val-msg-for="regex" val-toggle-msg="valServer">{{propertyForm.regex.errorMsg}}</span>
+    <span class="help-inline" val-msg-for="regex" val-toggle-msg="valRegex" ></span>
+    <span class="help-inline" val-msg-for="regex" val-toggle-msg="valServer"></span>
 </div>

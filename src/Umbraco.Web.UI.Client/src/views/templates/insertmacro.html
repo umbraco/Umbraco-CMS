@@ -1,4 +1,4 @@
-<div class="umb-panel" ng-controller="Umbraco.Editors.Templates.InsertMacroController">
+<div class="umb-panel show-validation" ng-controller="Umbraco.Editors.Templates.InsertMacroController">
 
     <form novalidate name="insertMacroForm" ng-submit="submitForm()">
         
@@ -23,18 +23,16 @@
                 <div class="umb-pane" ng-switch-when="paramSelect">
                     
                     <ul class="unstyled">
-                        <li ng-repeat="model in $parent.macroParams">
-                            <label>{{model.name}}</label>
-                            <div ng-include="model.view">
-                                
+                        <li ng-repeat="param in $parent.macroParams">
+                            
+                            <div class="control-group umb-control-group" ng-class="{error: insertMacroForm.$invalid}" >
+                                <label>{{param.name}}</label>
+                                <umb-editor model="param"></umb-editor>    
                             </div>
+
                         </li>
                     </ul>
                     
-                    <p>
-                        {{$parent.macroParams | json}}
-                    </p>
-
                 </div>
             </div>
         </div>

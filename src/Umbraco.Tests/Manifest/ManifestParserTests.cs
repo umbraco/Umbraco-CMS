@@ -111,6 +111,44 @@ namespace Umbraco.Tests.Manifest
         }
 
         [Test]
+        public void Property_Editors_Can_Be_Parameter_Editor()
+        {
+
+            var a = JsonConvert.DeserializeObject<JArray>(@"[
+    {
+        alias: 'Test.Test1',
+        name: 'Test 1',   
+        isParameterEditor: true,     
+        defaultConfig: { key1: 'some default val' },
+        editor: {
+            view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
+            valueType: 'int',
+            validation: {
+                required : true,
+                regex : '\\d*'
+            }
+        }
+    },
+    {
+        alias: 'Test.Test2',
+        name: 'Test 2',
+        defaultConfig: { key1: 'some default pre val' },
+        editor: {
+            view: '~/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html'
+        }
+    }
+]");
+            var parser = ManifestParser.GetPropertyEditors(a);
+
+            Assert.AreEqual(1, parser.Count(x => x.IsParameterEditor));
+
+            IParameterEditor parameterEditor = parser.First();
+            Assert.AreEqual(1, parameterEditor.Configuration.Count);
+            Assert.IsTrue(parameterEditor.Configuration.ContainsKey("key1"));
+            Assert.AreEqual("some default val", parameterEditor.Configuration["key1"]);
+        }
+
+        [Test]
         public void Parse_Parameter_Editors()
         {
 

@@ -24,9 +24,6 @@ function valPropertyMsg(serverValidationManager) {
          */
         link: function (scope, element, attrs, formCtrl) {
 
-            //assign the form control to our isolated scope so we can watch it's values
-            scope.formCtrl = formCtrl;
-            
             //if there's any remaining errors in the server validation service then we should show them.
             var showValidation = serverValidationManager.items.length > 0;
             var hasError = false;
@@ -34,17 +31,18 @@ function valPropertyMsg(serverValidationManager) {
             //create properties on our custom scope so we can use it in our template
             scope.errorMsg = "";
 
-            //listen for error changes
-            scope.$watch("formCtrl.$error", function () {
+            //listen for form error changes
+            scope.$watch(function() {
+                return formCtrl.$error;
+            }, function() {
                 if (formCtrl.$invalid) {
-                    
+
                     //first we need to check if the valPropertyMsg validity is invalid
                     if (formCtrl.$error.valPropertyMsg && formCtrl.$error.valPropertyMsg.length > 0) {
                         //since we already have an error we'll just return since this means we've already set the 
                         // hasError and errorMsg properties which occurs below in the serverValidationManager.subscribe
                         return;
-                    }                    
-                    else if (element.closest(".umb-control-group").find(".ng-invalid").length > 0) {
+                    } else if (element.closest(".umb-control-group").find(".ng-invalid").length > 0) {
                         //check if it's one of the properties that is invalid in the current content property
                         hasError = true;
                         //update the validation message if we don't already have one assigned.
@@ -56,13 +54,11 @@ function valPropertyMsg(serverValidationManager) {
                             }
                             scope.errorMsg = err ? err.errorMsg : "Property has errors";
                         }
-                    }
-                    else {
+                    } else {
                         hasError = false;
                         scope.errorMsg = "";
                     }
-                }
-                else {
+                } else {
                     hasError = false;
                     scope.errorMsg = "";
                 }
@@ -103,12 +99,12 @@ function valPropertyMsg(serverValidationManager) {
                 // is the only one, then we'll clear.
 
                 var errCount = 0;
-                for (var e in scope.formCtrl.$error) {
+                for (var e in formCtrl.$error) {
                     errCount++;
                 }
 
-                if ((errCount === 1 && scope.formCtrl.$error.valPropertyMsg !== undefined) ||
-                    (formCtrl.$invalid && scope.formCtrl.$error.valServer !== undefined)) {
+                if ((errCount === 1 && formCtrl.$error.valPropertyMsg !== undefined) ||
+                    (formCtrl.$invalid && formCtrl.$error.valServer !== undefined)) {
                     scope.errorMsg = "";
                     formCtrl.$setValidity('valPropertyMsg', true);
                 }

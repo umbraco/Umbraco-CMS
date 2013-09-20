@@ -28,5 +28,18 @@ namespace Umbraco.Web.Models.ContentEditing
         [Required(AllowEmptyStrings = false)]
         public string View { get; set; }
 
+        /// <summary>
+        /// The configuration for this parameter editor
+        /// </summary>
+        [DataMember(Name = "config", IsRequired = true)]
+        [Required(AllowEmptyStrings = false)]
+        public IDictionary<string, object> Configuration { get; set; }
+
+        /// <summary>
+        /// Since we don't post this back this isn't currently really used on the server side
+        /// </summary>
+        [DataMember(Name = "value")]
+        public object Value { get; set; }
+
     }
 }

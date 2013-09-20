@@ -3,6 +3,7 @@
 		{
 			alias: "MyPackage.Regex",
 			name: "Regex",
+			isParameterEditor: true,
 			defaultConfig: {
 				regex: "^\\d*$"
 			},
