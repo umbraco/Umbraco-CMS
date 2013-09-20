@@ -148,7 +148,8 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 //need to set the id explicitly here
                 propDto.Macro = id;
-                Database.Insert(propDto);
+                var propId = Convert.ToInt32(Database.Insert(propDto));
+                entity.Properties[propDto.Alias].Id = propId;
             }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
@@ -173,8 +174,8 @@ namespace Umbraco.Core.Persistence.Repositories
                     if (macro.AddedProperties.Contains(propDto.Alias))
                     {
                         //we need to insert since this was added  and re-assign the new id
-                        Database.Insert(propDto);
-                        macro.Properties[propDto.Alias].Id = propDto.Id;
+                        var propId = Convert.ToInt32(Database.Insert(propDto));
+                        macro.Properties[propDto.Alias].Id = propId;
                     }
                     else
                     {

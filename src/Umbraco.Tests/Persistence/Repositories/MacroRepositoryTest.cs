@@ -164,12 +164,14 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 var macro = new Macro("test", "Test", "~/usercontrol/blah.ascx", "MyAssembly", "test.xslt", "~/views/macropartials/test.cshtml");
+                macro.Properties.Add(new MacroProperty("test", "Test", 0, "test"));
                 repository.AddOrUpdate(macro);
                 unitOfWork.Commit();
 
                 // Assert
                 Assert.That(macro.HasIdentity, Is.True);
                 Assert.That(macro.Id, Is.EqualTo(4));//With 3 existing entries the Id should be 4   
+                Assert.Greater(macro.Properties.Single().Id, 0);
             }
         }
 

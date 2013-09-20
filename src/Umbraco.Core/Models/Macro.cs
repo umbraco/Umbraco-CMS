@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -125,13 +126,17 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo XsltPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.XsltPath);
         private static readonly PropertyInfo PropertiesSelector = ExpressionHelper.GetPropertyInfo<Macro, MacroPropertyCollection>(x => x.Properties);
 
-        protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(PropertiesSelector);
 
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                var alias = e.NewItems.Cast<IMacroProperty>().Select(x => x.Alias).First();
+                //listen for changes
+                var prop = e.NewItems.Cast<MacroProperty>().First();
+                prop.PropertyChanged += PropertyDataChanged;
+
+                var alias = prop.Alias;
 
                 //remove from the removed/added props (since people could add/remove all they want in one request)
                 _removedProperties.RemoveAll(s => s == alias);
@@ -142,7 +147,11 @@ namespace Umbraco.Core.Models
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                var alias = e.OldItems.Cast<IMacroProperty>().Select(x => x.Alias).First();
+                //remove listening for changes
+                var prop = e.OldItems.Cast<MacroProperty>().First();
+                prop.PropertyChanged -= PropertyDataChanged;
+
+                var alias = prop.Alias;
 
                 //remove from the removed/added props (since people could add/remove all they want in one request)
                 _removedProperties.RemoveAll(s => s == alias);
@@ -151,6 +160,16 @@ namespace Umbraco.Core.Models
                 //add to the added props
                 _removedProperties.Add(alias);
             }
+        }
+
+        /// <summary>
+        /// When some data of a property has changed ensure our Properties flag is dirty
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void PropertyDataChanged(object sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(PropertiesSelector);
         }
         
         internal override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
