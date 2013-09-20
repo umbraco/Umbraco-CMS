@@ -28,6 +28,12 @@ namespace Umbraco.Web.Models.ContentEditing
         public int ParentId { get; set; }
 
         /// <summary>
+        /// This will only be populated for some entities like macros
+        /// </summary>
+        [DataMember(Name = "alias")]
+        public string Alias { get; set; }
+
+        /// <summary>
         /// For now we'll exclude this from the json results, this is needed for permissions check filtering
         /// </summary>
         [IgnoreDataMember]

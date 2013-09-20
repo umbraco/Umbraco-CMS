@@ -28,41 +28,38 @@ angular.module('umbraco.services').factory('legacyJsLoader', legacyJsLoader);
 function umbPropEditorHelper() {
     return {
         /**
-     * @ngdoc function
-     * @name getImagePropertyValue
-     * @methodOf umbraco.services.umbPropertyEditorHelper
-     * @function    
-     *
-     * @description
-     * Returns the correct view path for a property editor, it will detect if it is a full virtual path but if not then default to the internal umbraco one
-     * 
-     * @param {string} input the view path currently stored for the property editor
-     */
-        getViewPath: function (input, isPreValue) {
+         * @ngdoc function
+         * @name getImagePropertyValue
+         * @methodOf umbraco.services.umbPropertyEditorHelper
+         * @function    
+         *
+         * @description
+         * Returns the correct view path for a property editor, it will detect if it is a full virtual path but if not then default to the internal umbraco one
+         * 
+         * @param {string} input the view path currently stored for the property editor
+         */
+        getViewPath: function(input, isPreValue) {
             var path = String(input);
 
             if (path.startsWith('/')) {
 
                 //This is an absolute path, so just leave it
                 return path;
-            }
-            else {
-                
+            } else {
+
                 if (path.indexOf("/") >= 0) {
                     //This is a relative path, so just leave it
                     return path;
-                }
-                else {
+                } else {
                     if (!isPreValue) {
                         //i.e. views/propertyeditors/fileupload/fileupload.html
                         return "views/propertyeditors/" + path + "/" + path + ".html";
-                    }
-                    else {
+                    } else {
                         //i.e. views/prevalueeditors/requiredfield.html
                         return "views/prevalueeditors/" + path + ".html";
                     }
                 }
-                
+
             }
         }
     };

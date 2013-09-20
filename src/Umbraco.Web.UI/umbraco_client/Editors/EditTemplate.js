@@ -7,15 +7,17 @@
         _opts: null,
 
         _openMacroModal: function(alias) {
-            var t = "";
-            if (alias != null && alias != "") {
-                t = "&alias=" + alias;
-            }
+            
+            var self = this;
+
             UmbClientMgr.openAngularModalWindow({
                 template: "views/templates/insertmacro.html",
                 dialogData: {
-                    renderingEngine: "Webforms",
-                    objectId: this._opts.editorClientId + t
+                    renderingEngine: "WebForms",
+                    selectedAlias: alias
+                },
+                callback: function(data) {
+                    UmbEditor.Insert(data, '', self._opts.editorClientId);
                 }
             });
         },

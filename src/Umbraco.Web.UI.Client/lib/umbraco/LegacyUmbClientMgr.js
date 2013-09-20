@@ -175,7 +175,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
             },
             
             /** This is used to launch an angular based modal window instead of the legacy window */
-            openAngularModalWindow: function (options, onCloseCallback) {
+            openAngularModalWindow: function (options) {
 
                 //get our angular navigation service
                 var injector = getRootInjector();
@@ -249,8 +249,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     //instead of calling just the dialog service we funnel it through the global 
                     //event emitter
                     getRootScope().$emit("closeDialogs", event);
-
-                    //dialogService.closeAll(rVal);
                 }                
             },
             _debug: function(strMsg) {

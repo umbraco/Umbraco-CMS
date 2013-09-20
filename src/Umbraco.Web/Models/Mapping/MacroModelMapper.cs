@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -24,7 +26,8 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMacro, IEnumerable<MacroParameter>>()
                     .ConvertUsing(macro => macro.Properties.Select(Mapper.Map<MacroParameter>).ToList());
 
-            config.CreateMap<IMacroProperty, MacroParameter>();
+            config.CreateMap<IMacroProperty, MacroParameter>()
+                  .ForMember(parameter => parameter.View, expression => expression.ResolveUsing<ParameterEditorViewResolver>());
 
         }
 

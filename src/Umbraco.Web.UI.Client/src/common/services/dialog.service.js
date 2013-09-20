@@ -38,8 +38,6 @@ angular.module('umbraco.services')
            for (var i = 0; i < dialogs.length; i++) {
                var dialog = dialogs[i];
                dialog.close(args);
-
-               //removeDialog(dialog, args);
                dialogs.splice(i, 1);
            }
        }
@@ -266,10 +264,8 @@ angular.module('umbraco.services')
             */
            close: function (dialog, args) {
               if(dialog){
-                  dialog.close();
-              }
-              
-               //removeDialog(dialog, args);
+                  dialog.close(args);
+              }              
            },
            
            /**
