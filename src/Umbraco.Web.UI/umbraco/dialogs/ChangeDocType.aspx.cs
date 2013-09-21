@@ -141,13 +141,11 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                 if (ri.ItemType == ListItemType.Item || ri.ItemType == ListItemType.AlternatingItem)
                 {
                     // Get data type from hidden field
-                    var dataTypeId = Guid.Parse(((HiddenField)ri.FindControl("DataTypeId")).Value);
-
-                    //TODO: Change this logic as it will not be backwards compatible with Belle if there's no GUID -> Alias mapping!
+                    var propEdAlias = ((HiddenField)ri.FindControl("PropertyEditorAlias")).Value;
 
                     // Bind destination list with properties that match data type
                     var ddl = (DropDownList)ri.FindControl("DestinationProperty");
-                    ddl.DataSource = properties.Where(x => x.DataTypeId == dataTypeId);
+                    ddl.DataSource = properties.Where(x => x.PropertyEditorAlias == propEdAlias);
                     ddl.DataValueField = "Alias";
                     ddl.DataTextField = "Name";
                     ddl.DataBind();

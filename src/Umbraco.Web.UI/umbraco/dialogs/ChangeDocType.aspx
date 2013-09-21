@@ -73,7 +73,7 @@
                         <%# DataBinder.Eval(Container, "DataItem.Name") %>
                         <asp:HiddenField ID="Alias" runat="server" Value='<%#DataBinder.Eval(Container, "DataItem.Alias")%>' />
                         <asp:HiddenField ID="Name" runat="server" Value='<%#DataBinder.Eval(Container, "DataItem.Name")%>' />
-                        <asp:HiddenField ID="DataTypeId" runat="server" Value='<%#DataBinder.Eval(Container, "DataItem.DataTypeId")%>' />
+                        <asp:HiddenField ID="PropertyEditorAlias" runat="server" Value='<%#DataBinder.Eval(Container, "DataItem.PropertyEditorAlias")%>' />
                     </td>
                     <td><asp:DropDownList id="DestinationProperty" runat="server" /></td>
                 </tr>
