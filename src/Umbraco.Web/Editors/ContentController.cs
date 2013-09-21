@@ -417,7 +417,7 @@ namespace Umbraco.Web.Editors
         /// <param name="contentService"></param>
         /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
         /// <param name="permissionToCheck"></param>
-        /// <param name="contentItem">Specifies the already resolved content item to check against, setting this ignores the nodeId</param>
+        /// <param name="contentItem">Specifies the already resolved content item to check against</param>
         /// <returns></returns>
         internal static bool CheckPermissions(
             IDictionary<string, object> storage,
