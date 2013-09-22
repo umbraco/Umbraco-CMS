@@ -44,7 +44,7 @@ namespace Umbraco.Core.PropertyEditors
             {
                 if (throwIfNotFound)
                 {
-                    throw new ObjectNotFoundException("Could not find a map for a property editor with a legacy id of " + legacyId);
+                    throw new ObjectNotFoundException("Could not find a map for a property editor with a legacy id of " + legacyId + ". Consider using the new business logic APIs instead of the old obsoleted ones.");
                 }
                 return null;
             }
@@ -64,7 +64,7 @@ namespace Umbraco.Core.PropertyEditors
             {
                 if (throwIfNotFound)
                 {
-                    throw new ObjectNotFoundException("Could not find a map for a property editor with an alias of " + alias);
+                    throw new ObjectNotFoundException("Could not find a map for a property editor with an alias of " + alias + ". Consider using the new business logic APIs instead of the old obsoleted ones.");
                 }
                 return null;
             }

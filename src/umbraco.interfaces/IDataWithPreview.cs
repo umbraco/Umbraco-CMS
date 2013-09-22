@@ -4,6 +4,7 @@ using System.Text;
 
 namespace umbraco.interfaces
 {
+    [Obsolete("IDataType is obsolete and is no longer used, it will be removed from the codebase in future versions")]
     public interface IDataWithPreview : IData
     {
         /// <summary>

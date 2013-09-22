@@ -7,6 +7,7 @@ namespace umbraco.interfaces
     /// The IDataEditor is part of the IDataType interface for creating new data types in the umbraco backoffice. 
     /// The IDataEditor represents the editing UI for the Data Type.
     /// </summary>
+    [Obsolete("IDataEditor is obsolete and is no longer used, it will be removed from the codebase in future versions")]
 	public interface IDataEditor 
 	{
         /// <summary>

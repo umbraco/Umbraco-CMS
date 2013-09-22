@@ -1,9 +1,12 @@
 
+using System;
+
 namespace umbraco.interfaces
 {
     /// <summary>
     /// IMenuElement is an interface for items in the umbraco backoffice panel menu
     /// </summary>
+    [Obsolete("IMenuElement is obsolete and is no longer used, it will be removed from the codebase in future versions")]
     public interface IMenuElement
     {
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using System.Web.UI;
+﻿using System;
+using System.Web.UI;
 
 namespace umbraco.interfaces
 {
@@ -6,6 +7,7 @@ namespace umbraco.interfaces
     /// Data type editor controls can choose to implement this interface
     /// to customize their Live Editing behavior.
     /// </summary>
+    [Obsolete("ILiveEditingDataEditor is obsolete and is no longer used, it will be removed from the codebase in future versions")]
     public interface ILiveEditingDataEditor
     {
         /// <summary>

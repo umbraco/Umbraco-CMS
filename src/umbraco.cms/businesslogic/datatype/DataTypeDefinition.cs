@@ -75,10 +75,12 @@ namespace umbraco.cms.businesslogic.datatype
                 if (value == null)
                     throw new InvalidOperationException("The value passed in is null. The DataType property cannot be set to a null value");
 
-                SqlHelper.ExecuteNonQuery("update cmsDataType set controlId = @id where nodeID = " + this.Id.ToString(),
-                    SqlHelper.CreateParameter("@id", value.Id));
-
                 var alias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(value.Id, true);
+
+                SqlHelper.ExecuteNonQuery("update cmsDataType set propertyEditorAlias = @alias where nodeID = " + this.Id,
+                    SqlHelper.CreateParameter("@alias", alias));
+
+                
 
                 _propertyEditorAlias = alias;
             }
@@ -243,12 +245,8 @@ namespace umbraco.cms.businesslogic.datatype
 
             var newId = MakeNew(-1, _objectType, u.Id, 1, Text, UniqueId).Id;
 
-            // initial control id changed to empty to ensure that it'll always work no matter if 3rd party configurators fail
-            // ref: http://umbraco.codeplex.com/workitem/29788
-            var firstcontrolId = Guid.Empty;
-
-            SqlHelper.ExecuteNonQuery("Insert into cmsDataType (nodeId, controlId, dbType) values (" + newId.ToString() + ",@controlId,'Ntext')",
-                SqlHelper.CreateParameter("@controlId", firstcontrolId));
+            //insert empty prop ed alias
+            SqlHelper.ExecuteNonQuery("Insert into cmsDataType (nodeId, propertyEditorAlias, dbType) values (" + newId + ",'','Ntext')");
 
             var dtd = new DataTypeDefinition(newId);
             dtd.OnNew(EventArgs.Empty);
