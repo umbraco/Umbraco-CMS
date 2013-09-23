@@ -1,3 +1,13 @@
-<div ng-controller="Umbraco.Editors.Content.SortController">
-    <umb-item-sorter model="sortableModel"></umb-item-sorter>
+<div class="umb-pane" ng-controller="Umbraco.Editors.Content.SortController">
+
+<ul umb-sort="sortOptions" 
+    ng-model="pagesToSort"> 
+	<li ng-repeat="page in pagesToSort">
+		<i class="icon-navigation handle"></i> {{page.name}}
+	</li>	
+</ul>
+{{ pagesToSort | json}}
 </div>
+
+
+
