@@ -131,10 +131,7 @@ namespace Umbraco.Web.Cache
             //clear static object cache
             global::umbraco.cms.businesslogic.ContentType.RemoveAllDataTypeCache();
 
-            // see PublishedContentType for details
-            // can do by object types - noone else should cache published content type
-            //ApplicationContext.Current.ApplicationCache.ClearStaticCacheByKeySearch("PublishedContentType_");
-            ApplicationContext.Current.ApplicationCache.ClearStaticCacheObjectTypes<PublishedContentType>();
+            PublishedContentType.ClearAll();
 
             base.RefreshAll();
         }
@@ -256,9 +253,7 @@ namespace Umbraco.Web.Cache
             //clears the dictionary object cache of the legacy ContentType
             global::umbraco.cms.businesslogic.ContentType.RemoveFromDataTypeCache(payload.Alias);
 
-            // see PublishedContentType for details
-            ApplicationContext.Current.ApplicationCache.ClearStaticCacheObjectTypes<PublishedContentType>(
-                (key, value) => value.Id == payload.Id); // faster than key strings comparisons
+            PublishedContentType.ClearContentType(payload.Id);
 
             //need to recursively clear the cache for each child content type
             foreach (var descendant in payload.DescendantPayloads)

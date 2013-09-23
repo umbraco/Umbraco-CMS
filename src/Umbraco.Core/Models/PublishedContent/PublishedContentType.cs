@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Caching;
+using System.Web.UI;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Models.PublishedContent
@@ -94,32 +95,35 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region Cache
 
-        // these methods are NOT called anymore
-        // instead, ContentTypeCacheRefresher and DataTypeCacheRefresher directly handle the ApplicationCache
+        // these methods are called by ContentTypeCacheRefresher and DataTypeCacheRefresher
 
-        //// internal, called by ContentTypeCacheRefresher
-        //internal static void ClearAll()
-        //{
-        //    Logging.LogHelper.Debug<PublishedContentType>("Clear all.");
-        //    ApplicationContext.Current.ApplicationCache.ClearStaticCacheByKeySearch("PublishedContentType_");
-        //}
+        internal static void ClearAll()
+        {
+            Logging.LogHelper.Debug<PublishedContentType>("Clear all.");
+            // ok and faster to do it by types, assuming noone else caches PublishedContentType instances
+            //ApplicationContext.Current.ApplicationCache.ClearStaticCacheByKeySearch("PublishedContentType_");
+            ApplicationContext.Current.ApplicationCache.ClearStaticCacheObjectTypes<PublishedContentType>();
+        }
 
-        //// internal, called by ContentTypeCacheRefresher
-        //internal static void ClearContentType(int id)
-        //{
-        //    Logging.LogHelper.Debug<PublishedContentType>("Clear content type w/id {0}.", () => id);
-        //    // requires a predicate because the key does not contain the ID
-        //    ApplicationContext.Current.ApplicationCache.ClearStaticCacheObjectTypes<PublishedContentType>(
-        //        (key, value) => value.Id == id);
-        //}
+        internal static void ClearContentType(int id)
+        {
+            Logging.LogHelper.Debug<PublishedContentType>("Clear content type w/id {0}.", () => id);
+            // requires a predicate because the key does not contain the ID
+            // faster than key strings comparisons anyway
+            ApplicationContext.Current.ApplicationCache.ClearStaticCacheObjectTypes<PublishedContentType>(
+                (key, value) => value.Id == id);
+        }
 
-        //// internal, called by DataTypeCacheRefresher
-        //internal static void ClearDataType(int id)
-        //{
-        //    Logging.LogHelper.Debug<PublishedContentType>("Clear data type w/id {0}.", () => id);
-        //    ApplicationContext.Current.ApplicationCache.ClearStaticCacheObjectTypes<PublishedContentType>(
-        //        (key, value) => value.PropertyTypes.Any(x => x.DataTypeId == id));
-        //}
+        internal static void ClearDataType(int id)
+        {
+            Logging.LogHelper.Debug<PublishedContentType>("Clear data type w/id {0}.", () => id);
+            // there is no recursion to handle here because a PublishedContentType contains *all* its
+            // properties ie both its own properties and those that were inherited (it's based upon an
+            // IContentTypeComposition) and so every PublishedContentType having a property based upon
+            // the cleared data type, be it local or inherited, will be cleared.
+            ApplicationContext.Current.ApplicationCache.ClearStaticCacheObjectTypes<PublishedContentType>(
+                (key, value) => value.PropertyTypes.Any(x => x.DataTypeId == id));
+        }
 
         public static PublishedContentType Get(PublishedItemType itemType, string alias)
         {
