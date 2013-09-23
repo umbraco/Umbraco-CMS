@@ -49,8 +49,10 @@ namespace Umbraco.Web.PropertyEditors
             /// <returns></returns>
             public override object FormatDataForPersistence(Core.Models.Editors.ContentPropertyData editorValue, object currentValue)
             {
-                var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValue.Value.ToString());
+                if (editorValue.Value == null)
+                    return null;
 
+                var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValue.Value.ToString());
                 return parsed;
             }
         }
