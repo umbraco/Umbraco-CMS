@@ -1619,10 +1619,10 @@ namespace Umbraco.Web
 								};
 
 						var userVals = new Dictionary<string, object>();
-                        // fixme - is it OK to use DataValue here?
                         foreach (var p in from IPublishedProperty p in n.Properties where p.DataValue != null select p)
-						{
-							userVals[p.PropertyTypeAlias] = p.DataValue; // use the raw, unprocessed value
+                        {
+                            // probably want the "object value" of the property here...
+							userVals[p.PropertyTypeAlias] = p.ObjectValue;
 						}
 						//add the row data
 						Core.DataTableExtensions.AddRowData(tableData, standardVals, userVals);

@@ -35,16 +35,12 @@ namespace Umbraco.Core.Dynamics
         public object DataValue { get { return _source == null ? _value : _source.DataValue; } }
         public bool HasValue { get { return _source == null || _source.HasValue; } }
         public object ObjectValue { get { return _source == null ? _value : _source.ObjectValue; } }
-        // fixme - is it OK to return null here?
         public object XPathValue { get { return ObjectValue == null ? null : ObjectValue.ToString(); } }
 
         // implements IHtmlString.ToHtmlString
         public string ToHtmlString()
         {
-            // note - use DataValue here, because that's what the original
-            // Razor macro engine seems to do...
-
-            var value = DataValue;
+            var value = ObjectValue;
 			return value == null ? string.Empty : value.ToString();
         }
     }

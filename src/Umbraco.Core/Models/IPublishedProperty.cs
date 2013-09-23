@@ -1,5 +1,3 @@
-using System;
-
 namespace Umbraco.Core.Models
 {
     /// <summary>
@@ -34,6 +32,8 @@ namespace Umbraco.Core.Models
         /// <para>The XmlPublishedCache raw values are strings exclusively since they come from the Xml cache.</para>
         /// <para>For other caches that get their raw value from the database, it would be either a string,
         /// an integer (Int32), or a date and time (DateTime).</para>
+        /// <para>If you're using that value, you're probably wrong, unless you're doing some internal
+        /// Umbraco stuff.</para>
         /// </remarks>
         object DataValue { get; }
 
