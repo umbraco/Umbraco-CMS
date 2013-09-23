@@ -100,6 +100,7 @@ namespace umbraco.presentation.dialogs
                 x.Attributes.Append(XmlHelper.AddAttribute(result, "title", r.Fields["nodeName"]));
                 x.Attributes.Append(XmlHelper.AddAttribute(result, "author", r.Fields["writerName"]));
                 x.Attributes.Append(XmlHelper.AddAttribute(result, "changeDate", r.Fields["updateDate"]));
+                x.Attributes.Append(xmlHelper.addAttribute(result, "type", r.Fields["nodeTypeAlias"]));
                 result.DocumentElement.AppendChild(x);
             }
 
