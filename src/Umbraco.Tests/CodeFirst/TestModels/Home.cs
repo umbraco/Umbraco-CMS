@@ -10,9 +10,7 @@ namespace Umbraco.Tests.CodeFirst.TestModels
         [PropertyType(typeof(TextFieldDataType))]
         public string SiteName { get; set; }
 
-        // fixme - yet the property alias is "siteDescription"?
-
-        [Alias("umbSiteDescription", Name = "Site Description")]
+        [Alias("umbSiteDescription", Name = "Site Description")] // ignored by the mapper at the moment
         [PropertyType(typeof(textfieldMultipleDataType))]
         public string SiteDescription { get; set; }
     }

@@ -78,13 +78,13 @@ namespace Umbraco.Tests.DynamicsAndReflection
 
             var m5 = typeof(ExtensionMethodFinderTests).GetMethod("TestMethod5");
 
-            // fixme - currently that fails because we can't match List<T> with List<int32>
+            // note - currently that fails because we can't match List<T> with List<int32>
             var a5 = new object[] {new List<int>()};
             var m5A = GetMethodForArguments(m5, a5);
             Assert.IsNotNull(m5A);
 
-            // fixme - should we also handle "ref" and "out" parameters?
-            // fixme - should we pay attention to array types?
+            // note - should we also handle "ref" and "out" parameters?
+            // note - should we pay attention to array types?
         }
 
         public void TestMethod1(int value) {}
@@ -122,7 +122,7 @@ namespace Umbraco.Tests.DynamicsAndReflection
                     var pos = parameterType.GenericParameterPosition;
                     if (genericArgumentTypes[pos] != null)
                     {
-                        // fixme - is this OK? what about variance and such?
+                        // note - is this OK? what about variance and such?
                         // it is NOT ok, if the first pass is SomethingElse then next is Something
                         // it will fail... the specs prob. indicate how it works, trying to find a common
                         // type...
@@ -172,7 +172,7 @@ namespace Umbraco.Tests.DynamicsAndReflection
             method.Invoke(null, new object[] { class1, 1 });
 
             method = ExtensionMethodFinder.FindExtensionMethod(typeof(Class1), new object[] { "x" }, "TestMethod1", false);
-            Assert.IsNull(method); // fixme - fails, return TestMethod1!
+            Assert.IsNull(method); // note - fails, return TestMethod1!
 
             method = ExtensionMethodFinder.FindExtensionMethod(typeof(Class1), new object[] { 1 }, "TestMethod2", false);
             Assert.IsNotNull(method);

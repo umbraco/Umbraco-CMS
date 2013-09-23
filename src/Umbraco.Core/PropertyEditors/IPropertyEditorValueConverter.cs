@@ -5,8 +5,8 @@ namespace Umbraco.Core.PropertyEditors
     /// <summary>
     /// Maps a property source value to a data object.
     /// </summary>
-    // fixme - should obsolete that class
-	public interface IPropertyEditorValueConverter
+    // todo: drop IPropertyEditorValueConverter support (when?).
+    public interface IPropertyEditorValueConverter
 	{
 		/// <summary>
 		/// Returns a value indicating whether this provider applies to the specified property.

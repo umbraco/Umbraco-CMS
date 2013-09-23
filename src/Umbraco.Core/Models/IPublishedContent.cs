@@ -148,7 +148,7 @@ namespace Umbraco.Core.Models
         /// <para>The recursive syntax (eg "_title") is _not_ supported here.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-		object this[string alias] { get; } // fixme - should obsolete this[alias]
+		object this[string alias] { get; } // todo - should obsolete this[alias] (when?)
 
         #endregion
     }

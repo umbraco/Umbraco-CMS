@@ -149,7 +149,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var index = this.Siblings().FindIndex(x => x.Id == Id);
             if (index < 0)
-                throw new IndexOutOfRangeException(""); // fixme
+                throw new IndexOutOfRangeException("Failed to find content in its siblings collection?!");
             return index;
         }
 

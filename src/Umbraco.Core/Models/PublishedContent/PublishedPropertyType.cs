@@ -86,7 +86,7 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             var converters = PropertyValueConvertersResolver.Current.Converters.ToArray();
 
-            // fixme - get rid of the IPropertyValueEditorConverter support eventually
+            // todo: remove Union() once we drop IPropertyEditorValueConverter support.
             _converter = null;
             foreach (var converter in converters.Union(GetCompatConverters()).Where(x => x.IsConverter(this)))
             {
@@ -206,8 +206,9 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region Compat
 
-        // fixme - remove in v7
         // backward-compatibility: support IPropertyEditorValueConverter while we have to
+        // todo: remove once we drop IPropertyEditorValueConverter support.
+
         IEnumerable<IPropertyValueConverter> GetCompatConverters()
         {
             return PropertyEditorValueConvertersResolver.HasCurrent

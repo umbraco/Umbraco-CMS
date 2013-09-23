@@ -126,6 +126,7 @@ namespace Umbraco.Tests.PublishedContent
 		private IPublishedContent GetContent(bool createChildren, int indexVals)
 		{
 		    var contentTypeAlias = createChildren ? "Parent" : "Child";
+            var z = new SolidPublishedContent(null;)
 			var d = new TestPublishedContent
 				{
 					CreateDate = DateTime.Now,
@@ -174,7 +175,8 @@ namespace Umbraco.Tests.PublishedContent
 			return d;
 		}
 
-        // fixme - why can't we just use SolidPublishedContent here?
+        // note - could probably rewrite those tests using SolidPublishedContentCache
+        // l8tr...
 	    private class TestPublishedContent : IPublishedContent
 	    {
 	        public string Url { get; set; }
@@ -214,7 +216,7 @@ namespace Umbraco.Tests.PublishedContent
 
 	        public object this[string propertyAlias]
 	        {
-                get { return GetProperty(propertyAlias).DataValue; } // fixme - why DataValue here?
+                get { return GetProperty(propertyAlias).ObjectValue; }
 	        }
 
 	        public IEnumerable<IPublishedContent> Children { get; set; }
