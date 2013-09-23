@@ -11,7 +11,7 @@
             var self = this;
 
             UmbClientMgr.openAngularModalWindow({
-                template: "views/templates/insertmacro.html",
+                template: "views/common/dialogs/insertmacro.html",
                 dialogData: {
                     renderingEngine: "WebForms",
                     selectedAlias: alias

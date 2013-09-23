@@ -91,3 +91,10 @@ iframe, .content-column-body {
 .mce-panel{background: @grayLighter !important; border-color: @grayLight !important;}
 .mce-btn-group, .mce-btn{border: none !important; background: none !important;}
 .mce-ico{font-size: 12px !important; color: @blackLight !important;}
+
+/* Special case to support helviticons for the tiny mce button controls */
+.mce-ico.mce-i-custom[class^="icon-"],
+.mce-ico.mce-i-custom[class*=" icon-"] {    
+    font-family: icomoon;
+    font-size:16px !important;
+}

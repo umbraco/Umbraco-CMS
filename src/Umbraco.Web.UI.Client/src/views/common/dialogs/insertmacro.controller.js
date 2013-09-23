@@ -1,6 +1,6 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.Templates.InsertMacroController
+ * @name Umbraco.Dialogs.InsertMacroController
  * @function
  * 
  * @description
@@ -21,10 +21,6 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
                     $scope.submit({ selectedMacro: $scope.selectedMacro });
                 } else {
                     $scope.wizardStep = "paramSelect";
-                    ////update the view on each editor to be correct
-                    //_.each(data, function (item) {
-                    //    item.view = umbPropEditorHelper.getViewPath(item.view);
-                    //});
                     $scope.macroParams = data;
                 }
             });
@@ -104,4 +100,4 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
 
 }
 
-angular.module("umbraco").controller("Umbraco.Editors.Templates.InsertMacroController", InsertMacroController);
+angular.module("umbraco").controller("Umbraco.Dialogs.InsertMacroController", InsertMacroController);
