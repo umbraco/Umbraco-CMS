@@ -17,7 +17,7 @@
                     selectedAlias: alias
                 },
                 callback: function(data) {
-                    UmbEditor.Insert(data, '', self._opts.editorClientId);
+                    UmbEditor.Insert(data.syntax, '', self._opts.editorClientId);
                 }
             });
         },

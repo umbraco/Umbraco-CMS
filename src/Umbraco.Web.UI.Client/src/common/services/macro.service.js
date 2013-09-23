@@ -13,6 +13,36 @@ function macroService() {
         /**
          * @ngdoc function
          * @name generateWebFormsSyntax
+         * @methodOf generateMacroSyntax.services.macroService
+         * @function    
+         *
+         * @description
+         * generates the syntax for inserting a macro into a rich text editor - this is the very old umbraco style syntax
+         * 
+         * @param {object} args an object containing the macro alias and it's parameter values
+         */
+        generateMacroSyntax: function (args) {
+
+            // <?UMBRACO_MACRO macroAlias="BlogListPosts" />
+
+            var macroString = '<?UMBRACO_MACRO ';
+
+            if (args.macroParams) {
+                for (var i = 0; i < args.macroParams.length; i++) {
+
+                    var keyVal = args.macroParams[i].alias + "=\"" + (args.macroParams[i].value ? args.macroParams[i].value : "") + "\" ";
+                    macroString += keyVal;
+                }
+            }
+
+            macroString += "macroAlias=\"" + args.macroAlias + "\" />";
+
+            return macroString;
+        },
+
+        /**
+         * @ngdoc function
+         * @name generateWebFormsSyntax
          * @methodOf umbraco.services.macroService
          * @function    
          *

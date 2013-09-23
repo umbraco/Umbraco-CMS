@@ -18,7 +18,8 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
                 //go to next page if there are params otherwise we can just exit
                 if (!angular.isArray(data) || data.length === 0) {
                     //we can just exist!
-                    $scope.submit({ selectedMacro: $scope.selectedMacro });
+                    submitForm();
+
                 } else {
                     $scope.wizardStep = "paramSelect";
                     $scope.macroParams = data;
@@ -44,11 +45,14 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
         if ($scope.dialogData.renderingEngine && $scope.dialogData.renderingEngine === "WebForms") {
             syntax = macroService.generateWebFormsSyntax({ macroAlias: macroAlias, macroParams: vals });
         }
-        else {
+        else if ($scope.dialogData.renderingEngine && $scope.dialogData.renderingEngine === "Mvc") {
             syntax = macroService.generateMvcSyntax({ macroAlias: macroAlias, macroParams: vals });
         }
+        else {
+            syntax = macroService.generateMacroSyntax({ macroAlias: macroAlias, macroParams: vals });
+        }
 
-        $scope.submit(syntax);
+        $scope.submit({syntax : syntax, macroAlias: macroAlias, macroParams: vals });
     }
 
     $scope.macros = [];

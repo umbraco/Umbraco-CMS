@@ -9,6 +9,34 @@ describe('macro service tests', function () {
 
     describe('generates macro syntax', function () {
 
+        it('can generate syntax for macros', function () {
+
+            var syntax = macroService.generateMacroSyntax({
+                macroAlias: "myMacro",
+                macroParams: [
+                    { alias: "param1", value: "value1" },
+                    { alias: "param2", value: "value2" },
+                    { alias: "param3", value: "value3" }
+                ]
+            });
+
+            expect(syntax).
+                toBe("<?UMBRACO_MACRO param1=\"value1\" param2=\"value2\" param3=\"value3\" macroAlias=\"myMacro\" />");
+
+        });
+
+        it('can generate syntax for macros with no params', function () {
+
+            var syntax = macroService.generateMacroSyntax({
+                macroAlias: "myMacro",
+                macroParams: []
+            });
+
+            expect(syntax).
+                toBe("<?UMBRACO_MACRO macroAlias=\"myMacro\" />");
+
+        });
+
         it('can generate syntax for webforms', function () {
 
             var syntax = macroService.generateWebFormsSyntax({
