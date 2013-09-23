@@ -14,6 +14,7 @@ using Umbraco.Core.Macros;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Macros;
@@ -21,6 +22,8 @@ using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.PropertyEditors;
+using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
@@ -281,10 +284,12 @@ namespace Umbraco.Web
             UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
                 PluginManager.Current.ResolveUmbracoApiControllers());
 
-            //the base creates the PropertyEditorValueConvertersResolver but we want to modify it in the web app and remove
-            //the TinyMcePropertyEditorValueConverter since when the web app is loaded the RteMacroRenderingPropertyEditorValueConverter
-            //is found and we'll use that instead.
-            PropertyValueConvertersResolver.Current.RemoveType<TinyMcePropertyValueConverter>();            
+            // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
+            // discovered when CoreBootManager configures the converters. We HAVE to remove one of them
+            // here because there cannot be two converters for one property editor - and we want the full
+            // RteMacroRenderingValueConverter that converts macros, etc. So remove TinyMceValueConverter.
+            // (why it exists in in the first place, I'm not sure to understand)
+            PropertyValueConvertersResolver.Current.RemoveType<TinyMceValueConverter>();
 
             PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
                 new PublishedCache.XmlPublishedCache.PublishedContentCache(),

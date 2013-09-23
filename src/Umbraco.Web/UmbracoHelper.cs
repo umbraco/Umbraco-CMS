@@ -435,9 +435,18 @@ namespace Umbraco.Web
 		/// <returns>String with a friendly url from a node</returns>
 		public string NiceUrl(int nodeId)
 		{
-			var urlProvider = UmbracoContext.Current.UrlProvider;
-			return urlProvider.GetUrl(nodeId);
+		    return Url(nodeId);
 		}
+
+        /// <summary>
+        /// Gets the url of a content identified by its identifier.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <returns>The url for the content.</returns>
+        public string Url(int contentId)
+        {
+            return UmbracoContext.Current.UrlProvider.GetUrl(contentId);
+        }
 
 		/// <summary>
 		/// This method will always add the domain to the path if the hostnames are set up correctly. 
@@ -446,9 +455,18 @@ namespace Umbraco.Web
 		/// <returns>String with a friendly url with full domain from a node</returns>
 		public string NiceUrlWithDomain(int nodeId)
 		{
-			var urlProvider = UmbracoContext.Current.UrlProvider;
-			return urlProvider.GetUrl(nodeId, true);
+		    return UrlAbsolute(nodeId);
 		}
+
+        /// <summary>
+        /// Gets the absolute url of a content identified by its identifier.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <returns>The absolute url for the content.</returns>
+        public string UrlAbsolute(int contentId)
+        {
+            return UmbracoContext.Current.UrlProvider.GetUrl(contentId, true);
+        }
 
 		#endregion
 
@@ -521,27 +539,27 @@ namespace Umbraco.Web
 
 		public dynamic Content(object id)
 		{
-            return DocumentById(id, _umbracoContext.ContentCache, new DynamicNull());
+            return DocumentById(id, _umbracoContext.ContentCache, DynamicNull.Null);
 		}
 
 		public dynamic Content(int id)
 		{
-            return DocumentById(id, _umbracoContext.ContentCache, new DynamicNull());
+            return DocumentById(id, _umbracoContext.ContentCache, DynamicNull.Null);
 		}
 
 		public dynamic Content(string id)
 		{
-            return DocumentById(id, _umbracoContext.ContentCache, new DynamicNull());
+            return DocumentById(id, _umbracoContext.ContentCache, DynamicNull.Null);
 		}
 
         public dynamic ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return DocumentByXPath(xpath, vars, _umbracoContext.ContentCache, new DynamicNull());
+            return DocumentByXPath(xpath, vars, _umbracoContext.ContentCache, DynamicNull.Null);
         }
 
         public dynamic ContentSingleAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         {
-            return DocumentByXPath(xpath, vars, _umbracoContext.ContentCache, new DynamicNull());
+            return DocumentByXPath(xpath, vars, _umbracoContext.ContentCache, DynamicNull.Null);
         }
 
         public dynamic Content(params object[] ids)
@@ -655,17 +673,17 @@ namespace Umbraco.Web
 
 		public dynamic Media(object id)
 		{
-            return DocumentById(id, _umbracoContext.MediaCache, new DynamicNull());
+            return DocumentById(id, _umbracoContext.MediaCache, DynamicNull.Null);
 		}
 
 		public dynamic Media(int id)
 		{
-            return DocumentById(id, _umbracoContext.MediaCache, new DynamicNull());
+            return DocumentById(id, _umbracoContext.MediaCache, DynamicNull.Null);
 		}
 
 		public dynamic Media(string id)
 		{
-            return DocumentById(id, _umbracoContext.MediaCache, new DynamicNull());
+            return DocumentById(id, _umbracoContext.MediaCache, DynamicNull.Null);
 		}
 
 		public dynamic Media(params object[] ids)
@@ -862,7 +880,7 @@ namespace Umbraco.Web
 		/// </remarks>
         private dynamic DocumentByIds(ContextualPublishedCache cache, params object[] ids)
 		{
-			var dNull = new DynamicNull();
+            var dNull = DynamicNull.Null;
 			var nodes = ids.Select(eachId => DocumentById(eachId, cache, dNull))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
 				.Cast<DynamicPublishedContent>();
@@ -871,7 +889,7 @@ namespace Umbraco.Web
 
         private dynamic DocumentByIds(ContextualPublishedCache cache, params int[] ids)
 		{
-			var dNull = new DynamicNull();
+            var dNull = DynamicNull.Null;
 			var nodes = ids.Select(eachId => DocumentById(eachId, cache, dNull))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
 				.Cast<DynamicPublishedContent>();
@@ -880,7 +898,7 @@ namespace Umbraco.Web
 
         private dynamic DocumentByIds(ContextualPublishedCache cache, params string[] ids)
 		{
-			var dNull = new DynamicNull();
+            var dNull = DynamicNull.Null;
 			var nodes = ids.Select(eachId => DocumentById(eachId, cache, dNull))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
 				.Cast<DynamicPublishedContent>();

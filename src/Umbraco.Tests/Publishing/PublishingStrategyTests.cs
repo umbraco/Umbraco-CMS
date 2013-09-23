@@ -150,6 +150,8 @@ namespace Umbraco.Tests.Publishing
             var result1 = strategy.Publish(_homePage, 0);
             Assert.IsTrue(result1);
             Assert.IsTrue(_homePage.Published);
+            
+            //NOTE (MCH) This isn't persisted, so not really a good test as it will look like the result should be something else.
             foreach (var c in ServiceContext.ContentService.GetChildren(_homePage.Id))
             {
                 var r = strategy.Publish(c, 0);
@@ -157,15 +159,20 @@ namespace Umbraco.Tests.Publishing
                 Assert.IsTrue(c.Published);
             }
 
-            //ok, all are published except the deepest descendant, we will pass in a flag to include it to 
-            //be published
-            var result = strategy.PublishWithChildrenInternal(
-                ServiceContext.ContentService.GetDescendants(_homePage).Concat(new[] { _homePage }), 0, true);
-            //there will be 4 here but only one "Success" the rest will be "SuccessAlreadyPublished"
-            Assert.AreEqual(1, result.Count(x => x.Result.StatusType == PublishStatusType.Success));
-            Assert.AreEqual(3, result.Count(x => x.Result.StatusType == PublishStatusType.SuccessAlreadyPublished));
-            Assert.IsTrue(result.Single(x => x.Result.StatusType == PublishStatusType.Success).Success);
-            Assert.IsTrue(result.Single(x => x.Result.StatusType == PublishStatusType.Success).Result.ContentItem.Published);
+            //NOTE (MCH) when doing the test like this the Publish status will not actually have been persisted
+            //since its only updating a property. The actual persistence and publishing is done through the ContentService.
+            //So when descendants are fetched from the ContentService the Publish status will be "reset", which
+            //means the result will be 1 'SuccessAlreadyPublished' and 3 'Success' because the Homepage is
+            //inserted in the list and since that item has the status of already being Published it will be the one item
+            //with 'SuccessAlreadyPublished'
+
+            var descendants = ServiceContext.ContentService.GetDescendants(_homePage).Concat(new[] {_homePage});
+            var result = strategy.PublishWithChildrenInternal(descendants, 0, true);
+            
+            Assert.AreEqual(3, result.Count(x => x.Result.StatusType == PublishStatusType.Success));
+            Assert.AreEqual(1, result.Count(x => x.Result.StatusType == PublishStatusType.SuccessAlreadyPublished));
+            Assert.IsTrue(result.First(x => x.Result.StatusType == PublishStatusType.Success).Success);
+            Assert.IsTrue(result.First(x => x.Result.StatusType == PublishStatusType.Success).Result.ContentItem.Published);
         }
 
         [NUnit.Framework.Ignore]

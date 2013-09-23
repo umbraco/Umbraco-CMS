@@ -61,7 +61,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var sql = GetBaseQuery(false);
 
-            return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql));
+            return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql))
+                .ToArray(); // important so we don't iterate twice, if we don't do thsi we can end up with null vals in cache if we were caching.
         }
 
         private IEnumerable<IUser> PerformGetAllOnIds(params int[] ids)

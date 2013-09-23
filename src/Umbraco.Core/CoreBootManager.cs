@@ -7,6 +7,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Mapping;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
@@ -17,6 +18,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Services;
@@ -308,13 +310,16 @@ namespace Umbraco.Core
             //the database migration objects
             MigrationResolver.Current = new MigrationResolver(
                 () => PluginManager.Current.ResolveMigrationTypes());
-            
-            //NOTE: These are legacy in v7+ and will eventually need to be removed.
-			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
+
+            // todo: remove once we drop IPropertyEditorValueConverter support.
+            PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
 				PluginManager.Current.ResolvePropertyEditorValueConverters());
 
+			//add the internal ones, these are not public currently so need to add them manually
             PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
                 PluginManager.Current.ResolvePropertyValueConverters());
+				// fixme - why not use the following syntax?
+                //PluginManager.Current.ResolveTypes<IPropertyValueConverter>());
 
             // this is how we'd switch over to DefaultShortStringHelper _and_ still use
             // UmbracoSettings UrlReplaceCharacters...
@@ -327,6 +332,9 @@ namespace Umbraco.Core
 
 		    UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(
 		        typeof (DefaultUrlSegmentProvider));
+
+		    PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver(
+		        new PublishedContentModelFactoryImpl());
 		}
 	}
 }

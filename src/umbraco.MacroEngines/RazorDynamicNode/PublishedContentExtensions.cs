@@ -12,15 +12,15 @@ using Property = umbraco.NodeFactory.Property;
 
 namespace umbraco.MacroEngines.Library
 {
-	/// <summary>
-	/// Extension methods for converting DynamicPublishedContent to INode
-	/// </summary>
+    /// <summary>
+    /// Provides extension methods for <c>IPublishedContent</c>.
+    /// </summary>
+    /// <remarks>These are dedicated to converting DynamicPublishedContent to INode.</remarks>
 	internal static class PublishedContentExtensions
-	{
-		
-		internal static IProperty ConvertToNodeProperty(this IPublishedContentProperty prop)
+	{		
+		internal static IProperty ConvertToNodeProperty(this IPublishedProperty prop)
 		{
-			return new PropertyResult(prop.Alias, prop.Value.ToString());
+			return new PropertyResult(prop.PropertyTypeAlias, prop.ObjectValue.ToString());
 		}
 
 		internal static INode ConvertToNode(this IPublishedContent doc)
@@ -30,7 +30,7 @@ namespace umbraco.MacroEngines.Library
 		}
 
 		/// <summary>
-		/// Internal custom INode class used for conversions from DynamicPublishedContent
+		/// Internal custom INode class used for conversions from DynamicPublishedContent.
 		/// </summary>
 		private class ConvertedNode : INode
 		{

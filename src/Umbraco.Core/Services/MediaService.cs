@@ -654,6 +654,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Permanently deletes versions from an <see cref="IMedia"/> object prior to a specific date.
+        /// This method will never delete the latest version of a content item.
         /// </summary>
         /// <param name="id">Id of the <see cref="IMedia"/> object to delete versions from</param>
         /// <param name="versionDate">Latest version date</param>
@@ -677,6 +678,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Permanently deletes specific version(s) from an <see cref="IMedia"/> object.
+        /// This method will never delete the latest version of a content item.
         /// </summary>
         /// <param name="id">Id of the <see cref="IMedia"/> object to delete a version from</param>
         /// <param name="versionId">Id of the version to delete</param>
@@ -684,14 +686,14 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
         public void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = 0)
         {
+            if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion: versionId), this))
+                return;
+
             if (deletePriorVersions)
             {
                 var content = GetByVersion(versionId);
                 DeleteVersions(id, content.UpdateDate, userId);
             }
-
-			if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion:versionId), this))
-				return;
 
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))

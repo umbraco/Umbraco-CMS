@@ -21,7 +21,7 @@ namespace Umbraco.Web
         public static dynamic GetDynamicById(this ContextualPublishedContentCache cache, int contentId)
         {
             var content = cache.GetById(contentId);
-            return content == null ? new DynamicNull() : new DynamicPublishedContent(content).AsDynamic();
+            return content == null ? DynamicNull.Null : new DynamicPublishedContent(content).AsDynamic();
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Umbraco.Web
         public static dynamic GetDynamicSingleByXPath(this ContextualPublishedContentCache cache, string xpath, params XPathVariable[] vars)
         {
             var content = cache.GetSingleByXPath(xpath, vars);
-            return content == null ? new DynamicNull() : new DynamicPublishedContent(content).AsDynamic();
+            return content == null ? DynamicNull.Null : new DynamicPublishedContent(content).AsDynamic();
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Umbraco.Web
         public static dynamic GetDynamicSingleByXPath(this ContextualPublishedContentCache cache, XPathExpression xpath, params XPathVariable[] vars)
         {
             var content = cache.GetSingleByXPath(xpath, vars);
-            return content == null ? new DynamicNull() : new DynamicPublishedContent(content).AsDynamic();
+            return content == null ? DynamicNull.Null : new DynamicPublishedContent(content).AsDynamic();
         }
 
         /// <summary>

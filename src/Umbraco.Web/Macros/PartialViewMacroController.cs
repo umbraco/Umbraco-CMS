@@ -33,7 +33,7 @@ namespace Umbraco.Web.Macros
         public PartialViewResult Index()
         {
             var model = new PartialViewMacroModel(
-                _currentPage.ConvertFromNode(),
+                _umbracoContext.ContentCache.GetById(_currentPage.Id), //_currentPage.ConvertFromNode(),
                 _macro.Id,
                 _macro.Alias,
                 _macro.Name,

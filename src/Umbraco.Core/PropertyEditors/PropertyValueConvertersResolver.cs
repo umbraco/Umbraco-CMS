@@ -5,16 +5,34 @@ using Umbraco.Core.ObjectResolution;
 namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
-    /// Manages the list of PropertyValueConverter's
+    /// Resolves the IPropertyValueConverter objects.
     /// </summary>
-    internal sealed class PropertyValueConvertersResolver : ManyObjectsResolverBase<PropertyValueConvertersResolver, PropertyValueConverter>
-    {
-        public PropertyValueConvertersResolver(IEnumerable<Type> converters)
-            : base(converters)
-        {
-        }
+    public sealed class PropertyValueConvertersResolver : ManyObjectsResolverBase<PropertyValueConvertersResolver, IPropertyValueConverter>
+	{
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyValueConvertersResolver"/> class with 
+        /// an initial list of converter types.
+        /// </summary>
+        /// <param name="converters">The list of converter types</param>
+        /// <remarks>The resolver is created by the <c>WebBootManager</c> and thus the constructor remains internal.</remarks>
+        internal PropertyValueConvertersResolver(IEnumerable<Type> converters)
+			: base(converters)
+		{ }
 
-        public IEnumerable<PropertyValueConverter> Converters
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyValueConvertersResolver"/> class with 
+        /// an initial list of converter types.
+        /// </summary>
+        /// <param name="converters">The list of converter types</param>
+        /// <remarks>The resolver is created by the <c>WebBootManager</c> and thus the constructor remains internal.</remarks>
+        internal PropertyValueConvertersResolver(params Type[] converters)
+            : base(converters)
+        { }
+
+        /// <summary>
+        /// Gets the converters.
+        /// </summary>
+        public IEnumerable<IPropertyValueConverter> Converters
         {
             get { return Values; }
         }

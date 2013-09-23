@@ -1,60 +1,46 @@
 ﻿using System;
 using Umbraco.Core.Models;
-using umbraco.interfaces;
 using System.Web;
 
 namespace Umbraco.Core.Dynamics
 {
-	internal class PropertyResult : IPublishedContentProperty, IHtmlString
-    {
-		internal PropertyResult(IPublishedContentProperty source, PropertyResultType type)
+	internal class PropertyResult : IPublishedProperty, IHtmlString
+	{
+	    private readonly IPublishedProperty _source;
+	    private readonly string _alias;
+	    private readonly object _value;
+        private readonly PropertyResultType _type;
+
+		internal PropertyResult(IPublishedProperty source, PropertyResultType type)
         {
     		if (source == null) throw new ArgumentNullException("source");
-
-    		Alias = source.Alias;
-			Value = source.Value;
-			PropertyType = type;
+            
+            _type = type;
+            _source = source;
         }
+
 		internal PropertyResult(string alias, object value, PropertyResultType type)
         {
         	if (alias == null) throw new ArgumentNullException("alias");
         	if (value == null) throw new ArgumentNullException("value");
 
-        	Alias = alias;
-			Value = value;
-        	PropertyType = type;
+            _type = type;
+            _alias = alias;
+			_value = value;
         }
 
-		internal PropertyResultType PropertyType { get; private set; }
-		
-    	public string Alias { get; private set; }
+        internal PropertyResultType PropertyType { get { return _type; } }
 
-    	public object Value { get; private set; }
-	
-		/// <summary>
-		/// Returns the value as a string output, this is used in the final rendering process of a property
-		/// </summary>
-		internal string ValueAsString
-		{
-			get
-			{
-				return Value == null ? "" : Convert.ToString(Value);
-			}
-		}
-
-		/// <summary>
-		/// The Id of the document for which this property belongs to
-		/// </summary>
-        public int DocumentId { get; set; }
-
-		/// <summary>
-		/// The alias of the document type alias for which this property belongs to
-		/// </summary>
-        public string DocumentTypeAlias { get; set; }
+        public string PropertyTypeAlias { get { return _source == null ? _alias : _source.PropertyTypeAlias; } }
+        public object DataValue { get { return _source == null ? _value : _source.DataValue; } }
+        public bool HasValue { get { return _source == null || _source.HasValue; } }
+        public object ObjectValue { get { return _source == null ? _value : _source.ObjectValue; } }
+        public object XPathValue { get { return ObjectValue == null ? null : ObjectValue.ToString(); } }
 
         public string ToHtmlString()
         {
-			return ValueAsString;
+            var value = ObjectValue;
+			return value == null ? string.Empty : value.ToString();
         }
     }
 }

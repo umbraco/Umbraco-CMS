@@ -74,6 +74,14 @@ namespace Umbraco.Core
         {            
         }
 
+	    internal void ClearStaticCacheObjectTypes<T>(Func<string, T, bool> predicate)
+	    {
+	        if (_enableCache)
+                _staticCache.ClearCacheObjectTypes(predicate);
+            else
+                _nullStaticCache.ClearCacheObjectTypes(predicate);
+	    }
+
         /// <summary>
         /// Private ctor used for creating a disabled cache helper
         /// </summary>

@@ -13,7 +13,96 @@ namespace Umbraco.Core.Dynamics
 	/// Utility class for finding extension methods on a type to execute
 	/// </summary>
     internal static class ExtensionMethodFinder
-    {	
+	{
+	    private static readonly MethodInfo[] AllExtensionMethods;
+
+	    static ExtensionMethodFinder()
+	    {
+            AllExtensionMethods = TypeFinder.GetAssembliesWithKnownExclusions()
+                // assemblies that contain extension methods
+                .Where(a => a.IsDefined(typeof(ExtensionAttribute), false))
+                // types that contain extension methods
+                .SelectMany(a => a.GetTypes()
+                    .Where(t => t.IsDefined(typeof(ExtensionAttribute), false) && t.IsSealed && t.IsGenericType == false && t.IsNested == false))
+                // actual extension methods
+                .SelectMany(t => t.GetMethods(BindingFlags.Static | BindingFlags.Public)
+                    .Where(m => m.IsDefined(typeof(ExtensionAttribute), false)))
+                // and also IEnumerable<T> extension methods - because the assembly is excluded
+                .Concat(typeof(Enumerable).GetMethods(BindingFlags.Static | BindingFlags.Public))
+                .ToArray();
+	    }
+
+        // ORIGINAL CODE IS NOT COMPLETE, DOES NOT HANDLE GENERICS, ETC...
+
+        // so this is an attempt at fixing things, but it's not done yet
+        // and do we really want to do this? extension methods are not supported on dynamics, period
+        // we should use strongly typed content instead of dynamics.
+
+        /*
+
+        // get all extension methods for type thisType, with name name,
+        // accepting argsCount arguments (not counting the instance of thisType).
+        private static IEnumerable<MethodInfo> GetExtensionMethods(Type thisType, string name, int argsCount)
+        {
+            var key = string.Format("{0}.{1}::{2}", thisType.FullName, name, argsCount);
+
+            var types = thisType.GetBaseTypes(true); // either do this OR have MatchFirstParameter handle the stuff... F*XME
+
+            var methods = AllExtensionMethods
+                .Where(m => m.Name == name)
+                .Where(m => m.GetParameters().Length == argsCount)
+                .Where(m => MatchFirstParameter(thisType, m.GetParameters()[0].ParameterType));
+
+            // f*xme - is this what we should cache?
+            return methods;
+        }
+
+        // find out whether the first parameter is a match for thisType
+        private static bool MatchFirstParameter(Type thisType, Type firstParameterType)
+        {
+            return MethodArgZeroHasCorrectTargetType(null, firstParameterType, thisType);
+        }
+
+        // get the single extension method for type thisType, with name name,
+        // that accepts the arguments in args (which does not contain the instance of thisType).
+        public static MethodInfo GetExtensionMethod(Type thisType, string name, object[] args)
+        {
+            MethodInfo result = null;
+            foreach (var method in GetExtensionMethods(thisType, name, args.Length).Where(m => MatchParameters(m, args)))
+            {
+                if (result == null)
+                    result = method;
+                else
+                    throw new AmbiguousMatchException("More than one matching extension method was found.");
+            }
+            return result;
+        }
+
+        // find out whether the method can accept the arguments
+        private static bool MatchParameters(MethodInfo method, IList<object> args)
+        {
+            var parameters = method.GetParameters();
+
+            var i = 0;
+            for (; i < parameters.Length; ++i)
+            {
+                if (MatchParameter(parameters[i].ParameterType, args[i].GetType()) == false)
+                    break;
+            }
+            return (i == parameters.Length);
+        }
+
+        internal static bool MatchParameter(Type parameterType, Type argumentType)
+        {
+            // public static int DoSomething<T>(Foo foo, T t1, T t2)
+            // DoSomething(foo, t1, t2) => how can we match?!
+            return parameterType == argumentType; // f*xme of course!
+        }
+         * 
+        */
+
+        // BELOW IS THE ORIGINAL CODE...
+
 		/// <summary>
 		/// Returns all extension methods found matching the definition
 		/// </summary>
@@ -27,6 +116,10 @@ namespace Umbraco.Core.Dynamics
 		/// </remarks>
         private static IEnumerable<MethodInfo> GetAllExtensionMethods(Type thisType, string name, int argumentCount, bool argsContainsThis)
         {
+            // at *least* we can cache the extension methods discovery
+		    var candidates = AllExtensionMethods;
+
+            /*
 			//only scan assemblies we know to contain extension methods (user assemblies)
         	var assembliesToScan = TypeFinder.GetAssembliesWithKnownExclusions();        	
 
@@ -45,6 +138,7 @@ namespace Umbraco.Core.Dynamics
 
             //add the extension methods defined in IEnumerable
             candidates = candidates.Concat(typeof(Enumerable).GetMethods(BindingFlags.Static | BindingFlags.Public));            
+            */
 
             //filter by name	
             var methodsByName = candidates.Where(m => m.Name == name);
