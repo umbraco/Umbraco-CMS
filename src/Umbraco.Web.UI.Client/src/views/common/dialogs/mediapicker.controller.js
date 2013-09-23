@@ -30,7 +30,7 @@ angular.module("umbraco")
                 if(folderId > 0){
                     entityResource.getAncestors(folderId, "media")
                         .then(function(anc){
-                            anc.splice(0,1);  
+                           // anc.splice(0,1);  
                             $scope.path = anc;
                         });
                 }else{
@@ -55,19 +55,17 @@ angular.module("umbraco")
                 $scope.gotoFolder($scope.options.formData.currentFolder);
             });
             
-
             $scope.selectMediaItem = function(image) {
                 if (image.contentTypeAlias.toLowerCase() == 'folder') {      
                     $scope.options.formData.currentFolder = image.id;
                     $scope.gotoFolder(image.id);
-                }
-                else if (image.contentTypeAlias.toLowerCase() == 'image') {
+                }else if (image.contentTypeAlias.toLowerCase() == 'image') {
 
                     eventsService.publish("Umbraco.Dialogs.MediaPickerController.Select", image).then(function(image){
                         if(dialogOptions && dialogOptions.multipicker){
                             $scope.select(image);
                         }else{
-                            $scope.submit(image);                  
+                            $scope.submit(image);                 
                         }
                     });
                 }

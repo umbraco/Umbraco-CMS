@@ -289,9 +289,7 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                 },
                 onclick: function () {
 
-                    dialogService.open({
-                        show: true,
-                        template: "views/common/dialogs/insertmacro.html",
+                    dialogService.macroPicker({
                         scope: $scope,
                         callback: function(data) {
 
