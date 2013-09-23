@@ -126,7 +126,6 @@ namespace Umbraco.Tests.PublishedContent
 		private IPublishedContent GetContent(bool createChildren, int indexVals)
 		{
 		    var contentTypeAlias = createChildren ? "Parent" : "Child";
-            var z = new SolidPublishedContent(null;)
 			var d = new TestPublishedContent
 				{
 					CreateDate = DateTime.Now,
