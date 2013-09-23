@@ -113,7 +113,7 @@
             UmbClientMgr.openAngularModalWindow({
                 template: 'views/common/dialogs/iconpicker.html', 
                 callback: function(data){
-                    jQuery(that).next().val("." + data);
+                    jQuery(that).next().val(data);
                     jQuery(that).find("i").attr("class", data);
                 }}); 
             

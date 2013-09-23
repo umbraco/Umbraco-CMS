@@ -34,8 +34,10 @@ namespace Umbraco.Web.PropertyEditors
             /// <returns></returns>
             public override object FormatDataForEditor(object dbValue)
             {
-                var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(dbValue.ToString(), new Dictionary<string, string>());
+                if (dbValue == null)
+                    return dbValue;
 
+                var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(dbValue.ToString(), new Dictionary<string, string>());
                 return parsed;
             }
 
