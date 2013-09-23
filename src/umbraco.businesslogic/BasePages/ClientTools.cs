@@ -46,7 +46,7 @@ namespace umbraco.BasePages
 			public static string RefreshAdmin { get { return "setTimeout('" + GetMainWindow + ".location.reload()', {0});"; } }
 			public static string ShowSpeechBubble { get { return GetMainWindow + ".UmbSpeechBubble.ShowMessage('{0}','{1}', '{2}');"; } }
 			public static string ChangeContentFrameUrl(string url) {
-				return string.Format("alert('sdsd'); " + ClientMgrScript + ".contentFrame('{0}');", url);
+				return string.Format(ClientMgrScript + ".contentFrame('{0}');", url);
 			}
 			public static string ReloadContentFrameUrlIfPathLoaded(string url) {
                 return string.Format(ClientMgrScript + ".reloadContentFrameUrlIfPathLoaded('{0}');", url);
