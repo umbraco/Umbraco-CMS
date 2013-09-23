@@ -1,5 +1,5 @@
 
-<div class="umb-listview" ng-controller="Umbraco.Editors.ListViewController">
+<div class="umb-editor umb-listview" ng-controller="Umbraco.Editors.ListViewController">
 	<div class="row-fluid">
 		<div class="umb-sub-header">
 		    <div class="btn-group">
@@ -9,8 +9,11 @@
 		        </a>
 		        <ul class="dropdown-menu">
 		            <li ng-repeat="contentType in listViewAllowedTypes">
-		                <a href="#/content/content/edit/{{content.id}}?doctype={{contentType.alias}}&create=true">
-		                    <i class="icon-{{contentType.cssClass}}"></i> {{contentType.name}}</a>
+		                <a 
+		                	href="#/content/content/edit/{{content.id}}?doctype={{contentType.alias}}&create=true">
+		                    	<i class="icon-{{contentType.cssClass}}"></i> 
+		                    	{{contentType.name}}
+		                </a>
 		            </li>
 		        </ul>
 		    </div>
