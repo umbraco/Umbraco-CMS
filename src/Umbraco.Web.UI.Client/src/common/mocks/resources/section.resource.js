@@ -18,6 +18,8 @@ function sectionMocks($httpBackend, mocksUtils) {
             { name: "Media", cssclass: "icon-umb-media", alias: "media" },
             { name: "Settings", cssclass: "icon-umb-settings", alias: "settings" },
             { name: "Developer", cssclass: "icon-umb-developer", alias: "developer" },
+            { name: "Users", cssclass: "icon-umb-users", alias: "users" },
+            { name: "Developer", cssclass: "icon-umb-developer", alias: "developer" },
             { name: "Users", cssclass: "icon-umb-users", alias: "users" }
         ];
         

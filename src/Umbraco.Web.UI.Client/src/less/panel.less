@@ -30,9 +30,6 @@
   cursor: text;
 }
 
-.umb-panel-header h1.umb-headline-editor {
-  cursor: text;
-}
 .umb-headline-editor-wrapper, 
 h1.headline{height: 40px; padding: 30px 0 0 20px;}
 
@@ -55,15 +52,17 @@ h1.headline{height: 40px; padding: 30px 0 0 20px;}
 }
 .umb-panel-header h1, {
   margin: 0;
-  font-size: @fontSizeLarge;
+  font-size: @fontSizeMedium;
   font-weight: 400;
   color: @gray;
-  line-height: 22px;
+  line-height: 1em;
   width: 100%;
+  margin: -2px 0 0 0;
 }
 
 .umb-headline-editor-wrapper input{
   display: none;
+  font-size: @fontSizeMedium
 }
 
 .umb-headline-editor-wrapper h1.umb-headline-editor:hover, .umb-headline-editor-wrapper input  {
@@ -71,9 +70,14 @@ h1.headline{height: 40px; padding: 30px 0 0 20px;}
 }
 
 .umb-headline-editor-wrapper input:focus  {
-  border: 1px solid @grayLight;
-  background: @white;
-  width: 100%;
+  background: none;
+  border: none;
+  width: auto;
+  margin: -9px 0 0 0;
+  padding: 0 0 2px 0;
+  border-radius: 0;
+  line-height: 1em;
+  color: @black
 }
 
 

@@ -8,6 +8,16 @@ data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
         <div style="height: 10px; margin: 10px 0px 10px 0px" class="umb-loader" 
         	ng-hide="active() == 0"></div>
 
+        <div class="umb-upload-drop-zone" ng-show="dropping">DROP HERE</div>
+        
+        <div class="umb-upload-upload-progress" ng-show="filesUploading.length">
+            NOW UPLOADING...
+            <ul>
+                <li ng-repeat="file in filesUploading">{{file | json}}</li>
+            </ul>
+        </div>
+
+
         <ul class="umb-thumbnails thumbnails">
 	        <li class="span2 folder" ng-repeat="image in images | orderBy:'contentTypeAlias' | filter:searchTerm">
 			    <a href="#/media/media/edit/{{image.id}}" class="thumbnail">
