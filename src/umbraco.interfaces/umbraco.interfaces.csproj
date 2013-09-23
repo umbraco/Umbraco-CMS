@@ -124,6 +124,7 @@
     </Compile>
     <Compile Include="IApplication.cs" />
     <Compile Include="IApplicationStartupHandler.cs" />
+    <Compile Include="IDataFieldWithButtons.cs" />
     <Compile Include="IProperty.cs" />
     <Compile Include="ITag.cs" />
     <Compile Include="ITaskReturnUrl.cs" />

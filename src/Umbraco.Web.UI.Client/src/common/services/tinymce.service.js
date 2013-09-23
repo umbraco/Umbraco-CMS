@@ -294,9 +294,19 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                         template: "views/common/dialogs/insertmacro.html",
                         scope: $scope,
                         callback: function(data) {
-                            
+
+                            //put the macro syntax in comments, we will parse this out on the server side to be used
+                            //for persisting.
+                            var macroSyntaxComment = "<!-- " + data.syntax + " -->";
+
                             editor.insertContent(
-                                editor.dom.createHTML('div', { 'class': 'umb-macro-holder' }, 'Macro alias: <strong>' + data.macroAlias + '</strong>'));
+                                editor.dom.createHTML('div',
+                                    {
+                                        'class': 'umb-macro-holder',
+                                        // indicates whether or not this should kick off the ajax request to load in the macro contents.
+                                        'data-load-content': false
+                                    },
+                                    macroSyntaxComment + 'Macro alias: <strong>' + data.macroAlias + '</strong>'));
 
                         }
                     });

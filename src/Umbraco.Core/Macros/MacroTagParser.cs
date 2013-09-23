@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Umbraco.Core.Macros
 {
@@ -9,6 +10,91 @@ namespace Umbraco.Core.Macros
 	/// </summary>
 	internal class MacroTagParser
 	{
+        private static readonly Regex MacroRteContent = new Regex(@"(<div class=[""']umb-macro-holder[""'].*?>.*?<!--\s*?)(<\?UMBRACO_MACRO.*?/>)(.*?</div>)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        private static readonly Regex MacroPersistedFormat = new Regex(@"<\?UMBRACO_MACRO macroAlias=[""'](\w+?)[""'].+?/>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+
+	    /// <summary>
+	    /// This formats the persisted string to something useful for the rte so that the macro renders properly since we 
+	    /// persist all macro formats like {?UMBRACO_MACRO macroAlias=\"myMacro\" /}
+	    /// </summary>
+	    /// <param name="persistedContent"></param>
+	    /// <param name="htmlAttributes">The html attributes to be added to the div</param>
+	    /// <returns></returns>
+	    /// <remarks>
+	    /// This converts the persisted macro format to this:
+	    /// 
+	    ///     {div class='umb-macro-holder'}
+	    ///         <!-- <?UMBRACO_MACRO macroAlias=\"myMacro\" /> -->
+	    ///         This could be some macro content
+	    ///     {/div}
+	    /// 
+	    /// </remarks>
+	    internal static string FormatRichTextPersistedDataForEditor(string persistedContent, IDictionary<string ,string> htmlAttributes)
+        {
+            return MacroPersistedFormat.Replace(persistedContent, match =>
+            {
+                if (match.Groups.Count >= 2)
+                {
+                    //<div class="umb-macro-holder" data-load-content="false">
+                    var sb = new StringBuilder("<div class=\"umb-macro-holder\"");
+                    foreach (var htmlAttribute in htmlAttributes)
+                    {
+                        sb.Append(" ");
+                        sb.Append(htmlAttribute.Key);
+                        sb.Append("=\"");
+                        sb.Append(htmlAttribute.Value);
+                        sb.Append("\"");
+                    }
+                    sb.AppendLine(">");
+                    sb.Append("<!-- ");
+                    sb.Append(match.Groups[0].Value);
+                    sb.AppendLine(" -->");
+                    sb.Append("Macro alias: ");
+                    sb.Append("<strong>");
+                    sb.Append(match.Groups[1].Value);
+                    sb.Append("</strong></div>");
+                    return sb.ToString();
+                }
+                //replace with nothing if we couldn't find the syntax for whatever reason
+                return "";
+            });
+        }
+
+        /// <summary>
+        /// This formats the string content posted from a rich text editor that contains macro contents to be persisted.
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// 
+        /// This is required because when editors are using the rte, the html that is contained in the editor might actually be displaying 
+        /// the entire macro content, when the data is submitted the editor will clear most of this data out but we'll still need to parse it properly
+        /// and ensure the correct sytnax is persisted to the db.
+        /// 
+        /// When a macro is inserted into the rte editor, the html will be:
+        /// 
+        ///     {div class='umb-macro-holder'}
+        ///         <!-- <?UMBRACO_MACRO macroAlias=\"myMacro\" /> -->
+        ///         This could be some macro content
+        ///     {/div}
+        /// 
+        /// What this method will do is remove the {div} and parse out the commented special macro syntax: {?UMBRACO_MACRO macroAlias=\"myMacro\" /}
+        /// since this is exactly how we need to persist it to the db.
+        /// 
+        /// </remarks>
+        internal static string FormatRichTextContentForPersistence(string rteContent)
+        {
+            return MacroRteContent.Replace(rteContent, match =>
+                {
+                    if (match.Groups.Count >= 3)
+                    {
+                        //get the 3rd group which is the macro syntax
+                        return match.Groups[2].Value;
+                    }
+                    //replace with nothing if we couldn't find the syntax for whatever reason
+                    return "";
+                });
+        }
+
 		/// <summary>
 		/// This will accept a text block and seach/parse it for macro markup.
 		/// When either a text block or a a macro is found, it will call the callback method.
