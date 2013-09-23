@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Services;
@@ -261,16 +262,9 @@ namespace Umbraco.Core
             PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
 				PluginManager.Current.ResolvePropertyEditorValueConverters());
 
-            // initialize the new property value converters
-            // fixme - discuss property converters explicit registration vs. discovery
+            // initialize the new property value converters by discovering IPropertyValueConverter
             PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
                 PluginManager.Current.ResolveTypes<IPropertyValueConverter>());
-
-            // add the internal ones
-            // fixme - property converters should be public, not internal, and auto-discovered
-            PropertyValueConvertersResolver.Current.AddType<YesNoValueConverter>();
-            PropertyValueConvertersResolver.Current.AddType<DatePickerValueConverter>();
-            PropertyValueConvertersResolver.Current.AddType<TinyMceValueConverter>();
 
             // this is how we'd switch over to DefaultShortStringHelper _and_ still use
             // UmbracoSettings UrlReplaceCharacters...

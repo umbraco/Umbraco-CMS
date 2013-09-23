@@ -6,9 +6,10 @@ using Umbraco.Core;
 using Umbraco.Core.Macros;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Templates;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
 	/// <summary>
 	/// A value converter for TinyMCE that will ensure any macro content is rendered properly even when 
@@ -21,7 +22,7 @@ namespace Umbraco.Web.PropertyEditors
     // actually required (since Request is default) but leave it here to be absolutely explicit.
     [PropertyValueType(typeof(IHtmlString))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Request)]
-    internal class RteMacroRenderingValueConverter : TinyMceValueConverter
+    public class RteMacroRenderingValueConverter : TinyMceValueConverter
 	{
         // NOT thread-safe over a request because it modifies the
         // global UmbracoContext.Current.InPreviewMode status. So it

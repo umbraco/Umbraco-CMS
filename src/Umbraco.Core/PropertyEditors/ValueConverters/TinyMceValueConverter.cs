@@ -2,7 +2,7 @@ using System;
 using System.Web;
 using Umbraco.Core.Models.PublishedContent;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
 	/// <summary>
 	/// Value converter for the RTE so that it always returns IHtmlString so that Html.Raw doesn't have to be used.
@@ -10,7 +10,7 @@ namespace Umbraco.Core.PropertyEditors
     // PropertyCacheLevel.Content is ok here because that version of RTE converter does not parse {locallink} nor executes macros
     [PropertyValueType(typeof(IHtmlString))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
-    internal class TinyMceValueConverter : PropertyValueConverterBase
+    public class TinyMceValueConverter : PropertyValueConverterBase
 	{
         public override bool IsConverter(PublishedPropertyType propertyType)
         {

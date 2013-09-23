@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.PropertyEditors

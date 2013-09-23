@@ -1,11 +1,11 @@
 ﻿using System;
 using Umbraco.Core.Models.PublishedContent;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
     [PropertyValueType(typeof(bool))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
-    class YesNoValueConverter : PropertyValueConverterBase
+    public class YesNoValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {

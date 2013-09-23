@@ -4,11 +4,11 @@ using System.Linq;
 using System.Xml;
 using Umbraco.Core.Models.PublishedContent;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
     [PropertyValueType(typeof(DateTime))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
-    internal class DatePickerValueConverter : PropertyValueConverterBase
+    public class DatePickerValueConverter : PropertyValueConverterBase
 	{
 	    private static readonly Guid[] DataTypeGuids = new[]
 	        {
