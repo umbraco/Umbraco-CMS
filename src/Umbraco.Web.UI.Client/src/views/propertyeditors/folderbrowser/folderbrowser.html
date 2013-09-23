@@ -13,7 +13,9 @@ data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
         <div class="umb-upload-upload-progress" ng-show="filesUploading.length">
             NOW UPLOADING...
             <ul>
-                <li ng-repeat="file in filesUploading">{{file | json}}</li>
+                <li ng-repeat="file in filesUploading">
+                    <div umb-upload-preview="file"></div>
+                </li>
             </ul>
         </div>
 
@@ -21,7 +23,8 @@ data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
         <ul class="umb-thumbnails thumbnails">
 	        <li class="span2 folder" ng-repeat="image in images | orderBy:'contentTypeAlias' | filter:searchTerm">
 			    <a href="#/media/media/edit/{{image.id}}" class="thumbnail">
-					<img ng-src="{{image.thumbnail}}" ng-switch-when="Image" alt="{{image.name}}"/>	
+					
+
                     <div ng-switch on="!!image.thumbnail" >
                         <img ng-src="{{image.thumbnail}}" class="image" ng-switch-when="true" alt="{{image.name}}"/>
 

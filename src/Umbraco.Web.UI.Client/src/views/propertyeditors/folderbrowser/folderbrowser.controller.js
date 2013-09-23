@@ -1,4 +1,15 @@
 angular.module("umbraco")
+.directive("umbUploadPreview",function($parse){
+        return {
+            link: function(scope, element, attr, ctrl) {
+               var fn = $parse(attr.umbUploadPreview),
+                                   file = fn(scope);
+                if (file.preview) {
+                   element.append(file.preview);
+               }
+            }
+        };
+})
 .controller("Umbraco.Editors.FolderBrowserController",
     function ($rootScope, $scope, assetsService, $routeParams, $timeout, umbRequestHelper, mediaResource, imageHelper) {
         var dialogOptions = $scope.$parent.dialogOptions;
@@ -39,7 +50,7 @@ angular.module("umbraco")
             console.log('processing');
 
             $scope.$apply(function() {
-                $scope.filesUploading.push(data.files[data.index].preview);
+                $scope.filesUploading.push(data.files[data.index]);
             });
         })
 
