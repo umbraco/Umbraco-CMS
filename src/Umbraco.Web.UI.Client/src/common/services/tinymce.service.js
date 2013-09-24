@@ -6,7 +6,7 @@
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
-function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeout, macroResource) {
+function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeout, macroResource, macroService) {
     return {
 
         /**
@@ -143,6 +143,25 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
             
             });
 
+            /**
+            * Because the macro gets wrapped in a P tag because of the way 'enter' works, this 
+            * method will return the macro element if not wrapped in a p, or the p if the macro
+            * element is the only one inside of it even if we are deep inside an element inside the macro
+            */
+            function getRealMacroElem(element) {
+                var e = $(element).closest(".umb-macro-holder");
+                if (e.length > 0) {
+                    if (e.get(0).parentNode.nodeName === "P") {
+                        //now check if we're the only element                    
+                        if (element.parentNode.childNodes.length === 1) {
+                            return e.get(0).parentNode;
+                        }
+                    }
+                    return e.get(0);
+                }
+                return null;
+            }
+
             /** Adds the button instance */
             editor.addButton('umbmacro', {
                 icon: 'custom icon-settings-alt',
@@ -151,25 +170,6 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
 
                     var ctrl = this;
                     var isOnMacroElement = false;
-
-                    /**
-                    * Because the macro gets wrapped in a P tag because of the way 'enter' works, this 
-                    * method will return the macro element if not wrapped in a p, or the p if the macro
-                    * element is the only one inside of it even if we are deep inside an element inside the macro
-                    */
-                    function getRealMacroElem(element) {
-                        var e = $(element).closest(".umb-macro-holder");
-                        if (e.length > 0) {
-                            if (e.get(0).parentNode.nodeName === "P") {
-                                //now check if we're the only element                    
-                                if (element.parentNode.childNodes.length === 1) {
-                                    return e.get(0).parentNode;
-                                }
-                            }
-                            return e.get(0);
-                        }
-                        return null;
-                    }
 
                     /**
                     * Add a node change handler, test if we're editing a macro and select the whole thing, then set our isOnMacroElement flag.
@@ -310,8 +310,32 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                 /** The insert macro button click event handler */
                 onclick: function () {
 
+                    var dialogData;
+
+                    //when we click we could have a macro already selected and in that case we'll want to edit the current parameters
+                    //so we'll need to extract them and submit them to the dialog.
+                    var macroElement = editor.selection.getNode();                    
+                    macroElement = getRealMacroElem(macroElement);
+                    if (macroElement) {
+                        //we have a macro selected so we'll need to parse it's alias and parameters
+                        var contents = $(macroElement).contents();                        
+                        var comment = _.find(contents, function(item) {
+                            return item.nodeType === 8;
+                        });
+                        if (!comment) {
+                            throw "Cannot parse the current macro, the syntax in the editor is invalid";
+                        }
+                        var syntax = comment.textContent.trim();
+                        var parsed = macroService.parseMacroSyntax(syntax);
+                        dialogData = {
+                            macroData: parsed  
+                        };
+
+                    }
+
                     dialogService.macroPicker({
                         scope: $scope,
+                        dialogData : dialogData,
                         callback: function(data) {
 
                             //put the macro syntax in comments, we will parse this out on the server side to be used

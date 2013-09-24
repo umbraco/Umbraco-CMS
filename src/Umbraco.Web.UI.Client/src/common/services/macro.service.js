@@ -10,6 +10,31 @@ function macroService() {
 
     return {
         
+        /** parses the special macro syntax like <?UMBRACO_MACRO macroAlias="Map" /> and returns an object with the macro alias and it's parameters */
+        parseMacroSyntax: function (syntax) {
+
+            var expression = /(<\?UMBRACO_MACRO macroAlias=["'](\w+?)["'].+?)(\/>|>.*?<\/\?UMBRACO_MACRO>)/im;
+            var match = expression.exec(syntax);
+            if (!match || match.length < 3) {
+                return null;
+            }
+            var alias = match[2];
+
+            //this will leave us with just the parameters
+            var paramsChunk = match[1].trim().replace(new RegExp("UMBRACO_MACRO macroAlias=[\"']" + alias + "[\"']"), "").trim();
+            
+            var paramExpression = new RegExp("(\\w+?)=['\"](.*?)['\"]", "g");
+            var paramMatch;
+            var returnVal = {
+                alias: alias,
+                params: []
+            };
+            while (paramMatch = paramExpression.exec(paramsChunk)) {
+                returnVal.params.push({ alias: paramMatch[1], value: paramMatch[2] });
+            }
+            return returnVal;
+        },
+
         /**
          * @ngdoc function
          * @name generateWebFormsSyntax
@@ -25,7 +50,7 @@ function macroService() {
 
             // <?UMBRACO_MACRO macroAlias="BlogListPosts" />
 
-            var macroString = '<?UMBRACO_MACRO ';
+            var macroString = '<?UMBRACO_MACRO macroAlias=\"' + args.macroAlias + "\" ";
 
             if (args.macroParams) {
                 for (var i = 0; i < args.macroParams.length; i++) {
@@ -35,7 +60,7 @@ function macroService() {
                 }
             }
 
-            macroString += "macroAlias=\"" + args.macroAlias + "\" />";
+            macroString += "/>";
 
             return macroString;
         },
