@@ -28,11 +28,11 @@ angular.module("umbraco.directives.html")
           var photos = ngModel.$modelValue;
           var rows = [];
 
-          scope.baseline = element.attr('baseline') | 0;
-          scope.minWidth = element.attr('minwidth') | 420;
-          scope.minHeight = element.attr('minheight') | 200;
-          scope.border = element.attr('border') | 5;
-
+          scope.baseline = element.attr('baseline') ? parseInt(element.attr('baseline'),10) : 0;
+          scope.minWidth = element.attr('min-width') ? parseInt(element.attr('min-width'),10) : 420;
+          scope.minHeight = element.attr('min-height') ? parseInt(element.attr('min-height'),10) : 200;
+          scope.border = element.attr('border') ? parseInt(element.attr('border'),10) : 5;
+          scope.clickHandler = scope.$eval(element.attr('on-click'));
           scope.lastWidth = Math.max(element.width(), scope.minWidth);
 
           // get row width - this is fixed.
@@ -46,24 +46,30 @@ angular.module("umbraco.directives.html")
           // store relative widths of all images (scaled to match estimate height above)
           var ws = [];
           $.each(photos, function(key, val) {
-            val.width_n = $.grep(val.properties, function(val, index) {return (val.alias === "umbracoWidth");})[0].value;
-            val.height_n = $.grep(val.properties, function(val, index) {return (val.alias === "umbracoHeight");})[0].value;
-            val.url_n = imageHelper.getThumbnail({ imageModel: val, scope: scope });
-            
-            var wt = parseInt(val.width_n, 10);
-            var ht = parseInt(val.height_n, 10);
-            
-            if( ht !== h ) { 
-              wt = Math.floor(wt * (h / ht)); 
-            }
-            
-            ws.push(wt);
+
+              val.width_n = $.grep(val.properties, function(val, index) {return (val.alias === "umbracoWidth");})[0];
+              val.height_n = $.grep(val.properties, function(val, index) {return (val.alias === "umbracoHeight");})[0];
+              
+              //val.url_n = imageHelper.getThumbnail({ imageModel: val, scope: scope });
+              
+              if(val.width_n && val.height_n){
+                var wt = parseInt(val.width_n.value, 10);
+                var ht = parseInt(val.height_n.value, 10);
+                
+                if( ht !== h ) { 
+                  wt = Math.floor(wt * (h / ht));
+                }
+                
+                ws.push(wt);
+              }else{
+                //if its files or folders, we make them square
+                ws.push(scope.minHeight);
+              }
           });
 
 
           var rowNum = 0;
           var limit = photos.length;
-
           while(scope.baseline < limit)
           {
               rowNum++;
@@ -103,7 +109,12 @@ angular.module("umbraco.directives.html")
                 tw += wt + scope.border * 2;
 
                 // Create image, set src, width, height and margin
-                var purl = photo.url_n;
+                //var purl = photo.url_n;
+                photo.thumbnail = imageHelper.getThumbnail({ imageModel: photo, scope: scope });
+                if(!photo.thumbnail){
+                  photo.thumbnail = "none";
+                }
+
                 photo.style = {"width": wt, "height": ht, "margin": scope.border+"px", "cursor": "pointer"};
                 row.photos.push(photo);
                 i++;
