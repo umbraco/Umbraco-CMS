@@ -40,7 +40,7 @@ angular.module("umbraco")
                     $scope.images = data;
                     //update the thumbnail property
                     _.each($scope.images, function(img) {
-                        img.thumbnail = imageHelper.getThumbnail({ imageModel: img, scope: $scope });
+                        //img.thumbnail = imageHelper.getThumbnail({ imageModel: img, scope: $scope });
                     });
 
                     // prettify the look and feel

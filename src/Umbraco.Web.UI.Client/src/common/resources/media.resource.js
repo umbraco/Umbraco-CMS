@@ -88,6 +88,37 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        [{ id: id }])),
                'Failed to retreive data for media id ' + id);
         },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaResource#deleteById
+         * @methodOf umbraco.resources.mediaResource
+         *
+         * @description
+         * Deletes a media item with a given id
+         *
+         * ##usage
+         * <pre>
+         * mediaResource.deleteById(1234)
+         *    .then(function() {
+         *        alert('its gone!');
+         *    });
+         * </pre> 
+         * 
+         * @param {Int} id id of media item to delete        
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        deleteById: function(id) {
+            return umbRequestHelper.resourcePromise(
+                $http.delete(
+                    umbRequestHelper.getApiUrl(
+                        "mediaApiBaseUrl",
+                        "DeleteById",
+                        [{ id: id }])),
+                'Failed to delete item ' + id);
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.mediaResource#getByIds

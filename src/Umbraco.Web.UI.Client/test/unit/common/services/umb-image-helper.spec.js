@@ -1,4 +1,4 @@
-describe('icon helper tests', function () {
+describe('image helper tests', function () {
     var umbImageHelper;
 
     beforeEach(module('umbraco.services'));
@@ -29,9 +29,9 @@ describe('icon helper tests', function () {
             var image2 = "a-png.png";
             var image3 = "thisisagif.blah.gif";
 
-            expect(umbImageHelper.getThumbnailFromPath(image1)).toBe("a-jpeg_thumb.jpg");
-            expect(umbImageHelper.getThumbnailFromPath(image2)).toBe("a-png_thumb.jpg");
-            expect(umbImageHelper.getThumbnailFromPath(image3)).toBe("thisisagif.blah_thumb.jpg");
+            expect(umbImageHelper.getThumbnailFromPath(image1)).toBe("a-jpeg_big-thumb.jpg");
+            expect(umbImageHelper.getThumbnailFromPath(image2)).toBe("a-png_big-thumb.jpg");
+            expect(umbImageHelper.getThumbnailFromPath(image3)).toBe("thisisagif.blah_big-thumb.jpg");
         });
         
     });

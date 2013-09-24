@@ -1,13 +1,6 @@
 <div>
     <p ng-hide="!caption" class="umb-abstract">{{caption}}</p>
-
-    <ul class="nav nav-pills">
-        <li class="active">
-            <a href="" ng-click="onConfirm()">Ok</a>
-        </li>
-        <li>
-            <a href="" ng-click="onCancel()">Cancel</a>
-        </li>
-    </ul>
-
+    
+    <a href class="btn btn-link" ng-click="onCancel()">Cancel</a>
+    <a href class="btn btn-primary" ng-click="onConfirm()">Ok</a>
 </div>
