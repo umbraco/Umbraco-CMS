@@ -21,7 +21,15 @@ function ContentSortController($scope, contentResource, treeService) {
 
     $scope.sortOptions ={
         group: "pages",
+        containerSelector: 'table',
+        itemPath: '> tbody',
+        itemSelector: 'tr',
+        placeholder: '<tr class="placeholder"/>',
+        clone: "<tr />",
+        mode: "table",
         onSortHandler: function(item, args){
+
+
             args.scope.changeIndex(args.oldIndex, args.newIndex);
         }
     };
