@@ -286,7 +286,7 @@ namespace Umbraco.Tests.PublishedContent
 
     class AutoPublishedContentType : PublishedContentType
     {
-        private static readonly PublishedPropertyType Default = new PublishedPropertyType("*", 0, Guid.Empty);
+        private static readonly PublishedPropertyType Default = new PublishedPropertyType("*", 0, "?");
 
         public AutoPublishedContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes)
             : base(id, alias, propertyTypes)

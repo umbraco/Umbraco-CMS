@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Collections.ObjectModel;
+using System.Web.Routing;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -9,21 +10,29 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
 using Umbraco.Tests.TestHelpers;
 using umbraco.BusinessLogic;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.PublishedContent
 {
     [TestFixture]
-    public class PublishedContentMoreTests
+    public class PublishedContentMoreTests : PublishedContentTestBase
     {
+        protected override DatabaseBehavior DatabaseTestBehavior
+        {
+            get { return DatabaseBehavior.NoDatabasePerFixture; }
+        }
+
         // read http://stackoverflow.com/questions/7713326/extension-method-that-works-on-ienumerablet-and-iqueryablet
         // and http://msmvps.com/blogs/jon_skeet/archive/2010/10/28/overloading-and-generic-constraints.aspx
         // and http://blogs.msdn.com/b/ericlippert/archive/2009/12/10/constraints-are-not-part-of-the-signature.aspx
 
         private PluginManager _pluginManager;
 
-        [SetUp]
-        public void Setup()
+        public override void Initialize()
         {
+            base.Initialize();
+
             // this is so the model factory looks into the test assembly
             _pluginManager = PluginManager.Current;
             PluginManager.Current = new PluginManager(false)
@@ -38,20 +47,36 @@ namespace Umbraco.Tests.PublishedContent
                 new PublishedContentModelFactoryResolver(new PublishedContentModelFactoryImpl());
             Resolution.Freeze();
 
+            //var caches = CreatePublishedContent();
+
+            //var factory = new FakeHttpContextFactory("http://umbraco.local/");
+            //StateHelper.HttpContext = factory.HttpContext;
+            //var context = new UmbracoContext(
+            //    factory.HttpContext,
+            //    ApplicationContext.Current,
+            //    caches);
+            //UmbracoContext.Current = context;
+
+            InitializeUmbracoContext();
+        }
+
+        private void InitializeUmbracoContext()
+        {
+            RouteData routeData = null;
+
             var caches = CreatePublishedContent();
 
-            ApplicationContext.Current = new ApplicationContext(false) { IsReady = true };
-            var factory = new FakeHttpContextFactory("http://umbraco.local/");
-            StateHelper.HttpContext = factory.HttpContext;
-            var context = new UmbracoContext(
-                factory.HttpContext,
-                ApplicationContext.Current,
-                caches);
-            UmbracoContext.Current = context;
+            var httpContext = GetHttpContextFactory("http://umbraco.local/", routeData).HttpContext;
+            var ctx = new UmbracoContext(
+                httpContext,
+                ApplicationContext,
+                caches,
+                new WebSecurity(httpContext, ApplicationContext));
+
+            UmbracoContext.Current = ctx;
         }
         
-        [TearDown]
-        public void TearDown()
+        public override void TearDown()
         {
             PluginManager.Current = _pluginManager;
             ApplicationContext.Current.DisposeIfDisposable();
@@ -204,7 +229,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var props = new[]
                     {
-                        new PublishedPropertyType("prop1", 1, System.Guid.Empty), 
+                        new PublishedPropertyType("prop1", 1, "?"), 
                     };
 
             var contentType1 = new PublishedContentType(1, "ContentType1", props);

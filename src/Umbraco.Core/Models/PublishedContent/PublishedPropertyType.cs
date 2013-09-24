@@ -24,22 +24,19 @@ namespace Umbraco.Core.Models.PublishedContent
             PropertyTypeAlias = propertyType.Alias;
 
             DataTypeId = propertyType.DataTypeDefinitionId;
-            PropertyEditorGuid = propertyType.DataTypeId;
-            //PropertyEditorAlias = propertyType.PropertyEditorAlias;
+            PropertyEditorAlias = propertyType.PropertyEditorAlias;
 
             InitializeConverters();
         }
 
         // for unit tests
-        internal PublishedPropertyType(string propertyTypeAlias, int dataTypeDefinitionId, Guid propertyEditorGuid)
-        //internal PublishedPropertyType(string propertyTypeAlias, int dataTypeDefinitionId, Alias propertyEditorAlias)
+        internal PublishedPropertyType(string propertyTypeAlias, int dataTypeDefinitionId, string propertyEditorAlias)
         {
             // ContentType to be set by PublishedContentType when creating it
             PropertyTypeAlias = propertyTypeAlias;
 
             DataTypeId = dataTypeDefinitionId;
-            PropertyEditorGuid = propertyEditorGuid;
-            //PropertyEditorAlias = PropertyEditorAlias;
+            PropertyEditorAlias = PropertyEditorAlias;
 
             InitializeConverters();
         }
@@ -63,14 +60,9 @@ namespace Umbraco.Core.Models.PublishedContent
         public int DataTypeId { get; private set; }
 
         /// <summary>
-        /// Gets or sets the guid uniquely identifying the property editor for the property type.
-        /// </summary>
-        public Guid PropertyEditorGuid { get; private set; }
-
-        /// <summary>
         /// Gets or sets the alias uniquely identifying the property editor for the property type.
         /// </summary>
-        //public string PropertyEditorAlias { get; private set; }
+        public string PropertyEditorAlias { get; private set; }
 
         #endregion
 
@@ -211,9 +203,10 @@ namespace Umbraco.Core.Models.PublishedContent
 
         IEnumerable<IPropertyValueConverter> GetCompatConverters()
         {
-            return PropertyEditorValueConvertersResolver.HasCurrent
+            var propertyEditorGuid = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(PropertyEditorAlias);
+            return PropertyEditorValueConvertersResolver.HasCurrent && propertyEditorGuid.HasValue
                 ? PropertyEditorValueConvertersResolver.Current.Converters
-                    .Where(x => x.IsConverterFor(PropertyEditorGuid, ContentType.Alias, PropertyTypeAlias))
+                    .Where(x => x.IsConverterFor(propertyEditorGuid.Value, ContentType.Alias, PropertyTypeAlias))
                     .Select(x => new CompatConverter(x))
                 : Enumerable.Empty<IPropertyValueConverter>();
         }

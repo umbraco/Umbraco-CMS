@@ -9,7 +9,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return Guid.Parse(Constants.PropertyEditors.TrueFalse).Equals(propertyType.PropertyEditorGuid);
+            return propertyType.PropertyEditorAlias == Constants.PropertyEditors.TrueFalseAlias;
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)

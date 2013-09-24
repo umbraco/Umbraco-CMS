@@ -10,15 +10,15 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class DatePickerValueConverter : PropertyValueConverterBase
 	{
-	    private static readonly Guid[] DataTypeGuids = new[]
-	        {
-	            Guid.Parse(Constants.PropertyEditors.DateTime),
-	            Guid.Parse(Constants.PropertyEditors.Date)
-	        };
+	    private static readonly string[] PropertyEditorAliases =
+	    {
+	        Constants.PropertyEditors.DateTimeAlias,
+	        Constants.PropertyEditors.DateAlias
+	    };
 
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return DataTypeGuids.Contains(propertyType.PropertyEditorGuid);
+            return PropertyEditorAliases.Contains(propertyType.PropertyEditorAlias);
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)

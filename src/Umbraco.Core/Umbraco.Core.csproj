@@ -308,7 +308,6 @@
     <Compile Include="PropertyEditors\PropertyCacheLevel.cs" />
     <Compile Include="PropertyEditors\PropertyValueConverterBase.cs" />
     <Compile Include="PropertyEditors\ValueConverters\TinyMceValueConverter.cs" />
-    <Compile Include="PropertyEditors\PropertyValueConvertersResolver.cs" />
     <Compile Include="PropertyEditors\IPropertyValueConverter.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentOrderedSet.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentSet.cs" />
@@ -358,7 +357,6 @@
     <Compile Include="Models\PreValue.cs" />
     <Compile Include="Models\MemberType.cs" />
     <Compile Include="Models\PreValueCollection.cs" />
-    <Compile Include="Models\PublishedPropertyDefinition.cs" />
     <Compile Include="Models\Rdbms\MemberReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\MemberTypeReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\PropertyDataReadOnlyDto.cs" />
@@ -733,7 +731,6 @@
     <Compile Include="Profiling\ProfilerExtensions.cs" />
     <Compile Include="Profiling\ProfilerResolver.cs" />
     <Compile Include="Profiling\WebProfiler.cs" />
-    <Compile Include="PropertyEditors\DateTimePickerPropertyValueConverter.cs" />
     <Compile Include="PropertyEditors\DelimitedManifestValueValidator.cs" />
     <Compile Include="PropertyEditors\IntegerValidator.cs" />
     <Compile Include="PropertyEditors\ManifestPropertyValidator.cs" />

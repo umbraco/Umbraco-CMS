@@ -27,7 +27,7 @@ namespace Umbraco.Tests.PublishedContent
             var propertyTypes = new[]
                 {
                     // AutoPublishedContentType will auto-generate other properties
-                    new PublishedPropertyType("content", 0, Guid.Parse(Constants.PropertyEditors.TinyMCEv3)), 
+                    new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEv3Alias), 
                 };
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
             PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;

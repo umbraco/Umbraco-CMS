@@ -114,12 +114,6 @@ namespace Umbraco.Tests.PublishedCache
 	        base.FreezeResolution();
 	    }
 		
-		[TearDown]
-		public void TearDown()
-		{
-			UmbracoSettings.Reset();
-		}
-
 	    [Test]
 		public void Has_Content_LegacySchema()
 		{

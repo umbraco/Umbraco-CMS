@@ -40,8 +40,6 @@ namespace Umbraco.Tests.PublishedContent
                     .Union(new[] { typeof(PublishedContentTests).Assembly })
             };
 
-            ApplicationContext.Current = new ApplicationContext(false) { IsReady = true };
-
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
             // when they are requested, but we must declare those that we
@@ -50,11 +48,11 @@ namespace Umbraco.Tests.PublishedContent
             var propertyTypes = new[]
                 {
                     // AutoPublishedContentType will auto-generate other properties
-                    new PublishedPropertyType("umbracoNaviHide", 0, Guid.Parse(Constants.PropertyEditors.TrueFalse)), 
-                    new PublishedPropertyType("selectedNodes", 0, Guid.Empty), 
-                    new PublishedPropertyType("umbracoUrlAlias", 0, Guid.Empty), 
-                    new PublishedPropertyType("content", 0, Guid.Parse(Constants.PropertyEditors.TinyMCEv3)), 
-                    new PublishedPropertyType("testRecursive", 0, Guid.Empty), 
+                    new PublishedPropertyType("umbracoNaviHide", 0, Constants.PropertyEditors.TrueFalseAlias), 
+                    new PublishedPropertyType("selectedNodes", 0, "?"), 
+                    new PublishedPropertyType("umbracoUrlAlias", 0, "?"), 
+                    new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEv3Alias), 
+                    new PublishedPropertyType("testRecursive", 0, "?"), 
                 };
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
             PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;

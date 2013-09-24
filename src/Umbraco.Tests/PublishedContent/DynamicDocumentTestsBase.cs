@@ -17,15 +17,6 @@ namespace Umbraco.Tests.PublishedContent
 	[TestFixture]
     public abstract class DynamicDocumentTestsBase<TDocument, TDocumentList> : PublishedContentTestBase
 	{
-
-        public override void Initialize()
-        {
-            base.Initialize();
-
-            var scriptingMock = Mock.Get(UmbracoSettings.Scripting);
-            scriptingMock.Setup(x => x.DataTypeModelStaticMappings).Returns(new List<IRazorStaticMapping>());
-        }
-
         protected override DatabaseBehavior DatabaseTestBehavior
         {
             get { return DatabaseBehavior.NoDatabasePerFixture; }
@@ -38,6 +29,9 @@ namespace Umbraco.Tests.PublishedContent
 
             base.Initialize();
 
+            var scriptingMock = Mock.Get(UmbracoSettings.Scripting);
+            scriptingMock.Setup(x => x.DataTypeModelStaticMappings).Returns(new List<IRazorStaticMapping>());
+
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
             // when they are requested, but we must declare those that we
@@ -46,14 +40,14 @@ namespace Umbraco.Tests.PublishedContent
             var propertyTypes = new[]
                 {
                     // AutoPublishedContentType will auto-generate other properties
-                    new PublishedPropertyType("umbracoNaviHide", 0, Guid.Empty), 
-                    new PublishedPropertyType("selectedNodes", 0, Guid.Empty), 
-                    new PublishedPropertyType("umbracoUrlAlias", 0, Guid.Empty), 
-                    new PublishedPropertyType("content", 0, Guid.Parse(Constants.PropertyEditors.TinyMCEv3)), 
-                    new PublishedPropertyType("testRecursive", 0, Guid.Empty), 
-                    new PublishedPropertyType("siteTitle", 0, Guid.Empty), 
-                    new PublishedPropertyType("creatorName", 0, Guid.Empty), 
-                    new PublishedPropertyType("blah", 0, Guid.Empty), // ugly error when that one is missing...
+                    new PublishedPropertyType("umbracoNaviHide", 0, "?"), 
+                    new PublishedPropertyType("selectedNodes", 0, "?"), 
+                    new PublishedPropertyType("umbracoUrlAlias", 0, "?"), 
+                    new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEv3Alias), 
+                    new PublishedPropertyType("testRecursive", 0, "?"), 
+                    new PublishedPropertyType("siteTitle", 0, "?"), 
+                    new PublishedPropertyType("creatorName", 0, "?"), 
+                    new PublishedPropertyType("blah", 0, "?"), // ugly error when that one is missing...
                 };
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
             PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;

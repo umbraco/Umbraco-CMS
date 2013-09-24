@@ -74,12 +74,12 @@ namespace Umbraco.Tests.CodeFirst
             var propertyTypes = new[]
                 {
                     // AutoPublishedContentType will auto-generate other properties
-                    new PublishedPropertyType("siteDescription", 0, Guid.Empty), 
-                    new PublishedPropertyType("siteName", 0, Guid.Empty), 
-                    new PublishedPropertyType("articleContent", 0, Guid.Empty), 
-                    new PublishedPropertyType("articleAuthor", 0, Guid.Empty), 
-                    new PublishedPropertyType("articleDate", 0, Guid.Empty), 
-                    new PublishedPropertyType("pageTitle", 0, Guid.Empty), 
+                    new PublishedPropertyType("siteDescription", 0, "?"), 
+                    new PublishedPropertyType("siteName", 0, "?"), 
+                    new PublishedPropertyType("articleContent", 0, "?"), 
+                    new PublishedPropertyType("articleAuthor", 0, "?"), 
+                    new PublishedPropertyType("articleDate", 0, "?"), 
+                    new PublishedPropertyType("pageTitle", 0, "?"), 
                 };
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
             PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
