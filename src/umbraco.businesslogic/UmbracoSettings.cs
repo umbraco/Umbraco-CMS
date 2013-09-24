@@ -93,15 +93,7 @@ namespace umbraco
         {
             get { return UmbracoConfiguration.Current.UmbracoSettings.Security.KeepUserLoggedIn; }
         }
-
-        /// <summary>
-        /// Enables the experimental canvas (live) editing on the frontend of the website
-        /// </summary>
-        public static bool EnableCanvasEditing
-        {
-            get { return UmbracoConfiguration.Current.UmbracoSettings.Content.EnableCanvasEditing; }
-        }
-
+        
         /// <summary>
         /// Show disabled users in the tree in the Users section in the backoffice
         /// </summary>

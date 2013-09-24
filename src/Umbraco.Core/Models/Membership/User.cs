@@ -90,11 +90,10 @@ namespace Umbraco.Core.Models.Membership
 
         [DataMember]
         public string Language { get; set; }
+
         [DataMember]
         public string DefaultPermissions { get; set; }
 
-        [DataMember]
-        public bool DefaultToLiveEditing { get; set; }
         [DataMember]
         public bool NoConsole { get; set; }
 

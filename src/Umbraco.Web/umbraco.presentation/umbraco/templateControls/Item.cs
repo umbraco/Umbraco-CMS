@@ -1,14 +1,11 @@
 using System;
 using System.Collections;
 using System.ComponentModel;
-using System.Security;
-using System.Security.Permissions;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core.Models;
 using umbraco.BusinessLogic.Actions;
-using umbraco.presentation.LiveEditing.Modules.ItemEditing;
 
 namespace umbraco.presentation.templateControls
 {
@@ -195,8 +192,7 @@ namespace umbraco.presentation.templateControls
             m_ItemId = (lastItemId != null ? (int)lastItemId + 1 : 1);
             HttpContext.Current.Items["LiveEditing_LastItemId"] = m_ItemId;
 
-            Renderer = !UmbracoContext.Current.LiveEditingContext.Enabled ? ItemRenderer.Instance
-                                                                          : LiveEditingItemRenderer.Instance;
+            Renderer = ItemRenderer.Instance;
         }
 
         /// <summary>

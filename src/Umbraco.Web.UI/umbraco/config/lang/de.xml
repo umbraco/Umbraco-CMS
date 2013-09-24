@@ -818,7 +818,6 @@ Ihr freundlicher Umbraco-Robot
     <key alias="changePassword">Kennwort ändern</key>
     <key alias="changePasswordDescription">Sie können Ihr Kennwort für den Zugriff auf den Umbraco-Verwaltungsbereich ändern, indem Sie das nachfolgende Formular ausfüllen und auf die 'Kennwort ändern'-Schaltfläche klicken</key>
     <key alias="contentChannel">Schnittstelle für externe Editoren</key>
-    <key alias="defaultToLiveEditing">Nach dem Anmelden direkt zum 'Canvas'-Modus wechseln</key>
     <key alias="descriptionField">Feld für Beschreibung</key>
     <key alias="disabled">Benutzer endgültig deaktivieren</key>
     <key alias="documentType">Dokumenttyp</key>

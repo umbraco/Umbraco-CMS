@@ -888,7 +888,6 @@
     <key alias="changePasswordDescription">Вы можете сменить свой пароль для доступа к административной панели Umbraco, заполнив нижеследующие поля и нажав на кнопку 'Изменить пароль'</key>
     <key alias="confirmNewPassword">Подтверждение нового пароля</key>
     <key alias="contentChannel">Канал содержимого</key>
-    <key alias="defaultToLiveEditing">При входе перевести в режим редактирования "на месте"</key>
     <key alias="descriptionField">Поле описания</key>
     <key alias="disabled">Отключить пользователя</key>
     <key alias="documentType">Тип документа</key>

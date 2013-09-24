@@ -46,21 +46,12 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("userEmail")]
         public string Email { get; set; }
-
-        [Column("userDefaultPermissions")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(50)]
-        public string DefaultPermissions { get; set; }
-
+        
         [Column("userLanguage")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(10)]
         public string UserLanguage { get; set; }
-
-        [Column("defaultToLiveEditing")]
-        [Constraint(Default = "0")]
-        public bool DefaultToLiveEditing { get; set; }
-
+        
         [ResultColumn]
         public List<User2AppDto> User2AppDtos { get; set; }
     }

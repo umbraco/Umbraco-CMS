@@ -982,27 +982,20 @@ namespace umbraco
         {
             if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
             {
-                if (!UmbracoContext.Current.LiveEditingContext.Enabled)
-                {										
-	                using (var sw = new StringWriter())
-	                {
-						try
-						{
-							var altTemplate = TemplateId == -1 ? null : (int?)TemplateId;
-							var templateRenderer = new TemplateRenderer(Umbraco.Web.UmbracoContext.Current, PageId, altTemplate);
-							templateRenderer.Render(sw);
-						}
-						catch (Exception ee)
-						{
-							sw.Write("<!-- Error rendering template with id {0}: '{1}' -->", PageId, ee);
-						}
-
-						return sw.ToString();    
-	                }
-                }
-                else
+                using (var sw = new StringWriter())
                 {
-                    return "RenderTemplate not supported in Canvas";
+                    try
+                    {
+                        var altTemplate = TemplateId == -1 ? null : (int?)TemplateId;
+                        var templateRenderer = new TemplateRenderer(Umbraco.Web.UmbracoContext.Current, PageId, altTemplate);
+                        templateRenderer.Render(sw);
+                    }
+                    catch (Exception ee)
+                    {
+                        sw.Write("<!-- Error rendering template with id {0}: '{1}' -->", PageId, ee);
+                    }
+
+                    return sw.ToString();
                 }
             }
             else

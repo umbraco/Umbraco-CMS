@@ -123,11 +123,8 @@ namespace umbraco
             using (DisposableTimer.DebugDuration<UmbracoDefault>("Load"))
             {
                 base.OnLoad(e);
-
-                // do not validate when liveEditing because there may be a RTE with markup
-                var liveEditing = umbraco.presentation.UmbracoContext.Current.LiveEditingContext.Enabled;
-
-                if (!liveEditing && ValidateRequest)
+                
+                if (ValidateRequest)
                     Request.ValidateInput();
             }
         }

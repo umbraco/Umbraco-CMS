@@ -75,36 +75,9 @@ namespace umbraco.cms.presentation
                 if (Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider] is ActiveDirectoryMembershipProvider)
                     ActiveDirectoryMapping(lname.Text, Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider].GetUser(lname.Text, false).Email);
 
-                BusinessLogic.User u = new User(lname.Text);
+                var u = new User(lname.Text);
                 doLogin(u);
-
-                // Check if the user should be redirected to live editing
-                if (UmbracoConfiguration.Current.UmbracoSettings.Content.EnableCanvasEditing && u.DefaultToLiveEditing)
-                {
-                    int startNode = u.StartNodeId;
-                    // If the startnode is -1 (access to all content), we'll redirect to the top root node
-                    if (startNode == -1)
-                    {
-                        if (Document.CountLeafNodes(-1, Document._objectType) > 0)
-                        {
-                            //get the first document
-                            var firstNodeId = Document.TopMostNodeIds(Document._objectType).First();
-                            startNode = new Document(firstNodeId).Id;
-                        }
-                        else
-                        {
-                            throw new Exception("There's currently no content to edit. Please contact your system administrator");
-                        }
-                    }
-                    string redir = String.Format("{0}/canvas.aspx?redir=/{1}.aspx", SystemDirectories.Umbraco, startNode);
-                    Response.Redirect(redir, true);
-                }
-                else if (u.DefaultToLiveEditing)
-                {
-                    throw new UserAuthorizationException(
-    "Canvas editing isn't enabled. It can be enabled via the UmbracoSettings.config");
-                }
-
+                
                 if (hf_height.Value != "undefined")
                 {
                     Session["windowHeight"] = hf_height.Value;

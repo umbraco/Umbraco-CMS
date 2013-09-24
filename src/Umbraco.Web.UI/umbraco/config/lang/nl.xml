@@ -781,7 +781,6 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="changePassword">Verander je wachtwoord</key>
     <key alias="changePasswordDescription">Je kunt je wachtwoord veranderen door onderstaan formulier in te vullen en op de knop 'Verander wachtwoord' te klikken </key>
     <key alias="contentChannel">Content Channel</key>
-    <key alias="defaultToLiveEditing">Doorlinken naar Canvas bij inloggen</key>
     <key alias="descriptionField">Omschrijving</key>
     <key alias="disabled">Geblokkeerde gebruiker</key>
     <key alias="documentType">Documenttype</key>

@@ -836,7 +836,6 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="changePassword">שנה את הסיסמה שלך</key>
     <key alias="changePasswordDescription">בעמוד זה ניתן לשנות את הסיסמה שלך ולאחר מכן ללחוץ על הכפתור 'שנה סיסמה'	 למטה</key>
     <key alias="contentChannel">ערוץ תוכן</key>
-    <key alias="defaultToLiveEditing">לאחר כניסה למערכת הפנה אוטומטית למצב עריכה "קנבס"</key>
     <key alias="descriptionField">שדה תיאור</key>
     <key alias="disabled">נטרל משתמש</key>
     <key alias="documentType">שדה מסמך</key>

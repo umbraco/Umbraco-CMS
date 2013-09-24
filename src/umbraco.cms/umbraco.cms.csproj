@@ -184,7 +184,6 @@
     <Compile Include="Actions\ActionEmptyTranscan.cs" />
     <Compile Include="Actions\ActionExport.cs" />
     <Compile Include="Actions\ActionImport.cs" />
-    <Compile Include="Actions\ActionLiveEdit.cs" />
     <Compile Include="Actions\ActionMove.cs" />
     <Compile Include="Actions\ActionNew.cs" />
     <Compile Include="Actions\ActionNewFolder.cs" />

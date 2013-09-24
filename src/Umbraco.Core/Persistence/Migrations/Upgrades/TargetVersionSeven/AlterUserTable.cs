@@ -4,11 +4,15 @@ using Umbraco.Core.Configuration;
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 {
     [Migration("7.0.0", 2, GlobalSettings.UmbracoMigrationName)]
-    public class RemoveDefaultPermissionUserColumn : MigrationBase
+    public class AlterUserTable : MigrationBase
     {
         public override void Up()
         {
-            //Delete.Column("userDefaultPermissions").FromTable("umbracoUser");
+            Delete.Column("userDefaultPermissions").FromTable("umbracoUser");
+
+            //"[DF_umbracoUser_defaultToLiveEditing]""
+            Delete.DefaultConstraint().OnTable("umbracoUser").OnColumn("defaultToLiveEditing");
+            Delete.Column("defaultToLiveEditing").FromTable("umbracoUser");
         }
 
         public override void Down()

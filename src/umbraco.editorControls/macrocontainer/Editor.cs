@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core.IO;
 using umbraco.interfaces;
 using umbraco.cms.businesslogic.macro;
 using umbraco.presentation.webservices;
@@ -12,7 +13,6 @@ using ClientDependency.Core;
 using System.Web;
 using ClientDependency.Core.Controls;
 using umbraco.presentation;
-using umbraco.IO;
 
 namespace umbraco.editorControls.macrocontainer
 {
@@ -44,27 +44,18 @@ namespace umbraco.editorControls.macrocontainer
         {
             base.OnInit(e);
 
-            //SD: This is useless as it won't work in live editing anyways whilst using MS Ajax/ScriptManager for ajax calls
-            if (!UmbracoContext.Current.LiveEditingContext.Enabled)
-            {
-                presentation.webservices.ajaxHelpers.EnsureLegacyCalls(base.Page);
-                ScriptManager sm = ScriptManager.GetCurrent(base.Page);
-                ServiceReference webservicePath = new ServiceReference(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/webservices/MacroContainerService.asmx");
+            ajaxHelpers.EnsureLegacyCalls(base.Page);
+            var sm = ScriptManager.GetCurrent(base.Page);
+            var webservicePath = new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/webservices/MacroContainerService.asmx");
 
-                if (!sm.Services.Contains(webservicePath))
-                    sm.Services.Add(webservicePath);
-            }
-            else
-            {
-                ClientDependencyLoader.Instance.RegisterDependency("webservices/legacyAjaxCalls.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
-                ClientDependencyLoader.Instance.RegisterDependency("webservices/MacroContainerService.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
-            }
+            if (!sm.Services.Contains(webservicePath))
+                sm.Services.Add(webservicePath);
 
             _addMacro = new LinkButton();
             _addMacro.ID = ID + "_btnaddmacro";
 
 
-            _addMacro.Click += new EventHandler(_addMacro_Click);
+            _addMacro.Click += _addMacro_Click;
             _addMacro.Text = ui.Text("insertMacro");
             _addMacro.CssClass = "macroContainerAdd";
 

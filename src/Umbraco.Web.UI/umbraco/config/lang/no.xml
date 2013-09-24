@@ -788,7 +788,6 @@ Vennlig hilsen umbraco roboten
     <key alias="changePassword">Bytt passord</key>
     <key alias="changePasswordDescription">Du kan endre passordet til Umbraco ved å fylle ut skjemaet under og klikke "Bytt passord" knappen.</key>
     <key alias="contentChannel">Innholdskanal</key>
-    <key alias="defaultToLiveEditing">Videresend til Canvas ved login</key>
     <key alias="descriptionField">Beskrivelsesfelt</key>
     <key alias="disabled">Deaktiver bruker</key>
     <key alias="documentType">Dokumenttype</key>

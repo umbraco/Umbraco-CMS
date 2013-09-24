@@ -857,7 +857,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="confirmNewPassword">新パスワードの確認</key>
     <key alias="changePasswordDescription">Umbracoの管理画面にアクセスするためのパスワードを変更するには、以下のフォームに新しいパスワード入力して「パスワードの変更」ボタンをクリックしてください。</key>
     <key alias="contentChannel">コンテントチャンネル</key>
-    <key alias="defaultToLiveEditing">ログオン後ライブ編集にリダイレクト</key>
     <key alias="descriptionField">概要フィールド</key>
     <key alias="disabled">ユーザーを無効にする</key>
     <key alias="documentType">ドキュメントタイプ</key>

@@ -28,8 +28,7 @@ namespace umbraco.BusinessLogic
         private UserType _usertype;
         private bool _userNoConsole;
         private bool _userDisabled;
-        private bool _defaultToLiveEditing;
-
+        
         private Hashtable _notifications = new Hashtable();
         private bool _notificationsInitialized = false;
 
@@ -51,7 +50,6 @@ namespace umbraco.BusinessLogic
             _startmediaid = user.StartMediaId;
             //this is cached, so should be 'ok'
             _usertype = UserType.GetUserType(user.UserType.Id);
-            _defaultToLiveEditing = user.DefaultToLiveEditing;
 
             _isInitialized = true;
         }
@@ -99,7 +97,7 @@ namespace umbraco.BusinessLogic
             _id = ID;
 
             using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                "Select userNoConsole, userDisabled, userType,startStructureID, startMediaId, userName,userLogin,userEmail,userDefaultPermissions, userLanguage, defaultToLiveEditing from umbracoUser where id = @id",
+                "Select userNoConsole, userDisabled, userType,startStructureID, startMediaId, userName,userLogin,userEmail, userLanguage from umbracoUser where id = @id",
                 SqlHelper.CreateParameter("@id", ID)))
             {
                 if (dr.Read())
@@ -114,7 +112,6 @@ namespace umbraco.BusinessLogic
                     if (!dr.IsNull("startMediaId"))
                         _startmediaid = dr.GetInt("startMediaID");
                     _usertype = UserType.GetUserType(dr.GetShort("UserType"));
-                    _defaultToLiveEditing = dr.GetBoolean("defaultToLiveEditing");
                 }
                 else
                 {
@@ -863,28 +860,6 @@ namespace umbraco.BusinessLogic
             {
                 _userDisabled = value;
                 SqlHelper.ExecuteNonQuery("update umbracoUser set userDisabled = @userDisabled where id = @id", SqlHelper.CreateParameter("@id", this.Id), SqlHelper.CreateParameter("@userDisabled", _userDisabled));
-                FlushFromCache();
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether a user should be redirected to liveediting by default.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if defaults to live editing; otherwise, <c>false</c>.
-        /// </value>
-        public bool DefaultToLiveEditing
-        {
-            get
-            {
-                if (!_isInitialized)
-                    setupUser(_id);
-                return _defaultToLiveEditing;
-            }
-            set
-            {
-                _defaultToLiveEditing = value;
-                SqlHelper.ExecuteNonQuery("update umbracoUser set defaultToLiveEditing = @defaultToLiveEditing where id = @id", SqlHelper.CreateParameter("@id", this.Id), SqlHelper.CreateParameter("@defaultToLiveEditing", _defaultToLiveEditing));
                 FlushFromCache();
             }
         }

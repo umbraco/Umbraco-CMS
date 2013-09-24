@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     /// editorAlias column (and maintaing data so we can reference it)
     /// </summary>
     [Migration("7.0.0", 5, GlobalSettings.UmbracoMigrationName)]
-    public class AddEditorAliasToCmsMacroProperty : MigrationBase
+    public class AlterCmsMacroPropertyTable : MigrationBase
     {
         public override void Up()
         {

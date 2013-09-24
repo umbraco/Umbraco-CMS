@@ -102,8 +102,7 @@ namespace umbraco.editorControls.tinyMCE3
 
                     // If the editor is used in umbraco, use umbraco's own toolbar
                     bool onFront = false;
-                    if (GlobalSettings.RequestIsInUmbracoApplication(HttpContext.Current) ||
-                        UmbracoContext.Current.LiveEditingContext.Enabled)
+                    if (GlobalSettings.RequestIsInUmbracoApplication(HttpContext.Current))
                     {
                         config.Add("theme_umbraco_toolbar_location", "external");
                         config.Add("skin", "umbraco");

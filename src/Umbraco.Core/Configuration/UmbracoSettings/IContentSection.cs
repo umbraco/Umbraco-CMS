@@ -20,8 +20,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         bool ScriptEditorDisable { get; }
 
-        bool EnableCanvasEditing { get; }
-
         bool ResolveUrlsFromTextString { get; }
 
         bool UploadAllowDirectories { get; }
