@@ -11,19 +11,23 @@ function valShowValidation(serverValidationManager) {
         restrict: "A",
         link: function (scope, element, attr, ctrl) {
 
+            var className = attr.valShowValidation ? attr.valShowValidation : "show-validation";
+            var savingEventName = attr.savingEvent ? attr.savingEvent : "saving";
+            var savedEvent = attr.savedEvent ? attr.savingEvent : "saved";
+
             //we should show validation if there are any msgs in the server validation collection
             if (serverValidationManager.items.length > 0) {
-                element.addClass("show-validation");
+                element.addClass(className);
             }
 
             //listen for the forms saving event
-            scope.$on("saving", function (ev, args) {
-                element.addClass("show-validation");
+            scope.$on(savingEventName, function (ev, args) {
+                element.addClass(className);
             });
             
             //listen for the forms saved event
-            scope.$on("saved", function (ev, args) {
-                element.removeClass("show-validation");
+            scope.$on(savedEvent, function (ev, args) {
+                element.removeClass(className);
             });
             
         }
