@@ -435,8 +435,9 @@ namespace Umbraco.Core.Models
                 if (fileStream.CanSeek) fileStream.Seek(0, 0);
                 using (var originalImage = Image.FromStream(fileStream))
                 {                    
-                    // Make default thumbnail
+                    // Make default thumbnails
                     Resize(fs, fileName, extension, 100, "thumb", originalImage);
+                    Resize(fs, fileName, extension, 500, "big-thumb", originalImage);
 
                     //Look up Prevalues for this upload datatype - if it is an upload datatype
                     if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)
