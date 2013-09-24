@@ -11,7 +11,7 @@ function macroResource($q, $http, umbRequestHelper) {
         
         /**
          * @ngdoc method
-         * @name umbraco.resources.entityResource#getMacroParameters
+         * @name umbraco.resources.macroResource#getMacroParameters
          * @methodOf umbraco.resources.macroResource
          *
          * @description
@@ -28,6 +28,28 @@ function macroResource($q, $http, umbRequestHelper) {
                        "GetMacroParameters",
                        [{ macroId: macroId }])),
                'Failed to retreive macro parameters for macro with id  ' + macroId);
+        },
+        
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.macroResource#getMacroResult
+         * @methodOf umbraco.resources.macroResource
+         *
+         * @description
+         * Gets the result of a macro as html to display in the rich text editor
+         *
+         * @param {int} macroId The macro id to get parameters for
+         * @param {int} pageId The current page id
+         *
+         */
+        getMacroResultAsHtmlForEditor: function (macroAlias, pageId) {
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "macroApiBaseUrl",
+                       "GetMacroResultAsHtmlForEditor",
+                       [{ macroAlias: macroAlias }, { pageId: pageId }])),
+               'Failed to retreive macro result for macro with alias  ' + macroAlias);
         }
             
     };

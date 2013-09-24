@@ -376,6 +376,8 @@ namespace Umbraco.Web
             // TODO - this is dirty old legacy tricks, we should clean it up at some point
             // also, what is a "custom page" and when should this be either null, or different
             // from PublishedContentRequest.PublishedContent.Id ??
+            // SD: Have found out it can be different when rendering macro contents in the back office, but really youshould just be able
+            // to pass a page id to the macro renderer instead but due to all the legacy bits that's real difficult.
             get
             {
                 try

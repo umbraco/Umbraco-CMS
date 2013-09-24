@@ -138,71 +138,107 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters)
 		{
-			if (alias == null) throw new ArgumentNullException("alias");
-
-			var m = macro.GetMacro(alias);
-			if (_umbracoContext.PageId == null)
-			{
-				throw new InvalidOperationException("Cannot render a macro when UmbracoContext.PageId is null.");
-			}
+			
 			if (_umbracoContext.PublishedContentRequest == null)
 			{
 				throw new InvalidOperationException("Cannot render a macro when there is no current PublishedContentRequest.");
 			}
-			var macroProps = new Hashtable();
-			foreach (var i in parameters)
-			{
-				//TODO: We are doing at ToLower here because for some insane reason the UpdateMacroModel method of macro.cs 
-				// looks for a lower case match. WTF. the whole macro concept needs to be rewritten.
-				macroProps.Add(i.Key.ToLower(), i.Value);
-			}
-			var macroControl = m.renderMacro(macroProps,
-				UmbracoContext.Current.PublishedContentRequest.UmbracoPage.Elements,
-				_umbracoContext.PageId.Value);
 
-			string html;
-			if (macroControl is LiteralControl)
-			{
-				// no need to execute, we already have text
-				html = (macroControl as LiteralControl).Text;
-			}
-			else
-			{
-				var containerPage = new FormlessPage();
-				containerPage.Controls.Add(macroControl);
+		    return RenderMacro(alias, parameters, _umbracoContext.PublishedContentRequest.UmbracoPage);
+		}
 
-				using (var output = new StringWriter())
-				{
-					// .Execute() does a PushTraceContext/PopTraceContext and writes trace output straight into 'output'
-					// and I do not see how we could wire the trace context to the current context... so it creates dirty
-					// trace output right in the middle of the page.
-					//
-					// The only thing we can do is fully disable trace output while .Execute() runs and restore afterwards
-					// which means trace output is lost if the macro is a control (.ascx or user control) that is invoked
-					// from within Razor -- which makes sense anyway because the control can _not_ run correctly from
-					// within Razor since it will never be inserted into the page pipeline (which may even not exist at all
-					// if we're running MVC).
-					//
+        /// <summary>
+        /// Renders the macro with the specified alias, passing in the specified parameters.
+        /// </summary>
+        /// <param name="alias">The alias.</param>
+        /// <param name="parameters">The parameters.</param>
+        /// <param name="umbracoPage">The legacy umbraco page object that is required for some macros</param>
+        /// <returns></returns>
+        internal IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters, page umbracoPage)
+        {
+            if (alias == null) throw new ArgumentNullException("alias");
+            if (umbracoPage == null) throw new ArgumentNullException("umbracoPage");
+
+            var m = macro.GetMacro(alias);
+            if (m == null)
+            {
+                throw new KeyNotFoundException("Could not find macro with alias " + alias);
+            }
+
+            return RenderMacro(m, parameters, umbracoPage);
+        }
+
+        /// <summary>
+        /// Renders the macro with the specified alias, passing in the specified parameters.
+        /// </summary>
+        /// <param name="m">The macro.</param>
+        /// <param name="parameters">The parameters.</param>
+        /// <param name="umbracoPage">The legacy umbraco page object that is required for some macros</param>
+        /// <returns></returns>
+        internal IHtmlString RenderMacro(macro m, IDictionary<string, object> parameters, page umbracoPage)
+        {   
+            if (umbracoPage == null) throw new ArgumentNullException("umbracoPage");
+            if (m == null) throw new ArgumentNullException("m");
+
+            if (_umbracoContext.PageId == null)
+            {
+                throw new InvalidOperationException("Cannot render a macro when UmbracoContext.PageId is null.");
+            }
+
+            var macroProps = new Hashtable();
+            foreach (var i in parameters)
+            {
+                //TODO: We are doing at ToLower here because for some insane reason the UpdateMacroModel method of macro.cs 
+                // looks for a lower case match. WTF. the whole macro concept needs to be rewritten.
+                macroProps.Add(i.Key.ToLower(), i.Value);
+            }
+            var macroControl = m.renderMacro(macroProps,
+                umbracoPage.Elements,
+                _umbracoContext.PageId.Value);
+
+            string html;
+            if (macroControl is LiteralControl)
+            {
+                // no need to execute, we already have text
+                html = (macroControl as LiteralControl).Text;
+            }
+            else
+            {
+                var containerPage = new FormlessPage();
+                containerPage.Controls.Add(macroControl);
+
+                using (var output = new StringWriter())
+                {
+                    // .Execute() does a PushTraceContext/PopTraceContext and writes trace output straight into 'output'
+                    // and I do not see how we could wire the trace context to the current context... so it creates dirty
+                    // trace output right in the middle of the page.
+                    //
+                    // The only thing we can do is fully disable trace output while .Execute() runs and restore afterwards
+                    // which means trace output is lost if the macro is a control (.ascx or user control) that is invoked
+                    // from within Razor -- which makes sense anyway because the control can _not_ run correctly from
+                    // within Razor since it will never be inserted into the page pipeline (which may even not exist at all
+                    // if we're running MVC).
+                    //
                     // I'm sure there's more things that will get lost with this context changing but I guess we'll figure 
                     // those out as we go along. One thing we lose is the content type response output.
                     // http://issues.umbraco.org/issue/U4-1599 if it is setup during the macro execution. So 
                     // here we'll save the content type response and reset it after execute is called.
 
-				    var contentType = _umbracoContext.HttpContext.Response.ContentType;
-					var traceIsEnabled = containerPage.Trace.IsEnabled;
-					containerPage.Trace.IsEnabled = false;
-					_umbracoContext.HttpContext.Server.Execute(containerPage, output, false);
-					containerPage.Trace.IsEnabled = traceIsEnabled;
+                    var contentType = _umbracoContext.HttpContext.Response.ContentType;
+                    var traceIsEnabled = containerPage.Trace.IsEnabled;
+                    containerPage.Trace.IsEnabled = false;
+                    _umbracoContext.HttpContext.Server.Execute(containerPage, output, false);
+                    containerPage.Trace.IsEnabled = traceIsEnabled;
                     //reset the content type
-				    _umbracoContext.HttpContext.Response.ContentType = contentType;
+                    _umbracoContext.HttpContext.Response.ContentType = contentType;
 
-					//Now, we need to ensure that local links are parsed
-					html = TemplateUtilities.ParseInternalLinks(output.ToString());
-				}
-			}
+                    //Now, we need to ensure that local links are parsed
+                    html = TemplateUtilities.ParseInternalLinks(output.ToString());
+                }
+            }
 
-			return new HtmlString(html);
-		}
+            return new HtmlString(html);
+        }
 
 		#endregion
 

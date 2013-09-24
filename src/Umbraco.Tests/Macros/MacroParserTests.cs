@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Macros
 
             Assert.AreEqual(@"<p>asdfasdf</p>
 <p>asdfsadf</p>
-<div class=""umb-macro-holder"" test1=""value1"" test2=""value2"">
+<div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" /> -->
 Macro alias: <strong>Map</strong></div>
 <p>asdfasdf</p>", result);
@@ -30,7 +30,7 @@ Macro alias: <strong>Map</strong></div>
             var content = @"<html>
 <body>
 <h1>asdfasdf</h1>
-<div class='umb-macro-holder' att1='asdf' att2='asdfasdfasdf' att3=""sdfsdfd"">
+<div class='umb-macro-holder Map mceNonEditable' att1='asdf' att2='asdfasdfasdf' att3=""sdfsdfd"">
 <!-- <?UMBRACO_MACRO macroAlias=""myMacro"" param1=""test1"" param2=""test2"" /> -->
 asdfasdf 
 asdfas

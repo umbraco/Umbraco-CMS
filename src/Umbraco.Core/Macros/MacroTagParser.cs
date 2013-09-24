@@ -10,7 +10,7 @@ namespace Umbraco.Core.Macros
 	/// </summary>
 	internal class MacroTagParser
 	{
-        private static readonly Regex MacroRteContent = new Regex(@"(<div class=[""']umb-macro-holder[""'].*?>.*?<!--\s*?)(<\?UMBRACO_MACRO.*?/>)(.*?</div>)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        private static readonly Regex MacroRteContent = new Regex(@"(<div class=[""']umb-macro-holder.+?[""'].*?>.*?<!--\s*?)(<\?UMBRACO_MACRO.*?/>)(.*?</div>)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
         private static readonly Regex MacroPersistedFormat = new Regex(@"<\?UMBRACO_MACRO macroAlias=[""'](\w+?)[""'].+?/>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
 	    /// <summary>
@@ -35,8 +35,11 @@ namespace Umbraco.Core.Macros
             {
                 if (match.Groups.Count >= 2)
                 {
-                    //<div class="umb-macro-holder" data-load-content="false">
-                    var sb = new StringBuilder("<div class=\"umb-macro-holder\"");
+                    //<div class="umb-macro-holder myMacro mceNonEditable">
+                    var alias = match.Groups[1].Value;
+                    var sb = new StringBuilder("<div class=\"umb-macro-holder ");
+                    sb.Append(alias);
+                    sb.Append(" mceNonEditable\"");
                     foreach (var htmlAttribute in htmlAttributes)
                     {
                         sb.Append(" ");
@@ -51,7 +54,7 @@ namespace Umbraco.Core.Macros
                     sb.AppendLine(" -->");
                     sb.Append("Macro alias: ");
                     sb.Append("<strong>");
-                    sb.Append(match.Groups[1].Value);
+                    sb.Append(alias);
                     sb.Append("</strong></div>");
                     return sb.ToString();
                 }
