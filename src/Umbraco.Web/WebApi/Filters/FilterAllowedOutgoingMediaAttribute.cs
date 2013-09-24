@@ -77,12 +77,13 @@ namespace Umbraco.Web.WebApi.Filters
             var toRemove = new List<dynamic>();
             foreach (dynamic item in items)
             {
-                var hasPathAccess = UserExtensions.HasPathAccess(item.Path, user.StartContentId, Constants.System.RecycleBinContent);
+                var hasPathAccess = (item != null && UserExtensions.HasPathAccess(item.Path, user.StartContentId, Constants.System.RecycleBinContent));
                 if (!hasPathAccess)
                 {
                     toRemove.Add(item);
                 }
             }
+
             foreach (var item in toRemove)
             {
                 items.Remove(item);

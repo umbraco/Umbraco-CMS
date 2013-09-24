@@ -122,7 +122,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "mediaApiBaseUrl",
                        "GetByIds",
                        idQuery)),
-               'Failed to retreive data for media id ' + id);
+               'Failed to retreive data for media ids ' + ids);
         },
 
         /**

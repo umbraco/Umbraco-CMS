@@ -1,10 +1,29 @@
 angular.module("umbraco")
+.directive("umbUploadPreview",function($parse){
+        return {
+            link: function(scope, element, attr, ctrl) {
+               var fn = $parse(attr.umbUploadPreview),
+                                   file = fn(scope);
+                if (file.preview) {
+                   element.append(file.preview);
+               }
+            }
+        };
+})
 .controller("Umbraco.Editors.FolderBrowserController",
-    function ($rootScope, $scope, assetsService, $routeParams, umbRequestHelper, mediaResource, imageHelper) {
+    function ($rootScope, $scope, assetsService, $routeParams, $timeout, umbRequestHelper, mediaResource, imageHelper) {
         var dialogOptions = $scope.$parent.dialogOptions;
+
+        $scope.filesUploading = [];
+
         $scope.options = {
             url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
             autoUpload: true,
+            disableImageResize: /Android(?!.*Chrome)|Opera/
+            .test(window.navigator.userAgent),
+            previewMaxWidth: 100,
+            previewMaxHeight: 100,
+            previewCrop: true,
             formData:{
                 currentFolder: $routeParams.id
             }
@@ -23,7 +42,33 @@ angular.module("umbraco")
 
         $scope.$on('fileuploadstop', function(event, files){
             $scope.loadChildren($scope.options.formData.currentFolder);
+            $scope.queue = [];
         });
+
+        $scope.$on('fileuploadprocessalways', function(e,data) {
+            var i;
+            console.log('processing');
+
+            $scope.$apply(function() {
+                $scope.filesUploading.push(data.files[data.index]);
+            });
+        })
+
+
+        // All these sit-ups are to add dropzone area and make sure it gets removed if dragging is aborted! 
+        $scope.$on('fileuploaddragover', function(event, files) {
+            if (!$scope.dragClearTimeout) {
+                $scope.$apply(function() {
+                    $scope.dropping = true;
+                });
+            } else {
+                $timeout.cancel($scope.dragClearTimeout);
+            }
+            $scope.dragClearTimeout = $timeout(function () {
+                $scope.dropping = null;
+                $scope.dragClearTimeout = null;
+            }, 100);
+        })
         
         //init load
         $scope.loadChildren($routeParams.id);

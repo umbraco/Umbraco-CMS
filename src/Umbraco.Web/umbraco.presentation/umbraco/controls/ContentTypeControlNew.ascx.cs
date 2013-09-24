@@ -429,7 +429,6 @@ namespace umbraco.controls
             txtName.Text = _contentType.GetRawText();
             txtAlias.Text = _contentType.Alias;
             description.Text = _contentType.GetRawDescription();
-
             tb_icon.Value = _contentType.IconUrl;
             
             if(string.IsNullOrEmpty(_contentType.IconUrl))

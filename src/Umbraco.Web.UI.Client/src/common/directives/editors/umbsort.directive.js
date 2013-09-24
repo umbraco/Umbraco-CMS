@@ -33,13 +33,14 @@ angular.module("umbraco.directives")
                 scope.opts.nested= cfg.nested || true,
                 scope.opts.drop= cfg.drop || true,
                 scope.opts.drag= cfg.drag || true,
+                /*
                 scope.opts.isValidTarget = function(item, container) {
                         if(container.el.is(".umb-" + scope.opts.group + "-container")){
                             return true;
                         }
                         return false;
                      };
-
+                */
 
                 element.addClass("umb-sort");
                 element.addClass("umb-" + cfg.group + "-container");
@@ -53,47 +54,66 @@ angular.module("umbraco.directives")
 
 
                 scope.opts.onDrop = function (item, targetContainer, _super)  {
-                      var children = $("li", targetContainer.el);
-                      var targetScope = $(targetContainer.el[0]).scope();
-                      var targetIndex = children.index(item);
-
-                      if(targetScope.opts.onDropHandler){
-                          var args = {
-                            sourceScope: umbSortContextInternal.sourceScope,
-                            sourceIndex: umbSortContextInternal.sourceIndex,
-                            sourceContainer: umbSortContextInternal.sourceContainer,
-
-                            targetScope: targetScope,
-                            targetIndex: targetIndex,
-                            targetContainer: targetContainer
-                          };   
-
-                          targetScope.opts.onDropHandler.call(this, item, args);
-                      }
-
-                      if(umbSortContextInternal.sourceScope.opts.onReleaseHandler){
-                          var _args = {
-                            sourceScope: umbSortContextInternal.sourceScope,
-                            sourceIndex: umbSortContextInternal.sourceIndex,
-                            sourceContainer: umbSortContextInternal.sourceContainer,
-
-                            targetScope: targetScope,
-                            targetIndex: targetIndex,
-                            targetContainer: targetContainer
-                          };
-
-                          umbSortContextInternal.sourceScope.opts.onReleaseHandler.call(this, item, _args);
-                      }
-
                       var clonedItem = $('<li/>').css({height: 0});
-                      item.before(clonedItem);
+                      item.after(clonedItem);
                       clonedItem.animate({'height': item.height()});
                       
+                      item.animate(clonedItem.position(), function  () {
+                         clonedItem.detach();
+                         _super(item);
+                      });
+
+
+                      var children = $("li", targetContainer.el);
+                      var targetIndex = children.index(item);
+                      var targetScope = $(targetContainer.el[0]).scope();
                       
-                         item.animate(clonedItem.position(), function  () {
-                           clonedItem.detach();
-                           _super(item);
-                         });
+
+                      if(targetScope === umbSortContextInternal.sourceScope){
+                          if(umbSortContextInternal.sourceScope.opts.onSortHandler){
+                              var _largs = {
+                                oldIndex: umbSortContextInternal.sourceIndex,
+                                newIndex: targetIndex,
+                                scope: umbSortContextInternal.sourceScope
+                              };
+
+                              umbSortContextInternal.sourceScope.opts.onSortHandler.call(this, item, _largs);
+                          }
+                      }else{
+                        
+
+                        if(targetScope.opts.onDropHandler){
+                            var args = {
+                              sourceScope: umbSortContextInternal.sourceScope,
+                              sourceIndex: umbSortContextInternal.sourceIndex,
+                              sourceContainer: umbSortContextInternal.sourceContainer,
+
+                              targetScope: targetScope,
+                              targetIndex: targetIndex,
+                              targetContainer: targetContainer
+                            };   
+
+                            targetScope.opts.onDropHandler.call(this, item, args);
+                        }
+
+                        if(umbSortContextInternal.sourceScope.opts.onReleaseHandler){
+                            var _args = {
+                              sourceScope: umbSortContextInternal.sourceScope,
+                              sourceIndex: umbSortContextInternal.sourceIndex,
+                              sourceContainer: umbSortContextInternal.sourceContainer,
+
+                              targetScope: targetScope,
+                              targetIndex: targetIndex,
+                              targetContainer: targetContainer
+                            };
+
+                            umbSortContextInternal.sourceScope.opts.onReleaseHandler.call(this, item, _args);
+                        }
+                      }
+                      
+
+                      
+                      
                 };
 
                 scope.changeIndex = function(from, to){

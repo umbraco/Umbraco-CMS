@@ -9,37 +9,52 @@ ul.sections {
 }
 
 ul.sections li {
-	border-bottom: 1px solid @grayDark;
 	display: block;
+	border-left: 4px @blackLight solid;
+	-webkit-transition: all .3s linear;
+	-moz-transition: all .3s linear;
+	transition: all .3s linear;
 }
 
-ul.sections li [class^="icon-"]:before, ul.sections li [class*=" icon-"]:before{
-	font-size: 24px;
+ul.sections li [class^="icon-"]:before, 
+ul.sections li [class*=" icon-"]:before{
+	font-size: 30px;
+	margin: 1px 0 0 0;
+	opacity: 0.4;
+	-webkit-transition: all .3s linear;
+	-moz-transition: all .3s linear;
+	transition: all .3s linear;
+}
+
+ul.sections:hover li [class^="icon-"]:before, 
+ul.sections:hover li [class*=" icon-"]:before {
+	opacity: 1
 }
 
 ul.sections li a {
-	display: inline-block;
+	display: block;
 	text-decoration: none;
-	font-size: 10px;
 	text-align: center;
-	color: @gray;
-	-webkit-transition: color .5s linear;
-	-moz-transition: color .5s linear;
-	transition: color .5s linear;
-
-	padding-top: 15px;
-	padding-bottom: 15px;
+	color: @grayLight;
+	padding: 20px 4px 4px 0;
+	border-bottom: 1px solid @grayDark;
+	width: 100%;
+	height: 100%;
+	margin: 0 0 0 -4px;
 }
 
 ul.sections a span {
-	display: block;
 	font-size: 10px;
-	line-height: 1em;
+	line-height: 1.4em;
+	opacity: 0;
+	-webkit-transition: all .3s linear;
+	-moz-transition: all .3s linear;
+	transition: all .3s linear;
+	display: block;
 }
 
-
-ul.sections:hover li a {
-	color: @grayLight;
+ul.sections:hover a span {
+	opacity: 1
 }
 
 
@@ -50,6 +65,8 @@ ul.sections li.avatar {
 	height: 69px;
 	padding: 30px 0 0 0;
 	text-align: center;
+	margin: 0 0 0 -4px;
+	border-bottom: 1px solid @grayDark;
 }
 
 ul.sections li.avatar a {
@@ -57,6 +74,7 @@ ul.sections li.avatar a {
 	padding: 0;
 	width: 40px;
 	height: 40px;
+	border: none
 }
 
 ul.sections li.avatar a img {
@@ -67,18 +85,12 @@ ul.sections li.avatar a img {
 	opacity: 0.4
 }
 
-ul.sections li i {
-	display: inline-block;
-}
-
-ul.sections li a {
-	display: inline-block;
-	padding-left: 4px;
-	padding-right: 4px;
-}
-
-ul.sections li.current {
+ul.sections li.current, ul.sections li:hover {
     border-left: 4px @orange solid;
+}
+
+ul.sections li.avatar.current, ul.sections li.avatar:hover {
+	border-left: 4px @blackLight solid;
 }
 
 ul.sections li.current a{
@@ -86,12 +98,15 @@ ul.sections li.current a{
 }
 
 ul.sections li.help {
-	border-top: 1px solid @grayDark;
-	border-bottom: none;
+	
 	margin: 0;
 	position: absolute;
 	bottom: 0;
 	left: 0;
 	display: block;
 	width: 100%;
+}
+
+ul.sections li.help a {
+	border-bottom: none;
 }

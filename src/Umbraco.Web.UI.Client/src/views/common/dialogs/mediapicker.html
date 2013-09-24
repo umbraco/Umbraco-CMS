@@ -63,28 +63,26 @@ data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupl
 	               ng-click="selectMediaItem(image)" 
 	               prevent-default>
 					
+                    <img 
+                    	ng-show="image.thumbnail" 
+                    	ng-src="{{image.thumbnail}}" 
+                    	class="image" 
+                    	alt="{{image.name}}"/>
 
-	               	<img ng-src="{{image.thumbnail}}" ng-switch-when="Image" alt="{{image.name}}"/>	
-
-
-                    <div ng-switch on="!!image.thumbnail" >
-                        <img ng-src="{{image.thumbnail}}" class="image" ng-switch-when="true" alt="{{image.name}}"/>
-
-                        <div ng-switch-default>
-                        	<i class="icon-folder large"></i>
-                        	{{image.name}}
-                        </div>
-                    </div>
-	            </a>
+                    <div ng-hide="image.thumbnail">
+                    	<i class="icon-folder large"></i>
+                    	{{image.name}}
+                    	</div>
+                </a>
 	        </li>
 	    </ul>
 	</div>
 
-
 	<div class="umb-panel-footer">
 		<div class="umb-el-wrap umb-panel-buttons">
 	        <div class="pull-right umb-btn-toolbar"> 
-	         	<button ng-show="dialogData.selection.length > 0" type="button" ng-click="submit(dialogData)" class="btn btn-primary">Select ({{dialogData.selection.length}})</button>
+	         	<button ng-show="dialogData.selection.length > 0" type="button" 
+	         		ng-click="submit(dialogData)" class="btn btn-primary">Select ({{dialogData.selection.length}})</button>
 	        </div>
 		</div>
 	</div>

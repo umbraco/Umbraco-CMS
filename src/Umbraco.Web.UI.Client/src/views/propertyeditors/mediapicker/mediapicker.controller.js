@@ -2,48 +2,53 @@
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco').controller("Umbraco.Editors.MediaPickerController", 
 	function($rootScope, $scope, dialogService, mediaResource, imageHelper, $log){
-	// 
-	//$( "#draggable" ).draggable();
+	
+	
+	$scope.images = [];
+	$scope.ids = [];
 
+	if($scope.model.value){
+		$scope.ids = $scope.model.value.split(',');
 
-	//saved value contains a list of images with their coordinates a Dot coordinates
-	//this will be $scope.model.value...
-	var sampleData = [
-		{id: 1143, coordinates: {x:123,y:345}, center: {x:123,y:12}},
-		{id: 1144, coordinates: {x:123,y:345}, center: {x:123,y:12}},
-		{id: 1145, coordinates: {x:123,y:345}, center: {x:123,y:12}},
-	];
-
-	$scope.images = sampleData;
-	$($scope.images).each(function(i,img){
-		mediaResource.getById(img.id).then(function(media){
+		mediaResource.getByIds($scope.ids).then(function(medias){
 			//img.media = media;
-
-			//shortcuts
-			//TODO, do something better then this for searching
-			img.src = imageHelper.getImagePropertyValue({imageModel: media});
-			img.thumbnail = imageHelper.getThumbnailFromPath(img.src); 
+			$(medias).each(function(i, media){
+				//shortcuts
+				//TODO, do something better then this for searching
+				var img = {};
+				img.src = imageHelper.getImagePropertyValue({imageModel: media});
+				img.thumbnail = imageHelper.getThumbnailFromPath(img.src);
+				$scope.images.push(img);
+			});
 		});
-	});
+	}
 
- 	//List of crops with name and size			
- 	$scope.config = {
- 		crops: [
-	 		{name: "default", x:300,y:400},
-	 		{name: "header", x:23,y:40},
-	 		{name: "tiny", x:10,y:10}
- 		]};
+	$scope.remove = function(index){
+		$scope.images.splice(index, 1);
+		$scope.ids.splice(index, 1);
+		$scope.sync();
+	};
 
+	$scope.add = function(){
+		dialogService.mediaPicker({multipicker:true, callback: function(data){
+			$(data.selection).each(function(i, media){
+				//shortcuts
+				//TODO, do something better then this for searching
 
- 		$scope.openMediaPicker =function(value){
- 			var d = dialogService.mediaPicker({scope: $scope, callback: populate});
- 		};
+				var img = {};
+				img.id = media.id;
+				img.src = imageHelper.getImagePropertyValue({imageModel: media});
+				img.thumbnail = imageHelper.getThumbnailFromPath(img.src);
+				$scope.images.push(img);
+				$scope.ids.push(img.id);
+			});
 
- 		$scope.crop = function(image){
- 			$scope.currentImage = image;
- 		};
+			$scope.sync();
+		}});
+	};
 
- 		function populate(data){
- 			$scope.model.value = data.selection;
- 		}
- 	});
+	$scope.sync = function(){
+		$scope.model.value = $scope.ids.join();
+	};
+
+});

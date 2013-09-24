@@ -310,9 +310,7 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                 /** The insert macro button click event handler */
                 onclick: function () {
 
-                    dialogService.open({
-                        show: true,
-                        template: "views/common/dialogs/insertmacro.html",
+                    dialogService.macroPicker({
                         scope: $scope,
                         callback: function(data) {
 

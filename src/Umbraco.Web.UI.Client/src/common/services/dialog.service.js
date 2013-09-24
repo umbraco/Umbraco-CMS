@@ -64,8 +64,7 @@ angular.module('umbraco.services')
            
            var dialog = angular.extend(defaults, options);
            var scope = options.scope || $rootScope.$new();
-           delete dialog.scope;
-
+           
            //Modal dom obj and unique id
            dialog.element = $('<div ng-swipe-left="hide()" ng-swipe-right="hide()"  data-backdrop="false"></div>');
            var id = dialog.template.replace('.html', '').replace('.aspx', '').replace(/[\/|\.|:\&\?\=]/g, "-") + '-' + scope.$id;
@@ -78,6 +77,7 @@ angular.module('umbraco.services')
                dialog.element.addClass("modal");
                dialog.element.addClass("hide");
            }
+
            //set the id and add classes
            dialog.element
                .attr('id', id)
@@ -332,8 +332,9 @@ angular.module('umbraco.services')
             * @returns {Object} modal object
             */
            macroPicker: function (options) {
-                options.template = 'views/common/dialogs/macroPicker.html';
+                options.template = 'views/common/dialogs/insertmacro.html';
                 options.show = true;
+                options.modalClass = "span7 umb-modal";
                 return openDialog(options);
            },
 
