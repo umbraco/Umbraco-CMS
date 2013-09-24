@@ -9,21 +9,22 @@ body.dragging, body.dragging * {
 }
 
 .umb-sort li{
-	display: block;
+	  display: block;
     margin: 5px;
     padding: 5px;
     border: 1px solid #CCC;
     background: @grayLighter;
 }
 
-.umb-sort li.placeholder {
+.umb-sort .placeholder {
   position: relative;
   margin: 0;
   padding: 0;
   border: none;
 }
-.umb-sort li.placeholder:before {
-  	position: absolute;
+
+.umb-sort .placeholder:before {
+  position: absolute;
 	content: "";
 	width: 0;
 	height: 0;
