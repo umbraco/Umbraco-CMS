@@ -32,7 +32,9 @@
 
     /* App-wide file-upload helper */
     'lib/jquery/jquery.upload/js/jquery.fileupload.js',
+    'lib/jquery/jquery.upload/js/load-image.min.js',
     'lib/jquery/jquery.upload/js/jquery.fileupload-process.js',
+    'lib/jquery/jquery.upload/js/jquery.fileupload-image.js',
     'lib/jquery/jquery.upload/js/jquery.fileupload-angular.js',
 
     'lib/bootstrap/js/bootstrap.js',

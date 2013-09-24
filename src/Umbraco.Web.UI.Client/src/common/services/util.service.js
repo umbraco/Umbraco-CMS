@@ -156,7 +156,7 @@ function imageHelper() {
 
         getThumbnailFromPath: function(imagePath) {
             var ext = imagePath.substr(imagePath.lastIndexOf('.'));
-            return imagePath.substr(0, imagePath.lastIndexOf('.')) + "_thumb" + ".jpg";
+            return imagePath.substr(0, imagePath.lastIndexOf('.')) + "_big-thumb" + ".jpg";
         },
         detectIfImageByExtension: function(imagePath) {
             var lowered = imagePath.toLowerCase();

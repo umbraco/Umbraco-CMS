@@ -23,6 +23,19 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
                 } else {
                     $scope.wizardStep = "paramSelect";
                     $scope.macroParams = data;
+                    
+                    //fill in the data if we are editing this macro
+                    if ($scope.dialogData && $scope.dialogData.macroData && $scope.dialogData.macroData.params) {
+                        _.each($scope.dialogData.macroData.params, function(p) {
+                            var prop = _.find($scope.macroParams, function (item) {
+                                return item.alias == p.alias;
+                            });
+                            if (prop) {
+                                prop.value = p.value;
+                            }
+                        });
+
+                    }
                 }
             });
     }
@@ -61,7 +74,7 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
     $scope.macroParams = [];
     
     $scope.submitForm = function () {
-
+        
         if ($scope.wizardStep === "paramSelect") {
             //we need to broadcast the saving event for the toggle validators to work
             $scope.$broadcast("saving");
@@ -82,25 +95,34 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
         
     };
 
+    //here we check to see if we've been passed a selected macro and if so we'll set the
+    //editor to start with parameter editing
+    if ($scope.dialogData && $scope.dialogData.macroData) {
+        $scope.wizardStep = "paramSelect";
+    }
+    
     //get the macro list
     entityResource.getAll("Macro")
-        .then(function (data) {            
+        .then(function (data) {
 
             $scope.macros = data;
-            
+
             //check if there's a pre-selected macro and if it exists
-            if ($scope.dialogData.selectedAlias) {
-                var found = _.find(data, function(item) {
-                    return item.alias === $scope.dialogData.selectedAlias;
+            if ($scope.dialogData && $scope.dialogData.macroData && $scope.dialogData.macroData.alias) {
+                var found = _.find(data, function (item) {
+                    return item.alias === $scope.dialogData.macroData.alias;
                 });
                 if (found) {
                     //select the macro and go to next screen
                     $scope.selectedMacro = found.id;
                     editParams();
+                    return;
                 }
-                
             }
+            //we don't have a pre-selected macro so ensure the correct step is set
+            $scope.wizardStep = "macroSelect";
         });
+
 
 }
 

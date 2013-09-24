@@ -83,3 +83,13 @@ td.mce-item-selected, th.mce-item-selected {
     display:block;
     margin:3px;
 } 
+
+/* loader for macro loading in tinymce*/
+    .mce-content-body .umb-macro-holder.loading {
+        background: url(img/loader.gif) right no-repeat;
+        -moz-background-size: 18px;
+        -o-background-size: 18px;
+        -webkit-background-size: 18px;
+        background-size: 18px;
+        background-position-x: 99%;
+    }

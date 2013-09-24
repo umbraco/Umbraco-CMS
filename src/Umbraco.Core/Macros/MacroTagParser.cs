@@ -10,8 +10,8 @@ namespace Umbraco.Core.Macros
 	/// </summary>
 	internal class MacroTagParser
 	{
-        private static readonly Regex MacroRteContent = new Regex(@"(<div class=[""']umb-macro-holder[""'].*?>.*?<!--\s*?)(<\?UMBRACO_MACRO.*?/>)(.*?</div>)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-        private static readonly Regex MacroPersistedFormat = new Regex(@"<\?UMBRACO_MACRO macroAlias=[""'](\w+?)[""'].+?/>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        private static readonly Regex MacroRteContent = new Regex(@"(<div class=[""']umb-macro-holder.+?[""'].*?>.*?<!--\s*?)(<\?UMBRACO_MACRO.*?/>)(.*?</div>)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        private static readonly Regex MacroPersistedFormat = new Regex(@"(<\?UMBRACO_MACRO macroAlias=[""'](\w+?)[""'].+?)(?:/>|>.*?</\?UMBRACO_MACRO>)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
 	    /// <summary>
 	    /// This formats the persisted string to something useful for the rte so that the macro renders properly since we 
@@ -33,10 +33,13 @@ namespace Umbraco.Core.Macros
         {
             return MacroPersistedFormat.Replace(persistedContent, match =>
             {
-                if (match.Groups.Count >= 2)
+                if (match.Groups.Count >= 3)
                 {
-                    //<div class="umb-macro-holder" data-load-content="false">
-                    var sb = new StringBuilder("<div class=\"umb-macro-holder\"");
+                    //<div class="umb-macro-holder myMacro mceNonEditable">
+                    var alias = match.Groups[2].Value;
+                    var sb = new StringBuilder("<div class=\"umb-macro-holder ");
+                    sb.Append(alias);
+                    sb.Append(" mceNonEditable\"");
                     foreach (var htmlAttribute in htmlAttributes)
                     {
                         sb.Append(" ");
@@ -47,11 +50,12 @@ namespace Umbraco.Core.Macros
                     }
                     sb.AppendLine(">");
                     sb.Append("<!-- ");
-                    sb.Append(match.Groups[0].Value);
+                    sb.Append(match.Groups[1].Value.Trim());
+                    sb.Append(" />");
                     sb.AppendLine(" -->");
                     sb.Append("Macro alias: ");
                     sb.Append("<strong>");
-                    sb.Append(match.Groups[1].Value);
+                    sb.Append(alias);
                     sb.Append("</strong></div>");
                     return sb.ToString();
                 }

@@ -1,41 +1,41 @@
-<div class="umb-panel show-validation" ng-controller="Umbraco.Dialogs.InsertMacroController">
+<form novalidate name="insertMacroForm" ng-submit="submitForm()" ng-controller="Umbraco.Dialogs.InsertMacroController">
+    <div class="umb-panel" val-show-validation>        
 
-    <form novalidate name="insertMacroForm" ng-submit="submitForm()">
-        
         <div class="umb-panel-header">
             <div class="umb-el-wrap umb-panel-buttons">
                 <div class="btn-toolbar umb-btn-toolbar">
+                    <button type="button" class="btn" ng-click="close()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Ok</button>
                 </div>
             </div>
         </div>
 
         <div class="umb-panel-body umb-scrollable" auto-scale="1">
-            <div class="tab-content umb-control-group" ng-switch="wizardStep">
+            <div class="umb-control-group" ng-switch="wizardStep">
                 <div class="umb-pane" ng-switch-when="macroSelect">
-                    
+
                     <label for="macroName">Choose a macro</label>
                     <select name="selectedMacro" ng-model="$parent.selectedMacro" ng-options="m.id as m.name for m in macros" required>
                         <option value="">-- Choose macro --</option>
-                    </select>    
+                    </select>
 
                 </div>
                 <div class="umb-pane" ng-switch-when="paramSelect">
-                    
+
                     <ul class="unstyled">
                         <li ng-repeat="param in $parent.macroParams">
-                            
-                            <div class="control-group umb-control-group" ng-class="{error: insertMacroForm.$invalid}" >
+
+                            <div class="control-group umb-control-group" ng-class="{error: insertMacroForm.$invalid}">
                                 <label>{{param.name}}</label>
-                                <umb-editor model="param"></umb-editor>    
+                                <umb-editor model="param"></umb-editor>
                             </div>
 
                         </li>
                     </ul>
-                    
+
                 </div>
             </div>
         </div>
 
-    </form>
-</div>
+    </div>
+</form>

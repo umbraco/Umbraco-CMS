@@ -16,6 +16,7 @@ namespace umbraco.presentation
     /// <summary>
     /// Summary description for macroResultWrapper.
     /// </summary>
+    [Obsolete("This is no longer used and will be removed from the codebase")]
     public partial class macroResultWrapper : BasePages.UmbracoEnsuredPage
     {
 

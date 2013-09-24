@@ -7,31 +7,34 @@
  * The controller for deleting content
  */
 function ContentSortController($scope, contentResource, treeService) {
-
-    $scope.sortableModel = {
-        itemsToSort: [],
-        name: $scope.nav.ui.currentNode.name
-    };
-
     contentResource.getChildren($scope.currentNode.id).then(function (data) {
-        $scope.sortableModel.itemsToSort = [];
+        $scope.pagesToSort = [];
         for (var i = 0; i < data.items.length; i++) {
-            $scope.sortableModel.itemsToSort.push({
+            $scope.pagesToSort.push({
                 id: data.items[i].id,
-                column1: data.items[i].name,
-                column2: data.items[i].updateDate,
-                column3: data.items[i].sortOrder
+                name: data.items[i].name,
+                updateDate: data.items[i].updateDate,
+                sortOrder: data.items[i].sortOrder
             });
         }
     });
 
-    $scope.$on("umbItemSorter.ok", function(event) {
-        $scope.nav.hideDialog();
-    });
-    $scope.$on("umbItemSorter.cancel", function (event) {
-        $scope.nav.hideDialog();
-    });
+    $scope.sortOptions ={
+        group: "pages",
+        containerSelector: 'table',
+        itemPath: '> tbody',
+        itemSelector: 'tr',
+        placeholder: '<tr class="placeholder"/>',
+        clone: "<tr />",
+        mode: "table",
+        onSortHandler: function(item, args){
 
+
+            args.scope.changeIndex(args.oldIndex, args.newIndex);
+        }
+    };
+
+/*
     $scope.$on("umbItemSorter.sorting", function (event, args) {
 
         var sortedIds = [];
@@ -43,8 +46,7 @@ function ContentSortController($scope, contentResource, treeService) {
                 $scope.sortableModel.complete = true;
                 treeService.loadNodeChildren({ node: $scope.nav.ui.currentNode, section: $scope.nav.ui.currentSection });
             });
-
-    });
+    });*/
 
 }
 

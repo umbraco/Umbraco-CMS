@@ -6,7 +6,7 @@
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
-function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeout) {
+function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeout, macroResource, macroService) {
     return {
 
         /**
@@ -126,8 +126,7 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
         * @param {Object} $scope the current controller scope
         */
         createInsertMacro: function (editor, $scope) {
-
-
+            
             /** Adds custom rules for the macro plugin and custom serialization */
             editor.on('preInit', function (args) {
                 //this is requires so that we tell the serializer that a 'div' is actually allowed in the root, otherwise the cleanup will strip it out
@@ -141,12 +140,27 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                         }
                     }
                 });
+            
             });
 
-            ///** Listens for the editor saving  */ 
-            //$scope.on("saving", function() {
-
-            //});
+            /**
+            * Because the macro gets wrapped in a P tag because of the way 'enter' works, this 
+            * method will return the macro element if not wrapped in a p, or the p if the macro
+            * element is the only one inside of it even if we are deep inside an element inside the macro
+            */
+            function getRealMacroElem(element) {
+                var e = $(element).closest(".umb-macro-holder");
+                if (e.length > 0) {
+                    if (e.get(0).parentNode.nodeName === "P") {
+                        //now check if we're the only element                    
+                        if (element.parentNode.childNodes.length === 1) {
+                            return e.get(0).parentNode;
+                        }
+                    }
+                    return e.get(0);
+                }
+                return null;
+            }
 
             /** Adds the button instance */
             editor.addButton('umbmacro', {
@@ -156,25 +170,6 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
 
                     var ctrl = this;
                     var isOnMacroElement = false;
-
-                    /**
-                    * Because the macro gets wrapped in a P tag because of the way 'enter' works, this 
-                    * method will return the macro element if not wrapped in a p, or the p if the macro
-                    * element is the only one inside of it even if we are deep inside an element inside the macro
-                    */
-                    function getRealMacroElem(element) {
-                        var e = $(element).closest(".umb-macro-holder");
-                        if (e.length > 0) {
-                            if (e.get(0).parentNode.nodeName === "P") {
-                                //now check if we're the only element                    
-                                if (element.parentNode.childNodes.length === 1) {
-                                    return e.get(0).parentNode;
-                                }
-                            }
-                            return e.get(0);
-                        }
-                        return null;
-                    }
 
                     /**
                     * Add a node change handler, test if we're editing a macro and select the whole thing, then set our isOnMacroElement flag.
@@ -194,7 +189,7 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
 
                             //remove the event listener before re-selecting
                             editor.off('NodeChange', onNodeChanged);
-
+                            
                             // move selection to top element to ensure we can't edit this
                             editor.selection.select(macroElement);
 
@@ -221,6 +216,31 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
 
                     }
 
+                    /** This prevents any other commands from executing when the current element is the macro so the content cannot be edited */
+                    editor.on('BeforeExecCommand', function (o) {                        
+                        if (isOnMacroElement) {
+                            if (o.preventDefault) {
+                                o.preventDefault();
+                            }
+                            if (o.stopImmediatePropagation) {
+                                o.stopImmediatePropagation();
+                            }
+                            return;
+                        }
+                    });
+                    
+                    /** This double checks and ensures you can't paste content into the rendered macro */
+                    editor.on("Paste", function (o) {                        
+                        if (isOnMacroElement) {
+                            if (o.preventDefault) {
+                                o.preventDefault();
+                            }
+                            if (o.stopImmediatePropagation) {
+                                o.stopImmediatePropagation();
+                            }
+                            return;
+                        }
+                    });
 
                     //set onNodeChanged event listener
                     editor.on('NodeChange', onNodeChanged);
@@ -264,7 +284,8 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                             };
 
                             //supported keys to move to the next or prev element (13-enter, 27-esc, 38-up, 40-down, 39-right, 37-left)
-                            //supported keys to remove the macro (8-backspace, 46-delete)                    
+                            //supported keys to remove the macro (8-backspace, 46-delete)
+                            //TODO: Should we make the enter key insert a line break before or leave it as moving to the next element?
                             if ($.inArray(e.keyCode, [13, 40, 39]) !== -1) {
                                 //move to next element
                                 moveSibling(macroElement, true);
@@ -280,32 +301,71 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                                 moveSibling(macroElement, false);
                                 editor.dom.remove(macroElement);
                             }
-
-                            return false;
-
+                            return ;
                         }
                     });
 
                 },
+                
+                /** The insert macro button click event handler */
                 onclick: function () {
+
+                    var dialogData;
+
+                    //when we click we could have a macro already selected and in that case we'll want to edit the current parameters
+                    //so we'll need to extract them and submit them to the dialog.
+                    var macroElement = editor.selection.getNode();                    
+                    macroElement = getRealMacroElem(macroElement);
+                    if (macroElement) {
+                        //we have a macro selected so we'll need to parse it's alias and parameters
+                        var contents = $(macroElement).contents();                        
+                        var comment = _.find(contents, function(item) {
+                            return item.nodeType === 8;
+                        });
+                        if (!comment) {
+                            throw "Cannot parse the current macro, the syntax in the editor is invalid";
+                        }
+                        var syntax = comment.textContent.trim();
+                        var parsed = macroService.parseMacroSyntax(syntax);
+                        dialogData = {
+                            macroData: parsed  
+                        };
+
+                    }
 
                     dialogService.macroPicker({
                         scope: $scope,
+                        dialogData : dialogData,
                         callback: function(data) {
 
                             //put the macro syntax in comments, we will parse this out on the server side to be used
                             //for persisting.
                             var macroSyntaxComment = "<!-- " + data.syntax + " -->";
+                            //create an id class for this element so we can re-select it after inserting
+                            var uniqueId = "umb-macro-" + editor.dom.uniqueId();
+                            var macroDiv = editor.dom.create('div',
+                                {
+                                    'class': 'umb-macro-holder ' + data.macroAlias + ' mceNonEditable ' + uniqueId
+                                },
+                                macroSyntaxComment + '<ins>Macro alias: <strong>' + data.macroAlias + '</strong></ins>');
 
-                            editor.insertContent(
-                                editor.dom.createHTML('div',
-                                    {
-                                        'class': 'umb-macro-holder',
-                                        // indicates whether or not this should kick off the ajax request to load in the macro contents.
-                                        'data-load-content': false
-                                    },
-                                    macroSyntaxComment + 'Macro alias: <strong>' + data.macroAlias + '</strong>'));
+                            editor.selection.setNode(macroDiv);
+                            
+                            var $macroDiv = $(editor.dom.select("div.umb-macro-holder." + uniqueId));
+                            var $ins = $macroDiv.find("ins");
 
+                            //show the throbber
+                            $macroDiv.addClass("loading");
+                            
+                            macroResource.getMacroResultAsHtmlForEditor(data.macroAlias, 1234)
+                                .then(function (htmlResult) {
+                                    
+                                    $macroDiv.removeClass("loading");
+                                    htmlResult = htmlResult.trim();
+                                    if (htmlResult !== "") {
+                                        $ins.html(htmlResult);
+                                    }
+                                });
                         }
                     });
 
