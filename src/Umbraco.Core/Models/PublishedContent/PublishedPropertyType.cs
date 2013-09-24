@@ -36,7 +36,7 @@ namespace Umbraco.Core.Models.PublishedContent
             PropertyTypeAlias = propertyTypeAlias;
 
             DataTypeId = dataTypeDefinitionId;
-            PropertyEditorAlias = PropertyEditorAlias;
+            PropertyEditorAlias = propertyEditorAlias;
 
             InitializeConverters();
         }

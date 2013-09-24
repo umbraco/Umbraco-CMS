@@ -41,23 +41,17 @@ namespace Umbraco.Tests.PublishedContent
                         .Union(new[] { typeof (PublishedContentMoreTests).Assembly})
                 };
 
+            InitializeUmbracoContext();
+        }
+
+        protected override void FreezeResolution()
+        {
             PropertyValueConvertersResolver.Current =
                 new PropertyValueConvertersResolver();
-            PublishedContentModelFactoryResolver.Current = 
+            PublishedContentModelFactoryResolver.Current =
                 new PublishedContentModelFactoryResolver(new PublishedContentModelFactoryImpl());
-            Resolution.Freeze();
 
-            //var caches = CreatePublishedContent();
-
-            //var factory = new FakeHttpContextFactory("http://umbraco.local/");
-            //StateHelper.HttpContext = factory.HttpContext;
-            //var context = new UmbracoContext(
-            //    factory.HttpContext,
-            //    ApplicationContext.Current,
-            //    caches);
-            //UmbracoContext.Current = context;
-
-            InitializeUmbracoContext();
+            base.FreezeResolution();
         }
 
         private void InitializeUmbracoContext()

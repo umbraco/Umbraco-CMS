@@ -39,13 +39,14 @@ namespace Umbraco.Tests.PublishedContent
 
         protected override void FreezeResolution()
         {
-            PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
-                new[]
-                    {
-                        typeof(DatePickerValueConverter),
-                        typeof(TinyMceValueConverter),
-                        typeof(YesNoValueConverter)
-                    });    
+            if (PropertyValueConvertersResolver.HasCurrent == false)
+                PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
+                    new[]
+                        {
+                            typeof(DatePickerValueConverter),
+                            typeof(TinyMceValueConverter),
+                            typeof(YesNoValueConverter)
+                        });    
 
             PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
                 new PublishedContentCache(), new PublishedMediaCache()));
