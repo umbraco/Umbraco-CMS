@@ -1,0 +1,8 @@
+<div class="umb-photo-folder">
+	<div class="picrow" ng-repeat="row in rows">
+		<img class="umb-photo"
+			  ng-repeat="img in row.photos"
+			  ng-src="{{img.thumbnail}}"
+			  ng-style="img.style"/>
+	</div>
+</div>
