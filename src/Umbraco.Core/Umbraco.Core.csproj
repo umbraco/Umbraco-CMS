@@ -745,7 +745,6 @@
     <Compile Include="PropertyEditors\PropertyEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorAttribute.cs" />
     <Compile Include="PropertyEditors\PropertyEditorResolver.cs" />
-    <Compile Include="PropertyEditors\PropertyValueConverter.cs" />
     <Compile Include="PropertyEditors\PropertyValueConvertersResolver.cs" />
     <Compile Include="PropertyEditors\RegexValidator.cs" />
     <Compile Include="PropertyEditors\RequiredManifestValueValidator.cs" />

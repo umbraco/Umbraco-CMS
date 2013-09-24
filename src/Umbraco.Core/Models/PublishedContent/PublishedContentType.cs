@@ -121,7 +121,7 @@ namespace Umbraco.Core.Models.PublishedContent
             // properties ie both its own properties and those that were inherited (it's based upon an
             // IContentTypeComposition) and so every PublishedContentType having a property based upon
             // the cleared data type, be it local or inherited, will be cleared.
-            ApplicationContext.Current.ApplicationCache.StaticCache.ClearCacheObjectTypes<PublishedContentType>( // fixme NOT!
+            ApplicationContext.Current.ApplicationCache.StaticCache.ClearCacheObjectTypes<PublishedContentType>(
                 (key, value) => value.PropertyTypes.Any(x => x.DataTypeId == id));
         }
 
