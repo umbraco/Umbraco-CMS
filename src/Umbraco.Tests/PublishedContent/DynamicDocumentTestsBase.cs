@@ -110,10 +110,10 @@ namespace Umbraco.Tests.PublishedContent
             var doc = GetDynamicNode(1174);
             var prop = doc.GetProperty("siteTitle", true);
             Assert.IsNotNull(prop);
-            Assert.AreEqual("This is my site", prop.Value);
+            Assert.AreEqual("This is my site", prop.ObjectValue);
             prop = doc.GetProperty("_siteTitle"); //test with underscore prefix
             Assert.IsNotNull(prop);
-            Assert.AreEqual("This is my site", prop.Value);
+            Assert.AreEqual("This is my site", prop.ObjectValue);
             Assert.AreEqual("This is my site", doc._siteTitle);
         }
 
@@ -132,7 +132,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsTrue(doc.HasProperty(Constants.Conventions.Content.UrlAlias));
             var prop = doc.GetProperty(Constants.Conventions.Content.UrlAlias);
             Assert.IsNotNull(prop);
-            Assert.AreEqual("page2/alias, 2ndpagealias", prop.Value);
+            Assert.AreEqual("page2/alias, 2ndpagealias", prop.ObjectValue);
             Assert.AreEqual("page2/alias, 2ndpagealias", doc.umbracoUrlAlias);
         }
 
