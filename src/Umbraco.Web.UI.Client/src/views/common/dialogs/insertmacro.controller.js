@@ -104,8 +104,8 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
         $scope.wizardStep = "paramSelect";
     }
     
-    //get the macro list
-    entityResource.getAll("Macro")
+    //get the macro list - pass in a filter if it is only for rte
+    entityResource.getAll("Macro", ($scope.dialogData && $scope.dialogData.richTextEditor && $scope.dialogData.richTextEditor === true) ? "UseInEditor=true" : null)
         .then(function (data) {
 
             $scope.macros = data;

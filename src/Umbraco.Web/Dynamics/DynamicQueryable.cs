@@ -11,6 +11,11 @@ using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Dynamics
 {
+    //TODO: Much of this can move to Umbraco.Core.Dynamics - but somehow need to remove all the hard coded references to things like 
+    // dynamicnull, etc...
+    //NOTE:  The OrderBy stuff here seems to be a bit hacked with hard references to umbraco node objects so don't think it can be
+    // re-used which is why we have the OrderBy stuff that hasn't been hacked in teh Umbraco.Core.Dynamics
+
     internal static class DynamicQueryable
     {
         public static IQueryable<T> Where<T>(this IQueryable<T> source, string predicate, params object[] values)

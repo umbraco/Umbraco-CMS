@@ -216,6 +216,12 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
 
                     }
 
+                    /** when the contents load we need to find any macros declared and load in their content */
+                    editor.on("LoadContent", function(o) {
+                        var asdf = editor.getContent();
+                        alert(asdf);
+                    });
+
                     /** This prevents any other commands from executing when the current element is the macro so the content cannot be edited */
                     editor.on('BeforeExecCommand', function (o) {                        
                         if (isOnMacroElement) {
@@ -310,7 +316,10 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                 /** The insert macro button click event handler */
                 onclick: function () {
 
-                    var dialogData;
+                    var dialogData = {
+                        //flag for use in rte so we only show macros flagged for the editor
+                        richTextEditor: true  
+                    };
 
                     //when we click we could have a macro already selected and in that case we'll want to edit the current parameters
                     //so we'll need to extract them and submit them to the dialog.

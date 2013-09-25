@@ -23,6 +23,8 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class MacroController : UmbracoAuthorizedJsonController
     {
+        
+
         /// <summary>
         /// Gets the macro parameters to be filled in for a particular macro
         /// </summary>
