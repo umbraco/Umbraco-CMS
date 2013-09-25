@@ -365,7 +365,7 @@ namespace umbraco
             //
             // so, use ObjectValue.ToString() here.
 	        var prop = doc.GetProperty(alias);
-	        return prop == null ? string.Empty : prop.ObjectValue.ToString();
+	        return prop == null ? string.Empty : prop.Value.ToString();
         }
 
         /// <summary>

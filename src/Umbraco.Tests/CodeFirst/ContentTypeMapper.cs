@@ -27,12 +27,12 @@ namespace Umbraco.Tests.CodeFirst
                 object value = null;
                 //TODO Proper mapping of types
                 if (propertyInfo.PropertyType == typeof(string))
-                    value = property.ObjectValue;
+                    value = property.Value;
                 else if (propertyInfo.PropertyType == typeof(DateTime))
-                    value = DateTime.Parse(property.ObjectValue.ToString());
+                    value = DateTime.Parse(property.Value.ToString());
                 else if (propertyInfo.PropertyType == typeof(Boolean))
                 {
-                    if (String.IsNullOrEmpty(property.ObjectValue.ToString()) || property.ObjectValue == "0")
+                    if (String.IsNullOrEmpty(property.Value.ToString()) || property.Value == "0")
                     {
                         value = false;
                     }

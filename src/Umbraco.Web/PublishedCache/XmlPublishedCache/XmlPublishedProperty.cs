@@ -34,7 +34,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	        get { return _xmlValue.Trim().Length > 0; }
 	    }
 
-        public override object ObjectValue { get { return _objectValue.Value; } }
+        public override object Value { get { return _objectValue.Value; } }
         public override object XPathValue { get { return _xpathValue.Value; } }
 
 		public XmlPublishedProperty(PublishedPropertyType propertyType, bool isPreviewing, XmlNode propertyXmlData)

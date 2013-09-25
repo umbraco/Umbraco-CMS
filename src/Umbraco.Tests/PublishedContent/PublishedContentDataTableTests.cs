@@ -215,7 +215,7 @@ namespace Umbraco.Tests.PublishedContent
 
 	        public object this[string propertyAlias]
 	        {
-                get { return GetProperty(propertyAlias).ObjectValue; }
+                get { return GetProperty(propertyAlias).Value; }
 	        }
 
 	        public IEnumerable<IPublishedContent> Children { get; set; }

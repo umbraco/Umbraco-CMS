@@ -288,7 +288,7 @@ namespace umbraco
 			{
 				if (!_elements.ContainsKey(p.PropertyTypeAlias))				
 				{
-					_elements[p.PropertyTypeAlias] = p.ObjectValue;
+					_elements[p.PropertyTypeAlias] = p.Value;
 				}
 			}			
 		}
@@ -461,7 +461,7 @@ namespace umbraco
                 get { return _dataValue; }
             }
 
-            public override object ObjectValue
+            public override object Value
             {
                 get
                 {

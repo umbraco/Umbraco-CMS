@@ -206,7 +206,7 @@ namespace Umbraco.Tests.PublishedContent
             get
             {
                 var property = GetProperty(alias);
-                return property == null || property.HasValue == false ? null : property.ObjectValue;
+                return property == null || property.HasValue == false ? null : property.Value;
             }
         }
 
@@ -222,7 +222,7 @@ namespace Umbraco.Tests.PublishedContent
 
         public string PropertyTypeAlias { get; set; }
         public object DataValue { get; set; }
-        public object ObjectValue { get; set; }
+        public object Value { get; set; }
         public bool HasValue { get; set; }
         public object XPathValue { get; set; }
     }
