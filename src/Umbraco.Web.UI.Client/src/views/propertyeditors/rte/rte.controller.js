@@ -23,7 +23,7 @@ angular.module("umbraco")
             + "input[accept|alt|checked|disabled|maxlength|name|readonly|size|src|type|value],"
             + "kbd,label[for],legend,noscript,optgroup[label|disabled],option[disabled|label|selected|value],"
             + "q[cite],samp,select[disabled|multiple|name|size],small,"
-            + "textarea[cols|rows|disabled|name|readonly],tt,var,big";
+            + "textarea[cols|rows|disabled|name|readonly],tt,var,big,iframe[*]";
 
         //TODO: This should be configurable (i.e. from the config file we have and/or from pre-values)
         var toolbar = "code | bold italic | styleselect | alignleft aligncenter alignright | bullist numlist | outdent indent | link image umbmediapicker umbiconpicker umbembeddialog umbmacro";
