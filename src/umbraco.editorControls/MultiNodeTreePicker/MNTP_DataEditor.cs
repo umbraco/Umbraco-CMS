@@ -27,6 +27,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 	[ClientDependency(ClientDependencyType.Javascript, "ui/jquery.tooltip.min.js", "UmbracoClient")]
 	[ClientDependency(ClientDependencyType.Javascript, "controls/Images/ImageViewer.js", "UmbracoRoot")]
     [ValidationProperty("Value")]
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
 	public class MNTP_DataEditor : Control, INamingContainer
 	{
 		#region Static Constructor

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 namespace umbraco.editorControls.checkboxlist
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
 	public class checkboxlistEditor : System.Web.UI.WebControls.CheckBoxList, interfaces.IDataEditor	
 	{
 		private String _text;

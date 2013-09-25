@@ -19,6 +19,7 @@ namespace umbraco.editorControls.macrocontainer
 
     [ClientDependency(ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Css, "macroContainer/macroContainer.css", "UmbracoClient")]
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class Editor : UpdatePanel, IDataEditor
     {
         private IData _data;

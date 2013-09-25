@@ -11,9 +11,7 @@ namespace umbraco.editorControls
     /// <summary>
     /// Summary description for colorPicker.
     /// </summary>
-    [DefaultProperty("Value"),
-    ValidationProperty("Value"),
-    ToolboxData("<{0}:colorPicker runat=server></{0}:colorPicker>")]
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class colorPicker : System.Web.UI.WebControls.HiddenField, interfaces.IDataEditor
     {
         private interfaces.IData _data;

@@ -7,6 +7,7 @@ namespace umbraco.editorControls.dictionaryPicker
 	/// <summary>
 	/// Summary description for dictionaryPicker.
 	/// </summary>
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
 	public class dictionaryPicker : System.Web.UI.WebControls.CheckBoxList, interfaces.IDataEditor
 	{
 		private interfaces.IData _data;

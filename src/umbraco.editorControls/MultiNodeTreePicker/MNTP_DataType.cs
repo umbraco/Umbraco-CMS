@@ -10,6 +10,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
     /// <summary>
     /// Multi-node tree picker data type
     /// </summary>
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class MNTP_DataType : AbstractDataEditor
     {
 

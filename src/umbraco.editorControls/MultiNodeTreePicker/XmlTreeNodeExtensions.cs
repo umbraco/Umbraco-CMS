@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using umbraco.cms.presentation.Trees;
@@ -8,6 +9,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
     /// <summary>
     /// XmlTreeNode extensions for the MultiNodeTreePicker.
     /// </summary>
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public static class XmlTreeNodeExtensions
     {
         //public static void DetermineSelected(this XmlTreeNode node)
