@@ -55,6 +55,22 @@ angular.module("umbraco")
                 $scope.gotoFolder($scope.options.formData.currentFolder);
             });
             
+            $scope.clickHandler = function(image, ev){
+                if (image.contentTypeAlias.toLowerCase() == 'folder') {      
+                    $scope.options.formData.currentFolder = image.id;
+                    $scope.gotoFolder(image.id);
+                }else if (image.contentTypeAlias.toLowerCase() == 'image') {
+                    eventsService.publish("Umbraco.Dialogs.MediaPickerController.Select", image).then(function(image){
+                        if(dialogOptions && dialogOptions.multipicker){
+                            $scope.select(image);
+                            image.cssclass = ($scope.dialogData.selection.indexOf(image) > -1) ? "selected" : "";
+                        }else{
+                            $scope.submit(image);                 
+                        }
+                    });
+                }
+            };
+
             $scope.selectMediaItem = function(image) {
                 if (image.contentTypeAlias.toLowerCase() == 'folder') {      
                     $scope.options.formData.currentFolder = image.id;

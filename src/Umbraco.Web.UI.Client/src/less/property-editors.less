@@ -32,14 +32,52 @@ ul.color-picker li a  {
     border:none;
 }
 
+
 //
 // Media picker
 // --------------------------------------------------
 .umb-mediapicker .add-link{
   display: inline-block;
-  height: 100px; 
-  width: 100px; 
+  height: 120px; 
+  width: 120px; 
+  text-align: center;
+  color: @grayLight;
+  border: 2px @grayLight dashed !important;
+  line-height: 120px;
+}
+
+
+//
+// folder-browser
+// --------------------------------------------------
+.umb-folderbrowser .add-link{
+  display: inline-block;
+  height: 120px; 
+  width: 120px; 
   text-align: center;
   border: 1px @grayLight dashed;
-  line-height: 100px
+  line-height: 120px
 }
+
+//
+// Photo folder styling
+// --------------------------------------------------
+
+.umb-photo-folder .umb-non-thumbnail{
+  text-align: center;
+  color: @gray;
+  font-size: 12px;
+}
+
+.umb-photo-folder .umb-non-thumbnail i{
+  color: @grayLight;
+  font-size: 60px;
+  line-height: 80px;
+  display: block
+}
+
+
+.umb-photo-folder .selected img{
+  opacity:0.5;
+}
+

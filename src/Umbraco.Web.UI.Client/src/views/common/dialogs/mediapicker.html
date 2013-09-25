@@ -57,6 +57,14 @@ data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupl
         <div style="height: 10px; margin: 10px 0px 10px 0px" class="umb-loader" 
         	ng-hide="active() == 0"></div>
 
+        <umb-photo-folder 
+        	min-height="100" 
+        	min-width="220"
+        	on-click="clickHandler"
+        	ng-model="images"
+        />
+
+        <!--	
         <ul class="umb-thumbnails thumbnails">
 	        <li class="span2 folder" ng-repeat="image in images | orderBy:'contentTypeAlias' | filter:searchTerm">
 			    <a href="#" class="thumbnail" ng-class="{selected: dialogData.selection.indexOf(image) > -1}" 
@@ -76,6 +84,7 @@ data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupl
                 </a>
 	        </li>
 	    </ul>
+		-->
 	</div>
 
 	<div class="umb-panel-footer">

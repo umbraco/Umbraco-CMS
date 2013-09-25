@@ -127,6 +127,40 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Moves an item to the recycle bin, if it is already there then it will permanently delete it
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// The CanAccessContentAuthorize attribute will deny access to this method if the current user
+        /// does not have Delete access to this node.
+        /// </remarks>
+        
+        [EnsureUserPermissionForMedia("id")]
+        public HttpResponseMessage DeleteById(int id)
+        {
+            //TODO: We need to check if the user is allowed to do this!
+
+            var foundMedia = Services.MediaService.GetById(id);
+            if (foundMedia == null)
+            {
+                return HandleContentNotFound(id, false);
+            }
+
+            //if the current item is in the recycle bin
+            if (foundMedia.IsInRecycleBin() == false)
+            {
+                Services.MediaService.MoveToRecycleBin(foundMedia, UmbracoUser.Id);
+            }
+            else
+            {
+                Services.MediaService.Delete(foundMedia, UmbracoUser.Id);
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        /// <summary>
         /// Saves content
         /// </summary>
         /// <returns></returns>        
