@@ -8,7 +8,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.skinning;
+
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.presentation.Trees;
 using umbraco.DataLayer;
@@ -132,7 +132,7 @@ namespace umbraco.cms.presentation.settings
 
 		    editorSource.Menu.NewElement("div", "splitButtonMacroPlaceHolder", "sbPlaceHolder", 40);
 
-			if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
+			if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
 			{
 			    MenuIconI umbContainer = editorSource.Menu.NewIcon();
 				umbContainer.ImageURL = UmbracoPath + "/images/editor/masterpagePlaceHolder.gif";

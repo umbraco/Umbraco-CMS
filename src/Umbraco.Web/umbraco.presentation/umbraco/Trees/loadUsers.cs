@@ -72,8 +72,8 @@ function openUser(id) {
             bool currUserIsAdmin = currUser.IsAdmin();
             foreach (User u in users.OrderBy(x => x.Disabled))
             {
-                if (!UmbracoConfiguration.Current.UmbracoSettings.Security.HideDisabledUsersInBackoffice
-                    || (UmbracoConfiguration.Current.UmbracoSettings.Security.HideDisabledUsersInBackoffice && !u.Disabled))
+                if (!UmbracoConfig.For.UmbracoSettings().Security.HideDisabledUsersInBackoffice
+                    || (UmbracoConfig.For.UmbracoSettings().Security.HideDisabledUsersInBackoffice && !u.Disabled))
                 {
 
                     XmlTreeNode xNode = XmlTreeNode.Create(this);

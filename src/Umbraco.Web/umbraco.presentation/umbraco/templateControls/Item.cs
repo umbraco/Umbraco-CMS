@@ -1,14 +1,11 @@
 using System;
 using System.Collections;
 using System.ComponentModel;
-using System.Security;
-using System.Security.Permissions;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core.Models;
 using umbraco.BusinessLogic.Actions;
-using umbraco.presentation.LiveEditing.Modules.ItemEditing;
 
 namespace umbraco.presentation.templateControls
 {
@@ -123,20 +120,6 @@ namespace umbraco.presentation.templateControls
             set { ViewState["DebugMode"] = value; }
         }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether Live Editing is disabled for this field.
-        /// </summary>
-        /// <value><c>true</c> if you manually wish to disable Live Editing for this field; otherwise, <c>false</c> (default is false).</value>
-        [Bindable(true)]
-        [Category("Umbraco")]
-        [DefaultValue("")]
-        [Localizable(true)]
-        public bool LiveEditingDisabled
-        {
-            get { return ((ViewState["LiveEditingDisabled"] == null) ? false : (bool)ViewState["LiveEditingDisabled"]); }
-            set { ViewState["LiveEditingDisabled"] = value; }
-        }
-
         public ItemRenderer Renderer { get; set; }
 
         #endregion
@@ -151,24 +134,7 @@ namespace umbraco.presentation.templateControls
         {
             get { return m_ItemId; }
         }
-
-        /// <summary>
-        /// Gets a value indicating whether this control can be used in Live Editing mode.
-        /// Checks whether live editing has not been disabled,
-        /// the control is inside a form tag,
-        /// the field is editable
-        /// and the user has sufficient permissions.
-        /// </summary>
-        /// <value><c>true</c> if live editing is useLiveEditing; otherwise, <c>false</c>.</value>
-        public bool CanUseLiveEditing
-        {
-            get
-            {
-                return !LiveEditingDisabled && IsInsideFormTag()
-                       && FieldSupportsLiveEditing() && FieldEditableWithUserPermissions();
-            }
-        }
-
+        
         /// <summary>
         /// Gets the Umbraco page elements.
         /// </summary>
@@ -189,14 +155,8 @@ namespace umbraco.presentation.templateControls
         /// Initializes a new instance of the <see cref="Item"/> class.
         /// </summary>
         public Item()
-        {
-            // create page unique ID for this item
-            object lastItemId = HttpContext.Current.Items["LiveEditing_LastItemId"];
-            m_ItemId = (lastItemId != null ? (int)lastItemId + 1 : 1);
-            HttpContext.Current.Items["LiveEditing_LastItemId"] = m_ItemId;
-
-            Renderer = !UmbracoContext.Current.LiveEditingContext.Enabled ? ItemRenderer.Instance
-                                                                          : LiveEditingItemRenderer.Instance;
+        {            
+            Renderer = ItemRenderer.Instance;
         }
 
         /// <summary>
@@ -306,23 +266,7 @@ namespace umbraco.presentation.templateControls
         #endregion
 
         #region Field Information Functions
-        // 27/08/2008 Ruben Verborgh: This functionality should really be inside some kind of super Field class,
-        // which could be anything from a property to a dictionary item.
-        // However, I don't think we should do this in the current Umbraco generation.
         
-        /// <summary>
-        /// Gets a value indicating whether Live Editing is useLiveEditing on this field.
-        /// Certain functionalities of the item field makes it hard to 
-        /// support Live Editing, like dictionary items and recursive values.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if Live Editing is useLiveEditing; otherwise, <c>false</c>.
-        /// </value>
-        protected virtual bool FieldSupportsLiveEditing()
-        {
-            return !(FieldIsRercursive() || FieldIsDictionaryItem());
-        }
-
         /// <summary>
         /// Determines whether the field is a dictionary item.
         /// </summary>

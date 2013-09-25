@@ -108,7 +108,7 @@ namespace Umbraco.Core.Services
         internal XElement Export(IContent content, bool deep = false)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             var xml = Export(content, nodeName);
             xml.Add(new XAttribute("nodeType", content.ContentType.Id));
@@ -862,7 +862,7 @@ namespace Umbraco.Core.Services
         internal XElement Export(IMedia media, bool deep = false)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             var xml = Export(media, nodeName);
             xml.Add(new XAttribute("nodeType", media.ContentType.Id));

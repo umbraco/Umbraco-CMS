@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Threading;
 using System.Web;
@@ -25,6 +26,33 @@ namespace Umbraco.Core.Cache
         protected override DictionaryCacheWrapper DictionaryCache
         {
             get { return _wrapper; }
+        }
+
+        /// <summary>
+        /// Clears all objects in the System.Web.Cache with the System.Type specified that satisfy the predicate
+        /// </summary>
+        public override void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
+        {
+            try
+            {
+                lock (Locker)
+                {
+                    foreach (DictionaryEntry c in _cache)
+                    {
+                        var key = c.Key.ToString();
+                        if (_cache[key] != null
+                            && _cache[key] is T
+                            && predicate(key, (T)_cache[key]))
+                        {
+                            _cache.Remove(c.Key.ToString());
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                LogHelper.Error<CacheHelper>("Cache clearing error", e);
+            }
         }
 
         /// <summary>

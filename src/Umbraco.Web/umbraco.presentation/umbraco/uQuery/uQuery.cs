@@ -107,7 +107,7 @@ namespace umbraco
 
 			try
 			{
-				isLegacyXmlSchema = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema;
+				isLegacyXmlSchema = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema;
 			}
 			catch (MissingMethodException)
 			{

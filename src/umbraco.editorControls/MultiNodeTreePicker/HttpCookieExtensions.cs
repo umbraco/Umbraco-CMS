@@ -13,6 +13,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
     /// it is much more complicated to try to persist these values between ajax request, 
     /// given the tree's current architecture.
     /// </remarks>
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public static class HttpCookieExtensions
     {
 

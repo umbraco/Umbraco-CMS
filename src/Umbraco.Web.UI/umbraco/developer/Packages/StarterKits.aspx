@@ -60,19 +60,6 @@
   <cc1:UmbracoPanel id="Panel1" Text="Starter kit" runat="server" Width="612px" Height="600px" hasMenu="false">
     <cc1:Feedback ID="fb" runat="server" />
     
-    <cc1:Pane id="StarterKitInstalled" Text="Install skin" runat="server">
-        <h3>Available skins</h3>
-        <p>You can choose from the following skins.</p>        
-        <div class="progress-status">Please wait...</div>
-        <div id="connectionError"></div>
-        <div id="serverError"></div>        
-        <div class="install-dialog">
-            <asp:PlaceHolder ID="ph_skins" runat="server"></asp:PlaceHolder>
-        </div>
-    </cc1:Pane>
-    
-    
-    
     <cc1:Pane id="StarterKitNotInstalled" Text="Install starter kit" runat="server">
         <h3>Available starter kits</h3>
         <p>You can choose from the following starter kits, each having specific functionality.</p>        
@@ -89,7 +76,7 @@
     </cc1:Pane>
     
     <cc1:Pane id="InstallationDirectoryNotAvailable" Text="Unable to install" runat="server" Visible="false">
-        <p>We can not install starterkits when the install directory is not present.</p>
+        <p>We can not install starterkits when the install directory or package repository is not present.</p>
     </cc1:Pane>
       
 

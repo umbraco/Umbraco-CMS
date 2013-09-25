@@ -1,8 +1,5 @@
 using System;
 using System.Web;
-using umbraco.presentation.LiveEditing;
-using umbraco.BasePages;
-using umbraco.cms.businesslogic.web;
 
 namespace umbraco.presentation
 {

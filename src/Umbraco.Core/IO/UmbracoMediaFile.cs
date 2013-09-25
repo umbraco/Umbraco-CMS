@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Core.IO
 {
@@ -135,7 +136,7 @@ namespace Umbraco.Core.IO
         {
             get
             {
-                return UmbracoConfiguration.Current.UmbracoSettings.Content.ImageFileTypes.InvariantContains(Extension);
+                return UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.InvariantContains(Extension);
             }
         }
 
@@ -176,7 +177,7 @@ namespace Umbraco.Core.IO
             {
                 EnsureFileSupportsResizing();
 
-                var fileNameThumb = DoResize(width, height, 0, string.Empty);
+                var fileNameThumb = DoResize(width, height, -1, string.Empty);
 
                 return _fs.GetUrl(fileNameThumb);    
             }
@@ -189,7 +190,7 @@ namespace Umbraco.Core.IO
             {
                 EnsureFileSupportsResizing();
 
-                var fileNameThumb = DoResize(GetDimensions().Width, GetDimensions().Height, maxWidthHeight, fileNameAddition);
+                var fileNameThumb = DoResize(-1, -1, maxWidthHeight, fileNameAddition);
 
                 return _fs.GetUrl(fileNameThumb);    
             }
@@ -206,7 +207,10 @@ namespace Umbraco.Core.IO
                         ? string.Format("{0}_UMBRACOSYSTHUMBNAIL.jpg", Path.Substring(0, Path.LastIndexOf(".", StringComparison.Ordinal)))
                         : string.Format("{0}_{1}.jpg", Path.Substring(0, Path.LastIndexOf(".", StringComparison.Ordinal)), fileNameAddition);
 
-                    var thumbnail = GenerateThumbnail(image, maxWidthHeight, width, height, fileNameThumb, maxWidthHeight == 0);
+
+                    var thumbnail = maxWidthHeight == -1 
+                        ?ImageHelper.GenerateThumbnail(image, maxWidthHeight, fileNameThumb, Extension, _fs)
+                        : ImageHelper.GenerateThumbnail(image, width, height, fileNameThumb, Extension, _fs);
 
                     return thumbnail.FileName;
                 }
@@ -219,66 +223,6 @@ namespace Umbraco.Core.IO
                 throw new InvalidOperationException(string.Format("The file {0} is not an image, so can't get dimensions", Filename));
         }
 
-        private ResizedImage GenerateThumbnail(Image image, int maxWidthHeight, int fileWidth, int fileHeight, string thumbnailFileName, bool useFixedDimensions)
-        {
-            // Generate thumbnail
-            float f = 1;
-            if (useFixedDimensions == false)
-            {
-                var fx = (float)image.Size.Width / (float)maxWidthHeight;
-                var fy = (float)image.Size.Height / (float)maxWidthHeight;
-
-                // must fit in thumbnail size
-                f = Math.Max(fx, fy);
-            }
-
-            var widthTh = (int)Math.Round((float)fileWidth / f);
-            var heightTh = (int)Math.Round((float)fileHeight / f);
-
-            // fixes for empty width or height
-            if (widthTh == 0)
-                widthTh = 1;
-            if (heightTh == 0)
-                heightTh = 1;
-
-            // Create new image with best quality settings
-            using (var bp = new Bitmap(widthTh, heightTh))
-            {
-                using (var g = Graphics.FromImage(bp))
-                {
-                    g.SmoothingMode = SmoothingMode.HighQuality;
-                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                    g.CompositingQuality = CompositingQuality.HighQuality;
-
-                    // Copy the old image to the new and resized
-                    var rect = new Rectangle(0, 0, widthTh, heightTh);
-                    g.DrawImage(image, rect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
-
-                    // Copy metadata
-                    var imageEncoders = ImageCodecInfo.GetImageEncoders();
-
-                    var codec = Extension.ToLower() == "png" || Extension.ToLower() == "gif"
-                        ? imageEncoders.Single(t => t.MimeType.Equals("image/png"))
-                        : imageEncoders.Single(t => t.MimeType.Equals("image/jpeg"));
-
-                    // Set compresion ratio to 90%
-                    var ep = new EncoderParameters();
-                    ep.Param[0] = new EncoderParameter(Encoder.Quality, 90L);
-
-                    // Save the new image using the dimensions of the image
-                    var newFileName = thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL", string.Format("{0}x{1}", widthTh, heightTh));
-                    using (var ms = new MemoryStream())
-                    {
-                        bp.Save(ms, codec, ep);
-                        ms.Seek(0, 0);
-
-                        _fs.AddFile(newFileName, ms);
-                    }
-
-                    return new ResizedImage(widthTh, heightTh, newFileName);
-                }
-            }
-        }
+        
     }
 }

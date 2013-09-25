@@ -17,7 +17,7 @@ namespace Umbraco.Core.Sync
         private readonly IEnumerable<IServer> _servers;
 
         public ConfigServerRegistrar()
-            : this(UmbracoConfiguration.Current.UmbracoSettings.DistributedCall.Servers)
+            : this(UmbracoConfig.For.UmbracoSettings().DistributedCall.Servers)
         {
             
         }

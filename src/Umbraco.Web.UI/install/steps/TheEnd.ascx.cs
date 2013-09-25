@@ -20,10 +20,7 @@ namespace Umbraco.Web.UI.Install.Steps
             // Update ClientDependency version
             var clientDependencyConfig = new ClientDependencyConfiguration();
             var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
-
-            if (!global::umbraco.cms.businesslogic.skinning.Skinning.IsStarterKitInstalled())
-                customizeSite.Visible = false;
-
+            
         }
 
     }

@@ -7,6 +7,7 @@ using umbraco.IO;
 
 namespace umbraco.editorControls.imagecropper
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class ImageInfo
     {
         public Image image { get; set; }

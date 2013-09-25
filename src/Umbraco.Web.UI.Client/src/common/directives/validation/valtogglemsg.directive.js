@@ -43,7 +43,8 @@ function valToggleMsg(serverValidationManager) {
                 }
             });
             
-            scope.$on("saving", function(ev, args) {
+            //listen for the saving event (the result is a callback method which is called to unsubscribe)
+            var unsubscribeSaving = scope.$on("saving", function (ev, args) {
                 showValidation = true;
                 if (formCtrl[attr.valMsgFor].$error[attr.valToggleMsg]) {
                     element.show();
@@ -57,9 +58,18 @@ function valToggleMsg(serverValidationManager) {
                 }
             });
             
-            scope.$on("saved", function (ev, args) {
+            //listen for the saved event (the result is a callback method which is called to unsubscribe)
+            var unsubscribeSaved = scope.$on("saved", function (ev, args) {
                 showValidation = false;
                 element.hide();
+            });
+
+            //when the element is disposed we need to unsubscribe!
+            // NOTE: this is very important otherwise if this directive is part of a modal, the listener still exists because the dom 
+            // element might still be there even after the modal has been hidden.
+            element.bind('$destroy', function () {
+                unsubscribeSaving();
+                unsubscribeSaved();
             });
 
         }

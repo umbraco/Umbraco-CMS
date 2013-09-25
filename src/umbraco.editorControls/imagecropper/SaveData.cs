@@ -4,6 +4,7 @@ using System.Xml;
 
 namespace umbraco.editorControls.imagecropper
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class SaveData
     {
         public ArrayList data { get; set; }

@@ -18,18 +18,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (ContentScriptEditorElement)this["scripteditor"]; }
         }
 
-        [ConfigurationProperty("EnableCanvasEditing")]
-        internal InnerTextConfigurationElement<bool> EnableCanvasEditing
-        {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                       (InnerTextConfigurationElement<bool>)this["EnableCanvasEditing"],
-                        //set the default
-                       false);
-            }
-        }
-
         [ConfigurationProperty("ResolveUrlsFromTextString")]
         internal InnerTextConfigurationElement<bool> ResolveUrlsFromTextString
         {
@@ -328,11 +316,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IEnumerable<string> IContentSection.ScriptFileTypes
         {
             get { return ScriptEditor.ScriptFileTypes; }
-        }
-
-        bool IContentSection.EnableCanvasEditing
-        {
-            get { return EnableCanvasEditing; }
         }
 
         bool IContentSection.ResolveUrlsFromTextString

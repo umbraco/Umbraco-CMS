@@ -214,7 +214,6 @@ namespace Umbraco.Tests.Services
             Assert.That(updatedItem.NoConsole, Is.EqualTo(originalUser.NoConsole));
             Assert.That(updatedItem.StartContentId, Is.EqualTo(originalUser.StartContentId));
             Assert.That(updatedItem.StartMediaId, Is.EqualTo(originalUser.StartMediaId));
-            Assert.That(updatedItem.DefaultToLiveEditing, Is.EqualTo(originalUser.DefaultToLiveEditing));
             Assert.That(updatedItem.Email, Is.EqualTo(originalUser.Email));
             Assert.That(updatedItem.Username, Is.EqualTo(originalUser.Username));
             Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(0));

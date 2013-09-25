@@ -145,11 +145,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(SettingsSection.Content.PropertyContextHelpOption == "text");
         }
         [Test]
-        public void EnableCanvasEditing()
-        {
-            Assert.IsTrue(SettingsSection.Content.EnableCanvasEditing == false);
-        }
-        [Test]
         public void PreviewBadge()
         {
             Assert.IsTrue(SettingsSection.Content.PreviewBadge == @"<a id=""umbracoPreviewBadge"" style=""position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px; background: url('{1}/preview/previewModeBadge.png') no-repeat;"" href=""{0}/endPreview.aspx?redir={2}""><span style=""display:none;"">In Preview Mode - click to end</span></a>");

@@ -66,7 +66,7 @@ namespace Umbraco.Web
             if (UmbracoContext.Current.InPreviewMode)
             {
                 var htmlBadge =
-                    String.Format(UmbracoConfiguration.Current.UmbracoSettings.Content.PreviewBadge,
+                    String.Format(UmbracoConfig.For.UmbracoSettings().Content.PreviewBadge,
                                   IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                                   IOHelper.ResolveUrl(SystemDirectories.UmbracoClient),
                                   UmbracoContext.Current.HttpContext.Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));

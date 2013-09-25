@@ -150,7 +150,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IDataWithPreview.cs" />
-    <Compile Include="ILiveEditingDataEditor.cs" />
     <Compile Include="IMacroGuiRendering.cs">
       <SubType>Code</SubType>
     </Compile>

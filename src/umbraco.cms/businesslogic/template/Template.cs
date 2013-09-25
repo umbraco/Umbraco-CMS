@@ -155,7 +155,7 @@ namespace umbraco.cms.businesslogic.template
             }
             dr.Close();
 
-			if (UmbracoConfiguration.Current.UmbracoSettings.Templates.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(this))
+			if (UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(this))
                 _design = ViewHelper.GetFileContents(this);
             else
                 _design = MasterPageHelper.GetFileContents(this);
@@ -266,13 +266,13 @@ namespace umbraco.cms.businesslogic.template
                 _design = value.Trim(NewLineChars);
 
                 //we only switch to MVC View editing if the template has a view file, and MVC editing is enabled
-                if (UmbracoConfiguration.Current.UmbracoSettings.Templates.DefaultRenderingEngine == RenderingEngine.Mvc && !MasterPageHelper.IsMasterPageSyntax(_design))
+                if (UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc && !MasterPageHelper.IsMasterPageSyntax(_design))
 				{
 					MasterPageHelper.RemoveMasterPageFile(this.Alias);
 					MasterPageHelper.RemoveMasterPageFile(_oldAlias);
 					_design = ViewHelper.UpdateViewFile(this, _oldAlias);
 				}
-				else if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
+				else if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
 				{
 					ViewHelper.RemoveViewFile(this.Alias);
 					ViewHelper.RemoveViewFile(_oldAlias);
@@ -352,7 +352,7 @@ namespace umbraco.cms.businesslogic.template
 	    /// </remarks>
 	    private static RenderingEngine DetermineRenderingEngine(Template t, string design = null)
 		{
-            var engine = UmbracoConfiguration.Current.UmbracoSettings.Templates.DefaultRenderingEngine;
+            var engine = UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine;
 
 			if (!design.IsNullOrWhiteSpace() && MasterPageHelper.IsMasterPageSyntax(design))
 			{

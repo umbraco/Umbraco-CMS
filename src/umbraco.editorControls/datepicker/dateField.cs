@@ -11,9 +11,7 @@ namespace umbraco.editorControls
 	/// <summary>
 	/// Summary description for dateField.
 	/// </summary>
-	[DefaultProperty("Text"), 
-	ToolboxData("<{0}:dateField runat=server></{0}:dateField>")]
-    [ValidationProperty("Text")]
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
 	public class dateField : DateTimePicker, interfaces.IDataEditor
 	{
 

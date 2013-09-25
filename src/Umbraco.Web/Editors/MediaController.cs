@@ -130,17 +130,10 @@ namespace Umbraco.Web.Editors
         /// Moves an item to the recycle bin, if it is already there then it will permanently delete it
         /// </summary>
         /// <param name="id"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// The CanAccessContentAuthorize attribute will deny access to this method if the current user
-        /// does not have Delete access to this node.
-        /// </remarks>
-        
+        /// <returns></returns> 
         [EnsureUserPermissionForMedia("id")]
         public HttpResponseMessage DeleteById(int id)
         {
-            //TODO: We need to check if the user is allowed to do this!
-
             var foundMedia = Services.MediaService.GetById(id);
             if (foundMedia == null)
             {
@@ -150,11 +143,11 @@ namespace Umbraco.Web.Editors
             //if the current item is in the recycle bin
             if (foundMedia.IsInRecycleBin() == false)
             {
-                Services.MediaService.MoveToRecycleBin(foundMedia, UmbracoUser.Id);
+                Services.MediaService.MoveToRecycleBin(foundMedia, (int)Security.CurrentUser.Id);
             }
             else
             {
-                Services.MediaService.Delete(foundMedia, UmbracoUser.Id);
+                Services.MediaService.Delete(foundMedia, (int)Security.CurrentUser.Id);
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);
@@ -277,6 +270,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         /// <remarks>
         /// We cannot validate this request with attributes (nicely) due to the nature of the multi-part for data.
+        /// 
+        /// TOOD: Validate this request properly!
         /// </remarks>
         public async Task<HttpResponseMessage> PostAddFile()
         {

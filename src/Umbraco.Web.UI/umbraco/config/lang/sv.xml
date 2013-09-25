@@ -745,7 +745,6 @@
     <key alias="changePasswordDescription">Du kan byta ditt lösenord för Umbraco Back Office genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".</key>
     <key alias="confirmNewPassword">Bekräfta det nya lösenordet</key>
     <key alias="contentChannel">Innehållskanal</key>
-    <key alias="defaultToLiveEditing">Gå direkt till Canvas efter inloggning</key>
     <key alias="descriptionField">Fält för beskrivning</key>
     <key alias="disabled">Avaktivera användare</key>
     <key alias="documentType">Dokumenttyp</key>

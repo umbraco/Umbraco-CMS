@@ -6,6 +6,7 @@ namespace umbraco.editorControls.label
 	/// <summary>
 	/// Summary description for DataTypeNoEdit.
 	/// </summary>
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
 	public class DataTypeNoEdit : cms.businesslogic.datatype.BaseDataType,interfaces.IDataType
 	{
 

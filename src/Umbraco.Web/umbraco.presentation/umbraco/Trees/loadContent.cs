@@ -115,10 +115,6 @@ namespace umbraco
         {
             actions.Clear();
             actions.Add(ActionNew.Instance);
-            if (UmbracoConfiguration.Current.UmbracoSettings.Content.EnableCanvasEditing)
-            {
-                actions.Add(ActionLiveEdit.Instance);
-            }
             actions.Add(ContextMenuSeperator.Instance);
             actions.Add(ActionDelete.Instance);
             actions.Add(ContextMenuSeperator.Instance);

@@ -226,7 +226,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				// that switch schemas fail - so cache and refresh when needed,
 				// ie never when running the actual site
 
-				var version = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? 0 : 1;
+				var version = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? 0 : 1;
 				if (_xPathStringsValue == null || _xPathStringsValue.Version != version)
 					_xPathStringsValue = new XPathStringsDefinition(version);
 				return _xPathStringsValue;

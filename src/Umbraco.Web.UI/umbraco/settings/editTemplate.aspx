@@ -24,7 +24,7 @@
                 restServiceLocation: "<%= Url.GetSaveFileServicePath() %>",                    
                 umbracoPath: '<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco) %>',
                 editorClientId: '<%= editorSource.ClientID %>',
-                useMasterPages: <%=UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages.ToString().ToLower()%>,
+                useMasterPages: <%=UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages.ToString().ToLower()%>,
                 templateId: <%= Request.QueryString["templateID"] %>,
                 masterTemplateId: jQuery('#<%= MasterTemplate.ClientID %>').val(),
                 masterPageDropDown: $("#<%= MasterTemplate.ClientID %>"),

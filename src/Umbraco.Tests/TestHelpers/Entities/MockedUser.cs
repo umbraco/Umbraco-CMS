@@ -22,7 +22,6 @@ namespace Umbraco.Tests.TestHelpers.Entities
                     DefaultPermissions = "ABC",
                     StartContentId = -1,
                     StartMediaId = -1,
-                    DefaultToLiveEditing = false,
                     Email = "test" + suffix + "@test.com",
                     Username = "TestUser" + suffix
                 };

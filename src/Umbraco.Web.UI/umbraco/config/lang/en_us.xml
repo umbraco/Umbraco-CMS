@@ -960,7 +960,6 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="confirmNewPassword">Confirm new password</key>
     <key alias="changePasswordDescription">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
     <key alias="contentChannel">Content Channel</key>
-    <key alias="defaultToLiveEditing">Redirect to canvas on login</key>
     <key alias="descriptionField">Description field</key>
     <key alias="disabled">Disable User</key>
     <key alias="documentType">Document Type</key>

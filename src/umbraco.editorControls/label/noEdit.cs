@@ -4,6 +4,7 @@ using System.Web.UI.WebControls;
 
 namespace umbraco.editorControls
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
 	public class noEdit : System.Web.UI.WebControls.Label, interfaces.IDataEditor
 	{
 		private interfaces.IData _data;

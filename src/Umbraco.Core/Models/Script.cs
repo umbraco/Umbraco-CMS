@@ -17,7 +17,7 @@ namespace Umbraco.Core.Models
         private readonly IContentSection _contentConfig;
 
         public Script(string path)
-            : this(path, UmbracoConfiguration.Current.UmbracoSettings.Content)
+            : this(path, UmbracoConfig.For.UmbracoSettings().Content)
         {
             
         }

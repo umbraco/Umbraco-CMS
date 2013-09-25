@@ -396,18 +396,20 @@ namespace Umbraco.Core.Models
                 SetFileOnContent(content, propertyTypeAlias, name, fileStream);
         }
 
-        private static void SetFileOnContent(IContentBase content, string propertyTypeAlias, string name, Stream fileStream)
+        private static void SetFileOnContent(IContentBase content, string propertyTypeAlias, string filename, Stream fileStream)
         {
             var property = content.Properties.FirstOrDefault(x => x.Alias == propertyTypeAlias);
             if (property == null)
                 return;
 
-            var numberedFolder = MediaSubfolderCounter.Current.Increment();
-            var fileName = UmbracoConfiguration.Current.UmbracoSettings.Content.UploadAllowDirectories
-                                              ? Path.Combine(numberedFolder.ToString(CultureInfo.InvariantCulture), name)
-                                              : numberedFolder + "-" + name;
+            //TODO: ALl of this naming logic needs to be put into the ImageHelper and then we need to change FileUploadPropertyValueEditor to do the same!
 
-            var extension = Path.GetExtension(name).Substring(1).ToLowerInvariant();
+            var numberedFolder = MediaSubfolderCounter.Current.Increment();
+            var fileName = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
+                                              ? Path.Combine(numberedFolder.ToString(CultureInfo.InvariantCulture), filename)
+                                              : numberedFolder + "-" + filename;
+
+            var extension = Path.GetExtension(filename).Substring(1).ToLowerInvariant();
 
             //the file size is the length of the stream in bytes
             var fileSize = fileStream.Length;
@@ -416,15 +418,15 @@ namespace Umbraco.Core.Models
             fs.AddFile(fileName, fileStream);
             
             //Check if file supports resizing and create thumbnails
-            var supportsResizing = UmbracoConfiguration.Current.UmbracoSettings.Content.ImageFileTypes.InvariantContains(extension);
+            var supportsResizing = UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.InvariantContains(extension);
 
             //the config section used to auto-fill properties
             IImagingAutoFillUploadField uploadFieldConfigNode = null;
 
             //Check for auto fill of additional properties
-            if (UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties != null)
+            if (UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties != null)
             {
-                uploadFieldConfigNode = UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties
+                uploadFieldConfigNode = UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties
                                     .FirstOrDefault(x => x.Alias == propertyTypeAlias);
 
             }
@@ -434,12 +436,10 @@ namespace Umbraco.Core.Models
                 //get the original image from the original stream
                 if (fileStream.CanSeek) fileStream.Seek(0, 0);
                 using (var originalImage = Image.FromStream(fileStream))
-                {                    
-                    // Make default thumbnails
-                    Resize(fs, fileName, extension, 100, "thumb", originalImage);
-                    Resize(fs, fileName, extension, 500, "big-thumb", originalImage);
+                {
+                    var additionalSizes = new List<int>();
 
-                    //Look up Prevalues for this upload datatype - if it is an upload datatype
+                    //Look up Prevalues for this upload datatype - if it is an upload datatype - get additional configured sizes
                     if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)
                     {
                         //Get Prevalues by the DataType's Id: property.PropertyType.DataTypeId
@@ -448,19 +448,20 @@ namespace Umbraco.Core.Models
                         //Additional thumbnails configured as prevalues on the DataType
                         if (thumbnailSizes != null)
                         {
-                            char sep = (!thumbnailSizes.Contains("") && thumbnailSizes.Contains(",")) ? ',' : ';';
-
+                            var sep = (thumbnailSizes.Contains("") == false && thumbnailSizes.Contains(",")) ? ',' : ';';
                             foreach (var thumb in thumbnailSizes.Split(sep))
                             {
                                 int thumbSize;
                                 if (thumb != "" && int.TryParse(thumb, out thumbSize))
                                 {
-                                    Resize(fs, fileName, extension, thumbSize, string.Format("thumb_{0}", thumbSize), originalImage);
+                                    additionalSizes.Add(thumbSize);
                                 }
                             }
                         }
                     }
 
+                    ImageHelper.GenerateMediaThumbnails(fs, fileName, extension, originalImage, additionalSizes);
+                    
                     //while the image is still open, we'll check if we need to auto-populate the image properties
                     if (uploadFieldConfigNode != null)
                     {
@@ -481,87 +482,7 @@ namespace Umbraco.Core.Models
             //Set the value of the property to that of the uploaded file's url
             property.Value = fs.GetUrl(fileName);
         }
-
-        private static ResizedImage Resize(MediaFileSystem fileSystem, string path, string extension, int maxWidthHeight, string fileNameAddition, Image originalImage)
-        {
-            var fileNameThumb = String.IsNullOrEmpty(fileNameAddition)
-                                            ? string.Format("{0}_UMBRACOSYSTHUMBNAIL.jpg", path.Substring(0, path.LastIndexOf(".")))
-                                            : string.Format("{0}_{1}.jpg", path.Substring(0, path.LastIndexOf(".")), fileNameAddition);
-
-            var thumb = GenerateThumbnail(fileSystem,
-                originalImage,
-                maxWidthHeight,
-                extension,
-                fileNameThumb,
-                maxWidthHeight == 0);
-
-            return thumb;    
-        }
         
-        private static ResizedImage GenerateThumbnail(MediaFileSystem fileSystem, Image image, int maxWidthHeight, string extension, string thumbnailFileName, bool useFixedDimensions)
-        {
-            // Generate thumbnail
-            float f = 1;
-            if (!useFixedDimensions)
-            {
-                var fx = image.Width / (float)maxWidthHeight;
-                var fy = image.Height / (float)maxWidthHeight;
-
-                // must fit in thumbnail size
-                f = Math.Max(fx, fy); //if (f < 1) f = 1;
-            }
-
-            var widthTh = (int)Math.Round(image.Width / f);
-            var heightTh = (int)Math.Round(image.Height / f);
-
-            // fixes for empty width or height
-            if (widthTh == 0)
-                widthTh = 1;
-            if (heightTh == 0)
-                heightTh = 1;
-
-            // Create new image with best quality settings
-            using (var bp = new Bitmap(widthTh, heightTh))
-            {
-                using (var g = Graphics.FromImage(bp))
-                {
-                    g.SmoothingMode = SmoothingMode.HighQuality;
-                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                    g.CompositingQuality = CompositingQuality.HighQuality;
-
-                    // Copy the old image to the new and resized
-                    var rect = new Rectangle(0, 0, widthTh, heightTh);
-                    g.DrawImage(image, rect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
-
-                    // Copy metadata
-                    var imageEncoders = ImageCodecInfo.GetImageEncoders();
-                    ImageCodecInfo codec;
-                    if (extension.ToLower() == "png" || extension.ToLower() == "gif")
-                        codec = imageEncoders.Single(t => t.MimeType.Equals("image/png"));
-                    else
-                        codec = imageEncoders.Single(t => t.MimeType.Equals("image/jpeg"));
-                    
-                    // Set compresion ratio to 90%
-                    var ep = new EncoderParameters();
-                    ep.Param[0] = new EncoderParameter(Encoder.Quality, 90L);
-
-                    // Save the new image using the dimensions of the image
-                    var newFileName = thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL",
-                                                                   string.Format("{0}x{1}", widthTh, heightTh));
-                    using (var ms = new MemoryStream())
-                    {
-                        bp.Save(ms, codec, ep);
-                        ms.Seek(0, 0);
-
-                        fileSystem.AddFile(newFileName, ms);                  
-                    }
-
-                    return new ResizedImage(widthTh, heightTh, newFileName);
-                }                
-            }
-        }
-
 		/// <summary>
 		/// Gets the <see cref="IProfile"/> for the Creator of this media item.
 		/// </summary>

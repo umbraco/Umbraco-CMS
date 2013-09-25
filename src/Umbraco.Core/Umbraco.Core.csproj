@@ -157,7 +157,7 @@
     <Compile Include="Configuration\FileSystemProviderElement.cs" />
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
-    <Compile Include="Configuration\UmbracoConfiguration.cs" />
+    <Compile Include="Configuration\UmbracoConfig.cs" />
     <Compile Include="Configuration\UmbracoConfigurationSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsElement.cs" />
@@ -281,6 +281,7 @@
     <Compile Include="Manifest\ParameterEditorConverter.cs" />
     <Compile Include="Manifest\PreValueFieldConverter.cs" />
     <Compile Include="Manifest\PropertyEditorConverter.cs" />
+    <Compile Include="Media\ImageHelper.cs" />
     <Compile Include="Media\MediaSubfolderCounter.cs" />
     <Compile Include="ModelMapperHelper.cs" />
     <Compile Include="Models\ContentBase.cs" />
@@ -406,11 +407,11 @@
     <Compile Include="Persistence\FaultHandling\Strategies\SqlAzureTransientErrorDetectionStrategy.cs" />
     <Compile Include="Persistence\FaultHandling\ThrottlingCondition.cs" />
     <Compile Include="Persistence\Mappers\MacroMapper.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AddEditorAliasToCmsMacroProperty.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AlterCmsMacroPropertyTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AddIndexToCmsMacroPropertyTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AddIndexToCmsMacroTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\RemoveCmsMacroPropertyTypeTable.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\RemoveDefaultPermissionUserColumn.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AlterUserTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\UpdateCmsMacroPropertyEditorAliasFromCmsMacroPropertyType.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\UpdateControlIdToPropertyEditorAlias.cs" />
     <Compile Include="Persistence\Relators\MacroPropertyRelator.cs" />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.UI;
+using ClientDependency.Core;
 using umbraco;
 using umbraco.cms.businesslogic.datatype;
 using System.Web.UI.HtmlControls;

@@ -20,7 +20,7 @@ namespace umbraco
             var masterId = ParentID;
             
             var editor = "settings/editTemplate.aspx";
-            if (UmbracoConfiguration.Current.UmbracoSettings.Templates.DefaultRenderingEngine == RenderingEngine.Mvc)
+            if (UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc)
                 editor = "settings/views/editView.aspx";
 
             if (masterId > 0)

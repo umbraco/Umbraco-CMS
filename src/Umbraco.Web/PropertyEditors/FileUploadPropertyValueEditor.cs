@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -87,13 +88,15 @@ namespace Umbraco.Web.PropertyEditors
                     {
                         var file = filesAsArray[i];
 
+                        //TODO: ALl of this naming logic needs to be put into the ImageHelper and then we need to change ContentExtensions to do the same!
+
                         var currentPersistedFile = currentPersistedValues.Length >= (i + 1)
                                                        ? currentPersistedValues[i]
                                                        : "";
 
                         var name = IOHelper.SafeFileName(file.FileName.Substring(file.FileName.LastIndexOf(IOHelper.DirSepChar) + 1, file.FileName.Length - file.FileName.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
 
-                        var subfolder = UmbracoConfiguration.Current.UmbracoSettings.Content.UploadAllowDirectories
+                        var subfolder = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
                                             ? currentPersistedFile.Replace(fs.GetUrl("/"), "").Split('/')[0]
                                             : currentPersistedFile.Substring(currentPersistedFile.LastIndexOf("/", StringComparison.Ordinal) + 1).Split('-')[0];
 
@@ -102,7 +105,7 @@ namespace Umbraco.Web.PropertyEditors
                                                  ? subfolderId.ToString(CultureInfo.InvariantCulture)
                                                  : MediaSubfolderCounter.Current.Increment().ToString(CultureInfo.InvariantCulture);
 
-                        var fileName = UmbracoConfiguration.Current.UmbracoSettings.Content.UploadAllowDirectories
+                        var fileName = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
                                            ? Path.Combine(numberedFolder, name)
                                            : numberedFolder + "-" + name;
 
@@ -112,27 +115,27 @@ namespace Umbraco.Web.PropertyEditors
 
                             if (umbracoFile.SupportsResizing)
                             {
-                                // make default thumbnail
-                                umbracoFile.Resize(100, "thumb");
-
+                                var additionalSizes = new List<int>();
                                 //get the pre-vals value
                                 var thumbs = editorValue.PreValues.FormatAsDictionary();
                                 if (thumbs.Any())
                                 {
                                     var thumbnailSizes = thumbs.First().Value.Value;
-
                                     // additional thumbnails configured as prevalues on the DataType
                                     var sep = (thumbnailSizes.Contains("") == false && thumbnailSizes.Contains(",")) ? ',' : ';';
-
                                     foreach (var thumb in thumbnailSizes.Split(sep))
                                     {
                                         int thumbSize;
-                                        if (thumb != "" && int.TryParse(thumb, out thumbSize))
-                                        {
-                                            umbracoFile.Resize(thumbSize, string.Format("thumb_{0}", thumbSize));
-                                        }
+                                        if (thumb == "" || int.TryParse(thumb, out thumbSize) == false) continue;
+                                        additionalSizes.Add(thumbSize);
                                     }
                                 }
+
+                                using (var image = Image.FromStream(fileStream))
+                                {
+                                    ImageHelper.GenerateMediaThumbnails(fs, fileName, umbracoFile.Extension, image, additionalSizes);
+                                }
+
                             }
                             newValue.Add(umbracoFile.Url);
                         }

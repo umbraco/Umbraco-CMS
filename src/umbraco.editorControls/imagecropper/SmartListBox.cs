@@ -1,7 +1,9 @@
-﻿using System.Web.UI.WebControls;
+﻿using System;
+using System.Web.UI.WebControls;
 
 namespace umbraco.editorControls.imagecropper
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class SmartListBox : ListBox
     {
         //Moves the selected items up one level

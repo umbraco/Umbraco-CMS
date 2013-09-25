@@ -6,6 +6,7 @@ namespace umbraco.editorControls.datepicker
 	/// <summary>
 	/// Summary description for DateDataType.
 	/// </summary>
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
 	public class DateDataType : cms.businesslogic.datatype.BaseDataType,interfaces.IDataType
 	{
 		private interfaces.IDataEditor _Editor;

@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Macros
 <p>asdfsadf</p>
 <div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" /> -->
-Macro alias: <strong>Map</strong></div>
+<ins>Macro alias: <strong>Map</strong></ins></div>
 <p>asdfasdf</p>", result);
         }
 
@@ -37,7 +37,7 @@ Macro alias: <strong>Map</strong></div>
 <p>asdfsadf</p>
 <div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" /> -->
-Macro alias: <strong>Map</strong></div>
+<ins>Macro alias: <strong>Map</strong></ins></div>
 <p>asdfasdf</p>", result);
         }
 
@@ -54,7 +54,7 @@ Macro alias: <strong>Map</strong></div>
 <p>asdfsadf</p>
 <div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
-Macro alias: <strong>Map</strong></div>
+<ins>Macro alias: <strong>Map</strong></ins></div>
 <p>asdfasdf</p>", result);
         }
 
@@ -71,7 +71,7 @@ Macro alias: <strong>Map</strong></div>
 <p>asdfsadf</p>
 <div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
-Macro alias: <strong>Map</strong></div>
+<ins>Macro alias: <strong>Map</strong></ins></div>
 <p>asdfasdf</p>", result);
         }
 
@@ -88,7 +88,7 @@ Macro alias: <strong>Map</strong></div>
 <p>asdfsadf</p>
 <div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
-Macro alias: <strong>Map</strong></div>
+<ins>Macro alias: <strong>Map</strong></ins></div>
 <p>asdfasdf</p>", result);
         }
 

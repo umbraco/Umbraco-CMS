@@ -843,24 +843,11 @@
 				});
 				*/
 				
-				if (jQuery("#LiveEditingToolbar")) {
-					// NH: Live editing hack for empty div in IE
-					if (jQuery.browser.msie) {
-						var emptyDiv = jQuery("#" + ed.getParam("umbraco_toolbar_id", "*")).prev();
-						if (emptyDiv.get(0).tagName == "DIV" && emptyDiv.html() == "") {
-							emptyDiv.hide();
-						}
-					}
-
-					t._addToolbars(etb, o);
-					DOM.show(DOM.get(ed.id + '_external'));
-				} else {
-					jQuery(document).ready(function () {
-						t._addToolbars(etb, o);
-						DOM.show(DOM.get(ed.id + '_external'));
-					});
-				}
-
+				jQuery(document).ready(function () {
+				    t._addToolbars(etb, o);
+				    DOM.show(DOM.get(ed.id + '_external'));
+				});
+			    
 				ed.onMouseUp.add(function () {
 					jQuery(".tinymceMenuBar").hide();
 					jQuery("#" + ed.id + "_external").parent().show();

@@ -12,6 +12,8 @@ namespace Umbraco.Web.Dynamics
 {
     //SD: I wish all of this wasn't hacked and was just the original dynamic linq from MS... sigh. Just
     // means we can't really use it for anything other than dynamic node (i think)
+    // I'm fairly sure it's just hte convert to dynamic null stuff... still seems to work for normal linq operations would love to make it
+    // properly one day.
 
 	internal class ExpressionParser<T>
 	{

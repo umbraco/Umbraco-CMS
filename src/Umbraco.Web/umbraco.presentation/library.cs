@@ -455,12 +455,12 @@ namespace umbraco
         {
             try
             {
-                if (UmbracoConfiguration.Current.UmbracoSettings.Content.UmbracoLibraryCacheDuration > 0)
+                if (UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration > 0)
                 {
                     XPathNodeIterator retVal = ApplicationContext.Current.ApplicationCache.GetCacheItem(
                         string.Format(
                             "{0}_{1}_{2}", CacheKeys.MediaCacheKey, MediaId, Deep),
-                        TimeSpan.FromSeconds(UmbracoConfiguration.Current.UmbracoSettings.Content.UmbracoLibraryCacheDuration),
+                        TimeSpan.FromSeconds(UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration),
                         () => getMediaDo(MediaId, Deep));
 
                     if (retVal != null)
@@ -489,7 +489,7 @@ namespace umbraco
                 XmlDocument mXml = new XmlDocument();
                 mXml.LoadXml(m.ToXml(mXml, Deep).OuterXml);
                 XPathNavigator xp = mXml.CreateNavigator();
-                string xpath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "/node" : String.Format("/{0}", Casing.SafeAliasWithForcingCheck(m.ContentType.Alias));
+                string xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "/node" : String.Format("/{0}", Casing.SafeAliasWithForcingCheck(m.ContentType.Alias));
                 return xp.Select(xpath);
             }
             return null;
@@ -506,12 +506,12 @@ namespace umbraco
         {
             try
             {
-                if (UmbracoConfiguration.Current.UmbracoSettings.Content.UmbracoLibraryCacheDuration > 0)
+                if (UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration > 0)
                 {
                     var retVal = ApplicationContext.Current.ApplicationCache.GetCacheItem(
                         string.Format(
                             "{0}_{1}", CacheKeys.MemberLibraryCacheKey, MemberId),
-                        TimeSpan.FromSeconds(UmbracoConfiguration.Current.UmbracoSettings.Content.UmbracoLibraryCacheDuration),
+                        TimeSpan.FromSeconds(UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration),
                         () => getMemberDo(MemberId));
 
                     if (retVal != null)
@@ -980,29 +980,22 @@ namespace umbraco
         /// <returns>The rendered template as a string</returns>
         public static string RenderTemplate(int PageId, int TemplateId)
         {
-            if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
+            if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
             {
-                if (!UmbracoContext.Current.LiveEditingContext.Enabled)
-                {										
-	                using (var sw = new StringWriter())
-	                {
-						try
-						{
-							var altTemplate = TemplateId == -1 ? null : (int?)TemplateId;
-							var templateRenderer = new TemplateRenderer(Umbraco.Web.UmbracoContext.Current, PageId, altTemplate);
-							templateRenderer.Render(sw);
-						}
-						catch (Exception ee)
-						{
-							sw.Write("<!-- Error rendering template with id {0}: '{1}' -->", PageId, ee);
-						}
-
-						return sw.ToString();    
-	                }
-                }
-                else
+                using (var sw = new StringWriter())
                 {
-                    return "RenderTemplate not supported in Canvas";
+                    try
+                    {
+                        var altTemplate = TemplateId == -1 ? null : (int?)TemplateId;
+                        var templateRenderer = new TemplateRenderer(Umbraco.Web.UmbracoContext.Current, PageId, altTemplate);
+                        templateRenderer.Render(sw);
+                    }
+                    catch (Exception ee)
+                    {
+                        sw.Write("<!-- Error rendering template with id {0}: '{1}' -->", PageId, ee);
+                    }
+
+                    return sw.ToString();
                 }
             }
             else
@@ -1867,7 +1860,7 @@ namespace umbraco
         internal static string GetCurrentNotFoundPageId()
         {
             //XmlNode error404Node = UmbracoSettings.GetKeyAsNode("/settings/content/errors/error404");
-            if (UmbracoConfiguration.Current.UmbracoSettings.Content.Error404Collection.Count() > 1)
+            if (UmbracoConfig.For.UmbracoSettings().Content.Error404Collection.Count() > 1)
             {
                 // try to get the 404 based on current culture (via domain)
                 IContentErrorPage cultureErr;
@@ -1876,7 +1869,7 @@ namespace umbraco
                     var d = Domain.GetDomain(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]);
 
                     // test if a 404 page exists with current culture
-                    cultureErr = UmbracoConfiguration.Current.UmbracoSettings.Content.Error404Collection
+                    cultureErr = UmbracoConfig.For.UmbracoSettings().Content.Error404Collection
                                                      .FirstOrDefault(x => x.Culture == d.Language.CultureAlias);
 
                     if (cultureErr != null)
@@ -1887,7 +1880,7 @@ namespace umbraco
                 }
 
                 // test if a 404 page exists with current culture thread
-                cultureErr = UmbracoConfiguration.Current.UmbracoSettings.Content.Error404Collection
+                cultureErr = UmbracoConfig.For.UmbracoSettings().Content.Error404Collection
                                                  .FirstOrDefault(x => x.Culture == System.Threading.Thread.CurrentThread.CurrentUICulture.Name);
                 if (cultureErr != null)
                 {
@@ -1895,7 +1888,7 @@ namespace umbraco
                 }
 
                 // there should be a default one!
-                cultureErr = UmbracoConfiguration.Current.UmbracoSettings.Content.Error404Collection
+                cultureErr = UmbracoConfig.For.UmbracoSettings().Content.Error404Collection
                                                  .FirstOrDefault(x => x.Culture == "default");
                 if (cultureErr != null)
                 {
@@ -1905,7 +1898,7 @@ namespace umbraco
             else
             {
 
-                return UmbracoConfiguration.Current.UmbracoSettings.Content.Error404Collection.First().ContentId.ToInvariantString();                
+                return UmbracoConfig.For.UmbracoSettings().Content.Error404Collection.First().ContentId.ToInvariantString();                
             }
 
             return "";

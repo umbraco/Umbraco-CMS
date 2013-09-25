@@ -6,7 +6,7 @@
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
-function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeout, macroResource, macroService) {
+function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeout, macroResource, macroService, $routeParams) {
     return {
 
         /**
@@ -22,7 +22,7 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
         */
         createInsertEmbeddedMedia: function (editor, $scope) {
             editor.addButton('umbembeddialog', {
-                icon: 'media',
+                icon: 'custom icon-tv',
                 tooltip: 'Embed',
                 onclick: function () {
                     dialogService.embedDialog({
@@ -162,6 +162,41 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                 return null;
             }
 
+            /** loads in the macro content async from the server */
+            function loadMacroContent($macroDiv, macroData) {
+                
+                //if we don't have the macroData, then we'll need to parse it from the macro div
+                if (!macroData) {                    
+                    var contents = $macroDiv.contents();
+                    var comment = _.find(contents, function (item) {
+                        return item.nodeType === 8;
+                    });
+                    if (!comment) {
+                        throw "Cannot parse the current macro, the syntax in the editor is invalid";
+                    }
+                    var syntax = comment.textContent.trim();
+                    var parsed = macroService.parseMacroSyntax(syntax);
+                    macroData = parsed;
+                }
+
+                var $ins = $macroDiv.find("ins");
+
+                //show the throbber
+                $macroDiv.addClass("loading");
+
+                var contentId = $routeParams.id;
+
+                macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.marcoParamsDictionary)
+                    .then(function (htmlResult) {
+
+                        $macroDiv.removeClass("loading");
+                        htmlResult = htmlResult.trim();
+                        if (htmlResult !== "") {
+                            $ins.html(htmlResult);
+                        }
+                    });
+            }
+            
             /** Adds the button instance */
             editor.addButton('umbmacro', {
                 icon: 'custom icon-settings-alt',
@@ -170,6 +205,57 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
 
                     var ctrl = this;
                     var isOnMacroElement = false;
+
+                    /**
+                     if the selection comes from a different element that is not the macro's
+                     we need to check if the selection includes part of the macro, if so we'll force the selection
+                     to clear to the next element since if people can select part of the macro markup they can then modify it.
+                    */
+                    function handleSelectionChange() {
+
+                        if (!editor.selection.isCollapsed()) {
+                            var endSelection = tinymce.activeEditor.selection.getEnd();
+                            var startSelection = tinymce.activeEditor.selection.getStart();
+                            //don't proceed if it's an entire element selected
+                            if (endSelection !== startSelection) { 
+                                
+                                //if the end selection is a macro then move the cursor
+                                //NOTE: we don't have to handle when the selection comes from a previous parent because
+                                // that is automatically taken care of with the normal onNodeChanged logic since the 
+                                // evt.element will be the macro once it becomes part of the selection.
+                                var $testForMacro = $(endSelection).closest(".umb-macro-holder");
+                                if ($testForMacro.length > 0) {
+                                    
+                                    //it came from before so move after, if there is no after then select ourselves
+                                    var next = $testForMacro.next();
+                                    if (next.length > 0) {
+                                        editor.selection.setCursorLocation($testForMacro.next().get(0));
+                                    }
+                                    else {
+                                        selectMacroElement($testForMacro.get(0));
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+
+                    /** helper method to select the macro element */
+                    function selectMacroElement(macroElement) {
+                        // move selection to top element to ensure we can't edit this
+                        editor.selection.select(macroElement);
+
+                        // check if the current selection *is* the element (ie bug)
+                        var currentSelection = editor.selection.getStart();
+                        if (tinymce.isIE) {
+                            if (!editor.dom.hasClass(currentSelection, 'umb-macro-holder')) {
+                                while (!editor.dom.hasClass(currentSelection, 'umb-macro-holder') && currentSelection.parentNode) {
+                                    currentSelection = currentSelection.parentNode;
+                                }
+                                editor.selection.select(currentSelection);
+                            }
+                        }
+                    }
 
                     /**
                     * Add a node change handler, test if we're editing a macro and select the whole thing, then set our isOnMacroElement flag.
@@ -181,7 +267,10 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
 
                         //set our macro button active when on a node of class umb-macro-holder
                         var $macroElement = $(evt.element).closest(".umb-macro-holder");
+                        
+                        handleSelectionChange();
 
+                        //set the button active
                         ctrl.active($macroElement.length !== 0);
 
                         if ($macroElement.length > 0) {
@@ -189,20 +278,8 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
 
                             //remove the event listener before re-selecting
                             editor.off('NodeChange', onNodeChanged);
-                            
-                            // move selection to top element to ensure we can't edit this
-                            editor.selection.select(macroElement);
 
-                            // check if the current selection *is* the element (ie bug)
-                            var currentSelection = editor.selection.getStart();
-                            if (tinymce.isIE) {
-                                if (!editor.dom.hasClass(currentSelection, 'umb-macro-holder')) {
-                                    while (!editor.dom.hasClass(currentSelection, 'umb-macro-holder') && currentSelection.parentNode) {
-                                        currentSelection = currentSelection.parentNode;
-                                    }
-                                    editor.selection.select(currentSelection);
-                                }
-                            }
+                            selectMacroElement(macroElement);
 
                             //set the flag
                             isOnMacroElement = true;
@@ -215,6 +292,16 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                         }
 
                     }
+
+                    /** when the contents load we need to find any macros declared and load in their content */
+                    editor.on("LoadContent", function (o) {
+                        
+                        //get all macro divs and load their content
+                        $(editor.dom.select(".umb-macro-holder.mceNonEditable")).each(function() {
+                            loadMacroContent($(this));
+                        });                        
+
+                    });
 
                     /** This prevents any other commands from executing when the current element is the macro so the content cannot be edited */
                     editor.on('BeforeExecCommand', function (o) {                        
@@ -310,7 +397,10 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                 /** The insert macro button click event handler */
                 onclick: function () {
 
-                    var dialogData;
+                    var dialogData = {
+                        //flag for use in rte so we only show macros flagged for the editor
+                        richTextEditor: true  
+                    };
 
                     //when we click we could have a macro already selected and in that case we'll want to edit the current parameters
                     //so we'll need to extract them and submit them to the dialog.
@@ -352,20 +442,9 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                             editor.selection.setNode(macroDiv);
                             
                             var $macroDiv = $(editor.dom.select("div.umb-macro-holder." + uniqueId));
-                            var $ins = $macroDiv.find("ins");
 
-                            //show the throbber
-                            $macroDiv.addClass("loading");
-                            
-                            macroResource.getMacroResultAsHtmlForEditor(data.macroAlias, 1234)
-                                .then(function (htmlResult) {
-                                    
-                                    $macroDiv.removeClass("loading");
-                                    htmlResult = htmlResult.trim();
-                                    if (htmlResult !== "") {
-                                        $ins.html(htmlResult);
-                                    }
-                                });
+                            //async load the macro content
+                            loadMacroContent($macroDiv, data);                          
                         }
                     });
 

@@ -5,6 +5,7 @@ using System.Globalization;
 
 namespace umbraco.editorControls
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
 	public class numberField : TextBox, interfaces.IDataEditor
 	{
 		private interfaces.IData _data;

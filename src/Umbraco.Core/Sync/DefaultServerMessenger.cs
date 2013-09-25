@@ -39,7 +39,7 @@ namespace Umbraco.Core.Sync
         /// <param name="login"></param>
         /// <param name="password"></param>
         internal DefaultServerMessenger(string login, string password)
-            : this(login, password, UmbracoConfiguration.Current.UmbracoSettings.DistributedCall.Enabled)
+            : this(login, password, UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled)
         {            
         }
 
@@ -226,7 +226,7 @@ namespace Umbraco.Core.Sync
                             {
                                 Login = result.Item1;
                                 Password = result.Item2;
-                                _useDistributedCalls = UmbracoConfiguration.Current.UmbracoSettings.DistributedCall.Enabled;    
+                                _useDistributedCalls = UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled;    
                             }
                         }
                         catch (Exception ex)

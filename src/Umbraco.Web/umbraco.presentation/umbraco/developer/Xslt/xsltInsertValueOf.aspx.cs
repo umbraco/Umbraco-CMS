@@ -38,7 +38,7 @@ namespace umbraco.developer
             foreach (PropertyType pt in PropertyType.GetAll())
                 if (!existingGenProps.Contains("," + pt.Alias + ","))
                 {
-                    if(UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
+                    if(UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
                         preValuesSource.Add(string.Format("data [@alias = '{0}']", pt.Alias));
                     else
                         preValuesSource.Add(pt.Alias);

@@ -26,18 +26,18 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             set { base["repositoryurl"] = value; }
         }
 
-        [ConfigurationProperty("repositoryurl", DefaultValue = "/umbraco/webservices/api/repository.asmx")]
+        [ConfigurationProperty("webserviceurl", DefaultValue = "/umbraco/webservices/api/repository.asmx")]
         public string WebServiceUrl
         {
-            get { return (string)base["repositoryurl"]; }
-            set { base["repositoryurl"] = value; }
+            get { return (string)base["webserviceurl"]; }
+            set { base["webserviceurl"] = value; }
         }
 
         public bool HasCustomWebServiceUrl
         {
             get
             {
-                var prop = Properties["repositoryurl"];
+                var prop = Properties["webserviceurl"];
                 var repoUrl = this[prop] as ConfigurationElement;
                 return (repoUrl != null && repoUrl.ElementInformation.IsPresent);
             }

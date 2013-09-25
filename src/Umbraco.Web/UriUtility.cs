@@ -68,7 +68,7 @@ namespace Umbraco.Web
 			{
 				if (!GlobalSettings.UseDirectoryUrls)
 					path += ".aspx";
-                else if (UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.AddTrailingSlash)
+                else if (UmbracoConfig.For.UmbracoSettings().RequestHandler.AddTrailingSlash)
 					path += "/";
 			}
 

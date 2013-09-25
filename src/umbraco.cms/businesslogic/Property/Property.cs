@@ -110,11 +110,11 @@ namespace umbraco.cms.businesslogic.property
         }
         public XmlNode ToXml(XmlDocument xd)
         {
-            string nodeName = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "data" : helpers.Casing.SafeAlias(PropertyType.Alias);
+            string nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "data" : helpers.Casing.SafeAlias(PropertyType.Alias);
             XmlNode x = xd.CreateNode(XmlNodeType.Element, nodeName, "");
 
             // Alias
-            if (UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
+            if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
             {
                 XmlAttribute alias = xd.CreateAttribute("alias");
                 alias.Value = this.PropertyType.Alias;

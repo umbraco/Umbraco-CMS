@@ -11,14 +11,5 @@ namespace Umbraco.Web.UI.Install.Steps {
     
     
     public partial class TheEnd {
-        
-        /// <summary>
-        /// customizeSite control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl customizeSite;
     }
 }
