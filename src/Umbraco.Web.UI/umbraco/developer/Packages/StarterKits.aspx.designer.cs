@@ -40,24 +40,6 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages {
         protected global::umbraco.uicontrols.Feedback fb;
         
         /// <summary>
-        /// StarterKitInstalled control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::umbraco.uicontrols.Pane StarterKitInstalled;
-        
-        /// <summary>
-        /// ph_skins control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder ph_skins;
-        
-        /// <summary>
         /// StarterKitNotInstalled control.
         /// </summary>
         /// <remarks>
