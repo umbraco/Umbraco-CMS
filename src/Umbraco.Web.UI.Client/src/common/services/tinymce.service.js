@@ -6,7 +6,7 @@
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
-function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeout, macroResource, macroService) {
+function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeout, macroResource, macroService, $routeParams) {
     return {
 
         /**
@@ -184,7 +184,9 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                 //show the throbber
                 $macroDiv.addClass("loading");
 
-                macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, 1234, macroData.marcoParamsDictionary)
+                var contentId = $routeParams.id;
+
+                macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.marcoParamsDictionary)
                     .then(function (htmlResult) {
 
                         $macroDiv.removeClass("loading");
