@@ -1,7 +1,7 @@
 <div class="umb-photo-folder">
 	<div class="picrow" ng-repeat="row in rows">
 		<a 
-			href 
+			href="#media/media/edit/{{img.id}}" 
 			ng-click="clickHandler(img, $event)" 
 			ng-switch="img.thumbnail" 
 			ng-repeat="img in row.photos"
