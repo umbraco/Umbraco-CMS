@@ -70,7 +70,7 @@ namespace Umbraco.Web.PropertyEditors
             foreach (var p in model.Properties)
             {
                 var uploadFieldConfigNode =
-                    UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties
+                    UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties
                                         .FirstOrDefault(x => x.Alias == p.Alias);
 
                 if (uploadFieldConfigNode != null)

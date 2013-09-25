@@ -40,7 +40,7 @@ namespace umbraco.cms.helpers
             tidy.Options.TidyMark = false;
 
             // To avoid entity encoding
-            tidy.Options.CharEncoding = (TidyNet.CharEncoding)Enum.Parse(typeof(TidyNet.CharEncoding), UmbracoConfiguration.Current.UmbracoSettings.Content.TidyCharEncoding);
+            tidy.Options.CharEncoding = (TidyNet.CharEncoding)Enum.Parse(typeof(TidyNet.CharEncoding), UmbracoConfig.For.UmbracoSettings().Content.TidyCharEncoding);
 
 
             /* Declare the parameters that is needed */

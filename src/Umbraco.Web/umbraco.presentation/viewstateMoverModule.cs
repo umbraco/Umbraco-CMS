@@ -27,7 +27,7 @@ namespace umbraco.presentation
 
         void IHttpModule.Init(HttpApplication context)
         {
-            if (UmbracoConfiguration.Current.UmbracoSettings.ViewStateMoverModule.Enable)
+            if (UmbracoConfig.For.UmbracoSettings().ViewStateMoverModule.Enable)
             {
                 context.BeginRequest += new EventHandler(context_BeginRequest);
             }

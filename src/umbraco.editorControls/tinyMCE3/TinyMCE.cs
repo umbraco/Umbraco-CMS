@@ -326,7 +326,7 @@ namespace umbraco.editorControls.tinyMCE3
                 parsedString = replaceMacroTags(parsedString).Trim();
 
                 // tidy html - refactored, see #30534
-                if (UmbracoConfiguration.Current.UmbracoSettings.Content.TidyEditorContent)
+                if (UmbracoConfig.For.UmbracoSettings().Content.TidyEditorContent)
                 {
                     // always wrap in a <div> - using <p> was a bad idea
                     parsedString = "<div>" + parsedString + "</div>";

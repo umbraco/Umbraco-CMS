@@ -527,7 +527,7 @@ namespace umbraco.controls
             {
                 string caption = p.PropertyType.Name;
                 if (p.PropertyType.Description != null && p.PropertyType.Description != String.Empty)
-                    switch (UmbracoConfiguration.Current.UmbracoSettings.Content.PropertyContextHelpOption)
+                    switch (UmbracoConfig.For.UmbracoSettings().Content.PropertyContextHelpOption)
                     {
                         case "icon":
                             caption += " <img src=\"" + this.ResolveUrl(SystemDirectories.Umbraco) + "/images/help.png\" class=\"umbPropertyContextHelp\" alt=\"" + p.PropertyType.Description + "\" title=\"" + p.PropertyType.Description + "\" />";

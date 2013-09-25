@@ -57,15 +57,15 @@ namespace umbraco.cms.presentation.settings.scripts
 
             lttPath.Text = "<a target='_blank' href='" + path + "'>" + path + "</a>";
 
-            var exts = UmbracoConfiguration.Current.UmbracoSettings.Content.ScriptFileTypes.ToList();
-            if (UmbracoConfiguration.Current.UmbracoSettings.Templates.DefaultRenderingEngine == RenderingEngine.Mvc)
+            var exts = UmbracoConfig.For.UmbracoSettings().Content.ScriptFileTypes.ToList();
+            if (UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc)
             {
                 exts.Add("cshtml");
                 exts.Add("vbhtml");
             }
 
             var dirs = SystemDirectories.Scripts;
-            if (UmbracoConfiguration.Current.UmbracoSettings.Templates.DefaultRenderingEngine == RenderingEngine.Mvc)
+            if (UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc)
                 dirs += "," + SystemDirectories.MvcViews;
 
             // validate file

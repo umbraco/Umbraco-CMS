@@ -94,7 +94,7 @@ function isValidAlias(alias) {{
         public string GetShortStringServicesJavaScript(string controllerPath)
         {
             return string.Format(SssjsFormat,
-                UmbracoConfiguration.Current.UmbracoSettings.Content.ForceSafeAliases ? "true" : "false", SssjsValidCharacters, SssjsInvalidFirstCharacters);
+                UmbracoConfig.For.UmbracoSettings().Content.ForceSafeAliases ? "true" : "false", SssjsValidCharacters, SssjsInvalidFirstCharacters);
         }
 
         #endregion
@@ -205,7 +205,7 @@ function isValidAlias(alias) {{
             var ext = filePath.Substring(filePath.LastIndexOf('.'));
 
             //Because the file usually is downloadable as well we check characters against 'UmbracoSettings.UrlReplaceCharacters'
-            foreach (var n in UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.CharCollection)
+            foreach (var n in UmbracoConfig.For.UmbracoSettings().RequestHandler.CharCollection)
             {
                 if (n.Char.IsNullOrWhiteSpace() == false)
                     fileNamePart = fileNamePart.Replace(n.Char, n.Replacement);
@@ -468,14 +468,14 @@ function isValidAlias(alias) {{
         public string LegacyFormatUrl(string url)
         {
             var newUrl = url.ToLowerInvariant();
-            foreach (var n in UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.CharCollection)
+            foreach (var n in UmbracoConfig.For.UmbracoSettings().RequestHandler.CharCollection)
             {
                 if (n.Char != "")
                     newUrl = newUrl.Replace(n.Char, n.Replacement);
             }
 
             // check for double dashes
-            if (UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.RemoveDoubleDashes)
+            if (UmbracoConfig.For.UmbracoSettings().RequestHandler.RemoveDoubleDashes)
             {
                 newUrl = Regex.Replace(newUrl, @"[-]{2,}", "-");
             }

@@ -106,7 +106,7 @@ namespace Umbraco.Web.Routing
 
             if (mode == UrlProviderMode.AutoLegacy)
             {
-                mode = UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.UseDomainPrefixes
+                mode = UmbracoConfig.For.UmbracoSettings().RequestHandler.UseDomainPrefixes
                     ? UrlProviderMode.Absolute
                     : UrlProviderMode.Auto;
             }

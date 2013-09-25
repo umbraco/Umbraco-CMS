@@ -76,7 +76,7 @@ namespace umbraco.presentation.channels
                     doc.getProperty(userChannel.FieldExcerptAlias).Value = removeLeftUrl(post.mt_excerpt);
 
                 
-                if (UmbracoConfiguration.Current.UmbracoSettings.Content.TidyEditorContent)
+                if (UmbracoConfig.For.UmbracoSettings().Content.TidyEditorContent)
                     doc.getProperty(userChannel.FieldDescriptionAlias).Value = library.Tidy(removeLeftUrl(post.description), false);
                 else
                     doc.getProperty(userChannel.FieldDescriptionAlias).Value = removeLeftUrl(post.description);
@@ -387,7 +387,7 @@ namespace umbraco.presentation.channels
 
 
                 // Description
-                if (UmbracoConfiguration.Current.UmbracoSettings.Content.TidyEditorContent)
+                if (UmbracoConfig.For.UmbracoSettings().Content.TidyEditorContent)
                     doc.getProperty(userChannel.FieldDescriptionAlias).Value = library.Tidy(removeLeftUrl(post.description), false);
                 else
                     doc.getProperty(userChannel.FieldDescriptionAlias).Value = removeLeftUrl(post.description);
@@ -517,7 +517,7 @@ namespace umbraco.presentation.channels
         private static bool validateUser(string username, string password)
         {
             
-            return Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider].ValidateUser(username, password);
+            return Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider].ValidateUser(username, password);
         }
 
         [XmlRpcMethod("blogger.getUsersBlogs",

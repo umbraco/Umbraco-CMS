@@ -14,7 +14,7 @@
         (function($) {
             $(document).ready(function () {
                 Umbraco.Dialogs.EditMacro.getInstance().init({
-                    useAspNetMasterPages: <%=UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages.ToString().ToLower() %>,
+                    useAspNetMasterPages: <%=UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages.ToString().ToLower() %>,
                     codeEditorElementId: "<%=Request.GetItemAsString("objectId")%>",
                     renderingEngine: "<%=Request.GetItemAsString("renderingEngine", "Mvc")%>",
                     macroAlias: '<%= _macroAlias %>'

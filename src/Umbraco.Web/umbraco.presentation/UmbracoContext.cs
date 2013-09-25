@@ -110,7 +110,7 @@ namespace umbraco.presentation
         {
             get
             {
-                return !UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema;
+                return !UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema;
             }
         }
         

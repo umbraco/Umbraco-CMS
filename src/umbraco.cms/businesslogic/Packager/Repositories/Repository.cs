@@ -69,7 +69,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
             var repositories = new List<Repository>();
 
-            foreach (var r in UmbracoConfiguration.Current.UmbracoSettings.PackageRepositories.Repositories)
+            foreach (var r in UmbracoConfig.For.UmbracoSettings().PackageRepositories.Repositories)
             {
                 var repository = new Repository
                 {
@@ -107,7 +107,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
                 throw new FormatException("The repositoryGuid is not a valid GUID");
             }
 
-            var found = UmbracoConfiguration.Current.UmbracoSettings.PackageRepositories.Repositories.FirstOrDefault(x => x.Id == id);
+            var found = UmbracoConfig.For.UmbracoSettings().PackageRepositories.Repositories.FirstOrDefault(x => x.Id == id);
             if (found == null)
             {
                 return null;
@@ -196,7 +196,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
             if (key == string.Empty)
             {
-                if (UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
+                if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
                     fileByteArray = this.Webservice.fetchPackage(packageGuid);
                 else
                     fileByteArray = this.Webservice.fetchPackageByVersion(packageGuid, Version.Version41);

@@ -69,7 +69,7 @@ namespace umbraco.presentation.translation
                 while (ide.MoveNext())
                 {
                     var x = (XmlElement)ide.Value;
-                    var parentXpath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "//node [@id = '" + x.SelectSingleNode("//node").Attributes.GetNamedItem("parentID").Value + "']" :
+                    var parentXpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "//node [@id = '" + x.SelectSingleNode("//node").Attributes.GetNamedItem("parentID").Value + "']" :
                         "//* [@isDoc and @id = '" + x.SelectSingleNode("//* [@isDoc]").Attributes.GetNamedItem("parentID").Value + "']";
                     var parent = _xd.SelectSingleNode(parentXpath);
 

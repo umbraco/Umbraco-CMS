@@ -75,7 +75,7 @@ namespace umbraco.controls
         /// <returns>The correct syntax for the macro including all parameters</returns>
         public string GetMacroTag() {
             string tag = "";
-            if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
+            if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
             {
                 tag = "<umbraco:Macro runat=\"server\"";
             }

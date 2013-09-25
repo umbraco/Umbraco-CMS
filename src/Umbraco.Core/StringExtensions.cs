@@ -958,7 +958,7 @@ namespace Umbraco.Core
         /// <remarks>Checks <c>UmbracoSettings.ForceSafeAliases</c> to determine whether it should filter the text.</remarks>
         public static string ToSafeAliasWithForcingCheck(this string alias)
         {
-            return UmbracoConfiguration.Current.UmbracoSettings.Content.ForceSafeAliases ? alias.ToSafeAlias() : alias;
+            return UmbracoConfig.For.UmbracoSettings().Content.ForceSafeAliases ? alias.ToSafeAlias() : alias;
         }
 
         /// <summary>
@@ -970,7 +970,7 @@ namespace Umbraco.Core
         /// <remarks>Checks <c>UmbracoSettings.ForceSafeAliases</c> to determine whether it should filter the text.</remarks>
         public static string ToSafeAliasWithForcingCheck(this string alias, CultureInfo culture)
         {
-            return UmbracoConfiguration.Current.UmbracoSettings.Content.ForceSafeAliases ? alias.ToSafeAlias(culture) : alias;
+            return UmbracoConfig.For.UmbracoSettings().Content.ForceSafeAliases ? alias.ToSafeAlias(culture) : alias;
         }
 
         // note: LegacyShortStringHelper will produce a 100% backward-compatible output for ToUmbracoAlias.

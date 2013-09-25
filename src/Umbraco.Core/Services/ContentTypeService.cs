@@ -567,7 +567,7 @@ namespace Umbraco.Core.Services
         public string GetContentTypesDtd()
         {
             var dtd = new StringBuilder();
-            if (UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
+            if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
             {
                 dtd.AppendLine("<!ELEMENT node ANY> <!ATTLIST node id ID #REQUIRED>  <!ELEMENT data ANY>");
             }

@@ -290,7 +290,7 @@ namespace umbraco.cms.businesslogic.media
                 XmlGenerate(xd);
 
                 // generate preview for blame history?
-                if (UmbracoConfiguration.Current.UmbracoSettings.Content.GlobalPreviewStorageEnabled)
+                if (UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled)
                 {
                     // Version as new guid to ensure different versions are generated as media are not versioned currently!
                     SavePreviewXml(generateXmlWithoutSaving(xd), Guid.NewGuid());

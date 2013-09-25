@@ -265,7 +265,7 @@ namespace umbraco
                             pageContent.Controls.Add(new LiteralControl("<div title=\"Macro Tag: '" + System.Web.HttpContext.Current.Server.HtmlEncode(tag) + "'\" style=\"border: 1px solid #009;\">"));
 
                         // NH: Switching to custom controls for macros
-                        if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
+                        if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
                         {
                             umbraco.presentation.templateControls.Macro macroControl = new umbraco.presentation.templateControls.Macro();
                             macroControl.Alias = helper.FindAttribute(attributes, "macroalias");
@@ -311,7 +311,7 @@ namespace umbraco
                         {
 
                             // NH: Switching to custom controls for items
-                            if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
+                            if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
                             {
                                 umbraco.presentation.templateControls.Item itemControl = new umbraco.presentation.templateControls.Item();
                                 itemControl.Field = helper.FindAttribute(attributes, "field");
@@ -525,7 +525,7 @@ namespace umbraco
             this._templateName = t._templateName;
 
             // Only check for master on legacy templates - can show error when using master pages.
-            if (!UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
+            if (!UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
             {
                 checkForMaster(tId);
             }

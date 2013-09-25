@@ -62,7 +62,7 @@ namespace umbraco.presentation
 				// run scheduled url tasks
 				try
 				{
-                    foreach (var t in UmbracoConfiguration.Current.UmbracoSettings.ScheduledTasks.Tasks)
+                    foreach (var t in UmbracoConfig.For.UmbracoSettings().ScheduledTasks.Tasks)
                     {
                         bool runTask = false;
                         if (!ScheduledTaskTimes.ContainsKey(t.Alias))

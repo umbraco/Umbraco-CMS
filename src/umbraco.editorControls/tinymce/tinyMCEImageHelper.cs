@@ -14,7 +14,7 @@ namespace umbraco.editorControls.tinymce
     {
         public static string cleanImages(string html)
         {
-            var allowedAttributes = UmbracoConfiguration.Current.UmbracoSettings.Content.ImageTagAllowedAttributes.Select(x => x.ToLower()).ToList();
+            var allowedAttributes = UmbracoConfig.For.UmbracoSettings().Content.ImageTagAllowedAttributes.Select(x => x.ToLower()).ToList();
             
             //Always add src as it's essential to output any image at all
             if (allowedAttributes.Contains("src") == false)

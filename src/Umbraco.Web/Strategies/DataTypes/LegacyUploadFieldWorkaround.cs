@@ -27,7 +27,7 @@ namespace Umbraco.Web.Strategies.DataTypes
         
 		void DocumentBeforeSave(global::umbraco.cms.businesslogic.web.Document sender, global::umbraco.cms.businesslogic.SaveEventArgs e)
 		{
-            if (UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties.Any())
+            if (UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties.Any())
 			{
 				var property = sender.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id == new Guid(Constants.PropertyEditors.UploadField));
 				if (property == null)
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Strategies.DataTypes
 
 		void MediaBeforeSave(global::umbraco.cms.businesslogic.media.Media sender, global::umbraco.cms.businesslogic.SaveEventArgs e)
 		{
-            if (UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties.Any())
+            if (UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties.Any())
 			{
 				var property = sender.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id == new Guid(Constants.PropertyEditors.UploadField));
 				if (property == null)
@@ -53,7 +53,7 @@ namespace Umbraco.Web.Strategies.DataTypes
 
         private void FillProperties(global::umbraco.cms.businesslogic.Content content, global::umbraco.cms.businesslogic.property.Property property)
 		{			
-            var uploadFieldConfigNode = UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties
+            var uploadFieldConfigNode = UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties
                                                             .FirstOrDefault(x => x.Alias == property.PropertyType.Alias);
 
 			if (uploadFieldConfigNode != null)
@@ -77,7 +77,7 @@ namespace Umbraco.Web.Strategies.DataTypes
 						? fileSystem.GetExtension(path).Substring(1).ToLowerInvariant()
 						: "";
 
-				    var isImageType = UmbracoConfiguration.Current.UmbracoSettings.Content.ImageFileTypes.InvariantContains(extension);
+				    var isImageType = UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.InvariantContains(extension);
                         
 					var dimensions = isImageType ? GetDimensions(path, fileSystem) : null;
 

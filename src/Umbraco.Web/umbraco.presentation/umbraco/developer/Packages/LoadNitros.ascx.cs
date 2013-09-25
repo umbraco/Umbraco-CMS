@@ -177,7 +177,7 @@ namespace umbraco.presentation.developer.packages {
 				try
 				{
 
-					if (UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
+					if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
 						rep_nitros.DataSource = repo.Webservice.NitrosCategorizedByVersion(cms.businesslogic.packager.repositories.Version.Version4);
 					else
 						rep_nitros.DataSource = repo.Webservice.NitrosCategorizedByVersion(cms.businesslogic.packager.repositories.Version.Version41);

@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             }
             else
             {
-                SettingsSection = UmbracoConfiguration.For<IUmbracoSettingsSection>(configuration);
+                SettingsSection = configuration.GetSection("umbracoConfiguration/settings") as UmbracoSettingsSection;
             }
 
             

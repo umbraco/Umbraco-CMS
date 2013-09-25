@@ -532,7 +532,7 @@ namespace Umbraco.Web.Routing
 			// does not apply
             // + optionnally, apply the alternate template on internal redirects
             var useAltTemplate = _pcr.IsInitialPublishedContent
-                || (UmbracoConfiguration.Current.UmbracoSettings.WebRouting.InternalRedirectPreservesTemplate && _pcr.IsInternalRedirectPublishedContent);
+                || (UmbracoConfig.For.UmbracoSettings().WebRouting.InternalRedirectPreservesTemplate && _pcr.IsInternalRedirectPublishedContent);
             string altTemplate = useAltTemplate
                 ? _routingContext.UmbracoContext.HttpContext.Request[Constants.Conventions.Url.AltTemplate]
 				: null;
