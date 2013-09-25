@@ -53,7 +53,7 @@
 
 			if (data.percentage > 0) {
 				updateProgressBar(data.percentage);
-				updateStatusMessage(data.message)
+			    updateStatusMessage(data.message);
 			}
 
 			if (data.error != "") {
@@ -119,22 +119,5 @@
 			<strong>Starting installation...</strong>
 		</div>
 	</div>
-</div>
-
-
-<!-- itstall skin -->
-<div class="tab install-tab" id="installingSkin" style="display: none">
-	<div class="container">
-		<h1>Installing Skin</h1>
-		<h2>The <strong id="skinname"></strong> skin is installing. </h2>
-
-		<div class="loader alt">
-			<div class="hold">
-				<div class="progress-bar"></div>
-				<span class="progress-bar-value">56%</span>
-			</div>
-			<strong>Starting installation...</strong>
-		</div>
-	</div>	
 </div>
 

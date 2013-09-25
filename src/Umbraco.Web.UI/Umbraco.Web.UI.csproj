@@ -655,9 +655,6 @@
     <None Include="Config\tinyMceConfig.Release.config">
       <DependentUpon>tinyMceConfig.config</DependentUpon>
     </None>
-    <None Include="Config\Skinning.Release.config">
-      <DependentUpon>Skinning.config</DependentUpon>
-    </None>
     <None Include="Config\scripting.Release.config">
       <DependentUpon>scripting.config</DependentUpon>
     </None>
@@ -2106,7 +2103,6 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Config\scripting.config" />
-    <Content Include="Config\Skinning.config" />
     <Content Include="Config\feedProxy.config" />
     <Content Include="Umbraco_Client\ui\ui-lightness\jquery-ui.custom.css" />
     <Content Include="Config\applications.config" />

@@ -2,6 +2,7 @@
 using Umbraco.Core.IO;
 using Umbraco.Web.Install;
 using Umbraco.Web.UI.Install.Steps.Skinning;
+using umbraco.cms.businesslogic.packager;
 
 namespace Umbraco.Web.UI.Install.Steps
 {
@@ -10,6 +11,9 @@ namespace Umbraco.Web.UI.Install.Steps
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (InstalledPackage.GetAllInstalledPackages().Count > 0)
+                GotoNextStep(sender, e);
+
             ShowStarterKits();
         }
 
