@@ -26,12 +26,6 @@ namespace umbraco.cms.businesslogic.packager.repositories
         {
             get
             {
-
-                if (!WebserviceUrl.Contains("://"))
-                {
-                    WebserviceUrl = RepositoryUrl.Trim('/') + "/" + WebserviceUrl.Trim('/');
-                }
-
                 var repo = new RepositoryWebservice(WebserviceUrl);
                 return repo;
             }
@@ -84,7 +78,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
                 };
 
                 repository.RepositoryUrl = r.RepositoryUrl;
-                repository.WebserviceUrl = repository.RepositoryUrl.Trim('/') + "/" + repository.WebserviceUrl.Trim('/');
+                repository.WebserviceUrl = repository.RepositoryUrl.Trim('/') + "/" + r.WebServiceUrl.Trim('/');
                 if (r.HasCustomWebServiceUrl)
                 {
                     string wsUrl = r.WebServiceUrl;
@@ -126,7 +120,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
             };
 
             repository.RepositoryUrl = found.RepositoryUrl;
-            repository.WebserviceUrl = repository.RepositoryUrl.Trim('/') + "/" + repository.WebserviceUrl.Trim('/');
+            repository.WebserviceUrl = repository.RepositoryUrl.Trim('/') + "/" + found.WebServiceUrl.Trim('/');
 
             if (found.HasCustomWebServiceUrl)
             {
