@@ -50,13 +50,13 @@ namespace Umbraco.Web.Search
 			if (registeredProviders == 0)
 				return;
 
-            MediaService.Created += MediaServiceCreated;
+            //MediaService.Created += MediaServiceCreated;
             MediaService.Saved += MediaServiceSaved;
             MediaService.Deleted += MediaServiceDeleted;
             MediaService.Moved += MediaServiceMoved;
             MediaService.Trashed += MediaServiceTrashed;
 
-            ContentService.Created += ContentServiceCreated;
+            //ContentService.Created += ContentServiceCreated;
             ContentService.Saved += ContentServiceSaved;
             ContentService.Deleted += ContentServiceDeleted;
             ContentService.Moved += ContentServiceMoved;
