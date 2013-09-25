@@ -132,7 +132,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 if (_properties != null)
                 {
                     var property = _properties.FirstOrDefault(prop => prop.PropertyTypeAlias.InvariantEquals(alias));
-                    if (property != null) return property.HasValue ? property.ObjectValue : null;
+                    if (property != null) return property.HasValue ? property.Value : null;
                 }
                 return Content[alias];
             }

@@ -34,13 +34,13 @@ namespace Umbraco.Core.Dynamics
         public string PropertyTypeAlias { get { return _source == null ? _alias : _source.PropertyTypeAlias; } }
         public object DataValue { get { return _source == null ? _value : _source.DataValue; } }
         public bool HasValue { get { return _source == null || _source.HasValue; } }
-        public object ObjectValue { get { return _source == null ? _value : _source.ObjectValue; } }
-        public object XPathValue { get { return ObjectValue == null ? null : ObjectValue.ToString(); } }
+        public object Value { get { return _source == null ? _value : _source.Value; } }
+        public object XPathValue { get { return Value == null ? null : Value.ToString(); } }
 
         // implements IHtmlString.ToHtmlString
         public string ToHtmlString()
         {
-            var value = ObjectValue;
+            var value = Value;
 			return value == null ? string.Empty : value.ToString();
         }
     }

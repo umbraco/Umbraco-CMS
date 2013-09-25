@@ -367,11 +367,11 @@ namespace umbraco
             //   where prop.Value is parsed for internal links + resolve urls - but not for macros
             //   comments say "fixing U4-917 and U4-821" which are not related
             // if we return DataValue.ToString() we're back to the original situation
-            // if we return ObjectValue.ToString() we'll have macros parsed and that's nice
+            // if we return Value.ToString() we'll have macros parsed and that's nice
             //
-            // so, use ObjectValue.ToString() here.
+            // so, use Value.ToString() here.
 	        var prop = doc.GetProperty(alias);
-	        return prop == null ? string.Empty : prop.ObjectValue.ToString();
+	        return prop == null ? string.Empty : prop.Value.ToString();
         }
 
         /// <summary>

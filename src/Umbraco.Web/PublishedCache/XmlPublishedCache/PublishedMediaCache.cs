@@ -331,7 +331,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 					{
                         // so in dd.Properties, there is an IPublishedProperty with property type alias "__NodeTypeAlias" and
                         // that special property would contain the node type alias, which we use to get "aliases & names". That
-                        // special property is going to be a PropertyResult (with ObjectValue == DataValue) and we
+                        // special property is going to be a PropertyResult (with Value == DataValue) and we
                         // want its value in the most simple way = it is OK to use DataValue here.
 						var aliasesAndNames = ContentType.GetAliasesAndNames(dd.Properties.First(x => x.PropertyTypeAlias.InvariantEquals(UmbracoContentIndexer.NodeTypeAliasFieldName)).DataValue.ToString());
 						if (aliasesAndNames != null)

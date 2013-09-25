@@ -45,7 +45,7 @@ namespace Umbraco.Core.Models
         /// <para>It can be null, or any type of CLR object.</para>
         /// <para>It has been fully prepared and processed by the appropriate converter.</para>
         /// </remarks>
-        object ObjectValue { get; }
+        object Value { get; }
 
         /// <summary>
         /// Gets the XPath value of the property.

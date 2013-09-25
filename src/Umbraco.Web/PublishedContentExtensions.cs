@@ -206,7 +206,7 @@ namespace Umbraco.Web
         public static object GetPropertyValue(this IPublishedContent content, string alias)
         {
             var property = content.GetProperty(alias);
-            return property == null ? null : property.ObjectValue;
+            return property == null ? null : property.Value;
 		}
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace Umbraco.Web
         public static object GetPropertyValue(this IPublishedContent content, string alias, string defaultValue)
         {
             var property = content.GetProperty(alias);
-            return property == null || property.HasValue == false ? defaultValue : property.ObjectValue;
+            return property == null || property.HasValue == false ? defaultValue : property.Value;
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace Umbraco.Web
         public static object GetPropertyValue(this IPublishedContent content, string alias, object defaultValue)
         {
             var property = content.GetProperty(alias);
-            return property == null || property.HasValue == false ? defaultValue : property.ObjectValue;
+            return property == null || property.HasValue == false ? defaultValue : property.Value;
         }
 
         /// <summary>
@@ -264,7 +264,7 @@ namespace Umbraco.Web
         public static object GetPropertyValue(this IPublishedContent content, string alias, bool recurse)
         {
             var property = content.GetProperty(alias, recurse);
-            return property == null ? null : property.ObjectValue;
+            return property == null ? null : property.Value;
         }
 
         /// <summary>
@@ -285,7 +285,7 @@ namespace Umbraco.Web
         public static object GetPropertyValue(this IPublishedContent content, string alias, bool recurse, object defaultValue)
         {
             var property = content.GetProperty(alias, recurse);
-            return property == null || property.HasValue == false ? defaultValue : property.ObjectValue;
+            return property == null || property.HasValue == false ? defaultValue : property.Value;
         }
 
         #endregion
@@ -1622,7 +1622,7 @@ namespace Umbraco.Web
                         foreach (var p in from IPublishedProperty p in n.Properties where p.DataValue != null select p)
                         {
                             // probably want the "object value" of the property here...
-							userVals[p.PropertyTypeAlias] = p.ObjectValue;
+							userVals[p.PropertyTypeAlias] = p.Value;
 						}
 						//add the row data
 						Core.DataTableExtensions.AddRowData(tableData, standardVals, userVals);
