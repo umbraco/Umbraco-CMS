@@ -237,7 +237,7 @@ namespace umbraco.editorControls.tinymce
 
             data += "|";
 
-            // full width currenctly not useLiveEditing
+            
 		    data += "0|";
             /*
             if (_fullWidth.Checked)

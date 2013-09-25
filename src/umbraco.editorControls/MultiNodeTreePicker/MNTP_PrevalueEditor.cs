@@ -3,10 +3,11 @@ using System.Collections;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
+using ClientDependency.Core;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.interfaces;
 using umbraco.uicontrols.TreePicker;
-using Umbraco.Core;
+using Constants = Umbraco.Core.Constants;
 
 namespace umbraco.editorControls.MultiNodeTreePicker
 {

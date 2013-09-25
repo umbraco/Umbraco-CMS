@@ -51,14 +51,6 @@ namespace Umbraco.Core.IO
                 return SystemDirectories.Config + "/dashboard.config";
             }
         }
-        
-        public static string SkinningXml
-        {
-            get
-            {
-                return SystemDirectories.Data + "/skinning.config";
-            }
-        }
 
         public static string NotFoundhandlersConfig
         {

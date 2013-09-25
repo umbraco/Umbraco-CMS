@@ -27,7 +27,7 @@ using umbraco.cms.businesslogic.template;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
 using umbraco.BusinessLogic.Actions;
-using umbraco.cms.businesslogic.skinning;
+
 
 namespace umbraco
 {

@@ -31,8 +31,7 @@ jQuery(document).ready(function () {
 			source .NET CMS.
 			<br />
 			If you installed a starter kit you can start by configuring your new site, just click &quot;Preview your new website&quot; and follow the instructions. Or to start adding content right away click &quot;Set up your new website&quot; </p>
-		<ul class="btn-web">
-			<li class="btn-preview-web" id="customizeSite" runat="server"><a href="<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco) %>/canvas.aspx?redir=<%= this.ResolveUrl("~/")  %>&umbSkinning=true&umbSkinningConfigurator=true" target="_blank"><span>Set up your new website</span></a></li>
+		<ul class="btn-web">			
 			<li class="btn-set"><a href="<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco) %>/"><span>Launch umbraco</span></a></li>
 		</ul>
 	</div>

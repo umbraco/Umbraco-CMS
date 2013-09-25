@@ -18,7 +18,7 @@ using umbraco.uicontrols;
 
 namespace umbraco.editorControls.tinyMCE3
 {
-    public class TinyMCE : TinyMCEWebControl, IDataEditor, IMenuElement, ILiveEditingDataEditor
+    public class TinyMCE : TinyMCEWebControl, IDataEditor, IMenuElement
     {
         private readonly string _activateButtons = "";
         private readonly string _advancedUsers = "";
@@ -38,8 +38,6 @@ namespace umbraco.editorControls.tinyMCE3
         private readonly int m_maxImageWidth = 500;
         private bool _isInitialized;
         private string _plugins = "";
-        private bool m_isInLiveEditingMode;
-
 
         public TinyMCE(IData Data, string Configuration)
         {
@@ -402,19 +400,6 @@ namespace umbraco.editorControls.tinyMCE3
             }
         }
 
-        #region ILiveEditingDataEditor Members
-
-        public Control LiveEditingControl
-        {
-            get
-            {
-                m_isInLiveEditingMode = true;
-                base.IsInLiveEditingMode = true;
-                return this;
-            }
-        }
-
-        #endregion
 
         #region IMenuElement Members
 
@@ -457,20 +442,9 @@ namespace umbraco.editorControls.tinyMCE3
                     config.Add("theme_umbraco_versionId", base.VersionId.ToString());
 
                     // we'll need to make an extra check for the liveediting as that value is set after the constructor have initialized
-                    if (IsInLiveEditingMode)
-                    {
-                        if (config["theme_umbraco_toolbar_location"] == null)
-                            config.Add("theme_umbraco_toolbar_location", "");
-                        config["theme_umbraco_toolbar_location"] = "external";
-                        config.Add("umbraco_toolbar_id",
-                                   "LiveEditingClientToolbar");
-                    }
-                    else
-                    {
-                        config.Add("umbraco_toolbar_id",
+                    config.Add("umbraco_toolbar_id",
                                    ElementIdPreFix +
                                    ((cms.businesslogic.datatype.DefaultData)_data).PropertyId);
-                    }
                 }
                 else
                 {

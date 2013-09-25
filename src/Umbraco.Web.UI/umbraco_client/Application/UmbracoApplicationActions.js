@@ -270,12 +270,6 @@ Umbraco.Application.Actions = function () {
             }
         },
 
-        actionLiveEdit: function () {
-            /// <summary></summary>
-
-            window.open("canvas.aspx?redir=/" + UmbClientMgr.mainTree().getActionNode().nodeId + ".aspx", "liveediting");
-        },
-
         actionNew: function () {
             /// <summary>Show the create new modal overlay</summary>
             var actionNode = UmbClientMgr.mainTree().getActionNode();

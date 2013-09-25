@@ -306,7 +306,7 @@ namespace Umbraco.Web.Security
                     var user = CurrentUser;
 
                     // Check for console access
-                    if (user.IsLockedOut || (user.NoConsole && GlobalSettings.RequestIsInUmbracoApplication(_httpContext) && GlobalSettings.RequestIsLiveEditRedirector(_httpContext) == false))
+                    if (user.IsLockedOut || (user.NoConsole && GlobalSettings.RequestIsInUmbracoApplication(_httpContext)))
                     {
                         if (throwExceptions) throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
                         return ValidateRequestAttempt.FailedNoPrivileges;

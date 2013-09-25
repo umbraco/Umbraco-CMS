@@ -497,9 +497,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal IEnumerable<Type> ResolveDataTypes()
         {
-            //ensure we ignore types that should not be loaded
-            return ResolveTypes<IDataType>()
-                .Except(new[] {Type.GetType("umbraco.presentation.LiveEditing.Modules.ItemEditing.PageElementEditor,umbraco")});
+            return ResolveTypes<IDataType>();
         }
 
         /// <summary>

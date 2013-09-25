@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using ClientDependency.Core;
 using umbraco;
 using umbraco.cms.businesslogic.datatype;
 

@@ -313,8 +313,8 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 			base.OnLoad(e);
 
 			//add the js/css required
-			this.RegisterEmbeddedClientResource("umbraco.editorControls.MultiNodeTreePicker.MultiNodePickerStyles.css", umbraco.cms.businesslogic.datatype.ClientDependencyType.Css);
-			this.RegisterEmbeddedClientResource("umbraco.editorControls.MultiNodeTreePicker.MultiNodePickerScripts.js", umbraco.cms.businesslogic.datatype.ClientDependencyType.Javascript);
+			this.RegisterEmbeddedClientResource("umbraco.editorControls.MultiNodeTreePicker.MultiNodePickerStyles.css", ClientDependencyType.Css);
+			this.RegisterEmbeddedClientResource("umbraco.editorControls.MultiNodeTreePicker.MultiNodePickerScripts.js", ClientDependencyType.Javascript);
 
 			//update the tree type (we need to do this each time because i don't think view state works with these controls)
 			switch (TreeToRender)

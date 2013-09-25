@@ -352,9 +352,6 @@
     <Compile Include="Install\Steps\RenderingEngine.ascx.designer.cs">
       <DependentUpon>RenderingEngine.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Install\Steps\Skinning\loadStarterKitDesigns.ascx.designer.cs">
-      <DependentUpon>loadStarterKitDesigns.ascx</DependentUpon>
-    </Compile>
     <Compile Include="Install\Steps\Skinning\LoadStarterKits.ascx.cs">
       <DependentUpon>loadStarterKits.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -368,10 +365,6 @@
     </Compile>
     <Compile Include="Install\Steps\StarterKits.ascx.designer.cs">
       <DependentUpon>StarterKits.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Install\Steps\Skinning\loadStarterKitDesigns.ascx.cs">
-      <DependentUpon>loadStarterKitDesigns.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Install\Steps\StepUserControl.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -735,8 +728,6 @@
     <Content Include="Umbraco\Images\thumbs_med.png" />
     <Content Include="Umbraco\Images\thumbs_smll.png" />
     <Content Include="Umbraco\Images\Umbraco\settingView.gif" />
-    <Content Include="Umbraco\LiveEditing\Modules\ItemEditing\ItemEditing.js" />
-    <Content Include="Umbraco\LiveEditing\Modules\ItemEditing\ItemEditingInvoke.js" />
     <Content Include="Umbraco\Plugins\UGoLive\cog.png" />
     <Content Include="Umbraco\Plugins\UGoLive\cross.png" />
     <Content Include="Umbraco\Plugins\UGoLive\Dashboard.ascx" />
@@ -1725,7 +1716,6 @@
     <Content Include="Install\Steps\database.ascx" />
     <Content Include="Install\Steps\renaming.ascx" />
     <Content Include="Install\Steps\StarterKits.ascx" />
-    <Content Include="Install\Steps\Skinning\loadStarterKitDesigns.ascx" />
     <Content Include="Install\Steps\Skinning\loadStarterKits.ascx" />
     <Content Include="Install\Title.ascx" />
     <Content Include="Install\InstallerRestService.aspx" />
@@ -1750,7 +1740,6 @@
     <Content Include="Umbraco\Dashboard\StartupDashboardKits.ascx" />
     <Content Include="Umbraco\Dashboard\StartupDashboardVideos.ascx" />
     <Content Include="Umbraco\Developer\Packages\StarterKits.aspx" />
-    <Content Include="Umbraco\Dialogs\TemplateSkinning.aspx" />
     <Content Include="Umbraco\helpRedirect.aspx" />
     <Content Include="Umbraco\Images\aboutNew.png" />
     <Content Include="Umbraco\Images\Editor\skin.gif" />
@@ -1760,20 +1749,6 @@
     <Content Include="Umbraco\Images\SpeechBubble\speechbubble_top.png" />
     <Content Include="Umbraco\Images\umbracoSplash.png" />
     <Content Include="Umbraco\Images\Umbraco\settingSkin.gif" />
-    <Content Include="Umbraco\LiveEditing\Modules\SkinModule\CssParser.aspx" />
-    <Content Include="Umbraco\LiveEditing\Modules\SkinModule\Images\loader.gif" />
-    <Content Include="Umbraco\LiveEditing\Modules\SkinModule\ImageUploader.aspx" />
-    <Content Include="Umbraco\LiveEditing\Modules\SkinModule\Images\module.gif" />
-    <Content Include="Umbraco\LiveEditing\Modules\SkinModule\Js\disableInstallButtonsOnClick.js" />
-    <Content Include="Umbraco\LiveEditing\Modules\SkinModule\Js\initslider.js" />
-    <Content Include="Umbraco\LiveEditing\Modules\SkinModule\Js\ModuleInjection.js" />
-    <Content Include="Umbraco\LiveEditing\Modules\SkinModule\Js\SkinModuleShowOnStartup.js" />
-    <Content Include="Umbraco\LiveEditing\Modules\SkinModule\ModuleInjectionMacroRenderer.aspx" />
-    <Content Include="Umbraco\LiveEditing\Modules\SkinModule\ModuleInjector.aspx" />
-    <Content Include="Umbraco\LiveEditing\Modules\SkinModule\ModuleInstaller.aspx" />
-    <Content Include="Umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx" />
-    <Content Include="Umbraco\LiveEditing\Modules\SkinModule\Images\skin.gif" />
-    <Content Include="Umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx" />
     <Content Include="Umbraco\Members\MemberSearch.ascx" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.idle-timer.js" />
     <Content Include="Umbraco_Client\Colorpicker\Css\colorpicker.css" />
@@ -1804,7 +1779,6 @@
     <Content Include="Umbraco_Client\Colorpicker\Images\select2.png" />
     <Content Include="Umbraco_Client\Colorpicker\Images\slider.png" />
     <Content Include="Umbraco_Client\Colorpicker\Js\colorpicker.js" />
-    <Content Include="Umbraco\LiveEditing\Modules\SkinModule\Js\initcolorpicker.js" />
     <Content Include="Umbraco_Client\MacroContainer\macroContainer.css" />
     <Content Include="Umbraco_Client\Mousewheel\jquery.mousewheel.js" />
     <Content Include="Umbraco_Client\Ui\base2.js" />
@@ -1947,7 +1921,6 @@
     <Content Include="Umbraco_Client\Tree\Themes\Umbraco\li.gif" />
     <Content Include="Umbraco_Client\Tree\Themes\Umbraco\style.css" />
     <Content Include="Umbraco_Client\Tree\Themes\Umbraco\throbber.gif" />
-    <Content Include="Umbraco\Css\umbLiveEditing.css" />
     <Content Include="Umbraco\Developer\Packages\proxy.htm" />
     <Content Include="Umbraco\Developer\Xslt\xsltVisualize.aspx" />
     <Content Include="Umbraco\Dialogs\empty.htm" />
@@ -2120,18 +2093,6 @@
     <Content Include="Umbraco\Js\UmbracoSpeechBubble.js" />
     <Content Include="Umbraco\Js\UmbracoSpeechBubbleBackEnd.js" />
     <Content Include="Umbraco\Js\umbracoUpgradeChecker.js" />
-    <Content Include="Umbraco\LiveEditing\Controls\Communicator.js" />
-    <Content Include="Umbraco\LiveEditing\Controls\LiveEditingToolbar.js" />
-    <Content Include="Umbraco\LiveEditing\Css\LiveEditing.css" />
-    <Content Include="Umbraco\LiveEditing\Images\dialog_background.png" />
-    <Content Include="Umbraco\LiveEditing\Images\canvas.gif" />
-    <Content Include="Umbraco\LiveEditing\Modules\CreateModule\create.png" />
-    <Content Include="Umbraco\LiveEditing\Modules\CreateModule\CreateModule.js" />
-    <Content Include="Umbraco\LiveEditing\Modules\DeleteModule\delete.png" />
-    <Content Include="Umbraco\LiveEditing\Modules\DeleteModule\DeleteModule.js" />
-    <Content Include="Umbraco\LiveEditing\Modules\MacroModule\MacroModule.js" />
-    <Content Include="Umbraco\LiveEditing\Modules\UnpublishModule\unpublish.png" />
-    <Content Include="Umbraco\LiveEditing\Modules\UnpublishModule\UnpublishModule.js" />
     <Content Include="Umbraco\Members\ViewMembers.aspx" />
     <Content Include="Umbraco\Plugins\Tinymce3\insertImage.aspx" />
     <Content Include="Umbraco\Plugins\Tinymce3\insertLink.aspx" />
@@ -2205,7 +2166,6 @@
       <SubType>Designer</SubType>
     </None>
     <Content Include="Umbraco\Dashboard\Air\DesktopMediaUploader.air" />
-    <None Include="Umbraco\LiveEditing\LiveEditing.cd" />
     <Content Include="Umbraco\Masterpages\umbracoPage.Master" />
     <Content Include="Umbraco\Masterpages\umbracoDialog.Master" />
     <Content Include="Umbraco\Search\QuickSearchHandler.ashx" />
@@ -2234,7 +2194,6 @@
     <Content Include="Umbraco\Images\Umbraco\settingsScript.gif" />
     <Content Include="Umbraco\Settings\DictionaryItemList.aspx" />
     <Content Include="Umbraco\Settings\Scripts\editScript.aspx" />
-    <Content Include="Umbraco\canvas.aspx" />
     <Content Include="Umbraco\Translation\default.aspx" />
     <Content Include="Umbraco\Translation\preview.aspx" />
     <Content Include="Umbraco\Translation\xml.aspx" />

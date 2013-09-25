@@ -1066,13 +1066,6 @@
     <Compile Include="umbraco.presentation\umbraco\dashboard\SettingsDashboardVideos.ascx.designer.cs">
       <DependentUpon>SettingsDashboardVideos.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\Settings\Applyskin.ascx.cs">
-      <DependentUpon>Applyskin.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\Settings\Applyskin.ascx.designer.cs">
-      <DependentUpon>Applyskin.ascx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\StartupDashboardIntro.ascx.designer.cs">
       <DependentUpon>StartupDashboardIntro.ascx</DependentUpon>
     </Compile>
@@ -1109,13 +1102,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\Preview.aspx.designer.cs">
       <DependentUpon>Preview.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\TemplateSkinning.aspx.cs">
-      <DependentUpon>TemplateSkinning.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\TemplateSkinning.aspx.designer.cs">
-      <DependentUpon>TemplateSkinning.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\MemberSearch.ascx.cs">
       <DependentUpon>MemberSearch.ascx</DependentUpon>
@@ -1864,14 +1850,12 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\dashboard\SettingsDashboardIntro.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\SettingsDashboardVideos.ascx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\Settings\Applyskin.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardIntro.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardKits.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardVideos.ascx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\TemplateSkinning.aspx" />
     <Content Include="umbraco.presentation\umbraco\members\MemberSearch.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

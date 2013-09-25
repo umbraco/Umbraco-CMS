@@ -13,10 +13,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!global::umbraco.cms.businesslogic.skinning.Skinning.IsStarterKitInstalled())
-                ShowStarterKits();
-            else
-                ShowSkins((Guid)global::umbraco.cms.businesslogic.skinning.Skinning.StarterKitGuid());
+            ShowStarterKits();
         }
 
         private void ShowStarterKits()
@@ -40,22 +37,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
             StarterKitInstalled.Visible = false;
 
         }
-
-        public void ShowSkins(Guid starterKitGuid)
-        {
-
-            var ctrl = (LoadStarterKitDesigns)LoadControl(SystemDirectories.Install + "/steps/Skinning/loadStarterKitDesigns.ascx");
-            ctrl.ID = "StarterKitDesigns";
-
-            ctrl.StarterKitGuid = starterKitGuid;
-            ctrl.StarterKitDesignInstalled += CtrlStarterKitDesignInstalled;
-            ph_skins.Controls.Add(ctrl);
-
-            StarterKitNotInstalled.Visible = false;
-            StarterKitInstalled.Visible = true;
-
-        }
-
+        
         void StarterkitsctrlStarterKitInstalled()
         {
             StarterKitNotInstalled.Visible = false;
@@ -63,14 +45,6 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
 
             installationCompleted.Visible = true;
 
-        }
-
-        void CtrlStarterKitDesignInstalled()
-        {
-            StarterKitNotInstalled.Visible = false;
-            StarterKitInstalled.Visible = false;
-
-            installationCompleted.Visible = true;
         }
 
     }

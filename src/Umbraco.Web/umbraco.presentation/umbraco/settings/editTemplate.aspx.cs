@@ -8,7 +8,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.skinning;
+
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.presentation.Trees;
 using umbraco.DataLayer;

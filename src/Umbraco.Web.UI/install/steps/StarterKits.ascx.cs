@@ -10,10 +10,7 @@ namespace Umbraco.Web.UI.Install.Steps
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!global::umbraco.cms.businesslogic.skinning.Skinning.IsStarterKitInstalled())
-                ShowStarterKits();
-            else
-                ShowStarterKitDesigns((Guid)global::umbraco.cms.businesslogic.skinning.Skinning.StarterKitGuid());
+            ShowStarterKits();
         }
 
        
@@ -26,19 +23,6 @@ namespace Umbraco.Web.UI.Install.Steps
 
 
         }
-
-        private void ShowStarterKitDesigns(Guid starterKitGuid)
-        {
-            var ctrl = (LoadStarterKitDesigns)LoadControl(SystemDirectories.Install + "/steps/Skinning/loadStarterKitDesigns.ascx");
-            ctrl.ID = "StarterKitDesigns";
-
-            ctrl.StarterKitGuid = starterKitGuid;
-            ph_starterKitDesigns.Controls.Add(ctrl);
-
-            pl_starterKit.Visible = false;
-            pl_starterKitDesign.Visible = true;
-        }
-
-
+        
     }
 }
