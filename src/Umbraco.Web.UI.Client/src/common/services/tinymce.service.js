@@ -194,7 +194,7 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                         }
                     });
             }
-
+            
             /** Adds the button instance */
             editor.addButton('umbmacro', {
                 icon: 'custom icon-settings-alt',
@@ -203,6 +203,57 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
 
                     var ctrl = this;
                     var isOnMacroElement = false;
+
+                    /**
+                     if the selection comes from a different element that is not the macro's
+                     we need to check if the selection includes part of the macro, if so we'll force the selection
+                     to clear to the next element since if people can select part of the macro markup they can then modify it.
+                    */
+                    function handleSelectionChange() {
+
+                        if (!editor.selection.isCollapsed()) {
+                            var endSelection = tinymce.activeEditor.selection.getEnd();
+                            var startSelection = tinymce.activeEditor.selection.getStart();
+                            //don't proceed if it's an entire element selected
+                            if (endSelection !== startSelection) { 
+                                
+                                //if the end selection is a macro then move the cursor
+                                //NOTE: we don't have to handle when the selection comes from a previous parent because
+                                // that is automatically taken care of with the normal onNodeChanged logic since the 
+                                // evt.element will be the macro once it becomes part of the selection.
+                                var $testForMacro = $(endSelection).closest(".umb-macro-holder");
+                                if ($testForMacro.length > 0) {
+                                    
+                                    //it came from before so move after, if there is no after then select ourselves
+                                    var next = $testForMacro.next();
+                                    if (next.length > 0) {
+                                        editor.selection.setCursorLocation($testForMacro.next().get(0));
+                                    }
+                                    else {
+                                        selectMacroElement($testForMacro.get(0));
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+
+                    /** helper method to select the macro element */
+                    function selectMacroElement(macroElement) {
+                        // move selection to top element to ensure we can't edit this
+                        editor.selection.select(macroElement);
+
+                        // check if the current selection *is* the element (ie bug)
+                        var currentSelection = editor.selection.getStart();
+                        if (tinymce.isIE) {
+                            if (!editor.dom.hasClass(currentSelection, 'umb-macro-holder')) {
+                                while (!editor.dom.hasClass(currentSelection, 'umb-macro-holder') && currentSelection.parentNode) {
+                                    currentSelection = currentSelection.parentNode;
+                                }
+                                editor.selection.select(currentSelection);
+                            }
+                        }
+                    }
 
                     /**
                     * Add a node change handler, test if we're editing a macro and select the whole thing, then set our isOnMacroElement flag.
@@ -214,7 +265,10 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
 
                         //set our macro button active when on a node of class umb-macro-holder
                         var $macroElement = $(evt.element).closest(".umb-macro-holder");
+                        
+                        handleSelectionChange();
 
+                        //set the button active
                         ctrl.active($macroElement.length !== 0);
 
                         if ($macroElement.length > 0) {
@@ -222,20 +276,8 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
 
                             //remove the event listener before re-selecting
                             editor.off('NodeChange', onNodeChanged);
-                            
-                            // move selection to top element to ensure we can't edit this
-                            editor.selection.select(macroElement);
 
-                            // check if the current selection *is* the element (ie bug)
-                            var currentSelection = editor.selection.getStart();
-                            if (tinymce.isIE) {
-                                if (!editor.dom.hasClass(currentSelection, 'umb-macro-holder')) {
-                                    while (!editor.dom.hasClass(currentSelection, 'umb-macro-holder') && currentSelection.parentNode) {
-                                        currentSelection = currentSelection.parentNode;
-                                    }
-                                    editor.selection.select(currentSelection);
-                                }
-                            }
+                            selectMacroElement(macroElement);
 
                             //set the flag
                             isOnMacroElement = true;
@@ -256,7 +298,6 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                         $(editor.dom.select(".umb-macro-holder.mceNonEditable")).each(function() {
                             loadMacroContent($(this));
                         });                        
-
 
                     });
 
