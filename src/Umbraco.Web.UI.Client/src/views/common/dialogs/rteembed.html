@@ -1,33 +1,39 @@
-﻿<div class="umb-panel" ng-controller="Umbraco.Dialogs.RteEmbedController">
+﻿<form ng-controller="Umbraco.Dialogs.RteEmbedController">
+    
+    <div class="umb-panel" val-show-validation>
  
-    <div class="umb-panel-header">
-        <div class="umb-el-wrap umb-panel-buttons">
-            <div class="btn-toolbar umb-btn-toolbar">
-                <button type="button" class="btn" ng-click="close()">Cancel</button>
-                <input type="button" ng-click="insert()" class="btn btn-primary" value="Insert" ng-disabled="!success" />
+        <div class="umb-panel-header">
+            <div class="umb-el-wrap umb-panel-buttons">
+                <div class="btn-toolbar umb-btn-toolbar">
+                    <button type="button" class="btn" ng-click="close()">Cancel</button>
+                    
+                    <input type="button" ng-click="insert()" class="btn btn-primary" value="Ok" ng-disabled="!success" />
+                </div>
             </div>
         </div>
-    </div>
        
-    <div class="umb-panel-body umb-scrollable" auto-scale="1">
-        <div class="umb-panel">
-            <div class="umb-control-group">
-
-                <label for="url">Url</label> 
-                <input id="url" type="text" ng-model="url" ng-change="showPreview()"/>
-                
-                <div ng-show="supportsDimensions">
-                    <label>Size:</label> 
-                    <input type="text" ng-model="width" on-blur="changeSize('width')"/> x <input type="text" ng-model="height" on-blur="changeSize('height')"/>
-                    <label for="constrain">Constrain:</label> 
-                    <input id="constrain" type="checkbox" ng-model="constrain"/>
+         <div class="umb-panel-body umb-scrollable" auto-scale="1">
+           
+                <div class="umb-control-group">
+                    
+                    <div class="umb-pane">
+                    <label for="url">Url</label> 
+                    <input id="url" type="text" ng-model="url" ng-change="showPreview()" required/>
+                    </div>
+                    <div class="umb-pane" ng-show="supportsDimensions">
+                        <label>Size:</label> 
+                        <input type="text" ng-model="width" on-blur="changeSize('width')" style="width:50px"/> x <input type="text" ng-model="height" on-blur="changeSize('height')" style="width:50px"/>
+                        <label for="constrain" style="display:inline">Constrain:</label> 
+                        <input id="constrain" type="checkbox" ng-model="constrain" style="margin-bottom: 10px;"/>
+                    </div>
+                      <div class="umb-pane">
+                    <p ng-bind="info"></p>
+                          <div ng-bind-html-unsafe="preview">
+                          </div>
+                           </div>
                 </div>
-
-                <p ng-bind="info"></p>
-                <div ng-bind-html-unsafe="preview">
-                </div>
-            </div>
+          
         </div>
-    </div>
 
-</div>
+    </div>
+</form>
