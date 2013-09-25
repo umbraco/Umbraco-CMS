@@ -44,10 +44,13 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
     function submitForm() {
         
         //collect the value data, close the dialog and send the data back to the caller
-        var vals = _.map($scope.macroParams, function (item) {
-            return { value: item.value, alias: item.alias };
-        });
 
+        //create a dictionary for the macro params
+        var paramDictionary = {};
+        _.each($scope.macroParams, function (item) {
+            paramDictionary[item.alias] = item.value;
+        });
+        
         //need to find the macro alias for the selected id
         var macroAlias = _.find($scope.macros, function (item) {
             return item.id == $scope.selectedMacro;
@@ -56,16 +59,16 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
         //get the syntax based on the rendering engine
         var syntax;
         if ($scope.dialogData.renderingEngine && $scope.dialogData.renderingEngine === "WebForms") {
-            syntax = macroService.generateWebFormsSyntax({ macroAlias: macroAlias, macroParams: vals });
+            syntax = macroService.generateWebFormsSyntax({ macroAlias: macroAlias, marcoParamsDictionary: paramDictionary });
         }
         else if ($scope.dialogData.renderingEngine && $scope.dialogData.renderingEngine === "Mvc") {
-            syntax = macroService.generateMvcSyntax({ macroAlias: macroAlias, macroParams: vals });
+            syntax = macroService.generateMvcSyntax({ macroAlias: macroAlias, marcoParamsDictionary: paramDictionary });
         }
         else {
-            syntax = macroService.generateMacroSyntax({ macroAlias: macroAlias, macroParams: vals });
+            syntax = macroService.generateMacroSyntax({ macroAlias: macroAlias, marcoParamsDictionary: paramDictionary });
         }
 
-        $scope.submit({syntax : syntax, macroAlias: macroAlias, macroParams: vals });
+        $scope.submit({ syntax: syntax, macroAlias: macroAlias, marcoParamsDictionary: paramDictionary });
     }
 
     $scope.macros = [];

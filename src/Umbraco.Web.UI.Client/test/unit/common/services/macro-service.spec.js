@@ -47,11 +47,11 @@ describe('macro service tests', function () {
 
             var syntax = macroService.generateMacroSyntax({
                 macroAlias: "myMacro",
-                macroParams: [
-                    { alias: "param1", value: "value1" },
-                    { alias: "param2", value: "value2" },
-                    { alias: "param3", value: "value3" }
-                ]
+                marcoParamsDictionary: {
+                    param1: "value1",
+                    param2: "value2",
+                    param3: "value3"
+                }
             });
 
             expect(syntax).
@@ -63,7 +63,7 @@ describe('macro service tests', function () {
 
             var syntax = macroService.generateMacroSyntax({
                 macroAlias: "myMacro",
-                macroParams: []
+                marcoParamsDictionary: {}
             });
 
             expect(syntax).
@@ -75,11 +75,11 @@ describe('macro service tests', function () {
 
             var syntax = macroService.generateWebFormsSyntax({
                 macroAlias: "myMacro",
-                macroParams: [
-                    { alias: "param1", value: "value1" },
-                    { alias: "param2", value: "value2" },
-                    { alias: "param3", value: "value3" }
-                ]
+                marcoParamsDictionary: {
+                    param1: "value1",
+                    param2: "value2",
+                    param3: "value3"
+                }
             });
             
             expect(syntax).
@@ -91,7 +91,7 @@ describe('macro service tests', function () {
 
             var syntax = macroService.generateWebFormsSyntax({
                 macroAlias: "myMacro",
-                macroParams: []
+                marcoParamsDictionary: {}
             });
 
             expect(syntax).
@@ -103,11 +103,11 @@ describe('macro service tests', function () {
 
             var syntax = macroService.generateMvcSyntax({
                 macroAlias: "myMacro",
-                macroParams: [
-                    { alias: "param1", value: "value1" },
-                    { alias: "param2", value: "value2" },
-                    { alias: "param3", value: "value3" }
-                ]
+                marcoParamsDictionary: {
+                    param1: "value1",
+                    param2: "value2",
+                    param3: "value3"
+                }
             });
 
             expect(syntax).
@@ -116,11 +116,11 @@ describe('macro service tests', function () {
            
         });
         
-        it('can generate syntax for webforms with no params', function () {
+        it('can generate syntax for MVC with no params', function () {
 
             var syntax = macroService.generateMvcSyntax({
                 macroAlias: "myMacro",
-                macroParams: []
+                marcoParamsDictionary: {}
             });
 
             expect(syntax).

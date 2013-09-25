@@ -357,7 +357,7 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                             //show the throbber
                             $macroDiv.addClass("loading");
                             
-                            macroResource.getMacroResultAsHtmlForEditor(data.macroAlias, 1234)
+                            macroResource.getMacroResultAsHtmlForEditor(data.macroAlias, 1234, data.marcoParamsDictionary)
                                 .then(function (htmlResult) {
                                     
                                     $macroDiv.removeClass("loading");

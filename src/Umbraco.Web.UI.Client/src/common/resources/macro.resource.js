@@ -40,15 +40,27 @@ function macroResource($q, $http, umbRequestHelper) {
          *
          * @param {int} macroId The macro id to get parameters for
          * @param {int} pageId The current page id
+         * @param {Array} macroParamDictionary A dictionary of macro parameters
          *
          */
-        getMacroResultAsHtmlForEditor: function (macroAlias, pageId) {
+        getMacroResultAsHtmlForEditor: function (macroAlias, pageId, macroParamDictionary) {
+
+            //need to format the query string for the custom dictionary
+            var query = "macroAlias=" + macroAlias + "&pageId=" + pageId;
+            if (macroParamDictionary) {
+                var counter = 0;
+                _.each(macroParamDictionary, function(val, key) {
+                    query += "&macroParams[" + counter + "].key=" + key + "&macroParams[" + counter + "].value=" + val;
+                    counter++;
+                });
+            }
+
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "macroApiBaseUrl",
                        "GetMacroResultAsHtmlForEditor",
-                       [{ macroAlias: macroAlias }, { pageId: pageId }])),
+                       query)),
                'Failed to retreive macro result for macro with alias  ' + macroAlias);
         }
             
