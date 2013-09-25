@@ -25,13 +25,13 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
                     $scope.macroParams = data;
                     
                     //fill in the data if we are editing this macro
-                    if ($scope.dialogData && $scope.dialogData.macroData && $scope.dialogData.macroData.params) {
-                        _.each($scope.dialogData.macroData.params, function(p) {
+                    if ($scope.dialogData && $scope.dialogData.macroData && $scope.dialogData.macroData.marcoParamsDictionary) {
+                        _.each($scope.dialogData.macroData.marcoParamsDictionary, function (val, key) {
                             var prop = _.find($scope.macroParams, function (item) {
-                                return item.alias == p.alias;
+                                return item.alias == key;
                             });
                             if (prop) {
-                                prop.value = p.value;
+                                prop.value = val;
                             }
                         });
 
@@ -111,9 +111,9 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
             $scope.macros = data;
 
             //check if there's a pre-selected macro and if it exists
-            if ($scope.dialogData && $scope.dialogData.macroData && $scope.dialogData.macroData.alias) {
+            if ($scope.dialogData && $scope.dialogData.macroData && $scope.dialogData.macroData.macroAlias) {
                 var found = _.find(data, function (item) {
-                    return item.alias === $scope.dialogData.macroData.alias;
+                    return item.alias === $scope.dialogData.macroData.macroAlias;
                 });
                 if (found) {
                     //select the macro and go to next screen

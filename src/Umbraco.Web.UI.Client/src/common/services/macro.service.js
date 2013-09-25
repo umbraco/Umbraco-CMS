@@ -26,11 +26,11 @@ function macroService() {
             var paramExpression = new RegExp("(\\w+?)=['\"](.*?)['\"]", "g");
             var paramMatch;
             var returnVal = {
-                alias: alias,
-                params: []
+                macroAlias: alias,
+                marcoParamsDictionary: {}
             };
             while (paramMatch = paramExpression.exec(paramsChunk)) {
-                returnVal.params.push({ alias: paramMatch[1], value: paramMatch[2] });
+                returnVal.marcoParamsDictionary[paramMatch[1]] = paramMatch[2];
             }
             return returnVal;
         },

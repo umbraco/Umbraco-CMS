@@ -162,6 +162,39 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                 return null;
             }
 
+            /** loads in the macro content async from the server */
+            function loadMacroContent($macroDiv, macroData) {
+                
+                //if we don't have the macroData, then we'll need to parse it from the macro div
+                if (!macroData) {                    
+                    var contents = $macroDiv.contents();
+                    var comment = _.find(contents, function (item) {
+                        return item.nodeType === 8;
+                    });
+                    if (!comment) {
+                        throw "Cannot parse the current macro, the syntax in the editor is invalid";
+                    }
+                    var syntax = comment.textContent.trim();
+                    var parsed = macroService.parseMacroSyntax(syntax);
+                    macroData = parsed;
+                }
+
+                var $ins = $macroDiv.find("ins");
+
+                //show the throbber
+                $macroDiv.addClass("loading");
+
+                macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, 1234, macroData.marcoParamsDictionary)
+                    .then(function (htmlResult) {
+
+                        $macroDiv.removeClass("loading");
+                        htmlResult = htmlResult.trim();
+                        if (htmlResult !== "") {
+                            $ins.html(htmlResult);
+                        }
+                    });
+            }
+
             /** Adds the button instance */
             editor.addButton('umbmacro', {
                 icon: 'custom icon-settings-alt',
@@ -217,9 +250,14 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                     }
 
                     /** when the contents load we need to find any macros declared and load in their content */
-                    editor.on("LoadContent", function(o) {
-                        var asdf = editor.getContent();
-                        alert(asdf);
+                    editor.on("LoadContent", function (o) {
+                        
+                        //get all macro divs and load their content
+                        $(editor.dom.select(".umb-macro-holder.mceNonEditable")).each(function() {
+                            loadMacroContent($(this));
+                        });                        
+
+
                     });
 
                     /** This prevents any other commands from executing when the current element is the macro so the content cannot be edited */
@@ -361,20 +399,9 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                             editor.selection.setNode(macroDiv);
                             
                             var $macroDiv = $(editor.dom.select("div.umb-macro-holder." + uniqueId));
-                            var $ins = $macroDiv.find("ins");
 
-                            //show the throbber
-                            $macroDiv.addClass("loading");
-                            
-                            macroResource.getMacroResultAsHtmlForEditor(data.macroAlias, 1234, data.marcoParamsDictionary)
-                                .then(function (htmlResult) {
-                                    
-                                    $macroDiv.removeClass("loading");
-                                    htmlResult = htmlResult.trim();
-                                    if (htmlResult !== "") {
-                                        $ins.html(htmlResult);
-                                    }
-                                });
+                            //async load the macro content
+                            loadMacroContent($macroDiv, data);                          
                         }
                     });
 
