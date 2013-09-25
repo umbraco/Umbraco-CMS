@@ -12,7 +12,7 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
     /** changes the view to edit the params of the selected macro */
     function editParams() {
         //get the macro params if there are any
-        macroResource.getMacroParameters($scope.selectedMacro)
+        macroResource.getMacroParameters($scope.selectedMacro.id)
             .then(function (data) {
 
                 //go to next page if there are params otherwise we can just exit
@@ -49,9 +49,11 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
         });
 
         //need to find the macro alias for the selected id
-        var macroAlias = _.find($scope.macros, function (item) {
-            return item.id == $scope.selectedMacro;
-        }).alias;
+        var macroAlias = $scope.selectedMacro.alias;
+
+         /* _.find($scope.macros, function (item) {
+            return item.id == $scope.selectedMacro.id;
+        }).alias;*/
 
         //get the syntax based on the rendering engine
         var syntax;
