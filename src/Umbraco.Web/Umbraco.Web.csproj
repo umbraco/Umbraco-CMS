@@ -1021,59 +1021,12 @@
     <Compile Include="umbraco.presentation\umbraco\create\templateTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\userTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\XsltTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\dashboard\ChangePassword.ascx.cs">
-      <DependentUpon>ChangePassword.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\ChangePassword.ascx.designer.cs">
-      <DependentUpon>ChangePassword.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\DesktopMediaUploader.ascx.cs">
-      <DependentUpon>DesktopMediaUploader.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\DesktopMediaUploader.ascx.designer.cs">
-      <DependentUpon>DesktopMediaUploader.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\DeveloperDashboardIntro.ascx.designer.cs">
-      <DependentUpon>DeveloperDashboardIntro.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\DeveloperDashboardVideos.ascx.designer.cs">
-      <DependentUpon>DeveloperDashboardVideos.ascx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.designer.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\MediaDashboardIntro.ascx.designer.cs">
-      <DependentUpon>MediaDashboardIntro.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\MediaDashboardVideos.ascx.designer.cs">
-      <DependentUpon>MediaDashboardVideos.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\MembersDashboardIntro.ascx.designer.cs">
-      <DependentUpon>MembersDashboardIntro.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\MembersDashboardVideos.ascx.designer.cs">
-      <DependentUpon>MembersDashboardVideos.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\SettingsDashboardIntro.ascx.designer.cs">
-      <DependentUpon>SettingsDashboardIntro.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\SettingsDashboardVideos.ascx.designer.cs">
-      <DependentUpon>SettingsDashboardVideos.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\StartupDashboardIntro.ascx.designer.cs">
-      <DependentUpon>StartupDashboardIntro.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\StartupDashboardKits.ascx.designer.cs">
-      <DependentUpon>StartupDashboardKits.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\StartupDashboardVideos.ascx.designer.cs">
-      <DependentUpon>StartupDashboardVideos.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx.cs">
       <DependentUpon>EditRelationType.aspx</DependentUpon>
@@ -1831,28 +1784,7 @@
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\RelationTypesWebService.asmx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\DesktopMediaUploader.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\dashboard\ChangePassword.ascx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\DeveloperDashboardIntro.ascx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\DeveloperDashboardVideos.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\MediaDashboardIntro.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\dashboard\MediaDashboardVideos.ascx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\MembersDashboardIntro.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\dashboard\MembersDashboardVideos.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\dashboard\SettingsDashboardIntro.ascx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\SettingsDashboardVideos.ascx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardIntro.ascx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardKits.ascx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardVideos.ascx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

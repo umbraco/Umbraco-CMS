@@ -694,9 +694,6 @@
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Create\PartialViewMacro.ascx" />
     <Content Include="Umbraco\Dashboard\ExamineManagement.ascx" />
-    <Content Include="Umbraco\Dashboard\Images\access-denied.png" />
-    <Content Include="Umbraco\Dashboard\Scripts\swfobject.js" />
-    <Content Include="Umbraco\Dashboard\MediaDashboardFolderBrowser.ascx" />
     <Content Include="Umbraco\Developer\RelationTypes\EditRelationType.aspx" />
     <Content Include="Umbraco\Developer\RelationTypes\Images\Bidirectional.png" />
     <Content Include="Umbraco\Developer\RelationTypes\Images\ParentToChild.png" />
@@ -1593,16 +1590,6 @@
     <Content Include="Umbraco_Client\Tinymce3\Utils\form_utils.js" />
     <Content Include="Umbraco_Client\Tinymce3\Utils\mctabs.js" />
     <Content Include="Umbraco_Client\Tinymce3\Utils\validate.js" />
-    <Content Include="Umbraco\Dashboard\DesktopMediaUploader.ascx" />
-    <Content Include="Umbraco\Dashboard\Images\dmu-badge.jpg" />
-    <Content Include="Umbraco\Dashboard\Images\dmu.png" />
-    <Content Include="Umbraco\Dashboard\Images\logo32x32.png" />
-    <Content Include="Umbraco\Dashboard\Images\membersearch.png" />
-    <Content Include="Umbraco\Dashboard\Images\starterkit32x32.png" />
-    <Content Include="Umbraco\Dashboard\Images\TV.png" />
-    <Content Include="Umbraco\Dashboard\Images\ZipFile.png" />
-    <Content Include="Umbraco\Dashboard\Swfs\AIRInstallBadge.swf" />
-    <Content Include="Umbraco\Dashboard\Swfs\expressinstall.swf" />
     <Content Include="Umbraco\Images\Editor\insMacroSB.png" />
     <Content Include="Umbraco\Images\Editor\insRazorMacro.png" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.hotkeys.js" />
@@ -1717,25 +1704,7 @@
     <Content Include="Install\Title.ascx" />
     <Content Include="Install\InstallerRestService.aspx" />
     <Content Include="Umbraco\Config\Lang\ko.xml" />
-    <Content Include="Umbraco\Dashboard\ChangePassword.ascx" />
-    <Content Include="Umbraco\Dashboard\DeveloperDashboardIntro.ascx" />
-    <Content Include="Umbraco\Dashboard\DeveloperDashboardVideos.ascx" />
-    <Content Include="Umbraco\Dashboard\Images\contour-icon.png" />
-    <Content Include="Umbraco\Dashboard\Images\courier-icon.png" />
-    <Content Include="Umbraco\Dashboard\Images\logo.gif" />
-    <Content Include="Umbraco\Dashboard\Images\starterkit-icon.png" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
-    <Content Include="Umbraco\Dashboard\MediaDashboardIntro.ascx" />
-    <Content Include="Umbraco\Dashboard\MediaDashboardVideos.ascx" />
-    <Content Include="Umbraco\Dashboard\MembersDashboardIntro.ascx" />
-    <Content Include="Umbraco\Dashboard\MembersDashboardVideos.ascx" />
-    <Content Include="Umbraco\Dashboard\Scripts\jquery.jfeed.pack.js" />
-    <Content Include="Umbraco\Dashboard\SettingsDashboardIntro.ascx" />
-    <Content Include="Umbraco\Dashboard\SettingsDashboardVideos.ascx" />
-    <Content Include="Umbraco\Dashboard\Settings\Applyskin.ascx" />
-    <Content Include="Umbraco\Dashboard\StartupDashboardIntro.ascx" />
-    <Content Include="Umbraco\Dashboard\StartupDashboardKits.ascx" />
-    <Content Include="Umbraco\Dashboard\StartupDashboardVideos.ascx" />
     <Content Include="Umbraco\Developer\Packages\StarterKits.aspx" />
     <Content Include="Umbraco\helpRedirect.aspx" />
     <Content Include="Umbraco\Images\aboutNew.png" />
@@ -2161,7 +2130,6 @@
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Umbraco\Dashboard\Air\DesktopMediaUploader.air" />
     <Content Include="Umbraco\Masterpages\umbracoPage.Master" />
     <Content Include="Umbraco\Masterpages\umbracoDialog.Master" />
     <Content Include="Umbraco\Search\QuickSearchHandler.ashx" />
