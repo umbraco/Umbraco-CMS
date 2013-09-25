@@ -22,7 +22,7 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
         */
         createInsertEmbeddedMedia: function (editor, $scope) {
             editor.addButton('umbembeddialog', {
-                icon: 'media',
+                icon: 'custom icon-tv',
                 tooltip: 'Embed',
                 onclick: function () {
                     dialogService.embedDialog({
