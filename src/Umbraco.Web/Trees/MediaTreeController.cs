@@ -47,6 +47,9 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
+            //set the default
+            menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+
             if (id == Constants.System.Root.ToInvariantString())
             {
                 // root actions         

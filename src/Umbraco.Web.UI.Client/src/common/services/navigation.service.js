@@ -191,48 +191,48 @@ angular.module('umbraco.services')
             var deferred = $q.defer();
             var self = this;
 
-            if (args.event !== undefined && args.node.defaultAction && !args.event.altKey) {
-
-                treeService.getMenuItemByAlias({ treeNode: args.node, menuItemAlias: args.node.defaultAction })
-                    .then(function(result) {
-
-                        if (!result) {
-                            throw "No menu item found with alias " + args.node.defaultAction;
-                        }
-
-                        self.ui.currentNode = args.node;
-                        
-                        //ensure the current dialog is cleared before creating another!
-                        if (self.ui.currentDialog) {
-                            dialogService.close(self.ui.currentDialog);
-                        }
-
-                        var dialog = self.showDialog({
-                            scope: args.scope,
-                            node: args.node,
-                            action: result,
-                            section: self.ui.currentSection
+            treeService.getMenu({ treeNode: args.node })
+                .then(function(data) {
+                    
+                    //check for a default
+                    if (data.defaultAlias) {
+                        var found = _.find(data.menuItems, function(item) {
+                            return item.alias = data.defaultAlias;
                         });
+                        if (found) {
+                            
+                            self.ui.currentNode = args.node;
+                            //ensure the current dialog is cleared before creating another!
+                            if (self.ui.currentDialog) {
+                                dialogService.close(self.ui.currentDialog);
+                            }
 
-                        //return the dialog this is opening.
-                        deferred.resolve(dialog);
-                    });
-            }
-            else {
-                setMode("menu");
+                            var dialog = self.showDialog({
+                                scope: args.scope,
+                                node: args.node,
+                                action: found,
+                                section: self.ui.currentSection
+                            });
 
-                treeService.getMenu({ treeNode: args.node })
-                    .then(function(data) {
-                        ui.actions = data;
-                    });
+                            //return the dialog this is opening.
+                            deferred.resolve(dialog);
+                            return;
+                        }
+                    }
 
-                this.ui.currentNode = args.node;
-                this.ui.dialogTitle = args.node.name;
+                    //there is no default or we couldn't find one so just continue showing the menu                    
+                    
+                    setMode("menu");
+                    
+                    ui.actions = data.menuItems;
+                    
+                    ui.currentNode = args.node;
+                    ui.dialogTitle = args.node.name;
 
-                //we're not opening a dialog, return null.
-                deferred.resolve(null);
-            }
-
+                    //we're not opening a dialog, return null.
+                    deferred.resolve(null);
+                });
+            
             return deferred.promise;
         },
 

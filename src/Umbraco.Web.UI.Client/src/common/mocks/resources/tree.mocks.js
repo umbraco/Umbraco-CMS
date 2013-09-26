@@ -31,7 +31,12 @@ angular.module('umbraco.mocks').
                 { seperator: true, name: "Empty Recycle Bin", cssclass: "trash", alias: "emptyrecyclebin", metaData: {} }
           ];
 
-          return [200, menu, null];
+          var result = {
+              menuItems: menu,
+              defaultAlias: "create"
+          };
+
+          return [200, result, null];
       }
 
       function returnChildren(status, data, headers) {
@@ -54,10 +59,10 @@ angular.module('umbraco.mocks').
           }
 
           var children = [
-              { name: "child-of-" + section, childNodesUrl: url, id: level + "" + 1234, icon: "icon-document", children: [], expanded: false, hasChildren: true, level: level, defaultAction: action, menuUrl: menuUrl },
-              { name: "random-name-" + section, childNodesUrl: url, id: level + "" + 1235, icon: "icon-document", children: [], expanded: false, hasChildren: true, level: level, defaultAction: action, menuUrl: menuUrl },
-              { name: "random-name-" + section, childNodesUrl: url, id: level + "" + 1236, icon: "icon-document", children: [], expanded: false, hasChildren: true, level: level, defaultAction: action, menuUrl: menuUrl },
-              { name: "random-name-" + section, childNodesUrl: url, id: level + "" + 1237, icon: "icon-document", routePath: "common/legacy/1237?p=" + encodeURI("developer/contentType.aspx?idequal1234"), children: [], expanded: false, hasChildren: true, level: level, defaultAction: action, menuUrl: menuUrl }
+              { name: "child-of-" + section, childNodesUrl: url, id: level + "" + 1234, icon: "icon-document", children: [], expanded: false, hasChildren: true, level: level, menuUrl: menuUrl },
+              { name: "random-name-" + section, childNodesUrl: url, id: level + "" + 1235, icon: "icon-document", children: [], expanded: false, hasChildren: true, level: level, menuUrl: menuUrl },
+              { name: "random-name-" + section, childNodesUrl: url, id: level + "" + 1236, icon: "icon-document", children: [], expanded: false, hasChildren: true, level: level, menuUrl: menuUrl },
+              { name: "random-name-" + section, childNodesUrl: url, id: level + "" + 1237, icon: "icon-document", routePath: "common/legacy/1237?p=" + encodeURI("developer/contentType.aspx?idequal1234"), children: [], expanded: false, hasChildren: true, level: level, menuUrl: menuUrl }
           ];
 
           return [200, children, null];
@@ -69,10 +74,10 @@ angular.module('umbraco.mocks').
           }
           
           var children = [
-              { name: "Textstring", childNodesUrl: null, id: 10, icon: "icon-document", children: [], expanded: false, hasChildren: false, level: 1, defaultAction: null, menuUrl: null },
-              { name: "Multiple textstring", childNodesUrl: null, id: 11, icon: "icon-document", children: [], expanded: false, hasChildren: false, level: 1, defaultAction: null, menuUrl: null },
-              { name: "Yes/No", childNodesUrl: null, id: 12, icon: "icon-document", children: [], expanded: false, hasChildren: false, level: 1, defaultAction: null, menuUrl: null },
-              { name: "Rich Text Editor", childNodesUrl: null, id: 13, icon: "icon-document", children: [], expanded: false, hasChildren: false, level: 1, defaultAction: null, menuUrl: null }
+              { name: "Textstring", childNodesUrl: null, id: 10, icon: "icon-document", children: [], expanded: false, hasChildren: false, level: 1,  menuUrl: null },
+              { name: "Multiple textstring", childNodesUrl: null, id: 11, icon: "icon-document", children: [], expanded: false, hasChildren: false, level: 1,  menuUrl: null },
+              { name: "Yes/No", childNodesUrl: null, id: 12, icon: "icon-document", children: [], expanded: false, hasChildren: false, level: 1,  menuUrl: null },
+              { name: "Rich Text Editor", childNodesUrl: null, id: 13, icon: "icon-document", children: [], expanded: false, hasChildren: false, level: 1,  menuUrl: null }
           ];
           
           return [200, children, null];
@@ -112,10 +117,10 @@ angular.module('umbraco.mocks').
                       name: "content",
                       id: -1,
                       children: [
-                          { name: "My website", id: 1234, childNodesUrl: url, icon: "icon-home", children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl },
-                          { name: "Components", id: 1235, childNodesUrl: url, icon: "icon-document", children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl },
-                          { name: "Archieve", id: 1236, childNodesUrl: url, icon: "icon-document", children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl },
-                          { name: "Recycle Bin", id: -20, childNodesUrl: url, icon: "icon-trash", routePath: section + "/recyclebin", children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl }
+                          { name: "My website", id: 1234, childNodesUrl: url, icon: "icon-home", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "Components", id: 1235, childNodesUrl: url, icon: "icon-document", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "Archieve", id: 1236, childNodesUrl: url, icon: "icon-document", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "Recycle Bin", id: -20, childNodesUrl: url, icon: "icon-trash", routePath: section + "/recyclebin", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
                       ],
                       expanded: true,
                       hasChildren: true,
@@ -130,10 +135,10 @@ angular.module('umbraco.mocks').
                       name: "media",
                       id: -1,
                       children: [
-                          { name: "random-name-" + section, childNodesUrl: url, id: 1234, icon: "icon-home", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                          { name: "random-name-" + section, childNodesUrl: url, id: 1235, icon: "icon-folder-close", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                          { name: "random-name-" + section, childNodesUrl: url, id: 1236, icon: "icon-folder-close", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                          { name: "random-name-" + section, childNodesUrl: url, id: 1237, icon: "icon-folder-close", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1234, icon: "icon-home", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1235, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1236, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1237, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
                       ],
                       expanded: true,
                       hasChildren: true,
@@ -189,10 +194,10 @@ angular.module('umbraco.mocks').
                       name: "randomTree",
                       id: -1,
                       children: [
-                          { name: "random-name-" + section, childNodesUrl: url, id: 1234, icon: "icon-home", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                          { name: "random-name-" + section, childNodesUrl: url, id: 1235, icon: "icon-folder-close", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                          { name: "random-name-" + section, childNodesUrl: url, id: 1236, icon: "icon-folder-close", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                          { name: "random-name-" + section, childNodesUrl: url, id: 1237, icon: "icon-folder-close", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1234, icon: "icon-home", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1235, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1236, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                          { name: "random-name-" + section, childNodesUrl: url, id: 1237, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
                       ],
                       expanded: true,
                       hasChildren: true,

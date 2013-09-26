@@ -11,7 +11,7 @@ using umbraco.BusinessLogic.Actions;
 
 namespace Umbraco.Web.Trees
 {
-    public abstract class ContentTreeControllerBase : TreeApiController
+    public abstract class ContentTreeControllerBase : TreeController
     {
         /// <summary>
         /// Returns the 
@@ -99,19 +99,27 @@ namespace Umbraco.Web.Trees
         /// <summary>
         /// Based on the allowed actions, this will filter the ones that the current user is allowed
         /// </summary>
-        /// <param name="allMenuItems"></param>
+        /// <param name="menuWithAllItems"></param>
         /// <param name="userAllowedMenuItems"></param>
         /// <returns></returns>
-        protected MenuItemCollection GetUserAllowedMenuItems(IEnumerable<MenuItem> allMenuItems, IEnumerable<MenuItem> userAllowedMenuItems)
+        protected void FilterUserAllowedMenuItems(MenuItemCollection menuWithAllItems, IEnumerable<MenuItem> userAllowedMenuItems)
         {
             var userAllowedActions = userAllowedMenuItems.Where(x => x.Action != null).Select(x => x.Action).ToArray();
-            return new MenuItemCollection(allMenuItems.Where(
-                a => (a.Action == null
-                      || a.Action.CanBePermissionAssigned == false
-                      || (a.Action.CanBePermissionAssigned && userAllowedActions.Contains(a.Action)))));
+
+            var notAllowed = menuWithAllItems.MenuItems.Where(
+                a => (a.Action != null
+                      && a.Action.CanBePermissionAssigned
+                      && (a.Action.CanBePermissionAssigned == false || userAllowedActions.Contains(a.Action) == false)))
+                                             .ToArray();
+
+            //remove the ones that aren't allowed.
+            foreach (var m in notAllowed)
+            {
+                menuWithAllItems.RemoveMenuItem(m);
+            }
         }
 
-        internal MenuItemCollection GetUserMenuItemsForNode(IUmbracoEntity dd)
+        internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
             var actions = global::umbraco.BusinessLogic.Actions.Action.FromString(UmbracoUser.GetPermissions(dd.Path));
 
@@ -119,7 +127,7 @@ namespace Umbraco.Web.Trees
             if (dd.CreatorId == UmbracoUser.Id && actions.Contains(ActionDelete.Instance) == false)
                 actions.Add(ActionDelete.Instance);
 
-            return new MenuItemCollection(actions.Select(x => new MenuItem(x)));
+            return actions.Select(x => new MenuItem(x));
         }
 
         /// <summary>

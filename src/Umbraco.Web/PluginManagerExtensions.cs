@@ -26,7 +26,7 @@ namespace Umbraco.Web
         internal static IEnumerable<Type> ResolveAttributedTreeControllers(this PluginManager resolver)
         {
             //don't cache the result of this because it is only used once during app startup, caching will just add a bit more mem overhead for no reason
-            return resolver.ResolveTypesWithAttribute<TreeApiController, TreeAttribute>(cacheResult: false);
+            return resolver.ResolveTypesWithAttribute<TreeController, TreeAttribute>(cacheResult: false);
         }
 
 		internal static IEnumerable<Type> ResolveSurfaceControllers(this PluginManager resolver)

@@ -26,7 +26,7 @@ namespace Umbraco.Web.Trees
         {
             //get reference to all TreeApiControllers
             var controllerTrees = UmbracoApiControllerResolver.Current.RegisteredUmbracoApiControllers
-                                                              .Where(TypeHelper.IsTypeAssignableFrom<TreeApiController>)
+                                                              .Where(TypeHelper.IsTypeAssignableFrom<TreeController>)
                                                               .ToArray();
 
             //find the one we're looking for
@@ -47,7 +47,7 @@ namespace Umbraco.Web.Trees
             }
             var foundControllerTree = foundControllerTreeAttempt.Result;
             //instantiate it, since we are proxying, we need to setup the instance with our current context
-            var instance = (TreeApiController)DependencyResolver.Current.GetService(foundControllerTree);
+            var instance = (TreeController)DependencyResolver.Current.GetService(foundControllerTree);
             instance.ControllerContext = controllerContext;
             instance.Request = controllerContext.Request;
             //return the root
@@ -67,7 +67,7 @@ namespace Umbraco.Web.Trees
             var foundControllerTree = foundControllerTreeAttempt.Result;
 
             //instantiate it, since we are proxying, we need to setup the instance with our current context
-            var instance = (TreeApiController)DependencyResolver.Current.GetService(foundControllerTree);
+            var instance = (TreeController)DependencyResolver.Current.GetService(foundControllerTree);
             instance.ControllerContext = controllerContext;
             instance.Request = controllerContext.Request;
             //return it's data
