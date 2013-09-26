@@ -1747,7 +1747,6 @@
     <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-UmbracoObjectType.cs">
       <DependentUpon>uQuery.cs</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\GoogleSpellChecker.cs" />
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\SpellChecker.cs" />
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\SpellCheckerInput.cs" />
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\SpellCheckerResult.cs" />
