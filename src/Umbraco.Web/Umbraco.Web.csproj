@@ -303,6 +303,7 @@
     <Compile Include="Editors\DashboardController.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
+    <Compile Include="Editors\LogController.cs" />
     <Compile Include="Editors\MacroController.cs" />
     <Compile Include="Models\ContentEditing\MacroParameter.cs" />
     <Compile Include="Models\ContentEditing\UmbracoEntityTypes.cs" />
