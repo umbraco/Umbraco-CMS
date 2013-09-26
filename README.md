@@ -1,5 +1,8 @@
 Umbraco CMS
 ===========
+##Note: Building version 7 from source##
+If you're interested in using the source code and building version 7, make sure to read the [Belle ReadMe file](src/Umbraco.Web.UI.Client/README.md). Note that you can always [download a nightly build](http://nightly.umbraco.org/umbraco%207.0.0/) so you don't have to build the code yourself.
+
 ## Watch a five minute introduction video ##
 
 [![ScreenShot](http://umbraco.com/images/whatisumbraco.png)](http://umbraco.org/help-and-support/video-tutorials/getting-started/what-is-umbraco)
