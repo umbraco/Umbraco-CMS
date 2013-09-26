@@ -82,9 +82,6 @@ angular.module("umbraco")
                         tinyMceService.createMediaPicker(editor, $scope);
 
                         //Create the insert icon plugin
-                        tinyMceService.createIconPicker(editor, $scope);
-                        
-                        //Create the insert icon plugin
                         tinyMceService.createInsertEmbeddedMedia(editor, $scope);
 
                         //Create the insert macro plugin

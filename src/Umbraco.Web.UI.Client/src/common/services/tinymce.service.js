@@ -47,7 +47,7 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
         */
         createMediaPicker: function (editor, $scope) {
             editor.addButton('umbmediapicker', {
-                icon: 'media',
+                icon: 'custom icon-picture',
                 tooltip: 'Media Picker',
                 onclick: function () {
                     dialogService.mediaPicker({
@@ -76,38 +76,6 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
 
                                 }, 500);
                             }
-                        }
-                    });
-                }
-            });
-        },
-
-        /**
-        * @ngdoc method
-        * @name umbraco.services.tinyMceService#createIconPicker
-        * @methodOf umbraco.services.tinyMceService
-        *
-        * @description
-        * Creates the umbrco insert icon tinymce plugin
-        *
-        * @param {Object} editor the TinyMCE editor instance    
-        * @param {Object} $scope the current controller scope
-        */
-        createIconPicker: function (editor, $scope) {
-            editor.addButton('umbiconpicker', {
-                icon: 'media',
-                tooltip: 'Icon Picker',
-                onclick: function () {
-                    dialogService.open({
-                        show: true, template: "views/common/dialogs/iconpicker.html", scope: $scope, callback: function (c) {
-
-                            var data = {
-                                style: 'font-size: 60px'
-                            };
-
-                            var i = editor.dom.createHTML('i', data);
-                            tinyMCE.activeEditor.dom.addClass(i, c);
-                            editor.insertContent(i);
                         }
                     });
                 }
