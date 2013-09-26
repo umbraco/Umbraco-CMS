@@ -32,7 +32,7 @@ angular.module("umbraco")
         $scope.loadChildren = function(id){
             mediaResource.getChildren(id)
                 .then(function(data) {
-                    $scope.images = data;
+                    $scope.images = data.items;
                 });    
         };
 

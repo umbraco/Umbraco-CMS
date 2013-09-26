@@ -10,12 +10,15 @@ using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
+using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
@@ -117,13 +120,49 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns the child media objects
         /// </summary>
-        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>))]
-        public IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(int parentId)
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(int id,
+            int pageNumber = 0,
+            int pageSize = 0,
+            string orderBy = "SortOrder",
+            Direction orderDirection = Direction.Ascending,
+            string filter = "")
         {
-            //TODO: Change this to be like content with paged params
-            
-            return Services.MediaService.GetChildren(parentId)
-                           .Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
+            //TODO: Not sure how to handle 'filter' just yet! - SD: have implemented this for EntityService so I just need to get it working here,
+            // will be a post filter though.
+
+            //TODO: This will be horribly inefficient for paging! This is because our datasource/repository 
+            // doesn't support paging at the SQL level... and it'll be pretty interesting to try to make that work.
+
+            var children = Services.MediaService.GetChildren(id).ToArray();
+            var totalChildren = children.Length;
+
+            var result = children
+                .Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>)
+                .AsQueryable();
+
+            var orderedResult = orderDirection == Direction.Ascending
+                ? result.OrderBy(orderBy)
+                : result.OrderByDescending(orderBy);
+
+            var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(
+               totalChildren,
+               pageNumber,
+               pageSize);
+
+            if (pageNumber > 0 && pageSize > 0)
+            {
+                pagedResult.Items = orderedResult
+                    .Skip(pagedResult.SkipSize)
+                    .Take(pageSize);
+            }
+            else
+            {
+                pagedResult.Items = orderedResult;
+            }
+
+            return pagedResult;
+
         }
 
         /// <summary>

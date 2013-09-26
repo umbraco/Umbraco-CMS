@@ -211,15 +211,71 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         },
 
-        getChildren: function (parentId) {
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaResource#getChildren
+         * @methodOf umbraco.resources.mediaResource
+         *
+         * @description
+         * Gets children of a media item with a given id
+         *
+         * ##usage
+         * <pre>
+         * mediaResource.getChildren(1234, {pageSize: 10, pageNumber: 2})
+         *    .then(function(contentArray) {
+         *        var children = contentArray; 
+         *        alert('they are here!');
+         *    });
+         * </pre> 
+         * 
+         * @param {Int} parentid id of content item to return children of
+         * @param {Object} options optional options object
+         * @param {Int} options.pageSize if paging data, number of nodes per page, default = 0
+         * @param {Int} options.pageNumber if paging data, current page index, default = 0
+         * @param {String} options.filter if provided, query will only return those with names matching the filter
+         * @param {String} options.orderDirection can be `Ascending` or `Descending` - Default: `Ascending`
+         * @param {String} options.orderBy property to order items by, default: `SortOrder`
+         * @returns {Promise} resourcePromise object containing an array of content items.
+         *
+         */
+        getChildren: function (parentId, options) {
+
+            var defaults = {
+                pageSize: 0,
+                pageNumber: 0,
+                filter: '',
+                orderDirection: "Ascending",
+                orderBy: "SortOrder"
+            };
+            if (options === undefined) {
+                options = {};
+            }
+            //overwrite the defaults if there are any specified
+            angular.extend(defaults, options);
+            //now copy back to the options we will use
+            options = defaults;
+            //change asc/desct
+            if (options.orderDirection === "asc") {
+                options.orderDirection = "Ascending";
+            }
+            else if (options.orderDirection === "desc") {
+                options.orderDirection = "Descending";
+            }
 
             return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "mediaApiBaseUrl",
-                        "GetChildren",
-                        [{ parentId: parentId }])),
-                'Failed to retreive data for root media');
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "mediaApiBaseUrl",
+                       "GetChildren",
+                       [
+                           { id: parentId },
+                           { pageNumber: options.pageNumber },
+                           { pageSize: options.pageSize },
+                           { orderBy: options.orderBy },
+                           { orderDirection: options.orderDirection },
+                           { filter: options.filter }
+                       ])),
+               'Failed to retreive children for media item ' + parentId);
         },
         
         /** saves or updates a media object */

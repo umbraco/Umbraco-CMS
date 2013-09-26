@@ -122,21 +122,18 @@ namespace Umbraco.Web.Editors
             Direction orderDirection = Direction.Ascending, 
             string filter = "")
         {
-            //TODO: Not sure how to handle 'filter' just yet!
+            //TODO: Not sure how to handle 'filter' just yet! - SD: have implemented this for EntityService so I just need to get it working here,
+            // will be a post filter though.
 
             //TODO: This will be horribly inefficient for paging! This is because our datasource/repository 
             // doesn't support paging at the SQL level... and it'll be pretty interesting to try to make that work.
 
-            var foundContent = Services.ContentService.GetById(id);
-            if (foundContent == null)
-            {
-                HandleContentNotFound(id);
-            }
-            
-            var totalChildren = ((ContentService) Services.ContentService).CountChildren(id);
-            var result = foundContent.Children()
-                                     .Select(Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>)
-                                     .AsQueryable();
+            var children = Services.ContentService.GetChildren(id).ToArray();
+            var totalChildren = children.Length;
+
+            var result = children
+                .Select(Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>)
+                .AsQueryable();
 
             var orderedResult = orderDirection == Direction.Ascending 
                 ? result.OrderBy(orderBy) 

@@ -45,7 +45,7 @@ angular.module("umbraco")
                         
                         $scope.images = [];
                         $scope.searchTerm = "";
-                        $scope.images = data;
+                        $scope.images = data.items;
                         //update the thumbnail property
                         _.each($scope.images, function(img) {
                             img.thumbnail = imageHelper.getThumbnail({ imageModel: img, scope: $scope });
