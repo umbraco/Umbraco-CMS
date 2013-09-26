@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Globalization;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml;
@@ -7,10 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using umbraco.BasePages;
-using umbraco.cms.businesslogic.web;
-using umbraco.presentation;
 using System.Linq;
-using umbraco.cms.businesslogic;
 using umbraco.cms.presentation.user;
 using umbraco.interfaces;
 using Umbraco.Web;
@@ -51,20 +49,21 @@ namespace umbraco.dialogs
                     ok.Text = ui.Text("general", "ok", UmbracoUser);
                     ok.Attributes.Add("style", "width: 60px");
 
-                    var documentType = new DocumentType(int.Parse(Request.GetItemAsString("id")));
+                    var documentType = Services.ContentTypeService.GetContentType(int.Parse(Request.GetItemAsString("id")));
 
                     //Load master types... 
                     masterType.Attributes.Add("style", "width: 350px;");
                     masterType.Items.Add(new ListItem(ui.Text("none") + "...", "0"));
-                    foreach (var docT in DocumentType.GetAllAsList())
+
+                    foreach (var docT in Services.ContentTypeService.GetAllContentTypes().OrderBy(x => x.Name))
                     {
-                        masterType.Items.Add(new ListItem(docT.Text, docT.Id.ToString()));
+                        masterType.Items.Add(new ListItem(docT.Name, docT.Id.ToString(CultureInfo.InvariantCulture)));
                     }
 
-                    masterType.SelectedValue = documentType.MasterContentType.ToString();
+                    masterType.SelectedValue = (documentType.ParentId > 0 ? documentType.ParentId : 0).ToString(CultureInfo.InvariantCulture);
 
-                    rename.Text = documentType.Text + " (copy)";
-                    pane_settings.Text = "Make a copy of the document type '" + documentType.Text + "' and save it under a new name";
+                    rename.Text = documentType.Name + " (copy)";
+                    pane_settings.Text = "Make a copy of the document type '" + documentType.Name + "' and save it under a new name";
 
                 }
                 else
@@ -272,16 +271,16 @@ namespace umbraco.dialogs
                     {
                         if (CurrentApp == Constants.Applications.Content)
                         {
-                            //Backwards comp. change, so old events are fired #U4-2731
-                            var doc = new Document(currContent as IContent);
-                            doc.Move(Request.GetItemAs<int>("copyTo"));
+                            var doc = (IContent)currContent;
+                            var copyToId = Request.GetItemAs<int>("copyTo");
+                            Services.ContentService.Move(doc, copyToId, UmbracoUser.Id);
+
                         }
                         else
                         {
-                            //Backwards comp. change, so old events are fired #U4-2731
-                            var media = new umbraco.cms.businesslogic.media.Media(currContent as IMedia);
-                            media.Move(Request.GetItemAs<int>("copyTo"));
-                            library.ClearLibraryCacheForMedia(currContent.Id);
+                            var media = (IMedia)currContent;
+                            var copyToId = Request.GetItemAs<int>("copyTo");
+                            Services.MediaService.Move(media, copyToId, UmbracoUser.Id);
                         }
 
                         feedback.Text = ui.Text("moveOrCopy", "moveDone", nodes, UmbracoUser) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
@@ -293,12 +292,11 @@ namespace umbraco.dialogs
                     else
                     {
                         //NOTE: We ONLY support Copy on content not media for some reason.
-
-                        //Backwards comp. change, so old events are fired #U4-2731
-                        var newContent = new Document(currContent as IContent);
-                        newContent.Copy(Request.GetItemAs<int>("copyTo"), getUser(), RelateDocuments.Checked);
                         
-                        feedback.Text = ui.Text("moveOrCopy", "copyDone", nodes, getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+                        var newContent = (IContent)currContent;
+                        Services.ContentService.Copy(newContent, Request.GetItemAs<int>("copyTo"), RelateDocuments.Checked, UmbracoUser.Id);
+
+                        feedback.Text = ui.Text("moveOrCopy", "copyDone", nodes, UmbracoUser) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
                         feedback.type = uicontrols.Feedback.feedbacktype.success;
 
                         // refresh tree
