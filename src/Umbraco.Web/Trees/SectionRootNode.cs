@@ -14,17 +14,35 @@ namespace Umbraco.Web.Trees
     [DataContract(Name = "node", Namespace = "")]
     public sealed class SectionRootNode : TreeNode
     {
-        public SectionRootNode(string nodeId, string menuUrl)
-            : base(nodeId, string.Empty, menuUrl)
+        public static SectionRootNode CreateMultiTreeSectionRoot(string nodeId, TreeNodeCollection children)
+        {
+           return new SectionRootNode(nodeId, "", "")
+                {
+                    IsContainer = true,
+                    Children = children
+                };
+        }
+
+        public static SectionRootNode CreateSingleTreeSectionRoot(string nodeId, string getChildNodesUrl, string menuUrl, string title, TreeNodeCollection children)
+        {
+            return new SectionRootNode(nodeId, getChildNodesUrl, menuUrl)
+            {
+                Children = children,
+                Title = title
+            };
+        }
+
+        private SectionRootNode(string nodeId, string getChildNodesUrl, string menuUrl)
+            : base(nodeId, getChildNodesUrl, menuUrl)
         {
             //default to false
             IsContainer = false;
         }
         
         [DataMember(Name = "isContainer")]
-        public bool IsContainer { get; set; }
+        public bool IsContainer { get; private set; }
 
         [DataMember(Name = "children")]
-        public TreeNodeCollection Children { get; set; }
+        public TreeNodeCollection Children { get; private set; }
     }
 }

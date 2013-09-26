@@ -29,10 +29,10 @@ namespace Umbraco.Web.Trees
             TreeNode node;
 
             //if the user's start node is not default, then return their start node as the root node.
-            if (UmbracoUser.StartNodeId != Constants.System.Root)
+            if (Security.CurrentUser.StartContentId != Constants.System.Root)
             {
                 var currApp = queryStrings.GetValue<string>(TreeQueryStringParameters.Application);
-                var userRoot = Services.EntityService.Get(UmbracoUser.StartNodeId, UmbracoObjectTypes.Document);
+                var userRoot = Services.EntityService.Get(Security.CurrentUser.StartContentId, UmbracoObjectTypes.Document);
                 if (userRoot == null)
                 {
                     throw new HttpResponseException(HttpStatusCode.NotFound);
