@@ -35,7 +35,7 @@ namespace dashboardUtilities
                     Document d = new Document(int.Parse(NodeId.ToString()));										
 					count++;
 					return
-                        "<a href=\"editContent.aspx?id=" + NodeId.ToString() + "\" style=\"text-decoration: none\"><img src=\"" + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/images/forward.png\" align=\"absmiddle\" border=\"0\"/> " + d.Text + "</a>. " + umbraco.ui.Text("general", "edited", User.GetCurrent()) + " " + umbraco.library.ShortDateWithTimeAndGlobal(DateTime.Parse(Date.ToString()).ToString(), umbraco.ui.Culture(User.GetCurrent())) + "<br/>";
+                        "<a href=\"#/content/content/edit/" + NodeId.ToString() + "\" style=\"text-decoration: none\"><i class='icon icon-document'></i> " + d.Text + " -  " + umbraco.ui.Text("general", "edited", User.GetCurrent()) + " " + umbraco.library.ShortDateWithTimeAndGlobal(DateTime.Parse(Date.ToString()).ToString(), umbraco.ui.Culture(User.GetCurrent())) + "</a>";
 				}
 				catch {
 					return "";
