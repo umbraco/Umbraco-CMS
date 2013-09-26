@@ -57,13 +57,13 @@
             var self = this;
 
             UmbClientMgr.openAngularModalWindow({
-                template: "views/templates/insertmacro.html",
+                template: "views/common/dialogs/insertmacro.html",
                 dialogData: {
                     renderingEngine: "Mvc",
                     selectedAlias: alias
                 },
                 callback: function (data) {
-                    UmbEditor.Insert(data, '', self._opts.codeEditorElementId);
+                    UmbEditor.Insert(data.syntax, '', self._opts.codeEditorElementId);
                 }
             });
         },
