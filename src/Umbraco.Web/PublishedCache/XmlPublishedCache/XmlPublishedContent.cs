@@ -374,7 +374,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		        if (_xmlNode.Attributes.GetNamedItem("writerID") != null)
 		            _writerId = int.Parse(_xmlNode.Attributes.GetNamedItem("writerID").Value);
 
-                if (UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
+                if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
 		        {
 		            if (_xmlNode.Attributes.GetNamedItem("nodeTypeAlias") != null)
 		                _docTypeAlias = _xmlNode.Attributes.GetNamedItem("nodeTypeAlias").Value;
@@ -401,7 +401,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
 
 		    // load data
-            var dataXPath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "data" : "* [not(@isDoc)]";
+            var dataXPath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "data" : "* [not(@isDoc)]";
 		    var nodes = _xmlNode.SelectNodes(dataXPath);
 
 		    _contentType = PublishedContentType.Get(PublishedItemType.Content, _docTypeAlias);
@@ -410,7 +410,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             if (nodes != null)
                 foreach (XmlNode n in nodes)
                 {
-                    var alias = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema
+                    var alias = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
                         ? n.Attributes.GetNamedItem("alias").Value
                         : n.Name;
                     propertyNodes[alias.ToLowerInvariant()] = n;
@@ -433,7 +433,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	        if (_xmlNode == null) return;
 
             // load children
-            var childXPath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "node" : "* [@isDoc]";
+            var childXPath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : "* [@isDoc]";
             var nav = _xmlNode.CreateNavigator();
             var expr = nav.Compile(childXPath);
             expr.AddSort("@sortOrder", XmlSortOrder.Ascending, XmlCaseOrder.None, "", XmlDataType.Number);
