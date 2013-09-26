@@ -251,16 +251,6 @@ namespace umbraco.controls
             _asyncSaveTask.EndInvoke(ar);
         }
 
-        private void HandleAsyncSaveTimeout(IAsyncResult ar)
-        {
-            Trace.Write("ContentTypeControlNew", "async operation timed out!");
-
-            LogHelper.Error<ContentTypeControlNew>(
-                "The content type saving operation timed out",
-                new TimeoutException("The content type saving operation timed out. This could cause problems because the xml for the content node might not have been generated. "));
-
-        }
-
         /// <summary>
         /// The save button click event handlers
         /// </summary>
@@ -277,7 +267,8 @@ namespace umbraco.controls
                 }, _contentType.Alias, _contentType.Text, txtAlias.Text, txtName.Text, _contentType.PropertyTypes.Select(x => x.Alias).ToArray());
 
             //Add the async operation to the page
-            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncSaveOperation, EndAsyncSaveOperation, HandleAsyncSaveTimeout, state));
+            //NOTE: Must pass in a null and do not pass in a true to the 'executeInParallel', this is changed in .net 4.5 for the better, otherwise you'll get a ysod.
+            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncSaveOperation, EndAsyncSaveOperation, null, state));
             
             //create the save task to be executed async
             _asyncSaveTask = asyncState =>
@@ -1115,7 +1106,8 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 (GenericPropertyWrapper)sender);
 
             //Add the async operation to the page
-            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncDeleteOperation, EndAsyncDeleteOperation, HandleAsyncSaveTimeout, state));
+            //NOTE: Must pass in a null and do not pass in a true to the 'executeInParallel', this is changed in .net 4.5 for the better, otherwise you'll get a ysod. 
+            Page.RegisterAsyncTask(new PageAsyncTask(BeginAsyncDeleteOperation, EndAsyncDeleteOperation, null, state));
 
             //create the save task to be executed async
             _asyncDeleteTask = asyncState =>
