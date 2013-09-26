@@ -16,11 +16,13 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         public void Does_Not_Throw_Exception_When_Access_Allowed_By_Path()
         {
             //arrange
-            var user = new Mock<IUser>().Object;
-            user.Id = 9;
-            user.StartContentId = -1;
-            var content = new Mock<IContent>().Object;
-            content.Path = "-1,1234,5678";
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(9);
+            userMock.Setup(u => u.StartContentId).Returns(-1);
+            var user = userMock.Object;
+            var contentMock = new Mock<IContent>();
+            contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
+            var content = contentMock.Object;
             var contentServiceMock = new Mock<IContentService>();
             contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
             var contentService = contentServiceMock.Object;
@@ -40,11 +42,13 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         public void Throws_Exception_When_No_Content_Found()
         {
             //arrange
-            var user = new Mock<IUser>().Object;
-            user.Id = 9;
-            user.StartContentId = -1;
-            var content = new Mock<IContent>().Object;
-            content.Path = "-1,1234,5678";
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(9);
+            userMock.Setup(u => u.StartContentId).Returns(-1);
+            var user = userMock.Object;
+            var contentMock = new Mock<IContent>();
+            contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
+            var content = contentMock.Object;
             var contentServiceMock = new Mock<IContentService>();
             contentServiceMock.Setup(x => x.GetById(0)).Returns(content);
             var contentService = contentServiceMock.Object;
@@ -61,11 +65,13 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         public void Throws_Exception_When_No_Access_By_Path()
         {
             //arrange
-            var user = new Mock<IUser>().Object;
-            user.Id = 9;
-            user.StartContentId = 9876;
-            var content = new Mock<IContent>().Object;
-            content.Path = "-1,1234,5678";
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(9);
+            userMock.Setup(u => u.StartContentId).Returns(9876);
+            var user = userMock.Object;
+            var contentMock = new Mock<IContent>();
+            contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
+            var content = contentMock.Object;
             var contentServiceMock = new Mock<IContentService>();
             contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
             var contentService = contentServiceMock.Object;
@@ -85,11 +91,13 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         public void Throws_Exception_When_No_Access_By_Permission()
         {
             //arrange
-            var user = new Mock<IUser>().Object;
-            user.Id = 9;
-            user.StartContentId = -1;
-            var content = new Mock<IContent>().Object;
-            content.Path = "-1,1234,5678";
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(9);
+            userMock.Setup(u => u.StartContentId).Returns(-1);
+            var user = userMock.Object;
+            var contentMock = new Mock<IContent>();
+            contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
+            var content = contentMock.Object;
             var contentServiceMock = new Mock<IContentService>();
             contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
             var contentService = contentServiceMock.Object;
@@ -112,11 +120,13 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         public void Does_Not_Throw_Exception_When_Access_Allowed_By_Permission()
         {
             //arrange
-            var user = new Mock<IUser>().Object;
-            user.Id = 9;
-            user.StartContentId = -1;
-            var content = new Mock<IContent>().Object;
-            content.Path = "-1,1234,5678";
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(9);
+            userMock.Setup(u => u.StartContentId).Returns(-1);
+            var user = userMock.Object;
+            var contentMock = new Mock<IContent>();
+            contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
+            var content = contentMock.Object;
             var contentServiceMock = new Mock<IContentService>();
             contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
             var contentService = contentServiceMock.Object;
@@ -139,11 +149,13 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         public void Does_Not_Throw_Exception_When_No_Permissions_Assigned()
         {
             //arrange
-            var user = new Mock<IUser>().Object;
-            user.Id = 9;
-            user.StartContentId = -1;
-            var content = new Mock<IContent>().Object;
-            content.Path = "-1,1234,5678";
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(9);
+            userMock.Setup(u => u.StartContentId).Returns(-1);
+            var user = userMock.Object;
+            var contentMock = new Mock<IContent>();
+            contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
+            var content = contentMock.Object;
             var contentServiceMock = new Mock<IContentService>();
             contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
             var contentService = contentServiceMock.Object;
