@@ -1,39 +1,48 @@
 angular.module('umbraco.services')
-.factory('searchService', function () {
+.factory('searchService', function ($q, $log, entityResource) {
+	var m = {results: []};
 	return {
-		search: function(term, section){
-			return [
-			{
-				section: "settings",
-				tree: "documentTypes",
-				matches:[
-				{ name: "News archive", path:"/News Archive", id: 1234, icon: "icon-list-alt", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1 },
-				{ name: "Meta Data", path:"/Seo/Meta Data", id: 1234, icon: "icon-list-alt", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1 },
-				{ name: "Dooo", path:"/Woop/dee/dooo", id: 1234, icon: "icon-list-alt red", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1 }
-				
-				]	
-			},
-			
-			{
-				section: "content",
-				tree: "content",
-				matches:[
-				{ name: "News", path:"/archive/news", id: 1234, icon: "icon-file", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1 },
-				{ name: "Data types", path:"/Something/About/Data-Types", id: 1234, icon: "icon-file", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1 },
-				{ name: "Dooo", path:"/Woop/dee/dooo", id: 1234, icon: "icon-file", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1 }
-				]	
-			},
+		results: m,
+		search: function(term){
+			m.results.length = 0;
 
-			{
-				section: "developer",
-				tree: "macros",
-				matches:[
-				{ name: "Navigation", path:"/Macros/Navigation.xslt", id: 1234, icon: "icon-cogs", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1 },
-				{ name: "List of stuff", path:"/Macros/Navigation.xslt", id: 1234, icon: "icon-cogs", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1 },
-				{ name: "Something else", path:"/Macros/Navigation.xslt",id: 1234, icon: "icon-cogs", view: section + "/edit/" + 1234, children: [], expanded: false, level: 1 }
-				]	
-			}
-			];
+			var deferred = $q.defer();
+			var i = 0;
+
+			entityResource.search(term, "Document").then(function(data){
+				$log.log(data);
+
+				m.results.push({
+					icon: "icon-document",
+					editor: "content/content/edit/",
+					matches: data
+				});
+				i++;
+
+				//deferred.notify(results);
+
+
+				if(i === 2){
+					deferred.resolve(m);
+				}
+			});
+
+			entityResource.search(term, "Media").then(function(data){
+				$log.log(data);
+
+				m.results.push({
+					icon: "icon-picture",
+					editor: "media/media/edit/",
+					matches: data
+				});
+				i++;
+
+				if(i === 2){
+					deferred.resolve(m);
+				}
+			});
+
+			return deferred.promise;
 		},
 		
 		setCurrent: function(sectionAlias){

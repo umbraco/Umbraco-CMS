@@ -11,11 +11,12 @@
 
             <div class="span8">
                 <div class="btn-toolbar pull-right umb-btn-toolbar">
-                    
-                    <div class="btn-group">
-                        
-                        <button type="submit" class="btn btn-success">Save</button>
+                    <div class="btn-group" ng-animate="'fade'" ng-show="status">
+                        <p class="btn btn-link umb-status-label">{{status}}</p>
+                    </div>
 
+                    <div class="btn-group">
+                        <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">Save</button>
                     </div>
                 </div>
             </div>

@@ -37,8 +37,18 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
 
             });
     }
-        
+    
+    $scope.setStatus = function(status){
+        //add localization
+        $scope.status = status;
+        $timeout(function(){
+            $scope.status = undefined;
+        }, 2500);
+    };
+
     $scope.save = function () {
+        
+        $scope.setStatus("Saving...");
         
         $scope.$broadcast("saving", { scope: $scope });
 

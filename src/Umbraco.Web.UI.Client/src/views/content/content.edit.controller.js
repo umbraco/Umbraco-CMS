@@ -39,6 +39,8 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
     //TODO: Need to figure out a way to share the saving and event broadcasting with all editors!
 
     $scope.saveAndPublish = function () {
+        
+        $scope.setStatus("Publishing...");
         $scope.$broadcast("saving", { scope: $scope });
         
         var currentForm = angularHelper.getRequiredCurrentForm($scope);

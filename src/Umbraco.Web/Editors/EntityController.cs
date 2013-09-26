@@ -32,7 +32,8 @@ namespace Umbraco.Web.Editors
     /// </remarks>
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
-    {       
+    {   
+        [HttpGet]
         public IEnumerable<EntityBasic> Search([FromUri] string query, UmbracoEntityTypes type)
         {
             switch (type)

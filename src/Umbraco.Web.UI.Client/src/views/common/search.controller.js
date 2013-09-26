@@ -8,21 +8,21 @@
  *  
  */
 function SearchController($scope, searchService, $log, navigationService) {
+    
+
     var currentTerm = "";
+    navigationService.ui.search = searchService.results;
+
     $scope.deActivateSearch = function () {
         currentTerm = "";
     };
 
     $scope.performSearch = function (term) {
         if (term != undefined && term != currentTerm) {
-            if (term.length > 3) {
                 navigationService.ui.selectedSearchResult = -1;
                 navigationService.showSearch();
                 currentTerm = term;
-                navigationService.ui.searchResults = searchService.search(term, navigationService.currentSection);
-            } else {
-                navigationService.ui.searchResults = [];
-            }
+                searchService.search(term);
         }
     };
 
