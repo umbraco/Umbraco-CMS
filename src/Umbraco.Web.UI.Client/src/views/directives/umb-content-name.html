@@ -5,7 +5,7 @@
         <h1 ng-click="goEdit()" ng-hide="editMode">{{model}}</h1>
         
         <input
-        	on-blur="editMode = false" 
+        	on-blur="exitEdit()" 
         	ng-show="editMode" 
         	name="name" 
         	type="text" 
