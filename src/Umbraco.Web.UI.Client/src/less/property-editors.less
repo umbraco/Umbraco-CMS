@@ -1,12 +1,25 @@
 //
 // Container styles
 // --------------------------------------------------
-.tab-content .control-group .umb-editor {
+.umb-editor {
   width:66.6%;
 }
-.umb-modal .control-group .umb-editor {
-    width: 80%;
+
+.umb-modal .umb-editor {
+    width: 95%;
 }
+
+.umb-codeeditor{
+  width: 99%; 
+}
+
+//
+// Content picker
+// --------------------------------------------------
+.umb-contentpicker li a:hover .hover-hide, .umb-contentpicker li a .hover-show{
+  display: none;
+}
+.umb-contentpicker li a:hover .hover-show{display: inline-block;}
 
 
 //
@@ -44,7 +57,53 @@ ul.color-picker li a  {
   color: @grayLight;
   border: 2px @grayLight dashed !important;
   line-height: 120px;
+  text-decoration: none;
 }
+
+//wtf? where does this opacity crap comes from?
+.umb-mediapicker *:hover{
+  opacity: 1 !important;
+}
+
+.umb-mediapicker .picked-image:hover:before{
+    content: "\e1a4";
+    font-family: Icomoon;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    opacity: 0.5;
+
+    font-size: 24px;
+    color: red;
+    background: white;
+    
+    line-height: 36px;
+    text-align: center;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+
+    height: 32px;
+    width: 32px;
+    overflow: hidden;
+    display: block;
+  }
+
+  .umb-thumbnails .thumbnail {
+    padding: 0;
+    border:none;
+  }
+
+  .umb-thumbnails > li {
+    margin: 1px;
+    text-align: center;
+  }
+
+  .umb-thumbnails i{margin: auto;}
+  .umb-thumbnails a{
+    outline: none;
+    border:none !important;
+    box-shadow:none !important;
+  }
 
 
 //
@@ -59,25 +118,83 @@ ul.color-picker li a  {
   line-height: 120px
 }
 
+.umb-upload-drop-zone .info{
+    display: block;
+    padding: 30px;
+    opacity: 0.7;
+
+    border: 1px dashed @grayLight;
+    background: @grayLighter;
+
+    text-align: center;
+    font-size: 14px;
+
+    color: @grayLight;
+}
+
+
+.umb-upload-drop-zone .info i.icon{
+  font-size: 90px;
+  line-height: 110px
+}
+
+
+
+
 //
 // Photo folder styling
 // --------------------------------------------------
 
+.umb-photo-folder .picrow a, .umb-photo-preview{
+  margin: 0px;
+  padding: 0px;
+  border: none;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.umb-photo-folder a:hover{text-decoration: none}
 .umb-photo-folder .umb-non-thumbnail{
   text-align: center;
-  color: @gray;
+  vertical-align: center;
   font-size: 12px;
+  background: @grayLighter;
+  color: @grayLight;
+  text-decoration: none;
 }
 
 .umb-photo-folder .umb-non-thumbnail i{
   color: @grayLight;
-  font-size: 60px;
+  font-size: 70px;
   line-height: 80px;
-  display: block
+  display: block;
+  margin: auto;
+  padding-top: 25%;
 }
 
-
-.umb-photo-folder .selected img{
-  opacity:0.5;
+.umb-photo-folder .selected{
+  position: relative;
 }
 
+.umb-photo-folder .selected:before{
+    content: "\e165";
+    font-family: Icomoon;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+
+    font-size: 24px;
+    color: black;
+    opacity: 0.5;
+    background: white;
+    
+    line-height: 36px;
+    text-align: center;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+
+    height: 32px;
+    width: 32px;
+    overflow: hidden;
+    display: block;
+  }

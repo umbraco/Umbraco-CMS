@@ -14,7 +14,7 @@ namespace Umbraco.Web.Trees
 {
     [Tree(Constants.Applications.Developer, Constants.Trees.DataTypes, "Data Types")]
     [PluginController("UmbracoTrees")]
-    public class DataTypeTreeController : TreeApiController
+    public class DataTypeTreeController : TreeController
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {

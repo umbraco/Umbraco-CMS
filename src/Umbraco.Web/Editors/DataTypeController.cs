@@ -42,6 +42,9 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
+            //TODO: Here we need to do a legacy check... if we cannot find a property editor with the alias
+            // we should display a warning but let them select a different one!
+
             return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dataType);
         }
 

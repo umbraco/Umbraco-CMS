@@ -60,7 +60,7 @@ namespace Umbraco.Web.Trees
                 var legacyAtt = controllerAttempt.Result.GetCustomAttribute<LegacyBaseTreeAttribute>(false);
                 if (legacyAtt == null)
                 {
-                    LogHelper.Warn<LegacyTreeDataConverter>("Cannot render tree: " + appTree.Alias + ". Cannot render a " + typeof(TreeApiController) + " tree type with the legacy web services unless attributed with " + typeof(LegacyBaseTreeAttribute));
+                    LogHelper.Warn<LegacyTreeDataConverter>("Cannot render tree: " + appTree.Alias + ". Cannot render a " + typeof(TreeController) + " tree type with the legacy web services unless attributed with " + typeof(LegacyBaseTreeAttribute));
                     return null;
                 }
 
@@ -143,7 +143,7 @@ namespace Umbraco.Web.Trees
                 if (t is ContextMenuSeperator && numAdded > 0)
                 {
                     //store the index for which the seperator should be placed
-                    seperators.Add(collection.Count());
+                    seperators.Add(collection.MenuItems.Count());
                 }
                 else
                 {
@@ -164,12 +164,12 @@ namespace Umbraco.Web.Trees
                     numAdded++;
                 }
             }
-            var length = collection.Count();
+            var length = collection.MenuItems.Count();
             foreach (var s in seperators)
             {
                 if (length >= s)
                 {
-                    collection.ElementAt(s).SeperatorBefore = true;
+                    collection.MenuItems.ElementAt(s).SeperatorBefore = true;
                 }
             }
 
@@ -266,7 +266,7 @@ namespace Umbraco.Web.Trees
                 case "UmbClientMgr.appActions().actionRePublish()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
-                            "dialogs/republish.aspx?rnd=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
+                            "dialogs/republish.aspx?rnd=" + DateTime.UtcNow.Ticks,
                             "Republishing entire site"));
                 case "UmbClientMgr.appActions().actionAssignDomain()":
                     return Attempt.Succeed(

@@ -46,10 +46,7 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
             var allOrigProps = this.getAllProps(origContent);
             var allNewProps = this.getAllProps(newContent);
 
-            function getNewProp(alias) {
-                if (alias.startsWith("_umb_")) {
-                    return null;
-                }
+            function getNewProp(alias) {                
                 return _.find(allNewProps, function (item) {
                     return item.alias === alias;
                 });

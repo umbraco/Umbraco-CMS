@@ -1,6 +1,7 @@
 ﻿using System;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
@@ -24,7 +25,11 @@ namespace Umbraco.Web.Models.Mapping
             var editor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
             if (editor == null)
             {
-                throw new NullReferenceException("The property editor with alias " + property.PropertyType.PropertyEditorAlias + " does not exist");
+                LogHelper.Error<ContentPropertyBasicConverter<T>>(
+                    "No property editor found, converting to a Label",
+                    new NullReferenceException("The property editor with alias " + property.PropertyType.PropertyEditorAlias + " does not exist"));
+
+                editor = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias);
             }
             var result = new T
                 {

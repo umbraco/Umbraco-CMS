@@ -9,12 +9,14 @@ using umbraco.interfaces;
 namespace Umbraco.Web.Trees.Menu
 {
 
-    [CollectionDataContract(Name = "menuItems", Namespace = "")]
-    public class MenuItemCollection : IEnumerable<MenuItem>
+    [DataContract(Name = "menuItems", Namespace = "")]
+    public class MenuItemCollection
     {
+        private readonly List<MenuItem> _menuItems;
+
         public MenuItemCollection()
         {
-            
+            _menuItems = new List<MenuItem>();
         }
 
         public MenuItemCollection(IEnumerable<MenuItem> items)
@@ -22,7 +24,20 @@ namespace Umbraco.Web.Trees.Menu
             _menuItems = new List<MenuItem>(items);
         }
 
-        private readonly List<MenuItem> _menuItems = new List<MenuItem>();
+        /// <summary>
+        /// Sets the default menu item alias to be shown when the menu is launched - this is optional and if not set then the menu will just be shown normally.
+        /// </summary>
+        [DataMember(Name = "defaultAlias")]
+        public string DefaultMenuAlias { get; set; }
+
+        /// <summary>
+        /// The list of menu items
+        /// </summary>
+        [DataMember(Name = "menuItems")]
+        public IEnumerable<MenuItem> MenuItems
+        {
+            get { return _menuItems; }
+        }
 
         /// <summary>
         /// Adds a menu item
@@ -35,6 +50,15 @@ namespace Umbraco.Web.Trees.Menu
 
             _menuItems.Add(item);
             return item;
+        }
+
+        /// <summary>
+        /// Removes a menu item
+        /// </summary>
+        /// <param name="item"></param>
+        public void RemoveMenuItem(MenuItem item)
+        {
+            _menuItems.Remove(item);
         }
 
         /// <summary>
@@ -167,14 +191,5 @@ namespace Umbraco.Web.Trees.Menu
             }
         }
 
-        public IEnumerator<MenuItem> GetEnumerator()
-        {
-            return _menuItems.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
     }
 }

@@ -290,8 +290,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
-                var macro = new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml");
-                macro.Properties.Add(new MacroProperty("blah1", "New1", 4, null));
+                var macro = new Macro("newmacro", "A new macro", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml");
+                macro.Properties.Add(new MacroProperty("blah1", "New1", 4, "test.editor"));
 
                 repository.AddOrUpdate(macro);
 
@@ -315,8 +315,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
-                var macro = new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml");
-                macro.Properties.Add(new MacroProperty("blah1", "New1", 4, null));
+                var macro = new Macro("newmacro", "A new macro", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml");
+                macro.Properties.Add(new MacroProperty("blah1", "New1", 4, "test.editor"));
                 repository.AddOrUpdate(macro);
                 unitOfWork.Commit();
 
@@ -340,9 +340,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current))
             {
-                var macro = new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml");
-                var prop1 = new MacroProperty("blah1", "New1", 4, null);
-                var prop2 = new MacroProperty("blah2", "New2", 3, null);
+                var macro = new Macro("newmacro", "A new macro", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml");
+                var prop1 = new MacroProperty("blah1", "New1", 4, "test.editor");
+                var prop2 = new MacroProperty("blah2", "New2", 3, "test.editor");
 
                 //add/remove a few to test the collection observable
                 macro.Properties.Add(prop1);

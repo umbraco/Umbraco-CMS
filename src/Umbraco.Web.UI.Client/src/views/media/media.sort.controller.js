@@ -15,12 +15,12 @@ function MediaSortController($scope, mediaResource, treeService) {
 
     mediaResource.getChildren($scope.currentNode.id).then(function (data) {
         $scope.sortableModel.itemsToSort = [];
-        for (var i = 0; i < data.length; i++) {
+        for (var i = 0; i < data.items.length; i++) {
             $scope.sortableModel.itemsToSort.push({
-                id: data[i].id,
-                column1: data[i].name,
-                column2: data[i].updateDate,
-                column3: data[i].sortOrder
+                id: data.items[i].id,
+                column1: data.items[i].name,
+                column2: data.items[i].updateDate,
+                column3: data.items[i].sortOrder
             });
         }
     });

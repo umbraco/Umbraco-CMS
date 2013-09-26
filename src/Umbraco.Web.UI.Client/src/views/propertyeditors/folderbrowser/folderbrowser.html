@@ -5,59 +5,14 @@ class="umb-editor umb-folderbrowser"
 data-file-upload="options" 
 data-file-upload-progress="" 
 data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
-
-        <div class="umb-upload-drop-zone" ng-show="dropping || filesUploading.length" style="width: 99%; border: 1px solid #ccc; border-bottom: 2px solid #ccc; padding: 10px; margin-bottom: 10px;">
-            <p class="umb-upload-drop-text" style="text-align: center; font-size: 1.4em;" ng-show="dropping">Drop your files here...</p>
-
-            <div class="umb-upload-upload-progress" ng-show="filesUploading.length">
-                <ul style="list-style: none;">
-                    <li ng-repeat="file in filesUploading">
-                        <div umb-upload-preview="file">
-                            <p>{{file.name}}</p>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
         
-        <div class="umb-photo-folder-max-width" style="height: 0px; width: 99%"></div>
-        <div class="umb-photo-folder"></div>
-<!--
-        <div class="umb-photo-folder">
-            <div ng-repeat="image in images | orderBy:'contentTypeAlias' | filter:searchTerm">
-                <a href="#/media/media/edit/{{image.id}}">
-                    <div ng-switch on="!!image.thumbnail" >
-                        <img ng-src="{{image.thumbnail}}" ng-switch-when="true" alt="{{image.name}}"/>
-
-                        <div ng-switch-default>
-                            <i class="icon-folder large"></i>
-                            {{image.name}}
-                        </div>
-                    </div>
-                </a>
-            </li>
-        </div>
-    -->
-<!--
-        <ul class="umb-thumbnails thumbnails">
-	        <li class="span2 folder" ng-repeat="image in images | orderBy:'contentTypeAlias' | filter:searchTerm">
-			    <a href="#/media/media/edit/{{image.id}}" class="thumbnail">
-					
-
-                    <div ng-switch on="!!image.thumbnail" >
-                        <img ng-src="{{image.thumbnail}}" class="image" ng-switch-when="true" alt="{{image.name}}"/>
-
-                        <div ng-switch-default>
-                        	<i class="icon-folder large"></i>
-                        	{{image.name}}
-                        </div>
-                    </div>
-	            </a>
-	        </li>
-	    </ul>
-    -->
-	</div>
-
-</div>
-
+        <umb-upload-dropzone dropping="dropping" files="filesUploading">
+        </umb-upload-dropzone>
+        
+        <umb-photo-folder 
+            min-height="220" 
+            min-width="220"
+            on-click="clickHandler"
+            ng-model="images"
+        />
 </form>

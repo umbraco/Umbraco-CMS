@@ -65,13 +65,18 @@ namespace Umbraco.Web.Trees.Menu
         {
             //First try to get a URL/title from the legacy action,
             // if that doesn't work, try to get the legacy confirm view
+
+            //in some edge cases, item can be null so we'll just convert those to "-1" and "" for id and name since these edge cases don't need that.
             Attempt
-                .Try(LegacyTreeDataConverter.GetUrlAndTitleFromLegacyAction(menuItem.Action, item.Id.ToInvariantString(), nodeType, item.Name, currentSection),
+                .Try(LegacyTreeDataConverter.GetUrlAndTitleFromLegacyAction(menuItem.Action,
+                                                                            item == null ? "-1" : item.Id.ToInvariantString(),
+                                                                            nodeType,
+                                                                            item == null ? "" : item.Name, currentSection),
                      action => menuItem.LaunchDialogUrl(action.Url, action.DialogTitle))
                 .OnFailure(() => LegacyTreeDataConverter.GetLegacyConfirmView(menuItem.Action, currentSection),
-                          view => menuItem.LaunchDialogView(
-                              view,
-                              ui.GetText("defaultdialogs", "confirmdelete") + " '" + item.Name + "' ?"));
+                           view => menuItem.LaunchDialogView(
+                               view,
+                               ui.GetText("defaultdialogs", "confirmdelete") + " '" + item.Name + "' ?"));
         }
     }
 }

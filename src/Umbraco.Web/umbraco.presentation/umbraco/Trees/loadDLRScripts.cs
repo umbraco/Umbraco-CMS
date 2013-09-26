@@ -68,6 +68,7 @@ namespace umbraco
 
         protected override void OnRenderFileNode(ref XmlTreeNode xNode)
         {
+
             xNode.Action = xNode.Action.Replace("openFile", "openDLRScript");
             string ex = xNode.Text.Substring(xNode.Text.LastIndexOf('.')).Trim('.').ToLower();
             string icon = "developerScript.gif";
@@ -80,6 +81,10 @@ namespace umbraco
                 case "py":
                     icon = "developerPython.gif";
                     break;
+                case "config":
+                    //remove all config files
+                    xNode = null;
+                    return;
                 default:
                     icon = "developerScript.gif";
                     break;

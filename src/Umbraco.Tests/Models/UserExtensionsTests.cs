@@ -17,11 +17,11 @@ namespace Umbraco.Tests.Models
         public void Determines_Path_Based_Access_To_Content(int userId, string contentPath, bool outcome)
         {
             var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.StartContentId).Returns(userId);
             var user = userMock.Object;
-            user.StartContentId = userId;
             var contentMock = new Mock<IContent>();
+            contentMock.Setup(c => c.Path).Returns(contentPath);
             var content = contentMock.Object;
-            content.Path = contentPath;
 
             Assert.AreEqual(outcome, user.HasPathAccess(content));
         }

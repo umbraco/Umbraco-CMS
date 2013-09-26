@@ -29,10 +29,10 @@ namespace Umbraco.Web.Trees
             TreeNode node;
 
             //if the user's start node is not default, then return their start node as the root node.
-            if (UmbracoUser.StartNodeId != Constants.System.Root)
+            if (Security.CurrentUser.StartContentId != Constants.System.Root)
             {
                 var currApp = queryStrings.GetValue<string>(TreeQueryStringParameters.Application);
-                var userRoot = Services.EntityService.Get(UmbracoUser.StartNodeId, UmbracoObjectTypes.Document);
+                var userRoot = Services.EntityService.Get(Security.CurrentUser.StartContentId, UmbracoObjectTypes.Document);
                 if (userRoot == null)
                 {
                     throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -54,9 +54,6 @@ namespace Umbraco.Web.Trees
             {
                 node = base.CreateRootNode(queryStrings);    
             }
-
-            //InjectLegacyTreeCompatibility(node, queryStrings);
-
             return node;
             
         }
@@ -81,7 +78,7 @@ namespace Umbraco.Web.Trees
             {
                 var e = (UmbracoEntity)entity;
                
-                var allowedUserOptions = GetUserMenuItemsForNode(e);
+                var allowedUserOptions = GetAllowedUserMenuItemsForNode(e);
                 if (CanUserAccessNode(e, allowedUserOptions))
                 {
                     //TODO: if the node is of a specific type, don't list its children
@@ -99,8 +96,6 @@ namespace Umbraco.Web.Trees
                         e.ContentTypeIcon,
                         hasChildren);
 
-                    //InjectLegacyTreeCompatibility(node, queryStrings);
-
                     nodes.Add(node);
                 }
             }
@@ -109,10 +104,13 @@ namespace Umbraco.Web.Trees
 
         protected override MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            var menu = new MenuItemCollection();
-
             if (id == Constants.System.Root.ToInvariantString())
             {
+                var menu = new MenuItemCollection();
+
+                //set the default to create
+                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+
                 // we need to get the default permissions as you can't set permissions on the very root node
                 var nodeActions = global::umbraco.BusinessLogic.Actions.Action.FromString(
                     UmbracoUser.GetPermissions(Constants.System.Root.ToInvariantString()))
@@ -123,18 +121,19 @@ namespace Umbraco.Web.Trees
                 menu.AddMenuItem<ActionSort>();
 
                 //filter the standard items
-                var allowedMenu = GetUserAllowedMenuItems(menu, nodeActions);
+                FilterUserAllowedMenuItems(menu, nodeActions);
 
-                if (allowedMenu.Any())
+                if (menu.MenuItems.Any())
                 {
-                    allowedMenu.Last().SeperatorBefore = true;
+                    menu.MenuItems.Last().SeperatorBefore = true;
                 }
 
                 // add default actions for *all* users
-                allowedMenu.AddMenuItem<ActionRePublish>();
-                allowedMenu.AddMenuItem<RefreshNode, ActionRefresh>(true);
-                return allowedMenu;
+                menu.AddMenuItem<ActionRePublish>().ConvertLegacyMenuItem(null, "content", "content");
+                menu.AddMenuItem<RefreshNode, ActionRefresh>(true);
+                return menu;
             }
+
 
             //return a normal node menu:
             int iid;
@@ -148,9 +147,15 @@ namespace Umbraco.Web.Trees
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            return GetUserAllowedMenuItems(
-                CreateAllowedActions(item), 
-                GetUserMenuItemsForNode(item));
+            var nodeMenu = GetAllNodeMenuItems(item);
+            var allowedMenuItems = GetAllowedUserMenuItemsForNode(item);
+                
+            FilterUserAllowedMenuItems(nodeMenu, allowedMenuItems);
+
+            //set the default to create
+            nodeMenu.DefaultMenuAlias = ActionNew.Instance.Alias;
+
+            return nodeMenu;
         }
 
         protected override UmbracoObjectTypes UmbracoObjectType
@@ -158,7 +163,12 @@ namespace Umbraco.Web.Trees
             get { return UmbracoObjectTypes.Document; }
         }
 
-        protected IEnumerable<MenuItem> CreateAllowedActions(IUmbracoEntity item)
+        /// <summary>
+        /// Returns a collection of all menu items that can be on a content node
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        protected MenuItemCollection GetAllNodeMenuItems(IUmbracoEntity item)
         {
             var menu = new MenuItemCollection();
             menu.AddMenuItem<ActionNew>();
@@ -185,23 +195,5 @@ namespace Umbraco.Web.Trees
             return menu;
         }
 
-        ///// <summary>
-        ///// This is required so that the legacy tree dialog pickers and the legacy TreeControl.ascx stuff works with these new trees.
-        ///// </summary>
-        ///// <param name="node"></param>
-        ///// <param name="queryStrings"></param>
-        ///// <remarks>
-        ///// NOTE: That if developers create brand new trees using webapi controllers then they'll need to manually make it 
-        ///// compatible with the legacy tree pickers, 99.9% of the time devs won't be doing that and once we make the new tree
-        ///// pickers and devs update their apps to be angularized it won't matter
-        ///// </remarks>
-        //private void InjectLegacyTreeCompatibility(TreeNode node, FormDataCollection queryStrings)
-        //{
-        //    if (IsDialog(queryStrings))
-        //    {
-        //        node.AdditionalData["legacyDialogAction"] = "javascript:openContent(" + node.NodeId + ");";
-        //    }
-        //}
-        
     }
 }

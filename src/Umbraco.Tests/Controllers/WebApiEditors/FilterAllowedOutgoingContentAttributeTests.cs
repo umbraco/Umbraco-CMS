@@ -80,9 +80,11 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
                 path += i.ToInvariantString();
                 list.Add(new ContentItemBasic { Id = i, Name = "Test" + i, ParentId = i, Path = path });
             }
-            var user = new Mock<IUser>().Object;
-            user.Id = 9;
-            user.StartContentId = 5;
+
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(9);
+            userMock.Setup(u => u.StartContentId).Returns(5);
+            var user = userMock.Object;
             
             att.FilterBasedOnStartNode(list, user);
 
@@ -100,9 +102,12 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
                 list.Add(new ContentItemBasic{Id = i, Name = "Test" + i, ParentId = -1});
             }
             var ids = list.Select(x => (int)x.Id).ToArray();
-            var user = new Mock<IUser>().Object;
-            user.Id = 9;
-            user.StartContentId = -1;
+            
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(9);
+            userMock.Setup(u => u.StartContentId).Returns(-1);
+            var user = userMock.Object;
+
             var userServiceMock = new Mock<IUserService>();
             //we're only assigning 3 nodes browse permissions so that is what we expect as a result
             var permissions = new List<EntityPermission>

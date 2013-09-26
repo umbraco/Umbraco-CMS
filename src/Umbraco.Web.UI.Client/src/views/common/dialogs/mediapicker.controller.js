@@ -37,10 +37,15 @@ angular.module("umbraco")
                     $scope.path = [];
                 }
                 
+
+
                 //mediaResource.rootMedia()
                 mediaResource.getChildren(folderId)
                     .then(function(data) {
-                        $scope.images = data;
+                        
+                        $scope.images = [];
+                        $scope.searchTerm = "";
+                        $scope.images = data.items;
                         //update the thumbnail property
                         _.each($scope.images, function(img) {
                             img.thumbnail = imageHelper.getThumbnail({ imageModel: img, scope: $scope });
@@ -56,6 +61,8 @@ angular.module("umbraco")
             });
             
             $scope.clickHandler = function(image, ev){
+                
+
                 if (image.contentTypeAlias.toLowerCase() == 'folder') {      
                     $scope.options.formData.currentFolder = image.id;
                     $scope.gotoFolder(image.id);
@@ -69,6 +76,8 @@ angular.module("umbraco")
                         }
                     });
                 }
+
+                ev.preventDefault();
             };
 
             $scope.selectMediaItem = function(image) {

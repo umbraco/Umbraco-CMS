@@ -61,11 +61,7 @@ namespace Umbraco.Web.Trees
                 collection.Add(rootNode); 
             }
 
-            return new SectionRootNode(rootId, "")
-                {
-                    Children = collection,
-                    IsContainer = true
-                };
+            return SectionRootNode.CreateMultiTreeSectionRoot(rootId, collection);
         }
 
         /// <summary>
@@ -113,13 +109,13 @@ namespace Umbraco.Web.Trees
                     throw new InvalidOperationException("Could not create root node for tree " + configTree.Alias);
                 }
 
-                var sectionRoot = new SectionRootNode(
-                    rootId,
-                    rootNode.Result.MenuUrl)
-                {
-                    Title = rootNode.Result.Title,
-                    Children = byControllerAttempt.Result
-                };
+                var sectionRoot = SectionRootNode.CreateSingleTreeSectionRoot(
+                    rootId, 
+                    rootNode.Result.ChildNodesUrl, 
+                    rootNode.Result.MenuUrl, 
+                    rootNode.Result.Title,
+                    byControllerAttempt.Result);
+
                 foreach (var d in rootNode.Result.AdditionalData)
                 {
                     sectionRoot.AdditionalData[d.Key] = d.Value;
@@ -130,15 +126,17 @@ namespace Umbraco.Web.Trees
             var legacyAttempt = configTree.TryLoadFromLegacyTree(id, queryStrings, Url, configTree.ApplicationAlias);
             if (legacyAttempt.Success)
             {
-                var sectionRoot = new SectionRootNode(
-                    rootId,
-                    Url.GetUmbracoApiService<LegacyTreeController>("GetMenu", rootId)
+                var sectionRoot = SectionRootNode.CreateSingleTreeSectionRoot(
+                   rootId,
+                   "", //TODO: I think we'll need this in this situation!
+                   Url.GetUmbracoApiService<LegacyTreeController>("GetMenu", rootId)
                         + "&parentId=" + rootId
                         + "&treeType=" + application
-                        + "&section=" + application)
-                {
-                    Children = legacyAttempt.Result
-                };
+                        + "&section=" + application,
+                   "", //TODO: I think we'll need this in this situation!
+                   legacyAttempt.Result);
+
+                
                 sectionRoot.AdditionalData.Add("treeAlias", configTree.Alias);
                 return sectionRoot;
             }

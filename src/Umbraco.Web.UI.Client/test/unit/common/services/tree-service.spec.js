@@ -11,17 +11,17 @@ describe('tree service tests', function () {
             id: -1,
             children: [
                 {
-                    name: "My website", id: 1234, childNodesUrl: url, icon: "icon-home", expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl,
+                    name: "My website", id: 1234, childNodesUrl: url, icon: "icon-home", expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl,
                     children: [
-                        { name: "random-name-1", childNodesUrl: url, id: 11, icon: "icon-home", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                        { name: "random-name-2", childNodesUrl: url, id: 12, icon: "icon-folder-close", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                        { name: "random-name-3", childNodesUrl: url, id: 13, icon: "icon-folder-close", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
-                        { name: "random-name-4", childNodesUrl: url, id: 14, icon: "icon-folder-close", defaultAction: "create", children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
+                        { name: "random-name-1", childNodesUrl: url, id: 11, icon: "icon-home",  children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                        { name: "random-name-2", childNodesUrl: url, id: 12, icon: "icon-folder-close",  children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                        { name: "random-name-3", childNodesUrl: url, id: 13, icon: "icon-folder-close",  children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl },
+                        { name: "random-name-4", childNodesUrl: url, id: 14, icon: "icon-folder-close",  children: [], expanded: false, hasChildren: true, level: 1, menuUrl: menuUrl }
                     ]
                 },
-                { name: "Components", id: 1235, childNodesUrl: url, icon: "icon-cogs", children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl },
-                { name: "Archieve", id: 1236, childNodesUrl: url, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl },
-                { name: "Recycle Bin", id: -20, childNodesUrl: url, icon: "icon-trash", routePath: "content/recyclebin", children: [], expanded: false, hasChildren: true, level: 1, defaultAction: "create", menuUrl: menuUrl }
+                { name: "Components", id: 1235, childNodesUrl: url, icon: "icon-cogs", children: [], expanded: false, hasChildren: true, level: 1,  menuUrl: menuUrl },
+                { name: "Archieve", id: 1236, childNodesUrl: url, icon: "icon-folder-close", children: [], expanded: false, hasChildren: true, level: 1,  menuUrl: menuUrl },
+                { name: "Recycle Bin", id: -20, childNodesUrl: url, icon: "icon-trash", routePath: "content/recyclebin", children: [], expanded: false, hasChildren: true, level: 1,  menuUrl: menuUrl }
             ],
             expanded: true,
             hasChildren: true,

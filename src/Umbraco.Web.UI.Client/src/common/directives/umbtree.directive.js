@@ -93,7 +93,7 @@ angular.module("umbraco.directives")
              *  When changing sections we don't want all of the tree-ndoes to do their 'leave' animations.
              */
             scope.animation = function () {
-                if (enableDeleteAnimations) {
+                if (enableDeleteAnimations && scope.tree.root.expanded) {
                     return { leave: 'tree-node-delete-leave' };
                 }
                 else {

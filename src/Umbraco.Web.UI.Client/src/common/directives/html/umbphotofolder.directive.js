@@ -4,7 +4,7 @@
 * @restrict E
 **/
 angular.module("umbraco.directives.html")
-.directive('umbPhotoFolder', function ($compile, $log, $timeout, imageHelper) {
+.directive('umbPhotoFolder', function ($compile, $log, $timeout, $filter, imageHelper) {
 
   return {
     restrict: 'E',
@@ -13,35 +13,15 @@ angular.module("umbraco.directives.html")
     terminate: true,
     templateUrl: 'views/directives/html/umb-photo-folder.html',
     link: function(scope, element, attrs, ngModel) {
-      
-      element.ready(function(){
-        var wat = 1;
 
-      });
-
-      ngModel.$render = function() {
-
-        if(ngModel.$modelValue){
-
-          $timeout(function(){
-
-          var photos = ngModel.$modelValue;
-          var rows = [];
-
-          scope.baseline = element.attr('baseline') ? parseInt(element.attr('baseline'),10) : 0;
-          scope.minWidth = element.attr('min-width') ? parseInt(element.attr('min-width'),10) : 420;
-          scope.minHeight = element.attr('min-height') ? parseInt(element.attr('min-height'),10) : 200;
-          scope.border = element.attr('border') ? parseInt(element.attr('border'),10) : 5;
-          scope.clickHandler = scope.$eval(element.attr('on-click'));
-          scope.lastWidth = Math.max(element.width(), scope.minWidth);
-
+      function _renderCollection(scope, photos){
           // get row width - this is fixed.
           var w = scope.lastWidth;
-
+          var rows = [];
 
           // initial height - effectively the maximum height +/- 10%;
           var h = Math.max(scope.minHeight,Math.floor(w / 5));
-         
+          
 
           // store relative widths of all images (scaled to match estimate height above)
           var ws = [];
@@ -146,8 +126,34 @@ angular.module("umbraco.directives.html")
               }
             }
 
-            //populate the scope
-            scope.rows = rows;
+            return rows;
+        }
+
+      ngModel.$render = function() {
+        if(ngModel.$modelValue){
+        
+        $timeout(function(){
+            var photos = ngModel.$modelValue;
+            
+            scope.baseline = element.attr('baseline') ? parseInt(element.attr('baseline'),10) : 0;
+            scope.minWidth = element.attr('min-width') ? parseInt(element.attr('min-width'),10) : 420;
+            scope.minHeight = element.attr('min-height') ? parseInt(element.attr('min-height'),10) : 200;
+            scope.border = element.attr('border') ? parseInt(element.attr('border'),10) : 5;
+            scope.clickHandler = scope.$eval(element.attr('on-click'));
+            scope.lastWidth = Math.max(element.width(), scope.minWidth);
+
+            scope.rows = _renderCollection(scope, photos);
+
+            if(attrs.filterBy){
+                scope.$watch(attrs.filterBy, function(newVal, oldVal){
+                      if(newVal !== oldVal){
+                          var p = $filter('filter')(photos, newVal, false);
+                          scope.baseline = 0;
+                          var m = _renderCollection(scope, p);
+                          scope.rows = m;
+                      }
+                });
+            }
 
             }, 500); //end timeout
           } //end if modelValue

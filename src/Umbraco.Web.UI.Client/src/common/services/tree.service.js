@@ -60,7 +60,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
 
         /**
          * @ngdoc method
-         * @name umbraco.services.treeService#getMenuItemByAlias
+         * @name umbraco.services.treeService#loadNodeChildren
          * @methodOf umbraco.services.treeService
          * @function
          *
@@ -237,39 +237,6 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                 });
         },
         
-        /**
-         * @ngdoc method
-         * @name umbraco.services.treeService#getMenuItemByAlias
-         * @methodOf umbraco.services.treeService
-         * @function
-         *
-         * @description
-         * Attempts to return a tree node's menu item based on the alias supplied, otherwise returns null.
-         * @param {object} args An arguments object
-         * @param {object} args.treeNode The tree node to get the menu item for
-         * @param {object} args.menuItemAlias The menu item alias to attempt to find
-         */
-        getMenuItemByAlias: function (args) {
-
-            if (!args) {
-                throw "args cannot be null";
-            }
-            if (!args.treeNode) {
-                throw "args.treeNode cannot be null";                
-            }
-            if (!args.menuItemAlias) {
-                throw "args.menuItemAlias cannot be null";
-            }
-
-            return this.getMenu(args)
-                .then(function (menuItems) {
-                    //try to find the node with the alias
-                    return _.find(menuItems, function(item) {
-                        return item.alias === args.menuItemAlias;
-                    });
-                });
-        },
-        
         /** Gets the children from the server for a given node */
         getChildren: function (args) {
 
@@ -282,12 +249,6 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
 
             var section = args.section || 'content';
             var treeItem = args.node;
-
-            //hack to have create as default content action
-            var action;
-            if(section === "content"){
-                action = "create";
-            }
 
             var self = this;
 

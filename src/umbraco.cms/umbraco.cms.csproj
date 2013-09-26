@@ -198,7 +198,6 @@
     <Compile Include="Actions\ActionRePublish.cs" />
     <Compile Include="Actions\ActionRights.cs" />
     <Compile Include="Actions\ActionRollback.cs" />
-    <Compile Include="Actions\ActionSave.cs" />
     <Compile Include="Actions\ActionSendToTranslate.cs" />
     <Compile Include="Actions\ActionSort.cs" />
     <Compile Include="Actions\ActionToPublish.cs" />

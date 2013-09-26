@@ -17,12 +17,12 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         {
             //arrange
             var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(9);
+            userMock.Setup(u => u.StartMediaId).Returns(-1);
             var user = userMock.Object;
-            user.Id = 9;
-            user.StartMediaId = -1;
             var mediaMock = new Mock<IMedia>();
+            mediaMock.Setup(m => m.Path).Returns("-1,1234,5678");
             var media = mediaMock.Object;
-            media.Path = "-1,1234,5678";
             var mediaServiceMock = new Mock<IMediaService>();            
             mediaServiceMock.Setup(x => x.GetById(1234)).Returns(media);
             var mediaService = mediaServiceMock.Object;
@@ -39,12 +39,12 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         {
             //arrange
             var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(9);
+            userMock.Setup(u => u.StartMediaId).Returns(-1);
             var user = userMock.Object;
-            user.Id = 9;
-            user.StartMediaId = -1;
             var mediaMock = new Mock<IMedia>();
+            mediaMock.Setup(m => m.Path).Returns("-1,1234,5678");
             var media = mediaMock.Object;
-            media.Path = "-1,1234,5678";
             var mediaServiceMock = new Mock<IMediaService>();
             mediaServiceMock.Setup(x => x.GetById(0)).Returns(media);
             var mediaService = mediaServiceMock.Object;
@@ -58,14 +58,14 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         {
             //arrange
             var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(9);
+            userMock.Setup(u => u.StartMediaId).Returns(9876);
             var user = userMock.Object;
-            user.Id = 9;
-            user.StartMediaId = 9876;
             var mediaMock = new Mock<IMedia>();
+            mediaMock.Setup(m => m.Path).Returns("-1,1234,5678");
             var media = mediaMock.Object;
-            media.Path = "-1,1234,5678";
             var mediaServiceMock = new Mock<IMediaService>();
-            mediaServiceMock.Setup(x => x.GetById(0)).Returns(media);
+            mediaServiceMock.Setup(x => x.GetById(1234)).Returns(media);
             var mediaService = mediaServiceMock.Object;
             
             //act
