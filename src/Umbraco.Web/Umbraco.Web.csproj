@@ -305,8 +305,11 @@
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\LogController.cs" />
     <Compile Include="Editors\MacroController.cs" />
+    <Compile Include="Models\ContentEditing\AuditLog.cs" />
     <Compile Include="Models\ContentEditing\MacroParameter.cs" />
     <Compile Include="Models\ContentEditing\UmbracoEntityTypes.cs" />
+    <Compile Include="Models\ContentEditing\AuditLogType.cs" />
+    <Compile Include="Models\Mapping\LogModelMapper.cs" />
     <Compile Include="Models\Mapping\MacroModelMapper.cs" />
     <Compile Include="PropertyEditors\ColorListPreValueEditor.cs" />
     <Compile Include="PropertyEditors\ListViewPropertyEditor.cs" />

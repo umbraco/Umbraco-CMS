@@ -66,7 +66,7 @@ function logResource($q, $http, umbRequestHelper) {
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "logApiBaseUrl",
-                       "GetUserLog",
+                       "GetCurrentUserLog",
                        [{ logtype: type, sinceDate: since }])),
                'Failed to retreive user data for id ' + id);
         },
