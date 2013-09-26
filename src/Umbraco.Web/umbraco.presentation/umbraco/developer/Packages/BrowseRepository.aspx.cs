@@ -56,7 +56,7 @@ namespace umbraco.presentation.developer.packages {
                     UmbracoVersion.Current.Major,
                     UmbracoVersion.Current.Minor,
                     UmbracoVersion.Current.Build,
-                    UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema.ToString(), Environment.Version,
+                    UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema.ToString(), Environment.Version,
                     Umbraco.Core.SystemUtilities.GetCurrentTrustLevel());
         }
 

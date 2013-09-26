@@ -16,6 +16,8 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class MacroController : UmbracoAuthorizedJsonController
     {
+        
+
         /// <summary>
         /// Gets the macro parameters to be filled in for a particular macro
         /// </summary>
@@ -40,8 +42,14 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="macroAlias"></param>
         /// <param name="pageId"></param>
+        /// <param name="macroParams">
+        /// To send a dictionary as a GET parameter the query should be structured like:
+        /// 
+        /// ?macroAlias=Test&pageId=3634&macroParams[0].key=myKey&macroParams[0].value=myVal&macroParams[1].key=anotherKey&macroParams[1].value=anotherVal
+        /// 
+        /// </param>
         /// <returns></returns>
-        public HttpResponseMessage GetMacroResultAsHtmlForEditor(string macroAlias, int pageId)
+        public HttpResponseMessage GetMacroResultAsHtmlForEditor(string macroAlias, int pageId, [FromUri]IDictionary<string, object> macroParams)
         {
             // note - here we should be using the cache, provided that the preview content is in the cache...
 
@@ -83,7 +91,7 @@ namespace Umbraco.Web.Editors
                 //need to create a specific content result formatted as html since this controller has been configured
                 //with only json formatters.
                 Content = new StringContent(
-                    Umbraco.RenderMacro(macro, new Dictionary<string, object>(), legacyPage).ToString(),
+                    Umbraco.RenderMacro(macro, macroParams, legacyPage).ToString(),
                     Encoding.UTF8,
                     "text/html"
                 )

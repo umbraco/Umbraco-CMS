@@ -20,6 +20,7 @@ using Constants = Umbraco.Core.Constants;
 using Examine;
 using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
+using Umbraco.Web.Dynamics;
 
 namespace Umbraco.Web.Editors
 {
@@ -69,9 +70,9 @@ namespace Umbraco.Web.Editors
             return GetResultForAncestors(id, type);
         }
 
-        public IEnumerable<EntityBasic> GetAll(UmbracoEntityTypes type)
+        public IEnumerable<EntityBasic> GetAll(UmbracoEntityTypes type, string postFilter, [FromUri]IDictionary<string, object> postFilterParams)
         {
-            return GetResultForAll(type);
+            return GetResultForAll(type, postFilter, postFilterParams);
         }
         
         private IEnumerable<EntityBasic> ExamineSearch(string query, bool isContent)
@@ -147,20 +148,49 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        private IEnumerable<EntityBasic> GetResultForAll(UmbracoEntityTypes entityType)
+        /// <summary>
+        /// Gets the result for the entity list based on the type
+        /// </summary>
+        /// <param name="entityType"></param>
+        /// <param name="postFilter">A string where filter that will filter the results dynamically with linq - optional</param>
+        /// <param name="postFilterParams">the parameters to fill in the string where filter - optional</param>
+        /// <returns></returns>
+        private IEnumerable<EntityBasic> GetResultForAll(UmbracoEntityTypes entityType, string postFilter = null, IDictionary<string, object> postFilterParams = null)
         {
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                return Services.EntityService.GetAll(objectType.Value).Select(Mapper.Map<EntityBasic>)
-                    .WhereNotNull();
+                //TODO: Should we order this by something ?
+                var entities = Services.EntityService.GetAll(objectType.Value).WhereNotNull().Select(Mapper.Map<EntityBasic>);
+                
+                //if a post filter is assigned then try to execute it
+                if (postFilter.IsNullOrWhiteSpace() == false)
+                {
+                    return postFilterParams == null
+                               ? entities.AsQueryable().Where(postFilter).ToArray()
+                               : entities.AsQueryable().Where(postFilter, postFilterParams).ToArray();
+
+                }
+                return entities;
             }
             //now we need to convert the unknown ones
             switch (entityType)
             {
                 case UmbracoEntityTypes.Macro:                    
                     //Get all macros from the macro service
-                    return Services.MacroService.GetAll().OrderBy(x => x.Name).Select(Mapper.Map<EntityBasic>);
+                    var result = Services.MacroService.GetAll().WhereNotNull().OrderBy(x => x.Name).AsQueryable();
+
+                    //if a post filter is assigned then try to execute it
+                    if (postFilter.IsNullOrWhiteSpace() == false)
+                    {
+                        result = postFilterParams == null
+                            ? result.Where(postFilter)
+                            : result.Where(postFilter, postFilterParams);
+
+                    }
+
+                    return result.Select(Mapper.Map<EntityBasic>);
+
                 case UmbracoEntityTypes.Domain:
 
                 case UmbracoEntityTypes.Language:

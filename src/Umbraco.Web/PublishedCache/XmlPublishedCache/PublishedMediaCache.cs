@@ -257,7 +257,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			if (xpath == null) throw new ArgumentNullException("xpath");
 
 			var values = new Dictionary<string, string> {{"nodeName", xpath.GetAttribute("nodeName", "")}};
-			if (!UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
+			if (!UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
 			{
 				values.Add("nodeTypeAlias", xpath.Name);
 			}

@@ -15,13 +15,13 @@ namespace Umbraco.Core.Persistence
         private readonly IUmbracoSettingsSection _settings;
 
         public RepositoryFactory()
-            : this(false, UmbracoConfiguration.Current.UmbracoSettings)
+            : this(false, UmbracoConfig.For.UmbracoSettings())
         {
             
         }
 
         internal RepositoryFactory(bool disableAllCache)
-            : this(disableAllCache, UmbracoConfiguration.Current.UmbracoSettings)
+            : this(disableAllCache, UmbracoConfig.For.UmbracoSettings())
         {
 
         }

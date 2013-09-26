@@ -320,7 +320,7 @@ namespace Umbraco.Web
 			{
 				LogHelper.Warn<UmbracoModule>("Umbraco is not ready");
 
-                if (UmbracoConfiguration.Current.UmbracoSettings.Content.EnableSplashWhileLoading == false)
+                if (UmbracoConfig.For.UmbracoSettings().Content.EnableSplashWhileLoading == false)
 				{
 					// let requests pile up and wait for 10s then show the splash anyway
 					ready = ApplicationContext.Current.WaitForReady(10 * 1000);
@@ -398,7 +398,7 @@ namespace Umbraco.Web
             else if (pcr.Is404)
             {
                 response.StatusCode = 404;
-                response.TrySkipIisCustomErrors = UmbracoConfiguration.Current.UmbracoSettings.WebRouting.TrySkipIisCustomErrors;
+                response.TrySkipIisCustomErrors = UmbracoConfig.For.UmbracoSettings().WebRouting.TrySkipIisCustomErrors;
             }
 
             if (pcr.ResponseStatusCode > 0)

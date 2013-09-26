@@ -93,7 +93,7 @@ namespace Umbraco.Web.PropertyEditors
 
                         var name = IOHelper.SafeFileName(file.FileName.Substring(file.FileName.LastIndexOf(IOHelper.DirSepChar) + 1, file.FileName.Length - file.FileName.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
 
-                        var subfolder = UmbracoConfiguration.Current.UmbracoSettings.Content.UploadAllowDirectories
+                        var subfolder = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
                                             ? currentPersistedFile.Replace(fs.GetUrl("/"), "").Split('/')[0]
                                             : currentPersistedFile.Substring(currentPersistedFile.LastIndexOf("/", StringComparison.Ordinal) + 1).Split('-')[0];
 
@@ -102,7 +102,7 @@ namespace Umbraco.Web.PropertyEditors
                                                  ? subfolderId.ToString(CultureInfo.InvariantCulture)
                                                  : MediaSubfolderCounter.Current.Increment().ToString(CultureInfo.InvariantCulture);
 
-                        var fileName = UmbracoConfiguration.Current.UmbracoSettings.Content.UploadAllowDirectories
+                        var fileName = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
                                            ? Path.Combine(numberedFolder, name)
                                            : numberedFolder + "-" + name;
 

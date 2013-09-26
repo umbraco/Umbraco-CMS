@@ -25,7 +25,7 @@ namespace Umbraco.Core.Macros
 	    /// 
 	    ///     {div class='umb-macro-holder'}
 	    ///         <!-- <?UMBRACO_MACRO macroAlias=\"myMacro\" /> -->
-	    ///         This could be some macro content
+	    ///         {ins}Macro alias: {strong}My Macro{/strong}{/ins}
 	    ///     {/div}
 	    /// 
 	    /// </remarks>
@@ -53,10 +53,11 @@ namespace Umbraco.Core.Macros
                     sb.Append(match.Groups[1].Value.Trim());
                     sb.Append(" />");
                     sb.AppendLine(" -->");
+                    sb.Append("<ins>");
                     sb.Append("Macro alias: ");
                     sb.Append("<strong>");
                     sb.Append(alias);
-                    sb.Append("</strong></div>");
+                    sb.Append("</strong></ins></div>");
                     return sb.ToString();
                 }
                 //replace with nothing if we couldn't find the syntax for whatever reason

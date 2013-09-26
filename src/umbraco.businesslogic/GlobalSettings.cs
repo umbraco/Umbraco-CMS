@@ -329,12 +329,7 @@ namespace umbraco
         {
         	return Umbraco.Core.Configuration.GlobalSettings.RequestIsInUmbracoApplication(context);
         }
-
-        public static bool RequestIsLiveEditRedirector(HttpContext context)
-        {
-			return Umbraco.Core.Configuration.GlobalSettings.RequestIsLiveEditRedirector(context);
-        }
-
+        
         /// <summary>
         /// Gets a value indicating whether umbraco should force a secure (https) connection to the backoffice.
         /// </summary>

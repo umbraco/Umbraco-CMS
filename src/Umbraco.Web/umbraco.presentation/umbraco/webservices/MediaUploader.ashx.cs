@@ -223,7 +223,7 @@ namespace umbraco.presentation.umbraco.webservices
 
             if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
             {
-                var mp = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider];
+                var mp = Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider];
                 if (mp != null && mp.ValidateUser(username, password))
                 {
                     var user = new User(username);

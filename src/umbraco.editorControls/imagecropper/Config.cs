@@ -3,6 +3,7 @@ using System.Collections;
 
 namespace umbraco.editorControls.imagecropper
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class Config
     {
         public string UploadPropertyAlias { get; set; }

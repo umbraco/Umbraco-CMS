@@ -18,18 +18,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <param name="settings"></param>
         public static void ConfigureSettings(IUmbracoSettingsSection settings)
         {
-            UmbracoConfiguration.Current.UmbracoSettings = settings;
-        }
-
-        /// <summary>
-        /// Used for unit tests to explicitly associate an IUmbracoConfigurationSection to an implementation
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="implementation"></param>
-        public static void SetSetting<T>(T implementation)
-            where T : IUmbracoConfigurationSection
-        {
-            UmbracoConfiguration.Set<T>(implementation);
+            UmbracoConfig.For.SetUmbracoSettings(settings);
         }
 
         /// <summary>

@@ -26,8 +26,6 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
         private int _nodeId = 0;
         private Guid _versionId;
 
-        public bool IsInLiveEditingMode { get; set; }
-
         public int NodeId
         {
             set { _nodeId = value; }
@@ -109,33 +107,19 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
         protected override void Render(HtmlTextWriter writer)
         {
             base.Render(writer);
-            if (!IsInLiveEditingMode)
-                writer.Write(m_scriptInitBlock.ToString());
-            else
-                // add a marker to tell Live Editing when a tinyMCE control is on the page
-                writer.Write("<input type='hidden' id='__umbraco_tinyMCE' />");
+            // add a marker to tell Live Editing when a tinyMCE control is on the page
+            writer.Write("<input type='hidden' id='__umbraco_tinyMCE' />");
         }
 
         protected override void OnLoad(EventArgs args)
         {
-            if (!IsInLiveEditingMode)
-                this.config["elements"] = this.ClientID;
+            this.config["elements"] = this.ClientID;
+               
 
             bool first = true;
 
-            // Render HTML for TinyMCE instance
-            // in the liveediting mode we're always preloading tinymce script
-            if (!IsInLiveEditingMode)
-            {
-                //TinyMCE uses it's own compressor so leave it up to ScriptManager to render
-                ScriptManager.RegisterClientScriptInclude(this, this.GetType(), _versionId.ToString(), this.ScriptURI);
-            }
-            else
-            {
-                //We're in live edit mode so add the base js file to the dependency list
-                ClientDependencyLoader.Instance.RegisterDependency("tinymce3/tiny_mce_src.js",
-                    "UmbracoClient", ClientDependencyType.Javascript);
-            }
+            //TinyMCE uses it's own compressor so leave it up to ScriptManager to render
+            ScriptManager.RegisterClientScriptInclude(this, this.GetType(), _versionId.ToString(), this.ScriptURI);
 
             // Write script tag start
             m_scriptInitBlock.Append(HtmlTextWriter.TagLeftChar.ToString());
@@ -150,54 +134,28 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
             foreach (string key in this.config.Keys)
             {
                 //TODO: This is a hack to test if we can prevent tinymce from automatically download languages
-                if (!IsInLiveEditingMode || (key != "language"))
-                {
-                    string val = this.config[key];
+                string val = this.config[key];
 
-                    if (!first)
-                        m_scriptInitBlock.Append(",\n");
-                    else
-                        first = false;
+                if (!first)
+                    m_scriptInitBlock.Append(",\n");
+                else
+                    first = false;
 
-                    // Is boolean state or string
-                    if (val == "true" || val == "false")
-                        m_scriptInitBlock.Append(key + ":" + this.config[key]);
-                    else
-                        m_scriptInitBlock.Append(key + ":'" + this.config[key] + "'");
-                }
+                // Is boolean state or string
+                if (val == "true" || val == "false")
+                    m_scriptInitBlock.Append(key + ":" + this.config[key]);
+                else
+                    m_scriptInitBlock.Append(key + ":'" + this.config[key] + "'");
             }
 
             m_scriptInitBlock.Append("\n});\n");
-            // we're wrapping the tinymce init call in a load function when in live editing,
-            // so we'll need to close that function declaration
-            if (IsInLiveEditingMode)
-            {
-                m_scriptInitBlock.Append(@"(function() { var f =
-                    function() {
-                        if(document.getElementById('__umbraco_tinyMCE'))
-                            tinyMCE.execCommand('mceAddControl',false,'").Append(ClientID).Append(@"'); 
-                        ItemEditing.remove_startEdit(f);
-                    }
-                    ItemEditing.add_startEdit(f);})();");
-                m_scriptInitBlock.Append(@"(function() { var f =
-                    function() {
-                        tinyMCE.execCommand('mceRemoveControl',false,'").Append(ClientID).Append(@"');
-                        ItemEditing.remove_stopEdit(f);
-                    }
-                    ItemEditing.add_stopEdit(f);})();");
-            }
+            
 
             // Write script tag end
             m_scriptInitBlock.Append(HtmlTextWriter.EndTagLeftChars);
             m_scriptInitBlock.Append("script");
             m_scriptInitBlock.Append(HtmlTextWriter.TagRightChar.ToString());
-
-            // add to script manager
-            if (IsInLiveEditingMode)
-            {
-                ScriptManager.RegisterClientScriptBlock(this, this.GetType(), new Guid().ToString(),
-                                            m_scriptInitBlock.ToString(), false);
-            }
+            
 
         }
 

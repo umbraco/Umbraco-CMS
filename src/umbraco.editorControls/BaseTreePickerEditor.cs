@@ -52,9 +52,8 @@ namespace umbraco.editorControls
             base.OnLoad(e);
 
             //need to check if this is an async postback in live editing, because if it is, we need to set the value
-            if ((ScriptManager.GetCurrent(Page).IsInAsyncPostBack 
-                && UmbracoContext.Current.LiveEditingContext.Enabled)
-                || !Page.IsPostBack)
+            //SD: Since live editing is removed I don't really think this is at all necessary but it's still here.
+            if ((ScriptManager.GetCurrent(Page).IsInAsyncPostBack) || !Page.IsPostBack)
             {
                 ItemIdValue.Value = StoredItemId != -1 ? StoredItemId.ToString() : "";
             }

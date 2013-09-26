@@ -36,7 +36,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
 			string value = xmlHelper.GetNodeValue(xmlData);
 			template.Template tmp = template.Template.GetByAlias(templateAlias);
 
-            if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
+            if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
 				value = tmp.EnsureMasterPageSyntax(value);
 
 			_addStringToHtmlElement(tmp, value, templateAlias, htmlElementId, position);
@@ -58,7 +58,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
 			string value = xmlHelper.GetNodeValue(xmlData);
 			template.Template tmp = template.Template.GetByAlias(templateAlias);
 
-			if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
+			if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
 				value = tmp.EnsureMasterPageSyntax(value);
 
 			_removeStringFromHtmlElement(tmp, value, templateAlias, htmlElementId);

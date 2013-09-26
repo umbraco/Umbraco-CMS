@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using ClientDependency.Core;
 using umbraco;
 using umbraco.cms.businesslogic.datatype;
 
@@ -14,6 +15,7 @@ namespace umbraco.editorControls.MultipleTextstring
     /// The MultipleTextstring control sets a character limit on a TextBox.
     /// </summary>
     [ValidationProperty("IsValid")]
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class MultipleTextstringControl : PlaceHolder
     {
         /// <summary>

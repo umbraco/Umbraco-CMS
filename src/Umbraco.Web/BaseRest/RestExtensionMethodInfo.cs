@@ -89,7 +89,7 @@ namespace Umbraco.Web.BaseRest
 		//
 		static RestExtensionMethodInfo GetFromConfiguration(string extensionAlias, string methodName, int paramsCount)
 		{
-            var config = UmbracoConfiguration.Current.BaseRestExtensions;
+            var config = UmbracoConfig.For.BaseRestExtensions();
 
 			var configExtension = config.Items[extensionAlias];
 			if (configExtension == null)

@@ -12,7 +12,7 @@ namespace umbraco
         { 
 
             var mediaType = cms.businesslogic.media.MediaType.MakeNew(User, Alias.Replace("'", "''"));
-            mediaType.IconUrl = UmbracoConfiguration.Current.UmbracoSettings.Content.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates ? ".sprTreeFolder" : "folder.gif";
+            mediaType.IconUrl = UmbracoConfig.For.UmbracoSettings().Content.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates ? ".sprTreeFolder" : "folder.gif";
            
             if (ParentID != -1)
             {

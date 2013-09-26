@@ -42,8 +42,6 @@ namespace umbraco.cms.presentation.user
         protected DropDownList userLanguage = new DropDownList();
         protected CheckBox NoConsole = new CheckBox();
         protected CheckBox Disabled = new CheckBox();
-        protected CheckBox DefaultToLiveEditing = new CheckBox();
-
 
         protected controls.ContentPicker mediaPicker = new umbraco.controls.ContentPicker();
         protected controls.ContentPicker contentPicker = new umbraco.controls.ContentPicker();
@@ -78,10 +76,7 @@ namespace umbraco.cms.presentation.user
             {
                 throw new Exception("Admin users can only be edited by admins");
             }
-
-            // check if canvas editing is enabled
-            DefaultToLiveEditing.Visible = UmbracoConfiguration.Current.UmbracoSettings.Content.EnableCanvasEditing;
-
+            
             // Populate usertype list
             foreach (UserType ut in UserType.getAll)
             {
@@ -115,8 +110,7 @@ namespace umbraco.cms.presentation.user
             // Console access and disabling
             NoConsole.Checked = u.NoConsole;
             Disabled.Checked = u.Disabled;
-            DefaultToLiveEditing.Checked = u.DefaultToLiveEditing;
-
+            
             PlaceHolder medias = new PlaceHolder();
             mediaPicker.AppAlias = Constants.Applications.Media;
             mediaPicker.TreeAlias = "media";
@@ -157,10 +151,7 @@ namespace umbraco.cms.presentation.user
 
             //Generel umrbaco access
             Pane ppAccess = new Pane();
-            if (UmbracoConfiguration.Current.UmbracoSettings.Content.EnableCanvasEditing)
-            {
-                ppAccess.addProperty(ui.Text("user", "defaultToLiveEditing", base.getUser()), DefaultToLiveEditing);
-            }
+            
             ppAccess.addProperty(ui.Text("user", "noConsole", base.getUser()), NoConsole);
             ppAccess.addProperty(ui.Text("user", "disabled", base.getUser()), Disabled);
 
@@ -311,7 +302,7 @@ namespace umbraco.cms.presentation.user
 
             if (!IsPostBack)
             {
-                MembershipUser user = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider].GetUser(u.LoginName, true);
+                MembershipUser user = Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider].GetUser(u.LoginName, true);
                 uname.Text = u.Name;
                 lname.Text = (user == null) ? u.LoginName : user.UserName;
                 email.Text = (user == null) ? u.Email : user.Email;
@@ -376,7 +367,7 @@ namespace umbraco.cms.presentation.user
             {
                 try
                 {
-                    MembershipUser user = Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider].GetUser(u.LoginName, true);
+                    MembershipUser user = Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider].GetUser(u.LoginName, true);
 
 
                     string tempPassword = ((controls.passwordChanger)passw.Controls[0]).Password;
@@ -388,14 +379,14 @@ namespace umbraco.cms.presentation.user
                     }
 
                     // Is it using the default membership provider
-                    if (Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider] is UsersMembershipProvider)
+                    if (Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider] is UsersMembershipProvider)
                     {
                         // Save user in membership provider
                         UsersMembershipUser umbracoUser = user as UsersMembershipUser;
                         umbracoUser.FullName = uname.Text.Trim();
                         umbracoUser.Language = userLanguage.SelectedValue;
                         umbracoUser.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
-                        Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider].UpdateUser(umbracoUser);
+                        Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider].UpdateUser(umbracoUser);
 
                         // Save user details
                         u.Email = email.Text.Trim();
@@ -406,7 +397,7 @@ namespace umbraco.cms.presentation.user
                         u.Name = uname.Text.Trim();
                         u.Language = userLanguage.SelectedValue;
                         u.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
-                        if (!(Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider] is ActiveDirectoryMembershipProvider)) Membership.Providers[UmbracoConfiguration.Current.UmbracoSettings.Providers.DefaultBackOfficeUserProvider].UpdateUser(user);
+                        if (!(Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider] is ActiveDirectoryMembershipProvider)) Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider].UpdateUser(user);
                     }
 
 
@@ -427,7 +418,7 @@ namespace umbraco.cms.presentation.user
 
 
                     u.Disabled = Disabled.Checked;
-                    u.DefaultToLiveEditing = DefaultToLiveEditing.Checked;
+                    
                     u.NoConsole = NoConsole.Checked;
                     //u.StartMediaId = int.Parse(mediaStartNode.Value);
 

@@ -16,7 +16,7 @@ namespace Umbraco.Core.IO
 	    private readonly IContentSection _contentConfig;
 
 	    public MediaFileSystem(IFileSystem wrapped)
-			: this(wrapped, UmbracoConfiguration.Current.UmbracoSettings.Content)
+			: this(wrapped, UmbracoConfig.For.UmbracoSettings().Content)
 		{
 		}
 

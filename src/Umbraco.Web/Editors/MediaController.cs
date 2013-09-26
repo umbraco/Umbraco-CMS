@@ -277,6 +277,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         /// <remarks>
         /// We cannot validate this request with attributes (nicely) due to the nature of the multi-part for data.
+        /// 
+        /// TOOD: Validate this request properly!
         /// </remarks>
         public async Task<HttpResponseMessage> PostAddFile()
         {

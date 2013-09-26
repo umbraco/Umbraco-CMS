@@ -25,13 +25,13 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
                     $scope.macroParams = data;
                     
                     //fill in the data if we are editing this macro
-                    if ($scope.dialogData && $scope.dialogData.macroData && $scope.dialogData.macroData.params) {
-                        _.each($scope.dialogData.macroData.params, function(p) {
+                    if ($scope.dialogData && $scope.dialogData.macroData && $scope.dialogData.macroData.marcoParamsDictionary) {
+                        _.each($scope.dialogData.macroData.marcoParamsDictionary, function (val, key) {
                             var prop = _.find($scope.macroParams, function (item) {
-                                return item.alias == p.alias;
+                                return item.alias == key;
                             });
                             if (prop) {
-                                prop.value = p.value;
+                                prop.value = val;
                             }
                         });
 
@@ -44,10 +44,13 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
     function submitForm() {
         
         //collect the value data, close the dialog and send the data back to the caller
-        var vals = _.map($scope.macroParams, function (item) {
-            return { value: item.value, alias: item.alias };
-        });
 
+        //create a dictionary for the macro params
+        var paramDictionary = {};
+        _.each($scope.macroParams, function (item) {
+            paramDictionary[item.alias] = item.value;
+        });
+        
         //need to find the macro alias for the selected id
         var macroAlias = _.find($scope.macros, function (item) {
             return item.id == $scope.selectedMacro;
@@ -56,16 +59,16 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
         //get the syntax based on the rendering engine
         var syntax;
         if ($scope.dialogData.renderingEngine && $scope.dialogData.renderingEngine === "WebForms") {
-            syntax = macroService.generateWebFormsSyntax({ macroAlias: macroAlias, macroParams: vals });
+            syntax = macroService.generateWebFormsSyntax({ macroAlias: macroAlias, marcoParamsDictionary: paramDictionary });
         }
         else if ($scope.dialogData.renderingEngine && $scope.dialogData.renderingEngine === "Mvc") {
-            syntax = macroService.generateMvcSyntax({ macroAlias: macroAlias, macroParams: vals });
+            syntax = macroService.generateMvcSyntax({ macroAlias: macroAlias, marcoParamsDictionary: paramDictionary });
         }
         else {
-            syntax = macroService.generateMacroSyntax({ macroAlias: macroAlias, macroParams: vals });
+            syntax = macroService.generateMacroSyntax({ macroAlias: macroAlias, marcoParamsDictionary: paramDictionary });
         }
 
-        $scope.submit({syntax : syntax, macroAlias: macroAlias, macroParams: vals });
+        $scope.submit({ syntax: syntax, macroAlias: macroAlias, marcoParamsDictionary: paramDictionary });
     }
 
     $scope.macros = [];
@@ -101,16 +104,16 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
         $scope.wizardStep = "paramSelect";
     }
     
-    //get the macro list
-    entityResource.getAll("Macro")
+    //get the macro list - pass in a filter if it is only for rte
+    entityResource.getAll("Macro", ($scope.dialogData && $scope.dialogData.richTextEditor && $scope.dialogData.richTextEditor === true) ? "UseInEditor=true" : null)
         .then(function (data) {
 
             $scope.macros = data;
 
             //check if there's a pre-selected macro and if it exists
-            if ($scope.dialogData && $scope.dialogData.macroData && $scope.dialogData.macroData.alias) {
+            if ($scope.dialogData && $scope.dialogData.macroData && $scope.dialogData.macroData.macroAlias) {
                 var found = _.find(data, function (item) {
-                    return item.alias === $scope.dialogData.macroData.alias;
+                    return item.alias === $scope.dialogData.macroData.macroAlias;
                 });
                 if (found) {
                     //select the macro and go to next screen

@@ -26,11 +26,11 @@ function macroService() {
             var paramExpression = new RegExp("(\\w+?)=['\"](.*?)['\"]", "g");
             var paramMatch;
             var returnVal = {
-                alias: alias,
-                params: []
+                macroAlias: alias,
+                marcoParamsDictionary: {}
             };
             while (paramMatch = paramExpression.exec(paramsChunk)) {
-                returnVal.params.push({ alias: paramMatch[1], value: paramMatch[2] });
+                returnVal.marcoParamsDictionary[paramMatch[1]] = paramMatch[2];
             }
             return returnVal;
         },
@@ -52,12 +52,13 @@ function macroService() {
 
             var macroString = '<?UMBRACO_MACRO macroAlias=\"' + args.macroAlias + "\" ";
 
-            if (args.macroParams) {
-                for (var i = 0; i < args.macroParams.length; i++) {
+            if (args.marcoParamsDictionary) {
 
-                    var keyVal = args.macroParams[i].alias + "=\"" + (args.macroParams[i].value ? args.macroParams[i].value : "") + "\" ";
+                _.each(args.marcoParamsDictionary, function (val, key) {
+                    var keyVal = key + "=\"" + (val ? val : "") + "\" ";
                     macroString += keyVal;
-                }
+                });
+
             }
 
             macroString += "/>";
@@ -80,12 +81,13 @@ function macroService() {
             
             var macroString = '<umbraco:Macro ';
 
-            if (args.macroParams) {
-                for (var i = 0; i < args.macroParams.length; i++) {
-
-                    var keyVal = args.macroParams[i].alias + "=\"" + (args.macroParams[i].value ? args.macroParams[i].value : "") + "\" ";
+            if (args.marcoParamsDictionary) {
+                
+                _.each(args.marcoParamsDictionary, function (val, key) {
+                    var keyVal = key + "=\"" + (val ? val : "") + "\" ";
                     macroString += keyVal;
-                }
+                });
+
             }
 
             macroString += "Alias=\"" + args.macroAlias + "\" runat=\"server\"></umbraco:Macro>";
@@ -108,19 +110,28 @@ function macroService() {
 
             var macroString = "@Umbraco.RenderMacro(\"" + args.macroAlias + "\"";
 
-            if (args.macroParams && args.macroParams.length > 0) {
-                macroString += ", new {";
-                for (var i = 0; i < args.macroParams.length; i++) {
-                    
-                    var keyVal = args.macroParams[i].alias + "=\"" + (args.macroParams[i].value ? args.macroParams[i].value : "") + "\"";
+            var hasParams = false;
+            var paramString;
+            if (args.marcoParamsDictionary) {
+                
+                paramString = ", new {";
 
-                    macroString += keyVal;
+                _.each(args.marcoParamsDictionary, function(val, key) {
+
+                    hasParams = true;
                     
-                    if (i < args.macroParams.length - 1) {
-                        macroString += ", ";
-                    }
-                }
-                macroString += "}";
+                    var keyVal = key + "=\"" + (val ? val : "") + "\", ";
+
+                    paramString += keyVal;
+                });
+                
+                //remove the last , 
+                paramString = paramString.trimEnd(", ");
+
+                paramString += "}";
+            }
+            if (hasParams) {
+                macroString += paramString;
             }
 
             macroString += ")";

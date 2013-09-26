@@ -15,7 +15,6 @@ namespace Umbraco.Core.Models.Membership
         int StartContentId { get; set; }
         int StartMediaId { get; set; }
         string Language { get; set; }
-        bool DefaultToLiveEditing { get; set; }
         
         bool NoConsole { get; set; }
         IUserType UserType { get; }

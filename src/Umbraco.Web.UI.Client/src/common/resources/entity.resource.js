@@ -128,16 +128,29 @@ function entityResource($q, $http, umbRequestHelper) {
          * </pre> 
          * 
          * @param {string} type Object type name        
+         * @param {string} postFilter optional filter expression which will execute a dynamic where clause on the server
+         * @param {string} postFilterParams optional parameters for the postFilter expression
          * @returns {Promise} resourcePromise object containing the entity.
          *
          */
-        getAll: function (type) {            
+        getAll: function (type, postFilter, postFilterParams) {            
+
+            //need to build the query string manually
+            var query = "type=" + type + "&postFilter=" + (postFilter ? postFilter : "");
+            if (postFilter && postFilterParams) {
+                var counter = 0;
+                _.each(postFilterParams, function(val, key) {
+                    query += "&postFilterParams[" + counter + "].key=" + key + "&postFilterParams[" + counter + "].value=" + val;
+                    counter++;
+                });
+            } 
+
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetAll",
-                       [{type: type }])),
+                       query)),
                'Failed to retreive entity data for type ' + type);
         },
 

@@ -14,6 +14,7 @@ using umbraco.editorControls;
 
 namespace umbraco.editorControls.mediapicker
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class MediaPickerPrevalueEditor : System.Web.UI.WebControls.PlaceHolder, umbraco.interfaces.IDataPrevalue
     {
 

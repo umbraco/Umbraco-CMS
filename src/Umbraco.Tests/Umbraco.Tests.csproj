@@ -237,6 +237,7 @@
     <Compile Include="Controllers\WebApiEditors\FilterAllowedOutgoingContentAttributeTests.cs" />
     <Compile Include="Controllers\WebApiEditors\MediaControllerUnitTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
+    <Compile Include="Dynamics\QueryableExtensionTests.cs" />
     <Compile Include="DynamicsAndReflection\ExtensionMethodFinderTests.cs" />
     <Compile Include="DynamicsAndReflection\ReflectionTests.cs" />
     <Compile Include="Integration\CreateContent.cs" />

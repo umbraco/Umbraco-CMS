@@ -75,7 +75,7 @@ namespace umbraco {
                     string langXpath = CreateXPathQuery(domainUrl + "/" + url, false);
                     if (content.Instance.XmlContent.DocumentElement.SelectSingleNode(langXpath) != null)
                         return langXpath;
-                    else if (UmbracoConfiguration.Current.UmbracoSettings.RequestHandler.UseDomainPrefixes)
+                    else if (UmbracoConfig.For.UmbracoSettings().RequestHandler.UseDomainPrefixes)
                         return "/domainprefixes-are-used-so-i-do-not-work";
                 }
             }
@@ -143,7 +143,7 @@ namespace umbraco {
                 string currentDomain = System.Web.HttpContext.Current.Request.ServerVariables["SERVER_NAME"];
                 string prefixXPath = "";
                 if (Domain.Exists(currentDomain)) {
-                    string xpathDomain = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "//node [@id = '{0}']" : "//* [@isDoc and @id = '{0}']";
+                    string xpathDomain = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "//node [@id = '{0}']" : "//* [@isDoc and @id = '{0}']";
                     prefixXPath = string.Format(xpathDomain, Domain.GetRootFromDomain(currentDomain));
                     _cacheUrl = false;
                 }
@@ -151,7 +151,7 @@ namespace umbraco {
 
                 // the reason we have almost two identical queries in the xpath is to support scenarios where the user have 
                 // entered "/my-url" instead of "my-url" (ie. added a beginning slash)
-                string xpath = UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema ? "//node [contains(concat(',',translate(data [@alias = 'umbracoUrlAlias'], ' ', ''),','),',{0},') or contains(concat(',',translate(data [@alias = 'umbracoUrlAlias'], ' ', ''),','),',{1},')]" :
+                string xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "//node [contains(concat(',',translate(data [@alias = 'umbracoUrlAlias'], ' ', ''),','),',{0},') or contains(concat(',',translate(data [@alias = 'umbracoUrlAlias'], ' ', ''),','),',{1},')]" :
                     "//* [@isDoc and (contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{0},') or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{1},'))]";
                 string query = String.Format(prefixXPath + xpath, tempUrl, "/" + tempUrl);
                 XmlNode redir =

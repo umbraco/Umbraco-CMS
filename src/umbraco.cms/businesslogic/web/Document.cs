@@ -1315,11 +1315,11 @@ namespace umbraco.cms.businesslogic.web
             x.Attributes.Append(addAttribute(xd, "urlName", urlName));
             x.Attributes.Append(addAttribute(xd, "writerName", Writer.Name));
             x.Attributes.Append(addAttribute(xd, "creatorName", Creator.Name.ToString()));
-            if (ContentType != null && UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
+            if (ContentType != null && UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
                 x.Attributes.Append(addAttribute(xd, "nodeTypeAlias", ContentType.Alias));
             x.Attributes.Append(addAttribute(xd, "path", Path));
 
-            if (!UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema)
+            if (!UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
             {
                 x.Attributes.Append(addAttribute(xd, "isDoc", ""));
             }

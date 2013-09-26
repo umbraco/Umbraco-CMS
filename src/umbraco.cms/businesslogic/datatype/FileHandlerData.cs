@@ -66,7 +66,7 @@ namespace umbraco.cms.businesslogic.datatype
                     {
                         var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
-                        var subfolder = UmbracoConfiguration.Current.UmbracoSettings.Content.UploadAllowDirectories
+                        var subfolder = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
                             ? currentValue.Replace(fs.GetUrl("/"), "").Split('/')[0]
                             : currentValue.Substring(currentValue.LastIndexOf("/", StringComparison.Ordinal) + 1).Split('-')[0];
                         
@@ -75,7 +75,7 @@ namespace umbraco.cms.businesslogic.datatype
                             ? subfolderId.ToString(CultureInfo.InvariantCulture)
                             : MediaSubfolderCounter.Current.Increment().ToString(CultureInfo.InvariantCulture);
 
-                        var fileName = UmbracoConfiguration.Current.UmbracoSettings.Content.UploadAllowDirectories 
+                        var fileName = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories 
                             ? Path.Combine(numberedFolder, name) 
                             : numberedFolder + "-" + name;
                         
@@ -103,10 +103,10 @@ namespace umbraco.cms.businesslogic.datatype
                         }
 
                         // check for auto fill of other properties (width, height, extension and filesize)
-                        if (UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties.Any())
+                        if (UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties.Any())
                         {
                             var uploadFieldConfigNode =
-                                UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties.FirstOrDefault(x => x.Alias == PropertyTypeAlias);
+                                UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties.FirstOrDefault(x => x.Alias == PropertyTypeAlias);
 
                             if (uploadFieldConfigNode != null)
                             {
@@ -139,10 +139,10 @@ namespace umbraco.cms.businesslogic.datatype
             if (PropertyId == default(int))
                 return;
 
-            if (UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties.Any())
+            if (UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties.Any())
             {
                 var uploadFieldConfigNode =
-                    UmbracoConfiguration.Current.UmbracoSettings.Content.ImageAutoFillProperties.FirstOrDefault(x => x.Alias == PropertyTypeAlias);
+                    UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties.FirstOrDefault(x => x.Alias == PropertyTypeAlias);
                 if (uploadFieldConfigNode != null)
                 {
                     // get the current document

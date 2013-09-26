@@ -272,13 +272,7 @@ namespace Umbraco.Web.Trees
                     return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/assignDomain2.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
-                            ui.GetText("actions", "assignDomain")));
-                case "UmbClientMgr.appActions().actionLiveEdit()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "canvas.aspx?redir=/" + nodeId + ".aspx",
-                            "",
-                            ActionUrlMethod.BlankWindow));
+                            ui.GetText("actions", "assignDomain")));                
                 case "UmbClientMgr.appActions().actionSendToTranslate()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(

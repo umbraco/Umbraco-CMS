@@ -27,7 +27,7 @@ using umbraco.cms.businesslogic.template;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
 using umbraco.BusinessLogic.Actions;
-using umbraco.cms.businesslogic.skinning;
+
 
 namespace umbraco
 {
@@ -72,7 +72,7 @@ namespace umbraco
                 RenderTemplateFolderItems(folder, folderPath, ref tree);
             else
             {
-                if (UmbracoConfiguration.Current.UmbracoSettings.Templates.EnableTemplateFolders)
+                if (UmbracoConfig.For.UmbracoSettings().Templates.EnableTemplateFolders)
                     RenderTemplateFolders(ref tree);
                 
                 RenderTemplates(ref tree);
@@ -195,7 +195,7 @@ namespace umbraco
                 xNode.Source = GetTreeServiceUrl(t.Id);
                 xNode.HasChildren = t.HasChildren;
 
-                if (UmbracoConfiguration.Current.UmbracoSettings.Templates.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(t))
+                if (UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(t))
                 {
                     xNode.Action = "javascript:openView(" + t.Id + ");";
                     xNode.Icon = "icon-newspaper-alt";

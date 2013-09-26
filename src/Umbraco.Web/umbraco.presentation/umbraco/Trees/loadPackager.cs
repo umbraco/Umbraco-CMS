@@ -174,9 +174,6 @@ namespace umbraco
 
                         treeElement.SetAttribute("text", ui.Text("treeHeaders", "installStarterKit"));
 
-                        if (cms.businesslogic.skinning.Skinning.IsStarterKitInstalled())
-                            treeElement.SetAttribute("text", ui.Text("treeHeaders", "installSkin"));
-
                         break;
 
                     default:

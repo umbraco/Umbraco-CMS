@@ -2,22 +2,12 @@
 using System.Collections.Generic;
 using System.Web;
 using Umbraco.Core;
-using Umbraco.Core.Services;
-using Umbraco.Core.CodeAnnotations;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using umbraco;
-using umbraco.IO;
-using umbraco.presentation;
-using umbraco.presentation.LiveEditing;
-using umbraco.BasePages;
-using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic;
-using System.Xml;
 using umbraco.presentation.preview;
-using Examine.Providers;
-using Examine;
 using IOHelper = Umbraco.Core.IO.IOHelper;
 using SystemDirectories = Umbraco.Core.IO.SystemDirectories;
 

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Web;
 using Umbraco.Core.Configuration;
-using umbraco.presentation.LiveEditing;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.web;
-using System.Xml.Linq;
 using umbraco.BusinessLogic;
 using System.Xml;
 using umbraco.presentation.preview;
@@ -112,31 +110,10 @@ namespace umbraco.presentation
         {
             get
             {
-                return !UmbracoConfiguration.Current.UmbracoSettings.Content.UseLegacyXmlSchema;
+                return !UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema;
             }
         }
-
-        /// <summary>
-        /// Gets the current Live Editing Context.
-        /// </summary>
-        public virtual ILiveEditingContext LiveEditingContext
-        {
-            get
-            {
-                ILiveEditingContext value = (ILiveEditingContext)_httpContext.Items["LiveEditingContext"];
-                if (value == null)
-                {
-                    LiveEditingContext = value = new DefaultLiveEditingContext();
-                }
-                return value;
-            }
-
-            set
-            {
-                _httpContext.Items["LiveEditingContext"] = value;
-            }
-        }
-
+        
         /// <summary>
         /// Gets the response for the current context
         /// </summary>

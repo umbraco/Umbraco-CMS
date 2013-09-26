@@ -220,7 +220,6 @@ namespace Umbraco.Core.Services
 
                 var user = new User(userType)
                 {
-                    DefaultToLiveEditing = false,
                     Email = email,
                     Language = Umbraco.Core.Configuration.GlobalSettings.DefaultUILanguage,
                     Name = name,

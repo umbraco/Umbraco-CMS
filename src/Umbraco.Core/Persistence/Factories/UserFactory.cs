@@ -30,11 +30,10 @@ namespace Umbraco.Core.Persistence.Factories
                            IsLockedOut = dto.Disabled,
                            IsApproved = dto.Disabled == false,
                            Email = dto.Email,
-                           Language = dto.UserLanguage,
-                           DefaultToLiveEditing = dto.DefaultToLiveEditing,
+                           Language = dto.UserLanguage,                          
                            NoConsole = dto.NoConsole,
                            
-                           //NOTE: The umbracoUser.DefaultPermissions column is never used, the default permission come from the user type's default permissions
+                           //NOTE: The default permission come from the user type's default permissions
                            DefaultPermissions = _userType.Permissions
                        };
 
@@ -56,7 +55,6 @@ namespace Umbraco.Core.Persistence.Factories
                           {
                               ContentStartId = entity.StartContentId,
                               MediaStartId = entity.StartMediaId,
-                              DefaultToLiveEditing = entity.DefaultToLiveEditing,
                               Disabled = entity.IsApproved == false,
                               Email = entity.Email,
                               Login = entity.Username,
@@ -65,8 +63,6 @@ namespace Umbraco.Core.Persistence.Factories
                               UserLanguage = entity.Language,
                               UserName = entity.Name,
                               Type = short.Parse(entity.UserType.Id.ToString(CultureInfo.InvariantCulture)),
-                              //NOTE: This column in the db is *not* used so we'll just let it remain null
-                              DefaultPermissions = null,
                               User2AppDtos = new List<User2AppDto>()
                           };
 

@@ -92,7 +92,7 @@ namespace umbraco.cms.businesslogic.media
                         int subfolderId;
                         var currentValue = prop.Value.ToString();
 
-                        var subfolder = UmbracoConfiguration.Current.UmbracoSettings.Content.UploadAllowDirectories
+                        var subfolder = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
                             ? currentValue.Replace(FileSystem.GetUrl("/"), "").Split('/')[0]
                             : currentValue.Substring(currentValue.LastIndexOf("/", StringComparison.Ordinal) + 1).Split('-')[0];
                         

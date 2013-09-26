@@ -1,5 +1,8 @@
-﻿namespace umbraco.editorControls.imagecropper
+﻿using System;
+
+namespace umbraco.editorControls.imagecropper
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     struct Crop
     {
         public int X;
@@ -16,6 +19,7 @@
         }
     }
 
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     enum DefaultCropPosition
     {
         CenterCenter = 0,
@@ -29,6 +33,7 @@
         RightBottom
     }
 
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     struct Preset
     {
         public string Name;

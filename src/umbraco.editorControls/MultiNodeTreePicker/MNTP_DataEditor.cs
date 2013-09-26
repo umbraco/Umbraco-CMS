@@ -27,6 +27,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 	[ClientDependency(ClientDependencyType.Javascript, "ui/jquery.tooltip.min.js", "UmbracoClient")]
 	[ClientDependency(ClientDependencyType.Javascript, "controls/Images/ImageViewer.js", "UmbracoRoot")]
     [ValidationProperty("Value")]
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
 	public class MNTP_DataEditor : Control, INamingContainer
 	{
 		#region Static Constructor
@@ -313,8 +314,8 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 			base.OnLoad(e);
 
 			//add the js/css required
-			this.RegisterEmbeddedClientResource("umbraco.editorControls.MultiNodeTreePicker.MultiNodePickerStyles.css", umbraco.cms.businesslogic.datatype.ClientDependencyType.Css);
-			this.RegisterEmbeddedClientResource("umbraco.editorControls.MultiNodeTreePicker.MultiNodePickerScripts.js", umbraco.cms.businesslogic.datatype.ClientDependencyType.Javascript);
+			this.RegisterEmbeddedClientResource("umbraco.editorControls.MultiNodeTreePicker.MultiNodePickerStyles.css", ClientDependencyType.Css);
+			this.RegisterEmbeddedClientResource("umbraco.editorControls.MultiNodeTreePicker.MultiNodePickerScripts.js", ClientDependencyType.Javascript);
 
 			//update the tree type (we need to do this each time because i don't think view state works with these controls)
 			switch (TreeToRender)

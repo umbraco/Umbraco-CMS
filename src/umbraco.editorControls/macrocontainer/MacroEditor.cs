@@ -14,6 +14,7 @@ using System.Web;
 
 namespace umbraco.editorControls.macrocontainer
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class MacroEditor : System.Web.UI.Control
     {
         private List<string> _allowedMacros;
@@ -85,71 +86,36 @@ namespace umbraco.editorControls.macrocontainer
         {
             base.OnLoad(e);
 
-
-            if (!GlobalSettings.RequestIsInUmbracoApplication(HttpContext.Current) && umbraco.presentation.UmbracoContext.Current.LiveEditingContext.Enabled)
+            if (!Page.IsPostBack)
             {
-                if (ViewState[ID + "init"] == null)
+
+                //Handle Initial Request
+                if (DataValues["macroalias"] != null)
                 {
-                    if (DataValues["macroalias"] != null)
-                    {
-                        //Data is available from the database, initialize the form with the data
-                        string alias = DataValues["macroalias"].ToString();
+                    //Data is available from the database, initialize the form with the data
+                    string alias = DataValues["macroalias"].ToString();
 
-                        //Set Pulldown selected value based on the macro alias
-                        _macroSelectDropdown.SelectedValue = alias;
+                    //Set Pulldown selected value based on the macro alias
+                    _macroSelectDropdown.SelectedValue = alias;
 
-                        //Create from with values based on the alias
-                        InitializeForm(alias);
-                    }
-                    else
-                    {
-                        this.Visible = false;
-                    }
-
-                    ViewState[ID + "init"] = "ok";
+                    //Create from with values based on the alias
+                    InitializeForm(alias);
                 }
                 else
                 {
-                    //Render form if properties are in the viewstate
-                    if (SelectedProperties.Count > 0)
-                    {
-                        RendeFormControls();
-                    }
+                    this.Visible = false;
                 }
+
             }
             else
             {
-
-                if (!Page.IsPostBack)
+                //Render form if properties are in the viewstate
+                if (SelectedProperties.Count > 0)
                 {
-
-                    //Handle Initial Request
-                    if (DataValues["macroalias"] != null)
-                    {
-                        //Data is available from the database, initialize the form with the data
-                        string alias = DataValues["macroalias"].ToString();
-
-                        //Set Pulldown selected value based on the macro alias
-                        _macroSelectDropdown.SelectedValue = alias;
-
-                        //Create from with values based on the alias
-                        InitializeForm(alias);
-                    }
-                    else
-                    {
-                        this.Visible = false;
-                    }
-
-                }
-                else
-                {
-                    //Render form if properties are in the viewstate
-                    if (SelectedProperties.Count > 0)
-                    {
-                        RendeFormControls();
-                    }
+                    RendeFormControls();
                 }
             }
+
             //Make sure child controls get rendered
             EnsureChildControls();
 

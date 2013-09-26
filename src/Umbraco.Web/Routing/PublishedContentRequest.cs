@@ -164,7 +164,7 @@ namespace Umbraco.Web.Routing
 		    IsInternalRedirectPublishedContent = isInternalRedirect;
 
             // must restore the template if it's an internal redirect & the config option is set
-            if (isInternalRedirect && UmbracoConfiguration.Current.UmbracoSettings.WebRouting.InternalRedirectPreservesTemplate)
+            if (isInternalRedirect && UmbracoConfig.For.UmbracoSettings().WebRouting.InternalRedirectPreservesTemplate)
             {
                 // restore
                 _template = template;

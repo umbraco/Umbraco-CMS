@@ -43,7 +43,7 @@ namespace umbraco.dialogs
 			pp_removePTags.Text = ui.Text("templateEditor", "removeParagraph");
 
 
-			if (UmbracoConfiguration.Current.UmbracoSettings.Templates.UseAspNetMasterPages)
+			if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
 			{
 				tagName.Value = "umbraco:Item";
 			}

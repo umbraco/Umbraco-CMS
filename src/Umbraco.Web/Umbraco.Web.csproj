@@ -686,9 +686,6 @@
     <Compile Include="umbraco.presentation\umbraco\channels\rsd.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\canvas.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\moveOrCopy.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1071,13 +1068,6 @@
     <Compile Include="umbraco.presentation\umbraco\dashboard\SettingsDashboardVideos.ascx.designer.cs">
       <DependentUpon>SettingsDashboardVideos.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\Settings\Applyskin.ascx.cs">
-      <DependentUpon>Applyskin.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\Settings\Applyskin.ascx.designer.cs">
-      <DependentUpon>Applyskin.ascx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\StartupDashboardIntro.ascx.designer.cs">
       <DependentUpon>StartupDashboardIntro.ascx</DependentUpon>
     </Compile>
@@ -1115,66 +1105,6 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\Preview.aspx.designer.cs">
       <DependentUpon>Preview.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\TemplateSkinning.aspx.cs">
-      <DependentUpon>TemplateSkinning.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\TemplateSkinning.aspx.designer.cs">
-      <DependentUpon>TemplateSkinning.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\CanvasClientDependencyProvider.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\CssParser.aspx.cs">
-      <DependentUpon>CssParser.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\CssParser.aspx.designer.cs">
-      <DependentUpon>CssParser.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ImageUploader.aspx.cs">
-      <DependentUpon>ImageUploader.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ImageUploader.aspx.designer.cs">
-      <DependentUpon>ImageUploader.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInjectionMacroRenderer.aspx.cs">
-      <DependentUpon>ModuleInjectionMacroRenderer.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInjectionMacroRenderer.aspx.designer.cs">
-      <DependentUpon>ModuleInjectionMacroRenderer.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInjector.aspx.cs">
-      <DependentUpon>ModuleInjector.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInjector.aspx.designer.cs">
-      <DependentUpon>ModuleInjector.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInstaller.aspx.cs">
-      <DependentUpon>ModuleInstaller.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInstaller.aspx.designer.cs">
-      <DependentUpon>ModuleInstaller.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx.cs">
-      <DependentUpon>ModuleSelector.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx.designer.cs">
-      <DependentUpon>ModuleSelector.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx.cs">
-      <DependentUpon>SkinCustomizer.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx.designer.cs">
-      <DependentUpon>SkinCustomizer.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\SkinModule.cs" />
     <Compile Include="umbraco.presentation\umbraco\members\MemberSearch.ascx.cs">
       <DependentUpon>MemberSearch.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1497,28 +1427,6 @@
     <Compile Include="umbraco.presentation\umbraco\js\language.aspx.designer.cs">
       <DependentUpon>language.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Controls\Communicator.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\BaseModule.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\Separator.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\CreateModule\CreateModule.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\DeleteModule\DeleteModule.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\ItemEditing\ItemEditor.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Controls\LiveEditingManager.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\DefaultLiveEditingContext.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\ItemEditing\PageElementEditor.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\UnpublishModule\UnpublishModule.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Updates\DefaultUpdateList.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\ItemEditing\ItemUpdate.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\ILiveEditingContext.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\ItemEditing\LiveEditingItemRenderer.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Menu\DefaultLiveEditingMenu.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Menu\ILiveEditingMenu.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Controls\LiveEditingToolbar.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\MacroModule\MacroModule.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Updates\IUpdate.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Updates\IUpdateList.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\MacroModule\TemplateUpdate.cs" />
-    <Compile Include="umbraco.presentation\umbraco\LiveEditing\Utility.cs" />
     <Compile Include="umbraco.presentation\umbraco\members\EditMember.aspx.cs">
       <DependentUpon>EditMember.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1944,23 +1852,12 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\dashboard\SettingsDashboardIntro.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\SettingsDashboardVideos.ascx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\Settings\Applyskin.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardIntro.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardKits.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardVideos.ascx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\TemplateSkinning.aspx" />
-    <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\CssParser.aspx" />
-    <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ImageUploader.aspx" />
-    <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInjectionMacroRenderer.aspx" />
-    <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInjector.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleInstaller.aspx" />
-    <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx" />
-    <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx" />
     <Content Include="umbraco.presentation\umbraco\members\MemberSearch.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -2071,7 +1968,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
     </None>
-    <None Include="umbraco.presentation\umbraco\LiveEditing\LiveEditing.cd" />
     <Content Include="umbraco.presentation\umbraco\Search\QuickSearchHandler.ashx" />
     <None Include="umbraco.presentation\umbraco\templateControls\InlineXslt.xsltTemplate" />
     <Content Include="umbraco.presentation\umbraco\users\NodePermissions.ascx" />

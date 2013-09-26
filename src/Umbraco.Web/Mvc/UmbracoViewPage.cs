@@ -139,7 +139,7 @@ namespace Umbraco.Web.Mvc
                         {
                             // creating previewBadge markup
                             markupToInject =
-                                String.Format(UmbracoConfiguration.Current.UmbracoSettings.Content.PreviewBadge,
+                                String.Format(UmbracoConfig.For.UmbracoSettings().Content.PreviewBadge,
                                     IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                                     IOHelper.ResolveUrl(SystemDirectories.UmbracoClient),
                                     Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));

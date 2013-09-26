@@ -711,7 +711,6 @@ Miłego dnia!]]></key>
     <key alias="changePassword">TRANSLATE ME: 'Change Your Password'</key>
     <key alias="changePasswordDescription">TRANSLATE ME: 'You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button'</key>
     <key alias="contentChannel">Zawartość</key>
-    <key alias="defaultToLiveEditing">Przekieruj do logowania online</key>
     <key alias="descriptionField">Opis</key>
     <key alias="disabled">Wyłącz użytkownika</key>
     <key alias="documentType">Typ dokumentu</key>

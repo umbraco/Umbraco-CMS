@@ -142,7 +142,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 resolved.NoConsole = true;
                 resolved.StartContentId = 10;
                 resolved.StartMediaId = 11;
-                resolved.DefaultToLiveEditing = true;
                 resolved.Email = "new@new.com";
                 resolved.Username = "newName";
                 resolved.RemoveAllowedSection("content");
@@ -161,7 +160,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(updatedItem.NoConsole, Is.EqualTo(resolved.NoConsole));
                 Assert.That(updatedItem.StartContentId, Is.EqualTo(resolved.StartContentId));
                 Assert.That(updatedItem.StartMediaId, Is.EqualTo(resolved.StartMediaId));
-                Assert.That(updatedItem.DefaultToLiveEditing, Is.EqualTo(resolved.DefaultToLiveEditing));
                 Assert.That(updatedItem.Email, Is.EqualTo(resolved.Email));
                 Assert.That(updatedItem.Username, Is.EqualTo(resolved.Username));
                 Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(1));
@@ -515,7 +513,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(updatedItem.NoConsole, Is.EqualTo(originalUser.NoConsole));
             Assert.That(updatedItem.StartContentId, Is.EqualTo(originalUser.StartContentId));
             Assert.That(updatedItem.StartMediaId, Is.EqualTo(originalUser.StartMediaId));
-            Assert.That(updatedItem.DefaultToLiveEditing, Is.EqualTo(originalUser.DefaultToLiveEditing));
             Assert.That(updatedItem.Email, Is.EqualTo(originalUser.Email));
             Assert.That(updatedItem.Username, Is.EqualTo(originalUser.Username));
             Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(2));

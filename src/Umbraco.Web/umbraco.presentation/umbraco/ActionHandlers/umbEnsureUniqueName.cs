@@ -38,7 +38,7 @@ namespace umbraco.ActionHandlers
         public bool Execute(umbraco.cms.businesslogic.web.Document documentObject, interfaces.IAction action)
         {
             
-            if (UmbracoConfiguration.Current.UmbracoSettings.Content.EnsureUniqueNaming)
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnsureUniqueNaming)
             {
                 string currentName = documentObject.Text;
                 int uniqueNumber = 1;

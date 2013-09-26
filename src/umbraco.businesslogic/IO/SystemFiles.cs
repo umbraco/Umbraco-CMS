@@ -38,10 +38,6 @@ namespace umbraco.IO
 			get { return Umbraco.Core.IO.SystemFiles.DashboardConfig; }
 		}
 
-		public static string SkinningXml
-		{
-			get { return Umbraco.Core.IO.SystemFiles.SkinningXml; }
-		}
 
 		public static string NotFoundhandlersConfig
 		{

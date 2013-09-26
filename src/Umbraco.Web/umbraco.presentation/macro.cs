@@ -305,7 +305,7 @@ namespace umbraco
                                                 Alias = Model.Alias,
                                                 ItemKey = Model.ScriptName,
                                                 Exception = e,
-                                                Behaviour = UmbracoConfiguration.Current.UmbracoSettings.Content.MacroErrorBehaviour
+                                                Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour
                                             };
                                     return GetControlForErrorBehavior("Error loading Partial View script (file: " + ScriptFile + ")", macroErrorEventArgs);
                                 };
@@ -373,7 +373,7 @@ namespace umbraco
                                         Alias = Model.Alias,
                                         ItemKey = Model.TypeName,
                                         Exception = e,
-                                        Behaviour = UmbracoConfiguration.Current.UmbracoSettings.Content.MacroErrorBehaviour
+                                        Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour
                                     };
 
                                     macroControl = GetControlForErrorBehavior("Error loading userControl '" + Model.TypeName + "'", macroErrorEventArgs);
@@ -414,7 +414,7 @@ namespace umbraco
                                         Alias = Model.Alias,
                                         ItemKey = Model.TypeAssembly,
                                         Exception = e,
-                                        Behaviour = UmbracoConfiguration.Current.UmbracoSettings.Content.MacroErrorBehaviour
+                                        Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour
                                     };
 
                                     macroControl = GetControlForErrorBehavior("Error loading customControl (Assembly: " + Model.TypeAssembly + ", Type: '" + Model.TypeName + "'", macroErrorEventArgs);
@@ -446,7 +446,7 @@ namespace umbraco
                                                 Alias = Model.Alias,
                                                 ItemKey = ScriptFile,
                                                 Exception = e,
-                                                Behaviour = UmbracoConfiguration.Current.UmbracoSettings.Content.MacroErrorBehaviour
+                                                Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour
                                             };
 
                                     return GetControlForErrorBehavior("Error loading MacroEngine script (file: " + ScriptFile + ")", macroErrorEventArgs);
@@ -917,7 +917,7 @@ namespace umbraco
                             Exceptions.Add(e);
                             LogHelper.WarnWithException<macro>("Error parsing XSLT file", e);
                             
-                            var macroErrorEventArgs = new MacroErrorEventArgs { Name = Model.Name, Alias = Model.Alias, ItemKey = Model.Xslt, Exception = e, Behaviour = UmbracoConfiguration.Current.UmbracoSettings.Content.MacroErrorBehaviour };
+                            var macroErrorEventArgs = new MacroErrorEventArgs { Name = Model.Name, Alias = Model.Alias, ItemKey = Model.Xslt, Exception = e, Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour };
                             var macroControl = GetControlForErrorBehavior("Error parsing XSLT file: \\xslt\\" + XsltFile, macroErrorEventArgs);
                             //if it is null, then we are supposed to throw the (original) exception
                             // see: http://issues.umbraco.org/issue/U4-497 at the end
@@ -935,7 +935,7 @@ namespace umbraco
                     LogHelper.WarnWithException<macro>("Error loading XSLT " + Model.Xslt, true, e);
 
                     // Invoke any error handlers for this macro
-                    var macroErrorEventArgs = new MacroErrorEventArgs { Name = Model.Name, Alias = Model.Alias, ItemKey = Model.Xslt, Exception = e, Behaviour = UmbracoConfiguration.Current.UmbracoSettings.Content.MacroErrorBehaviour };
+                    var macroErrorEventArgs = new MacroErrorEventArgs { Name = Model.Name, Alias = Model.Alias, ItemKey = Model.Xslt, Exception = e, Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour };
                     var macroControl = GetControlForErrorBehavior("Error reading XSLT file: \\xslt\\" + XsltFile, macroErrorEventArgs);
                     //if it is null, then we are supposed to throw the (original) exception
                     // see: http://issues.umbraco.org/issue/U4-497 at the end

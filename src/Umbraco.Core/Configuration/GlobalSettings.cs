@@ -597,19 +597,9 @@ namespace Umbraco.Core.Configuration
             return context.Request.Path.ToLower().IndexOf(IOHelper.ResolveUrl(SystemDirectories.Umbraco).ToLower()) > -1;
         }
 
-        public static bool RequestIsLiveEditRedirector(HttpContext context)
-        {
-            return context.Request.Path.ToLower().IndexOf(SystemDirectories.Umbraco.ToLower() + "/liveediting.aspx") > -1;
-        }
-
         public static bool RequestIsInUmbracoApplication(HttpContextBase context)
         {
             return context.Request.Path.ToLower().IndexOf(IOHelper.ResolveUrl(SystemDirectories.Umbraco).ToLower()) > -1;
-        }
-
-        public static bool RequestIsLiveEditRedirector(HttpContextBase context)
-        {
-            return context.Request.Path.ToLower().IndexOf(SystemDirectories.Umbraco.ToLower() + "/liveediting.aspx") > -1;
         }
 
         /// <summary>

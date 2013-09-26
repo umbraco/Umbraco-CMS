@@ -919,7 +919,6 @@ Pour gerer votre site, accéder simplement au back office et commencez à contri
     <key alias="confirmNewPassword">Confirmer votre nouveau mot de passe</key>
     <key alias="changePasswordDescription">Vous pouvez modifier votre mot de passe pour accéder au backoffice d'Umbraco en remplissant le formulaire ci-dessous et en cliquant sur le bouton 'Change Password'</key>
     <key alias="contentChannel">Section contenu</key>
-    <key alias="defaultToLiveEditing">Rediriger en mode edition live après l'authentification</key>
     <key alias="descriptionField">Champ description</key>
     <key alias="disabled">Désactiver l'utilisateur</key>
     <key alias="documentType">Type de document</key>

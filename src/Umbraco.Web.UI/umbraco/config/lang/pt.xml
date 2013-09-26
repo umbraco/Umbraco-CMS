@@ -803,7 +803,6 @@ Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fech
     <key alias="changePassword">Alterar Sua Senha</key>
     <key alias="changePasswordDescription">você pode alterar sua senha para acessar a área administrativa do Umbraco preenchendo o formulário abaixo e clicando no botão 'Alterar Senha'</key>
     <key alias="contentChannel">Canal de Conteúdo</key>
-    <key alias="defaultToLiveEditing">Redirecionar à Tela de Edição após login</key>
     <key alias="descriptionField">Campo de descrição</key>
     <key alias="disabled">Desabilitar Usuário</key>
     <key alias="documentType">Tipo de Documento</key>

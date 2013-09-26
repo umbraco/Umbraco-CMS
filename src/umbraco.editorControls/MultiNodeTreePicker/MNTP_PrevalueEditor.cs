@@ -3,16 +3,18 @@ using System.Collections;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
+using ClientDependency.Core;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.interfaces;
 using umbraco.uicontrols.TreePicker;
-using Umbraco.Core;
+using Constants = Umbraco.Core.Constants;
 
 namespace umbraco.editorControls.MultiNodeTreePicker
 {
     /// <summary>
     /// The pre-value editor for the multi node tree picker.
     /// </summary>
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class MNTP_PrevalueEditor : Control, IDataPrevalue
     {
         private readonly umbraco.cms.businesslogic.datatype.BaseDataType m_DataType;

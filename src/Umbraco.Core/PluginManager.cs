@@ -454,17 +454,6 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Returns all classes of type IUmbracoConfigurationSection
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveUmbracoConfigurationSections()
-        {
-            //don't cache the result since it's a one time lookup for a type anyways
-            //ONLY look in the CORE assembly for performance.
-            return ResolveTypes<IUmbracoConfigurationSection>(false, new[] { typeof(IUmbracoConfigurationSection).Assembly });
-        }
-
-        /// <summary>
         /// Returns all classes of type ICacheRefresher
         /// </summary>
         /// <returns></returns>
@@ -497,9 +486,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal IEnumerable<Type> ResolveDataTypes()
         {
-            //ensure we ignore types that should not be loaded
-            return ResolveTypes<IDataType>()
-                .Except(new[] {Type.GetType("umbraco.presentation.LiveEditing.Modules.ItemEditing.PageElementEditor,umbraco")});
+            return ResolveTypes<IDataType>();
         }
 
         /// <summary>

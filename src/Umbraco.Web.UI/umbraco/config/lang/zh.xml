@@ -850,7 +850,6 @@
     <key alias="changePasswordDescription">要改变密码，请在框中输入新密码，然后单击“更改密码”。</key>
     <key alias="confirmNewPassword">确认新密码</key>
     <key alias="contentChannel">内容频道</key>
-    <key alias="defaultToLiveEditing">登录后进入实时编辑模式</key>
     <key alias="descriptionField">描述字段</key>
     <key alias="disabled">禁用用户</key>
     <key alias="documentType">文档类型</key>

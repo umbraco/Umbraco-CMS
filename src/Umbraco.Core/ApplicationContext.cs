@@ -65,10 +65,9 @@ namespace Umbraco.Core
         // note - the original umbraco module checks on content.Instance in umbraco.dll
         //   now, the boot task that setup the content store ensures that it is ready
         bool _isReady = false;
-		readonly System.Threading.ManualResetEventSlim _isReadyEvent = new System.Threading.ManualResetEventSlim(false);
+		readonly ManualResetEventSlim _isReadyEvent = new ManualResetEventSlim(false);
 		private DatabaseContext _databaseContext;
 		private ServiceContext _services;
-	    private UmbracoConfiguration _umbracoConfiguration;
 
 		public bool IsReady
         {
