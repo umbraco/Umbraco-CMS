@@ -675,6 +675,7 @@
       <DependentUpon>Dashboard.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
+    <Content Include="MacroScripts\Web.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -2553,7 +2554,6 @@
     <Folder Include="App_Plugins\MyPackage\Common\Css\" />
     <Folder Include="App_Plugins\MyPackage\PropertyEditors\Css\" />
     <Folder Include="Css\" />
-    <Folder Include="MacroScripts\" />
     <Folder Include="MasterPages\" />
     <Folder Include="Media\" />
     <Folder Include="Scripts\" />
