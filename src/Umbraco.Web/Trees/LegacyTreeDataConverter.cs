@@ -266,7 +266,7 @@ namespace Umbraco.Web.Trees
                 case "UmbClientMgr.appActions().actionRePublish()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
-                            "dialogs/republish.aspx?rnd=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
+                            "dialogs/republish.aspx?rnd=" + DateTime.UtcNow.Ticks,
                             "Republishing entire site"));
                 case "UmbClientMgr.appActions().actionAssignDomain()":
                     return Attempt.Succeed(

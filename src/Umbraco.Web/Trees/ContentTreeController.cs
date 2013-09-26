@@ -131,7 +131,7 @@ namespace Umbraco.Web.Trees
                 }
 
                 // add default actions for *all* users
-                allowedMenu.AddMenuItem<ActionRePublish>();
+                allowedMenu.AddMenuItem<ActionRePublish>().ConvertLegacyMenuItem(null, "content", "content");
                 allowedMenu.AddMenuItem<RefreshNode, ActionRefresh>(true);
                 return allowedMenu;
             }
