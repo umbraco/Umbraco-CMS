@@ -195,7 +195,9 @@ angular.module('umbraco.services')
                 .then(function(data) {
                     
                     //check for a default
-                    if (data.defaultAlias) {
+                    //NOTE: event will be undefined when a call to hideDialog is made so it won't re-load the default again.
+                    // but perhaps there's a better way to deal with with an additional parameter in the args ? it works though.
+                    if (event && data.defaultAlias) {
                         var found = _.find(data.menuItems, function(item) {
                             return item.alias = data.defaultAlias;
                         });
