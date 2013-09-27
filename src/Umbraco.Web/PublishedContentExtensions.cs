@@ -1651,6 +1651,12 @@ namespace Umbraco.Web
             return contents.Where(x => types.Contains(x.DocumentTypeAlias.ToLowerInvariant()));
         }
 
+        public static T OfType<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content as T;
+        }
+
         #endregion
 
         #region PropertyAliasesAndNames
