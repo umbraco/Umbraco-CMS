@@ -23,12 +23,13 @@ namespace umbraco.cms.presentation.create.controls
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 			sbmt.Text = ui.Text("create");
+            pp_name.Text = ui.Text("name");
+
             if (!IsPostBack)
             {
                 string nodeId = umbraco.helper.Request("nodeId");
                 if (String.IsNullOrEmpty(nodeId) || nodeId == "init")
                 {
-                    masterType.Attributes.Add("style", "width: 350px;");
                     masterType.Items.Add(new ListItem(ui.Text("none") + "...", "0"));
                     foreach (cms.businesslogic.web.DocumentType dt in cms.businesslogic.web.DocumentType.GetAllAsList())
                     {
