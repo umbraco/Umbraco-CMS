@@ -29,6 +29,7 @@ using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Editors
 {
@@ -347,16 +348,24 @@ namespace Umbraco.Web.Editors
             foreach (var file in result.FileData)
             {
                 var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' });
+                var ext = fileName.Substring(fileName.LastIndexOf('.')+1).ToLower();
 
-                var mediaService = ApplicationContext.Services.MediaService;
-                var f = mediaService.CreateMedia(fileName, parentId, Constants.Conventions.MediaTypes.Image);
-
-                using (var fs = System.IO.File.OpenRead(file.LocalFileName))
+                if (!UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Contains(ext))
                 {
-                    f.SetValue(Constants.Conventions.Media.File, fileName, fs);
-                }
+                    var mediaType = Constants.Conventions.MediaTypes.File;
 
-                mediaService.Save(f);
+                    if (UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.Contains(ext))
+                        mediaType = Constants.Conventions.MediaTypes.Image;
+
+                    var mediaService = ApplicationContext.Services.MediaService;
+                    var f = mediaService.CreateMedia(fileName, parentId, mediaType);
+                    using (var fs = System.IO.File.OpenRead(file.LocalFileName))
+                    {
+                        f.SetValue(Constants.Conventions.Media.File, fileName, fs);
+                    }
+
+                    mediaService.Save(f);
+                }
 
                 //now we can remove the temp file
                 System.IO.File.Delete(file.LocalFileName);
