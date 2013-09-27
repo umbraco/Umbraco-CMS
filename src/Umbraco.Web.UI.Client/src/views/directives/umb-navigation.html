@@ -54,16 +54,28 @@
             <div id="search-results" class="umb-modalcolumn-body" 
                 ng-show="nav.ui.showSearchResults">
 
-                <h5 class="umb-tree-header">Search results</h5>
-                <ul class="umb-item-list nav nav-stacked" ng-repeat="resultGroup in nav.ui.search.results">
-                    <li ng-repeat="result in resultGroup.matches">
-                        <a ng-href="#/{{resultGroup.editor}}{{result.id}}">
-                               <i class="icon umb-tree-icon sprTree {{resultGroup.icon}}" 
-                                   ng-show="$first"></i>
-                                {{result.name}}
-                            </a>
+                <ul class="umb-tree">
+                    <li class="root">
+                        <div>
+                            <h5>Search results</h5>
+                        </div>
+                        
+                        <ul class="umb-search-group" ng-repeat="resultGroup in nav.ui.search.results">
+                            <li ng-repeat="result in resultGroup.matches">
+                                <div style="padding-left: 20px">
+                                <a ng-class="{'first':$first}" ng-href="#/{{resultGroup.editor}}{{result.id}}">
+                                       <i 
+                                        class="icon umb-tree-icon sprTree {{resultGroup.icon}}"></i>
+                                        {{result.name}}
+                                    </a>
+
+                                    <a href class="umb-options"><i></i><i></i><i></i></a>
+                                </div>
+                            </li>
+                        </ul>
+
                     </li>
-                </ul>
+                </ul>    
             </div>
             
 
