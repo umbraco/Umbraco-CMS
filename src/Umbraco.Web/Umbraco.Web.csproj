@@ -315,6 +315,7 @@
     <Compile Include="Models\ContentEditing\AuditLog.cs" />
     <Compile Include="Models\ContentEditing\MacroParameter.cs" />
     <Compile Include="Models\ContentEditing\MemberDisplay.cs" />
+    <Compile Include="Models\ContentEditing\MemberSave.cs" />
     <Compile Include="Models\ContentEditing\UmbracoEntityTypes.cs" />
     <Compile Include="Models\ContentEditing\AuditLogType.cs" />
     <Compile Include="Models\Mapping\LogModelMapper.cs" />
@@ -369,6 +370,7 @@
     <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
     <Compile Include="Trees\Menu\CreateChildEntity.cs" />
+    <Compile Include="WebApi\Binders\MemberBinder.cs" />
     <Compile Include="WebApi\ControllerContextExtensions.cs" />
     <Compile Include="WebApi\CustomDateTimeConvertor.cs" />
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />

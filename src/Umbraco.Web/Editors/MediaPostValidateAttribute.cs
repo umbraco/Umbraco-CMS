@@ -45,7 +45,7 @@ namespace Umbraco.Web.Editors
         
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            var mediaItem = (ContentItemSave<IMedia>)actionContext.ActionArguments["contentItem"];
+            var mediaItem = (MediaItemSave)actionContext.ActionArguments["contentItem"];
 
             //We now need to validate that the user is allowed to be doing what they are doing.
             //Then if it is new, we need to lookup those permissions on the parent.

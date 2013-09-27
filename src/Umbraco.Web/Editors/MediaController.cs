@@ -201,7 +201,7 @@ namespace Umbraco.Web.Editors
         [MediaPostValidate]
         public MediaItemDisplay PostSave(
             [ModelBinder(typeof(MediaItemBinder))]
-                ContentItemSave<IMedia> contentItem)
+                MediaItemSave contentItem)
         {
             //If we've reached here it means:
             // * Our model has been bound

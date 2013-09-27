@@ -151,26 +151,43 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
         },
 
         /** Used for saving media/content specifically */
-        postSaveContent: function (restApiUrl, content, action, files) {
+        postSaveContent: function (args) {
+
+            if (!args.restApiUrl) {
+                throw "args.restApiUrl is a required argument";
+            }
+            if (!args.content) {
+                throw "args.content is a required argument";
+            }
+            if (!args.action) {
+                throw "args.action is a required argument";
+            }
+            if (!args.files) {
+                throw "args.files is a required argument";
+            }
+            if (!args.dataFormatter) {
+                throw "args.dataFormatter is a required argument";
+            }
+
 
             var deferred = $q.defer();
 
             //save the active tab id so we can set it when the data is returned.
-            var activeTab = _.find(content.tabs, function (item) {
+            var activeTab = _.find(args.content.tabs, function (item) {
                 return item.active;
             });
-            var activeTabIndex = (activeTab === undefined ? 0 : _.indexOf(content.tabs, activeTab));
+            var activeTabIndex = (activeTab === undefined ? 0 : _.indexOf(args.content.tabs, activeTab));
 
             //save the data
             this.postMultiPartRequest(
-                restApiUrl,
-                { key: "contentItem", value: umbDataFormatter.formatContentPostData(content, action) },
+                args.restApiUrl,
+                { key: "contentItem", value: args.dataFormatter(args.content, args.action) },
                 function (data, formData) {
                     //now add all of the assigned files
-                    for (var f in files) {
+                    for (var f in args.files) {
                         //each item has a property id and the file object, we'll ensure that the id is suffixed to the key
                         // so we know which property it belongs to on the server side
-                        formData.append("file_" + files[f].id, files[f].file);
+                        formData.append("file_" + args.files[f].id, args.files[f].file);
                     }
 
                 },

@@ -8,13 +8,13 @@ using Umbraco.Core.Models;
 namespace Umbraco.Web.Models.ContentEditing
 {
     /// <summary>
-    /// A model representing a content item to be saved
+    /// A model representing a content base item to be saved
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
-    public class ContentItemSave<TPersisted> : ContentItemBasic<ContentPropertyBasic, TPersisted>, IHaveUploadedFiles 
-        where TPersisted : IContentBase
+    public abstract class ContentBaseItemSave<TPersisted> : ContentItemBasic<ContentPropertyBasic, TPersisted>, IHaveUploadedFiles 
+        where TPersisted : IContentBase   
     {
-        public ContentItemSave()
+        protected ContentBaseItemSave()
         {
             UploadedFiles = new List<ContentItemFile>();
         }
@@ -26,6 +26,25 @@ namespace Umbraco.Web.Models.ContentEditing
         [Required]
         public ContentSaveAction Action { get; set; }
 
+        [IgnoreDataMember]
+        public List<ContentItemFile> UploadedFiles { get; private set; }
+    }
+
+    /// <summary>
+    /// A model representing a media item to be saved
+    /// </summary>
+    [DataContract(Name = "content", Namespace = "")]
+    public class MediaItemSave : ContentBaseItemSave<IMedia>
+    {
+
+    }
+
+    /// <summary>
+    /// A model representing a content item to be saved
+    /// </summary>
+    [DataContract(Name = "content", Namespace = "")]
+    public class ContentItemSave : ContentBaseItemSave<IContent> 
+    {
         /// <summary>
         /// The template alias to save
         /// </summary>
@@ -38,10 +57,5 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "expireDate")]
         public DateTime? ExpireDate { get; set; }
 
-        /// <summary>
-        /// The collection of files uploaded
-        /// </summary>
-        [JsonIgnore]
-        public List<ContentItemFile> UploadedFiles { get; private set; }
     }
 }

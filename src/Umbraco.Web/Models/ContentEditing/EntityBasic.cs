@@ -18,7 +18,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
-        public int Id { get; set; }
+        public object Id { get; set; }
         
         [DataMember(Name = "icon")]
         public string Icon { get; set; }

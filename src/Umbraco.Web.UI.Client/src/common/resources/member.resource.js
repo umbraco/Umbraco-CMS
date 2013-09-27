@@ -7,11 +7,18 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
     
     /** internal method process the saving of data and post processing the result */
     function saveMember(content, action, files) {
-        return umbRequestHelper.postSaveContent(
-            umbRequestHelper.getApiUrl(
+        
+        return umbRequestHelper.postSaveContent({
+            restApiUrl: umbRequestHelper.getApiUrl(
                 "memberApiBaseUrl",
                 "PostSave"),
-            content, action, files);
+            content: content,
+            action: action,
+            files: files,            
+            dataFormatter: function(c, a) {
+                return umbDataFormatter.formatMemberPostData(c, a);
+            }
+        });
     }
 
     return {

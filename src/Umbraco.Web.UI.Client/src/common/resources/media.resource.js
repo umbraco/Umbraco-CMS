@@ -7,11 +7,17 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
     
     /** internal method process the saving of data and post processing the result */
     function saveMediaItem(content, action, files) {
-        return umbRequestHelper.postSaveContent(
-            umbRequestHelper.getApiUrl(
+        return umbRequestHelper.postSaveContent({
+            restApiUrl: umbRequestHelper.getApiUrl(
                 "mediaApiBaseUrl",
                 "PostSave"),
-            content, action, files);
+            content: content,
+            action: action,
+            files: files,
+            dataFormatter: function (c, a) {
+                return umbDataFormatter.formatMediaPostData(c, a);
+            }
+        });
     }
 
     return {

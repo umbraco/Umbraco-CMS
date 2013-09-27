@@ -45,7 +45,7 @@ namespace Umbraco.Web.Models.Mapping
                       expression => expression.MapFrom(content => content.ContentType.Alias));
 
             //FROM IMember TO ContentItemDto<IMember>
-            config.CreateMap<IMember, ContentItemDto<IMedia>>()
+            config.CreateMap<IMember, ContentItemDto<IMember>>()
                   .ForMember(
                       dto => dto.Owner,
                       expression => expression.ResolveUsing<OwnerResolver<IMember>>());
@@ -77,7 +77,7 @@ namespace Umbraco.Web.Models.Mapping
                     },
                 new ContentPropertyDisplay
                     {
-                        Alias = string.Format("{0}template", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Alias = string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                         Label = ui.Text("general", "email"),
                         Value = display.Email,
                         View = "textbox"

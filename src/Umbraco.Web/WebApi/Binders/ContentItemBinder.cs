@@ -7,7 +7,7 @@ using Umbraco.Web.Models.Mapping;
 
 namespace Umbraco.Web.WebApi.Binders
 {
-    internal class ContentItemBinder : ContentItemBaseBinder<IContent>
+    internal class ContentItemBinder : ContentItemBaseBinder<IContent, ContentItemSave>        
     {
 
         public ContentItemBinder(ApplicationContext applicationContext) 
@@ -23,12 +23,12 @@ namespace Umbraco.Web.WebApi.Binders
         {            
         }
 
-        protected override IContent GetExisting(ContentItemSave<IContent> model)
+        protected override IContent GetExisting(ContentItemSave model)
         {
-            return ApplicationContext.Services.ContentService.GetById(model.Id);
+            return ApplicationContext.Services.ContentService.GetById(Convert.ToInt32(model.Id));
         }
 
-        protected override IContent CreateNew(ContentItemSave<IContent> model)
+        protected override IContent CreateNew(ContentItemSave model)
         {
             var contentType = ApplicationContext.Services.ContentTypeService.GetContentType(model.ContentTypeAlias);
             if (contentType == null)
@@ -38,7 +38,7 @@ namespace Umbraco.Web.WebApi.Binders
             return new Content(model.Name, model.ParentId, contentType);     
         }
 
-        protected override ContentItemDto<IContent> MapFromPersisted(ContentItemSave<IContent> model)
+        protected override ContentItemDto<IContent> MapFromPersisted(ContentItemSave model)
         {
             return Mapper.Map<IContent, ContentItemDto<IContent>>(model.PersistedContent);
         }
