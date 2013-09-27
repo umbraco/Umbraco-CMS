@@ -206,18 +206,19 @@ function entityResource($q, $http, umbRequestHelper) {
          * @methodOf umbraco.resources.entityResource
          *
          * @description
-         * Gets an array of entities, given a lucene query
+         * Gets an array of entities, given a lucene query and a type
          *
          * ##usage
          * <pre>
-         * entityResource.search("news")
+         * entityResource.search("news", "Media")
          *    .then(function(mediaArray) {
          *        var myDoc = mediaArray; 
          *        alert('they are here!');
          *    });
          * </pre> 
          * 
-         * @param {String} Query search query        
+         * @param {String} Query search query 
+         * @param {String} Type type of conten to search        
          * @returns {Promise} resourcePromise object containing the entity array.
          *
          */
@@ -227,7 +228,7 @@ function entityResource($q, $http, umbRequestHelper) {
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
-                       "SearchMedia",
+                       "Search",
                        [{ query: query }, {type: type}])),
                'Failed to retreive entity data for query ' + query);
         }

@@ -9,7 +9,7 @@
 function mediaCreateController($scope, $routeParams, mediaTypeResource, iconHelper) {
     
     mediaTypeResource.getAllowedTypes($scope.currentNode.id).then(function(data) {
-        $scope.allowedTypes = iconHelper.formatContentTypeThumbnails(data);
+        $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
     });
     
 }

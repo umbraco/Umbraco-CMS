@@ -191,10 +191,14 @@ namespace Umbraco.Core.Models
         /// Id of the DataType control
         /// </summary>
         [DataMember]
-        [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the PropertyEditorAlias property instead")]
+        [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the PropertyEditorAlias property instead. This method will return a generated GUID for any property editor alias not explicitly mapped to a legacy ID")]
         public Guid ControlId
         {
-            get { return LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(_propertyEditorAlias, true).Value; }
+            get
+            {
+                return LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(
+                    _propertyEditorAlias, LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.GenerateId).Value;
+            }
             set
             {
                 var alias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(value, true);

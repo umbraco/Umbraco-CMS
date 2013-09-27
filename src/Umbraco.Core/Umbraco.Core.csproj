@@ -437,6 +437,8 @@
     <Compile Include="Persistence\Relators\MacroPropertyRelator.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IMacroRepository.cs" />
     <Compile Include="Persistence\Repositories\MacroRepository.cs" />
+    <Compile Include="PropertyEditors\BackwardsCompatibleData.cs" />
+    <Compile Include="PropertyEditors\BackwardsCompatibleDataType.cs" />
     <Compile Include="PropertyEditors\LegacyParameterEditorAliasConverter.cs" />
     <Compile Include="PropertyEditors\LegacyPropertyEditorIdToAliasConverter.cs" />
     <Compile Include="Persistence\Mappers\MapperForAttribute.cs" />

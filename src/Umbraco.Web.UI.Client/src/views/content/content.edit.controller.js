@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, contentResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, editorContextService) {
+function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, editorContextService) {
        
     //initialize the file manager
     fileManager.clearFiles();
@@ -39,6 +39,8 @@ function ContentEditController($scope, $routeParams, contentResource, notificati
     //TODO: Need to figure out a way to share the saving and event broadcasting with all editors!
 
     $scope.saveAndPublish = function () {
+        
+        $scope.setStatus("Publishing...");
         $scope.$broadcast("saving", { scope: $scope });
         
         var currentForm = angularHelper.getRequiredCurrentForm($scope);
@@ -68,7 +70,28 @@ function ContentEditController($scope, $routeParams, contentResource, notificati
             });     
     };
 
+    $scope.preview = function(content){
+            if(!content.id){
+                $scope.save().then(function(data){
+                      $window.open('dialogs/preview.aspx?id='+data.id,'umbpreview');  
+                });
+            }else{
+                $window.open('dialogs/preview.aspx?id='+content.id,'umbpreview');
+            }    
+    };
+
+    $scope.setStatus = function(status){
+        //add localization
+        $scope.status = status;
+        $timeout(function(){
+            $scope.status = undefined;
+        }, 2500);
+    };
+
     $scope.save = function () {
+        var deferred = $q.defer();
+
+        $scope.setStatus("Saving...");
         $scope.$broadcast("saving", { scope: $scope });
             
         var currentForm = angularHelper.getRequiredCurrentForm($scope);
@@ -86,6 +109,8 @@ function ContentEditController($scope, $routeParams, contentResource, notificati
                     newContent: data,
                     rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                 });
+
+                deferred.resolve(data);
                 
             }, function (err) {
                 contentEditingHelper.handleSaveError({
@@ -93,7 +118,11 @@ function ContentEditController($scope, $routeParams, contentResource, notificati
                     allNewProps: contentEditingHelper.getAllProps(err.data),
                     allOrigProps: contentEditingHelper.getAllProps($scope.content)
                 });
+
+                deferred.reject(err);
         });
+
+        return deferred.promise;
     };
 
 }

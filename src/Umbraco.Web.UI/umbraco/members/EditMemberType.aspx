@@ -1,5 +1,4 @@
-
-<%@ Page language="c#" MasterPageFile="../masterpages/umbracoPage.Master" Codebehind="EditMemberType.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.members.EditMemberType" %>
+<%@ Page Async="true" language="c#" MasterPageFile="../masterpages/umbracoPage.Master" Codebehind="EditMemberType.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.members.EditMemberType" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="uc1" TagName="ContentTypeControlNew" Src="../controls/ContentTypeControlNew.ascx" %>
 <%@ Register Namespace="umbraco" TagPrefix="umb" Assembly="umbraco" %>

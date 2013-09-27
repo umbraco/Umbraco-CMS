@@ -6,7 +6,7 @@
  * @description
  * The controller for the media editor
  */
-function mediaEditController($scope, $routeParams, mediaResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, editorContextService) {
+function mediaEditController($scope, $routeParams, mediaResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, editorContextService, $timeout) {
 
     //initialize the file manager
     fileManager.clearFiles();
@@ -37,8 +37,18 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
 
             });
     }
-        
+    
+    $scope.setStatus = function(status){
+        //add localization
+        $scope.status = status;
+        $timeout(function(){
+            $scope.status = undefined;
+        }, 2500);
+    };
+
     $scope.save = function () {
+        
+        $scope.setStatus("Saving...");
         
         $scope.$broadcast("saving", { scope: $scope });
 

@@ -61,8 +61,8 @@ function openDictionary() {
                 xNode.NodeID = l.id.ToString(); //"language_" + l.id.ToString();
                 xNode.Text = l.FriendlyName;
                 xNode.Action = "javascript:openLanguage(" + l.id + ");";
-                xNode.Icon = "settingLanguage.gif";
-                xNode.OpenIcon = "settingLanguage.gif";
+                xNode.Icon = "icon-flag-alt";
+                xNode.OpenIcon = "icon-flag-alt";
 
                 OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
                 if (xNode != null)

@@ -2,8 +2,15 @@
     
     <ng-form name="contentNameForm">        
         
-        <h1>{{model}}</h1>
-        <input name="name" type="text" placeholder="{{placeholder}}" ng-model="model" 
+        <h1 ng-click="goEdit()" ng-hide="editMode">{{model}}</h1>
+        
+        <input
+        	on-blur="exitEdit()" 
+        	ng-show="editMode" 
+        	name="name" 
+        	type="text" 
+        	placeholder="{{placeholder}}" 
+        	ng-model="model" 
                required   
                val-server-field="Name" />
 

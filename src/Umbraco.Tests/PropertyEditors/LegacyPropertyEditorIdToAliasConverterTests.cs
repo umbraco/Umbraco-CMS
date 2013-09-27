@@ -28,7 +28,11 @@ namespace Umbraco.Tests.PropertyEditors
             var id = Guid.NewGuid();
             LegacyPropertyEditorIdToAliasConverter.CreateMap(id, "test");
 
-            Assert.AreEqual(id, LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias("test", true));
+            Assert.AreEqual(
+                id,
+                LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(
+                    "test",
+                    LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.ThrowException));
         }
 
         [Test]
@@ -37,7 +41,22 @@ namespace Umbraco.Tests.PropertyEditors
             var id = Guid.NewGuid();
             LegacyPropertyEditorIdToAliasConverter.CreateMap(id, "test");
 
-            Assert.AreEqual("test", LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(id, true));
+            Assert.AreEqual(
+                "test",
+                LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(
+                    id,
+                    true));
+        }
+
+        [Test]
+        public void Can_Generate_Id_From_Missing_Alias()
+        {
+            var gen1 = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias("Donotfindthisone", LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.GenerateId);
+            var gen2 = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias("Donotfindthisone", LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.GenerateId);
+
+            Assert.IsNotNull(gen1);
+            Assert.IsNotNull(gen2);
+            Assert.AreEqual(gen1, gen2);
         }
 
         [Test]

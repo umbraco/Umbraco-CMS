@@ -13,6 +13,9 @@ using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.datatype
 {
+
+    
+
     /// <summary>
     /// Datatypedefinitions is the basic buildingblocks of umbraco's documents/medias/members generic datastructure 
     /// 
@@ -59,12 +62,27 @@ namespace umbraco.cms.businesslogic.datatype
                 if (_propertyEditorAlias.IsNullOrWhiteSpace()) 
                     return null;
 
-                var controlId = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(_propertyEditorAlias, true);
+                //Attempt to resolve a legacy control id from the alias. If one is not found we'll generate one - 
+                // the reason one will not be found is if there's a new v7 property editor created that doesn't have a legacy
+                // property editor predecessor.
+                //So, we'll generate an id for it based on the alias which will remain consistent, but then we'll try to resolve a legacy
+                // IDataType which of course will not exist. In this case we'll have to create a new one on the fly for backwards compatibility but 
+                // this instance will have limited capabilities and will really only work for saving data so the legacy APIs continue to work.
+                var controlId = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(_propertyEditorAlias, LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.GenerateId);
 
                 var dt = DataTypesResolver.Current.GetById(controlId.Value);
-
+                
                 if (dt != null)
+                {
                     dt.DataTypeDefinitionId = Id;
+                }
+                else
+                {
+                    //Ok so it was not found, we can only assume that this is because this is a new property editor that does not have a legacy predecessor.
+                    //we'll have to attempt to generate one at runtime.
+                    dt = BackwardsCompatibleDataType.Create(_propertyEditorAlias, controlId.Value, Id);
+                }
+                    
 
                 return dt;
             }

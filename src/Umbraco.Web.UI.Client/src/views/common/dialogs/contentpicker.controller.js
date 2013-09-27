@@ -8,7 +8,6 @@ angular.module("umbraco").controller("Umbraco.Dialogs.ContentPickerController",
 		args.event.preventDefault();
 		args.event.stopPropagation();
 
-
 		eventsService.publish("Umbraco.Dialogs.ContentPickerController.Select", args).then(function(args){
 			if(dialogOptions && dialogOptions.multipicker){
 				

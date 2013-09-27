@@ -43,7 +43,7 @@
                         <input type="text"
                             ng-model="nav.ui.searchTerm"
                             class="umb-search-field search-query"
-                            placeholder="{{localization.app.search.typeToSearch}}"
+                            placeholder="Type to search..."
                             on-blur="deActivateSearch()"
                             on-keyup="performSearch(nav.ui.searchTerm)">
                     </form>
@@ -54,18 +54,28 @@
             <div id="search-results" class="umb-modalcolumn-body" 
                 ng-show="nav.ui.showSearchResults">
 
-                <h5 class="umb-tree-header">Search results</h5>
-                <ul class="umb-item-list" ng-repeat="resultGroup in nav.ui.searchResults">
-                    <li class="umb-icon-item" ng-class="{selected:$index==nav.ui.selectedSearchResult}" ng-repeat="result in resultGroup.matches">
-                        <i class="icon umb-tree-icon sprTree {{result.icon}}" ng-show="$first"></i>
-                        <a ng-href="#{{result.view}}">{{result.name}}
-                                    <small>{{result.path}}</small>
-                        </a>
+                <ul class="umb-tree">
+                    <li class="root">
+                        <div>
+                            <h5>Search results</h5>
+                        </div>
+                        
+                        <ul class="umb-search-group" ng-repeat="resultGroup in nav.ui.search.results">
+                            <li ng-repeat="result in resultGroup.matches">
+                                <div style="padding-left: 20px">
+                                <a ng-class="{'first':$first}" ng-href="#/{{resultGroup.editor}}{{result.id}}">
+                                       <i 
+                                        class="icon umb-tree-icon sprTree {{resultGroup.icon}}"></i>
+                                        {{result.name}}
+                                    </a>
 
-                        <i class="umb-options" ng-click="nav.showMenu(result, $event)"><i></i><i></i><i></i></i>
+                                    <a href class="umb-options"><i></i><i></i><i></i></a>
+                                </div>
+                            </li>
+                        </ul>
+
                     </li>
-
-                </ul>
+                </ul>    
             </div>
             
 
