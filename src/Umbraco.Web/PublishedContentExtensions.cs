@@ -537,9 +537,27 @@ namespace Umbraco.Web
 
 		#region Is Helpers
 
-		public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias)
+		public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias, bool recursive = false)
 		{
-			return content.DocumentTypeAlias == docTypeAlias;
+			if (content.DocumentTypeAlias == docTypeAlias)
+				return true;
+
+			if (recursive)
+				return IsDocumentTypeRecursive(content, docTypeAlias);
+			return false;
+		}
+
+		private static bool IsDocumentTypeRecursive(IPublishedContent content, string docTypeAlias)
+		{
+			var contentTypeService = UmbracoContext.Current.Application.Services.ContentTypeService;
+			var type = contentTypeService.GetContentType(content.DocumentTypeAlias);
+			while (type.ParentId > 0)
+			{
+				type = contentTypeService.GetContentType(type.ParentId);
+				if (type.Alias == docTypeAlias)
+					return true;
+			}
+			return false;
 		}
 
 		public static bool IsNull(this IPublishedContent content, string alias, bool recursive)
