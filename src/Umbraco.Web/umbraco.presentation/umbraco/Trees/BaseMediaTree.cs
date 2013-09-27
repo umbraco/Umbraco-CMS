@@ -171,7 +171,7 @@ function openMedia(id) {
             foreach (var property in entity.UmbracoProperties)
             {
                 //required for backwards compatibility with v7 with changing the GUID -> alias
-                var controlId = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(property.PropertyEditorAlias);
+                var controlId = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(property.PropertyEditorAlias, LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.ReturnNull);
                 if (controlId != null)
                 {
                     if (LinkableMediaDataTypes.Contains(controlId.Value) &&

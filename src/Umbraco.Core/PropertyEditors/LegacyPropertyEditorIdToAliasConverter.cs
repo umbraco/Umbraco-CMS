@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -14,6 +15,14 @@ namespace Umbraco.Core.PropertyEditors
     /// </remarks>
     public static class LegacyPropertyEditorIdToAliasConverter
     {
+
+        public enum NotFoundLegacyIdResponseBehavior
+        {
+            ThrowException,
+            ReturnNull,
+            GenerateId
+        }
+
         /// <summary>
         /// The map consists of a key which is always the GUID (lowercase, no hyphens + alias (trimmed))
         /// </summary>
@@ -55,18 +64,27 @@ namespace Umbraco.Core.PropertyEditors
         /// Gets a legacy Id based on the alias
         /// </summary>
         /// <param name="alias"></param>
-        /// <param name="throwIfNotFound">if set to true will throw an exception if the map isn't found</param>
+        /// <param name="notFoundBehavior"></param>
         /// <returns>Returns the legacy GUID of a property editor if found, otherwise returns null</returns>
-        public static Guid? GetLegacyIdFromAlias(string alias, bool throwIfNotFound = false)
+        public static Guid? GetLegacyIdFromAlias(string alias, NotFoundLegacyIdResponseBehavior notFoundBehavior)
         {
             var found = _map.FirstOrDefault(x => x.Value.Item2 == alias);
             if (found.Equals(default(KeyValuePair<string, Tuple<Guid, string>>)))
             {
-                if (throwIfNotFound)
+                switch (notFoundBehavior)
                 {
-                    throw new ObjectNotFoundException("Could not find a map for a property editor with an alias of " + alias + ". Consider using the new business logic APIs instead of the old obsoleted ones.");
+                    case NotFoundLegacyIdResponseBehavior.ThrowException:
+                        throw new ObjectNotFoundException("Could not find a map for a property editor with an alias of " + alias + ". Consider using the new business logic APIs instead of the old obsoleted ones.");
+                    case NotFoundLegacyIdResponseBehavior.ReturnNull:
+                        return null;
+                    case NotFoundLegacyIdResponseBehavior.GenerateId:
+                        var generated = alias.EncodeAsGuid();
+                        CreateMap(generated, alias);
+
+                        LogHelper.Warn(typeof(LegacyPropertyEditorIdToAliasConverter), "A legacy GUID id was generated for property editor " + alias + ". This occurs when the legacy APIs are used and done to attempt to maintain backwards compatibility. Consider upgrading all code to use the new Services APIs instead to avoid any potential issues.");
+
+                        return generated;
                 }
-                return null;
             }
             return found.Value.Item1;
         }

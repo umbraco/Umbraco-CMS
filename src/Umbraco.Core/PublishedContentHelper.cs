@@ -113,16 +113,16 @@ namespace Umbraco.Core
                 //if it is good return it, otherwise we'll continue processing the legacy stuff below.
                 if (result.Success)
                 {
-                    return new Attempt<object>(true, result.Result);
+                    return Attempt<object>.Succeed(result.Result);
                 }
             }
 
             //In order to maintain backwards compatibility here with IPropertyEditorValueConverter we need to attempt to lookup the 
             // legacy GUID for the current property editor. If one doesn't exist then we will abort the conversion.
-            var legacyId = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(propertyDefinition.PropertyEditorAlias);
+            var legacyId = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(propertyDefinition.PropertyEditorAlias, LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.ReturnNull);
             if (legacyId.HasValue == false)
             {
-                return Attempt<object>.False;
+                return Attempt<object>.Fail();
             }
 
 			//First lets check all registered converters for this data type.			
