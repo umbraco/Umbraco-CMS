@@ -32,7 +32,7 @@ using Umbraco.Core;
 
 namespace umbraco
 {
-    [Tree(Constants.Applications.Settings, "scripts", "Scripts", "folder.gif", "folder_o.gif", sortOrder: 2)]
+    [Tree(Constants.Applications.Settings, "scripts", "Scripts", "icon-folder", "icon-folder", sortOrder: 2)]
     public class loadScripts : FileSystemTree
 	{
         public loadScripts(string application) : base(application) { }
@@ -76,7 +76,7 @@ namespace umbraco
         {
             xNode.Action = xNode.Action.Replace("openFile", "openScriptEditor");
             xNode.Icon = "icon-code";
-            xNode.OpenIcon = "icon.code";
+            xNode.OpenIcon = "icon-code";
         }
 
         
