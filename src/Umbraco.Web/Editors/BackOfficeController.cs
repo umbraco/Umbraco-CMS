@@ -66,7 +66,8 @@ namespace Umbraco.Web.Editors
                                 {"entityApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<EntityController>("GetById")},
                                 {"dataTypeApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<DataTypeController>("GetById")},
                                 {"dashboardApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<DashboardController>("GetDashboard")},
-                                {"logApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<LogController>("GetEntityLog")}
+                                {"logApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<LogController>("GetEntityLog")},
+                                {"memberApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberController>("GetByLogin")},
                             }
                     },
                     {

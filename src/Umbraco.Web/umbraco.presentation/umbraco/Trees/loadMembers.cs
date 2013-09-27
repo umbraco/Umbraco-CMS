@@ -31,7 +31,7 @@ namespace umbraco
     /// <summary>
     /// Handles loading of the member application into the application tree
     /// </summary>
-    [Tree(Constants.Applications.Members, "member", "Members")]
+    [Obsolete("This is no longer used and will be removed from the codebase in the future")]
     public class loadMembers : BaseTree
     {
         public loadMembers(string application) : base(application) { }

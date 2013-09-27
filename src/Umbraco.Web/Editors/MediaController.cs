@@ -33,6 +33,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Editors
 {
 
+
     /// <remarks>
     /// This controller is decorated with the UmbracoApplicationAuthorizeAttribute which means that any user requesting
     /// access to ALL of the methods on this controller will need access to the media application.
