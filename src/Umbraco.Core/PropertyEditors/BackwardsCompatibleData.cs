@@ -18,18 +18,17 @@ namespace Umbraco.Core.PropertyEditors
 
         public XmlNode ToXMl(XmlDocument data)
         {
-            throw new NotSupportedException(
-                    typeof(IData)
-                    + " is a legacy object and is not supported by runtime generated "
-                    + " instances to maintain backwards compatibility with the legacy APIs. Consider upgrading your code to use the new Services APIs.");
+            //TODO: We need to get the xml property value converters in place, then this method will need to call in to that converter to 
+            // get the xml, for now we're just creating a CDATA section with the raw value.
+
+            var sValue = Value != null ? Value.ToString() : String.Empty;
+            return data.CreateCDataSection(sValue);
+
         }
         
         public void MakeNew(int PropertyId)
         {
-            throw new NotSupportedException(
-                    typeof(IData)
-                    + " is a legacy object and is not supported by runtime generated "
-                    + " instances to maintain backwards compatibility with the legacy APIs. Consider upgrading your code to use the new Services APIs.");
+            //DO nothing
         }
 
         public void Delete()
