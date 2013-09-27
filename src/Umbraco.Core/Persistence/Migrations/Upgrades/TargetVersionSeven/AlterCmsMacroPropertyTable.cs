@@ -23,8 +23,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             //change the type (keep the data)
             Alter.Table("cmsMacroProperty").AlterColumn("macroPropertyType").AsString(255);
             //rename the column
+            Alter.Table("cmsMacroProperty").AddColumn("editorAlias").AsString(255).NotNullable().WithDefaultValue("");
             Rename.Column("macroPropertyType").OnTable("cmsMacroProperty").To("editorAlias");
-            
+            Delete.Column("macroPropertyType").FromTable("cmsMacroProperty");
         }
 
         public override void Down()
