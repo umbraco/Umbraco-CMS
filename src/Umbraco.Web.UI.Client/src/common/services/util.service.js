@@ -323,6 +323,9 @@ function iconHelper($q) {
         { oldIcon: ".sprTreeUserType", newIcon: "" },
         */
 
+        { oldIcon: "folder.png", newIcon: "icon-folder" },
+        { oldIcon: "mediaphoto.gif", newIcon: "icon-picture" },
+        { oldIcon: "mediafile.gif", newIcon: "icon-document" },
 
         { oldIcon: ".sprTreeDeveloperCacheItem", newIcon: "icon-box" },
         { oldIcon: ".sprTreeDeveloperCacheTypes", newIcon: "icon-box" },
