@@ -95,13 +95,20 @@ namespace Umbraco.Web.Routing
 			// can't go beyond that point without a PublishedContent to render
 			// it's ok not to have a template, in order to give MVC a chance to hijack routes
 
-			// assign the legacy page back to the docrequest
-			// handlers like default.aspx will want it and most macros currently need it
-			_pcr.UmbracoPage = new page(_pcr);
+            // note - the page() ctor below will cause the "page" to get the value of all its
+            // "elements" ie of all the IPublishedContent property. If we use the object value,
+            // that will trigger macro execution - which can't happen because macro execution
+            // requires that _pcr.UmbracoPage is already initialized = catch-22. The "legacy"
+            // pipeline did _not_ evaluate the macros, ie it is using the data value, and we
+            // have to keep doing it because of that catch-22.
 
-			// these two are used by many legacy objects
-			_routingContext.UmbracoContext.HttpContext.Items["pageID"] = _pcr.PublishedContent.Id;
-			_routingContext.UmbracoContext.HttpContext.Items["pageElements"] = _pcr.UmbracoPage.Elements;
+            // assign the legacy page back to the docrequest
+            // handlers like default.aspx will want it and most macros currently need it
+            _pcr.UmbracoPage = new page(_pcr);
+
+            // used by many legacy objects
+            _routingContext.UmbracoContext.HttpContext.Items["pageID"] = _pcr.PublishedContent.Id;
+            _routingContext.UmbracoContext.HttpContext.Items["pageElements"] = _pcr.UmbracoPage.Elements;
 		}
 
 		/// <summary>
@@ -137,6 +144,8 @@ namespace Umbraco.Web.Routing
 				// to Mvc since Mvc can't do much either
 				return;
 			}
+
+            // see note in PrepareRequest()
 
 			// assign the legacy page back to the docrequest
 			// handlers like default.aspx will want it and most macros currently need it
