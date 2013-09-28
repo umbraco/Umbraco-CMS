@@ -203,7 +203,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
         IEnumerable<IPropertyValueConverter> GetCompatConverters()
         {
-            var propertyEditorGuid = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(PropertyEditorAlias);
+            var propertyEditorGuid = LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(PropertyEditorAlias, LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.ReturnNull);
             return PropertyEditorValueConvertersResolver.HasCurrent && propertyEditorGuid.HasValue
                 ? PropertyEditorValueConvertersResolver.Current.Converters
                     .Where(x => x.IsConverterFor(propertyEditorGuid.Value, ContentType.Alias, PropertyTypeAlias))
