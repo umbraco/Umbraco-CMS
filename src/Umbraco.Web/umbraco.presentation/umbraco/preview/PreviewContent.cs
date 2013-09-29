@@ -13,6 +13,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Xml.Linq;
 using System.Xml;
 using System.IO;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
@@ -96,7 +97,8 @@ namespace umbraco.presentation.preview
                 //Inject preview xml
                 parentId = document.Level == 1 ? -1 : document.Parent.Id;
                 var previewXml = document.ToPreviewXml(XmlContent);
-                if (document.HasPendingChanges()) // HasPendingChanges is obsolete but what's the equivalent that wouldn't hit the DB?
+                if (document.Content.Published == false 
+                    && ApplicationContext.Current.Services.ContentService.HasPublishedVersion(document.Id))
                     previewXml.Attributes.Append(XmlContent.CreateAttribute("isDraft"));
                 content.AppendDocumentXml(document.Id, document.Level, parentId, previewXml, XmlContent);
             }

@@ -16,6 +16,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 using umbraco;
 using System.Collections.Generic;
@@ -483,6 +484,17 @@ namespace Umbraco.Web
         {
             return UmbracoContext.Current.UrlProvider.GetUrl(contentId);
         }
+
+        /// <summary>
+        /// Gets the url of a content identified by its identifier, in a specified mode.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="mode">The mode.</param>
+        /// <returns>The url for the content.</returns>
+	    public string Url(int contentId, UrlProviderMode mode)
+	    {
+	        return UmbracoContext.Current.UrlProvider.GetUrl(contentId, mode);
+	    }
 
 		/// <summary>
 		/// This method will always add the domain to the path if the hostnames are set up correctly. 

@@ -528,6 +528,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				{
 				    IPublishedProperty property;
 
+                    // must ignore that one
+				    if (i.Key == "version") continue;
+
                     if (i.Key.InvariantStartsWith("__"))
 				    {
                         // no type for that one, dunno how to convert

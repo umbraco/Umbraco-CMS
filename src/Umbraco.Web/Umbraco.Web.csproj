@@ -536,6 +536,7 @@
     </Compile>
     <Compile Include="UI\JavaScript\ServerVariablesParser.cs" />
     <Compile Include="UI\CdfLogger.cs" />
+    <Compile Include="umbraco.presentation\CompatibilityHelper.cs" />
     <Compile Include="umbraco.presentation\umbraco\ActionHandlers\SimilarNodeNameComparer.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>

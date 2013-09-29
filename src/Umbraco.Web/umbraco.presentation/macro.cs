@@ -35,6 +35,7 @@ using umbraco.cms.businesslogic.member;
 using umbraco.DataLayer;
 using umbraco.NodeFactory;
 using umbraco.presentation.templateControls;
+using Umbraco.Web.umbraco.presentation;
 using Content = umbraco.cms.businesslogic.Content;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
 using MacroErrorEventArgs = Umbraco.Core.Events.MacroErrorEventArgs;
@@ -1334,7 +1335,7 @@ namespace umbraco
 			IMacroEngine engine = null;
 			
 			engine = MacroEngineFactory.GetEngine(PartialViewMacroEngine.EngineName);
-			var ret = engine.Execute(macro, Node.GetCurrent());
+			var ret = engine.Execute(macro, CompatibilityHelper.ConvertToNode(UmbracoContext.Current.PublishedContentRequest.PublishedContent));
 
 			// if the macro engine supports success reporting and executing failed, then return an empty control so it's not cached
 			if (engine is IMacroEngineResultStatus)
@@ -1359,13 +1360,13 @@ namespace umbraco
                 engine = MacroEngineFactory.GetByExtension(macro.ScriptLanguage);
                 ret = engine.Execute(
                     macro,
-                    Node.GetCurrent());
+                    CompatibilityHelper.ConvertToNode(UmbracoContext.Current.PublishedContentRequest.PublishedContent));
             }
             else
             {
                 string path = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + macro.ScriptName);
                 engine = MacroEngineFactory.GetByFilename(path);
-                ret = engine.Execute(macro, Node.GetCurrent());
+                ret = engine.Execute(macro, CompatibilityHelper.ConvertToNode(UmbracoContext.Current.PublishedContentRequest.PublishedContent));
             }
 
             // if the macro engine supports success reporting and executing failed, then return an empty control so it's not cached

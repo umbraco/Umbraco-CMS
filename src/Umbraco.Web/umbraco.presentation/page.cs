@@ -286,9 +286,17 @@ namespace umbraco
 		{
 			foreach(var p in node.Properties)
 			{
-				if (!_elements.ContainsKey(p.PropertyTypeAlias))				
+				if (_elements.ContainsKey(p.PropertyTypeAlias) == false)				
 				{
-					_elements[p.PropertyTypeAlias] = p.Value;
+                    // note: legacy used the raw value (see populating from an Xml node below)
+                    // so we're doing the same here, using DataValue. If we use Value then every
+                    // value will be converted NOW - including RTEs that may contain macros that
+                    // require that the 'page' is already initialized = catch-22.
+
+                    // to properly fix this, we'd need to turn the elements collection into some
+                    // sort of collection of lazy values.
+
+					_elements[p.PropertyTypeAlias] = p.DataValue;
 				}
 			}			
 		}
