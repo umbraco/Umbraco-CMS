@@ -527,6 +527,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				{
 				    IPublishedProperty property;
 
+                    // must ignore that one
+				    if (i.Key == "version") continue;
+
                     if (i.Key.InvariantStartsWith("__"))
 				    {
                         // no type for tha tone, dunno how to convert
