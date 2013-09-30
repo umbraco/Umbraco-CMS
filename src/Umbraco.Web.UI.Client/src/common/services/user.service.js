@@ -2,6 +2,7 @@ angular.module('umbraco.services')
 .factory('userService', function ($rootScope, $q, $location, $log, securityRetryQueue, authResource, dialogService) {
 
     var currentUser = null;
+    var lastUserId = null;
     var loginDialog = null;
 
     // Redirect to the given url (defaults to '/')
@@ -38,7 +39,11 @@ angular.module('umbraco.services')
         if (securityRetryQueue.hasMore()) {
             
             //clear the user
+            lastUserId = currentUser.id;
             currentUser = null;
+
+            //broadcast a global event that the user is no longer logged in
+            $rootScope.$broadcast("notAuthenticated");
 
             openLoginDialog();
         }
@@ -47,7 +52,7 @@ angular.module('umbraco.services')
     return {
 
         /** Returns a promise, sends a request to the server to check if the current cookie is authorized  */
-        isAuthenticated: function () {
+        isAuthenticated: function (args) {
             
             return authResource.isAuthenticated()
                 .then(function(data) {
@@ -57,9 +62,17 @@ angular.module('umbraco.services')
                         throw "Not authenticated";
                     }
                     else {
+
+                        var result = { user: data, authenticated: true };
+
+                        if (args.broadcastEvent) {
+                            //broadcast a global event, will inform listening controllers to load in the user specific data
+                            $rootScope.$broadcast("authenticated", result);
+                        }
+
                         currentUser = data;
                         currentUser.avatar = 'http://www.gravatar.com/avatar/' + data.emailHash + '?s=40&d=404';
-                        return { user: data, authenticated: true };
+                        return result;
                     }
                 });
         },
@@ -73,7 +86,7 @@ angular.module('umbraco.services')
                     //when it's successful, return the user data
                     currentUser = data;
 
-                    var result = { user: data, authenticated: true };
+                    var result = { user: data, authenticated: true, previousUserId: lastUserId };
 
                     //broadcast a global event
                     $rootScope.$broadcast("authenticated", result);
@@ -86,6 +99,7 @@ angular.module('umbraco.services')
             return authResource.performLogout()
                 .then(function (data) {                   
 
+                    lastUserId = currentUser.id;
                     currentUser = null;
 
                     //broadcast a global event

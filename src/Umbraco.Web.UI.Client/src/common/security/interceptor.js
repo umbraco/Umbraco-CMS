@@ -1,18 +1,13 @@
 angular.module('umbraco.security.interceptor', ['umbraco.security.retryQueue'])
 
 // This http interceptor listens for authentication failures
-.factory('securityInterceptor', ['$injector', 'securityRetryQueue', 'notificationsService', '$rootScope', '$log', function ($injector, queue, notifications, $rootScope, $log) {
+.factory('securityInterceptor', ['$injector', 'securityRetryQueue', 'notificationsService', function ($injector, queue, notifications) {
     return function (promise) {
         // Intercept failed requests
         return promise.then(null, function (originalResponse) {
             
             //A 401 means that the user is not logged in
             if (originalResponse.status === 401) {
-
-                $log.log("Broadcasting notAuthenticated event");
-                
-                //emit a global event that the user is no longer logged in
-                $rootScope.$broadcast("notAuthenticated");
 
                 // The request bounced because it was not authorized - add a new request to the retry queue
                 promise = queue.pushRetryFn('unauthorized-server', function retryRequest() {

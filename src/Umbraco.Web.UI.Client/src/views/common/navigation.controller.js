@@ -15,9 +15,12 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
     // IMPORTANT: all properties assigned to this scope are generally available on the scope object on dialogs since
     //   when we create a dialog we pass in this scope to be used for the dialog's scope instead of creating a new one.
     $scope.nav = navigationService;
-    $scope.routeParams = $routeParams;
-    $scope.$watch("routeParams.section", function (newVal, oldVal) {
-            $scope.currentSection = newVal;
+
+    $scope.$watch(function () {
+        //watch the route parameters section
+        return $routeParams.section;
+    }, function(newVal, oldVal) {
+        $scope.currentSection = newVal;
     });
 
     //trigger search with a hotkey:
@@ -31,13 +34,14 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
     $scope.selectedId = navigationService.currentId;
     $scope.sections = navigationService.sections;
 
-    $scope.$on("notAuthenticated", function() {
-        $log.log("NavigationController handling notAuthenticated");
+    //When the user logs out or times out
+    $scope.$on("notAuthenticated", function () {
+        
     });
     
+    //When the user logs in
     $scope.$on("authenticated", function (evt, data) {
-        $log.log("NavigationController handling authenticated");
-
+        //populate their sections if the user hasn't changed
         sectionResource.getSections()
             .then(function(result) {
                 $scope.sections = result;

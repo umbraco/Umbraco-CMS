@@ -57,9 +57,6 @@ function MainController($scope, $routeParams, $rootScope, $timeout, $http, $log,
     //when a user logs out or timesout
     $scope.$on("notAuthenticated", function() {
 
-        //this means that the user has logged out
-        $log.log("MainController handling notAuthenticated");
-
         $scope.authenticated = null;
         $scope.user = null;
 
@@ -67,9 +64,6 @@ function MainController($scope, $routeParams, $rootScope, $timeout, $http, $log,
     
     //when a user is authorized setup the data
     $scope.$on("authenticated", function (evt, data) {
-
-        //this means that the user has logged in
-        $log.log("MainController handling authenticated");
 
         //We need to load in the legacy tree js but only once no matter what user has logged in 
         if (!legacyTreeJsLoaded) {
@@ -84,45 +78,22 @@ function MainController($scope, $routeParams, $rootScope, $timeout, $http, $log,
         $scope.authenticated = data.authenticated;
         $scope.user = data.user;
 
+        //var url = "http://www.gravatar.com/avatar/" + $scope.user.emailHash + ".json?404=404";
+        //$http.jsonp(url).then(function(response){
+        //    $log.log("found: " + response);
+        //}, function(data){
+        //    $log.log(data);
+        //});
+
+        //if($scope.user.avatar){
+        //    $http.get($scope.user.avatar).then(function(){
+        //        //alert($scope.user.avatar);
+        //        $scope.avatar = $scope.user.avatar;
+        //    });
+        //}
+
     });
 
-    ////fetch the authorized status         
-    //userService.isAuthenticated()
-    //    .then(function (data) {
-            
-    //        ////We need to load in the legacy tree js but only once no matter what user has logged in 
-    //        //if (!legacyTreeJsLoaded) {
-    //        //    legacyJsLoader.loadLegacyTreeJs($scope).then(
-    //        //        function (result) {                        
-    //        //            legacyTreeJsLoaded = true;
-                        
-    //        //            //TODO: We could wait for this to load before running the UI ?
-    //        //        });
-    //        //}
-            
-    //        //$scope.authenticated = data.authenticated;
-    //        //$scope.user = data.user;
-            
-    //        //var url = "http://www.gravatar.com/avatar/" + $scope.user.emailHash + ".json?404=404";
-    //        //$http.jsonp(url).then(function(response){
-    //        //    $log.log("found: " + response);
-    //        //}, function(data){
-    //        //    $log.log(data);
-    //        //});
-
-    //        //if($scope.user.avatar){
-    //        //    $http.get($scope.user.avatar).then(function(){
-    //        //        //alert($scope.user.avatar);
-    //        //        $scope.avatar = $scope.user.avatar;
-    //        //    });
-    //        //}
-
-            
-    //    }, function (reason) {
-    //        notificationsService.error("An error occurred checking authentication.");
-    //        $scope.authenticated = false;
-    //        $scope.user = null;
-    //    });
 }
 
 
