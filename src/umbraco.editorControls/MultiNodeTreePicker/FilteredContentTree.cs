@@ -36,7 +36,6 @@ namespace umbraco.editorControls.MultiNodeTreePicker
         /// </summary>
         private int? m_DeterminedStartNodeId = null;
 
-        [Obsolete("This is no longer used and has no effect")]
         protected override bool LoadMinimalDocument
         {
             get
