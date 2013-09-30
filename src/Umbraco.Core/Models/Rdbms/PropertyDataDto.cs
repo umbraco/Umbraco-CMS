@@ -65,12 +65,12 @@ namespace Umbraco.Core.Models.Rdbms
                     return Date.Value;
                 }
                 
-                if(!string.IsNullOrEmpty(VarChar))
+                if(string.IsNullOrEmpty(VarChar) == false)
                 {
                     return VarChar;
                 }
 
-                if(!string.IsNullOrEmpty(Text))
+                if(string.IsNullOrEmpty(Text) == false)
                 {
                     return Text;
                 }
