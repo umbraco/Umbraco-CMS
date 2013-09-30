@@ -55,51 +55,72 @@ namespace Umbraco.Core.Persistence.Factories
 
         private PropertyGroupCollection GetPropertyTypeGroupCollection(MemberTypeReadOnlyDto dto, MemberType memberType)
         {
-            var propertyTypeGroupCollection = new PropertyGroupCollection();
-            foreach (var propertyTypeGroup in dto.PropertyTypeGroups.Where(x => x.Id.HasValue))
+            var propertyGroups = new PropertyGroupCollection();
+            foreach (var groupDto in dto.PropertyTypeGroups.Where(x => x.Id.HasValue))
             {
-                //Find PropertyTypes that belong to the current PropertyTypeGroup
-                var groupId = propertyTypeGroup.Id.Value;
-                var propertyTypesByGroup =
-                    dto.PropertyTypes.Where(
-                        x => x.Id.HasValue && x.PropertyTypeGroupId.HasValue && x.PropertyTypeGroupId.Value.Equals(groupId));
-                //Create PropertyTypeCollection for passing into the PropertyTypeGroup, and loop through the above result to create PropertyTypes
-                var propertyTypeCollection = new PropertyTypeCollection();
-                foreach (var propTypeDto in propertyTypesByGroup)
+                var group = new PropertyGroup();
+                //Only assign an Id if the PropertyGroup belongs to this ContentType
+                if (groupDto.Id.HasValue && groupDto.Id == memberType.Id)
                 {
-                    //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
-                    memberType.MemberTypePropertyTypes.Add(propTypeDto.Alias,
-                        new Tuple<bool, bool, int>(propTypeDto.CanEdit, propTypeDto.ViewOnProfile, propTypeDto.Id.Value));
-                    //PropertyType Collection
-                    propertyTypeCollection.Add(new PropertyType(propTypeDto.ControlId,
-                        propTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
-                                               {
-                                                   Alias = propTypeDto.Alias,
-                                                   DataTypeDefinitionId = propTypeDto.DataTypeId,
-                                                   Description = propTypeDto.Description,
-                                                   HelpText = propTypeDto.HelpText,
-                                                   Id = propTypeDto.Id.Value,
-                                                   Mandatory = propTypeDto.Mandatory,
-                                                   Name = propTypeDto.Name,
-                                                   SortOrder = propTypeDto.SortOrder,
-                                                   ValidationRegExp = propTypeDto.ValidationRegExp,
-                                                   PropertyGroupId = new Lazy<int>(() => propTypeDto.PropertyTypeGroupId.Value),
-                                                   CreateDate = dto.CreateDate,
-                                                   UpdateDate = dto.CreateDate
-                                               });
+                    group.Id = groupDto.Id.Value;
+
+                    if (groupDto.ParentGroupId.HasValue)
+                        group.ParentId = groupDto.ParentGroupId.Value;
+                }
+                else
+                {
+                    //If the PropertyGroup is inherited, we add a reference to the group as a Parent.
+                    group.ParentId = groupDto.Id;
                 }
 
-                var group = new PropertyGroup(propertyTypeCollection) {Id = groupId};
-                propertyTypeGroupCollection.Add(@group);
+                group.Name = groupDto.Text;
+                group.SortOrder = groupDto.SortOrder;
+                group.PropertyTypes = new PropertyTypeCollection();
+
+                //Because we are likely to have a group with no PropertyTypes we need to ensure that these are excluded
+                var typeDtos = dto.PropertyTypes.Where(x => x.Id.HasValue && x.Id > 0 && x.PropertyTypeGroupId.HasValue && x.PropertyTypeGroupId.Value == groupDto.Id.Value);
+                foreach (var typeDto in typeDtos)
+                {
+                    //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
+                    memberType.MemberTypePropertyTypes.Add(typeDto.Alias,
+                        new Tuple<bool, bool, int>(typeDto.CanEdit, typeDto.ViewOnProfile, typeDto.Id.Value));
+
+                    var tempGroupDto = groupDto;
+                    var propertyType = new PropertyType(typeDto.ControlId,
+                                                             typeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
+                    {
+                        Alias = typeDto.Alias,
+                        DataTypeDefinitionId = typeDto.DataTypeId,
+                        Description = typeDto.Description,
+                        Id = typeDto.Id.Value,
+                        Name = typeDto.Name,
+                        HelpText = typeDto.HelpText,
+                        Mandatory = typeDto.Mandatory,
+                        SortOrder = typeDto.SortOrder,
+                        ValidationRegExp = typeDto.ValidationRegExp,
+                        PropertyGroupId = new Lazy<int>(() => tempGroupDto.Id.Value),
+                        CreateDate = memberType.CreateDate,
+                        UpdateDate = memberType.UpdateDate
+                    };
+                    //on initial construction we don't want to have dirty properties tracked
+                    // http://issues.umbraco.org/issue/U4-1946
+                    propertyType.ResetDirtyProperties(false);
+                    group.PropertyTypes.Add(propertyType);
+                }
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                group.ResetDirtyProperties(false);
+                propertyGroups.Add(group);
             }
-            return propertyTypeGroupCollection;
+
+            return propertyGroups;
         }
 
         private List<PropertyType> GetPropertyTypes(MemberTypeReadOnlyDto dto, MemberType memberType)
         {
             //Find PropertyTypes that does not belong to a PropertyTypeGroup
             var propertyTypes = new List<PropertyType>();
-            foreach (var propertyType in dto.PropertyTypes.Where(x => x.PropertyTypeGroupId.HasValue == false && x.Id.HasValue))
+            foreach (var propertyType in dto.PropertyTypes.Where(x => (x.PropertyTypeGroupId.HasValue == false || x.PropertyTypeGroupId.Value == 0) && x.Id.HasValue))
             {
                 //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
                 memberType.MemberTypePropertyTypes.Add(propertyType.Alias,

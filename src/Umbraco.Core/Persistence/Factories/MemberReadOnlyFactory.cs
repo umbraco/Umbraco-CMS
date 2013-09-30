@@ -61,7 +61,7 @@ namespace Umbraco.Core.Persistence.Factories
                                    ? propertyType.CreatePropertyFromValue(null)
                                    : propertyType.CreatePropertyFromRawValue(propertyDataDto.GetValue,
                                                                              propertyDataDto.VersionId,
-                                                                             propertyDataDto.Id);
+                                                                             propertyDataDto.PropertyDataId.Value);
                 //on initial construction we don't want to have dirty properties tracked
                 property.CreateDate = createDate;
                 property.UpdateDate = createDate;

@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -171,6 +172,31 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(result.Any(x => x == null), Is.False);
                 Assert.That(result.Count(), Is.EqualTo(5));
+            }
+        }
+
+        [Test]
+        public void MemberRepository_Can_Persist_Member()
+        {
+            IMember sut;
+            var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
+                var memberType = MockedContentTypes.CreateSimpleMemberType();
+                memberTypeRepository.AddOrUpdate(memberType);
+                unitOfWork.Commit();
+
+                var member = MockedMember.CreateSimpleContent(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty", -1);
+                repository.AddOrUpdate(member);
+                unitOfWork.Commit();
+
+                sut = repository.Get(member.Id);
+
+                Assert.That(sut, Is.Not.Null);
+                Assert.That(sut.ContentType.PropertyGroups.Count(), Is.EqualTo(1));
+                Assert.That(sut.ContentType.PropertyTypes.Count(), Is.EqualTo(12));
+                Assert.That(sut.Properties.Count(), Is.EqualTo(12));
             }
         }
 

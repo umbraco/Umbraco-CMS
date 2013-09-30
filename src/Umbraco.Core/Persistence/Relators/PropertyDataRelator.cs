@@ -15,6 +15,8 @@ namespace Umbraco.Core.Persistence.Relators
             if (a == null)
                 return Current;
 
+            p.VersionId = a.VersionId;
+
             // Is this the same MemberReadOnlyDto as the current one we're processing
             if (Current != null && Current.UniqueId == a.UniqueId)
             {
