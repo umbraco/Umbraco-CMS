@@ -350,6 +350,8 @@
     <Compile Include="TestHelpers\Entities\MockedContentTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
     <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
+    <Compile Include="Trees\BaseContentTreeTests.cs" />
+    <Compile Include="Trees\BaseMediaTreeTests.cs" />
     <Compile Include="UmbracoExamine\ContentServiceTest.cs" />
     <Compile Include="UmbracoExamine\EventsTest.cs" />
     <Compile Include="TypeHelperTests.cs" />

@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-16"?>
+<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>UmbracoCms.Core</id>
-        <version>6.1.2</version>
+        <version>6.2.0</version>
         <title>Umbraco Cms Core Binaries</title>
         <authors>Morten Christensen</authors>
         <owners>Umbraco HQ</owners>
@@ -14,57 +14,57 @@
         <summary>Contains the core assemblies needed to run Umbraco Cms</summary>
         <language>en-US</language>
         <tags>umbraco</tags>
-		<dependencies>
+        <dependencies>
             <dependency id="Microsoft.AspNet.Mvc" version="4.0" />
-			<dependency id="Microsoft.AspNet.WebApi" version="4.0" />
-			<dependency id="Microsoft.AspNet.Mvc.FixedDisplayModes" version="1.0.0" />
-			<dependency id="MiniProfiler" version="2.1.0" />
-			<dependency id="HtmlAgilityPack" version="1.4.6" />
-			<dependency id="Lucene.Net" version="[2.9.4.1]" />
-			<dependency id="SharpZipLib" version="0.86.0" />
-			<dependency id="MySql.Data" version="[6.6.5]" />
-			<dependency id="xmlrpcnet" version="2.5.0" />
-			<dependency id="ClientDependency" version="[1.7.0,1.7.1)" />
-			<dependency id="ClientDependency-Mvc" version="[1.7.0,1.7.1)" />
+            <dependency id="Microsoft.AspNet.WebApi" version="4.0" />
+            <dependency id="Microsoft.AspNet.Mvc.FixedDisplayModes" version="1.0.0" />
+            <dependency id="MiniProfiler" version="[2.1.0, 3.0.0)" />
+            <dependency id="HtmlAgilityPack" version="[1.4.6, 2.0.0)" />
+            <dependency id="Lucene.Net" version="[2.9.4.1, 3.0.0.0)" />
+            <dependency id="SharpZipLib" version="[0.86.0, 1.0.0)" />
+            <dependency id="MySql.Data" version="[6.6.5]" />
+            <dependency id="xmlrpcnet" version="[2.5.0, 3.0.0)" />
+            <dependency id="ClientDependency" version="[1.7.0, 2.0.0)" />
+            <dependency id="ClientDependency-Mvc" version="[1.7.0, 2.0.0)" />
         </dependencies>
     </metadata>
-	<files>
-		<file src="..\_BuildOutput\WebApp\bin\businesslogic.dll" target="lib\businesslogic.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\businesslogic.xml" target="lib\businesslogic.xml" />
-		<file src="..\_BuildOutput\WebApp\bin\cms.dll" target="lib\cms.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\cms.xml" target="lib\cms.xml" />
-		<file src="..\_BuildOutput\WebApp\bin\controls.dll" target="lib\controls.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\controls.xml" target="lib\controls.xml" />
-		<file src="..\_BuildOutput\WebApp\bin\Examine.dll" target="lib\Examine.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\interfaces.dll" target="lib\interfaces.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\interfaces.xml" target="lib\interfaces.xml" />
-		<file src="..\_BuildOutput\WebApp\bin\log4net.dll" target="lib\log4net.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\Microsoft.ApplicationBlocks.Data.dll" target="lib\Microsoft.ApplicationBlocks.Data.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\Microsoft.Web.Helpers.dll" target="lib\Microsoft.Web.Helpers.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\Our.Umbraco.uGoLive.47x.dll" target="lib\Our.Umbraco.uGoLive.47x.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\Our.Umbraco.uGoLive.Checks.dll" target="lib\Our.Umbraco.uGoLive.Checks.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\Our.Umbraco.uGoLive.dll" target="lib\Our.Umbraco.uGoLive.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\SQLCE4Umbraco.dll" target="lib\SQLCE4Umbraco.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.dll" target="lib\System.Data.SqlServerCe.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.Entity.dll" target="lib\System.Data.SqlServerCe.Entity.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\TidyNet.dll" target="lib\TidyNet.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\Umbraco.Core.dll" target="lib\Umbraco.Core.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\Umbraco.Core.xml" target="lib\Umbraco.Core.xml" />
-		<file src="..\_BuildOutput\WebApp\bin\umbraco.DataLayer.dll" target="lib\umbraco.DataLayer.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\umbraco.DataLayer.xml" target="lib\umbraco.DataLayer.xml" />
-		<file src="..\_BuildOutput\WebApp\bin\umbraco.dll" target="lib\umbraco.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\umbraco.xml" target="lib\umbraco.xml" />
-		<file src="..\_BuildOutput\WebApp\bin\umbraco.editorControls.dll" target="lib\umbraco.editorControls.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\umbraco.editorControls.xml" target="lib\umbraco.editorControls.xml" />
-		<file src="..\_BuildOutput\WebApp\bin\umbraco.MacroEngines.dll" target="lib\umbraco.MacroEngines.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\umbraco.MacroEngines.xml" target="lib\umbraco.MacroEngines.xml" />
-		<file src="..\_BuildOutput\WebApp\bin\umbraco.macroRenderings.dll" target="lib\umbraco.macroRenderings.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\umbraco.macroRenderings.xml" target="lib\umbraco.macroRenderings.xml" />
-		<file src="..\_BuildOutput\WebApp\bin\umbraco.providers.dll" target="lib\umbraco.providers.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\umbraco.providers.xml" target="lib\umbraco.providers.xml" />
-		<file src="..\_BuildOutput\WebApp\bin\Umbraco.Web.UI.dll" target="lib\Umbraco.Web.UI.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\umbraco.XmlSerializers.dll" target="lib\umbraco.XmlSerializers.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\UmbracoExamine.dll" target="lib\UmbracoExamine.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\UrlRewritingNet.UrlRewriter.dll" target="lib\UrlRewritingNet.UrlRewriter.dll" />
-	</files>
+    <files>
+        <file src="..\_BuildOutput\WebApp\bin\businesslogic.dll" target="lib\businesslogic.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\businesslogic.xml" target="lib\businesslogic.xml" />
+        <file src="..\_BuildOutput\WebApp\bin\cms.dll" target="lib\cms.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\cms.xml" target="lib\cms.xml" />
+        <file src="..\_BuildOutput\WebApp\bin\controls.dll" target="lib\controls.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\controls.xml" target="lib\controls.xml" />
+        <file src="..\_BuildOutput\WebApp\bin\Examine.dll" target="lib\Examine.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\interfaces.dll" target="lib\interfaces.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\interfaces.xml" target="lib\interfaces.xml" />
+        <file src="..\_BuildOutput\WebApp\bin\log4net.dll" target="lib\log4net.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\Microsoft.ApplicationBlocks.Data.dll" target="lib\Microsoft.ApplicationBlocks.Data.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\Microsoft.Web.Helpers.dll" target="lib\Microsoft.Web.Helpers.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\Our.Umbraco.uGoLive.47x.dll" target="lib\Our.Umbraco.uGoLive.47x.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\Our.Umbraco.uGoLive.Checks.dll" target="lib\Our.Umbraco.uGoLive.Checks.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\Our.Umbraco.uGoLive.dll" target="lib\Our.Umbraco.uGoLive.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\SQLCE4Umbraco.dll" target="lib\SQLCE4Umbraco.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.dll" target="lib\System.Data.SqlServerCe.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.Entity.dll" target="lib\System.Data.SqlServerCe.Entity.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\TidyNet.dll" target="lib\TidyNet.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\Umbraco.Core.dll" target="lib\Umbraco.Core.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\Umbraco.Core.xml" target="lib\Umbraco.Core.xml" />
+        <file src="..\_BuildOutput\WebApp\bin\umbraco.DataLayer.dll" target="lib\umbraco.DataLayer.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\umbraco.DataLayer.xml" target="lib\umbraco.DataLayer.xml" />
+        <file src="..\_BuildOutput\WebApp\bin\umbraco.dll" target="lib\umbraco.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\umbraco.xml" target="lib\umbraco.xml" />		
+        <file src="..\_BuildOutput\WebApp\bin\umbraco.editorControls.dll" target="lib\umbraco.editorControls.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\umbraco.editorControls.xml" target="lib\umbraco.editorControls.xml" />
+        <file src="..\_BuildOutput\WebApp\bin\umbraco.MacroEngines.dll" target="lib\umbraco.MacroEngines.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\umbraco.MacroEngines.xml" target="lib\umbraco.MacroEngines.xml" />
+        <file src="..\_BuildOutput\WebApp\bin\umbraco.macroRenderings.dll" target="lib\umbraco.macroRenderings.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\umbraco.macroRenderings.xml" target="lib\umbraco.macroRenderings.xml" />
+        <file src="..\_BuildOutput\WebApp\bin\umbraco.providers.dll" target="lib\umbraco.providers.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\umbraco.providers.xml" target="lib\umbraco.providers.xml" />
+        <file src="..\_BuildOutput\WebApp\bin\Umbraco.Web.UI.dll" target="lib\Umbraco.Web.UI.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\umbraco.XmlSerializers.dll" target="lib\umbraco.XmlSerializers.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\UmbracoExamine.dll" target="lib\UmbracoExamine.dll" />
+        <file src="..\_BuildOutput\WebApp\bin\UrlRewritingNet.UrlRewriter.dll" target="lib\UrlRewritingNet.UrlRewriter.dll" />
+    </files>
 </package>
