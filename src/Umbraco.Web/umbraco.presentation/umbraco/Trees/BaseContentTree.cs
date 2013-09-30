@@ -27,7 +27,6 @@ namespace umbraco.cms.presentation.Trees
 
         private User _user;
         
-        [Obsolete("This is no longer used and has no effect")]
         protected virtual bool LoadMinimalDocument { get; set; }
 
         /// <summary>
@@ -118,6 +117,11 @@ function openContent(id) {
                     {
                         var node = CreateNode(e, allowedUserOptions);
 
+                        //in optimized mode the LoadMinimalDocument will ALWAYS be true, if it is not true then we will
+                        // be rendering in non-optimized mode and this code will not get executed so we don't need to worry
+                        // about performance here.
+                        OnRenderNode(ref node, new Document(e, LoadMinimalDocument));
+                        
                         OnBeforeNodeRender(ref Tree, ref node, EventArgs.Empty);
                         if (node != null)
                         {
@@ -495,7 +499,7 @@ function openContent(id) {
                 //now we need to check if the current tree type has OnRenderNode overridden with a custom implementation
                 //Strangely - this even works in med trust!
                 var method = this.GetType().GetMethod("OnRenderNode", BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(XmlTreeNode).MakeByRefType(), typeof(Document) }, null);
-                if (TypeHelper.IsOverride(method))
+                if (TypeHelper.IsOverride(method) && LoadMinimalDocument == false)
                 {
                     return false;
                 }

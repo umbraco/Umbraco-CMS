@@ -20,7 +20,6 @@ namespace umbraco.cms.presentation.Trees
 
         public ContentRecycleBin(string application) : base(application) { }
 
-        [Obsolete("This is no longer used and has no effect")]
         protected override bool LoadMinimalDocument
         {
             get
