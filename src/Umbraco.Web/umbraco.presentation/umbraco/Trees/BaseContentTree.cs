@@ -26,14 +26,8 @@ namespace umbraco.cms.presentation.Trees
         public BaseContentTree(string application) : base(application) { }
 
         private User _user;
-
-        /// <summary>
-        /// Determines whether the (legacy) Document object passed to the OnRenderNode-method
-        /// should be initialized with a full set of properties.
-        /// By default the Document will be initialized, so setting the boolean to True will
-        /// ensure that the Document object is loaded with a minimum set of properties to 
-        /// improve performance.
-        /// </summary>
+        
+        [Obsolete("This is no longer used and has no effect")]
         protected virtual bool LoadMinimalDocument { get; set; }
 
         /// <summary>

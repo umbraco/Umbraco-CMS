@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.presentation.Trees;
 using umbraco.interfaces;
 using Umbraco.Core;
+using Action = umbraco.BusinessLogic.Actions.Action;
 
 namespace umbraco
 {
@@ -54,6 +56,7 @@ namespace umbraco
             }
         }
 
+        [Obsolete("This is no longer used and has no effect")]
         protected override bool LoadMinimalDocument
         {
             get

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
@@ -19,6 +20,7 @@ namespace umbraco.cms.presentation.Trees
 
         public ContentRecycleBin(string application) : base(application) { }
 
+        [Obsolete("This is no longer used and has no effect")]
         protected override bool LoadMinimalDocument
         {
             get
