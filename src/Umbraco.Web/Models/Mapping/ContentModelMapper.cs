@@ -94,6 +94,11 @@ namespace Umbraco.Web.Models.Mapping
                 templateItemConfig.Add(t.Alias, t.Name);
             }
 
+
+            if(content.ContentType.IsContainer)
+                TabsAndPropertiesResolver.AddContainerView(content, display);
+
+
             TabsAndPropertiesResolver.MapGenericProperties(
                 content, display,
                 new ContentPropertyDisplay

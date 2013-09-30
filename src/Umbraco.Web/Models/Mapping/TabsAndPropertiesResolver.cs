@@ -28,6 +28,33 @@ namespace Umbraco.Web.Models.Mapping
             _ignoreProperties = ignoreProperties;
         }
 
+        public static void AddContainerView<TPersisted>(TPersisted content, ContentItemDisplayBase<ContentPropertyDisplay, TPersisted> display)
+             where TPersisted : IContentBase
+        {
+            var listViewTab = new Tab<ContentPropertyDisplay>();
+            listViewTab.Alias = "containerView";
+            listViewTab.Label = "Content";
+            listViewTab.Id = 25;
+            listViewTab.IsActive = true;
+
+            var listViewProperties = new List<ContentPropertyDisplay>();
+            listViewProperties.Add(new ContentPropertyDisplay
+            {
+                Alias = string.Format("{0}containerView", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                Label = ui.Text("content", "releaseDate"),
+                Value = null,
+                View = "listview",
+                HideLabel = true
+            });
+            listViewTab.Properties = listViewProperties;
+
+            //Is there a better way?
+            var tabs = new List<Tab<ContentPropertyDisplay>>();
+            tabs.Add(listViewTab);
+            tabs.AddRange(display.Tabs);
+            display.Tabs = tabs;
+        }
+
         /// <summary>
         /// Maps properties on to the generic properties tab
         /// </summary>
@@ -46,6 +73,8 @@ namespace Umbraco.Web.Models.Mapping
             params ContentPropertyDisplay[] customProperties) 
             where TPersisted : IContentBase
         {
+
+
             var genericProps = display.Tabs.Single(x => x.Id == 0);
 
             //store the current props to append to the newly inserted ones

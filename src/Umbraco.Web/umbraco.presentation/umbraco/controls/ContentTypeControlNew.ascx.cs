@@ -100,8 +100,13 @@ namespace umbraco.controls
             pp_alias.Text = ui.Text("alias", Security.CurrentUser);
             pp_name.Text = ui.Text("name", Security.CurrentUser);
             pp_allowedChildren.Text = ui.Text("allowedchildnodetypes", Security.CurrentUser);
+            
             pp_description.Text = ui.Text("editcontenttype", "description", Security.CurrentUser);
             pp_icon.Text = ui.Text("icon", Security.CurrentUser);
+
+            pp_isContainer.Text = ui.Text("editcontenttype", "iscontainercontenttype", Security.CurrentUser);
+            
+
             //pp_thumbnail.Text = ui.Text("editcontenttype", "thumbnail", Security.CurrentUser);
 
 
@@ -290,6 +295,7 @@ namespace umbraco.controls
                         _contentType.ContentTypeItem.Description = description.Text;
                         //_contentType.ContentTypeItem.Thumbnail = ddlThumbnails.SelectedValue;
                         _contentType.ContentTypeItem.AllowedAsRoot = allowAtRoot.Checked;
+                        _contentType.ContentTypeItem.IsContainer = cb_isContainer.Checked;
 
                         int i = 0;
                         var ids = SaveAllowedChildTypes();
@@ -570,6 +576,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             }
 
             allowAtRoot.Checked = _contentType.AllowAtRoot;
+            cb_isContainer.Checked = _contentType.IsContainerContentType;
         }
 
         private int[] SaveAllowedChildTypes()
@@ -1399,6 +1406,9 @@ Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::umbraco.uicontrols.PropertyPanel pp_newTab;
+
+        protected global::umbraco.uicontrols.PropertyPanel pp_isContainer;
+        protected global::System.Web.UI.WebControls.CheckBox cb_isContainer;    
 
         /// <summary>
         /// txtNewTab control.
