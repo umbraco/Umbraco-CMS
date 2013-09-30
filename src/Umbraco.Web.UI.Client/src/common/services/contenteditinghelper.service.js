@@ -55,8 +55,19 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
             for (var p in allOrigProps) {
                 var newProp = getNewProp(allOrigProps[p].alias);
                 if (newProp && !_.isEqual(allOrigProps[p].value, newProp.value)) {
+
                     //they have changed so set the origContent prop to the new one
+                    var origVal = allOrigProps[p].value;
                     allOrigProps[p].value = newProp.value;
+                    
+                    //instead of having a property editor $watch their expression to check if it has 
+                    // been updated, instead we'll check for the existence of a special method on their model
+                    // and just call it.
+                    if (angular.isFunction(allOrigProps[p].onValueChanged)) {
+                        //send the newVal + oldVal
+                        allOrigProps[p].onValueChanged(allOrigProps[p].value, origVal);
+                    }
+
                     changed.push(allOrigProps[p]);
                 }
             }
