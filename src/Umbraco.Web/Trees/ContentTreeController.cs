@@ -81,12 +81,9 @@ namespace Umbraco.Web.Trees
                 var allowedUserOptions = GetAllowedUserMenuItemsForNode(e);
                 if (CanUserAccessNode(e, allowedUserOptions))
                 {
-                    //TODO: if the node is of a specific type, don't list its children
-                    //this is to enable the list view on the editor
-
-                    //for WIP I'm just checking against a hardcoded value
+                    //TODO: Here I look up a contenttype for every node, must make a faster call for this
                     var hasChildren = e.HasChildren;
-                    if (e.ContentTypeAlias == "umbNewsArea")
+                    if (isContainer(e.ContentTypeAlias))
                         hasChildren = false;
 
                     var node = CreateTreeNode(
@@ -100,6 +97,12 @@ namespace Umbraco.Web.Trees
                 }
             }
             return nodes;
+        }
+
+       //TODO: find a faster way to do this
+        private bool isContainer(string alias)
+        {
+            return Services.ContentTypeService.GetContentType(alias).IsContainer;
         }
 
         protected override MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings)
@@ -175,10 +178,10 @@ namespace Umbraco.Web.Trees
             menu.AddMenuItem<ActionDelete>(true);
             
             //need to ensure some of these are converted to the legacy system - until we upgrade them all to be angularized.
-            menu.AddMenuItem<ActionMove>(true).ConvertLegacyMenuItem(item, "content", "content");
+            menu.AddMenuItem<ActionMove>(true);
             menu.AddMenuItem<ActionCopy>().ConvertLegacyMenuItem(item, "content", "content");
             
-            menu.AddMenuItem<ActionSort>(true);
+            menu.AddMenuItem<ActionSort>(true).ConvertLegacyMenuItem(item, "content", "content");
 
             menu.AddMenuItem<ActionRollback>().ConvertLegacyMenuItem(item, "content", "content");
             menu.AddMenuItem<ActionPublish>(true).ConvertLegacyMenuItem(item, "content", "content");
