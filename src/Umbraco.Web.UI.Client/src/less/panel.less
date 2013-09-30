@@ -6,7 +6,6 @@
           top: 0px; bottom: 0px; left: 0px; right: 0px;}
 
 .umb-panel-nobody{padding-top: 100px;}
-
 .umb-panel-header {
   background: @grayLighter;
   border-bottom: 1px solid @grayLight;
@@ -24,9 +23,14 @@
     bottom: 0px;
     position: absolute;
     clear: both;
+    overflow: auto;
 }
 .umb-panel-body.no-header {
     top: 0px;
+}
+
+.umb-panel-body.with-footer {
+    bottom: 90px;
 }
 
 .umb-panel-header h1.umb-headline-editor {

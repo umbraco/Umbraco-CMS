@@ -353,6 +353,7 @@ angular.module('umbraco.services')
                     inline: true,
                     show: true,
                     iframe: iframe,
+                    modalClass: "umb-dialog",
                     template: templateUrl
                 });
 
