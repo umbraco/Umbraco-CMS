@@ -105,7 +105,7 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual string GetDbConnectionString()
         {
-            return @"Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;File Access Retry Timeout=10";            
+            return @"Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;";            
         }
 
         /// <summary>
