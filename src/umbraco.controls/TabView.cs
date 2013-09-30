@@ -25,7 +25,9 @@ namespace umbraco.uicontrols {
         private HtmlGenericControl _tabList = new HtmlGenericControl();
         private HtmlGenericControl _body = new HtmlGenericControl();
         private HtmlGenericControl _tabsHolder = new HtmlGenericControl();
-        
+
+        private HiddenField _activeTabHolder = new HiddenField();
+
         protected override void CreateChildControls()
         {
             base.CreateChildControls();
@@ -53,6 +55,10 @@ namespace umbraco.uicontrols {
 
                 _tabsHolder.Controls.Add(tabPage);
             }
+
+            _activeTabHolder.ID = "activeTabHolder";
+            _body.Controls.Add(_activeTabHolder);
+
         }
 
         protected override void OnInit(EventArgs e)
@@ -84,6 +90,7 @@ namespace umbraco.uicontrols {
                 HtmlGenericControl a = new HtmlGenericControl();
                 a.TagName = "a";
                 a.Attributes.Add("href", "#"+tabId);
+                a.Attributes.Add("onclick", "$('#" + _activeTabHolder.ClientID + "').val('" + tabId + "');");
                 a.Attributes.Add("data-toggle", "tab");
                 a.InnerText = tabPageCaption;
                 li.Controls.Add(a);
@@ -129,8 +136,14 @@ namespace umbraco.uicontrols {
         {
             get
             {
+
+                if (_activeTabHolder.Value != "")
+                    return _activeTabHolder.Value;
+
                 if (TabPages.Count > 0)
                     return TabPages.ElementAt(0).Value.ID;
+
+                
 
                 return "tab01";
             }
