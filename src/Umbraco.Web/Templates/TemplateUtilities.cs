@@ -21,10 +21,15 @@ namespace Umbraco.Web.Templates
             var inPreviewMode = UmbracoContext.Current.InPreviewMode;
             UmbracoContext.Current.InPreviewMode = preview;
 
-            text = ParseInternalLinks(text);
-
-            // restore
-            UmbracoContext.Current.InPreviewMode = inPreviewMode;
+            try
+            {
+                text = ParseInternalLinks(text);
+            }
+            finally
+            {
+                // restore
+                UmbracoContext.Current.InPreviewMode = inPreviewMode;
+            }
 
             return text;
 	    }
