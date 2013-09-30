@@ -12,6 +12,19 @@ angular.module("umbraco").controller("Umbraco.Editors.DatepickerController",
         //map back to the model
         $scope.model.config = config;
 
+        function applyDate(e){
+                // when a date is changed, update the model
+                if (e.localDate) {
+                    if ($scope.model.config.format == "yyyy-MM-dd HH:mm:ss") {
+                        $scope.$apply(function(){
+                            $scope.model.value = e.localDate.toIsoDateTimeString();
+                        });
+                    }else{
+                        $scope.model.value = e.localDate.toIsoDateString();
+                    }
+                }
+        }
+
         assetsService.loadJs(
                 'views/propertyeditors/datepicker/bootstrap-datetimepicker.min.js'
             ).then(
@@ -20,23 +33,12 @@ angular.module("umbraco").controller("Umbraco.Editors.DatepickerController",
 
                 // Get the id of the datepicker button that was clicked
                 var pickerId = $scope.model.alias;
-
                 // Open the datepicker and add a changeDate eventlistener
-                $("#" + pickerId).datetimepicker($scope.model.config).on("changeDate", function (e) {
-                    // when a date is changed, update the model
-                    if (e.localDate) {
-                        if ($scope.model.config.format == "yyyy-MM-dd HH:mm:ss") {
-                            $scope.model.value = e.localDate.toIsoDateTimeString();
-                        }
-                        else {
-                            $scope.model.value = e.localDate.toIsoDateString();
-                        }
-                    }
-                    else {
-                        $scope.model.value = null;
-                    }
+                $("#" + pickerId)
+                    .datetimepicker($scope.model.config)
+                    .on("changeDate", applyDate)
+                    .on("hide", applyDate);
 
-                });
             });
 
 
