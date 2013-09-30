@@ -10,6 +10,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using System.Xml;
 using System.IO;
+using Umbraco.Core;
 using umbraco;
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
@@ -37,7 +38,7 @@ namespace umbraco.cms.presentation.user
 
 			if (!IsPostBack)
 			{
-				JTree.App = TreeDefinitionCollection.Instance.FindTree<loadContent>().Tree.ApplicationAlias;
+			    JTree.App = Constants.Applications.Content;
 				JTree.ShowContextMenu = false;
 				JTree.IsDialog = true;
 			}
