@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Web;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
@@ -24,14 +26,7 @@ namespace umbraco.cms.presentation.Trees
         public BaseContentTree(string application) : base(application) { }
 
         private User _user;
-
-        /// <summary>
-        /// Determines whether the (legacy) Document object passed to the OnRenderNode-method
-        /// should be initialized with a full set of properties.
-        /// By default the Document will be initialized, so setting the boolean to True will
-        /// ensure that the Document object is loaded with a minimum set of properties to 
-        /// improve performance.
-        /// </summary>
+        
         protected virtual bool LoadMinimalDocument { get; set; }
 
         /// <summary>
@@ -73,61 +68,69 @@ function openContent(id) {
         /// Renders the specified tree item.
         /// </summary>        
         /// <param name="Tree">The tree.</param>
-        /*public override void Render(ref XmlTree Tree)
-        {
-            //get documents to render
-            Document[] docs = Document.GetChildrenForTree(m_id);
-
-            var args = new TreeEventArgs(Tree);
-            OnBeforeTreeRender(docs, args);
-
-            foreach (Document dd in docs)
-            {
-                List<IAction> allowedUserOptions = GetUserActionsForNode(dd);
-                if (CanUserAccessNode(dd, allowedUserOptions))
-                {
-
-                    XmlTreeNode node = CreateNode(dd, allowedUserOptions);
-
-                    OnRenderNode(ref node, dd);
-
-                    OnBeforeNodeRender(ref Tree, ref node, EventArgs.Empty);
-                    if (node != null)
-                    {
-                        Tree.Add(node);
-                        OnAfterNodeRender(ref Tree, ref node, EventArgs.Empty);
-                    }
-                }
-            }
-            OnAfterTreeRender(docs, args);
-        }*/
         public override void Render(ref XmlTree Tree)
         {
-            //get documents to render
-            var entities = Services.EntityService.GetChildren(m_id, UmbracoObjectTypes.Document).ToArray();
-
-            var args = new TreeEventArgs(Tree);
-            OnBeforeTreeRender(entities, args, true);
-
-            foreach (var entity in entities)
+            if (UseOptimizedRendering == false)
             {
-                var e = entity as UmbracoEntity;
-                List<IAction> allowedUserOptions = GetUserActionsForNode(e);
-                if (CanUserAccessNode(e, allowedUserOptions))
+                //We cannot run optimized mode since there are subscribers to events/methods that require document instances
+                // so we'll render the original way by looking up the docs.
+
+                //get documents to render
+                var docs = Document.GetChildrenForTree(m_id);
+
+                var args = new TreeEventArgs(Tree);
+                OnBeforeTreeRender(docs, args);
+
+                foreach (var dd in docs)
                 {
-                    XmlTreeNode node = CreateNode(e, allowedUserOptions);
-
-                    OnRenderNode(ref node, new Document(entity, LoadMinimalDocument));
-
-                    OnBeforeNodeRender(ref Tree, ref node, EventArgs.Empty);
-                    if (node != null)
+                    var allowedUserOptions = GetUserActionsForNode(dd);
+                    if (CanUserAccessNode(dd, allowedUserOptions))
                     {
-                        Tree.Add(node);
-                        OnAfterNodeRender(ref Tree, ref node, EventArgs.Empty);
+
+                        var node = CreateNode(dd, allowedUserOptions);
+
+                        OnRenderNode(ref node, dd);
+
+                        OnBeforeNodeRender(ref Tree, ref node, EventArgs.Empty);
+                        if (node != null)
+                        {
+                            Tree.Add(node);
+                            OnAfterNodeRender(ref Tree, ref node, EventArgs.Empty);
+                        }
+                    }
+                }
+                OnAfterTreeRender(docs, args);
+            }
+            else
+            {
+
+                //We ARE running in optmized mode, this means we will NOT be raising the BeforeTreeRender or AfterTreeRender 
+                // events and NOT calling the OnRenderNode method - we've already detected that there are not subscribers or implementations
+                // to call so that is fine.
+
+                var entities = Services.EntityService.GetChildren(m_id, UmbracoObjectTypes.Document).ToArray();
+                foreach (var entity in entities)
+                {
+                    var e = entity as UmbracoEntity;
+                    var allowedUserOptions = GetUserActionsForNode(e);
+                    if (CanUserAccessNode(e, allowedUserOptions))
+                    {
+                        var node = CreateNode(e, allowedUserOptions);
+
+                        //in optimized mode the LoadMinimalDocument will ALWAYS be true, if it is not true then we will
+                        // be rendering in non-optimized mode and this code will not get executed so we don't need to worry
+                        // about performance here.
+                        OnRenderNode(ref node, new Document(e, LoadMinimalDocument));
+                        
+                        OnBeforeNodeRender(ref Tree, ref node, EventArgs.Empty);
+                        if (node != null)
+                        {
+                            Tree.Add(node);
+                            OnAfterNodeRender(ref Tree, ref node, EventArgs.Empty);
+                        }
                     }
                 }
             }
-            OnAfterTreeRender(entities, args, true);
         }
 
         #region Tree Create-node-helper Methods - Legacy
@@ -473,6 +476,36 @@ function openContent(id) {
                 fullMenu = fullMenu.Replace(",,", ",");
             fullMenu = fullMenu.Trim(new char[] { ',' }); //remove any ending dividers
             return umbraco.BusinessLogic.Actions.Action.FromString(fullMenu);
+        }
+
+        /// <summary>
+        /// Returns true if we can use the EntityService to render the tree or revert to the original way 
+        /// using normal documents
+        /// </summary>
+        /// <remarks>
+        /// We determine this by:
+        /// * If there are any subscribers to the events: BeforeTreeRender or AfterTreeRender - then we cannot run optimized
+        /// * If there are any overrides of the method: OnRenderNode - then we cannot run optimized
+        /// </remarks>
+        internal bool UseOptimizedRendering
+        {
+            get
+            {
+                if (HasEntityBasedEventSubscribers)
+                {
+                    return false;
+                }
+
+                //now we need to check if the current tree type has OnRenderNode overridden with a custom implementation
+                //Strangely - this even works in med trust!
+                var method = this.GetType().GetMethod("OnRenderNode", BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(XmlTreeNode).MakeByRefType(), typeof(Document) }, null);
+                if (TypeHelper.IsOverride(method) && LoadMinimalDocument == false)
+                {
+                    return false;
+                }
+
+                return true;
+            }
         }
 
     }
