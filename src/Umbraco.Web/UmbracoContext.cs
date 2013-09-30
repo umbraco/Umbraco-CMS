@@ -412,8 +412,8 @@ namespace Umbraco.Web
             return
                 //StateHelper.Cookies.Preview.HasValue // has preview cookie
                 HttpContext.Request.HasPreviewCookie()
-                && UmbracoUser != null // has user
-                && currentUrl.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)) == false; // is not in admin UI
+                && currentUrl.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)) == false
+                && UmbracoUser != null; // has user
         }
         
         private HttpRequestBase GetRequestFromContext()

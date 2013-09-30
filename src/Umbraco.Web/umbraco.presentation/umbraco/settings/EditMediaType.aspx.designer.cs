@@ -19,6 +19,6 @@ namespace umbraco.cms.presentation.settings {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.controls.ContentTypeControlNew ContentTypeControlNew1;
+        protected global::System.Web.UI.UserControl ContentTypeControlNew1;
     }
 }

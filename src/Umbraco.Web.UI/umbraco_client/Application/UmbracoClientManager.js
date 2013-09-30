@@ -130,15 +130,16 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     }
 
                     this._debug("contentFrame: parsed location: " + strLocation);
-                    var self = this;
-                    window.setTimeout(function() {
-                        if (typeof self.mainWindow().right != "undefined") {
-                            self.mainWindow().right.location.href = strLocation;
-                        }
-                        else {
-                            self.mainWindow().location.href = strLocation; //set the current windows location if the right frame doesn't exist int he current context
-                        }
-                    }, 200);
+
+                    if (!this.mainWindow().UmbClientMgr) {
+                        window.setTimeout(function() {
+                            var self = this;
+                            self.mainWindow().location.href = strLocation;
+                        }, 200);
+                    }
+                    else {
+                        this.mainWindow().UmbClientMgr.contentFrame(strLocation);
+                    }
                 }
             },
             reloadContentFrameUrlIfPathLoaded: function (url) {

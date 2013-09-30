@@ -12,7 +12,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
         public override void Up()
         {   
             Alter.Table("cmsDataType").AlterColumn("controlId").AsString(255);
+            Alter.Table("cmsDataType").AddColumn("propertyEditorAlias").AsString(255).NotNullable().WithDefaultValue("");
             Rename.Column("controlId").OnTable("cmsDataType").To("propertyEditorAlias");
+
+            Delete.Column("controlId").FromTable("cmsDataType");
         }
 
         public override void Down()

@@ -52,10 +52,11 @@ function openMediaType(id) {
                 xNode.NodeID = mediaType.Id.ToString(CultureInfo.InvariantCulture);
                 xNode.Text = mediaType.Name;
                 xNode.Action = string.Format("javascript:openMediaType({0});", mediaType.Id);
-                xNode.Icon = "settingDataType.gif";
-                xNode.OpenIcon = "settingDataType.gif";
+                xNode.Icon = "icon-item-arrangement";
+                xNode.OpenIcon = "icon-item-arrangement";
                 xNode.Source = GetTreeServiceUrl(mediaType.Id);
                 xNode.HasChildren = hasChildren;
+                
                 if (hasChildren)
                 {
                     xNode.Icon = "settingMasterDataType.gif";

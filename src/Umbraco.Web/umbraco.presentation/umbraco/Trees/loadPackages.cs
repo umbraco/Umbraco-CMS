@@ -135,15 +135,6 @@ namespace umbraco
                             xNode.OpenIcon = "icon-folder";
                             xNode.NodeType = "packagesCategory" + cat.Id;                        
                             tree.Add(xNode);
-                            /*
-                            XmlElement catElement = Tree.CreateElement("tree");
-                            catElement.SetAttribute("text", cat.Text);
-                            //catElement.SetAttribute("menu", "");
-                            catElement.SetAttribute("icon", "folder.gif");
-                            catElement.SetAttribute("openIcon", "folder_o.gif");
-                            catElement.SetAttribute("nodeType", "packagesCategory" + cat.Id);
-                            catElement.SetAttribute("action", "javascript:openPackageCategory('BrowseRepository.aspx?category=" + cat.Id + "&repoGuid=" + currentRepo.Guid + "');");
-                            root.AppendChild(catElement);*/
                         }
                     }
                     break;
@@ -171,6 +162,7 @@ namespace umbraco
         {
             set { m_app = value; }
         }
+
 
         void ITree.Render(ref XmlDocument Tree)
         {

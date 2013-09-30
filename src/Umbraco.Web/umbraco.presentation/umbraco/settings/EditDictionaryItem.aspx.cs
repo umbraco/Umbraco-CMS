@@ -39,6 +39,7 @@ namespace umbraco.settings
             uicontrols.Pane p = new uicontrols.Pane();
 
 			var save = Panel1.Menu.NewButton();
+            save.Text = ui.Text("save");
             save.Click += save_Click;
 			save.ToolTip = ui.Text("save");
             save.ID = "save";
