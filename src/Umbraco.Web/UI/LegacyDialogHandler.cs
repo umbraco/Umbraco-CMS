@@ -68,16 +68,17 @@ namespace Umbraco.Web.UI
             var del = def.SelectSingleNode("./tasks/" + operationNode);
             if (del == null)
             {
-                throw new InvalidOperationException("No delete task found for node type " + nodeType);
+                throw new InvalidOperationException("No " + operationNode + " task found for node type " + nodeType);
             }
             if (!del.Attributes.HasAttribute("assembly"))
             {
-                throw new InvalidOperationException("No assembly attribute found for delete task for node type " + nodeType);
+                throw new InvalidOperationException("No assembly attribute found for " + operationNode + " task for node type " + nodeType);
             }
             var taskAssembly = del.AttributeValue<string>("assembly");
+            
             if (!del.Attributes.HasAttribute("type"))
             {
-                throw new InvalidOperationException("No type attribute found for delete task for node type " + nodeType);
+                throw new InvalidOperationException("No type attribute found for " + operationNode + " task for node type " + nodeType);
             }
             var taskType = del.AttributeValue<string>("type");
 
