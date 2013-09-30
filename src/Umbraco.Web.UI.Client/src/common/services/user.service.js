@@ -2,6 +2,7 @@ angular.module('umbraco.services')
 .factory('userService', function ($rootScope, $q, $location, $log, securityRetryQueue, authResource, dialogService) {
 
     var currentUser = null;
+    var lastUserId = null;
     var loginDialog = null;
 
     // Redirect to the given url (defaults to '/')
@@ -36,6 +37,16 @@ angular.module('umbraco.services')
     // Register a handler for when an item is added to the retry queue
     securityRetryQueue.onItemAddedCallbacks.push(function (retryItem) {
         if (securityRetryQueue.hasMore()) {
+            
+            //store the last user id and clear the user
+            if (currentUser && currentUser.id !== undefined) {
+                lastUserId = currentUser.id;
+            }
+            currentUser = null;
+
+            //broadcast a global event that the user is no longer logged in
+            $rootScope.$broadcast("notAuthenticated");
+
             openLoginDialog();
         }
     });
@@ -43,19 +54,27 @@ angular.module('umbraco.services')
     return {
 
         /** Returns a promise, sends a request to the server to check if the current cookie is authorized  */
-        isAuthenticated: function () {
+        isAuthenticated: function (args) {
             
             return authResource.isAuthenticated()
                 .then(function(data) {
 
                     //note, this can return null if they are not authenticated
-                    if (!data) {
+                    if (!data) {                        
                         throw "Not authenticated";
                     }
                     else {
+
+                        var result = { user: data, authenticated: true, lastUserId: lastUserId };
+
+                        if (args.broadcastEvent) {
+                            //broadcast a global event, will inform listening controllers to load in the user specific data
+                            $rootScope.$broadcast("authenticated", result);
+                        }
+
                         currentUser = data;
                         currentUser.avatar = 'http://www.gravatar.com/avatar/' + data.emailHash + '?s=40&d=404';
-                        return { user: data, authenticated: true };
+                        return result;
                     }
                 });
         },
@@ -65,16 +84,29 @@ angular.module('umbraco.services')
 
             return authResource.performLogin(login, password)
                 .then(function (data) {
+
                     //when it's successful, return the user data
                     currentUser = data;
-                    return { user: data, authenticated: true };
+
+                    var result = { user: data, authenticated: true, lastUserId: lastUserId };
+
+                    //broadcast a global event
+                    $rootScope.$broadcast("authenticated", result);
+
+                    return result;
                 });
         },
 
         logout: function () {
             return authResource.performLogout()
                 .then(function (data) {                   
+
+                    lastUserId = currentUser.id;
                     currentUser = null;
+
+                    //broadcast a global event
+                    $rootScope.$broadcast("notAuthenticated");
+
                     openLoginDialog();
                     return null;
                 });

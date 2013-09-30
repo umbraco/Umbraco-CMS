@@ -53,8 +53,10 @@ app.config(function ($routeProvider) {
 });
 
 
-app.run(['userService', function (userService) {
+app.run(['userService', '$log', '$rootScope', function (userService, $log, $rootScope) {
+
     // Get the current user when the application starts
     // (in case they are still logged in from a previous session)
-    userService.isAuthenticated();
+
+    userService.isAuthenticated({broadcastEvent: true});
 }]);  
