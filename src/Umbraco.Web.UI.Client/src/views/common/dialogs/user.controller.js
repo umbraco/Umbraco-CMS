@@ -12,7 +12,7 @@ angular.module("umbraco")
 
 	    $scope.gotoHistory = function (link) {
 		    $location.path(link);
-		    $scope.$apply() 
+	        $scope.$apply();
 		    $scope.hide();
 		};
 });

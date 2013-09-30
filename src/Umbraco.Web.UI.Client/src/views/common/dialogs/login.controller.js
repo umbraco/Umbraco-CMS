@@ -15,7 +15,8 @@
     $scope.today = weekday[d.getDay()];
     $scope.errorMsg = "";
     
-    $scope.loginSubmit = function (login, password) {        
+    $scope.loginSubmit = function (login, password) {
+        
         //if the login and password are not empty we need to automatically 
         // validate them - this is because if there are validation errors on the server
         // then the user has to change both username & password to resubmit which isn't ideal,
@@ -32,20 +33,19 @@
 
         userService.authenticate(login, password)
             .then(function (data) {
-                //We need to load in the legacy tree js.
-                legacyJsLoader.loadLegacyTreeJs($scope).then(
-                    function(result) {
-                        var iframe = $("#right");
-                        if(iframe){
-                            var url = decodeURIComponent($routeParams.url);
-                            if(!url){
-                                url ="dashboard.aspx";
-                            }
-                            iframe.attr("src", url);
-                        }
+                
+                var iframe = $("#right");
+                if (iframe) {
+                    var url = decodeURIComponent($routeParams.url);
+                    if (!url) {
+                        url = "dashboard.aspx";
+                    }
+                    iframe.attr("src", url);
+                }
 
-                        $scope.submit(true);
-                    });
+                $scope.submit(true);
+                
+                
             }, function (reason) {
                 $scope.errorMsg = reason.errorMsg;
                 

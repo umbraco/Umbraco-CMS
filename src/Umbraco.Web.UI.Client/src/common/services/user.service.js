@@ -36,6 +36,10 @@ angular.module('umbraco.services')
     // Register a handler for when an item is added to the retry queue
     securityRetryQueue.onItemAddedCallbacks.push(function (retryItem) {
         if (securityRetryQueue.hasMore()) {
+            
+            //clear the user
+            currentUser = null;
+
             openLoginDialog();
         }
     });
@@ -49,7 +53,7 @@ angular.module('umbraco.services')
                 .then(function(data) {
 
                     //note, this can return null if they are not authenticated
-                    if (!data) {
+                    if (!data) {                        
                         throw "Not authenticated";
                     }
                     else {
@@ -65,16 +69,28 @@ angular.module('umbraco.services')
 
             return authResource.performLogin(login, password)
                 .then(function (data) {
+
                     //when it's successful, return the user data
                     currentUser = data;
-                    return { user: data, authenticated: true };
+
+                    var result = { user: data, authenticated: true };
+
+                    //broadcast a global event
+                    $rootScope.$broadcast("authenticated", result);
+
+                    return result;
                 });
         },
 
         logout: function () {
             return authResource.performLogout()
                 .then(function (data) {                   
+
                     currentUser = null;
+
+                    //broadcast a global event
+                    $rootScope.$broadcast("notAuthenticated");
+
                     openLoginDialog();
                     return null;
                 });

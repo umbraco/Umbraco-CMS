@@ -53,8 +53,16 @@ app.config(function ($routeProvider) {
 });
 
 
-app.run(['userService', function (userService) {
+app.run(['userService', '$log', '$rootScope', function (userService, $log, $rootScope) {
+
     // Get the current user when the application starts
     // (in case they are still logged in from a previous session)
-    userService.isAuthenticated();
+    
+    userService.isAuthenticated()
+        .then(function (data) {
+            
+            //broadcast a global event, will inform listening controllers to load in the user specific data
+            $rootScope.$broadcast("authenticated", data);
+            
+        });
 }]);  

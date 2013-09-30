@@ -30,11 +30,19 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
 
     $scope.selectedId = navigationService.currentId;
     $scope.sections = navigationService.sections;
+
+    $scope.$on("notAuthenticated", function() {
+        $log.log("NavigationController handling notAuthenticated");
+    });
     
-    sectionResource.getSections()
-        .then(function(result) {
-            $scope.sections = result;
-        });
+    $scope.$on("authenticated", function (evt, data) {
+        $log.log("NavigationController handling authenticated");
+
+        sectionResource.getSections()
+            .then(function(result) {
+                $scope.sections = result;
+            });
+    });
 
     //This reacts to clicks passed to the body element which emits a global call to close all dialogs
     $rootScope.$on("closeDialogs", function (event) {
