@@ -60,7 +60,6 @@ angular.module("umbraco.directives")
               if (scope.eventhandler) {
                 $(scope.eventhandler).trigger(eventName, args);
               }
-             //   $rootScope.$broadcast(eventName, args);
             }
 
             /** Method to load in the tree data */
@@ -93,7 +92,7 @@ angular.module("umbraco.directives")
              *  When changing sections we don't want all of the tree-ndoes to do their 'leave' animations.
              */
             scope.animation = function () {
-                if (enableDeleteAnimations && scope.tree.root.expanded) {
+                if (enableDeleteAnimations && scope.tree && scope.tree.root && scope.tree.root.expanded) {
                     return { leave: 'tree-node-delete-leave' };
                 }
                 else {
@@ -126,8 +125,17 @@ angular.module("umbraco.directives")
                 }
             });
 
-            //initial change
-            loadTree();
+            //When the user logs in
+            scope.$on("authenticated", function (evt, data) {
+                //populate the tree if the user has changed
+                if (data.lastUserId !== data.user.id) {
+                    treeService.clearCache();
+                    scope.tree = null;
+                    loadTree();
+                }
+            });
+            
+            
          };
        }
       };

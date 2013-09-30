@@ -33,19 +33,16 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
 
     $scope.selectedId = navigationService.currentId;
     $scope.sections = navigationService.sections;
-
-    //When the user logs out or times out
-    $scope.$on("notAuthenticated", function () {
-        
-    });
     
     //When the user logs in
     $scope.$on("authenticated", function (evt, data) {
-        //populate their sections if the user hasn't changed
-        sectionResource.getSections()
-            .then(function(result) {
-                $scope.sections = result;
-            });
+        //populate their sections if the user has changed
+        if (data.lastUserId !== data.user.id) {
+            sectionResource.getSections()
+                .then(function (result) {
+                    $scope.sections = result;
+                });
+        }        
     });
 
     //This reacts to clicks passed to the body element which emits a global call to close all dialogs

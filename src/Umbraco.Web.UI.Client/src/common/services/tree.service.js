@@ -8,8 +8,10 @@
  * The tree service factory, used internally by the umbTree and umbTreeItem directives
  */
 function treeService($q, treeResource, iconHelper, notificationsService, $rootScope) {
-    //implement this in local storage
+
+    //TODO: implement this in local storage
     var treeArray = [];
+    
     var standardCssClass = 'icon umb-tree-icon sprTree';
 
     return {  
@@ -56,6 +58,11 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     treeNodes[i].cssClass = standardCssClass + " legacy-custom-file";
                 }
             }
+        },
+
+        /** clears the tree cache */
+        clearCache: function() {
+            treeArray = [];
         },
 
         /**
@@ -259,6 +266,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     return data;
                 });
         }
+        
     };
 }
 

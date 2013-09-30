@@ -38,8 +38,10 @@ angular.module('umbraco.services')
     securityRetryQueue.onItemAddedCallbacks.push(function (retryItem) {
         if (securityRetryQueue.hasMore()) {
             
-            //clear the user
-            lastUserId = currentUser.id;
+            //store the last user id and clear the user
+            if (currentUser && currentUser.id !== undefined) {
+                lastUserId = currentUser.id;
+            }
             currentUser = null;
 
             //broadcast a global event that the user is no longer logged in
@@ -63,7 +65,7 @@ angular.module('umbraco.services')
                     }
                     else {
 
-                        var result = { user: data, authenticated: true };
+                        var result = { user: data, authenticated: true, lastUserId: lastUserId };
 
                         if (args.broadcastEvent) {
                             //broadcast a global event, will inform listening controllers to load in the user specific data
@@ -86,7 +88,7 @@ angular.module('umbraco.services')
                     //when it's successful, return the user data
                     currentUser = data;
 
-                    var result = { user: data, authenticated: true, previousUserId: lastUserId };
+                    var result = { user: data, authenticated: true, lastUserId: lastUserId };
 
                     //broadcast a global event
                     $rootScope.$broadcast("authenticated", result);
