@@ -16,7 +16,7 @@ namespace Umbraco.Web
 	/// <summary>
 	/// Extension methods for the cache helper
 	/// </summary>
-	internal static class CacheHelperExtensions
+	public static class CacheHelperExtensions
 	{
 		/// <summary>
 		/// Application event handler to bind to events to clear the cache for the cache helper extensions
