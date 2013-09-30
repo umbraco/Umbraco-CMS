@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         public override string ConnectionString
         {
-            get { return @"server=.\SQLEXPRESS;database=Kloud-Website-Production;user id=umbraco;password=umbraco"; }
+            get { return @"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco"; }
         }
 
         public override string ProviderName
