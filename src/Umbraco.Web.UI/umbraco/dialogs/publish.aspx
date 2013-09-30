@@ -35,6 +35,7 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="body" runat="server">
 
     <div id="container" >
+
         <div class="propertyDiv" data-bind="visible: processStatus() == 'init'">
             <p>
                 <%= umbraco.ui.Text("publish", "publishHelp", PageName, UmbracoUser) %>
@@ -54,16 +55,17 @@
                 </label>
             </div>
             
-            <button id="ok" class="guiInputButton" data-bind="click: startPublish">
-                <%=umbraco.ui.Text("content", "publish", UmbracoUser)%>
-            </button>
+            
 
-            <em><%= umbraco.ui.Text("general","or") %></em>
+        </div>
 
-            <a href="#" data-bind="click: closeDialog">
+         <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar"  data-bind="visible: processStatus() == 'init'">
+            <a href="#" class="btn btn-link" data-bind="click: closeDialog">
                 <%=umbraco.ui.Text("general", "cancel", UmbracoUser)%>
             </a>
-
+             <button id="ok" class="btn btn-primary" data-bind="click: startPublish">
+                <%=umbraco.ui.Text("content", "publish", UmbracoUser)%>
+            </button>
         </div>
 
         <div id="animDiv" class="propertyDiv" data-bind="visible: processStatus() == 'publishing'">
@@ -76,6 +78,7 @@
             </div>
         </div>
 
+
         <div id="feedbackMsg" data-bind="visible: processStatus() == 'complete'">
             <div data-bind="css: { success: isSuccessful(), error: !isSuccessful() }">
                 <span data-bind="text: resultMessage, visible: resultMessages().length == 0"></span>
@@ -84,7 +87,7 @@
                 </ul>
             </div>
              <p>
-                 <a href='#' data-bind="click: closeDialog"><%=umbraco.ui.Text("closeThisWindow") %></a>
+                 <a href='#' class="btn" data-bind="click: closeDialog"><%=umbraco.ui.Text("closeThisWindow") %></a>
              </p>
         </div> 
        
