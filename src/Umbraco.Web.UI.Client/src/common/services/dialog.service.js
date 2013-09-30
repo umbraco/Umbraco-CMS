@@ -71,7 +71,6 @@ angular.module('umbraco.services')
 
            if (options.inline) {
                dialog.animation = "";
-               dialog.modalClass = "";
            }
            else {
                dialog.element.addClass("modal");
