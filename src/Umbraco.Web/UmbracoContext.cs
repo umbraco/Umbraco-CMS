@@ -23,6 +23,8 @@ namespace Umbraco.Web
 
         private bool _replacing;
         private PreviewContent _previewContent;
+        //explicit flag during ctor 
+        private bool? _isPreviewing;
 
         /// <summary>
         /// Used if not running in a web application (no real HttpContext)
@@ -198,8 +200,8 @@ namespace Umbraco.Web
 
             ContentCache = publishedCaches.CreateContextualContentCache(this);
             MediaCache = publishedCaches.CreateContextualMediaCache(this);
-            InPreviewMode = preview ?? DetectInPreviewModeFromRequest();
-
+            _isPreviewing = preview;
+            
             // set the urls...
             //original request url
             //NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
@@ -399,7 +401,10 @@ namespace Umbraco.Web
         /// <summary>
         /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>
-        public bool InPreviewMode { get; private set; }
+        public bool InPreviewMode 
+        {
+            get { return _isPreviewing ?? DetectInPreviewModeFromRequest(); }
+        }
 
         private bool DetectInPreviewModeFromRequest()
         {

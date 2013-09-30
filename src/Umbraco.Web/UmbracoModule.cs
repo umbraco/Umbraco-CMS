@@ -168,9 +168,9 @@ namespace Umbraco.Web
             if (http.Request.Url.IsClientSideRequest())
                 return;
 
-            if (app.Request.Url.IsBackOfficeRequest() 
-                || app.Request.Url.IsInstallerRequest() 
-                || BaseRest.BaseRestHandler.IsBaseRestRequest(UmbracoContext.Current.OriginalRequestUrl))
+            var req = new HttpRequestWrapper(app.Request);
+
+            if (ShouldAuthenticateRequest(req, UmbracoContext.Current.OriginalRequestUrl))
             {
                 var ticket = http.GetUmbracoAuthTicket();
                 if (ticket != null && !ticket.Expired && http.RenewUmbracoAuthTicket())
@@ -219,6 +219,35 @@ namespace Umbraco.Web
 		#endregion
 
 		#region Methods
+
+        /// <summary>
+        /// Determines if we should authenticate the request
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="originalRequestUrl"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// We auth the request when:
+        /// * it is a back office request
+        /// * it is an installer request
+        /// * it is a /base request
+        /// * it is a preview request
+        /// </remarks>
+        internal static bool ShouldAuthenticateRequest(HttpRequestBase request, Uri originalRequestUrl)
+        {
+            if (//check back office
+                request.Url.IsBackOfficeRequest()
+                //check installer
+                || request.Url.IsInstallerRequest()
+                //detect in preview
+                || (request.HasPreviewCookie() && request.Url != null && request.Url.AbsolutePath.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)) == false)
+                //check for base
+                || BaseRest.BaseRestHandler.IsBaseRestRequest(originalRequestUrl))
+            {
+                return true;
+            }
+            return false;
+        }
 
 		/// <summary>
 		/// Checks the current request and ensures that it is routable based on the structure of the request and URI
