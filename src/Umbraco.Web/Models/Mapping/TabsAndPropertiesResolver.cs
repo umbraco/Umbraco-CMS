@@ -15,6 +15,19 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class TabsAndPropertiesResolver : ValueResolver<IContentBase, IEnumerable<Tab<ContentPropertyDisplay>>>
     {
+        private readonly IEnumerable<string> _ignoreProperties;
+
+        public TabsAndPropertiesResolver()
+        {
+            _ignoreProperties = new List<string>();
+        }
+
+        public TabsAndPropertiesResolver(IEnumerable<string> ignoreProperties)
+        {
+            if (ignoreProperties == null) throw new ArgumentNullException("ignoreProperties");
+            _ignoreProperties = ignoreProperties;
+        }
+
         /// <summary>
         /// Maps properties on to the generic properties tab
         /// </summary>
@@ -110,9 +123,13 @@ namespace Umbraco.Web.Models.Mapping
                 for (var i = 0; i < propertyGroups.Count(); i++)
                 {
                     var current = propertyGroups.Single(x => x.ParentId == currentParentId);
+
+                    var propsForGroup = content.GetPropertiesForGroup(current)
+                        .Where(x => _ignoreProperties.Contains(x.Alias) == false); //don't include ignored props
+
                     aggregateProperties.AddRange(
                         Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(
-                            content.GetPropertiesForGroup(current)));
+                            propsForGroup));
                     currentParentId = current.Id;
                 }
 
@@ -129,7 +146,8 @@ namespace Umbraco.Web.Models.Mapping
             }
 
             //now add the generic properties tab for any properties that don't belong to a tab
-            var orphanProperties = content.GetNonGroupedProperties();
+            var orphanProperties = content.GetNonGroupedProperties()
+                .Where(x => _ignoreProperties.Contains(x.Alias) == false); //don't include ignored props
 
             //now add the generic properties tab
             aggregateTabs.Add(new Tab<ContentPropertyDisplay>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.ObjectResolution
 {
@@ -27,14 +28,14 @@ namespace Umbraco.Core.ObjectResolution
 		public static bool IsFrozen
 		{
 		    get { return _isFrozen; }
-		    private set { _isFrozen = value; }
 		}
 
 	    public static void EnsureIsFrozen()
 		{
             if (!_isFrozen)
+            {
                 throw new InvalidOperationException("Resolution is not frozen, it is not yet possible to get values from it.");
-
+            }
 		}
 
 		/// <summary>
@@ -71,20 +72,24 @@ namespace Umbraco.Core.ObjectResolution
         // keep the class here because it needs write-access to Resolution.IsFrozen
         private class DirtyBackdoor : IDisposable
         {
-            private static readonly System.Threading.ReaderWriterLockSlim _dirtyLock = new ReaderWriterLockSlim();
+            private static readonly ReaderWriterLockSlim DirtyLock = new ReaderWriterLockSlim();
 
             private IDisposable _lock;
             private bool _frozen;
 
             public DirtyBackdoor()
             {
-                _lock = new WriteLock(_dirtyLock);
+                LogHelper.Debug(typeof(DirtyBackdoor), "Creating back door for resolution");
+
+                _lock = new WriteLock(DirtyLock);
                 _frozen = _isFrozen;
                 _isFrozen = false;
             }
 
             public void Dispose()
             {
+                LogHelper.Debug(typeof(DirtyBackdoor), "Disposing back door for resolution");
+
                 _isFrozen = _frozen;
                 _lock.Dispose();
             }
@@ -96,6 +101,8 @@ namespace Umbraco.Core.ObjectResolution
 		/// <exception cref="InvalidOperationException">resolution is already frozen.</exception>
 		public static void Freeze()
 		{
+            LogHelper.Debug(typeof(Resolution), "Freezing resolution");
+
             if (_isFrozen)
 				throw new InvalidOperationException("Resolution is frozen. It is not possible to freeze it again.");
 
@@ -110,6 +117,8 @@ namespace Umbraco.Core.ObjectResolution
         /// <remarks>To be used in unit tests.</remarks>
         internal static void Reset()
         {
+            LogHelper.Debug(typeof(DirtyBackdoor), "Resetting resolution");
+
             _isFrozen = false;
             Frozen = null;
         }

@@ -4,6 +4,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco;
+using System.Linq;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -29,7 +30,11 @@ namespace Umbraco.Web.Models.Mapping
                       dto => dto.ContentTypeName,
                       expression => expression.MapFrom(content => content.ContentType.Name))
                   .ForMember(display => display.Properties, expression => expression.Ignore())
-                  .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
+                  .ForMember(display => display.Tabs,
+                             expression => expression.ResolveUsing(
+                                 new TabsAndPropertiesResolver(
+                                     //do no map this properties (currently anyways, they were never there in 6.x)
+                                     Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias))))
                   .AfterMap(MapGenericCustomProperties);
 
             //FROM IMember TO ContentItemBasic<ContentPropertyBasic, IMember>
@@ -58,7 +63,6 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="display"></param>
         private static void MapGenericCustomProperties(IMember member, MemberDisplay display)
         {
-
             TabsAndPropertiesResolver.MapGenericProperties(
                 member, display,
                 new ContentPropertyDisplay
@@ -82,6 +86,7 @@ namespace Umbraco.Web.Models.Mapping
                         Value = display.Email,
                         View = "textbox"
                     });
+
         }
 
     }
