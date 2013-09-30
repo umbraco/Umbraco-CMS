@@ -10,6 +10,7 @@ using System.Xml;
 using Umbraco.Core.Logging;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.businesslogic.Exceptions;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
@@ -64,20 +65,27 @@ namespace umbraco.cms.presentation.user
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            //if the current user is not an admin they cannot edit a user at all
+            if (CurrentUser.IsAdmin() == false)
+            {
+                throw new UserAuthorizationException("Access denied");
+            }
 
             int UID = int.Parse(Request.QueryString["id"]);
             u = BusinessLogic.User.GetUser(UID);
 
-            // do initial check for edit rights
+            //the true admin can only edit the true admin
             if (u.Id == 0 && CurrentUser.Id != 0)
             {
                 throw new Exception("Only the root user can edit the 'root' user (id:0)");
             }
-            else if (u.IsAdmin() && !CurrentUser.IsAdmin())
+
+            //only another admin can edit another admin (who is not the true admin)
+            if (u.IsAdmin() && CurrentUser.IsAdmin() == false)
             {
                 throw new Exception("Admin users can only be edited by admins");
             }
-
+            
             // check if canvas editing is enabled
             DefaultToLiveEditing.Visible = UmbracoSettings.EnableCanvasEditing;
 
@@ -351,6 +359,8 @@ namespace umbraco.cms.presentation.user
         
         protected override void OnInit(EventArgs e)
         {
+            base.OnInit(e);
+
             //lapps.SelectionMode = ListSelectionMode.Multiple;
             lapps.RepeatLayout = RepeatLayout.Flow;
             lapps.RepeatDirection = RepeatDirection.Vertical;
