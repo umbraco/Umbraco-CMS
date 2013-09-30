@@ -363,6 +363,59 @@ namespace Umbraco.Web.Editors
             }
         }
 
+        /// <summary>
+        /// Change the sort order for media
+        /// </summary>
+        /// <param name="sorted"></param>
+        /// <returns></returns>
+        [EnsureUserPermissionForContent("move.ParentId", 'M')]
+        public HttpResponseMessage PostMove(ContentMove move)
+        {
+            if (move == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+
+            var contentService = Services.ContentService;
+            try
+            {
+                contentService.Move(contentService.GetById(move.Id), move.ParentId);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<ContentController>("Could not move content", ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Copies a 
+        /// </summary>
+        /// <param name="sorted"></param>
+        /// <returns></returns>
+        [EnsureUserPermissionForContent("copy.ParentId", 'C')]
+        public HttpResponseMessage PostCopy(ContentMove copy)
+        {
+            if (copy == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+
+            var contentService = Services.ContentService;
+            try
+            {
+                contentService.Copy(contentService.GetById(copy.Id), copy.ParentId, true);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<ContentController>("Could not copy content", ex);
+                throw;
+            }
+        }
+
+
         private void ShowMessageForStatus(PublishStatus status, ContentItemDisplay display)
         {
             switch (status.StatusType)
