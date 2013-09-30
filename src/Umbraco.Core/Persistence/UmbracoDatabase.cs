@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence
 	/// can then override any additional execution (such as additional loggging, functionality, etc...) that we need to without breaking compatibility since we'll always be exposing
 	/// this object instead of the base PetaPoco database object.	
 	/// </remarks>
-	public class UmbracoDatabase : Database
+    public class UmbracoDatabase : Database, IDisposeOnRequestEnd
 	{
         private readonly Guid _instanceId = Guid.NewGuid();
 		/// <summary>

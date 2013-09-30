@@ -28,11 +28,13 @@ namespace Umbraco.Web.Routing
 		/// <param name="pcr">The content request.</param>
 		public PublishedContentRequestEngine(PublishedContentRequest pcr)
 		{
+			if (pcr == null) throw new ArgumentException("pcr is null.");
 			_pcr = pcr;
+			
 			_routingContext = pcr.RoutingContext;
-
-			var umbracoContext = _routingContext.UmbracoContext;
 			if (_routingContext == null) throw new ArgumentException("pcr.RoutingContext is null.");
+			
+			var umbracoContext = _routingContext.UmbracoContext;
 			if (umbracoContext == null) throw new ArgumentException("pcr.RoutingContext.UmbracoContext is null.");
 			if (umbracoContext.RoutingContext != _routingContext) throw new ArgumentException("RoutingContext confusion.");
 			// no! not set yet.

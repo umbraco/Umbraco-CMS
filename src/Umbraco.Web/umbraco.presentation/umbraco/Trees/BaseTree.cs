@@ -528,6 +528,7 @@ namespace umbraco.cms.presentation.Trees
                 AfterTreeRender(sender, e);
         }
 
+        [Obsolete("Do not use this method to raise events, it is no longer used and will cause very high performance spikes!")]
         protected internal virtual void OnBeforeTreeRender(IEnumerable<IUmbracoEntity> sender, TreeEventArgs e, bool isContent)
         {
             if (BeforeTreeRender != null)
@@ -543,6 +544,7 @@ namespace umbraco.cms.presentation.Trees
             }
         }
 
+        [Obsolete("Do not use this method to raise events, it is no longer used and will cause very high performance spikes!")]
         protected internal virtual void OnAfterTreeRender(IEnumerable<IUmbracoEntity> sender, TreeEventArgs e, bool isContent)
         {
             if (AfterTreeRender != null)
@@ -556,6 +558,14 @@ namespace umbraco.cms.presentation.Trees
                     AfterTreeRender(sender.Select(x => new Media(x, false)).ToArray(), e);
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns true if there are subscribers to either BeforeTreeRender or AfterTreeRender
+        /// </summary>
+        internal bool HasEntityBasedEventSubscribers
+        {
+            get { return BeforeTreeRender != null || AfterTreeRender != null; }
         }
 
         /// <summary>
