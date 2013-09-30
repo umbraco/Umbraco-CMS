@@ -111,11 +111,15 @@ angular.module("umbraco.directives")
             
             //watch for section changes
             scope.$watch("section", function (newVal, oldVal) {
+
+              if(!scope.tree){
+                  loadTree();  
+                }
+
                 if (!newVal) {
                     //store the last section loaded
                     lastSection = oldVal;
-                }                
-                else if (newVal !== oldVal && newVal !== lastSection) {
+                }else if (newVal !== oldVal && newVal !== lastSection) {
                     //only reload the tree data and Dom if the newval is different from the old one
                     // and if the last section loaded is different from the requested one.
                     loadTree();
