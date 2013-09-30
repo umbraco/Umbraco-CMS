@@ -1463,7 +1463,7 @@ namespace umbraco
 			IMacroEngine engine = null;
 			
 			engine = MacroEngineFactory.GetEngine(PartialViewMacroEngine.EngineName);
-			var ret = engine.Execute(macro, CompatibilityHelper.ConvertToNode(UmbracoContext.Current.PublishedContentRequest.PublishedContent));
+			var ret = engine.Execute(macro, GetCurrentNode());
 
 			// if the macro engine supports success reporting and executing failed, then return an empty control so it's not cached
 			if (engine is IMacroEngineResultStatus)
@@ -1488,13 +1488,13 @@ namespace umbraco
                 engine = MacroEngineFactory.GetByExtension(macro.ScriptLanguage);
                 ret = engine.Execute(
                     macro,
-                    CompatibilityHelper.ConvertToNode(UmbracoContext.Current.PublishedContentRequest.PublishedContent));
+                    GetCurrentNode());
             }
             else
             {
                 string path = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + macro.ScriptName);
                 engine = MacroEngineFactory.GetByFilename(path);
-                ret = engine.Execute(macro, CompatibilityHelper.ConvertToNode(UmbracoContext.Current.PublishedContentRequest.PublishedContent));
+                ret = engine.Execute(macro, GetCurrentNode());
             }
 
             // if the macro engine supports success reporting and executing failed, then return an empty control so it's not cached
@@ -1521,13 +1521,13 @@ namespace umbraco
                 engine = MacroEngineFactory.GetByExtension(macro.ScriptLanguage);
                 ret.Text = engine.Execute(
                     macro,
-                    CompatibilityHelper.ConvertToNode(UmbracoContext.Current.PublishedContentRequest.PublishedContent));
+                    GetCurrentNode());
             }
             else
             {
                 string path = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + macro.ScriptName);
                 engine = MacroEngineFactory.GetByFilename(path);
-                ret.Text = engine.Execute(macro, CompatibilityHelper.ConvertToNode(UmbracoContext.Current.PublishedContentRequest.PublishedContent));
+                ret.Text = engine.Execute(macro, GetCurrentNode());
             }
 
             // if the macro engine supports success reporting and executing failed, then return an empty control so it's not cached
@@ -2080,6 +2080,13 @@ namespace umbraco
 
             value = false;
             return false;
+        }
+
+        private static INode GetCurrentNode()
+        {
+            var id = Node.getCurrentNodeId();
+            var content = UmbracoContext.Current.ContentCache.GetById(id);
+            return CompatibilityHelper.ConvertToNode(content);
         }
 
         #region Events
