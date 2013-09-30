@@ -32,7 +32,7 @@ namespace umbraco.MacroEngines
         }
         public DynamicBackingItem(int Id)
         {
-            var n = UmbracoContext.Current.ContentCache.GetById(Id).ConvertToNode();
+            var n = CompatibilityHelper.ConvertToNode(UmbracoContext.Current.ContentCache.GetById(Id));
            
             this.content = n;
             this.Type = DynamicBackingItemType.Content;
@@ -57,7 +57,7 @@ namespace umbraco.MacroEngines
             }
             else
             {
-                this.content = UmbracoContext.Current.ContentCache.GetById(Id).ConvertToNode();
+                this.content = CompatibilityHelper.ConvertToNode(UmbracoContext.Current.ContentCache.GetById(Id));
                 this.Type = Type;
             }
         }

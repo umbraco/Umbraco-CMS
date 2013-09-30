@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.XPath;
@@ -543,10 +544,9 @@ namespace umbraco.NodeFactory
 
 		public static int getCurrentNodeId()
 		{
-            if (UmbracoContext.Current == null) throw new InvalidOperationException("Cannot get current node id without an UmbracoContext.");
-            if (UmbracoContext.Current.PublishedContentRequest == null) throw new InvalidOperationException("Cannot get current node id without a PublishedContentRequest.");
-            if (UmbracoContext.Current.PublishedContentRequest.HasPublishedContent == false) throw new InvalidOperationException("Cannot get current node id because the current PublishedContentRequest has no content.");
-            return UmbracoContext.Current.PublishedContentRequest.PublishedContent.Id;
+           if (HttpContext.Current.Items["pageID"] == null)
+                throw new InvalidOperationException("There is no current node.");
+		    return (int)HttpContext.Current.Items["pageID"];
 		}
 	}
 }

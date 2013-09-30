@@ -11,10 +11,7 @@ namespace Umbraco.Web.umbraco.presentation
 {
     static class CompatibilityHelper
     {
-        // NOTE - this is all already in umbraco.MacroEngines
-        // which references Umbraco.Web - so we can't reference it without
-        // creating circular references
-        // fixme - there has to be a better way?
+        // NOTE - moved from umbraco.MacroEngines to avoid circ. references
 
         public static INode ConvertToNode(IPublishedContent doc)
         {
@@ -22,9 +19,9 @@ namespace Umbraco.Web.umbraco.presentation
             return node;
         }
 
-        public static IProperty ConvertToNodeProperty(IPublishedProperty prop)
+        private static IProperty ConvertToNodeProperty(IPublishedProperty prop)
         {
-            return new ConvertedProperty(prop.PropertyTypeAlias, prop.Value.ToString());
+            return new ConvertedProperty(prop);
         }
 
         private class ConvertedNode : INode
@@ -96,20 +93,16 @@ namespace Umbraco.Web.umbraco.presentation
             {
                 get { return _doc.Children.Select(ConvertToNode).ToList(); }
             }
-            public IProperty GetProperty(string Alias)
+            public IProperty GetProperty(string alias)
             {
-                return PropertiesAsList.Cast<global::umbraco.NodeFactory.Property>().FirstOrDefault(p => p.Alias == Alias);
+                return PropertiesAsList.Cast<global::umbraco.NodeFactory.Property>().FirstOrDefault(p => p.Alias == alias);
             }
 
-            public IProperty GetProperty(string Alias, out bool propertyExists)
+            public IProperty GetProperty(string alias, out bool propertyExists)
             {
-                foreach (var p in from global::umbraco.NodeFactory.Property p in PropertiesAsList where p.Alias == Alias select p)
-                {
-                    propertyExists = true;
-                    return p;
-                }
-                propertyExists = false;
-                return null;
+                var prop = _doc.GetProperty(alias);
+                propertyExists = prop != null;
+                return prop == null ? null : ConvertToNodeProperty(prop);
             }
 
             public DataTable ChildrenAsTable()
@@ -125,23 +118,21 @@ namespace Umbraco.Web.umbraco.presentation
 
         private class ConvertedProperty : IProperty, IHtmlString
         {
-            private readonly string _alias;
-            private readonly string _value;
+            private readonly IPublishedProperty _prop;
 
-            public ConvertedProperty(string alias, string value)
+            public ConvertedProperty(IPublishedProperty prop)
             {
-                _alias = alias;
-                _value = value;
+                _prop = prop;
             }
 
             public string Alias
             {
-                get { return _alias; }
+                get { return _prop.PropertyTypeAlias; }
             }
 
             public string Value
             {
-                get { return _value; }
+                get { return _prop.DataValue == null ? null : _prop.DataValue.ToString(); }
             }
 
             public Guid Version
@@ -156,7 +147,7 @@ namespace Umbraco.Web.umbraco.presentation
 
             public bool HasValue()
             {
-                return !string.IsNullOrWhiteSpace(Value);
+                return _prop.HasValue;
             }
 
             public int ContextId { get; set; }

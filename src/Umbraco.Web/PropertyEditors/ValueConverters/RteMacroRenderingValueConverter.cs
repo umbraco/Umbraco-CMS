@@ -35,19 +35,25 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 	        UmbracoContext.Current.InPreviewMode = preview;
 
             var sb = new StringBuilder();
-            var umbracoHelper = new UmbracoHelper(UmbracoContext.Current);
-            MacroTagParser.ParseMacros(
-                source,
-                //callback for when text block is found
-                textBlock => sb.Append(textBlock),
-                //callback for when macro syntax is found
-                (macroAlias, macroAttributes) => sb.Append(umbracoHelper.RenderMacro(
-                    macroAlias,
-                    //needs to be explicitly casted to Dictionary<string, object>
-                    macroAttributes.ConvertTo(x => (string)x, x => x)).ToString()));
-
-            // restore
-	        UmbracoContext.Current.InPreviewMode = inPreviewMode;
+            
+            try
+	        {
+	            var umbracoHelper = new UmbracoHelper(UmbracoContext.Current);
+	            MacroTagParser.ParseMacros(
+	                source,
+	                //callback for when text block is found
+	                textBlock => sb.Append(textBlock),
+	                //callback for when macro syntax is found
+	                (macroAlias, macroAttributes) => sb.Append(umbracoHelper.RenderMacro(
+	                    macroAlias,
+	                    //needs to be explicitly casted to Dictionary<string, object>
+	                    macroAttributes.ConvertTo(x => (string) x, x => x)).ToString()));
+	        }
+	        finally
+	        {
+                // restore
+                UmbracoContext.Current.InPreviewMode = inPreviewMode;	            
+	        }
 
             return sb.ToString();
         }
