@@ -27,11 +27,17 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     /** internal method process the saving of data and post processing the result */
     function saveContentItem(content, action, files) {
-        return umbRequestHelper.postSaveContent(
-            umbRequestHelper.getApiUrl(
+        return umbRequestHelper.postSaveContent({
+            restApiUrl: umbRequestHelper.getApiUrl(
                 "contentApiBaseUrl",
                 "PostSave"),
-            content, action, files);
+            content: content,
+            action: action,
+            files: files,
+            dataFormatter: function (c, a) {
+                return umbDataFormatter.formatContentPostData(c, a);
+            }
+        });
     }
 
     return {

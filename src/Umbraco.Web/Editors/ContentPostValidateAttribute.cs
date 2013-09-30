@@ -53,7 +53,7 @@ namespace Umbraco.Web.Editors
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            var contentItem = (ContentItemSave<IContent>)actionContext.ActionArguments["contentItem"];
+            var contentItem = (ContentItemSave)actionContext.ActionArguments["contentItem"];
 
             //We now need to validate that the user is allowed to be doing what they are doing.
             //Based on the action we need to check different permissions.

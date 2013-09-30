@@ -1,0 +1,40 @@
+﻿<form novalidate name="contentForm" 
+      ng-controller="Umbraco.Editors.Member.EditController" 
+      ng-show="loaded" 
+      ng-submit="save()">
+    <umb-panel val-show-validation>  
+        <umb-header tabs="content.tabs">
+            
+            <div class="span4">
+                <umb-content-name ng-model="content.name" placeholder="Enter a page title"></umb-content-name>
+            </div>
+
+            <div class="span8">
+                <div class="btn-toolbar pull-right umb-btn-toolbar">
+                    <div class="btn-group" ng-animate="'fade'" ng-show="status">
+                        <p class="btn btn-link umb-status-label">{{status}}</p>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">Save</button>
+                    </div>
+                </div>
+            </div>
+        </umb-header>
+
+        <umb-tab-view>
+            <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
+
+                <div class="umb-pane">
+                    <umb-property 
+                        property="property"
+                        ng-repeat="property in tab.properties">
+                        
+                        <umb-editor model="property"></umb-editor>
+                    </umb-property>
+                </div>
+
+            </umb-tab>
+        </umb-tab-view>
+    </umb-panel>
+</form>

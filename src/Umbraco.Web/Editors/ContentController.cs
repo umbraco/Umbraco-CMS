@@ -166,7 +166,7 @@ namespace Umbraco.Web.Editors
         [ContentPostValidate]
         public ContentItemDisplay PostSave(
             [ModelBinder(typeof(ContentItemBinder))]
-                ContentItemSave<IContent> contentItem)
+                ContentItemSave contentItem)
         {            
             //If we've reached here it means:
             // * Our model has been bound

@@ -34,7 +34,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "sortOrder")]
         public int SortOrder { get; set; }
-
+        
         protected bool Equals(ContentItemBasic other)
         {
             return Id == other.Id;
@@ -50,7 +50,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         public override int GetHashCode()
         {
-            return Id;
+            return Id.GetHashCode();
         }
     }
 

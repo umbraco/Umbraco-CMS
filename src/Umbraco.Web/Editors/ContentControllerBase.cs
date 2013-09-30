@@ -39,7 +39,7 @@ namespace Umbraco.Web.Editors
         {
         }
 
-        protected HttpResponseMessage HandleContentNotFound(int id, bool throwException = true)
+        protected HttpResponseMessage HandleContentNotFound(object id, bool throwException = true)
         {
             ModelState.AddModelError("id", string.Format("content with id: {0} was not found", id));
             var errorResponse = Request.CreateErrorResponse(
@@ -52,7 +52,7 @@ namespace Umbraco.Web.Editors
             return errorResponse;
         }
 
-        protected void UpdateName<TPersisted>(ContentItemSave<TPersisted> contentItem) 
+        protected void UpdateName<TPersisted>(ContentBaseItemSave<TPersisted> contentItem) 
             where TPersisted : IContentBase
         {
             //Don't update the name if it is empty
@@ -78,7 +78,7 @@ namespace Umbraco.Web.Editors
             return null;
         }
 
-        protected void MapPropertyValues<TPersisted>(ContentItemSave<TPersisted> contentItem)
+        protected void MapPropertyValues<TPersisted>(ContentBaseItemSave<TPersisted> contentItem)
             where TPersisted : IContentBase
         {
             //Map the property values

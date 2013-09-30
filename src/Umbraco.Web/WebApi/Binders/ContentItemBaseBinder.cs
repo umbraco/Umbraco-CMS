@@ -33,8 +33,9 @@ namespace Umbraco.Web.WebApi.Binders
     /// <summary>
     /// Binds the content model to the controller action for the posted multi-part Post
     /// </summary>
-    internal abstract class ContentItemBaseBinder<TPersisted> : IModelBinder
+    internal abstract class ContentItemBaseBinder<TPersisted, TModelSave> : IModelBinder
         where TPersisted : class, IContentBase
+        where TModelSave : ContentBaseItemSave<TPersisted>
     {
         protected ApplicationContext ApplicationContext { get; private set; }
 
@@ -69,7 +70,7 @@ namespace Umbraco.Web.WebApi.Binders
                                    }
 
                                    //now that everything is binded, validate the properties
-                                   var contentItemValidator = new ContentItemValidationHelper<TPersisted>(ApplicationContext);
+                                   var contentItemValidator = new ContentItemValidationHelper<TPersisted, TModelSave>(ApplicationContext);
                                    contentItemValidator.ValidateItem(actionContext, x.Result);
 
                                    bindingContext.Model = x.Result;
@@ -87,7 +88,7 @@ namespace Umbraco.Web.WebApi.Binders
         /// <param name="bindingContext"></param>
         /// <param name="provider"></param>
         /// <returns></returns>
-        private async Task<ContentItemSave<TPersisted>> GetModel(HttpActionContext actionContext, ModelBindingContext bindingContext, MultipartFormDataStreamProvider provider)
+        private async Task<TModelSave> GetModel(HttpActionContext actionContext, ModelBindingContext bindingContext, MultipartFormDataStreamProvider provider)
         {
             var request = actionContext.Request;
 
@@ -115,13 +116,13 @@ namespace Umbraco.Web.WebApi.Binders
             var contentItem = result.FormData["contentItem"];
 
             //deserialize into our model
-            var model = JsonConvert.DeserializeObject<ContentItemSave<TPersisted>>(contentItem);
+            var model = JsonConvert.DeserializeObject<TModelSave>(contentItem);
             
             //get the default body validator and validate the object
             var bodyValidator = actionContext.ControllerContext.Configuration.Services.GetBodyModelValidator();
             var metadataProvider = actionContext.ControllerContext.Configuration.Services.GetModelMetadataProvider();
             //all validation errors will not contain a prefix
-            bodyValidator.Validate(model, typeof (ContentItemSave<TPersisted>), metadataProvider, actionContext, "");
+            bodyValidator.Validate(model, typeof(TModelSave), metadataProvider, actionContext, "");
 
             //get the files
             foreach (var file in result.FileData)
@@ -187,7 +188,7 @@ namespace Umbraco.Web.WebApi.Binders
         /// </summary>
         /// <param name="saveModel"></param>
         /// <param name="dto"></param>
-        private static void MapPropertyValuesFromSaved(ContentItemSave<TPersisted> saveModel, ContentItemDto<TPersisted> dto)
+        private static void MapPropertyValuesFromSaved(TModelSave saveModel, ContentItemDto<TPersisted> dto)
         {
             foreach (var p in saveModel.Properties)
             {
@@ -195,8 +196,8 @@ namespace Umbraco.Web.WebApi.Binders
             }
         }
 
-        protected abstract TPersisted GetExisting(ContentItemSave<TPersisted> model);
-        protected abstract TPersisted CreateNew(ContentItemSave<TPersisted> model);
-        protected abstract ContentItemDto<TPersisted> MapFromPersisted(ContentItemSave<TPersisted> model);
+        protected abstract TPersisted GetExisting(TModelSave model);
+        protected abstract TPersisted CreateNew(TModelSave model);
+        protected abstract ContentItemDto<TPersisted> MapFromPersisted(TModelSave model);
     }
 }

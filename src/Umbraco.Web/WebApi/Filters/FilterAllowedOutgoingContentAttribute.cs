@@ -57,7 +57,7 @@ namespace Umbraco.Web.WebApi.Filters
             var toRemove = new List<dynamic>();
             foreach(dynamic item in items)
             {
-                var nodePermission = permissions.Where(x => x.EntityId == item.Id).ToArray();
+                var nodePermission = permissions.Where(x => x.EntityId == Convert.ToInt32(item.Id)).ToArray();
                 //if there are no permissions for this id then we need to check what the user's default
                 // permissions are.
                 if (nodePermission.Any() == false)

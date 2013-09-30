@@ -30,7 +30,7 @@ module.exports = function (grunt) {
     connect: {
              devserver: {
                options: {
-                 port: 9999,
+                 port: 9990,
                  hostname: '0.0.0.0',
                  base: './build',
                  middleware: function(connect, options){
@@ -50,7 +50,7 @@ module.exports = function (grunt) {
 
     open : {
       dev : {
-        path: 'http://localhost:9999/belle/'
+          path: 'http://localhost:9990/belle/'
       }
     },
 

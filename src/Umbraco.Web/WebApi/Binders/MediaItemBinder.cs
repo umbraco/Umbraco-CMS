@@ -7,7 +7,7 @@ using Umbraco.Web.Models.Mapping;
 
 namespace Umbraco.Web.WebApi.Binders
 {
-    internal class MediaItemBinder : ContentItemBaseBinder<IMedia>
+    internal class MediaItemBinder : ContentItemBaseBinder<IMedia, MediaItemSave>
     {        
         public MediaItemBinder(ApplicationContext applicationContext)
             : base(applicationContext)
@@ -22,12 +22,12 @@ namespace Umbraco.Web.WebApi.Binders
         {
         }
 
-        protected override IMedia GetExisting(ContentItemSave<IMedia> model)
+        protected override IMedia GetExisting(MediaItemSave model)
         {
-            return ApplicationContext.Services.MediaService.GetById(model.Id);
+            return ApplicationContext.Services.MediaService.GetById(Convert.ToInt32(model.Id));
         }
 
-        protected override IMedia CreateNew(ContentItemSave<IMedia> model)
+        protected override IMedia CreateNew(MediaItemSave model)
         {
             var contentType = ApplicationContext.Services.ContentTypeService.GetMediaType(model.ContentTypeAlias);
             if (contentType == null)
@@ -37,7 +37,7 @@ namespace Umbraco.Web.WebApi.Binders
             return new Core.Models.Media(model.Name, model.ParentId, contentType);
         }
 
-        protected override ContentItemDto<IMedia> MapFromPersisted(ContentItemSave<IMedia> model)
+        protected override ContentItemDto<IMedia> MapFromPersisted(MediaItemSave model)
         {
             return Mapper.Map<IMedia, ContentItemDto<IMedia>>(model.PersistedContent);
         }

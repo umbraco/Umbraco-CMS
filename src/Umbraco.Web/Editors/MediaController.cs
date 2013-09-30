@@ -34,6 +34,7 @@ using Umbraco.Core.Configuration;
 namespace Umbraco.Web.Editors
 {
 
+
     /// <remarks>
     /// This controller is decorated with the UmbracoApplicationAuthorizeAttribute which means that any user requesting
     /// access to ALL of the methods on this controller will need access to the media application.
@@ -201,7 +202,7 @@ namespace Umbraco.Web.Editors
         [MediaPostValidate]
         public MediaItemDisplay PostSave(
             [ModelBinder(typeof(MediaItemBinder))]
-                ContentItemSave<IMedia> contentItem)
+                MediaItemSave contentItem)
         {
             //If we've reached here it means:
             // * Our model has been bound

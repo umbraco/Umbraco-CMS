@@ -196,24 +196,45 @@ function umbDataFormatter() {
             return saveModel;
         },
 
-        /** formats the display model used to display the content to the model used to save the content */
-        formatContentPostData: function (displayModel, action) {
+        /** formats the display model used to display the member to the model used to save the member */
+        formatMemberPostData: function(displayModel, action) {
+            //this is basically the same as for media but we need to explicitly add the username,email to the save model
+            var saveModel = this.formatMediaPostData(displayModel, action);
+
+            var genericTab = _.find(displayModel.tabs, function (item) {
+                return item.id === 0;
+            });
+
+            var propLogin = _.find(genericTab.properties, function (item) {
+                return item.alias === "_umb_login";
+            });
+            var propEmail = _.find(genericTab.properties, function (item) {
+                return item.alias === "_umb_email";
+            });
+            saveModel.email = propEmail.value;
+            saveModel.username = propLogin.value;
+
+            return saveModel;
+        },
+
+        /** formats the display model used to display the media to the model used to save the media */
+        formatMediaPostData: function(displayModel, action) {
             //NOTE: the display model inherits from the save model so we can in theory just post up the display model but 
             // we don't want to post all of the data as it is unecessary.
             var saveModel = {
                 id: displayModel.id,
                 properties: [],
                 name: displayModel.name,
-                contentTypeAlias : displayModel.contentTypeAlias,
+                contentTypeAlias: displayModel.contentTypeAlias,
                 parentId: displayModel.parentId,
                 //set the action on the save model
                 action: action
             };
-            
+
             _.each(displayModel.tabs, function (tab) {
-                
+
                 _.each(tab.properties, function (prop) {
-                    
+
                     //don't include the custom generic tab properties
                     if (!prop.alias.startsWith("_umb_")) {
                         saveModel.properties.push({
@@ -222,24 +243,35 @@ function umbDataFormatter() {
                             value: prop.value
                         });
                     }
-                    else {
-                        //here we need to map some of our internal properties to the content save item
-
-                        switch (prop.alias) {
-                            case "_umb_expiredate":
-                                saveModel.expireDate = prop.value;
-                                break;
-                            case "_umb_releasedate":
-                                saveModel.releaseDate = prop.value;
-                                break;
-                            case "_umb_template":
-                                saveModel.templateAlias = prop.value;
-                                break;
-                        }
-                    }
                     
                 });
             });
+
+            return saveModel;
+        },
+
+        /** formats the display model used to display the content to the model used to save the content  */
+        formatContentPostData: function (displayModel, action) {
+
+            //this is basically the same as for media but we need to explicitly add some extra properties
+            var saveModel = this.formatMediaPostData(displayModel, action);
+
+            var genericTab = _.find(displayModel.tabs, function (item) {
+                return item.id === 0;
+            });
+            
+            var propExpireDate = _.find(genericTab.properties, function(item) {
+                return item.alias === "_umb_expiredate";
+            });
+            var propReleaseDate = _.find(genericTab.properties, function (item) {
+                return item.alias === "_umb_releasedate";
+            });
+            var propTemplate = _.find(genericTab.properties, function (item) {
+                return item.alias === "_umb_template";
+            });
+            saveModel.expireDate = propExpireDate.value;
+            saveModel.releaseDate = propReleaseDate.value;
+            saveModel.templateAlias = propTemplate.value;
 
             return saveModel;
         }

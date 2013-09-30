@@ -16,12 +16,14 @@ namespace Umbraco.Web.WebApi.Filters
     /// A validation helper class used with ContentItemValidationFilterAttribute to be shared between content, media, etc...
     /// </summary>
     /// <typeparam name="TPersisted"></typeparam>
+    /// <typeparam name="TModelSave"></typeparam>
     /// <remarks>
     /// If any severe errors occur then the response gets set to an error and execution will not continue. Property validation
     /// errors will just be added to the ModelState.
     /// </remarks>
-    internal class ContentItemValidationHelper<TPersisted>
+    internal class ContentItemValidationHelper<TPersisted, TModelSave>
         where TPersisted : class, IContentBase
+        where TModelSave : ContentBaseItemSave<TPersisted>
     {
         private readonly ApplicationContext _applicationContext;
 
@@ -38,10 +40,10 @@ namespace Umbraco.Web.WebApi.Filters
 
         public void ValidateItem(HttpActionContext actionContext, string argumentName)
         {
-            var contentItem = actionContext.ActionArguments[argumentName] as ContentItemSave<TPersisted>;
+            var contentItem = actionContext.ActionArguments[argumentName] as TModelSave;
             if (contentItem == null)
             {
-                actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "No " + typeof(ContentItemSave<IContent>) + " found in request");
+                actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "No " + typeof(TModelSave) + " found in request");
                 return;
             }
 
@@ -49,7 +51,7 @@ namespace Umbraco.Web.WebApi.Filters
 
         }
 
-        public void ValidateItem(HttpActionContext actionContext, ContentItemSave<TPersisted> contentItem)
+        public void ValidateItem(HttpActionContext actionContext, TModelSave contentItem)
         {
             //now do each validation step
             if (ValidateExistingContent(contentItem, actionContext) == false) return;
@@ -119,7 +121,7 @@ namespace Umbraco.Web.WebApi.Filters
                 if (editor == null)
                 {
                     var message = string.Format("The property editor with alias: {0} was not found for property with id {1}", p.DataType.PropertyEditorAlias, p.Id);
-                    LogHelper.Warn<ContentItemValidationHelper<TPersisted>>(message);
+                    LogHelper.Warn<ContentItemValidationHelper<TPersisted, TModelSave>>(message);
                     //actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
                     //return false;
                     continue;

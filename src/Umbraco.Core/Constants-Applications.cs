@@ -56,6 +56,11 @@
             /// <summary>
             /// alias for the media tree.
             /// </summary>
+            public const string Members = "member";
+
+            /// <summary>
+            /// alias for the media tree.
+            /// </summary>
             public const string Media = "media";
 
             /// <summary>

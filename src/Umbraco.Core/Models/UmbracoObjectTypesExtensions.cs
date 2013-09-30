@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Umbraco.Core.CodeAnnotations;
 
@@ -9,7 +10,8 @@ namespace Umbraco.Core.Models
     /// </summary>
     public static class UmbracoObjectTypesExtensions
     {
-        private static readonly Dictionary<UmbracoObjectTypes, Guid> UmbracoObjectTypeCache = new Dictionary<UmbracoObjectTypes,Guid>();
+        //MUST be concurrent to avoid thread collisions!
+        private static readonly ConcurrentDictionary<UmbracoObjectTypes, Guid> UmbracoObjectTypeCache = new ConcurrentDictionary<UmbracoObjectTypes, Guid>();
 
         /// <summary>
         /// Get an UmbracoObjectTypes value from it's name
@@ -48,24 +50,22 @@ namespace Umbraco.Core.Models
         /// <returns>a GUID value of the UmbracoObjectTypes</returns>
         public static Guid GetGuid(this UmbracoObjectTypes umbracoObjectType)
         {
-            if (UmbracoObjectTypeCache.ContainsKey(umbracoObjectType))
-                return UmbracoObjectTypeCache[umbracoObjectType];
+            return UmbracoObjectTypeCache.GetOrAdd(umbracoObjectType, types =>
+                {
+                    var type = typeof(UmbracoObjectTypes);
+                    var memInfo = type.GetMember(umbracoObjectType.ToString());
+                    var attributes = memInfo[0].GetCustomAttributes(typeof(UmbracoObjectTypeAttribute),
+                        false);
 
-            var type = typeof(UmbracoObjectTypes);
-            var memInfo = type.GetMember(umbracoObjectType.ToString());
-            var attributes = memInfo[0].GetCustomAttributes(typeof(UmbracoObjectTypeAttribute),
-                false);
+                    if (attributes.Length == 0)
+                        return Guid.Empty;
 
-            if (attributes.Length == 0)
-                return Guid.Empty;
+                    var attribute = ((UmbracoObjectTypeAttribute)attributes[0]);
+                    if (attribute == null)
+                        return Guid.Empty;
 
-            var attribute = ((UmbracoObjectTypeAttribute)attributes[0]);
-            if (attribute == null)
-                return Guid.Empty;
-
-            UmbracoObjectTypeCache.Add(umbracoObjectType, attribute.ObjectId);
-
-            return attribute.ObjectId;
+                    return attribute.ObjectId;
+                });
         }
 
         /// <summary>

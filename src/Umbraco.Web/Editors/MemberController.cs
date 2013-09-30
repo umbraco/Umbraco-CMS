@@ -3,17 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Web.Http;
+using System.Web.Http.ModelBinding;
+using AutoMapper;
 using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
-
-using umbraco.cms.businesslogic.member;
+using Umbraco.Core.Models;
+using Umbraco.Web.WebApi;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
+using umbraco;
 using Constants = Umbraco.Core.Constants;
 using Examine;
 using System.Web.Security;
+using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace Umbraco.Web.Editors
 {
@@ -23,71 +28,107 @@ namespace Umbraco.Web.Editors
     /// </remarks>
     [PluginController("UmbracoApi")]
     [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Members)]
-    public class MemberController : UmbracoAuthorizedJsonController
+    public class MemberController : ContentControllerBase
     {
-        public IEnumerable<MemberEntityBasic> Search(string query)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public MemberController()
+            : this(UmbracoContext.Current)
+        {            
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        public MemberController(UmbracoContext umbracoContext)
+            : base(umbracoContext)
         {
-            if (string.IsNullOrEmpty(query))
-                throw new ArgumentException("A search query must be defined", "query");
+        }
 
-
-            //this will change when we add the new members API, but for now, we need to live with this setup
+        /// <summary>
+        /// Gets the content json for the member
+        /// </summary>
+        /// <param name="loginName"></param>
+        /// <returns></returns>
+        public MemberDisplay GetByLogin(string loginName)
+        {
             if (Member.InUmbracoMemberMode())
             {
-                var internalSearcher = ExamineManager.Instance.SearchProviderCollection[Constants.Examine.InternalMemberSearcher];
-                var criteria = internalSearcher.CreateSearchCriteria("member", BooleanOperation.Or);
-                var fields = new[] { "id", "__nodeName", "email" };
-                var term = new[] { query.ToLower().Escape() };
-                var operation = criteria.GroupedOr(fields, term).Compile();
-
-                var results = internalSearcher.Search(operation)
-                    .Select(x => new MemberEntityBasic
-                    {
-                        Id = int.Parse(x["id"]),
-                        Name = x["nodeName"],
-                        Email = x["email"],
-                        LoginName = x["loginName"],
-                        Icon = ".icon-user"
-                    });
-
-                    return results;
+                var foundMember = Services.MemberService.GetByUsername(loginName);
+                if (foundMember == null)
+                {
+                    HandleContentNotFound(loginName);
+                }
+                return Mapper.Map<IMember, MemberDisplay>(foundMember);
             }
             else
             {
-                IEnumerable<MemberEntityBasic> results;
-                
-                if (query.Contains("@"))
-                {
-                    results = from MembershipUser x in Membership.FindUsersByEmail(query)
-                              select
-                                  new MemberEntityBasic()
-                                  {
-                                      //how do we get ID? 
-                                      Id = 0,
-                                      Email = x.Email,
-                                      LoginName = x.UserName,
-                                      Name = x.UserName,
-                                      Icon = "icon-user"
-                                  };
-                }
-                else
-                {
-                    results = from MembershipUser x in Membership.FindUsersByName(query + "%")
-                              select
-                                  new MemberEntityBasic()
-                                  {
-                                      //how do we get ID? 
-                                      Id = 0,
-                                      Email = x.Email,
-                                      LoginName = x.UserName,
-                                      Name = x.UserName,
-                                      Icon = "icon-user"
-                                  };
-                }
-
-                return results;
+                //TODO: Support this
+                throw new HttpResponseException(Request.CreateValidationErrorResponse("Editing member with a non-umbraco membership provider is currently not supported"));
             }
+            
         }
 
+        /// <summary>
+        /// Saves member
+        /// </summary>
+        /// <returns></returns>        
+        [FileUploadCleanupFilter]
+        public MemberDisplay PostSave(
+            [ModelBinder(typeof(MemberBinder))]
+                MemberSave contentItem)
+        {
+            //If we've reached here it means:
+            // * Our model has been bound
+            // * and validated
+            // * any file attachments have been saved to their temporary location for us to use
+            // * we have a reference to the DTO object and the persisted object
+            // * Permissions are valid
+
+            UpdateName(contentItem);
+
+            MapPropertyValues(contentItem);
+
+            //We need to manually check the validation results here because:
+            // * We still need to save the entity even if there are validation value errors
+            // * Depending on if the entity is new, and if there are non property validation errors (i.e. the name is null)
+            //      then we cannot continue saving, we can only display errors
+            // * If there are validation errors and they were attempting to publish, we can only save, NOT publish and display 
+            //      a message indicating this
+            if (!ModelState.IsValid)
+            {
+                if (ValidationHelper.ModelHasRequiredForPersistenceErrors(contentItem)
+                    && (contentItem.Action == ContentSaveAction.SaveNew))
+                {
+                    //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
+                    // add the modelstate to the outgoing object and throw validation response
+                    var forDisplay = Mapper.Map<IMember, MemberDisplay>(contentItem.PersistedContent);
+                    forDisplay.Errors = ModelState.ToErrorDictionary();
+                    throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
+                }
+            }
+
+            //save the item
+            Services.MemberService.Save(contentItem.PersistedContent);
+
+            //return the updated model
+            var display = Mapper.Map<IMember, MemberDisplay>(contentItem.PersistedContent);
+
+            //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
+            HandleInvalidModelState(display);
+
+            //put the correct msgs in 
+            switch (contentItem.Action)
+            {
+                case ContentSaveAction.Save:
+                case ContentSaveAction.SaveNew:
+                    display.AddSuccessNotification(ui.Text("speechBubbles", "editMemberSaved"), ui.Text("speechBubbles", "editMemberSaved"));
+                    break;
+            }
+
+            return display;
+        }
     }
 }

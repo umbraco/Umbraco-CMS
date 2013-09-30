@@ -59,7 +59,7 @@ namespace Umbraco.Web.Editors
             switch (dataType.Action)
             {
                 case ContentSaveAction.Save:
-                    persisted = DataTypeService.GetDataTypeDefinitionById(dataType.Id);
+                    persisted = DataTypeService.GetDataTypeDefinitionById(Convert.ToInt32(dataType.Id));
                     if (persisted == null)
                     {
                         var message = string.Format("Data type with id: {0} was not found", dataType.Id);

@@ -17,12 +17,13 @@ namespace Umbraco.Web
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
-    public class UmbracoContext : DisposableObject
+    public class UmbracoContext : DisposableObject, IDisposeOnRequestEnd
     {
         private const string HttpContextItemName = "Umbraco.Web.UmbracoContext";
         private static readonly object Locker = new object();
 
         private bool _replacing;
+        private bool? _previewing;
 
         /// <summary>
         /// Used if not running in a web application (no real HttpContext)
@@ -198,8 +199,8 @@ namespace Umbraco.Web
 
             ContentCache = publishedCaches.CreateContextualContentCache(this);
             MediaCache = publishedCaches.CreateContextualMediaCache(this);
-            InPreviewMode = preview ?? DetectInPreviewModeFromRequest();
-
+            _previewing = preview;
+            
             // set the urls...
             //original request url
             //NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
@@ -400,7 +401,11 @@ namespace Umbraco.Web
         /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>
         /// <remarks>Can be internally set by the RTE macro rendering to render macros in the appropriate mode.</remarks>
-        public bool InPreviewMode { get; internal set; }
+        public bool InPreviewMode
+        {
+            get { return _previewing ?? (_previewing = DetectInPreviewModeFromRequest()).Value; }
+			set { _previewing = value; }
+        }
 
         private bool DetectInPreviewModeFromRequest()
         {
