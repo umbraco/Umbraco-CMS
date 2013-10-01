@@ -86,7 +86,7 @@ namespace Umbraco.Core.Persistence.Factories
                         new Tuple<bool, bool, int>(typeDto.CanEdit, typeDto.ViewOnProfile, typeDto.Id.Value));
 
                     var tempGroupDto = groupDto;
-                    var propertyType = new PropertyType(typeDto.ControlId,
+                    var propertyType = new PropertyType(typeDto.PropertyEditorAlias,
                                                              typeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
                     {
                         Alias = typeDto.Alias,
