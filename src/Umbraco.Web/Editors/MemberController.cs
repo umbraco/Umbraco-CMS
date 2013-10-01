@@ -89,6 +89,11 @@ namespace Umbraco.Web.Editors
 
             UpdateName(contentItem);
 
+            //map the custom properties
+            contentItem.PersistedContent.Email = contentItem.Email;
+            //TODO: If we allow changing the alias then we'll need to change URLs, etc... in the editor, would prefer to use 
+            // a unique id but then need to figure out how to handle that with custom membership providers - waiting on feedback from morten.
+
             MapPropertyValues(contentItem);
 
             //We need to manually check the validation results here because:
