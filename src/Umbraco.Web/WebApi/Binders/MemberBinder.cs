@@ -43,7 +43,7 @@ namespace Umbraco.Web.WebApi.Binders
             {
                 throw new InvalidOperationException("No member type found wth alias " + model.ContentTypeAlias);
             }
-            return new Member(model.Name, model.ParentId, contentType, new PropertyCollection());
+            return new Member(model.Name, model.Email, model.Username, model.Password, -1, contentType);
         }
 
         protected override ContentItemDto<IMember> MapFromPersisted(MemberSave model)
