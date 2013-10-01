@@ -422,13 +422,6 @@
     <Compile Include="Umbraco\controls\Images\ImageViewer.ascx.designer.cs">
       <DependentUpon>ImageViewer.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Create.aspx.cs">
-      <DependentUpon>create.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Create.aspx.designer.cs">
-      <DependentUpon>create.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Create\PartialView.ascx.cs">
       <DependentUpon>PartialView.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -588,13 +581,6 @@
     <Compile Include="Umbraco\TreeInit.aspx.designer.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Umbraco.aspx.cs">
-      <DependentUpon>umbraco.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Umbraco.aspx.designer.cs">
-      <DependentUpon>umbraco.aspx</DependentUpon>
-    </Compile>
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
     <Content Include="App_Plugins\MyPackage\Common\Js\MyPackage.js" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\CsvEditor.js" />
@@ -695,7 +681,6 @@
     <Content Include="Umbraco\Config\Lang\ru.xml" />
     <Content Include="Umbraco\Config\Lang\zh.xml" />
     <Content Include="Umbraco\Controls\Tree\CustomTreeService.asmx" />
-    <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Create\PartialViewMacro.ascx" />
     <Content Include="Umbraco\Dashboard\ExamineManagement.ascx" />
     <Content Include="Umbraco\Developer\RelationTypes\EditRelationType.aspx" />
@@ -2048,7 +2033,6 @@
     <Content Include="Install\Steps\welcome.ascx">
       <SubType>UserControl</SubType>
     </Content>
-    <Content Include="Umbraco\cacheBrowser.aspx" />
     <Content Include="Umbraco\Config\Create\UI.xml" />
     <Content Include="Umbraco\Config\Lang\en.xml">
       <SubType>Designer</SubType>
@@ -2182,7 +2166,6 @@
     <Content Include="Umbraco_Client\GenericProperty\genericproperty.css" />
     <Content Include="Umbraco\Css\splitter.gif" />
     <Content Include="Umbraco\Css\umbracoGui.css" />
-    <Content Include="Umbraco\dashboard.aspx" />
     <Content Include="Umbraco\Dashboard\LatestEdits.ascx" />
     <Content Include="Umbraco\Developer\Macros\assemblyBrowser.aspx" />
     <Content Include="Umbraco\Developer\autoDoc.aspx" />
@@ -2191,8 +2174,6 @@
     <Content Include="Umbraco\Developer\Xslt\getXsltStatus.asmx" />
     <Content Include="Umbraco\Developer\Xslt\xsltChooseExtension.aspx" />
     <Content Include="Umbraco\Developer\Xslt\xsltInsertValueOf.aspx" />
-    <Content Include="Umbraco\editContent.aspx" />
-    <Content Include="Umbraco\editMedia.aspx" />
     <Content Include="Umbraco\Images\arrawBack.gif" />
     <Content Include="Umbraco\Images\arrowDown.gif" />
     <Content Include="Umbraco\Images\arrowForward.gif" />
@@ -2397,8 +2378,6 @@
     <Content Include="Umbraco\Js\umbracoCheckKeys.js" />
     <Content Include="Umbraco\Js\xmlextras.js" />
     <Content Include="Umbraco\Js\xmlRequest.js" />
-    <Content Include="Umbraco\login.aspx" />
-    <Content Include="Umbraco\logout.aspx" />
     <Content Include="Umbraco\macroResultWrapper.aspx">
       <SubType>Form</SubType>
     </Content>
@@ -2422,7 +2401,6 @@
     <Content Include="Umbraco\Dialogs\sort.aspx" />
     <Content Include="Umbraco\tree.aspx" />
     <Content Include="Umbraco\treeInit.aspx" />
-    <Content Include="Umbraco\umbraco.aspx" />
     <Content Include="Umbraco\Users\EditUser.aspx" />
     <Content Include="Umbraco\Users\EditUserType.aspx" />
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
