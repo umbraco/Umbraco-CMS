@@ -313,7 +313,7 @@
     <Compile Include="Editors\LogController.cs" />
     <Compile Include="Editors\MacroController.cs" />
     <Compile Include="Models\ContentEditing\AuditLog.cs" />
-    <Compile Include="Models\ContentEditing\ContentMove.cs" />
+    <Compile Include="Models\ContentEditing\MoveOrCopy.cs" />
     <Compile Include="Models\ContentEditing\MacroParameter.cs" />
     <Compile Include="Models\ContentEditing\MemberDisplay.cs" />
     <Compile Include="Models\ContentEditing\MemberSave.cs" />

@@ -8,10 +8,10 @@ using System.Text;
 namespace Umbraco.Web.Models.ContentEditing
 {
     /// <summary>
-    /// A model representing a new sort order for a content/media item
+    /// A model representing a model for moving or copying
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
-    public class ContentMove
+    public class MoveOrCopy
     {
         /// <summary>
         /// The Id of the node to move or copy to
@@ -21,11 +21,18 @@ namespace Umbraco.Web.Models.ContentEditing
         public int ParentId { get; set; }
 
         /// <summary>
-        /// ´The id of the node to move or copy
+        /// The id of the node to move or copy
         /// </summary>
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
         public int Id { get; set; }
+
+        /// <summary>
+        /// Boolean indicating whether copying the object should create a relation to it's original
+        /// </summary>
+        [DataMember(Name = "relateToOriginal", IsRequired = true)]
+        [Required]
+        public bool RelateToOriginal { get; set; }
     }
 
 }

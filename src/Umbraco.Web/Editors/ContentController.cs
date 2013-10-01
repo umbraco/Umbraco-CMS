@@ -366,55 +366,86 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Change the sort order for media
         /// </summary>
-        /// <param name="sorted"></param>
+        /// <param name="move"></param>
         /// <returns></returns>
         [EnsureUserPermissionForContent("move.ParentId", 'M')]
-        public HttpResponseMessage PostMove(ContentMove move)
+        public HttpResponseMessage PostMove(MoveOrCopy move)
         {
-            if (move == null)
-            {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-            }
+            var toMove = ValidateMoveOrCopy(move);
 
-            var contentService = Services.ContentService;
-            try
-            {
-                contentService.Move(contentService.GetById(move.Id), move.ParentId);
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (Exception ex)
-            {
-                LogHelper.Error<ContentController>("Could not move content", ex);
-                throw;
-            }
+            Services.ContentService.Move(toMove, move.ParentId);
+
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         /// <summary>
         /// Copies a 
         /// </summary>
-        /// <param name="sorted"></param>
+        /// <param name="copy"></param>
         /// <returns></returns>
         [EnsureUserPermissionForContent("copy.ParentId", 'C')]
-        public HttpResponseMessage PostCopy(ContentMove copy)
+        public HttpResponseMessage PostCopy(MoveOrCopy copy)
         {
-            if (copy == null)
+            var toCopy = ValidateMoveOrCopy(copy);
+
+            Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal);
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        /// <summary>
+        /// Ensures the item can be moved/copied to the new location
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private IContent ValidateMoveOrCopy(MoveOrCopy model)
+        {
+            if (model == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
             var contentService = Services.ContentService;
-            try
+            var toMove = contentService.GetById(model.Id);
+            if (toMove == null)
             {
-                contentService.Copy(contentService.GetById(copy.Id), copy.ParentId, true);
-                return Request.CreateResponse(HttpStatusCode.OK);
+                throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-            catch (Exception ex)
+            if (model.ParentId < 0)
             {
-                LogHelper.Error<ContentController>("Could not copy content", ex);
-                throw;
+                //cannot move if the content item is not allowed at the root
+                if (toMove.ContentType.AllowedAsRoot == false)
+                {
+                    throw new HttpResponseException(
+                        Request.CreateValidationErrorResponse(ui.Text("moveOrCopy", "notAllowedAtRoot", Security.CurrentUser)));
+                }
             }
-        }
+            else
+            {
+                var parent = contentService.GetById(model.ParentId);
+                if (parent == null)
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
 
+                //check if the item is allowed under this one
+                if (parent.ContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
+                    .Any(x => x.Value == toMove.ContentType.Id) == false)
+                {
+                    throw new HttpResponseException(
+                        Request.CreateValidationErrorResponse(ui.Text("moveOrCopy", "notAllowedByContentType", Security.CurrentUser)));
+                }
+
+                // Check on paths
+                if ((string.Format(",{0},", parent.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
+                {
+                    throw new HttpResponseException(
+                        Request.CreateValidationErrorResponse(ui.Text("moveOrCopy", "notAllowedByPath", Security.CurrentUser)));
+                }
+            }
+
+            return toMove;
+        }
 
         private void ShowMessageForStatus(PublishStatus status, ContentItemDisplay display)
         {
