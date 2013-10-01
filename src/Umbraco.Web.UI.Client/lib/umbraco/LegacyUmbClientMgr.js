@@ -99,8 +99,16 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 //return this._mainTree;
             },
             appActions: function() {
-               
-                throw "Not implemented!";
+                var injector = getRootInjector();
+                var navService = injector.get("navigationService");
+
+                var _actions = {};
+                _actions.openDashboard = function(section){
+                    navService.changeSection(section);
+                };
+
+                return _actions;
+                //throw "Not implemented!";
 
                 ////if the main window has no actions, we'll create some
                 //if (this._appActions == null) {
