@@ -370,6 +370,7 @@
     <Compile Include="PropertyEditors\PropertyValueEditorWrapper.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
+    <Compile Include="Trees\MemberTreeController.cs" />
     <Compile Include="Trees\Menu\CreateChildEntity.cs" />
     <Compile Include="WebApi\Binders\MemberBinder.cs" />
     <Compile Include="WebApi\ControllerContextExtensions.cs" />

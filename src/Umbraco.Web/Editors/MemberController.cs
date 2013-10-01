@@ -50,16 +50,16 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Gets the content json for the member
         /// </summary>
-        /// <param name="loginName"></param>
+        /// <param name="key"></param>
         /// <returns></returns>
-        public MemberDisplay GetByLogin(string loginName)
+        public MemberDisplay GetByKey(Guid key)
         {
             if (Member.InUmbracoMemberMode())
             {
-                var foundMember = Services.MemberService.GetByUsername(loginName);
+                var foundMember = Services.MemberService.GetByKey(key);
                 if (foundMember == null)
                 {
-                    HandleContentNotFound(loginName);
+                    HandleContentNotFound(key);
                 }
                 return Mapper.Map<IMember, MemberDisplay>(foundMember);
             }
