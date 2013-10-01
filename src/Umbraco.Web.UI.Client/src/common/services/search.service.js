@@ -10,7 +10,10 @@ angular.module('umbraco.services')
 			var i = 0;
 
 			entityResource.search(term, "Document").then(function(data){
-				$log.log(data);
+
+				_.each(data, function(el){
+					el.menuUrl = "UmbracoTrees/ContentTree/GetMenu?id=" + el.id + "&application=content";
+				});
 
 				m.results.push({
 					icon: "icon-document",
@@ -19,8 +22,6 @@ angular.module('umbraco.services')
 				});
 				i++;
 
-				//deferred.notify(results);
-
 
 				if(i === 2){
 					deferred.resolve(m);
@@ -28,7 +29,10 @@ angular.module('umbraco.services')
 			});
 
 			entityResource.search(term, "Media").then(function(data){
-				$log.log(data);
+
+				_.each(data, function(el){
+					el.menuUrl = "UmbracoTrees/MediaTree/GetMenu?id=" + el.id + "&application=media";
+				});
 
 				m.results.push({
 					icon: "icon-picture",

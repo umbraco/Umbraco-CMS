@@ -68,6 +68,19 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
         navigationService.showMenu(ev, args);
     });
 
+    //this reacts to the options item in the tree
+    $scope.searchShowMenu = function (ev, args) {
+        
+        $scope.currentNode = args.node;
+        args.scope = $scope;
+
+        if(args.event && args.event.altKey){
+            args.skipDefault = true;
+        }
+
+        navigationService.showMenu(ev, args);
+    };
+
     //this reacts to tree items themselves being clicked
     //the tree directive should not contain any handling, simply just bubble events
     $scope.treeEventHandler.bind("treeNodeSelect", function (ev, args) {
@@ -98,7 +111,7 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
                 $log.error("Error evaluating js callback from legacy tree node: " + ex);
             }
         }
-        else {
+        else if(n.routePath){
             //add action to the history service
             historyService.add({ name: n.name, link: n.routePath, icon: n.icon });
             //not legacy, lets just set the route value and clear the query string if there is one.
