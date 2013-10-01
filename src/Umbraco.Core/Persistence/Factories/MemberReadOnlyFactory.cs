@@ -18,17 +18,13 @@ namespace Umbraco.Core.Persistence.Factories
         public IMember BuildEntity(MemberReadOnlyDto dto)
         {
             var properties = CreateProperties(_memberTypes[dto.ContentTypeAlias], dto.Properties, dto.CreateDate);
-            var propertyCollection = new PropertyCollection(properties);
 
-            var member = new Member(dto.Text, dto.ParentId, _memberTypes[dto.ContentTypeAlias], propertyCollection)
+            var member = new Member(dto.Text, dto.Email, dto.LoginName, dto.Password, dto.ParentId, _memberTypes[dto.ContentTypeAlias])
                          {
                              Id = dto.NodeId,
                              CreateDate = dto.CreateDate,
                              UpdateDate = dto.UpdateDate,
                              Name = dto.Text,
-                             Email = dto.Email,
-                             Username = dto.LoginName,
-                             Password = dto.Password,
                              ProviderUserKey = dto.UniqueId,
                              Trashed = dto.Trashed,
                              Key = dto.UniqueId.Value,
@@ -37,7 +33,8 @@ namespace Umbraco.Core.Persistence.Factories
                              Path = dto.Path,
                              SortOrder = dto.SortOrder,
                              Version = dto.VersionId,
-                             ContentTypeAlias = dto.ContentTypeAlias
+                             ContentTypeAlias = dto.ContentTypeAlias,
+                             Properties = new PropertyCollection(properties)
                          };
 
             member.SetProviderUserKeyType(typeof(Guid));
