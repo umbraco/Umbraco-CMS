@@ -32,6 +32,7 @@ angular.module('umbraco.services')
                 ui.showContextMenuDialog = false;
                 ui.stickyNavigation = false;
 
+                service.hideUserDialog();
                 //$("#search-form input").focus();    
                 break;
             case 'menu':
@@ -67,6 +68,7 @@ angular.module('umbraco.services')
         active: false,
         mode: "default",
         touchDevice: false,
+        userDialog: undefined,
         ui: ui,
 
         /**
@@ -266,13 +268,33 @@ angular.module('umbraco.services')
          * template is located in views/common/dialogs/user.html
          */
         showUserDialog: function () {
-            return dialogService.open(
+            userDialog = dialogService.open(
                 {
                     template: "views/common/dialogs/user.html",
                     modalClass: "umb-modal-left",
                     show: true
                 });
+
+            return userDialog;
         },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.navigationService#hideUserDialog
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * Hides the user dialog, next to the sections navigation
+         * template is located in views/common/dialogs/user.html
+         */
+        hideUserDialog: function () {
+            if(userDialog){
+                userDialog.close();
+                userDialog = undefined;
+            } 
+        },
+
+
         /**
          * @ngdoc method
          * @name umbraco.services.navigationService#showDialog
