@@ -59,8 +59,11 @@ namespace Umbraco.Core.Persistence.Factories
             foreach (var groupDto in dto.PropertyTypeGroups.Where(x => x.Id.HasValue))
             {
                 var group = new PropertyGroup();
+               
                 //Only assign an Id if the PropertyGroup belongs to this ContentType
-                if (groupDto.Id.HasValue && groupDto.Id == memberType.Id)
+                if (groupDto.Id.HasValue 
+                    /*SD: I've commented this out since it's never correct, why would the group id be the same as the type??
+                     * && groupDto.Id == memberType.Id*/)
                 {
                     group.Id = groupDto.Id.Value;
 
