@@ -42,14 +42,12 @@ namespace Umbraco.Tests.UI
         [TestCase(typeof(memberTasks), DefaultApps.member)]
         [TestCase(typeof(MemberGroupTasks), DefaultApps.member)]
         [TestCase(typeof(MediaTypeTasks), DefaultApps.settings)]
-        [TestCase(typeof(mediaTasks), DefaultApps.media)]
         [TestCase(typeof(dictionaryTasks), DefaultApps.settings)]
         [TestCase(typeof(macroTasks), DefaultApps.developer)]
         [TestCase(typeof(languageTasks), DefaultApps.settings)]
         [TestCase(typeof(DLRScriptingTasks), DefaultApps.developer)]
         [TestCase(typeof(DataTypeTasks), DefaultApps.developer)]
         [TestCase(typeof(CreatedPackageTasks), DefaultApps.developer)]
-        [TestCase(typeof(contentTasks), DefaultApps.content)]
         [TestCase(typeof(PartialViewTasks), DefaultApps.settings)]
         public void Check_Assigned_Apps_For_Tasks(Type taskType, DefaultApps app)
         {

@@ -1010,7 +1010,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\contentItemTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\contentItemTypeTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\contentTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\CreatedPackageTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\DataTypeTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\dictionaryTasks.cs" />
@@ -1023,7 +1022,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\DLRScriptingTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\macroTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\mediaTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\MediaTypeTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\MemberGroupTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\memberTasks.cs" />
