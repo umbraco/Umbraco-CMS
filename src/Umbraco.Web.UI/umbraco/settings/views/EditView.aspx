@@ -37,6 +37,7 @@
                     codeEditorElementId: '<%= editorSource.ClientID %>',
                     modalUrl: "<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco) %>/dialogs/editMacro.aspx"
                 });
+
                 //initialize it.
                 editViewEditor.init();
                 
