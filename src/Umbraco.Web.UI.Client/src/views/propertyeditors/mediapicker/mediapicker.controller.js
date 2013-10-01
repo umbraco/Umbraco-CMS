@@ -12,7 +12,7 @@ angular.module('umbraco').controller("Umbraco.Editors.MediaPickerController",
 
 		mediaResource.getByIds($scope.ids).then(function(medias){
 			//img.media = media;
-			$(medias).each(function(i, media){
+		    _.each(medias, function (media, i) {
 				//shortcuts
 				//TODO, do something better then this for searching
 				var img = {};
@@ -31,7 +31,7 @@ angular.module('umbraco').controller("Umbraco.Editors.MediaPickerController",
 
 	$scope.add = function(){
 		dialogService.mediaPicker({multipicker:true, callback: function(data){
-			$(data.selection).each(function(i, media){
+		    _.each(data.selection, function (media, i) {
 				//shortcuts
 				//TODO, do something better then this for searching
 
@@ -50,5 +50,7 @@ angular.module('umbraco').controller("Umbraco.Editors.MediaPickerController",
 	$scope.sync = function(){
 		$scope.model.value = $scope.ids.join();
 	};
+	    
+	    //TODO: Need to add the onValueChanged method to detect if the server has changed the model value and re-create the ids
 
 });
