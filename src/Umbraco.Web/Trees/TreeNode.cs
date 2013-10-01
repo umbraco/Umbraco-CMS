@@ -53,13 +53,6 @@ namespace Umbraco.Web.Trees
         [DataMember(Name = "name")]
         public string Title { get; set; }
 
-        //TODO: This doesn't seem to be used by anything!
-        /// <summary>
-        /// Gets or sets the node path.
-        /// </summary>
-        [DataMember(Name = "nodePath")]
-        public string NodePath { get; set; }
-
         /// <summary>
         /// The icon to use for the node, this can be either a path to an image or a Css class. 
         /// If a '/' is found in the string then it will be considered a path to an image.

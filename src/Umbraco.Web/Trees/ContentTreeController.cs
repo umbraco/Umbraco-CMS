@@ -26,36 +26,13 @@ namespace Umbraco.Web.Trees
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
-            TreeNode node;
-
-            //if the user's start node is not default, then return their start node as the root node.
+            var node = base.CreateRootNode(queryStrings); 
+            //if the user's start node is not default, then ensure the root doesn't have a menu
             if (Security.CurrentUser.StartContentId != Constants.System.Root)
             {
-                var currApp = queryStrings.GetValue<string>(TreeQueryStringParameters.Application);
-                var userRoot = Services.EntityService.Get(Security.CurrentUser.StartContentId, UmbracoObjectTypes.Document);
-                if (userRoot == null)
-                {
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
-                }
-
-                node = new TreeNode(
-                    userRoot.Id.ToInvariantString(),
-                    "", //root nodes aren't expandable, no need to lookup the child nodes url
-                    Url.GetMenuUrl(GetType(), userRoot.Id.ToInvariantString(), queryStrings))
-                    {
-                        HasChildren = true,
-                        RoutePath = currApp,
-                        Title = userRoot.Name
-                    };
-
-
-            }
-            else
-            {
-                node = base.CreateRootNode(queryStrings);    
+                node.MenuUrl = "";
             }
             return node;
-            
         }
 
         protected override int RecycleBinId
@@ -66,6 +43,11 @@ namespace Umbraco.Web.Trees
         protected override bool RecycleBinSmells
         {
             get { return Services.ContentService.RecycleBinSmells(); }
+        }
+
+        protected override int UserStartNode
+        {
+            get { return Security.CurrentUser.StartContentId; }
         }
 
         protected override TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings)
@@ -111,10 +93,17 @@ namespace Umbraco.Web.Trees
             {
                 var menu = new MenuItemCollection();
 
+                //if the user's start node is not the root then ensure the root menu is empty/doesn't exist
+                if (Security.CurrentUser.StartContentId != Constants.System.Root)
+                {
+                    return menu;
+                }
+
                 //set the default to create
                 menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
                 // we need to get the default permissions as you can't set permissions on the very root node
+                //TODO: Use the new services to get permissions
                 var nodeActions = global::umbraco.BusinessLogic.Actions.Action.FromString(
                     UmbracoUser.GetPermissions(Constants.System.Root.ToInvariantString()))
                                         .Select(x => new MenuItem(x));

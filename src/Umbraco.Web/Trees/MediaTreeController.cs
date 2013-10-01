@@ -20,6 +20,17 @@ namespace Umbraco.Web.Trees
     [PluginController("UmbracoTrees")]
     public class MediaTreeController : ContentTreeControllerBase
     {
+        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        {
+            var node = base.CreateRootNode(queryStrings);
+            //if the user's start node is not default, then ensure the root doesn't have a menu
+            if (Security.CurrentUser.StartMediaId != Constants.System.Root)
+            {
+                node.MenuUrl = "";
+            }
+            return node;
+        }
+
         protected override int RecycleBinId
         {
             get { return Constants.System.RecycleBinContent; }
@@ -28,6 +39,11 @@ namespace Umbraco.Web.Trees
         protected override bool RecycleBinSmells
         {
             get { return Services.MediaService.RecycleBinSmells(); }
+        }
+
+        protected override int UserStartNode
+        {
+            get { return Security.CurrentUser.StartMediaId; }
         }
 
         protected override TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings)
@@ -53,6 +69,12 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.Root.ToInvariantString())
             {
+                //if the user's start node is not the root then ensure the root menu is empty/doesn't exist
+                if (Security.CurrentUser.StartMediaId != Constants.System.Root)
+                {
+                    return menu;
+                }
+
                 // root actions         
                 menu.AddMenuItem<ActionNew>();
                 menu.AddMenuItem<ActionSort>(true);
