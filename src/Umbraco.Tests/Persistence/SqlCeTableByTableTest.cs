@@ -35,12 +35,12 @@ namespace Umbraco.Tests.Persistence
             }
 
             //Create the Sql CE database
-            var engine = new SqlCeEngine("Datasource=|DataDirectory|test.sdf;Flush Interval=1;File Access Retry Timeout=10");
+            var engine = new SqlCeEngine("Datasource=|DataDirectory|test.sdf;Flush Interval=1;");
             engine.CreateDatabase();
             
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
-            _database = new Database("Datasource=|DataDirectory|test.sdf;Flush Interval=1;File Access Retry Timeout=10",
+            _database = new Database("Datasource=|DataDirectory|test.sdf;Flush Interval=1;",
                                      "System.Data.SqlServerCe.4.0");
         }
 
