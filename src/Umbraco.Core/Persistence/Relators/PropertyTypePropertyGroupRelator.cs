@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Relators
@@ -21,7 +22,7 @@ namespace Umbraco.Core.Persistence.Relators
                 // Yes, just add this PropertyTypeReadOnlyDto to the current MemberTypeReadOnlyDto's collection
                 Current.PropertyTypes.Add(p);
 
-                if(g.Id.HasValue)
+                if (g.Id.HasValue && Current.PropertyTypeGroups != null && Current.PropertyTypeGroups.Any(x => x.Id == g.Id.Value) == false)
                     Current.PropertyTypeGroups.Add(g);
 
                 // Return null to indicate we're not done with this MemberTypeReadOnlyDto yet
