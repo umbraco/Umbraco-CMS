@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Tests.TestHelpers.Entities
 {
@@ -6,7 +7,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
     {
         public static Member CreateSimpleContent(IMemberType contentType, string name, string email, string password, string username, int parentId)
         {
-            var member = new Member(name, parentId, contentType, new PropertyCollection())
+            var member = new Member(name, email, username, password, parentId, contentType)
                          {
                              CreatorId = 0,
                              Email = email,

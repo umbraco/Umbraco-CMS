@@ -61,9 +61,7 @@ namespace Umbraco.Core.Persistence.Factories
                 var group = new PropertyGroup();
                
                 //Only assign an Id if the PropertyGroup belongs to this ContentType
-                if (groupDto.Id.HasValue 
-                    /*SD: I've commented this out since it's never correct, why would the group id be the same as the type??
-                     * && groupDto.Id == memberType.Id*/)
+                if (groupDto.ContentTypeNodeId == memberType.Id)
                 {
                     group.Id = groupDto.Id.Value;
 
@@ -81,7 +79,8 @@ namespace Umbraco.Core.Persistence.Factories
                 group.PropertyTypes = new PropertyTypeCollection();
 
                 //Because we are likely to have a group with no PropertyTypes we need to ensure that these are excluded
-                var typeDtos = dto.PropertyTypes.Where(x => x.Id.HasValue && x.Id > 0 && x.PropertyTypeGroupId.HasValue && x.PropertyTypeGroupId.Value == groupDto.Id.Value);
+                var localGroupDto = groupDto;
+                var typeDtos = dto.PropertyTypes.Where(x => x.Id.HasValue && x.Id > 0 && x.PropertyTypeGroupId.HasValue && x.PropertyTypeGroupId.Value == localGroupDto.Id.Value);
                 foreach (var typeDto in typeDtos)
                 {
                     //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType

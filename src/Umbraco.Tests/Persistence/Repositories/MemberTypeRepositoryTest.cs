@@ -1,24 +1,22 @@
 ﻿using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [TestFixture, NUnit.Framework.Ignore]
-    public class MemberTypeRepositoryTest : MemberRepositoryBaseTest
+    [TestFixture]
+    public class MemberTypeRepositoryTest : BaseDatabaseFactoryTest
     {
-        #region Overrides of MemberRepositoryBaseTest
-
         [SetUp]
         public override void Initialize()
         {
             base.Initialize();
-
-            SqlSyntaxContext.SqlSyntaxProvider = SqlServerSyntax.Provider;
         }
 
         [TearDown]
@@ -26,18 +24,6 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             base.TearDown();
         }
-
-        public override string ConnectionString
-        {
-            get { return @"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco"; }
-        }
-
-        public override string ProviderName
-        {
-            get { return "System.Data.SqlClient"; }
-        }
-
-        #endregion
 
         private MemberTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
@@ -59,9 +45,33 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void MemberRepository_Can_Persist_Member()
+        {
+            IMemberType sut;
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var memberType = MockedContentTypes.CreateSimpleMemberType();
+                repository.AddOrUpdate(memberType);
+                unitOfWork.Commit();
+
+                sut = repository.Get(memberType.Id);
+
+                Assert.That(sut, Is.Not.Null);
+                Assert.That(sut.PropertyGroups.Count(), Is.EqualTo(1));
+                Assert.That(sut.PropertyTypes.Count(), Is.EqualTo(12));
+
+                Assert.That(sut.PropertyGroups.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
+                Assert.That(sut.PropertyTypes.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
+            }
+        }
+
+        [Test, NUnit.Framework.Ignore]
         public void MemberTypeRepository_Can_Get_MemberType_By_Id()
         {
-            var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
 

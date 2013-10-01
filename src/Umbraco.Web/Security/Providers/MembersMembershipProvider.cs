@@ -323,8 +323,8 @@ namespace Umbraco.Web.Security.Providers
                     "Cannot create member as a member with the same email address exists: " + email);
                 return null;
             }
-            
-            var member = MemberService.CreateMember(username, email, password, DefaultMemberTypeAlias);
+
+            var member = MemberService.CreateMember(email, username, password, DefaultMemberTypeAlias);
 
             member.IsApproved = isApproved;
             member.PasswordQuestion = passwordQuestion;
