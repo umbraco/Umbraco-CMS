@@ -16,8 +16,9 @@
 .umbracoDialog .umb-dialog-body .umb-pane{margin-left: 20px; margin-right: 20px; margin-top: 20px;}
 .umbracoDialog form{height: 100%;}
 
-/*ensures dialogs doesnt have side-by-side labels */
-.umbracoDialog .controls-row, .umb-modal .controls-row{margin-left: 0px !important;}
+/*ensures dialogs doesnt have side-by-side labels*/
+.umbracoDialog .controls-row, 
+.umb-modal .controls-row{margin-left: 0px !important;}
 
 .controls-row img {
 	max-width: none;
@@ -84,16 +85,4 @@ iframe, .content-column-body {
 .legacy-custom-file{
   width: 16px; height: 16px; margin-right: 11px; display: inline-block;
   background-position: center center;
-}
-
-/* TINYMCE OVERRIDES */
-.mce-tinymce{border: 1px solid @grayLight !important; }
-.mce-panel{background: @grayLighter !important; border-color: @grayLight !important;}
-.mce-btn-group, .mce-btn{border: none !important; background: none !important;}
-.mce-ico{font-size: 12px !important; color: @blackLight !important;}
-/* Special case to support helviticons for the tiny mce button controls */
-.mce-ico.mce-i-custom[class^="icon-"],
-.mce-ico.mce-i-custom[class*=" icon-"] {    
-    font-family: icomoon;
-    font-size:16px !important;
 }

@@ -86,11 +86,11 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
          * @ngdoc method
-         * @name umbraco.resources.contentResource#sort
+         * @name umbraco.resources.contentResource#move
          * @methodOf umbraco.resources.contentResource
          *
          * @description
-         * Sorts all children below a given parent node id, based on a collection of node-ids
+         * Moves a node underneath a new parentId
          *
          * ##usage
          * <pre>
@@ -98,7 +98,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *    .then(function() {
          *        alert("node was moved");
          *    }, function(err){
-         *      alert("node didnt move:" + err); 
+         *      alert("node didnt move:" + err.data.Message); 
          *    });
          * </pre> 
          * @param {Object} args arguments object
@@ -125,6 +125,49 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         id: args.id
                     }),
                 'Failed to move content');
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentResource#copy
+         * @methodOf umbraco.resources.contentResource
+         *
+         * @description
+         * Copies a node underneath a new parentId
+         *
+         * ##usage
+         * <pre>
+         * contentResource.copy({ parentId: 1244, id: 123 })
+         *    .then(function() {
+         *        alert("node was copied");
+         *    }, function(err){
+         *      alert("node wasnt copy:" + err.data.Message); 
+         *    });
+         * </pre> 
+         * @param {Object} args arguments object
+         * @param {Int} args.idd the ID of the node to copy
+         * @param {Int} args.parentId the ID of the parent node to copy to
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        copy: function (args) {
+            if (!args) {
+                throw "args cannot be null";
+            }
+            if (!args.parentId) {
+                throw "args.parentId cannot be null";
+            }
+            if (!args.id) {
+                throw "args.id cannot be null";
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostCopy"),
+                    {
+                        parentId: args.parentId,
+                        id: args.id
+                    }),
+                'Failed to copy content');
         },
 
         /**

@@ -1,5 +1,5 @@
-//used for the media picker dialog
-angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
+angular.module("umbraco")
+	.controller("Umbraco.Editors.Content.CopyController",
 	function ($scope, eventsService, contentResource, $log) {	
 	var dialogOptions = $scope.$parent.dialogOptions;
 	
@@ -10,7 +10,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 		args.event.preventDefault();
 		args.event.stopPropagation();
 
-		eventsService.publish("Umbraco.Editors.Content.MoveController.Select", args).then(function(args){
+		eventsService.publish("Umbraco.Editors.Content.CopyController.Select", args).then(function(args){
 			var c = $(args.event.target.parentElement);
 			if($scope.selectedEl){
 				$scope.selectedEl.find(".temporary").remove();
@@ -25,8 +25,8 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 		});
 	});
 
-	$scope.move = function(){
-		contentResource.move({parentId: $scope.target.id, id: node.id})
+	$scope.copy = function(){
+		contentResource.copy({parentId: $scope.target.id, id: node.id})
 			.then(function(){
 				$scope.error = false;
 				$scope.success = true;

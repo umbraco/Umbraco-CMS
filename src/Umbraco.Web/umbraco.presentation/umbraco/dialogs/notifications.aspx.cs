@@ -55,6 +55,7 @@ namespace umbraco.dialogs
                         c.Checked = true;
 
                     uicontrols.PropertyPanel pp = new umbraco.uicontrols.PropertyPanel();
+                    pp.CssClass = "inline";
                     pp.Text = ui.Text("actions", a.Alias);
                     pp.Controls.Add(c);
 
@@ -92,11 +93,14 @@ namespace umbraco.dialogs
             getUser().resetNotificationCache();
             base.getUser().initNotifications();
 
-
-            feedback.Text = ui.Text("notifications") + " " + ui.Text("ok") + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+            var feedback = new umbraco.uicontrols.Feedback();
+            feedback.Text = ui.Text("notifications") + " " + ui.Text("ok") + "</p><p><a href='#' class='btn btn-primary' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
             feedback.type = umbraco.uicontrols.Feedback.feedbacktype.success;
 
-            pane_form.Visible = false;
+            pane_form.Controls.Clear();
+            pane_form.Controls.Add(feedback);
+
+            //pane_form.Visible = false;
             pl_buttons.Visible = false;
         }
     }

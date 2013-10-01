@@ -107,7 +107,7 @@ namespace Umbraco.Web.Trees
 
                 //these two are the standard items
                 menu.AddMenuItem<ActionNew>();
-                menu.AddMenuItem<ActionSort>();
+                menu.AddMenuItem<ActionSort>(true).ConvertLegacyMenuItem(null, "content", "content");
 
                 //filter the standard items
                 FilterUserAllowedMenuItems(menu, nodeActions);
@@ -175,7 +175,7 @@ namespace Umbraco.Web.Trees
             
             //need to ensure some of these are converted to the legacy system - until we upgrade them all to be angularized.
             menu.AddMenuItem<ActionMove>(true);
-            menu.AddMenuItem<ActionCopy>().ConvertLegacyMenuItem(item, "content", "content");
+            menu.AddMenuItem<ActionCopy>();
             
             menu.AddMenuItem<ActionSort>(true).ConvertLegacyMenuItem(item, "content", "content");
 

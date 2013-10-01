@@ -12,7 +12,6 @@ angular.module("umbraco").controller("Umbraco.Dialogs.ContentPickerController",
 			if(dialogOptions && dialogOptions.multipicker){
 				
 				var c = $(args.event.target.parentElement);
-
 				if(!args.node.selected){
 					args.node.selected = true;
 					c.find("i.umb-tree-icon").hide()
@@ -22,13 +21,6 @@ angular.module("umbraco").controller("Umbraco.Dialogs.ContentPickerController",
 					c.find(".temporary").remove();
 					c.find("i.umb-tree-icon").show();
 				}
-
-/*
-				$(args.event.target.parentElement)
-					.find("i.umb-tree-icon")
-					.hide()
-					.after("class", "icon umb-tree-icon sprTree icon-check blue");	
-				*/
 
 				$scope.select(args.node);
 
