@@ -29,7 +29,7 @@ angular.module("umbraco.directives")
 
          if(!hideheader){ 
            template +='<div>' + 
-           '<h5><a href="#{{section}}" class="root-link">{{tree.name}}</a></h5>' +
+           '<h5><a href="#{{section}}" ng-click="select(this, tree.root, $event)"  class="root-link">{{tree.name}}</a></h5>' +
                '<a href class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(this, tree.root, $event)" ng-swipe-right="options(this, tree.root, $event)"><i></i><i></i><i></i></a>' +
            '</div>';
          }
@@ -56,7 +56,6 @@ angular.module("umbraco.directives")
 
             /** Helper function to emit tree events */
             function emitEvent(eventName, args) {
-
               if (scope.eventhandler) {
                 $(scope.eventhandler).trigger(eventName, args);
               }
@@ -109,6 +108,17 @@ angular.module("umbraco.directives")
                 emitEvent("treeOptionsClick", { element: e, node: n, event: ev });
             };
             
+            /**
+              Method called when an item is clicked in the tree, this passes the 
+              DOM element, the tree node object and the original click
+              and emits it as a treeNodeSelect element if there is a callback object
+              defined on the tree
+            */
+            scope.select = function(e,n,ev){
+                emitEvent("treeNodeSelect", { element: e, node: n, event: ev });
+            };
+            
+
             //watch for section changes
             scope.$watch("section", function (newVal, oldVal) {
 
