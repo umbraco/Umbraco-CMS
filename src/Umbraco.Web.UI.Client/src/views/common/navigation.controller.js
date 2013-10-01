@@ -61,6 +61,10 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
         $scope.currentNode = args.node;
         args.scope = $scope;
 
+        if(args.event && args.event.altKey){
+            args.skipDefault = true;
+        }
+
         navigationService.showMenu(ev, args);
     });
 
