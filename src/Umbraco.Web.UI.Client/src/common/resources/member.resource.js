@@ -81,7 +81,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 $http.delete(
                     umbRequestHelper.getApiUrl(
                         "memberApiBaseUrl",
-                        "DeleteById",
+                        "DeleteByKey",
                         [{ key: key }])),
                 'Failed to delete item ' + key);
         },

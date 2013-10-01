@@ -85,6 +85,7 @@ namespace Umbraco.Web.Trees
             }
 
             menu.AddMenuItem<ActionDelete>();
+            menu.AddMenuItem<RefreshNode, ActionRefresh>(true);
             return menu;
         }
     }

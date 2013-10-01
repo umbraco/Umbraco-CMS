@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -134,6 +136,25 @@ namespace Umbraco.Web.Editors
             }
 
             return display;
+        }
+
+
+        /// <summary>
+        /// Permanently deletes a member
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>        
+        public HttpResponseMessage DeleteByKey(Guid key)
+        {
+            var foundMember = Services.MemberService.GetByKey(key);
+            if (foundMember == null)
+            {
+                return HandleContentNotFound(key, false);
+            }
+
+            Services.MemberService.Delete(foundMember);
+
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
     }
 }
