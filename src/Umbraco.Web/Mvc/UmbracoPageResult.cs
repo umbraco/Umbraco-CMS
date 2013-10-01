@@ -11,8 +11,7 @@ namespace Umbraco.Web.Mvc
 	{
 		public override void ExecuteResult(ControllerContext context)
 		{
-
-			//since we could be returning the current page from a surface controller posted values in which the routing values are changed, we 
+            //since we could be returning the current page from a surface controller posted values in which the routing values are changed, we 
 			//need to revert these values back to nothing in order for the normal page to render again.
 			context.RouteData.DataTokens["area"] = null;
 			context.RouteData.DataTokens["Namespaces"] = null;
@@ -24,30 +23,44 @@ namespace Umbraco.Web.Mvc
 			}
 
 			var routeDef = (RouteDefinition)context.RouteData.DataTokens["umbraco-route-def"];
+            var factory = ControllerBuilder.Current.GetControllerFactory();
 
 			//ensure the original template is reset
 			context.RouteData.Values["action"] = routeDef.ActionName;
 
 			//ensure ModelState is copied across
-			routeDef.Controller.ViewData.ModelState.Merge(context.Controller.ViewData.ModelState);
+		    ControllerBase controller = null;
 
-			//ensure TempData and ViewData is copied across
-			foreach (var d in context.Controller.ViewData)
-				routeDef.Controller.ViewData[d.Key] = d.Value;
-			routeDef.Controller.TempData = context.Controller.TempData;
+		    try
+		    {
+                controller = factory.CreateController(context.RequestContext, routeDef.ControllerName) as ControllerBase;
 
-			using (DisposableTimer.TraceDuration<UmbracoPageResult>("Executing Umbraco RouteDefinition controller", "Finished"))
-			{
-				try
-				{
-					((IController)routeDef.Controller).Execute(context.RequestContext);
-				}
-				finally
-				{
-					routeDef.Controller.DisposeIfDisposable();
-				}
-			}
+                if (controller == null)
+                {
+                    throw new InvalidOperationException("Could not create controller with name " + routeDef.ControllerName + " in the context of an Http POST when using a SurfaceController form");
+                }
 
+                controller.ViewData.ModelState.Merge(context.Controller.ViewData.ModelState);
+
+                //ensure TempData and ViewData is copied across
+                foreach (var d in context.Controller.ViewData)
+                    controller.ViewData[d.Key] = d.Value;
+
+                controller.TempData = context.Controller.TempData;
+
+                using (DisposableTimer.TraceDuration<UmbracoPageResult>("Executing Umbraco RouteDefinition controller", "Finished"))
+                {
+                    ((IController)controller).Execute(context.RequestContext);
+                }
+		    }
+		    finally 
+		    {
+                if (controller != null)
+                    factory.ReleaseController(controller);
+
+                if (controller != null)
+                    controller.DisposeIfDisposable();
+		    }
 		}
 	}
 }
