@@ -33,7 +33,26 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Simply checks if the current user's cookie is valid and if so returns the user object associated
+        /// Checks if the current user's cookie is valid and if so returns OK or a 400 (BadRequest)
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public HttpResponseMessage IsAuthenticated()
+        {
+            var attempt = UmbracoContext.Security.AuthorizeRequest();
+            if (attempt == ValidateRequestAttempt.Success)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            //return Forbidden (403), we don't want to return a 401 because that get's intercepted 
+            // by our angular helper because it thinks that we need to re-perform the request once we are
+            // authorized.
+            return Request.CreateResponse(HttpStatusCode.Forbidden);
+        }
+
+
+        /// <summary>
+        /// Checks if the current user's cookie is valid and if so returns the user object associated
         /// </summary>
         /// <returns></returns>
         public UserDetail GetCurrentUser()

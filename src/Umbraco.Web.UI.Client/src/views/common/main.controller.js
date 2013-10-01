@@ -80,7 +80,7 @@ function MainController($scope, $location, $routeParams, $rootScope, $timeout, $
 
         //if the user has changed we need to redirect to the root so they don't try to continue editing the
         //last item in the URL
-        if (data.lastUserId !== data.user.id) {
+        if (data.lastUserId && data.lastUserId !== data.user.id) {
             $location.path("/").search("");
         }
 
