@@ -268,14 +268,14 @@ angular.module('umbraco.services')
          * template is located in views/common/dialogs/user.html
          */
         showUserDialog: function () {
-            userDialog = dialogService.open(
+            service.userDialog = dialogService.open(
                 {
                     template: "views/common/dialogs/user.html",
                     modalClass: "umb-modal-left",
                     show: true
                 });
 
-            return userDialog;
+            return service.userDialog;
         },
 
         /**
@@ -288,9 +288,9 @@ angular.module('umbraco.services')
          * template is located in views/common/dialogs/user.html
          */
         hideUserDialog: function () {
-            if(userDialog){
-                userDialog.close();
-                userDialog = undefined;
+            if(service.userDialog){
+                service.userDialog.close();
+                service.userDialog = undefined;
             } 
         },
 
@@ -374,6 +374,8 @@ angular.module('umbraco.services')
                 {
                     container: $("#dialog div.umb-modalcolumn-body"),
                     scope: scope,
+                    currentNode: args.node,
+                    currentAction: args.action,
                     inline: true,
                     show: true,
                     iframe: iframe,
@@ -383,7 +385,6 @@ angular.module('umbraco.services')
 
             //save the currently assigned dialog so it can be removed before a new one is created
             this.ui.currentDialog = dialog;
-
             return dialog;
         },
 
