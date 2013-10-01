@@ -197,10 +197,12 @@ angular.module('umbraco.services')
                     //check for a default
                     //NOTE: event will be undefined when a call to hideDialog is made so it won't re-load the default again.
                     // but perhaps there's a better way to deal with with an additional parameter in the args ? it works though.
-                    if (event && data.defaultAlias) {
+                    if (data.defaultAlias && !args.skipDefault) {
+
                         var found = _.find(data.menuItems, function(item) {
                             return item.alias = data.defaultAlias;
                         });
+
                         if (found) {
                             
                             self.ui.currentNode = args.node;
@@ -372,7 +374,7 @@ angular.module('umbraco.services')
 	     * hides the currently open dialog
 	     */
         hideDialog: function () {
-            this.showMenu(undefined, { node: this.ui.currentNode });
+            this.showMenu(undefined, {skipDefault: true, node: this.ui.currentNode });
         },
         /**
           * @ngdoc method

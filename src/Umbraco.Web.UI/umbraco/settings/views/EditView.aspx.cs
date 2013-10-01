@@ -159,8 +159,6 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 
 
             SaveButton = Panel1.Menu.NewButton();
-            SaveButton.Icon = "save";
-            SaveButton.OnClientClick = "doSubmit()";
             SaveButton.Text = ui.Text("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";

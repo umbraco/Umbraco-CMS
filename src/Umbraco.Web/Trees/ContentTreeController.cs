@@ -123,6 +123,12 @@ namespace Umbraco.Web.Trees
                 // add default actions for *all* users
                 menu.AddMenuItem<ActionRePublish>().ConvertLegacyMenuItem(null, "content", "content");
                 menu.AddMenuItem<RefreshNode, ActionRefresh>(true);
+
+                foreach (var menuItem in menu.MenuItems)
+                {
+                    menuItem.Name = ui.Text("actions", menuItem.Alias);
+                }
+
                 return menu;
             }
 
@@ -147,6 +153,10 @@ namespace Umbraco.Web.Trees
             //set the default to create
             nodeMenu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
+            foreach (var menuItem in nodeMenu.MenuItems)
+            {
+                menuItem.Name = ui.Text("actions", menuItem.Alias);
+            }
             return nodeMenu;
         }
 

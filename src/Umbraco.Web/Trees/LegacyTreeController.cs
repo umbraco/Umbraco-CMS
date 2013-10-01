@@ -74,6 +74,11 @@ namespace Umbraco.Web.Trees
                     LogHelper.Error<LegacyTreeController>(msg, attempt.Exception);
                     throw new ApplicationException(msg);
                 }
+
+                foreach (var menuItem in attempt.Result.MenuItems)
+                {
+                    menuItem.Name = global::umbraco.ui.Text("actions", menuItem.Alias);
+                }
                 return attempt.Result;
             }
             else
@@ -84,6 +89,10 @@ namespace Umbraco.Web.Trees
                     var msg = "Could not render menu for treeType " + queryStrings.GetRequiredString("treeType") + " for node id " + parentId;
                     LogHelper.Error<LegacyTreeController>(msg, attempt.Exception);
                     throw new ApplicationException(msg);
+                }
+                foreach (var menuItem in attempt.Result.MenuItems)
+                {
+                    menuItem.Name = global::umbraco.ui.Text("actions", menuItem.Alias);
                 }
                 return attempt.Result;
             }                       
