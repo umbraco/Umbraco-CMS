@@ -93,11 +93,11 @@ namespace Umbraco.Web.Models.Mapping
             {
                 templateItemConfig.Add(t.Alias, t.Name);
             }
-
-
-            if(content.ContentType.IsContainer)
-                TabsAndPropertiesResolver.AddContainerView(content, display);
-
+            
+            if (content.ContentType.IsContainer)
+            {
+                AddContainerView(display);
+            }
 
             TabsAndPropertiesResolver.MapGenericProperties(
                 content, display,
@@ -133,6 +133,33 @@ namespace Umbraco.Web.Models.Mapping
                         Value = string.Join(",", display.Urls),
                         View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                     });
+        }
+
+        private static void AddContainerView<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display)
+             where TPersisted : IContentBase
+        {
+            var listViewTab = new Tab<ContentPropertyDisplay>();
+            listViewTab.Alias = "containerView";
+            listViewTab.Label = "Content";
+            listViewTab.Id = 25;
+            listViewTab.IsActive = true;
+
+            var listViewProperties = new List<ContentPropertyDisplay>();
+            listViewProperties.Add(new ContentPropertyDisplay
+            {
+                Alias = string.Format("{0}containerView", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                Label = ui.Text("content", "releaseDate"),
+                Value = null,
+                View = "listview",
+                HideLabel = true
+            });
+            listViewTab.Properties = listViewProperties;
+
+            //Is there a better way?
+            var tabs = new List<Tab<ContentPropertyDisplay>>();
+            tabs.Add(listViewTab);
+            tabs.AddRange(display.Tabs);
+            display.Tabs = tabs;
         }
 
         /// <summary>

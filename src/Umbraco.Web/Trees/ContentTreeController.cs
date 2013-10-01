@@ -62,11 +62,14 @@ namespace Umbraco.Web.Trees
                
                 var allowedUserOptions = GetAllowedUserMenuItemsForNode(e);
                 if (CanUserAccessNode(e, allowedUserOptions))
-                {
-                    //TODO: Here I look up a contenttype for every node, must make a faster call for this
+                {                    
                     var hasChildren = e.HasChildren;
-                    if (isContainer(e.ContentTypeAlias))
+
+                    //Special check to see if it ia a container, if so then we'll hide children.
+                    if (entity.AdditionalData["IsContainer"] is bool && (bool) entity.AdditionalData["IsContainer"])
+                    {
                         hasChildren = false;
+                    }
 
                     var node = CreateTreeNode(
                         e.Id.ToInvariantString(),
@@ -79,12 +82,6 @@ namespace Umbraco.Web.Trees
                 }
             }
             return nodes;
-        }
-
-       //TODO: find a faster way to do this
-        private bool isContainer(string alias)
-        {
-            return Services.ContentTypeService.GetContentType(alias).IsContainer;
         }
 
         protected override MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings)
