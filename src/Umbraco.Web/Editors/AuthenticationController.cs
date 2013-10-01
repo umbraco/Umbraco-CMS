@@ -44,10 +44,11 @@ namespace Umbraco.Web.Editors
             {
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
-            //return Forbidden (403), we don't want to return a 401 because that get's intercepted 
+            //return BadRequest (400), we don't want to return a 401 because that get's intercepted 
             // by our angular helper because it thinks that we need to re-perform the request once we are
-            // authorized.
-            return Request.CreateResponse(HttpStatusCode.Forbidden);
+            // authorized and we don't want to return a 403 because angular will show a warning msg indicating 
+            // that the user doesn't have access to perform this function, we just want to return a normal invalid msg.
+            return Request.CreateResponse(HttpStatusCode.BadRequest);
         }
 
 
