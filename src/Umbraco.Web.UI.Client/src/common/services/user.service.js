@@ -53,30 +53,20 @@ angular.module('umbraco.services')
 
     return {
 
+        /** Internal method to display the login dialog */
+        _showLoginDialog: function () {
+            openLoginDialog();
+        },
+
         /** Returns a promise, sends a request to the server to check if the current cookie is authorized  */
-        isAuthenticated: function (args) {
-            
-            return authResource.isAuthenticated()
-                .then(function(data) {
-
-                    //note, this can return null if they are not authenticated
-                    if (!data) {                        
-                        throw "Not authenticated";
-                    }
-                    else {
-
-                        var result = { user: data, authenticated: true, lastUserId: lastUserId };
-
-                        if (args.broadcastEvent) {
-                            //broadcast a global event, will inform listening controllers to load in the user specific data
-                            $rootScope.$broadcast("authenticated", result);
-                        }
-
-                        currentUser = data;
-                        currentUser.avatar = 'http://www.gravatar.com/avatar/' + data.emailHash + '?s=40&d=404';
-                        return result;
-                    }
-                });
+        isAuthenticated: function () {
+            //if we've got a current user then just return true
+            if (currentUser) {
+                var deferred = $q.defer();
+                deferred.resolve(true);
+                return deferred.promise;
+            }
+            return authResource.isAuthenticated();
         },
 
         /** Returns a promise, sends a request to the server to validate the credentials  */
@@ -97,6 +87,7 @@ angular.module('umbraco.services')
                 });
         },
 
+        /** Logs the user out and redirects to the login page */
         logout: function () {
             return authResource.performLogout()
                 .then(function (data) {                   
@@ -107,14 +98,38 @@ angular.module('umbraco.services')
                     //broadcast a global event
                     $rootScope.$broadcast("notAuthenticated");
 
-                    openLoginDialog();
+                    $location.path("/login").search({check: false});
+
                     return null;
                 });
         },
 
-        /** Returns the current user object, if null then calls to authenticated or authenticate must be called  */
-        getCurrentUser: function () {
-            return currentUser;
+        /** Returns the current user object in a promise  */
+        getCurrentUser: function (args) {
+            var deferred = $q.defer();
+            
+            if (!currentUser) {
+                authResource.getCurrentUser()
+                    .then(function(data) {
+
+                        var result = { user: data, authenticated: true, lastUserId: lastUserId };
+
+                        if (args.broadcastEvent) {
+                            //broadcast a global event, will inform listening controllers to load in the user specific data
+                            $rootScope.$broadcast("authenticated", result);
+                        }
+
+                        currentUser = data;
+                        currentUser.avatar = 'http://www.gravatar.com/avatar/' + data.emailHash + '?s=40&d=404';
+                        deferred.resolve(currentUser);
+                    });
+
+            }
+            else {
+                deferred.resolve(currentUser);
+            }
+            
+            return deferred.promise;
         }
     };
 

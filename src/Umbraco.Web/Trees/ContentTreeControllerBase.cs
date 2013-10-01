@@ -23,6 +23,11 @@ namespace Umbraco.Web.Trees
         /// </summary>
         protected abstract bool RecycleBinSmells { get; }
 
+        /// <summary>
+        /// Returns the user's start node for this tree
+        /// </summary>
+        protected abstract int UserStartNode { get; }
+
         protected abstract TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings);
         
         protected abstract MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings);
@@ -39,9 +44,11 @@ namespace Umbraco.Web.Trees
 
             //if a request is made for the root node data but the user's start node is not the default, then
             // we need to return their start node data
-            if (iid == Constants.System.Root && UmbracoUser.StartNodeId != Constants.System.Root)
+            if (iid == Constants.System.Root && UserStartNode != Constants.System.Root)
             {
-                return Services.EntityService.GetChildren(UmbracoUser.StartNodeId, UmbracoObjectType).ToArray();
+                //just return their single start node, it will show up under the 'Content' label
+                var startNode = Services.EntityService.Get(UserStartNode, UmbracoObjectType);
+                return new[] {startNode};
             }
 
             return Services.EntityService.GetChildren(iid, UmbracoObjectType).ToArray();
@@ -56,7 +63,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected sealed override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.Root.ToInvariantString() && UserStartNode == Constants.System.Root)
             {
                 //we need to append the recycle bin to the end (if not in dialog mode)
                 var nodes = PerformGetTreeNodes(id, queryStrings);

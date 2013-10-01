@@ -17,7 +17,7 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("contentTypeId")]
         public int ContentTypeId { get; set; }
 
-        [Column("propertyTypeGroupId")]
+        [Column("PropertyTypesGroupId")]
         public int? PropertyTypeGroupId { get; set; }
 
         [Column("Alias")]

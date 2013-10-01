@@ -229,10 +229,8 @@ namespace Umbraco.Core.Persistence.Repositories
             dto.NodeId = nodeDto.NodeId;
             Database.Insert(dto);
 
-            //TODO ContentType for the Member entity
-
             //Create the PropertyData for this version - cmsPropertyData
-            /*var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
+            var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
             var propertyDataDtos = propertyFactory.BuildDto(((Member)entity).Properties);
             var keyDictionary = new Dictionary<int, int>();
 
@@ -247,7 +245,7 @@ namespace Umbraco.Core.Persistence.Repositories
             foreach (var property in ((Member)entity).Properties)
             {
                 property.Id = keyDictionary[property.PropertyTypeId];
-            }*/
+            }
 
             ((Member)entity).ResetDirtyProperties();
         }
@@ -300,7 +298,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //TODO ContentType for the Member entity
 
             //Create the PropertyData for this version - cmsPropertyData
-            /*var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
+            var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
             var propertyDataDtos = propertyFactory.BuildDto(((Member)entity).Properties);
             var keyDictionary = new Dictionary<int, int>();
 
@@ -325,7 +323,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     property.Id = keyDictionary[property.PropertyTypeId];
                 }
-            }*/
+            }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }

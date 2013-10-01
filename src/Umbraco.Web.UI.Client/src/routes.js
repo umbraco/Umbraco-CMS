@@ -1,15 +1,62 @@
 app.config(function ($routeProvider) {
+
+    /** This checks if the user is authenticated for a route and what the isRequired is set to. 
+        Depending on whether isRequired = true, it first check if the user is authenticated and will resolve successfully
+        otherwise the route will fail and the $routeChangeError event will execute, in that handler we will redirect to the rejected
+        path that is resolved from this method and prevent default (prevent the route from executing) */
+    var checkAuth = function(isRequired) {
+        return {
+            isAuthenticated: function ($q, userService, $route) {
+                var deferred = $q.defer();
+
+                //don't need to check if we've redirected to login and we've already checked auth
+                if (!$route.current.params.section && $route.current.params.check === false) {
+                    deferred.resolve(true);
+                    return deferred.promise;
+                }
+                
+                userService.isAuthenticated()
+                    .then(function () {
+                        if (isRequired) {
+                            //this will resolve successfully so the route will continue
+                            deferred.resolve(true);
+                        }
+                        else {
+                            deferred.reject({ path: "/" });
+                        }
+                    }, function () {
+                        if (isRequired) {                            
+                            //the check=false is checked above so that we don't have to make another http call to check
+                            //if they are logged in since we already know they are not.
+                            deferred.reject({ path: "/login", search: { check: false } });
+                        }
+                        else {
+                            //this will resolve successfully so the route will continue
+                            deferred.resolve(true);
+                        }
+                    });                
+                return deferred.promise;
+            }
+        };
+    };
+
     $routeProvider
+        .when('/login', {
+            templateUrl: 'views/common/login.html',
+            //ensure auth is *not* required so it will redirect to /content otherwise
+            resolve: checkAuth(false)
+        })
         .when('/:section', {
             templateUrl: function (rp) {
-                if (rp.section === "default" || rp.section === "")
+                if (rp.section.toLowerCase() === "default" || rp.section.toLowerCase() === "umbraco" || rp.section === "")
                 {
                     rp.section = "content";
                 }
 
                 rp.url = "dashboard.aspx?app=" + rp.section;
                 return 'views/common/dashboard.html';
-            }
+            },
+            resolve: checkAuth(true)
         })
         .when('/framed/:url', {
             //This occurs when we need to launch some content in an iframe
@@ -18,7 +65,8 @@ app.config(function ($routeProvider) {
                     throw "A framed resource must have a url route parameter";
 
                 return 'views/common/legacy.html';
-            }
+            },
+            resolve: checkAuth(true)
         })
         .when('/:section/:method', {
             templateUrl: function(rp) {
@@ -32,7 +80,8 @@ app.config(function ($routeProvider) {
                 // dashboards (as tabs if we wanted) and each tab could actually be a route link to one of these views?
 
                 return 'views/' + rp.section + '/' + rp.method + '.html';
-            }
+            },
+            resolve: checkAuth(true)
         })
         .when('/:section/:tree/:method/:id', {
             templateUrl: function (rp) {
@@ -43,9 +92,10 @@ app.config(function ($routeProvider) {
                 //we don't need to put views into section folders since theoretically trees
                 // could be moved among sections, we only need folders for specific trees.
                 return 'views/' + rp.tree + '/' + rp.method + '.html';
-            }
+            },
+            resolve: checkAuth(true)
         })        
-        .otherwise({ redirectTo: '/content' });
+        .otherwise({ redirectTo: '/login' });
     }).config(function ($locationProvider) {
 
         //$locationProvider.html5Mode(false).hashPrefix('!'); //turn html5 mode off
@@ -53,10 +103,28 @@ app.config(function ($routeProvider) {
 });
 
 
-app.run(['userService', '$log', '$rootScope', function (userService, $log, $rootScope) {
+app.run(['userService', '$log', '$rootScope', '$location', function (userService, $log, $rootScope, $location) {
 
-    // Get the current user when the application starts
-    // (in case they are still logged in from a previous session)
+    var firstRun = true;
 
-    userService.isAuthenticated({broadcastEvent: true});
+    /** when we have a successful first route that is not the login page - meaning the user is authenticated
+        we'll get the current user from the user service and ensure it broadcasts it's events. If the route
+        is successful from after a login then this will not actually do anything since the authenticated event would
+        have alraedy fired, but if the user is loading the angularjs app for the first time and they are already authenticated
+        then this is when the authenticated event will be fired.
+    */
+    $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
+        if (firstRun && !$location.url().toLowerCase().startsWith("/login")) {
+            firstRun = false;
+            userService.getCurrentUser({ broadcastEvent: true });
+        }
+    });
+
+    /** When the route change is rejected - based on checkAuth - we'll prevent the rejected route from executing including
+        wiring up it's controller, etc... and then redirect to the rejected URL.   */
+    $rootScope.$on('$routeChangeError', function (event, current, previous, rejection) {
+        event.preventDefault();
+        $location.path(rejection.path).search(rejection.search);
+    });
+
 }]);  

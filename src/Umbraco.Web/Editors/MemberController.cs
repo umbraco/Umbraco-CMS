@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -50,16 +52,16 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Gets the content json for the member
         /// </summary>
-        /// <param name="loginName"></param>
+        /// <param name="key"></param>
         /// <returns></returns>
-        public MemberDisplay GetByLogin(string loginName)
+        public MemberDisplay GetByKey(Guid key)
         {
             if (Member.InUmbracoMemberMode())
             {
-                var foundMember = Services.MemberService.GetByUsername(loginName);
+                var foundMember = Services.MemberService.GetByKey(key);
                 if (foundMember == null)
                 {
-                    HandleContentNotFound(loginName);
+                    HandleContentNotFound(key);
                 }
                 return Mapper.Map<IMember, MemberDisplay>(foundMember);
             }
@@ -88,6 +90,11 @@ namespace Umbraco.Web.Editors
             // * Permissions are valid
 
             UpdateName(contentItem);
+
+            //map the custom properties
+            contentItem.PersistedContent.Email = contentItem.Email;
+            //TODO: If we allow changing the alias then we'll need to change URLs, etc... in the editor, would prefer to use 
+            // a unique id but then need to figure out how to handle that with custom membership providers - waiting on feedback from morten.
 
             MapPropertyValues(contentItem);
 
@@ -129,6 +136,25 @@ namespace Umbraco.Web.Editors
             }
 
             return display;
+        }
+
+
+        /// <summary>
+        /// Permanently deletes a member
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>        
+        public HttpResponseMessage DeleteByKey(Guid key)
+        {
+            var foundMember = Services.MemberService.GetByKey(key);
+            if (foundMember == null)
+            {
+                return HandleContentNotFound(key, false);
+            }
+
+            Services.MemberService.Delete(foundMember);
+
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
     }
 }

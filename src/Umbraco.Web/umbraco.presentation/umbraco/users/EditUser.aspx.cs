@@ -69,8 +69,7 @@ namespace umbraco.cms.presentation.user
             {
                 throw new UserAuthorizationException("Access denied");
             }
-
-            int UID = int.Parse(Request.QueryString["id"]);
+           int UID = int.Parse(Request.QueryString["id"]);
             u = BusinessLogic.User.GetUser(UID);
 
             //the true admin can only edit the true admin

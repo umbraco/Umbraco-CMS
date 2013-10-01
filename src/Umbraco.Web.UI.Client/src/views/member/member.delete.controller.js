@@ -13,7 +13,7 @@ function MemberDeleteController($scope, memberResource, treeService, navigationS
         //mark it for deletion (used in the UI)
         $scope.currentNode.loading = true;
 
-        memberResource.deleteByLogin($scope.currentNode.id).then(function () {
+        memberResource.deleteByKey($scope.currentNode.id).then(function () {
             $scope.currentNode.loading = false;
 
             //TODO: Need to sync tree, etc...

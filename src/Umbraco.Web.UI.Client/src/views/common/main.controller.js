@@ -8,7 +8,7 @@
  * The main application controller
  * 
  */
-function MainController($scope, $routeParams, $rootScope, $timeout, $http, $log, notificationsService, userService, navigationService, legacyJsLoader) {
+function MainController($scope, $location, $routeParams, $rootScope, $timeout, $http, $log, notificationsService, userService, navigationService, legacyJsLoader) {
 
     var legacyTreeJsLoaded = false;
     
@@ -77,6 +77,12 @@ function MainController($scope, $routeParams, $rootScope, $timeout, $http, $log,
 
         $scope.authenticated = data.authenticated;
         $scope.user = data.user;
+
+        //if the user has changed we need to redirect to the root so they don't try to continue editing the
+        //last item in the URL
+        if (data.lastUserId && data.lastUserId !== data.user.id) {
+            $location.path("/").search("");
+        }
 
         //var url = "http://www.gravatar.com/avatar/" + $scope.user.emailHash + ".json?404=404";
         //$http.jsonp(url).then(function(response){

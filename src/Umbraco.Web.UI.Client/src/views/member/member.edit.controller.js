@@ -22,7 +22,7 @@ function MemberEditController($scope, $routeParams, $q, $timeout, $window, membe
     }
     else {
         //we are editing so get the content item from the server
-        memberResource.getByLogin($routeParams.id)
+        memberResource.getByKey($routeParams.id)
             .then(function(data) {
                 $scope.loaded = true;
                 $scope.content = data;

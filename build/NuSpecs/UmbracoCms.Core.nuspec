@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>UmbracoCms.Core</id>
@@ -20,12 +20,12 @@
             <dependency id="Microsoft.AspNet.Mvc.FixedDisplayModes" version="1.0.0" />
             <dependency id="MiniProfiler" version="[2.1.0, 3.0.0)" />
             <dependency id="HtmlAgilityPack" version="[1.4.6, 2.0.0)" />
-            <dependency id="Lucene.Net" version="[2.9.4.1]" />
+            <dependency id="Lucene.Net" version="[2.9.4.1, 3.0.0.0)" />
             <dependency id="SharpZipLib" version="[0.86.0, 1.0.0)" />
             <dependency id="MySql.Data" version="[6.6.5]" />
             <dependency id="xmlrpcnet" version="[2.5.0, 3.0.0)" />
-            <dependency id="ClientDependency" version="[1.7.0, 1.7.1)" />
-            <dependency id="ClientDependency-Mvc" version="[1.7.0, 1.7.1)" />
+            <dependency id="ClientDependency" version="[1.7.0, 2.0.0)" />
+            <dependency id="ClientDependency-Mvc" version="[1.7.0, 2.0.0)" />
             <dependency id="AutoMapper" version="[2.2.1, 3.0.0)" />
         </dependencies>
     </metadata>
@@ -68,4 +68,5 @@
         <file src="..\_BuildOutput\WebApp\bin\UmbracoExamine.dll" target="lib\UmbracoExamine.dll" />
         <file src="..\_BuildOutput\WebApp\bin\UrlRewritingNet.UrlRewriter.dll" target="lib\UrlRewritingNet.UrlRewriter.dll" />
     </files>
+</package>
 </package>
