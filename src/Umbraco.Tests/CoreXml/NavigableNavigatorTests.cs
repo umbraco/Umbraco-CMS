@@ -257,7 +257,7 @@ namespace Umbraco.Tests.CoreXml
   </type1>
 </root>";
 
-            Assert.AreEqual(xml, nav.OuterXml);
+            Assert.AreEqual(xml.Lf(), nav.OuterXml.Lf());
         }
 
         [Test]
@@ -280,7 +280,7 @@ namespace Umbraco.Tests.CoreXml
   </type1>
 </root>";
 
-            Assert.AreEqual(outerXml, nav.OuterXml);
+            Assert.AreEqual(outerXml.Lf(), nav.OuterXml.Lf());
         }
 
         [Test]
@@ -728,7 +728,7 @@ namespace Umbraco.Tests.CoreXml
 
             //Console.WriteLine("--------");
             //Console.WriteLine(writer.ToString());
-            Assert.AreEqual(expected, writer.ToString());
+            Assert.AreEqual(expected.Lf(), writer.ToString().Lf());
         }
 
         [Test]
@@ -778,7 +778,7 @@ namespace Umbraco.Tests.CoreXml
   </item>
   <item x="""" />
   <item x="" "" />
-</root>", docNav.OuterXml);
+</root>".Lf(), docNav.OuterXml.Lf());
 
             docNav.MoveToRoot();
             Assert.IsTrue(docNav.MoveToFirstChild());
@@ -817,7 +817,7 @@ namespace Umbraco.Tests.CoreXml
   <item id=""5"" attr=""  ooo  "">
     <prop>   ooo   </prop>
   </item>
-</root>", nav.OuterXml);
+</root>".Lf(), nav.OuterXml.Lf());
         }
     }
 
