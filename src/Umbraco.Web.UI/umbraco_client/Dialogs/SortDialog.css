@@ -2,7 +2,6 @@
 {
     height: 270px;
     overflow: auto;
-    border: 1px solid #ccc;
 }
 
 #sortableNodes

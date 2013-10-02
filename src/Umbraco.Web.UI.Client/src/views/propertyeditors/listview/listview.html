@@ -2,7 +2,8 @@
 <div class="umb-editor umb-listview" ng-controller="Umbraco.Editors.ListViewController">
 	<div class="row-fluid">
 		<div class="umb-sub-header">
-		    <div class="btn-group">
+
+		    <div class="btn-group" ng-show="listViewAllowedTypes">
 		        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
 		            Create
 		            <span class="caret"></span>
@@ -57,7 +58,7 @@
 				</tr>
 			</tbody>
 
-			<tfoot ng-show="pagination.length > 0">
+			<tfoot ng-show="pagination.length > 1">
 				<tr>
 					<th colspan="5">
 						<div class="pull-left">

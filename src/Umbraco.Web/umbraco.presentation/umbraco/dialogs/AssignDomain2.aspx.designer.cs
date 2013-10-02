@@ -58,12 +58,12 @@ namespace umbraco.dialogs {
         protected global::umbraco.uicontrols.Pane pane_domains;
         
         /// <summary>
-        /// phSave control.
+        /// p_buttons control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder phSave;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl p_buttons;
     }
 }

@@ -1,48 +1,49 @@
 ﻿angular.module("umbraco").controller("Umbraco.Dialogs.RteEmbedController", function ($scope, $http) {
-    $scope.url = "";
-    $scope.width = 500;
-    $scope.height = 300;
-    $scope.constrain = true;
-    $scope.preview = "";
-    $scope.success = false;
-    $scope.info = "";
-    $scope.supportsDimensions = false;
+    $scope.form = {};
+    $scope.form.url = "";
+    $scope.form.width = 360;
+    $scope.form.height = 240;
+    $scope.form.constrain = true;
+    $scope.form.preview = "";
+    $scope.form.success = false;
+    $scope.form.info = "";
+    $scope.form.supportsDimensions = false;
     
     var origWidth = 500;
     var origHeight = 300;
     
     $scope.showPreview = function(){
 
-        if ($scope.url != "") {
-            
-            $scope.preview = "<div class=\"umb-loader\" style=\"height: 10px; margin: 10px 0px;\"></div>";
-            $scope.info = "";
-            $scope.success = false;
+        if ($scope.form.url != "") {
+            $scope.form.show = true;
+            $scope.form.preview = "<div class=\"umb-loader\" style=\"height: 10px; margin: 10px 0px;\"></div>";
+            $scope.form.info = "";
+            $scope.form.success = false;
 
-            $http({ method: 'GET', url: '/umbraco/UmbracoApi/RteEmbed/GetEmbed', params: { url: $scope.url, width: $scope.width, height: $scope.height } })
+            $http({ method: 'GET', url: '/umbraco/UmbracoApi/RteEmbed/GetEmbed', params: { url: $scope.form.url, width: $scope.form.width, height: $scope.form.height } })
                 .success(function (data) {
                     
-                    $scope.preview = "";
+                    $scope.form.preview = "";
                     
                     switch (data.Status) {
                         case 0:
                             //not supported
-                            $scope.info = "Not Supported";
+                            $scope.form.info = "Not Supported";
                             break;
                         case 1:
                             //error
-                            $scope.info = "Computer says no";
+                            $scope.form.info = "Computer says no";
                             break;
                         case 2:
-                            $scope.preview = data.Markup;
-                            $scope.supportsDimensions = data.SupportsDimensions;
-                            $scope.success = true;
+                            $scope.form.preview = data.Markup;
+                            $scope.form.supportsDimensions = data.SupportsDimensions;
+                            $scope.form.success = true;
                             break;
                     }
                 })
                 .error(function() {
-                    $scope.preview = "";
-                    $scope.info = "Computer says no";
+                    $scope.form.preview = "";
+                    $scope.form.info = "Computer says no";
                 });
 
         }
@@ -52,24 +53,24 @@
     $scope.changeSize = function (type) {
         var width, height;
         
-        if ($scope.constrain) {
-            width = parseInt($scope.width, 10);
-            height = parseInt($scope.height, 10);
+        if ($scope.form.constrain) {
+            width = parseInt($scope.form.width, 10);
+            height = parseInt($scope.form.height, 10);
             if (type == 'width') {
                 origHeight = Math.round((width / origWidth) * height);
-                $scope.height = origHeight;
+                $scope.form.height = origHeight;
             } else {
                 origWidth = Math.round((height / origHeight) * width);
-                $scope.width = origWidth;
+                $scope.form.width = origWidth;
             }
         }
-        if ($scope.url != "") {
+        if ($scope.form.url != "") {
             $scope.showPreview();
         }
 
     };
     
     $scope.insert = function(){
-        $scope.submit($scope.preview);
+        $scope.submit($scope.form.preview);
     };
 });

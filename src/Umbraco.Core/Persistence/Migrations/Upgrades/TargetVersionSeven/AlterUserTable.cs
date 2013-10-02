@@ -3,7 +3,7 @@ using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 {
-    [Migration("7.0.0", 2, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.0.0", 3, GlobalSettings.UmbracoMigrationName)]
     public class AlterUserTable : MigrationBase
     {
         public override void Up()

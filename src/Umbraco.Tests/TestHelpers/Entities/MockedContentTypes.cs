@@ -279,5 +279,32 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
             return mediaType;
         }
+
+        public static MemberType CreateSimpleMemberType()
+        {
+            var contentType = new MemberType(-1)
+            {
+                Alias = "simple",
+                Name = "Simple Page",
+                Description = "ContentType used for simple text pages",
+                Icon = ".sprTreeDoc3",
+                Thumbnail = "doc.png",
+                SortOrder = 1,
+                CreatorId = 0,
+                Trashed = false
+            };
+
+            var contentCollection = new PropertyTypeCollection();
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext) { Alias = "title", Name = "Title", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext) { Alias = "bodyText", Name = "Body Text", Description = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -87 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext) { Alias = "author", Name = "Author", Description = "Name of the author", Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -88 });
+
+            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
+
+            return contentType;
+        }
     }
 }

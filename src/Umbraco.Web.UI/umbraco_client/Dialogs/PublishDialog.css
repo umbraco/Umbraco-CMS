@@ -5,13 +5,12 @@
 }
 
 #animDiv > div {
-    width: 230px;
     margin-left:auto;
     margin-right:auto;
 }
 
-#container a {
-    color: blue;
+#container label{
+    display: inline;
 }
 
 .disabled {

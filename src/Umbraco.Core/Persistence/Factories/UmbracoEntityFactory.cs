@@ -8,6 +8,45 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal class UmbracoEntityFactory : IEntityFactory<UmbracoEntity, EntityRepository.UmbracoEntityDto>
     {
+        internal UmbracoEntity BuildEntityFromDynamic(dynamic d)
+        {
+            var entity = new UmbracoEntity(d.trashed)
+            {
+                CreateDate = d.createDate,
+                CreatorId = d.nodeUser,
+                Id = d.id,
+                Key = d.uniqueID,
+                Level = d.level,
+                Name = d.text,
+                NodeObjectTypeId = d.nodeObjectType,
+                ParentId = d.parentID,
+                Path = d.path,
+                SortOrder = d.sortOrder,
+                HasChildren = d.children > 0,
+                ContentTypeAlias = d.alias ?? string.Empty,
+                ContentTypeIcon = d.icon ?? string.Empty,
+                ContentTypeThumbnail = d.thumbnail ?? string.Empty,
+                UmbracoProperties = new List<UmbracoEntity.UmbracoProperty>()
+            };
+
+            var asDictionary = (IDictionary<string, object>)d;
+
+            var publishedVersion = default(Guid);            
+            //some content items don't have a published version
+            if (asDictionary.ContainsKey("publishedVersion") && asDictionary["publishedVersion"] != null)
+            {
+                Guid.TryParse(d.publishedVersion.ToString(), out publishedVersion);    
+            }
+            var newestVersion = default(Guid);
+            Guid.TryParse(d.newestVersion.ToString(), out newestVersion);
+
+            entity.IsPublished = publishedVersion != default(Guid) || (newestVersion != default(Guid) && publishedVersion == newestVersion);
+            entity.IsDraft = newestVersion != default(Guid) && (publishedVersion == default(Guid) || publishedVersion != newestVersion);
+            entity.HasPendingChanges = (publishedVersion != default(Guid) && newestVersion != default(Guid)) && publishedVersion != newestVersion;
+
+            return entity;
+        }
+
         public UmbracoEntity BuildEntity(EntityRepository.UmbracoEntityDto dto)
         {
             var entity = new UmbracoEntity(dto.Trashed)

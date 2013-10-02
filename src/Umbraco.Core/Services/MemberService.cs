@@ -200,13 +200,13 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Creates a new Member
         /// </summary>
-        /// <param name="username"></param>
         /// <param name="email"></param>
+        /// <param name="username"></param>
         /// <param name="password"></param>
         /// <param name="memberTypeAlias"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public IMember CreateMember(string username, string email, string password, string memberTypeAlias, int userId = 0)
+        public IMember CreateMember(string email, string username, string password, string memberTypeAlias, int userId = 0)
         {
             var uow = _uowProvider.GetUnitOfWork();
             IMemberType memberType;
@@ -220,14 +220,10 @@ namespace Umbraco.Core.Services
             if (memberType == null)
                 throw new Exception(string.Format("No MemberType matching the passed in Alias: '{0}' was found", memberTypeAlias));
 
-            var member = new Member(email, -1, memberType, new PropertyCollection());
+            var member = new Member(email, email, username, password, -1, memberType);
 
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                member.Username = username;
-                member.Email = email;
-                member.Password = password;
-
                 repository.AddOrUpdate(member);
                 uow.Commit();
             }

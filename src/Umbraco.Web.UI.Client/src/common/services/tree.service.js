@@ -8,8 +8,10 @@
  * The tree service factory, used internally by the umbTree and umbTreeItem directives
  */
 function treeService($q, treeResource, iconHelper, notificationsService, $rootScope) {
-    //implement this in local storage
+
+    //TODO: implement this in local storage
     var treeArray = [];
+    
     var standardCssClass = 'icon umb-tree-icon sprTree';
 
     return {  
@@ -29,8 +31,6 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     if (treeNodes[i].metaData && treeNodes[i].metaData["treeAlias"]) {
                         //this is a root node
                         treeNodes[i].routePath = section;
-                        //we're going to remove any js callbacks from legacy tree nodes here!
-                        treeNodes[i].metaData["jsClickCallback"] = null;
                     }
                     else {
                         var treeAlias = this.getTreeAlias(treeNodes[i]);
@@ -56,6 +56,11 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     treeNodes[i].cssClass = standardCssClass + " legacy-custom-file";
                 }
             }
+        },
+
+        /** clears the tree cache */
+        clearCache: function() {
+            treeArray = [];
         },
 
         /**
@@ -198,7 +203,6 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             }
 
             var self = this;
-
             return treeResource.loadApplication(args)
                 .then(function(data) {
                     //this will be called once the tree app data has loaded
@@ -259,6 +263,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     return data;
                 });
         }
+        
     };
 }
 

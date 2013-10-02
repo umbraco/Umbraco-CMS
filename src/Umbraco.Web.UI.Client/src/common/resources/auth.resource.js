@@ -34,16 +34,28 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                         "PostLogout")));
         },
         
-        /** Sends a request to the server to check if the current cookie value is valid for the user */
-        isAuthenticated: function () {
+        /** Sends a request to the server to get the current user details, will return a 401 if the user is not logged in  */
+        getCurrentUser: function () {
             
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "authenticationApiBaseUrl",
                         "GetCurrentUser")),
-                'Server call failed for checking authorization'); 
-        }
+                'Server call failed for getting current user'); 
+        },
+        
+        /** Checks if the user is logged in or not - does not return 401 or 403 */
+        isAuthenticated: function () {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "authenticationApiBaseUrl",
+                        "IsAuthenticated")),
+                'Server call failed for checking authentication');
+        },
+
     };
 }
 

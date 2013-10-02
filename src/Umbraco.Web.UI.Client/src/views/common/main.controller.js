@@ -8,8 +8,9 @@
  * The main application controller
  * 
  */
-function MainController($scope, $routeParams, $rootScope, $timeout, $http, $log, notificationsService, userService, navigationService, legacyJsLoader) {
+function MainController($scope, $location, $routeParams, $rootScope, $timeout, $http, $log, notificationsService, userService, navigationService, legacyJsLoader) {
 
+    var legacyTreeJsLoaded = false;
     
     //detect if the current device is touch-enabled
     $scope.touchDevice = ("ontouchstart" in window || window.touch || window.navigator.msMaxTouchPoints===5 || window.DocumentTouch && document instanceof DocumentTouch);
@@ -53,53 +54,54 @@ function MainController($scope, $routeParams, $rootScope, $timeout, $http, $log,
         $rootScope.$emit("closeDialogs", event);
     };
 
-    //fetch the authorized status         
-    userService.isAuthenticated()
-        .then(function (data) {
-            
-            //We need to load in the legacy tree js.
+    //when a user logs out or timesout
+    $scope.$on("notAuthenticated", function() {
+
+        $scope.authenticated = null;
+        $scope.user = null;
+
+    });
+    
+    //when a user is authorized setup the data
+    $scope.$on("authenticated", function (evt, data) {
+
+        //We need to load in the legacy tree js but only once no matter what user has logged in 
+        if (!legacyTreeJsLoaded) {
             legacyJsLoader.loadLegacyTreeJs($scope).then(
                 function (result) {
+                    legacyTreeJsLoaded = true;
+
                     //TODO: We could wait for this to load before running the UI ?
                 });
-            
-            $scope.authenticated = data.authenticated;
-            $scope.user = data.user;
+        }
 
+        $scope.authenticated = data.authenticated;
+        $scope.user = data.user;
 
-/*
-            var url = "http://www.gravatar.com/avatar/" + $scope.user.emailHash + ".json?404=404";
-            $http.jsonp(url).then(function(response){
-                $log.log("found: " + response);
-            }, function(data){
-                $log.log(data);
-            });
-*/
+        //if the user has changed we need to redirect to the root so they don't try to continue editing the
+        //last item in the URL
+        if (data.lastUserId && data.lastUserId !== data.user.id) {
+            $location.path("/").search("");
+        }
 
-            /*    
-            if($scope.user.avatar){
-                $http.get($scope.user.avatar).then(function(){
-                    //alert($scope.user.avatar);
-                    $scope.avatar = $scope.user.avatar;
-                });
-            }*/
+        //var url = "http://www.gravatar.com/avatar/" + $scope.user.emailHash + ".json?404=404";
+        //$http.jsonp(url).then(function(response){
+        //    $log.log("found: " + response);
+        //}, function(data){
+        //    $log.log(data);
+        //});
 
-            
-        }, function (reason) {
-            notificationsService.error("An error occurred checking authentication.");
-            $scope.authenticated = false;
-            $scope.user = null;
-        });
+        //if($scope.user.avatar){
+        //    $http.get($scope.user.avatar).then(function(){
+        //        //alert($scope.user.avatar);
+        //        $scope.avatar = $scope.user.avatar;
+        //    });
+        //}
+
+    });
+
 }
 
 
 //register it
 angular.module('umbraco').controller("Umbraco.MainController", MainController);
-
-/*
-angular.module("umbraco").run(function(eventsService){
-    eventsService.subscribe("Umbraco.Dialogs.ContentPickerController.Select", function(a, b){
-        a.node.name = "wat";
-    });
-});
-*/

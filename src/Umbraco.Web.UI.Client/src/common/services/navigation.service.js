@@ -32,6 +32,7 @@ angular.module('umbraco.services')
                 ui.showContextMenuDialog = false;
                 ui.stickyNavigation = false;
 
+                service.hideUserDialog();
                 //$("#search-form input").focus();    
                 break;
             case 'menu':
@@ -67,6 +68,7 @@ angular.module('umbraco.services')
         active: false,
         mode: "default",
         touchDevice: false,
+        userDialog: undefined,
         ui: ui,
 
         /**
@@ -197,10 +199,12 @@ angular.module('umbraco.services')
                     //check for a default
                     //NOTE: event will be undefined when a call to hideDialog is made so it won't re-load the default again.
                     // but perhaps there's a better way to deal with with an additional parameter in the args ? it works though.
-                    if (event && data.defaultAlias) {
+                    if (data.defaultAlias && !args.skipDefault) {
+
                         var found = _.find(data.menuItems, function(item) {
                             return item.alias = data.defaultAlias;
                         });
+
                         if (found) {
                             
                             self.ui.currentNode = args.node;
@@ -264,13 +268,33 @@ angular.module('umbraco.services')
          * template is located in views/common/dialogs/user.html
          */
         showUserDialog: function () {
-            return dialogService.open(
+            service.userDialog = dialogService.open(
                 {
                     template: "views/common/dialogs/user.html",
                     modalClass: "umb-modal-left",
                     show: true
                 });
+
+            return service.userDialog;
         },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.navigationService#hideUserDialog
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * Hides the user dialog, next to the sections navigation
+         * template is located in views/common/dialogs/user.html
+         */
+        hideUserDialog: function () {
+            if(service.userDialog){
+                service.userDialog.close();
+                service.userDialog = undefined;
+            } 
+        },
+
+
         /**
          * @ngdoc method
          * @name umbraco.services.navigationService#showDialog
@@ -350,15 +374,17 @@ angular.module('umbraco.services')
                 {
                     container: $("#dialog div.umb-modalcolumn-body"),
                     scope: scope,
+                    currentNode: args.node,
+                    currentAction: args.action,
                     inline: true,
                     show: true,
                     iframe: iframe,
+                    modalClass: "umb-dialog",
                     template: templateUrl
                 });
 
             //save the currently assigned dialog so it can be removed before a new one is created
             this.ui.currentDialog = dialog;
-
             return dialog;
         },
 
@@ -371,7 +397,7 @@ angular.module('umbraco.services')
 	     * hides the currently open dialog
 	     */
         hideDialog: function () {
-            this.showMenu(undefined, { node: this.ui.currentNode });
+            this.showMenu(undefined, {skipDefault: true, node: this.ui.currentNode });
         },
         /**
           * @ngdoc method

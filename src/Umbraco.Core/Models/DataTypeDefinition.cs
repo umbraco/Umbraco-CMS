@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
@@ -33,12 +34,14 @@ namespace Umbraco.Core.Models
         {
             _parentId = parentId;
             _propertyEditorAlias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(controlId, true);
+            AdditionalData = new Dictionary<string, object>();
         }
 
         public DataTypeDefinition(int parentId, string propertyEditorAlias)
         {
             _parentId = parentId;
             _propertyEditorAlias = propertyEditorAlias;
+            AdditionalData = new Dictionary<string, object>();
         }
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<DataTypeDefinition, string>(x => x.Name);
@@ -184,6 +187,8 @@ namespace Umbraco.Core.Models
                     _propertyEditorAlias = value;
                     return _propertyEditorAlias;
                 }, _propertyEditorAlias, PropertyEditorAliasSelector);
+                //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
+                AdditionalData["DatabaseType"] = value;
             }
         }
 
@@ -203,6 +208,8 @@ namespace Umbraco.Core.Models
             {
                 var alias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(value, true);
                 PropertyEditorAlias = alias;
+                //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
+                AdditionalData["DatabaseType"] = value;
             }
         }
 
@@ -220,8 +227,16 @@ namespace Umbraco.Core.Models
                     _databaseType = value;
                     return _databaseType;
                 }, _databaseType, DatabaseTypeSelector);
+
+                //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
+                AdditionalData["DatabaseType"] = value;
             }
         }
+
+        /// <summary>
+        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
+        /// </summary>
+        public IDictionary<string, object> AdditionalData { get; private set; }
 
         internal override void AddingEntity()
         {

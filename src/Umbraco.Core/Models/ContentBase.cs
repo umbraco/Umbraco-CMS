@@ -50,6 +50,7 @@ namespace Umbraco.Core.Models
             _contentTypeId = int.Parse(contentType.Id.ToString(CultureInfo.InvariantCulture));
             _properties = properties;
             _properties.EnsurePropertyTypes(PropertyTypes);
+            AdditionalData = new Dictionary<string, object>();
         }
 
         /// <summary>
@@ -73,6 +74,7 @@ namespace Umbraco.Core.Models
 			_contentTypeId = int.Parse(contentType.Id.ToString(CultureInfo.InvariantCulture));
 			_properties = properties;
 			_properties.EnsurePropertyTypes(PropertyTypes);
+            AdditionalData = new Dictionary<string, object>();
 		}
 
 	    private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Name);
@@ -252,6 +254,11 @@ namespace Umbraco.Core.Models
                 _properties.CollectionChanged += PropertiesChanged;
             }
         }
+
+        /// <summary>
+        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
+        /// </summary>
+        public IDictionary<string, object> AdditionalData { get; private set; }
 
         /// <summary>
         /// List of PropertyGroups available on this Content object

@@ -12,12 +12,11 @@ angular.module('umbraco').controller("Umbraco.Editors.UrlListController",
 
 	    formatDisplayValue();
 	    
-	    //we need to put a watch on the real model because when it changes we have to update our renderModel
-	    $scope.$watch("model.value", function (newVal, oldVal) {
-	        if (newVal !== null && newVal !== undefined && newVal !== oldVal) {
-	            //update the display val again
-	            formatDisplayValue();
-	        }
-	    });
+	    //here we declare a special method which will be called whenever the value has changed from the server
+	    //this is instead of doing a watch on the model.value = faster
+	    $scope.model.onValueChanged = function(newVal, oldVal) {
+	        //update the display val again
+	        formatDisplayValue();
+	    };
 
 	});

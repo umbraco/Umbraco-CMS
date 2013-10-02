@@ -64,6 +64,11 @@ namespace umbraco.cms.presentation.user
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            //if the current user is not an admin they cannot edit a user at all
+            if (CurrentUser.IsAdmin() == false)
+            {
+                throw new UserAuthorizationException("Access denied");
+            }
            int UID = int.Parse(Request.QueryString["id"]);
             u = BusinessLogic.User.GetUser(UID);
 

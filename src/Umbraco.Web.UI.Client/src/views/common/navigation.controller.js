@@ -15,9 +15,12 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
     // IMPORTANT: all properties assigned to this scope are generally available on the scope object on dialogs since
     //   when we create a dialog we pass in this scope to be used for the dialog's scope instead of creating a new one.
     $scope.nav = navigationService;
-    $scope.routeParams = $routeParams;
-    $scope.$watch("routeParams.section", function (newVal, oldVal) {
-            $scope.currentSection = newVal;
+
+    $scope.$watch(function () {
+        //watch the route parameters section
+        return $routeParams.section;
+    }, function(newVal, oldVal) {
+        $scope.currentSection = newVal;
     });
 
     //trigger search with a hotkey:
@@ -31,10 +34,16 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
     $scope.selectedId = navigationService.currentId;
     $scope.sections = navigationService.sections;
     
-    sectionResource.getSections()
-        .then(function(result) {
-            $scope.sections = result;
-        });
+    //When the user logs in
+    $scope.$on("authenticated", function (evt, data) {
+        //populate their sections if the user has changed
+        if (data.lastUserId !== data.user.id) {
+            sectionResource.getSections()
+                .then(function (result) {
+                    $scope.sections = result;
+                });
+        }        
+    });
 
     //This reacts to clicks passed to the body element which emits a global call to close all dialogs
     $rootScope.$on("closeDialogs", function (event) {
@@ -52,8 +61,25 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
         $scope.currentNode = args.node;
         args.scope = $scope;
 
+        if(args.event && args.event.altKey){
+            args.skipDefault = true;
+        }
+
         navigationService.showMenu(ev, args);
     });
+
+    //this reacts to the options item in the tree
+    $scope.searchShowMenu = function (ev, args) {
+        
+        $scope.currentNode = args.node;
+        args.scope = $scope;
+
+        if(args.event && args.event.altKey){
+            args.skipDefault = true;
+        }
+
+        navigationService.showMenu(ev, args);
+    };
 
     //this reacts to tree items themselves being clicked
     //the tree directive should not contain any handling, simply just bubble events
@@ -85,7 +111,7 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
                 $log.error("Error evaluating js callback from legacy tree node: " + ex);
             }
         }
-        else {
+        else if(n.routePath){
             //add action to the history service
             historyService.add({ name: n.name, link: n.routePath, icon: n.icon });
             //not legacy, lets just set the route value and clear the query string if there is one.

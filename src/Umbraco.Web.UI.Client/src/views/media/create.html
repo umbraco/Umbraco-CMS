@@ -1,20 +1,22 @@
-<div class="umb-dialog umb-pane" ng-controller="Umbraco.Editors.Media.CreateController">
-	<div class="umb-dialog-body" auto-scale="90">
-	<p class="umb-abstract">Create a page under {{currentNode.name}}</p>
+<div class="umb-dialog-body with-footer" ng-controller="Umbraco.Editors.Media.CreateController">
+	<div class="umb-pane">
 
+	<h5>Create a page under {{currentNode.name}}</h5>
 		<ul class="umb-actions">
 			<li class="action">
 				<ul class="umb-actions-child">
 
 					<li ng-repeat="docType in allowedTypes">
 					    <a href="#media/media/edit/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
-					        <i class="icon-large {{docType.cssClass}}" style="{{docType.style}}"></i>
+
+					        <i class="large {{docType.icon}}"></i>
+					        
 					        <span class="menu-label">
-					            {{docType.name}}
-					            <small>
-					                {{docType.description}}
-					            </small>
-					        </span>
+	        		        	{{docType.name}}
+	        		            <small>
+	        		                {{docType.description}}
+	        		            </small>
+	        		        </span>
 					    </a>
 					</li>
 <!--
@@ -33,8 +35,9 @@
 			</li>
 		</ul>
 	</div>
+</div>
+
 	
-	<div class="btn-toolbar umb-btn-toolbar">
+<div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
 		<button class="btn" ng-click="nav.hideDialog()">Do something else</button>
-	</div>
 </div>

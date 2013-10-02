@@ -341,6 +341,7 @@
     <Compile Include="Models\IMacro.cs" />
     <Compile Include="Models\IMacroProperty.cs" />
     <Compile Include="Models\IMacroPropertyType.cs" />
+    <Compile Include="Models\ITag.cs" />
     <Compile Include="Models\Macro.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentExtended.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelAttribute.cs" />
@@ -395,6 +396,7 @@
     <Compile Include="Models\Script.cs" />
     <Compile Include="Models\Stylesheet.cs" />
     <Compile Include="Models\StylesheetProperty.cs" />
+    <Compile Include="Models\Tag.cs" />
     <Compile Include="Models\Task.cs" />
     <Compile Include="Models\TaskType.cs" />
     <Compile Include="Models\Template.cs" />
@@ -418,6 +420,7 @@
     <Compile Include="Persistence\Factories\MemberTypeFactory.cs" />
     <Compile Include="Persistence\Factories\MemberTypeReadOnlyFactory.cs" />
     <Compile Include="Persistence\Factories\ServerRegistrationFactory.cs" />
+    <Compile Include="Persistence\Factories\TagFactory.cs" />
     <Compile Include="Persistence\Factories\UmbracoEntityFactory.cs" />
     <Compile Include="Persistence\Factories\UserSectionFactory.cs" />
     <Compile Include="Persistence\FaultHandling\ITransientErrorDetectionStrategy.cs" />
@@ -436,13 +439,16 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AlterCmsMacroPropertyTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AddIndexToCmsMacroPropertyTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AddIndexToCmsMacroTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AlterTagRelationsTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AlterTagsTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\DropControlIdColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\RemoveCmsMacroPropertyTypeTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AlterUserTable.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\UpdateCmsMacroPropertyEditorAliasFromCmsMacroPropertyType.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\UpdateControlIdToPropertyEditorAlias.cs" />
     <Compile Include="Persistence\Relators\MacroPropertyRelator.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IMacroRepository.cs" />
     <Compile Include="Persistence\Repositories\MacroRepository.cs" />
+    <Compile Include="Persistence\Repositories\TagsRepository.cs" />
     <Compile Include="PropertyEditors\BackwardsCompatibleData.cs" />
     <Compile Include="PropertyEditors\BackwardsCompatibleDataType.cs" />
     <Compile Include="PropertyEditors\LegacyParameterEditorAliasConverter.cs" />
@@ -634,7 +640,7 @@
     <Compile Include="Persistence\Migrations\Syntax\Update\UpdateBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Update\UpdateDataBuilder.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourNineZero\RemoveUmbracoAppConstraints.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\ChangeControlIdColumn.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AddPropertyEditorAliasColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixOneZero\CreateServerRegistryTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\AddChangeDocumentTypePermission.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixZeroOne\UpdatePropertyTypesAndGroups.cs" />

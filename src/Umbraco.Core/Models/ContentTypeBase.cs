@@ -42,6 +42,7 @@ namespace Umbraco.Core.Models
             _allowedContentTypes = new List<ContentTypeSort>();
             _propertyGroups = new PropertyGroupCollection();
             _propertyTypes = new PropertyTypeCollection();
+            AdditionalData = new Dictionary<string, object>();
         }
 
 		protected ContentTypeBase(IContentTypeBase parent)
@@ -52,6 +53,7 @@ namespace Umbraco.Core.Models
 			_allowedContentTypes = new List<ContentTypeSort>();
 			_propertyGroups = new PropertyGroupCollection();
             _propertyTypes = new PropertyTypeCollection();
+            AdditionalData = new Dictionary<string, object>();
 		}
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Name);
@@ -313,6 +315,11 @@ namespace Umbraco.Core.Models
                 }, _trashed, TrashedSelector);
             }
         }
+
+        /// <summary>
+        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
+        /// </summary>
+        public IDictionary<string, object> AdditionalData { get; private set; }
 
         /// <summary>
         /// Gets or sets a list of integer Ids for allowed ContentTypes

@@ -32,15 +32,13 @@ namespace umbraco.dialogs
 			//set labels on properties...
 			pp_insertAltField.Text = ui.Text("templateEditor", "alternativeField");
 			pp_insertAltText.Text = ui.Text("templateEditor", "alternativeText");
-			pp_recursive.Text = ui.Text("templateEditor", "recursive");
 			pp_insertBefore.Text = ui.Text("templateEditor", "preContent");
 			pp_insertAfter.Text = ui.Text("templateEditor", "postContent");
 
 			pp_FormatAsDate.Text = ui.Text("templateEditor", "formatAsDate");
 			pp_casing.Text = ui.Text("templateEditor", "casing");
 			pp_encode.Text = ui.Text("templateEditor", "encoding");
-			pp_convertLineBreaks.Text = ui.Text("templateEditor", "convertLineBreaks");
-			pp_removePTags.Text = ui.Text("templateEditor", "removeParagraph");
+			
 
 
 			if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)

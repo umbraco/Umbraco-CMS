@@ -29,7 +29,7 @@ angular.module("umbraco.directives")
 
          if(!hideheader){ 
            template +='<div>' + 
-           '<h5><a href="#{{section}}" class="root-link">{{tree.name}}</a></h5>' +
+           '<h5><a href="#{{section}}" ng-click="select(this, tree.root, $event)"  class="root-link">{{tree.name}}</a></h5>' +
                '<a href class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(this, tree.root, $event)" ng-swipe-right="options(this, tree.root, $event)"><i></i><i></i><i></i></a>' +
            '</div>';
          }
@@ -56,11 +56,9 @@ angular.module("umbraco.directives")
 
             /** Helper function to emit tree events */
             function emitEvent(eventName, args) {
-
               if (scope.eventhandler) {
                 $(scope.eventhandler).trigger(eventName, args);
               }
-             //   $rootScope.$broadcast(eventName, args);
             }
 
             /** Method to load in the tree data */
@@ -93,7 +91,7 @@ angular.module("umbraco.directives")
              *  When changing sections we don't want all of the tree-ndoes to do their 'leave' animations.
              */
             scope.animation = function () {
-                if (enableDeleteAnimations && scope.tree.root.expanded) {
+                if (enableDeleteAnimations && scope.tree && scope.tree.root && scope.tree.root.expanded) {
                     return { leave: 'tree-node-delete-leave' };
                 }
                 else {
@@ -110,13 +108,28 @@ angular.module("umbraco.directives")
                 emitEvent("treeOptionsClick", { element: e, node: n, event: ev });
             };
             
+            /**
+              Method called when an item is clicked in the tree, this passes the 
+              DOM element, the tree node object and the original click
+              and emits it as a treeNodeSelect element if there is a callback object
+              defined on the tree
+            */
+            scope.select = function(e,n,ev){
+                emitEvent("treeNodeSelect", { element: e, node: n, event: ev });
+            };
+            
+
             //watch for section changes
             scope.$watch("section", function (newVal, oldVal) {
+
+              if(!scope.tree){
+                  loadTree();  
+                }
+
                 if (!newVal) {
                     //store the last section loaded
                     lastSection = oldVal;
-                }                
-                else if (newVal !== oldVal && newVal !== lastSection) {
+                }else if (newVal !== oldVal && newVal !== lastSection) {
                     //only reload the tree data and Dom if the newval is different from the old one
                     // and if the last section loaded is different from the requested one.
                     loadTree();
@@ -126,8 +139,17 @@ angular.module("umbraco.directives")
                 }
             });
 
-            //initial change
-            loadTree();
+            //When the user logs in
+            scope.$on("authenticated", function (evt, data) {
+                //populate the tree if the user has changed
+                if (data.lastUserId !== data.user.id) {
+                    treeService.clearCache();
+                    scope.tree = null;
+                    loadTree();
+                }
+            });
+            
+            
          };
        }
       };

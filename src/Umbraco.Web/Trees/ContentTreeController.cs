@@ -26,36 +26,13 @@ namespace Umbraco.Web.Trees
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
-            TreeNode node;
-
-            //if the user's start node is not default, then return their start node as the root node.
+            var node = base.CreateRootNode(queryStrings); 
+            //if the user's start node is not default, then ensure the root doesn't have a menu
             if (Security.CurrentUser.StartContentId != Constants.System.Root)
             {
-                var currApp = queryStrings.GetValue<string>(TreeQueryStringParameters.Application);
-                var userRoot = Services.EntityService.Get(Security.CurrentUser.StartContentId, UmbracoObjectTypes.Document);
-                if (userRoot == null)
-                {
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
-                }
-
-                node = new TreeNode(
-                    userRoot.Id.ToInvariantString(),
-                    "", //root nodes aren't expandable, no need to lookup the child nodes url
-                    Url.GetMenuUrl(GetType(), userRoot.Id.ToInvariantString(), queryStrings))
-                    {
-                        HasChildren = true,
-                        RoutePath = currApp,
-                        Title = userRoot.Name
-                    };
-
-
-            }
-            else
-            {
-                node = base.CreateRootNode(queryStrings);    
+                node.MenuUrl = "";
             }
             return node;
-            
         }
 
         protected override int RecycleBinId
@@ -66,6 +43,11 @@ namespace Umbraco.Web.Trees
         protected override bool RecycleBinSmells
         {
             get { return Services.ContentService.RecycleBinSmells(); }
+        }
+
+        protected override int UserStartNode
+        {
+            get { return Security.CurrentUser.StartContentId; }
         }
 
         protected override TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings)
@@ -80,14 +62,14 @@ namespace Umbraco.Web.Trees
                
                 var allowedUserOptions = GetAllowedUserMenuItemsForNode(e);
                 if (CanUserAccessNode(e, allowedUserOptions))
-                {
-                    //TODO: if the node is of a specific type, don't list its children
-                    //this is to enable the list view on the editor
-
-                    //for WIP I'm just checking against a hardcoded value
+                {                    
                     var hasChildren = e.HasChildren;
-                    if (e.ContentTypeAlias == "umbNewsArea")
+
+                    //Special check to see if it ia a container, if so then we'll hide children.
+                    if (entity.AdditionalData["IsContainer"] is bool && (bool) entity.AdditionalData["IsContainer"])
+                    {
                         hasChildren = false;
+                    }
 
                     var node = CreateTreeNode(
                         e.Id.ToInvariantString(),
@@ -108,17 +90,24 @@ namespace Umbraco.Web.Trees
             {
                 var menu = new MenuItemCollection();
 
+                //if the user's start node is not the root then ensure the root menu is empty/doesn't exist
+                if (Security.CurrentUser.StartContentId != Constants.System.Root)
+                {
+                    return menu;
+                }
+
                 //set the default to create
                 menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
                 // we need to get the default permissions as you can't set permissions on the very root node
+                //TODO: Use the new services to get permissions
                 var nodeActions = global::umbraco.BusinessLogic.Actions.Action.FromString(
                     UmbracoUser.GetPermissions(Constants.System.Root.ToInvariantString()))
                                         .Select(x => new MenuItem(x));
 
                 //these two are the standard items
                 menu.AddMenuItem<ActionNew>();
-                menu.AddMenuItem<ActionSort>();
+                menu.AddMenuItem<ActionSort>(true).ConvertLegacyMenuItem(null, "content", "content");
 
                 //filter the standard items
                 FilterUserAllowedMenuItems(menu, nodeActions);
@@ -131,6 +120,12 @@ namespace Umbraco.Web.Trees
                 // add default actions for *all* users
                 menu.AddMenuItem<ActionRePublish>().ConvertLegacyMenuItem(null, "content", "content");
                 menu.AddMenuItem<RefreshNode, ActionRefresh>(true);
+
+                foreach (var menuItem in menu.MenuItems)
+                {
+                    menuItem.Name = ui.Text("actions", menuItem.Alias);
+                }
+
                 return menu;
             }
 
@@ -155,6 +150,10 @@ namespace Umbraco.Web.Trees
             //set the default to create
             nodeMenu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
+            foreach (var menuItem in nodeMenu.MenuItems)
+            {
+                menuItem.Name = ui.Text("actions", menuItem.Alias);
+            }
             return nodeMenu;
         }
 
@@ -175,10 +174,10 @@ namespace Umbraco.Web.Trees
             menu.AddMenuItem<ActionDelete>(true);
             
             //need to ensure some of these are converted to the legacy system - until we upgrade them all to be angularized.
-            menu.AddMenuItem<ActionMove>(true).ConvertLegacyMenuItem(item, "content", "content");
-            menu.AddMenuItem<ActionCopy>().ConvertLegacyMenuItem(item, "content", "content");
+            menu.AddMenuItem<ActionMove>(true);
+            menu.AddMenuItem<ActionCopy>();
             
-            menu.AddMenuItem<ActionSort>(true);
+            menu.AddMenuItem<ActionSort>(true).ConvertLegacyMenuItem(item, "content", "content");
 
             menu.AddMenuItem<ActionRollback>().ConvertLegacyMenuItem(item, "content", "content");
             menu.AddMenuItem<ActionPublish>(true).ConvertLegacyMenuItem(item, "content", "content");

@@ -6,7 +6,9 @@ angular.module('umbraco.security.interceptor', ['umbraco.security.retryQueue'])
         // Intercept failed requests
         return promise.then(null, function (originalResponse) {
             
+            //A 401 means that the user is not logged in
             if (originalResponse.status === 401) {
+
                 // The request bounced because it was not authorized - add a new request to the retry queue
                 promise = queue.pushRetryFn('unauthorized-server', function retryRequest() {
                     // We must use $injector to get the $http service to prevent circular dependency

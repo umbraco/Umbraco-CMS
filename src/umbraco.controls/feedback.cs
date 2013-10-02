@@ -46,7 +46,7 @@ namespace umbraco.uicontrols {
                     styleString += key + ":" + this.Style[key] + ";";
                 }
 
-                writer.WriteLine("<div id=\"" + this.ClientID + "\" style=\"" + styleString + "\" class=\"" + type.ToString() + "\"><p>");
+                writer.WriteLine("<div id=\"" + this.ClientID + "\" style=\"" + styleString + "\" class=\"alert alert-" + type.ToString() + "\"><p>");
                 writer.WriteLine(_text);
                 writer.WriteLine("</p></div>");
             }  

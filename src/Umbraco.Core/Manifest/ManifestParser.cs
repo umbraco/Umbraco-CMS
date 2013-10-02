@@ -128,7 +128,14 @@ namespace Umbraco.Core.Manifest
                 {
                     throw new FormatException("The manifest is not formatted correctly contains more than one 'javascript' element");
                 }
-                
+
+                //validate the css
+                var cssinit = deserialized.Properties().Where(x => x.Name == "stylesheet").ToArray();
+                if (cssinit.Length > 1)
+                {
+                    throw new FormatException("The manifest is not formatted correctly contains more than one 'stylesheet' element");
+                }
+
                 //validate the property editors section
                 var propEditors = deserialized.Properties().Where(x => x.Name == "propertyEditors").ToArray();
                 if (propEditors.Length > 1)
@@ -138,6 +145,9 @@ namespace Umbraco.Core.Manifest
 
                 var jConfig = init.Any() ? (JArray)deserialized["javascript"] : new JArray();
                 ReplaceVirtualPaths(jConfig);
+
+                var cssConfig = cssinit.Any() ? (JArray)deserialized["stylesheet"] : new JArray();
+                ReplaceVirtualPaths(cssConfig);
 
                 //replace virtual paths for each property editor
                 if (deserialized["propertyEditors"] != null)
@@ -158,6 +168,7 @@ namespace Umbraco.Core.Manifest
                 var manifest = new PackageManifest()
                     {
                         JavaScriptInitialize = jConfig,
+                        StyleSheetInitialize = cssConfig,
                         PropertyEditors = propEditors.Any() ? (JArray)deserialized["propertyEditors"] : new JArray(),
                         ParameterEditors = propEditors.Any() ? (JArray)deserialized["parameterEditors"] : new JArray()
                     };

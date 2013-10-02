@@ -2,6 +2,7 @@ angular.module('umbraco.services')
 .factory('userService', function ($rootScope, $q, $location, $log, securityRetryQueue, authResource, dialogService) {
 
     var currentUser = null;
+    var lastUserId = null;
     var loginDialog = null;
 
     // Redirect to the given url (defaults to '/')
@@ -36,28 +37,36 @@ angular.module('umbraco.services')
     // Register a handler for when an item is added to the retry queue
     securityRetryQueue.onItemAddedCallbacks.push(function (retryItem) {
         if (securityRetryQueue.hasMore()) {
+            
+            //store the last user id and clear the user
+            if (currentUser && currentUser.id !== undefined) {
+                lastUserId = currentUser.id;
+            }
+            currentUser = null;
+
+            //broadcast a global event that the user is no longer logged in
+            $rootScope.$broadcast("notAuthenticated");
+
             openLoginDialog();
         }
     });
 
     return {
 
+        /** Internal method to display the login dialog */
+        _showLoginDialog: function () {
+            openLoginDialog();
+        },
+
         /** Returns a promise, sends a request to the server to check if the current cookie is authorized  */
         isAuthenticated: function () {
-            
-            return authResource.isAuthenticated()
-                .then(function(data) {
-
-                    //note, this can return null if they are not authenticated
-                    if (!data) {
-                        throw "Not authenticated";
-                    }
-                    else {
-                        currentUser = data;
-                        currentUser.avatar = 'http://www.gravatar.com/avatar/' + data.emailHash + '?s=40&d=404';
-                        return { user: data, authenticated: true };
-                    }
-                });
+            //if we've got a current user then just return true
+            if (currentUser) {
+                var deferred = $q.defer();
+                deferred.resolve(true);
+                return deferred.promise;
+            }
+            return authResource.isAuthenticated();
         },
 
         /** Returns a promise, sends a request to the server to validate the credentials  */
@@ -65,24 +74,62 @@ angular.module('umbraco.services')
 
             return authResource.performLogin(login, password)
                 .then(function (data) {
+
                     //when it's successful, return the user data
                     currentUser = data;
-                    return { user: data, authenticated: true };
+
+                    var result = { user: data, authenticated: true, lastUserId: lastUserId };
+
+                    //broadcast a global event
+                    $rootScope.$broadcast("authenticated", result);
+
+                    return result;
                 });
         },
 
+        /** Logs the user out and redirects to the login page */
         logout: function () {
             return authResource.performLogout()
                 .then(function (data) {                   
+
+                    lastUserId = currentUser.id;
                     currentUser = null;
-                    openLoginDialog();
+
+                    //broadcast a global event
+                    $rootScope.$broadcast("notAuthenticated");
+
+                    $location.path("/login").search({check: false});
+
                     return null;
                 });
         },
 
-        /** Returns the current user object, if null then calls to authenticated or authenticate must be called  */
-        getCurrentUser: function () {
-            return currentUser;
+        /** Returns the current user object in a promise  */
+        getCurrentUser: function (args) {
+            var deferred = $q.defer();
+            
+            if (!currentUser) {
+                authResource.getCurrentUser()
+                    .then(function(data) {
+
+                        var result = { user: data, authenticated: true, lastUserId: lastUserId };
+
+                        if (args.broadcastEvent) {
+                            //broadcast a global event, will inform listening controllers to load in the user specific data
+                            $rootScope.$broadcast("authenticated", result);
+                        }
+
+                        currentUser = data;
+                        currentUser.avatar = 'http://www.gravatar.com/avatar/' + data.emailHash + '?s=40&d=404';
+                        deferred.resolve(currentUser);
+                    });
+
+            }
+            else {
+                deferred.resolve(currentUser);
+            }
+            
+            return deferred.promise;
         }
     };
 

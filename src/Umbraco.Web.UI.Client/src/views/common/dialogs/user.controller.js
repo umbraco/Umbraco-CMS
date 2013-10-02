@@ -5,14 +5,14 @@ angular.module("umbraco")
         $scope.history = historyService.current;
 
         $scope.logout = function () {
-	        userService.logout();
-	        $scope.hide();
-	        $location.path("/");
+            userService.logout().then(function() {
+                $scope.hide();                
+            });
     	};
 
 	    $scope.gotoHistory = function (link) {
 		    $location.path(link);
-		    $scope.$apply() 
+	        $scope.$apply();
 		    $scope.hide();
 		};
 });

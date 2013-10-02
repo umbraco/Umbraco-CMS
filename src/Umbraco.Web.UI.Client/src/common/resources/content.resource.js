@@ -86,6 +86,90 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
          * @ngdoc method
+         * @name umbraco.resources.contentResource#move
+         * @methodOf umbraco.resources.contentResource
+         *
+         * @description
+         * Moves a node underneath a new parentId
+         *
+         * ##usage
+         * <pre>
+         * contentResource.move({ parentId: 1244, id: 123 })
+         *    .then(function() {
+         *        alert("node was moved");
+         *    }, function(err){
+         *      alert("node didnt move:" + err.data.Message); 
+         *    });
+         * </pre> 
+         * @param {Object} args arguments object
+         * @param {Int} args.idd the ID of the node to move
+         * @param {Int} args.parentId the ID of the parent node to move to
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        move: function (args) {
+            if (!args) {
+                throw "args cannot be null";
+            }
+            if (!args.parentId) {
+                throw "args.parentId cannot be null";
+            }
+            if (!args.id) {
+                throw "args.id cannot be null";
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostMove"),
+                    {
+                        parentId: args.parentId,
+                        id: args.id
+                    }),
+                'Failed to move content');
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentResource#copy
+         * @methodOf umbraco.resources.contentResource
+         *
+         * @description
+         * Copies a node underneath a new parentId
+         *
+         * ##usage
+         * <pre>
+         * contentResource.copy({ parentId: 1244, id: 123 })
+         *    .then(function() {
+         *        alert("node was copied");
+         *    }, function(err){
+         *      alert("node wasnt copy:" + err.data.Message); 
+         *    });
+         * </pre> 
+         * @param {Object} args arguments object
+         * @param {Int} args.id the ID of the node to copy
+         * @param {Int} args.parentId the ID of the parent node to copy to
+         * @param {Boolean} args.relateToOriginal if true, relates the copy to the original through the relation api
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        copy: function (args) {
+            if (!args) {
+                throw "args cannot be null";
+            }
+            if (!args.parentId) {
+                throw "args.parentId cannot be null";
+            }
+            if (!args.id) {
+                throw "args.id cannot be null";
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostCopy"),
+                    args),
+                'Failed to copy content');
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.resources.contentResource#emptyRecycleBin
          * @methodOf umbraco.resources.contentResource
          *

@@ -46,6 +46,8 @@ namespace Umbraco.Web.Models.Mapping
             params ContentPropertyDisplay[] customProperties) 
             where TPersisted : IContentBase
         {
+
+
             var genericProps = display.Tabs.Single(x => x.Id == 0);
 
             //store the current props to append to the newly inserted ones
@@ -111,7 +113,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //now we need to aggregate the tabs and properties since we might have duplicate tabs (based on aliases) because
             // of how content composition works. 
-            foreach (var propertyGroups in content.PropertyGroups.GroupBy(x => x.Name))
+            foreach (var propertyGroups in content.PropertyGroups.OrderBy(x => x.SortOrder).GroupBy(x => x.Name))
             {
                 var aggregateProperties = new List<ContentPropertyDisplay>();
 
@@ -158,6 +160,7 @@ namespace Umbraco.Web.Models.Mapping
                     Properties = Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(orphanProperties)
                 });
 
+            
             //set the first tab to active
             aggregateTabs.First().IsActive = true;
 

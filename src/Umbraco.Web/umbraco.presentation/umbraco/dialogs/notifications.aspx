@@ -2,23 +2,17 @@
   Inherits="umbraco.dialogs.notifications" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
-<asp:Content ContentPlaceHolderID="head" runat="server">
-<style type="text/css">
-  .propertyItemheader{width: 190px !Important;}
-</style>
-</asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server">
 
-<cc1:Feedback ID="feedback" runat="server" />
+<div class="umb-dialog-body form-horizontal">
+    
+    <cc1:Pane ID="pane_form" runat="server">
 
-<cc1:Pane ID="pane_form" runat="server">
 
-</cc1:Pane>
-
-<asp:Panel ID="pl_buttons" runat="server">
-<br />
-<asp:Button ID="Button1" runat="server" Text="" OnClick="Button1_Click"></asp:Button>
-&nbsp; <em><%= umbraco.ui.Text("or") %></em> &nbsp;<a href="#" style="color: blue"  onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>      
-</asp:Panel>
-
+    </cc1:Pane>
+</div>
+<div runat="server" ID="pl_buttons" class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+        <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel")%></a>  
+       <asp:Button ID="Button1" runat="server" CssClass="btn btn-primary" OnClick="Button1_Click"></asp:Button>
+</div>
 </asp:Content>

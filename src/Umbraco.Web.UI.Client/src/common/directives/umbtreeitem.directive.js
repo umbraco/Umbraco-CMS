@@ -47,11 +47,9 @@ angular.module("umbraco.directives")
 
         /** Helper function to emit tree events */
         function emitEvent(eventName, args) {
-
           if(scope.eventhandler){
             $(scope.eventhandler).trigger(eventName,args);
           }
-          //$rootScope.$broadcast(eventName, args);
         }
 
         /**

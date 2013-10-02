@@ -12,7 +12,7 @@ function treeResource($q, $http, umbRequestHelper) {
         }
         return node.childNodesUrl;
     }
-
+        
     /** internal method to get the tree menu url */
     function getTreeMenuUrl(node) {
         if (!node.menuUrl) {

@@ -18,5 +18,8 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("PropertyGroupSortOrder")]
         public int SortOrder { get; set; }
+
+        [Column("contenttypeNodeId")]
+        public int ContentTypeNodeId { get; set; }
     }
 }

@@ -26,7 +26,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
       
         /**
          * @ngdoc method
-         * @name umbraco.resources.memberResource#getByLogin
+         * @name umbraco.resources.memberResource#getByKey
          * @methodOf umbraco.resources.memberResource
          *
          * @description
@@ -34,7 +34,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *
          * ##usage
          * <pre>
-         * memberResource.getByLogin("tom")
+         * memberResource.getByKey("0000-0000-000-00000-000")
          *    .then(function(member) {
          *        var mymember = member; 
          *        alert('its here!');
@@ -45,20 +45,20 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the member item.
          *
          */
-        getByLogin: function (loginName) {
+        getByKey: function (key) {
             
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "memberApiBaseUrl",
-                       "GetByLogin",
-                       [{ loginName: loginName }])),
-               'Failed to retreive data for member id ' + loginName);
+                       "GetByKey",
+                       [{ key: key }])),
+               'Failed to retreive data for member id ' + key);
         },
 
         /**
          * @ngdoc method
-         * @name umbraco.resources.memberResource#deleteByLogin
+         * @name umbraco.resources.memberResource#deleteByKey
          * @methodOf umbraco.resources.memberResource
          *
          * @description
@@ -66,7 +66,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *
          * ##usage
          * <pre>
-         * memberResource.deleteByLogin(1234)
+         * memberResource.deleteByKey("0000-0000-000-00000-000")
          *    .then(function() {
          *        alert('its gone!');
          *    });
@@ -76,14 +76,14 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @returns {Promise} resourcePromise object.
          *
          */
-        deleteByLogin: function (id) {
+        deleteByKey: function (key) {
             return umbRequestHelper.resourcePromise(
                 $http.delete(
                     umbRequestHelper.getApiUrl(
                         "memberApiBaseUrl",
-                        "DeleteById",
-                        [{ id: id }])),
-                'Failed to delete item ' + id);
+                        "DeleteByKey",
+                        [{ key: key }])),
+                'Failed to delete item ' + key);
         },
 
         /**

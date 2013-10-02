@@ -26,7 +26,7 @@ namespace umbraco.dialogs
                 feedback.Text = ui.Text("assignDomain", "invalidNode");
                 pane_language.Visible = false;
                 pane_domains.Visible = false;
-                phSave.Visible = false;
+                p_buttons.Visible = false;
                 return;
             }
 
@@ -35,12 +35,12 @@ namespace umbraco.dialogs
                 feedback.Text = ui.Text("assignDomain", "permissionDenied");
                 pane_language.Visible = false;
                 pane_domains.Visible = false;
-                phSave.Visible = false;
+                p_buttons.Visible = false;
                 return;
             }
 
-            pane_language.Text = ui.Text("assignDomain", "setLanguage");
-            pane_domains.Text = ui.Text("assignDomain", "setDomains");
+            pane_language.Title = ui.Text("assignDomain", "setLanguage");
+            pane_domains.Title = ui.Text("assignDomain", "setDomains");
             prop_language.Text = ui.Text("assignDomain", "language");
 
             var nodeDomains = DomainHelper.GetNodeDomains(nodeId, true);

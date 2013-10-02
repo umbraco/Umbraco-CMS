@@ -5,7 +5,6 @@
 .umb-modalcolumn {
 	background: white;
 	border-left: #f6f6f6 1px solid;
-	white-space: nowrap
 }
 
 .umb-modalcolumn-header {
@@ -13,10 +12,12 @@
   border-bottom: 1px solid @grayLight;
   height: 79px;
   padding: 20px 20px 0px 20px;
+  white-space: nowrap
 }
 
 .umb-modalcolumn-header h1{
   margin: 0;
+  white-space: nowrap;
   font-size: @fontSizeLarge;
   font-weight: 400;
   padding-top: 10px !important;
@@ -56,13 +57,19 @@
 /* umb.dialog is used for the dialogs on the conent tree*/
 .umb-dialog {
 	outline: none;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	position: absolute;
+	padding: 0px;
 }
+
 .umb-dialog .umb-btn-toolbar {
 	text-align: right;
 	padding: 15px 20px 10px 20px;
 	margin-top: 30px;
 	clear: both;
-	border-top: #efefef 1px solid;
 }
 .umb-dialog .umb-btn-toolbar .umb-control-group{
 	border: none;
@@ -70,8 +77,27 @@
 }
 
 .umb-dialog-body{
+	position: absolute;
     overflow:auto;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 90px;
 }
+.umb-dialog-body .umb-pane{margin-top: 15px;}
+
+.umb-dialog-footer{
+		border-top: #efefef 1px solid;
+		position: absolute;
+	    overflow:auto;
+	    text-align: right;
+	    
+	    height: 60px;
+	    left: 0px;
+	    right: 0px;
+	    bottom: 0px;
+}
+
 
 /* modal and umb-modal are used for right.hand dialogs */
 .modal.fade.in{border: none !important; border-radius: none !important;}

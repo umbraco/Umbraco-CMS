@@ -8,8 +8,6 @@ namespace umbraco.cms.presentation
 {
     public class Create : BasePages.UmbracoEnsuredPage
     {
-        [Obsolete("This property is no longer used")]
-        protected umbWindow createWindow;
         protected Label helpText;
         protected TextBox rename;
         protected Label Label1;

@@ -44,10 +44,12 @@ namespace Umbraco.Core.Models
 
         public UmbracoEntity()
         {
+            AdditionalData = new Dictionary<string, object>();
         }
 
         public UmbracoEntity(bool trashed)
         {
+            AdditionalData = new Dictionary<string, object>();
             Trashed = trashed;
         }
 
@@ -142,6 +144,9 @@ namespace Umbraco.Core.Models
             }
         }
 
+        public IDictionary<string, object> AdditionalData { get; private set; }
+
+
         public bool HasChildren
         {
             get { return _hasChildren; }
@@ -152,6 +157,9 @@ namespace Umbraco.Core.Models
                     _hasChildren = value;
                     return _hasChildren;
                 }, _hasChildren, HasChildrenSelector);  
+
+                //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
+                AdditionalData["HasChildren"] = value;
             }
         }
 
@@ -164,7 +172,10 @@ namespace Umbraco.Core.Models
                 {
                     _isPublished = value;
                     return _isPublished;
-                }, _isPublished, IsPublishedSelector);  
+                }, _isPublished, IsPublishedSelector);
+
+                //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
+                AdditionalData["IsPublished"] = value;
             }
         }
 
@@ -178,6 +189,9 @@ namespace Umbraco.Core.Models
                     _isDraft = value;
                     return _isDraft;
                 }, _isDraft, IsDraftSelector);
+
+                //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
+                AdditionalData["IsDraft"] = value;
             }
         }
 
@@ -191,6 +205,9 @@ namespace Umbraco.Core.Models
                     _hasPendingChanges = value;
                     return _hasPendingChanges;
                 }, _hasPendingChanges, HasPendingChangesSelector);
+
+                //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
+                AdditionalData["HasPendingChanges"] = value;
             }
         }
 
@@ -204,6 +221,9 @@ namespace Umbraco.Core.Models
                     _contentTypeAlias = value;
                     return _contentTypeAlias;
                 }, _contentTypeAlias, ContentTypeAliasSelector);
+
+                //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
+                AdditionalData["ContentTypeAlias"] = value;
             }
         }
 
@@ -217,6 +237,9 @@ namespace Umbraco.Core.Models
                     _contentTypeIcon = value;
                     return _contentTypeIcon;
                 }, _contentTypeIcon, ContentTypeIconSelector);
+
+                //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
+                AdditionalData["ContentTypeIcon"] = value;
             }
         }
 
@@ -230,6 +253,9 @@ namespace Umbraco.Core.Models
                     _contentTypeThumbnail = value;
                     return _contentTypeThumbnail;
                 }, _contentTypeThumbnail, ContentTypeThumbnailSelector);
+
+                //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
+                AdditionalData["ContentTypeThumbnail"] = value;
             }
         }
 
@@ -242,10 +268,16 @@ namespace Umbraco.Core.Models
                 {
                     _nodeObjectTypeId = value;
                     return _nodeObjectTypeId;
-                }, _nodeObjectTypeId, NodeObjectTypeIdSelector);  
+                }, _nodeObjectTypeId, NodeObjectTypeIdSelector);
+
+                //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
+                AdditionalData["NodeObjectTypeId"] = value;
             }
         }
 
+        /// <summary>
+        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
+        /// </summary>
         public IList<UmbracoProperty> UmbracoProperties { get; set; }
 
         internal class UmbracoProperty

@@ -4,31 +4,23 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Publishing;
-using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [TestFixture, NUnit.Framework.Ignore]
-    public class MemberRepositoryTest : MemberRepositoryBaseTest
+    [TestFixture]
+    public class MemberRepositoryTest : BaseDatabaseFactoryTest
     {
-        #region Overrides of MemberRepositoryBaseTest
-
         [SetUp]
         public override void Initialize()
         {
             base.Initialize();
-
-            SqlSyntaxContext.SqlSyntaxProvider = SqlServerSyntax.Provider;
         }
 
         [TearDown]
@@ -36,18 +28,6 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             base.TearDown();
         }
-
-        public override string ConnectionString
-        {
-            get { return @"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco"; }
-        }
-
-        public override string ProviderName
-        {
-            get { return "System.Data.SqlClient"; }
-        }
-
-        #endregion
 
         private MemberRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MemberTypeRepository memberTypeRepository)
         {
@@ -70,10 +50,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(repository, Is.Not.Null);
         }
 
-        [Test]
+        [Test, NUnit.Framework.Ignore]
         public void MemberRepository_Can_Get_Member_By_Id()
         {
-            var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
             {
@@ -84,10 +65,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        [Test]
+        [Test, NUnit.Framework.Ignore]
         public void MemberRepository_Can_Get_Specific_Members()
         {
-            var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
             {
@@ -100,10 +82,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        [Test]
+        [Test, NUnit.Framework.Ignore]
         public void MemberRepository_Can_Get_All_Members()
         {
-            var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
             {
@@ -116,11 +99,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        [Test]
+        [Test, NUnit.Framework.Ignore]
         public void MemberRepository_Can_Perform_GetByQuery_With_Key()
         {
             // Arrange
-            var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
             {
@@ -135,11 +119,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        [Test]
+        [Test, NUnit.Framework.Ignore]
         public void MemberRepository_Can_Perform_GetByQuery_With_Property_Value()
         {
             // Arrange
-            var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
             {
@@ -155,11 +140,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        [Test]
+        [Test, NUnit.Framework.Ignore]
         public void MemberRepository_Can_Perform_GetByQuery_With_Property_Alias_And_Value()
         {
             // Arrange
-            var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
             {
@@ -171,6 +157,34 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(result.Any(x => x == null), Is.False);
                 Assert.That(result.Count(), Is.EqualTo(5));
+            }
+        }
+
+        [Test]
+        public void MemberRepository_Can_Persist_Member()
+        {
+            IMember sut;
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
+                var memberType = MockedContentTypes.CreateSimpleMemberType();
+                memberTypeRepository.AddOrUpdate(memberType);
+                unitOfWork.Commit();
+
+                var member = MockedMember.CreateSimpleContent(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty", -1);
+                repository.AddOrUpdate(member);
+                unitOfWork.Commit();
+
+                sut = repository.Get(member.Id);
+
+                Assert.That(sut, Is.Not.Null);
+                Assert.That(sut.ContentType.PropertyGroups.Count(), Is.EqualTo(1));
+                Assert.That(sut.ContentType.PropertyTypes.Count(), Is.EqualTo(12));
+
+                Assert.That(sut.Properties.Count(), Is.EqualTo(12));
+                Assert.That(sut.Properties.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
             }
         }
 
@@ -251,63 +265,5 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             get { return new Guid(Constants.ObjectTypes.Member); }
         }
-    }
-
-    [TestFixture]
-    public abstract class MemberRepositoryBaseTest
-    {
-        [SetUp]
-        public virtual void Initialize()
-        {
-            TestHelper.SetupLog4NetForTests();
-            TestHelper.InitializeContentDirectories();
-
-            string path = TestHelper.CurrentAssemblyDirectory;
-            AppDomain.CurrentDomain.SetData("DataDirectory", path);
-
-            RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory());
-            
-            MappingResolver.Current = new MappingResolver(
-                () => PluginManager.Current.ResolveAssignedMapperTypes());
-            //disable cache
-            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
-
-            
-            var dbFactory = new DefaultDatabaseFactory(ConnectionString, ProviderName);
-            UnitOfWorkProvider = new PetaPocoUnitOfWorkProvider(dbFactory);
-
-            ApplicationContext.Current = new ApplicationContext(
-                //assign the db context
-                new DatabaseContext(dbFactory),
-                //assign the service context
-                new ServiceContext(UnitOfWorkProvider, new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),
-                //disable cache
-                cacheHelper)
-            {
-                IsReady = true
-            };
-
-            Resolution.Freeze();
-        }
-
-        [TearDown]
-        public virtual void TearDown()
-        {
-            SqlSyntaxContext.SqlSyntaxProvider = null;
-            AppDomain.CurrentDomain.SetData("DataDirectory", null);
-
-            //reset the app context
-            ApplicationContext.Current = null;
-
-            RepositoryResolver.Reset();
-            MappingResolver.Reset();
-        }
-
-        public abstract string ConnectionString { get; }
-
-        public abstract string ProviderName { get; }
-
-        public PetaPocoUnitOfWorkProvider UnitOfWorkProvider { get; set; }
     }
 }
