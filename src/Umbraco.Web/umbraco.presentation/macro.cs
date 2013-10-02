@@ -1344,8 +1344,11 @@ namespace umbraco
                     break;
 
                 case "mediaCurrent":
-                    var c = new Content(int.Parse(macroPropertyValue));
-                    macroXmlNode.AppendChild(macroXml.ImportNode(c.ToXml(umbraco.content.Instance.XmlContent, false), true));
+                    if (string.IsNullOrEmpty(macroPropertyValue) == false)
+                    {
+                        var c = new Content(int.Parse(macroPropertyValue));
+                        macroXmlNode.AppendChild(macroXml.ImportNode(c.ToXml(umbraco.content.Instance.XmlContent, false), true));
+                    }
                     break;
 
                 default:
