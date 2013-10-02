@@ -1,5 +1,5 @@
 <div ng-controller="Umbraco.Editors.Content.CopyController">
-<div class="umb-dialog-body">
+<div class="umb-dialog-body form-horizontal">
 	<div class="umb-pane">
 
 		<p class="abstract" ng-hide="success">
@@ -26,6 +26,13 @@
 				showoptions="false"
 				eventhandler="dialogTreeEventHandler">
 			</umb-tree>
+
+
+			<umb-pane>
+				<umb-control-group label="Relate to original">
+					<input type="checkbox" ng-model="relate" /> </label>
+				</umb-control-group>
+		    </umb-pane>
 		</div>
 	</div>
 </div>
