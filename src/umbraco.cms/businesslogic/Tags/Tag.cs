@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Rdbms;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using umbraco.interfaces;
@@ -12,6 +15,12 @@ namespace umbraco.cms.businesslogic.Tags
 {
     public class Tag : ITag
     {
+
+        private const string SqlGetTagPropertyIdsForNode = @"SELECT cmsPropertyType.id FROM cmsPropertyType 
+                INNER JOIN cmsContent ON cmsContent.contentType = cmsPropertyType.contentTypeId
+                INNER JOIN cmsDataType ON cmsDataType.nodeId = cmsPropertyType.dataTypeId
+                WHERE cmsContent.nodeId = {0}
+                AND cmsDataType.propertyEditorAlias = '" + Constants.PropertyEditors.TagsAlias + "'";
 
         #region Constructors
         public Tag() { }
@@ -53,14 +62,46 @@ namespace umbraco.cms.businesslogic.Tags
 
         public static void AssociateTagToNode(int nodeId, int tagId)
         {
-            SqlHelper.ExecuteNonQuery("INSERT INTO cmsTagRelationShip(nodeId,tagId) VALUES (@nodeId, @tagId)",
-                            SqlHelper.CreateParameter("@nodeId", nodeId),
-                            SqlHelper.CreateParameter("@tagId", tagId)
-                        );
+            //need to check if there's a tag property type to associate with the node, this is a new change with the db change
+            var tagProperties = ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(
+                string.Format(SqlGetTagPropertyIdsForNode, nodeId)).ToArray();
+            if (tagProperties.Any() == false)
+            {
+                throw new InvalidOperationException("Cannot associate a tag to a node that doesn't have a Property Type assigned to a Tag Property Editor");
+            }
+            if (tagProperties.Length > 1)
+            {
+                LogHelper.Warn<Tag>("Because the legacy Tag data layer is being used, the tags being associated with the node will only be associated with the first found Property Type containing a Tag Property Editor");
+            }
+
+            if (ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
+                "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND tagId=@tagId AND propertyTypeId=@propertyTypeId",
+                new {tagId = tagId, nodeId = nodeId, propertyTypeId = tagProperties[0]}) == 0)
+            {
+                ApplicationContext.Current.DatabaseContext.Database.Insert(new TagRelationshipDto
+                {
+                    NodeId = nodeId,
+                    TagId = tagId,
+                    PropertyTypeId = tagProperties[0]
+                });
+            }
+                        
         }
 
         public static void AddTagsToNode(int nodeId, string tags, string group)
         {
+            //need to check if there's a tag property type to associate with the node, this is a new change with the db change
+            var tagProperties = ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(
+                string.Format(SqlGetTagPropertyIdsForNode, nodeId)).ToArray();
+            if (tagProperties.Any() == false)
+            {
+                throw new InvalidOperationException("Cannot associate a tag to a node that doesn't have a Property Type assigned to a Tag Property Editor");
+            }
+            if (tagProperties.Length > 1)
+            {
+                LogHelper.Warn<Tag>("Because the legacy Tag data layer is being used, the tags being associated with the node will only be associated with the first found Property Type containing a Tag Property Editor");
+            }
+
             string[] allTags = tags.Split(",".ToCharArray());
             for (int i = 0; i < allTags.Length; i++)
             {
@@ -69,15 +110,8 @@ namespace umbraco.cms.businesslogic.Tags
                 if (id == 0)
                     id = AddTag(allTags[i], group);
 
-                //GE 2011-10-31
-                //if not exists is not supported on SQLCE
-                //SqlHelper.ExecuteNonQuery("if not exists(select nodeId from cmsTagRelationShip where nodeId = @nodeId and tagId = @tagId) INSERT INTO cmsTagRelationShip(nodeId,tagId) VALUES (@nodeId, @tagId)",
-                //        SqlHelper.CreateParameter("@nodeId", nodeId),
-                //        SqlHelper.CreateParameter("@tagId", id)
-                //    );
-
                 //Perform a subselect insert into cmsTagRelationship using a left outer join to perform the if not exists check
-                string sql = "insert into cmsTagRelationship (nodeId,tagId) select " + string.Format("{0}", nodeId) + ", " + string.Format("{0}", id) + " from cmsTags ";
+                var sql = "insert into cmsTagRelationship (nodeId,tagId,propertyTypeId) select " + string.Format("{0}", nodeId) + ", " + string.Format("{0}", id) + ", " + string.Format("{0}", tagProperties[0]) + " from cmsTags ";
                 //sorry, gotta do this, @params not supported in join clause
                 sql += "left outer join cmsTagRelationship on (cmsTags.id = cmsTagRelationship.TagId and cmsTagRelationship.nodeId = " + string.Format("{0}", nodeId) + ") ";
                 sql += "where cmsTagRelationship.tagId is null and cmsTags.id = " + string.Format("{0}", id);
@@ -91,6 +125,19 @@ namespace umbraco.cms.businesslogic.Tags
 
         public static void MergeTagsToNode(int nodeId, string tags, string group)
         {
+            //need to check if there's a tag property type to associate with the node, this is a new change with the db change
+            var tagProperties = ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(
+                string.Format(SqlGetTagPropertyIdsForNode, nodeId)).ToArray();
+            if (tagProperties.Any() == false)
+            {
+                throw new InvalidOperationException("Cannot associate a tag to a node that doesn't have a Property Type assigned to a Tag Property Editor");
+            }
+            if (tagProperties.Length > 1)
+            {
+                LogHelper.Warn<Tag>("Because the legacy Tag data layer is being used, the tags being associated with the node will only be associated with the first found Property Type containing a Tag Property Editor");
+            }
+
+
             //GE 2011-11-01
             //When you have a new CSV list of tags (e.g. from control) and want to push those to the DB, the only way to do this
             //is delete all the existing tags and add the new ones. 
@@ -126,8 +173,8 @@ namespace umbraco.cms.businesslogic.Tags
             SqlHelper.ExecuteNonQuery(sql);
 
             //adds any tags found in csv that aren't in tagrelationships
-            sql = "insert into cmsTagRelationship (TagId,NodeId) ";
-            sql += "select NewTagsSet.Id, " + string.Format("{0}", nodeId) + " from  ";
+            sql = "insert into cmsTagRelationship (TagId,NodeId,propertyTypeId) ";
+            sql += "select NewTagsSet.Id, " + string.Format("{0}", nodeId) + ", " + string.Format("{0}", tagProperties[0]) + " from  ";
             sql += "( ";
             sql += "select NewTags.Id from  ";
             sql += " " + TagSet + " ";

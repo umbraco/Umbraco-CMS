@@ -28,6 +28,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
             //we need to drop the primary key
             Delete.PrimaryKey("PK_cmsTagRelationship").FromTable("cmsTagRelationship");
+
+            //drop the foreign key on umbracoNode
+            Delete.ForeignKey("FK_cmsTagRelationship_umbracoNode_id").OnTable("cmsTagRelationship");
         }
 
         private void Upgrade()
@@ -55,8 +58,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 if (propertyTypes.Length == 0)
                 {
                     LogHelper.Warn<AlterTagsTable>("There was no cmsContent reference for cmsTagRelationship for nodeId " 
-                        + tr.NodeId + 
-                        ". The new tag system only supports tags with references to content in the umbracoNode and cmsPropertyType tables. This row will be deleted: " 
+                        + tr.NodeId +
+                        ". The new tag system only supports tags with references to content in the cmsContent and cmsPropertyType tables. This row will be deleted: " 
                         + string.Format("nodeId: {0}, tagId: {1}", tr.NodeId, tr.TagId));
                     Delete.FromTable("cmsTagRelationship").Row(new { nodeId = tr.NodeId, tagId = tr.TagId });
                 }
@@ -99,9 +102,15 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                   .PrimaryColumn("id")
                   .OnDelete(Rule.Cascade)
                   .OnUpdate(Rule.None);
-
-            //change the column to be not nullable
-            Alter.Table("cmsTagRelationship").AlterColumn("propertyTypeId").AsInt32().NotNullable();
+            
+            //now we need to add a foreign key to the nodeId column to cmsContent (intead of the original umbracoNode)
+            Create.ForeignKey("FK_cmsTagRelationship_cmsContent")
+                  .FromTable("cmsTagRelationship")
+                  .ForeignColumn("nodeId")
+                  .ToTable("cmsContent")
+                  .PrimaryColumn("nodeId")
+                  .OnDelete(Rule.Cascade)
+                  .OnUpdate(Rule.None);
 
         }
 
