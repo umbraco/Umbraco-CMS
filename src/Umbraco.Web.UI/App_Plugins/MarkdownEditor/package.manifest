@@ -27,5 +27,8 @@
 	,
 	javascript: [
 	    '~/App_Plugins/MarkDownEditor/markdowneditor.controller.js'
+	],
+	stylesheet: [
+	    '~/App_Plugins/MarkDownEditor/lib/red.css'
 	]
 }
