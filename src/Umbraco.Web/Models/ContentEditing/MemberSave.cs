@@ -17,7 +17,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
         public string Email { get; set; }
 
-        [DataMember(Name = "password", IsRequired = true)]        
+        [DataMember(Name = "password")]        
         public string Password { get; set; }
     }
 }

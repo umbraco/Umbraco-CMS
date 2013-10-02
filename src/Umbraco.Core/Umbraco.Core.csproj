@@ -416,6 +416,7 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AlterCmsMacroPropertyTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AddIndexToCmsMacroPropertyTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AddIndexToCmsMacroTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AlterTagsTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\RemoveCmsMacroPropertyTypeTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AlterUserTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\UpdateCmsMacroPropertyEditorAliasFromCmsMacroPropertyType.cs" />
