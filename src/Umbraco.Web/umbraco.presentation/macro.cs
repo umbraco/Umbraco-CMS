@@ -25,6 +25,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Xml.XPath;
 using Umbraco.Core.Profiling;
+using umbraco.interfaces;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Macros;
