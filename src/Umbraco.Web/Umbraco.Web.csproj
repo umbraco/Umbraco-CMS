@@ -1840,7 +1840,9 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\create.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\cruds.aspx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\cruds.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\emptyTrashcan.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\exportDocumenttype.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\imageViewer.aspx" />
@@ -1857,7 +1859,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\RegexWs.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\uploadImage.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx" />
