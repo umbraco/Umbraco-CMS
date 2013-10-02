@@ -304,8 +304,8 @@ li.root > div > a.umb-options {
 }
 .umb-actions-child i {
 	font-size: 32px;
-	vertical-align: top;
 }
+
 .umb-actions-child li.add {
 	margin-top: 20px;
 	border-top: 1px solid #e9e9e9;
@@ -346,6 +346,7 @@ width:100%;
 height:1px;
 overflow:hidden;
 }
+
 .umb-tree li div.l div, div.umb-loader{
 background-color: @blue;
 margin-top:0;
@@ -365,7 +366,7 @@ margin-left:-100%;
 -o-animation-name:bounce_loadingProgressG;
 -o-animation-duration:1s;
 -o-animation-iteration-count:infinite;
--o-animation-timing-function:linear;
+-o-animationtiming-function:linear;
 animation-name:bounce_loadingProgressG;
 animation-duration:1s;
 animation-iteration-count:infinite;
@@ -373,6 +374,7 @@ animation-timing-function:linear;
 width:100%;
 height:1px;
 }
+
 
     @-moz-keyframes bounce_loadingProgressG{
     0%{
@@ -422,10 +424,13 @@ height:1px;
     0%{
     margin-left:-100%;
     }
-
     100%{
     margin-left:100%;
     }
+}
+//loader defaults
+.umb-loader{
+	height: 10px; margin: 10px 10px 10px 10px;
 }
 
 
