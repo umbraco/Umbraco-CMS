@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using Umbraco.Core.Logging;
 
@@ -127,6 +128,14 @@ namespace Umbraco.Core.ObjectResolution
         internal static void Reset()
         {
             LogHelper.Debug(typeof(Resolution), "Resetting resolution");
+
+            /*
+            var trace = new System.Diagnostics.StackTrace();
+            var testing = trace.GetFrames().Any(frame =>
+                frame.GetMethod().DeclaringType.FullName.StartsWith("Umbraco.Tests"));
+            if (testing == false)
+                throw new InvalidOperationException("Only unit tests can reset configuration.");
+            */
 
             using (new WriteLock(ConfigurationLock))
             {

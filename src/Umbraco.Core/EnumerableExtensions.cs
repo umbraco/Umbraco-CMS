@@ -13,14 +13,23 @@ namespace Umbraco.Core
     {
         public static IEnumerable<IEnumerable<T>> InGroupsOf<T>(this IEnumerable<T> source, int groupSize)
         {
-            var i = 0;
-            var length = source.Count();
+            if (source == null)
+               throw new NullReferenceException("source");
 
-            while ((i * groupSize) < length)
+            // enumerate the source only once!
+            var enumerator = source.GetEnumerator();
+
+            while (enumerator.MoveNext())
+                yield return EnumerateGroup(enumerator, groupSize);
+        }
+
+        private static IEnumerable<T> EnumerateGroup<T>(IEnumerator<T> enumerator, int count)
+        {
+            var c = 1;
+            do
             {
-                yield return source.Skip(i * groupSize).Take(groupSize);
-                i++;
-            }
+                yield return enumerator.Current;
+            } while (c++ < count && enumerator.MoveNext());
         }
 
 
