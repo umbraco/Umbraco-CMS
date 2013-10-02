@@ -8,6 +8,7 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using System.Collections.Generic;
 
 namespace umbraco.dialogs
 {
@@ -41,36 +42,46 @@ namespace umbraco.dialogs
 
 			node = new cms.businesslogic.CMSNode(int.Parse(helper.Request("id")));
 
-			HtmlTable ht = new HtmlTable();
-			ht.CellPadding = 4;
+            HtmlTable ht = new HtmlTable();
+            ht.Attributes.Add("class", "table");
 
-			HtmlTableRow captions = new HtmlTableRow();
-			captions.Cells.Add(new HtmlTableCell());
+        	HtmlTableRow names = new HtmlTableRow();
+
+            var corner = new HtmlTableCell("th");
+            corner.Style.Add("border", "none");
+			names.Cells.Add(corner);
+
 
             ArrayList actionList = BusinessLogic.Actions.Action.GetAll();
+            Dictionary<string, HtmlTableRow> permissions = new Dictionary<string, HtmlTableRow>();
+
+
             foreach (interfaces.IAction a in actionList)
             {
 				if (a.CanBePermissionAssigned) 
 				{
-					HtmlTableCell hc = new HtmlTableCell();
-					hc.Attributes.Add("class", "guiDialogTinyMark");
-					hc.Controls.Add(new LiteralControl(ui.Text("actions", a.Alias)));
-					captions.Cells.Add(hc);
+
+                    HtmlTableRow permission = new HtmlTableRow();
+                    HtmlTableCell label = new HtmlTableCell();
+                    label.InnerText = ui.Text("actions", a.Alias);
+                    permission.Cells.Add(label);
+                    permissions.Add(a.Alias, permission);
 				}
 			}
-			ht.Rows.Add(captions);
+			
+            ht.Rows.Add(names);
+
 
 			foreach (BusinessLogic.User u in BusinessLogic.User.getAll()) 
 			{
 				// Not disabled users and not system account
 				if (!u.Disabled && u.Id > 0) 
 				{
-					HtmlTableRow hr = new HtmlTableRow();
-
-					HtmlTableCell hc = new HtmlTableCell();
-					hc.Attributes.Add("class", "guiDialogTinyMark");
-					hc.Controls.Add(new LiteralControl(u.Name));
-					hr.Cells.Add(hc);
+					HtmlTableCell hc = new HtmlTableCell("th");
+                    hc.InnerText = u.Name;
+                    hc.Style.Add("text-align", "center");
+                    hc.Style.Add("border", "none");
+					names.Cells.Add(hc);
 
 					foreach (interfaces.IAction a in BusinessLogic.Actions.Action.GetAll()) 
 					{
@@ -80,17 +91,22 @@ namespace umbraco.dialogs
 						{
 							if (u.GetPermissions(node.Path).IndexOf(a.Letter) > -1)
 								c.Checked = true;
-							HtmlTableCell cell = new HtmlTableCell();
+							
+                            HtmlTableCell cell = new HtmlTableCell();
 							cell.Style.Add("text-align", "center");
 							cell.Controls.Add(c);
-							permissions.Add(c);
-							hr.Cells.Add(cell);
+
+                            permissions[a.Alias].Cells.Add(cell);
 						}
 							
 					}
-					ht.Rows.Add(hr);
 				}
 			}
+
+            //add all collected rows
+            foreach (var perm in permissions.Values)
+                ht.Rows.Add(perm);
+
 			PlaceHolder1.Controls.Add(ht);
 		}
 		
@@ -128,7 +144,7 @@ namespace umbraco.dialogs
 			//FeedBackMessage.Text = "<div class=\"feedbackCreate\">" + ui.Text("rights") + " " + ui.Text("ok") + "</div>";
             feedback1.type = umbraco.uicontrols.Feedback.feedbacktype.success;
             feedback1.Text = ui.Text("rights") + " " + ui.Text("ok");
-			pane_form.Visible = false;
+			PlaceHolder1.Visible = false;
             panel_buttons.Visible = false;
 
 
