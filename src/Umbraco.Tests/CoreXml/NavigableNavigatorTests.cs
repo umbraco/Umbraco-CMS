@@ -79,13 +79,13 @@ namespace Umbraco.Tests.CoreXml
             // in non-native we can't have Value dump everything, else
             // we'd dump the entire database? Makes not much sense.
 
-            Assert.AreEqual(native ? "\r\n        blah\r\n            blah\r\n        bam\r\n        " : string.Empty, nav.Value); // !!
+            Assert.AreEqual(native ? "\n        blah\n            blah\n        bam\n        " : string.Empty, nav.Value.Lf()); // !!
             Assert.IsTrue(nav.MoveToFirstChild());
             Assert.AreEqual("root", nav.Name);
-            Assert.AreEqual(native ? "\r\n        blah\r\n            blah\r\n        bam\r\n        " : string.Empty, nav.Value); // !!
+            Assert.AreEqual(native ? "\n        blah\n            blah\n        bam\n        " : string.Empty, nav.Value.Lf()); // !!
             Assert.IsTrue(nav.MoveToFirstChild());
             Assert.AreEqual("wrap", nav.Name);
-            Assert.AreEqual(native ? "\r\n        blah\r\n            blah\r\n        bam\r\n        " : string.Empty, nav.Value); // !!
+            Assert.AreEqual(native ? "\n        blah\n            blah\n        bam\n        " : string.Empty, nav.Value.Lf()); // !!
 
             Assert.IsTrue(nav.MoveToFirstChild());
             Assert.AreEqual("item1", nav.Name);
@@ -113,11 +113,11 @@ namespace Umbraco.Tests.CoreXml
 
             Assert.IsTrue(nav.MoveToNext());
             Assert.AreEqual("item2c", nav.Name);
-            Assert.AreEqual("\r\n        ", nav.Value); // ok since it's a property
+            Assert.AreEqual("\n        ", nav.Value.Lf()); // ok since it's a property
             Assert.IsTrue(nav.MoveToFirstChild());
             Assert.AreEqual(XPathNodeType.Text, nav.NodeType);
             Assert.AreEqual(string.Empty, nav.Name);
-            Assert.AreEqual("\r\n        ", nav.Value);
+            Assert.AreEqual("\n        ", nav.Value.Lf());
             Assert.IsTrue(nav.MoveToParent());
 
             Assert.IsTrue(nav.MoveToNext());
@@ -131,11 +131,11 @@ namespace Umbraco.Tests.CoreXml
 
             Assert.IsTrue(nav.MoveToNext());
             Assert.AreEqual("item3a", nav.Name);
-            Assert.AreEqual("\r\n            blah\r\n        ", nav.Value); // ok since it's a property
+            Assert.AreEqual("\n            blah\n        ", nav.Value.Lf()); // ok since it's a property
             Assert.IsTrue(nav.MoveToFirstChild());
             Assert.AreEqual(XPathNodeType.Text, nav.NodeType);
             Assert.AreEqual(string.Empty, nav.Name);
-            Assert.AreEqual("\r\n            blah\r\n        ", nav.Value);
+            Assert.AreEqual("\n            blah\n        ", nav.Value.Lf());
             Assert.IsTrue(nav.MoveToParent());
 
             Assert.IsTrue(nav.MoveToNext());
@@ -157,10 +157,10 @@ namespace Umbraco.Tests.CoreXml
 
             Assert.IsTrue(nav.MoveToNext());
             Assert.AreEqual("item5", nav.Name);
-            Assert.AreEqual("\r\n        ", nav.Value);
+            Assert.AreEqual("\n        ", nav.Value.Lf());
             Assert.IsTrue(nav.MoveToFirstChild());
             Assert.AreEqual(XPathNodeType.Text, nav.NodeType);
-            Assert.AreEqual("\r\n        ", nav.Value);
+            Assert.AreEqual("\n        ", nav.Value.Lf());
         }
 
         [Test]
@@ -257,7 +257,7 @@ namespace Umbraco.Tests.CoreXml
   </type1>
 </root>";
 
-            Assert.AreEqual(xml, nav.OuterXml);
+            Assert.AreEqual(xml.Lf(), nav.OuterXml.Lf());
         }
 
         [Test]
@@ -280,7 +280,7 @@ namespace Umbraco.Tests.CoreXml
   </type1>
 </root>";
 
-            Assert.AreEqual(outerXml, nav.OuterXml);
+            Assert.AreEqual(outerXml.Lf(), nav.OuterXml.Lf());
         }
 
         [Test]
@@ -728,7 +728,7 @@ namespace Umbraco.Tests.CoreXml
 
             //Console.WriteLine("--------");
             //Console.WriteLine(writer.ToString());
-            Assert.AreEqual(expected, writer.ToString());
+            Assert.AreEqual(expected.Lf(), writer.ToString().Lf());
         }
 
         [Test]
@@ -778,7 +778,7 @@ namespace Umbraco.Tests.CoreXml
   </item>
   <item x="""" />
   <item x="" "" />
-</root>", docNav.OuterXml);
+</root>".Lf(), docNav.OuterXml.Lf());
 
             docNav.MoveToRoot();
             Assert.IsTrue(docNav.MoveToFirstChild());
@@ -817,7 +817,7 @@ namespace Umbraco.Tests.CoreXml
   <item id=""5"" attr=""  ooo  "">
     <prop>   ooo   </prop>
   </item>
-</root>", nav.OuterXml);
+</root>".Lf(), nav.OuterXml.Lf());
         }
     }
 
@@ -1106,11 +1106,11 @@ namespace Umbraco.Tests.CoreXml
                     null, 
                     null, 
                     null, 
-                    "\r\n        ", 
+                    "\n        ", 
                     "blah", 
-                    "\r\n            blah\r\n        ",
+                    "\n            blah\n        ",
                     "<subitem x=\"1\">bam</subitem>",
-                    "\r\n        "
+                    "\n        "
                 );
 
             Root = new TestRootContent(type).WithChildren(1);
@@ -1155,11 +1155,20 @@ namespace Umbraco.Tests.CoreXml
             Content[1] = new TestContent(type1, 1, -1).WithValues(null, null);
             Content[2] = new TestContent(type1, 2, -1).WithValues("", "");
             Content[3] = new TestContent(type1, 3, -1).WithValues("   ", "   ");
-            Content[4] = new TestContent(type1, 4, -1).WithValues("", "\r\n");
+            Content[4] = new TestContent(type1, 4, -1).WithValues("", "\n");
             Content[5] = new TestContent(type1, 5, -1).WithValues("  ooo  ", "   ooo   ");
             Root = new TestRootContent(type).WithValues(null).WithChildren(1, 2, 3, 4, 5);
         }
     }
 
     #endregion
+
+    static class StringCrLfExtensions
+    {
+        public static string Lf(this string s)
+        {
+            if (string.IsNullOrEmpty(s)) return s;
+            return s.Replace("\r", ""); // remove Cr
+        }
+    }
 }
