@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
                 + (10 * 5) //the docs that have 2 tag prop per document - these are the update statements
                 + (10 * 5) //the docs that have 2 tag prop per document - these are the insert statements
                 + 1//the delete clause
-                + 5 , //additional db expressions
+                + 7 , //additional db expressions
                 migrationContext.Expressions.Count);
         }
     }
