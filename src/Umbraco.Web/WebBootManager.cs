@@ -132,7 +132,8 @@ namespace Umbraco.Web
 			ViewEngines.Engines.Clear();
 	        foreach (var engine in engines)
 	        {
-		        ViewEngines.Engines.Add(new ProfilingViewEngine(engine));
+		        var wrappedEngine = engine is ProfilingViewEngine ? engine : new ProfilingViewEngine(engine);
+		        ViewEngines.Engines.Add(wrappedEngine);
 	        }
 
 	        //set routes
