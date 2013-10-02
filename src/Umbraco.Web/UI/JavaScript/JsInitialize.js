@@ -27,8 +27,8 @@
     */
 
     /* temporary sorter lib, should be updated
-    'lib/angular/angular-ui-sortable.js',*/
-    'lib/jquery/jquery.sortable/jquery.sortable.js',
+    'lib/angular/angular-ui-sortable.js',
+    'lib/jquery/jquery.sortable/jquery.sortable.js',*/
 
     /* App-wide file-upload helper */
     'lib/jquery/jquery.upload/js/jquery.fileupload.js',

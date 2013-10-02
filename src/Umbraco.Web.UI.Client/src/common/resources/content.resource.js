@@ -145,8 +145,9 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *    });
          * </pre> 
          * @param {Object} args arguments object
-         * @param {Int} args.idd the ID of the node to copy
+         * @param {Int} args.id the ID of the node to copy
          * @param {Int} args.parentId the ID of the parent node to copy to
+         * @param {Boolean} args.relateToOriginal if true, relates the copy to the original through the relation api
          * @returns {Promise} resourcePromise object.
          *
          */
@@ -163,10 +164,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostCopy"),
-                    {
-                        parentId: args.parentId,
-                        id: args.id
-                    }),
+                    args),
                 'Failed to copy content');
         },
 

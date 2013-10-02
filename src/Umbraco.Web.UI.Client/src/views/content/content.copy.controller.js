@@ -26,7 +26,7 @@ angular.module("umbraco")
 	});
 
 	$scope.copy = function(){
-		contentResource.copy({parentId: $scope.target.id, id: node.id})
+		contentResource.copy({parentId: $scope.target.id, id: node.id, relateToOriginal: $scope.relate})
 			.then(function(){
 				$scope.error = false;
 				$scope.success = true;
