@@ -114,7 +114,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             DatabaseContext.Database.Insert(new TagRelationshipDto { NodeId = -1, TagId = alltags.First().Id });
 
 
-            var migration = new AlterTagsTable();
+            var migration = new AlterTagRelationsTable();
             var migrationContext = new MigrationContext(DatabaseProviders.SqlServerCE, DatabaseContext.Database);
             migration.GetUpExpressions(migrationContext);
 

@@ -76,9 +76,9 @@ namespace Umbraco.Web.Trees
                 }
 
                 // root actions         
-                menu.AddMenuItem<ActionNew>();
-                menu.AddMenuItem<ActionSort>(true).ConvertLegacyMenuItem(null, "media", "media");
-                menu.AddMenuItem<RefreshNode, ActionRefresh>(true);
+                menu.AddMenuItem<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
+                menu.AddMenuItem<ActionSort>(ui.Text("actions", ActionSort.Instance.Alias), true).ConvertLegacyMenuItem(null, "media", "media");
+                menu.AddMenuItem<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
 
@@ -93,11 +93,11 @@ namespace Umbraco.Web.Trees
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
             //return a normal node menu:
-            menu.AddMenuItem<ActionNew>();
-            menu.AddMenuItem<ActionMove>();
-            menu.AddMenuItem<ActionDelete>();
-            menu.AddMenuItem<ActionSort>().ConvertLegacyMenuItem(null, "media", "media");
-            menu.AddMenuItem<ActionRefresh>(true);
+            menu.AddMenuItem<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
+            menu.AddMenuItem<ActionMove>(ui.Text("actions", ActionMove.Instance.Alias));
+            menu.AddMenuItem<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+            menu.AddMenuItem<ActionSort>(ui.Text("actions", ActionSort.Instance.Alias)).ConvertLegacyMenuItem(null, "media", "media");
+            menu.AddMenuItem<ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
             return menu;
         }
 

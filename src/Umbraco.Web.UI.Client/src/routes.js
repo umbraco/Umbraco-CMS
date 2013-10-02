@@ -88,9 +88,15 @@ app.config(function ($routeProvider) {
                 if (!rp.tree || !rp.method) {
                     return "views/common/dashboard.html";
                 }
-                    
+                
+                //TODO: Here we need to figure out if this route is for a package and if so then we need
+                // to change it's convention view path to:
+                // /App_Plugins/{mypackage}/umbraco/{treetype}/{method}.html
+                
+
                 //we don't need to put views into section folders since theoretically trees
                 // could be moved among sections, we only need folders for specific trees.
+                
                 return 'views/' + rp.tree + '/' + rp.method + '.html';
             },
             resolve: checkAuth(true)

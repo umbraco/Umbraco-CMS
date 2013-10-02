@@ -4,11 +4,9 @@ using System.Dynamic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 

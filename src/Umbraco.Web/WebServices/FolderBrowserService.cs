@@ -10,6 +10,7 @@ using Umbraco.Web.Media.ThumbnailProviders;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.Tags;
 using Umbraco.Web.BaseRest;
+using Tag = umbraco.cms.businesslogic.Tags.Tag;
 
 namespace Umbraco.Web.WebServices
 {

@@ -2,6 +2,7 @@
 using System.Runtime.Serialization;
 using umbraco.interfaces;
 using System.Collections.Generic;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Trees.Menu
 {
@@ -16,10 +17,17 @@ namespace Umbraco.Web.Trees.Menu
             AdditionalData = new Dictionary<string, object>();
         }
 
-        public MenuItem(IAction legacyMenu)
+        public MenuItem(string alias, string name)
             : this()
         {
-            Name = legacyMenu.Alias;
+            Alias = alias;
+            Name = name;
+        }
+
+        public MenuItem(IAction legacyMenu, string name = "")
+            : this()
+        {
+            Name = name.IsNullOrWhiteSpace() ? legacyMenu.Alias : name;
             Alias = legacyMenu.Alias;
             SeperatorBefore = false;
             Icon = legacyMenu.Icon;

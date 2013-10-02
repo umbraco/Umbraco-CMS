@@ -5,46 +5,7 @@ using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Persistence.Caching
 {
-    //internal class RequestRepositoryCacheProvider : IRepositoryCacheProvider
-    //{
-    //    private readonly ICacheProvider _requestCacheProvider;
-
-    //    public RequestRepositoryCacheProvider(ICacheProvider requestCacheProvider)
-    //    {
-    //        _requestCacheProvider = requestCacheProvider;
-    //    }
-
-    //    public IEntity GetById(Type type, Guid id)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public IEnumerable<IEntity> GetByIds(Type type, List<Guid> ids)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public IEnumerable<IEntity> GetAllByType(Type type)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public void Save(Type type, IEntity entity)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public void Delete(Type type, IEntity entity)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public void Clear(Type type)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
-
+  
     /// <summary>
     /// Defines the implementation of a Cache Provider intented to back a repository
     /// </summary>

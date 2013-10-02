@@ -12,8 +12,9 @@ namespace Umbraco.Web.Trees.Menu
     [DataContract(Name = "menuItems", Namespace = "")]
     public class MenuItemCollection
     {
+        private readonly string _packageFolderName;
         private readonly List<MenuItem> _menuItems;
-
+        
         public MenuItemCollection()
         {
             _menuItems = new List<MenuItem>();
@@ -21,6 +22,18 @@ namespace Umbraco.Web.Trees.Menu
 
         public MenuItemCollection(IEnumerable<MenuItem> items)
         {
+            _menuItems = new List<MenuItem>(items);
+        }
+
+        public MenuItemCollection(string packageFolderName)
+            : this()
+        {
+            _packageFolderName = packageFolderName;
+        }
+
+        public MenuItemCollection(string packageFolderName, IEnumerable<MenuItem> items)
+        {
+            _packageFolderName = packageFolderName;
             _menuItems = new List<MenuItem>(items);
         }
 
@@ -42,13 +55,15 @@ namespace Umbraco.Web.Trees.Menu
         /// <summary>
         /// Adds a menu item
         /// </summary>
-        internal MenuItem AddMenuItem(IAction action)
+        /// <param name="action"></param>
+        /// <param name="name">The text to display for the menu item, will default to the IAction alias if not specified</param>
+        internal MenuItem AddMenuItem(IAction action, string name)
         {
             var item = new MenuItem(action);
 
             DetectLegacyActionMenu(action.GetType(), item);
 
-            _menuItems.Add(item);
+            AddItemToCollection(item);
             return item;
         }
 
@@ -66,16 +81,23 @@ namespace Umbraco.Web.Trees.Menu
         /// </summary>
         public void AddMenuItem(MenuItem item)
         {
-            _menuItems.Add(item);
+            AddItemToCollection(item);
         }
-
-        //TODO: Implement more overloads for MenuItem with dictionary vals
-
-        public TMenuItem AddMenuItem<TMenuItem, TAction>(bool hasSeparator = false, IDictionary<string, object> additionalData = null)
+        
+        /// <summary>
+        /// Adds a menu item
+        /// </summary>
+        /// <typeparam name="TMenuItem"></typeparam>
+        /// <typeparam name="TAction"></typeparam>
+        /// <param name="hasSeparator"></param>
+        /// <param name="name">The text to display for the menu item, will default to the IAction alias if not specified</param>
+        /// <param name="additionalData"></param>
+        /// <returns></returns>
+        public TMenuItem AddMenuItem<TMenuItem, TAction>(string name, bool hasSeparator = false, IDictionary<string, object> additionalData = null)
             where TAction : IAction
             where TMenuItem : MenuItem, new()
         {
-            var item = CreateMenuItem<TAction>(hasSeparator, additionalData);
+            var item = CreateMenuItem<TAction>(name, hasSeparator, additionalData);
             if (item == null) return null;
 
             var customMenuItem = new TMenuItem
@@ -87,7 +109,7 @@ namespace Umbraco.Web.Trees.Menu
                     Action = item.Action
                 };
 
-            _menuItems.Add(customMenuItem);
+            AddItemToCollection(customMenuItem);
 
             return customMenuItem;
         }
@@ -95,11 +117,12 @@ namespace Umbraco.Web.Trees.Menu
         /// <summary>
         /// Adds a menu item
         /// </summary>
+        /// <param name="name">The text to display for the menu item, will default to the IAction alias if not specified</param>
         /// <typeparam name="T"></typeparam>
-        public MenuItem AddMenuItem<T>()
+        public MenuItem AddMenuItem<T>(string name)
             where T : IAction
         {
-            return AddMenuItem<T>(false, null);
+            return AddMenuItem<T>(name, false, null);
         }
 
         /// <summary>
@@ -108,23 +131,51 @@ namespace Umbraco.Web.Trees.Menu
         /// <typeparam name="T"></typeparam>
         /// <param name="key"></param>
         /// <param name="value"></param>
+        /// <param name="name">The text to display for the menu item, will default to the IAction alias if not specified</param>
         /// <param name="hasSeparator"></param>
-        public MenuItem AddMenuItem<T>(string key, string value, bool hasSeparator = false)
+        public MenuItem AddMenuItem<T>(string name, string key, string value, bool hasSeparator = false)
             where T : IAction
         {
-            return AddMenuItem<T>(hasSeparator, new Dictionary<string, object> { { key, value } });
+            return AddMenuItem<T>(name, hasSeparator, new Dictionary<string, object> { { key, value } });
         }
 
-        internal MenuItem CreateMenuItem<T>(bool hasSeparator = false, IDictionary<string, object> additionalData = null)
+        /// <summary>
+        /// Adds a menu item with a dictionary which is merged to the AdditionalData bag
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="hasSeparator"></param>
+        /// /// <param name="name">The text to display for the menu item, will default to the IAction alias if not specified</param>
+        /// <param name="additionalData"></param>
+        public MenuItem AddMenuItem<T>(string name, bool hasSeparator = false, IDictionary<string, object> additionalData = null)
+            where T : IAction
+        {
+            var item = CreateMenuItem<T>(name, hasSeparator, additionalData);
+            if (item != null) 
+            {
+                AddItemToCollection(item);
+                return item;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="hasSeparator"></param>
+        /// <param name="name">The text to display for the menu item, will default to the IAction alias if not specified</param>
+        /// <param name="additionalData"></param>
+        /// <returns></returns>
+        internal MenuItem CreateMenuItem<T>(string name, bool hasSeparator = false, IDictionary<string, object> additionalData = null)
             where T : IAction
         {
             var item = ActionsResolver.Current.GetAction<T>();
             if (item != null)
             {
-                var menuItem = new MenuItem(item)
-                    {
-                        SeperatorBefore = hasSeparator
-                    };
+                var menuItem = new MenuItem(item, name)
+                {
+                    SeperatorBefore = hasSeparator
+                };
 
                 if (additionalData != null)
                 {
@@ -134,7 +185,7 @@ namespace Umbraco.Web.Trees.Menu
                     }
                 }
 
-                DetectLegacyActionMenu(typeof (T), menuItem);
+                DetectLegacyActionMenu(typeof(T), menuItem);
 
                 //TODO: Once we implement 'real' menu items, not just IActions we can implement this since
                 // people may need to pass specific data to their menu items
@@ -143,24 +194,6 @@ namespace Umbraco.Web.Trees.Menu
                 //item.ValidateRequiredData(AdditionalData);
 
                 return menuItem;
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Adds a menu item with a dictionary which is merged to the AdditionalData bag
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="hasSeparator"></param>
-        /// <param name="additionalData"></param>
-        public MenuItem AddMenuItem<T>(bool hasSeparator = false, IDictionary<string, object> additionalData = null)
-            where T : IAction
-        {
-            var item = CreateMenuItem<T>(hasSeparator, additionalData);
-            if (item != null) 
-            {
-                _menuItems.Add(item);
-                return item;
             }
             return null;
         }
@@ -189,6 +222,19 @@ namespace Umbraco.Web.Trees.Menu
                     menuItem.AdditionalData.Add("jsAction", string.Format("{0}.{1}", attribute.ServiceName, attribute.MethodName));
                 }
             }
+        }
+
+        /// <summary>
+        /// This handles adding a menu item to the internal collection and will configure it accordingly
+        /// </summary>
+        /// <param name="menuItem"></param>
+        private void AddItemToCollection(MenuItem menuItem)
+        {
+            if (_packageFolderName.IsNullOrWhiteSpace() == false)
+            {
+                menuItem.SetPackageFolder(_packageFolderName);
+            }
+            _menuItems.Add(menuItem);
         }
 
     }

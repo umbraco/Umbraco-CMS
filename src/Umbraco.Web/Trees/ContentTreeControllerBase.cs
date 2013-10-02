@@ -96,8 +96,8 @@ namespace Umbraco.Web.Trees
             if (RecycleBinId.ToInvariantString() == id)
             {
                 var menu = new MenuItemCollection();
-                menu.AddMenuItem<ActionEmptyTranscan>();
-                menu.AddMenuItem<ActionRefresh>(true);
+                menu.AddMenuItem<ActionEmptyTranscan>(ui.Text("actions", ActionEmptyTranscan.Instance.Alias));
+                menu.AddMenuItem<ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
             return PerformGetMenuForNode(id, queryStrings);
