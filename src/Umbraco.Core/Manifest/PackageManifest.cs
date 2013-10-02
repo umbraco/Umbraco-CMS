@@ -13,6 +13,11 @@ namespace Umbraco.Core.Manifest
         public JArray JavaScriptInitialize { get; set; }
 
         /// <summary>
+        /// The json array used to initialize the application with the CSS dependencies required
+        /// </summary>
+        public JArray StyleSheetInitialize { get; set; }
+
+        /// <summary>
         /// The json array of property editors
         /// </summary>
         public JArray PropertyEditors { get; set; }
