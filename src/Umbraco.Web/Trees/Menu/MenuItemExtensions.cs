@@ -10,12 +10,22 @@ namespace Umbraco.Web.Trees.Menu
         /// Used as a key for the AdditionalData to specify a specific dialog title instead of the menu title
         /// </summary>
         internal const string DialogTitleKey = "dialogTitle";
+        
+        /// <summary>
+        /// Used to specify the URL that the dialog will launch to in an iframe
+        /// </summary>
         internal const string ActionUrlKey = "actionUrl";
+
+
         internal const string ActionUrlMethodKey = "actionUrlMethod";
+
+        /// <summary>
+        /// Used to specify the angular view that the dialog will launch
+        /// </summary>
         internal const string ActionViewKey = "actionView";
 
         /// <summary>
-        /// Sets the menu item to display a dialog based on a view path
+        /// Sets the menu item to display a dialog based on an angular view path
         /// </summary>
         /// <param name="menuItem"></param>
         /// <param name="view"></param>
@@ -27,7 +37,7 @@ namespace Umbraco.Web.Trees.Menu
         }
 
         /// <summary>
-        /// Sets the menu item to display a dialog based on a url path
+        /// Sets the menu item to display a dialog based on a url path in an iframe
         /// </summary>
         /// <param name="menuItem"></param>
         /// <param name="url"></param>
