@@ -364,7 +364,17 @@ angular.module('umbraco.services')
                 //by convention we will look into the /views/{treetype}/{action}.html
                 // for example: /views/content/create.html
 
-                templateUrl = "views/" + treeService.getTreeAlias(args.node) + "/" + args.action.alias + ".html";
+                //we will also check for a 'packageName' in metaData, if it exists, we'll look by convention in that folder
+                // for example: /App_Plugins/{mypackage}/umbraco/{treetype}/create.html
+
+                if (args.action.metaData["packageName"]) {
+
+                    templateUrl = Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
+                        "/umbraco/views/" + treeService.getTreeAlias(args.node) + "/" + args.action.alias + ".html";
+                }
+                else {
+                    templateUrl = "views/" + treeService.getTreeAlias(args.node) + "/" + args.action.alias + ".html";
+                }
 
                 iframe = false;
             }

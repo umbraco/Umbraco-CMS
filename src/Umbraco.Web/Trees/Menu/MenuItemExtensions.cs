@@ -7,6 +7,11 @@ namespace Umbraco.Web.Trees.Menu
     public static class MenuItemExtensions
     {
         /// <summary>
+        /// Used as a key for the AdditionalData to specify which package folder the menu launcher should look in for views
+        /// </summary>
+        internal const string PackageName = "packageName";
+
+        /// <summary>
         /// Used as a key for the AdditionalData to specify a specific dialog title instead of the menu title
         /// </summary>
         internal const string DialogTitleKey = "dialogTitle";
@@ -16,13 +21,26 @@ namespace Umbraco.Web.Trees.Menu
         /// </summary>
         internal const string ActionUrlKey = "actionUrl";
 
-
+        //TODO: some action's want to launch a new window like live editing, we support this in the menu item's metadata with
+        // a key called: "actionUrlMethod" which can be set to either: Dialog, BlankWindow. Normally this is always set to Dialog 
+        // if a URL is specified in the "actionUrl" metadata. For now I'm not going to implement launching in a blank window, 
+        // though would be v-easy, just not sure we want to ever support that?
         internal const string ActionUrlMethodKey = "actionUrlMethod";
 
         /// <summary>
         /// Used to specify the angular view that the dialog will launch
         /// </summary>
         internal const string ActionViewKey = "actionView";
+
+        /// <summary>
+        /// Sets the package folder to look for views in
+        /// </summary>
+        /// <param name="menuItem"></param>
+        /// <param name="packageFolder"></param>
+        internal static void SetPackageFolder(this MenuItem menuItem, string packageFolder)
+        {
+            menuItem.AdditionalData[PackageName] = packageFolder;
+        }
 
         /// <summary>
         /// Sets the menu item to display a dialog based on an angular view path

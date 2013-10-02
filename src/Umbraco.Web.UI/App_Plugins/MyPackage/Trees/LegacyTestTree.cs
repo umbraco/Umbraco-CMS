@@ -10,31 +10,32 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.UI.App_Plugins.MyPackage.Trees
 {
-    //[Tree(Constants.Applications.Settings, "myTree", "My Tree")]
-    //[PluginController("MyPackage")]
-    //public class MyCustomTree : TreeController
-    //{
-    //    protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
-    //    {
-    //        if (id == Constants.System.Root.ToInvariantString())
-    //        {
-    //            var tree = new TreeNodeCollection
-    //                {
-    //                    CreateTreeNode("1", queryStrings, "My Node 1"), 
-    //                    CreateTreeNode("2", queryStrings, "My Node 2"), 
-    //                    CreateTreeNode("3", queryStrings, "My Node 3")
-    //                };
-    //            return tree;
-    //        }
-    //        throw new NotSupportedException();
-    //    }
+    [Tree(Constants.Applications.Settings, "myTree", "My Tree")]
+    [PluginController("MyPackage")]
+    public class MyCustomTreeController : TreeController
+    {
+        protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
+        {
+            if (id == Constants.System.Root.ToInvariantString())
+            {
+                var tree = new TreeNodeCollection
+                    {
+                        CreateTreeNode("1", queryStrings, "My Node 1"), 
+                        CreateTreeNode("2", queryStrings, "My Node 2"), 
+                        CreateTreeNode("3", queryStrings, "My Node 3")
+                    };
+                return tree;
+            }
+            throw new NotSupportedException();
+        }
 
-    //    protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
-    //    {
-    //        var menu = new MenuItemCollection();
-    //        menu.AddMenuItem(new MenuItem("create", "Create"));
-    //    }
-    //}
+        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        {
+            var menu = new MenuItemCollection("MyPackage");
+            menu.AddMenuItem(new MenuItem("create", "Create"));
+            return menu;
+        }
+    }
 
     public class LegacyTestTree : BaseTree
     {

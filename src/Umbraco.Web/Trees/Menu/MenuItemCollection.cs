@@ -12,6 +12,7 @@ namespace Umbraco.Web.Trees.Menu
     [DataContract(Name = "menuItems", Namespace = "")]
     public class MenuItemCollection
     {
+        private readonly string _packageFolderName;
         private readonly List<MenuItem> _menuItems;
 
         public MenuItemCollection()
@@ -21,6 +22,18 @@ namespace Umbraco.Web.Trees.Menu
 
         public MenuItemCollection(IEnumerable<MenuItem> items)
         {
+            _menuItems = new List<MenuItem>(items);
+        }
+
+        public MenuItemCollection(string packageFolderName)
+            : this()
+        {
+            _packageFolderName = packageFolderName;
+        }
+
+        public MenuItemCollection(string packageFolderName, IEnumerable<MenuItem> items)
+        {
+            _packageFolderName = packageFolderName;
             _menuItems = new List<MenuItem>(items);
         }
 
@@ -50,7 +63,7 @@ namespace Umbraco.Web.Trees.Menu
 
             DetectLegacyActionMenu(action.GetType(), item);
 
-            _menuItems.Add(item);
+            AddItemToCollection(item);
             return item;
         }
 
@@ -68,7 +81,7 @@ namespace Umbraco.Web.Trees.Menu
         /// </summary>
         public void AddMenuItem(MenuItem item)
         {
-            _menuItems.Add(item);
+            AddItemToCollection(item);
         }
         
         /// <summary>
@@ -96,7 +109,7 @@ namespace Umbraco.Web.Trees.Menu
                     Action = item.Action
                 };
 
-            _menuItems.Add(customMenuItem);
+            AddItemToCollection(customMenuItem);
 
             return customMenuItem;
         }
@@ -139,7 +152,7 @@ namespace Umbraco.Web.Trees.Menu
             var item = CreateMenuItem<T>(name, hasSeparator, additionalData);
             if (item != null) 
             {
-                _menuItems.Add(item);
+                AddItemToCollection(item);
                 return item;
             }
             return null;
@@ -209,6 +222,19 @@ namespace Umbraco.Web.Trees.Menu
                     menuItem.AdditionalData.Add("jsAction", string.Format("{0}.{1}", attribute.ServiceName, attribute.MethodName));
                 }
             }
+        }
+
+        /// <summary>
+        /// This handles adding a menu item to the internal collection and will configure it accordingly
+        /// </summary>
+        /// <param name="menuItem"></param>
+        private void AddItemToCollection(MenuItem menuItem)
+        {
+            if (_packageFolderName.IsNullOrWhiteSpace() == false)
+            {
+                menuItem.SetPackageFolder(_packageFolderName);
+            }
+            _menuItems.Add(menuItem);
         }
 
     }

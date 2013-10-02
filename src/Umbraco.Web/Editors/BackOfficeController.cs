@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Web.Mvc;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
 using Umbraco.Core;
 using Umbraco.Web.Mvc;
@@ -79,6 +80,7 @@ namespace Umbraco.Web.Editors
                         "umbracoSettings", new Dictionary<string, object>
                             {
                                 {"umbracoPath", GlobalSettings.Path},
+                                {"appPluginsPath", IOHelper.ResolveUrl(SystemDirectories.AppPlugins).TrimEnd('/')},
                                 {"imageFileTypes", 
                                     string.Join(",",UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes)},
                             }
