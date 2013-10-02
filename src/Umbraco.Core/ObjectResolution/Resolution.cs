@@ -126,7 +126,7 @@ namespace Umbraco.Core.ObjectResolution
         /// <remarks>To be used in unit tests.</remarks>
         internal static void Reset()
         {
-            LogHelper.Debug(typeof(DirtyBackdoor), "Resetting resolution");
+            LogHelper.Debug(typeof(Resolution), "Resetting resolution");
 
             using (new WriteLock(ConfigurationLock))
             {
