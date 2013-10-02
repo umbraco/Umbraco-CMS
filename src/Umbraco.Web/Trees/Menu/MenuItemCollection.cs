@@ -14,7 +14,7 @@ namespace Umbraco.Web.Trees.Menu
     {
         private readonly string _packageFolderName;
         private readonly List<MenuItem> _menuItems;
-
+        
         public MenuItemCollection()
         {
             _menuItems = new List<MenuItem>();
