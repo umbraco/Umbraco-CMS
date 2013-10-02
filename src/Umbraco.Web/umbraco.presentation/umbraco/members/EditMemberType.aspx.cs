@@ -64,7 +64,7 @@ namespace umbraco.cms.presentation.members
 				}
 				handled = true;
 			}
-			setupExtraEditorControls();
+			
 			return handled;
 		}
 		private void setupExtraEditorControls(){
