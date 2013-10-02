@@ -77,7 +77,7 @@ namespace Umbraco.Web.Trees
 
                 // root actions         
                 menu.AddMenuItem<ActionNew>();
-                menu.AddMenuItem<ActionSort>(true);
+                menu.AddMenuItem<ActionSort>(true).ConvertLegacyMenuItem(null, "media", "media");
                 menu.AddMenuItem<RefreshNode, ActionRefresh>(true);
                 return menu;
             }
@@ -94,9 +94,9 @@ namespace Umbraco.Web.Trees
             }
             //return a normal node menu:
             menu.AddMenuItem<ActionNew>();
-            menu.AddMenuItem<ActionMove>().ConvertLegacyMenuItem(item, "media", "media");
+            menu.AddMenuItem<ActionMove>();
             menu.AddMenuItem<ActionDelete>();
-            menu.AddMenuItem<ActionSort>();
+            menu.AddMenuItem<ActionSort>().ConvertLegacyMenuItem(null, "media", "media");
             menu.AddMenuItem<ActionRefresh>(true);
             return menu;
         }
