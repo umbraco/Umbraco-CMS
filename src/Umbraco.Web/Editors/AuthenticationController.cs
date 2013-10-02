@@ -86,10 +86,11 @@ namespace Umbraco.Web.Editors
                 return Mapper.Map<UserDetail>(user);
             }
 
-            //return Forbidden (403), we don't want to return a 401 because that get's intercepted 
+            //return BadRequest (400), we don't want to return a 401 because that get's intercepted 
             // by our angular helper because it thinks that we need to re-perform the request once we are
-            // authorized. A login form should not return a 401 because its the authorization process.
-            throw new HttpResponseException(HttpStatusCode.Forbidden);
+            // authorized and we don't want to return a 403 because angular will show a warning msg indicating 
+            // that the user doesn't have access to perform this function, we just want to return a normal invalid msg.
+            throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
 
         /// <summary>
