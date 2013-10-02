@@ -781,8 +781,21 @@ namespace Umbraco.Core
         /// does initialise the resolver.</remarks>
         private static IShortStringHelper ShortStringHelper
         {
-            get { return ShortStringHelperResolver.HasCurrent ?  ShortStringHelperResolver.Current.Helper : new LegacyShortStringHelper(); }
+            get
+            {
+                if (ShortStringHelperResolver.HasCurrent)
+                    return ShortStringHelperResolver.Current.Helper;
+                if (_helper != null)
+                    return _helper;
+
+                // there *has* to be a short string helper, even if the resolver has not
+                // been initialized - used the default one with default configuration.
+                _helper = new DefaultShortStringHelper().WithConfig(allowLeadingDigits: true);
+                _helper.Freeze();
+                return _helper;
+            }
         }
+        private static IShortStringHelper _helper;
 
         /// <summary>
         /// Returns a new string in which all occurences of specified strings are replaced by other specified strings.
