@@ -422,6 +422,12 @@
     <Compile Include="Umbraco\controls\Images\ImageViewer.ascx.designer.cs">
       <DependentUpon>ImageViewer.ascx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Create.aspx.cs">
+      <DependentUpon>create.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Umbraco\Create.aspx.designer.cs">
+      <DependentUpon>create.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Create\PartialView.ascx.cs">
       <DependentUpon>PartialView.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -581,6 +587,7 @@
     <Compile Include="Umbraco\TreeInit.aspx.designer.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
     </Compile>
+    <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
     <Content Include="App_Plugins\MyPackage\Common\Js\MyPackage.js" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\CsvEditor.js" />

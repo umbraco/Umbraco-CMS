@@ -373,6 +373,9 @@
     <Compile Include="Trees\DataTypeTreeController.cs" />
     <Compile Include="Trees\MemberTreeController.cs" />
     <Compile Include="Trees\Menu\CreateChildEntity.cs" />
+    <Compile Include="umbraco.presentation\umbraco\create.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="WebApi\Binders\MemberBinder.cs" />
     <Compile Include="WebApi\ControllerContextExtensions.cs" />
     <Compile Include="WebApi\CustomDateTimeConvertor.cs" />
