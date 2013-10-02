@@ -79,13 +79,13 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
                 // root actions         
-                menu.AddMenuItem<ActionNew>();
-                menu.AddMenuItem<RefreshNode, ActionRefresh>(true);
+                menu.AddMenuItem<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
+                menu.AddMenuItem<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
 
-            menu.AddMenuItem<ActionDelete>();
-            menu.AddMenuItem<RefreshNode, ActionRefresh>(true);
+            menu.AddMenuItem<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+            menu.AddMenuItem<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
             return menu;
         }
     }

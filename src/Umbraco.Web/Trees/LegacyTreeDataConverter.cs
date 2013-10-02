@@ -147,7 +147,7 @@ namespace Umbraco.Web.Trees
                 }
                 else
                 {
-                    var menuItem = collection.AddMenuItem(t);
+                    var menuItem = collection.AddMenuItem(t, ui.Text("actions", t.Alias));
 
                     var currentAction = t;
 
