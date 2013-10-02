@@ -28,10 +28,11 @@ namespace umbraco.presentation.dialogs
         
         protected void version_load(object sender, EventArgs e) {
 
-            if (allVersions.SelectedValue != "") {
+            if (allVersions.SelectedValue != "")
+            {
                 diffPanel.Visible = true;
                 Document rollback = new Document(currentDoc.Id, new Guid(allVersions.SelectedValue));
-                
+
                 propertiesCompare.Text = "<tr><th style='width: 25%;' valign='top'>" + ui.Text("general", "name") + ":</th><td>" + rollback.Text + "</td></tr>";
                 propertiesCompare.Text += "<tr><th style='width: 25%;' valign='top'>" + ui.Text("content", "createDate") + ":</th><td>" + rollback.VersionDate.ToLongDateString() + " " + rollback.VersionDate.ToLongTimeString() + ui.Text("general", "by") + ": " + rollback.User.Name + "</td></tr>";
 
@@ -42,50 +43,63 @@ namespace umbraco.presentation.dialogs
 
 
                 var props = rollback.GenericProperties;
-                foreach (Property p in props) {
-                    try {
+                foreach (Property p in props)
+                {
+                    try
+                    {
 
-                        if (p.Value != null) {
+                        if (p.Value != null)
+                        {
 
                             //new property value... 
                             string thevalue = p.Value.ToString();
 
-                            if (rbl_mode.SelectedValue == "diff") {
-                                
+                            if (rbl_mode.SelectedValue == "diff")
+                            {
+
                                 //if display mode is set to diff...
                                 thevalue = library.StripHtml(p.Value.ToString());
                                 Property cP = currentDoc.getProperty(p.PropertyType);
-                                if (cP != null && cP.Value != null) {
+                                if (cP != null && cP.Value != null)
+                                {
 
                                     string cThevalue = library.StripHtml(cP.Value.ToString());
 
                                     propertiesCompare.Text += "<tr><th style='width: 25%;' valign='top'>" + p.PropertyType.Name + ":</th><td>" + library.ReplaceLineBreaks(cms.businesslogic.utilities.Diff.Diff2Html(cThevalue, thevalue)) + "</td></tr>";
 
-                                    
-                                } else {
+
+                                }
+                                else
+                                {
                                     //If no current version of the value... display with no diff.
                                     propertiesCompare.Text += "<tr><th style='width: 25%;' valign='top'>" + p.PropertyType.Name + ":</th><td>" + thevalue + "</td></tr>";
                                 }
 
-                            
-                            } else {
+
+                            }
+                            else
+                            {
                                 //If display mode is html
                                 propertiesCompare.Text += "<tr><th style='width: 25%;' valign='top'>" + p.PropertyType.Name + ":</th><td>" + thevalue + "</td></tr>";
                             }
-                            
-                        //previewVersionContent.Controls.Add(new LiteralControl("<div style=\"margin-top: 4px; border: 1px solid #DEDEDE; padding: 4px;\"><p style=\"padding: 0px; margin: 0px;\" class=\"guiDialogNormal\"><b>" + p.PropertyType.Name + "</b><br/>"));
-                        //previewVersionContent.Controls.Add(new LiteralControl(thevalue));
-                        
+
+                            //previewVersionContent.Controls.Add(new LiteralControl("<div style=\"margin-top: 4px; border: 1px solid #DEDEDE; padding: 4px;\"><p style=\"padding: 0px; margin: 0px;\" class=\"guiDialogNormal\"><b>" + p.PropertyType.Name + "</b><br/>"));
+                            //previewVersionContent.Controls.Add(new LiteralControl(thevalue));
+
                         }
                         //previewVersionContent.Controls.Add(new LiteralControl("</p></div>"));
-                    } catch { }
+                    }
+                    catch { }
                 }
 
-                doRollback.Enabled = true;
-                doRollback.Attributes.Add("onclick", "return confirm('" + ui.Text("areyousure") + "');");
-                
-            }else
+                pl_buttons.Visible = true;
+
+            }
+            else
+            {
                 diffPanel.Visible = false;
+                pl_buttons.Visible = false;
+            }
 
         }
 
@@ -105,50 +119,8 @@ namespace umbraco.presentation.dialogs
                 foreach (DocumentVersionList dl in currentDoc.GetVersions()) {
                     allVersions.Items.Add(new ListItem(dl.Text + " (" + ui.Text("content", "createDate") + ": " + dl.Date.ToShortDateString() + " " + dl.Date.ToShortTimeString() + ")", dl.Version.ToString()));
                 }
-                doRollback.Text = ui.Text("actions", "rollback");
+                Button1.Text = ui.Text("actions", "rollback");
             }
-
-            /*
-            foreach(Property p in d.getProperties) 
-			{
-				string thevalue = p.Value.ToString();
-				if (CheckBoxHtml.Checked)
-					thevalue = Server.HtmlEncode(thevalue);
-				currentVersionContent.Controls.Add(new LiteralControl("<div style=\"margin-top: 4px; border: 1px solid #DEDEDE; padding: 4px;\"><p style=\"padding: 0px; margin: 0px;\" class=\"guiDialogNormal\"><b>" + p.PropertyType.Name + "</b><br/>" + thevalue + "</p></div>"));
-			}
-
-			if (allVersions.SelectedValue != "") 
-			{
-				Document rollback = new Document(d.Id, new Guid(allVersions.SelectedValue));
-				previewVersionTitle.Text = rollback.Text;
-				previewVersionDetails.Text = "Created at: " + rollback.VersionDate.ToLongDateString() + " " + rollback.VersionDate.ToLongTimeString() + " by: " + rollback.User.Name;
-				foreach(Property p in rollback.getProperties) 
-				{
-					try 
-					{
-						previewVersionContent.Controls.Add(new LiteralControl("<div style=\"margin-top: 4px; border: 1px solid #DEDEDE; padding: 4px;\"><p style=\"padding: 0px; margin: 0px;\" class=\"guiDialogNormal\"><b>" + p.PropertyType.Name + "</b><br/>"));
-						if (p.Value != null) 
-						{
-							string thevalue = p.Value.ToString();
-							if (CheckBoxHtml.Checked)
-								thevalue = Server.HtmlEncode(thevalue);
-							previewVersionContent.Controls.Add(new LiteralControl(thevalue));
-						}
-						previewVersionContent.Controls.Add(new LiteralControl("</p></div>"));
-					} 
-					catch {}
-				}
-				doRollback.Enabled = true;
-				doRollback.Attributes.Add("onClick", "return confirm('" + ui.Text("areyousure") + "');");
-			} 
-			else 
-			{
-				doRollback.Enabled = false;
-				previewVersionTitle.Text = "No version selected...";
-			}
-
-			
-		    */									  
 		}
 
 		#region Web Form Designer generated code
@@ -182,8 +154,10 @@ namespace umbraco.presentation.dialogs
                 Document rollback = new Document(d.Id, new Guid(allVersions.SelectedValue));
                 feedBackMsg.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
                 string[] vars = {rollback.Text, rollback.VersionDate.ToLongDateString()};
+                
                 feedBackMsg.Text = ui.Text("rollback", "documentRolledBack", vars, new global::umbraco.BusinessLogic.User(0)) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
-                diffPanel.Height = new Unit(200, UnitType.Pixel);
+                diffPanel.Visible = false;
+                pl_buttons.Visible = false;
 
                 ClientTools.ChangeContentFrameUrl("editContent.aspx?Id=" + d.Id.ToString());
             }
