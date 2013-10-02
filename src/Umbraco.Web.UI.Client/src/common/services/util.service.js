@@ -418,7 +418,7 @@ function iconHelper($q) {
         },
 
         /** Return a list of icons, optionally filter them */
-        /** It fetches them directly from the active stylesheet in the browser */
+        /** It fetches them directly from the active stylesheets in the browser */
         getIcons: function(filter){
 
             var deferred = $q.defer();
@@ -426,22 +426,32 @@ function iconHelper($q) {
                 deferred.resolve(collectedIcons);
             }
 
-            var classes = document.styleSheets[0].rules || document.styleSheets[0].cssRules;
             collectedIcons = [];
             var f = filter || "";
             var c = ".icon-" + f;
+            for (var i = document.styleSheets.length - 1; i >= 0; i--) {
+                var classes = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
+                
+                for(var x=0;x<classes.length;x++) {
+                    var cur = classes[x];
+                    if(cur.selectorText && cur.selectorText.indexOf(c) === 0) {
+                        var s = cur.selectorText.substring(1);
+                        var hasSpace = s.indexOf(" ");
+                        if(hasSpace>0){
+                            s = s.substring(0, hasSpace);
+                        }
+                        var hasPseudo = s.indexOf(":");
+                        if(hasPseudo>0){
+                            s = s.substring(0, hasPseudo);
+                        }
 
-            for(var x=0;x<classes.length;x++) {
-                var cur = classes[x];
-                if(cur.selectorText && cur.selectorText.indexOf(c) === 0 && cur.selectorText.indexOf("before") > 0 && cur.selectorText.indexOf(",") < 0) {
-                    var s = cur.selectorText;
-                    s = cur.selectorText.substring(1, s.indexOf(":"));
-                    
-                    if(collectedIcons.indexOf(s) < 0){
-                        collectedIcons.push(s);
+                        if(collectedIcons.indexOf(s) < 0){
+                            collectedIcons.push(s);
+                        }
                     }
                 }
             }
+
             deferred.resolve(collectedIcons);
             return deferred.promise;
         },
