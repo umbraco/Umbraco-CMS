@@ -31,9 +31,6 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     if (treeNodes[i].metaData && treeNodes[i].metaData["treeAlias"]) {
                         //this is a root node
                         treeNodes[i].routePath = section;
-
-                        //we're going to remove any js callbacks from legacy tree nodes here!
-                        //treeNodes[i].metaData["jsClickCallback"] = null;
                     }
                     else {
                         var treeAlias = this.getTreeAlias(treeNodes[i]);
@@ -201,12 +198,11 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             cacheKey += "_" + section;	
 
             //return the cache if it exists
-            //if (treeArray[cacheKey] !== undefined){
-            //    return treeArray[cacheKey];
-           // }
+            if (treeArray[cacheKey] !== undefined){
+                return treeArray[cacheKey];
+            }
 
             var self = this;
-
             return treeResource.loadApplication(args)
                 .then(function(data) {
                     //this will be called once the tree app data has loaded
