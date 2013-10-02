@@ -57,7 +57,7 @@ namespace umbraco.BusinessLogic.Actions
                 using (Umbraco.Core.ObjectResolution.Resolution.DirtyBackdoorToConfiguration)
                 {
                     //TODO: Based on the above, this is a big hack as types should all be cleared on package install!
-                    ActionsResolver.Reset();
+                    ActionsResolver.Reset(false); // and do NOT reset the whole resolution!
                     ActionHandlers.Clear();
 
                     //TODO: Based on the above, this is a big hack as types should all be cleared on package install!
