@@ -19,6 +19,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("ParentId")]
         [NullSetting(NullSetting = NullSettings.Null)]
+        [ForeignKey(typeof(TagDto), Name = "FK_cmsTags_cmsTags")]
         public int? ParentId { get; set; }
 
         [Column("group")]

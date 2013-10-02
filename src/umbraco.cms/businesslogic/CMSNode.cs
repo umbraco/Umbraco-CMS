@@ -20,6 +20,7 @@ using umbraco.cms.businesslogic.workflow;
 using umbraco.cms.businesslogic.Tags;
 using File = System.IO.File;
 using Media = umbraco.cms.businesslogic.media.Media;
+using Tag = umbraco.cms.businesslogic.Tags.Tag;
 using Task = umbraco.cms.businesslogic.task.Task;
 
 namespace umbraco.cms.businesslogic
