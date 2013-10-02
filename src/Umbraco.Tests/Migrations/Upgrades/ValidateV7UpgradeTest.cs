@@ -114,7 +114,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             DatabaseContext.Database.Insert(new TagRelationshipDto { NodeId = -1, TagId = alltags.First().Id });
 
 
-            var migration = new UpgradeTagTableData();
+            var migration = new AlterTagsTable();
             var migrationContext = new MigrationContext(DatabaseProviders.SqlServerCE, DatabaseContext.Database);
             migration.GetUpExpressions(migrationContext);
 
@@ -122,7 +122,8 @@ namespace Umbraco.Tests.Migrations.Upgrades
                 (10 * 5) //the docs that only have 1 tag prop per document
                 + (10 * 5) //the docs that have 2 tag prop per document - these are the update statements
                 + (10 * 5) //the docs that have 2 tag prop per document - these are the insert statements
-                + 1, //the delete clause
+                + 1//the delete clause
+                + 5 , //additional db expressions
                 migrationContext.Expressions.Count);
         }
     }
@@ -130,21 +131,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
     [TestFixture]
     public class ValidateV7UpgradeTest
     {
-        [Test]
-        public void Validate_AlterTagsTableFinal()
-        {
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
-            var migration = new AlterTagsTableFinal();
-            var migrationContext = new MigrationContext(DatabaseProviders.SqlServerCE, null);
-            migration.GetUpExpressions(migrationContext);
-
-            Assert.AreEqual(1, migrationContext.Expressions.Count);
-
-            var result = migrationContext.Expressions.First().ToString();
-
-            Assert.AreEqual("ALTER TABLE [cmsTagRelationship] ADD CONSTRAINT [FK_cmsTagRelationship_cmsPropertyType] FOREIGN KEY ([propertyTypeId]) REFERENCES [cmsPropertyType] ([id]) ON DELETE CASCADE", result);
-        }
+       
 
         [Test]
         public void Validate_AddIndexToCmsMacroTable()

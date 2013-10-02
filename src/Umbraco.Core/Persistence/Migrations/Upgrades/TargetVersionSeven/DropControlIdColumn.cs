@@ -3,12 +3,14 @@ using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 {
-    [Migration("7.0.0", 8, GlobalSettings.UmbracoMigrationName)]
-    public class RemoveCmsMacroPropertyTypeTable : MigrationBase
+    [Migration("7.0.0", 2, GlobalSettings.UmbracoMigrationName)]
+    public class DropControlIdColumn : MigrationBase
     {
         public override void Up()
         {
-            Delete.Table("cmsMacroPropertyType");
+            Delete.Column("controlId").FromTable("cmsDataType");
+            //drop the default contstraint on the new column too
+            Delete.DefaultConstraint().OnTable("cmsDataType").OnColumn("propertyEditorAlias");
         }
 
         public override void Down()

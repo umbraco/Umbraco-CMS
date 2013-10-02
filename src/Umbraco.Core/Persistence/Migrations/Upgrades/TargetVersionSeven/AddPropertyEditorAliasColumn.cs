@@ -3,19 +3,13 @@ using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 {
-    //TODO: There's other migrations we need to run for v7 like:
-    // * http://issues.umbraco.org/issue/U4-2664
 
     [Migration("7.0.0", 0, GlobalSettings.UmbracoMigrationName)]
-    public class ChangeControlIdColumn : MigrationBase
+    public class AddPropertyEditorAliasColumn : MigrationBase
     {
         public override void Up()
-        {   
-            Alter.Table("cmsDataType").AlterColumn("controlId").AsString(255);
+        {               
             Alter.Table("cmsDataType").AddColumn("propertyEditorAlias").AsString(255).NotNullable().WithDefaultValue("");
-            Rename.Column("controlId").OnTable("cmsDataType").To("propertyEditorAlias");
-
-            Delete.Column("controlId").FromTable("cmsDataType");
         }
 
         public override void Down()
