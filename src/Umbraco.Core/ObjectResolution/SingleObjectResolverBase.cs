@@ -102,10 +102,7 @@ namespace Umbraco.Core.ObjectResolution
 		{
 			get
 			{
-                // ensure we can
-                if (CanResolveBeforeFrozen == false)
-                    Resolution.EnsureIsFrozen();
-
+                using (Resolution.Reader(CanResolveBeforeFrozen))
 				using (new ReadLock(_lock))
 				{
 					if (!_canBeNull && _value == null)

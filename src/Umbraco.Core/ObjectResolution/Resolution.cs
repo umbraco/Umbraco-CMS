@@ -13,8 +13,8 @@ namespace Umbraco.Core.ObjectResolution
 	/// </remarks>
 	internal static class Resolution
 	{
-		private static readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
-	    private volatile static bool _isFrozen;
+		private static readonly ReaderWriterLockSlim ConfigurationLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        private volatile static bool _isFrozen;
 
 	    /// <summary>
 		/// Occurs when resolution is frozen.
@@ -25,18 +25,26 @@ namespace Umbraco.Core.ObjectResolution
 		/// <summary>
 		/// Gets or sets a value indicating whether resolution of objects is frozen.
 		/// </summary>
-		public static bool IsFrozen
+		// internal for unit tests, use ReadFrozen if you want to be sure
+		internal static bool IsFrozen
 		{
-		    get { return _isFrozen; }
+		    get
+		    {
+		        using (new ReadLock(ConfigurationLock))
+		        {
+                    return _isFrozen;
+                }
+		    }
 		}
 
-	    public static void EnsureIsFrozen()
-		{
-            if (!_isFrozen)
-            {
-                throw new InvalidOperationException("Resolution is not frozen, it is not yet possible to get values from it.");
-            }
-		}
+	    public static IDisposable Reader(bool canReadUnfrozen = false)
+	    {
+            IDisposable l = new ReadLock(ConfigurationLock);
+            if (canReadUnfrozen || _isFrozen) return l;
+
+            l.Dispose();
+            throw new InvalidOperationException("Resolution is not frozen, it is not yet possible to get values from it.");
+	    }
 
 		/// <summary>
 		/// Returns a disposable object that represents safe access to unfrozen resolution configuration.
@@ -46,13 +54,11 @@ namespace Umbraco.Core.ObjectResolution
 		{
 			get
 			{
-				IDisposable l = new WriteLock(_lock);
-                if (_isFrozen)
-				{
-					l.Dispose();
-					throw new InvalidOperationException("Resolution is frozen, it is not possible to configure it anymore.");
-				}
-				return l;
+				IDisposable l = new WriteLock(ConfigurationLock);
+			    if (_isFrozen == false) return l;
+
+			    l.Dispose();
+			    throw new InvalidOperationException("Resolution is frozen, it is not possible to configure it anymore.");
 			}
 		}
 
@@ -72,16 +78,15 @@ namespace Umbraco.Core.ObjectResolution
         // keep the class here because it needs write-access to Resolution.IsFrozen
         private class DirtyBackdoor : IDisposable
         {
-            private static readonly ReaderWriterLockSlim DirtyLock = new ReaderWriterLockSlim();
 
-            private IDisposable _lock;
-            private bool _frozen;
+            private readonly IDisposable _lock;
+            private readonly bool _frozen;
 
             public DirtyBackdoor()
             {
                 LogHelper.Debug(typeof(DirtyBackdoor), "Creating back door for resolution");
 
-                _lock = new WriteLock(DirtyLock);
+                _lock = new WriteLock(ConfigurationLock);
                 _frozen = _isFrozen;
                 _isFrozen = false;
             }
@@ -103,11 +108,15 @@ namespace Umbraco.Core.ObjectResolution
 		{
             LogHelper.Debug(typeof(Resolution), "Freezing resolution");
 
-            if (_isFrozen)
-				throw new InvalidOperationException("Resolution is frozen. It is not possible to freeze it again.");
+		    using (new WriteLock(ConfigurationLock))
+		    {
+                if (_isFrozen)
+                    throw new InvalidOperationException("Resolution is frozen. It is not possible to freeze it again.");
 
-            _isFrozen = true;
-			if (Frozen != null)
+                _isFrozen = true;
+            }
+			
+            if (Frozen != null)
 				Frozen(null, null);
 		}
         
@@ -117,9 +126,12 @@ namespace Umbraco.Core.ObjectResolution
         /// <remarks>To be used in unit tests.</remarks>
         internal static void Reset()
         {
-            LogHelper.Debug(typeof(DirtyBackdoor), "Resetting resolution");
+            LogHelper.Debug(typeof(Resolution), "Resetting resolution");
 
-            _isFrozen = false;
+            using (new WriteLock(ConfigurationLock))
+            {
+                _isFrozen = false;
+            }
             Frozen = null;
         }
 	}
