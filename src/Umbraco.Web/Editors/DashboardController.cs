@@ -1,25 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Web.Http;
-using System.Web.Http.Controllers;
-using System.Web.Http.ModelBinding;
-using AutoMapper;
-using Newtonsoft.Json;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Services;
+﻿using System.Collections.Generic;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi;
 using System.Linq;
-using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Models;
-using Umbraco.Web.WebApi.Filters;
-
-using Constants = Umbraco.Core.Constants;
-
 using System.Xml;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.Editors
 {
@@ -32,185 +18,61 @@ namespace Umbraco.Web.Editors
 
         public IEnumerable<Tab<DashboardControl>> GetDashboard(string section)
         {
-            return GetDashboardFromXml(section);
-
-            //return Mapper.Map<EntityBasic>(Services.EntityService.Get(id, UmbracoObjectTypes.Document));
-        }
-
-        //TODO migrate this into a more managed class
-        private IEnumerable<Tab<DashboardControl>> GetDashboardFromXml(string section)
-        {
-
-            XmlDocument dashBoardXml = new XmlDocument();
-            dashBoardXml.Load(IOHelper.MapPath(SystemFiles.DashboardConfig));
-            var user = UmbracoContext.Security.CurrentUser;
             var tabs = new List<Tab<DashboardControl>>();
 
-            // test for new tab interface
-            foreach (XmlNode dashboard in dashBoardXml.DocumentElement.SelectNodes("//section [areas/area = '" + section.ToLower() + "']"))
+            var dashboardSection = UmbracoConfig.For.DashboardSettings()
+                                                .Sections.FirstOrDefault(x => x.Area.InvariantEquals(section));
+            
+            //if we cannot find it for whatever reason just return an empty one.
+            if (dashboardSection == null)
             {
-                if (dashboard != null)
+                return tabs;
+            }
+
+            //we need to validate access to this section
+            if (DashboardSecurity.AuthorizeAccess(dashboardSection, Security.CurrentUser, Services.SectionService) == false)
+            {
+                //return empty collection
+                return tabs;
+            }
+
+            var i = 1;
+            foreach (var dashTab in dashboardSection.Tabs)
+            {
+                //we need to validate access to this tab
+                if (DashboardSecurity.AuthorizeAccess(dashTab, Security.CurrentUser, Services.SectionService))
                 {
-                    var i = 0;
-
-                    foreach (XmlNode entry in dashboard.SelectNodes("./tab"))
+                    var props = new List<DashboardControl>();
+                    
+                    foreach (var dashCtrl in dashTab.Controls)
                     {
-
-                        if (ValidateAccess(entry, user))
+                        if (DashboardSecurity.AuthorizeAccess(dashCtrl, Security.CurrentUser, Services.SectionService))
                         {
-                            i++;
-
-                            Tab<DashboardControl> tab = new Tab<DashboardControl>();
-                            tab.Label = entry.Attributes.GetNamedItem("caption").Value;
-                            var props = new List<DashboardControl>();
-                            tab.Id = i;
-                            tab.Alias = tab.Label.ToLower().Replace(" ", "_");
-                            tab.IsActive = i == 1;
-
-                            foreach (XmlNode uc in entry.SelectNodes("./control"))
+                            var ctrl = new DashboardControl();
+                            var controlPath = dashCtrl.ControlPath.Trim(' ', '\r', '\n');
+                            ctrl.Path = IOHelper.FindFile(controlPath);
+                            if (controlPath.ToLower().EndsWith(".ascx"))
                             {
-                                if (ValidateAccess(uc, user))
-                                {
-                                    DashboardControl ctrl = new DashboardControl();
-                                    
-                                    string control = Core.XmlHelper.GetNodeValue(uc).Trim(' ', '\r', '\n');
-                                    ctrl.Path = IOHelper.FindFile(control);
-                                    if (control.ToLower().EndsWith(".ascx"))
-                                        ctrl.ServerSide = true;
-
-                                    props.Add(ctrl);
-                                    
-                                    /*
-                                    try
-                                    {
-                                        Control c = LoadControl(path);
-
-                                        // set properties
-                                        Type type = c.GetType();
-                                        if (type != null)
-                                        {
-                                            foreach (XmlAttribute att in uc.Attributes)
-                                            {
-                                                string attributeName = att.Name;
-                                                string attributeValue = parseControlValues(att.Value).ToString();
-                                                // parse special type of values
-
-
-                                                PropertyInfo prop = type.GetProperty(attributeName);
-                                                if (prop == null)
-                                                {
-                                                    continue;
-                                                }
-
-                                                prop.SetValue(c, Convert.ChangeType(attributeValue, prop.PropertyType),
-                                                              null);
-
-                                            }
-                                        }
-
-                                        //resolving files from dashboard config which probably does not map to a virtual fi
-                                        tab.Controls.Add(AddPanel(uc, c));
-                                    }
-                                    catch (Exception ee)
-                                    {
-                                        tab.Controls.Add(
-                                            new LiteralControl(
-                                                "<p class=\"umbracoErrorMessage\">Could not load control: '" + path +
-                                                "'. <br/><span class=\"guiDialogTiny\"><strong>Error message:</strong> " +
-                                                ee.ToString() + "</span></p>"));
-                                    }*/
-                                }
+                                ctrl.ServerSide = true;
                             }
-                            tab.Properties = props;
-                            tabs.Add(tab);
+                            props.Add(ctrl);
                         }
-
-
                     }
+
+                    tabs.Add(new Tab<DashboardControl>
+                    {
+                        Id = i,
+                        Alias = dashTab.Caption.ToSafeAlias(),
+                        IsActive = i == 1,
+                        Label = dashTab.Caption,
+                        Properties = props
+                    });
+                    i++;
                 }
-                
             }
 
             return tabs;
 
-        }
-
-
-        //TODO: This has to go away, jesus
-        //for now I'm just returning true, this is likely to change anyway
-        private bool ValidateAccess(XmlNode node, IUser currentUser)
-        {
-            return true;
-    
-            /*            
-            // check if this area should be shown at all
-            string onlyOnceValue = StateHelper.GetCookieValue(generateCookieKey(node));
-            if (!String.IsNullOrEmpty(onlyOnceValue))
-            {
-                return false;
-            }
-
-            // the root user can always see everything
-            if (currentUser.IsRoot())
-            {
-                return true;
-            }
-            else if (node != null)
-            {
-                XmlNode accessRules = node.SelectSingleNode("access");
-                bool retVal = true;
-                if (accessRules != null && accessRules.HasChildNodes)
-                {
-                    string currentUserType = CurrentUser.UserType.Alias.ToLowerInvariant();
-
-                    //Update access rules so we'll be comparing lower case to lower case always
-
-                    var denies = accessRules.SelectNodes("deny");
-                    foreach (XmlNode deny in denies)
-                    {
-                        deny.InnerText = deny.InnerText.ToLowerInvariant();
-                    }
-
-                    var grants = accessRules.SelectNodes("grant");
-                    foreach (XmlNode grant in grants)
-                    {
-                        grant.InnerText = grant.InnerText.ToLowerInvariant();
-                    }
-
-                    string allowedSections = ",";
-                    foreach (BusinessLogic.Application app in CurrentUser.Applications)
-                    {
-                        allowedSections += app.alias.ToLower() + ",";
-                    }
-                    XmlNodeList grantedTypes = accessRules.SelectNodes("grant");
-                    XmlNodeList grantedBySectionTypes = accessRules.SelectNodes("grantBySection");
-                    XmlNodeList deniedTypes = accessRules.SelectNodes("deny");
-
-                    // if there's a grant type, everyone who's not granted is automatically denied
-                    if (grantedTypes.Count > 0 || grantedBySectionTypes.Count > 0)
-                    {
-                        retVal = false;
-                        if (grantedBySectionTypes.Count > 0 && accessRules.SelectSingleNode(String.Format("grantBySection [contains('{0}', concat(',',.,','))]", allowedSections)) != null)
-                        {
-                            retVal = true;
-                        }
-                        else if (grantedTypes.Count > 0 && accessRules.SelectSingleNode(String.Format("grant [. = '{0}']", currentUserType)) != null)
-                        {
-                            retVal = true;
-                        }
-                    }
-                    // if the current type of user is denied we'll say nay
-                    if (deniedTypes.Count > 0 && accessRules.SelectSingleNode(String.Format("deny [. = '{0}']", currentUserType)) != null)
-                    {
-                        retVal = false;
-                    }
-
-                }
-
-                return retVal;
-            }
-            return false;
-             * */
         }
 
     }

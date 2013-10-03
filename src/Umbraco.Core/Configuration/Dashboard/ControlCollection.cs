@@ -4,7 +4,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.Dashboard
 {
-    internal class ControlCollection : ConfigurationElementCollection, IEnumerable<IControl>
+    internal class ControlCollection : ConfigurationElementCollection, IEnumerable<IDashboardControl>
     {
         internal void Add(ControlElement c)
         {
@@ -21,11 +21,11 @@ namespace Umbraco.Core.Configuration.Dashboard
             return ((ControlElement)element).ControlPath;
         }
 
-        IEnumerator<IControl> IEnumerable<IControl>.GetEnumerator()
+        IEnumerator<IDashboardControl> IEnumerable<IDashboardControl>.GetEnumerator()
         {
             for (var i = 0; i < Count; i++)
             {
-                yield return BaseGet(i) as IControl;
+                yield return BaseGet(i) as IDashboardControl;
             }
         }
 

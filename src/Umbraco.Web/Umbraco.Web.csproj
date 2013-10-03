@@ -308,6 +308,7 @@
     <Compile Include="Controllers\LoginStatusController.cs" />
     <Compile Include="Editors\ContentPostValidateAttribute.cs" />
     <Compile Include="Editors\DashboardController.cs" />
+    <Compile Include="Editors\DashboardSecurity.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\LogController.cs" />

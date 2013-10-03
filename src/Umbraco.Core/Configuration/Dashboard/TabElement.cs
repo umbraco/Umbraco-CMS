@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.Dashboard
 {
-    internal class TabElement : ConfigurationElement, ITab
+    internal class TabElement : ConfigurationElement, IDashboardTab
     {
         [ConfigurationProperty("caption", IsRequired = true)]
         public string Caption
@@ -25,12 +25,12 @@ namespace Umbraco.Core.Configuration.Dashboard
             set { base[""] = value; }
         }
         
-        IEnumerable<IControl> ITab.Controls
+        IEnumerable<IDashboardControl> IDashboardTab.Controls
         {
             get { return ControlCollection; }            
         }
 
-        IAccess ITab.AccessRights
+        IAccess IDashboardTab.AccessRights
         {
             get { return Access; }
         }

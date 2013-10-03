@@ -32,7 +32,7 @@ namespace Umbraco.Core.Configuration
         /// </summary>
         private UmbracoConfig()
         {
-            if (UmbracoSettings() == null)
+            if (_umbracoSettings == null)
             {
                 var umbracoSettings = ConfigurationManager.GetSection("umbracoConfiguration/settings") as IUmbracoSettingsSection;
                 if (umbracoSettings == null)
@@ -42,7 +42,7 @@ namespace Umbraco.Core.Configuration
                 SetUmbracoSettings(umbracoSettings);
             }
 
-            if (BaseRestExtensions() == null)
+            if (_baseRestExtensions == null)
             {
                 var baseRestExtensions = ConfigurationManager.GetSection("umbracoConfiguration/BaseRestExtensions") as IBaseRestSection;
                 if (baseRestExtensions == null)
@@ -50,6 +50,16 @@ namespace Umbraco.Core.Configuration
                     LogHelper.Warn<UmbracoConfig>("Could not load the " + typeof(IBaseRestSection) + " from config file!");
                 }
                 SetBaseRestExtensions(baseRestExtensions);
+            }
+
+            if (_dashboardSection == null)
+            {
+                var dashboardConfig = ConfigurationManager.GetSection("umbracoConfiguration/dashBoard") as IDashboardSection;
+                if (dashboardConfig == null)
+                {
+                    LogHelper.Warn<UmbracoConfig>("Could not load the " + typeof(IDashboardSection) + " from config file!");
+                }
+                SetDashboardSettings(dashboardConfig);
             }
         }
 

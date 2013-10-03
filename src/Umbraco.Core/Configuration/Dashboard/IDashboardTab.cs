@@ -2,11 +2,11 @@
 
 namespace Umbraco.Core.Configuration.Dashboard
 {
-    public interface ITab
+    public interface IDashboardTab
     {
         string Caption { get; }
 
-        IEnumerable<IControl> Controls { get; }
+        IEnumerable<IDashboardControl> Controls { get; }
 
         IAccess AccessRights { get; }
     }

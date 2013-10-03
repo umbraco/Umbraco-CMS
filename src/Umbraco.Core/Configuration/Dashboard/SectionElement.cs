@@ -31,7 +31,7 @@ namespace Umbraco.Core.Configuration.Dashboard
             set { base[""] = value; }
         }
 
-        IEnumerable<ITab> ISection.Tabs
+        IEnumerable<IDashboardTab> ISection.Tabs
         {
             get { return TabCollection; }            
         }

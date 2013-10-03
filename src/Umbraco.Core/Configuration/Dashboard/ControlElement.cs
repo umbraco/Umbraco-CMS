@@ -6,7 +6,7 @@ using System.Xml.Linq;
 namespace Umbraco.Core.Configuration.Dashboard
 {
     
-    internal class ControlElement : RawXmlConfigurationElement, IControl
+    internal class ControlElement : RawXmlConfigurationElement, IDashboardControl
     {
         public bool ShowOnce
         {
@@ -66,7 +66,7 @@ namespace Umbraco.Core.Configuration.Dashboard
         }
 
 
-        IAccess IControl.AccessRights
+        IAccess IDashboardControl.AccessRights
         {
             get { return Access; }
         }

@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Configuration.Dashboard
 {
-    public interface IControl
+    public interface IDashboardControl
     {
         bool ShowOnce { get; }
 
