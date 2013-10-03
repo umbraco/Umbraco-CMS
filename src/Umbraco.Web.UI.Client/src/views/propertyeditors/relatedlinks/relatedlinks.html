@@ -1,3 +1,40 @@
 ﻿<div class="umb-editor umb-relatedlinks" ng-controller="Umbraco.Editors.RelatedLinksController">
-    
+    <div class="row-fluid">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <td>Caption</td>
+                    <td>Link</td>
+                    <td>Open in new window</td>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="link in relatedLinks">
+                    <td>{{link.caption}}</td>
+                    <td><a href="{{link.link}}" target="_blank">{{link.link}}</a></td>
+                    <td>{{link.newWindow}} {{$index}}</td>
+                    <td>
+                       
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default">Edit</button>
+                            <button type="button" class="btn btn-default" ng-click="delete($index)">Delete</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <form ng-submit="add()">
+                    <td><input type="text" ng-model="newCaption" placeholder="Enter a new caption" required/></td>
+                    <td><input type="text" ng-model="newLink" placeholder="Enter the link" required/></td>
+                    <td><input type="checkbox" ng-model="newNewWindow"/> </td>
+                    <td>
+                        <div class="btn-group">
+                            <input type="submit" class="btn btn-default" value="Add"/>
+                        </div>
+                    </td>
+                    </form>
+                </tr>
+            </tbody>
+        </table>
+    </div>  
 </div>
