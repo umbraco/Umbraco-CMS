@@ -17,21 +17,41 @@ namespace Umbraco.Core
                throw new NullReferenceException("source");
 
             // enumerate the source only once!
-            var enumerator = source.GetEnumerator();
-
-            while (enumerator.MoveNext())
-                yield return EnumerateGroup(enumerator, groupSize);
+            return new InGroupsEnumerator<T>(source, groupSize).Groups();
         }
 
-        private static IEnumerable<T> EnumerateGroup<T>(IEnumerator<T> enumerator, int count)
+        // this class makes sure that the source is enumerated only ONCE
+        // which means that when it is enumerated, the actual groups content
+        // has to be evaluated at the same time, and stored in an array.
+        private class InGroupsEnumerator<T>
         {
-            var c = 1;
-            do
-            {
-                yield return enumerator.Current;
-            } while (c++ < count && enumerator.MoveNext());
-        }
+            private readonly IEnumerator<T> _source;
+            private readonly int _count;
+            private bool _mightHaveNext;
 
+            public InGroupsEnumerator(IEnumerable<T> source, int count)
+            {
+                _source = source.GetEnumerator();
+                _count = count;
+                _mightHaveNext = true;
+            }
+
+            public IEnumerable<IEnumerable<T>> Groups()
+            {
+                while (_mightHaveNext && _source.MoveNext())
+                    yield return Group().ToArray(); // see note above
+            }
+
+            private IEnumerable<T> Group()
+            {
+                var c = 0;
+                do
+                {
+                    yield return _source.Current;
+                } while (++c < _count && _source.MoveNext());
+                _mightHaveNext = c == _count;
+            }
+        }
 
         /// <summary>The distinct by.</summary>
         /// <param name="source">The source.</param>

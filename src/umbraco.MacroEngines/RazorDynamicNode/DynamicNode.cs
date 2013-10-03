@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Strings;
 using umbraco.interfaces;
 using System.Collections;
 using System.Reflection;
@@ -682,8 +683,8 @@ namespace umbraco.MacroEngines
             {
                 //if we cannot get with the current alias, try changing it's case
                 attempt = alias[0].IsUpperCase()
-                    ? getMember(alias.ConvertCase(StringAliasCaseType.CamelCase))
-                    : getMember(alias.ConvertCase(StringAliasCaseType.PascalCase));
+                    ? getMember(alias.ToCleanString(CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.CamelCase))
+                    : getMember(alias.ToCleanString(CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.PascalCase));
             }
 
             return attempt.Success ? attempt.Result : null;
