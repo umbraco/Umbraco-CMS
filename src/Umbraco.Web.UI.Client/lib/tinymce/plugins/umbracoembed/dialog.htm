@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>{#embed_dlg.title}</title>
+	<script type="text/javascript" src="../../../ui/jquery.js"></script>
+	<script type="text/javascript" src="../../tiny_mce_popup.js"></script>
+	<script type="text/javascript" src="js/dialog.js"></script>
+    <script type="text/javascript" src="../../utils/mctabs.js"></script>
+    <style>
+    #previewContainer
+    {
+        height:195px;
+        width:550px;
+        overflow:auto;
+    }
+    #source
+    {
+        width:99%;
+        height:270px;
+        
+    }
+    #url
+    {
+        width:400px;
+    }
+    .size
+    {
+        width:50px;
+    }
+    </style>
+</head>
+<body>
+
+    <form onsubmit="UmbracoEmbedDialog.insert();return false;" action="#">
+		<div class="tabs" role="presentation">
+			<ul>
+				<li id="general_tab" class="current" aria-controls="general_panel"><span><a href="javascript:mcTabs.displayTab('general_tab','general_panel');" onmousedown="return false;">{#embed_dlg.general}</a></span></li>
+				<li id="source_tab" aria-controls="source_panel"><span><a href="javascript:mcTabs.displayTab('source_tab','source_panel');" onmousedown="return false;">{#embed_dlg.source}</a></span></li>
+			</ul>
+		</div>    
+        <div class="panel_wrapper">
+            <div id="general_panel" class="panel current">
+            <fieldset>
+					<legend>{#embed_dlg.general}</legend>
+                    <table role="presentation" border="0" cellpadding="4" cellspacing="0">
+				        <tr>
+					        <td><label for="media_type">{#embed_dlg.url}</label></td>
+					        <td>
+						        <input type="text" id="url" onChange="UmbracoEmbedDialog.showPreview()"/>
+					        </td>
+				        </tr>
+                        <tr id="dimensions">
+                            <td><label for="width">{#embed_dlg.size}</label></td>
+							<td>
+								<table role="presentation" border="0" cellpadding="0" cellspacing="0">
+									<tr>
+										<td><input type="text" id="width" name="width" value="500" class="size" onchange="UmbracoEmbedDialog.changeSize('width');" onfocus="UmbracoEmbedDialog.beforeResize();"/> x <input type="text" id="height" name="height" value="300" class="size" onchange="UmbracoEmbedDialog.changeSize('height');" onfocus="UmbracoEmbedDialog.beforeResize();" /></td>
+										<td>&nbsp;&nbsp;<input id="constrain" type="checkbox" name="constrain" class="checkbox" checked="checked" /></td>
+										<td><label id="constrainlabel" for="constrain">{#embed_dlg.constrain_proportions}</label></td>
+									</tr>
+								</table>
+							</td>
+                        </tr>
+                    </table>
+
+            </fieldset>
+            <fieldset>
+					<legend>{#embed_dlg.preview}</legend>
+                     <div id="previewContainer">
+                        <div id="preview">
+                       
+                        </div>
+                    </div>
+            </fieldset>
+            </div>
+            <div id="source_panel" class="panel">
+                <fieldset>
+                    <legend>{#embed_dlg.source}</legend>
+                    <textarea id="source" onkeyup="UmbracoEmbedDialog.changeSource();" onchange="UmbracoEmbedDialog.updatePreviewFromSource();"></textarea>
+                </fieldset>
+            </div>
+        </div>    
+
+
+        <div class="mceActionPanel">
+            <input type="button" id="insert" name="insert" value="{#insert}" onclick="UmbracoEmbedDialog.insert();" disabled="disabled"/>
+            <input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
+        </div>
+    </form>
+
+</body>
+</html>
